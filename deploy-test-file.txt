@@ -1,0 +1,5 @@
+This is a test file uploaded by DeployHQ [www.deployhq.com] to test your
+server connection. This file can be safely removed if found although it
+should be removed automatically as part of our tests.
+
+If you have any questions, please contact support@deployhq.com.

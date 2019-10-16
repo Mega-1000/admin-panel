@@ -1,0 +1,9 @@
+.is-empty-info {
+    color: #c40804;
+}
+
+.is-empty-info select,
+.is-empty-info input{
+    border-color: #c40804;
+    border-width: 3px;
+}

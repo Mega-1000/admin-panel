@@ -1,0 +1,46 @@
+.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th {
+    vertical-align: middle;
+}
+
+#dataTable_paginate {
+    margin-bottom: 10px;
+}
+
+#dataTable {
+    width: 100% !important;
+}
+
+.dt-center .btn {
+    display: block;
+}
+
+@media (min-width: 1000px) {
+    .edit {
+        width: 100%;
+    }
+    .delete {
+        width: 100%;
+    }
+}
+
+.ck-editor__editable {
+    min-height: 500px;
+}
+
+.panel-body {
+    overflow: unset !important;
+}
+
+.table-responsive {
+    overflow-x: unset !important;
+}
+
+.table>tfoot>tr>th,
+.table>thead>tr>th, #dataTable_info,
+.table>thead>tr>th, .dataTables_paginate ,
+.panel-body ,
+.table ,
+.form-control ,
+#dataTable > tbody > tr {
+    color: black !important;
+}
