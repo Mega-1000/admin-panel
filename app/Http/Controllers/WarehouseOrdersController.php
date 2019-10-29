@@ -116,6 +116,7 @@ class WarehouseOrdersController extends Controller
             'comments_for_warehouse' => $request->input('comments_for_warehouse'),
             'warehouse_comments' => $request->input('warehouse_comment'),
         ], $id);
+        dd($request->all());
         foreach ($request->input('itemPrice') as $key => $value) {
             $this->warehouseOrdersItemsRepository->update([
                 'price' => $value,
@@ -135,6 +136,7 @@ class WarehouseOrdersController extends Controller
     public function makeOrder(Request $request) 
     {
         $products = json_decode($request->input('products'));
+
         foreach($products as $product) {
             foreach($product as $key => $value) {
                 if($value->warehouse != null) {
@@ -211,6 +213,7 @@ class WarehouseOrdersController extends Controller
             'order_id' => $warehouseOrder->id,
             'type' => 'INVOICE_ADDRESS'
         ]);
+
         return route('orders.edit', $warehouseOrder->id);
     }
 

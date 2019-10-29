@@ -365,7 +365,6 @@ class Jas
         }
 
         $result = $this->client->__getLastResponse();
-
         $exp = explode('<Status_Text>', $result);
         $data = explode('</Status_Text', $exp[1]);
         $status = $data[0];

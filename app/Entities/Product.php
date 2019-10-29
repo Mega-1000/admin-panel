@@ -26,6 +26,7 @@ class Product extends Model implements Transformable
         'name',
         'multiplier_of_the_number_of_pieces',
         'url',
+        'url_for_website',
         'weight_trade_unit',
         'weight_collective_unit',
         'weight_biggest_unit',
@@ -79,7 +80,9 @@ class Product extends Model implements Transformable
         'quality',
         'quality_to_price',
         'comments',
-        'value_of_the_order_for_free_transport'
+        'value_of_the_order_for_free_transport',
+        'show_on_page',
+        'token_prod_cat',
     ];
 
     public $customColumnsVisibilities = [
@@ -138,7 +141,8 @@ class Product extends Model implements Transformable
         'discount1',
         'discount2',
         'discount3',
-
+        'show_on_page,',
+        'token_prod_cat',
     ];
 
     /**

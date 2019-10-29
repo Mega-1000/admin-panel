@@ -28,14 +28,6 @@ class OrderUpdateRequest extends FormRequest
             'warehouse_cost' => 'nullable|regex:/^\d*(\.\d{2})?$/',
             'additional_service_cost' => 'nullable|regex:/^-?\d*(\.\d{2})?$/',
             'correction_amount' => 'nullable|regex:/^\d*(\.\d{2})?$/',
-            'id' => 'required|array|min:1',
-        ];
-    }
-
-    public function messages()
-    {
-        return [
-            'id.required' => 'Musisz wybrać chociaż jeden produkt',
         ];
     }
 }

@@ -57,9 +57,4 @@ class Task extends Model implements Transformable
         return $this->hasOne(TaskTime::class);
     }
 
-    public function reportProperty()
-    {
-        return $this->hasMany(ReportProperty::class);
-    }
-
 }

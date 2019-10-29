@@ -244,10 +244,6 @@
                 <textarea rows="5" cols="40"  class="form-control" id="warehouse_notice" name="warehouse_notice">{{ $order->warehouse_notice ?? ''}}</textarea>
             </div>
             <div class="form-group" style="width: 50%; float: left; padding: 5px;">
-                <label for="warehouse_notice">Informacje dla spedycji</label>
-                <textarea rows="5" cols="40"  class="form-control" id="spedition_comment" name="spedition_comment">{{ $order->spedition_comment ?? ''}}</textarea>
-            </div>
-            <div class="form-group" style="width: 50%; float: left; padding: 5px;">
                 <label for="consultant_notice">@lang('orders.form.consultant_notice')</label>
                 <textarea rows="5" cols="40" type="text" class="form-control" id="consultant_notice" name="consultant_notice">{{ $order->consultant_notice ?? ''}}</textarea>
             </div>
@@ -630,16 +626,10 @@
                                    class="form-control price change-order quantityChange" id="quantity_commercial[{{$item->id}}]">
                         </td>
                         <td colspan="3">
-                            @php
-                                $quantityAll = 0;
-                            @endphp
+                            Ilość wszystkich: {{ $item->realProduct() }} <br/>
                             @foreach($item->realProductPositions() as $position)
                                 <p>Pozycja: {{ $position->lane }} {{ $position->bookstand }} {{ $position->shelf }} {{ $position->position }} Ilość na pozycji: {{ $position->position_quantity }}</p>
-                                @php
-                                    $quantityAll += $position->position_quantity;
-                                @endphp
                             @endforeach
-                                Ilość wszystkich: {{ $quantityAll }} <br/>
                         </td>
                     </tr>
                     <tr class="row-{{$item->id}}">
@@ -881,7 +871,6 @@
                                     Przydziel
                                 </button>
                             @endif
-                            <a href="{{ route('payments.edit', ['id' => $payment->id]) }}" class="btn btn-info">Edytuj</a>
                             <a href="{{ route('payments.destroy', ['id' => $payment->id]) }}" class="btn btn-danger">Usuń</a>
                         </td>
                     </tr>
@@ -1086,22 +1075,6 @@
     <div class="order-messages" id="order-messages">
         <div class="panel panel-bordered">
             <div class="panel-body">
-                @if(!empty($emails))
-                    @foreach($emails as $email)
-                        <div style="display: inline-block;">
-                            <img src="https://purepng.com/public/uploads/large/purepng.com-mail-iconsymbolsiconsapple-iosiosios-8-iconsios-8-721522596075clftr.png" alt="" style="width: 50px; height: 50px;">
-                            <div style="
-    display: inline-block;
-">
-                                <span>{{ str_replace('+0100', '', $email->timestamp) }}</span>
-
-                                <a href="{{ Storage::url('mails/' . $email->path) }}" style="display: block;">Ściągnij</a>
-                            </div>
-
-                        </div>
-                    @endforeach
-                @endif
-                    <hr>
                 @foreach($messages as $message)
                     @switch($message->type)
                         @case('GENERAL')
@@ -1200,11 +1173,6 @@
                                         </button>
                                         <form id="splitOrders" action="{{ action('OrdersController@splitOrders')}}" method="post">
                                             {{ csrf_field() }}
-                                            <div>
-                                                <label for="splitAndUpdate">Wydziel produkty do nowych zamówień i zaktualizuj zlecenie główne</label>
-                                                <input type="checkbox" name="splitAndUpdate">
-                                            </div>
-
                                             <input type="hidden" value="{{ $order->id }}" name="orderId">
                                             <table id="productsTable" class="table table1 table-venice-blue" style="width: 100%;">
                                                 <tbody id="products-tbody">
@@ -3635,9 +3603,4 @@
                     </script>
 
      <script src="{{ URL::asset('js/views/orders/edit.js') }}"></script>
-                        <style>
-                            .firstOrder, .secondOrder, .thirdOrder, .fourthOrder, .fifthOrder {
-                                display: none;
-                            }
-                        </style>
 @endsection

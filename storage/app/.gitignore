@@ -1,0 +1,4 @@
+*
+!public/
+!order-mails/
+!.gitignore

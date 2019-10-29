@@ -2638,8 +2638,8 @@ class ElektronicznyNadawca extends SoapClient {
                 $options['classmap'][$key] = '\App\Integrations\Pocztex'.'\\'.$value;
             }
         }
-        $options["login"] = 'ebudownictwo@wp.pl';
-        $options["password"] = 'Mega201909';
+        $options["login"] = 'paletymega';
+        $options["password"] = 'Mega201905';
         $options["trace"] = 1;
 
         parent::__construct($wsdl, $options);

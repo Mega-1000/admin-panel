@@ -4,12 +4,9 @@ namespace App\Jobs;
 
 use App\Entities\Order;
 use App\Jobs\Orders\ChangeWarehouseStockJob;
-use App\Mail\ConfirmData;
-use App\Mail\DifferentCustomerData;
 use App\Repositories\LabelRepository;
 use App\Repositories\OrderRepository;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class RemoveLabelJob extends Job
 {
@@ -58,17 +55,7 @@ class RemoveLabelJob extends Job
             }
 
             if($labelId == 74) {
-                $noData = DB::table('gt_invoices')->where('order_id', $this->order->id)->where('gt_invoice_status_id', '13')->first();
-                if(!empty($noData)) {
-                    \Mailer::create()
-                        ->to($this->order->customer->login)
-                        ->send(new DifferentCustomerData('Wybór danych do wystawienia faktury - zlecenie' . $this->order->id, $this->order->id, $noData->id));
-                } else {
-                    \Mailer::create()
-                        ->to($this->order->customer->login)
-                        ->send(new ConfirmData('Wybór danych do wystawienia faktury  - zlecenie' . $this->order->id, $this->order->id));
-                }
-
+                dispatch_now(new ValidateSubiekt($this->order->id));
             }
 
             $label = $labelRepository->find($labelId);

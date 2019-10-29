@@ -21,7 +21,7 @@ class Category extends Model implements Transformable
      * @var array
      */
     protected $fillable = [
-        'name', 'status', 'url'
+        'name', 'status', 'url',
     ];
 
     /**

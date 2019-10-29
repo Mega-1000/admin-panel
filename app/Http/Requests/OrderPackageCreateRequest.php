@@ -39,14 +39,13 @@ class OrderPackageCreateRequest extends FormRequest
             'shape' => 'nullable',
             'sending_number' => 'nullable',
             'letter_number' => 'nullable',
-            'cash_on_delivery' => 'nullable',
+            'cash_on_delivery' => 'nullable|regex:/^\d*(\.\d{2})?$/',
             'status' => 'required|in:NEW',
             'cost_for_client' => 'nullable|regex:/^\d*(\.\d{2})?$/',
             'cost_for_company' => 'nullable|regex:/^\d*(\.\d{2})?$/',
             'real_cost_for_company' => 'nullable|regex:/^\d*(\.\d{2})?$/',
             'chosen_data_template' => 'nullable',
-            'content' => 'required',
-            'toCheck' => 'nullable',
+            'content' => 'required'
         ];
     }
 }

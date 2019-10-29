@@ -77,7 +77,8 @@ class OrderItem extends Model implements Transformable
         } else {
             $variable = $productName;
         }
-	$product =  DB::table('products')->where('symbol', 'LIKE', $variable)->first();
+
+        $product =  DB::table('products')->where('symbol', 'LIKE', '%' . $variable . '%')->first();
         $stock = DB::table('product_stocks')->where('product_id', '=', $product->id)->first();
         $positions = DB::table('product_stock_positions')->where('product_stock_id', '=', $stock->id)->get();
 

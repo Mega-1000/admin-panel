@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Class ImportController
@@ -32,7 +34,7 @@ class ImportController extends Controller
         $import = DB::table('import')->where('id', '=', 1)->where('processing', '=', true)->first();
 
         if ($import === null) {
-            dispatch(new ImportCsvFileJob(5))->onConnection('database');
+            dispatch(new ImportCsvFileJob())->onConnection('database');
             dispatch(new ImportCsvFileJob(11000))->onConnection('database');
             dispatch(new ImportCsvFileJob(18000))->onConnection('database');
 
@@ -52,5 +54,19 @@ class ImportController extends Controller
                 'error' => false
             ]);
         }
+    }
+
+    public function store(Request $request) {
+        // cache the file
+        $file = $request->file('importFile');
+
+        if (File::exists(public_path('Baza.csv'))) {
+            File::delete(public_path('Baza.csv'));
+        }
+        $disk = Storage::disk();
+
+        $disk->put('/public/Baza.csv', fopen($file, 'r+'));
+
+        return redirect('/admin/import');
     }
 }

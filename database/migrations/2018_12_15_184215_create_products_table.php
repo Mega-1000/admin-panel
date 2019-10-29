@@ -56,6 +56,7 @@ class CreateProductsTable extends Migration
             $table->string('product_url')->nullable()->comment('url_kat1 + url_kat2 + url_kat3 + url_kat4 + url_kat5 ze starej bazy');
             $table->string('product_group')->nullable()->comment('Grupowanie produktów dla przestawienia oferty[wariacji]');//???
             $table->dateTime('price_change_date')->nullable()->comment('Data zmiany ceny dla produktu potrzebna do przypomnienia fabryce o konieczności zmiany ceny');
+            $table->string('url_for_website')->nullable()->comment('Url do zdjec po translacji na sciezke serwerowa a nie lokalna');
             $table->timestamps();
 
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');

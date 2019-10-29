@@ -22,7 +22,7 @@ class OrderMessage extends Model implements Transformable
      * @var array
      */
     protected $fillable = [
-        'order_id', 'employee_id', 'title', 'message', 'additional_description', 'type', 'source', 'status', 'user_id', 'timestamp'
+        'order_id', 'employee_id', 'title', 'message', 'additional_description', 'type', 'source', 'status', 'user_id'
     ];
 
     /**

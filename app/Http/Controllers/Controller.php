@@ -9,6 +9,8 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use TCG\Voyager\Facades\Voyager;
+use TCG\Voyager\Models\Menu;
 
 /**
  * Class Controller
@@ -50,5 +52,9 @@ class Controller extends BaseController
             'quantity' => $quantity[1],
             'user_id' => $userId
         ]);
+    }
+    public function test() {
+        Menu::display('main');
+        Voyager::setting('site.title');
     }
 }

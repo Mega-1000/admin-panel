@@ -13,7 +13,6 @@ use App\Repositories\CustomerRepository;
 use App\Repositories\OrderPaymentRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentRepository;
-use App\Repositories\OrderPackageRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -49,26 +48,19 @@ class OrdersPaymentsController extends Controller
     protected $customerRepository;
 
     /**
-     * @var OrderPackageRepository
-     */
-    protected $orderPackageRepository;
-
-    /**
      * OrderPaymentController constructor.
      *
      * @param OrderPaymentRepository $repository
      * @param OrderRepository $orderRepository
      * @param PaymentRepository $paymentRepository
      * @param CustomerRepository $customerRepository
-     * @param OrderPackageRepository $orderPackageRepository
      */
-    public function __construct(OrderPaymentRepository $repository, OrderRepository $orderRepository, PaymentRepository $paymentRepository, CustomerRepository $customerRepository, OrderPackageRepository $orderPackageRepository)
+    public function __construct(OrderPaymentRepository $repository, OrderRepository $orderRepository, PaymentRepository $paymentRepository, CustomerRepository $customerRepository)
     {
         $this->repository = $repository;
         $this->orderRepository = $orderRepository;
         $this->paymentRepository = $paymentRepository;
         $this->customerRepository = $customerRepository;
-        $this->orderPackageRepository = $orderPackageRepository;
     }
 
 
@@ -143,8 +135,7 @@ class OrdersPaymentsController extends Controller
             'notices' => $request->input('notices'),
             'promise' => $promise,
             'promise_date' => $request->input('promise_date'),
-            'order_id' => $order_id,
-            'created_at' => $request->input('created_at')
+            'order_id' => $order_id
         ], $id);
 
         $this->dispatchLabelsForPaymentAmount($payment);
@@ -234,30 +225,17 @@ class OrdersPaymentsController extends Controller
         ])->withInput(['tab' => 'orderPayments']);
     }
 
-    public function storeFromImport($orderId, $amount, $date)
+    public function storeFromImport($orderId, $amount)
     {
-        if($date == null) {
-            $date = \Carbon\Carbon::now();
-        }
-        $globalAmount = $amount;
-        if(strlen($orderId) > 10) {
-            $orderPackage = $this->orderPackageRepository->findWhere(['letter_number' => $orderId])->first();
-            if(!empty($orderPackage)) {
-                $orderId = $orderPackage->order_id;
-                $order = $this->orderRepository->findWhere(['id' => $orderId])->first();
-            } else {
-                return false;
-            }
-        }
-        elseif (strlen($orderId) > 4 && strlen($orderId) < 10) {
+        if (strlen($orderId) > 4) {
             $order = $this->orderRepository->findWhere(['id_from_front_db' => $orderId])->first();
             $orderId = $order->id;
-        } elseif (strlen($orderId) < 5) {
+        } else {
             $order = $this->orderRepository->find($orderId);
         }
         /////// połączone
         $connectedOrders = $this->orderRepository->findWhere(['master_order_id' => $order->id]);
-        if($connectedOrders->count() > 0) {
+        if(!empty($connectedOrders)) {
             $hasGroupPromisePayment = false;
             $hasGroupBookedPayment = false;
 
@@ -269,12 +247,8 @@ class OrdersPaymentsController extends Controller
                     $hasGroupBookedPayment = true;
                 }
             }
-            if($order->hasPromisePayments() > 0) {
-                $hasGroupPromisePayment = true;
-            }
-            if($order->hasBookedPayments() > 0) {
-                $hasGroupBookedPayment = true;
-            }
+
+
             if($hasGroupPromisePayment == true) {
                 $orderGroupPromisePaymentSum = 0;
                 foreach ($connectedOrders as $connectedOrder) {
@@ -299,14 +273,12 @@ class OrdersPaymentsController extends Controller
                                             'amount' => $amount,
                                             'amount_left' => $amount,
                                             'customer_id' => $order->customer_id,
-                                            'created_at' => $date
                                         ]);
                                         $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
 
                                         $payment = $this->repository->create([
                                             'amount' => $connectedOrder->getSumOfGrossValues(),
                                             'order_id' => $connectedOrder->id,
-                                            'master_payment_id' => $globalPayment->id,
                                             'promise' => '',
                                         ]);
                                     } else {
@@ -318,62 +290,12 @@ class OrdersPaymentsController extends Controller
                                         $payment = $this->repository->create([
                                             'amount' => $connectedOrder->getSumOfGrossValues(),
                                             'order_id' => $connectedOrder->id,
-                                            'master_payment_id' => $globalPayment->id,
                                             'promise' => '',
                                         ]);
                                     }
 
                                     $this->dispatchLabelsForPaymentAmount($payment);
                                     dispatch_now(new AddLabelJob($connectedOrder->id, [130]));
-                                    if ($payment != null && $order->status_id != 5) {
-                                        $this->orderRepository->update([
-                                            'status_id' => 5,
-                                        ], $orderId);
-                                    }
-                                    dispatch_now(new MissingDeliveryAddressSendMailJob($orderId));
-                                }
-                            }
-                        } else {
-                            foreach ($order->promisePayments() as $promisePayment) {
-                                if (empty($this->repository->findWhere([
-                                    'amount' => $promisePayment->amount,
-                                    'order_id' => $order->id,
-                                    'promise' => '',
-                                ])->first())) {
-                                    if(empty($this->paymentRepository->findWhere([
-                                        'amount' => $amount,
-                                        'customer_id' => $order->customer_id,
-                                    ])->first())) {
-                                        $globalPayment = $this->paymentRepository->create([
-                                            'amount' => $amount,
-                                            'amount_left' => $amount,
-                                            'customer_id' => $order->customer_id,
-                                            'created_at' => $date
-                                        ]);
-                                        $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
-
-                                        $payment = $this->repository->create([
-                                            'amount' => $globalPayment->amount,
-                                            'order_id' => $order->id,
-                                            'master_payment_id' => $globalPayment->id,
-                                            'promise' => '',
-                                        ]);
-                                    } else {
-                                        $globalPayment = $this->paymentRepository->findWhere([
-                                            'amount' => $amount,
-                                            'customer_id' => $order->customer_id,
-                                        ])->first();
-                                        $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
-                                        $payment = $this->repository->create([
-                                            'amount' => $order->getSumOfGrossValues(),
-                                            'order_id' => $order->id,
-                                            'master_payment_id' => $globalPayment->id,
-                                            'promise' => '',
-                                        ]);
-                                    }
-
-                                    $this->dispatchLabelsForPaymentAmount($payment);
-                                    dispatch_now(new AddLabelJob($order->id, [130]));
                                     if ($payment != null && $order->status_id != 5) {
                                         $this->orderRepository->update([
                                             'status_id' => 5,
@@ -419,37 +341,12 @@ class OrdersPaymentsController extends Controller
                                     'promise' => '',
                                 ])->first())) {
 
-                                    if(empty($this->paymentRepository->findWhere([
-                                        'amount' => $amount,
-                                        'customer_id' => $order->customer_id,
-                                    ])->first())) {
-                                        $globalPayment = $this->paymentRepository->create([
-                                            'amount' => $amount,
-                                            'amount_left' => $amount,
-                                            'customer_id' => $order->customer_id,
-                                            'created_at' => $date
-                                        ]);
-                                        $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
-
-                                        $payment = $this->repository->create([
-                                            'amount' => $connectedOrder->getSumOfGrossValues(),
-                                            'order_id' => $connectedOrder->id,
-                                            'master_payment_id' => $globalPayment->id,
-                                            'promise' => '',
-                                        ]);
-                                    } else {
-                                        $globalPayment = $this->paymentRepository->findWhere([
-                                            'amount' => $amount,
-                                            'customer_id' => $order->customer_id,
-                                        ])->first();
-                                        $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
-                                        $payment = $this->repository->create([
-                                            'amount' => $connectedOrder->getSumOfGrossValues(),
-                                            'order_id' => $connectedOrder->id,
-                                            'master_payment_id' => $globalPayment->id,
-                                            'promise' => '',
-                                        ]);
-                                    }
+                                    $payment = $this->repository->create([
+                                        'amount' => $promisePayment->amount,
+                                        'order_id' => $connectedOrder->id,
+                                        'promise' => '',
+                                    ]);
+                                    $amount = $amount - $promisePayment->amount;
 
                                     $this->dispatchLabelsForPaymentAmount($payment);
 
@@ -477,7 +374,6 @@ class OrdersPaymentsController extends Controller
                         $payment = $this->repository->create([
                             'amount' => $amount,
                             'order_id' => $orderId,
-                            'master_payment_id' => $globalPayment->id,
                             'promise' => '',
                         ]);
                     } else {
@@ -489,7 +385,6 @@ class OrdersPaymentsController extends Controller
                         $payment = $this->repository->create([
                             'amount' => $amount,
                             'order_id' => $orderId,
-                            'master_payment_id' => $globalPayment->id,
                             'promise' => '',
                         ]);
                     }
@@ -498,300 +393,7 @@ class OrdersPaymentsController extends Controller
             }
 
             if($hasGroupBookedPayment == true) {
-                $ordersSum = 0;
-                foreach($connectedOrders as $connectedOrder) {
-                    $ordersSum += $connectedOrder->getSumOfGrossValues();
-                }
-                $ordersSum += $order->getSumOfGrossValues();
-                if((float)$ordersSum == (float)$amount) {
-                    foreach($connectedOrders as $connectedOrder) {
-                        if (empty($this->repository->findWhere([
-                            'amount' => $connectedOrder->getSumOfGrossValues(),
-                            'order_id' => $connectedOrder->id,
-                            'promise' => '',
-                        ])->first())) {
-                            if(empty($this->paymentRepository->findWhere([
-                                'amount' => $amount,
-                                'customer_id' => $order->customer_id,
-                            ])->first())) {
-                                $globalPayment = $this->paymentRepository->create([
-                                    'amount' => $amount,
-                                    'amount_left' => $amount,
-                                    'customer_id' => $order->customer_id,
-                                ]);
-                                $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
 
-                                $payment = $this->repository->create([
-                                    'amount' => $connectedOrder->getSumOfGrossValues(),
-                                    'order_id' => $connectedOrder->id,
-                                    'master_payment_id' => $globalPayment->id,
-                                    'promise' => '',
-                                ]);
-                            } else {
-                                $globalPayment = $this->paymentRepository->findWhere([
-                                    'amount' => $amount,
-                                    'customer_id' => $order->customer_id,
-                                ])->first();
-                                $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
-                                $payment = $this->repository->create([
-                                    'amount' => $connectedOrder->getSumOfGrossValues(),
-                                    'order_id' => $connectedOrder->id,
-                                    'master_payment_id' => $globalPayment->id,
-                                    'promise' => '',
-                                ]);
-                            }
-
-                            dispatch_now(new AddLabelJob($connectedOrder->id, [40]));
-                        }
-                    }
-
-                    if (empty($this->repository->findWhere([
-                        'amount' => $order->getSumOfGrossValues(),
-                        'order_id' => $order->id,
-                        'promise' => '',
-                    ])->first())) {
-                        if(empty($this->paymentRepository->findWhere([
-                            'amount' => $amount,
-                            'customer_id' => $order->customer_id,
-                        ])->first())) {
-                            $globalPayment = $this->paymentRepository->create([
-                                'amount' => $amount,
-                                'amount_left' => $amount,
-                                'customer_id' => $order->customer_id,
-                            ]);
-                            $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
-
-                            $payment = $this->repository->create([
-                                'amount' => $amount,
-                                'order_id' => $orderId,
-                                'master_payment_id' => $globalPayment->id,
-                                'promise' => '',
-                            ]);
-                        } else {
-                            $globalPayment = $this->paymentRepository->findWhere([
-                                'amount' => $amount,
-                                'customer_id' => $order->customer_id,
-                            ])->first();
-                            $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
-                            $payment = $this->repository->create([
-                                'amount' => $amount,
-                                'order_id' => $orderId,
-                                'master_payment_id' => $globalPayment->id,
-                                'promise' => '',
-                            ]);
-                        }
-
-                        dispatch_now(new RemoveLabelJob($order->id, [40]));
-                        dispatch_now(new DispatchLabelEventByNameJob($order->id, "payment-received"));
-                    }
-                    return ['orderId' => $orderId, 'amount' => $amount,  'info' => 'Zlecenie zostało pomyślnie utworzone.'];
-                }
-
-                if((float)$ordersSum > (float)$amount) {
-                    if (empty($this->repository->findWhere([
-                        'amount' => $order->getSumOfGrossValues(),
-                        'order_id' => $order->id,
-                        'promise' => '',
-                    ])->first())) {
-                        if(empty($this->paymentRepository->findWhere([
-                            'amount' => $globalAmount,
-                            'customer_id' => $order->customer_id,
-                        ])->first())) {
-                            $globalPayment = $this->paymentRepository->create([
-                                'amount' => $globalAmount,
-                                'amount_left' => $globalAmount,
-                                'customer_id' => $order->customer_id,
-                            ]);
-                            $globalPayment->update(['amount_left' => $globalPayment->amount - $order->toPay()]);
-                            if($order->toPay() < $amount) {
-                                $amount = $amount - $order->toPay();
-                                $payment = $this->repository->create([
-                                    'amount' => $order->toPay(),
-                                    'order_id' => $orderId,
-                                    'promise' => '',
-                                    'master_payment_id' => $globalPayment->id
-                                ]);
-                            } else {
-                                $payment = $this->repository->create([
-                                    'amount' => $amount,
-                                    'order_id' => $orderId,
-                                    'promise' => '',
-                                    'master_payment_id' => $globalPayment->id
-                                ]);
-                                $amount = 0;
-                            }
-                        }
-
-                        dispatch_now(new RemoveLabelJob($order->id, [40]));
-                        dispatch_now(new DispatchLabelEventByNameJob($order->id, "payment-received"));
-                    }
-                    foreach($connectedOrders as $connectedOrder) {
-                        if($amount >= $connectedOrder->toPay()) {
-                            if (empty($this->repository->findWhere([
-                                'amount' => $connectedOrder->getSumOfGrossValues(),
-                                'order_id' => $connectedOrder->id,
-                                'promise' => '',
-                            ])->first())) {
-                                if(empty($this->paymentRepository->findWhere([
-                                    'amount' => $amount,
-                                    'customer_id' => $order->customer_id,
-                                ])->first())) {
-                                    $globalPayment = $this->paymentRepository->create([
-                                        'amount' => $amount,
-                                        'amount_left' => $amount,
-                                        'customer_id' => $order->customer_id,
-                                    ]);
-                                    $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
-
-                                    $payment = $this->repository->create([
-                                        'amount' => $connectedOrder->getSumOfGrossValues(),
-                                        'order_id' => $connectedOrder->id,
-                                        'master_payment_id' => $globalPayment->id,
-                                        'promise' => '',
-                                    ]);
-                                } else {
-                                    $globalPayment = $this->paymentRepository->findWhere([
-                                        'amount' => $amount,
-                                        'customer_id' => $order->customer_id,
-                                    ])->first();
-                                    $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
-                                    $payment = $this->repository->create([
-                                        'amount' => $connectedOrder->getSumOfGrossValues(),
-                                        'order_id' => $connectedOrder->id,
-                                        'master_payment_id' => $globalPayment->id,
-                                        'promise' => '',
-                                    ]);
-                                }
-
-                                dispatch_now(new AddLabelJob($connectedOrder->id, [40]));
-                            }
-                        } else {
-                            if (empty($this->repository->findWhere([
-                                'amount' => $connectedOrder->getSumOfGrossValues(),
-                                'order_id' => $connectedOrder->id,
-                                'promise' => '',
-                            ])->first())) {
-                                if(empty($this->paymentRepository->findWhere([
-                                    'amount' => $globalAmount,
-                                    'customer_id' => $order->customer_id,
-                                ])->first())) {
-                                    $globalPayment = $this->paymentRepository->create([
-                                        'amount' => $amount,
-                                        'amount_left' => $globalAmount,
-                                        'customer_id' => $order->customer_id,
-                                    ]);
-                                    $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
-
-                                    $payment = $this->repository->create([
-                                        'amount' => $amount,
-                                        'order_id' => $connectedOrder->id,
-                                        'promise' => '',
-                                        'master_payment_id' => $globalPayment->id,
-                                    ]);
-                                } else {
-                                    $globalPayment = $this->paymentRepository->findWhere([
-                                        'amount' => $globalAmount,
-                                        'customer_id' => $order->customer_id,
-                                    ])->first();
-                                    $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
-                                    $payment = $this->repository->create([
-                                        'amount' => $amount,
-                                        'order_id' => $connectedOrder->id,
-                                        'master_payment_id' => $globalPayment->id,
-                                        'promise' => '',
-                                    ]);
-                                }
-
-                                dispatch_now(new AddLabelJob($connectedOrder->id, [40]));
-                            }
-                        }
-                    }
-                    return ['orderId' => $orderId, 'amount' => $globalAmount,  'info' => 'Zlecenie zostało pomyślnie utworzone.'];
-                }
-
-                if((float)$ordersSum < (float)$amount) {
-                    foreach($connectedOrders as $connectedOrder) {
-                        if (empty($this->repository->findWhere([
-                            'amount' => $connectedOrder->getSumOfGrossValues(),
-                            'order_id' => $connectedOrder->id,
-                            'promise' => '',
-                        ])->first())) {
-                            if(empty($this->paymentRepository->findWhere([
-                                'amount' => $amount,
-                                'customer_id' => $order->customer_id,
-                            ])->first())) {
-                                $globalPayment = $this->paymentRepository->create([
-                                    'amount' => $amount,
-                                    'amount_left' => $amount,
-                                    'customer_id' => $order->customer_id,
-                                ]);
-                                $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
-
-                                $payment = $this->repository->create([
-                                    'amount' => $connectedOrder->getSumOfGrossValues(),
-                                    'order_id' => $connectedOrder->id,
-                                    'promise' => '',
-                                    'master_payment_id' => $globalPayment->id,
-                                ]);
-                            } else {
-                                $globalPayment = $this->paymentRepository->findWhere([
-                                    'amount' => $amount,
-                                    'customer_id' => $order->customer_id,
-                                ])->first();
-                                $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
-                                $payment = $this->repository->create([
-                                    'amount' => $connectedOrder->getSumOfGrossValues(),
-                                    'order_id' => $connectedOrder->id,
-                                    'promise' => '',
-                                    'master_payment_id' => $globalPayment->id,
-                                ]);
-                            }
-
-                            dispatch_now(new RemoveLabelJob($connectedOrder->id, [40]));
-                        }
-                        $amount = $amount - $connectedOrder->getSumOfGrossValues();
-                    }
-
-                    if (empty($this->repository->findWhere([
-                        'amount' => $order->getSumOfGrossValues(),
-                        'order_id' => $order->id,
-                        'promise' => '',
-                    ])->first())) {
-                        if(empty($this->paymentRepository->findWhere([
-                            'amount' => $amount,
-                            'customer_id' => $order->customer_id,
-                        ])->first())) {
-                            $globalPayment = $this->paymentRepository->create([
-                                'amount' => $amount,
-                                'amount_left' => $amount,
-                                'customer_id' => $order->customer_id,
-                            ]);
-                            $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
-
-                            $payment = $this->repository->create([
-                                'amount' => $amount,
-                                'order_id' => $orderId,
-                                'promise' => '',
-                                'master_payment_id' => $globalPayment->id,
-                            ]);
-                        } else {
-                            $globalPayment = $this->paymentRepository->findWhere([
-                                'amount' => $amount,
-                                'customer_id' => $order->customer_id,
-                            ])->first();
-                            $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
-                            $payment = $this->repository->create([
-                                'amount' => $amount,
-                                'order_id' => $orderId,
-                                'promise' => '',
-                                'master_payment_id' => $globalPayment->id,
-                            ]);
-                        }
-                        dispatch_now(new RemoveLabelJob($order->id, [40]));
-                    }
-                    $amount = $amount - $order->getSumOfGrossValues();
-                    return ['orderId' => $orderId, 'amount' => $amount,  'info' => 'Zlecenie zostało pomyślnie utworzone.'];
-                }
             }
 
             if($hasGroupBookedPayment == false && $hasGroupPromisePayment == false) {
@@ -823,7 +425,6 @@ class OrdersPaymentsController extends Controller
                                     'amount' => $connectedOrder->getSumOfGrossValues(),
                                     'order_id' => $connectedOrder->id,
                                     'promise' => '',
-                                    'master_payment_id' => $globalPayment->id,
                                 ]);
                             } else {
                                 $globalPayment = $this->paymentRepository->findWhere([
@@ -835,11 +436,11 @@ class OrdersPaymentsController extends Controller
                                     'amount' => $connectedOrder->getSumOfGrossValues(),
                                     'order_id' => $connectedOrder->id,
                                     'promise' => '',
-                                    'master_payment_id' => $globalPayment->id,
                                 ]);
                             }
 
                             dispatch_now(new RemoveLabelJob($connectedOrder->id, [40]));
+                            dispatch_now(new DispatchLabelEventByNameJob($connectedOrder->id, "payment-received"));
                         }
                     }
 
@@ -863,7 +464,6 @@ class OrdersPaymentsController extends Controller
                                 'amount' => $amount,
                                 'order_id' => $orderId,
                                 'promise' => '',
-                                'master_payment_id' => $globalPayment->id,
                             ]);
                         } else {
                             $globalPayment = $this->paymentRepository->findWhere([
@@ -875,11 +475,11 @@ class OrdersPaymentsController extends Controller
                                 'amount' => $amount,
                                 'order_id' => $orderId,
                                 'promise' => '',
-                                'master_payment_id' => $globalPayment->id,
                             ]);
                         }
 
                         dispatch_now(new RemoveLabelJob($order->id, [40]));
+                        dispatch_now(new DispatchLabelEventByNameJob($order->id, "payment-received"));
                     }
                     return ['orderId' => $orderId, 'amount' => $amount,  'info' => 'Zlecenie zostało pomyślnie utworzone.'];
                 }
@@ -910,7 +510,6 @@ class OrdersPaymentsController extends Controller
                                     'amount' => $connectedOrder->getSumOfGrossValues(),
                                     'order_id' => $connectedOrder->id,
                                     'promise' => '',
-                                    'master_payment_id' => $globalPayment->id,
                                 ]);
                             } else {
                                 $globalPayment = $this->paymentRepository->findWhere([
@@ -922,11 +521,11 @@ class OrdersPaymentsController extends Controller
                                     'amount' => $connectedOrder->getSumOfGrossValues(),
                                     'order_id' => $connectedOrder->id,
                                     'promise' => '',
-                                    'master_payment_id' => $globalPayment->id,
                                 ]);
                             }
 
                             dispatch_now(new RemoveLabelJob($connectedOrder->id, [40]));
+                            dispatch_now(new DispatchLabelEventByNameJob($connectedOrder->id, "payment-received"));
                         }
                         $amount = $amount - $connectedOrder->getSumOfGrossValues();
                     }
@@ -951,7 +550,6 @@ class OrdersPaymentsController extends Controller
                                 'amount' => $amount,
                                 'order_id' => $orderId,
                                 'promise' => '',
-                                'master_payment_id' => $globalPayment->id,
                             ]);
                         } else {
                             $globalPayment = $this->paymentRepository->findWhere([
@@ -963,10 +561,10 @@ class OrdersPaymentsController extends Controller
                                 'amount' => $amount,
                                 'order_id' => $orderId,
                                 'promise' => '',
-                                'master_payment_id' => $globalPayment->id,
                             ]);
                         }
                         dispatch_now(new RemoveLabelJob($order->id, [40]));
+                        dispatch_now(new DispatchLabelEventByNameJob($order->id, "payment-received"));
                     }
                     $amount = $amount - $order->getSumOfGrossValues();
                     return ['orderId' => $orderId, 'amount' => $amount,  'info' => 'Zlecenie zostało pomyślnie utworzone.'];
@@ -997,7 +595,6 @@ class OrdersPaymentsController extends Controller
                         'amount' => $amount,
                         'order_id' => $orderId,
                         'promise' => '',
-                        'master_payment_id' => $globalPayment->id,
                     ]);
                 } else {
                     $globalPayment = $this->paymentRepository->findWhere([
@@ -1009,7 +606,6 @@ class OrdersPaymentsController extends Controller
                         'amount' => $amount,
                         'order_id' => $orderId,
                         'promise' => '',
-                        'master_payment_id' => $globalPayment->id,
                     ]);
                 }
 
@@ -1045,7 +641,7 @@ class OrdersPaymentsController extends Controller
                 'customer_id' => $request->input('customer_id'),
                 'notices' => $request->input('notices'),
                 'promise' => $promise,
-                'created_at' => $request->input('created_at'),
+                'promise_date' => $request->input('promise_date'),
             ]);
 
 
@@ -1162,21 +758,10 @@ class OrdersPaymentsController extends Controller
 
     public function paymentsEdit($id)
     {
-        $payment = $this->paymentRepository->find($id);
+        $customer = $this->customerRepository->find($id);
 
         return view('payments.edit',
-            compact('payment'));
-    }
-
-    public function paymentUpdate(Request $request, $id)
-    {
-        $payment = $this->paymentRepository->find($id);
-
-        $this->paymentRepository->update([
-            'created_at' => $request->get('created_at')
-        ], $payment->id);
-
-        return redirect()->back();
+            compact('customer'));
     }
 
     /**

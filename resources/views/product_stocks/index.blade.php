@@ -160,19 +160,8 @@
                     }
                 },
                 {
-                    data: 'id',
+                    data: 'quantity',
                     name: 'quantity',
-		    render: function(data, type, row) {
-			let html = 0;
-                        if (row.positions) {
-                            row.positions.forEach(function (position) {
-                                html += parseInt(position.position_quantity);
-                            });
-
-                        }
-
-                        return html;
-		    },
                     searchable: false,
                 },
                 {

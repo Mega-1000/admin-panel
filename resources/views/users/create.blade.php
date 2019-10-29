@@ -54,12 +54,12 @@
                             </div>
                             <div class="form-group">
                                 <label for="phone">@lang('users.form.phone')</label>
-                                <input type="text" id="phone" name="phone" class="form-control"
+                                <input type="phone" id="phone" name="phone" class="form-control"
                                        value="{{ old('phone') }}">
                             </div>
                             <div class="form-group">
                                 <label for="phone2">@lang('users.form.phone2')</label>
-                                <input type="text" id="phone2" name="phone2" class="form-control"
+                                <input type="phone2" id="phone2" name="phone2" class="form-control"
                                        value="{{ old('phone2')}}">
                             </div>
                             <div class="form-group">
@@ -119,11 +119,6 @@
                                         @endforeach
                                     @endif
                                 </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="rate_hour">@lang('users.form.rate_hour')</label>
-                                <input type="number" id="rate_hour" name="rate_hour" class="form-control"
-                                       value="{{ old('rate_hour')}}">
                             </div>
                             <div class="form-group">
                                 <label for="avatar">@lang('users.form.avatar')</label>

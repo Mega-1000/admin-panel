@@ -164,9 +164,9 @@ class CheckPackagesStatusJob
         if ($err) {
             Log::info("cURL Error #:" . $err);
         } else {
-            $result = preg_match('/Przesyłka odebrana przez Kuriera/', $response);
+            $result = preg_match('/Przesyłka doręczona/', $response);
             if ($result == '1') {
-                $package->status = 'SENDING';
+                $package->status = 'DELIVERED';
                 $package->update();
             }
         }

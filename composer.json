@@ -17,14 +17,12 @@
         "laravel/framework": "5.7.*",
         "laravel/passport": "^7.0",
         "laravel/tinker": "^1.0",
-        "php-mime-mail-parser/php-mime-mail-parser": "^5.0",
         "predis/predis": "~1.0",
         "prettus/l5-repository": "^2.6",
         "rap2hpoutre/laravel-log-viewer": "^1.0",
         "sentry/sentry-laravel": "1.0.0",
         "smalot/pdfparser": "*",
         "tcg/voyager": "^1.1",
-        "vaibhavpandeyvpz/phemail": "^1.0",
         "yajra/laravel-datatables-oracle": "~8.0"
     },
     "require-dev": {

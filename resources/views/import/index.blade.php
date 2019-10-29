@@ -28,6 +28,15 @@
                                 <button href="#" class="btn btn-primary" id="import"
                                    name="import" @if($import->processing == 1) disabled @endif> @lang('import.do_import')</button>
                             </div>
+                            <form action="{{ route('import.store') }}" enctype="multipart/form-data" method="POST">
+                                {{ csrf_field() }}
+                                Wgraj plik do importu ( może to potrwać do 20-30min w zależnosci do szybkości łącza )
+                                <br />
+                                <input type="file" name="importFile" />
+                                <br /><br />
+                                <input type="submit" value=" Wgraj " />
+                            </form>
+
                         </div>
                     </div>
                 </div>

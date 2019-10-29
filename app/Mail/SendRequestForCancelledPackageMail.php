@@ -11,7 +11,7 @@ class SendRequestForCancelledPackageMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $package;
+    public $sendingNumber;
 
     public $url;
 
@@ -20,10 +20,10 @@ class SendRequestForCancelledPackageMail extends Mailable
      *
      * @return void
      */
-    public function __construct($subject, $package, $url)
+    public function __construct($subject, $sendingNumber, $url)
     {
         $this->subject = $subject;
-        $this->package = $package;
+        $this->sendingNumber = $sendingNumber;
         $this->url = $url;
     }
 

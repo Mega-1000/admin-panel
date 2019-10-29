@@ -4,8 +4,6 @@ namespace App;
 
 use App\Entities\ProductStockLog;
 use App\Entities\Report;
-use App\Entities\ReportDaily;
-use App\Entities\ReportProperty;
 use App\Entities\Task;
 use App\Entities\UserEmail;
 use App\Entities\UserWork;
@@ -39,8 +37,7 @@ class User extends \TCG\Voyager\Models\User
         'email',
         'password',
         'status',
-        'warehouse_id',
-        'rate_hour'
+        'warehouse_id'
     ];
 
     /**
@@ -61,59 +58,28 @@ class User extends \TCG\Voyager\Models\User
         return $this->hasMany(ProductStockLog::class);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
     public function userEmailData()
     {
         return $this->hasOne(UserEmail::class);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function tasks()
     {
         return $this->hasMany(Task::class);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function userWorks()
     {
         return $this->hasMany(UserWork::class);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
     public function reports()
     {
-        return $this->hasMany(Report::class);
+        return $this->belongsToMany(Report::class);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function warehouse()
     {
         return $this->belongsTo(Warehouse::class);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function reportProperties()
-    {
-        return $this->belongsToMany(ReportProperty::class);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function reportDaily()
-    {
-        return $this->hasMany(ReportDaily::class);
     }
 }

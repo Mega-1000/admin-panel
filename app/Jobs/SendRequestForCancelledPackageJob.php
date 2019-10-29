@@ -50,7 +50,7 @@ class SendRequestForCancelledPackageJob implements ShouldQueue
                 $email = $firm->email;
                 break;
             case 'POCZTEX':
-                $firm = $firmRepository->findByField('symbol', 'POCZTAPOLSKA')->first();
+                $firm = $firmRepository->findByField('symbol', 'POCZTEX')->first();
                 $email = $firm->email;
                 break;
             case 'JAS':
@@ -69,7 +69,7 @@ class SendRequestForCancelledPackageJob implements ShouldQueue
 
         \Mailer::create()
             ->to($email)
-            ->send(new SendRequestForCancelledPackageMail("Prośba o anulację nadania paczki", $package,
+            ->send(new SendRequestForCancelledPackageMail("Prośba o anulację nadania paczki", $package->sending_number,
                 $url));
     }
 }

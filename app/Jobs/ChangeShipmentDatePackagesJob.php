@@ -26,8 +26,7 @@ class ChangeShipmentDatePackagesJob
     public function __construct(
         OrderPackageRepository $orderPackageRepository,
         OrderPackagesDataHelper $orderPackagesDataHelper
-    )
-    {
+    ) {
         $this->orderPackageRepository = $orderPackageRepository;
         $this->orderPackagesDataHelper = $orderPackagesDataHelper;
     }
@@ -54,14 +53,6 @@ class ChangeShipmentDatePackagesJob
                     $package->order->shipment_date = $shipmentDate;
                     $package->order->update();
                     $this->orderPackageRepository->update($array, $package->id);
-                    if ($package->order->task != null) {
-                        $dateStart = new Carbon($package->order->task->taskTime->date_start);
-                        $dateEnd = new Carbon($package->order->task->taskTime->date_end);
-                        $package->order->task->taskTime->update([
-                            'date_start' => $dateStart->addDay()->toDateTimeString(),
-                            'date_end' => $dateEnd->addDay()->toDateTimeString(),
-                        ]);
-                    }
                 }
             }
         }

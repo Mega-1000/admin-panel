@@ -39,8 +39,6 @@ class CheckPromisePaymentsDates implements ShouldQueue
             foreach ($notConfirmedPayments as $notConfirmedPayment) {
                 if ($this->shouldAttachLabel($notConfirmedPayment, $now)) {
                     dispatch_now(new AddLabelJob($notConfirmedPayment->order->id, [119]));
-                } else {
-                    dispatch_now(new RemoveLabelJob($notConfirmedPayment->order->id, [119]));
                 }
             }
         }
@@ -49,12 +47,7 @@ class CheckPromisePaymentsDates implements ShouldQueue
 
     protected function shouldAttachLabel($notConfirmedPayment, $now)
     {
-        if($notConfirmedPayment->order->toPay() == 0 || $notConfirmedPayment->order->hasLabel(40)) {
-            return false;
-        } else {
-            return $notConfirmedPayment->created_at->diff($now)->h >= 15; //only schedules that wait longer then 2h
-        }
-
+        return $notConfirmedPayment->created_at->diff($now)->h >= 15; //only schedules that wait longer then 2h
     }
 
 

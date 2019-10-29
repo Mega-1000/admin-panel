@@ -25,7 +25,6 @@ class ReportCreateRequest extends FormRequest
     {
         return [
             'name' => 'required|min:3',
-            'users_id' => 'required',
             'from' => 'required',
             'to'   => 'required'
         ];

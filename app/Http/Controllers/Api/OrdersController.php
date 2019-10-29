@@ -359,12 +359,6 @@ class OrdersController extends Controller
             'DELIVERY_ADDRESS')->first();
     }
 
-    public function getCustomerStandardAddress($orderId)
-    {
-        return $this->orderRepository->find($orderId)->customer->addresses->where('type', '=',
-            'STANDARD_ADDRESS')->first();
-    }
-
     public function getReadyToShipFormAutocompleteData($orderId)
     {
         $order = $this->orderRepository->find($orderId);

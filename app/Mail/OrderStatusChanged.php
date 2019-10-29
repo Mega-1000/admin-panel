@@ -12,19 +12,16 @@ class OrderStatusChanged extends Mailable
     use Queueable, SerializesModels;
 
     public $mailBody;
-    public $pdf;
 
     /**
      * OrderStatusChanged constructor.
      * @param $subject
      * @param $message
-     * @param $pdf
      */
-    public function __construct($subject, $message, $pdf = false)
+    public function __construct($subject, $message)
     {
         $this->subject = $subject;
         $this->mailBody = $message;
-        $this->pdf = $pdf;
     }
 
     /**
@@ -34,14 +31,6 @@ class OrderStatusChanged extends Mailable
      */
     public function build()
     {
-        if($this->pdf != false) {
-            return $this->view('emails.order-status-changed')
-                ->attachData($this->pdf, 'proforma.pdf', [
-                    'mime' => 'application/pdf',
-                ]);
-        } else {
-            return $this->view('emails.order-status-changed');
-        }
+        return $this->view('emails.order-status-changed');
     }
 }
-

@@ -11,21 +11,8 @@
 |
  */
 
-use App\Entities\Order;
-use Barryvdh\DomPDF\Facade as PDF;
-
 Route::get('/', function () {
     return view('welcome');
-});
-
-Route::get('/test', function() {
-    $order = Order::find(1228);
-    $proformDate = \Carbon\Carbon::now()->format('m-Y');
-    $proformDate = str_replace('-', '/', $proformDate);
-    $date = \Carbon\Carbon::now()->toDateString();
-//    return view('pdf.proform', compact('now2'));
-    $pdf = PDF::loadView('pdf.proform', compact('date', 'proformDate', 'order'));
-    return $pdf->download('invoice.pdf');
 });
 
 Route::group(['prefix' => 'admin'], function () {
@@ -36,9 +23,6 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get('/get/user/{id}',
             'OrdersController@getUserInfo');
-
-        Route::get('/order/task/create/',
-            'TaskController@createTask');
 
         Route::get('users', 'UserController@index')->name('users.index');
         Route::get('users/datatable/all', 'UserController@datatable')->name('users.datatable');
@@ -232,8 +216,6 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('payments', 'OrdersPaymentsController@payments')->name('payments.index');
         Route::get('payments/{id}/list', 'OrdersPaymentsController@paymentsEdit')->name('payments.edit');
         Route::get('payments/{id}/delete', 'OrdersPaymentsController@paymentsDestroy')->name('payments.destroy');
-        Route::get('payments/{id}/edit', 'OrdersPaymentsController@paymentsEdit')->name('payments.edit');
-        Route::put('payments/{id}/update', 'OrdersPaymentsController@paymentUpdate')->name('payments.update');
         Route::post('payments/book', 'OrdersPaymentsController@bookPayment')->name('payments.book');
         Route::post('orderPayments/store', 'OrdersPaymentsController@store')->name('order_payments.store');
         Route::post('orderPayments/store/master',
@@ -274,7 +256,6 @@ Route::group(['prefix' => 'admin'], function () {
             'OrdersPackagesController@getProtocols')->name('order_packages.getProtocols');
         Route::get('orderPackages/{package_id}/send',
             'OrdersPackagesController@prepareGroupPackageToSend')->name('orders.package.prepareToSend');
-        Route::post('orderPackages/changeValue', 'OrdersPackagesController@changeValue')->name('order_packages.changeValue');
 
         Route::get('orderMessages/datatable/{id}',
             'OrdersMessagesController@datatable')->name('order_messages.datatable');
@@ -302,7 +283,7 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get('import', 'ImportController@index')->name('import.index');
         Route::get('import/do', 'ImportController@doImport')->name('import.do');
-        Route::get('store/import/{id}/{amount}', 'OrdersPaymentsController@storeFromImport');
+        Route::post('import/store', 'ImportController@store')->name('import.store');
 
         Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');
 
@@ -378,8 +359,11 @@ Route::group(['prefix' => 'admin'], function () {
                     Route::get('/datatable', 'ReportsController@datatable')->name('datatable');
                     Route::get('/create', 'ReportsController@create')->name('create');
                     Route::post('/store', 'ReportsController@store')->name('store');
-                    Route::get('/{id}/generateReport', 'ReportsController@generateReport')->name('generateReport');
+                    Route::get('/{id}/edit', 'ReportsController@edit')->name('edit');
                     Route::get('/{id}/generatePdfReport', 'ReportsController@generatePdfReport')->name('generatePdfReport');
+                    Route::post('/{id}/update', [
+                        'uses' => 'ReportsController@update',
+                    ])->name('update');
                     Route::delete('/{id}/delete', [
                         'uses' => 'ReportsController@destroy',
                     ])->name('destroy');
@@ -412,5 +396,4 @@ Route::get('/communication/{orderId}', 'OrdersMessagesController@userCommunicati
 Route::post('/communication/storeWarehouseMessage',
     'OrdersMessagesController@storeWarehouseMessage')->name('storeWarehouseMessage');
 Route::get('/customer/{orderId}/confirmation/{invoice}', 'OrdersController@confirmCustomerInformation')->name('customerConfirmation');
-Route::get('/customer/{orderId}/confirmation', 'OrdersController@confirmCustomerInformationWithoutData')->name('customerConfirmationWithoutData');
 Route::post('/customer/confirmation', 'OrdersController@confirmCustomer')->name('confirmation');

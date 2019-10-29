@@ -5,7 +5,7 @@ namespace App\Jobs;
 use App\Repositories\OrderMessageRepository;
 use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderRepository;
-use Illuminate\Support\Facades\DB;
+use PhpMimeMailParser\Parser;
 
 class SearchOrdersInStoredMailsJob extends Job
 {
@@ -17,26 +17,37 @@ class SearchOrdersInStoredMailsJob extends Job
      * @return void
      */
     public function handle(
+        Parser $messageParser,
         OrderMessageRepository $messageRepository,
         OrderPackageRepository $orderPackageRepository,
         OrderRepository $orderRepository
     ) {
-        $mbox = imap_open ("{pro23.linuxpl.com:993/imap/ssl}INBOX", "info@mega1000.pl", "d`2{12y@B4`1BX+");
-        $message_count = imap_num_msg($mbox);
-        for ($i = 1; $i < $message_count; $i++) {
-            $headers = imap_fetchheader($mbox, $i, FT_PREFETCHTEXT);
-            $overview = imap_fetch_overview($mbox, $i, 0);
-            $body = imap_body($mbox, $i);
-            $timestamp = $overview[0]->date;
-            if(property_exists($overview[0], 'subject')) {
-                $subject = iconv_mime_decode($overview[0]->subject);
-            } else {
-                $subject = '';
-            }
-	    $data = [];
+        $filesToProceed = array_diff(
+            scandir(storage_path(self::STORAGE_MAILS_NAME)),
+            ['.', '..', '.gitignore', 'proceeded', 'not-found']
+        );
+
+        if (empty($filesToProceed)) {
+            return;
+        }
+        foreach ($filesToProceed as $file) {
             $found = false;
-            $re = '/\s(\d+)\s?/i';
-            preg_match_all($re, $subject, $matches, PREG_SET_ORDER, 0);
+            $currentFilePath = storage_path(self::STORAGE_MAILS_NAME) . DIRECTORY_SEPARATOR . $file;
+            $mail = $messageParser->setPath($currentFilePath);
+            $dateFolderName = (new \DateTime())->format("Y-m-d");
+            $mailSubject = $mail->getHeader('subject');
+            $mailContent = empty($mail->getMessageBody('text')) ? "!! NIE ODCZYTANO ZAWARTOŚCI MAILA !!" : $mail->getMessageBody('text');
+
+            $data = [
+                'title' => $mailSubject,
+                'message' => $mailContent,
+                'source' => 'MAIL',
+                'status' => 'OPEN',
+                'type' => 'GENERAL',
+            ];
+
+            $re = '/\s(\d+)\s/i';
+            preg_match_all($re, $mailSubject, $matches, PREG_SET_ORDER, 0);
             if (!empty($matches)) {     //found some matching number
                 $number = $matches[0][1];
                 $orderPackage = $orderPackageRepository->scopeQuery(function ($query) use ($number) {
@@ -55,26 +66,26 @@ class SearchOrdersInStoredMailsJob extends Job
                     }
                 }
             }
-            if ($found) {
-                $emailMessage = DB::table('emails_messages')->where('timestamp', $timestamp)->first();
-                if(empty($emailMessage)) {
-                    $unique = uniqid();
-                    $path = storage_path('app/public/mails/' . $unique . '.eml');
-                    file_put_contents($path, $headers . "\n" . $body);
-                    DB::table('emails_messages')->insert([
-                        [
-                            'path' => $unique  .'.eml',
-                            'timestamp' => $timestamp,
-                            'order_id' => $data['order_id'],
-                        ]
-                    ]);
-                    dispatch_now(new AddLabelJob($data['order_id'], [138]));
-                }
 
+            if ($found) {
+                $messageRepository->create($data);
+                $proceededDateFolderName = $this->createDateFolderName($dateFolderName, 'proceeded');
+                rename($currentFilePath, $proceededDateFolderName . DIRECTORY_SEPARATOR . $file);
+            } else {
+                $notFoundFolderName = $this->createDateFolderName($dateFolderName, 'not-found');
+                rename($currentFilePath, $notFoundFolderName . DIRECTORY_SEPARATOR . $file);
             }
         }
     }
+
+    protected function createDateFolderName($dateFolderName, $name)
+    {
+        $dirName = storage_path(self::STORAGE_MAILS_NAME . DIRECTORY_SEPARATOR . $name . DIRECTORY_SEPARATOR . $dateFolderName);
+
+        if (!file_exists($dirName)) {
+            mkdir($dirName);
+        }
+
+        return $dirName;
+    }
 }
-
-
-

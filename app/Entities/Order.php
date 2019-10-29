@@ -62,8 +62,7 @@ class Order extends Model implements Transformable
         'warehouse_notice',
         'warehouse_value',
         'production_date',
-        'master_order_id',
-        'spedition_comment',
+        'master_order_id'
     ];
 
     public $customColumnsVisibilities = [
@@ -163,12 +162,8 @@ class Order extends Model implements Transformable
     {
         $orderTotalPrice = $this->getSumOfGrossValues();
         $totalPaymentAmount = floatval($this->payments()->sum("amount"));
-        if($orderTotalPrice - $totalPaymentAmount > -2 && $orderTotalPrice - $totalPaymentAmount < 2) {
-            return 0;
-        } else {
-            return $orderTotalPrice - $totalPaymentAmount;
-        }
 
+        return $orderTotalPrice - $totalPaymentAmount;
     }
 
     public function isDeliveryDataComplete()
@@ -184,27 +179,6 @@ class Order extends Model implements Transformable
             empty($deliveryAddress->city) ||
             empty($deliveryAddress->postal_code)
         ));
-    }
-
-    public function isInvoiceDataComplete()
-    {
-        $invoiceAddress = $this->addresses()->where('type', '=', 'INVOICE_ADDRESS')->first();
-        return (!(
-            empty($invoiceAddress->firstname) ||
-            empty($invoiceAddress->lastname) ||
-            empty($invoiceAddress->phone) ||
-            empty($invoiceAddress->address) ||
-            empty($invoiceAddress->flat_number) ||
-            empty($invoiceAddress->city) ||
-            empty($invoiceAddress->postal_code)
-        ));
-    }
-
-    public function getDeliveryAddress()
-    {
-        $deliveryAddress = $this->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first();
-
-        return $deliveryAddress;
     }
 
     public function getInvoiceAddress()
@@ -255,17 +229,6 @@ class Order extends Model implements Transformable
     public function hasBookedPayments()
     {
         return $this->payments()->where('promise', 'like', '')->count();
-    }
-
-    public function packagesCashOnDeliverySum()
-    {
-        $sum = 0;
-        $packages = $this->packages()->whereIn('status', ['SENDING', 'DELIVERED', 'NEW', 'WAITING_FOR_SENDING'])->get();
-        foreach($packages as $package) {
-            $sum += $package->cash_on_delivery;
-        }
-
-        return $sum;
     }
 
     public function bookedPaymentsSum()

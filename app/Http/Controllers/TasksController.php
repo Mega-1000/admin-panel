@@ -105,16 +105,13 @@ class TasksController extends Controller
                 }
                 $task->order->update([
                     'shipment_date' => $request->date_start,
+                    'consultant_notice' => $request->consultant_notice,
                     'consultant_value' => $consultantVal,
+                    'warehouse_notice' => $request->warehouse_notice,
                     'warehouse_value' => $request->warehouse_value,
                     'total_price' => $totalPrice
                 ]);
-                $dataToSave = $request->all();
-                $arr = [
-                    'consultant_notice' => $task->order->consultant_notice,
-                    'warehouse_notice' => $task->order->warehouse_notice,
-                ];
-                $task->taskSalaryDetail()->create(array_merge($dataToStore, $arr));
+                $task->taskSalaryDetail()->create($request->all());
                 $prev = [];
                 dispatch_now(new AddLabelJob($request->order_id, [47], $prev));
             }
@@ -553,10 +550,6 @@ class TasksController extends Controller
                         'date_start' => $request->start,
                         'date_end' => $request->end
                     ]);
-                    if ($item->order_id !== null) {
-                        $shipmentDate = new Carbon($request->start);
-                        $item->order->update(['production_date' => $request->start, 'shipment_date' => $shipmentDate->toDateString()]);
-                    }
                 } else {
                     if ($different !== 0) {
                         $different = abs($different);
@@ -577,10 +570,6 @@ class TasksController extends Controller
                         'date_start' => $dateS,
                         'date_end' => $dateE
                     ]);
-                    if ($item->order_id !== null) {
-                        $shipmentDate = new Carbon($dateS);
-                        $item->order->update(['production_date' => $dateS, 'shipment_date' => $shipmentDate->toDateString()]);
-                    }
                 }
             }
             return redirect()->route('planning.timetable.index', [

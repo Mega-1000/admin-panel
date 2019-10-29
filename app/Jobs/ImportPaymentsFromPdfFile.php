@@ -22,18 +22,15 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
 
     protected $filename;
 
-    protected $date;
-
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct(OrderRepository $orderRepository, $filename, $date = null)
+    public function __construct(OrderRepository $orderRepository, $filename)
     {
         $this->orderRepository = $orderRepository;
         $this->filename = $filename;
-        $this->date = $date;
     }
 
     /**
@@ -108,7 +105,7 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
         {
             if(array_key_exists('orderId', $payment))
             {
-                $paymentsInfo[] = app()->call(OrdersPaymentsController::class . '@storeFromImport', [$payment['orderId'], $payment['amount'], $this->date]);
+                $paymentsInfo[] = app()->call(OrdersPaymentsController::class . '@storeFromImport', [$payment['orderId'], $payment['amount']]);
             }
         }
 

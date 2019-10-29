@@ -84,10 +84,10 @@
                         style="font-size:14px; font-weight:bold;">{{ $item->product->name }}</span><br/>symbol: {{ $item->product->symbol }}
                     <br/>Ilość: {{ $item->quantity }} {{ $item->product->packing->calciation_unit }}<br/></td>
                 <td>
-                    ILOSC NA STANIE: {{ $item->realProduct() }} <br/>
-                    @if(count($item->realProductPositions()))
+                    ILOSC NA STANIE: {{ $item->product->stock->quantity }} <br/>
+                    @if(count($item->product->stock->position))
                     LOKACJA PRODUKTOW: <br/>
-                        @foreach($item->realProductPositions() as $position)
+                        @foreach($item->product->stock->position as $position)
                             Alejka: {{ $position->lane }} <br/>
                             Regał: {{ $position->bookstand }} </br>
                             Półka: {{ $position->shelf }} </br>

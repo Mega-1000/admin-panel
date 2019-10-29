@@ -5,49 +5,12 @@
         <i class="voyager-window-list"></i> @lang('warehouse_orders.title')
     </h1>
     <style>
-	.itemQuantity {
-		width: 100px;
-	}
-	.btn {
-		padding: 0px;
-	}
-
-    #dataTable-warehouseOrder {
-        table-layout: fixed;
-    }
-
-	table.dataTable tbody td {
-		padding: 0px;
-	}
-
-    .dt-center {
-        max-width: 300px !important;
-    }
-
-    /*#dataTable-warehouseOrder thead input {
-        max-width: 50px !important;
-    }
-
-    #dataTable-warehouseOrder thead div {
-        max-width: 50px !important;
-    }
-
-    #dataTable-warehouseOrder thead tr th {
-        max-width: 130px !important;
-    }*/
-
-	.dt-center span {
-		word-break: break-all:
-	}
         .pointer {
             cursor: pointer;
         }
         .ui-tooltip {
             width: 400px !important;
         }
-	#dataTable-warehouseOrder #columnSearch32, #columnSearch33, #columnSearch36, #columnSearch37, #columnSearch40, #columnSearch41, #columnSearch45, #columnSearch46, #columnSearch50, #columnSearch51 {
-    width: 50px;
-}
     </style>
 @endsection
 
@@ -170,7 +133,7 @@
             "lengthMenu": [[10, 25, 50, 100, 200, 500, -1], [10, 25, 50, 100, 200, 500, "Wszystkie"]],
             columnDefs: [
                 {className: "dt-center", targets: "_all"},
-                {width: "20%", targets: 32,'max-width': '300px' }
+                {width: "20%", targets: 32 }
             ],
             responsive: true,
             dom: 'Bfrtip',
@@ -789,7 +752,7 @@
                 let notSearchable = [17, 19];
                 let localDatatables = localStorage.getItem('DataTables_dataTable_/admin/orders');
                 let objDatatables = JSON.parse(localDatatables);
-                if (title == "Podaj ilość zamówienia w jedn. zbior." || title == "Pod aj ilo ść zamów ienia w jedn. handl." || title == "Podaj ilość zamówienia w jedn. transp." || title == "Podaj ilość zamówienia w jedn. podst." || title == 'Podaj ilość zamówienia w jedn. oblicz.' ) {
+                if (i == 30 || i == 34 || i == 39 || i == 43 || i == 47 ) {
                     $(this).html('<div><span>' + title + '</span><button class="btn btn-success" name="makeWarehouseOrder">Stwórz zlecenie</button></div>');
                 } else if(~notSearchable.indexOf(i) == false) {
                     $(this).html('<div><span>'+title+'</span></div><div class="input_div"><input type="text" id="columnSearch' + i + '"/></div>');
@@ -829,7 +792,6 @@
             } else {
                 $("#columnSearch" + column).parent().hide();
             }
-            table.columns.adjust();
 
         });
 
