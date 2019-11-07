@@ -14,11 +14,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $length = env('DB_DEFAULT_STRING_LENGTH', 0);
-        if ($length > 0) {
-            Schema::defaultStringLength($length);
-        }
-	}
+        //
+    }
 
     /**
      * Register any application services.
@@ -27,5 +24,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        Schema::defaultStringLength(191);
     }
 }

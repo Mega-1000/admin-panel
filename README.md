@@ -3,7 +3,7 @@
 Mega 1000
 
 [Wymagania:]
-- PHP > 7
+- PHP > 7.2
 - composer
 
 [Run]
@@ -14,4 +14,4 @@ Mega 1000
 
 [Aktualizacja CSV]: ImportCsvFileJob
 1. wyeksportować z excela plik o nazwie `Baza.csv` a następnie skopiować go do `public/storage`
-2. `php artisan import:product` || `php artisan import:products`
+2. `php artisan import:products`
