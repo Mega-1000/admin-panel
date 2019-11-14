@@ -77,7 +77,7 @@ class ImportCsvFileJob implements ShouldQueue
         Log::channel('import')->info('Import start: ' . $data);
         for ($i = 1; $line = fgetcsv($handle, 0, ';'); $i++) {
             /** token produktu i kategori*/
-            $tokenProductAndCategory = (string) Str::uuid();
+            $tokenProductAndCategory = (string)Str::uuid();
             if ($i % 100 === 0) {
                 var_dump($i);
             }
@@ -123,7 +123,7 @@ class ImportCsvFileJob implements ShouldQueue
                     'img_url' => $line[303],
                     'token_prod_cat' => $tokenProductAndCategory,
                 ];
-                var_dump('i:' . $i . ' line: '.$line[301]);
+                var_dump('i:' . $i . ' line: ' . $line[301]);
 
 
                 if (!empty($categoryDetails['img_url'])
@@ -247,15 +247,15 @@ class ImportCsvFileJob implements ShouldQueue
                 'quality_to_price' => $line[281],
                 'comments' => $line[284],
                 'value_of_the_order_for_free_transport' => $line[282],
-//                        'gross_selling_price_basic_unit' => $line[254],
+                'gross_selling_price_basic_unit' => $line[254],
 //                        'gross_purchase_price_basic_unit_after_discounts' => $line[195],
 //                        'gross_selling_price_commercial_unit' => $line[252],
 //                        'gross_purchase_price_commercial_unit_after_discounts' => $line[193],
-//                        'gross_selling_price_calculated_unit' => $line[253],
+                'gross_selling_price_calculated_unit' => $line[253],
 //                        'gross_purchase_price_calculated_unit_after_discounts' => $line[194],
-//                        'gross_selling_price_aggregate_unit' => $line[255],
+                'gross_selling_price_aggregate_unit' => $line[255],
 //                        'gross_purchase_price_aggregate_unit_after_discounts' => $line[196],
-//                        'gross_selling_price_the_largest_unit' => $line[256],
+                'gross_selling_price_the_largest_unit' => $line[256],
 //                        'gross_purchase_price_the_largest_unit_after_discounts' => $line[197],
             ];
 
@@ -278,7 +278,7 @@ class ImportCsvFileJob implements ShouldQueue
                 $categoryColumn++;
 
                 for ($j = 0; $j < 8; $j++) {
-                    if ((string) $line[$categoryColumn] !== '') {
+                    if ((string)$line[$categoryColumn] !== '') {
                         $category[] = $line[$categoryColumn++];
                     }
 
@@ -381,7 +381,8 @@ class ImportCsvFileJob implements ShouldQueue
         Log::channel('import')->info('Import end: ' . Carbon::now());
     }
 
-    private function getShowOnPageParameter(array $line, int $columnIterator) {
+    private function getShowOnPageParameter(array $line, int $columnIterator)
+    {
         if (array_key_exists($columnIterator + 14, $line)
             && $line[$columnIterator + 14] == 1
         ) {
@@ -392,9 +393,10 @@ class ImportCsvFileJob implements ShouldQueue
         return false;
     }
 
-    private function getProductsOrder(array $line, int $columnIterator) {
+    private function getProductsOrder(array $line, int $columnIterator)
+    {
         if (array_key_exists($columnIterator + 7, $line)) {
-            $l = (int) $line[$columnIterator + 7];
+            $l = (int)$line[$columnIterator + 7];
             $l = $l ?? 0;
 //            var_dump('priority -> ' .$l);
             return $l;
