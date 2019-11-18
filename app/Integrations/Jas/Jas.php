@@ -2,6 +2,7 @@
 
 namespace App\Integrations\Jas;
 
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use SoapClient;
 use Illuminate\Support\Facades\Log;
@@ -388,6 +389,7 @@ class Jas
             Log::error($e->getMessage(), $params);
         }
         $result = $this->client->__getLastResponse();
+        Session::put('message', $result);
         Log::error(json_encode($result));
     }
 

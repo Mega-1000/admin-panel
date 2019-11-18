@@ -32,6 +32,13 @@ class Customer extends Model implements Transformable
         return $this->hasMany(CustomerAddress::class);
     }
 
+    public function standardAddress()
+    {
+        $standardAddress = $this->addresses()->where('type', '=', 'STANDARD_ADDRESS')->first();
+
+        return $standardAddress;
+    }
+
     public function orders()
     {
         return $this->hasMany(Order::class);

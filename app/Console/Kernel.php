@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Jobs\AddNewWorkHourForUsers;
+use App\Jobs\ChangeOrderInvoiceData;
 use App\Jobs\ChangeShipmentDatePackagesJob;
 use App\Jobs\CheckPackagesStatusJob;
 use App\Jobs\CheckPriceChangesInProductsJob;
@@ -17,6 +18,7 @@ use App\Jobs\ImportPaymentsFromPdfFile;
 use App\Jobs\Orders\CloseChattingsJob;
 use App\Jobs\Orders\FindOrdersForCheckingMissingDeliveryAddresses;
 use App\Jobs\Orders\TriggerOrderLabelSchedulersJob;
+use App\Jobs\SearchOrdersInStoredMailsJob;
 use App\Jobs\ValidateSubiekt;
 use App\Jobs\WarehouseDispatchPendingReminderJob;
 use Illuminate\Console\Scheduling\Schedule;
@@ -45,9 +47,9 @@ class Kernel extends ConsoleKernel
     {
         //$schedule->command('inspire')
         //    ->hourly();
-        //$schedule->call(function () {
-        //    dispatch_now(new GetAllegroOrders());
-        //});
+//        $schedule->call(function () {
+//            dispatch_now(new ChangeOrderInvoiceData());
+//        });
         //$schedule->job(ImportFirmsAndWarehousesJob::class)->everyMinute();
         //$schedule->job(ImportCsvFileJob::class)->everyMinute();
         //$schedule->job(ImportCustomersJob::class)->everyMinute();
@@ -64,9 +66,11 @@ class Kernel extends ConsoleKernel
         $schedule->job(TriggerOrderLabelSchedulersJob::class)->everyFiveMinutes();
         $schedule->job(AddNewWorkHourForUsers::class)->dailyAt("00:01");
         $schedule->job(CheckTasksFromYesterdayJob::class)->dailyAt("00:01");
-        $schedule->job(WarehouseDispatchPendingReminderJob::class)->everyFifteenMinutes();
-        $schedule->job(CheckPromisePaymentsDates::class)->everyMinute();
+        $schedule->job(WarehouseDispatchPendingReminderJob::class)->everyFifteenMinutes()->between('9:00', '17:00');
+		$schedule->job(CheckPromisePaymentsDates::class)->everyMinute();
         $schedule->job(ValidateSubiekt::class)->everyFiveMinutes();
+        $schedule->job(ChangeOrderInvoiceData::class)->dailyAt("07:00");
+        $schedule->job(SearchOrdersInStoredMailsJob::class)->everyFifteenMinutes();
     }
 
     /**

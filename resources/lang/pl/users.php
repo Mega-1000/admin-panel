@@ -38,7 +38,8 @@ return [
         'port' => 'Port SMTP',
         'host' => 'Host SMTP',
         'encryption' => 'Sposób szyfrowania',
-        'warehouse' => 'Magazyn'
+        'warehouse' => 'Magazyn',
+        'rate_hour' => 'Stawka godzinowa'
     ],
     'message' => [
         'store' => 'Użytkownik został dodany pomyślnie!',

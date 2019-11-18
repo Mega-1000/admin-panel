@@ -382,7 +382,7 @@
         <button class="btn btn-text">Filtr zamówień</button>
         <select style="margin-left: 10px;" class="form-control text-uppercase orderFilter" id="orderFilter">
             <option value="ALL">Wszystkie</option>
-            <option value="PENDING">Wszystkie zlecenia wyłączając bez realizacji</option>
+            <option value="PENDING">Wszystkie zlecenia wyłączając bez realizacji oraz zakończone</option>
             <option value="WITHOUT_REALIZATION">Bez realizacji</option>
             <option value="COMPLETED">Oferta zakończona</option>
         </select>
@@ -802,13 +802,13 @@
                                 html += '<div><p>' + row.orderId + '/' + value.number + '</p>';
                                 html += '<div><p>' + value.delivery_courier_name  + ' ' + value.size_a + 'x'+value.size_b+'x'+value.size_c+'</p>';
                                 if(value.container_type === 'EUR') {
-                                    html += '<p>EUROPALETA</p>';
+                                    html += '<p>PALETA 80x120</p>';
                                 } else if(value.container_type === 'POLPALETA'){
-                                    html += '<p>PÓŁPALETA</p>';
+                                    html += '<p>PÓŁPALETA 60x80</p>';
                                 } else if(value.container_type === 'PACZ'){
                                     html += '<p>PACZKA</p>';
                                 } else if (value.container_type === 'INNA'){
-                                    html += '<p>INNA</p>';
+                                    html += '<p>PALETA 100x120</p>';
                                 }
                                 if(value.status === 'WAITING_FOR_CANCELLED') {
                                     html += '<p>WYSŁANO DO ANULACJI</p>';
@@ -870,8 +870,17 @@
                 {
                     data: 'orderId',
                     name: 'orderId',
-                    render: function(orderId){
-                        return '<a target="_blank" href="/admin/planning/timetable?id=taskOrder-'+orderId+'">'+orderId+'</a>';
+                    render: function(orderId, row, data){
+                        if(data.master_order_id == null) {
+                            let html = '';
+                            for(let i = 0; i < data.connected.length; i++) {
+                                html += '<span style="display: block;">(P)' + data.connected[i].id + '</span>';
+                            }
+                            return '<a target="_blank" href="/admin/planning/timetable?id=taskOrder-'+orderId+'">(G)'+orderId+'</a>' + html;
+                        } else {
+                            return '<a target="_blank" href="/admin/planning/timetable?id=taskOrder-'+orderId+'">(P)'+orderId+'</a><span style="display: block;">(G)' + data.master_order_id + '</span>';
+                        }
+
                     }
                 },
                 {
@@ -1177,15 +1186,23 @@
                     render: function(data, type, row) {
                         console.log(row);
                         let totalOfPayments = 0;
+                        let totalOfDeclaredPayments = 0;
                         var payments = row['payments'];
 
                         for (let index = 0; index < payments.length; index++) {
                             if(payments[index].promise != "1") {
                                 totalOfPayments += parseFloat(payments[index].amount);
+                            } else {
+                                totalOfDeclaredPayments += parseFloat(payments[index].amount);
                             }
                         }
 
-                        return totalOfPayments;
+                        if(totalOfDeclaredPayments > 0 ) {
+                            return '<p>Z: ' + totalOfPayments + '</p><p>D: ' + totalOfDeclaredPayments +'</p>';
+                        } else {
+                            return '<p>Z: ' + totalOfPayments + '</p>';
+                        }
+
                     }
                 },
                 {
@@ -1615,7 +1632,7 @@
             } else {
                 table
                     .columns('statusName:name')
-                    .search( 'przyjete zapytanie ofertowe|w trakcie analizowania przez konsultanta|mozliwa do realizacji|mozliwa do realizacji kominy|w trakcie realizacji|oferta zakonczona|oferta oczekujaca|przekazane konsultantowi do obslugi', true, false )
+                    .search( 'przyjete zapytanie ofertowe|w trakcie analizowania przez konsultanta|mozliwa do realizacji|mozliwa do realizacji kominy|w trakcie realizacji|oferta oczekujaca|przekazane konsultantowi do obslugi', true, false )
                     .draw();
                 localStorage.setItem("filter", "PENDING");
             }
@@ -1659,13 +1676,12 @@
                 .columns()
                 .search('');
 
-            $('#orderFilter').val('ALL');
-            localStorage.removeItem('filter');
-            table.draw();
+            table.order([7, "desc"]).draw();
 
             if (reload) {
                 table.draw();
             }
+
         }
 
         function removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType) {
@@ -2042,7 +2058,7 @@
                         if (info.view.type !== 'timeGridWeek' && info.view.type !== 'dayGridMonth') {
                             $('#addNewTask').modal();
                             let startDate = new Date(info.dateStr);
-                            let firstDate = new Date(startDate.setHours(startDate.getHours() - 2));
+                            let firstDate = new Date(startDate.setHours(startDate.getHours() - 1));
                             let startMinutes = firstDate.getMinutes();
                             if (startMinutes < 10) {
                                 startMinutes = '0' + startMinutes;
@@ -2176,14 +2192,14 @@
                                 $.each(data, function (index, value) {
                                     if (value.status === 'WAITING_FOR_ACCEPT') {
                                         let startDate = new Date(value.start);
-                                        let firstDate = new Date(startDate.setHours(startDate.getHours() - 2));
+                                        let firstDate = new Date(startDate.setHours(startDate.getHours() - 1));
                                         let startMinutes = firstDate.getMinutes();
                                         if (startMinutes < 10) {
                                             startMinutes = '0' + startMinutes;
                                         }
                                         let dateTime = firstDate.getFullYear() + '-' + ( '0' + (firstDate.getMonth() + 1) ).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getHours() + ':' + startMinutes;
                                         let newDate = new Date(value.end);
-                                        let endDate = new Date(newDate.setHours(newDate.getHours() - 2));
+                                        let endDate = new Date(newDate.setHours(newDate.getHours() - 1));
                                         let minutes = endDate.getMinutes();
                                         if (minutes < 10) {
                                             minutes = '0' + minutes;
@@ -2230,13 +2246,13 @@
                     },
                     eventMouseEnter: function (info) {
                         let startDate = new Date(info.event.start);
-                        let firstDate = new Date(startDate.setHours(startDate.getHours() - 2));
+                        let firstDate = new Date(startDate.setHours(startDate.getHours() - 1));
                         let startMinutes = firstDate.getMinutes();
                         if (startMinutes < 10) {
                             startMinutes = '0' + startMinutes;
                         }
                         let newDate = new Date(info.event.end);
-                        let endDate = new Date(newDate.setHours(newDate.getHours() - 2));
+                        let endDate = new Date(newDate.setHours(newDate.getHours() - 1));
                         let minutes = endDate.getMinutes();
                         if (minutes < 10) {
                             minutes = '0' + minutes;
@@ -2246,14 +2262,14 @@
                     },
                     eventDrop: function (info) {
                         let startDate = new Date(info.event.start);
-                        let firstDate = new Date(startDate.setHours(startDate.getHours() - 2));
+                        let firstDate = new Date(startDate.setHours(startDate.getHours() - 1));
                         let startMinutes = firstDate.getMinutes();
                         if (startMinutes < 10) {
                             startMinutes = '0' + startMinutes;
                         }
                         let dateTime = firstDate.getFullYear() + '-' + ( '0' + (firstDate.getMonth() + 1) ).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getHours() + ':' + startMinutes;
                         let newDate = new Date(info.event.end);
-                        let endDate = new Date(newDate.setHours(newDate.getHours() - 2));
+                        let endDate = new Date(newDate.setHours(newDate.getHours() - 1));
                         let minutes = endDate.getMinutes();
                         if (minutes < 10) {
                             minutes = '0' + minutes;
@@ -2276,14 +2292,14 @@
                     eventResize: function (info) {
                         $('#editTask').modal();
                         let startDate = new Date(info.event.start);
-                        let firstDate = new Date(startDate.setHours(startDate.getHours() - 2));
+                        let firstDate = new Date(startDate.setHours(startDate.getHours() - 1));
                         let startMinutes = firstDate.getMinutes();
                         if (startMinutes < 10) {
                             startMinutes = '0' + startMinutes;
                         }
                         let dateTime = firstDate.getFullYear() + '-' + ( '0' + (firstDate.getMonth() + 1) ).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getHours() + ':' + startMinutes;
                         let newDate = new Date(info.event.end);
-                        let endDate = new Date(newDate.setHours(newDate.getHours() - 2));
+                        let endDate = new Date(newDate.setHours(newDate.getHours() - 1));
                         let minutes = endDate.getMinutes();
                         if (minutes < 10) {
                             minutes = '0' + minutes;

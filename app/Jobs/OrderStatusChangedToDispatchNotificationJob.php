@@ -27,6 +27,10 @@ class OrderStatusChangedToDispatchNotificationJob extends Job
     /**
      * @var null
      */
+    protected $pathSecond;
+    /**
+     * @var null
+     */
     protected $packageNumber;
 
     /**
@@ -34,11 +38,12 @@ class OrderStatusChangedToDispatchNotificationJob extends Job
      * @param $orderId
      * @param $self
      */
-    public function __construct($orderId, $self = null, $path = null, $packageNumber = null)
+    public function __construct($orderId, $self = null, $path = null, $packageNumber = null, $pathSecond = null)
     {
         $this->orderId = $orderId;
         $this->self = $self;
         $this->path = $path;
+        $this->pathSecond = $pathSecond;
         $this->packageNumber = $packageNumber;
     }
 
@@ -81,7 +86,7 @@ class OrderStatusChangedToDispatchNotificationJob extends Job
                     ->to($warehouseMail)
                     ->send(new OrderStatusChangedToDispatchMail($subject,
                         $acceptanceFormLink,
-                        $sendFormInvoice, $order, $this->self, $this->path, $this->packageNumber));
+                        $sendFormInvoice, $order, $this->self, $this->path, $this->packageNumber, $this->pathSecond));
             }
         }
     }

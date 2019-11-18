@@ -1,5 +1,7 @@
 <body>
-Proszę o anulowanie zlecenia o id: {{$sendingNumber}}
+Proszę o anulowanie zlecenia o id: {{$package->order_id}}/{{$package->number}}<br>
+Numer listu przewozowego: {{$package->letter_number}}<br>
+Numer nadania: {{$package->sending_number}}<br>
 
 <p>
     Jeśli wyrażacie Państwo zgodę na anulację - proszę o kliknięcie przycisku TAK, w innym przypadku proszę o kliknięcie

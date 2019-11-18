@@ -21,7 +21,7 @@ class OrderPayment extends Model implements Transformable
      * @var array
      */
     protected $fillable = [
-        'order_id', 'amount', 'notices', 'promise', 'promise_date', 'master_payment_id'
+        'order_id', 'amount', 'notices', 'promise', 'promise_date', 'master_payment_id', 'created_at'
     ];
 
     /**

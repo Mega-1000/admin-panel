@@ -14,8 +14,8 @@ use Prettus\Repository\Traits\TransformableTrait;
  */
 class Order extends Model implements Transformable
 {
-    use TransformableTrait;
 
+    use TransformableTrait;
     /**
      * The attributes that are mass assignable.
      *
@@ -62,9 +62,9 @@ class Order extends Model implements Transformable
         'warehouse_notice',
         'warehouse_value',
         'production_date',
-        'master_order_id'
+        'master_order_id',
+        'spedition_comment',
     ];
-
     public $customColumnsVisibilities = [
         'mark',
         'spedition_exchange_invoiced_selector',
@@ -128,19 +128,18 @@ class Order extends Model implements Transformable
             }
         }
 
-        return round(($totalOfProductsPrices * 1.23) + floatval($this->shipment_price_for_client) + floatval($this->additional_service_cost) + floatval($this->additional_cash_on_delivery_cost),
-            2);
+        return round(($totalOfProductsPrices * 1.23) + floatval($this->shipment_price_for_client) + floatval($this->additional_service_cost) + floatval($this->additional_cash_on_delivery_cost), 2);
     }
 
     public function getPackagesCashOnSum()
     {
         $sum = 0;
 
-        foreach($this->packages as $package) {
+        foreach ($this->packages as $package) {
             $sum += $package->cash_on_delivery;
         }
 
-        return $this->toPay() - $sum;
+        return $this->toPayPackages() - $sum;
     }
 
     /**
@@ -148,8 +147,8 @@ class Order extends Model implements Transformable
      */
     public function isPaymentRegulated()
     {
-        $valueRange = config('orders.plus-minus-regulation-amount');
-        $orderTotalPrice = $this->getSumOfGrossValues();
+        $valueRange         = config('orders.plus-minus-regulation-amount');
+        $orderTotalPrice    = $this->getSumOfGrossValues();
         $totalPaymentAmount = floatval($this->payments()->where("promise", "")->sum("amount"));
 
         return ($totalPaymentAmount > ($orderTotalPrice - $valueRange) && $totalPaymentAmount < ($orderTotalPrice + $valueRange));
@@ -158,12 +157,42 @@ class Order extends Model implements Transformable
     /**
      * @return bool
      */
+    public function toPayPackages()
+    {
+        $sum      = 0;
+        $packages = $this->packages()->whereIn('status', ['SENDING', 'DELIVERED', 'NEW', 'WAITING_FOR_SENDING'])->get();
+        foreach ($packages as $package) {
+            $sum += $package->cash_on_delivery;
+        }
+        $orderTotalPrice           = $this->getSumOfGrossValues();
+        $totalPaymentAmount        = floatval($this->payments()->where('promise', '=', '')->sum("amount"));
+        $totalPromisePaymentAmount = floatval($this->payments()->where('promise', '=', '1')->sum("amount"));
+        //dd($orderTotalPrice - $totalPromisePaymentAmount - $sum);
+        if ($orderTotalPrice - $totalPaymentAmount > -2 && $orderTotalPrice - $totalPaymentAmount < 2) {
+            return 0;
+        } else if ($totalPaymentAmount < 2 && $totalPromisePaymentAmount > 2) {
+            return $orderTotalPrice - $totalPromisePaymentAmount - $sum;
+        } else {
+            return $orderTotalPrice - $totalPaymentAmount - $sum;
+        }
+    }
+
+    /**
+     * @return bool
+     */
     public function toPay()
     {
         $orderTotalPrice = $this->getSumOfGrossValues();
-        $totalPaymentAmount = floatval($this->payments()->sum("amount"));
-
-        return $orderTotalPrice - $totalPaymentAmount;
+        if (floatval($this->payments()->where('promise', '=', '')->sum("amount")) > 2) {
+            $totalPaymentAmount = floatval($this->payments()->where('promise', '=', '')->sum("amount"));
+        } else {
+            $totalPaymentAmount = floatval($this->payments()->where('promise', '=', '1')->sum("amount"));
+        }
+        if ($orderTotalPrice - $totalPaymentAmount > -2 && $orderTotalPrice - $totalPaymentAmount < 2) {
+            return 0;
+        } else {
+            return $orderTotalPrice - $totalPaymentAmount;
+        }
     }
 
     public function isDeliveryDataComplete()
@@ -178,7 +207,28 @@ class Order extends Model implements Transformable
             empty($deliveryAddress->flat_number) ||
             empty($deliveryAddress->city) ||
             empty($deliveryAddress->postal_code)
-        ));
+            ));
+    }
+
+    public function isInvoiceDataComplete()
+    {
+        $invoiceAddress = $this->addresses()->where('type', '=', 'INVOICE_ADDRESS')->first();
+        return (!(
+            empty($invoiceAddress->firstname) ||
+            empty($invoiceAddress->lastname) ||
+            empty($invoiceAddress->phone) ||
+            empty($invoiceAddress->address) ||
+            empty($invoiceAddress->flat_number) ||
+            empty($invoiceAddress->city) ||
+            empty($invoiceAddress->postal_code)
+            ));
+    }
+
+    public function getDeliveryAddress()
+    {
+        $deliveryAddress = $this->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first();
+
+        return $deliveryAddress;
     }
 
     public function getInvoiceAddress()
@@ -207,17 +257,15 @@ class Order extends Model implements Transformable
 
     public function promisePaymentsSum()
     {
-        $sum = 0;
+        $sum             = 0;
         $promisePayments = $this->payments()->where('promise', 'like', '1')->get();
 
-        foreach($promisePayments as $promisePayment)
-        {
+        foreach ($promisePayments as $promisePayment) {
             $sum += $promisePayment->amount;
         }
 
         return $sum;
     }
-
 
     public function bookedPayments()
     {
@@ -231,13 +279,23 @@ class Order extends Model implements Transformable
         return $this->payments()->where('promise', 'like', '')->count();
     }
 
+    public function packagesCashOnDeliverySum()
+    {
+        $sum      = 0;
+        $packages = $this->packages()->whereIn('status', ['SENDING', 'DELIVERED', 'NEW', 'WAITING_FOR_SENDING'])->get();
+        foreach ($packages as $package) {
+            $sum += $package->cash_on_delivery;
+        }
+
+        return $sum;
+    }
+
     public function bookedPaymentsSum()
     {
-        $sum = 0;
+        $sum             = 0;
         $promisePayments = $this->payments()->where('promise', 'like', '')->get();
 
-        foreach($promisePayments as $promisePayment)
-        {
+        foreach ($promisePayments as $promisePayment) {
             $sum += $promisePayment->amount;
         }
 
@@ -246,11 +304,10 @@ class Order extends Model implements Transformable
 
     public function orderGroupBookedPaymentsSum()
     {
-        $sum = 0;
+        $sum             = 0;
         $promisePayments = $this->payments()->where('promise', 'like', '')->get();
 
-        foreach($promisePayments as $promisePayment)
-        {
+        foreach ($promisePayments as $promisePayment) {
             $sum += $promisePayment->amount;
         }
 
@@ -261,7 +318,7 @@ class Order extends Model implements Transformable
     {
         $LPs = $this->packages()->where('status', '!=', 'NEW')->first();
 
-        if(!empty($LPs)) {
+        if (!empty($LPs)) {
             return true;
         } else {
             return false;

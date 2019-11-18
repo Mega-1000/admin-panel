@@ -197,8 +197,9 @@
                 {
                     data: 'id',
                     name: 'id',
-                    render: function (id) {
-                        let html = '<form action="{{ url()->current() }}/' + id + '/change-status" method="POST" style="display: inline;">';
+                    render: function (id, type, row) {
+			console.log(row);
+                        let html = '<form action="{{ url()->current() }}/' + row.customer_id + '/change-status" method="POST" style="display: inline;">';
                         html += '{{ method_field('put') }}';
                         html += '{{ csrf_field() }}';
                         html += '<button type="submit" href="{{ url()->current() }}/' + id + '/change-status" class="btn btn-sm btn-primary delete">';
@@ -207,12 +208,12 @@
                         html += '</button>';
                         html += '</form>';
 
-                        html += '<a href="{{ url()->current() }}/' + id + '/edit" class="btn btn-sm btn-primary edit">';
+                        html += '<a href="{{ url()->current() }}/' + row.customer_id + '/edit" class="btn btn-sm btn-primary edit">';
                         html += '<i class="voyager-edit"></i>';
                         html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
                         html += '</a>';
 
-                        html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecord(' + id + ')">';
+                        html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecord(' + row.customer_id + ')">';
                         html += '<i class="voyager-trash"></i>';
                         html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
                         html += '</button>';

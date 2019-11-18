@@ -41,10 +41,10 @@
                 <label for="notices">@lang('order_payments.form.notices')</label>
                 <textarea class="form-control" id="notices" name="notices" rows="5">{{ $orderPayment->notices }}</textarea>
             </div>
-            @if(Auth::user()->role_id == 2 || Auth::user()->role_id == 3)
+            @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 2 || Auth::user()->role_id == 3)
             <div class="form-group">
                 <label for="tags">@lang('order_payments.form.promise')</label>
-                <input type="checkbox" id="promise" name="promise" @if($orderPayment->promise == '1') checked="checked" @endif>
+                <input type="checkbox" id="promise" value="yes" name="promise" @if($orderPayment->promise == '1') checked="checked" @endif>
             </div>
             @endif
             <div class="form-group">
@@ -60,7 +60,7 @@
                 </select>
 
             </div>
-            @if(Auth::user()->role_id == 2 || Auth::user()->role_id == 3)
+            @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 2 || Auth::user()->role_id == 3)
             <div class="form-group">
                 <label for="promise_date">@lang('order_payments.form.promise_date')</label><br/>
                 <input type="text" id="promise_date" name="promise_date" value="{{ $orderPayment->promise_date }}" class="form-control default-date-picker-now">

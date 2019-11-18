@@ -2,7 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Entities\Order;
 use App\Repositories\StatusRepository;
+use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -76,10 +78,22 @@ class OrderStatusChangedNotificationJob extends Job
             $method = $tag->handler;
             $message = preg_replace("[" . preg_quote($tag->name) . "]", $emailTagHandler->$method(), $message);
         }
+        if($order->status_id == 3 || $order->status_id == 4) {
+            $subject = "Zmiana statusu - numer oferty: ". $this->orderId . " z: " . $oldStatus->name . " na: " . $order->status->name . ' oraz proforma';
+            $order = Order::find($order->id);
+            $proformDate = \Carbon\Carbon::now()->format('m-Y');
+            $proformDate = str_replace('-', '/', $proformDate);
+            $date = \Carbon\Carbon::now()->toDateString();
 
-        $subject = "Zmiana statusu - numer oferty: ". $this->orderId . " z: " . $oldStatus->name . " na: " . $order->status->name;
-        \Mailer::create()
-            ->to($order->customer->login)
-            ->send(new OrderStatusChanged($subject, $message));
+            $pdf = PDF::loadView('pdf.proform', compact('date', 'proformDate', 'order'));
+            \Mailer::create()
+                ->to($order->customer->login)
+                ->send(new OrderStatusChanged($subject, $message, $pdf->output()));
+        }
+
+        //$subject = "Zmiana statusu - numer oferty: ". $this->orderId . " z: " . $oldStatus->name . " na: " . $order->status->name;
+        //\Mailer::create()
+        //    ->to($order->customer->login)
+        //    ->send(new OrderStatusChanged($subject, $message));
     }
 }

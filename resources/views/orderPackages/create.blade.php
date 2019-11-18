@@ -16,6 +16,12 @@
             width: 50%;
             float: right;
         }
+        .wrong-difference {
+            color: orange;
+        }
+        .valid-difference {
+            color: black;
+        }
     </style>
 @endsection
 
@@ -126,12 +132,14 @@
             <div class="form-group">
                 <label for="container_type">@lang('order_packages.form.container_type')</label><br/>
                 <select class="form-control" id="container_type" name="container_type">
-                    <option {{old('container_type') === 'EUR' ? 'selected="selected"' : ''}} value="EUR">EUROPALETA
-                    </option>
                     <option {{old('container_type') === 'POLPALETA' ? 'selected="selected"' : ''}} value="POLPALETA">
-                        PÓŁPALETA
+                        PÓŁPALETA 60x80
                     </option>
-                    <option {{old('container_type') === 'INNA' ? 'selected="selected"' : ''}} value="INNA">INNA</option>
+                    <option {{old('container_type') === 'EUR' ? 'selected="selected"' : ''}} value="EUR">PALETA 680x120
+                    </option>
+                    <option {{old('container_type') === 'INNA' ? 'selected="selected"' : ''}} value="INNA">PALETA
+                        100x120
+                    </option>
                     <option {{old('container_type') === 'PACZ' ? 'selected="selected"' : ''}} value="PACZ">PACZKA
                     </option>
                 </select>
@@ -140,11 +148,165 @@
                 <label for="shape">@lang('order_packages.form.shape')</label><br/>
                 <input type="text" id="shape" name="shape" class="form-control" value="{{ old('shape') }}">
             </div>
-            <div class="form-group">
-                <label for="cash_on_delivery">@lang('order_packages.form.cash_on_delivery')</label>
-                <input type="number" step=".01" class="form-control" id="cash_on_delivery" name="cash_on_delivery"
-                       value="{{ $order->getPackagesCashOnSum() }}">
+
+                <table id="paymentsTable" class="table table-hover" style="float: left;">
+                    <thead>
+                    <tr>
+                        <th>Typ zlecenia</th>
+                        <th>ID zlecenia</th>
+                        <th>Wartość zlecenia</th>
+                        <th>Zaliczki zaksięgowane</th>
+                        <th>Zaliczki deklarowane</th>
+                        <th>Pozostało do zapłaty <br/> przed wskazaniem pobrania <br/> na teraz nadawanym LP</th>
+			<th>Pobrania wskazane w już nadanych LP</th>
+			<th>Kwota pobrania w tym LP <br/> dla bilansu wszystkich zleceń <br/> (głównego oraz połączonych)</th>
+			<th>Pozostało do pobrania <br/> po uwzględnieniu obecnego LP <br/> dla bilansu wszystkich zleceń <br/> (głównego oraz połączonych) </th>
+                        <th>Listy przewozowe</th>
+                        <th>Rodzaj kuriera</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+			@php
+				$toPaySum = $order->toPayPackages();
+				$sumOfGrossValues = $order->getSumOfGrossValues();
+                                        $bookedPaymentsSum = $order->bookedPaymentsSum();
+                                        $promisePaymentsSum = $order->promisePaymentsSum();
+			@endphp
+                        <td>Główne</td>
+                        <td>{{ $order->id }}</td>
+                        <td>{{ $order->getSumOfGrossValues() }}</td>
+                        <td>{{ $order->bookedPaymentsSum() }}</td>
+                        <td>{{ $order->promisePaymentsSum() }}</td>
+                        <td>{{ $order->toPayPackages() }}</td>
+			<td>
+			                            @foreach($order->packages as $package)
+                                @if($package->status == 'CANCELLED' || $package->status == 'WAITING_FOR_CANCELLED')
+
+                                @else
+                                <p style="display: inline-block;">{{$package->cash_on_delivery }}</p>
+				@if($package->status == 'SENDING' || $package->status == 'DELIVERED')
+				@else
+				 <a type="button" class="open" style="text-decoration: none;display: inline-block;" data-package-id="{{ $package->id }}" data-package-value="{{ $package->cash_on_delivery }}">
+                                    Zmień
+                                </a>
+				@endif
+				<br/>
+                                @endif
+                            @endforeach
+			</td>
+                            <td>
+                            </td>
+			<td></td>
+                        <td style="vertical-align: top;">
+                            @foreach($order->packages as $package)
+                                @if($package->status == 'CANCELLED' || $package->status == 'WAITING_FOR_CANCELLED')
+
+                                @else
+                                    <p>{{$package->letter_number}}</p>
+
+                                @endif
+                            @endforeach
+                        </td>
+                        <td  style="vertical-align: top;">
+                            @foreach($order->packages as $package)
+				@if($package->status == 'CANCELLED' || $package->status == 'WAITING_FOR_CANCELLED')
+
+                                @else
+                                <p>{{$package->delivery_courier_name}}</p>
+				@endif
+                            @endforeach
+                        </td>
+                    </tr>
+                    @foreach($connectedOrders as $connectedOrder)
+                        <tr>
+                            <td>Połączone</td>
+                            <td>{{ $connectedOrder->id }}</td>
+                            <td>{{ $connectedOrder->getSumOfGrossValues() }}</td>
+                            <td>{{ $connectedOrder->bookedPaymentsSum() }}</td>
+                            <td>{{ $connectedOrder->promisePaymentsSum() }}</td>
+                            <td>{{ $connectedOrder->toPayPackages() }}</td>
+				<td>
+                                @foreach($connectedOrder->packages as $package)
+                                    @if($package->status == 'CANCELLED' || $package->status == 'WAITING_FOR_CANCELLED')
+
+                                    @else
+                                        <p style="display: inline-block;">{{$package->cash_on_delivery }}</p>
+					@if($package->status == 'SENDING' || $package->status == 'DELIVERED')
+                                @else
+                                 <a type="button" class="open" style="text-decoration: none;display: inline-block;" data-package-id="{{ $package->id }}" data-package-value="{{ $package->cash_on_delivery }}">
+                                    Zmień
+                                </a>
+                                @endif
+                                <br/>
+                                    @endif
+                                @endforeach
+                            </td>
+				<td></td>
+			<td></td>
+		<td style="vertical-align: top;">
+                            @foreach($order->packages as $package)
+                                @if($package->status == 'CANCELLED' || $package->status == 'WAITING_FOR_CANCELLED')
+
+                                @else
+                                    <p>{{$package->letter_number}}</p>
+
+                                @endif
+                            @endforeach
+                        </td>
+
+				@php
+					$sumOfGrossValues += $connectedOrder->getSumOfGrossValues();
+					$bookedPaymentsSum += $connectedOrder->bookedPaymentsSum();
+					$promisePaymentsSum += $connectedOrder->promisePaymentsSum();
+					$toPaySum += $connectedOrder->toPayPackages();
+				@endphp
+                            <td style="vertical-align: top;">
+                                @foreach($connectedOrder->packages as $package)
+					@if($package->status == 'CANCELLED' || $package->status == 'WAITING_FOR_CANCELLED')
+
+                                    @else
+                                    <p>{{$package->delivery_courier_name}}</p>
+					@endif
+                                @endforeach
+                            </td>            </tr>
+                    @endforeach
+                    <tr>
+                        <td colspan="2">
+
+                        </td>
+			<td>
+			{{ $sumOfGrossValues }}
+			</td>
+			<td>
+			{{ $bookedPaymentsSum  }}
+			</td>
+                        <td>
+			{{ $promisePaymentsSum }}
+                        </td>
+                        <td>
+			{{ $toPaySum }}
+                        </td>
+			<td>
+			</td>
+			<td>
+			<label for="cash_on_delivery">Wpisz kwotę pobrania na tworzonym LP</label>
+                                <input type="number" step=".01" class="form-control" id="cash_on_delivery" style="border: 1px solid green;" name="cash_on_delivery"
+                                       value="{{ $toPaySum }}">
+			Automatycznie wpisana kwota jest kwotą sugerowaną, która zamyka bilans wszystkich zleceń (głównego i połączonych)
+			</td>
+                        
+			<td>
+			<h3><span id="packageCost"></span> zł <input type="hidden" value="" id="toCheck" name="toCheck"></h3>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            <div class="text-right">
+                <h3 style="display: none;">Bilans zamówień: {{ $allOrdersSum }} zł</h3>
+                <h3 style="display: none;">Pobrane łącznie w LP: {{ number_format(($allOrdersSum) - ($allOrdersSum - $cashOnDeliverySum), 2) }} zł</h3>
             </div>
+
             <div class="form-group">
                 <label for="notices">@lang('order_packages.form.notices')</label>
                 <textarea cols="40" rows="5" type="text" class="form-control" id="notices" name="notices">
@@ -190,162 +352,168 @@
         </div>
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
     </form>
-    <form action="">
-        <table id="paymentsTable" class="table table-hover" style="float: left;">
-            <thead>
-            <tr>
-                <th>Typ zlecenia</th>
-                <th>ID zlecenia</th>
-                <th>Wartość zlecenia</th>
-                <th>Zaliczki zaksięgowane</th>
-                <th>Zaliczki deklarowane</th>
-                <th>Pozostało do zapłaty</th>
-                <th>Listy przewozowe</th>
-                <th>Do pobrania w LP</th>
-                <th>Rodzaj kuriera</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>Główne</td>
-                <td>{{ $order->id }}</td>
-                <td>{{ $order->getSumOfGrossValues() }}</td>
-                <td>{{ $order->bookedPaymentsSum() }}</td>
-                <td>{{ $order->promisePaymentsSum() }}</td>
-                <td>{{ $order->toPay() }}</td>
-                <td>
-                    @foreach($order->packages as $package)
-                        <p>{{$package->letter_number}}</p>
-                    @endforeach
-                </td>
-                <td>
-                    @foreach($order->packages as $package)
-                        <p>{{$package->cash_on_delivery }}</p>
-                    @endforeach
-                </td>
-                <td>
-                    @foreach($order->packages as $package)
-                        <p>{{$package->delivery_courier_name}}</p>
-                    @endforeach
-                </td>
-            </tr>
-            @foreach($connectedOrders as $order)
-            <tr>
-                <td>Połączone</td>
-                <td>{{ $order->id }}</td>
-                <td>{{ $order->getSumOfGrossValues() }}</td>
-                <td>{{ $order->bookedPaymentsSum() }}</td>
-                <td>{{ $order->promisePaymentsSum() }}</td>
-                <td>{{ $order->toPay() }}</td>
-                <td>
-                    @foreach($order->packages as $package)
-                        <p>{{$package->letter_number}}</p>
-                    @endforeach
-                </td>
-                <td>
-                    @foreach($order->packages as $package)
-                        <p>{{$package->cash_on_delivery }}</p>
-                    @endforeach
-                </td>
-                <td>
-                    @foreach($order->packages as $package)
-                        <p>{{$package->delivery_courier_name}}</p>
-                    @endforeach
-                </td>            </tr>
-            @endforeach
-            </tbody>
-        </table>
-        <h1>Wartość zbiorcza pobrania dla wszystkich zleceń: {{ $cashOnDeliverySum }}</h1>
+    <form action="" id="cashon">
     </form>
+    <div class="modal fade" id="packageDialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <form action="{{ action('OrdersPackagesController@changeValue') }}" method="POST">
+                    {{ csrf_field() }}
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Zmiana wartości przesyłki <span
+                                    class="package_id"></span></h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="cash_on_delivery">@lang('order_packages.form.cash_on_delivery')</label>
+                            <input type="number" step=".01" class="form-control" id="modalPackageValue"
+                                   name="modalPackageValue"
+                                   value="0">
+                            <input type="hidden" value="0" name="packageId" id="packageId">
+                            <input type="hidden" value="0" id="template-id" name="template-id">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Zapisz</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection
 @section('scripts')
     <script>
-        let templateData = @json($templateData);
-        let orderData = @json($orderData);
-        let payments = @json($payments);
-        let promisedPayments = @json($promisedPayments);
-        let paymentsSum = 0;
-        let promisedPaymentsSum = 0;
+      $(document).on("click", ".open", function () {
+        let id = $(this).data('package-id');
+        let value = $(this).data('package-value');
+        $('.package_id').text(id);
+        $('#packageId').val(id);
+        $('#modalPackageValue').val(value);
+        $('#packageDialog').modal('show');
+      });
+      let templateData = @json($templateData);
+      let orderData = @json($orderData);
+      let payments = @json($payments);
+      let promisedPayments = @json($promisedPayments);
+      let paymentsSum = 0;
+      let promisedPaymentsSum = 0;
+
+        $(document).ready(function() {
+             let toPay = {{ $toPaySum }};
+             let templateId = '{{ Session::get('template-id') }}';
+             $('#packageCost').text(toPay - $('#cash_on_delivery').val());
+             $('#toCheck').val(toPay - $('#cash_on_delivery').val());
 
 
-        payments.forEach(function (payment) {
-            paymentsSum = payment.amount;
-        });
+             $('#cash_on_delivery').on('change', function() {
+                 let difference = toPay - $(this).val();
+                 $('#toCheck').val(toPay - $('#cash_on_delivery').val());
+                 if(difference != 0) {
+                     $('#packageCost').addClass('wrong-difference');
+                     $('#packageCost').text(difference);
+                 } else {
+                     $('#packageCost').removeClass('wrong-difference');
+                     $('#packageCost').text(difference);
+                 }
 
-        promisedPayments.forEach(function (payment) {
-            promisedPaymentsSum = payment.amount;
-        });
+             });
 
-
-        $('#data_template').change(function () {
-            let selectedTemplateData = templateData[$("#data_template option:selected").val()];
-
-            $("#chosen_data_template").val(selectedTemplateData['name']);
-
-            $("#size_a").val(selectedTemplateData['size_a']);
-            $("#size_b").val(selectedTemplateData['size_b']);
-            $("#size_c").val(selectedTemplateData['size_c']);
-            $("#service_courier_name").val(selectedTemplateData['service_courier_name']);
-            $("#delivery_courier_name").val(selectedTemplateData['delivery_courier_name']);
-            $("#quantity").val(selectedTemplateData['quantity']);
-            $("#shape").val(selectedTemplateData['shape']);
-            $("#shipment_date").val(orderData['shipment_date']);
-            $("#delivery_date").val(orderData['delivery_date']);
-            $("#weight").val(selectedTemplateData['weight']);
-            $("#notices").val(orderData['customer_notices']);
-            $("#cost_for_client").val(orderData['shipment_price_for_client']);
-            $("#cost_for_company").val(orderData['shipment_price_for_us']);
-            $("#container_type").val(selectedTemplateData['container_type']);
-        });
-
-        $("#shipment_date").on('dp.change', function () {
-            var shipmentDate = new Date($("#shipment_date").val());
-            var deliveryDate = "", noOfDaysToAdd = 1, count = 0;
-
-            while (count < noOfDaysToAdd) {
-                deliveryDate = new Date(shipmentDate.setDate(shipmentDate.getDate() + 1));
-                if (deliveryDate.getDay() != 0 && deliveryDate.getDay() != 6) {
-                    //Date.getDay() gives weekday starting from 0(Sunday) to 6(Saturday)
-                    count++;
-                }
+            $('#data_template').on('change', function() {
+                $('#template-id').val($(this).val());
+            });
+            if(templateId != '') {
+                $('#data_template').val(templateId).trigger('change');
             }
 
-            $("#delivery_date").val(moment(deliveryDate).format('YYYY-MM-DD'));
+
 
         });
 
-        function validate(form) {
-            if (payments.length == 0) {
-                if (confirm('Zlecenie posiada wyłącznie zaliczkę deklarowaną. Czy chcesz kontynuować przy jej użyciu?')) {
-                    $('#shouldTakePayment').val(1);
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-            if (promisedPaymentsSum == paymentsSum) {
-                $('#shouldTakePayment').val(2);
-                return true;
-            }
-            if (payments.length > 0) {
-                if (promisedPaymentsSum != paymentsSum) {
-                    if (confirm('Zaliczka deklarowana posiada inną wartość niż zaliczka zaksięgowana. System uwzględni zaliczkę zaksięgowaną.')) {
-                        $('#shouldTakePayment').val(3);
-                        return true;
-                    } else {
-                        return false;
-                    }
-                }
-            }
+
+      payments.forEach(function (payment) {
+        paymentsSum = payment.amount;
+      });
+
+      promisedPayments.forEach(function (payment) {
+        promisedPaymentsSum = payment.amount;
+      });
+
+
+      $('#data_template').change(function () {
+        let selectedTemplateData = templateData[$("#data_template option:selected").val()];
+
+        $("#chosen_data_template").val(selectedTemplateData['name']);
+
+        $("#size_a").val(selectedTemplateData['size_a']);
+        $("#size_b").val(selectedTemplateData['size_b']);
+        $("#size_c").val(selectedTemplateData['size_c']);
+        $("#service_courier_name").val(selectedTemplateData['service_courier_name']);
+        $("#delivery_courier_name").val(selectedTemplateData['delivery_courier_name']);
+        $("#quantity").val(selectedTemplateData['quantity']);
+        $("#shape").val(selectedTemplateData['shape']);
+        $("#shipment_date").val(orderData['shipment_date']);
+        $("#delivery_date").val(orderData['delivery_date']);
+        $("#weight").val(selectedTemplateData['weight']);
+        $("#notices").val(orderData['customer_notices']);
+        $("#cost_for_client").val(orderData['shipment_price_for_client']);
+        $("#cost_for_company").val(orderData['shipment_price_for_us']);
+        $("#container_type").val(selectedTemplateData['container_type']);
+      });
+
+      $("#shipment_date").on('dp.change', function () {
+        var shipmentDate = new Date($("#shipment_date").val());
+        var deliveryDate = "", noOfDaysToAdd = 1, count = 0;
+
+        while (count < noOfDaysToAdd) {
+          deliveryDate = new Date(shipmentDate.setDate(shipmentDate.getDate() + 1));
+          if (deliveryDate.getDay() != 0 && deliveryDate.getDay() != 6) {
+            //Date.getDay() gives weekday starting from 0(Sunday) to 6(Saturday)
+            count++;
+          }
         }
+
+        $("#delivery_date").val(moment(deliveryDate).format('YYYY-MM-DD'));
+
+      });
+
+      function validate(form) {
+	console.log(payments);
+        if (paymentsSum < 2 && promisedPaymentsSum > 2) {
+          if (confirm('Zlecenie posiada wyłącznie zaliczkę deklarowaną. Czy chcesz kontynuować przy jej użyciu?')) {
+            $('#shouldTakePayment').val(1);
+            return true;
+          } else {
+            return false;
+          }
+        }
+        if (promisedPaymentsSum == paymentsSum) {
+          $('#shouldTakePayment').val(2);
+          return true;
+        }
+        if (payments.length > 0) {
+          if (Math.abs(promisedPaymentsSum - paymentsSum) > 2 && Math.abs(promisedPaymentsSum - paymentsSum) < -2) {
+            if (confirm('Zaliczka deklarowana posiada inną wartość niż zaliczka zaksięgowana. System uwzględni zaliczkę zaksięgowaną.')) {
+              $('#shouldTakePayment').val(3);
+              return true;
+            } else {
+	      
+              return false;
+            }
+          }
+        }
+      }
     </script>
     <script src="{{URL::asset('js/jscolor.js')}}"></script>
     <script>
-        var breadcrumb = $('.breadcrumb:nth-child(2)');
+      var breadcrumb = $('.breadcrumb:nth-child(2)');
 
-        breadcrumb.children().remove();
-        breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");
-        breadcrumb.append("<li class='active'><a href='/admin/orders/{{$id}}/edit'>Przesyłki</a></li>");
-        breadcrumb.append("<li class='disable'><a href='javascript:void()'>Dodaj</a></li>");
+      breadcrumb.children().remove();
+      breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");
+      breadcrumb.append("<li class='active'><a href='/admin/orders/{{$id}}/edit'>Przesyłki</a></li>");
+      breadcrumb.append("<li class='disable'><a href='javascript:void()'>Dodaj</a></li>");
     </script>
 @endsection

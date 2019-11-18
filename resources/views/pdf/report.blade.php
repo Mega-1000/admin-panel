@@ -2,7 +2,7 @@
 <head>
     <style>
         body {
-            font-family: Verdana !important;
+            font-family: Calibri !important;
             font-size: 12px !important;
         }
     </style>
@@ -11,68 +11,71 @@
           integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
 <body>
-<div>
+<h1 class="page-title">
+    <i class="voyager-tag"></i> Raport {{$report->from}} - {{$report->to}}
+</h1>
 
-    @if($report->user_id === null)
-        <div class="title"><h2>Raport dla magazynu {{$report->warehouse->symbol}} z okresu {{$report->from}}
-                - {{$report->to}} </h2> - wygenerowano: {{$date}}</div>
-    @else
-        <div class="title"><h2>Raport dla konsultanta {{$report->user->name}} z okresu {{$report->from}}
-                - {{$report->to}} - wygenerowano: {{$date}} </h2></div>
-    @endif
-    <table class="table table-striped">
-        <thead>
-        <tr style="height:20px;">
-            <th>Lp.</th>
-            <th>Zadanie</th>
-            <th>Data rozpoczecia</th>
-            <th>Data zakonczenia</th>
-            <th>Konsultant</th>
-            <th>Magazyn</th>
-            @if($report->user_id === null)
-                <th>Koszt obslugi konsultanta</th>
-            @else
-                <th>Koszt obslugi magazynu</th>
-            @endif
-        </tr>
-        </thead>
-        <tbody>
-        @php
-            $i = 0;
-        @endphp
-        @foreach($tasks as $task)
-            {{$i++}}
-            <tr>
-                <td>{{$i}}</td>
-                <td>{{$task->name}}</td>
-                <td>{{$task->taskTime !== null ? $task->taskTime->date_start : ''}}</td>
-                <td>{{$task->taskTime !== null ? $task->taskTime->date_end : ''}}</td>
-                <td>{{$task->user->name}}</td>
-                <td>{{$task->warehouse->symbol}}</td>
-                @if($report->user_id === null)
-                    <td>{{$task->taskSalaryDetail !== null ? $task->taskSalaryDetail->warehouse_value : ''}}</td>
-                @else
-                    <td>{{$task->taskSalaryDetail !== null ? $task->taskSalaryDetail->consultant_value : ''}}</td>
-                @endif
-            </tr>
+@if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
+<div class="container-fluid">
+
+        @foreach($report->users as $user)
+        <div class="row">
+                <div class="col-md-12">
+                    <table class="table table-striped">
+                        <thead>
+                        <tr>
+                            <th colspan="3">{{$user->firstname}} {{$user->lastname}}</th>
+                        </tr>
+                        <tr>
+                            <th>Nazwa</th>
+                            <th>Czas pracy</th>
+                            <th>Kwota</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @php
+                            $sum = 0;
+                        @endphp
+                        @foreach($report->properties->where('user_id', '=', $user->id) as $item)
+                            @if($item != null)
+                                <tr>
+                                    <td><a target="_blank"
+                                           href="{{env('APP_URL')}}/admin/planning/timetable?id={{$item->task->order_id != null ? 'taskOrder-'.$item->task->order_id : 'task-'.$item->task->id}}">{{$item->task->name}}</a>
+                                    </td>
+                                    <td>{{is_float($item->time_work) ? number_format($item->time_work, '2') : $item->time_work }}</td>
+                                    <td>{{number_format($item->price,'2')}} zl</td>
+                                </tr>
+                                @php
+                                    $sum += number_format($item->price,'2');
+                                @endphp
+                            @endif
+                        @endforeach
+                        <tr><td colspan="3">Raport wg. dni</td></tr>
+                        @foreach($report->daily->where('user_id', '=', $user->id) as $dailyItem)
+                            <tr>
+                                <td colspan="2"><a target="_blank" href="/admin/planning/timetable?date={{$dailyItem->date}}">{{$dailyItem->date}}</a></td>
+                                <td>{{number_format($dailyItem->price,'2')}} zl</td>
+                            </tr>
+                        @endforeach
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td><strong>Suma: {{number_format($sum,'2')}} zl</strong></td>
+                        </tr>
+                        </tbody>
+                    </table>
+            </div>
+        </div>
         @endforeach
-        </tbody>
-        <tfoot>
-        <tr>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th></th>
-            <th style="text-align: center;">
-                Suma: {{$sum}}
-            </th>
-        </tr>
-        </tfoot>
-    </table>
+
 </div>
-
-
 </body>
 </html>

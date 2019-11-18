@@ -9,6 +9,10 @@
     <form action="{{ route('invoices.storePaymentsPdf') }}" method="POST" enctype="multipart/form-data">
         {{ csrf_field() }}
         <div class="payments-file">
+            <div class="form-group">
+                <label for="created_at">Data wpłaty</label><br/>
+                <input type="date" id="created_at" name="created_at" value="{{ Carbon\Carbon::now()->format('Y-m-d') }}" class="form-control">
+            </div>
             <input type="file" class="payments-file-input" id="payments" name="payments">
         </div>
         <button type="submit" class="btn btn-primary">Wyślij</button>

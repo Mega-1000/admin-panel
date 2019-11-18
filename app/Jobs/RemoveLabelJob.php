@@ -4,9 +4,12 @@ namespace App\Jobs;
 
 use App\Entities\Order;
 use App\Jobs\Orders\ChangeWarehouseStockJob;
+use App\Mail\ConfirmData;
+use App\Mail\DifferentCustomerData;
 use App\Repositories\LabelRepository;
 use App\Repositories\OrderRepository;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class RemoveLabelJob extends Job
 {
@@ -24,12 +27,11 @@ class RemoveLabelJob extends Job
      */
     public function __construct($order, $labelIdsToRemove, &$loopPreventionArray = [], $customLabelIdsToAddAfterRemoval = [])
     {
-        $this->order = $order;
-        $this->labelIdsToRemove = $labelIdsToRemove;
-        $this->loopPreventionArray = $loopPreventionArray;
+        $this->order                           = $order;
+        $this->labelIdsToRemove                = $labelIdsToRemove;
+        $this->loopPreventionArray             = $loopPreventionArray;
         $this->customLabelIdsToAddAfterRemoval = $customLabelIdsToAddAfterRemoval;
     }
-
 
     /**
      * Execute the job.
@@ -37,7 +39,7 @@ class RemoveLabelJob extends Job
      */
     public function handle(OrderRepository $orderRepository, LabelRepository $labelRepository)
     {
-        if (! ($this->order instanceof Order)) {
+        if (!($this->order instanceof Order)) {
             $this->order = $orderRepository->find($this->order);
         }
 
@@ -46,16 +48,33 @@ class RemoveLabelJob extends Job
         }
 
         foreach ($this->labelIdsToRemove as $labelId) {
-            if(!empty($this->loopPreventionArray['already-removed']) && in_array($labelId, $this->loopPreventionArray['already-removed'])) {
+            if (!empty($this->loopPreventionArray['already-removed']) && in_array($labelId, $this->loopPreventionArray['already-removed'])) {
                 continue;
             }
 
-            if($labelId == 49 && Auth::user()->role_id == 4) {
+            if ($labelId == 49 && Auth::user()->role_id == 4) {
                 continue;
             }
 
-            if($labelId == 74) {
-                dispatch_now(new ValidateSubiekt($this->order->id));
+            if ($labelId == 74) {
+                $noData = DB::table('gt_invoices')->where('order_id', $this->order->id)->where('gt_invoice_status_id', '13')->first();
+                if (!empty($noData)) {
+                    try {
+                        \Mailer::create()
+                            ->to($this->order->customer->login)
+                            ->send(new DifferentCustomerData('Wybór danych do wystawienia faktury - zlecenie'.$this->order->id, $this->order->id, $noData->id));
+                    } catch (\Swift_TransportException $e) {
+
+                    }
+                } else {
+                    try {
+                        \Mailer::create()
+                            ->to($this->order->customer->login)
+                            ->send(new ConfirmData('Wybór danych do wystawienia faktury  - zlecenie'.$this->order->id, $this->order->id));
+                    } catch (\Swift_TransportException $e) {
+
+                    }
+                }
             }
 
             $label = $labelRepository->find($labelId);
@@ -66,9 +85,9 @@ class RemoveLabelJob extends Job
                 $labelIdsToAttach = [];
                 foreach ($label->labelsToAddAfterRemoval as $item) {
                     $labelIdsToAttach[] = $item->id;
-                    if($item->id == 50) {
+                    if ($item->id == 50) {
                         $response = dispatch_now(new ChangeWarehouseStockJob($this->order));
-                        if(strlen((string)$response) > 0) {
+                        if (strlen((string) $response) > 0) {
                             return $response;
                         } else {
                             $this->order->labels()->detach($label);

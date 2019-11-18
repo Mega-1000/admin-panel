@@ -37,21 +37,19 @@
                 <label for="name">@lang('reports.form.name')</label>
                 <input type="text" class="form-control" id="name" name="name" value="{{old('name')}}">
             </div>
+            @php
+                $arraySelected = [];
+            @endphp
+            @if(old('users_id') != null)
+            @foreach(old('users_id') as $userId)
+                @php(array_push($arraySelected, $userId))
+            @endforeach
+            @endif
             <div class="form-group">
-                <label for="user_id">Użytkownik</label>
-                <select name="user_id" class="form-control">
-                    <option value="">Wybierz</option>
+                <label for="users_id">Użytkownik</label>
+                <select name="users_id[]" class="form-control" multiple>
                     @foreach($users as $user)
-                        <option {{old('user_id') === $user->id ? 'selected="selected"' : ''}} value="{{$user->id}}">{{$user->firstname}} {{$user->lastname}}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="warehouse_id">Magazyn</label>
-                <select name="warehouse_id" class="form-control">
-                    <option value="">Wybierz</option>
-                    @foreach($warehouses as $warehouse)
-                        <option {{old('warehouse_id') === $warehouse->id ? 'selected="selected"' : ''}} value="{{$warehouse->id}}">{{$warehouse->symbol}}</option>
+                        <option {{in_array($user->id, $arraySelected) == true ? 'selected="selected"' : ''}} value="{{$user->id}}">{{$user->firstname}} {{$user->lastname}}</option>
                     @endforeach
                 </select>
             </div>

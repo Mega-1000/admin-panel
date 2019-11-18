@@ -66,25 +66,53 @@
             <div class="form-group">
                 <label for="service_courier_name">@lang('order_packages.form.service_courier_name')</label>
                 <select class="form-control" id="service_courier_name" name="service_courier_name">
-                    <option {{ $orderPackage->service_courier_name === 'INPOST' ? 'selected="selected"' : '' }} value="INPOST">INPOST</option>
-                    <option {{ $orderPackage->service_courier_name === 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">POCZTEX</option>
-                    <option {{ $orderPackage->service_courier_name === 'DPD' ? 'selected="selected"' : '' }} value="DPD">DPD</option>
-                    <option {{ $orderPackage->service_courier_name === 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">APACZKA</option>
-                    <option {{ $orderPackage->service_courier_name === 'JAS' ? 'selected="selected"' : '' }} value="JAS">JAS</option>
-                    <option {{ $orderPackage->service_courier_name === 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">GIELDA</option>
-                    <option {{ $orderPackage->service_courier_name === 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">ODBIÓR OSOBISTY</option>
+                    <option {{ $orderPackage->service_courier_name === 'INPOST' ? 'selected="selected"' : '' }} value="INPOST">
+                        INPOST
+                    </option>
+                    <option {{ $orderPackage->service_courier_name === 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">
+                        POCZTEX
+                    </option>
+                    <option {{ $orderPackage->service_courier_name === 'DPD' ? 'selected="selected"' : '' }} value="DPD">
+                        DPD
+                    </option>
+                    <option {{ $orderPackage->service_courier_name === 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
+                        APACZKA
+                    </option>
+                    <option {{ $orderPackage->service_courier_name === 'JAS' ? 'selected="selected"' : '' }} value="JAS">
+                        JAS
+                    </option>
+                    <option {{ $orderPackage->service_courier_name === 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
+                        GIELDA
+                    </option>
+                    <option {{ $orderPackage->service_courier_name === 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
+                        ODBIÓR OSOBISTY
+                    </option>
                 </select>
             </div>
             <div class="form-group">
                 <label for="delivery_courier_name">@lang('order_packages.form.delivery_courier_name')</label>
                 <select class="form-control" id="delivery_courier_name" name="delivery_courier_name">
-                    <option {{ $orderPackage->delivery_courier_name === 'INPOST' ? 'selected="selected"' : '' }} value="INPOST">INPOST</option>
-                    <option {{ $orderPackage->delivery_courier_name === 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">POCZTEX</option>
-                    <option {{ $orderPackage->delivery_courier_name === 'DPD' ? 'selected="selected"' : '' }} value="DPD">DPD</option>
-                    <option {{ $orderPackage->delivery_courier_name === 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">APACZKA</option>
-                    <option {{ $orderPackage->delivery_courier_name === 'JAS' ? 'selected="selected"' : '' }} value="JAS">JAS</option>
-                    <option {{ $orderPackage->delivery_courier_name === 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">GIELDA</option>
-                    <option {{ $orderPackage->delivery_courier_name === 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">ODBIÓR OSOBISTY</option>
+                    <option {{ $orderPackage->delivery_courier_name === 'INPOST' ? 'selected="selected"' : '' }} value="INPOST">
+                        INPOST
+                    </option>
+                    <option {{ $orderPackage->delivery_courier_name === 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">
+                        POCZTEX
+                    </option>
+                    <option {{ $orderPackage->delivery_courier_name === 'DPD' ? 'selected="selected"' : '' }} value="DPD">
+                        DPD
+                    </option>
+                    <option {{ $orderPackage->delivery_courier_name === 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
+                        APACZKA
+                    </option>
+                    <option {{ $orderPackage->delivery_courier_name === 'JAS' ? 'selected="selected"' : '' }} value="JAS">
+                        JAS
+                    </option>
+                    <option {{ $orderPackage->delivery_courier_name === 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
+                        GIELDA
+                    </option>
+                    <option {{ $orderPackage->delivery_courier_name === 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
+                        ODBIÓR OSOBISTY
+                    </option>
                 </select>
             </div>
             <div class="form-group">
@@ -100,14 +128,14 @@
             <div class="form-group">
                 <label for="container_type">@lang('order_packages.form.container_type')</label><br/>
                 <select class="form-control" id="container_type" name="container_type">
-                    <option {{$orderPackage->container_type === 'EUR' ? 'selected="selected"' : ''}} value="EUR">
-                        EUROPALETA
-                    </option>
                     <option {{$orderPackage->container_type === 'POLPALETA' ? 'selected="selected"' : ''}} value="POLPALETA">
-                        PÓŁPALETA
+                        PÓŁPALETA 60x80
+                    </option>
+                    <option {{$orderPackage->container_type === 'EUR' ? 'selected="selected"' : ''}} value="EUR">
+                        PALETA 80x120
                     </option>
                     <option {{$orderPackage->container_type === 'INNA' ? 'selected="selected"' : ''}} value="INNA">
-                        INNA
+                        PALETA 100x120
                     </option>
                     <option {{$orderPackage->container_type === 'PACZ' ? 'selected="selected"' : ''}} value="PACZ">
                         PACZKA
@@ -125,7 +153,8 @@
             </div>
             <div class="form-group">
                 <label for="notices">@lang('order_packages.form.notices')</label>
-                <textarea cols="40" rows="5" type="text" class="form-control" id="notices" name="notices">{{ $orderPackage->notices }}</textarea>
+                <textarea cols="40" rows="5" type="text" class="form-control" id="notices"
+                          name="notices">{{ $orderPackage->notices }}</textarea>
             </div>
             <div class="form-group">
                 <label for="status">@lang('order_packages.form.status')</label>
@@ -235,37 +264,37 @@
 @section('scripts')
     <script src="{{URL::asset('js/jscolor.js')}}"></script>
     <script>
-        var breadcrumb = $('.breadcrumb:nth-child(2)');
+      var breadcrumb = $('.breadcrumb:nth-child(2)');
 
-        breadcrumb.children().remove();
-        breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");
-        breadcrumb.append("<li class='active'><a href='/admin/orders/{{$orderPackage->order_id}}/edit'>Przesyłki</a></li>");
-        breadcrumb.append("<li class='disable'><a href='javascript:void()'>Edytuj</a></li>");
+      breadcrumb.children().remove();
+      breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");
+      breadcrumb.append("<li class='active'><a href='/admin/orders/{{$orderPackage->order_id}}/edit'>Przesyłki</a></li>");
+      breadcrumb.append("<li class='disable'><a href='javascript:void()'>Edytuj</a></li>");
 
-        function commaReplace(cssClass) {
-            document.querySelectorAll(cssClass).forEach(function (input) {
-                input.value = input.value.replace(/,/g, '.');
-            });
+      function commaReplace(cssClass) {
+        document.querySelectorAll(cssClass).forEach(function (input) {
+          input.value = input.value.replace(/,/g, '.');
+        });
+      }
+
+      $(document).ready(function () {
+        commaReplace('.priceChange');
+      });
+
+      $("#shipment_date").on('dp.change', function () {
+        var shipmentDate = new Date($("#shipment_date").val());
+        var deliveryDate = "", noOfDaysToAdd = 1, count = 0;
+
+        while (count < noOfDaysToAdd) {
+          deliveryDate = new Date(shipmentDate.setDate(shipmentDate.getDate() + 1));
+          if (deliveryDate.getDay() != 0 && deliveryDate.getDay() != 6) {
+            //Date.getDay() gives weekday starting from 0(Sunday) to 6(Saturday)
+            count++;
+          }
         }
 
-        $(document).ready(function () {
-            commaReplace('.priceChange');
-        });
+        $("#delivery_date").val(moment(deliveryDate).format('YYYY-MM-DD'));
 
-        $("#shipment_date").on('dp.change', function(){
-            var shipmentDate = new Date($("#shipment_date").val());
-            var deliveryDate = "", noOfDaysToAdd = 1, count = 0;
-
-            while(count < noOfDaysToAdd){
-                deliveryDate = new Date(shipmentDate.setDate(shipmentDate.getDate() + 1));
-                if(deliveryDate.getDay() != 0 && deliveryDate.getDay() != 6) {
-                    //Date.getDay() gives weekday starting from 0(Sunday) to 6(Saturday)
-                    count++;
-                }
-            }
-
-            $("#delivery_date").val(moment(deliveryDate).format('YYYY-MM-DD'));
-
-        });
+      });
     </script>
 @endsection

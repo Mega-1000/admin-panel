@@ -105,13 +105,16 @@ class TasksController extends Controller
                 }
                 $task->order->update([
                     'shipment_date' => $request->date_start,
-                    'consultant_notice' => $request->consultant_notice,
                     'consultant_value' => $consultantVal,
-                    'warehouse_notice' => $request->warehouse_notice,
                     'warehouse_value' => $request->warehouse_value,
                     'total_price' => $totalPrice
                 ]);
-                $task->taskSalaryDetail()->create($request->all());
+                $dataToSave = $request->all();
+                $arr = [
+                    'consultant_notice' => $task->order->consultant_notice,
+                    'warehouse_notice' => $task->order->warehouse_notice,
+                ];
+                $task->taskSalaryDetail()->create(array_merge($dataToStore, $arr));
                 $prev = [];
                 dispatch_now(new AddLabelJob($request->order_id, [47], $prev));
             }
@@ -474,9 +477,11 @@ class TasksController extends Controller
             if (empty($task)) {
                 abort(404);
             }
+            $start = new Carbon($request->start);
+            $end = new Carbon($request->end);
             $dataToStore = [
-                'start' => $request->start,
-                'end' => $request->end,
+                'start' => $start->addHour()->toDateTimeString(),
+                'end' => $end->addHour()->toDateTimeString(),
                 'id' => $id,
                 'user_id' => $request->new_resource !== null ? $request->new_resource : $task->user_id
             ];
@@ -550,6 +555,10 @@ class TasksController extends Controller
                         'date_start' => $request->start,
                         'date_end' => $request->end
                     ]);
+                    if ($item->order_id !== null) {
+                        $shipmentDate = new Carbon($request->start);
+                        $item->order->update(['production_date' => $request->start, 'shipment_date' => $shipmentDate->toDateString()]);
+                    }
                 } else {
                     if ($different !== 0) {
                         $different = abs($different);
@@ -570,6 +579,10 @@ class TasksController extends Controller
                         'date_start' => $dateS,
                         'date_end' => $dateE
                     ]);
+                    if ($item->order_id !== null) {
+                        $shipmentDate = new Carbon($dateS);
+                        $item->order->update(['production_date' => $dateS, 'shipment_date' => $shipmentDate->toDateString()]);
+                    }
                 }
             }
             return redirect()->route('planning.timetable.index', [

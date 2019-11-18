@@ -94,12 +94,8 @@
                     name: 'id',
                     render: function (id) {
                         let html = '';
-                        html += '<a href="{{ url()->current() }}/' + id + '/generatePdfReport" class="btn btn-sm btn-warning edit">';
+                        html += '<a href="{{ url()->current() }}/' + id + '/generateReport" class="btn btn-sm btn-warning edit">';
                         html += '<span class="hidden-xs hidden-sm">Generuj raport</span>';
-                        html += '</a>';
-                        html += '<a href="{{ url()->current() }}/' + id + '/edit" class="btn btn-sm btn-primary edit">';
-                        html += '<i class="voyager-edit"></i>';
-                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
                         html += '</a>';
                         html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecord('+ id +')">';
                         html += '<i class="voyager-trash"></i>';

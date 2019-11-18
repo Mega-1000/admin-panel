@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Helpers\OrderPackagesDataHelper;
 use App\Http\Requests\OrderPackageCreateRequest;
 use App\Http\Requests\OrderPackageUpdateRequest;
+use App\Jobs\AddLabelJob;
 use App\Jobs\SendRequestForCancelledPackageJob;
 use App\Repositories\FirmRepository;
 use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderRepository;
+use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade as PDF;
@@ -69,16 +71,22 @@ class OrdersPackagesController extends Controller
         $order = $this->orderRepository->find($id);
         $shipmentDate = $this->orderPackagesDataHelper->calculateShipmentDate();
         $connectedOrders = $this->orderRepository->findWhere(['master_order_id' => $order->id]);
-
+        if($order->master_order_id != null) {
+            $mainId = $order->master_order_id;
+            $order = $this->orderRepository->find($mainId);
+            $connectedOrders = $this->orderRepository->findWhere(['master_order_id' => $order->id]);
+        }
         $promisedPayments = [];
         $payments = [];
 
+
         $cashOnDeliverySum = 0;
 
-        foreach($order->packages()->where('status', '!=', 'CANCELLED')->get() as $package) {
+        foreach($order->packages()->where('letter_number', '=', 'null')->get() as $package) {
             $cashOnDeliverySum += $package->cash_on_delivery;
         }
 
+        $allOrdersSum = 0;
         $isAdditionalDKPExists = false;
         $connectedOrders = $this->orderRepository->findWhere(['master_order_id' => $order->id]);
         foreach($connectedOrders as $connectedOrder)
@@ -86,7 +94,9 @@ class OrdersPackagesController extends Controller
             if($connectedOrder->additional_cash_on_delivery_cost == 50) {
                 $isAdditionalDKPExists = true;
             }
+            $allOrdersSum += $connectedOrder->getSumOfGrossValues();
         }
+        $allOrdersSum += $order->getSumOfGrossValues();
         if($order->additional_cash_on_delivery_cost == 50) {
             $isAdditionalDKPExists = true;
         }
@@ -120,8 +130,15 @@ class OrdersPackagesController extends Controller
             'shipment_price_for_us' => $order->shipment_price_for_us,
             'weight' => $order->weight,
         ];
+        return view('orderPackages.create', compact('id', 'templateData', 'orderData', 'order', 'payments', 'promisedPayments', 'connectedOrders', 'cashOnDeliverySum', 'isAdditionalDKPExists', 'allOrdersSum'));
+    }
 
-        return view('orderPackages.create', compact('id', 'templateData', 'orderData', 'order', 'payments', 'promisedPayments', 'connectedOrders', 'cashOnDeliverySum', 'isAdditionalDKPExists'));
+    public function changeValue(Request $request)
+    {
+        $this->repository->update([
+            'cash_on_delivery' => $request->input('modalPackageValue')
+        ], $request->input('packageId'));
+        return redirect()->back()->with('template-id', $request->input('template-id'));
     }
 
 
@@ -171,6 +188,7 @@ class OrdersPackagesController extends Controller
     {
         $order_id = $request->input('order_id');
         $data = $request->validated();
+        $toCheck = (float)$request->input('toCheck');
 
         $data['delivery_date'] = new \DateTime($data['delivery_date']);
         $data['shipment_date'] = new \DateTime($data['shipment_date']);
@@ -208,17 +226,14 @@ class OrdersPackagesController extends Controller
             }
         }
 
-        if($request->input('shouldTakePayment') == 1) {
-            $data['cash_on_delivery'] = $data['cash_on_delivery'] - $order->promisePaymentsSum();
-        } elseif($request->input('shouldTakePayment') == 2) {
-            $data['cash_on_delivery'] = $data['cash_on_delivery'] - $order->bookedPaymentsSum();
-        } elseif($request->input('shouldTakePayment') == 3) {
-            $data['cash_on_delivery'] = $data['cash_on_delivery'] - $order->bookedPaymentsSum();
-        }
 
 
         $this->repository->create($data);
-
+        if($toCheck != 0) {
+            dispatch_now(new AddLabelJob($order->id, [134]));
+        } else {
+            dispatch_now(new AddLabelJob($order->id, [133]));
+        }
         return redirect()->route('orders.edit', ['order_id' => $order_id])->with([
             'message' => __('order_packages.message.store'),
             'alert-type' => 'success'
@@ -296,7 +311,7 @@ class OrdersPackagesController extends Controller
             'cash_on_delivery' => $package->cash_on_delivery !== null ? true : false,
             'number_account_for_cash_on_delivery' => $package->cash_on_delivery !== null ? env('ACCOUNT_NUMBER') : null,
             'bank_name' => $package->cash_on_delivery !== null ? env('BANK_NAME') : null,
-            'price_for_cash_on_delivery' => $package->cash_on_delivery !== null ? $package->cash_on_delivery : null,
+            'price_for_cash_on_delivery' => $package->cash_on_delivery !== null ? $package->cash_on_delivery === 0 ? null : $package->cash_on_delivery : null,
             'amount' => 1000,
             'content' => $package->content,
             'additional_data' => [
@@ -344,7 +359,10 @@ class OrdersPackagesController extends Controller
 
         }
         $validator = $this->validatePackage($data);
-
+        if($data['price_for_cash_on_delivery'] == '0.00') {
+            $data['cash_on_delivery'] = false;
+            unset($data['price_for_cash_on_delivery']);
+        }
         if($validator === true) {
             dispatch_now(new OrdersCourierJobs($data));
             $message = ['status' => 200, 'message' => null];
@@ -371,18 +389,29 @@ class OrdersPackagesController extends Controller
         if ($courierName !== 'all') {
             $packages = $this->repository->findWhere([
                 ['delivery_courier_name', '=', $courierName],
-                ['shipment_date', '=', Carbon::today()]
+                ['shipment_date', '=', Carbon::today()],
+                ['status', '!=', 'CANCELLED'],
+                ['status', '!=', 'WAITING_FOR_CANCELLED'],
+                ['status', '!=', 'REJECT_CANCELLED'],
             ]);
         } else {
             $courierName = 'wszystkie';
             $packages = $this->repository->findWhere([
-                ['shipment_date', '>', Carbon::today()]
+                ['shipment_date', '=', Carbon::today()],
+                ['status', '!=', 'CANCELLED'],
+                ['status', '!=', 'WAITING_FOR_CANCELLED'],
+                ['status', '!=', 'REJECT_CANCELLED'],
             ]);
         }
 
         if (!$packages->isEmpty()) {
             $packagesArray = [];
             foreach ($packages as $package) {
+                if($package->order->warehouse !== null){
+                    if($package->order->warehouse->symbol !== 'MEGA-OLAWA') {
+                        continue;
+                    }
+                }
                 $packagesArr = [
                     'order_id' => $package->order->id,
                     'number' => $package->number,
@@ -437,7 +466,7 @@ class OrdersPackagesController extends Controller
                 $email = $firm->email;
                 break;
             case 'POCZTEX':
-                $firm = $this->firmRepository->findByField('symbol', $courierName)->first();
+                $firm = $this->firmRepository->findByField('symbol', 'POCZTAPOLSKA')->first();
                 $email = $firm->email;
                 break;
             case 'JAS':
@@ -480,7 +509,6 @@ class OrdersPackagesController extends Controller
                     $resArr = $result->getData();
                     $itemMessage = 'ID Zamówienia ' . $package->order->id . ' | Numer paczki: ' . $package->id;
                     if ($resArr->message != null) {
-                        continue;
                         foreach ($resArr->message as $msg) {
                             $itemMessage .= ' ' . $msg;
                         }
@@ -498,7 +526,7 @@ class OrdersPackagesController extends Controller
                 $alert = 'success';
             }
             return redirect()->back()->with([
-                'message' => __('order_packages.message.courier_success'),
+                'message' => $message,
                 'alert-type' => $alert
             ]);
         } else {
@@ -545,7 +573,7 @@ class OrdersPackagesController extends Controller
             'length' => 'required|numeric',
             'width' => 'required|numeric',
             'height' => 'required|numeric',
-            'cash_on_delivery' => 'required',
+            'cash_on_delivery' => 'nullable',
             'content' => 'required|min:3|string',
             'amount' => 'nullable|regex:/^\d*(\.\d{2})?$/',
             'notices' => 'nullable',

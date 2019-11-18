@@ -2,7 +2,7 @@
 @section('app-header')
     <h1 class="page-title">
         <i class="voyager-tag"></i> @lang('order_payments.create')
-        <a style="margin-left: 15px;" href=""
+        <a style="margin-left: 15px;" href="{{ action('OrdersController@edit', ["id" => $id]) }}"
            class="btn btn-info install pull-right">
             <span>@lang('order_payments.list')</span>
         </a>
@@ -50,8 +50,8 @@
                 @endif
             </div>
             <div class="form-group">
-                <label for="promise_date">@lang('order_payments.form.promise_date')</label><br/>
-                <input type="datetime" id="promise_date" name="promise_date" value="{{ Carbon\Carbon::now() }}" class="form-control">
+                <label for="promise_date">Data wpłaty</label><br/>
+                <input type="datetime" id="promise_date" name="created_at" value="{{ Carbon\Carbon::now() }}" class="form-control default-date-picker-now">
             </div>
             @if(!empty($order))
             <input type="hidden" value="{{ $order->id }}" name="order_id">

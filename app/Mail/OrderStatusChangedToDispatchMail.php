@@ -24,6 +24,8 @@ class OrderStatusChangedToDispatchMail extends Mailable implements ShouldQueue
 
     public $packageNumber;
 
+    public $pathSecond;
+
     /**
      * OrderStatusChangedToDispatchMail constructor.
      * @param $subject
@@ -32,7 +34,7 @@ class OrderStatusChangedToDispatchMail extends Mailable implements ShouldQueue
      * @param $order
      * @param $self
      */
-    public function __construct($subject, $formLink, $sendFormInvoice, $order, $self = null, $path = null, $packageNumber = null)
+    public function __construct($subject, $formLink, $sendFormInvoice, $order, $self = null, $path = null, $packageNumber = null, $pathSecond = null)
     {
         ini_set('max_execution_time', 60);
         $this->formLink = $formLink;
@@ -41,7 +43,8 @@ class OrderStatusChangedToDispatchMail extends Mailable implements ShouldQueue
         $this->order = $order;
         $this->self = $self;
         $this->path = $path;
-        $this->path = $packageNumber;
+        $this->packageNumber = $packageNumber;
+        $this->pathSecond = $pathSecond;
     }
 
     /**
@@ -57,7 +60,7 @@ class OrderStatusChangedToDispatchMail extends Mailable implements ShouldQueue
             if($this->path == null) {
                 return $this->view('emails.order-status-changed-to-dispatch');
             } else {
-                return $this->view('emails.reminder-order-status-changed-to-dispatch')->attach($this->path);
+                return $this->view('emails.reminder-order-status-changed-to-dispatch')->attach($this->path)->attach($this->pathSecond);
             }
         }
 

@@ -144,5 +144,6 @@ return [
     */
 
     'attributes' => [
+        'id' => 'Produkty są wymagane'
     ],
 ];

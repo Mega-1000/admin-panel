@@ -117,7 +117,7 @@
                                 <label for="encryption">@lang('users.form.encryption')</label>
                                 <select class="form-control text-uppercase" name="encryption">
                                 @if($userEmail != null)
-                                    @if($userEmail->encryption == 'SSL') 
+                                    @if($userEmail->encryption == 'SSL')
                                         <option value="SSL" selected>SSL</option>
                                         <option value="TLS">TLS</option>
                                         <option value="NONE">Brak</option>
@@ -125,17 +125,22 @@
                                         <option value="SSL">SSL</option>
                                         <option value="TLS" selected>TLS</option>
                                         <option value="NONE">Brak</option>
-                                    @else 
+                                    @else
                                         <option value="SSL">SSL</option>
                                         <option value="TLS">TLS</option>
                                         <option value="NONE" selected>Brak</option>
-                                    @endif 
+                                    @endif
                                 @else
                                     <option value="SSL">SSL</option>
                                     <option value="TLS">TLS</option>
                                     <option value="NONE" selected>Brak</option>
                                 @endif
                                 </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="rate_hour">@lang('users.form.rate_hour')</label>
+                                <input type="number" id="rate_hour" name="rate_hour" class="form-control"
+                                       value="{{ $user->rate_hour }}">
                             </div>
                             <div class="form-group">
                                 <label for="status">@lang('users.form.status')</label>

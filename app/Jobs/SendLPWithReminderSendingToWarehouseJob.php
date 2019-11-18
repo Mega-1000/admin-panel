@@ -33,10 +33,12 @@ class SendLPWithReminderSendingToWarehouseJob
     {
         $orderPackages = $orderPackageRepository->findWhere(['shipment_date', '=', Carbon::today()])->all();
         foreach ($orderPackages as $orderPackage) {
+            $pathSecond = null;
             if ($orderPackage->delivery_courier_name === 'INPOST') {
                 $path = storage_path('app/public/inpost/stickers/sticker' . $orderPackage->letter_number . '.pdf');
             } elseif ($orderPackage->delivery_courier_name === 'DPD') {
                 $path = storage_path('app/public/dpd/protocols/protocol' . $orderPackage->letter_number . '.pdf');
+                $pathSecond = storage_path('app/public/dpd/stickers/sticker' . $orderPackage->letter_number . '.pdf');
             } elseif ($orderPackage->delivery_courier_name === 'JAS') {
                 $path = storage_path('app/public/jas/protocols/protocol' . $orderPackage->letter_number . '.pdf');
             } elseif ($orderPackage->delivery_courier_name === 'POCZTEX') {
@@ -46,7 +48,7 @@ class SendLPWithReminderSendingToWarehouseJob
             }
             if ($path !== null) {
                 dispatch(new OrderStatusChangedToDispatchNotificationJob($orderPackage->order->id, null,
-                    $path));
+                    $path, null, $pathSecond));
             }
         }
     }

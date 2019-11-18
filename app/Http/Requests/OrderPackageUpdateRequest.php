@@ -38,7 +38,7 @@ class OrderPackageUpdateRequest extends FormRequest
             'shape' => 'nullable',
             'sending_number' => 'nullable',
             'letter_number' => 'nullable',
-            'cash_on_delivery' => 'nullable|regex:/^\d*(\.\d{2})?$/',
+            'cash_on_delivery' => 'nullable',
             'status' => 'required|in:DELIVERED,CANCELLED,NEW,SENDING,WAITING_FOR_SENDING,WAITING_FOR_CANCELLED,REJECT_CANCELLED',
             'cost_for_client' => 'nullable|regex:/^\d*(\.\d{2})?$/',
             'cost_for_company' => 'nullable|regex:/^\d*(\.\d{2})?$/',

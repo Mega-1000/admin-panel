@@ -90,7 +90,8 @@ class UserController extends Controller
             'lastname' => $request->input('lastname'),
             'phone' => $request->input('phone'),
             'phone2' => $request->input('phone2'),
-            'warehouse_id' => $request->input('warehouse_id')
+            'warehouse_id' => $request->input('warehouse_id'),
+            'rate_hour' => $request->input('rate_hour')
         ]);
         if($request->warehouse_id !== null){
             dispatch_now(new AddNewWorkHourForUsers());
@@ -171,9 +172,9 @@ class UserController extends Controller
 
         $this->userRepository->update($dataToStore, $user->id);
 
-        if($request->warehouse_id !== null){
-            dispatch_now(new AddNewWorkHourForUsers());
-        }
+//        if($request->warehouse_id !== null){
+//            dispatch_now(new AddNewWorkHourForUsers());
+//        }
 
         $emailData = $this->userEmailRepository->findWhere(['user_id' => $user->id])->first();
         if(empty($emailData)) {

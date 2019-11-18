@@ -66,6 +66,14 @@
         <div class="product_stocks-stocks" id="stocks">
             <div class="form-group">
                 <label for="quantity">@lang('product_stocks.form.quantity')</label>
+                @php
+                    $quantity = 0;
+                @endphp
+                @foreach ($productStocks->position as $position)
+                    @php
+                        $quantity += $position->position_quantity
+                    @endphp
+                @endforeach
                 <input type="number" class="form-control" id="quantity" name="quantity"
                        value="{{ $productStocks->quantity }}" disabled>
                 <input type="hidden" class="form-control" id="different" name="different"

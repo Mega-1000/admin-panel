@@ -1,3 +1,3 @@
 <body>
-    {!! $mailBody !!}
+{!! $mailBody !!}
 </body>

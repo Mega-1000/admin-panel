@@ -41,7 +41,7 @@ class CheckStatusInpostPackagesJob extends Job
             $integration = new Inpost();
             foreach ($orderPackages as $orderPackage) {
                 if ($orderPackage->inpost_url !== null) {
-                    if ($orderPackage->status !== 'DELIVERED' && $orderPackage->status !== 'SENDING') {
+                    if ($orderPackage->status !== 'DELIVERED' && $orderPackage->status !== 'SENDING' &&  $orderPackage->status !== 'WAITING_FOR_CANCELLED' && $orderPackage->status !== 'CANCELLED') {
                         $href = $integration->hrefExecute($orderPackage->inpost_url);
                         $this->orderPackageRepository->update(['letter_number' => $href->tracking_number],
                             $orderPackage->id);

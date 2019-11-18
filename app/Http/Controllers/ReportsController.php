@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\ReportProperty;
+use App\Repositories\ReportDailyRepository;
+use App\Repositories\ReportPropertyRepository;
 use App\Repositories\TaskRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
@@ -29,20 +32,51 @@ class ReportsController extends Controller
      */
     protected $userRepository;
 
+    /**
+     * @var TaskRepository
+     */
     protected $taskRepository;
 
+    /**
+     * @var WarehouseRepository
+     */
     protected $warehouseRepository;
 
+
+    /**
+     * @var ReportPropertyRepository
+     */
+    protected $reportPropertyRepository;
+
+    /**
+     * @var ReportDailyRepository
+     */
+    protected $reportDailyRepository;
+
+    /**
+     * ReportsController constructor.
+     * @param ReportRepository $repository
+     * @param UserRepository $userRepository
+     * @param TaskRepository $taskRepository
+     * @param WarehouseRepository $warehouseRepository
+     * @param ReportPropertyRepository $reportPropertyRepository
+     * @param ReportDailyRepository $reportDailyRepository
+     */
     public function __construct(
         ReportRepository $repository,
         UserRepository $userRepository,
         TaskRepository $taskRepository,
-        WarehouseRepository $warehouseRepository
-    ) {
+        WarehouseRepository $warehouseRepository,
+        ReportPropertyRepository $reportPropertyRepository,
+        ReportDailyRepository $reportDailyRepository
+    )
+    {
         $this->userRepository = $userRepository;
         $this->repository = $repository;
         $this->taskRepository = $taskRepository;
         $this->warehouseRepository = $warehouseRepository;
+        $this->reportPropertyRepository = $reportPropertyRepository;
+        $this->reportDailyRepository = $reportDailyRepository;
     }
 
 
@@ -80,8 +114,80 @@ class ReportsController extends Controller
      */
     public function store(ReportCreateRequest $request)
     {
-
-        $report = $this->repository->create($request->all());
+        $dataToStore = $request->all();
+        $report = $this->repository->create($dataToStore);
+        $allSum = 0;
+        $allTime = 0;
+        foreach ($dataToStore['users_id'] as $userId) {
+            $report->users()->attach($userId);
+            if ($userId !== null) {
+                $tasks = $this->taskRepository->with([
+                    'taskTime',
+                    'taskSalaryDetail'
+                ])->whereHas('taskTime', function ($query) use ($dataToStore, $userId) {
+                    $from = new Carbon($dataToStore['from'] . ' ' . '00:00:00');
+                    $to = new Carbon($dataToStore['to'] . ' ' . '23:59:59');
+                    $query->whereBetween('date_start', [$from->toDateTimeString(), $to->toDateTimeString()])
+                        ->orWhereBetween('date_end', [$from->toDateTimeString(), $to->toDateTimeString()]);
+                })->findWhere([['user_id', '=', $userId], ['name', '!=', 'Przerwa']])->all();
+            }
+            if (count($tasks) == 0) {
+                continue;
+            }
+            foreach ($tasks as $task) {
+                $sum = 0;
+                $time = 0;
+                $dateStart = new Carbon($task->taskTime->date_start);
+                $reportDaily = $this->reportDailyRepository->findWhere([['date', '=', $dateStart->toDateString()], ['report_id', '=', $report->id], ['user_id', '=', $userId]])->first();
+                if ($task->order_id !== null) {
+                    if ($task->taskSalaryDetail !== null) {
+                        $user = $this->userRepository->find($userId);
+                        if ($user->role_id === 5) {
+                            $sum += (float)$task->taskSalaryDetail->warehouse_value;
+                            $report->properties()->create([
+                                'task_id' => $task->id,
+                                'time_work' => 'Nie dotyczy',
+                                'price' => (float)$task->taskSalaryDetail->warehouse_value,
+                                'user_id' => $userId
+                            ]);
+                        } else {
+                            $sum += (float)$task->taskSalaryDetail->consultant_value;
+                            $report->properties()->create([
+                                'task_id' => $task->id,
+                                'time_work' => 'Nie dotyczy',
+                                'price' => (float)$task->taskSalaryDetail->consultant_value,
+                                'user_id' => $userId
+                            ]);
+                        }
+                    }
+                } else {
+                    $start = strtotime($task->taskTime->date_start);
+                    $end = strtotime($task->taskTime->date_end);
+                    $time = ($end - $start) / 3600;
+                    $allTime += $time;
+                    $sum += $task->user->rate_hour * $time;
+                    $allSum += $task->user->rate_hour * $time;
+                    $report->properties()->create([
+                        'task_id' => $task->id,
+                        'time_work' => $time,
+                        'price' => (float)$task->user->rate_hour * $time,
+                        'user_id' => $userId
+                    ]);
+                }
+                if (!$reportDaily) {
+                    $report->daily()->create([
+                        'user_id' => $userId,
+                        'date' => $dateStart->toDateString(),
+                        'price' => $sum
+                    ]);
+                } else {
+                    $reportDaily->update(['price' => $reportDaily->price + $sum]);
+                }
+                unset($time);
+            }
+        }
+        $dataToStore['value'] = $allSum;
+        $report->update($dataToStore);
         if ($report) {
             return redirect()->route('planning.reports.index')->with([
                 'message' => __('reports.message.store'),
@@ -91,43 +197,6 @@ class ReportsController extends Controller
 
         return redirect()->route('planning.reports.index')->with([
             'message' => __('reports.message.error.store'),
-            'alert-type' => 'error'
-        ]);
-    }
-
-
-    /**
-     * @param $id
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function edit($id)
-    {
-        $report = $this->repository->find($id);
-        $users = $this->userRepository->all();
-        $warehouses = $this->warehouseRepository->findByField('symbol', 'MEGA-OLAWA');
-
-        return view('planning.report.edit', compact('report', 'users', 'warehouses'));
-    }
-
-
-    /**
-     * @param ReportUpdateRequest $request
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function update(ReportUpdateRequest $request, $id)
-    {
-        $report = $this->repository->find($id);
-
-        if ($report->update($request->all())) {
-            return redirect()->route('planning.reports.index')->with([
-                'message' => __('reports.message.update'),
-                'alert-type' => 'success'
-            ]);
-        }
-
-        return redirect()->back()->with([
-            'message' => __('reports.message.error.update'),
             'alert-type' => 'error'
         ]);
     }
@@ -173,52 +242,31 @@ class ReportsController extends Controller
         return $collection;
     }
 
-    public function generatePdfReport($id)
+    /**
+     * @param $id
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function generateReport($id)
     {
         $report = $this->repository->find($id);
-        if ($report) {
-            if($report->user_id !== null) {
-                $tasks = $this->taskRepository->with([
-                    'taskTime' => function ($query) use ($report) {
-                        $from = new Carbon($report->from);
-                        $to = new Carbon($report->to);
-                        $query->whereBetween('date_start', [$from->toDateTimeString(), $to->toDateTimeString()])
-                            ->orWhereBetween('date_end', [$from->toDateTimeString(), $to->toDateTimeString()]);
-                    },
-                    'taskSalaryDetail'
-                ])->findWhere([['created_by', '=', $report->user_id]])->all();
-            } else {
-                if($report->user_id === null) {
-                    $tasks = $this->taskRepository->with([
-                        'taskTime',
-                        'taskSalaryDetail'
-                    ])->findWhere([['warehouse_id', '=', $report->warehouse_id]])->all();
-                }
-            }
-            $sum = 0;
-            if(count($tasks) == 0){
-                return redirect()->back()->with([
-                    'message' => __('reports.message.error.generateReport'),
-                    'alert-type' => 'error'
-                ]);
-            }
+        if (!$report) {
+            abort(404);
+        }
+        return view('planning.report.show', compact(['report']));
+    }
 
-            foreach ($tasks as $task) {
-                if ($task->order_id !== null) {
-                    if ($task->taskSalaryDetail !== null) {
-                        if($report->user_id === null) {
-                            $sum += (float)$task->taskSalaryDetail->warehouse_value;
-                        } else {
-                            $sum += (float)$task->taskSalaryDetail->consultant_value;
-                        }
-                    }
-                }
-            }
+    /**
+     * @param $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function generatePdfReport($id)
+    {
+        ini_set('max_execution_time', -1);
+        $report = $this->repository->find($id);
+        if ($report) {
+
             $pdf = PDF::loadView('pdf.report', [
                 'report' => $report,
-                'date' => Carbon::today()->toDateString(),
-                'sum' => $sum,
-                'tasks' => $tasks
             ])->setPaper('a4');
             return $pdf->download('report.pdf');
         } else {

@@ -39,12 +39,18 @@ class ImportPaymentsController extends Controller
 
     public function store(OrderRepository $orderRepository, Request $request)
     {
+        $date = $request->get('created_at');
+
         $path = $request->file('payments')->store('payments');
+
 
         $this->paymentImportRepository->create([
             'file_path' => $path
         ]);
-        $payments = dispatch_now(new ImportPaymentsFromPdfFile($orderRepository, $path));
+
+        $payments = dispatch_now(new ImportPaymentsFromPdfFile($orderRepository, $path, $date));
+
+
         return redirect()->route('invoices.importPayments')->with([
             'message' => __('order_payments.import'),
             'alert-type' => 'success',

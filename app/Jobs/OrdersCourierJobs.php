@@ -21,6 +21,7 @@ use App\Integrations\DPD\DPDService;
 use App\Integrations\Apaczka\apaczkaApi;
 use App\Integrations\Apaczka\ApaczkaOrder;
 use App\Integrations\Apaczka\ApaczkaOrderShipment;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Mockery\Exception;
@@ -174,6 +175,7 @@ class OrdersCourierJobs extends Job
                     'sizey' => $this->data['length'],
                     'sizez' => $this->data['height'],
                     'weight' => $this->data['weight'],
+                    'customerNotes' => $this->data['notices']
                 ],
             ];
 
@@ -191,6 +193,7 @@ class OrdersCourierJobs extends Job
             $result = $dpd->sendPackage($parcels, $receiver, 'SENDER');
 
             if ($result->success == false) {
+                Session::put('message', $result);
                 Log::info(
                     'Problem with send package in DPD',
                     [
@@ -249,6 +252,7 @@ class OrdersCourierJobs extends Job
                 'Problem in DPD integration',
                 ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
             );
+            Session::put('message', $exception->getMessage());
             return ['status' => '500', 'error_code' => self::ERRORS['PROBLEM_WITH_DPD_INTEGRATION']];
         }
 
@@ -264,6 +268,7 @@ class OrdersCourierJobs extends Job
             $json = $integration->prepareJsonForInpost();
             $package = $integration->createSimplePackage($json);
             if ($package->status == '400') {
+                Session::put('message', $package);
                 Log::info(
                     'Problem in INPOST integration with validation',
                     ['courier' => $package, 'class' => get_class($this), 'line' => __LINE__]
@@ -283,6 +288,7 @@ class OrdersCourierJobs extends Job
                 'letter_number' => null,
             ];
         } catch (Exception $exception) {
+            Session::put('message', $exception->getMessage());
             Log::info(
                 'Problem in INPOST integration',
                 ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
@@ -730,6 +736,8 @@ class OrdersCourierJobs extends Job
             preg_match('/(?:(?<!\d)\d{20}(?!\d))/', $text, $matches);
             $letter_number = $matches[0];
         } else {
+            Session::put('message', $idSend);
+            Session::put('message', $retval);
             Log::info(
                 'Problem in Pocztex integration',
                 ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
