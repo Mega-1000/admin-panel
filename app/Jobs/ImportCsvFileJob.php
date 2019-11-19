@@ -123,7 +123,7 @@ class ImportCsvFileJob implements ShouldQueue
                     'img_url' => $line[303],
                     'token_prod_cat' => $tokenProductAndCategory,
                 ];
-                var_dump('i:' . $i . ' line: ' . $line[301]);
+                //var_dump('i:' . $i . ' line: ' . $line[301]);
 
 
                 if (!empty($categoryDetails['img_url'])
@@ -365,7 +365,7 @@ class ImportCsvFileJob implements ShouldQueue
                         $array));
                 }
             } catch (\Exception $exception) {
-                var_dump($exception->getMessage());
+                //var_dump($exception->getMessage());
                 Log::channel('import')->debug($array);
                 Log::channel('import')->debug($exception);
             }
