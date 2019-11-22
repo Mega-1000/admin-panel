@@ -35,8 +35,6 @@ class ImportController extends Controller
 
         if ($import === null) {
             dispatch(new ImportCsvFileJob())->onConnection('database');
-            dispatch(new ImportCsvFileJob(11000))->onConnection('database');
-            dispatch(new ImportCsvFileJob(18000))->onConnection('database');
 
             DB::table('import')->where('id', '=', 1)->update(
                 ['name' => 'Import products', 'processing' => true, 'last_import' => Carbon::now()]
