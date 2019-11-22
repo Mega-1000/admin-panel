@@ -57,10 +57,10 @@ class Kernel extends ConsoleKernel
 
 
         $schedule->job(CheckStatusInpostPackagesJob::class)->everyMinute();
-        $schedule->job(FindOrdersForCheckingMissingDeliveryAddresses::class)->dailyAt("05:00");
+        $schedule->job(FindOrdersForCheckingMissingDeliveryAddresses::class)->dailyAt("09:22");
         $schedule->job(CheckPackagesStatusJob::class)->everyMinute();
         $schedule->job(ChangeShipmentDatePackagesJob::class)->dailyAt("00:30");
-        $schedule->job(SendLPWithReminderSendingToWarehouseJob::class)->dailyAt("05:00");
+        $schedule->job(SendLPWithReminderSendingToWarehouseJob::class)->dailyAt("09:23");
         $schedule->job(CheckPriceChangesInProductsJob::class)->dailyAt("04:00");
         $schedule->job(CheckDateOfProductNewPriceJob::class)->dailyAt("04:30");
         $schedule->job(TriggerOrderLabelSchedulersJob::class)->everyFiveMinutes();
