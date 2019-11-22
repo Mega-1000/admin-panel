@@ -31,7 +31,7 @@ class SendLPWithReminderSendingToWarehouseJob
      */
     public function handle(OrderPackageRepository $orderPackageRepository)
     {
-        $orderPackages = $orderPackageRepository->findWhere(['shipment_date', '=', Carbon::today()])->all();
+        $orderPackages = $orderPackageRepository->findWhere(['shipment_date' => Carbon::today()])->all();
         foreach ($orderPackages as $orderPackage) {
             $pathSecond = null;
             if ($orderPackage->delivery_courier_name === 'INPOST') {
