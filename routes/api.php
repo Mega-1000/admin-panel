@@ -12,14 +12,15 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
+//
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+Route::post('orders', 'Api\OrdersController@store')->name('api.orders.store');
+Route::post('customers', 'Api\CustomersController@store')->name('api.customers.store');
+Route::post('new_order', 'Api\OrdersController@new')->name('api.orders.new');
 Route::middleware('client')->group(function () {
-    Route::post('customers', 'Api\CustomersController@store')->name('api.customers.store');
-    Route::post('orders', 'Api\OrdersController@store')->name('api.orders.store');
     Route::post('orders/message','Api\OrdersController@storeMessage')->name('api.orders.message.store');
     Route::get('orders/messages/{frontDbOrderId}','Api\OrdersController@getMessages')->name('api.orders.messages.get');
     Route::get('orders/{frontDbOrderId}', 'Api\OrdersController@getOrder')->name('api.orders.get');
