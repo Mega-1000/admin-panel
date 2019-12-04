@@ -113,6 +113,13 @@ class OrdersController extends Controller
     public function new(StoreOrderRequest $request)
     {
         $data = $request->all();
+        foreach ($data['order_items'] as $k => $order) {
+            if (is_array($order)) {
+                continue;
+            }
+            $data['order_items'][$k] = json_decode($order, true);
+        }
+        error_log(print_r($data, 1));
         if (isset($data['customer_login'])) {
             $customer = $this->customerRepository->findByField('login', $data['customer_login'])->first();
             if (empty($customer)) {
@@ -123,12 +130,14 @@ class OrdersController extends Controller
                 ]);
             }
         }
+        $data['old_prices'] = 1;
+        $data['old_prices'] = 1;
         return $this->newStore($data);
     }
 
     private function newStore($data)
     {
-//        DB::beginTransaction();
+        DB::beginTransaction();
         try {
             if (isset($data['id'])) {
                 $id = $data['id'];
@@ -175,21 +184,14 @@ class OrdersController extends Controller
                     $data['employee_id'] = $orderCustomerOpenExists->employee_id;
                 }
             }
-            error_log('test1');
-
-            error_log($id);
             $order = $this->orderRepository->updateOrCreate(['id' => -1], $data);
             $orderTotal = 0;
             $weight = 0;
-            error_log('test2');
-            error_log('test3');
             $orderItems = $this->orderItemRepository->findWhere(['order_id' => $order->id]);
-            error_log('test4');
             if (isset($data['old_id_from_front_db']) && !empty($data['old_id_from_front_db'])) {
                 $order2 = $this->orderRepository->findWhere(['id_from_front_db' => $data['old_id_from_front_db']])->first();
                 $orderItems = $this->orderItemRepository->findWhere(['order_id' => $order2->id]);
             }
-            error_log('test5');
             $oldPrices = [];
             $prices = [];
 
@@ -302,7 +304,7 @@ class OrdersController extends Controller
             Log::error('Problem with create new order :' . $e->getMessage(),
                 ['request' => $data, 'class' => get_class($this), 'line' => __LINE__]
             );
-            error_log($e->getMessage());
+            error_log($e);
 //            \Mailer::create()
 //                ->to('mokebato@gmail.com')
 //                ->send(new SendLog("Błąd podczas składania zamówienia", $e->getMessage()));
