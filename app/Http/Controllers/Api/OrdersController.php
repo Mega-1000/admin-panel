@@ -119,7 +119,6 @@ class OrdersController extends Controller
             }
             $data['order_items'][$k] = json_decode($order, true);
         }
-        error_log(print_r($data, 1));
         if (isset($data['customer_login'])) {
             $customer = $this->customerRepository->findByField('login', $data['customer_login'])->first();
             if (empty($customer)) {
@@ -304,10 +303,6 @@ class OrdersController extends Controller
             Log::error('Problem with create new order :' . $e->getMessage(),
                 ['request' => $data, 'class' => get_class($this), 'line' => __LINE__]
             );
-            error_log($e);
-//            \Mailer::create()
-//                ->to('mokebato@gmail.com')
-//                ->send(new SendLog("Błąd podczas składania zamówienia", $e->getMessage()));
             $message = 'Wystąpił wewnętrzny błąd systemu przy składaniu zamówienia. Dział techniczny został o tym poinformowany.';
             return $this->createdErrorResponse($message);
         }
@@ -485,10 +480,6 @@ class OrdersController extends Controller
             Log::error('Problem with create new order :' . $e->getMessage(),
                 ['request' => $data, 'class' => get_class($this), 'line' => __LINE__]
             );
-            error_log($e->getMessage());
-//            \Mailer::create()
-//                ->to('mokebato@gmail.com')
-//                ->send(new SendLog("Błąd podczas składania zamówienia", $e->getMessage()));
             $message = 'Wystąpił wewnętrzny błąd systemu przy składaniu zamówienia. Dział techniczny został o tym poinformowany.';
             return $this->createdErrorResponse($message);
         }
