@@ -297,7 +297,7 @@ class OrdersController extends Controller
                 }
             }
             DB::commit();
-            return $this->createdResponse();
+            return $this->createdResponse(['order_id' => $order->id]);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Problem with create new order :' . $e->getMessage(),

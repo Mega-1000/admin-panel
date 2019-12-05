@@ -14,9 +14,9 @@ trait ApiResponsesTrait
         return response()->make($message, 404);
     }
 
-    protected function createdResponse()
+    protected function createdResponse($message = null)
     {
-        return response()->make(null, 201);
+        return response()->make($message, 201);
     }
 
     protected function createdErrorResponse($message)
