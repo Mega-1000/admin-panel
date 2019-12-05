@@ -32,6 +32,7 @@ class ImportCsvFileJob implements ShouldQueue
     protected $path;
     protected $startRow;
     protected $imgStoragePath;
+    public $timeout = 3600;
 
     /**
      * Create a new job instance.
