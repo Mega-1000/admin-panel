@@ -177,7 +177,7 @@ class LabelsController extends Controller
             abort(404);
         }
 
-        $label->delete($label->id);
+        $this->repository->delete($label->id);
 
         return redirect()->route('labels.index')->with([
             'message' => __('labels.message.delete'),

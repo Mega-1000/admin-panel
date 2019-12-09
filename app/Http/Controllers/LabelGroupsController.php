@@ -109,7 +109,7 @@ class LabelGroupsController extends Controller
             abort(404);
         }
 
-        $labelGroup->delete();
+        $this->repository->delete($labelGroup->id);
 
         return redirect()->route('label_groups.index')->with([
             'message' => __('label_groups.message.delete'),

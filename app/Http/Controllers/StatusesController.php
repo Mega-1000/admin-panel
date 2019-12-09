@@ -156,8 +156,8 @@ class StatusesController extends Controller
         if (empty($status)) {
             abort(404);
         }
-
-        $status->delete($status->id);
+        
+        $this->repository->delete($status->id);
 
         return redirect()->route('statuses.index')->with([
             'message' => __('statuses.message.delete'),
