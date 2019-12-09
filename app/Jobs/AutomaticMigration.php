@@ -31,6 +31,7 @@ class AutomaticMigration implements ShouldQueue
      */
     public function handle()
     {
+
         $statuses = DB::table('statuses')->get();
         $label_groups = DB::table('label_groups')->get();
         $labels = DB::table('labels')->get();
@@ -49,9 +50,16 @@ class AutomaticMigration implements ShouldQueue
         ];
         $dumpJSON = json_encode($dump);
 
-        file_put_contents(database_path("seeds/dump.json"), $dumpJSON);
+        $path = database_path("seeds/dump.json");
+        file_put_contents($path, $dumpJSON);
 
-
-
+        shell_exec("git checkout -b automatic-db-migration");
+        shell_exec("git add " . $path);
+        shell_exec("git commit -m 'automatic update seeder'");
+        $key = env('GIT_BOT_KEY');
+        $login = env('GIT_BOT_LOGIN');
+        shell_exec("git push https://$login:$key@github.com/DawidZwiewka/mega-1000-backend.git -f");
+        shell_exec("git checkout master");
+        shell_exec("git branch -D automatic-db-migration");
     }
 }
