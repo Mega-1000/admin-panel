@@ -32,7 +32,7 @@ class AutomaticMigration implements ShouldQueue
     public function handle()
     {
         $statuses = DB::table('statuses')->get();
-        $labels_group = DB::table('label_groups')->get();
+        $label_groups = DB::table('label_groups')->get();
         $labels = DB::table('labels')->get();
         $label_labels_to_add_after_removal = DB::table('label_labels_to_add_after_removal')->get();
         $label_labels_to_remove_after_addition = DB::table('label_labels_to_remove_after_addition')->get();
@@ -41,12 +41,17 @@ class AutomaticMigration implements ShouldQueue
 
         $dump = [
             'statuses' => $statuses,
-            'labels_group' => $labels_group,
+            'label_groups' => $label_groups,
             'labels' => $labels,
             'label_labels_to_add_after_removal' => $label_labels_to_add_after_removal,
             'label_labels_to_remove_after_addition' => $label_labels_to_remove_after_addition,
             'label_labels_to_add_after_addition' => $label_labels_to_add_after_addition
         ];
-        file_put_contents(database_path("seeds/dump.php"), '<?php return ' . var_export($dump, true) . ';');
+        $dumpJSON = json_encode($dump);
+
+        file_put_contents(database_path("seeds/dump.json"), $dumpJSON);
+
+
+
     }
 }
