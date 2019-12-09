@@ -47,6 +47,6 @@ class AutomaticMigration implements ShouldQueue
             'label_labels_to_remove_after_addition' => $label_labels_to_remove_after_addition,
             'label_labels_to_add_after_addition' => $label_labels_to_add_after_addition
         ];
-        file_put_contents("database/seeds/dump.php", '<?php return ' . var_export($dump, true) . ';');
+        file_put_contents(database_path("seeds/dump.php"), '<?php return ' . var_export($dump, true) . ';');
     }
 }
