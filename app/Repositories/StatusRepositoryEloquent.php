@@ -7,6 +7,7 @@ use Prettus\Repository\Criteria\RequestCriteria;
 use App\Repositories\StatusRepository;
 use App\Entities\Status;
 use App\Validators\StatusesValidator;
+use App\Jobs\AutomaticMigration;
 
 /**
  * Class StatusRepositoryEloquent.
@@ -25,7 +26,7 @@ class StatusRepositoryEloquent extends BaseRepository implements StatusRepositor
         return Status::class;
     }
 
-    
+
 
     /**
      * Boot up the repository, pushing criteria
@@ -34,5 +35,42 @@ class StatusRepositoryEloquent extends BaseRepository implements StatusRepositor
     {
         $this->pushCriteria(app(RequestCriteria::class));
     }
-    
+
+    public function create(array $attributes)
+    {
+        $edition = parent::create($attributes);
+        AutomaticMigration::dispatch();
+        return $edition;
+    }
+
+    public function update(array $attributes, $id)
+    {
+        $update = parent::update($attributes, $id);
+        AutomaticMigration::dispatch();
+        return $update;
+    }
+
+    public function updateOrCreate(array $attributes, array $values = [])
+    {
+        $update = parent::updateOrCreate($attributes, $values);
+        AutomaticMigration::dispatch();
+        return $update;
+
+    }
+
+    public function delete($id)
+    {
+        $delete = parent::delete($id);
+        AutomaticMigration::dispatch();
+        return $delete;
+    }
+
+    public function deleteWhere(array $where)
+    {
+        $delete = parent::deleteWhere($where);
+        AutomaticMigration::dispatch();
+        return $delete;
+    }
+
+
 }
