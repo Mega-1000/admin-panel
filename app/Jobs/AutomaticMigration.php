@@ -48,7 +48,7 @@ class AutomaticMigration implements ShouldQueue
             'label_labels_to_remove_after_addition' => $label_labels_to_remove_after_addition,
             'label_labels_to_add_after_addition' => $label_labels_to_add_after_addition
         ];
-        $dumpJSON = json_encode($dump);
+        $dumpJSON = json_encode($dump, JSON_PRETTY_PRINT);
 
         $path = database_path("seeds/dump.json");
         file_put_contents($path, $dumpJSON);
