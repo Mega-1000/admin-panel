@@ -15,9 +15,9 @@
     <ul id="tree">
         @foreach($pages as $page)
             <li>
-                {{ $page['title'] }}
-                @if(count($page['childs']))
-                    @include('pages.manageChild',['childs' => $page['childs']])
+                {{ $page->name }}
+                @if(count($page->childs))
+                    @include('pages.manageChild',['childs' => $page->childs])
                 @endif
             </li>
         @endforeach
