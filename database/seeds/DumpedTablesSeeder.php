@@ -26,5 +26,9 @@ class DumpedTablesSeeder extends Seeder
         DB::table('label_labels_to_remove_after_addition')->insert($data['label_labels_to_remove_after_addition']);
         DB::table('label_labels_to_add_after_addition')->delete();
         DB::table('label_labels_to_add_after_addition')->insert($data['label_labels_to_add_after_addition']);
+        DB::table('menu_items')->delete();
+        DB::table('menu_items')->insert($data['menu_items']);
+        DB::table('menus')->delete();
+        DB::table('menus')->insert($data['menus']);
     }
 }
