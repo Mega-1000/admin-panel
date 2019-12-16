@@ -31,6 +31,11 @@ Route::get('/test', function() {
 Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
     Route::group(['middleware' => 'admin'], function () {
+
+        Route::get('/admin/pages', 'PagesGeneratorController@getPages')->name('pages.index');
+        Route::get('/admin/pages/new', 'PagesGeneratorController@createPage')->name('pages.create');
+
+
         Route::get('/warehouse/{id}',
             'OrdersController@getCalendar');
 
