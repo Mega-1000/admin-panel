@@ -18,12 +18,9 @@ class CustomPageCategory extends Model
     {
         return $query->whereNull('parent_id');
     }
-    public function custom_page_category_id()
+
+    public function childrens()
     {
         return $this->hasMany('App\Entities\CustomPageCategory', 'parent_id', 'id');
-    }
-
-    public function childs() {
-        return $this->custom_page_category_id();
     }
 }

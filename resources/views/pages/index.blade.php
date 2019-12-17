@@ -16,14 +16,14 @@
         @foreach($pages as $page)
             <li>
                 {{ $page->name }}
-                <button type="button" class="btn btn-danger" style="margin-left: 12px">
+                <button type="button" class="btn btn-danger" style="margin-left: 12px" onclick="window.location='{{ route('pages.delete', ['id' => $page->id]) }}'">
                     @lang('voyager.generic.delete')
                 </button>
                 <button type="button" class="btn btn-primary" onclick="window.location='{{ route('pages.edit', ['id' => $page->id]) }}'">
                     @lang('voyager.generic.edit')
                 </button>
-                @if(count($page->childs))
-                    @include('pages.manageChild',['childs' => $page->childs])
+                @if(count($page->childrens))
+                    @include('pages.manageChildren',['childrens' => $page->childrens])
                 @endif
             </li>
         @endforeach

@@ -34,6 +34,7 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get('/pages/new', 'PagesGeneratorController@createPage')->name('pages.create');
         Route::post('/pages/store', 'PagesGeneratorController@store')->name('pages.store');
+        Route::get('/pages/{id}/delete', 'PagesGeneratorController@delete')->name('pages.delete');
         Route::get('/pages/{id}', 'PagesGeneratorController@edit')->name('pages.edit');
         Route::get('/pages', 'PagesGeneratorController@getPages')->name('pages.index');
 

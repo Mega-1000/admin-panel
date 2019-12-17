@@ -34,7 +34,7 @@ class PagesGeneratorController extends Controller
         $category->order = $order ?: 0;
         $category->parent_id = $parentId > 0 ? $parentId : null;
         $category->save();
-        return $this->getPages();
+        return redirect()->route('pages.index');
     }
 
     public function edit(int $id)
@@ -42,5 +42,22 @@ class PagesGeneratorController extends Controller
         $page = CustomPageCategory::findOrFail($id);
         $pages = CustomPageCategory::all();
         return view('pages.edit')->withPage($page)->withPages($pages);
+    }
+
+    public function delete(int $id)
+    {
+        $page = CustomPageCategory::findOrFail($id);
+        $this->deleteRecursive($page);
+        return redirect()->route('pages.index');
+    }
+
+    private function deleteRecursive($category)
+    {
+        if ($category->childrens()->count() > 0) {
+            foreach ($category->childrens as $children) {
+                $this->deleteRecursive($children);
+            }
+        }
+        $category->delete();
     }
 }
