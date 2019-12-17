@@ -16,6 +16,12 @@
         @foreach($pages as $page)
             <li>
                 {{ $page->name }}
+                <button type="button" class="btn btn-danger" style="margin-left: 12px">
+                    @lang('voyager.generic.delete')
+                </button>
+                <button type="button" class="btn btn-primary" onclick="window.location='{{ route('pages.edit', ['id' => $page->id]) }}'">
+                    @lang('voyager.generic.edit')
+                </button>
                 @if(count($page->childs))
                     @include('pages.manageChild',['childs' => $page->childs])
                 @endif

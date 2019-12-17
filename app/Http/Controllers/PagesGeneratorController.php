@@ -23,11 +23,24 @@ class PagesGeneratorController extends Controller
     {
         $parentId = $request->input('parent_id');
         $order = $request->input('order');
-        $category = new CustomPageCategory();
+        $id = $request->input('id');
+        if ($id) {
+            $category = CustomPageCategory::find($id);
+
+        } else {
+            $category = new CustomPageCategory();
+        }
         $category->name = $request->input('name');
         $category->order = $order ?: 0;
         $category->parent_id = $parentId > 0 ? $parentId : null;
         $category->save();
         return $this->getPages();
+    }
+
+    public function edit(int $id)
+    {
+        $page = CustomPageCategory::findOrFail($id);
+        $pages = CustomPageCategory::all();
+        return view('pages.edit')->withPage($page)->withPages($pages);
     }
 }

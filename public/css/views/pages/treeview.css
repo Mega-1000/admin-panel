@@ -28,16 +28,28 @@
     font-weight:700;
     position:relative
 }
+.voyager-angle-up:before {
+    content:"\E047" !important;
+    width: auto;
+    border-top: none !important;
+    top: 0.5em !important;
+}
+.voyager-angle-down:before {
+    content: "\E038" !important;
+    width: auto !important;
+    border-top: none !important;
+    top: 0.5em !important;
+}
 .tree ul li:before {
     content:"";
-    display:block;
-    width:10px;
-    height:0;
-    border-top:1px solid;
-    margin-top:-1px;
-    position:absolute;
-    top:1em;
-    left:0
+    display: block;
+    width: 10px;
+    height: 20px;
+    border-top: 1px solid;
+    margin-top: -1px;
+    position: absolute;
+    top: 1em;
+    left: 0
 }
 .tree ul li:last-child:before {
     background:#fff;

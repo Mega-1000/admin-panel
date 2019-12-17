@@ -1,6 +1,5 @@
 @extends('layouts.datatable')
 @section('app-header')
-{{--    <link href="/css/views/pages/form.css" rel="stylesheet">--}}
 
     <h1 class="page-title">
         <i class="voyager-tag"></i> @lang('pages.title')
@@ -56,14 +55,4 @@
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
     </form>
 @endsection
-{{--@section('scripts')--}}
-{{--    <script src="{{URL::asset('js/jscolor.js')}}"></script>--}}
-{{--    <script>--}}
-{{--        var breadcrumb = $('.breadcrumb:nth-child(2)');--}}
 
-{{--        breadcrumb.children().remove();--}}
-{{--        breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");--}}
-{{--        breadcrumb.append("<li class='active'><a href='/admin/statuses/'>Statusy</a></li>");--}}
-{{--        breadcrumb.append("<li class='disable'><a href='javascript:void()'>Dodaj</a></li>");--}}
-{{--    </script>--}}
-{{--@endsection--}}
