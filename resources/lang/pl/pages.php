@@ -2,10 +2,12 @@
 
 return [
     'title' => 'Generowanie stron',
-    'create' => 'Dodaj nową stronę',
+    'create' => 'Dodaj nowy katalog',
+    'add_content' => 'Zarządzaj treścią stron',
     'table' => [
-        'name' => 'Nazwa Zakładki',
-        'isDirectory' => 'Czy jest kategorią',
+        'name' => 'Tytuł strony',
+        'created' => 'Data utworzenia',
+        'edited' => 'Data ostatniej edycji'
     ],
 
 ];

@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\CustomPage;
 use App\Entities\CustomPageCategory;
 use App\Http\Requests\PageCategoryCreateRequest;
+use App\Http\Requests\PageContentCreateRequest;
+use Illuminate\Http\Request;
 
 class PagesGeneratorController extends Controller
 {
@@ -19,6 +22,50 @@ class PagesGeneratorController extends Controller
         return view('pages.create')->withPages($pages);
     }
 
+    public function contentList(int $id)
+    {
+        $page = CustomPageCategory::findOrFail($id);
+        return view('pages.listContent')->withPage($page);
+    }
+
+    public function newContent($id)
+    {
+        return view('pages.newContent')->withId($id);
+    }
+
+    public function editContent(Request $request)
+    {
+        $id = $request->query('content_id');
+        $page = CustomPage::findOrFail($id);
+        return view('pages.editContent')->withPage($page)->withId($id);
+    }
+
+    public function deleteContent(Request $request)
+    {
+        $id = $request->query('content_id');
+        $page = CustomPage::findOrFail($id);
+        $catId = $page->category_id;
+        $page->delete();
+        return redirect()->route('pages.list', ['id' => $catId]);
+    }
+
+    public function storeContent($id, PageContentCreateRequest $request)
+    {
+        $pageContent = $request->input('content');
+        $title = $request->input('title');
+        $contentId = $request->input('id');
+        if ($contentId) {
+            $content = CustomPage::findOrFail($contentId);
+        } else {
+            $content = new CustomPage();
+        }
+        $content->title = $title;
+        $content->content = $pageContent;
+        $content->category_id = $id;
+        $content->save();
+        return redirect()->route('pages.list', ['id' => $id]);
+    }
+
     public function store(PageCategoryCreateRequest $request)
     {
         $parentId = $request->input('parent_id');
@@ -26,7 +73,6 @@ class PagesGeneratorController extends Controller
         $id = $request->input('id');
         if ($id) {
             $category = CustomPageCategory::find($id);
-
         } else {
             $category = new CustomPageCategory();
         }

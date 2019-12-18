@@ -32,6 +32,12 @@ Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
     Route::group(['middleware' => 'admin'], function () {
 
+        Route::get('/pages/content/delete', 'PagesGeneratorController@deleteContent')->name('pages.deleteContent');
+        Route::get('/pages/{id}/content/edit', 'PagesGeneratorController@editContent')->name('pages.editContent');
+        Route::get('/pages/{id}/content/new', 'PagesGeneratorController@newContent')->name('pages.newContent');
+        Route::post('/pages/{id}/content/store', 'PagesGeneratorController@storeContent')->name('pages.saveContent');
+        Route::get('/pages/{id}/content', 'PagesGeneratorController@contentList')->name('pages.list');
+
         Route::get('/pages/new', 'PagesGeneratorController@createPage')->name('pages.create');
         Route::post('/pages/store', 'PagesGeneratorController@store')->name('pages.store');
         Route::get('/pages/{id}/delete', 'PagesGeneratorController@delete')->name('pages.delete');

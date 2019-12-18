@@ -13,20 +13,7 @@
 
 @section('table')
     <ul id="tree">
-        @foreach($pages as $page)
-            <li>
-                {{ $page->name }}
-                <button type="button" class="btn btn-danger" style="margin-left: 12px" onclick="window.location='{{ route('pages.delete', ['id' => $page->id]) }}'">
-                    @lang('voyager.generic.delete')
-                </button>
-                <button type="button" class="btn btn-primary" onclick="window.location='{{ route('pages.edit', ['id' => $page->id]) }}'">
-                    @lang('voyager.generic.edit')
-                </button>
-                @if(count($page->childrens))
-                    @include('pages.manageChildren',['childrens' => $page->childrens])
-                @endif
-            </li>
-        @endforeach
+        @include('pages.manageChildren',['childrens' => $pages])
     </ul>
 @endsection
 
@@ -47,7 +34,7 @@
                         branch.addClass(closedClass)
                     }
                     branch.on('click', function (e) {
-                        if (this == e.target) {
+                        if (this === e.target) {
                             var icon = $(e.target)
                             icon.toggleClass(openedClass + " " + closedClass);
                             $(this).children().children().toggle();

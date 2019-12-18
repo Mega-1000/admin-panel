@@ -33,11 +33,9 @@
             <label class="form-group">
                 Kategoria nadrzędna
                 <select class="form-control" id="parent_id" name="parent_id">
-                    <option value="0"
-                            @if($page->parent_id == null)
-                                selected
-                            @endif>
-                        brak</option>
+                    <option value="0" @if($page->parent_id == null) selected @endif>
+                        brak
+                    </option>
                     @foreach($pages as $category)
                         @if($category->id === $page->id)
                             @continue
@@ -46,9 +44,8 @@
                         <option value={{$category->id}}
                         @if($category->id === $page->parent_id)
                             selected
-                        @endif
-                        >
-                        {{$category->name}}
+                            @endif>
+                            {{$category->name}}
                         </option>
                     @endforeach
                 </select>
@@ -63,10 +60,9 @@
                 Kolejność
                 <input class="form-control" id="order" name="order" type="number" value="{{$page->order}}">
             </label>
-            <br>
-
         </div>
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
     </form>
+    <br>
 @endsection
 

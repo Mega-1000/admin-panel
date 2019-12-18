@@ -2,7 +2,6 @@
 
 namespace App\Entities;
 
-use App\Entities\CategoryRootScope;
 use Illuminate\Database\Eloquent\Model;
 
 class CustomPageCategory extends Model
@@ -22,5 +21,10 @@ class CustomPageCategory extends Model
     public function childrens()
     {
         return $this->hasMany('App\Entities\CustomPageCategory', 'parent_id', 'id');
+    }
+
+    public function pages()
+    {
+        return $this->hasMany('App\Entities\CustomPage', 'category_id', 'id');
     }
 }

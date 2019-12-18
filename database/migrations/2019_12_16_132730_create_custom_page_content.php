@@ -16,9 +16,10 @@ class CreateCustomPageContent extends Migration
         Schema::create('custom_page_content', function (Blueprint $table) {
             $table->increments('id');
             $table->text('title');
-            $table->integer('category_id')->unique();
+            $table->unsignedInteger('category_id');
             $table->longText('content');
             $table->timestamps();
+            $table->foreign('category_id')->references('id')->on('custom_page_categories');
         });
     }
 
