@@ -136,6 +136,17 @@ class ProductsController
         }
     }
 
+    public function getHiddenProducts(Request $request)
+    {
+        $perPage = $this->getPerPage();
+        $products = Product::where('products_related_to_the_automatic_price_change', '=', $request->symbol)
+            ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
+            ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
+            ->paginate(999)->toJson();
+
+        return response($products);
+    }
+
     /**
      * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
@@ -182,9 +193,7 @@ class ProductsController
             ->where('products.show_on_page', '=', 1)
             ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
             ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
-            ->join('products AS prod', 'prod.products_related_to_the_automatic_price_change', 'products.symbol')
             ->paginate($perPage)->toJson();
-
         $products = json_decode($products, true, JSON_PRETTY_PRINT);
         foreach ($products['data'] as $productKey => $productValue) {
             if (array_key_exists('url_for_website', $productValue)) {
