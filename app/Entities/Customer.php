@@ -2,18 +2,20 @@
 
 namespace App\Entities;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
+use Laravel\Passport\HasApiTokens;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
  * Class Customer.
  *
  * @package namespace App\Entities;
  */
-class Customer extends Model implements Transformable
+class Customer extends Authenticatable implements Transformable
 {
-    use TransformableTrait;
+    use TransformableTrait, HasApiTokens, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -65,4 +67,9 @@ class Customer extends Model implements Transformable
         "city",
         "postal_code",
     ];
+
+    public function findForPassport($username)
+    {
+        return $this->where('login', $username)->first();
+    }
 }
