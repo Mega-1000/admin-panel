@@ -193,7 +193,7 @@ class ProductsController
             ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
             ->with(['categoryDetail' => function ($q) {
                 $q->with(['chimneyAttribute' => function ($q) {
-                    $q->with('chimneyAttributeOption');
+                    $q->with('options');
                 }]);
             }])
             ->paginate($perPage)->toJson();
