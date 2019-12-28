@@ -360,7 +360,8 @@ class ImportCsvFileJob implements ShouldQueue
         }
         $categoryDetails->save();
         $this->appendChimneyAttributes($categoryDetails, $line);
-        $this->appendChimneyProducts($categoryDetails, $line);
+        $this->appendChimneyProducts($categoryDetails, $line, 422, 40, false);
+        $this->appendChimneyProducts($categoryDetails, $line, 518, 30, true);
         if (count($categoryDetails->chimneyAttributes) > 0) {
             $this->createProduct($productArray);
         }
@@ -389,10 +390,9 @@ class ImportCsvFileJob implements ShouldQueue
         }
     }
 
-    private function appendChimneyProducts($categoryDetails, $line)
+    private function appendChimneyProducts($categoryDetails, $line, $start, $count, $optional)
     {
-        $start = 422;
-        for ($i = $start; $i < 462; $i++) {
+        for ($i = $start; $i < $start + $count; $i++) {
             if (empty($line[$i])) {
                 continue;
             }
@@ -403,7 +403,8 @@ class ImportCsvFileJob implements ShouldQueue
             $product = new Entities\ChimneyProduct([
                 'product_code' => $arr[0],
                 'formula' => $arr[1],
-                'column_number' => $i - $start + 1
+                'column_number' => $optional ? 0 : $i - $start + 1,
+                'optional' => $optional ? 1 : 0
             ]);
             $categoryDetails->chimneyProducts()->save($product);
         }

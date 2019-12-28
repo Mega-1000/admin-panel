@@ -36,8 +36,8 @@ class CreateChimneyTables extends Migration
             $table->foreign('category_detail_id')->references('id')->on('category_details');
             $table->string('product_code');
             $table->string('formula');
-            $table->integer('column_number');
-            $table->integer('optional')->default('0');
+            $table->integer('column_number')->default(0);
+            $table->integer('optional')->default(0);
             $table->timestamps();
         });
     }
