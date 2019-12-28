@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateBanksTable extends Migration
+class AddCollumnToCustomers extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,8 @@ class CreateBanksTable extends Migration
      */
     public function up()
     {
-        Schema::create('banks', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('name')->default(null)->nullable();
-            $table->string('site_url');
-            $table->string('img_url')->default(null)->nullable();
+        Schema::table('customers', function (Blueprint $table) {
+            $table->rememberToken();
         });
     }
 
@@ -28,6 +25,8 @@ class CreateBanksTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('banks');
+        Schema::table('customers', function (Blueprint $table) {
+            $table->dropRememberToken();
+        });
     }
 }

@@ -15,3 +15,4 @@ composer.phar
 yarn-error.log
 .env
 .phpunit.result.cache
+.rnd
