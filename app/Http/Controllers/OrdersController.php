@@ -615,23 +615,7 @@ class OrdersController extends Controller
             }
             $itemsArray[] = $item->product_id;
         }
-        $sumOfOrdersReturn = $this->sumOfOrders($order);
-        $sumToCheck = $sumOfOrdersReturn[0];
-        if ($order->status_id == 5 || $order->status_id == 6) {
-            if ($sumToCheck > 5 || $sumToCheck < -5) {
-                foreach($sumOfOrdersReturn[1] as $ordId) {
-                    dispatch_now(new AddLabelJob($ordId, [134]));
-                }
-            } else {
-                foreach($sumOfOrdersReturn[1] as $ordId) {
-                    dispatch_now(new RemoveLabelJob($ordId, [134]));
-                    dispatch_now(new AddLabelJob($ordId, [133]));
-                }
-            }
-        } else {
-            dispatch_now(new RemoveLabelJob($order, [134]));
-            dispatch_now(new RemoveLabelJob($order, [133]));
-        }
+
 
         if ($order->status_id === 4) {
             $consultantVal = OrderCalcHelper::calcConsultantValue($orderItemKMD, number_format($profit, 2, '.', ''));
@@ -761,6 +745,25 @@ class OrdersController extends Controller
             );
         }
 
+        $sumOfOrdersReturn = $this->sumOfOrders($order);
+        $sumToCheck = $sumOfOrdersReturn[0];
+        if ($order->status_id == 5 || $order->status_id == 6) {
+            if ($sumToCheck > 5 || $sumToCheck < -5) {
+                foreach($sumOfOrdersReturn[1] as $ordId) {
+                    dispatch_now(new RemoveLabelJob($ordId, [133]));
+                    dispatch_now(new AddLabelJob($ordId, [134]));
+                }
+            } else {
+                foreach($sumOfOrdersReturn[1] as $ordId) {
+                    dispatch_now(new RemoveLabelJob($ordId, [134]));
+                    dispatch_now(new AddLabelJob($ordId, [133]));
+                }
+            }
+        } else {
+            dispatch_now(new RemoveLabelJob($order, [134]));
+            dispatch_now(new RemoveLabelJob($order, [133]));
+        }
+
         if ($request->submit == 'updateAndStay') {
             return redirect()->route('orders.edit', ['order_id' => $order->id])->with([
                 'message' => __('orders.message.update'),
@@ -776,6 +779,8 @@ class OrdersController extends Controller
     {
         if($order->master_order_id != null) {
             $order = $this->orderRepository->find($order->master_order_id);
+        } else {
+            $order = $this->orderRepository->find($order->id);
         }
         $ids = [];
         $orderItems = $order->items;
@@ -785,15 +790,14 @@ class OrdersController extends Controller
         }
         $sum += $order->additional_service_cost + $order->additional_cash_on_delivery_cost + $order->shipment_price_for_client;
         $sum = round($sum, 2);
-
+//        dd($sum, $order->additional_service_cost,$order->additional_cash_on_delivery_cost,$order->shipment_price_for_client);
         if($order->bookedPaymentsSum() - $order->promisePaymentsSum() < -5 ) {
-            $sumOfPayments = $order->promisePaymentsSum();
+            $sumOfPayments = $order->promisePaymentsSum() - $order->bookedPaymentsSum();
         } else if($order->bookedPaymentsSum() - $order->promisePaymentsSum() > 5) {
             $sumOfPayments = $order->bookedPaymentsSum() + $order->promisePaymentsSum();
         } else {
             $sumOfPayments = $order->bookedPaymentsSum();
         }
-
         if($sum - $sumOfPayments < 2 && $sum - $sumOfPayments > -2) {
             $mainOrderSum = $sum - $sumOfPayments;
         } else {
@@ -829,20 +833,19 @@ class OrdersController extends Controller
             }
 
             $connectedSum += $connOrderSum;
-            $ids[] = $connectedOrder->id;
+            $ids[]        = $connectedOrder->id;
         }
-
+        
         if ($mainOrderSum < 0) {
+            $sumToCheck = $mainOrderSum + $connectedSum;
+        } else if ($connectedSum < 0) {
             $sumToCheck = $mainOrderSum + $connectedSum;
         } else {
             $sumToCheck = $mainOrderSum - $connectedSum;
         }
 
-
-
         return [$sumToCheck, $ids];
     }
-
 
     /**
      * @param $data
@@ -2275,3 +2278,4 @@ class OrdersController extends Controller
         return view('customers.confirmation.confirmationThanks');
     }
 }
+
