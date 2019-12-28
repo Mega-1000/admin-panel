@@ -185,14 +185,17 @@ class ProductsController
      */
     public function getProductsByCategory(Request $request)
     {
-        $product_url = $request->input('param');
-
         $perPage = $this->getPerPage();
 
         $products = Product::where('products.product_url', 'like', '%' . Input::get('param') . '%')
             ->where('products.show_on_page', '=', 1)
             ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
             ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
+            ->with(['categoryDetail' => function ($q) {
+                $q->with(['chimneyAttribute' => function ($q) {
+                    $q->with('chimneyAttributeOption');
+                }]);
+            }])
             ->paginate($perPage)->toJson();
         $products = json_decode($products, true, JSON_PRETTY_PRINT);
         foreach ($products['data'] as $productKey => $productValue) {

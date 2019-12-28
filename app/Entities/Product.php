@@ -192,4 +192,9 @@ class Product extends Model implements Transformable
     {
         return $this->hasMany(OrderItem::class);
     }
+
+    public function categoryDetail()
+    {
+        return $this->belongsTo('App\Entities\CategoryDetail', 'token_prod_cat', 'token_prod_cat');
+    }
 }
