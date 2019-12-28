@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Jobs;
-
 use App\Repositories\ProductPackingRepository;
 use App\Repositories\ProductPriceRepository;
 use App\Repositories\ProductRepository;
@@ -19,7 +17,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Ramsey\Uuid\Uuid;
-
 /**
  * Class ImportCsvFileJob
  *
@@ -28,7 +25,6 @@ use Ramsey\Uuid\Uuid;
 class ImportCsvFileJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
     protected $path;
     protected $startRow;
     protected $imgStoragePath;
@@ -45,7 +41,6 @@ class ImportCsvFileJob implements ShouldQueue
         $this->imgStoragePath = 'products';
         $this->startRow = $startRow;
     }
-
     /**
      * Execute the job.
      *
@@ -73,7 +68,6 @@ class ImportCsvFileJob implements ShouldQueue
 //        var_dump($handle);die;
         DB::table('category_details')->delete();
         DB::table('products')->delete();
-
             $data = Carbon::now();
             Log::channel('import')->info('Import start: ' . $data);
         for ($i = 1; $line = fgetcsv($handle, 0, ';'); $i++) {
@@ -82,7 +76,6 @@ class ImportCsvFileJob implements ShouldQueue
             if ($i % 100 === 0) {
                 var_dump($i);
             }
-
             if ($i <= $this->startRow) {
                 continue;
             }
@@ -97,8 +90,6 @@ class ImportCsvFileJob implements ShouldQueue
                     'token_prod_cat' => $tokenProductAndCategory,
                 ];
                 //var_dump('i:' . $i . ' line: ' . $line[301]);
-
-
                 if (!empty($categoryDetails['img_url'])
                     && strpos($categoryDetails['img_url'], "\\")
                 ) {
@@ -108,10 +99,8 @@ class ImportCsvFileJob implements ShouldQueue
                     $imgUrlWebsite = Storage::url($imgUrlWebsite);
                     $categoryDetails['url_for_website'] = $imgUrlWebsite;
                 }
-
                 DB::table('category_details')->insert($categoryDetails);
             }
-
                     $array = [
                         'name' => $line[4],
                         'symbol' => $line[5],
@@ -231,7 +220,6 @@ class ImportCsvFileJob implements ShouldQueue
                 'gross_selling_price_the_largest_unit' => $line[256],
 //                        'gross_purchase_price_the_largest_unit_after_discounts' => $line[197],
                     ];
-
             /** MT-20 import kategorii produktów - podejście 2 */
             $categoryName = null;
             $categoryColumn = null;
@@ -245,26 +233,21 @@ class ImportCsvFileJob implements ShouldQueue
                     break;
                         }
             }
-
             if ($categoryColumn !== null) {
                 $category = [];
                 $categoryColumn++;
-
                 for ($j = 0; $j < 8; $j++) {
                     if ((string)$line[$categoryColumn] !== '') {
                         $category[] = $line[$categoryColumn++];
                     }
-
                     $array['show_on_page'] = $this->getShowOnPageParameter($line, $col);
                     $array['priority'] = $this->getProductsOrder($line, $col);
 //                    var_dump('ffff' . $array['priority']);
                 }
-
                 $array['token_prod_cat'] = $tokenProductAndCategory;
                 $array['product_url'] = implode('/', $category);
 //                var_dump($array['product_url']);
             }
-
             try {
 //                OLEWAMY SPRAWDZANIE ZEBY IMPORTOWAL WSZYSTKO
 //                if ($array['symbol'] === null || $array['symbol'] === '') {
@@ -312,7 +295,6 @@ class ImportCsvFileJob implements ShouldQueue
                         }
                     }
                     /** MT-19 checking if url for product image exists and changing prefix of path to match server path */
-
                     if (!empty($array['url'])
                         && strpos($array['url'], "\\")
                     ) {
@@ -323,7 +305,6 @@ class ImportCsvFileJob implements ShouldQueue
                         $array['url_for_website'] = $imgUrlWebsite;
                     }
                 }
-
                 $item = $productRepository->findWhere(['symbol' => $array['symbol']])->first();
 
                 if ($item !== null) {
@@ -349,17 +330,14 @@ class ImportCsvFileJob implements ShouldQueue
                 Log::channel('import')->debug($exception);
             }
         }
-
         DB::table('import')->where('id', 1)->update(
             ['name' => 'Import products', 'processing' => 0]
         );
         DB::table('import')->where('id', 2)->update(
             ['name' => 'Import products done', 'last_import' => Carbon::now()]
         );
-
         Log::channel('import')->info('Import end: ' . Carbon::now());
     }
-
     private function getShowOnPageParameter(array $line, int $columnIterator)
     {
         if (array_key_exists($columnIterator + 14, $line)
@@ -369,7 +347,6 @@ class ImportCsvFileJob implements ShouldQueue
         }
         return false;
     }
-
     private function getProductsOrder(array $line, int $columnIterator)
     {
         if (array_key_exists($columnIterator + 7, $line)) {
@@ -377,8 +354,6 @@ class ImportCsvFileJob implements ShouldQueue
             $l = $l ?? 0;
             return $l;
         }
-
         return 0;
     }
-
 }
