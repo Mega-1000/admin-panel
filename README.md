@@ -16,6 +16,8 @@ Run
 4. `php artisan db:seed`
 5. ustawić uprawnienia do pliku .csv oraz dump.json dla uzytkownika `www-data`
 6. dodać git hooki, by przy pullowaniu odpalały komendę `php artisan import:dump`
+7. `yarn install`
+8. `yarn dev`
 
 
 Aktualizacja CSV: 
