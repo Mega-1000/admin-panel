@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Entities\Category;
+use App\Entities\CategoryDetail;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -16,28 +16,24 @@ class CategoriesController extends Controller
      */
     public function getCategoriesDetails()
     {
-        return response(DB::table('category_details')->get()->toJson());
+        $categories = CategoryDetail::withCount('chimneyAttributes')->get();
+        return response($categories->toJson());
     }
 
     public function getCategoryDetails(Request $request)
     {
         $category = $request->input('category');
-        $categoryDetails = DB::table('category_details as cd')
-            ->select(
-                'cd.id',
-                'cd.category',
-                'cd.category_edited',
-                'cd.description',
-                'cd.img_url',
-                'cd.url_for_website',
-                'cd.category_navigation',
-                'p.name',
-                'cd.token_prod_cat'
-                )
-            ->where('cd.category_navigation', 'like', '%' . $category . '%')
-            ->leftJoin('products as p', 'p.token_prod_cat', '=','cd.token_prod_cat')
+        $categoryDetails = CategoryDetail
+            ::where('category_navigation', 'like', '%' . $category . '%')
+            ->with('product')
+            ->with([
+                'chimneyAttributes' => function ($q) {
+                    $q->with('options');
+                }
+            ])
             ->first();
+        $categoryDetails->name = $categoryDetails->product ? $categoryDetails->product->name : '';
 
-        return response(json_encode($categoryDetails));
+        return response($categoryDetails->toJson());
     }
 }

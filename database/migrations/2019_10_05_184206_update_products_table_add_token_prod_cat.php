@@ -14,7 +14,7 @@ class UpdateProductsTableAddTokenProdCat extends Migration
     public function up()
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->string('token_prod_cat')->nullable();
+            $table->string('token_prod_cat')->nullable()->index();
         });
     }
 

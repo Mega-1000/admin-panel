@@ -21,7 +21,7 @@ class CreateCategoryDetails extends Migration
             $table->string('img_url');
             $table->string('url_for_website');
             $table->string('category_navigation');
-            $table->string('token_prod_cat')->nullable();
+            $table->string('token_prod_cat')->nullable()->index();
             $table->timestamps();
         });
     }

@@ -75,8 +75,8 @@ class ImportCsvFileJob implements ShouldQueue
             throw new FileNotFoundException('CSV file "'.$this->path.'" not found');
         }
 
-        Entities\ChimneyAttributeOption::truncate();
-        Entities\ChimneyAttribute::truncate();
+        DB::table('chimney_attribute_options')->delete();
+        DB::table('chimney_attributes')->delete();
         DB::table('category_details')->delete();
         DB::table('products')->delete();
 
@@ -372,5 +372,22 @@ class ImportCsvFileJob implements ShouldQueue
             $categoryDetails->url_for_website   = $imgUrlWebsite;
         }
         $categoryDetails->save();
+        $this->appendChimneyAttributes($categoryDetails, $line);
+    }
+    
+    private function appendChimneyAttributes($categoryDetails, $line)
+    {
+        for ($i = 407; $i < 422; $i++) {
+            if (empty($line[$i])) {
+                continue;
+            }
+            $arr = explode('||', $line[$i]);
+            $attribute = new Entities\ChimneyAttribute(['name' => $arr[0]]);
+            $categoryDetails->chimneyAttributes()->save($attribute);
+            $options = explode('|', $arr[1]);
+            foreach ($options as $opt) {
+                $attribute->options()->save(new Entities\ChimneyAttributeOption(['name' => $opt]));
+            }
+        }
     }
 }
