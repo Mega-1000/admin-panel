@@ -191,11 +191,6 @@ class ProductsController
             ->where('products.show_on_page', '=', 1)
             ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
             ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
-            ->with(['categoryDetail' => function ($q) {
-                $q->with(['chimneyAttributes' => function ($q) {
-                    $q->with('options');
-                }]);
-            }])
             ->paginate($perPage)->toJson();
         $products = json_decode($products, true, JSON_PRETTY_PRINT);
         foreach ($products['data'] as $productKey => $productValue) {
@@ -214,8 +209,7 @@ class ProductsController
      */
     public function getCategoriesTree()
     {
-        $categoriesList = DB::table('products')
-            ->select(DB::raw('distinct(product_url)'))
+        $categoriesList = Product::select(DB::raw('distinct(product_url)'))
             ->whereRaw('char_length(product_url) > 3')
             ->orderBy('priority', 'asc')
             ->get()
@@ -223,62 +217,13 @@ class ProductsController
 
         $categoriesListArray = json_decode($categoriesList, true);
 
-        $arrayOfUrls = [];
-        $navigationTree = [];
-
         $map = [];
 
         foreach($categoriesListArray as $url) {
             $folders = explode('/', $url['product_url']);
-
-            //clear empty strings
-
             $this->applyChain($map, $folders, []);
-
         }
         return response($map);
-
-//        foreach ($map as $key => $value) {
-//
-//            $key = array_keys($key);
-//            dump('key', $key);
-//
-//            $lastInsertId = DB::table('categories')->insertGetId(
-//                [
-//                    'name' => $key[0],
-//                    'status' => 1,
-//                ]
-//            );
-//            dump($lastInsertId);
-//        }
-
-        //struktura bazy
-//        $root_id = 0;
-//        $parent_id = 0;
-//        foreach($map as $item) {
-//            foreach ( $item as $root_key => $root_value ) {
-//
-//                $parent_id = $this->insertRecord($root_key, $parent_id);
-//                $root_id = $parent_id;
-//
-//                if ( is_array($root_value) ) {
-//                    foreach ( $root_value as $parent_key => $parent_value ) {
-//
-//                        $parent_id = $this->insertRecord($parent_key, $root_id);
-//                        $keep_parent_id = $parent_id;
-//
-//                        if ( is_array($parent_value) ) {
-//                            foreach ( $parent_value as $child_key => $child_value ) {
-//
-//                                $parent_id = $this->insertRecord($child_key, $keep_parent_id);
-//                                $this->getlevel($child_value, $parent_id);
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
     }
 
     private function applyChain(&$arr, $indexes, $value) { //Here's your recursion

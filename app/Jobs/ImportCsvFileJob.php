@@ -37,6 +37,12 @@ class ImportCsvFileJob implements ShouldQueue
     protected $imgStoragePath;
     public $timeout = 3600;
     public $tries   = 1;
+    
+    private $productRepository;
+    private $productPackingRepository;
+    private $productPriceRepository;
+    private $productStockRepository;
+    private $productStockPositionRepository;
 
     /**
      * Create a new job instance.
@@ -75,6 +81,13 @@ class ImportCsvFileJob implements ShouldQueue
             throw new FileNotFoundException('CSV file "'.$this->path.'" not found');
         }
 
+        $this->productRepository = $productRepository;
+        $this->productPackingRepository = $productPackingRepository;
+        $this->productPriceRepository = $productPriceRepository;
+        $this->productStockRepository = $productStockRepository;
+        $this->productStockPositionRepository = $productStockPositionRepository;
+
+        DB::table('chimney_products')->delete();
         DB::table('chimney_attribute_options')->delete();
         DB::table('chimney_attributes')->delete();
         DB::table('category_details')->delete();
@@ -92,8 +105,6 @@ class ImportCsvFileJob implements ShouldQueue
             if ($i <= $this->startRow) {
                 continue;
             }
-            
-            $this->saveCategory($line, $tokenProductAndCategory);
 
             $array          = [
                 'name' => $line[4],
@@ -184,8 +195,6 @@ class ImportCsvFileJob implements ShouldQueue
                 'set_rule' => $line[368],
                 'set_symbol' => $line[369],
                 'additional_payment_for_milling' => $line[473],
-//                'date_of_price_change' => $line[106] !== null  ? new Carbon($line[106]) : null,
-//                'date_of_the_new_prices' => $line[107] !== null  ? new Carbon($line[107]) : null,
                 'product_group_for_change_price' => $line[108],
                 'products_related_to_the_automatic_price_change' => $line[110],
                 'text_price_change' => $line[111],
@@ -204,18 +213,11 @@ class ImportCsvFileJob implements ShouldQueue
                 'comments' => $line[284],
                 'value_of_the_order_for_free_transport' => $line[282],
                 'gross_selling_price_basic_unit' => $line[254],
-//                        'gross_purchase_price_basic_unit_after_discounts' => $line[195],
-//                        'gross_selling_price_commercial_unit' => $line[252],
-//                        'gross_purchase_price_commercial_unit_after_discounts' => $line[193],
                 'gross_selling_price_calculated_unit' => $line[253],
-//                        'gross_purchase_price_calculated_unit_after_discounts' => $line[194],
                 'gross_selling_price_aggregate_unit' => $line[255],
-//                        'gross_purchase_price_aggregate_unit_after_discounts' => $line[196],
                 'gross_selling_price_the_largest_unit' => $line[256],
-//                        'gross_purchase_price_the_largest_unit_after_discounts' => $line[197],
             ];
             /** MT-20 import kategorii produktów - podejście 2 */
-            $categoryName   = null;
             $categoryColumn = null;
             //598 - 100.dzialki budowlane - pierwsza kategoria
             //1030 - 370. - ostatnia jawna kategoria
@@ -236,21 +238,15 @@ class ImportCsvFileJob implements ShouldQueue
                     }
                     $array['show_on_page'] = $this->getShowOnPageParameter($line, $col);
                     $array['priority']     = $this->getProductsOrder($line, $col);
-//                    var_dump('ffff' . $array['priority']);
                 }
                 $array['token_prod_cat'] = $tokenProductAndCategory;
                 $array['product_url']    = implode('/', $category);
-//                var_dump($array['product_url']);
             }
+
             try {
-//                OLEWAMY SPRAWDZANIE ZEBY IMPORTOWAL WSZYSTKO
-//                if ($array['symbol'] === null || $array['symbol'] === '') {
-//                    continue;
-//                }
                 foreach ($array as $key => $value) {
                     if ($key === 'description' || $key === 'name' || $key === 'url') {
                         $value       = iconv("utf-8", "ascii//IGNORE", $value);
-                        ;
                         $array[$key] = $value;
                     }
                     if ($value === null || $value === '') {
@@ -299,23 +295,14 @@ class ImportCsvFileJob implements ShouldQueue
                         $array['url_for_website'] = $imgUrlWebsite;
                     }
                 }
-                $item = $productRepository->findWhere(['symbol' => $array['symbol']])->first();
 
-                if ($item !== null) {
-                    $product = $productRepository->update($array, $item->id);
-                    $productPriceRepository->update(array_merge(['product_id', $product->id], $array), $product->id);
-                    $productPackingRepository->update(array_merge(['product_id', $product->id], $array), $product->id);
-                } else {
-                    $product = $productRepository->create($array);
-                    $productPriceRepository->create(array_merge(['product_id' => $product->id], $array));
-                    $productPackingRepository->create(array_merge(['product_id' => $product->id], $array));
-                    $productStockRepository->create([
-                        'product_id' => $product->id,
-                        'quantity' => 0,
-                        'created_at' => Carbon::now(),
-                        'updated_at' => Carbon::now()
-                    ]);
+                $this->saveCategory($line, $tokenProductAndCategory, $array);
+
+                if (empty($array['symbol'])) {
+                    continue;
                 }
+
+                $this->createProduct($array);
             } catch (\Exception $exception) {
                 Log::channel('import')->debug($array);
                 Log::channel('import')->debug($exception);
@@ -349,7 +336,7 @@ class ImportCsvFileJob implements ShouldQueue
         return 0;
     }
 
-    private function saveCategory($line, $token)
+    private function saveCategory($line, $token, $productArray)
     {
         if (empty($line[301]) && empty($line[302])) {
             return;
@@ -373,21 +360,76 @@ class ImportCsvFileJob implements ShouldQueue
         }
         $categoryDetails->save();
         $this->appendChimneyAttributes($categoryDetails, $line);
+        $this->appendChimneyProducts($categoryDetails, $line);
+        if (count($categoryDetails->chimneyAttributes) > 0) {
+            $this->createProduct($productArray);
+        }
     }
     
     private function appendChimneyAttributes($categoryDetails, $line)
     {
-        for ($i = 407; $i < 422; $i++) {
+        $start = 407;
+        for ($i = $start; $i < 422; $i++) {
             if (empty($line[$i])) {
                 continue;
             }
             $arr = explode('||', $line[$i]);
-            $attribute = new Entities\ChimneyAttribute(['name' => $arr[0]]);
+            if (count($arr) != 2) {
+                continue;
+            }
+            $attribute = new Entities\ChimneyAttribute([
+                'name' => $arr[0],
+                'column_number' => $i - $start + 1
+            ]);
             $categoryDetails->chimneyAttributes()->save($attribute);
             $options = explode('|', $arr[1]);
             foreach ($options as $opt) {
                 $attribute->options()->save(new Entities\ChimneyAttributeOption(['name' => $opt]));
             }
+        }
+    }
+
+    private function appendChimneyProducts($categoryDetails, $line)
+    {
+        $start = 422;
+        for ($i = $start; $i < 462; $i++) {
+            if (empty($line[$i])) {
+                continue;
+            }
+            $arr = explode('||', $line[$i]);
+            if (count($arr) != 2) {
+                continue;
+            }
+            $product = new Entities\ChimneyProduct([
+                'product_code' => $arr[0],
+                'formula' => $arr[1],
+                'column_number' => $i - $start + 1
+            ]);
+            $categoryDetails->chimneyProducts()->save($product);
+        }
+    }
+
+    private function createProduct($array)
+    {
+        if (empty($array['symbol'])) {
+            $array['symbol'] = 'fake-'.Str::random();
+        }
+        $item = $this->productRepository->findWhere(['symbol' => $array['symbol']])->first();
+
+        if ($item !== null) {
+            $product = $this->productRepository->update($array, $item->id);
+            $this->productPriceRepository->update(array_merge(['product_id', $product->id], $array), $product->id);
+            $this->productPackingRepository->update(array_merge(['product_id', $product->id], $array), $product->id);
+        } else {
+            $product = $this->productRepository->create($array);
+            $this->productPriceRepository->create(array_merge(['product_id' => $product->id], $array));
+            $this->productPackingRepository->create(array_merge(['product_id' => $product->id], $array));
+            $this->productStockRepository->create([
+                'product_id' => $product->id,
+                'quantity' => 0,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now()
+            ]);
         }
     }
 }

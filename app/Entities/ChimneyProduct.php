@@ -1,0 +1,15 @@
+<?php
+
+namespace App\Entities;
+
+use Illuminate\Database\Eloquent\Model;
+
+class ChimneyProduct extends Model
+{
+    public $fillable = ['product_code', 'formula'];
+
+    public function category()
+    {
+        return $this->belongsTo('App\Entities\CategoryDetail');
+    }
+}
