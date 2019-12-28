@@ -192,7 +192,7 @@ class ProductsController
             ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
             ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
             ->with(['categoryDetail' => function ($q) {
-                $q->with(['chimneyAttribute' => function ($q) {
+                $q->with(['chimneyAttributes' => function ($q) {
                     $q->with('options');
                 }]);
             }])
