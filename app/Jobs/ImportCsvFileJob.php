@@ -361,7 +361,7 @@ class ImportCsvFileJob implements ShouldQueue
         $categoryDetails->save();
         $this->appendChimneyAttributes($categoryDetails, $line);
         $this->appendChimneyProducts($categoryDetails, $line, 422, 40, false);
-        $this->appendChimneyProducts($categoryDetails, $line, 518, 30, true);
+        $this->appendChimneyProducts($categoryDetails, $line, 518, 38, true);
         if (count($categoryDetails->chimneyAttributes) > 0) {
             $this->createProduct($productArray);
         }
@@ -392,7 +392,7 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function appendChimneyProducts($categoryDetails, $line, $start, $count, $optional)
     {
-        for ($i = $start; $i < $start + $count; $i++) {
+        for ($i = $start; $i < $start + $count; $i = $i + ($optional ? 2 : 1)) {
             if (empty($line[$i])) {
                 continue;
             }
