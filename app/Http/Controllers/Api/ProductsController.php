@@ -5,8 +5,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Entities\Category;
 use App\Entities\Product;
+use App\Entities\ChimneyAttribute;
 use App\Http\Requests\Api\Products\ProductPricesUpdateRequest;
-use App\Repositories\CategoryRepositoryEloquent;
 use App\Repositories\ProductPriceRepository;
 use App\Repositories\ProductRepository;
 use App\Repositories\WarehouseRepository;
@@ -17,7 +17,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 class ProductsController
 {
@@ -138,11 +137,11 @@ class ProductsController
 
     public function getHiddenProducts(Request $request)
     {
-        $perPage = $this->getPerPage();
         $products = Product::where('products_related_to_the_automatic_price_change', '=', $request->symbol)
             ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
             ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
-            ->paginate(999)->toJson();
+            ->get()
+            ->toJson();
 
         return response($products);
     }
@@ -194,10 +193,8 @@ class ProductsController
             ->paginate($perPage)->toJson();
         $products = json_decode($products, true, JSON_PRETTY_PRINT);
         foreach ($products['data'] as $productKey => $productValue) {
-            if (array_key_exists('url_for_website', $productValue)) {
-                if (isset($productValue['url_for_website']) && !File::exists(public_path($productValue['url_for_website']))) {
-                    $products['data'][$productKey]['url_for_website'] = null;
-                }
+            if (!empty($productValue['url_for_website']) && !File::exists(public_path($productValue['url_for_website']))) {
+                $products['data'][$productKey]['url_for_website'] = null;
             }
         }
 
@@ -238,9 +235,6 @@ class ProductsController
         }
     }
 
-
-
-
     private function getlevel($sub_childs, $new_parent_id) {
         $keep_new_parent_id = $new_parent_id;
 
@@ -265,5 +259,119 @@ class ProductsController
         );
 
         return $lastInsertId;
+    }
+
+    public function getProductsForChimney(Request $request)
+    {
+        if (!is_array($request->attr) || empty($request->attr)) {
+            return response("You must provide attributes", 400);
+        }
+
+        try {
+            $categoryDetail = $this->getCategoryFromRequest($request);
+            $params = $this->getParamsFromRequest($request, $categoryDetail);
+        } catch (\Exception $e) {
+            return response($e->getMessage(), 400);
+        }
+
+        $products = $this->getProductsFromParams($params, $categoryDetail);
+        
+        return response(json_encode($products));
+    }
+
+    private function getCategoryFromRequest($request)
+    {
+        foreach ($request->attr as $id => $value) {
+            $attribute = ChimneyAttribute
+                ::with(['category' => function ($q) {
+                    $q->with(['chimneyAttributes' => function ($q) {
+                        $q->with('options');
+                    }]);
+                }])
+                ->find($id)
+            ;
+            if (!$attribute) {
+                throw new \Exception("Wrong attribute ID ($id)");
+            }
+        }
+        return $attribute->category;
+    }
+
+    private function getParamsFromRequest($request, $categoryDetail)
+    {
+        $params = [];
+
+        foreach ($categoryDetail->chimneyAttributes as $attribute) {
+            if (empty($request->attr[$attribute->id])) {
+                throw new \Exception("Missing or incorrect attribute \"{$attribute->name}\" (ID {$attribute->id})");
+            }
+            $value = null;
+            foreach ($attribute->options as $option) {
+                if ($request->attr[$attribute->id] == $option->id) {
+                    $value = $option->name;
+                    break;
+                }
+            }
+            if (empty($value)) {
+                throw new \Exception("Missing or incorrect attribute \"{$attribute->name}\" (ID {$attribute->id})");
+            }
+            $params[$attribute->column_number] = $value;
+        }
+
+        return $params;
+    }
+
+    private function getProductsFromParams($params, $categoryDetail)
+    {
+        $productsData = [];
+        foreach ($categoryDetail->chimneyProducts as $product) {
+            $code = $this->replaceParams($product->product_code, $params);
+            $quantity = $this->getQuantity($product->formula, $params);
+            if ($quantity == 0) {
+                continue;
+            }
+            $productsData[$code] = [
+                'quantity' => round($quantity, 2),
+                'optional' => $product->optional
+            ];
+        }
+
+
+        $products = Product::whereIn('products.symbol', array_keys($productsData))
+            ->where('products.show_on_page', '=', 1)
+            ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
+            ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
+            ->get()
+        ;
+
+        foreach ($products as $product) {
+            $product->quantity = $productsData[$product->symbol]['quantity'];
+            $product->optional = $productsData[$product->symbol]['optional'];
+        }
+
+        return $products;
+    }
+
+    private function getQuantity($formula, $params)
+    {
+        $formula = $this->replaceParams($formula, $params);
+        $formula = str_replace(',', '.', $formula);
+        $wrongChars = preg_replace('/(ceil|round|floor|\d|\.|\+|-|\*|\/|\(|\))/m', '', $formula);
+        if (!empty($wrongChars)) {
+            return 0;
+        }
+        try {
+            return eval("return $formula;");
+        } catch (\ParseError $e) {
+            return 0;
+        }
+    }
+
+    private function replaceParams($text, $params)
+    {
+        foreach ($params as $key => $value) {
+            $text = str_replace("[$key]", $value, $text);
+        }
+        return $text;
     }
 }

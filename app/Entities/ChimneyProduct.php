@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ChimneyProduct extends Model
 {
-    public $fillable = ['product_code', 'formula'];
+    public $fillable = ['product_code', 'formula', 'column_number', 'optional'];
 
     public function category()
     {
