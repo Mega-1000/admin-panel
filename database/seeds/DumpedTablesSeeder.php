@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\DB;
 
 class DumpedTablesSeeder extends Seeder
 {
+    private $data;
     /**
      * Run the database seeds.
      *
@@ -14,21 +15,22 @@ class DumpedTablesSeeder extends Seeder
     {
         $data = file_get_contents(database_path("seeds/dump.json"));
         $data = json_decode($data, true);
-        DB::table('statuses')->delete();
-        DB::table('statuses')->insert($data['statuses']);
-        DB::table('label_groups')->delete();
-        DB::table('label_groups')->insert($data['label_groups']);
-        DB::table('labels')->delete();
-        DB::table('labels')->insert($data['labels']);
-        DB::table('label_labels_to_add_after_removal')->delete();
-        DB::table('label_labels_to_add_after_removal')->insert($data['label_labels_to_add_after_removal']);
-        DB::table('label_labels_to_remove_after_addition')->delete();
-        DB::table('label_labels_to_remove_after_addition')->insert($data['label_labels_to_remove_after_addition']);
-        DB::table('label_labels_to_add_after_addition')->delete();
-        DB::table('label_labels_to_add_after_addition')->insert($data['label_labels_to_add_after_addition']);
-        DB::table('menu_items')->delete();
-        DB::table('menu_items')->insert($data['menu_items']);
-        DB::table('menus')->delete();
-        DB::table('menus')->insert($data['menus']);
+        $this->data = $data;
+        $this->refresh('statuses');
+        $this->refresh('label_groups');
+        $this->refresh('labels');
+        $this->refresh('label_labels_to_add_after_removal');
+        $this->refresh('label_labels_to_remove_after_addition');
+        $this->refresh('label_labels_to_add_after_addition');
+        $this->refresh('menu_items');
+        $this->refresh('menus');
+    }
+
+    private function refresh($table)
+    {
+        DB::table($table)->delete();
+        if (!empty($this->data[$table])) {
+            DB::table($table)->insert($this->data[$table]);
+        }
     }
 }
