@@ -52,7 +52,7 @@ Route::group(['prefix' => 'admin'], function () {
             'OrdersController@getUserInfo');
 
         Route::get('/order/task/create/',
-            'TaskController@createTask');
+            'TasksController@createTask');
 
         Route::get('users', 'UserController@index')->name('users.index');
         Route::get('users/datatable/all', 'UserController@datatable')->name('users.datatable');
