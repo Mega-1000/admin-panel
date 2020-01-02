@@ -37,9 +37,6 @@ class AutomaticMigration implements ShouldQueue
         $label_labels_to_add_after_removal = DB::table('label_labels_to_add_after_removal')->get();
         $label_labels_to_remove_after_addition = DB::table('label_labels_to_remove_after_addition')->get();
         $label_labels_to_add_after_addition = DB::table('label_labels_to_add_after_addition')->get();
-        $menus = DB::table('menus')->get();
-        $menu_items = DB::table('menu_items')->get();
-
 
         $dump = [
             'statuses' => $statuses,
@@ -48,8 +45,6 @@ class AutomaticMigration implements ShouldQueue
             'label_labels_to_add_after_removal' => $label_labels_to_add_after_removal,
             'label_labels_to_remove_after_addition' => $label_labels_to_remove_after_addition,
             'label_labels_to_add_after_addition' => $label_labels_to_add_after_addition,
-            'menus' => $menus,
-            'menu_items' => $menu_items
         ];
         $dumpJSON = json_encode($dump, JSON_PRETTY_PRINT);
 

@@ -419,5 +419,24 @@ class MenuItemsTableSeeder extends Seeder
                 'order' => 17,
             ])->save();
         }
+        
+        $menuItem = MenuItem::firstOrNew([
+            'menu_id' => $menu->id,
+            'title' => 'Generator Stron',
+            'url' => '',
+            'route' => 'pages.index'
+        ]);
+        if (!$menuItem->exists) {
+            $menuItem->fill([
+                'target' => '_self',
+                'icon_class' => 'voyager-window-list',
+                'color' => null,
+                'parent_id' => null,
+                'order' => 24,
+            ])->save();
+        }
+        
+        
+        
     }
 }

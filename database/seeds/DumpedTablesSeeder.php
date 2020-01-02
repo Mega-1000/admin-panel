@@ -22,8 +22,6 @@ class DumpedTablesSeeder extends Seeder
         $this->refresh('label_labels_to_add_after_removal');
         $this->refresh('label_labels_to_remove_after_addition');
         $this->refresh('label_labels_to_add_after_addition');
-        $this->refresh('menu_items');
-        $this->refresh('menus');
     }
 
     private function refresh($table)
