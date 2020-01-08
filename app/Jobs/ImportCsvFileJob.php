@@ -362,7 +362,6 @@ class ImportCsvFileJob implements ShouldQueue
         }
         $categoryDetails->save();
         $replacements = $this->getChimneyReplacements($line);
-        error_log(print_r($replacements, 1));
         $this->appendChimneyAttributes($categoryDetails, $line);
         $this->appendChimneyProducts($categoryDetails, $line, 422, 40, false, $replacements);
         $this->appendChimneyProducts($categoryDetails, $line, 518, 38, true);
