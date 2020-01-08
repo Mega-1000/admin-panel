@@ -270,13 +270,20 @@ class ProductsController
         try {
             $categoryDetail = $this->getCategoryFromRequest($request);
             $params = $this->getParamsFromRequest($request, $categoryDetail);
+            $replacements = $this->getReplacements($categoryDetail, $params);
+            $products = $this->getProductsFromParams($params, $categoryDetail);
+            $replaceProducts = $this->getProductsForSymbols(array_keys($replacements['products_replace']));
+            $this->attachReplaceParams($products, $replaceProducts, $replacements);
         } catch (\Exception $e) {
             return response($e->getMessage(), 400);
         }
 
-        $products = $this->getProductsFromParams($params, $categoryDetail);
         
-        return response(json_encode($products));
+        return response(json_encode([
+            'products' => $products,
+            'replacements' => $replacements['replacements'],
+            'products_replace' => $replaceProducts
+        ]));
     }
 
     private function getCategoryFromRequest($request)
@@ -286,6 +293,9 @@ class ProductsController
                 ::with(['category' => function ($q) {
                     $q->with(['chimneyAttributes' => function ($q) {
                         $q->with('options');
+                    }]);
+                    $q->with(['chimneyProducts' => function ($q) {
+                        $q->with('replacements');
                     }]);
                 }])
                 ->find($id)
@@ -336,13 +346,7 @@ class ProductsController
             ];
         }
 
-
-        $products = Product::whereIn('products.symbol', array_keys($productsData))
-            ->where('products.show_on_page', '=', 1)
-            ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
-            ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
-            ->get()
-        ;
+        $products = $this->getProductsForSymbols(array_keys($productsData));
 
         foreach ($products as $product) {
             $product->quantity = $productsData[$product->symbol]['quantity'];
@@ -350,6 +354,78 @@ class ProductsController
         }
 
         return $products;
+    }
+
+    private function getReplacements($categoryDetail, $params)
+    {
+        $out = [
+            'replacements' => [],
+            'products' => [],
+            'products_replace' => []
+        ];
+
+        foreach ($categoryDetail->chimneyProducts as $product) {
+            if (count($product->replacements) == 0) {
+                continue;
+            }
+            $id = count($out['replacements']) + 1;
+            $replacements = [
+                'description' => $product->replacement_description,
+                'img' => $product->replacement_img,
+                'id' => $id,
+                'products' => []
+            ];
+            $exists = false;
+            foreach ($product->replacements as $replacement) {
+                $symbol = $this->replaceParams($replacement->product, $params);
+                $quantity = $this->getQuantity($replacement->quantity, $params);
+                if ($quantity == 0) {
+                    continue;
+                }
+                $replacements['products'][$symbol] = $quantity;
+                $out['products'][$this->replaceParams($product->product_code, $params)] = $id;
+                $out['products_replace'][$symbol] = [
+                    'quantity' => $quantity,
+                    'id' => $id
+                ];
+                $exists = true;
+            }
+            if ($exists) {
+                $out['replacements'][$id] = $replacements;
+            }
+        }
+        return $out;
+    }
+
+    private function getProductsForSymbols($symbols)
+    {
+        $products = Product::whereIn('products.symbol', $symbols)
+            ->where('products.show_on_page', '=', 1)
+            ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
+            ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
+            ->get()
+        ;
+
+        return $products;
+    }
+
+    private function attachReplaceParams($products, $replaceProducts, $replacements)
+    {
+        foreach ($products as $product) {
+            if (isset($replacements['products'][$product->symbol])) {
+                $product->changer = $replacements['products'][$product->symbol];
+            } else {
+                $product->changer = 0;
+            }
+        }
+
+        foreach ($replaceProducts as $product) {
+            if (!isset($replacements['products_replace'][$product->symbol])) {
+                throw new \Exception('Unexpected unexisting replacement for symbol '.$product->symbol);
+            }
+            $product->changer = $replacements['products_replace'][$product->symbol]['id'];
+            $product->quantity = $replacements['products_replace'][$product->symbol]['quantity'];
+        }
     }
 
     private function getQuantity($formula, $params)

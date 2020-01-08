@@ -12,4 +12,9 @@ class ChimneyProduct extends Model
     {
         return $this->belongsTo('App\Entities\CategoryDetail');
     }
+
+    public function replacements()
+    {
+        return $this->hasMany('App\Entities\ChimneyReplacement');
+    }
 }

@@ -87,6 +87,7 @@ class ImportCsvFileJob implements ShouldQueue
         $this->productStockRepository = $productStockRepository;
         $this->productStockPositionRepository = $productStockPositionRepository;
 
+        DB::table('chimney_replacements')->delete();
         DB::table('chimney_products')->delete();
         DB::table('chimney_attribute_options')->delete();
         DB::table('chimney_attributes')->delete();
@@ -288,11 +289,7 @@ class ImportCsvFileJob implements ShouldQueue
                     /** MT-19 checking if url for product image exists and changing prefix of path to match server path */
                     if (!empty($array['url']) && strpos($array['url'], "\\")
                     ) {
-                        $imgUrlExploded           = explode('\\', $array['url']);
-                        $imgUrlExploded           = end($imgUrlExploded);
-                        $imgUrlWebsite            = $this->imgStoragePath.DIRECTORY_SEPARATOR.$imgUrlExploded;
-                        $imgUrlWebsite            = Storage::url($imgUrlWebsite);
-                        $array['url_for_website'] = $imgUrlWebsite;
+                        $array['url_for_website'] = $this->getUrl($array['url']);
                     }
                 }
 
@@ -315,6 +312,15 @@ class ImportCsvFileJob implements ShouldQueue
             ['name' => 'Import products done', 'last_import' => Carbon::now()]
         );
         Log::channel('import')->info('Import end: '.Carbon::now());
+    }
+
+    private function getUrl($url)
+    {
+        $imgUrlExploded           = explode('\\', $url);
+        $imgUrlExploded           = end($imgUrlExploded);
+        $imgUrlWebsite            = $this->imgStoragePath.DIRECTORY_SEPARATOR.$imgUrlExploded;
+        $imgUrlWebsite            = Storage::url($imgUrlWebsite);
+        return $imgUrlWebsite;
     }
 
     private function getShowOnPageParameter(array $line, int $columnIterator)
@@ -352,15 +358,13 @@ class ImportCsvFileJob implements ShouldQueue
 
         if (!empty($categoryDetails->img_url) && strpos($categoryDetails->img_url, "\\")
         ) {
-            $imgUrlExploded                     = explode('\\', $categoryDetails->img_url);
-            $imgUrlExploded                     = end($imgUrlExploded);
-            $imgUrlWebsite                      = $this->imgStoragePath.DIRECTORY_SEPARATOR.$imgUrlExploded;
-            $imgUrlWebsite                      = Storage::url($imgUrlWebsite);
-            $categoryDetails->url_for_website   = $imgUrlWebsite;
+            $categoryDetails->url_for_website = $this->getUrl($categoryDetails->img_url);
         }
         $categoryDetails->save();
+        $replacements = $this->getChimneyReplacements($line);
+        error_log(print_r($replacements, 1));
         $this->appendChimneyAttributes($categoryDetails, $line);
-        $this->appendChimneyProducts($categoryDetails, $line, 422, 40, false);
+        $this->appendChimneyProducts($categoryDetails, $line, 422, 40, false, $replacements);
         $this->appendChimneyProducts($categoryDetails, $line, 518, 38, true);
         if (count($categoryDetails->chimneyAttributes) > 0) {
             $this->createProduct($productArray);
@@ -385,12 +389,16 @@ class ImportCsvFileJob implements ShouldQueue
             $categoryDetails->chimneyAttributes()->save($attribute);
             $options = explode('|', $arr[1]);
             foreach ($options as $opt) {
+                $opt = trim($opt);
+                if (!$opt) {
+                    continue;
+                }
                 $attribute->options()->save(new Entities\ChimneyAttributeOption(['name' => $opt]));
             }
         }
     }
 
-    private function appendChimneyProducts($categoryDetails, $line, $start, $count, $optional)
+    private function appendChimneyProducts($categoryDetails, $line, $start, $count, $optional, $replacements = [])
     {
         for ($i = $start; $i < $start + $count; $i = $i + ($optional ? 2 : 1)) {
             if (empty($line[$i])) {
@@ -406,8 +414,46 @@ class ImportCsvFileJob implements ShouldQueue
                 'column_number' => $optional ? 0 : $i - $start + 1,
                 'optional' => $optional ? 1 : 0
             ]);
+            if (isset($replacements[$product->column_number])) {
+                $product->replacement_description = $replacements[$product->column_number]['description'];
+                $product->replacement_img = $replacements[$product->column_number]['img'];
+            }
             $categoryDetails->chimneyProducts()->save($product);
+            if (isset($replacements[$product->column_number])) {
+                $product->replacements()->saveMany($replacements[$product->column_number]['products']);
+            }
         }
+    }
+
+    private function getChimneyReplacements($line)
+    {
+        $replacements = [];
+        $start = 462;
+        for ($i = $start; $i < 518; $i += 4) {
+            if (empty($line[$i]) || empty($line[$i+1]) || empty($line[$i+2]) || empty($line[$i+3])) {
+                continue;
+            }
+            $arrs = explode('//', $line[$i + 2]);
+            foreach ($arrs as $arr) {
+                $arr = explode('||', $arr);
+                if (count($arr) != 2) {
+                    continue;
+                }
+                $productNumber = trim($line[$i + 1], "[]");
+                if (!isset($replacements[$productNumber])) {
+                    $replacements[$productNumber] = [
+                        'description' => $line[$i],
+                        'img' => $this->getUrl($line[$i + 3]),
+                        'products' => []
+                    ];
+                }
+                $replacements[$productNumber]['products'][] = new Entities\ChimneyReplacement([
+                    'product' => $arr[0],
+                    'quantity' => $arr[1],
+                ]);
+            }
+        }
+        return $replacements;
     }
 
     private function createProduct($array)

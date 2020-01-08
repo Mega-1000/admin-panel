@@ -10,6 +10,7 @@ class CategoryDetail extends Model
     {
         return $this->hasMany('App\Entities\ChimneyAttribute');
     }
+
     public function chimneyProducts()
     {
         return $this->hasMany('App\Entities\ChimneyProduct');

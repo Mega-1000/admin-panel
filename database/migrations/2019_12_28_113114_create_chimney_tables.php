@@ -38,6 +38,8 @@ class CreateChimneyTables extends Migration
             $table->string('formula');
             $table->integer('column_number')->default(0);
             $table->integer('optional')->default(0);
+            $table->string('replacement_description')->nullable();
+            $table->string('replacement_img')->nullable();
             $table->timestamps();
         });
     }
