@@ -17,7 +17,6 @@ class AllowNullableFieldsToOrderTables extends Migration
             $table->dateTime('last_status_update_date')->comment('Status data zmiany')->nullable()->change();
             $table->string('customer_notices')->nullable()->change();
             $table->decimal('cash_on_delivery_amount')->comment('Kwota pobrania')->nullable()->change();
-            $table->integer('allegro_transaction_id')->nullable()->change();
             $table->unsignedInteger('employee_id')->comment('Przypisany pracownik do zamówienia, w praktyce jest nim konsultant')->nullable()->change();
             $table->unsignedInteger('warehouse_id')->nullable()->change();
             $table->decimal('additional_service_cost')->nullable()->change();
@@ -45,7 +44,6 @@ class AllowNullableFieldsToOrderTables extends Migration
             $table->dateTime('last_status_update_date')->comment('Status data zmiany')->nullable(true)->change();
             $table->string('customer_notices')->nullable(true)->change();
             $table->decimal('cash_on_delivery_amount')->comment('Kwota pobrania')->nullable(true)->change();
-            $table->integer('allegro_transaction_id')->nullable(true)->change();
             $table->unsignedInteger('employee_id')->comment('Przypisany pracownik do zamówienia, w praktyce jest nim konsultant')->nullable(true)->change();
             $table->unsignedInteger('warehouse_id')->nullable(true)->change();
             $table->decimal('additional_service_cost')->nullable(true)->change();

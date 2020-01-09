@@ -33,9 +33,7 @@ class UpdateOrdersTableMakeFieldsNullable extends Migration
             $table->decimal('shipment_price')->comment('Koszt wysyłki')->nullable()->change();
             $table->string('customer_notices')->nullable()->change();
             $table->decimal('cash_on_delivery_amount')->comment('Kwota pobrania')->nullable()->change();
-            $table->integer('allegro_transaction_id')->nullable()->change();
             $table->unsignedInteger('employee_id')->comment('Przypisany pracownik do zamówienia, w praktyce jest nim konsultant')->nullable()->change();
-            $table->string('allegro_transaction_id')->unique()->change();
         });
     }
 

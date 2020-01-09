@@ -26,7 +26,7 @@ class CreateOrdersTable extends Migration
             $table->decimal('shipment_price')->comment('Koszt wysyłki');
             $table->string('customer_notices');
             $table->decimal('cash_on_delivery_amount')->comment('Kwota pobrania');
-            $table->integer('allegro_transaction_id');
+            $table->integer('allegro_transaction_id')->nullable();
             $table->unsignedInteger('employee_id')->comment('Przypisany pracownik do zamówienia, w praktyce jest nim konsultant');
             $table->timestamps();
 
