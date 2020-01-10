@@ -325,14 +325,13 @@ class ProductsController
             if (empty($value)) {
                 if (count($attribute->options) > 0) {
                     throw new \Exception("Missing or incorrect attribute \"{$attribute->name}\" (ID {$attribute->id})");
-                } else {
-                    $value = $request->attr[$attribute->id];
-                    $value = trim(str_replace(',', '.', $value));
-                    if (filter_var($value, FILTER_VALIDATE_FLOAT) === false || $value < 0) {
-                        throw new \Exception("Missing or incorrect attribute \"{$attribute->name}\" (ID {$attribute->id})");
-                    }
-                    $value = number_format($value, 2, '.', '');
                 }
+                $value = $request->attr[$attribute->id];
+                $value = trim(str_replace(',', '.', $value));
+                if (filter_var($value, FILTER_VALIDATE_FLOAT) === false || $value < 0) {
+                    throw new \Exception("Missing or incorrect attribute \"{$attribute->name}\" (ID {$attribute->id})");
+                }
+                $value = number_format($value, 2, '.', '');
             }
             $params[$attribute->column_number] = $value;
         }
