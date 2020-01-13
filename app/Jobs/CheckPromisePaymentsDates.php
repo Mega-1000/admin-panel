@@ -37,6 +37,10 @@ class CheckPromisePaymentsDates implements ShouldQueue
 
         if (!empty($notConfirmedPayments)) {
             foreach ($notConfirmedPayments as $notConfirmedPayment) {
+                if ($notConfirmedPayment == null) {
+                    error_log(print_r($notConfirmedPayment, true));
+                    continue;
+                }
                 if ($this->shouldAttachLabel($notConfirmedPayment, $now)) {
                     dispatch_now(new AddLabelJob($notConfirmedPayment->order->id, [119]));
                 } else {
