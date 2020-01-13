@@ -295,10 +295,6 @@ class ImportCsvFileJob implements ShouldQueue
 
                 $this->saveCategory($line, $tokenProductAndCategory, $array);
 
-                if (empty($array['symbol'])) {
-                    continue;
-                }
-
                 $this->createProduct($array);
             } catch (\Exception $exception) {
                 Log::channel('import')->debug($array);
@@ -365,9 +361,6 @@ class ImportCsvFileJob implements ShouldQueue
         $this->appendChimneyAttributes($categoryDetails, $line);
         $this->appendChimneyProducts($categoryDetails, $line, 422, 40, false, $replacements);
         $this->appendChimneyProducts($categoryDetails, $line, 518, 38, true);
-        if (count($categoryDetails->chimneyAttributes) > 0) {
-            $this->createProduct($productArray);
-        }
     }
     
     private function appendChimneyAttributes($categoryDetails, $line)
