@@ -37,7 +37,7 @@ class CheckPromisePaymentsDates implements ShouldQueue
 
         if (!empty($notConfirmedPayments)) {
             foreach ($notConfirmedPayments as $notConfirmedPayment) {
-                if ($notConfirmedPayment == null) {
+                if ($notConfirmedPayment->created_at == null) {
                     error_log(print_r($notConfirmedPayment, true));
                     continue;
                 }
