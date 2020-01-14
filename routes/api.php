@@ -13,8 +13,11 @@ use Illuminate\Http\Request;
 |
 */
 //
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
+Route::middleware('auth:api')->group(function() {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
+    Route::get('orders/getAll', 'Api\OrdersController@getAll')->name('api.orders.getall');
 });
 
 Route::post('orders', 'Api\OrdersController@store')->name('api.orders.store');

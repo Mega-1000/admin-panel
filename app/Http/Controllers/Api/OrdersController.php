@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use App\Mail\SendLog;
+use App\Entities\Order;
 
 /**
  * Class OrdersController
@@ -698,5 +698,23 @@ class OrdersController extends Controller
             );
             die();
         }
+    }
+
+    public function getAll(Request $request)
+    {
+        return $request->user()->orders()
+            ->with('status')
+            ->with(['items' => function($q) {
+                $q->with('product');
+            }])
+            ->with('packages')
+            ->with('payments')
+            ->with('labels')
+            ->with('addresses')
+            ->with('invoices')
+            ->orderBy('id', 'desc')
+            ->get()
+            ->toJson()
+        ;
     }
 }
