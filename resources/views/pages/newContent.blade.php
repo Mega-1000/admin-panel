@@ -45,6 +45,7 @@
 @section('javascript')
     <script src="{{ asset('node_modules/tinymce/tinymce.js') }}"></script>
     <script>
+        tinyMCE.baseURL = "{{asset('node_modules/tinymce/')}}";
         tinymce.init({
             selector: 'textarea.content',
             width: 900,
