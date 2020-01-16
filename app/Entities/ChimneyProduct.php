@@ -10,7 +10,7 @@ class ChimneyProduct extends Model
 
     public function category()
     {
-        return $this->belongsTo('App\Entities\CategoryDetail');
+        return $this->belongsTo('App\Entities\Category');
     }
 
     public function replacements()

@@ -15,8 +15,8 @@ class CreateChimneyTables extends Migration
     {
         Schema::create('chimney_attributes', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('category_detail_id')->unsigned();
-            $table->foreign('category_detail_id')->references('id')->on('category_details');
+            $table->integer('category_id')->unsigned();
+            $table->foreign('category_id')->references('id')->on('categories');
             $table->string('name');
             $table->integer('column_number');
             $table->timestamps();
@@ -32,8 +32,8 @@ class CreateChimneyTables extends Migration
 
         Schema::create('chimney_products', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('category_detail_id')->unsigned();
-            $table->foreign('category_detail_id')->references('id')->on('category_details');
+            $table->integer('category_id')->unsigned();
+            $table->foreign('category_id')->references('id')->on('categories');
             $table->string('product_code');
             $table->string('formula');
             $table->integer('column_number')->default(0);

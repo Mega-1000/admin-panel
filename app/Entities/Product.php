@@ -57,7 +57,6 @@ class Product extends Model implements Transformable
         'symbol_name_manufacturer',
         'pricelist_name',
         'calculator_type',
-        'product_url',
         'product_group',
         'date_of_price_change',
         'date_of_the_new_prices',
@@ -81,8 +80,7 @@ class Product extends Model implements Transformable
         'quality_to_price',
         'comments',
         'value_of_the_order_for_free_transport',
-        'show_on_page',
-        'token_prod_cat',
+        'show_on_page'
     ];
 
     public $customColumnsVisibilities = [
@@ -141,16 +139,15 @@ class Product extends Model implements Transformable
         'discount1',
         'discount2',
         'discount3',
-        'show_on_page,',
-        'token_prod_cat',
+        'show_on_page,'
     ];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function categories()
+    public function category()
     {
-        return $this->belongsToMany(Category::class);
+        return $this->belongsTo(Category::class);
     }
 
     /**
@@ -193,8 +190,13 @@ class Product extends Model implements Transformable
         return $this->hasMany(OrderItem::class);
     }
 
-    public function categoryDetail()
+    public function parentProduct()
     {
-        return $this->belongsTo('App\Entities\CategoryDetail', 'token_prod_cat', 'token_prod_cat');
+        return $this->belongsTo(self::class, 'parent_id', 'id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(self::class, 'parent_id', 'id');
     }
 }

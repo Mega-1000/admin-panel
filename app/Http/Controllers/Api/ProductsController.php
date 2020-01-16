@@ -137,10 +137,13 @@ class ProductsController
 
     public function getHiddenProducts(Request $request)
     {
-        $products = Product::where('products_related_to_the_automatic_price_change', '=', $request->symbol)
-            ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
-            ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
-            ->get()
+        $products = Product
+            ::with(['children' => function ($q) {
+                $q->join('product_prices', 'products.id', '=', 'product_prices.product_id');
+                $q->join('product_packings', 'products.id', '=', 'product_packings.product_id');
+            }])
+            ->find((int) $request->product)
+            ->children
             ->toJson();
 
         return response($products);
@@ -184,13 +187,17 @@ class ProductsController
      */
     public function getProductsByCategory(Request $request)
     {
-        $perPage = $this->getPerPage();
+        $products = Category
+            ::with(['products' => function ($q) {
+                $q->where('products.show_on_page', '=', 1);
+                $q->join('product_prices', 'products.id', '=', 'product_prices.product_id');
+                $q->join('product_packings', 'products.id', '=', 'product_packings.product_id');
+            }])
+            ->find((int) $request->category_id)
+            ->products
+            ->toJson()
+        ;
 
-        $products = Product::where('products.product_url', 'like', '%' . Input::get('param') . '%')
-            ->where('products.show_on_page', '=', 1)
-            ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
-            ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
-            ->paginate($perPage)->toJson();
         $products = json_decode($products, true, JSON_PRETTY_PRINT);
         foreach ($products['data'] as $productKey => $productValue) {
             if (!empty($productValue['url_for_website']) && !File::exists(public_path($productValue['url_for_website']))) {
@@ -206,59 +213,23 @@ class ProductsController
      */
     public function getCategoriesTree()
     {
-        $categoriesList = Product::select(DB::raw('distinct(product_url)'))
-            ->whereRaw('char_length(product_url) > 3')
-            ->orderBy('priority', 'asc')
-            ->get()
-            ->toJson();
-
-        $categoriesListArray = json_decode($categoriesList, true);
-
-        $map = [];
-
-        foreach($categoriesListArray as $url) {
-            $folders = explode('/', $url['product_url']);
-            $this->applyChain($map, $folders, []);
-        }
-        return response($map);
+        $allCategories = Category::orderBy('parent_id')->orderBy('priority')->get()->toArray();
+        $tree = $this->parseTree($allCategories);
+        return response(json_encode($tree));
     }
 
-    private function applyChain(&$arr, $indexes, $value) { //Here's your recursion
-        if(!is_array($indexes)) {
-            return;
-        }
-
-        if(count($indexes) == 0 || empty($indexes)) {
-            $arr = $value;
-        } else {
-            $this->applyChain($arr[array_shift($indexes)], $indexes, $value);
-        }
-    }
-
-    private function getlevel($sub_childs, $new_parent_id) {
-        $keep_new_parent_id = $new_parent_id;
-
-        if ( is_array($sub_childs) ) {
-            foreach ( $sub_childs as $sub_child => $sub_child_sub ) {
-
-                $new_parent_id = $this->insertRecord($sub_child, $keep_new_parent_id);
-                if ( is_array($sub_child_sub) ) {
-                    $this->getlevel($sub_child_sub, $new_parent_id);
-                }
+    private function parseTree($tree, $root = 0)
+    {
+        $return = [];
+        foreach($tree as $i => $row) {
+            $child = $row['id'];
+            $parent = $row['parent_id'];
+            if($parent == $root) {
+                unset($tree[$i]);
+                $return[] = array_merge($row, ['children' => $this->parseTree($tree, $child)]);
             }
         }
-    }
-
-    private function insertRecord($name, $parent_id) {
-        $lastInsertId = DB::table('categories')->insertGetId(
-            [
-                'name' => $name,
-                'status' => 1,
-                'parent_category' => $parent_id
-            ]
-        );
-
-        return $lastInsertId;
+        return $return;
     }
 
     public function getProductsForChimney(Request $request)
@@ -268,10 +239,10 @@ class ProductsController
         }
 
         try {
-            $categoryDetail = $this->getCategoryFromRequest($request);
-            $params = $this->getParamsFromRequest($request, $categoryDetail);
-            $replacements = $this->getReplacements($categoryDetail, $params);
-            $products = $this->getProductsFromParams($params, $categoryDetail);
+            $category = $this->getCategoryFromRequest($request);
+            $params = $this->getParamsFromRequest($request, $category);
+            $replacements = $this->getReplacements($category, $params);
+            $products = $this->getProductsFromParams($params, $category);
             $replaceProducts = $this->getProductsForSymbols(array_keys($replacements['products_replace']));
             $this->attachReplaceParams($products, $replaceProducts, $replacements);
         } catch (\Exception $e) {
@@ -307,11 +278,11 @@ class ProductsController
         return $attribute->category;
     }
 
-    private function getParamsFromRequest($request, $categoryDetail)
+    private function getParamsFromRequest($request, $category)
     {
         $params = [];
 
-        foreach ($categoryDetail->chimneyAttributes as $attribute) {
+        foreach ($category->chimneyAttributes as $attribute) {
             if (empty($request->attr[$attribute->id])) {
                 throw new \Exception("Missing or incorrect attribute \"{$attribute->name}\" (ID {$attribute->id})");
             }
@@ -339,10 +310,10 @@ class ProductsController
         return $params;
     }
 
-    private function getProductsFromParams($params, $categoryDetail)
+    private function getProductsFromParams($params, $category)
     {
         $productsData = [];
-        foreach ($categoryDetail->chimneyProducts as $product) {
+        foreach ($category->chimneyProducts as $product) {
             $code = $this->replaceParams($product->product_code, $params);
             $quantity = $this->getQuantity($product->formula, $params);
             if ($quantity == 0) {
@@ -364,7 +335,7 @@ class ProductsController
         return $products;
     }
 
-    private function getReplacements($categoryDetail, $params)
+    private function getReplacements($category, $params)
     {
         $out = [
             'replacements' => [],
@@ -372,7 +343,7 @@ class ProductsController
             'products_replace' => []
         ];
 
-        foreach ($categoryDetail->chimneyProducts as $product) {
+        foreach ($category->chimneyProducts as $product) {
             if (count($product->replacements) == 0) {
                 continue;
             }

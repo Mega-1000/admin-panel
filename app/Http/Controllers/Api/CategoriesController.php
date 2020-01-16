@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Entities\CategoryDetail;
+use App\Entities\Category;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
@@ -16,24 +16,20 @@ class CategoriesController extends Controller
      */
     public function getCategoriesDetails()
     {
-        $categories = CategoryDetail::withCount('chimneyAttributes')->get();
+        $categories = Category::withCount('chimneyAttributes')->get();
         return response($categories->toJson());
     }
 
     public function getCategoryDetails(Request $request)
     {
-        $category = $request->input('category');
-        $categoryDetails = CategoryDetail
-            ::where('category_navigation', 'like', '%' . $category . '%')
-            ->with('product')
-            ->with([
+        $category = Category
+            ::with([
                 'chimneyAttributes' => function ($q) {
                     $q->with('options');
                 }
             ])
-            ->first();
-        $categoryDetails->name = $categoryDetails->product ? $categoryDetails->product->name : '';
+            ->find((int) $request->input('category'));
 
-        return response($categoryDetails->toJson());
+        return response($category->toJson());
     }
 }

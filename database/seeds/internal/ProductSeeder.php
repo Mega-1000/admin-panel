@@ -50,7 +50,6 @@ class ProductSeeder extends Seeder
                 'symbol_name_manufacturer' => $faker->company,
                 'pricelist_name' => $faker->words(3, true),
                 'calculator_type' => $faker->text(20),
-                'product_url' => $faker->url,
                 'product_group' => $faker->text(30),
                 'price_change_date' => $faker->dateTimeThisYear(),
             ]);

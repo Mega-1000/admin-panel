@@ -19,8 +19,12 @@ class CreateCategoriesTable extends Migration
 		Schema::create('categories', function(Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->enum('status', ['ACTIVE', 'PENDING']);
-            $table->string('url');
+            $table->string('rewrite');
+            $table->text('description');
+            $table->string('img');
+            $table->boolean('is_visible');
+            $table->integer('priority');
+            $table->integer('parent_id')->index()->nullable();
             $table->timestamps();
 		});
 	}

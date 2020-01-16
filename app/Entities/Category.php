@@ -3,27 +3,14 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Prettus\Repository\Contracts\Transformable;
-use Prettus\Repository\Traits\TransformableTrait;
 
 /**
  * Class Category.
  *
  * @package namespace App\Entities;
  */
-class Category extends Model implements Transformable
+class Category extends Model
 {
-    use TransformableTrait;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'name', 'status', 'url'
-    ];
-
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
@@ -32,4 +19,23 @@ class Category extends Model implements Transformable
         return $this->hasMany(Product::class);
     }
 
+    public function chimneyAttributes()
+    {
+        return $this->hasMany('App\Entities\ChimneyAttribute');
+    }
+
+    public function chimneyProducts()
+    {
+        return $this->hasMany('App\Entities\ChimneyProduct');
+    }
+
+    public function parentCategory()
+    {
+        return $this->belongsTo(self::class, 'parent_id', 'id');
+    }
+
+    public function children()
+    {
+        return $this->hasMany(self::class, 'parent_id', 'id');
+    }
 }

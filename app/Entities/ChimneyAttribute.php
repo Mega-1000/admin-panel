@@ -10,7 +10,7 @@ class ChimneyAttribute extends Model
 
     public function category()
     {
-        return $this->belongsTo('App\Entities\CategoryDetail', 'category_detail_id', 'id');
+        return $this->belongsTo('App\Entities\Category');
     }
 
     public function options()
