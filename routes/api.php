@@ -3,15 +3,15 @@
 use Illuminate\Http\Request;
 
 /*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
+  |--------------------------------------------------------------------------
+  | API Routes
+  |--------------------------------------------------------------------------
+  |
+  | Here is where you can register API routes for your application. These
+  | routes are loaded by the RouteServiceProvider within a group which
+  | is assigned the "api" middleware group. Enjoy building your API!
+  |
+ */
 //
 Route::middleware('auth:api')->group(function() {
     Route::get('/user', function (Request $request) {
@@ -20,17 +20,19 @@ Route::middleware('auth:api')->group(function() {
     Route::get('orders/getAll', 'Api\OrdersController@getAll')->name('api.orders.getall');
 });
 
+Route::get('custom/pages', 'Api\CustomPagesController@getPages')->name('api.custompages.get');
+
 Route::post('orders', 'Api\OrdersController@store')->name('api.orders.store');
 Route::post('customers', 'Api\CustomersController@store')->name('api.customers.store');
 Route::post('new_order', 'Api\OrdersController@new')->name('api.orders.new');
 Route::middleware('client')->group(function () {
-    Route::post('orders/message','Api\OrdersController@storeMessage')->name('api.orders.message.store');
-    Route::get('orders/messages/{frontDbOrderId}','Api\OrdersController@getMessages')->name('api.orders.messages.get');
+    Route::post('orders/message', 'Api\OrdersController@storeMessage')->name('api.orders.message.store');
+    Route::get('orders/messages/{frontDbOrderId}', 'Api\OrdersController@getMessages')->name('api.orders.messages.get');
     Route::get('orders/{frontDbOrderId}', 'Api\OrdersController@getOrder')->name('api.orders.get');
 });
 
 Route::get('company-info/by-nip/{nip}', 'Api\CompanyInfoController@byNip')
-    ->name('api.company-info.by-nip');
+        ->name('api.company-info.by-nip');
 
 Route::get('orders/{orderId}/customer-delivery-address', 'Api\OrdersController@getCustomerDeliveryAddress')->name('api.orders.get-customer-delivery-address');
 Route::get('orders/{orderId}/customer-standard-address', 'Api\OrdersController@getCustomerStandardAddress')->name('api.orders.get-customer-standard-address');
@@ -38,15 +40,15 @@ Route::get('orders/{orderId}/ready-to-ship-form-autocomplete-data', 'Api\OrdersC
 Route::post('orders/{orderId}/update-order-delivery-and-invoice-addresses', 'Api\OrdersController@updateOrderDeliveryAndInvoiceAddresses')->name('api.orders.update-order-delivery-and-invoice-addresses');
 
 Route::post('order-warehouse-notification/deny/{notificationId}', 'Api\OrderWarehouseNotificationController@deny')
-    ->name('api.order-warehouse-notification.deny');
+        ->name('api.order-warehouse-notification.deny');
 Route::post('order-warehouse-notification/accept/{notificationId}', 'Api\OrderWarehouseNotificationController@accept')
-    ->name('api.order-warehouse-notification.accept');
+        ->name('api.order-warehouse-notification.accept');
 Route::get('order-warehouse-notification/{notificationId}', 'Api\OrderWarehouseNotificationController@getNotification')
-    ->name('api.order-warehouse-notification.get');
+        ->name('api.order-warehouse-notification.get');
 Route::post('order-warehouse-notification/accept/{notificationId}/sendInvoice', 'Api\OrderWarehouseNotificationController@sendInvoice')
-    ->name('api.order-warehouse-notification.accept.sendInvoice');
+        ->name('api.order-warehouse-notification.accept.sendInvoice');
 Route::post('order-warehouse-notification/accept/{notificationId}/changeStatus', 'Api\OrderWarehouseNotificationController@changeStatus')
-    ->name('api.order-warehouse-notification.accept.changeStatus');
+        ->name('api.order-warehouse-notification.accept.changeStatus');
 Route::get('order-shipping-cancelled/{package_id}', 'Api\OrdersController@orderPackagesCancelled')->name('api.order-shipping-cancelled');
 
 Route::get('get-associated-labels-to-order-from-group/{labelGroupName}', 'Api\LabelsController@getAssociatedLabelsToOrderFromGroup')->name('api.labels.get-associated-labels-to-order-from-group');
@@ -73,5 +75,5 @@ Route::post('spedition-exchange/new-offer/{hash}', 'Api\SpeditionExchangeControl
 Route::get('spedition-exchange/accept-offer/{offerId}', 'Api\SpeditionExchangeController@acceptOffer')->name('api.spedition-exchange.accept-offer');
 
 Route::post('banks', 'Api\BankController@getBanks')->name('api.banks');
-Route::post('categories/details','Api\CategoriesController@getCategoriesDetails')->name('api.categories.details');
+Route::post('categories/details', 'Api\CategoriesController@getCategoriesDetails')->name('api.categories.details');
 Route::get('categories/details/search', 'Api\CategoriesController@getCategoryDetails')->name('api.categories.search');
