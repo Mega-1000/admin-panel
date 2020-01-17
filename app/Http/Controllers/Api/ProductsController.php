@@ -188,13 +188,12 @@ class ProductsController
     public function getProductsByCategory(Request $request)
     {
         $products = Category
-            ::with(['products' => function ($q) {
-                $q->where('products.show_on_page', '=', 1);
-                $q->join('product_prices', 'products.id', '=', 'product_prices.product_id');
-                $q->join('product_packings', 'products.id', '=', 'product_packings.product_id');
-            }])
-            ->find((int) $request->category_id)
-            ->products
+            ::find((int) $request->category_id)
+            ->products()
+            ->where('products.show_on_page', '=', 1)
+            ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
+            ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
+            ->paginate($this->getPerPage())
             ->toJson()
         ;
 
