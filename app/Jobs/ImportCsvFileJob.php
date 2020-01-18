@@ -90,29 +90,22 @@ class ImportCsvFileJob implements ShouldQueue
         $this->productStockRepository = $productStockRepository;
         $this->productStockPositionRepository = $productStockPositionRepository;
 
-        DB::table('chimney_replacements')->delete();
-        DB::table('chimney_products')->delete();
-        DB::table('chimney_attribute_options')->delete();
-        DB::table('chimney_attributes')->delete();
-        Entities\Product::query()->update([
-            'category_id' => null,
-            'parent_id' => null
-        ]);
-        DB::table('categories')->delete();
-        DB::statement("ALTER TABLE categories AUTO_INCREMENT = 1;");
+        $this->clearTables();
 
         $data = Carbon::now();
         Log::channel('import')->info('Import start: '.$data);
 
+        $time = microtime(true);
         for ($i = 1; $line = fgetcsv($handle, 0, ';'); $i++) {
             if ($i % 100 === 0) {
-                var_dump($i);
+                echo $i.' - time '.round(microtime(true) - $time, 3)."\n";
+                $time = microtime(true);
             }
             if ($i <= $this->startRow) {
                 continue;
             }
             
-            //intentionally variable assigning here, not an error
+            //intentional variable assigning here, not an error
             if (!$categoryColumn = $this->getCategoryColumn($line)) {
                 continue;
             }
@@ -136,7 +129,6 @@ class ImportCsvFileJob implements ShouldQueue
                 }
             } catch (\Exception $e) {
                 Log::channel('import')->debug("Row $i EXCEPTION: ".$e->getMessage());
-                Log::channel('import')->debug($array);
             }
         }
         DB::table('import')->where('id', 1)->update(
@@ -146,6 +138,24 @@ class ImportCsvFileJob implements ShouldQueue
             ['name' => 'Import products done', 'last_import' => Carbon::now()]
         );
         Log::channel('import')->info('Import end: '.Carbon::now());
+    }
+
+    private function clearTables()
+    {
+        Entities\Product::query()->update([
+            'category_id' => null,
+            'parent_id' => null
+        ]);
+        DB::table('chimney_replacements')->delete();
+        DB::table('chimney_products')->delete();
+        DB::table('chimney_attribute_options')->delete();
+        DB::table('chimney_attributes')->delete();
+        DB::table('categories')->delete();
+        DB::statement("ALTER TABLE categories AUTO_INCREMENT = 1;");
+        DB::statement("ALTER TABLE chimney_replacements AUTO_INCREMENT = 1;");
+        DB::statement("ALTER TABLE chimney_products AUTO_INCREMENT = 1;");
+        DB::statement("ALTER TABLE chimney_attribute_options AUTO_INCREMENT = 1;");
+        DB::statement("ALTER TABLE chimney_attributes AUTO_INCREMENT = 1;");
     }
 
     private function getUrl($url)
@@ -239,19 +249,25 @@ class ImportCsvFileJob implements ShouldQueue
             if (count($arr) != 2) {
                 continue;
             }
-            $attribute = new Entities\ChimneyAttribute([
+            $attribute = $category->chimneyAttributes()->create([
                 'name' => $arr[0],
                 'column_number' => $i - $start + 1
             ]);
-            $category->chimneyAttributes()->save($attribute);
             $options = explode('|', $arr[1]);
+            $array = [];
             foreach ($options as $opt) {
                 $opt = trim($opt);
                 if (!$opt) {
                     continue;
                 }
-                $attribute->options()->save(new Entities\ChimneyAttributeOption(['name' => $opt]));
+                $array[] = [
+                    'name' => $opt,
+                    'chimney_attribute_id' => $attribute->id,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ];
             }
+            Entities\ChimneyAttributeOption::insert($array);
         }
     }
 
@@ -277,7 +293,13 @@ class ImportCsvFileJob implements ShouldQueue
             }
             $category->chimneyProducts()->save($product);
             if (isset($replacements[$product->column_number])) {
-                $product->replacements()->saveMany($replacements[$product->column_number]['products']);
+                $array = $replacements[$product->column_number]['products'];
+                foreach ($array as $key => $value) {
+                    $array[$key]['chimney_product_id'] = $product->id;
+                    $array[$key]['created_at'] = Carbon::now();
+                    $array[$key]['updated_at'] = Carbon::now();
+                }
+                Entities\ChimneyReplacement::insert($array);
             }
         }
     }
@@ -304,10 +326,10 @@ class ImportCsvFileJob implements ShouldQueue
                         'products' => []
                     ];
                 }
-                $replacements[$productNumber]['products'][] = new Entities\ChimneyReplacement([
+                $replacements[$productNumber]['products'][] = [
                     'product' => $arr[0],
                     'quantity' => $arr[1],
-                ]);
+                ];
             }
         }
         return $replacements;
@@ -318,7 +340,7 @@ class ImportCsvFileJob implements ShouldQueue
         $item = $this->productRepository->findWhere(['symbol' => $array['symbol']])->first();
 
         $category = $this->getCategoryParent($categoryTree, $array);
-        $array['category_id'] = $category['id'];
+        $array['category_id'] = $category['id'] ?: null;
 
         if ($item !== null) {
             $product = $this->productRepository->update($array, $item->id);
@@ -505,7 +527,7 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function getCategoryColumn($line)
     {
-        for ($col = 598; $col <= count($line) - 16; $col += 16) {
+        for ($col = 598; $col <= count($line) - 15; $col += 16) {
             if (!empty($line[$col])) {
                 return $col;
             }
