@@ -47,6 +47,8 @@ class ImportCsvFileJob implements ShouldQueue
     private $categories = ['id' => 0, 'children' => []];
     private $productsRelated = [];
 
+    private $currentLine;
+
     /**
      * Create a new job instance.
      *
@@ -97,6 +99,7 @@ class ImportCsvFileJob implements ShouldQueue
 
         $time = microtime(true);
         for ($i = 1; $line = fgetcsv($handle, 0, ';'); $i++) {
+            $this->currentLine = $i;
             if ($i % 100 === 0) {
                 echo $i.' - time '.round(microtime(true) - $time, 3)."\n";
                 $time = microtime(true);
@@ -220,9 +223,10 @@ class ImportCsvFileJob implements ShouldQueue
                         if (empty($current['children'])) {
                             return $current;
                         }
-                        throw new \Exception("Products can be placed in deepest category only");
+                        Log::channel('import')->debug("Row {$this->currentLine} WARNING: Products should be placed in deepest category only");
+                        return $this->categories;
                     }
-                    throw new \Exception($isProduct ? "Missing category for product (A)" : "Category already exists");
+                    throw new \Exception("Category already exists");
                 }
                 continue;
             } elseif ($i < $iMax) {
@@ -230,9 +234,10 @@ class ImportCsvFileJob implements ShouldQueue
                     if (empty($current['children'])) {
                         return $current;
                     }
-                    throw new \Exception("Products can be placed in deepest category only");
+                    Log::channel('import')->debug("Row {$this->currentLine} WARNING: Products should be placed in deepest category only");
+                    return $this->categories;
                 }
-                throw new \Exception($isProduct ? "Missing category for product (B)" : "Missing category parent");
+                throw new \Exception("Missing category parent");
             }
         }
         return $current;
