@@ -149,6 +149,7 @@ class ImportCsvFileJob implements ShouldQueue
             'category_id' => null,
             'parent_id' => null
         ]);
+        Entities\Product::where('symbol', '')->orWhereNull('symbol')->delete();
         DB::table('chimney_replacements')->delete();
         DB::table('chimney_products')->delete();
         DB::table('chimney_attribute_options')->delete();
@@ -342,7 +343,11 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function saveProduct($array, $categoryTree)
     {
-        $item = $this->productRepository->findWhere(['symbol' => $array['symbol']])->first();
+        if (!empty($array['symbol'])) {
+            $item = $this->productRepository->findWhere(['symbol' => $array['symbol']])->first();
+        } else {
+            $item = null;
+        }
 
         $category = $this->getCategoryParent($categoryTree, $array);
         $array['category_id'] = $category['id'] ?: null;
