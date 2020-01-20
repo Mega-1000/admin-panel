@@ -187,8 +187,13 @@ class ProductsController
      */
     public function getProductsByCategory(Request $request)
     {
-        $products = Category
-            ::find((int) $request->category_id)
+        $category = Category::find((int) $request->category_id);
+
+        if (!$category) {
+            return response("Wrong category_id {$request->category_id}", 400);
+        }
+
+        $products = $category
             ->products()
             ->where('products.show_on_page', '=', 1)
             ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
