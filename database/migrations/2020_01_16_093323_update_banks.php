@@ -16,6 +16,7 @@ class UpdateBanks extends Migration
     {
         Artisan::call('db:seed', [
             '--class' => BanksDataSeeder::class,
+            '--force' => true
         ]);
     }
 
