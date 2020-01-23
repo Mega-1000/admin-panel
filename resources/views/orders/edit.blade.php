@@ -366,7 +366,7 @@
             </div>
             <input type="hidden" value="{{ $order->customer->id }}" name="customer_id">
             <div class="form-group" style="widht: 100%; float: left;">
-                <a target="_blank" href="{{env('FRONT_URL')}}?order_token={{$order->getToken()}}" for="add-item">
+                <a target="_blank" href="{{env('FRONT_URL')}}/koszyk.html?cart_token={{$order->getToken()}}" for="add-item">
                     Edytuj zamówienie w koszyku
                 </a>
                 <br>

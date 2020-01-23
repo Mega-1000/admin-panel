@@ -24,7 +24,7 @@ Route::get('custom/pages', 'Api\CustomPagesController@getPages')->name('api.cust
 
 Route::post('orders', 'Api\OrdersController@store')->name('api.orders.store');
 Route::post('customers', 'Api\CustomersController@store')->name('api.customers.store');
-Route::post('new_order', 'Api\OrdersController@new')->name('api.orders.new');
+Route::post('new_order', 'Api\OrdersController@newOrder')->name('api.orders.new');
 Route::middleware('client')->group(function () {
     Route::post('orders/message', 'Api\OrdersController@storeMessage')->name('api.orders.message.store');
     Route::get('orders/messages/{frontDbOrderId}', 'Api\OrdersController@getMessages')->name('api.orders.messages.get');

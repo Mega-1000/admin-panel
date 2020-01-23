@@ -110,7 +110,7 @@ class OrdersController extends Controller
         return $this->oldStore($request->all());
     }
 
-    public function new(StoreOrderRequest $request)
+    public function newOrder(StoreOrderRequest $request)
     {
         $data = $request->all();
         foreach ($data['order_items'] as $k => $order) {
@@ -129,7 +129,6 @@ class OrdersController extends Controller
                 ]);
             }
         }
-        $data['old_prices'] = 1;
         $data['old_prices'] = 1;
         return $this->newStore($data);
     }
