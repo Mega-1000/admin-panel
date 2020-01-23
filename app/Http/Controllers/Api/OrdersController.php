@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Entities\Order;
+use App\Entities\Product;
 
 /**
  * Class OrdersController
@@ -107,381 +108,155 @@ class OrdersController extends Controller
 
     public function store(StoreOrderRequest $request)
     {
-        return $this->oldStore($request->all());
+        throw new \Exception("Method deprecated");
     }
 
     public function newOrder(StoreOrderRequest $request)
     {
         $data = $request->all();
-        foreach ($data['order_items'] as $k => $order) {
-            if (is_array($order)) {
-                continue;
-            }
-            $data['order_items'][$k] = json_decode($order, true);
+        DB::beginTransaction();
+        try {
+            $id = $this->newStore($data);
+            DB::commit();
+            return $this->createdResponse(['order_id' => $id]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Problem with create new order :' . $e->getMessage(),
+                ['request' => $data, 'class' => get_class($this), 'line' => __LINE__]
+            );
+            $message = 'Wystąpił wewnętrzny błąd systemu przy składaniu zamówienia. Dział techniczny został o tym poinformowany.';
+            return $this->createdErrorResponse($message);
         }
-        if (isset($data['customer_login'])) {
-            $customer = $this->customerRepository->findByField('login', $data['customer_login'])->first();
-            if (empty($customer)) {
-                $this->customerRepository->create([
-                    'login' => $data['customer_login'],
-                    'email' => $data['customer_login'],
-                    'password' => bcrypt($data['phone']),
-                ]);
-            }
-        }
-        $data['old_prices'] = 1;
-        return $this->newStore($data);
     }
 
     private function newStore($data)
     {
-        DB::beginTransaction();
-        try {
-            if (isset($data['id'])) {
-                $id = $data['id'];
-            } else {
-                $id = null;
+        if (empty($data['order_items']) || !is_array($data['order_items'])) {
+            throw new Exception("Missing products");
+        }
+        $order = null;
+        $orderExists = false;
+        if (!empty($data['cart_token'])) {
+            $order = Order::where('token', $data['cart_token'])->find();
+            if ($order) {
+                $orderExists = true;
             }
-            $orderExists = $this->orderRepository->findByField('id', $id);
-            if (isset($data['customer_login'])) {
-                $customer = $this->customerRepository->findByField('login', $data['customer_login'])->first();
+        }
+        if (!$order) {
+            $order = new Order();
+        }
+        if (isset($data['customer_login'])) {
+            $customer = $this->customerRepository->findByField('login', $data['customer_login'])->first();
+            if (empty($customer)) {
+                $customer = $this->customerRepository->create([
+                    'login' => $data['customer_login'],
+                    'email' => $data['customer_login'],
+                    'password' => 'new_client_from_old_db',
+                ]);
+                $this->customerAddressRepository->create([
+                    'type' => 'DELIVERY_ADDRESS',
+                    'customer_id' => $customer->id,
+                    'email' => $data['customer_login'],
+                ]);
+            }
+            $order->customer_id = $customer->id;
+        } elseif (!$orderExists) {
+            throw new \Exception('Nie podano customer_login, pomimo że zamówienie nie istnieje.');
+        }
 
-                if (empty($customer)) {
-                    $customer = $this->customerRepository->create([
-                        'login' => $data['customer_login'],
-                        'email' => $data['customer_login'],
-                        'password' => 'new_client_from_old_db',
-                    ]);
-                    $this->customerAddressRepository->create([
-                        'type' => 'DELIVERY_ADDRESS',
-                        'customer_id' => $customer->id,
-                        'email' => $data['customer_login'],
-                    ]);
+        if (!$orderExists) {
+            $order->status_id = 1;
+            $orderCustomerOpenExists = $this->orderRepository->findWhere(
+                [
+                    ['customer_id', '=', $customer->id],
+                    ['status_id', '<>', 6],
+                    ['status_id', '<>', 8],
+                    ['employee_id', '<>', null],
+                ]
+            )->first();
+
+            if (!empty($orderCustomerOpenExists)) {
+                $order->employee_id = $orderCustomerOpenExists->employee_id;
+            }
+        }
+        
+        $orderTotal = 0;
+        $weight = 0;
+        $orderItems = $order->items();
+        $order->items()->delete();
+        $oldPrices = [];
+
+        foreach ($orderItems as $item) {
+            foreach ($this->getPriceColumns() as $column) {
+                $oldPrices[$item->product_id][$column] = $item->$column;
+            }
+        }
+
+        foreach ($data['order_items'] as $item) {
+            $product = Product::find($item['id']);
+            $price = $product->price;
+            if (!$product || !$price) {
+                throw new \Exception("Product {$item['id']} not found in database");
+            }
+
+            $orderItem = new App\Entities\OrderItem();
+            $orderItem->quantity = $item['amount'];
+            $orderItem->product_id = $product->id;
+            foreach ($this->getPriceColumns() as $column) {
+                if (!empty($item['old_price']) && isset($oldPrices[$product->id])) {
+                    $orderItem->$column = $oldPrices[$product->id][$column];
                 } else {
-                    $customer = $this->customerRepository->findByField('login', $data['customer_login'])->first();
-                }
-                $data['customer_id'] = $customer->id;
-            } else {
-                if (count($orderExists) == 0) {
-                    throw new \Exception('Nie podano customer_login, pomimo że zamówienie nie istnieje.');
+                    $orderItem->$column = $price->$column;
                 }
             }
+            $orderTotal += $orderItem->net_selling_price_commercial_unit * $orderItem->quantity;
 
-            if (count($orderExists) == 0) {
-                $data['status_id'] = 1;
-                $orderCustomerOpenExists = $this->orderRepository->findWhere(
+            $order->items()->save($orderTotal);
+
+            if (!empty($product->weight_trade_unit)) {
+                $weight += $product->weight_trade_unit * $orderItem->quantity;
+            }
+        }
+
+        $order->total_price = $orderTotal * 1.23;
+        $order->weight = $weight;
+        $order->save();
+
+        if ($data['rewrite'] == 0) {
+            if (isset($data['delivery_address']) && !empty($data['delivery_address'])) {
+                $this->orderAddressRepository->updateOrCreate(
                     [
-                        ['customer_id', '=', $customer->id],
-                        ['status_id', '<>', 6],
-                        ['status_id', '<>', 8],
-                        ['employee_id', '<>', null],
-                    ]
-                )->first();
-
-                if (!empty($orderCustomerOpenExists)) {
-                    $data['employee_id'] = $orderCustomerOpenExists->employee_id;
-                }
-            }
-            $order = $this->orderRepository->updateOrCreate(['id' => -1], $data);
-            $orderTotal = 0;
-            $weight = 0;
-            $orderItems = $this->orderItemRepository->findWhere(['order_id' => $order->id]);
-            if (isset($data['old_id_from_front_db']) && !empty($data['old_id_from_front_db'])) {
-                $order2 = $this->orderRepository->findWhere(['id_from_front_db' => $data['old_id_from_front_db']])->first();
-                $orderItems = $this->orderItemRepository->findWhere(['order_id' => $order2->id]);
-            }
-            $oldPrices = [];
-            $prices = [];
-
-            foreach ($orderItems as $item) {
-                $oldPrices[$item->product_id]['net_purchase_price_commercial_unit'] = $item->net_purchase_price_commercial_unit;
-                $oldPrices[$item->product_id]['net_purchase_price_basic_unit'] = $item->net_purchase_price_basic_unit;
-                $oldPrices[$item->product_id]['net_purchase_price_calculated_unit'] = $item->net_purchase_price_calculated_unit;
-                $oldPrices[$item->product_id]['net_purchase_price_aggregate_unit'] = $item->net_purchase_price_aggregate_unit;
-                $oldPrices[$item->product_id]['net_purchase_price_the_largest_unit'] = $item->net_purchase_price_the_largest_unit;
-                $oldPrices[$item->product_id]['net_selling_price_commercial_unit'] = $item->net_selling_price_commercial_unit;
-                $oldPrices[$item->product_id]['net_selling_price_basic_unit'] = $item->net_selling_price_basic_unit;
-                $oldPrices[$item->product_id]['net_selling_price_calculated_unit'] = $item->net_selling_price_calculated_unit;
-                $oldPrices[$item->product_id]['net_selling_price_aggregate_unit'] = $item->net_selling_price_aggregate_unit;
-            }
-
-
-            foreach ($orderItems as $item) {
-                $item->delete();
-            }
-
-
-            if (isset($data['order_items']) && count($data['order_items']) > 0) {
-                foreach ($data['order_items'] as $item) {
-                    $product = $this->productRepository->findByField('symbol', $item['product_symbol'])->first();
-                    if (empty($product)) {
-                        return $this->notFoundResponse("Not found provided Product Symbol: " . $item['product_symbol']);
-                    }
-                    $productPrice = $this->productPriceRepository->findByField('product_id', $product->id)->first();
-                    if (isset($data['old_prices']) && $data['old_prices'] == 1 && isset($oldPrices[$product->id])) {
-                        $prices['net_purchase_price_commercial_unit'] = $oldPrices[$product->id]['net_purchase_price_commercial_unit'];
-                        $prices['net_purchase_price_basic_unit'] = $oldPrices[$product->id]['net_purchase_price_basic_unit'];
-                        $prices['net_purchase_price_calculated_unit'] = $oldPrices[$product->id]['net_purchase_price_calculated_unit'];
-                        $prices['net_purchase_price_aggregate_unit'] = $oldPrices[$product->id]['net_purchase_price_aggregate_unit'];
-                        $prices['net_purchase_price_the_largest_unit'] = $oldPrices[$product->id]['net_purchase_price_the_largest_unit'];
-                        $prices['net_selling_price_basic_unit'] = $oldPrices[$product->id]['net_selling_price_basic_unit'];
-                        $prices['net_selling_price_commercial_unit'] = $oldPrices[$product->id]['net_selling_price_commercial_unit'];
-                        $prices['net_selling_price_calculated_unit'] = $oldPrices[$product->id]['net_selling_price_calculated_unit'];
-                        $prices['net_selling_price_aggregate_unit'] = $oldPrices[$product->id]['net_selling_price_aggregate_unit'];
-                        $orderTotal += $oldPrices[$product->id]['net_selling_price_commercial_unit'] * $item['quantity'];
-                    } else {
-                        $prices['net_purchase_price_commercial_unit'] = $productPrice->net_purchase_price_commercial_unit_after_discounts;
-                        $prices['net_purchase_price_basic_unit'] = $productPrice->net_purchase_price_basic_unit_after_discounts;
-                        $prices['net_purchase_price_calculated_unit'] = $productPrice->net_purchase_price_calculated_unit_after_discounts;
-                        $prices['net_purchase_price_aggregate_unit'] = $productPrice->net_purchase_price_aggregate_unit_after_discounts;
-                        $prices['net_purchase_price_the_largest_unit'] = $productPrice->net_purchase_price_the_largest_unit_after_discounts;
-                        $prices['net_selling_price_basic_unit'] = $productPrice->net_selling_price_basic_unit;
-                        $prices['net_selling_price_commercial_unit'] = $productPrice->net_selling_price_commercial_unit;
-                        $prices['net_selling_price_calculated_unit'] = $productPrice->net_selling_price_calculated_unit;
-                        $prices['net_selling_price_aggregate_unit'] = $productPrice->net_selling_price_aggregate_unit;
-                        $orderTotal += $productPrice->net_selling_price_commercial_unit * $item['quantity'];
-                    }
-
-                    $this->orderItemRepository->create(
-                        array_merge(
-                            [
-                                'order_id' => $order->id,
-                                'product_id' => $product->id,
-                            ],
-                            $item,
-                            $prices
-                        )
-                    );
-                    if (!empty($product->weight_trade_unit)) {
-                        $weight += $product->weight_trade_unit * $item['quantity'];
-                    }
-                }
-            }
-
-            $order->total_price = $orderTotal * 1.23;
-            $order->weight = $weight;
-            $order->save();
-
-            if ($data['rewrite'] == 0) {
-                if (isset($data['delivery_address']) && !empty($data['delivery_address'])) {
-                    $this->orderAddressRepository->updateOrCreate(
+                        'order_id' => $order->id,
+                        'type' => 'DELIVERY_ADDRESS',
+                    ],
+                    array_merge(
                         [
                             'order_id' => $order->id,
                             'type' => 'DELIVERY_ADDRESS',
                         ],
-                        array_merge(
-                            [
-                                'order_id' => $order->id,
-                                'type' => 'DELIVERY_ADDRESS',
-                            ],
-                            $data['delivery_address']
-                        )
-                    );
-                }
-
-                if (isset($data['invoice_address']) && !empty($data['invoice_address'])) {
-                    $this->orderAddressRepository->updateOrCreate(
-                        [
-                            'order_id' => $order->id,
-                            'type' => 'INVOICE_ADDRESS',
-                        ],
-                        array_merge(
-                            [
-                                'order_id' => $order->id,
-                                'type' => 'INVOICE_ADDRESS',
-                            ],
-                            $data['invoice_address']
-                        )
-                    );
-                }
-            }
-            DB::commit();
-            return $this->createdResponse(['order_id' => $order->id]);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Problem with create new order :' . $e->getMessage(),
-                ['request' => $data, 'class' => get_class($this), 'line' => __LINE__]
-            );
-            $message = 'Wystąpił wewnętrzny błąd systemu przy składaniu zamówienia. Dział techniczny został o tym poinformowany.';
-            return $this->createdErrorResponse($message);
-        }
-    }
-
-    //todo: remove duplicates after 2nd company finishes their work
-    private function oldStore($data)
-    {
-        DB::beginTransaction();
-        try {
-            if (isset($data['id_from_front_db'])) {
-                $orderFrontId = $data['id_from_front_db'];
-            } else {
-                $orderFrontId = -1;
-            }
-            $orderExists = $this->orderRepository->findByField('id_from_front_db', $orderFrontId);
-            if (isset($data['customer_login'])) {
-                $customer = $this->customerRepository->findByField('login', $data['customer_login'])->first();
-
-                if (empty($customer)) {
-                    $customer = $this->customerRepository->create([
-                        'login' => $data['customer_login'],
-                        'email' => $data['customer_login'],
-                        'password' => 'new_client_from_old_db',
-                    ]);
-                    $this->customerAddressRepository->create([
-                        'type' => 'DELIVERY_ADDRESS',
-                        'customer_id' => $customer->id,
-                        'email' => $data['customer_login'],
-                    ]);
-                } else {
-                    $customer = $this->customerRepository->findByField('login', $data['customer_login'])->first();
-                }
-                $data['customer_id'] = $customer->id;
-            } else {
-                if (count($orderExists) == 0) {
-                    throw new \Exception('Nie podano customer_login, pomimo że zamówienie nie istnieje.');
-                }
+                        $data['delivery_address']
+                    )
+                );
             }
 
-
-            if (count($orderExists) == 0) {
-                $data['status_id'] = 1;
-                $orderCustomerOpenExists = $this->orderRepository->findWhere(
+            if (isset($data['invoice_address']) && !empty($data['invoice_address'])) {
+                $this->orderAddressRepository->updateOrCreate(
                     [
-                        ['customer_id', '=', $customer->id],
-                        ['status_id', '<>', 6],
-                        ['status_id', '<>', 8],
-                        ['employee_id', '<>', null],
-                    ]
-                )->first();
-
-                if (!empty($orderCustomerOpenExists)) {
-                    $data['employee_id'] = $orderCustomerOpenExists->employee_id;
-                }
-            }
-
-            $order = $this->orderRepository->updateOrCreate(['id_from_front_db' => $data['id_from_front_db']], $data);
-            $orderTotal = 0;
-            $weight = 0;
-            $orderItems = $this->orderItemRepository->findWhere(['order_id' => $order->id]);
-            if (isset($data['old_id_from_front_db']) && !empty($data['old_id_from_front_db'])) {
-                $order2 = $this->orderRepository->findWhere(['id_from_front_db' => $data['old_id_from_front_db']])->first();
-                $orderItems = $this->orderItemRepository->findWhere(['order_id' => $order2->id]);
-            }
-            $oldPrices = [];
-            $prices = [];
-
-            foreach ($orderItems as $item) {
-                $oldPrices[$item->product_id]['net_purchase_price_commercial_unit'] = $item->net_purchase_price_commercial_unit;
-                $oldPrices[$item->product_id]['net_purchase_price_basic_unit'] = $item->net_purchase_price_basic_unit;
-                $oldPrices[$item->product_id]['net_purchase_price_calculated_unit'] = $item->net_purchase_price_calculated_unit;
-                $oldPrices[$item->product_id]['net_purchase_price_aggregate_unit'] = $item->net_purchase_price_aggregate_unit;
-                $oldPrices[$item->product_id]['net_purchase_price_the_largest_unit'] = $item->net_purchase_price_the_largest_unit;
-                $oldPrices[$item->product_id]['net_selling_price_commercial_unit'] = $item->net_selling_price_commercial_unit;
-                $oldPrices[$item->product_id]['net_selling_price_basic_unit'] = $item->net_selling_price_basic_unit;
-                $oldPrices[$item->product_id]['net_selling_price_calculated_unit'] = $item->net_selling_price_calculated_unit;
-                $oldPrices[$item->product_id]['net_selling_price_aggregate_unit'] = $item->net_selling_price_aggregate_unit;
-            }
-
-
-            foreach ($orderItems as $item) {
-                $item->delete();
-            }
-
-
-            if (isset($data['order_items']) && count($data['order_items']) > 0) {
-                foreach ($data['order_items'] as $item) {
-                    $product = $this->productRepository->findByField('symbol', $item['product_symbol'])->first();
-                    if (empty($product)) {
-                        return $this->notFoundResponse("Not found provided Product Symbol: " . $item['product_symbol']);
-                    }
-                    $productPrice = $this->productPriceRepository->findByField('product_id', $product->id)->first();
-                    if (isset($data['old_prices']) && $data['old_prices'] == 1 && isset($oldPrices[$product->id])) {
-                        $prices['net_purchase_price_commercial_unit'] = $oldPrices[$product->id]['net_purchase_price_commercial_unit'];
-                        $prices['net_purchase_price_basic_unit'] = $oldPrices[$product->id]['net_purchase_price_basic_unit'];
-                        $prices['net_purchase_price_calculated_unit'] = $oldPrices[$product->id]['net_purchase_price_calculated_unit'];
-                        $prices['net_purchase_price_aggregate_unit'] = $oldPrices[$product->id]['net_purchase_price_aggregate_unit'];
-                        $prices['net_purchase_price_the_largest_unit'] = $oldPrices[$product->id]['net_purchase_price_the_largest_unit'];
-                        $prices['net_selling_price_basic_unit'] = $oldPrices[$product->id]['net_selling_price_basic_unit'];
-                        $prices['net_selling_price_commercial_unit'] = $oldPrices[$product->id]['net_selling_price_commercial_unit'];
-                        $prices['net_selling_price_calculated_unit'] = $oldPrices[$product->id]['net_selling_price_calculated_unit'];
-                        $prices['net_selling_price_aggregate_unit'] = $oldPrices[$product->id]['net_selling_price_aggregate_unit'];
-                        $orderTotal += $oldPrices[$product->id]['net_selling_price_commercial_unit'] * $item['quantity'];
-                    } else {
-                        $prices['net_purchase_price_commercial_unit'] = $productPrice->net_purchase_price_commercial_unit_after_discounts;
-                        $prices['net_purchase_price_basic_unit'] = $productPrice->net_purchase_price_basic_unit_after_discounts;
-                        $prices['net_purchase_price_calculated_unit'] = $productPrice->net_purchase_price_calculated_unit_after_discounts;
-                        $prices['net_purchase_price_aggregate_unit'] = $productPrice->net_purchase_price_aggregate_unit_after_discounts;
-                        $prices['net_purchase_price_the_largest_unit'] = $productPrice->net_purchase_price_the_largest_unit_after_discounts;
-                        $prices['net_selling_price_basic_unit'] = $productPrice->net_selling_price_basic_unit;
-                        $prices['net_selling_price_commercial_unit'] = $productPrice->net_selling_price_commercial_unit;
-                        $prices['net_selling_price_calculated_unit'] = $productPrice->net_selling_price_calculated_unit;
-                        $prices['net_selling_price_aggregate_unit'] = $productPrice->net_selling_price_aggregate_unit;
-                        $orderTotal += $productPrice->net_selling_price_commercial_unit * $item['quantity'];
-                    }
-
-                    $this->orderItemRepository->create(
-                        array_merge(
-                            [
-                                'order_id' => $order->id,
-                                'product_id' => $product->id,
-                            ],
-                            $item,
-                            $prices
-                        )
-                    );
-                    if (!empty($product->weight_trade_unit)) {
-                        $weight += $product->weight_trade_unit * $item['quantity'];
-                    }
-                }
-            }
-
-            $order->total_price = $orderTotal * 1.23;
-            $order->weight = $weight;
-            $order->save();
-
-            if ($data['rewrite'] == 0) {
-                if (isset($data['delivery_address']) && !empty($data['delivery_address'])) {
-                    $this->orderAddressRepository->updateOrCreate(
-                        [
-                            'order_id' => $order->id,
-                            'type' => 'DELIVERY_ADDRESS',
-                        ],
-                        array_merge(
-                            [
-                                'order_id' => $order->id,
-                                'type' => 'DELIVERY_ADDRESS',
-                            ],
-                            $data['delivery_address']
-                        )
-                    );
-                }
-
-                if (isset($data['invoice_address']) && !empty($data['invoice_address'])) {
-                    $this->orderAddressRepository->updateOrCreate(
+                        'order_id' => $order->id,
+                        'type' => 'INVOICE_ADDRESS',
+                    ],
+                    array_merge(
                         [
                             'order_id' => $order->id,
                             'type' => 'INVOICE_ADDRESS',
                         ],
-                        array_merge(
-                            [
-                                'order_id' => $order->id,
-                                'type' => 'INVOICE_ADDRESS',
-                            ],
-                            $data['invoice_address']
-                        )
-                    );
-                }
+                        $data['invoice_address']
+                    )
+                );
             }
-            DB::commit();
-            return $this->createdResponse();
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Problem with create new order :' . $e->getMessage(),
-                ['request' => $data, 'class' => get_class($this), 'line' => __LINE__]
-            );
-            $message = 'Wystąpił wewnętrzny błąd systemu przy składaniu zamówienia. Dział techniczny został o tym poinformowany.';
-            return $this->createdErrorResponse($message);
         }
+
+        return $order->id;
     }
 
     public function storeMessage(StoreOrderMessageRequest $request)
@@ -739,23 +514,7 @@ class OrdersController extends Controller
         $products = [];
 
         foreach ($order->items as $item) {
-            foreach ([
-                'net_purchase_price_commercial_unit',
-                'net_purchase_price_basic_unit',
-                'net_purchase_price_calculated_unit',
-                'net_purchase_price_aggregate_unit',
-                'net_purchase_price_the_largest_unit',
-                'net_selling_price_commercial_unit',
-                'net_selling_price_basic_unit',
-                'net_selling_price_calculated_unit',
-                'net_selling_price_aggregate_unit',
-                'net_selling_price_the_largest_unit',
-                'net_purchase_price_commercial_unit_after_discounts',
-                'net_purchase_price_basic_unit_after_discounts',
-                'net_purchase_price_calculated_unit_after_discounts',
-                'net_purchase_price_aggregate_unit_after_discounts',
-                'net_purchase_price_the_largest_unit_after_discounts'
-            ] as $column) {
+            foreach ($this->getPriceColumns() as $column) {
                 $item->product->$column = $item->$column;
             }
 
@@ -779,5 +538,26 @@ class OrdersController extends Controller
         }
 
         return response(json_encode($products));
+    }
+
+    private function getPriceColumns()
+    {
+        return [
+            'net_purchase_price_commercial_unit',
+            'net_purchase_price_basic_unit',
+            'net_purchase_price_calculated_unit',
+            'net_purchase_price_aggregate_unit',
+            'net_purchase_price_the_largest_unit',
+            'net_selling_price_commercial_unit',
+            'net_selling_price_basic_unit',
+            'net_selling_price_calculated_unit',
+            'net_selling_price_aggregate_unit',
+            'net_selling_price_the_largest_unit',
+            'net_purchase_price_commercial_unit_after_discounts',
+            'net_purchase_price_basic_unit_after_discounts',
+            'net_purchase_price_calculated_unit_after_discounts',
+            'net_purchase_price_aggregate_unit_after_discounts',
+            'net_purchase_price_the_largest_unit_after_discounts'
+        ];
     }
 }
