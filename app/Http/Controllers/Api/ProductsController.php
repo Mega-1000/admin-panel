@@ -179,7 +179,13 @@ class ProductsController
      */
     public function getProduct($id)
     {
-        return response(Product::where('id', (int) $id)->first()->toJson());
+        return response(
+            Product
+            ::join('product_prices', 'products.id', '=', 'product_prices.product_id')
+            ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
+            ->find($id)
+            ->toJson()
+        );
     }
 
     /**
