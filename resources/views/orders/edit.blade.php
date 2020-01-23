@@ -366,18 +366,10 @@
             </div>
             <input type="hidden" value="{{ $order->customer->id }}" name="customer_id">
             <div class="form-group" style="widht: 100%; float: left;">
-                <a target="_blank" href="{{env('FRONT_URL')}}/index.php?nazwa_s=_cart&popraw_nadpisz=1&ed_prod={{$order->id_from_front_db}}" for="add-item">
-                    Dodaj nowy produkt i nadpisz zamówienie
-                </a> <br />
-                <a target="_blank" href="{{env('FRONT_URL')}}/index.php?nazwa_s=_cart&popraw_nadpisz=1&ed_prod={{$order->id_from_front_db}}&old_prices=1" for="add-item">
-                    Dodaj nowy produkt i nadpisz zamówienie zachowując obecne ceny produktów
-                </a> <br />
-                <a target="_blank" href="{{env('FRONT_URL')}}/index.php?nazwa_s=_cart&&ed_prod={{$order->id_from_front_db}}" for="add-item">
-                    Dodaj nowy produkt i stwórz nowe zamówienie (należy wyedytować zawartość zamówienia)
-                </a>  <br />
-                <a target="_blank" href="{{env('FRONT_URL')}}/index.php?nazwa_s=_cart&&ed_prod={{$order->id_from_front_db}}&old_prices=1" for="add-item">
-                    Dodaj nowy produkt i stwórz nowe zamówienie (należy wyedytować zawartość zamówienia) zachowując obecne ceny produktów
+                <a target="_blank" href="{{env('FRONT_URL')}}?order_token={{$order->getToken()}}" for="add-item">
+                    Edytuj zamówienie w koszyku
                 </a>
+                <br>
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
                     Podziel zamówienie
                 </button>

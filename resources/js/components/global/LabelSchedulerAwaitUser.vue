@@ -125,7 +125,7 @@
             }
         }
 
-        /deep/ .label-scheduler-await-user {
+        .label-scheduler-await-user {
             width: 250px;
             text-align: center;
         }

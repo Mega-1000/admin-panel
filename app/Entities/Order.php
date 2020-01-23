@@ -6,6 +6,7 @@ use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
+use Illuminate\Support\Str;
 
 /**
  * Class Order.
@@ -432,5 +433,14 @@ class Order extends Model implements Transformable
     public function taskSchedule()
     {
         return $this->hasOne(Task::class);
+    }
+
+    public function getToken()
+    {
+        if (empty($this->token)) {
+            $this->token = Str::random(32);
+            static::where('id', $this->id)->update(['token' => $this->token]);
+        }
+        return $this->token;
     }
 }

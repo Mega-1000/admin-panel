@@ -717,4 +717,18 @@ class OrdersController extends Controller
             ->toJson()
         ;
     }
+
+    public function getByToken(Request $request, $token)
+    {
+        if (empty($token)) {
+            return response("Missing token", 400);
+        }
+        $order = Order::where('token', $token)->get();
+        if (!$order) {
+            return response("Order doesn't exist", 400);
+        }
+        $json = [];
+
+        return response(json_encode($json));
+    }
 }
