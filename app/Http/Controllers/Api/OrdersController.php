@@ -132,54 +132,82 @@ class OrdersController extends Controller
     private function newStore($data)
     {
         if (empty($data['order_items']) || !is_array($data['order_items'])) {
-            throw new Exception("Missing products");
+            throw new \Exception("Missing products");
         }
         $order = null;
         $orderExists = false;
         if (!empty($data['cart_token'])) {
             $order = Order::where('token', $data['cart_token'])->find();
-            if ($order) {
-                $orderExists = true;
+            $orderExists = true;
+            if (!$order) {
+                throw new \Exception("Wrong cart_token");
             }
-        }
-        if (!$order) {
+        } else {
             $order = new Order();
         }
-        if (isset($data['customer_login'])) {
-            $customer = $this->customerRepository->findByField('login', $data['customer_login'])->first();
-            if (empty($customer)) {
-                $customer = $this->customerRepository->create([
-                    'login' => $data['customer_login'],
-                    'email' => $data['customer_login'],
-                    'password' => 'new_client_from_old_db',
-                ]);
-                $this->customerAddressRepository->create([
-                    'type' => 'DELIVERY_ADDRESS',
-                    'customer_id' => $customer->id,
-                    'email' => $data['customer_login'],
-                ]);
-            }
-            $order->customer_id = $customer->id;
-        } elseif (!$orderExists) {
+        $customer = $this->getCustomerByLogin($data['customer_login']);
+
+        if (!$customer && !$orderExists) {
             throw new \Exception('Nie podano customer_login, pomimo że zamówienie nie istnieje.');
         }
 
+        $order->customer_id = $customer->id;
+
         if (!$orderExists) {
             $order->status_id = 1;
-            $orderCustomerOpenExists = $this->orderRepository->findWhere(
-                [
-                    ['customer_id', '=', $customer->id],
-                    ['status_id', '<>', 6],
-                    ['status_id', '<>', 8],
-                    ['employee_id', '<>', null],
-                ]
-            )->first();
-
-            if (!empty($orderCustomerOpenExists)) {
-                $order->employee_id = $orderCustomerOpenExists->employee_id;
-            }
+            $this->assignEmployeeToOrder($order, $customer);
         }
-        
+
+        $this->assignItemsToOrder($order, $data['order_items']);
+
+        $order->save();
+
+        if ($data['rewrite'] == 0) {
+            $this->updateOrderAddress($order, $data['delivery_address'] ?? '', $data['invoice_address'] ?? '');
+        }
+
+        return $order->id;
+    }
+
+    private function getCustomerByLogin($login)
+    {
+        if (empty($login)) {
+            return null;
+        }
+        $customer = $this->customerRepository->findByField('login', $login)->first();
+        if (!$customer) {
+            $customer = $this->customerRepository->create([
+                'login' => $login,
+                'email' => $login,
+                'password' => 'new_client_from_old_db',
+            ]);
+            $this->customerAddressRepository->create([
+                'type' => 'DELIVERY_ADDRESS',
+                'customer_id' => $customer->id,
+                'email' => $login,
+            ]);
+        }
+        return $customer;
+    }
+
+    private function assignEmployeeToOrder($order, $customer)
+    {
+        $orderCustomerOpenExists = $this->orderRepository->findWhere(
+            [
+                ['customer_id', '=', $customer->id],
+                ['status_id', '<>', 6],
+                ['status_id', '<>', 8],
+                ['employee_id', '<>', null],
+            ]
+        )->first();
+
+        if (!empty($orderCustomerOpenExists)) {
+            $order->employee_id = $orderCustomerOpenExists->employee_id;
+        }
+    }
+
+    private function assignItemsToOrder($order, $items)
+    {
         $orderTotal = 0;
         $weight = 0;
         $orderItems = $order->items();
@@ -192,7 +220,7 @@ class OrdersController extends Controller
             }
         }
 
-        foreach ($data['order_items'] as $item) {
+        foreach ($items as $item) {
             $product = Product::find($item['id']);
             $price = $product->price;
             if (!$product || !$price) {
@@ -220,43 +248,40 @@ class OrdersController extends Controller
 
         $order->total_price = $orderTotal * 1.23;
         $order->weight = $weight;
-        $order->save();
+    }
 
-        if ($data['rewrite'] == 0) {
-            if (isset($data['delivery_address']) && !empty($data['delivery_address'])) {
-                $this->orderAddressRepository->updateOrCreate(
+    private function updateOrderAddress($order, $deliveryAddress, $invoiceAddress)
+    {
+        if (!empty($deliveryAddress)) {
+            $this->orderAddressRepository->updateOrCreate(
+                [
+                    'order_id' => $order->id,
+                    'type' => 'DELIVERY_ADDRESS',
+                ],
+                array_merge(
                     [
                         'order_id' => $order->id,
                         'type' => 'DELIVERY_ADDRESS',
                     ],
-                    array_merge(
-                        [
-                            'order_id' => $order->id,
-                            'type' => 'DELIVERY_ADDRESS',
-                        ],
-                        $data['delivery_address']
-                    )
-                );
-            }
-
-            if (isset($data['invoice_address']) && !empty($data['invoice_address'])) {
-                $this->orderAddressRepository->updateOrCreate(
+                    $deliveryAddress
+                )
+            );
+        }
+        if (!empty($invoiceAddress)) {
+            $this->orderAddressRepository->updateOrCreate(
+                [
+                    'order_id' => $order->id,
+                    'type' => 'INVOICE_ADDRESS',
+                ],
+                array_merge(
                     [
                         'order_id' => $order->id,
                         'type' => 'INVOICE_ADDRESS',
                     ],
-                    array_merge(
-                        [
-                            'order_id' => $order->id,
-                            'type' => 'INVOICE_ADDRESS',
-                        ],
-                        $data['invoice_address']
-                    )
-                );
-            }
+                    $invoiceAddress
+                )
+            );
         }
-
-        return $order->id;
     }
 
     public function storeMessage(StoreOrderMessageRequest $request)
