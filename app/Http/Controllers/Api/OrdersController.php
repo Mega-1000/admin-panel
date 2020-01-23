@@ -723,12 +723,62 @@ class OrdersController extends Controller
         if (empty($token)) {
             return response("Missing token", 400);
         }
-        $order = Order::where('token', $token)->get();
+        $order = Order
+            ::where('token', $token)
+            ->with(['items' => function($q) {
+                $q->with(['product' => function ($q) {
+                    $q->join('product_prices', 'products.id', '=', 'product_prices.product_id');
+                    $q->join('product_packings', 'products.id', '=', 'product_packings.product_id');
+                }]);
+            }])
+            ->first()
+        ;
         if (!$order) {
             return response("Order doesn't exist", 400);
         }
-        $json = [];
 
-        return response(json_encode($json));
+        $products = [];
+
+        foreach ($order->items as $item) {
+            foreach ([
+                'net_purchase_price_commercial_unit',
+                'net_purchase_price_basic_unit',
+                'net_purchase_price_calculated_unit',
+                'net_purchase_price_aggregate_unit',
+                'net_purchase_price_the_largest_unit',
+                'net_selling_price_commercial_unit',
+                'net_selling_price_basic_unit',
+                'net_selling_price_calculated_unit',
+                'net_selling_price_aggregate_unit',
+                'net_selling_price_the_largest_unit',
+                'net_purchase_price_commercial_unit_after_discounts',
+                'net_purchase_price_basic_unit_after_discounts',
+                'net_purchase_price_calculated_unit_after_discounts',
+                'net_purchase_price_aggregate_unit_after_discounts',
+                'net_purchase_price_the_largest_unit_after_discounts'
+            ] as $column) {
+                $item->product->$column = $item->$column;
+            }
+
+            $vat = 1 + $item->product->vat / 100;
+
+            foreach ([
+                'selling_price_calculated_unit',
+                'selling_price_basic_uni',
+                'selling_price_aggregate_unit',
+                'selling_price_the_largest_unit'
+            ] as $column) {
+                $kGross = "gross_$column";
+                $kNet = "net_$column";
+                $item->product->$kGross = round($item->$kNet * $vat, 2);
+            }
+
+            $item->product->gross_price_of_packing = round($item->net_selling_price_commercial_unit * $vat, 2);
+            $item->product->amount = $item->quantity;
+
+            $products[] = $item->product;
+        }
+
+        return response(json_encode($products));
     }
 }
