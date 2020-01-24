@@ -297,7 +297,7 @@ class OrdersController extends Controller
 
     private function updateOrderAddress($order, $deliveryAddress, $type, $phone)
     {
-        $phone = preg_replace('/[^0-9]/', $phone);
+        $phone = preg_replace('/[^0-9]/', '', $phone);
         
         if (!is_array($deliveryAddress)) {
             $deliveryAddress = [];
