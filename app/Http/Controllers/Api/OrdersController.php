@@ -169,6 +169,10 @@ class OrdersController extends Controller
             $order->customer_notices = $data['customer_notices'];
         }
 
+        if (!empty($data['shipping_abroad'])) {
+            $order->shipping_abroad = 1;
+        }
+
         $order->save();
 
         $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone']);
