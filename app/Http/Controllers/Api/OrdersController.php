@@ -209,7 +209,7 @@ class OrdersController extends Controller
         }
         $customer = Customer::where('login', $login)->first();
         //TODO update old passwords
-        if ($customer && !Hash::check($pass, $customer->password) && md5($pass) != md5($customer->password)) {
+        if ($customer && !Hash::check($pass, $customer->password) && md5($pass) != $customer->password) {
             $this->error_code = 'wrong_password';
             throw new \Exception();
         }
