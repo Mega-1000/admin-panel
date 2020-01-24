@@ -163,8 +163,6 @@ class OrdersController extends Controller
             $this->assignEmployeeToOrder($order, $customer);
         }
 
-        $this->assignItemsToOrder($order, $data['order_items']);
-
         if (!empty($data['customer_notices'])) {
             $order->customer_notices = $data['customer_notices'];
         }
@@ -174,6 +172,8 @@ class OrdersController extends Controller
         }
 
         $order->save();
+
+        $this->assignItemsToOrder($order, $data['order_items']);
 
         $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone']);
         $this->updateOrderAddress($order, $data['invoice_address'] ?? [], 'INVOICE_ADDRESS', $data['phone']);
