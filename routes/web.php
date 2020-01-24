@@ -19,13 +19,7 @@ Route::get('/', function () {
 });
 
 Route::get('/test', function() {
-    $order = Order::find(1228);
-    $proformDate = \Carbon\Carbon::now()->format('m-Y');
-    $proformDate = str_replace('-', '/', $proformDate);
-    $date = \Carbon\Carbon::now()->toDateString();
-//    return view('pdf.proform', compact('now2'));
-    $pdf = PDF::loadView('pdf.proform', compact('date', 'proformDate', 'order'));
-    return $pdf->download('invoice.pdf');
+    return 'test';
 });
 
 Route::group(['prefix' => 'admin'], function () {
