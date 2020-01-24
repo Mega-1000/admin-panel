@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Entities\Order;
+use App\Entities\OrderItem;
 use App\Entities\Product;
 
 /**
@@ -227,7 +228,7 @@ class OrdersController extends Controller
                 throw new \Exception("Product {$item['id']} not found in database");
             }
 
-            $orderItem = new App\Entities\OrderItem();
+            $orderItem = new OrderItem();
             $orderItem->quantity = $item['amount'];
             $orderItem->product_id = $product->id;
             foreach ($this->getPriceColumns() as $column) {
