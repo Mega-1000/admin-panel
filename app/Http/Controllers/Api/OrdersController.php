@@ -137,7 +137,7 @@ class OrdersController extends Controller
         $order = null;
         $orderExists = false;
         if (!empty($data['cart_token'])) {
-            $order = Order::where('token', $data['cart_token'])->find();
+            $order = Order::where('token', $data['cart_token'])->first();
             $orderExists = true;
             if (!$order) {
                 throw new \Exception("Wrong cart_token");
@@ -145,7 +145,7 @@ class OrdersController extends Controller
         } else {
             $order = new Order();
         }
-        $customer = $this->getCustomerByLogin($data['customer_login']);
+        $customer = $this->getCustomerByLogin($data['customer_login'] ?? '');
 
         if (!$customer && !$orderExists) {
             throw new \Exception('Nie podano customer_login, pomimo że zamówienie nie istnieje.');
@@ -162,7 +162,7 @@ class OrdersController extends Controller
 
         $order->save();
 
-        if ($data['rewrite'] == 0) {
+        if (empty($data['rewrite'])) {
             $this->updateOrderAddress($order, $data['delivery_address'] ?? '', $data['invoice_address'] ?? '');
         }
 
