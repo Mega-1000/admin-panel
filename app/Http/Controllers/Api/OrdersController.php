@@ -24,6 +24,10 @@ use Illuminate\Support\Facades\Log;
 use App\Entities\Order;
 use App\Entities\OrderItem;
 use App\Entities\Product;
+use App\Entities\Customer;
+use App\Entities\CustomerAddress;
+use App\Entities\OrderAddress;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * Class OrdersController
@@ -146,7 +150,7 @@ class OrdersController extends Controller
         } else {
             $order = new Order();
         }
-        $customer = $this->getCustomerByLogin($data['customer_login'] ?? '');
+        $customer = $this->getCustomerByLogin($data['customer_login'] ?? '', $data['phone'] ?? '');
 
         if (!$customer && !$orderExists) {
             throw new \Exception('Nie podano customer_login, pomimo że zamówienie nie istnieje.');
@@ -163,30 +167,38 @@ class OrdersController extends Controller
 
         $order->save();
 
-        if (empty($data['rewrite'])) {
-            $this->updateOrderAddress($order, $data['delivery_address'] ?? '', $data['invoice_address'] ?? '');
-        }
+        $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone']);
+        $this->updateOrderAddress($order, $data['invoice_address'] ?? [], 'INVOICE_ADDRESS', $data['phone']);
 
         return $order->id;
     }
 
-    private function getCustomerByLogin($login)
+    private function getCustomerByLogin($login, $pass)
     {
         if (empty($login)) {
             return null;
         }
-        $customer = $this->customerRepository->findByField('login', $login)->first();
+        $customer = Customer::where('login', $login)->first();
+        if ($customer && !Hash::check($pass, $customer->password)) {
+            throw new \Exception('Błędny adres e-mail lub hasło');
+        }
         if (!$customer) {
-            $customer = $this->customerRepository->create([
-                'login' => $login,
-                'email' => $login,
-                'password' => 'new_client_from_old_db',
-            ]);
-            $this->customerAddressRepository->create([
-                'type' => 'DELIVERY_ADDRESS',
-                'customer_id' => $customer->id,
-                'email' => $login,
-            ]);
+            $pass = preg_replace('/[^0-9]/', $pass);
+            if (strlen($pass) < 9) {
+                throw new \Exception('Podaj prawidłowy nr telefonu');
+            }
+            $customer = new Customer();
+            $customer->login = $login;
+            $customer->email = $login;
+            $customer->password = Hash::make($pass);
+            $customer->save();
+
+            $address = new CustomerAddress();
+            $address->type = 'DELIVERY_ADDRESS';
+            $address->email = $login;
+            $address->phone = $pass;
+
+            $customer->addresses()->save($address);
         }
         return $customer;
     }
@@ -251,38 +263,38 @@ class OrdersController extends Controller
         $order->weight = $weight;
     }
 
-    private function updateOrderAddress($order, $deliveryAddress, $invoiceAddress)
+    private function updateOrderAddress($order, $deliveryAddress, $type, $phone)
     {
-        if (!empty($deliveryAddress)) {
-            $this->orderAddressRepository->updateOrCreate(
-                [
-                    'order_id' => $order->id,
-                    'type' => 'DELIVERY_ADDRESS',
-                ],
-                array_merge(
-                    [
-                        'order_id' => $order->id,
-                        'type' => 'DELIVERY_ADDRESS',
-                    ],
-                    $deliveryAddress
-                )
-            );
+        $phone = preg_replace('/[^0-9]/', $phone);
+        
+        if (!is_array($deliveryAddress)) {
+            $deliveryAddress = [];
         }
-        if (!empty($invoiceAddress)) {
-            $this->orderAddressRepository->updateOrCreate(
-                [
-                    'order_id' => $order->id,
-                    'type' => 'INVOICE_ADDRESS',
-                ],
-                array_merge(
-                    [
-                        'order_id' => $order->id,
-                        'type' => 'INVOICE_ADDRESS',
-                    ],
-                    $invoiceAddress
-                )
-            );
+
+        $address = $order->addresses()->where('type', $type)->first();
+        
+        if (!$address) {
+            $address = new OrderAddress();
+            $address->phone = $phone;
+            $address->type = $type;
         }
+
+        foreach ([
+            'firstname',
+            'lastname',
+            'firmname',
+            'nip',
+            'address',
+            'flat_number',
+            'city',
+            'postal_code'
+        ] as $column) {
+            if (!empty($deliveryAddress[$column])) {
+                $address->$column = $deliveryAddress[$column];
+            }
+        }
+
+        $order->addresses()->save($address);
     }
 
     public function storeMessage(StoreOrderMessageRequest $request)
