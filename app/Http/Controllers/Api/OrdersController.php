@@ -165,6 +165,10 @@ class OrdersController extends Controller
 
         $this->assignItemsToOrder($order, $data['order_items']);
 
+        if (!empty($data['customer_notices'])) {
+            $order->customer_notices = $data['customer_notices'];
+        }
+
         $order->save();
 
         $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone']);
