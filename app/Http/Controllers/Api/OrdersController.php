@@ -169,11 +169,11 @@ class OrdersController extends Controller
         } else {
             $order = new Order();
         }
-        $customer = $this->getCustomerByLogin($data['customer_login'] ?? '', $data['phone'] ?? '');
 
-        if (!$customer && !$orderExists) {
-            $this->error_code = 'missing_customer_login';
-            throw new \Exception();
+        if ($orderExists) {
+            $customer = $order->customer;
+        } else {
+            $customer = $this->getCustomerByLogin($data['customer_login'] ?? '', $data['phone'] ?? '');
         }
 
         $order->customer_id = $customer->id;
@@ -204,7 +204,8 @@ class OrdersController extends Controller
     private function getCustomerByLogin($login, $pass)
     {
         if (empty($login)) {
-            return null;
+            $this->error_code = 'missing_customer_login';
+            throw new \Exception();
         }
         $customer = Customer::where('login', $login)->first();
         if ($customer && !Hash::check($pass, $customer->password)) {
