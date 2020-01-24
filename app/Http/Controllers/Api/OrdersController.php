@@ -198,7 +198,7 @@ class OrdersController extends Controller
             throw new \Exception();
         }
         if (!$customer) {
-            $pass = preg_replace('/[^0-9]/', $pass);
+            $pass = preg_replace('/[^0-9]/', '', $pass);
             if (strlen($pass) < 9) {
                 $this->error = 'Podaj prawidłowy nr telefonu';
                 throw new \Exception();
