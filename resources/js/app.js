@@ -25,9 +25,11 @@ Settings.defaultLocale = 'pl'
  *
  * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
  */
+const files = require.context('./', true, /\.vue$/i).keys();
 
-const files = require.context('./', true, /\.vue$/i)
-files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key)))
+files.forEach(file => {
+    Vue.component(file.split('/').pop().split('.')[0], () => import(`${file}`));
+});
 
 // Vue.component('example-component', require('./components/ExampleComponent.vue'));
 
