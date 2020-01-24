@@ -70,7 +70,18 @@ class OrdersController extends Controller
     /** @var UzytkownicyRepository */
     protected $uzytkownicyRepository;
 
-    private $error = '';
+    private $error_code = null;
+
+    private $errors = [
+        'missing_products' => 'Musisz dodać przynajmniej jeden produkt do koszyka.',
+        'wrong_cart_token' => 'Błędny token zamówienia',
+        'missing_customer_login' => 'Musisz podać login',
+        'wrong_password' => 'Błędny adres e-mail lub hasło',
+        'wrong_phone' => 'Podaj prawidłowy nr telefonu',
+        'wrong_product_id' => null
+    ];
+
+    private $defaultError = 'Wystąpił wewnętrzny błąd systemu przy składaniu zamówienia. Dział techniczny został o tym poinformowany.';
 
     /**
      * OrdersController constructor.
@@ -128,19 +139,22 @@ class OrdersController extends Controller
             return $this->createdResponse(['order_id' => $id]);
         } catch (\Exception $e) {
             DB::rollBack();
-            $message = $this->error ?: $e->getMessage();
-            Log::error('Problem with create new order :' . $message,
+            $message = $this->errors[$this->error_code] ?? $e->getMessage();
+            Log::error("Problem with create new order: [{$this->error_code}] $message",
                 ['request' => $data, 'class' => get_class($this), 'line' => __LINE__]
             );
-            $message = $this->error ?: 'Wystąpił wewnętrzny błąd systemu przy składaniu zamówienia. Dział techniczny został o tym poinformowany.';
-            return response($message, 400);
+            $message = $this->errors[$this->error_code] ?? $this->defaultError;
+            return response(json_encode([
+                'error_code' => $this->error_code,
+                'error_message' => $message
+            ]), $this->error_code ? 400 : 500);
         }
     }
 
     private function newStore($data)
     {
         if (empty($data['order_items']) || !is_array($data['order_items'])) {
-            $this->error = "Missing products";
+            $this->error_code = 'missing_products';
             throw new \Exception();
         }
         $order = null;
@@ -149,7 +163,7 @@ class OrdersController extends Controller
             $order = Order::where('token', $data['cart_token'])->first();
             $orderExists = true;
             if (!$order) {
-                $this->error = "Wrong cart_token";
+                $this->error_code = 'wrong_cart_token';
                 throw new \Exception();
             }
         } else {
@@ -158,7 +172,7 @@ class OrdersController extends Controller
         $customer = $this->getCustomerByLogin($data['customer_login'] ?? '', $data['phone'] ?? '');
 
         if (!$customer && !$orderExists) {
-            $this->error = 'Nie podano customer_login, pomimo że zamówienie nie istnieje.';
+            $this->error_code = 'missing_customer_login';
             throw new \Exception();
         }
 
@@ -194,13 +208,13 @@ class OrdersController extends Controller
         }
         $customer = Customer::where('login', $login)->first();
         if ($customer && !Hash::check($pass, $customer->password)) {
-            $this->error = 'Błędny adres e-mail lub hasło';
+            $this->error_code = 'wrong_password';
             throw new \Exception();
         }
         if (!$customer) {
             $pass = preg_replace('/[^0-9]/', '', $pass);
             if (strlen($pass) < 9) {
-                $this->error = 'Podaj prawidłowy nr telefonu';
+                $this->error_code = 'wrong_phone';
                 throw new \Exception();
             }
             $customer = new Customer();
@@ -253,7 +267,7 @@ class OrdersController extends Controller
             $product = Product::find($item['id']);
             $price = $product->price;
             if (!$product || !$price) {
-                $this->error = "Product {$item['id']} not found in database";
+                $this->error_code = 'wrong_product_id';
                 throw new \Exception();
             }
 
