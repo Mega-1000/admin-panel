@@ -96,4 +96,10 @@ class CustomersController extends Controller
             die();
         }
     }
+
+    public function emailExists(Request $request, $email)
+    {
+        $customer = \App\Entities\Customer::where('login', $email)->first();
+        return response($customer ? 1 : 0);
+    }
 }
