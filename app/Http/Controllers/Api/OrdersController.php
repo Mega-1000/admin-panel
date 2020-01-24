@@ -195,8 +195,8 @@ class OrdersController extends Controller
 
         $this->assignItemsToOrder($order, $data['order_items']);
 
-        $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone']);
-        $this->updateOrderAddress($order, $data['invoice_address'] ?? [], 'INVOICE_ADDRESS', $data['phone']);
+        $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone'] ?? '');
+        $this->updateOrderAddress($order, $data['invoice_address'] ?? [], 'INVOICE_ADDRESS', $data['phone'] ?? '');
 
         return $order->id;
     }
