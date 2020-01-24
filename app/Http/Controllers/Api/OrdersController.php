@@ -240,7 +240,7 @@ class OrdersController extends Controller
             }
             $orderTotal += $orderItem->net_selling_price_commercial_unit * $orderItem->quantity;
 
-            $order->items()->save($orderTotal);
+            $order->items()->save($orderItem);
 
             if (!empty($product->weight_trade_unit)) {
                 $weight += $product->weight_trade_unit * $orderItem->quantity;
