@@ -220,7 +220,6 @@ class OrdersController extends Controller
             }
             $customer = new Customer();
             $customer->login = $login;
-            $customer->email = $login;
             $customer->password = Hash::make($pass);
             $customer->save();
 
