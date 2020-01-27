@@ -301,6 +301,7 @@ class OrdersController extends Controller
         switch ($relation) {
             case 'order':
                 $address = $order->addresses()->where('type', $type)->first();
+                $obj = $order;
                 if (!$address) {
                     $address = new OrderAddress();
                     $address->phone = $phone;
@@ -309,6 +310,7 @@ class OrdersController extends Controller
                 break;
             case 'customer':
                 $address = $order->customer->addresses()->where('type', $type)->first();
+                $obj = $order->customer;
                 if (!$address) {
                     $address = new CustomerAddress();
                     $address->email = $login;
@@ -336,7 +338,8 @@ class OrdersController extends Controller
             }
         }
 
-        $order->addresses()->save($address);
+
+        $obj->addresses()->save($address);
     }
 
     public function storeMessage(StoreOrderMessageRequest $request)
