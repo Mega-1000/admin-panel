@@ -308,7 +308,7 @@ class OrdersController extends Controller
                 }
                 break;
             case 'customer':
-                $address = $order->customer()->addresses()->where('type', $type)->first();
+                $address = $order->customer->addresses()->where('type', $type)->first();
                 if (!$address) {
                     $address = new CustomerAddress();
                     $address->email = $login;
