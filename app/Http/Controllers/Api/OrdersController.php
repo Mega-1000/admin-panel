@@ -195,8 +195,10 @@ class OrdersController extends Controller
 
         $this->assignItemsToOrder($order, $data['order_items']);
 
-        $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone'] ?? '');
-        $this->updateOrderAddress($order, $data['invoice_address'] ?? [], 'INVOICE_ADDRESS', $data['phone'] ?? '');
+        $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone'] ?? '', 'order');
+        $this->updateOrderAddress($order, $data['invoice_address'] ?? [], 'INVOICE_ADDRESS', $data['phone'] ?? '', 'order');
+        $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'STANDARD_ADDRESS', $data['phone'] ?? '', 'customer', $data['customer_login'] ?? '');
+        $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone'] ?? '', 'customer', $data['customer_login'] ?? '');
 
         return $order->id;
     }
@@ -223,13 +225,6 @@ class OrdersController extends Controller
             $customer->login = $login;
             $customer->password = Hash::make($pass);
             $customer->save();
-
-            $address = new CustomerAddress();
-            $address->type = 'DELIVERY_ADDRESS';
-            $address->email = $login;
-            $address->phone = $pass;
-
-            $customer->addresses()->save($address);
         }
         return $customer;
     }
@@ -295,7 +290,7 @@ class OrdersController extends Controller
         $order->weight = $weight;
     }
 
-    private function updateOrderAddress($order, $deliveryAddress, $type, $phone)
+    private function updateOrderAddress($order, $deliveryAddress, $type, $phone, $relation, $login = '')
     {
         $phone = preg_replace('/[^0-9]/', '', $phone);
         
@@ -303,12 +298,27 @@ class OrdersController extends Controller
             $deliveryAddress = [];
         }
 
-        $address = $order->addresses()->where('type', $type)->first();
-        
-        if (!$address) {
-            $address = new OrderAddress();
-            $address->phone = $phone;
-            $address->type = $type;
+        switch ($relation) {
+            case 'order':
+                $address = $order->addresses()->where('type', $type)->first();
+                if (!$address) {
+                    $address = new OrderAddress();
+                    $address->phone = $phone;
+                    $address->type = $type;
+                }
+                break;
+            case 'customer':
+                $address = $order->customer()->addresses()->where('type', $type)->first();
+                if (!$address) {
+                    $address = new CustomerAddress();
+                    $address->email = $login;
+                    $address->phone = $phone;
+                    $address->type = $type;
+                }
+                break;
+            default:
+                $this->error_code = 'exception';
+                throw new \Exception('Unsupported order address relation');
         }
 
         foreach ([
