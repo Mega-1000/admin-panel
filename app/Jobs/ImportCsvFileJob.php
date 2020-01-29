@@ -354,7 +354,9 @@ class ImportCsvFileJob implements ShouldQueue
 
         if ($item !== null) {
             $product = $this->productRepository->update($array, $item->id);
-            $this->productPriceRepository->update(array_merge(['product_id', $product->id], $array), $product->id);
+            if (!$array['subject_to_price_change']) {
+                $this->productPriceRepository->update(array_merge(['product_id', $product->id], $array), $product->id);
+            }
             $this->productPackingRepository->update(array_merge(['product_id', $product->id], $array), $product->id);
         } else {
             $product = $this->productRepository->create($array);
@@ -499,30 +501,6 @@ class ImportCsvFileJob implements ShouldQueue
                 if ($key !== 'symbol') {
                     $value       = str_replace(',', '.', $value);
                     $array[$key] = $value;
-                }
-            }
-            if ($key === 'subject_to_price_change') {
-                if ($value == '1') {
-                    unset($array['net_purchase_price_commercial_unit']);
-                    unset($array['net_purchase_price_calculated_unit']);
-                    unset($array['net_purchase_price_basic_unit']);
-                    unset($array['net_purchase_price_aggregate_unit']);
-                    unset($array['net_purchase_price_the_largest_unit']);
-                    unset($array['net_purchase_price_commercial_unit_after_discounts']);
-                    unset($array['net_purchase_price_calculated_unit_after_discounts']);
-                    unset($array['net_purchase_price_basic_unit_after_discounts']);
-                    unset($array['net_purchase_price_aggregate_unit_after_discounts']);
-                    unset($array['net_purchase_price_the_largest_unit_after_discounts']);
-                    unset($array['net_special_price_commercial_unit']);
-                    unset($array['net_special_price_calculated_unit']);
-                    unset($array['net_special_price_basic_unit']);
-                    unset($array['net_special_price_aggregate_unit']);
-                    unset($array['net_special_price_the_largest_unit']);
-                    unset($array['net_selling_price_commercial_unit']);
-                    unset($array['net_selling_price_basic_unit']);
-                    unset($array['net_selling_price_calculated_unit']);
-                    unset($array['net_selling_price_aggregate_unit']);
-                    unset($array['net_selling_price_the_largest_unit']);
                 }
             }
             /** MT-19 checking if url for product image exists and changing prefix of path to match server path */
