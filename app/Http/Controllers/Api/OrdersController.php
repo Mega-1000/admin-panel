@@ -559,7 +559,7 @@ class OrdersController extends Controller
 
     public function getAll(Request $request)
     {
-        return $request->user()->orders()
+        $orders = $request->user()->orders()
             ->with('status')
             ->with(['items' => function($q) {
                 $q->with('product');
@@ -571,8 +571,13 @@ class OrdersController extends Controller
             ->with('invoices')
             ->orderBy('id', 'desc')
             ->get()
-            ->toJson()
         ;
+
+        foreach ($orders as $order) {
+            $order->total_sum = $order->getSumOfGrossValues();
+        }
+
+        return $orders->toJson();
     }
 
     public function getByToken(Request $request, $token)
