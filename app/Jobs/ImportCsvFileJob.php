@@ -124,6 +124,10 @@ class ImportCsvFileJob implements ShouldQueue
                     $this->saveCategory($line, $categoryTree, $categoryColumn);
                 } else {
                     $product = $this->saveProduct($array, $categoryTree);
+                    $media = $this->getProductsMedia($line);
+                    if ($media) {
+                        $this->createProductMedia($media, $product);
+                    }
                     if (!empty($multiCalcBase)) {
                         $this->productsRelated[$multiCalcBase] = $product->id;
                     } elseif (!empty($multiCalcCurrent) && !empty($this->productsRelated[$multiCalcCurrent])) {
@@ -151,12 +155,14 @@ class ImportCsvFileJob implements ShouldQueue
             'parent_id' => null
         ]);
         Entities\Product::where('symbol', '')->orWhereNull('symbol')->delete();
+        DB::table('product_media')->delete();
         DB::table('chimney_replacements')->delete();
         DB::table('chimney_products')->delete();
         DB::table('chimney_attribute_options')->delete();
         DB::table('chimney_attributes')->delete();
         DB::table('categories')->delete();
         DB::statement("ALTER TABLE categories AUTO_INCREMENT = 1;");
+        DB::statement("ALTER TABLE product_media AUTO_INCREMENT = 1;");
         DB::statement("ALTER TABLE chimney_replacements AUTO_INCREMENT = 1;");
         DB::statement("ALTER TABLE chimney_products AUTO_INCREMENT = 1;");
         DB::statement("ALTER TABLE chimney_attribute_options AUTO_INCREMENT = 1;");
@@ -353,8 +359,6 @@ class ImportCsvFileJob implements ShouldQueue
         $category = $this->getCategoryParent($categoryTree, $array);
         $array['category_id'] = $category['id'] ?: null;
         if ($item !== null) {
-            $prod = Entities\Product::find($item->id);
-            $this->updateMedia($array, $prod);
             $product = $this->productRepository->update($array, $item->id);
             if (!$array['subject_to_price_change']) {
                 $this->productPriceRepository->update(array_merge(['product_id', $product->id], $array), $product->id);
@@ -362,13 +366,6 @@ class ImportCsvFileJob implements ShouldQueue
             $this->productPackingRepository->update(array_merge(['product_id', $product->id], $array), $product->id);
         } else {
             $product = $this->productRepository->create($array);
-            foreach ($array['media'] as $link) {
-                $newMedia = new Entities\ProductMedia;
-                $newMedia->product_id = $product->id;
-                $newMedia->url = $link['url'];
-                $newMedia->description = $link['description'];
-                $newMedia->save();
-            }
 
             $this->productPriceRepository->create(array_merge(['product_id' => $product->id], $array));
             $this->productPackingRepository->create(array_merge(['product_id' => $product->id], $array));
@@ -496,8 +493,7 @@ class ImportCsvFileJob implements ShouldQueue
             'gross_selling_price_aggregate_unit' => $line[255],
             'gross_selling_price_the_largest_unit' => $line[256],
             'show_on_page' => $this->getShowOnPageParameter($line, $categoryColumn),
-            'priority' => $this->getProductsOrder($line, $categoryColumn),
-            'media' => $this->getProductsMedia($line)
+            'priority' => $this->getProductsOrder($line, $categoryColumn)
         ];
 
         foreach ($array as $key => $value) {
@@ -565,14 +561,10 @@ class ImportCsvFileJob implements ShouldQueue
     public function getProductsMedia($line)
     {
         $media = [];
-        if (!empty($line[304])) {
-            $media[] = $this->prepareMediaData($line[304]);
-        }
-        if (!empty($line[305])) {
-            $media[] = $this->prepareMediaData($line[305]);
-        }
-        if (!empty($line[306])) {
-            $media[] = $this->prepareMediaData($line[306]);
+        for ($i = 304; $i <= 306; $i++) {
+            if (!empty($line[$i])) {
+                $media[] = $this->prepareMediaData($line[$i]);
+            }
         }
         return $media;
     }
@@ -583,29 +575,14 @@ class ImportCsvFileJob implements ShouldQueue
         return ['url' => $temp[0], 'description' => $temp[1]];
     }
 
-    private function updateMedia($productFromCSV, $productFromDb)
+    private function createProductMedia(array $media, $product)
     {
-        for ($i = 0; $i <= 2; $i++) {
-            $mediaFromCSV = isset($productFromCSV['media'][$i]) ? $productFromCSV['media'][$i] : false;
-            if ($mediaFromCSV) {
-                $mediaEntity = $productFromDb->media->get($i);
-                if (null !== $mediaEntity) {
-                    $mediaEntity->url = $mediaFromCSV['url'];
-                    $mediaEntity->description = $mediaFromCSV['description'];
-                    $mediaEntity->save();
-                } else {
-                    $newMedia = new Entities\ProductMedia;
-                    $newMedia->product_id = $productFromDb->id;
-                    $newMedia->url = $mediaFromCSV['url'];
-                    $newMedia->description = $mediaFromCSV['description'];
-                    $newMedia->save();
-                }
-            } else {
-                $mediaEntity = $productFromDb->media->get($i);
-                if (null !== $mediaEntity) {
-                    $mediaEntity->delete();
-                }
-            }
+        foreach ($media as $link) {
+            $newMedia = new Entities\ProductMedia;
+            $newMedia->product_id = $product->id;
+            $newMedia->url = $link['url'];
+            $newMedia->description = $link['description'];
+            $newMedia->save();
         }
     }
 
