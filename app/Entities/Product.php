@@ -195,6 +195,11 @@ class Product extends Model implements Transformable
         return $this->belongsTo(self::class, 'parent_id', 'id');
     }
 
+    public function media()
+    {
+        return $this->hasMany(ProductMedia::class);
+    }
+
     public function children()
     {
         return $this->hasMany(self::class, 'parent_id', 'id');

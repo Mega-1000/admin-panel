@@ -32,12 +32,13 @@ class ImportCsvFileJob implements ShouldQueue
         InteractsWithQueue,
         Queueable,
         SerializesModels;
+
     protected $path;
     protected $startRow;
     protected $imgStoragePath;
     public $timeout = 3600;
-    public $tries   = 1;
-    
+    public $tries = 1;
+
     private $productRepository;
     private $productPackingRepository;
     private $productPriceRepository;
@@ -56,9 +57,9 @@ class ImportCsvFileJob implements ShouldQueue
      */
     public function __construct(int $startRow = 0)
     {
-        $this->path           = Storage::path('public/Baza.csv');
+        $this->path = Storage::path('public/Baza.csv');
         $this->imgStoragePath = 'products';
-        $this->startRow       = $startRow;
+        $this->startRow = $startRow;
     }
 
     /**
@@ -83,7 +84,7 @@ class ImportCsvFileJob implements ShouldQueue
     {
         $handle = fopen($this->path, 'rb');
         if (!$handle) {
-            throw new FileNotFoundException('CSV file "'.$this->path.'" not found');
+            throw new FileNotFoundException('CSV file "' . $this->path . '" not found');
         }
 
         $this->productRepository = $productRepository;
@@ -95,19 +96,19 @@ class ImportCsvFileJob implements ShouldQueue
         $this->clearTables();
 
         $data = Carbon::now();
-        Log::channel('import')->info('Import start: '.$data);
+        Log::channel('import')->info('Import start: ' . $data);
 
         $time = microtime(true);
         for ($i = 1; $line = fgetcsv($handle, 0, ';'); $i++) {
             $this->currentLine = $i;
             if ($i % 100 === 0) {
-                echo $i.' - time '.round(microtime(true) - $time, 3)."\n";
+                echo $i . ' - time ' . round(microtime(true) - $time, 3) . "\n";
                 $time = microtime(true);
             }
             if ($i <= $this->startRow) {
                 continue;
             }
-            
+
             //intentional variable assigning here, not an error
             if (!$categoryColumn = $this->getCategoryColumn($line)) {
                 continue;
@@ -123,6 +124,10 @@ class ImportCsvFileJob implements ShouldQueue
                     $this->saveCategory($line, $categoryTree, $categoryColumn);
                 } else {
                     $product = $this->saveProduct($array, $categoryTree);
+                    $media = $this->getProductsMedia($line);
+                    if ($media) {
+                        $this->createProductMedia($media, $product);
+                    }
                     if (!empty($multiCalcBase)) {
                         $this->productsRelated[$multiCalcBase] = $product->id;
                     } elseif (!empty($multiCalcCurrent) && !empty($this->productsRelated[$multiCalcCurrent])) {
@@ -131,7 +136,7 @@ class ImportCsvFileJob implements ShouldQueue
                     }
                 }
             } catch (\Exception $e) {
-                Log::channel('import')->debug("Row $i EXCEPTION: ".$e->getMessage());
+                Log::channel('import')->debug("Row $i EXCEPTION: " . $e->getMessage());
             }
         }
         DB::table('import')->where('id', 1)->update(
@@ -140,7 +145,7 @@ class ImportCsvFileJob implements ShouldQueue
         DB::table('import')->where('id', 2)->update(
             ['name' => 'Import products done', 'last_import' => Carbon::now()]
         );
-        Log::channel('import')->info('Import end: '.Carbon::now());
+        Log::channel('import')->info('Import end: ' . Carbon::now());
     }
 
     private function clearTables()
@@ -150,12 +155,14 @@ class ImportCsvFileJob implements ShouldQueue
             'parent_id' => null
         ]);
         Entities\Product::where('symbol', '')->orWhereNull('symbol')->delete();
+        DB::table('product_media')->delete();
         DB::table('chimney_replacements')->delete();
         DB::table('chimney_products')->delete();
         DB::table('chimney_attribute_options')->delete();
         DB::table('chimney_attributes')->delete();
         DB::table('categories')->delete();
         DB::statement("ALTER TABLE categories AUTO_INCREMENT = 1;");
+        DB::statement("ALTER TABLE product_media AUTO_INCREMENT = 1;");
         DB::statement("ALTER TABLE chimney_replacements AUTO_INCREMENT = 1;");
         DB::statement("ALTER TABLE chimney_products AUTO_INCREMENT = 1;");
         DB::statement("ALTER TABLE chimney_attribute_options AUTO_INCREMENT = 1;");
@@ -164,10 +171,10 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function getUrl($url)
     {
-        $imgUrlExploded           = explode('\\', $url);
-        $imgUrlExploded           = end($imgUrlExploded);
-        $imgUrlWebsite            = $this->imgStoragePath.DIRECTORY_SEPARATOR.$imgUrlExploded;
-        $imgUrlWebsite            = Storage::url($imgUrlWebsite);
+        $imgUrlExploded = explode('\\', $url);
+        $imgUrlExploded = end($imgUrlExploded);
+        $imgUrlWebsite = $this->imgStoragePath . DIRECTORY_SEPARATOR . $imgUrlExploded;
+        $imgUrlWebsite = Storage::url($imgUrlWebsite);
         return $imgUrlWebsite;
     }
 
@@ -178,7 +185,7 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function getProductsOrder(array $line, int $columnIterator)
     {
-        return ((int) $line[$columnIterator + 7]) ?: 1000000;
+        return ((int)$line[$columnIterator + 7]) ?: 1000000;
     }
 
     private function saveCategory($line, $categoryTree, $categoryColumn)
@@ -215,7 +222,7 @@ class ImportCsvFileJob implements ShouldQueue
     private function &getCategoryParent($categoryTree, $isProduct = false)
     {
         $current = &$this->categories;
-        $iMax = count($categoryTree) -  ($isProduct ? 0 : 1);
+        $iMax = count($categoryTree) - ($isProduct ? 0 : 1);
         foreach ($categoryTree as $i => $cat) {
             if (isset($current['children'][$cat])) {
                 $current = &$current['children'][$cat];
@@ -243,7 +250,7 @@ class ImportCsvFileJob implements ShouldQueue
         }
         return $current;
     }
-    
+
     private function appendChimneyAttributes($category, $line)
     {
         $start = 407;
@@ -315,7 +322,7 @@ class ImportCsvFileJob implements ShouldQueue
         $replacements = [];
         $start = 462;
         for ($i = $start; $i < 518; $i += 4) {
-            if (empty($line[$i]) || empty($line[$i+1]) || empty($line[$i+2]) || empty($line[$i+3])) {
+            if (empty($line[$i]) || empty($line[$i + 1]) || empty($line[$i + 2]) || empty($line[$i + 3])) {
                 continue;
             }
             $arrs = explode('//', $line[$i + 2]);
@@ -351,7 +358,6 @@ class ImportCsvFileJob implements ShouldQueue
 
         $category = $this->getCategoryParent($categoryTree, $array);
         $array['category_id'] = $category['id'] ?: null;
-
         if ($item !== null) {
             $product = $this->productRepository->update($array, $item->id);
             if (!$array['subject_to_price_change']) {
@@ -360,6 +366,7 @@ class ImportCsvFileJob implements ShouldQueue
             $this->productPackingRepository->update(array_merge(['product_id', $product->id], $array), $product->id);
         } else {
             $product = $this->productRepository->create($array);
+
             $this->productPriceRepository->create(array_merge(['product_id' => $product->id], $array));
             $this->productPackingRepository->create(array_merge(['product_id' => $product->id], $array));
             $this->productStockRepository->create([
@@ -400,10 +407,10 @@ class ImportCsvFileJob implements ShouldQueue
             'numbers_of_basic_commercial_units_in_pack' => $line[73],
             'number_of_sale_units_in_the_pack' => $line[74],
             'number_of_trade_items_in_the_largest_unit' => $line[75],
-            'weight_collective_unit' => (float) $line[103],
-            'weight_trade_unit' => (float) $line[100],
-            'weight_biggest_unit' => (float) $line[104],
-            'weight_base_unit' => (float) $line[102],
+            'weight_collective_unit' => (float)$line[103],
+            'weight_trade_unit' => (float)$line[100],
+            'weight_biggest_unit' => (float)$line[104],
+            'weight_base_unit' => (float)$line[102],
             'net_purchase_price_commercial_unit' => $line[116],
             'net_purchase_price_calculated_unit' => $line[117],
             'net_purchase_price_basic_unit' => $line[118],
@@ -491,15 +498,15 @@ class ImportCsvFileJob implements ShouldQueue
 
         foreach ($array as $key => $value) {
             if ($key === 'description' || $key === 'name' || $key === 'url') {
-                $value       = iconv("utf-8", "ascii//IGNORE", $value);
+                $value = iconv("utf-8", "ascii//IGNORE", $value);
                 $array[$key] = $value;
             }
             if ($value === '#ARG!' || $value === '#DZIEL/0!' || $value === '$ADR!') {
                 unset($array[$key]);
             }
-            if (strpos($value, ',') !== false) {
+            if (is_string($value) && strpos($value, ',') !== false) {
                 if ($key !== 'symbol') {
-                    $value       = str_replace(',', '.', $value);
+                    $value = str_replace(',', '.', $value);
                     $array[$key] = $value;
                 }
             }
@@ -550,4 +557,33 @@ class ImportCsvFileJob implements ShouldQueue
             )
         );
     }
+
+    public function getProductsMedia($line)
+    {
+        $media = [];
+        for ($i = 304; $i <= 306; $i++) {
+            if (!empty($line[$i])) {
+                $media[] = $this->prepareMediaData($line[$i]);
+            }
+        }
+        return $media;
+    }
+
+    public function prepareMediaData($line)
+    {
+        $temp = explode('||', $line);
+        return ['url' => $temp[0], 'description' => $temp[1]];
+    }
+
+    private function createProductMedia(array $media, $product)
+    {
+        foreach ($media as $link) {
+            $newMedia = new Entities\ProductMedia;
+            $newMedia->product_id = $product->id;
+            $newMedia->url = $link['url'];
+            $newMedia->description = $link['description'];
+            $newMedia->save();
+        }
+    }
+
 }
