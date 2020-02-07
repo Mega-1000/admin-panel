@@ -562,7 +562,10 @@ class OrdersController extends Controller
         $orders = $request->user()->orders()
             ->with('status')
             ->with(['items' => function($q) {
-                $q->with('product');
+                $q->with(['product' => function($w) {
+                    $w->with('packing')
+                        ->with('price');
+                }]);
             }])
             ->with('packages')
             ->with('payments')
@@ -647,7 +650,17 @@ class OrdersController extends Controller
             'net_purchase_price_basic_unit_after_discounts',
             'net_purchase_price_calculated_unit_after_discounts',
             'net_purchase_price_aggregate_unit_after_discounts',
-            'net_purchase_price_the_largest_unit_after_discounts'
+            'net_purchase_price_the_largest_unit_after_discounts',
+            'gross_selling_price_basic_unit',
+            'gross_purchase_price_basic_unit_after_discounts',
+            'gross_selling_price_commercial_unit',
+            'gross_purchase_price_commercial_unit_after_discounts',
+            'gross_selling_price_calculated_unit',
+            'gross_purchase_price_calculated_unit_after_discounts',
+            'gross_selling_price_aggregate_unit',
+            'gross_purchase_price_aggregate_unit_after_discounts',
+            'gross_selling_price_the_largest_unit',
+            'gross_purchase_price_the_largest_unit_after_discounts'
         ];
     }
 }
