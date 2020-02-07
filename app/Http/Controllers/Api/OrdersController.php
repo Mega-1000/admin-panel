@@ -293,7 +293,7 @@ class OrdersController extends Controller
     private function updateOrderAddress($order, $deliveryAddress, $type, $phone, $relation, $login = '')
     {
         $phone = preg_replace('/[^0-9]/', '', $phone);
-        
+
         if (!is_array($deliveryAddress)) {
             $deliveryAddress = [];
         }
@@ -576,6 +576,7 @@ class OrdersController extends Controller
 
         foreach ($orders as $order) {
             $order->total_sum = $order->getSumOfGrossValues();
+            $order->bookedPaymentsSum = $order->bookedPaymentsSum();
         }
 
         return $orders->toJson();
