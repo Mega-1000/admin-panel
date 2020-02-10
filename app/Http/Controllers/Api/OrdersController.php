@@ -197,8 +197,10 @@ class OrdersController extends Controller
 
         $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone'] ?? '', 'order');
         $this->updateOrderAddress($order, $data['invoice_address'] ?? [], 'INVOICE_ADDRESS', $data['phone'] ?? '', 'order');
-        $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'STANDARD_ADDRESS', $data['phone'] ?? '', 'customer', $data['customer_login'] ?? '');
-        $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone'] ?? '', 'customer', $data['customer_login'] ?? '');
+        if (isset($data['is_standard'])) {
+            $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'STANDARD_ADDRESS', $data['phone'] ?? '', 'customer', $data['customer_login'] ?? '');
+            $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone'] ?? '', 'customer', $data['customer_login'] ?? '');
+        }
 
         return $order->id;
     }
@@ -650,17 +652,7 @@ class OrdersController extends Controller
             'net_purchase_price_basic_unit_after_discounts',
             'net_purchase_price_calculated_unit_after_discounts',
             'net_purchase_price_aggregate_unit_after_discounts',
-            'net_purchase_price_the_largest_unit_after_discounts',
-            'gross_selling_price_basic_unit',
-            'gross_purchase_price_basic_unit_after_discounts',
-            'gross_selling_price_commercial_unit',
-            'gross_purchase_price_commercial_unit_after_discounts',
-            'gross_selling_price_calculated_unit',
-            'gross_purchase_price_calculated_unit_after_discounts',
-            'gross_selling_price_aggregate_unit',
-            'gross_purchase_price_aggregate_unit_after_discounts',
-            'gross_selling_price_the_largest_unit',
-            'gross_purchase_price_the_largest_unit_after_discounts'
+            'net_purchase_price_the_largest_unit_after_discounts'
         ];
     }
 }
