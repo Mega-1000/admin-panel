@@ -103,4 +103,16 @@ class CustomersController extends Controller
         $customer = \App\Entities\Customer::where('login', $email)->first();
         return response($customer ? 1 : 0);
     }
+
+    public function getDetails(Request $request)
+    {
+        $user = $request->user();
+        $user->addresses;
+        unset($user->password);
+        unset($user->id);
+        unset($user->id_from_old_db);
+        unset($user->nick_allegro);
+        unset($user->remember_token);
+        return $user;
+    }
 }

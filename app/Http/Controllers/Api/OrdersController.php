@@ -197,8 +197,10 @@ class OrdersController extends Controller
 
         $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone'] ?? '', 'order');
         $this->updateOrderAddress($order, $data['invoice_address'] ?? [], 'INVOICE_ADDRESS', $data['phone'] ?? '', 'order');
-        $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'STANDARD_ADDRESS', $data['phone'] ?? '', 'customer', $data['customer_login'] ?? '');
-        $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone'] ?? '', 'customer', $data['customer_login'] ?? '');
+        if (isset($data['is_standard']) && $data['is_standard'] || $order->customer->addresses()->count() < 2) {
+            $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'STANDARD_ADDRESS', $data['phone'] ?? '', 'customer', $data['customer_login'] ?? '');
+            $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone'] ?? '', 'customer', $data['customer_login'] ?? '');
+        }
 
         return $order->id;
     }
@@ -337,7 +339,6 @@ class OrdersController extends Controller
                 $address->$column = $deliveryAddress[$column];
             }
         }
-
 
         $obj->addresses()->save($address);
     }
@@ -526,6 +527,25 @@ class OrdersController extends Controller
         }
     }
 
+    public function updateOrderAddressEndpoint(Request $request, $orderId)
+    {
+        $order = Order::find($orderId);
+        if ($order == null) {
+            return response('Zamówienie nie zostało znalezione', 404);
+        }
+        $data = $request->all();
+        $isDeliverModificationForbidden = $order->labels()->whereIn('labels.id', [52, 53, 77])->count();
+        if ($data['address_type'] === 'DELIVERY_ADDRESS' && $isDeliverModificationForbidden) {
+            return response('Nie można edytować', 400);
+        }
+        $isInvoiceModificationForbidden = $order->labels()->whereIn('labels.id', [42, 120])->count();
+        if ($data['address_type'] === 'INVOICE_ADDRESS' && $isInvoiceModificationForbidden) {
+            return response('Nie można edytować', 400);
+        }
+        $this->updateOrderAddress($order, $data['order_params'] ?? [], $data['address_type'], $data['order_params']['phone'] ?? '', 'order');
+        return response('Success', 200);
+    }
+
     public function orderPackagesCancelled(Request $request, $id)
     {
         try {
@@ -562,7 +582,10 @@ class OrdersController extends Controller
         $orders = $request->user()->orders()
             ->with('status')
             ->with(['items' => function($q) {
-                $q->with('product');
+                $q->with(['product' => function($w) {
+                    $w->with('packing')
+                        ->with('price');
+                }]);
             }])
             ->with('packages')
             ->with('payments')
