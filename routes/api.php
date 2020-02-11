@@ -16,7 +16,7 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->group(function() {
     Route::get('/user', 'Api\CustomersController@getDetails')->name('api.customers.getdetails');
     Route::get('orders/getAll', 'Api\OrdersController@getAll')->name('api.orders.getall');
-    Route::post('orders/{orderId}/update-order-address', 'Api\OrdersController@updateOrderAddressEndpoint')->name('api.orders.update-order-addresses');
+    Route::post('orders/update-order-address/{orderId}', 'Api\OrdersController@updateOrderAddressEndpoint')->name('api.orders.update-order-addresses');
 });
 
 Route::get('custom/pages', 'Api\CustomPagesController@getPages')->name('api.custompages.get');

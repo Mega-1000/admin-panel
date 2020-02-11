@@ -197,7 +197,7 @@ class OrdersController extends Controller
 
         $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone'] ?? '', 'order');
         $this->updateOrderAddress($order, $data['invoice_address'] ?? [], 'INVOICE_ADDRESS', $data['phone'] ?? '', 'order');
-        if (isset($data['is_standard'])) {
+        if (isset($data['is_standard']) && $data['is_standard'] || $order->customer->addresses()->count() < 2) {
             $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'STANDARD_ADDRESS', $data['phone'] ?? '', 'customer', $data['customer_login'] ?? '');
             $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone'] ?? '', 'customer', $data['customer_login'] ?? '');
         }
@@ -339,7 +339,6 @@ class OrdersController extends Controller
                 $address->$column = $deliveryAddress[$column];
             }
         }
-
 
         $obj->addresses()->save($address);
     }
@@ -530,16 +529,16 @@ class OrdersController extends Controller
 
     public function updateOrderAddressEndpoint(Request $request, $orderId)
     {
-        $order = Order::where('id', $orderId)->first();
+        $order = Order::find($orderId);
         if ($order == null) {
             return response('Zamówienie nie zostało znalezione', 404);
         }
         $data = $request->all();
-        $isDeliverModificationForbidden = $order->labels()->whereIn('labels.id', [52, 53, 77])->get()->count();
+        $isDeliverModificationForbidden = $order->labels()->whereIn('labels.id', [52, 53, 77])->count();
         if ($data['address_type'] === 'DELIVERY_ADDRESS' && $isDeliverModificationForbidden) {
             return response('Nie można edytować', 400);
         }
-        $isInvoiceModificationForbidden = $order->labels()->whereIn('labels.id', [42, 120])->get()->count();
+        $isInvoiceModificationForbidden = $order->labels()->whereIn('labels.id', [42, 120])->count();
         if ($data['address_type'] === 'INVOICE_ADDRESS' && $isInvoiceModificationForbidden) {
             return response('Nie można edytować', 400);
         }
