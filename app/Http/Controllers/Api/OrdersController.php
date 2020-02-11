@@ -528,6 +528,25 @@ class OrdersController extends Controller
         }
     }
 
+    public function updateOrderAddressEndpoint(Request $request, $orderId)
+    {
+        $order = Order::where('id', $orderId)->first();
+        if ($order == null) {
+            return response('Zamówienie nie zostało znalezione', 404);
+        }
+        $data = $request->all();
+        $isDeliverModificationForbidden = $order->labels()->whereIn('labels.id', [52, 53, 77])->get()->count();
+        if ($data['address_type'] === 'DELIVERY_ADDRESS' && $isDeliverModificationForbidden) {
+            return response('Nie można edytować', 400);
+        }
+        $isInvoiceModificationForbidden = $order->labels()->whereIn('labels.id', [42, 120])->get()->count();
+        if ($data['address_type'] === 'INVOICE_ADDRESS' && $isInvoiceModificationForbidden) {
+            return response('Nie można edytować', 400);
+        }
+        $this->updateOrderAddress($order, $data['order_params'] ?? [], $data['address_type'], $data['order_params']['phone'] ?? '', 'order');
+        return response('Success', 200);
+    }
+
     public function orderPackagesCancelled(Request $request, $id)
     {
         try {
