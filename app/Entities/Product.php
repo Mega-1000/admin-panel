@@ -80,7 +80,7 @@ class Product extends Model implements Transformable
         'quality_to_price',
         'comments',
         'value_of_the_order_for_free_transport',
-        'show_on_page',
+        'show_on_page'
     ];
 
     public $customColumnsVisibilities = [
