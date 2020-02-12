@@ -80,17 +80,7 @@ class Product extends Model implements Transformable
         'quality_to_price',
         'comments',
         'value_of_the_order_for_free_transport',
-        'show_on_page',
-        'gross_selling_price_basic_unit',
-        'gross_purchase_price_basic_unit_after_discounts',
-        'gross_selling_price_commercial_unit',
-        'gross_purchase_price_commercial_unit_after_discounts',
-        'gross_selling_price_calculated_unit',
-        'gross_purchase_price_calculated_unit_after_discounts',
-        'gross_selling_price_aggregate_unit',
-        'gross_purchase_price_aggregate_unit_after_discounts',
-        'gross_selling_price_the_largest_unit',
-        'gross_purchase_price_the_largest_unit_after_discounts'
+        'show_on_page'
     ];
 
     public $customColumnsVisibilities = [
