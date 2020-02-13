@@ -27,7 +27,7 @@
         </tr>
         <tr>
             <td>
-            <img width="100%" src="{!! str_replace('C:\\z\\', 'https://mega1000.pl/z/', $item->product->url) !!}">
+            <img width="100%" src="{!! str_replace('C:\\z\\', env('APP_URL') . 'storage/', $item->product->url) !!}">
             </td>
         </tr>
         <tr class="id row-{{$item->id}}" id="id[{{$item->id}}]">
