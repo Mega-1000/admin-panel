@@ -77,7 +77,7 @@
         @foreach($order->items as $item)
             <tr>
                 <td style="width:100px"><img
-                        src="{!! str_replace('C:\\z\\', env('APP_URL') . 'storage/', $item->product->url) !!}"
+                        src="{!! str_replace('C:\\z\\', env('APP_URL') . 'storage/products/', $item->product->url) !!}"
                         alt="{{ $item->product->name }}"
                         style="width:70px"/></td>
                 <td><span

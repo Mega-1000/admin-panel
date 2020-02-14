@@ -432,7 +432,7 @@
                         $weight += $item->product->weight_trade_unit * $item->quantity;
                     @endphp
                     <tr class="id row-{{$item->id}}" id="id[{{$item->id}}]">
-                        <td colspan="4"><h4><img src="{!! str_replace('C:\\z\\', env('APP_URL') . 'storage/', $item->product->url) !!}" style="width: 179px; height: 130px;"><strong>{{ $loop->iteration }}. </strong>{{ $item->product->name }} (symbol: {{ $item->product->symbol }}) </h4></td>
+                        <td colspan="4"><h4><img src="{!! str_replace('C:\\z\\', env('APP_URL') . 'storage/products/', $item->product->url) !!}" style="width: 179px; height: 130px;"><strong>{{ $loop->iteration }}. </strong>{{ $item->product->name }} (symbol: {{ $item->product->symbol }}) </h4></td>
 
                         <input name="id[{{$item->id}}]"
                                value="{{ $item->id }}" type="hidden"

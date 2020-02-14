@@ -45,7 +45,7 @@
                         50-312 WROCŁAW <br/>
                         NIP: 8971719229 <br/>
                         Telefony: {{env('FRONT_URL')}}/kontakt <br/>
-                        E-mail ogólny : info@mega1000.pl <br/>
+                        E-mail ogólny : info@{{env('DOMAIN_NAME')}} <br/>
                     </p>
                 </td>
                 <td>

@@ -3266,7 +3266,7 @@
                         }
 
                         function replaceImageUrl(url) {
-                            let validUrl = url.replace('C\:\\z\\', env('APP_URL') . 'storage/');
+                            let validUrl = url.replace('C\:\\z\\', env('APP_URL') . 'storage/products/');
                         }
 
                         $( document ).ready(function() {
