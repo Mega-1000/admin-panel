@@ -214,4 +214,15 @@ class Product extends Model implements Transformable
     {
         return $this->hasMany(self::class, 'parent_id', 'id');
     }
+
+    public function isInTransportGroup()
+    {
+        //todo sprawdzić, czy posiada grupę transportową
+        return false;
+    }
+
+    public function hasAllTransportParameters()
+    {
+        return $this->packing->warehouse && $this->packing->recommended_courier && $this->packing->packing_name;
+    }
 }
