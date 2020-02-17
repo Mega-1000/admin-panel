@@ -82,13 +82,12 @@ class ImportCsvFileJob implements ShouldQueue
         ProductStockPositionRepository $productStockPositionRepository
     ): void
     {
-        $data = Carbon::now();
-        Log::channel('import')->info('Import start: ' . $data);
+        $this->log('Import start: '.Carbon::now());
 
         $handle = fopen($this->path, 'rb');
         if (!$handle) {
             $msg = 'CSV file "' . $this->path . '" not found';
-            Log::channel('import')->info($msg);
+            $this->log($msg);
             throw new FileNotFoundException($msg);
         }
 
@@ -98,15 +97,15 @@ class ImportCsvFileJob implements ShouldQueue
         $this->productStockRepository = $productStockRepository;
         $this->productStockPositionRepository = $productStockPositionRepository;
 
-        Log::channel('import')->info('Clear tables start');
+        $this->log('Clear tables start');
         $this->clearTables();
-        Log::channel('import')->info('Clear tables end');
+        $this->log('Clear tables end');
 
         $time = microtime(true);
         for ($i = 1; $line = fgetcsv($handle, 0, ';'); $i++) {
             $this->currentLine = $i;
             if ($i % 100 === 0) {
-                Log::channel('import')->info($i . ' - time ' . round(microtime(true) - $time, 3));
+                $this->log($i . ' - time ' . round(microtime(true) - $time, 3));
                 $time = microtime(true);
             }
             if ($i <= $this->startRow) {
@@ -140,7 +139,7 @@ class ImportCsvFileJob implements ShouldQueue
                     }
                 }
             } catch (\Exception $e) {
-                Log::channel('import')->debug("Row $i EXCEPTION: " . $e->getMessage());
+                $this->log("Row $i EXCEPTION: " . $e->getMessage());
             }
         }
         DB::table('import')->where('id', 1)->update(
@@ -149,7 +148,7 @@ class ImportCsvFileJob implements ShouldQueue
         DB::table('import')->where('id', 2)->update(
             ['name' => 'Import products done', 'last_import' => Carbon::now()]
         );
-        Log::channel('import')->info('Import end: ' . Carbon::now());
+        $this->log('Import end: ' . Carbon::now());
     }
 
     private function clearTables()
@@ -235,7 +234,7 @@ class ImportCsvFileJob implements ShouldQueue
                         if (empty($current['children'])) {
                             return $current;
                         }
-                        Log::channel('import')->debug("Row {$this->currentLine} WARNING: Products should be placed in deepest category only");
+                        $this->log("Row {$this->currentLine} WARNING: Products should be placed in deepest category only");
                         return $this->categories;
                     }
                     throw new \Exception("Category already exists");
@@ -246,7 +245,7 @@ class ImportCsvFileJob implements ShouldQueue
                     if (empty($current['children'])) {
                         return $current;
                     }
-                    Log::channel('import')->debug("Row {$this->currentLine} WARNING: Products should be placed in deepest category only");
+                    $this->log("Row {$this->currentLine} WARNING: Products should be placed in deepest category only");
                     return $this->categories;
                 }
                 throw new \Exception("Missing category parent");
@@ -590,4 +589,9 @@ class ImportCsvFileJob implements ShouldQueue
         }
     }
 
+    private function log($text)
+    {
+        Log::channel('import')->info($text);
+        echo $text."\n";
+    }
 }
