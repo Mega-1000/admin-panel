@@ -11,9 +11,6 @@
 |
  */
 
-use App\Entities\Order;
-use Barryvdh\DomPDF\Facade as PDF;
-
 Route::get('/', function () {
     return view('welcome');
 });

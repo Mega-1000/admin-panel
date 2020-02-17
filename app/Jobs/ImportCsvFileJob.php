@@ -82,9 +82,14 @@ class ImportCsvFileJob implements ShouldQueue
         ProductStockPositionRepository $productStockPositionRepository
     ): void
     {
+        $data = Carbon::now();
+        Log::channel('import')->info('Import start: ' . $data);
+
         $handle = fopen($this->path, 'rb');
         if (!$handle) {
-            throw new FileNotFoundException('CSV file "' . $this->path . '" not found');
+            $msg = 'CSV file "' . $this->path . '" not found';
+            Log::channel('import')->info($msg);
+            throw new FileNotFoundException($msg);
         }
 
         $this->productRepository = $productRepository;
@@ -93,16 +98,15 @@ class ImportCsvFileJob implements ShouldQueue
         $this->productStockRepository = $productStockRepository;
         $this->productStockPositionRepository = $productStockPositionRepository;
 
+        Log::channel('import')->info('Clear tables start');
         $this->clearTables();
-
-        $data = Carbon::now();
-        Log::channel('import')->info('Import start: ' . $data);
+        Log::channel('import')->info('Clear tables end');
 
         $time = microtime(true);
         for ($i = 1; $line = fgetcsv($handle, 0, ';'); $i++) {
             $this->currentLine = $i;
             if ($i % 100 === 0) {
-                echo $i . ' - time ' . round(microtime(true) - $time, 3) . "\n";
+                Log::channel('import')->info($i . ' - time ' . round(microtime(true) - $time, 3));
                 $time = microtime(true);
             }
             if ($i <= $this->startRow) {
