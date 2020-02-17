@@ -22,9 +22,9 @@
     </script>
 </head>
 <div class="container text-center">
-    <img src="https://mega1000.pl/strony/logo.png" alt="">
+    <img src="{{env('APP_URL') . 'images/logo.png'}}" alt="">
     <h1>Dziękujemy za wybranie danych do faktury.</h1>
-    <h3>Zapraszamy do odwiedzin naszego sklepu <a href="https://mega1000.pl">mega1000.pl</a></h3>
+    <h3>Zapraszamy do odwiedzin naszego sklepu <a href="{{env('FRONT_URL')}}">{{env('DOMAIN_NAME')}}</a></h3>
 </div>
 
 @section('javascript')

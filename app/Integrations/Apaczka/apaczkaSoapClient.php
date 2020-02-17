@@ -53,7 +53,7 @@ class apaczkaApi
     function get_json()
     {
         //	$jsons = file_get_contents('http://meblau.pl/projekty/api_inpost/json.txt');
-        $jsons = file_get_contents('https://mega1000.pl/admin/e-nadawca/dane_wysylki.txt');//"https://mega1000.pl/admin/e-nadawca/dane_wysylki.txt"
+        $jsons = file_get_contents(env('APP_URL') . 'admin/e-nadawca/dane_wysylki.txt');//"https://mega1000.pl/admin/e-nadawca/dane_wysylki.txt"
         $jsons = json_decode($jsons, true);
         //print_r($jsons);
         return $jsons;
