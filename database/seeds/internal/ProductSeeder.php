@@ -28,7 +28,7 @@ class ProductSeeder extends Seeder
                 'video_url' => $faker->url,
                 'manufacturer_url' => $faker->url,
                 'priority' => $faker->numberBetween(1, 150),
-                'meta_title' => $faker->text(55),
+                'meta_price' => $faker->text(55),
                 'meta_description' => $faker->text,
                 'meta_keywords' => $faker->words(7, true),
                 'status' => rand(1, 30) % 3 === 0 ? 'ACTIVE' : 'PENDING',
