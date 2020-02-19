@@ -35,7 +35,7 @@ class Product extends Model implements Transformable
         'video_url',
         'manufacturer_url',
         'priority',
-        'meta_title',
+        'meta_price',
         'meta_description',
         'meta_keywords',
         'status',

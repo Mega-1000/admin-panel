@@ -448,7 +448,7 @@ class ImportCsvFileJob implements ShouldQueue
             'manufacturer_url' => $line[304],
             'video_url' => $line[305],
             'calculator_type' => $line[306],
-            'meta_title' => $line[309],
+            'meta_price' => $line[309],
             'description' => $line[310],
             'meta_description' => $line[311],
             'meta_keywords' => $line[312],
