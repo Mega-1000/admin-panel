@@ -167,5 +167,4 @@ class PackageDivider
         }
         $packageToSplit->removeEmpty();
     }
-
 }

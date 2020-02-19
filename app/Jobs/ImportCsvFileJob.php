@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\ProductTradeGroups;
 use App\Repositories\ProductPackingRepository;
 use App\Repositories\ProductPriceRepository;
 use App\Repositories\ProductRepository;
@@ -128,6 +129,7 @@ class ImportCsvFileJob implements ShouldQueue
                     if ($media) {
                         $this->createProductMedia($media, $product);
                     }
+                    $tradeGroups = $this->setProductTradeGroups($line, $product);
                     if (!empty($multiCalcBase)) {
                         $this->productsRelated[$multiCalcBase] = $product->id;
                     } elseif (!empty($multiCalcCurrent) && !empty($this->productsRelated[$multiCalcCurrent])) {
@@ -156,6 +158,7 @@ class ImportCsvFileJob implements ShouldQueue
         ]);
         Entities\Product::where('symbol', '')->orWhereNull('symbol')->delete();
         DB::table('product_media')->delete();
+        DB::table('product_trade_groups')->delete();
         DB::table('chimney_replacements')->delete();
         DB::table('chimney_products')->delete();
         DB::table('chimney_attribute_options')->delete();
@@ -163,6 +166,7 @@ class ImportCsvFileJob implements ShouldQueue
         DB::table('categories')->delete();
         DB::statement("ALTER TABLE categories AUTO_INCREMENT = 1;");
         DB::statement("ALTER TABLE product_media AUTO_INCREMENT = 1;");
+        DB::statement("ALTER TABLE product_trade_groups AUTO_INCREMENT = 1;");
         DB::statement("ALTER TABLE chimney_replacements AUTO_INCREMENT = 1;");
         DB::statement("ALTER TABLE chimney_products AUTO_INCREMENT = 1;");
         DB::statement("ALTER TABLE chimney_attribute_options AUTO_INCREMENT = 1;");
@@ -473,6 +477,7 @@ class ImportCsvFileJob implements ShouldQueue
             'max_in_pallete_80' => $line[369],
             'max_in_pallete_100' => $line[370],
             'per_package_factor' => $line[371],
+            'trade_group_name' => $line[378],
             'additional_payment_for_milling' => $line[473],
             'product_group_for_change_price' => $line[108],
             'products_related_to_the_automatic_price_change' => $line[110],
@@ -589,4 +594,42 @@ class ImportCsvFileJob implements ShouldQueue
         }
     }
 
+    private function setProductTradeGroups(array $line, Entities\Product $product)
+    {
+        $this->getTradeGroupParams(379, 'price', $line, $product);
+        $this->getTradeGroupParams(385, 'weight', $line, $product);
+    }
+
+    private function getTradeGroupParams($firstParam, $type, $line, Entities\Product $product)
+    {
+        $tradeGroup = new ProductTradeGroups();
+        $tradeGroup->type = $type;
+        for ($i = 0; $i < 6; $i += 2) {
+            if (!isset ($line[$firstParam + $i]) || !isset ($line[$firstParam + $i + 1])) {
+                continue;
+            }
+            switch ($i / 2) {
+                case 0:
+                    $prefix = 'first';
+                    break;
+                case 1:
+                    $prefix = 'second';
+                    break;
+                case 2:
+                    $prefix = 'third';
+                    break;
+                default:
+                    throw new \Exception('Błąd ustawiania grupy');
+            }
+            $conditionField = $prefix . '_condition';
+            $priceField = $prefix . '_price';
+            $tradeGroup->$conditionField = $line[$firstParam + $i];
+            $tradeGroup->$priceField = $line[$firstParam + $i + 1];
+        }
+        if (empty($tradeGroup->first_condition)) {
+            return;
+        }
+        $tradeGroup->product_id = $product->id;
+        $tradeGroup->save();
+    }
 }

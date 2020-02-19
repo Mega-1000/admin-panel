@@ -2,6 +2,7 @@
 
 namespace App\Entities;
 
+use App\ProductTradeGroups;
 use Illuminate\Database\Eloquent\Model;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
@@ -80,7 +81,8 @@ class Product extends Model implements Transformable
         'quality_to_price',
         'comments',
         'value_of_the_order_for_free_transport',
-        'show_on_page'
+        'show_on_page',
+        'trade_group_name'
     ];
 
     public $customColumnsVisibilities = [
@@ -210,6 +212,11 @@ class Product extends Model implements Transformable
         return $this->hasMany(ProductMedia::class);
     }
 
+    public function tradeGroups()
+    {
+        return $this->hasMany(ProductTradeGroups::class);
+    }
+
     public function children()
     {
         return $this->hasMany(self::class, 'parent_id', 'id');
@@ -217,8 +224,7 @@ class Product extends Model implements Transformable
 
     public function isInTransportGroup()
     {
-        //todo sprawdzić, czy posiada grupę transportową
-        return false;
+        return $this->tradeGroups()->count() > 0;
     }
 
     public function hasAllTransportParameters()
