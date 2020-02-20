@@ -35,6 +35,7 @@ class Inpost
         $this->data = $data;
         $this->url = config('integrations.inpost.url');
         $this->authorization = config('integrations.inpost.authorization');
+        $this->org_id = config('integrations.inpost.org_id');
     }
 
     /**
@@ -50,7 +51,7 @@ class Inpost
                 'post_code' => $this->data['delivery_address']['postal_code'],
                 'country_code' => 'PL'
             ];
-            $address2 = [
+            $addressSender = [
                 'street' => $this->data['pickup_address']['address'],
                 'building_number' => $this->data['pickup_address']['flat_number'],
                 'city' => $this->data['pickup_address']['city'],
@@ -84,7 +85,7 @@ class Inpost
                         'last_name' => $this->data['pickup_address']['lastname'],
                         'email' => $this->data['pickup_address']['email'],
                         'phone' => $this->data['pickup_address']['phone'],
-                        'address' => $address2
+                        'address' => $addressSender
                     ]
             ];
             if ($this->data['courier_type'] == 'PACZKOMAT' && $this->data['amount'] == '8.99') {
@@ -162,7 +163,7 @@ class Inpost
     public function createSimplePackage($json)
     {
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->url . '/v1/organizations/14565/shipments');
+        curl_setopt($ch, CURLOPT_URL, $this->url . '/v1/organizations/'.$this->org_id.'/shipments');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -188,7 +189,7 @@ class Inpost
     public function getLabel($id, $trackingNumber)
     {
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->url . '/v1/organizations/14565/shipments/labels');
+        curl_setopt($ch, CURLOPT_URL, $this->url . '/v1/organizations/'.$this->org_id.'/shipments/labels');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
