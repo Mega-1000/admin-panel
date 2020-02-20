@@ -309,7 +309,7 @@
 
             <div class="form-group">
                 <label for="notices">@lang('order_packages.form.notices')</label>
-                <textarea cols="40" rows="5" type="text" class="form-control" id="notices" name="notices">
+                <textarea cols="40" rows="5" maxlength="30" type="text" class="form-control" id="notices" name="notices">
                        {{ old('notices') }}</textarea>
             </div>
             <div class="form-group">
