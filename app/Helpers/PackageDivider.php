@@ -2,10 +2,10 @@
 
 namespace App\Helpers;
 
-use App\Entities\Product;
+use App\Helpers\interfaces\iPackageDivider;
 use Illuminate\Database\Eloquent\Collection;
 
-class PackageDivider
+class PackageDivider implements iPackageDivider
 {
     const TRANSPORT_GROUPS = 'transport_group';
     //todo make this adjustable
@@ -69,7 +69,7 @@ class PackageDivider
         return [$divided, $transportCalculations];
     }
 
-    public function calculatePackages($items, $isLong = false)
+    private function calculatePackages($items, $isLong = false)
     {
         $packages = [];
         foreach ($items as $item) {
