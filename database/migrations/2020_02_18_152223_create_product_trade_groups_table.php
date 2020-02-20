@@ -19,10 +19,10 @@ class CreateProductTradeGroupsTable extends Migration
             $table->integer('product_id');
             $table->decimal('first_condition', 12, 2);
             $table->decimal('first_price', 12, 2);
-            $table->decimal('second_condition', 12, 2);
-            $table->decimal('second_price', 12, 2);
-            $table->decimal('third_condition', 12, 2);
-            $table->decimal('third_price', 12, 2);
+            $table->decimal('second_condition', 12, 2)->nullable();
+            $table->decimal('second_price', 12, 2)->nullable();
+            $table->decimal('third_condition', 12, 2)->nullable();
+            $table->decimal('third_price', 12, 2)->nullable();
             $table->timestamps();
         });
     }

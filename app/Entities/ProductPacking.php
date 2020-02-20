@@ -65,8 +65,13 @@ class ProductPacking extends Model implements Transformable
             || $this->dimension_z > self::LONG_VALUE;
     }
 
-    public function getVolume()
+    public function getVolume($maxLength = false)
     {
-        return $this->dimension_x * $this->dimension_y * $this->dimension_z;
+        if ($maxLength) {
+            $longDimension = $maxLength;
+        } else {
+            $longDimension = $this->dimension_x;
+        }
+        return $longDimension * $this->dimension_y * $this->dimension_z;
     }
 }

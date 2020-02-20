@@ -605,9 +605,6 @@ class ImportCsvFileJob implements ShouldQueue
         $tradeGroup = new ProductTradeGroups();
         $tradeGroup->type = $type;
         for ($i = 0; $i < 6; $i += 2) {
-            if (!isset ($line[$firstParam + $i]) || !isset ($line[$firstParam + $i + 1])) {
-                continue;
-            }
             switch ($i / 2) {
                 case 0:
                     $prefix = 'first';
@@ -623,6 +620,9 @@ class ImportCsvFileJob implements ShouldQueue
             }
             $conditionField = $prefix . '_condition';
             $priceField = $prefix . '_price';
+            if ($line[$firstParam + $i] === '' || $line[$firstParam + $i + 1] === '') {
+                continue;
+            }
             $tradeGroup->$conditionField = $line[$firstParam + $i];
             $tradeGroup->$priceField = $line[$firstParam + $i + 1];
         }

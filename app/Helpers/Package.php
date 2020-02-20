@@ -13,6 +13,8 @@ class Package
     const CAN_NOT_ADD_MORE = 'Nie można dodać prodktu do koszyka';
     private $productList;
     private $volumeMargin;
+    private $isLong = false;
+
 
     public function __construct($margin)
     {
@@ -36,9 +38,15 @@ class Package
         });
 
         $moreItems = $this->icreaseAmount($moreItems, $product, $quantity);
-        $total = $moreItems->reduce(function ($carry, $item) {
+        $maxLength = false;
+        if ($this->isLong) {
+            $maxLength = $moreItems->reduce(function ($carry, $item) {
+                return $item->packing->dimension_x > $carry ? $item->packing->dimension_x : $carry;
+            });
+        }
+        $total = $moreItems->reduce(function ($carry, $item) use ($maxLength) {
             $carry['weight'] += $item->weight_trade_unit * $item->quantity;
-            $carry['volume'] += $item->packing->getVolume() * $item->quantity * $this->volumeMargin;
+            $carry['volume'] += $item->packing->getVolume($maxLength) * $item->quantity * $this->volumeMargin;
             return $carry;
         }, ['weight' => 0, 'volume' => 0]);
         return $total['weight'] < self::MAX_WEIGHT && $total['volume'] < self::VOLUME_RATIO;
@@ -60,7 +68,8 @@ class Package
         return $list;
     }
 
-    public function deepCopy() {
+    public function deepCopy()
+    {
         $copy = clone $this;
         $copy->productList = $copy->productList->map(function ($item) {
             return clone $item;
@@ -74,5 +83,15 @@ class Package
             return $item->quantity === 0;
         });
 
+    }
+
+    public function getIsLong()
+    {
+        return $this->isLong;
+    }
+
+    public function setIsLong($isLong): void
+    {
+        $this->isLong = $isLong;
     }
 }

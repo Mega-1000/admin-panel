@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Collection;
 class PackageDivider
 {
     const TRANSPORT_GROUPS = 'transport_group';
+    //todo make this adjustable
     const MARGIN = 1.3;
     private $itemList;
     private const LONG = 'long';
@@ -27,21 +28,13 @@ class PackageDivider
     private function groupByPackageType()
     {
         $warehouses = [];
-
         foreach ($this->itemList as $product) {
             $product->quantity = 5; //todo remove
             if ($product->hasAllTransportParameters()) {
-                if ($product->packing()->first()->isLong()) {
-                    $warehouses [sprintf("%s_%s_%s",
-                        $product->packing->warehouse,
-                        $product->packing->recommended_courier,
-                        self::LONG)] [] = $product;
-                } else if ($product->isInTransportGroup()) {
-                    $warehouses [self::TRANSPORT_GROUPS] [] = $product;
+                if ($product->isInTransportGroup()) {
+                    $warehouses [self::TRANSPORT_GROUPS] [$product->trade_group_name] [] = $product;
                 } else {
-                    $warehouses [$product->packing->warehouse . '_' .
-                    $product->packing->recommended_courier . '_' .
-                    $product->packing->packing_name] [] = $product;
+                    $warehouses = $this->insertToWarehouseArray($product, $warehouses);
                 }
             } else {
                 $warehouses[self::NOT_CALCULABLE] [] = $product;
@@ -55,24 +48,32 @@ class PackageDivider
         $divided = [];
         unset($sorted[self::NOT_CALCULABLE]);
         foreach ($sorted as $key => $items) {
+            if ($key === self::TRANSPORT_GROUPS) {
+                $transportCalculations = $this->calculateTransportGroups($items);
+            }
+        }
+        unset($sorted[self::TRANSPORT_GROUPS]);
+        foreach ($transportCalculations['cantsend'] as $item) {
+            $sorted = $this->insertToWarehouseArray($item, $sorted);
+        }
+        foreach ($sorted as $key => $items) {
             if (strpos($key, self::LONG)) {
-                $this->calculateLongPackages($items);
-            } elseif ($key === self::TRANSPORT_GROUPS) {
-                $this->calculateTransportGroups($sorted);
-            } else {
+                $items = $this->sortByLength($items);
+                $divided[$key] = $this->calculatePackages($items, true);
+            } elseif ($key !== self::TRANSPORT_GROUPS) {
+                uasort($items, array('App\Helpers\PackageDivider', 'weightAndVolumeSort'));
                 $divided[$key] = $this->calculatePackages($items);
             }
         }
 
-        return $divided;
+        return [$divided, $transportCalculations];
     }
 
-    public function calculatePackages($items)
+    public function calculatePackages($items, $isLong = false)
     {
-        $items = $this->orderByWeightAndVolume($items);
         $packages = [];
         foreach ($items as $item) {
-            $packages = array_merge($packages, $this->createHomoPackage($item));
+            $packages = array_merge($packages, $this->createHomoPackage($item, $isLong));
         }
         array_reverse($packages);
         foreach ($packages as $key => $singlePackage) {
@@ -87,29 +88,33 @@ class PackageDivider
         return $packages;
     }
 
-    public function orderByWeightAndVolume($items)
+    private static function weightAndVolumeSort($first, $second)
     {
-        $sorter = function ($first, $second) {
-            if ($first->weight_trade_unit == $second->weight_trade_unit) {
-                if ($first->packing->getVolume() == $second->packing->getVolume()) {
-                    return 0;
-                }
-                return $first->packing->getVolume() > $second->packing->getVolume() ? -1 : 1;
+        if ($first->weight_trade_unit == $second->weight_trade_unit) {
+            if ($first->packing->getVolume() == $second->packing->getVolume()) {
+                return 0;
             }
-            return $first->weight_trade_unit > $second->weight_trade_unit ? -1 : 1;
+            return $first->packing->getVolume() > $second->packing->getVolume() ? -1 : 1;
+        }
+        return $first->weight_trade_unit > $second->weight_trade_unit ? -1 : 1;
+    }
+
+    private function sortByLength($items)
+    {
+        $sortByLength = function ($first, $second) {
+            if ($first->packing->dimension_x == $second->packing->dimension_x) {
+                return self::weightAndVolumeSort($first, $second);
+            }
+            return $first->packing->dimension_x > $second->packing->dimension_x ? -1 : 1;
         };
-        uasort($items, $sorter);
+        uasort($items, $sortByLength);
         return $items;
     }
 
-    private function calculateLongPackages($items)
-    {
-
-    }
-
-    private function createHomoPackage($item)
+    private function createHomoPackage($item, $isLong)
     {
         $package = new Package(self::MARGIN);
+        $package->setIsLong($isLong);
         $packageList = [$package];
         do {
             try {
@@ -131,16 +136,45 @@ class PackageDivider
 
     private function calculateTransportGroups($sorted)
     {
-        //todo implement
+        $sums = [];
+        foreach ($sorted as $key => $group) {
+            $sums = array_merge($sums, [$key => $this->sumGroupWeightAndPrice($group)]);
+        }
+        $cantSend = [];
+        $calculated = [];
+        foreach ($sums as $key => $sum) {
+            $priceCondition = $sum['factory_group']->where('type', 'price')->first();
+            $weightCondition = $sum['factory_group']->where('type', 'weight')->first();
+            $firstPrice = $this->checkPriceConditions($sum, $priceCondition);
+            $secondPrice = $this->checkPriceConditions($sum, $weightCondition);
+            unset($sum['factory_group']);
+            if ($firstPrice === false && $secondPrice === false) {
+                $cantSend = array_merge($cantSend, $sum['items']);
+                continue;
+            } else if ($firstPrice === false || $secondPrice === false) {
+                $sum['transport_price'] = $firstPrice ? $firstPrice : $secondPrice;
+            } else {
+                $sum['transport_price'] = $firstPrice < $secondPrice ? $firstPrice : $secondPrice;
+            }
+            array_push($calculated, $sum);
+        }
+        return ['calculated' => $calculated, 'cantsend' => $cantSend];
     }
 
-    private function makeDeepCopyOfPackageArray(array $packages)
+    private function sumGroupWeightAndPrice($group)
     {
-        $deepCopyPackages = [];
-        foreach ($packages as $package) {
-            $deepCopyPackages [] = $package->deepCopy();
+        $sums = [];
+        foreach ($group as $item) {
+            $price = isset($sums['price']) ? $sums['price'] : 0;
+            $weight = isset($sums['weight']) ? $sums['weight'] : 0;
+            $items = isset($sums['items']) ? $sums['items'] : [];
+            array_push($items, $item);
+            $sums = ['price' => $price + $item->quantity * $item->price->net_purchase_price_commercial_unit,
+                'weight' => $weight + $item->quantity * $item->weight_trade_unit,
+                'factory_group' => $item->tradeGroups,
+                'items' => $items];
         }
-        return $deepCopyPackages;
+        return $sums;
     }
 
     private function packAsMuchYouCan($packageToSplit, array &$allPackages)
@@ -166,5 +200,34 @@ class PackageDivider
             }
         }
         $packageToSplit->removeEmpty();
+    }
+
+    private function checkPriceConditions($sum, $priceCondition)
+    {
+        if (empty($priceCondition)) {
+            return false;
+        }
+        if ($sum['price'] > $priceCondition->first_condition) {
+            return $priceCondition->first_price;
+        } else if (isset($priceCondition->second_condition) && $sum['price'] > $priceCondition->second_condition) {
+            return $priceCondition->second_price;
+        } else if (isset($priceCondition->second_condition) && $sum['price'] > $priceCondition->third_condition) {
+            return $priceCondition->third_price;
+        }
+        return false;
+    }
+
+    private function insertToWarehouseArray($product, array $warehouses): array
+    {
+        if ($product->packing()->first()->isLong()) {
+            $packingName = self::LONG;
+        } else {
+            $packingName = $product->packing->packing_name;
+        }
+        $warehouses [sprintf("%s_%s_%s",
+            $product->packing->warehouse,
+            $product->packing->recommended_courier,
+            $packingName)] [] = $product;
+        return $warehouses;
     }
 }
