@@ -9,7 +9,7 @@ return [
     ],
     'inpost' => [
         'url' => 'https://api-shipx-pl.easypack24.net',
-        'authorization' => 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJhcGktc2hpcHgtcGwuZWFzeXBhY2syNC5uZXQiLCJzdWIiOiJhcGktc2hpcHgtcGwuZWFzeXBhY2syNC5uZXQiLCJleHAiOjE1ODE2NzczNTYsImlhdCI6MTU4MTY3NzM1NiwianRpIjoiOTZlNzY4OGEtMzI4YS00ZWU2LWE4MzMtOGUzZGMyZGZjNzQ5In0.F3Ai66dzY-VAiHl8W3XuIrr8w-yachNo9IxjOsg41RpmFcmNNpGLNQ46ji1JGkpbV7Jx0g2R1Nn0hjfQzpCzBQ. ',
+        'authorization' => 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJhcGktc2hpcHgtcGwuZWFzeXBhY2syNC5uZXQiLCJzdWIiOiJhcGktc2hpcHgtcGwuZWFzeXBhY2syNC5uZXQiLCJleHAiOjE1ODE2NzczNTYsImlhdCI6MTU4MTY3NzM1NiwianRpIjoiOTZlNzY4OGEtMzI4YS00ZWU2LWE4MzMtOGUzZGMyZGZjNzQ5In0.F3Ai66dzY-VAiHl8W3XuIrr8w-yachNo9IxjOsg41RpmFcmNNpGLNQ46ji1JGkpbV7Jx0g2R1Nn0hjfQzpCzBQ.',
         'tracking_url' => 'https://api-shipx-pl.easypack24.net/v1/organizations/14565/shipments?tracking_number='
     ],
     'dpd' => [
