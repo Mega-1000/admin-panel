@@ -50,7 +50,13 @@ class Inpost
                 'post_code' => $this->data['delivery_address']['postal_code'],
                 'country_code' => 'PL'
             ];
-
+            $address2 = [
+                'street' => $this->data['pickup_address']['address'],
+                'building_number' => $this->data['pickup_address']['flat_number'],
+                'city' => $this->data['pickup_address']['city'],
+                'post_code' => $this->data['pickup_address']['postal_code'],
+                'country_code' => 'PL'
+            ];
             if ($this->data['courier_type'] == 'PACZKOMAT') {
                 $sections = [
                     'receiver' => [
@@ -72,7 +78,15 @@ class Inpost
                     ]
                 ];
             }
-
+            $sections += [
+                'sender' => [
+                        'first_name' => $this->data['pickup_address']['firstname'],
+                        'last_name' => $this->data['pickup_address']['lastname'],
+                        'email' => $this->data['pickup_address']['email'],
+                        'phone' => $this->data['pickup_address']['phone'],
+                        'address' => $address2
+                    ]
+            ];
             if ($this->data['courier_type'] == 'PACZKOMAT' && $this->data['amount'] == '8.99') {
                 $sections += [
                     'custom_attributes' => [
