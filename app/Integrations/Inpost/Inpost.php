@@ -162,7 +162,7 @@ class Inpost
     public function createSimplePackage($json)
     {
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->url . '/v1/organizations/3336/shipments');
+        curl_setopt($ch, CURLOPT_URL, $this->url . '/v1/organizations/14565/shipments');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -188,7 +188,7 @@ class Inpost
     public function getLabel($id, $trackingNumber)
     {
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->url . '/v1/organizations/3336/shipments/labels');
+        curl_setopt($ch, CURLOPT_URL, $this->url . '/v1/organizations/14565/shipments/labels');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);

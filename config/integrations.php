@@ -9,8 +9,8 @@ return [
     ],
     'inpost' => [
         'url' => 'https://api-shipx-pl.easypack24.net',
-        'authorization' => 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJhcGktc2hpcHgtcGwuZWFzeXBhY2syNC5uZXQiLCJzdWIiOiJhcGktc2hpcHgtcGwuZWFzeXBhY2syNC5uZXQiLCJleHAiOjE1MzU3MDIyODEsImlhdCI6MTUzNTcwMjI4MSwianRpIjoiODBlYmJiZmYtMjY4Yy00ZGU3LWJiM2YtYWM5M2Y0N2ZmOGYzIn0._VCy_poxPjgq9tlF3h2IwyAz3eGE4ougapVaBG7zuXQ32SCzEHO2LfdkWbBGy5PUavdTTYUlrH3hyp9m5pcCJA',
-        'tracking_url' => 'https://api-shipx-pl.easypack24.net/v1/organizations/3336/shipments?tracking_number='
+        'authorization' => 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJhcGktc2hpcHgtcGwuZWFzeXBhY2syNC5uZXQiLCJzdWIiOiJhcGktc2hpcHgtcGwuZWFzeXBhY2syNC5uZXQiLCJleHAiOjE1ODE2NzczNTYsImlhdCI6MTU4MTY3NzM1NiwianRpIjoiOTZlNzY4OGEtMzI4YS00ZWU2LWE4MzMtOGUzZGMyZGZjNzQ5In0.F3Ai66dzY-VAiHl8W3XuIrr8w-yachNo9IxjOsg41RpmFcmNNpGLNQ46ji1JGkpbV7Jx0g2R1Nn0hjfQzpCzBQ. ',
+        'tracking_url' => 'https://api-shipx-pl.easypack24.net/v1/organizations/14565/shipments?tracking_number='
     ],
     'dpd' => [
         'fid' => '239325',
