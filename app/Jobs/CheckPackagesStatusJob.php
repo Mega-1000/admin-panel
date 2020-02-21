@@ -55,7 +55,9 @@ class CheckPackagesStatusJob
                         $this->checkStatusInInpostPackages($package);
                         break;
                     case 'DPD':
+                        if (strtotime($package->created_at)>strtotime('2020-02-21 15:15:00')) {
                         $this->checkStatusInDpdPackages($package);
+                        }
                         break;
                     case 'APACZKA':
                         $this->checkStatusInApaczkaPackages($package);
