@@ -10,10 +10,11 @@ class Package
     //todo pobierać dane z bazy
     const MAX_WEIGHT = 70;
     const VOLUME_RATIO = 180000;
-    const CAN_NOT_ADD_MORE = 'Nie można dodać prodktu do koszyka';
-    private $productList;
+    const CAN_NOT_ADD_MORE = 'Nie można dodać produktu do koszyka';
+    public $productList;
     private $volumeMargin;
     private $isLong = false;
+    protected $visible = ['productList'];
 
 
     public function __construct($margin)

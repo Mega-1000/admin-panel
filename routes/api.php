@@ -21,6 +21,8 @@ Route::middleware('auth:api')->group(function() {
 
 Route::get('custom/pages', 'Api\CustomPagesController@getPages')->name('api.custompages.get');
 
+Route::post('packages/count', 'Api\PackageController@countPackages')->name('api.packages.count');
+
 Route::post('orders', 'Api\OrdersController@store')->name('api.orders.store');
 Route::post('customers', 'Api\CustomersController@store')->name('api.customers.store');
 Route::get('customers/emailExists/{email}', 'Api\CustomersController@emailExists')->name('api.customers.email-exists');
