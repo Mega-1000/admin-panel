@@ -52,7 +52,9 @@ class CheckPackagesStatusJob
             if ($package->letter_number !== null) {
                 switch ($package->delivery_courier_name) {
                     case 'INPOST':
-                        $this->checkStatusInInpostPackages($package);
+                        if (strtotime($package->created_at)>strtotime('2020-02-20 14:38:44')){
+                            $this->checkStatusInInpostPackages($package);
+                        }
                         break;
                     case 'DPD':
                         $this->checkStatusInDpdPackages($package);
