@@ -2,9 +2,9 @@
 
 return [
     'apaczka' => [
-        'login' => 'ebudownictwo@wp.pl',
-        'password' => 'aaaaaaaaaa',
-        'apiKey' => 'abcdefg111',
+        'login' => 'info@mega1000.pl',
+        'password' => env('APACZKA_PASSWORD'),
+        'apiKey' => env('APACZKA_API_KEY'),
         'tracking_url' => 'www.apaczka.pl/check_status.php?waybill_number='
     ],
     'inpost' => [
