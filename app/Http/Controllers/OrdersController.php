@@ -835,7 +835,7 @@ class OrdersController extends Controller
             $connectedSum += $connOrderSum;
             $ids[]        = $connectedOrder->id;
         }
-        
+
         if ($mainOrderSum < 0) {
             $sumToCheck = $mainOrderSum + $connectedSum;
         } else if ($connectedSum < 0) {
@@ -2076,9 +2076,11 @@ class OrdersController extends Controller
             "order_id" => $order->id,
             'type' => 'DELIVERY_ADDRESS',
         ])->first();
+        $productsArray = [];
         foreach ($order->items as $item) {
             $productsArray[] = $item->product_id;
         }
+        $productsVariation = null;
         foreach ($order->items as $product) {
             if ($product->product->product_group != null) {
                 $productVar = $this->productRepository->findByField('product_group',
