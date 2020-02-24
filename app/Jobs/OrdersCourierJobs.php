@@ -415,8 +415,13 @@ class OrdersCourierJobs extends Job
                     $this->data['pickup_address']['email'],
                     $this->data['pickup_address']['phone']
                 );
+                if ($this->data['courier_type'] === 'ODBIOR_OSOBISTY') {
+                    $pickup = 'SELF'; 
+                } else {
+                    $pickup = 'COURIER';
+                }
                 $order->setPickup(
-                    $this->data['courier_type'],
+                    $pickup,
                     6,
                     17,
                     $this->data['pickup_address']['parcel_date']
