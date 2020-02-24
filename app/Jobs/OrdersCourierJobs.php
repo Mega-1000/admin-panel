@@ -351,6 +351,9 @@ class OrdersCourierJobs extends Job
                 case 'PACZKOMAT':
                     $carrierType = 'PACZKOMAT';
                     break;
+                case 'POCZTEX':
+                    $carrierType = 'POCZTEX';
+                    break;
                 default:
                     Log::notice(
                         'Wrong courier',
