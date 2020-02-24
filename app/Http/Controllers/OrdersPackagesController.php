@@ -316,7 +316,7 @@ class OrdersPackagesController extends Controller
             'content' => $package->content,
             'additional_data' => [
                 'order_package_id' => $package->id,
-                'forwarding_delivery' => $package->service_courier_name,
+                'forwarding_delivery' => $package->delivery_courier_name,
                 'allegro_id' => $order->customer->nick_allegro,
                 'allegro_transaction_id' => $order->allegro_transaction_id,
                 'package_type' => $package->container_type
