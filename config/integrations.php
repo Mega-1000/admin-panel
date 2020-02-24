@@ -9,13 +9,14 @@ return [
     ],
     'inpost' => [
         'url' => 'https://api-shipx-pl.easypack24.net',
-        'authorization' => 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJpc3MiOiJhcGktc2hpcHgtcGwuZWFzeXBhY2syNC5uZXQiLCJzdWIiOiJhcGktc2hpcHgtcGwuZWFzeXBhY2syNC5uZXQiLCJleHAiOjE1MzU3MDIyODEsImlhdCI6MTUzNTcwMjI4MSwianRpIjoiODBlYmJiZmYtMjY4Yy00ZGU3LWJiM2YtYWM5M2Y0N2ZmOGYzIn0._VCy_poxPjgq9tlF3h2IwyAz3eGE4ougapVaBG7zuXQ32SCzEHO2LfdkWbBGy5PUavdTTYUlrH3hyp9m5pcCJA',
-        'tracking_url' => 'https://api-shipx-pl.easypack24.net/v1/organizations/3336/shipments?tracking_number='
+        'authorization' => env('INPOST_AUTHORIZATION_KEY'),
+        'tracking_url' => 'https://api-shipx-pl.easypack24.net/v1/organizations/'.env('INPOST_ORG_ID').'/shipments?tracking_number=',
+        'org_id' => env('INPOST_ORG_ID')
     ],
     'dpd' => [
-        'fid' => '239325',
-        'username' => '23932501',
-        'password' => 'YHskMhxk3f8DiHtF',
+        'fid' => '279242',
+        'username' => '27924201',
+        'password' => 'yDdRigACZCxR7TVA',
         'wsdl' => 'https://dpdservices.dpd.com.pl/DPDPackageObjServicesService/DPDPackageObjServices?WSDL',
         'lang_code' => 'PL',
         'api_version' => 4,
