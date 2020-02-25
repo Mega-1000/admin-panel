@@ -436,19 +436,19 @@ class ApaczkaOrder
             $order['accountNumber'] = $this->accountNumber;
             $order['codAmount'] = $this->codAmount;
         }
+        $order['notification']= array(
+            'new' => $this->notificationNew,
+            'sent' => $this->notificationSent,
+            'exception' => $this->notificationException,
+            'delivered' => $this->notificationDelivered
+        );
 
-        $order['notificationDelivered'] = $this->notificationDelivered;
-        $order['notificationException'] = $this->notificationException;
-        $order['notificationNew'] = $this->notificationNew;
-        $order['notificationSent'] = $this->notificationSent;
-
-        $order['orderPickupType'] = $this->orderPickupType;
-
-        if ($this->pickupTimeFrom != '' and $this->pickupTimeTo != '') {
-            $order['pickupTimeFrom'] = $this->pickupTimeFrom;
-            $order['pickupTimeTo'] = $this->pickupTimeTo;
-            $order['pickupDate'] = $this->pickupDate;
-        }
+        $order['pickup']= array(
+            'type' => $this->orderPickupType,
+            'date' => $this->pickupDate,
+            'hours_from' => $this->pickupTimeFrom,
+            'hours_to' => $this->pickupTimeTo
+        );
 
         $order['options'] = $this->options;
 
@@ -479,7 +479,7 @@ class ApaczkaOrderShipment
     private $options = '';
     private $position = 0;
     private static $dictShipmentOptions = array('UBEZP', 'PRZES_NIETYP', 'DUZA_PACZKA');
-    private static $dictShipmentTypeCode = array('LIST', 'PACZ', 'PALETA');
+    private static $dictShipmentTypeCode = array('LIST', 'PACZKA', 'PALETA');
 
     function ApaczkaOrderShipment($shipmentTypeCode = '', $dim1 = '', $dim2 = '', $dim3 = '', $weight = '')
     {

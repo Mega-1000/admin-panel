@@ -397,7 +397,7 @@ class OrdersCourierJobs extends Job
             $weight = $this->data['weight'];
 
             $orderShipment = new ApaczkaOrderShipment();
-            $orderShipment->createShipment('PACZ', $width, $length, $height, $weight);
+            $orderShipment->createShipment('PACZKA', $width, $length, $height, $weight);
 
             $date = Carbon::now();
 
