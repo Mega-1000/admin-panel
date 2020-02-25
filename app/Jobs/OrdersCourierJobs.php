@@ -352,7 +352,7 @@ class OrdersCourierJobs extends Job
                     $carrierType = 'PACZKOMAT';
                     break;
                 case 'POCZTEX':
-                    $carrierType = 'POCZTEX';
+                    $carrierType = 'POCZTA_POLSKA_E24';
                     break;
                 default:
                     Log::notice(
