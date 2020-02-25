@@ -160,7 +160,7 @@ class OrdersController extends Controller
             throw new \Exception();
         }
 
-        return ['id' => $product->id, 'amount' => 1];
+        return [['id' => $product->id, 'amount' => 1]];
     }
 
     private function setEmptyOrderData(&$data)
