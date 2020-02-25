@@ -167,6 +167,7 @@ class OrdersController extends Controller
     {
         if (!empty($data['want_contact'])) {
             $data = [
+                'phone' => $data['phone'],
                 'customer_login' => $data['phone'] . '@mega1000.pl',
                 'customer_notices' => '',
                 'delivery_address' => [
