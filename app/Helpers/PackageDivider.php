@@ -22,7 +22,8 @@ class PackageDivider implements iPackageDivider
     public function divide()
     {
         $sorted = $this->groupByPackageType();
-        return $this->divideToParcels($sorted);
+        $parcels = $this->divideToParcels($sorted);
+        return $this->divideToPalette($parcels);
     }
 
     private function groupByPackageType()
@@ -45,28 +46,34 @@ class PackageDivider implements iPackageDivider
     private function divideToParcels($sorted)
     {
         $divided = [];
+        $allCalculated = empty($sorted[self::NOT_CALCULABLE]);
+        $notCalculated = isset($sorted[self::NOT_CALCULABLE]) ? $sorted[self::NOT_CALCULABLE] : [];
         unset($sorted[self::NOT_CALCULABLE]);
+        $transportCalculations = [];
         foreach ($sorted as $key => $items) {
             if ($key === self::TRANSPORT_GROUPS) {
                 $transportCalculations = $this->calculateTransportGroups($items);
             }
         }
         unset($sorted[self::TRANSPORT_GROUPS]);
-        foreach ($transportCalculations['cantsend'] as $item) {
-            $sorted = $this->insertToWarehouseArray($item, $sorted);
+        if (isset($transportCalculations['cantsend'])) {
+            foreach ($transportCalculations['cantsend'] as $item) {
+                $sorted = $this->insertToWarehouseArray($item, $sorted);
+            }
+            unset($transportCalculations['cantsend']);
         }
-        unset($transportCalculations['cantsend']);
         foreach ($sorted as $key => $items) {
             if (strpos($key, self::LONG)) {
                 $items = $this->sortByLength($items);
-                $divided[$key] = $this->calculatePackages($items, true);
+                $divided = $this->calculatePackages($items, true);
             } elseif ($key !== self::TRANSPORT_GROUPS) {
                 uasort($items, array('App\Helpers\PackageDivider', 'weightAndVolumeSort'));
-                $divided[$key] = $this->calculatePackages($items);
+                $divided = $this->calculatePackages($items);
             }
         }
-        error_log(print_r($divided,1));
-        return [$divided, $transportCalculations];
+        return ['packages' => array_values($divided),
+            'transport_groups' => isset($transportCalculations['calculated']) ? $transportCalculations['calculated'] : [],
+            'not_calculated' => $notCalculated];
     }
 
     private function calculatePackages($items, $isLong = false)
@@ -84,6 +91,7 @@ class PackageDivider implements iPackageDivider
         }
         foreach ($packages as $pack) {
             $pack->removeEmpty();
+            $pack->productList = array_values($pack->productList->toArray());
         }
         return $packages;
     }
@@ -113,7 +121,10 @@ class PackageDivider implements iPackageDivider
 
     private function createHomoPackage($item, $isLong)
     {
-        $package = new Package(self::MARGIN);
+        $packageName = sprintf("%s_%s",
+            $item->packing->recommended_courier,
+            $item->packing->packing_name);
+        $package = new Package($packageName, self::MARGIN);
         $package->setIsLong($isLong);
         $packageList = [$package];
         do {
@@ -126,7 +137,7 @@ class PackageDivider implements iPackageDivider
                 } else if ($package->getProducts()->count() === 0) {
                     return ["Element nie mieści się w paczce"];
                 } else {
-                    $package = new Package(self::MARGIN);
+                    $package = new Package($packageName, self::MARGIN);
                     $packageList[] = $package;
                 }
             }
@@ -145,8 +156,8 @@ class PackageDivider implements iPackageDivider
         foreach ($sums as $key => $sum) {
             $priceCondition = $sum['factory_group']->where('type', 'price')->first();
             $weightCondition = $sum['factory_group']->where('type', 'weight')->first();
-            $firstPrice = $this->checkPriceConditions($sum, $priceCondition);
-            $secondPrice = $this->checkPriceConditions($sum, $weightCondition);
+            $firstPrice = $this->checkConditions($sum['price'], $priceCondition);
+            $secondPrice = $this->checkConditions($sum['weight'], $weightCondition);
             unset($sum['factory_group']);
             if ($firstPrice === false && $secondPrice === false) {
                 $cantSend = array_merge($cantSend, $sum['items']);
@@ -172,7 +183,8 @@ class PackageDivider implements iPackageDivider
             $sums = ['price' => $price + $item->quantity * $item->price->net_purchase_price_commercial_unit,
                 'weight' => $weight + $item->quantity * $item->weight_trade_unit,
                 'factory_group' => $item->tradeGroups,
-                'items' => $items];
+                'items' => $items,
+                'name' => $items[0]->trade_group_name];
         }
         return $sums;
     }
@@ -202,17 +214,17 @@ class PackageDivider implements iPackageDivider
         $packageToSplit->removeEmpty();
     }
 
-    private function checkPriceConditions($sum, $priceCondition)
+    private function checkConditions($sum, $condition)
     {
-        if (empty($priceCondition)) {
+        if (empty($condition)) {
             return false;
         }
-        if ($sum['price'] > $priceCondition->first_condition) {
-            return $priceCondition->first_price;
-        } else if (isset($priceCondition->second_condition) && $sum['price'] > $priceCondition->second_condition) {
-            return $priceCondition->second_price;
-        } else if (isset($priceCondition->second_condition) && $sum['price'] > $priceCondition->third_condition) {
-            return $priceCondition->third_price;
+        if ($sum > $condition->first_condition) {
+            return $condition->first_price;
+        } else if (isset($condition->second_condition) && $sum > $condition->second_condition) {
+            return $condition->second_price;
+        } else if (isset($condition->second_condition) && $sum > $condition->third_condition) {
+            return $condition->third_price;
         }
         return false;
     }
@@ -229,5 +241,10 @@ class PackageDivider implements iPackageDivider
             $product->packing->recommended_courier,
             $packingName)] [] = $product;
         return $warehouses;
+    }
+
+    private function divideToPalette(array $parcels)
+    {
+        return $parcels;
     }
 }

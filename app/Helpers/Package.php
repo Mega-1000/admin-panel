@@ -12,14 +12,16 @@ class Package
     const VOLUME_RATIO = 180000;
     const CAN_NOT_ADD_MORE = 'Nie można dodać produktu do koszyka';
     public $productList;
+    public $packageName;
     private $volumeMargin;
     private $isLong = false;
-    protected $visible = ['productList'];
+    protected $visible = ['packageName', 'productList'];
 
 
-    public function __construct($margin)
+    public function __construct($packageName, $margin)
     {
         $this->volumeMargin = $margin;
+        $this->packageName = $packageName;
         $this->productList = collect([]);
     }
 
@@ -83,7 +85,6 @@ class Package
         $this->productList = $this->productList->reject(function ($item) {
             return $item->quantity === 0;
         });
-
     }
 
     public function getIsLong()

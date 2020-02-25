@@ -18,7 +18,7 @@ class PackageController extends Controller
         foreach ($responseArray as $items) {
             $prodIds [] = $items['id'];
         }
-        $prodList = Product::whereIn('id', $prodIds)->get();
+        $prodList = Product::whereIn('id', $prodIds)->with('tradeGroups')->with('price')->get();
         $prodList->map(function ($item) use ($responseArray) {
             $product = $responseArray->where('id', $item->id)->first();
             $item->quantity = $product['amount'];
