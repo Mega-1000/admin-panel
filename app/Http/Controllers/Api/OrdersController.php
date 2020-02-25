@@ -154,7 +154,7 @@ class OrdersController extends Controller
 
     private function getDefaultProduct()
     {
-        $product = Product::where('token', 'KMK')->first();
+        $product = Product::where('symbol', 'KMK')->first();
         if (!$product) {
             $this->error_code = 'wrong_product_id';
             throw new \Exception();
