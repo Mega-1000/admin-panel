@@ -436,17 +436,19 @@ class ApaczkaOrder
             $order['accountNumber'] = $this->accountNumber;
             $order['codAmount'] = $this->codAmount;
         }
-        
+
         $order['notificationDelivered'] = $this->notificationDelivered;
         $order['notificationException'] = $this->notificationException;
         $order['notificationNew'] = $this->notificationNew;
         $order['notificationSent'] = $this->notificationSent;
-        $order['pickup']= array(
-            'type' => $this->orderPickupType,
-            'date' => $this->pickupDate,
-            'hours_from' => $this->pickupTimeFrom,
-            'hours_to' => $this->pickupTimeTo
-        );
+        
+        $order['orderPickupType'] = $this->orderPickupType;
+
+        if ($this->pickupTimeFrom != '' and $this->pickupTimeTo != '') {
+            $order['pickupTimeFrom'] = $this->pickupTimeFrom;
+            $order['pickupTimeTo'] = $this->pickupTimeTo;
+            $order['pickupDate'] = $this->pickupDate;
+        }
 
         $order['options'] = $this->options;
 
