@@ -422,8 +422,8 @@ class OrdersCourierJobs extends Job
                 }
                 $order->setPickup(
                     $pickup,
-                    6,
-                    17,
+                    '06:00',
+                    '17:00',
                     $this->data['pickup_address']['parcel_date']
                 );
             }

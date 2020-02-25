@@ -436,13 +436,11 @@ class ApaczkaOrder
             $order['accountNumber'] = $this->accountNumber;
             $order['codAmount'] = $this->codAmount;
         }
-        $order['notification']= array(
-            'new' => $this->notificationNew,
-            'sent' => $this->notificationSent,
-            'exception' => $this->notificationException,
-            'delivered' => $this->notificationDelivered
-        );
-
+        
+        $order['notificationDelivered'] = $this->notificationDelivered;
+        $order['notificationException'] = $this->notificationException;
+        $order['notificationNew'] = $this->notificationNew;
+        $order['notificationSent'] = $this->notificationSent;
         $order['pickup']= array(
             'type' => $this->orderPickupType,
             'date' => $this->pickupDate,
