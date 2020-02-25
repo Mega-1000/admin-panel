@@ -132,11 +132,24 @@ class OrdersController extends Controller
     public function newOrder(StoreOrderRequest $request)
     {
         $data = $request->all();
+        if (isset($data['want_contact'])) {
+
+            $data['customer_login'] = $data['phone'] . '@mega1000.pl';
+            $data['customer_notices'] = '';
+            $data['delivery_address'] = ['city' => 'Oława',
+                'postal_code' => '55-200'
+            ];
+            $data['is_standard'] = false;
+            $data['rewrite'] = 0;
+            $data['order_items'] = [['id' => 1, 'amount' => 1]];
+        }
+
         DB::beginTransaction();
         try {
             $id = $this->newStore($data);
             DB::commit();
-            return $this->createdResponse(['order_id' => $id]);
+            $order = Order::find($id);
+            return $this->createdResponse(['order_id' => $id, 'token' => $order->getToken()]);
         } catch (\Exception $e) {
             DB::rollBack();
             $message = $this->errors[$this->error_code] ?? $e->getMessage();
@@ -326,15 +339,15 @@ class OrdersController extends Controller
         }
 
         foreach ([
-            'firstname',
-            'lastname',
-            'firmname',
-            'nip',
-            'address',
-            'flat_number',
-            'city',
-            'postal_code'
-        ] as $column) {
+                     'firstname',
+                     'lastname',
+                     'firmname',
+                     'nip',
+                     'address',
+                     'flat_number',
+                     'city',
+                     'postal_code'
+                 ] as $column) {
             if (!empty($deliveryAddress[$column])) {
                 $address->$column = $deliveryAddress[$column];
             }
@@ -581,8 +594,8 @@ class OrdersController extends Controller
     {
         $orders = $request->user()->orders()
             ->with('status')
-            ->with(['items' => function($q) {
-                $q->with(['product' => function($w) {
+            ->with(['items' => function ($q) {
+                $q->with(['product' => function ($w) {
                     $w->with('packing')
                         ->with('price');
                 }]);
@@ -594,8 +607,7 @@ class OrdersController extends Controller
             ->with('invoices')
             ->with('employee')
             ->orderBy('id', 'desc')
-            ->get()
-        ;
+            ->get();
 
         foreach ($orders as $order) {
             $order->total_sum = $order->getSumOfGrossValues();
@@ -612,14 +624,13 @@ class OrdersController extends Controller
         }
         $order = Order
             ::where('token', $token)
-            ->with(['items' => function($q) {
+            ->with(['items' => function ($q) {
                 $q->with(['product' => function ($q) {
                     $q->join('product_prices', 'products.id', '=', 'product_prices.product_id');
                     $q->join('product_packings', 'products.id', '=', 'product_packings.product_id');
                 }]);
             }])
-            ->first()
-        ;
+            ->first();
         if (!$order) {
             return response("Order doesn't exist", 400);
         }
@@ -634,11 +645,11 @@ class OrdersController extends Controller
             $vat = 1 + $item->product->vat / 100;
 
             foreach ([
-                'selling_price_calculated_unit',
-                'selling_price_basic_uni',
-                'selling_price_aggregate_unit',
-                'selling_price_the_largest_unit'
-            ] as $column) {
+                         'selling_price_calculated_unit',
+                         'selling_price_basic_uni',
+                         'selling_price_aggregate_unit',
+                         'selling_price_the_largest_unit'
+                     ] as $column) {
                 $kGross = "gross_$column";
                 $kNet = "net_$column";
                 $item->product->$kGross = round($item->$kNet * $vat, 2);
