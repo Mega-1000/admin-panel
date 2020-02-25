@@ -136,7 +136,8 @@ class OrdersController extends Controller
         try {
             $id = $this->newStore($data);
             DB::commit();
-            return $this->createdResponse(['order_id' => $id]);
+            $order = Order::find($id);
+            return $this->createdResponse(['order_id' => $id, 'token' => $order->getToken()]);
         } catch (\Exception $e) {
             DB::rollBack();
             $message = $this->errors[$this->error_code] ?? $e->getMessage();
@@ -151,8 +152,41 @@ class OrdersController extends Controller
         }
     }
 
+    private function getDefaultProduct()
+    {
+        $product = Product::where('symbol', 'KMK')->first();
+        if (!$product) {
+            $this->error_code = 'wrong_product_id';
+            throw new \Exception();
+        }
+
+        return ['id' => $product->id, 'amount' => 1];
+    }
+
+    private function setEmptyOrderData(&$data)
+    {
+        if (!empty($data['want_contact'])) {
+            $data = [
+                'phone' => $data['phone'],
+                'customer_login' => $data['phone'] . '@mega1000.pl',
+                'customer_notices' => '',
+                'delivery_address' => [
+                    'city' => 'Oława',
+                    'postal_code' => '55-200'
+                ],
+                'is_standard' => false,
+                'rewrite' => 0
+            ];
+        }
+
+        if (empty($data['order_items'])) {
+            $data['order_items'] = $this->getDefaultProduct();
+        }
+    }
+
     private function newStore($data)
     {
+        $this->setEmptyOrderData($data);
         if (empty($data['order_items']) || !is_array($data['order_items'])) {
             $this->error_code = 'missing_products';
             throw new \Exception();
@@ -212,8 +246,8 @@ class OrdersController extends Controller
             throw new \Exception();
         }
         $customer = Customer::where('login', $login)->first();
-        //TODO update old passwords
-        if ($customer && !Hash::check($pass, $customer->password) && md5($pass) != $customer->password) {
+
+        if ($customer && !Hash::check($pass, $customer->password)) {
             $this->error_code = 'wrong_password';
             throw new \Exception();
         }
@@ -581,8 +615,8 @@ class OrdersController extends Controller
     {
         $orders = $request->user()->orders()
             ->with('status')
-            ->with(['items' => function($q) {
-                $q->with(['product' => function($w) {
+            ->with(['items' => function ($q) {
+                $q->with(['product' => function ($w) {
                     $w->with('packing')
                         ->with('price');
                 }]);
@@ -594,8 +628,7 @@ class OrdersController extends Controller
             ->with('invoices')
             ->with('employee')
             ->orderBy('id', 'desc')
-            ->get()
-        ;
+            ->get();
 
         foreach ($orders as $order) {
             $order->total_sum = $order->getSumOfGrossValues();
@@ -612,14 +645,13 @@ class OrdersController extends Controller
         }
         $order = Order
             ::where('token', $token)
-            ->with(['items' => function($q) {
+            ->with(['items' => function ($q) {
                 $q->with(['product' => function ($q) {
                     $q->join('product_prices', 'products.id', '=', 'product_prices.product_id');
                     $q->join('product_packings', 'products.id', '=', 'product_packings.product_id');
                 }]);
             }])
-            ->first()
-        ;
+            ->first();
         if (!$order) {
             return response("Order doesn't exist", 400);
         }
