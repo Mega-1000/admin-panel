@@ -28,7 +28,7 @@ class apaczkaApi
     private $isTest = 0;
     private $isVerboseMode = 0;
 
-    function apaczkaApi($login = '', $passwd = '', $apiKey = '')
+    function __construct($login = '', $passwd = '', $apiKey = '')
     {
         if ($login != '' && $passwd != '' && $apiKey != '') {
             $this->apiKey = $apiKey;
