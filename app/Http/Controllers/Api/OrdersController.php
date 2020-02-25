@@ -132,18 +132,6 @@ class OrdersController extends Controller
     public function newOrder(StoreOrderRequest $request)
     {
         $data = $request->all();
-        if (isset($data['want_contact'])) {
-
-            $data['customer_login'] = $data['phone'] . '@mega1000.pl';
-            $data['customer_notices'] = '';
-            $data['delivery_address'] = ['city' => 'Oława',
-                'postal_code' => '55-200'
-            ];
-            $data['is_standard'] = false;
-            $data['rewrite'] = 0;
-            $data['order_items'] = [['id' => 1, 'amount' => 1]];
-        }
-
         DB::beginTransaction();
         try {
             $id = $this->newStore($data);
@@ -164,8 +152,40 @@ class OrdersController extends Controller
         }
     }
 
+    private function getDefaultProduct()
+    {
+        $product = Product::where('token', 'KMK')->first();
+        if (!$product) {
+            $this->error_code = 'wrong_product_id';
+            throw new \Exception();
+        }
+
+        return ['id' => $product->id, 'amount' => 1];
+    }
+
+    private function setEmptyOrderData(&$data)
+    {
+        if (!empty($data['want_contact'])) {
+            $data = [
+                'customer_login' => $data['phone'] . '@mega1000.pl',
+                'customer_notices' => '',
+                'delivery_address' => [
+                    'city' => 'Oława',
+                    'postal_code' => '55-200'
+                ],
+                'is_standard' => false,
+                'rewrite' => 0
+            ];
+        }
+
+        if (empty($data['order_items'])) {
+            $data['order_items'] = $this->getDefaultProduct();
+        }
+    }
+
     private function newStore($data)
     {
+        $this->setEmptyOrderData($data);
         if (empty($data['order_items']) || !is_array($data['order_items'])) {
             $this->error_code = 'missing_products';
             throw new \Exception();
@@ -225,8 +245,8 @@ class OrdersController extends Controller
             throw new \Exception();
         }
         $customer = Customer::where('login', $login)->first();
-        //TODO update old passwords
-        if ($customer && !Hash::check($pass, $customer->password) && md5($pass) != $customer->password) {
+
+        if ($customer && !Hash::check($pass, $customer->password)) {
             $this->error_code = 'wrong_password';
             throw new \Exception();
         }
@@ -339,15 +359,15 @@ class OrdersController extends Controller
         }
 
         foreach ([
-                     'firstname',
-                     'lastname',
-                     'firmname',
-                     'nip',
-                     'address',
-                     'flat_number',
-                     'city',
-                     'postal_code'
-                 ] as $column) {
+            'firstname',
+            'lastname',
+            'firmname',
+            'nip',
+            'address',
+            'flat_number',
+            'city',
+            'postal_code'
+        ] as $column) {
             if (!empty($deliveryAddress[$column])) {
                 $address->$column = $deliveryAddress[$column];
             }
@@ -645,11 +665,11 @@ class OrdersController extends Controller
             $vat = 1 + $item->product->vat / 100;
 
             foreach ([
-                         'selling_price_calculated_unit',
-                         'selling_price_basic_uni',
-                         'selling_price_aggregate_unit',
-                         'selling_price_the_largest_unit'
-                     ] as $column) {
+                'selling_price_calculated_unit',
+                'selling_price_basic_uni',
+                'selling_price_aggregate_unit',
+                'selling_price_the_largest_unit'
+            ] as $column) {
                 $kGross = "gross_$column";
                 $kNet = "net_$column";
                 $item->product->$kGross = round($item->$kNet * $vat, 2);
