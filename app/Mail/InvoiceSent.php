@@ -38,6 +38,6 @@ class InvoiceSent extends Mailable
     {
         return $this->view('emails.invoice-sent')
             ->subject($this->subject)
-            ->attach('/home/mega1000/domains/mega1000.pro-linuxpl.com/public_html/subiekt/invoices/' . $this->attachment);
+            ->attach('/home/mega1000/domains/' . env('APP_URL') . '/public_html/subiekt/invoices/' . $this->attachment);
     }
 }

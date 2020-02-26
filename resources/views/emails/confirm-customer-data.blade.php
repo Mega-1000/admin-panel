@@ -5,5 +5,5 @@
 <p>W przypadku braku zatwierdzenia ponizszych danych informujemy iz system codziennie do 10 dnia nastepnego miesiaca od zakupu towaru bedzie wysylal taki e mail po czym automatycznie po tej dacie wystawi fakture na dane osoby odbierajacej towar i przyjmie jego zgodnosc z oferta.</p>
 
 <br/>
-<a href="http://mega1000.pro-linuxpl.com/customer/{{ $orderId }}/confirmation">POTWIERDZ DANE DO FAKTURY</a>
+<a href="https://{{env('APP_URL')}}/customer/{{ $orderId }}/confirmation">POTWIERDZ DANE DO FAKTURY</a>
 </body>
