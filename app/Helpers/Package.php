@@ -34,6 +34,19 @@ class Package
         }
     }
 
+    public function getTotalVolume()
+    {
+        return $this->productList->reduce(function ($carry, $item){
+            return $carry + $this->calculateVolumeForItem($item, $this->productList);
+        });
+    }
+    public function getTotalWeight()
+    {
+        return $this->productList->reduce(function ($carry, $item){
+            return $carry + $item->weight_trade_unit * $item->quantity;
+        });
+    }
+
     public function canPutNewItem($product, $quantity)
     {
         $moreItems = $this->productList->map(function ($item) {
@@ -41,18 +54,23 @@ class Package
         });
 
         $moreItems = $this->icreaseAmount($moreItems, $product, $quantity);
-        $maxLength = false;
-        if ($this->isLong) {
-            $maxLength = $moreItems->reduce(function ($carry, $item) {
-                return $item->packing->dimension_x > $carry ? $item->packing->dimension_x : $carry;
-            });
-        }
-        $total = $moreItems->reduce(function ($carry, $item) use ($maxLength) {
+        $total = $moreItems->reduce(function ($carry, $item) use ($moreItems) {
             $carry['weight'] += $item->weight_trade_unit * $item->quantity;
-            $carry['volume'] += $item->packing->getVolume($maxLength) * $item->quantity * $this->volumeMargin;
+            $carry['volume'] += $this->calculateVolumeForItem($item, $moreItems);
             return $carry;
         }, ['weight' => 0, 'volume' => 0]);
         return $total['weight'] < self::MAX_WEIGHT && $total['volume'] < self::VOLUME_RATIO;
+    }
+
+    private function calculateVolumeForItem($item, $list)
+    {
+        $maxLength = false;
+        if ($this->isLong) {
+            $maxLength = $list->reduce(function ($carry, $item) {
+                return $item->packing->dimension_x > $carry ? $item->packing->dimension_x : $carry;
+            });
+        }
+        return $item->packing->getVolume($maxLength) * $item->quantity * $this->volumeMargin;
     }
 
     public function getProducts()

@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App\Helpers\interfaces\iPackageDivider;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Log;
 
 class PackageDivider implements iPackageDivider
 {
@@ -46,7 +47,6 @@ class PackageDivider implements iPackageDivider
     private function divideToParcels($sorted)
     {
         $divided = [];
-        $allCalculated = empty($sorted[self::NOT_CALCULABLE]);
         $notCalculated = isset($sorted[self::NOT_CALCULABLE]) ? $sorted[self::NOT_CALCULABLE] : [];
         unset($sorted[self::NOT_CALCULABLE]);
         $transportCalculations = [];
@@ -91,7 +91,7 @@ class PackageDivider implements iPackageDivider
         }
         foreach ($packages as $pack) {
             $pack->removeEmpty();
-            $pack->productList = array_values($pack->productList->toArray());
+            $pack->productList = $pack->productList->values();
         }
         return $packages;
     }
@@ -206,7 +206,7 @@ class PackageDivider implements iPackageDivider
                     $product->quantity--;
                 } catch (\Exception $exception) {
                     if ($exception->getMessage() != Package::CAN_NOT_ADD_MORE) {
-                        error_log($exception->getMessage());
+                        Log::error('Package Building: repack', [$exception->getMessage()]);
                     }
                 }
             }
@@ -245,6 +245,37 @@ class PackageDivider implements iPackageDivider
 
     private function divideToPalette(array $parcels)
     {
+        $packageCollection = collect($parcels['packages']);
+        $packageCollection->sort(function (Package $first, Package $second) {
+            if ($first->getTotalVolume() == $second->getTotalVolume()) {
+                return 0;
+            }
+            return $first->getTotalVolume() > $second->getTotalVolume() ? -1 : 1;
+        })->values()->all();
+
+        $i = 0;
+        $palette = new Palette();
+        $palettes = [$palette];
+        while ($packageCollection->count() > 0) {
+            $package = $packageCollection->get($i);
+            if (isset($package)) {
+                if ($palette->canPutNewItem($package)) {
+                    $palette->addItem($package);
+                    $packageCollection->forget($i);
+                    $packageCollection = $packageCollection->values();
+                } else {
+                    $palette = new Palette();
+                    array_push($palettes, $palette);
+                    $i++;
+                }
+            } else {
+                $i = 0;
+            }
+        }
+        foreach ($palettes as $palette) {
+            $palette->tryFitInSmallerPalette();
+        }
+        $parcels['packages'] = $palettes;
         return $parcels;
     }
 }
