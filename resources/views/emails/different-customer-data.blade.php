@@ -5,5 +5,5 @@
     <p>W przypadku braku zatwierdzenia ponizszych danych informujemy iz system codziennie przez kolejne 7 dni od zakupu towaru bedzie wysylal taki e mail po czym automatycznie po tej dacie wystawi fakture na dane osoby odbierajacej towar i przyjmie jego zgodnosc z oferta.</p>
 
     <br/>
-    <a href="https://{{env('APP_URL')}}/customer/{{ $orderId }}/confirmation/{{$invoiceId}}">POTWIERDZ DANE DO FAKTURY</a>
+    <a href="{{env('APP_URL')}}/customer/{{ $orderId }}/confirmation/{{$invoiceId}}">POTWIERDZ DANE DO FAKTURY</a>
 </body>
