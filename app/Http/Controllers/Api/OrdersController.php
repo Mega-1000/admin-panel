@@ -179,8 +179,10 @@ class OrdersController extends Controller
             ];
         }
 
+        $data['update_email'] = false;
         if (empty($data['order_items'])) {
             $data['order_items'] = $this->getDefaultProduct();
+            $data['update_email'] = true;
         }
     }
 
@@ -204,11 +206,7 @@ class OrdersController extends Controller
             $order = new Order();
         }
 
-        if ($orderExists) {
-            $customer = $order->customer;
-        } else {
-            $customer = $this->getCustomerByLogin($data['customer_login'] ?? '', $data['phone'] ?? '');
-        }
+        $customer = $this->getCustomer($orderExists, $order, $data);
 
         $order->customer_id = $customer->id;
 
@@ -232,11 +230,46 @@ class OrdersController extends Controller
         $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone'] ?? '', 'order');
         $this->updateOrderAddress($order, $data['invoice_address'] ?? [], 'INVOICE_ADDRESS', $data['phone'] ?? '', 'order');
         if (isset($data['is_standard']) && $data['is_standard'] || $order->customer->addresses()->count() < 2) {
-            $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'STANDARD_ADDRESS', $data['phone'] ?? '', 'customer', $data['customer_login'] ?? '');
-            $this->updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone'] ?? '', 'customer', $data['customer_login'] ?? '');
+            $this->updateOrderAddress(
+                $order,
+                $data['delivery_address'] ?? [],
+                'STANDARD_ADDRESS',
+                $data['phone'] ?? '',
+                'customer',
+                $data['customer_login'] ?? '',
+                $data['update_email']
+            );
+            $this->updateOrderAddress(
+                $order,
+                $data['delivery_address'] ?? [],
+                'DELIVERY_ADDRESS',
+                $data['phone'] ?? '',
+                'customer',
+                $data['customer_login'] ?? '',
+                $data['update_email']
+            );
         }
 
         return $order->id;
+    }
+
+    private function getCustomer($orderExists, $order, $data)
+    {
+        if ($orderExists) {
+            $customer = $order->customer;
+            if ($data['update_email'] && !empty($data['customer_login'])) {
+                $existingCustomer = Customer::where('login', $data['customer_login'])->first();
+                if ($existingCustomer) {
+                    $customer = $existingCustomer;
+                } else {
+                    $customer->login = $data['customer_login'];
+                    $customer->save();
+                }
+            }
+        } else {
+            $customer = $this->getCustomerByLogin($data['customer_login'] ?? '', $data['phone'] ?? '');
+        }
+        return $customer;
     }
 
     private function getCustomerByLogin($login, $pass)
@@ -327,7 +360,7 @@ class OrdersController extends Controller
         $order->save();
     }
 
-    private function updateOrderAddress($order, $deliveryAddress, $type, $phone, $relation, $login = '')
+    private function updateOrderAddress($order, $deliveryAddress, $type, $phone, $relation, $login = '', $forceUpdateEmail = false)
     {
         $phone = preg_replace('/[^0-9]/', '', $phone);
 
@@ -347,12 +380,15 @@ class OrdersController extends Controller
                 break;
             case 'customer':
                 $address = $order->customer->addresses()->where('type', $type)->first();
+                $exists = (bool) $address;
                 $obj = $order->customer;
                 if (!$address) {
                     $address = new CustomerAddress();
-                    $address->email = $login;
                     $address->phone = $phone;
                     $address->type = $type;
+                }
+                if (!empty($login) && (!$exists || $forceUpdateEmail)) {
+                    $address->email = $login;
                 }
                 break;
             default:
