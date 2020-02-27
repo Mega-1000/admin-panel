@@ -324,6 +324,7 @@ class OrdersController extends Controller
 
         $order->total_price = $orderTotal * 1.23;
         $order->weight = $weight;
+        $order->save();
     }
 
     private function updateOrderAddress($order, $deliveryAddress, $type, $phone, $relation, $login = '')
