@@ -16,7 +16,6 @@ use App\Jobs\ImportCustomersJob;
 use App\Jobs\ImportFirmsAndWarehousesJob;
 use App\Jobs\ImportPaymentsFromPdfFile;
 use App\Jobs\Orders\CloseChattingsJob;
-use App\Jobs\Orders\FindOrdersForCheckingMissingDeliveryAddresses;
 use App\Jobs\Orders\TriggerOrderLabelSchedulersJob;
 use App\Jobs\SearchOrdersInStoredMailsJob;
 use App\Jobs\ValidateSubiekt;
@@ -57,7 +56,6 @@ class Kernel extends ConsoleKernel
 
 
         $schedule->job(CheckStatusInpostPackagesJob::class)->everyMinute();
-        $schedule->job(FindOrdersForCheckingMissingDeliveryAddresses::class)->dailyAt("05:00");
         $schedule->job(CheckPackagesStatusJob::class)->everyMinute();
         $schedule->job(ChangeShipmentDatePackagesJob::class)->dailyAt("00:30");
         $schedule->job(SendLPWithReminderSendingToWarehouseJob::class)->dailyAt("05:00");
