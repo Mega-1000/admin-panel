@@ -20,7 +20,6 @@ use Illuminate\Support\Facades\Log;
 use App\Integrations\DPD\DPDService;
 use App\Integrations\Apaczka\apaczkaApi;
 use App\Integrations\Apaczka\ApaczkaOrder;
-use App\Integrations\Apaczka\ApaczkaOrderShipment;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
@@ -304,55 +303,56 @@ class OrdersCourierJobs extends Job
     public function createPackageForApaczka()
     {
         try {
-            try {
-                $apaczka = new apaczkaApi($this->config['apaczka']['login'], $this->config['apaczka']['password'],
-                    $this->config['apaczka']['apiKey']);
-                $apaczka->setProductionMode();
-                $apaczka->validateAuthData();
-            } catch (Exception $exception) {
-                Log::notice(
-                    'validateAuthData ERROR',
-                    ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
-                );
-                return ['status' => '500', 'error_code' => self::ERRORS['INVALID_AUTH_DATA_COURIER']];
-            }
+            $apaczka = new apaczkaApi($this->config['apaczka']['appId'], $this->config['apaczka']['appSecret']);
             $forwardingDelivery = $this->data['additional_data']['forwarding_delivery'];
             switch ($forwardingDelivery) {
                 case 'DPD_CLASSIC':
                     $carrierType = 'DPD_CLASSIC';
+                    $carrierID = 21;
                     break;
                 case 'DHLSTD':
                     $carrierType = 'DHLSTD';
+                    $carrierID = 82;
                     break;
                 case 'DHL12':
                     $carrierType = 'DHL12';
+                    $carrierID = 83;
                     break;
                 case 'DHL09':
                     $carrierType = 'DHL09';
+                    $carrierID = 84;
                     break;
                 case 'DHL1722':
                     $carrierType = 'DHL1722';
+                    $carrierID = '';
                     break;
                 case 'KEX_EXPRESS':
                     $carrierType = 'KEX_EXPRESS';
+                    $carrierID = '';
                     break;
                 case 'FEDEX':
                     $carrierType = 'FEDEX';
+                    $carrierID = 151;
                     break;
                 case 'POCZTA_POLSKA_E24':
                     $carrierType = 'POCZTA_POLSKA_E24';
+                    $carrierID = '';
                     break;
                 case 'TNT':
                     $carrierType = 'TNT';
+                    $carrierID = 170;
                     break;
                 case 'INPOST':
                     $carrierType = 'INPOST';
+                    $carrierID = 42;
                     break;
                 case 'PACZKOMAT':
                     $carrierType = 'PACZKOMAT';
+                    $carrierID = 41;
                     break;
                 case 'POCZTEX':
-                    $carrierType = 'POCZTA_POLSKA_E24';
+                    $carrierType = 'POCZTEX_EXPRESS_24';
+                    $carrierID = 161;
                     break;
                 default:
                     Log::notice(
@@ -361,18 +361,17 @@ class OrdersCourierJobs extends Job
                     );
                     return ['status' => '500', 'error_code' => self::ERRORS['INVALID_FORWARDING_DELIVERY']];
             }
-
             $order = new ApaczkaOrder();
 
-            $order->notificationDelivered = $order->createNotification(false, false, true, false);
-            $order->notificationException = $order->createNotification(false, false, true, false);
-            $order->notificationNew = $order->createNotification(false, false, true, false);
-            $order->notificationSent = $order->createNotification(false, false, true, false);
+            $order->notificationDelivered = $order->createNotification(0, 0, 1, 0);
+            $order->notificationException = $order->createNotification(0, 0, 1, 0);
+            $order->notificationNew = $order->createNotification(0, 0, 1, 0);
+            $order->notificationSent = $order->createNotification(0, 0, 1, 0);
 
-            $order->setServiceCode($carrierType);
+            $order->setServiceCode($carrierType, $carrierID);
             $order->referenceNumber = $this->data['order_id'];
             $order->contents = $this->data['content'];
-
+            $order->comment = $this->data['notices'];
             $order->setReceiverAddress(
                 $this->data['delivery_address']['firstname'],
                 $this->data['delivery_address']['lastname'],
@@ -396,12 +395,10 @@ class OrdersCourierJobs extends Job
             $height = $this->data['height'];
             $weight = $this->data['weight'];
 
-            $orderShipment = new ApaczkaOrderShipment();
-            $orderShipment->createShipment('PACZKA', $width, $length, $height, $weight);
+            $order->createShipment('PACZKA', $width, $length, $height, $weight);
 
             $date = Carbon::now();
 
-            $order->addShipment($orderShipment);
             if (isset($this->data['pickup_address'])) {
                 $order->setSenderAddress(
                     $this->data['pickup_address']['firmname'],
@@ -422,44 +419,45 @@ class OrdersCourierJobs extends Job
                 }
                 $order->setPickup(
                     $pickup,
-                    '06:00',
+                    '08:00',
                     '17:00',
                     $this->data['pickup_address']['parcel_date']
                 );
             }
 
-            $result = $apaczka->placeOrder($order);
-            if ($result !== false && $result->return->order) {
-                $orderId = $result->return->order->id;
+            $json = $apaczka->placeOrder($order);
+            $result = json_decode($json);
+            if ($result->status !== 400 && $result->response->order) {
+                $orderId = $result->response->order->id;
             } else {
                 Log::notice(
-                    $result->return->result->messages->Message->description,
+                    $result->message,
                     ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
                 );
                 return ['status' => '500', 'error_code' => self::ERRORS['PROBLEM_IN_PLACE_ORDER']];
             }
-            $waybill = $apaczka->getWaybillDocument($orderId);
-
-            if ($waybill) {
+            $waybilljson = $apaczka->getWaybillDocument($orderId);
+            $waybill = json_decode($waybilljson);
+            if ($waybill->status == 200) {
                 Storage::disk('local')->put('public/apaczka/stickers/sticker' . $orderId . '.pdf',
-                    $waybill->return->waybillDocument);
+                    $waybill->response->waybill);
             } else {
                 Log::notice(
-                    $waybill->return->result->messages,
+                    $waybill->message,
                     ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
                 );
                 return ['status' => '500', 'error_code' => self::ERRORS['PROBLEM_WITH_DOWNLOAD_WAYBILL']];
             }
 
-            $result = $apaczka->getCollectiveTurnInCopyDocument($orderId);
+            $TurnInjson = $apaczka->getCollectiveTurnInCopyDocument($orderId);
+            $TurnIn = json_decode($TurnInjson);
             Storage::disk('local')->put('public/apaczka/protocols/protocol' . $date . '-' . $orderId . '.pdf',
-                $result->return->turnInCopyDocument);
-            dispatch_now(new CheckStatusInpostPackagesJob());
+                $TurnIn->response->turn_in);
             return [
                 'status' => 200,
                 'error_code' => 0,
                 'sending_number' => $orderId,
-                'letter_number' => $waybill->return->waybillDocument
+                'letter_number' => $waybill->response->waybill
             ];
         } catch (Exception $exception) {
             Log::info(
