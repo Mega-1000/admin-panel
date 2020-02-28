@@ -517,6 +517,9 @@
                 </div>
             </th>
             <th>
+                <div><span>@lang('orders.table.add_invoice')</span></div>
+            </th>
+            <th>
                 @lang('orders.table.profit')
             </th>
             <th>
@@ -1070,6 +1073,11 @@
                 {
                     data: 'nick_allegro',
                     name: 'nick_allegro',
+                },
+                {
+                    data: 'orderId',
+                    name: 'add_invoice',
+                    render: (orderId, type, row) => ('<a href="{{env('FRONT_NUXT_URL')}}' + '/magazyn/awizacja/0/0/' + orderId + '/wyslij-fakture">dodaj fakturę</a>')
                 },
                 {
                     data: 'orderId',

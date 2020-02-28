@@ -25,6 +25,7 @@ return [
         'clientFirstname' => 'Imię',
         'clientLastname' => 'Nazwisko',
         'nick_allegro' => 'Nick Allegro',
+        'add_invoice' => 'Dodaj fakturę',
         'profit' => 'Zysk na towarze',
         'weight' => 'Waga',
         'products_value_gross' => 'Wart. sprz. tow. br.',
