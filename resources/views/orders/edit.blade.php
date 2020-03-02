@@ -3843,7 +3843,6 @@
                             if (profit == 1) {
                                 $('#profitInfo').val((parseFloat($('#profit').val()) + additionalServieCost).toFixed(2));
                             }
-                            //let sum = $('#totalPriceInfo').val() + packingWarehouseCost + shipmentPriceForClient + additionalServieCost;
                             let sum = valueOfItemsGross + packingWarehouseCost + shipmentPriceForClient + additionalServieCost;
                             console.log('Gross' + valueOfItemsGross);
                             console.log('Suma' + sum);
