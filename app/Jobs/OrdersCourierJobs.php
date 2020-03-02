@@ -230,8 +230,8 @@ class OrdersCourierJobs extends Job
 
             $date = Carbon::parse($this->data['pickup_address']['parcel_date'])->format('Y-m-d');
             $pickupDate = $date;
-            $pickupTimeFrom = '06:00';
-            $pickupTimeTo = '17:00';
+            $pickupTimeFrom = '10:00';
+            $pickupTimeTo = '16:00';
 
             $contactInfo = [
                 'name' => $this->data['pickup_address']['firstname'] . ' ' . $this->data['pickup_address']['lastname'],
