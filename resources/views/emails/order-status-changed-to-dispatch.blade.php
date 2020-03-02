@@ -9,16 +9,18 @@
     <li>Potwierdzić lub zanegować kliknając na link: <a href="{{ $formLink }}">FORMULARZ POTWIERDZANIA AWIZACJI</a></li>
 </ul>
 <p>
-    W przypadku gdy awizazja nie zostanie potwierdzona bądź odrzucona, system będzie wysyłał informację z prośbą o wykonanie tej czynności.
+    W przypadku gdy awizazja nie zostanie potwierdzona bądź odrzucona, system będzie wysyłał informację z prośbą o
+    wykonanie tej czynności.
 </p>
-<p style="color:red">Jeśli awizacja jest pozytywna pod różnymi warunkami np. zapłacenie proformy prosimy o ZATWIERDZENIE oraz wpisanie informacji o tym warunku w polu UWAGI.</p>
+<p style="color:red">Jeśli awizacja jest pozytywna pod różnymi warunkami np. zapłacenie proformy prosimy o ZATWIERDZENIE
+    oraz wpisanie informacji o tym warunku w polu UWAGI.</p>
 <p>
     Także prosimy pozostawić tego maila do mometnu wydania towaru który neleży potwierdzić przyciskiem <a
-            href="{{$sendFormInvoice}}">TOWAR ZOSTAL WYDANY</a> w dniu wydania zlecenia.
+        href="{{$sendFormInvoice}}">TOWAR ZOSTAL WYDANY</a> w dniu wydania zlecenia.
 </p>
 <p>
     Jednoczesnie prosimy zalączyc fakturę a dokonać tego można po uzyciu przycisku <a
-            href="{{$sendFormInvoice}}">ZALACZ FAKTURE</a>.
+        href="{{$sendFormInvoice}}">ZALACZ FAKTURE</a>.
 </p>
 <p>
     Faktura powinna byc bez pieczatek i podpisow i po wydrukowaniu powinna wygladac jak oryginal. (Prosimy nie wysylac
@@ -36,13 +38,19 @@
 <p>
     Prosimy wpisywac nr oferty na wszystkich dokumentach poniewaz tylko po nim identyfikujemy zlecenia.
 </p>
+{{$order->employee->firstname . ' ' . $order->employee->lastname}}<br>
+
 <p>
     {{$order->warehouse->symbol}}<br>
     {{$order->warehouse->address->address}} {{$order->warehouse->address->warehouse_number}}<br>
     {{$order->warehouse->address->postal_code}} {{$order->warehouse->address->city}}<br>
 </p>
 <p>
-    !!!!!!! UWAGA W 2018 FAKTURUJEMY NA NOWA FIRME DANE PONIZEJ !!!!!!!!<br>
+    ELEKTRONICZNA PLATFORMA HANDLOWA WOJCIECH WEISSBROT<br/>
+    IWASZKIEWICZA 15A<br/>
+    55-200 OLAWA<br/>
+    NIP: 9121027907<br/>
+
     Od<br>
     MEGA1000 BIS SP Z O O<br>
     ZEROMSKIEGO 52/18<br>
@@ -50,7 +58,7 @@
     NIP 8971719229<br>
 </p>
 <p>
-    Dane do dostawy:
+    Dane do dostawy: <br/>
     {{$order->addresses->first->id->firstname}} {{$order->addresses->first->id->lastname}}<br>
     {{$order->addresses->first->id->address}} {{$order->addresses->first->id->flat_number}}<br>
     {{$order->addresses->first->id->postal_code}} {{$order->addresses->first->id->city}}<br>
@@ -66,16 +74,38 @@
 </p>
 @foreach($order->items as $item)
     <p>
-        Nazwa: {{$item->product->name}}<br>
-        Symbol: {{$item->product->symbol}}<br>
-        Ilość: {{$item->quantity}}<br>
-        Cena jednostkowa netto: {{$item->net_purchase_price_commercial_unit}}<br>
-        Wartość: {{$item->price}}<br>
+        Nazwa: {{$item->product->name}} Symbol: {{$item->product->symbol}} <br/>
+        {{$item->product->supplier_product_name ? 'Nazwa producenta: ' . $item->product->supplier_product_name : null}}
+        {{$item->product->supplier_product_symbol ? 'Symbol producenta: ' . $item->product->supplier_product_symbol : null}}
     </p>
+    @include('emails.item-price-table', [
+    'item' => $item,
+    'bw' => $item->product->packing->number_of_sale_units_in_the_pack,
+    'bx' => $item->product->packing->number_of_trade_items_in_the_largest_unit,
+    ])
+    <br/>
 @endforeach
+@php
+    $sumOfItems = 0;
+    foreach ($order->items as $item) {
+        $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+    }
+    $orderValue = str_replace(',', '', number_format($sumOfItems + $order->shipment_price_for_client + $order->additional_service_cost + $order->additional_cash_on_delivery_cost, 2));
+    $paymentsValue = 0;
+    $paymentsPromise = 0;
+
+    foreach($order->bookedPayments($order->id) as $payment){
+        $paymentsValue += $payment->amount;
+    }
+    foreach($order->promisePayments($order->id) as $payment){
+        $paymentsPromise += $payment->amount;
+    }
+@endphp
 <p>
-    Koszt transportu brutto: {{$order->shipment_price_for_client}}<br>
-    Kwota ktora zobowiazujecie sie pobrac przed rozladunkiem i nam przekazac: {{$order->total_price}}<br>
+    Koszt transportu brutto: {{$order->shipment_price_for_us}}<br>
+
+    Kwota ktora zobowiazujecie sie pobrac przed rozladunkiem i nam
+    przekazac: {{$orderValue - $paymentsValue - $paymentsPromise}}<br>
     Data rozpoczęcia nadawania przesyłki: {{$order->shipment_date}}
 </p>
 <p>
