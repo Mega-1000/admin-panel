@@ -601,11 +601,6 @@ class OrdersController extends Controller
             dispatch_now(new MissingDeliveryAddressSendMailJob($order));
         }
 
-        if ($request->input('status') != $order->status_id && $request->input('status') == 5) {       //w trakcie realizacji
-            dispatch_now(new MissingDeliveryAddressSendMailJob($order,
-                ["dispatch-labels-by-name" => ["missing-delivery-address"]]));
-        }
-
         $orderItems = $order->items;
         $itemsArray = [];
         $orderItemKMD = 0;

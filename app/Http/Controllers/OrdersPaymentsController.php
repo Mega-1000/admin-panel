@@ -7,7 +7,6 @@ use App\Http\Requests\OrderPaymentCreateRequest;
 use App\Http\Requests\OrderPaymentUpdateRequest;
 use App\Jobs\AddLabelJob;
 use App\Jobs\DispatchLabelEventByNameJob;
-use App\Jobs\Orders\MissingDeliveryAddressSendMailJob;
 use App\Jobs\RemoveLabelJob;
 use App\Repositories\CustomerRepository;
 use App\Repositories\OrderPaymentRepository;
@@ -224,10 +223,6 @@ class OrdersPaymentsController extends Controller
             ], $orderId);
         }
 
-
-        dispatch_now(new MissingDeliveryAddressSendMailJob($orderId));
-
-
         return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
             'message' => __('order_payments.message.store'),
             'alert-type' => 'success'
@@ -330,7 +325,6 @@ class OrdersPaymentsController extends Controller
                                             'status_id' => 5,
                                         ], $orderId);
                                     }
-                                    dispatch_now(new MissingDeliveryAddressSendMailJob($orderId));
                                 }
                             }
                         } else {
@@ -394,7 +388,6 @@ class OrdersPaymentsController extends Controller
                                             'status_id' => 5,
                                         ], $orderId);
                                     }
-                                    dispatch_now(new MissingDeliveryAddressSendMailJob($orderId));
                                 }
                             }
                         }
@@ -473,7 +466,6 @@ class OrdersPaymentsController extends Controller
                                             'status_id' => 5,
                                         ], $orderId);
                                     }
-                                    dispatch_now(new MissingDeliveryAddressSendMailJob($orderId));
                                 }
                             }
                         }
@@ -1056,7 +1048,6 @@ class OrdersPaymentsController extends Controller
                         'status_id' => 5,
                     ], $orderId);
                 }
-                dispatch_now(new MissingDeliveryAddressSendMailJob($orderId));
                 return ['orderId' => $orderId, 'amount' => $amount,  'info' => 'Zlecenie zostało pomyślnie utworzone.'];
 
             } else {
