@@ -2,7 +2,7 @@
     <tbody>
     <Tr>
         <Th/>
-        <th colSpan='4'>Jednostki</th>
+        <th colSpan='{{4 + ($bw > 0) + ($bx > 0 && $item->net_purchase_price_the_largest_unit > 0)}}'>Jednostki</th>
     </Tr>
     <Tr>
         <Th/>
