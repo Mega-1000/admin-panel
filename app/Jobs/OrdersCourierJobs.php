@@ -126,7 +126,9 @@ class OrdersCourierJobs extends Job
                 $path = storage_path('app/public/jas/protocols/protocol' . $package->letter_number . '.pdf');
             } else {
                 if ($package->delivery_courier_name === 'POCZTEX') {
+                    if ($package->service_courier_name != 'APACZKA') {
                     $path = storage_path('app/public/pocztex/protocols/protocol' . $package->sending_number . '.pdf');
+                    } 
                 }
             }
 
@@ -308,19 +310,19 @@ class OrdersCourierJobs extends Job
             switch ($forwardingDelivery) {
                 case 'DPD_CLASSIC':
                     $carrierType = 'DPD_CLASSIC';
-                    $carrierID = 21;
+                    $carrierID = $apaczka->DPD_CLASSIC;
                     break;
                 case 'DHLSTD':
                     $carrierType = 'DHLSTD';
-                    $carrierID = 82;
+                    $carrierID = $apaczka->DHLSTD;
                     break;
                 case 'DHL12':
                     $carrierType = 'DHL12';
-                    $carrierID = 83;
+                    $carrierID = $apaczka->DHL12;
                     break;
                 case 'DHL09':
                     $carrierType = 'DHL09';
-                    $carrierID = 84;
+                    $carrierID = $apaczka->DHL09;
                     break;
                 case 'DHL1722':
                     $carrierType = 'DHL1722';
@@ -332,7 +334,7 @@ class OrdersCourierJobs extends Job
                     break;
                 case 'FEDEX':
                     $carrierType = 'FEDEX';
-                    $carrierID = 151;
+                    $carrierID = $apaczka->FEDEX;
                     break;
                 case 'POCZTA_POLSKA_E24':
                     $carrierType = 'POCZTA_POLSKA_E24';
@@ -340,19 +342,19 @@ class OrdersCourierJobs extends Job
                     break;
                 case 'TNT':
                     $carrierType = 'TNT';
-                    $carrierID = 170;
+                    $carrierID = $apaczka->TNT;
                     break;
                 case 'INPOST':
                     $carrierType = 'INPOST';
-                    $carrierID = 42;
+                    $carrierID = $apaczka->INPOST;
                     break;
                 case 'PACZKOMAT':
                     $carrierType = 'PACZKOMAT';
-                    $carrierID = 41;
+                    $carrierID = $apaczka->PACZKOMAT;
                     break;
                 case 'POCZTEX':
                     $carrierType = 'POCZTEX_EXPRESS_24';
-                    $carrierID = 161;
+                    $carrierID = $apaczka->POCZTEX_EXPRESS_24;
                     break;
                 default:
                     Log::notice(
@@ -365,7 +367,7 @@ class OrdersCourierJobs extends Job
 
             $order->notificationDelivered = $order->createNotification(0, 0, 1, 0);
             $order->notificationException = $order->createNotification(0, 0, 1, 0);
-            $order->notificationNew = $order->createNotification(0, 0, 1, 0);
+            $order->notificationNew = $order->createNotification(0, 0, 1);
             $order->notificationSent = $order->createNotification(0, 0, 1, 0);
 
             $order->setServiceCode($carrierType, $carrierID);
@@ -425,7 +427,7 @@ class OrdersCourierJobs extends Job
                 );
             }
 
-            $json = $apaczka->placeOrder($order);
+            $json = $apaczka->placeOrder($order)->getBody();
             $result = json_decode($json);
             if ($result->status !== 400 && $result->response->order) {
                 $orderId = $result->response->order->id;
@@ -436,11 +438,11 @@ class OrdersCourierJobs extends Job
                 );
                 return ['status' => '500', 'error_code' => self::ERRORS['PROBLEM_IN_PLACE_ORDER']];
             }
-            $waybilljson = $apaczka->getWaybillDocument($orderId);
+            $waybilljson = $apaczka->getWaybillDocument($orderId)->getBody();
             $waybill = json_decode($waybilljson);
             if ($waybill->status == 200) {
                 Storage::disk('local')->put('public/apaczka/stickers/sticker' . $orderId . '.pdf',
-                    $waybill->response->waybill);
+                base64_decode($waybill->response->waybill));
             } else {
                 Log::notice(
                     $waybill->message,
@@ -449,15 +451,15 @@ class OrdersCourierJobs extends Job
                 return ['status' => '500', 'error_code' => self::ERRORS['PROBLEM_WITH_DOWNLOAD_WAYBILL']];
             }
 
-            $TurnInjson = $apaczka->getCollectiveTurnInCopyDocument($orderId);
+            $TurnInjson = $apaczka->getCollectiveTurnInCopyDocument($orderId)->getBody();
             $TurnIn = json_decode($TurnInjson);
-            Storage::disk('local')->put('public/apaczka/protocols/protocol' . $date . '-' . $orderId . '.pdf',
-                $TurnIn->response->turn_in);
+            Storage::disk('local')->put('public/apaczka/protocols/protocol' . $orderId . '.pdf',
+            base64_decode($TurnIn->response->turn_in));
             return [
                 'status' => 200,
                 'error_code' => 0,
                 'sending_number' => $orderId,
-                'letter_number' => $waybill->response->waybill
+                'letter_number' => $result->response->order->waybill_number
             ];
         } catch (Exception $exception) {
             Log::info(

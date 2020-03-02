@@ -14,12 +14,22 @@ class apaczkaApi
     var $outputFileName = "XOLTResult.log";
 
     var $Error = "";
-
+    var $DPD_CLASSIC = 21;
+    var $DHL12 = 83;
+    var $DHL09 = 84;
+    var $DHLSTD = 82;
+    var $FEDEX = 151;
+    var $TNT = 170;
+    var $INPOST = 42;
+    var $PACZKOMAT = 41;
+    var $POCZTEX_EXPRESS_24 = 161;
+ 
     private $mode = array('trace' => 1, 'exceptions' => 0, 'encoding' => 'UTF-8');
     protected $client;
 
     private $isTest = 0;
     private $isVerboseMode = 0;
+    
 
     function __construct($appId = '', $appSecret = '')
     {
@@ -46,39 +56,40 @@ class apaczkaApi
         return sprintf( "%s:%s:%s:%s", $appId, $route, $data, $expires );
     }
     
+    function placeOrder(ApaczkaOrder $order)
+    {
+        $data = $order->getOrder();
+        $route = 'order_send/';
+
+        $requestData = $this->makeRequest($route, $data);
+        $resp = $this->sendRequest($route, $requestData);
+        return $resp;
+    }
+    
     function makeRequest($route, $data) 
     {
-      $expires = time()+1800;  
+      $expires = time()+1800;
       $signature =  $this->getSignature($this->stringToSign( $this->appId, $route, $data, $expires ), $this->appSecret );
       $requestData = [
-       'appId' => $this->appId,
+       'app_id' => $this->appId,
        'request' => $data,
        'expires' => $expires,
        'signature' => $signature   
-      ];
-      $resp = $this->sendRequest($route, $requestData);
-      return $resp;
+      ]; 
+      return $requestData;
     }
 
     function sendRequest($route, $requestData)
     {
-        $client= new \GuzzleHttp\Client(["base_uri" => $route]);
-        $options = $requestData;
+        
+        $client= new \GuzzleHttp\Client(["base_uri" => 'https://www.apaczka.pl/api/v2/']);
 
-        $resp = $client->post("/post", $options);
+        $options = ['form_params' => $requestData];
+        $resp = $client->post($route, $options);
         return $resp;
     }
 
 
-    function placeOrder(ApaczkaOrder $order)
-    {
-        $data = $order->getOrder();
-        $route = 'https://www.apaczka.pl/api/v2/order_send';
-
-        $resp = $this->makeRequest($route, $data);
-
-        return $resp;
-    }
 
 
     function getWaybillDocument($orderId = false)
@@ -88,22 +99,25 @@ class apaczkaApi
             throw new Exception('orderId must be intval: [' . print_r($orderId, 1) . '] given.');
         }
 
-        $route = 'https://www.apaczka.pl/api/v2/waybill'.$orderId; 
+        $route = 'waybill/'.$orderId.'/'; 
         $data = json_encode( [] );
 
-        $resp = $this->makeRequest($route, $data);
+        $requestData = $this->makeRequest($route, $data);
+        $resp = $this->sendRequest($route, $requestData);
         
         return $resp;
     }
 
     function getCollectiveTurnInCopyDocument($orderId)
     {
-        $route = 'https://www.apaczka.pl/api/v2/turn_in';
+        $route = 'turn_in/';
         $data= json_encode(['order_ids' => [$orderId]]); 
 
-        $resp = $this->makeRequest($route, $data);
-
+        $requestData = $this->makeRequest($route, $data);
+        $resp = $this->sendRequest($route, $requestData);
+        
         return $resp;
+
     }
 }
 
@@ -169,14 +183,15 @@ class ApaczkaOrder
     function setReferenceNumber($referenceNumber) {
         $this->referenceNumber = $referenceNumber;
     }
-    function createNotification($isReceiverEmail, $isReceiverSms, $isSenderEmail, $isSenderSms)
+    function createNotification($isReceiverEmail, $isReceiverSms, $isSenderEmail, $isSenderSms = null)
     {
         $notification = array();
         $notification['isReceiverEmail'] = $isReceiverEmail;
         $notification['isReceiverSms'] = $isReceiverSms;
         $notification['isSenderEmail'] = $isSenderEmail;
+        if (!is_null($isSenderSms)) {
         $notification['isSenderSms'] = $isSenderSms;
-
+        }
         return $notification;
     }
 
@@ -257,7 +272,7 @@ class ApaczkaOrder
         $address['postalCode'] = $postalCode;
         $address['city'] = $city;
         $address['is_residential'] = 1;
-        $address['contactName'] = $contactName;
+        $address['contact_person'] = $contactName;
         $address['email'] = $email;
         $address['phone'] = $phone;
         if ($stateCode != '') {
@@ -287,18 +302,18 @@ class ApaczkaOrder
 //        if (!$this->accountNumber || !$this->codAmount){
 //            $this->codAmount = 0;
 //        }
-        $order = json_encode([
+        $order = [
             'service_id' => $this->serviceId,
             'address' => [
                 'sender' => $this->address_sender,
                 'receiver' => $this->address_receiver                
             ],
             'option' => [
-                '31' => 1, // powiadomienie sms,
-                '11' => 0, // rod
-                '19' => 0, // dostawa w sobotę,
-                '25' => 0, // dostawa w godzinach,
-                '58' => 0, // ostrożnie  
+//                '31' => 0, // powiadomienie sms,
+//                '11' => 0, // rod
+//                '19' => 0, // dostawa w sobotę,
+//                '25' => 0, // dostawa w godzinach,
+                '58' => 0 // ostrożnie  
             ],
             'notification' => [
                 'new' => $this->notificationNew,
@@ -312,12 +327,13 @@ class ApaczkaOrder
                 'bankaccount' => $this->accountNumber     
             ],
             'pickup' => $this->pickUp,
-            'shipment' => $this->shipment,
+            'shipment' => [$this->shipment],
             'comment' => $this->comment,
             'content' => $this->contents           
-        ]);
-        
-        return $order;
+        ];
+        return json_encode( [
+        'order' => $order 
+    ] );
     }
 
 }
