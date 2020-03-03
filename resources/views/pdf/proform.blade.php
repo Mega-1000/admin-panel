@@ -29,7 +29,7 @@
         <tbody>
             <tr>
                 <td style="width: 50%">
-                    <h4>Proforma PRO/{{$order->id}}/{{ $proformDate }}</h4>
+                    <h4>Proforma PRO/QQ{{$order->id}}QQ/{{ $proformDate }}</h4>
                     Data wystawienia: {{ $date }} <br/>
                     Data sprzedaży: {{ $date }}
                 </td>
@@ -37,10 +37,12 @@
             <tr>
                 <td>
                     <h4>Sprzedawca</h4>
-                    <p> MEGA 1000 BIS SP Z O O <br/>
-                        ŻEROMSKIEGO 52/18    <br/>
-                        50-312 WROCŁAW <br/>
-                        NIP: 8971719229 <br/>
+
+                    <p>
+                        ELEKTRONICZNA PLATFORMA HANDLOWA WOJCIECH WEISSBROT<br/>
+                        IWASZKIEWICZA 15A<br/>
+                        55-200 OLAWA<br/>
+                        NIP: 9121027907<br/>
                         Nr konta: {{env('ACCOUNT_PROFORMA')}} <br/>
                         Telefony: {{env('FRONT_URL')}}/kontakt <br/>
                         E-mail ogólny : {{'info@' . env('DOMAIN_NAME')}} <br/>
