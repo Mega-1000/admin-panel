@@ -38,24 +38,17 @@
 <p>
     Prosimy wpisywac nr oferty na wszystkich dokumentach poniewaz tylko po nim identyfikujemy zlecenia.
 </p>
-{{$order->employee->firstname . ' ' . $order->employee->lastname}}<br>
+{{$order->employee->firstname . ' ' . $order->employee->lastname}}<br/>
+{{$order->employee->email . ' ' . $order->employee->phone}}<br/>
+{{'Numer konsultanta:' . $order->employee->name}}<br/>
+
 
 <p>
-    {{$order->warehouse->symbol}}<br>
-    {{$order->warehouse->address->address}} {{$order->warehouse->address->warehouse_number}}<br>
-    {{$order->warehouse->address->postal_code}} {{$order->warehouse->address->city}}<br>
-</p>
-<p>
+    Od<br>
     ELEKTRONICZNA PLATFORMA HANDLOWA WOJCIECH WEISSBROT<br/>
     IWASZKIEWICZA 15A<br/>
     55-200 OLAWA<br/>
     NIP: 9121027907<br/>
-
-    Od<br>
-    MEGA1000 BIS SP Z O O<br>
-    ZEROMSKIEGO 52/18<br>
-    50-112 WROCLAW<br>
-    NIP 8971719229<br>
 </p>
 <p>
     Dane do dostawy: <br/>
@@ -65,12 +58,16 @@
     Tel: {{$order->addresses->first->id->phone}}<br>
 </p>
 <p>
-    Uwagi osoby zamawiającej:<br>
-    {{$order->customer_notices}}
+    @if($order->customer_notices)
+        Uwagi osoby zamawiającej: <br/>
+        {{$order->customer_notices}}
+    @endif
 </p>
 <p>
-    Uwagi do spedycji:<br>
-    {{$order->consultant_notices}}
+    @if($order->consultant_notices)
+        Uwagi do spedycji: <br/>
+        {{$order->consultant_notices}}
+    @endif
 </p>
 @foreach($order->items as $item)
     <p>
@@ -100,12 +97,14 @@
     foreach($order->promisePayments($order->id) as $payment){
         $paymentsPromise += $payment->amount;
     }
+    $toPay = $orderValue - $paymentsValue - $paymentsPromise;
 @endphp
 <p>
     Koszt transportu brutto: {{$order->shipment_price_for_us}}<br>
-
-    Kwota ktora zobowiazujecie sie pobrac przed rozladunkiem i nam
-    przekazac: {{$orderValue - $paymentsValue - $paymentsPromise}}<br>
+    @if($toPay > 2)
+        Kwota ktora zobowiazujecie sie pobrac przed rozladunkiem i nam
+        przekazac: {{$toPay}} zł<br>
+    @endif
     Data rozpoczęcia nadawania przesyłki: {{$order->shipment_date}}
 </p>
 <p>
