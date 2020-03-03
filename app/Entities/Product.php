@@ -80,7 +80,8 @@ class Product extends Model implements Transformable
         'quality_to_price',
         'comments',
         'value_of_the_order_for_free_transport',
-        'show_on_page'
+        'show_on_page',
+        'trade_group_name'
     ];
 
     public $customColumnsVisibilities = [
@@ -210,8 +211,23 @@ class Product extends Model implements Transformable
         return $this->hasMany(ProductMedia::class);
     }
 
+    public function tradeGroups()
+    {
+        return $this->hasMany(ProductTradeGroup::class);
+    }
+
     public function children()
     {
         return $this->hasMany(self::class, 'parent_id', 'id');
+    }
+
+    public function isInTransportGroup()
+    {
+        return $this->tradeGroups()->count() > 0;
+    }
+
+    public function hasAllTransportParameters()
+    {
+        return $this->packing->warehouse && $this->packing->recommended_courier && $this->packing->packing_name;
     }
 }

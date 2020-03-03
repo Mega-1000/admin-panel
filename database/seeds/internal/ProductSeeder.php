@@ -62,7 +62,7 @@ class ProductSeeder extends Seeder
                     'unit_commercial' => 'szt',
                     'unit_basic' => 'szt',
                     'numbers_of_basic_commercial_units_in_pack' => 1,
-                    'courier_volume_factor' => 0,
+                    'packing_name' => 0,
                     'max_pieces_in_one_package' => 1,
                     'number_of_volume_items_for_paczkomat' => 0,
                 ]);
