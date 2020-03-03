@@ -28,7 +28,7 @@ class apaczkaApi
     private $isTest = 0;
     private $isVerboseMode = 0;
 
-    function apaczkaApi($login = '', $passwd = '', $apiKey = '')
+    function __construct($login = '', $passwd = '', $apiKey = '')
     {
         if ($login != '' && $passwd != '' && $apiKey != '') {
             $this->apiKey = $apiKey;
@@ -53,7 +53,7 @@ class apaczkaApi
     function get_json()
     {
         //	$jsons = file_get_contents('http://meblau.pl/projekty/api_inpost/json.txt');
-        $jsons = file_get_contents('https://mega1000.pl/admin/e-nadawca/dane_wysylki.txt');//"https://mega1000.pl/admin/e-nadawca/dane_wysylki.txt"
+        $jsons = file_get_contents(env('APP_URL') . 'admin/e-nadawca/dane_wysylki.txt');//"https://mega1000.pl/admin/e-nadawca/dane_wysylki.txt"
         $jsons = json_decode($jsons, true);
         //print_r($jsons);
         return $jsons;
@@ -246,7 +246,7 @@ class ApaczkaOrder
 
     var $shipments = array();
 
-    private static $dictServiceCode = array('UPS_K_STANDARD', 'UPS_K_EX_SAV', 'UPS_K_EX', 'UPS_K_EXP_PLUS', 'UPS_Z_STANDARD', 'UPS_Z_EX_SAV', 'UPS_Z_EX', 'UPS_Z_EXPEDITED', 'UPS_K_TODAY_STANDARD', 'UPS_K_TODAY_EXPRESS', 'UPS_K_TODAY_EXP_SAV', 'DPD_CLASSIC', 'DPD_CLASSIC_FOREIGN', 'DHLSTD', 'DHL12', 'DHL09', 'DHL1722', 'KEX_EXPRESS', 'FEDEX', 'POCZTA_POLSKA', 'POCZTA_POLSKA_E24', 'TNT', 'TNT_Z', 'TNT_Z2');
+    private static $dictServiceCode = array('UPS_K_STANDARD', 'UPS_K_EX_SAV', 'UPS_K_EX', 'UPS_K_EXP_PLUS', 'UPS_Z_STANDARD', 'UPS_Z_EX_SAV', 'UPS_Z_EX', 'UPS_Z_EXPEDITED', 'UPS_K_TODAY_STANDARD', 'UPS_K_TODAY_EXPRESS', 'UPS_K_TODAY_EXP_SAV', 'DPD_CLASSIC', 'DPD_CLASSIC_FOREIGN', 'DHLSTD', 'DHL12', 'DHL09', 'DHL1722', 'KEX_EXPRESS', 'FEDEX', 'POCZTA_POLSKA', 'POCZTA_POLSKA_E24', 'TNT', 'TNT_Z', 'TNT_Z2', 'POCZTEX_EXPRESS_24');
     private static $dictOrderPickupType = array('COURIER', 'SELF');
     private static $dictOrderOptions = array('POBRANIE', 'ZWROT_DOK', 'DOR_OSOBA_PRYW', 'DOST_SOB', 'PODPIS_DOROS');
 
@@ -441,7 +441,7 @@ class ApaczkaOrder
         $order['notificationException'] = $this->notificationException;
         $order['notificationNew'] = $this->notificationNew;
         $order['notificationSent'] = $this->notificationSent;
-
+        
         $order['orderPickupType'] = $this->orderPickupType;
 
         if ($this->pickupTimeFrom != '' and $this->pickupTimeTo != '') {
@@ -479,7 +479,7 @@ class ApaczkaOrderShipment
     private $options = '';
     private $position = 0;
     private static $dictShipmentOptions = array('UBEZP', 'PRZES_NIETYP', 'DUZA_PACZKA');
-    private static $dictShipmentTypeCode = array('LIST', 'PACZ', 'PALETA');
+    private static $dictShipmentTypeCode = array('LIST', 'PACZKA', 'PALETA');
 
     function ApaczkaOrderShipment($shipmentTypeCode = '', $dim1 = '', $dim2 = '', $dim3 = '', $weight = '')
     {

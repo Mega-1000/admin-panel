@@ -29,7 +29,7 @@
         <tbody>
             <tr>
                 <td style="width: 50%">
-                    <img src="https://mega1000.pl/strony/logo.png" alt="">
+                    <img src="{{env('APP_URL') . 'images/logo.png'}}" alt="">
                 </td>
                 <td style="width: 50%">
                     <h4>Proforma PRO/{{$order->id}}/{{ $proformDate }}</h4>
@@ -44,8 +44,8 @@
                         ŻEROMSKIEGO 52/18    <br/>
                         50-312 WROCŁAW <br/>
                         NIP: 8971719229 <br/>
-                        Telefony: https://mega1000.pl/kontakt <br/>
-                        E-mail ogólny : info@mega1000.pl <br/>
+                        Telefony: {{env('FRONT_URL')}}/kontakt <br/>
+                        E-mail ogólny : info@{{env('DOMAIN_NAME')}} <br/>
                     </p>
                 </td>
                 <td>

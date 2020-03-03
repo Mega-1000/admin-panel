@@ -64,7 +64,7 @@ class CheckPriceChangesInProductsJob
                                 $sendFormWithProducts, $warehouse->first->id->symbol));
                     }
                     \Mailer::create()
-                        ->to('info@mega1000.pl')
+                        ->to('info@' . env('DOMAIN_NAME'))
                         ->send(new SendTableWithProductPriceChangeMail("Prośba o aktualizację cen produktów " . $warehouse->first->id->symbol,
                             $sendFormWithProducts, $warehouse->first->id->symbol));
                 }
@@ -74,7 +74,7 @@ class CheckPriceChangesInProductsJob
                     ['supplier' => $supplier, 'class' => get_class($this), 'line' => __LINE__]
                 );
                 \Mailer::create()
-                    ->to('info@mega1000.pl')
+                    ->to('info@' . env('DOMAIN_NAME'))
                     ->send(new SendToMega1000WarehouseNotFoundMail("Brak danych magazynu " . $supplier,
                         $supplier));
             }

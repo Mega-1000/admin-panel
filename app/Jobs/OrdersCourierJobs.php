@@ -229,8 +229,8 @@ class OrdersCourierJobs extends Job
 
             $date = Carbon::parse($this->data['pickup_address']['parcel_date'])->format('Y-m-d');
             $pickupDate = $date;
-            $pickupTimeFrom = '06:00';
-            $pickupTimeTo = '17:00';
+            $pickupTimeFrom = '10:00';
+            $pickupTimeTo = '16:00';
 
             $contactInfo = [
                 'name' => $this->data['pickup_address']['firstname'] . ' ' . $this->data['pickup_address']['lastname'],
@@ -351,6 +351,9 @@ class OrdersCourierJobs extends Job
                 case 'PACZKOMAT':
                     $carrierType = 'PACZKOMAT';
                     break;
+                case 'POCZTEX':
+                    $carrierType = 'POCZTA_POLSKA_E24';
+                    break;
                 default:
                     Log::notice(
                         'Wrong courier',
@@ -394,7 +397,7 @@ class OrdersCourierJobs extends Job
             $weight = $this->data['weight'];
 
             $orderShipment = new ApaczkaOrderShipment();
-            $orderShipment->createShipment('PACZ', $width, $length, $height, $weight);
+            $orderShipment->createShipment('PACZKA', $width, $length, $height, $weight);
 
             $date = Carbon::now();
 
@@ -412,10 +415,15 @@ class OrdersCourierJobs extends Job
                     $this->data['pickup_address']['email'],
                     $this->data['pickup_address']['phone']
                 );
+                if ($this->data['courier_type'] === 'ODBIOR_OSOBISTY') {
+                    $pickup = 'SELF'; 
+                } else {
+                    $pickup = 'COURIER';
+                }
                 $order->setPickup(
-                    $this->data['courier_type'],
-                    6,
-                    17,
+                    $pickup,
+                    '06:00',
+                    '17:00',
                     $this->data['pickup_address']['parcel_date']
                 );
             }

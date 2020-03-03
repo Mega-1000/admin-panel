@@ -21,7 +21,7 @@ class SearchOrdersInStoredMailsJob extends Job
         OrderPackageRepository $orderPackageRepository,
         OrderRepository $orderRepository
     ) {
-        $mbox = imap_open ("{pro23.linuxpl.com:993/imap/ssl}INBOX", "info@mega1000.pl", "d`2{12y@B4`1BX+");
+        $mbox = imap_open (env('IMAP_INBOX'), "info@" . env('DOMAIN_NAME'), env('IMAP_PASSWORD'));
         $message_count = imap_num_msg($mbox);
         for ($i = 1; $i < $message_count; $i++) {
             $headers = imap_fetchheader($mbox, $i, FT_PREFETCHTEXT);

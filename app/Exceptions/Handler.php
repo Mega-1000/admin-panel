@@ -26,6 +26,8 @@ class Handler extends ExceptionHandler
         'password_confirmation',
     ];
 
+    const ERROR_ACCESS_DENIED = 9;
+
     /**
      * Report or log an exception.
      *
@@ -34,6 +36,9 @@ class Handler extends ExceptionHandler
      */
     public function report(Exception $exception)
     {
+        if ($exception instanceof \League\OAuth2\Server\Exception\OAuthServerException && $exception->getCode() == self::ERROR_ACCESS_DENIED) {
+            return;
+        }
         parent::report($exception);
     }
 

@@ -27,7 +27,8 @@
         </tr>
         <tr>
             <td>
-            <img width="100%" src="{!! str_replace('C:\\z\\', 'https://mega1000.pl/z/', $item->product->url) !!}">
+                <img width="100%"
+                     src="{!! str_replace('C:\\z\\', env('APP_URL') . 'storage/products/', $item->product->url) !!}">
             </td>
         </tr>
         <tr class="id row-{{$item->id}}" id="id[{{$item->id}}]">
@@ -40,8 +41,8 @@
                    class="form-control" id="product_id[{{$item->id}}]">
 
             <input
-                    value="{{ $item->quantity }}" type="hidden"
-                    class="form-control item_quantity" name="item_quantity[{{$item->id}}]" data-item-id="{{$item->id}}">
+                value="{{ $item->quantity }}" type="hidden"
+                class="form-control item_quantity" name="item_quantity[{{$item->id}}]" data-item-id="{{$item->id}}">
 
             <input name="numbers_of_basic_commercial_units_in_pack[{{$item->id}}]"
                    data-item-id="{{$item->id}}"
@@ -109,7 +110,7 @@
                     </td>
                     <td>
                         @php
-                            if (empty($item->product->packing->number_of_sale_units_in_the_pack))
+                            if (empty($item->product->packing->number_of_sale_units_in_the_pack) || $item->product->packing->number_of_sale_units_in_the_pack == 0)
                                 $a = 0;
                             else
                                 $a = $item->quantity / $item->product->packing->number_of_sale_units_in_the_pack;

@@ -82,9 +82,13 @@ class ImportCsvFileJob implements ShouldQueue
         ProductStockPositionRepository $productStockPositionRepository
     ): void
     {
+        $this->log('Import start: '.Carbon::now());
+
         $handle = fopen($this->path, 'rb');
         if (!$handle) {
-            throw new FileNotFoundException('CSV file "' . $this->path . '" not found');
+            $msg = 'CSV file "' . $this->path . '" not found';
+            $this->log($msg);
+            throw new FileNotFoundException($msg);
         }
 
         $this->productRepository = $productRepository;
@@ -93,16 +97,15 @@ class ImportCsvFileJob implements ShouldQueue
         $this->productStockRepository = $productStockRepository;
         $this->productStockPositionRepository = $productStockPositionRepository;
 
+        $this->log('Clear tables start');
         $this->clearTables();
-
-        $data = Carbon::now();
-        Log::channel('import')->info('Import start: ' . $data);
+        $this->log('Clear tables end');
 
         $time = microtime(true);
         for ($i = 1; $line = fgetcsv($handle, 0, ';'); $i++) {
             $this->currentLine = $i;
             if ($i % 100 === 0) {
-                echo $i . ' - time ' . round(microtime(true) - $time, 3) . "\n";
+                $this->log($i . ' - time ' . round(microtime(true) - $time, 3));
                 $time = microtime(true);
             }
             if ($i <= $this->startRow) {
@@ -137,7 +140,7 @@ class ImportCsvFileJob implements ShouldQueue
                     }
                 }
             } catch (\Exception $e) {
-                Log::channel('import')->debug("Row $i EXCEPTION: " . $e->getMessage());
+                $this->log("Row $i EXCEPTION: " . $e->getMessage());
             }
         }
         DB::table('import')->where('id', 1)->update(
@@ -146,7 +149,7 @@ class ImportCsvFileJob implements ShouldQueue
         DB::table('import')->where('id', 2)->update(
             ['name' => 'Import products done', 'last_import' => Carbon::now()]
         );
-        Log::channel('import')->info('Import end: ' . Carbon::now());
+        $this->log('Import end: ' . Carbon::now());
     }
 
     private function clearTables()
@@ -234,7 +237,7 @@ class ImportCsvFileJob implements ShouldQueue
                         if (empty($current['children'])) {
                             return $current;
                         }
-                        Log::channel('import')->debug("Row {$this->currentLine} WARNING: Products should be placed in deepest category only");
+                        $this->log("Row {$this->currentLine} WARNING: Products should be placed in deepest category only");
                         return $this->categories;
                     }
                     throw new \Exception("Category already exists");
@@ -245,7 +248,7 @@ class ImportCsvFileJob implements ShouldQueue
                     if (empty($current['children'])) {
                         return $current;
                     }
-                    Log::channel('import')->debug("Row {$this->currentLine} WARNING: Products should be placed in deepest category only");
+                    $this->log("Row {$this->currentLine} WARNING: Products should be placed in deepest category only");
                     return $this->categories;
                 }
                 throw new \Exception("Missing category parent");
@@ -394,8 +397,8 @@ class ImportCsvFileJob implements ShouldQueue
             'product_name_supplier' => $line[19],
             'product_name_supplier_on_documents' => $line[20],
             'product_name_on_collective_box' => $line[22],
-            'product_symbol_on_supplier_documents' => $line[24],
-            'product_symbol_on_collective_box' => $line[26],
+            'supplier_product_symbol' => $line[24],
+            'supplier_product_name' => $line[26],
             'ean_of_commercial_packing' => $line[29],
             'ean_of_collective_packing' => $line[30],
             'ean_of_biggest_packing' => $line[31],
@@ -448,7 +451,7 @@ class ImportCsvFileJob implements ShouldQueue
             'manufacturer_url' => $line[304],
             'video_url' => $line[305],
             'calculator_type' => $line[306],
-            'meta_title' => $line[309],
+            'meta_price' => $line[309],
             'description' => $line[310],
             'meta_description' => $line[311],
             'meta_keywords' => $line[312],
@@ -630,5 +633,10 @@ class ImportCsvFileJob implements ShouldQueue
         }
         $tradeGroup->product_id = $product->id;
         $tradeGroup->save();
+
+    private function log($text)
+    {
+        Log::channel('import')->info($text);
+        echo $text."\n";
     }
 }

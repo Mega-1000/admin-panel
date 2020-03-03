@@ -43,7 +43,7 @@ class SelfMessageSent extends Mailable
     public function build()
     {
         return $this->view('emails.message-to-warehouse')
-                    ->from('info@mega1000.pl')
-                    ->subject('Nowa wiadomość od www.mega1000.pl');
+                    ->from('info@' . env('DOMAIN_NAME'))
+                    ->subject('Nowa wiadomość od www.' . env('DOMAIN_NAME'));
     }
 }
