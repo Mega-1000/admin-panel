@@ -29,9 +29,6 @@
         <tbody>
             <tr>
                 <td style="width: 50%">
-                    <img src="{{env('APP_URL') . 'images/logo.png'}}" alt="">
-                </td>
-                <td style="width: 50%">
                     <h4>Proforma PRO/{{$order->id}}/{{ $proformDate }}</h4>
                     Data wystawienia: {{ $date }} <br/>
                     Data sprzedaży: {{ $date }}
@@ -44,8 +41,9 @@
                         ŻEROMSKIEGO 52/18    <br/>
                         50-312 WROCŁAW <br/>
                         NIP: 8971719229 <br/>
+                        Nr konta: {{env('ACCOUNT_PROFORMA')}} <br/>
                         Telefony: {{env('FRONT_URL')}}/kontakt <br/>
-                        E-mail ogólny : info@{{env('DOMAIN_NAME')}} <br/>
+                        E-mail ogólny : {{'info@' . env('DOMAIN_NAME')}} <br/>
                     </p>
                 </td>
                 <td>
