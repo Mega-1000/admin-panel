@@ -2,7 +2,6 @@
 
 namespace App\Entities;
 
-use App\ProductTradeGroups;
 use Illuminate\Database\Eloquent\Model;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
@@ -214,7 +213,7 @@ class Product extends Model implements Transformable
 
     public function tradeGroups()
     {
-        return $this->hasMany(ProductTradeGroups::class);
+        return $this->hasMany(ProductTradeGroup::class);
     }
 
     public function children()

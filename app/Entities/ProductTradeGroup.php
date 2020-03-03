@@ -1,11 +1,11 @@
 <?php
 
-namespace App;
+namespace App\Entities;
 
 use App\Entities\Product;
 use Illuminate\Database\Eloquent\Model;
 
-class ProductTradeGroups extends Model
+class ProductTradeGroup extends Model
 {
 
     protected $fillable = [

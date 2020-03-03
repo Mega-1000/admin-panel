@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\ProductTradeGroups;
 use App\Repositories\ProductPackingRepository;
 use App\Repositories\ProductPriceRepository;
 use App\Repositories\ProductRepository;
@@ -602,7 +601,7 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function getTradeGroupParams($firstParam, $type, $line, Entities\Product $product)
     {
-        $tradeGroup = new ProductTradeGroups();
+        $tradeGroup = new ProductTradeGroup();
         $tradeGroup->type = $type;
         for ($i = 0; $i < 6; $i += 2) {
             switch ($i / 2) {
