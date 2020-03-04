@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Entities\ProductTradeGroup;
 use App\Repositories\ProductPackingRepository;
 use App\Repositories\ProductPriceRepository;
 use App\Repositories\ProductRepository;
