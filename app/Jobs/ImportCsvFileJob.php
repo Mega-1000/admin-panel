@@ -633,6 +633,7 @@ class ImportCsvFileJob implements ShouldQueue
         }
         $tradeGroup->product_id = $product->id;
         $tradeGroup->save();
+    }
 
     private function log($text)
     {
