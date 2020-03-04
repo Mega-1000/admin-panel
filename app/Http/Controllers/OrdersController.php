@@ -588,19 +588,6 @@ class OrdersController extends Controller
             ]);
         }
 
-
-        if ($request->input('status') != $order->status_id && $request->input('shouldBeSent') == 'on') {
-            dispatch_now(new OrderStatusChangedNotificationJob($order->id, $request->input('mail_message'), $oldStatus));
-        }
-
-        if ($request->input('status') != $order->status_id && $request->input('status') == 3) {      //mozliwa do realizacji
-            dispatch_now(new MissingDeliveryAddressSendMailJob($order));
-        }
-
-        if ($request->input('status') != $order->status_id && $request->input('status') == 4) {      //mozliwa do realizacji
-            dispatch_now(new MissingDeliveryAddressSendMailJob($order));
-        }
-
         $orderItems = $order->items;
         $itemsArray = [];
         $orderItemKMD = 0;
@@ -757,6 +744,18 @@ class OrdersController extends Controller
         } else {
             dispatch_now(new RemoveLabelJob($order, [134]));
             dispatch_now(new RemoveLabelJob($order, [133]));
+        }
+
+        if ($request->input('status') != $order->status_id && $request->input('shouldBeSent') == 'on') {
+            dispatch_now(new OrderStatusChangedNotificationJob($order->id, $request->input('mail_message'), $oldStatus));
+        }
+
+        if ($request->input('status') != $order->status_id && $request->input('status') == 3) {      //mozliwa do realizacji
+            dispatch_now(new MissingDeliveryAddressSendMailJob($order));
+        }
+
+        if ($request->input('status') != $order->status_id && $request->input('status') == 4) {      //mozliwa do realizacji
+            dispatch_now(new MissingDeliveryAddressSendMailJob($order));
         }
 
         if ($request->submit == 'updateAndStay') {
