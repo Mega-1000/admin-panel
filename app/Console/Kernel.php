@@ -10,12 +10,6 @@ use App\Jobs\CheckPriceChangesInProductsJob;
 use App\Jobs\CheckPromisePaymentsDates;
 use App\Jobs\CheckStatusInpostPackagesJob;
 use App\Jobs\CheckTasksFromYesterdayJob;
-use App\Jobs\GetAllegroOrders;
-use App\Jobs\ImportCsvFileJob;
-use App\Jobs\ImportCustomersJob;
-use App\Jobs\ImportFirmsAndWarehousesJob;
-use App\Jobs\ImportPaymentsFromPdfFile;
-use App\Jobs\Orders\CloseChattingsJob;
 use App\Jobs\Orders\TriggerOrderLabelSchedulersJob;
 use App\Jobs\SearchOrdersInStoredMailsJob;
 use App\Jobs\ValidateSubiekt;
@@ -24,6 +18,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Jobs\SendLPWithReminderSendingToWarehouseJob;
 use App\Jobs\CheckDateOfProductNewPriceJob;
+use App\Jobs\JpgGeneratorJob;
 
 class Kernel extends ConsoleKernel
 {
@@ -44,17 +39,6 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        //$schedule->command('inspire')
-        //    ->hourly();
-//        $schedule->call(function () {
-//            dispatch_now(new ChangeOrderInvoiceData());
-//        });
-        //$schedule->job(ImportFirmsAndWarehousesJob::class)->everyMinute();
-        //$schedule->job(ImportCsvFileJob::class)->everyMinute();
-        //$schedule->job(ImportCustomersJob::class)->everyMinute();
-        //$schedule->job(CloseChattingsJob::class)->dailyAt("05:10");
-
-
         $schedule->job(CheckStatusInpostPackagesJob::class)->everyMinute();
         $schedule->job(CheckPackagesStatusJob::class)->everyMinute();
         $schedule->job(ChangeShipmentDatePackagesJob::class)->dailyAt("00:30");
@@ -69,6 +53,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(ValidateSubiekt::class)->everyFiveMinutes();
         $schedule->job(ChangeOrderInvoiceData::class)->dailyAt("07:00");
         $schedule->job(SearchOrdersInStoredMailsJob::class)->everyFifteenMinutes();
+        $schedule->job(JpgGeneratorJob::class)->dailyAt("01:00");
     }
 
     /**
