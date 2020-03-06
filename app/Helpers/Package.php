@@ -15,11 +15,28 @@ class Package
     public $packageName;
     private $volumeMargin;
     private $isLong = false;
+    public $price;
     protected $visible = ['packageName', 'productList'];
+    const I_K_PRICE = 17;
+    const DPD_D_PRICE = 32;
+    const DPD_K_PRICE = 18;
 
 
     public function __construct($packageName, $margin)
     {
+        switch (strtolower($packageName)) {
+            case 'dpd_k':
+                $this->price = self::DPD_K_PRICE;
+                break;
+            case 'dpd_d':
+                $this->price = self::DPD_D_PRICE;
+                break;
+            case 'i_k':
+                $this->price = self::I_K_PRICE;
+                break;
+            default:
+                throw new \Exception('Nie istnieje dany kurier');
+        }
         $this->volumeMargin = $margin;
         $this->packageName = $packageName;
         $this->productList = collect([]);
