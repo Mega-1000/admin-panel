@@ -4,8 +4,6 @@ namespace App\Integrations\Apaczka;
 
 use GuzzleHttp\Client;
 
-date_default_timezone_set('Europe/Warsaw');
-
 class ApaczkaGuzzleClient {
 
 //	Configuration

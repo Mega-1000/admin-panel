@@ -2,10 +2,6 @@
 
 namespace App\Integrations\Apaczka;
 
-use GuzzleHttp\Client;
-
-date_default_timezone_set('Europe/Warsaw');
-
 class ApaczkaOrder {
 
     private $notificationDelivered = array();
@@ -164,14 +160,11 @@ class ApaczkaOrder {
     }
 
     function getOrder() {
-//        if (!$this->accountNumber || !$this->codAmount){
-//            $this->codAmount = 0;
-//        }
         $order = [
             'service_id' => $this->serviceId,
             'address' => [
-                'sender' => $this->address_sender,
-                'receiver' => $this->address_receiver
+            'sender' => $this->address_sender,
+            'receiver' => $this->address_receiver
             ],
             'option' => [
 //                '31' => 0, // powiadomienie sms,
