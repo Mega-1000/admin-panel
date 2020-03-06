@@ -55,11 +55,11 @@ class ApaczkaOrder {
         $this->referenceNumber = $referenceNumber;
     }
 
-    function createNotification($isReceiverEmail, $isReceiverSms, $isSenderEmail, $isSenderSms = null) {
+    function createNotification($isSenderSms = null) {
         $notification = array();
-        $notification['isReceiverEmail'] = $isReceiverEmail;
-        $notification['isReceiverSms'] = $isReceiverSms;
-        $notification['isSenderEmail'] = $isSenderEmail;
+        $notification['isReceiverEmail'] = 0;
+        $notification['isReceiverSms'] = 0;
+        $notification['isSenderEmail'] = 1;
         if (!is_null($isSenderSms)) {
             $notification['isSenderSms'] = $isSenderSms;
         }
@@ -141,13 +141,10 @@ class ApaczkaOrder {
         if ($stateCode != '') {
             $address['stateCode'] = $stateCode;
         }
-
-
         return $address;
     }
 
     function createShipment($shipmentTypeCode, $dim1 = '', $dim2 = '', $dim3 = '', $weight = '') {
-
         $shipment = [
             'dimension1' => $dim1,
             'dimension2' => $dim2,
@@ -167,10 +164,6 @@ class ApaczkaOrder {
             'receiver' => $this->address_receiver
             ],
             'option' => [
-//                '31' => 0, // powiadomienie sms,
-//                '11' => 0, // rod
-//                '19' => 0, // dostawa w sobotę,
-//                '25' => 0, // dostawa w godzinach,
                 '58' => 0 // ostrożnie  
             ],
             'notification' => [

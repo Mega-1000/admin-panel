@@ -9,9 +9,6 @@ class ApaczkaGuzzleClient {
 //	Configuration
     private $appId = "";
     private $appSecret = "";
-    private $outputFileName = "XOLTResult.log";
-    private $Error = "";
-
     const DPD_CLASSIC = 21;
     const DHL12 = 83;
     const DHL09 = 84;
@@ -53,8 +50,7 @@ class ApaczkaGuzzleClient {
         $route = 'order_send/';
 
         $requestData = $this->makeRequest($route, $data);
-        $resp = $this->sendRequest($route, $requestData);
-        return $resp;
+        return $this->sendRequest($route, $requestData);        
     }
 
     function makeRequest($route, $data) {
@@ -70,12 +66,10 @@ class ApaczkaGuzzleClient {
     }
 
     function sendRequest($route, $requestData) {
-
         $client = new \GuzzleHttp\Client(["base_uri" => 'https://www.apaczka.pl/api/v2/']);
 
         $options = ['form_params' => $requestData];
-        $resp = $client->post($route, $options);
-        return $resp;
+        return $client->post($route, $options);
     }
 
     function getWaybillDocument($orderId = false) {
@@ -88,9 +82,7 @@ class ApaczkaGuzzleClient {
         $data = json_encode([]);
 
         $requestData = $this->makeRequest($route, $data);
-        $resp = $this->sendRequest($route, $requestData);
-
-        return $resp;
+        return $this->sendRequest($route, $requestData);
     }
 
     function getCollectiveTurnInCopyDocument($orderId) {
