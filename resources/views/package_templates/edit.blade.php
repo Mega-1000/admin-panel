@@ -16,74 +16,74 @@
             </ul>
         </div>
     @endif
-    <form action="{{ action('PackageTemplatesController@update') }}" method="POST" onsubmit="return validate(this);">
+    <form action="{{ action('PackageTemplatesController@update', $old->id) }}" method="POST" onsubmit="return validate(this);">
         {{ csrf_field() }}
         <div class="form-group">
             <label for="data_template">Nazwa Szablonu Danych</label>
             <input type="text" class="form-control" id="name" name="name"
-                       value="{{ old('name') }}">
+                       value="{{ $old->name }}">
         </div>
         <div class="form-group">
             <label for="data_template">Dodatkowe Informacje Dotyczące Szablonu</label>
             <input type="text" class="form-control" id="info" name="info"
-                       value="{{ old('info') }}">
+                       value="{{ $old->info }}">
         </div>
         <div class="firms-general" id="orderPayment">
             <div class="form-group">
-                <label for="size_a">@lang('order_packages.form.size_a')</label>
-                <input type="number" class="form-control" id="size_a" name="size_a"
-                       value="{{ old('size_a') }}">
+                <label for="sizeC">@lang('order_packages.form.size_a')</label>
+                <input type="number" class="form-control" id="sizeA" name="sizeA"
+                       value="{{ $old->sizeA }}">
             </div>
             <div class="form-group">
-                <label for="size_b">@lang('order_packages.form.size_b')</label>
-                <input type="number" class="form-control" id="size_b" name="size_b"
-                       value="{{ old('size_b') }}">
+                <label for="sizeB">@lang('order_packages.form.size_b')</label>
+                <input type="number" class="form-control" id="sizeB" name="sizeB"
+                       value="{{ $old->sizeB }}">
             </div>
             <div class="form-group">
-                <label for="size_c">@lang('order_packages.form.size_c')</label>
-                <input type="number" class="form-control" id="size_c" name="size_c"
-                       value="{{ old('size_c') }}">
+                <label for="sizeA">@lang('order_packages.form.size_c')</label>
+                <input type="number" class="form-control" id="sizeC" name="sizeC"
+                       value="{{ $old->sizeC }}">
             </div>
             <div class="form-group">
-                <label for="size_c">Godzina przyjmowania zleceń</label>
+                <label for="accept_time">Godzina przyjmowania zleceń</label>
                 <input type="time" class="form-control" id="accept_time" name="accept_time"
-                        required>
+                        required value="{{$old->accept_time}}">
             </div>
             <div class="form-group">
-                <label for="size_c">Informacja dot. Godzin Zleceń</label>
-                <input type="number" class="form-control" id="accept_time_info" name="accept_time_info"
-                       value="{{ old('accept_time_info') }}">
+                <label for="size_c">Informacja dot. Godziny Zleceń</label>
+                <input type="text" class="form-control" id="accept_time_info" name="accept_time_info"
+                       value="{{ $old->accept_time_info }}">
             </div>
             <div class="form-group">
                 <label for="size_c">Godzina graniczna wysyłania przesyłki</label>
                 <input type="time" class="form-control" id="max_time" name="max_time"
-                        required>
+                        required value="{{$old->max_time}}">
             </div>
             <div class="form-group">
-                <label for="size_c">Informacja dot. Godzin Granicznej</label>
-                <input type="number" class="form-control" id="max_time_info" name="max_time_info"
-                       value="{{ old('max_time_info') }}">
+                <label for="size_c">Informacja dot. Godziny Granicznej</label>
+                <input type="text" class="form-control" id="max_time_info" name="max_time_info"
+                       value="{{ $old->max_time_info}}">
             </div>
             <div class="form-group">
                 <label for="service_courier_name">@lang('order_packages.form.service_courier_name')</label>
                 <select class="form-control" id="service_courier_name" name="service_courier_name">
-                    <option {{ old('delivery_courier_name') == 'INPOST' ? 'selected="selected"' : '' }} value="INPOST">
+                    <option {{ $old->service_courier_name == 'INPOST' ? 'selected="selected"' : '' }} value="INPOST">
                         INPOST
                     </option>
-                    <option {{ old('delivery_courier_name') == 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">
+                    <option {{ $old->service_courier_name == 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">
                         POCZTEX
                     </option>
-                    <option {{ old('delivery_courier_name') == 'DPD' ? 'selected="selected"' : '' }} value="DPD">DPD
+                    <option {{ $old->service_courier_name == 'DPD' ? 'selected="selected"' : '' }} value="DPD">DPD
                     </option>
-                    <option {{ old('delivery_courier_name') == 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
+                    <option {{ $old->service_courier_name == 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
                         APACZKA
                     </option>
-                    <option {{ old('delivery_courier_name') == 'JAS' ? 'selected="selected"' : '' }} value="JAS">JAS
+                    <option {{ $old->service_courier_name == 'JAS' ? 'selected="selected"' : '' }} value="JAS">JAS
                     </option>
-                    <option {{ old('delivery_courier_name') == 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
+                    <option {{ $old->service_courier_name == 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
                         GIELDA
                     </option>
-                    <option {{ old('delivery_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
+                    <option {{ $old->ser_courier_name == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         ODBIÓR OSOBISTY
                     </option>
                 </select>
@@ -91,23 +91,23 @@
             <div class="form-group">
                 <label for="delivery_courier_name">@lang('order_packages.form.delivery_courier_name')</label>
                 <select class="form-control" id="delivery_courier_name" name="delivery_courier_name">
-                    <option {{ old('delivery_courier_name') == 'INPOST' ? 'selected="selected"' : '' }} value="INPOST">
+                    <option {{ $old->delivery_courier_name == 'INPOST' ? 'selected="selected"' : '' }} value="INPOST">
                         INPOST
                     </option>
-                    <option {{ old('delivery_courier_name') == 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">
+                    <option {{ $old->delivery_courier_name == 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">
                         POCZTEX
                     </option>
-                    <option {{ old('delivery_courier_name') == 'DPD' ? 'selected="selected"' : '' }} value="DPD">DPD
+                    <option {{ $old->delivery_courier_name == 'DPD' ? 'selected="selected"' : '' }} value="DPD">DPD
                     </option>
-                    <option {{ old('delivery_courier_name') == 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
+                    <option {{ $old->delivery_courier_name == 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
                         APACZKA
                     </option>
-                    <option {{ old('delivery_courier_name') == 'JAS' ? 'selected="selected"' : '' }} value="JAS">JAS
+                    <option {{ $old->delivery_courier_name == 'JAS' ? 'selected="selected"' : '' }} value="JAS">JAS
                     </option>
-                    <option {{ old('delivery_courier_name') == 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
+                    <option {{ $old->delivery_courier_name == 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
                         GIELDA
                     </option>
-                    <option {{ old('delivery_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
+                    <option {{ $old->delivery_courier_name == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         ODBIÓR OSOBISTY
                     </option>
                 </select>
@@ -115,30 +115,30 @@
             <div class="form-group">
                 <label for="weight">@lang('order_packages.form.weight')</label>
                 <input type="text" class="form-control" id="weight" name="weight"
-                       value="{{ old('weight') }}">
+                       value="{{ $old->weight }}">
             </div>
             <div class="form-group">
                 <label for="container_type">@lang('order_packages.form.container_type')</label><br/>
                 <select class="form-control" id="container_type" name="container_type">
-                    <option {{old('container_type') === 'POLPALETA' ? 'selected="selected"' : ''}} value="POLPALETA">
+                    <option {{ $old->container_type === 'POLPALETA' ? 'selected="selected"' : ''}} value="POLPALETA">
                         PÓŁPALETA 60x80
                     </option>
-                    <option {{old('container_type') === 'EUR' ? 'selected="selected"' : ''}} value="EUR">PALETA 680x120
+                    <option {{ $old->container_type === 'EUR' ? 'selected="selected"' : ''}} value="EUR">PALETA 680x120
                     </option>
-                    <option {{old('container_type') === 'INNA' ? 'selected="selected"' : ''}} value="INNA">PALETA
+                    <option {{ $old->container_type === 'INNA' ? 'selected="selected"' : ''}} value="INNA">PALETA
                         100x120
                     </option>
-                    <option {{old('container_type') === 'PACZ' ? 'selected="selected"' : ''}} value="PACZ">PACZKA
+                    <option {{ $old->container_type === 'PACZ' ? 'selected="selected"' : ''}} value="PACZ">PACZKA
                     </option>
                 </select>
             </div>
             <div class="form-group">
                 <label for="shape">@lang('order_packages.form.shape')</label><br/>
-                <input type="text" id="shape" name="shape" class="form-control" value="{{ old('shape') }}">
+                <input type="text" id="shape" name="shape" class="form-control" value="{{ $old->shape }}">
             </div>
             <div class="form-group">
                 <label for="notices">Maksymalna ilość znaków w uwagach do spedycji</label>
-                <input type="number" id="notice_max_lenght" name="notice_max_lenght" class="form-control" value="{{ old('notice_max_lenght') }}">
+                <input type="number" id="notice_max_lenght" name="notice_max_lenght" class="form-control" value="{{ $old->notice_max_lenght }}">
             </div>
             <div class="form-group">
                 <input type="hidden" name="status" value="NEW">
@@ -149,50 +149,25 @@
                        value="Materiały budowlane">
             </div>
             <div class="form-group">
-                <label for="cost_for_client">@lang('order_packages.form.cost_for_client')</label>
-                <input type="number" step=".01" class="form-control" id="cost_for_client" name="cost_for_client"
-                       value="{{ old('cost_for_client') }}">
+                <label for="cod_cost">Koszt pobrania</label>
+                <input type="number" step=".01" class="form-control" id="cod_cost" name="cod_cost"
+                       value="{{ $old->cod_cost }}">
             </div>
             <div class="form-group">
-                <label for="cost_for_company">@lang('order_packages.form.cost_for_company')</label>
-                <input type="number" step=".01" class="form-control" id="cost_for_company" name="cost_for_company"
-                       value="{{ old('cost_for_company') }}">
+                <label for="cost_for_client">@lang('order_packages.form.cost_for_client')</label>
+                <input type="number" step=".01" class="form-control" id="approx_cost_client" name="approx_cost_client"
+                       value="{{ $old->approx_cost_client }}">
+            </div>
+            <div class="form-group">
+                <label for="cost_for_firm">@lang('order_packages.form.cost_for_company')</label>
+                <input type="number" step=".01" class="form-control" id="approx_cost_firm" name="approx_cost_firm"
+                       value="{{ $old->approx_cost_firm}}">
             </div>
         </div>
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
     </form>
     <form action="" id="cashon">
     </form>
-    <div class="modal fade" id="packageDialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <form action="{{ action('OrdersPackagesController@changeValue') }}" method="POST">
-                    {{ csrf_field() }}
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Zmiana wartości przesyłki <span
-                                    class="package_id"></span></h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="cash_on_delivery">@lang('order_packages.form.cash_on_delivery')</label>
-                            <input type="number" step=".01" class="form-control" id="modalPackageValue"
-                                   name="modalPackageValue"
-                                   value="0">
-                            <input type="hidden" value="0" name="packageId" id="packageId">
-                            <input type="hidden" value="0" id="template-id" name="template-id">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Zapisz</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 @endsection
 @section('scripts')
     <script>

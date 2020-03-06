@@ -13,7 +13,6 @@
     <table id="dataTable" class="table table-hover">
         <thead>
         <tr>
-            <th></th>
             <th>ID</th>
             <th>Nazwa</th>
             <th>Data utworzenia</th>
@@ -22,18 +21,20 @@
         </thead>
         <tbody>
          @foreach ($packageTemplates as $packageTemplate) 
-        <td>{{$packageTemplates->id}}</td>
-        <td>{{$packageTemplates->name}}</td>
-        <td>{{$packageTemplates->created_at}}</td>
+        <td width="10%">{{$packageTemplate->id}}</td>
+        <td width="40%">{{$packageTemplate->name}}</td>
+        <td width="30%">{{$packageTemplate->created_at}}</td>
         <td>
-            <a href="{{ url()->current() }}/{{$packageTemplates->id}}/edit" class="btn btn-sm btn-primary edit">
-                <i class="voyager-edit"></i>
-                <span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>
-            </a>
-            <a href="{{ url()->current() }}/{{$packageTemplates->id}}/delete" class="btn btn-sm btn-primary edit">
-                <i class="voyager-edit"></i>
-                <span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>
-            </a>
+            <div class="col-md-10">
+                <a href="{{ url()->current() }}/{{$packageTemplate->id}}/edit" class="btn btn-sm btn-primary edit">
+                    <i class="voyager-edit"></i>
+                    <span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>
+                </a>
+                <a href="{{ url()->current() }}/{{$packageTemplate->id}}/delete" class="btn btn-sm btn-danger edit">
+                    <i class="voyager-edit"></i>
+                    <span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>
+                </a>
+            </div>
         </td>
          @endforeach
         </tbody>

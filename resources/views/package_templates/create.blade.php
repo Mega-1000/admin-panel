@@ -149,50 +149,25 @@
                        value="Materiały budowlane">
             </div>
             <div class="form-group">
+                <label for="cost_for_client">Koszt pobrania</label>
+                <input type="number" step=".01" class="form-control" id="cod_cost" name="cod_cost"
+                       value="{{ old('cod_cost') }}">
+            </div>
+            <div class="form-group">
                 <label for="cost_for_client">@lang('order_packages.form.cost_for_client')</label>
                 <input type="number" step=".01" class="form-control" id="approx_cost_client" name="approx_cost_client"
-                       value="{{ old('cost_for_client') }}">
+                       value="{{ old('approx_cost_client') }}">
             </div>
             <div class="form-group">
                 <label for="cost_for_company">@lang('order_packages.form.cost_for_company')</label>
                 <input type="number" step=".01" class="form-control" id="approx_cost_firm" name="approx_cost_firm"
-                       value="{{ old('cost_for_company') }}">
+                       value="{{ old('approx_cost_firm') }}">
             </div>
         </div>
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
     </form>
     <form action="" id="cashon">
     </form>
-    <div class="modal fade" id="packageDialog" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-         aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <form action="{{ action('OrdersPackagesController@changeValue') }}" method="POST">
-                    {{ csrf_field() }}
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Zmiana wartości przesyłki <span
-                                    class="package_id"></span></h5>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label for="cash_on_delivery">@lang('order_packages.form.cash_on_delivery')</label>
-                            <input type="number" step=".01" class="form-control" id="modalPackageValue"
-                                   name="modalPackageValue"
-                                   value="0">
-                            <input type="hidden" value="0" name="packageId" id="packageId">
-                            <input type="hidden" value="0" id="template-id" name="template-id">
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Zapisz</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 @endsection
 @section('scripts')
     <script>

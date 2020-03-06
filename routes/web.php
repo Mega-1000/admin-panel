@@ -179,7 +179,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('packageTemplates/store', 'PackageTemplatesController@store')->name('package_templates.store');
         Route::get('packageTemplates/{id}/edit', 'PackageTemplatesController@edit')->name('package_templates.edit');
         Route::put('packageTemplates/{id}/update', 'PackageTemplatesController@update')->name('package_templates.update');
-        Route::delete('packageTemplates', 'PackageTemplatesController@destroy')->name('package_templates.destroy');
+        Route::delete('packageTemplates/{id}/delete', 'PackageTemplatesController@destroy')->name('package_templates.destroy');
 
         Route::get('products/stocks', 'ProductStocksController@index')->name('product_stocks.index');
         Route::post('products/stocks/datatable', 'ProductStocksController@datatable')->name('product_stocks.datatable');

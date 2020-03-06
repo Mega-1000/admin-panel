@@ -15,7 +15,6 @@ class PackageTemplatesController extends Controller
     public function index()
     {
         $templates = \App\Entities\PackageTemplate::all();
-  
         return view('package_templates.index',compact('templates'))
         ->withpackageTemplates($templates); 
     }
@@ -74,8 +73,7 @@ class PackageTemplatesController extends Controller
         $template->approx_cost_client = $request->approx_cost_client;
         $template->approx_cost_firm = $request->approx_cost_firm;
         
-        error_log(print_r($template,1));
-//        $template->save();
+        $template->save();
         
         return redirect()->route('package_templates.index');
     }
@@ -90,8 +88,7 @@ class PackageTemplatesController extends Controller
     public function edit($id)
     {
          $packageTemplate = PackageTemplate::find($id);
-
-        return view('orderPackages.edit')->withOld($packageTemplate);
+        return view('package_templates.edit')->withOld($packageTemplate);
     }
 
     /**
@@ -153,6 +150,7 @@ class PackageTemplatesController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $packageTemplate = PackageTemplate::find($id);
+        $packageTemplate->delete();
     }
 }
