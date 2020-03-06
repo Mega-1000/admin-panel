@@ -48,6 +48,7 @@ class ImportCsvFileJob implements ShouldQueue
 
     private $categories = ['id' => 0, 'children' => []];
     private $productsRelated = [];
+    private $jpgData = [];
 
     private $currentLine;
 
@@ -140,10 +141,13 @@ class ImportCsvFileJob implements ShouldQueue
                         $product->save();
                     }
                 }
+                $this->generateJpgData($line, $categoryColumn);
             } catch (\Exception $e) {
                 $this->log("Row $i EXCEPTION: " . $e->getMessage());
             }
         }
+        $this->saveJpgData();
+
         DB::table('import')->where('id', 1)->update(
             ['name' => 'Import products', 'processing' => 0]
         );
@@ -167,6 +171,7 @@ class ImportCsvFileJob implements ShouldQueue
         DB::table('chimney_attribute_options')->delete();
         DB::table('chimney_attributes')->delete();
         DB::table('categories')->delete();
+        DB::table('jpg_data')->delete();
         DB::statement("ALTER TABLE categories AUTO_INCREMENT = 1;");
         DB::statement("ALTER TABLE product_media AUTO_INCREMENT = 1;");
         DB::statement("ALTER TABLE product_trade_groups AUTO_INCREMENT = 1;");
@@ -174,6 +179,7 @@ class ImportCsvFileJob implements ShouldQueue
         DB::statement("ALTER TABLE chimney_products AUTO_INCREMENT = 1;");
         DB::statement("ALTER TABLE chimney_attribute_options AUTO_INCREMENT = 1;");
         DB::statement("ALTER TABLE chimney_attributes AUTO_INCREMENT = 1;");
+        DB::statement("ALTER TABLE jpg_data AUTO_INCREMENT = 1;");
     }
 
     private function getUrl($url)
@@ -182,7 +188,7 @@ class ImportCsvFileJob implements ShouldQueue
         $imgUrlExploded = end($imgUrlExploded);
         $imgUrlWebsite = $this->imgStoragePath . DIRECTORY_SEPARATOR . $imgUrlExploded;
         $imgUrlWebsite = Storage::url($imgUrlWebsite);
-        return $imgUrlWebsite;
+        return str_replace("\\", '/', $imgUrlWebsite);
     }
 
     private function getShowOnPageParameter(array $line, int $columnIterator)
@@ -634,6 +640,58 @@ class ImportCsvFileJob implements ShouldQueue
         }
         $tradeGroup->product_id = $product->id;
         $tradeGroup->save();
+    }
+
+    private function generateJpgData($line, $categoryColumn)
+    {
+        $columns = [9 => 10, 11 => 13];
+        foreach ($columns as $fileNameColumn => $orderColumn) {
+            $fileName = trim($line[$categoryColumn + $fileNameColumn]);
+            if (empty($fileName)) {
+                continue;
+            }
+            $order = ((int)trim($line[$categoryColumn + $orderColumn])) ?: 1000000;
+            if (!trim($line[309])) {
+                continue;
+            }
+            $priceType = $line[309][0];
+            $price = $line[$priceType == 'h' ? 252 : ($priceType == 'o' ? 253 : 254)];
+            if ($price == 0) {
+                continue;
+            }
+            $this->jpgData[$fileName][$line[1]][$line[2]][$line[3]] = [
+                'price' => $price,
+                'order' => $order,
+                'name' => $line[4],
+                'image' => $this->getUrl($line[303])
+            ];
+        }
+    }
+
+    private function saveJpgData()
+    {
+        $data = [];
+
+        foreach ($this->jpgData as $fileName => $table) {
+            foreach ($table as $row => $rowData) {
+                foreach ($rowData as $col => $subdata) {
+                    foreach ($subdata as $subcol => $details) {
+                        $data[] = [
+                            'filename' => $fileName,
+                            'row' => $row,
+                            'col' => $col,
+                            'subcol' => $subcol,
+                            'price' => $details['price'],
+                            'order' => $details['order'],
+                            'image' => $details['image'],
+                            'name' => $details['name']
+                        ];
+                    }
+                }
+            }
+        }
+
+        \App\Entities\JpgDatum::insert($data);
     }
 
     private function log($text)
