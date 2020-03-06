@@ -13,8 +13,6 @@ class JpgGeneratorJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public static $testOut = null;
-
     /**
      * Create a new job instance.
      *
@@ -66,10 +64,6 @@ class JpgGeneratorJob implements ShouldQueue
                 ->delay(2000)
                 ->save(storage_path('app/public/products/'.$fileName.'r.jpg'))
             ;
-
-            if (!self::$testOut) {
-                self::$testOut = view('jpg/products', $fileData);
-            }
         }
     }
 
