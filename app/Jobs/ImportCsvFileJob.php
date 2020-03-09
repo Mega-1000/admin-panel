@@ -133,7 +133,7 @@ class ImportCsvFileJob implements ShouldQueue
                     if ($media) {
                         $this->createProductMedia($media, $product);
                     }
-                    $tradeGroups = $this->setProductTradeGroups($line, $product);
+                    $this->setProductTradeGroups($line, $product);
                     if (!empty($multiCalcBase)) {
                         $this->productsRelated[$multiCalcBase] = $product->id;
                     } elseif (!empty($multiCalcCurrent) && !empty($this->productsRelated[$multiCalcCurrent])) {
@@ -161,7 +161,10 @@ class ImportCsvFileJob implements ShouldQueue
     {
         Entities\Product::query()->update([
             'category_id' => null,
-            'parent_id' => null
+            'parent_id' => null,
+            'product_name_supplier' => '',
+            'product_group_for_change_price' => '',
+            'products_related_to_the_automatic_price_change' => ''
         ]);
         Entities\Product::where('symbol', '')->orWhereNull('symbol')->delete();
         DB::table('product_media')->delete();
@@ -401,7 +404,7 @@ class ImportCsvFileJob implements ShouldQueue
             'manufacturer' => $line[16],
             'product_name_manufacturer' => $line[17],
             'symbol_name_manufacturer' => $line[18],
-            'product_name_supplier' => $line[19],
+            'product_name_supplier' => $line[20],
             'product_name_supplier_on_documents' => $line[20],
             'product_name_on_collective_box' => $line[22],
             'supplier_product_symbol' => $line[24],
