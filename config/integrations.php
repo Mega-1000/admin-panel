@@ -5,7 +5,9 @@ return [
         'login' => 'info@mega1000.pl',
         'password' => env('APACZKA_PASSWORD'),
         'apiKey' => env('APACZKA_API_KEY'),
-        'tracking_url' => 'www.apaczka.pl/check_status.php?waybill_number='
+        'tracking_url' => 'www.apaczka.pl/check_status.php?waybill_number=',
+        'appId' => env('APACZKA_APP_ID'),
+        'appSecret' => env('APACZKA_APP_SECRET')
     ],
     'inpost' => [
         'url' => 'https://api-shipx-pl.easypack24.net',
