@@ -4,9 +4,7 @@ namespace App\Jobs;
 
 use App\Mail\SendTableWithProductPriceChangeMail;
 use App\Mail\SendToMega1000WarehouseNotFoundMail;
-use App\Repositories\ProductRepository;
 use App\Repositories\WarehouseRepository;
-use Illuminate\Support\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -26,7 +24,7 @@ class CheckPriceChangesInProductsJob
      */
     public function __construct($date = null)
     {
-        $this->date = $date;
+        $this->date = $date ?? date('Y-m-d');
     }
 
     /**
@@ -34,21 +32,20 @@ class CheckPriceChangesInProductsJob
      *
      * @return void
      */
-    public function handle(ProductRepository $repository, WarehouseRepository $warehouseRepository)
+    public function handle(WarehouseRepository $warehouseRepository)
     {
-        if ($this->date == null) {
-            $products = $repository->findWhere([['date_of_price_change', '<=', Carbon::now()]]);
-        } else {
-            $products = $repository->findWhere([['date_of_price_change', '!=', null]]);
+        $products = \App\Entities\Product::where('date_of_price_change', '<=', $this->date)->get();
+
+        if (count($products) == 0) {
+            return;
         }
 
         $suppliers = [];
-        if (!$products->isEmpty()) {
-            foreach ($products as $product) {
-                if ($product->product_name_supplier !== null && !in_array($product->product_name_supplier,
-                        $suppliers)) {
-                    array_push($suppliers, $product->product_name_supplier);
-                }
+
+        foreach ($products as $product) {
+            if ($product->product_name_supplier !== null && !in_array($product->product_name_supplier,
+                    $suppliers)) {
+                array_push($suppliers, $product->product_name_supplier);
             }
         }
 

@@ -3,14 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\CheckPriceChangesInProductsJob;
-use Illuminate\Http\Request;
 
 class ActualizationController extends Controller
 {
 
     public function sendActualization()
     {
-        dispatch_now(new CheckPriceChangesInProductsJob('all'));
+        dispatch_now(new CheckPriceChangesInProductsJob(date('Y-m-d', time() + 3600 * 24 * 365 * 10)));
 
         return redirect()->route('orders.index')->with([
             'message' => __('Prośba o aktualizację cen została wysłana.'),
