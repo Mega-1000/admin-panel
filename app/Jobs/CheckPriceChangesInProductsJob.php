@@ -6,7 +6,7 @@ use App\Mail\SendTableWithProductPriceChangeMail;
 use App\Mail\SendToMega1000WarehouseNotFoundMail;
 use App\Repositories\ProductRepository;
 use App\Repositories\WarehouseRepository;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -37,7 +37,7 @@ class CheckPriceChangesInProductsJob
     public function handle(ProductRepository $repository, WarehouseRepository $warehouseRepository)
     {
         if ($this->date == null) {
-            $products = $repository->findWhere([['date_of_price_change', '=<', $this->date]]);
+            $products = $repository->findWhere([['date_of_price_change', '<=', Carbon::now()]]);
         } else {
             $products = $repository->findWhere([['date_of_price_change', '!=', null]]);
         }
