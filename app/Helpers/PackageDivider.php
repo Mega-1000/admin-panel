@@ -288,7 +288,7 @@ class PackageDivider implements iPackageDivider
         foreach ($palettes as $k => $palette) {
             $palette->tryFitInSmallerPalette();
             $palette->setPackageCost();
-            if ($palette->price - $palette->packagesCost > 20) {
+            if ($palette->price > $palette->packagesCost) {
                 $parcels['packages'] = array_merge($parcels['packages'], $palette->packagesList->toArray());
             } else {
                 $parcels['packages'][] = $palette;
