@@ -4,6 +4,7 @@
             table {
                 border-collapse: collapse;
                 border: 2px solid black;
+                max-width: 800px;
             }
 
             td {
@@ -37,7 +38,9 @@
                 <td rowspan="{{ $hasSubcolumns ? 2 : 1 }}">&nbsp;</td>
                 @php ($i = 0)
                 @foreach ($cols as $col => $subcols)
-                    <td colspan='{{ count($subcols) }}' rowspan='{{ count($subcols) == 1 && $hasSubcolumns ? 2 : 1 }}' class='{{ $i++ % 2 ? 'dark' : 'light' }}'>
+                    <td colspan='{{ count($subcols) }}'
+                        rowspan='{{ count($subcols) == 1 && $hasSubcolumns && array_key_first($subcols) == "" ? 2 : 1 }}'
+                        class='{{ $i++ % 2 ? 'dark' : 'light' }}'>
                         {{ $col }}
                     </td>
                 @endforeach
@@ -47,7 +50,9 @@
                     @php ($i = 0)
                     @foreach ($cols as $col => $subcols)
                         @foreach ($subcols as $subcol => $notUsed)
-                            <td class='{{ $i % 2 ? 'dark' : 'light' }}'>{!! $subcol ?: '&nbsp;' !!}</td>
+                            @if ($subcol != "")
+                                <td class='{{ $i % 2 ? 'dark' : 'light' }}'>{!! $subcol ?: '&nbsp;' !!}</td>
+                            @endif
                         @endforeach
                         @php ($i++)
                     @endforeach

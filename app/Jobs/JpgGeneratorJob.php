@@ -50,6 +50,7 @@ class JpgGeneratorJob implements ShouldQueue
                     view('jpg/table', $fileData)
                     ->render()
                 )
+                ->windowSize(9999, 9999)
                 ->select('table')
                 ->save(storage_path('app/public/products/'.$fileName.'.jpg'))
             ;
@@ -59,7 +60,7 @@ class JpgGeneratorJob implements ShouldQueue
                     view('jpg/products', $fileData)
                     ->render()
                 )
-                ->windowSize(800, 9999)
+                ->windowSize(9999, 9999)
                 ->select('table')
                 ->delay(2000)
                 ->save(storage_path('app/public/products/'.$fileName.'r.jpg'))
