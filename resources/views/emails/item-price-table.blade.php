@@ -96,20 +96,20 @@
         </Th>
         <Th>
             <input disabled
-                   value={{number_format($item->quantity / $item->product->packing->numbers_of_basic_commercial_units_in_pack, 3)}}
+                   value={{number_format($item->quantity * $item->product->packing->numbers_of_basic_commercial_units_in_pack, 3)}}
             />
         </Th>
         @if($bw > 0)
             <Th>
                 <input disabled
-                       value={{number_format($item->quantity / $item->product->packing->number_of_sale_units_in_the_pack, 3)}}
+                       value={{number_format($item->quantity * $item->product->packing->number_of_sale_units_in_the_pack, 3)}}
                 />
             </Th>
         @endif
         @if($bx > 0 && $item->net_purchase_price_the_largest_unit > 0)
             <Th>
                 <input disabled
-                       value={{number_format($item->quantity / $item->product->packing->number_of_trade_items_in_the_largest_unit, 3)}}
+                       value={{number_format($item->quantity * $item->product->packing->number_of_trade_items_in_the_largest_unit, 3)}}
                 />
             </Th>
         @endif
@@ -128,20 +128,20 @@
         </Th>
         <Th>
             <input disabled
-                   value={{$item->quantity / $item->product->packing->numbers_of_basic_commercial_units_in_pack * $item->net_purchase_price_basic_unit}}
+                   value={{$item->quantity * $item->product->packing->numbers_of_basic_commercial_units_in_pack * $item->net_purchase_price_basic_unit}}
             />
         </Th>
         @if($bw > 0)
             <Th>
                 <input disabled
-                   value={{number_format($item->quantity / $item->product->packing->number_of_sale_units_in_the_pack * $item->net_purchase_price_aggregate_unit, 2)}}
+                   value={{number_format($item->quantity * $item->product->packing->number_of_sale_units_in_the_pack * $item->net_purchase_price_aggregate_unit, 2)}}
                 />
             </Th>
         @endif
         @if($bx > 0 && $item->net_purchase_price_the_largest_unit > 0)
             <Th>
                 <input disabled
-                       value={{number_format($item->quantity / $item->product->packing->number_of_trade_items_in_the_largest_unit * $item->net_purchase_price_the_largest_unit, 2)}}
+                       value={{number_format($item->quantity * $item->product->packing->number_of_trade_items_in_the_largest_unit * $item->net_purchase_price_the_largest_unit, 2)}}
                 />
             </Th>
         @endif
@@ -160,20 +160,20 @@
         </Th>
         <Th>
             <input disabled
-                   value={{number_format($item->quantity / $item->product->packing->numbers_of_basic_commercial_units_in_pack * round(1.23 * $item->net_purchase_price_basic_unit, 2), 2)}}
+                   value={{number_format($item->quantity * $item->product->packing->numbers_of_basic_commercial_units_in_pack * round(1.23 * $item->net_purchase_price_basic_unit, 2), 2)}}
             />
         </Th>
         @if($bw > 0)
             <Th>
                 <input disabled
-                       value={{number_format($item->quantity / $item->product->packing->number_of_sale_units_in_the_pack * round(1.23 * $item->net_purchase_price_aggregate_unit, 2), 2)}}
+                       value={{number_format($item->quantity * $item->product->packing->number_of_sale_units_in_the_pack * round(1.23 * $item->net_purchase_price_aggregate_unit, 2), 2)}}
                 />
             </Th>
         @endif
         @if($bx > 0 && $item->net_purchase_price_the_largest_unit > 0)
             <Th>
                 <input disabled
-                       value={{number_format($item->quantity / $item->product->packing->number_of_trade_items_in_the_largest_unit * round(1.23 * $item->net_purchase_price_the_largest_unit, 2), 2)}}
+                       value={{number_format($item->quantity * $item->product->packing->number_of_trade_items_in_the_largest_unit * round(1.23 * $item->net_purchase_price_the_largest_unit, 2), 2)}}
                 />
             </Th>
         @endif
