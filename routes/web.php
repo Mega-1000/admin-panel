@@ -172,6 +172,14 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('customers/{id}/update', 'CustomersController@update')->name('customers.update');
         Route::delete('customers/{id}/', 'CustomersController@destroy')->name('customers.destroy');
         Route::put('customers/{id}/change-status', 'CustomersController@changeStatus')->name('customers.change.status');
+        
+        Route::get('packageTemplates', 'PackageTemplatesController@index')->name('package_templates.index');
+        Route::get('packageTemplates/datatable', 'PackageTemplatesController@datatable')->name('package_templates.datatable');
+        Route::get('packageTemplates/create', 'PackageTemplatesController@create')->name('package_templates.create');
+        Route::post('packageTemplates/store', 'PackageTemplatesController@store')->name('package_templates.store');
+        Route::get('packageTemplates/{id}/edit', 'PackageTemplatesController@edit')->name('package_templates.edit');
+        Route::put('packageTemplates/{id}/update', 'PackageTemplatesController@update')->name('package_templates.update');
+        Route::delete('packageTemplates/{id}/delete', 'PackageTemplatesController@destroy')->name('package_templates.destroy');
 
         Route::get('products/stocks', 'ProductStocksController@index')->name('product_stocks.index');
         Route::post('products/stocks/datatable', 'ProductStocksController@datatable')->name('product_stocks.datatable');

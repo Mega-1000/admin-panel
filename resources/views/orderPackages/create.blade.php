@@ -45,8 +45,14 @@
                     <option value="{{ $templateKey }}">{{ $template['name'] }}</option>
                 @endforeach
             </select>
-        </div>
+        <br>
+        <div id="template_info" style="color: red"></div>
+        </div>        
         <div class="firms-general" id="orderPayment">
+            <div class="form-group">
+                <label for="quantity">@lang('order_packages.form.quantity')</label><br/>
+                <input type="text" id="quantity" name="quantity" class="form-control" value="{{ old('quantity') }}">
+            </div>
             <div class="form-group">
                 <label for="size_a">@lang('order_packages.form.size_a')</label>
                 <input type="text" class="form-control" id="size_a" name="size_a"
@@ -67,6 +73,8 @@
                 <input type="text" id="shipment_date" name="shipment_date" class="form-control default-date-picker-now"
                        value="{{ old('shipment_date') }}">
             </div>
+            <div id="hour_info" style="color: red"></div>
+            <br>
             <div class="form-group">
                 <label for="delivery_date">@lang('order_packages.form.delivery_date')</label><br/>
                 <input type="text" id="delivery_date" name="delivery_date" class="form-control default-date-picker-now"
@@ -124,10 +132,6 @@
                 <label for="weight">@lang('order_packages.form.weight')</label>
                 <input type="text" class="form-control" id="weight" name="weight"
                        value="{{ old('weight') }}">
-            </div>
-            <div class="form-group">
-                <label for="quantity">@lang('order_packages.form.quantity')</label><br/>
-                <input type="text" id="quantity" name="quantity" class="form-control" value="{{ old('quantity') }}">
             </div>
             <div class="form-group">
                 <label for="container_type">@lang('order_packages.form.container_type')</label><br/>
@@ -293,7 +297,8 @@
 			<label for="cash_on_delivery">Wpisz kwotę pobrania na tworzonym LP</label>
                                 <input type="number" step=".01" class="form-control" id="cash_on_delivery" style="border: 1px solid green;" name="cash_on_delivery"
                                        value="{{ $toPaySum }}">
-			Automatycznie wpisana kwota jest kwotą sugerowaną, która zamyka bilans wszystkich zleceń (głównego i połączonych)
+                                Automatycznie wpisana kwota jest kwotą sugerowaną, która zamyka bilans wszystkich zleceń (głównego i połączonych)<br><br>
+                                Koszt pobrania u wybranego kuriera: <span id="cod_cost"></span> zł
 			</td>
                         
 			<td>
@@ -448,9 +453,9 @@
 
         $("#chosen_data_template").val(selectedTemplateData['name']);
 
-        $("#size_a").val(selectedTemplateData['size_a']);
-        $("#size_b").val(selectedTemplateData['size_b']);
-        $("#size_c").val(selectedTemplateData['size_c']);
+        $("#size_a").val(selectedTemplateData['sizeA']);
+        $("#size_b").val(selectedTemplateData['sizeB']);
+        $("#size_c").val(selectedTemplateData['sizeC']);
         $("#service_courier_name").val(selectedTemplateData['service_courier_name']);
         $("#delivery_courier_name").val(selectedTemplateData['delivery_courier_name']);
         $("#quantity").val(selectedTemplateData['quantity']);
@@ -459,9 +464,24 @@
         $("#delivery_date").val(orderData['delivery_date']);
         $("#weight").val(selectedTemplateData['weight']);
         $("#notices").val(orderData['customer_notices']);
-        $("#cost_for_client").val(orderData['shipment_price_for_client']);
-        $("#cost_for_company").val(orderData['shipment_price_for_us']);
+        $("#cost_for_client").val(selectedTemplateData['approx_cost_client']);
+        $("#cost_for_company").val(selectedTemplateData['approx_cost_firm']);
         $("#container_type").val(selectedTemplateData['container_type']);
+        $("#template_info").html(selectedTemplateData['info']);
+        $("#cod_cost").html(selectedTemplateData['cod_cost']);
+        var dt = new Date;
+        var h = dt.getHours();
+        var acc = selectedTemplateData['accept_time'].split(':');
+        var max = selectedTemplateData['max_time'].split(':');
+        var at = acc[0];
+        var mt = max[0];
+        if ( h >= at && h < mt)  {
+        $("#hour_info").html(selectedTemplateData['accept_time_info']);    
+        }
+        if (h >= mt) {
+        $("#hour_info").html(selectedTemplateData['max_time_info']);    
+        }
+        
       });
 
       $("#shipment_date").on('dp.change', function () {
