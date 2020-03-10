@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\Log;
 class PackageDivider implements iPackageDivider
 {
     const TRANSPORT_GROUPS = 'transport_group';
-    //todo make this adjustable
-    const MARGIN = 1.3;
     private $itemList;
     private const LONG = 'long';
     private const NOT_CALCULABLE = 'not_calculable';
@@ -133,7 +131,7 @@ class PackageDivider implements iPackageDivider
             $item->packing->recommended_courier,
             $item->packing->packing_name);
         try {
-            $package = new Package($packageName, self::MARGIN);
+            $package = new Package($packageName, env('PACKAGE_DIVIDE_MARGIN'));
         } catch (\Exception $exception) {
             return ['packages' => false, 'failed' => $item];
         }
@@ -145,11 +143,11 @@ class PackageDivider implements iPackageDivider
                 $item->quantity -= 1;
             } catch (\Exception $exception) {
                 if ($exception->getMessage() != Package::CAN_NOT_ADD_MORE) {
-                    error_log($exception->getMessage());
+                    Log::error('Błąd budownaia paczek: ' . $exception->getMessage(), ['class' => get_class($this), 'line' => __LINE__]);
                 } else if ($package->getProducts()->count() === 0) {
-                    return ["Element nie mieści się w paczce"];
+                    return ['packages' => false, 'failed' => $item];
                 } else {
-                    $package = new Package($packageName, self::MARGIN);
+                    $package = new Package($packageName,  env('PACKAGE_DIVIDE_MARGIN'));
                     $packageList[] = $package;
                 }
             }

@@ -2,41 +2,30 @@
 
 namespace App\Helpers;
 
+use App\Entities\PackageTemplate;
 use App\Entities\Product;
 use Illuminate\Database\Eloquent\Collection;
 
 class Package
 {
-    //todo pobierać dane z bazy
-    const MAX_WEIGHT = 70;
-    const VOLUME_RATIO = 180000;
     const CAN_NOT_ADD_MORE = 'Nie można dodać produktu do koszyka';
     public $productList;
     public $packageName;
+    private $maxWeight;
+    private $volumeRatio;
     private $volumeMargin;
     private $isLong = false;
     public $price;
     protected $visible = ['packageName', 'productList'];
-    const I_K_PRICE = 17;
-    const DPD_D_PRICE = 32;
-    const DPD_K_PRICE = 18;
-
 
     public function __construct($packageName, $margin)
     {
-        switch (strtolower($packageName)) {
-            case 'dpd_k':
-                $this->price = self::DPD_K_PRICE;
-                break;
-            case 'dpd_d':
-                $this->price = self::DPD_D_PRICE;
-                break;
-            case 'i_k':
-                $this->price = self::I_K_PRICE;
-                break;
-            default:
-                throw new \Exception('Nie istnieje dany kurier');
-        }
+        $packageTemplate = PackageTemplate::where('symbol', strtolower($packageName))->firstOrFail();
+
+        $this->price = $packageTemplate->approx_cost_client;
+        $this->volumeRatio = $packageTemplate->volume;
+        $this->maxWeight = $packageTemplate->max_weight;
+
         $this->volumeMargin = $margin;
         $this->packageName = $packageName;
         $this->productList = collect([]);
@@ -76,7 +65,7 @@ class Package
             $carry['volume'] += $this->calculateVolumeForItem($item, $moreItems);
             return $carry;
         }, ['weight' => 0, 'volume' => 0]);
-        return $total['weight'] < self::MAX_WEIGHT && $total['volume'] < self::VOLUME_RATIO;
+        return $total['weight'] < $this->maxWeight && $total['volume'] < $this->volumeRatio;
     }
 
     private function calculateVolumeForItem($item, $list)

@@ -56,35 +56,40 @@ class OrderPackage extends Model implements Transformable
         return $this->belongsTo(Order::class);
     }
 
-    public $customColumnsVisibilities =[
+    public $customColumnsVisibilities = [
         'number',
         'size_a',
         'size_b',
-        'size_c' ,
+        'size_c',
         'shipment_date',
         'delivery_date',
-        'delivery_courier_name' ,
-        'service_courier_name' ,
-        'weight' ,
-        'quantity' ,
-        'container_type' ,
+        'delivery_courier_name',
+        'service_courier_name',
+        'weight',
+        'quantity',
+        'container_type',
         'shape',
         'cash_on_delivery',
         'notices',
         'status',
         'new',
-        'sending' ,
-        'waiting_for_sending' ,
+        'sending',
+        'waiting_for_sending',
         'delivered',
-        'cancelled' ,
+        'cancelled',
         'sending_number',
-        'letter_number' ,
+        'letter_number',
         'cost_for_client',
         'cost_for_company',
         'real_cost_for_company',
-        'created_at' ,
-        'actions' ,
-        'waiting_for_cancelled' ,
+        'created_at',
+        'actions',
+        'waiting_for_cancelled',
         'reject_cancelled',
     ];
+
+    public function packedProducts()
+    {
+        return $this->belongsToMany('App\Entities\Product')->withPivot('quantity');
+    }
 }
