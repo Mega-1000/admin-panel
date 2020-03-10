@@ -39,6 +39,11 @@ class CreatePackageTemplatesTable extends Migration
             $table->integer('volume')->nullable();
             $table->timestamps();
         });
+        
+        Artisan::call('db:seed', [
+            '--class' => PackageTemplateSeeder::class,
+            '--force' => true
+        ]);
     }
 
     /**
