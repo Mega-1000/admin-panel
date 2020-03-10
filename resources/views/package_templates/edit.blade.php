@@ -17,6 +17,7 @@
         </div>
     @endif
     <form action="{{ action('PackageTemplatesController@update', $old->id) }}" method="POST" onsubmit="return validate(this);">
+     {{ method_field('PUT')}}
         {{ csrf_field() }}
         <div class="form-group">
             <label for="data_template">Nazwa Szablonu Danych</label>
@@ -27,6 +28,11 @@
             <label for="data_template">Dodatkowe Informacje Dotyczące Szablonu</label>
             <input type="text" class="form-control" id="info" name="info"
                        value="{{ $old->info }}">
+        </div>
+         <div class="form-group">
+            <label for="data_template">Symbol szablonu</label>
+            <input type="text" class="form-control" id="symbol" name="symbol"
+                       value="{{ $old->symbol }}">
         </div>
         <div class="firms-general" id="orderPayment">
             <div class="form-group">
@@ -47,7 +53,7 @@
             <div class="form-group">
                 <label for="accept_time">Godzina przyjmowania zleceń</label>
                 <input type="time" class="form-control" id="accept_time" name="accept_time"
-                        required value="{{$old->accept_time}}">
+                       value="{{$old->accept_time}}">
             </div>
             <div class="form-group">
                 <label for="size_c">Informacja dot. Godziny Zleceń</label>
@@ -57,7 +63,7 @@
             <div class="form-group">
                 <label for="size_c">Godzina graniczna wysyłania przesyłki</label>
                 <input type="time" class="form-control" id="max_time" name="max_time"
-                        required value="{{$old->max_time}}">
+                       value="{{$old->max_time}}">
             </div>
             <div class="form-group">
                 <label for="size_c">Informacja dot. Godziny Granicznej</label>
@@ -162,6 +168,16 @@
                 <label for="cost_for_firm">@lang('order_packages.form.cost_for_company')</label>
                 <input type="number" step=".01" class="form-control" id="approx_cost_firm" name="approx_cost_firm"
                        value="{{ $old->approx_cost_firm}}">
+            </div>
+            <div class="form-group">
+                <label for="cost_for_company">Maksymalna waga Paczki u wybranego kuriera</label>
+                <input type="number" step=".01" class="form-control" id="max_weight" name="max_weight"
+                       value="{{ $old->max_weight }}">
+            </div>
+            <div class="form-group">
+                <label for="cost_for_company">Współczynnik objętości</label>
+                <input type="number" step=".01" class="form-control" id="volume" name="volume"
+                       value="{{ $old->volume }}">
             </div>
         </div>
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>

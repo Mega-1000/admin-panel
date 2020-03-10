@@ -39,27 +39,20 @@ class PackageTemplatesController extends Controller
     {
         $this->validate($request, array(
             'name'=>'required|max:255',
-            'sizeA'=>'integer|required',
-            'sizeB'=>'integer|required',
-            'sizeC'=>'integer|required',
-            'service_courier_name'=>'required',
-            'delivery_courier_name'=>'required',
-            'weight'=>'required',
-            'container_type'=>'required',
             'notice_max_lenght'=>'integer|required',
-            'content'=>'required',
-            'approx_cost_client'=>'required',
-            'approx_cost_firm'=>'required'
-            
+            'symbol' => 'required',
+            'max_weight' => 'numeric|required',
+            'volume' => 'integer|required'
         ));
         $template = new PackageTemplate;
         $template->name = $request->name;
         $template->info = $request->info;
+        $template->symbol = $request->symbol;
         $template->sizeA = $request->sizeA;
         $template->sizeB = $request->sizeB;
         $template->sizeC = $request->sizeC;
         $template->accept_time = $request->accept_time;
-        $template->accept_time_info = $request->name;
+        $template->accept_time_info = $request->accept_time_info;
         $template->max_time = $request->max_time;
         $template->max_time_info = $request->max_time_info;
         $template->service_courier_name = $request->service_courier_name;
@@ -72,6 +65,8 @@ class PackageTemplatesController extends Controller
         $template->cod_cost = $request->cod_cost;
         $template->approx_cost_client = $request->approx_cost_client;
         $template->approx_cost_firm = $request->approx_cost_firm;
+        $template->max_weight = $request->max_weight;
+        $template->volume = $request->volume;
         
         $template->save();
         
@@ -102,27 +97,21 @@ class PackageTemplatesController extends Controller
     {
        $this->validate($request, array(
             'name'=>'required|max:255',
-            'sizeA'=>'integer|required',
-            'sizeB'=>'integer|required',
-            'sizeC'=>'integer|required',
-            'service_courier_name'=>'required',
-            'delivery_courier_name'=>'required',
-            'weight'=>'required',
-            'container_type'=>'required',
             'notice_max_lenght'=>'integer|required',
-            'content'=>'required',
-            'approx_cost_client'=>'required',
-            'approx_cost_firm'=>'required'
-            
+            'symbol' => 'required',
+            'max_weight' => 'numeric|required',
+            'volume' => 'integer|required'
         ));
-        $packageTemplate = PackageTemplate::find($id);
+ 
+        $template = PackageTemplate::find($id);
         $template->name = $request->name;
+        $template->symbol = $request->symbol;
         $template->info = $request->info;
         $template->sizeA = $request->sizeA;
         $template->sizeB = $request->sizeB;
         $template->sizeC = $request->sizeC;
         $template->accept_time = $request->accept_time;
-        $template->accept_time_info = $request->name;
+        $template->accept_time_info = $request->accept_time_info;
         $template->max_time = $request->max_time;
         $template->max_time_info = $request->max_time_info;
         $template->service_courier_name = $request->service_courier_name;
@@ -134,11 +123,13 @@ class PackageTemplatesController extends Controller
         $template->content = $request->content;
         $template->cod_cost = $request->cod_cost;
         $template->approx_cost_client = $request->approx_cost_client;
-        $template->approx_cost_firm = $request->aprrox_cost_firm;
-        
+        $template->approx_cost_firm = $request->approx_cost_firm;
+        $template->max_weight = $request->max_weight;
+        $template->volume = $request->volume;
+          
         $template->save();
         
-        return redirect()->route('packageTemplates');
+        return redirect()->route('package_templates.index');
                       
     }
 
@@ -152,5 +143,6 @@ class PackageTemplatesController extends Controller
     {
         $packageTemplate = PackageTemplate::find($id);
         $packageTemplate->delete();
+        return redirect()->route('package_templates.index');
     }
 }
