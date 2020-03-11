@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Entities\OrderOtherPackage;
 use App\Entities\OrderPackage;
 use App\Entities\PackageTemplate;
 use App\Helpers\Package;
@@ -255,6 +256,8 @@ class OrdersController extends Controller
         }
         $packages = $this->divideToPackages($data);
         $this->createPackages($packages, $order->id);
+        $this->saveNotCalculable($packages, $order->id);
+        $this->saveFactory($packages, $order->id);
         return $order->id;
     }
 
@@ -810,5 +813,31 @@ class OrdersController extends Controller
         $pack->shape = $packTemplate->shape;
         $pack->save();
         return $pack;
+    }
+
+    private function saveNotCalculable(array $packages, $orderId)
+    {
+        $container = new OrderOtherPackage();
+        $container->type = 'not_calculable';
+        $container->order_id = $orderId;
+        $container->save();
+        foreach ($packages['not_calculated'] as $item) {
+            $container->products()->attach($item->id, ['quantity' => $item->quantity]);
+        }
+    }
+
+    private function saveFactory(array $packages, $orderId)
+    {
+        foreach ($packages['transport_groups'] as $transport_group) {
+            $container = new OrderOtherPackage();
+            $container->type = 'from_factory';
+            $container->description = $transport_group['name'];
+            $container->order_id = $orderId;
+            $container->price = $transport_group['transport_price'];
+            $container->save();
+            foreach ($transport_group['items'] as $item) {
+                $container->products()->attach($item->id, ['quantity' => $item->quantity]);
+            }
+        }
     }
 }
