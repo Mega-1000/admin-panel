@@ -18,7 +18,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use App\Entities;
 
 /**
@@ -127,7 +126,7 @@ class ImportCsvFileJob implements ShouldQueue
                 $multiCalcCurrent = trim($line[$categoryColumn + 8]);
                 if (empty($array['symbol']) && empty($multiCalcBase) && empty($multiCalcCurrent)) {
                     $this->saveCategory($line, $categoryTree, $categoryColumn);
-                } else {
+                } elseif ($line[6] == 1) {
                     $product = $this->saveProduct($array, $categoryTree);
                     $media = $this->getProductsMedia($line);
                     if ($media) {
@@ -159,14 +158,16 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function clearTables()
     {
-        Entities\Product::query()->update([
+        Entities\Product::withTrashed()->where('symbol', '')->orWhereNull('symbol')->forceDelete();
+        Entities\Product::withTrashed()->update([
             'category_id' => null,
             'parent_id' => null,
             'product_name_supplier' => '',
+            'product_name_supplier_on_documents' => '',
             'product_group_for_change_price' => '',
-            'products_related_to_the_automatic_price_change' => ''
+            'products_related_to_the_automatic_price_change' => '',
+            'deleted_at' => Carbon::now()
         ]);
-        Entities\Product::where('symbol', '')->orWhereNull('symbol')->delete();
         DB::table('product_media')->delete();
         DB::table('product_trade_groups')->delete();
         DB::table('chimney_replacements')->delete();
@@ -367,15 +368,17 @@ class ImportCsvFileJob implements ShouldQueue
     private function saveProduct($array, $categoryTree)
     {
         if (!empty($array['symbol'])) {
-            $item = $this->productRepository->findWhere(['symbol' => $array['symbol']])->first();
+            $product = Entities\Product::withTrashed()->where('symbol', $array['symbol'])->first();
         } else {
-            $item = null;
+            $product = null;
         }
 
         $category = $this->getCategoryParent($categoryTree, $array);
         $array['category_id'] = $category['id'] ?: null;
-        if ($item !== null) {
-            $product = $this->productRepository->update($array, $item->id);
+        if ($product != null) {
+            $product->fill($array);
+            $product->restore();
+            $product->save();
             if (!$array['subject_to_price_change']) {
                 $this->productPriceRepository->update(array_merge(['product_id', $product->id], $array), $product->id);
             }
