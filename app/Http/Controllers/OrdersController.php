@@ -305,17 +305,9 @@ class OrdersController extends Controller
             "customer_id" => $order->customer->id,
             'type' => 'STANDARD_ADDRESS',
         ])->first();
-        $customerDelivery = $this->customerAddressRepository->findWhere([
-            "customer_id" => $order->customer->id,
-            'type' => 'DELIVERY_ADDRESS',
-        ])->first();
         $orderInvoiceAddress = $this->orderAddressRepository->findWhere([
             "order_id" => $order->id,
             'type' => 'INVOICE_ADDRESS',
-        ])->first();
-        $orderDeliveryAddress = $this->orderAddressRepository->findWhere([
-            "order_id" => $order->id,
-            'type' => 'DELIVERY_ADDRESS',
         ])->first();
         $customerDeliveryAddress = $this->customerAddressRepository->findWhere([
             "customer_id" => $order->customer->id,
@@ -329,107 +321,32 @@ class OrdersController extends Controller
         foreach ($orderItems as $item) {
             $productsArray[] = $item->product_id;
         }
-        $productsVariation = [];
 
         foreach ($order->items as $item) {
             $productsArray[] = $item->product_id;
         }
 
-        foreach ($order->items as $product) {
-            if ($product->product->product_group == null) {
-                continue;
-            }
-            $productVar = $this->productRepository->findByField('product_group', $product->product->product_group);
-            foreach ($productVar as $prod) {
-                $firm = $this->firmRepository->findByField('symbol', $prod->product_name_supplier);
-                if ($firm->isEmpty() || $firm->first->id->warehouses->isEmpty()) {
-                    continue;
-                }
-                $radius = 0;
-                $warehousePostalCode = $firm->first->id->warehouses->first->id->address->postal_code;
-                $firmLatLon = DB::table('postal_code_lat_lon')->where('postal_code', $warehousePostalCode)->get()->first();
-                $deliveryAddressLatLon = DB::table('postal_code_lat_lon')->where('postal_code', $orderDeliveryAddress->postal_code)->get()->first();
-
-                if ($firmLatLon != null && $deliveryAddressLatLon != null) {
-                    $radius = 73 * sqrt(
-                        pow($firmLatLon->latitude - $deliveryAddressLatLon->latitude, 2) +
-                        pow($firmLatLon->longitude - $deliveryAddressLatLon->longitude, 2)
-                    );
-                }
-                switch ($prod->variation_unit) {
-                    case 'UB':
-                        $unitData = $prod->price->gross_selling_price_basic_unit * $product->quantity * $prod->packing->numbers_of_basic_commercial_units_in_pack;
-                        break;
-                    case 'UC':
-                        $unitData = $prod->price->gross_selling_price_basic_unit * $product->quantity;
-                        break;
-                    case 'UCA':
-                        $unitData = $prod->price->gross_selling_price_basic_unit * $product->quantity * $prod->packing->numbers_of_basic_commercial_units_in_pack / $prod->packing->unit_consumption;
-                        break;
-                    case 'UCO':
-                        $unitData = $prod->price->gross_selling_price_basic_unit * $product->quantity / $prod->packing->number_of_sale_units_in_the_pack;
-                        break;
-                    default:
-                        Log::info(
-                            'Invalid variation unit: ' . $prod->variation_unit,
-                            ['product_id' => $prod->id, 'class' => get_class($this), 'line' => __LINE__]
-                        );
-                }
-
-                if ($radius > $firm->first->id->warehouses->first->id->radius ||
-                    $prod->price->gross_selling_price_commercial_unit === null ||
-                    $prod->price->gross_selling_price_basic_unit === null ||
-                    $prod->price->gross_selling_price_calculated_unit === null
-                ) {
-                    continue;
-                }
-                if ($prod->id == $product->product->id) {
-                    $diff = 0.0;
-                } else {
-                    $diff = $product->price - number_format($unitData, 2, '.', '');
-                }
-                $array = [
-                    'id' => $prod->id,
-                    'name' => $prod->name,
-                    'gross_selling_price_commercial_unit' => $prod->price->gross_selling_price_commercial_unit,
-                    'gross_selling_price_basic_unit' => $prod->price->gross_selling_price_basic_unit,
-                    'gross_selling_price_calculated_unit' => $prod->price->gross_selling_price_calculated_unit,
-                    'sum' => number_format($unitData, 2, '.', ''),
-                    'different' => $diff,
-                    'radius' => $radius,
-                    'product_name_supplier' => $prod->product_name_supplier,
-                    'phone' => $firm->first->id->phone
-                ];
-                $productsVariation[$product->product->id][] = $array;
-            }
-            foreach ($productsVariation as $variation) {
-                if (isset($productsVariation[$product->product->id])) {
-                    $productsVariation[$product->product->id] = collect($variation)->sortBy('different', 1,
-                        true);
-                }
-            }
-        }
         $allProductsFromSupplier = [];
-        if (isset($productsVariation)) {
-            foreach ($productsVariation as $variation) {
-                foreach ($variation as $item) {
-                    if (isset($allProductsFromSupplier[$item['product_name_supplier']])) {
-                        $sum = (float)$allProductsFromSupplier[$item['product_name_supplier']]['sum'];
-                        $sum += $item['sum'];
-                    } else {
-                        $sum = $item['sum'];
-                    }
-                    $arr = [
-                        'sum' => $sum,
-                        'different' => number_format($order->total_price - $sum, 2, '.', ''),
-                        'radius' => $item['radius'],
-                        'phone' => $item['phone'],
-                        'product_name_supplier' => $item['product_name_supplier']
-                    ];
-                    $allProductsFromSupplier[$item['product_name_supplier']] = $arr;
+        $productsVariation = $this->getVariations($order);
+        foreach ($productsVariation as $variation) {
+            foreach ($variation as $item) {
+                if (isset($allProductsFromSupplier[$item['product_name_supplier']])) {
+                    $sum = (float)$allProductsFromSupplier[$item['product_name_supplier']]['sum'];
+                    $sum += $item['sum'];
+                } else {
+                    $sum = $item['sum'];
                 }
+                $arr = [
+                    'sum' => $sum,
+                    'different' => number_format($order->total_price - $sum, 2, '.', ''),
+                    'radius' => $item['radius'],
+                    'phone' => $item['phone'],
+                    'product_name_supplier' => $item['product_name_supplier']
+                ];
+                $allProductsFromSupplier[$item['product_name_supplier']] = $arr;
             }
         }
+        
         if (!empty($allProductsFromSupplier)) {
             $allProductsFromSupplier = collect($allProductsFromSupplier)->sortBy('different', 1, true);
         } else {
@@ -2036,7 +1953,6 @@ class OrdersController extends Controller
                 'alert-type' => 'error',
             ]);
         }
-
     }
 
     /**
@@ -2059,134 +1975,41 @@ class OrdersController extends Controller
         if (empty($order)) {
             abort(404);
         }
-        $orderDeliveryAddress = $this->orderAddressRepository->findWhere([
-            "order_id" => $order->id,
-            'type' => 'DELIVERY_ADDRESS',
-        ])->first();
+        
         $productsArray = [];
         foreach ($order->items as $item) {
             $productsArray[] = $item->product_id;
         }
-        $productsVariation = null;
-        foreach ($order->items as $product) {
-            if ($product->product->product_group != null) {
-                $productVar = $this->productRepository->findByField('product_group',
-                    $product->product->product_group);
-                foreach ($productVar as $prod) {
-                    $firm = $this->firmRepository->findByField('symbol', $prod->product_name_supplier);
-                    if (!$firm->isEmpty()) {
-                        if (!$firm->first->id->warehouses->isEmpty()) {
-                            $warehousePostalCode = $firm->first->id->warehouses->first->id->address->postal_code;
-                            if ($warehousePostalCode != null) {
-                                $firmLatLon = DB::table('postal_code_lat_lon')->where('postal_code',
-                                    $warehousePostalCode)->get()->first();
-                                if (!empty($firmLatLon)) {
-                                    if ($orderDeliveryAddress != null) {
-                                        $deliveryAddressLatLon = DB::table('postal_code_lat_lon')->where('postal_code',
-                                            $orderDeliveryAddress->postal_code)->get()->first();
-
-                                        $radius = sqrt(pow($firmLatLon->latitude - $firmLatLon->longitude,
-                                                    2) + (pow($deliveryAddressLatLon->latitude - $deliveryAddressLatLon->longitude,
-                                                    2))) * 73 * 0.1;
-                                    } else {
-                                        $radius = 0;
-                                    }
-                                }
-                                else {
-                                    $radius = 0;
-                                }
-                            } else {
-                                $radius = 0;
-                            }
-                            switch ($prod->variation_unit) {
-                                case 'UB':
-                                    $unitData = $prod->price->gross_selling_price_basic_unit * $product->quantity * $prod->packing->numbers_of_basic_commercial_units_in_pack;
-                                    break;
-                                case 'UC':
-                                    $unitData = $prod->price->gross_selling_price_basic_unit * $product->quantity;
-                                    break;
-                                case 'UCA':
-                                    $unitData = $prod->price->gross_selling_price_basic_unit * $product->quantity * $prod->packing->numbers_of_basic_commercial_units_in_pack / $prod->packing->unit_consumption;
-                                    break;
-                                case 'UCO':
-                                    $unitData = $prod->price->gross_selling_price_basic_unit * $product->quantity / $prod->packing->number_of_sale_units_in_the_pack;
-                                    break;
-                                default:
-                                    Log::info(
-                                        'Invalid variation unit: ' . $prod->variation_unit,
-                                        ['product_id' => $prod->id, 'class' => get_class($this), 'line' => __LINE__]
-                                    );
-                            }
-                            if ($radius <= $firm->first->id->warehouses->first->id->radius) {
-                                if ($prod->price->gross_selling_price_commercial_unit !== null && $prod->price->gross_selling_price_basic_unit !== null && $prod->price->gross_selling_price_calculated_unit !== null) {
-                                    if ($prod->id == $product->product->id) {
-                                        $diff = 0.0;
-                                    } else {
-                                        $diff = $product->price - number_format($unitData, 2, '.', '');
-                                    }
-                                    $array = [
-                                        'id' => $prod->id,
-                                        'name' => $prod->name,
-                                        'gross_selling_price_commercial_unit' => $prod->price->gross_selling_price_commercial_unit,
-                                        'gross_selling_price_basic_unit' => $prod->price->gross_selling_price_basic_unit,
-                                        'gross_selling_price_calculated_unit' => $prod->price->gross_selling_price_calculated_unit,
-                                        'sum' => number_format($unitData, 2, '.', ''),
-                                        'different' => $diff,
-                                        'radius' => $radius,
-                                        'product_name_supplier' => $prod->product_name_supplier,
-                                        'phone' => $firm->first->id->phone,
-                                        'review' => $prod->review,
-                                        'quality' => $prod->quality,
-                                        'quality_to_price' => $prod->quality_to_price,
-                                        'comments' => $prod->comments,
-                                        'variation_group' => $prod->variation_group,
-                                        'value_of_the_order_for_free_transport' => $prod->value_of_the_order_for_free_transport
-                                    ];
-                                    $productsVariation[$product->product->id][] = $array;
-                                }
-                            }
-                        }
-                    }
-
-                }
-                foreach ($productsVariation as $variation) {
-                    if (isset($productsVariation[$product->product->id])) {
-                        $productsVariation[$product->product->id] = collect($variation)->sortBy('different', 1,
-                            true);
-                    }
-                }
-            }
-        }
+        
+        $productsVariation = $this->getVariations($order);
         $allProductsFromSupplier = [];
-        if (isset($productsVariation)) {
-            foreach ($productsVariation as $variation) {
-                foreach ($variation as $item) {
-                    if ($item['variation_group'] == null) {
-                        continue;
-                    }
-                    if (isset($allProductsFromSupplier[$item['product_name_supplier']])) {
-                        $sum = (float)$allProductsFromSupplier[$item['product_name_supplier']][$item['variation_group']]['sum'];
-                        $sum += $item['sum'];
-                    } else {
-                        $sum = $item['sum'];
-                    }
-                    $arr = [
-                        'sum' => $sum,
-                        'different' => number_format($order->total_price - $sum, 2, '.', ''),
-                        'radius' => $item['radius'],
-                        'phone' => $item['phone'],
-                        'product_name_supplier' => $item['product_name_supplier'],
-                        'review' => $item['review'],
-                        'quality' => $item['quality'],
-                        'quality_to_price' => $item['quality_to_price'],
-                        'comments' => $item['comments'],
-                        'value_of_the_order_for_free_transport' => number_format((float)$item['value_of_the_order_for_free_transport'] - $order->total_price,
-                            2, '.', '') <= 0 ? 'Darmowy transport!' : number_format((float)$item['value_of_the_order_for_free_transport'] - $order->total_price,
-                            2, '.', '')
-
-                    ];
-                    $allProductsFromSupplier[$item['product_name_supplier']][$item['variation_group']] = $arr;
+        foreach ($productsVariation as $variation) {
+            foreach ($variation as $item) {
+                if ($item['variation_group'] == null) {
+                    continue;
                 }
+                if (isset($allProductsFromSupplier[$item['product_name_supplier']])) {
+                    $sum = (float)$allProductsFromSupplier[$item['product_name_supplier']][$item['variation_group']]['sum'];
+                    $sum += $item['sum'];
+                } else {
+                    $sum = $item['sum'];
+                }
+                $arr = [
+                    'sum' => $sum,
+                    'different' => number_format($order->total_price - $sum, 2, '.', ''),
+                    'radius' => $item['radius'],
+                    'phone' => $item['phone'],
+                    'product_name_supplier' => $item['product_name_supplier'],
+                    'review' => $item['review'],
+                    'quality' => $item['quality'],
+                    'quality_to_price' => $item['quality_to_price'],
+                    'comments' => $item['comments'],
+                    'value_of_the_order_for_free_transport' => number_format((float)$item['value_of_the_order_for_free_transport'] - $order->total_price,
+                        2, '.', '') <= 0 ? 'Darmowy transport!' : number_format((float)$item['value_of_the_order_for_free_transport'] - $order->total_price,
+                        2, '.', '')
+
+                ];
+                $allProductsFromSupplier[$item['product_name_supplier']][$item['variation_group']] = $arr;
             }
         }
 
@@ -2208,6 +2031,97 @@ class OrdersController extends Controller
         ]);
     }
 
+    private function getVariations($order)
+    {
+        $productsVariation = [];
+
+        $orderDeliveryAddress = $this->orderAddressRepository->findWhere([
+            "order_id" => $order->id,
+            'type' => 'DELIVERY_ADDRESS',
+        ])->first();
+
+        foreach ($order->items as $product) {
+            if ($product->product->product_group == null) {
+                continue;
+            }
+            $productVar = $this->productRepository->findByField('product_group', $product->product->product_group);
+            foreach ($productVar as $prod) {
+                $firm = $this->firmRepository->findByField('symbol', $prod->product_name_supplier);
+                if ($firm->isEmpty() || $firm->first->id->warehouses->isEmpty()) {
+                    continue;
+                }
+                $radius = 0;
+                $warehousePostalCode = $firm->first->id->warehouses->first->id->address->postal_code;
+                $firmLatLon = DB::table('postal_code_lat_lon')->where('postal_code', $warehousePostalCode)->get()->first();
+                $deliveryAddressLatLon = DB::table('postal_code_lat_lon')->where('postal_code', $orderDeliveryAddress->postal_code)->get()->first();
+
+                if ($firmLatLon != null && $deliveryAddressLatLon != null) {
+                    $radius = 73 * sqrt(
+                        pow($firmLatLon->latitude - $deliveryAddressLatLon->latitude, 2) +
+                        pow($firmLatLon->longitude - $deliveryAddressLatLon->longitude, 2)
+                    );
+                }
+                switch ($prod->variation_unit) {
+                    case 'UB':
+                        $unitData = $prod->price->gross_selling_price_basic_unit * $product->quantity * $prod->packing->numbers_of_basic_commercial_units_in_pack;
+                        break;
+                    case 'UC':
+                        $unitData = $prod->price->gross_selling_price_basic_unit * $product->quantity;
+                        break;
+                    case 'UCA':
+                        $unitData = $prod->price->gross_selling_price_basic_unit * $product->quantity * $prod->packing->numbers_of_basic_commercial_units_in_pack / $prod->packing->unit_consumption;
+                        break;
+                    case 'UCO':
+                        $unitData = $prod->price->gross_selling_price_basic_unit * $product->quantity / $prod->packing->number_of_sale_units_in_the_pack;
+                        break;
+                    default:
+                        Log::info(
+                            'Invalid variation unit: ' . $prod->variation_unit,
+                            ['product_id' => $prod->id, 'class' => get_class($this), 'line' => __LINE__]
+                        );
+                }
+
+                if ($radius > $firm->first->id->warehouses->first->id->radius ||
+                    $prod->price->gross_selling_price_commercial_unit === null ||
+                    $prod->price->gross_selling_price_basic_unit === null ||
+                    $prod->price->gross_selling_price_calculated_unit === null
+                ) {
+                    continue;
+                }
+                if ($prod->id == $product->product->id) {
+                    $diff = 0.0;
+                } else {
+                    $diff = $product->price - number_format($unitData, 2, '.', '');
+                }
+                $array = [
+                    'id' => $prod->id,
+                    'name' => $prod->name,
+                    'gross_selling_price_commercial_unit' => $prod->price->gross_selling_price_commercial_unit,
+                    'gross_selling_price_basic_unit' => $prod->price->gross_selling_price_basic_unit,
+                    'gross_selling_price_calculated_unit' => $prod->price->gross_selling_price_calculated_unit,
+                    'sum' => number_format($unitData, 2, '.', ''),
+                    'different' => $diff,
+                    'radius' => $radius,
+                    'product_name_supplier' => $prod->product_name_supplier,
+                    'phone' => $firm->first->id->phone,
+                    'review' => $prod->review,
+                    'quality' => $prod->quality,
+                    'quality_to_price' => $prod->quality_to_price,
+                    'comments' => $prod->comments,
+                    'variation_group' => $prod->variation_group,
+                    'value_of_the_order_for_free_transport' => $prod->value_of_the_order_for_free_transport
+                ];
+                $productsVariation[$product->product->id][] = $array;
+            }
+            foreach ($productsVariation as $variation) {
+                if (isset($productsVariation[$product->product->id])) {
+                    $productsVariation[$product->product->id] = collect($variation)->sortBy('different', 1, true);
+                }
+            }
+        }
+        
+        return $productsVariation;
+    }
 
     public function getCalendar(int $id)
     {
