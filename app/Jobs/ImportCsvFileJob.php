@@ -494,8 +494,8 @@ class ImportCsvFileJob implements ShouldQueue
             'per_package_factor' => $line[371],
             'trade_group_name' => $line[378],
             'additional_payment_for_milling' => $line[473],
-            'date_of_price_change' => $line[106] != null ? new Carbon($line[106]) : null,
-            'date_of_the_new_prices' => $line[107] != null ? new Carbon($line[107]) : null,
+            'date_of_price_change' => $this->getDateOrNull($line[106]),
+            'date_of_the_new_prices' => $this->getDateOrNull($line[107]),
             'product_group_for_change_price' => $line[108],
             'products_related_to_the_automatic_price_change' => $line[110],
             'text_price_change' => $line[111],
@@ -710,5 +710,11 @@ class ImportCsvFileJob implements ShouldQueue
     {
         Log::channel('import')->info($text);
         echo $text."\n";
+    }
+
+    private function getDateOrNull($date)
+    {
+        $d = DateTime::createFromFormat('Y-m-d', $date);
+        return $d && $d->format('Y-m-d') == $date ? $date : null;
     }
 }
