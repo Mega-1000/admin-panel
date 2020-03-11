@@ -522,9 +522,6 @@
                 </div>
             </th>
             <th>
-                <div><span>@lang('orders.table.add_invoice')</span></div>
-            </th>
-            <th>
                 @lang('orders.table.profit')
             </th>
             <th>
@@ -1081,11 +1078,6 @@
                 },
                 {
                     data: 'orderId',
-                    name: 'add_invoice',
-                    render: (orderId, type, row) => ('<a href="{{env('FRONT_NUXT_URL')}}' + '/magazyn/awizacja/0/0/' + orderId + '/wyslij-fakture">dodaj fakturę</a>')
-                },
-                {
-                    data: 'orderId',
                     name: 'profit',
                     searchable: false,
                     orderable: false,
@@ -1386,15 +1378,17 @@
                 },
                     @endforeach
                 {
-                    data: 'invoices',
+                    data: null,
                     name: 'invoices',
-                    render: function(invoices) {
-                        let html = '';
+                    render: function(data) {
+                        let invoices = data.invoices
+                        let html = ''
                         if(invoices !== undefined){
                             invoices.forEach(function(invoice){
                                 html += '<a target="_blank" href="/storage/invoices/'+invoice.invoice_name+'" style="margin-top: 5px;">Faktura</a>';
                             });
                         }
+                        html += '<a href="{{env('FRONT_NUXT_URL')}}' + '/magazyn/awizacja/0/0/' + data.orderId + '/wyslij-fakture">Dodaj</a>'
                         return html;
                     }
                 },
