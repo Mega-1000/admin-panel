@@ -26,7 +26,7 @@
 <div class="docc">
     <h1>WZ {{ $order->id }}</h1>
     @if(!empty($order->employee))
-    <h2>Osoba odpowiedzialna:</h2> {!! $tagHelper->consultantOrStorekeeper() !!}<br/>
+        <h2>Osoba odpowiedzialna:</h2> {!! $tagHelper->consultantOrStorekeeper() !!}<br/>
     @endif
     <div style="position:absolute; right:40px; top:0px;">
         <h2>
@@ -49,61 +49,58 @@
     <br/><br/>
 
     @if(count($order->packages) > 0)
-    <table border="1" cellpadding="2" cellspacing="0" style="width: 100%;">
-        <tr>
-            <th>Data wysyłki</th>
-            <th>Kurier</th>
-            <th>Spedycja obsługująca</th>
-            <th>Rozmiar</th>
-            <th>Waga</th>
-            <th>Uwagi</th>
-        </tr>
         @foreach($order->packages as $package)
-        <tr>
-            <td>{{ $package->shipment_date }}</td>
-            <td>{{ $package->delivery_courier_name }}</td>
-            <td>{{ $package->service_courier_name }}</td>
-            <td>
-                {{ $package->size_a }} x {{ $package->size_b }} x {{ $package->size_c }}
-            </td>
-            <td>{{ $package->weight }}</td>
-            <td>{{ $order->id }}/{{ $package->number }}</td>
-        </tr>
+            <table border="1" cellpadding="2" cellspacing="0" style="width: 100%;">
+                <tr style="background: green">
+                    <th>Data wysyłki</th>
+                    <th>Kurier</th>
+                    <th>Spedycja obsługująca</th>
+                    <th>Rozmiar</th>
+                    <th>Waga</th>
+                    <th>Uwagi</th>
+                </tr>
+                <tr>
+                    <td>{{ $package->shipment_date }}</td>
+                    <td>{{ $package->delivery_courier_name }}</td>
+                    <td>{{ $package->service_courier_name }}</td>
+                    <td>
+                        {{ $package->size_a }} x {{ $package->size_b }} x {{ $package->size_c }}
+                    </td>
+                    <td>{{ $package->weight }}</td>
+                    <td>{{ $order->id }}/{{ $package->number }}</td>
+                </tr>
+            </table>
+            <br/><br/>
+            @include('orders.items_table',['$package' => $package])
         @endforeach
-    </table>
-    <br/><br/>
     @endif
-    <table border="0" cellpadding="1" cellspacing="1" style="width: 100%;">
-        @foreach($order->items as $item)
-            <tr>
-                <td style="width:100px"><img
-                        src="{!! str_replace('C:\\z\\', env('APP_URL') . 'storage/products/', $item->product->url) !!}"
-                        alt="{{ $item->product->name }}"
-                        style="width:70px"/></td>
-                <td><span
-                        style="font-size:14px; font-weight:bold;">{{ $item->product->name }}</span><br/>symbol: {{ $item->product->symbol }}
-                    <br/>Ilość: {{ $item->quantity }} {{ $item->product->packing->calciation_unit }}<br/></td>
-                <td>
-                    ILOSC NA STANIE: {{ $item->realProduct() }} <br/>
-                    @if(count($item->realProductPositions()))
-                    LOKACJA PRODUKTOW: <br/>
-                        @foreach($item->realProductPositions() as $position)
-                            Alejka: {{ $position->lane }} <br/>
-                            Regał: {{ $position->bookstand }} </br>
-                            Półka: {{ $position->shelf }} </br>
-                            Pozycja: {{ $position->position }} </br>
-                            Ilość: {{ $position->position_quantity }}
-                        @endforeach
-                    @endif
-                </td>
-            </tr>
-            <tr>
-                <td colspan="3">
-                    <hr/>
-                </td>
-            </tr>
+    @if(count($order->factoryDelivery) > 0)
+        @foreach($order->factoryDelivery as $package)
+            <table border="1" cellpadding="2" cellspacing="0" style="width: 100%;">
+                <tr style="background: green">
+                    <th>Fabryka:</th>
+                    <th>Cena:</th>
+                </tr>
+                <tr>
+                    <td>{{ $package->description }}</td>
+                    <td>{{ $package->price }}</td>
+                </tr>
+            </table>
+            <br/><br/>
+            @include('orders.items_table',['$package' => $package])
         @endforeach
-    </table>
+    @endif
+    @if(count($order->notCalculable) > 0)
+        @foreach($order->notCalculable as $package)
+            <table border="1" cellpadding="2" cellspacing="0" style="width: 100%;">
+                <tr style="background: red">
+                    <th>Produkty niepoliczalne</th>
+                </tr>
+            </table>
+            <br/><br/>
+            @include('orders.items_table',['$package' => $package])
+        @endforeach
+    @endif
 
 
     <br/><b>DANE KUPUJĄCEGO</b><br/>

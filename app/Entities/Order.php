@@ -17,6 +17,7 @@ class Order extends Model implements Transformable
 {
 
     use TransformableTrait;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -148,8 +149,8 @@ class Order extends Model implements Transformable
      */
     public function isPaymentRegulated()
     {
-        $valueRange         = config('orders.plus-minus-regulation-amount');
-        $orderTotalPrice    = $this->getSumOfGrossValues();
+        $valueRange = config('orders.plus-minus-regulation-amount');
+        $orderTotalPrice = $this->getSumOfGrossValues();
         $totalPaymentAmount = floatval($this->payments()->where("promise", "")->sum("amount"));
 
         return ($totalPaymentAmount > ($orderTotalPrice - $valueRange) && $totalPaymentAmount < ($orderTotalPrice + $valueRange));
@@ -160,13 +161,13 @@ class Order extends Model implements Transformable
      */
     public function toPayPackages()
     {
-        $sum      = 0;
+        $sum = 0;
         $packages = $this->packages()->whereIn('status', ['SENDING', 'DELIVERED', 'NEW', 'WAITING_FOR_SENDING'])->get();
         foreach ($packages as $package) {
             $sum += $package->cash_on_delivery;
         }
-        $orderTotalPrice           = $this->getSumOfGrossValues();
-        $totalPaymentAmount        = floatval($this->payments()->where('promise', '=', '')->sum("amount"));
+        $orderTotalPrice = $this->getSumOfGrossValues();
+        $totalPaymentAmount = floatval($this->payments()->where('promise', '=', '')->sum("amount"));
         $totalPromisePaymentAmount = floatval($this->payments()->where('promise', '=', '1')->sum("amount"));
         //dd($orderTotalPrice - $totalPromisePaymentAmount - $sum);
         if ($orderTotalPrice - $totalPaymentAmount > -2 && $orderTotalPrice - $totalPaymentAmount < 2) {
@@ -208,7 +209,7 @@ class Order extends Model implements Transformable
             empty($deliveryAddress->flat_number) ||
             empty($deliveryAddress->city) ||
             empty($deliveryAddress->postal_code)
-            ));
+        ));
     }
 
     public function isInvoiceDataComplete()
@@ -222,7 +223,7 @@ class Order extends Model implements Transformable
             empty($invoiceAddress->flat_number) ||
             empty($invoiceAddress->city) ||
             empty($invoiceAddress->postal_code)
-            ));
+        ));
     }
 
     public function getDeliveryAddress()
@@ -258,7 +259,7 @@ class Order extends Model implements Transformable
 
     public function promisePaymentsSum()
     {
-        $sum             = 0;
+        $sum = 0;
         $promisePayments = $this->payments()->where('promise', 'like', '1')->get();
 
         foreach ($promisePayments as $promisePayment) {
@@ -282,7 +283,7 @@ class Order extends Model implements Transformable
 
     public function packagesCashOnDeliverySum()
     {
-        $sum      = 0;
+        $sum = 0;
         $packages = $this->packages()->whereIn('status', ['SENDING', 'DELIVERED', 'NEW', 'WAITING_FOR_SENDING'])->get();
         foreach ($packages as $package) {
             $sum += $package->cash_on_delivery;
@@ -293,7 +294,7 @@ class Order extends Model implements Transformable
 
     public function bookedPaymentsSum()
     {
-        $sum             = 0;
+        $sum = 0;
         $promisePayments = $this->payments()->where('promise', 'like', '')->get();
 
         foreach ($promisePayments as $promisePayment) {
@@ -305,7 +306,7 @@ class Order extends Model implements Transformable
 
     public function orderGroupBookedPaymentsSum()
     {
-        $sum             = 0;
+        $sum = 0;
         $promisePayments = $this->payments()->where('promise', 'like', '')->get();
 
         foreach ($promisePayments as $promisePayment) {
@@ -442,5 +443,15 @@ class Order extends Model implements Transformable
             static::where('id', $this->id)->update(['token' => $this->token]);
         }
         return $this->token;
+    }
+
+    public function factoryDelivery()
+    {
+        return $this->hasMany('App\Entities\OrderOtherPackage')->where('type', 'from_factory');
+    }
+
+    public function notCalculable()
+    {
+        return $this->hasMany('App\Entities\OrderOtherPackage')->where('type', 'not_calculable');
     }
 }

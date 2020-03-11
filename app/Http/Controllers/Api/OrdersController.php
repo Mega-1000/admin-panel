@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Entities\OrderOtherPackage;
+use App\Entities\OrderPackage;
+use App\Entities\PackageTemplate;
+use App\Helpers\Package;
+use App\Helpers\PackageDivider;
 use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
 use App\Http\Requests\Api\Orders\StoreOrderRequest;
 use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
@@ -249,7 +254,10 @@ class OrdersController extends Controller
                 $data['update_email']
             );
         }
-
+        $packages = $this->divideToPackages($data);
+        $this->createPackages($packages, $order->id);
+        $this->saveNotCalculable($packages, $order->id);
+        $this->saveFactory($packages, $order->id);
         return $order->id;
     }
 
@@ -380,7 +388,7 @@ class OrdersController extends Controller
                 break;
             case 'customer':
                 $address = $order->customer->addresses()->where('type', $type)->first();
-                $exists = (bool) $address;
+                $exists = (bool)$address;
                 $obj = $order->customer;
                 if (!$address) {
                     $address = new CustomerAddress();
@@ -397,15 +405,15 @@ class OrdersController extends Controller
         }
 
         foreach ([
-            'firstname',
-            'lastname',
-            'firmname',
-            'nip',
-            'address',
-            'flat_number',
-            'city',
-            'postal_code'
-        ] as $column) {
+                     'firstname',
+                     'lastname',
+                     'firmname',
+                     'nip',
+                     'address',
+                     'flat_number',
+                     'city',
+                     'postal_code'
+                 ] as $column) {
             if (!empty($deliveryAddress[$column])) {
                 $address->$column = $deliveryAddress[$column];
             }
@@ -703,11 +711,11 @@ class OrdersController extends Controller
             $vat = 1 + $item->product->vat / 100;
 
             foreach ([
-                'selling_price_calculated_unit',
-                'selling_price_basic_uni',
-                'selling_price_aggregate_unit',
-                'selling_price_the_largest_unit'
-            ] as $column) {
+                         'selling_price_calculated_unit',
+                         'selling_price_basic_uni',
+                         'selling_price_aggregate_unit',
+                         'selling_price_the_largest_unit'
+                     ] as $column) {
                 $kGross = "gross_$column";
                 $kNet = "net_$column";
                 $item->product->$kGross = round($item->$kNet * $vat, 2);
@@ -741,5 +749,102 @@ class OrdersController extends Controller
             'net_purchase_price_aggregate_unit_after_discounts',
             'net_purchase_price_the_largest_unit_after_discounts'
         ];
+    }
+
+    private function divideToPackages($data): array
+    {
+        $prodIds = [];
+        $responseArray = collect($data['order_items']);
+        foreach ($responseArray as $items) {
+            $prodIds [] = $items['id'];
+        }
+        $prodList = Product::whereIn('id', $prodIds)->with('tradeGroups')->with('price')->get();
+        $prodList->map(function ($item) use ($responseArray) {
+            $product = $responseArray->where('id', $item->id)->first();
+            $item->quantity = $product['amount'];
+        });
+        $warehouse = new PackageDivider();
+        $warehouse->setItems($prodList);
+        return $warehouse->divide();
+    }
+
+    private function createPackages(array $packages, $orderId)
+    {
+        foreach ($packages['packages'] as $package) {
+            if (!empty($package->type)) {
+                $pack = $this->createPackage($package->type, $orderId);
+                $products = [];
+                foreach ($package->packagesList as $singlePack) {
+                    foreach ($singlePack->productList as $product) {
+                        $quantity = empty($products[$product->id]) ? $product->quantity : $products[$product->id] + $product->quantity;
+                        $products[$product->id] = $quantity;
+                    }
+                }
+                foreach ($products as $k => $quantity) {
+                    $pack->packedProducts()->attach($k, ['quantity' => $quantity]);
+                }
+            }
+            if (!empty($package->packageName)) {
+                $pack = $this->createPackage($package->packageName, $orderId);
+                $products = [];
+                foreach ($package->productList as $product) {
+                    $quantity = empty($products[$product->id]) ? $product->quantity : $products[$product->id] + $product->quantity;
+                    $products[$product->id] = $quantity;
+                }
+                foreach ($products as $k => $quantity) {
+                    $pack->packedProducts()->attach($k, ['quantity' => $quantity]);
+                }
+            }
+        }
+    }
+
+    private function createPackage($symbol, $orderId)
+    {
+        $packTemplate = PackageTemplate::where('symbol', $symbol)->firstOrFail();
+        $pack = new OrderPackage();
+        $pack->order_id = $orderId;
+        $pack->size_a = $packTemplate->sizeA;
+        $pack->size_b = $packTemplate->sizeB;
+        $pack->size_c = $packTemplate->sizeC;
+        $pack->delivery_courier_name = $packTemplate->delivery_courier_name;
+        $pack->service_courier_name = $packTemplate->service_courier_name;
+        $pack->weight = $packTemplate->weight;
+        $pack->status = 'NEW';
+        $pack->container_type = $packTemplate->container_type;
+        $pack->shape = $packTemplate->shape;
+        $pack->save();
+        return $pack;
+    }
+
+    private function saveNotCalculable(array $packages, $orderId)
+    {
+        if (count($packages['not_calculated']) == 0) {
+            return;
+        }
+        $container = new OrderOtherPackage();
+        $container->type = 'not_calculable';
+        $container->order_id = $orderId;
+        $container->save();
+        foreach ($packages['not_calculated'] as $item) {
+            $container->products()->attach($item->id, ['quantity' => $item->quantity]);
+        }
+    }
+
+    private function saveFactory(array $packages, $orderId)
+    {
+        if (count($packages['transport_groups']) == 0) {
+            return;
+        }
+        foreach ($packages['transport_groups'] as $transport_group) {
+            $container = new OrderOtherPackage();
+            $container->type = 'from_factory';
+            $container->description = $transport_group['name'];
+            $container->order_id = $orderId;
+            $container->price = $transport_group['transport_price'];
+            $container->save();
+            foreach ($transport_group['items'] as $item) {
+                $container->products()->attach($item->id, ['quantity' => $item->quantity]);
+            }
+        }
     }
 }
