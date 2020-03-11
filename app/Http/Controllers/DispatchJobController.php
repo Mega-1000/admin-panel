@@ -37,4 +37,11 @@ class DispatchJobController extends Controller
             "newStatusId" => $newStatusId,
         ];
     }
+
+    public function recalculatePrices()
+    {
+        dispatch_now(new \App\Jobs\CheckDateOfProductNewPriceJob());
+        \Session::flash('success', true);
+        return redirect(route('import.index'));
+    }
 }

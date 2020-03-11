@@ -412,9 +412,10 @@ Route::group(['prefix' => 'admin'], function () {
                 Route::post('/import/payments', 'ImportPaymentsController@store')->name('storePaymentsPdf');
         });
 
-
         Route::post('users/workHours/', 'UserWorksController@addWorkHours')->name('users.addWorkHours');
         Route::get('actualizationPrice', 'ActualizationController@sendActualization')->name('actualizationPrice');
+        
+        Route::get('/dispatch-job/recalculate-prices', 'DispatchJobController@recalculatePrices')->name('job.recalculatePrices');
     });
 });
 

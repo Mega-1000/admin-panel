@@ -24,10 +24,8 @@ class CheckDateOfProductNewPriceJob
      *
      * @return void
      */
-    public function __construct(ProductRepository $repository, ProductPriceRepository $productPriceRepository)
+    public function __construct()
     {
-        $this->repository = $repository;
-        $this->productPriceRepository = $productPriceRepository;
     }
 
     /**
@@ -35,8 +33,11 @@ class CheckDateOfProductNewPriceJob
      *
      * @return void
      */
-    public function handle()
+    public function handle(ProductRepository $repository, ProductPriceRepository $productPriceRepository)
     {
+        $this->repository = $repository;
+        $this->productPriceRepository = $productPriceRepository;
+        
         $products = $this->repository->findWhere([['date_of_the_new_prices', '<=', Carbon::today()->addDay()]]);
 
         foreach ($products as $product) {
