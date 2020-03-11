@@ -1591,6 +1591,7 @@ class OrdersController extends Controller
             $row->connected = \DB::table('orders')->where('master_order_id', $row->orderId)->get();
             $row->payments = \DB::table('order_payments')->where('order_id', $row->orderId)->get();
             $row->packages = \DB::table('order_packages')->where('order_id', $row->orderId)->get();
+            $row->otherPackages = \DB::table('order_other_packages')->where('order_id', $row->orderId)->get();
             $row->addresses = \DB::table('order_addresses')->where('order_id', $row->orderId)->get();
             $invoices = \DB::table('order_order_invoices')->where('order_id', $row->orderId)->get(['id']);
             $arrInvoice = [];

@@ -799,12 +799,18 @@
                     }
                 },
                 {
-                    data: 'packages',
+                    data: null,
                     name: 'packages_not_sent',
                     searchable: false,
                     orderable: false,
-                    render: function ( data, type, row ) {
-                        var html = '';
+                    render: function ( order, type, row ) {
+                        let data = order.packages
+                        var html = ''
+                        if (order.otherPackages && order.otherPackages.find(el => el.type == 'not_calculable')) {
+                            html = '<div style="background: red" >'
+                        } else {
+                            html = '<div style="background: green" >'
+                        }
                         $.each(data, function(key, value){
                             if(value.status !== 'SENDING' && value.status !== 'DELIVERED' && value.status !== 'CANCELLED') {
                                 html += '<div><p>' + row.orderId + '/' + value.number + '</p>';
@@ -848,6 +854,7 @@
                                 }
                             }
                         });
+                        html += '</div>';
                         return html;
                     }
                 },
@@ -1197,7 +1204,6 @@
                     name: 'sum_of_payments',
                     searchable: false,
                     render: function(data, type, row) {
-                        console.log(row);
                         let totalOfPayments = 0;
                         let totalOfDeclaredPayments = 0;
                         var payments = row['payments'];
