@@ -509,7 +509,7 @@ class ImportCsvFileJob implements ShouldQueue
             'value_of_price_change_data_third' => $line[127],
             'value_of_price_change_data_fourth' => $line[128],
             'pattern_to_set_the_price' => $line[129],
-            'euro_exchange' => $line[250],
+            'euro_exchange' => $line[131],
             'variation_unit' => $line[292],
             'variation_group' => $line[293],
             'review' => $line[279],
