@@ -809,6 +809,7 @@ class OrdersController extends Controller
         $pack->delivery_courier_name = $packTemplate->delivery_courier_name;
         $pack->service_courier_name = $packTemplate->service_courier_name;
         $pack->weight = $packTemplate->weight;
+        $pack->status = 'NEW';
         $pack->container_type = $packTemplate->container_type;
         $pack->shape = $packTemplate->shape;
         $pack->save();
@@ -817,6 +818,9 @@ class OrdersController extends Controller
 
     private function saveNotCalculable(array $packages, $orderId)
     {
+        if (count($packages['not_calculated']) == 0) {
+            return;
+        }
         $container = new OrderOtherPackage();
         $container->type = 'not_calculable';
         $container->order_id = $orderId;
@@ -828,6 +832,9 @@ class OrdersController extends Controller
 
     private function saveFactory(array $packages, $orderId)
     {
+        if (count($packages['transport_groups']) == 0) {
+            return;
+        }
         foreach ($packages['transport_groups'] as $transport_group) {
             $container = new OrderOtherPackage();
             $container->type = 'from_factory';
