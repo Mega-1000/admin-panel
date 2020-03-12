@@ -143,7 +143,7 @@
                 <input type="text" id="shape" name="shape" class="form-control" value="{{ $old->shape }}">
             </div>
             <div class="form-group">
-                <label for="notices">Maksymalna ilość znaków w uwagach do spedycji</label>
+                <label for="notices">@lang('order_packages.form.maxStringLength')</label>
                 <input type="number" id="notice_max_lenght" name="notice_max_lenght" class="form-control" value="{{ $old->notice_max_lenght }}">
             </div>
             <div class="form-group">
@@ -155,7 +155,7 @@
                        value="Materiały budowlane">
             </div>
             <div class="form-group">
-                <label for="cod_cost">Koszt pobrania</label>
+                <label for="cod_cost">@lang('order_packages.form.cost')</label>
                 <input type="number" step=".01" class="form-control" id="cod_cost" name="cod_cost"
                        value="{{ $old->cod_cost }}">
             </div>
@@ -170,12 +170,12 @@
                        value="{{ $old->approx_cost_firm}}">
             </div>
             <div class="form-group">
-                <label for="cost_for_company">Maksymalna waga Paczki u wybranego kuriera</label>
+                <label for="cost_for_company">@lang('order_packages.form.maxWeight')</label>
                 <input type="number" step=".01" class="form-control" id="max_weight" name="max_weight"
                        value="{{ $old->max_weight }}">
             </div>
             <div class="form-group">
-                <label for="cost_for_company">Współczynnik objętości</label>
+                <label for="cost_for_company">@lang('order_packages.form.weightVolume')</label>
                 <input type="number" step=".01" class="form-control" id="volume" name="volume"
                        value="{{ $old->volume }}">
             </div>
@@ -195,7 +195,7 @@
         $('#modalPackageValue').val(value);
         $('#packageDialog').modal('show');
       });
-     
+
       function validate(form) {
 	console.log(payments);
         if (paymentsSum < 2 && promisedPaymentsSum > 2) {
@@ -216,7 +216,7 @@
               $('#shouldTakePayment').val(3);
               return true;
             } else {
-	      
+
               return false;
             }
           }
