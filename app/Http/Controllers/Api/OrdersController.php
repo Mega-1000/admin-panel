@@ -672,6 +672,7 @@ class OrdersController extends Controller
             ->with('addresses')
             ->with('invoices')
             ->with('employee')
+            ->with('factoryDelivery')
             ->orderBy('id', 'desc')
             ->get();
 

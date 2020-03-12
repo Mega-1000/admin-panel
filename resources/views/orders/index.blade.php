@@ -856,15 +856,15 @@
                     }
                 },
                 {
-                    data: 'orderId',
+                    data: 'token',
                     name: 'print',
                     orderable: false,
-                    render: function(id, row, data) {
+                    render: function(token, row, data) {
                         let html = '';
                         if(data.print_order == '0') {
-                            html = '<a href="/admin/orders/' + id + '/print" target="_blank" class="btn btn-default" id="btn-print">W</a>';
+                            html = '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-default" id="btn-print">W</a>';
                         } else {
-                            html = '<a href="/admin/orders/' + id + '/print" target="_blank" class="btn btn-success">W</a>';
+                            html = '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-success">W</a>';
                         }
                         return html;
                     }

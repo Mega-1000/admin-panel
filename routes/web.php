@@ -172,7 +172,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('customers/{id}/update', 'CustomersController@update')->name('customers.update');
         Route::delete('customers/{id}/', 'CustomersController@destroy')->name('customers.destroy');
         Route::put('customers/{id}/change-status', 'CustomersController@changeStatus')->name('customers.change.status');
-        
+
         Route::get('packageTemplates', 'PackageTemplatesController@index')->name('package_templates.index');
         Route::get('packageTemplates/datatable', 'PackageTemplatesController@datatable')->name('package_templates.datatable');
         Route::get('packageTemplates/create', 'PackageTemplatesController@create')->name('package_templates.create');
@@ -222,7 +222,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('orders/{id}/updateSelf', [
             'uses' => 'OrdersController@updateSelf',
         ])->name('orders.updateSelf');
-        Route::get('orders/{id}/print', 'OrdersController@print')->name('orders.print');
+        Route::get('orders/{token}/print', 'OrdersController@print')->name('orders.print');
         Route::post('orders/splitOrders', 'OrdersController@splitOrders');
         Route::get('orders/{orderIdToGet}/data/{orderIdToSend}/move',
             'OrdersController@moveData')->name('orders.moveData');
@@ -414,7 +414,7 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::post('users/workHours/', 'UserWorksController@addWorkHours')->name('users.addWorkHours');
         Route::get('actualizationPrice', 'ActualizationController@sendActualization')->name('actualizationPrice');
-        
+
         Route::get('/dispatch-job/recalculate-prices', 'DispatchJobController@recalculatePrices')->name('job.recalculatePrices');
     });
 });
