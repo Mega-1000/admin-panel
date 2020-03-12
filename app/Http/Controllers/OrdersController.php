@@ -309,11 +309,14 @@ class OrdersController extends Controller
             "order_id" => $order->id,
             'type' => 'INVOICE_ADDRESS',
         ])->first();
+        $orderDeliveryAddress = $this->orderAddressRepository->findWhere([
+            "order_id" => $order->id,
+            'type' => 'DELIVERY_ADDRESS',
+        ])->first();
         $customerDeliveryAddress = $this->customerAddressRepository->findWhere([
             "customer_id" => $order->customer->id,
             'type' => 'DELIVERY_ADDRESS',
         ])->first();
-        $orderItems = $order->items();
         $messages = $this->orderMessageRepository->orderBy('type')->findWhere(["order_id" => $order->id]);
         $emails = DB::table('emails_messages')->where('order_id', $orderId)->get();
         $orderItems = $order->items;
@@ -346,7 +349,7 @@ class OrdersController extends Controller
                 $allProductsFromSupplier[$item['product_name_supplier']] = $arr;
             }
         }
-        
+
         if (!empty($allProductsFromSupplier)) {
             $allProductsFromSupplier = collect($allProductsFromSupplier)->sortBy('different', 1, true);
         } else {
@@ -388,7 +391,6 @@ class OrdersController extends Controller
         ]);
 
         $orderHasSentLP = $order->hasOrderSentLP();
-
         if ($order->customer_id == 4128) {
             return view('orders.edit_self',
                 compact('visibilitiesTask', 'visibilitiesPackage', 'visibilitiesPayments', 'warehouses', 'order',
@@ -1976,12 +1978,12 @@ class OrdersController extends Controller
         if (empty($order)) {
             abort(404);
         }
-        
+
         $productsArray = [];
         foreach ($order->items as $item) {
             $productsArray[] = $item->product_id;
         }
-        
+
         $productsVariation = $this->getVariations($order);
         $allProductsFromSupplier = [];
         foreach ($productsVariation as $variation) {
@@ -2120,7 +2122,7 @@ class OrdersController extends Controller
                 }
             }
         }
-        
+
         return $productsVariation;
     }
 
