@@ -71,7 +71,26 @@
                 </tr>
             </table>
             <br/><br/>
-            @include('orders.items_table',['$package' => $package])
+            @if(count($package->packedProducts) > 0)
+                @foreach($package->packedProducts as $item)
+                    <table border="0" cellpadding="1" cellspacing="1" style="width: 100%;">
+                        <tr>
+                            <td style="width:100px"><img
+                                    src="{!! str_replace('C:\\z\\', env('APP_URL') . 'storage/products/', $item->url) !!}"
+                                    alt="{{ $item->name }}"
+                                    style="width:70px"/></td>
+                            <td><span
+                                    style="font-size:14px; font-weight:bold;">{{ $item->name }}</span><br/>symbol: {{ $item->symbol }}
+                                <br/>Ilość: {{ $item->pivot->quantity }} {{ $item->packing->calciation_unit }}<br/></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3">
+                                <hr/>
+                            </td>
+                        </tr>
+                    </table>
+                @endforeach
+            @endif
         @endforeach
     @endif
     @if(count($order->factoryDelivery) > 0)
