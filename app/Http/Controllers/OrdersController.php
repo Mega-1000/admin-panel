@@ -1726,13 +1726,13 @@ class OrdersController extends Controller
     }
 
     /**
-     * @param $id
+     * @param $token
      *
      * @return \Illuminate\Contracts\View\View
      */
-    public function print($id)
+    public function print($token)
     {
-        $order = $this->orderRepository->find($id);
+        $order = $this->orderRepository->where('token', $token)->first();
 
         if (empty($order)) {
             abort(404);
