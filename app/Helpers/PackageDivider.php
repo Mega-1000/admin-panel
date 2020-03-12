@@ -61,6 +61,7 @@ class PackageDivider implements iPackageDivider
             unset($transportCalculations['cantsend']);
         }
         $failed = [];
+        $totalPacks = [];
         foreach ($sorted as $key => $items) {
             if (strpos($key, self::LONG)) {
                 $items = $this->sortByLength($items);
@@ -69,8 +70,9 @@ class PackageDivider implements iPackageDivider
                 uasort($items, array('App\Helpers\PackageDivider', 'weightAndVolumeSort'));
                 ['packages' => $divided, 'failed' => $failed] = $this->calculatePackages($items);
             }
+            $totalPacks = array_merge($divided, $totalPacks);
         }
-        return ['packages' => array_values($divided),
+        return ['packages' => array_values($totalPacks),
             'transport_groups' => isset($transportCalculations['calculated']) ? $transportCalculations['calculated'] : [],
             'not_calculated' => array_merge($notCalculated, $failed)];
     }
@@ -147,7 +149,7 @@ class PackageDivider implements iPackageDivider
                 } else if ($package->getProducts()->count() === 0) {
                     return ['packages' => false, 'failed' => $item];
                 } else {
-                    $package = new Package($packageName,  env('PACKAGE_DIVIDE_MARGIN'));
+                    $package = new Package($packageName, env('PACKAGE_DIVIDE_MARGIN'));
                     $packageList[] = $package;
                 }
             }
