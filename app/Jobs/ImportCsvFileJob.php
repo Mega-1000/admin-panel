@@ -128,16 +128,17 @@ class ImportCsvFileJob implements ShouldQueue
                 if (empty($array['symbol']) && empty($multiCalcBase) && empty($multiCalcCurrent)) {
                     $this->saveCategory($line, $categoryTree, $categoryColumn);
                 } elseif ($line[6] == 1) {
-                    $product = $this->saveProduct($array, $categoryTree);
+                    $product = $this->saveProduct($array, $categoryTree, !empty($multiCalcCurrent));
                     $media = $this->getProductsMedia($line);
                     if ($media) {
                         $this->createProductMedia($media, $product);
                     }
                     $this->setProductTradeGroups($line, $product);
                     if (!empty($multiCalcBase)) {
-                        $this->productsRelated[$multiCalcBase] = $product->id;
-                    } elseif (!empty($multiCalcCurrent) && !empty($this->productsRelated[$multiCalcCurrent])) {
-                        $product->parent_id = $this->productsRelated[$multiCalcCurrent];
+                        $this->productsRelated[$categoryColumn.'-'.$multiCalcBase] = $product->id;
+                    } elseif (!empty($multiCalcCurrent) && !empty($this->productsRelated[$categoryColumn.'-'.$multiCalcCurrent])) {
+                        $product->parent_id = $this->productsRelated[$categoryColumn.'-'.$multiCalcCurrent];
+                        $product->category_id = Entities\Product::find($product->parent_id)->category_id;
                         $product->save();
                     }
                 }
@@ -366,7 +367,7 @@ class ImportCsvFileJob implements ShouldQueue
         return $replacements;
     }
 
-    private function saveProduct($array, $categoryTree)
+    private function saveProduct($array, $categoryTree, $isChildProduct)
     {
         if (!empty($array['symbol'])) {
             $product = Entities\Product::withTrashed()->where('symbol', $array['symbol'])->first();
@@ -374,8 +375,13 @@ class ImportCsvFileJob implements ShouldQueue
             $product = null;
         }
 
-        $category = $this->getCategoryParent($categoryTree, $array);
-        $array['category_id'] = $category['id'] ?: null;
+        if (!$isChildProduct) {
+            $category = $this->getCategoryParent($categoryTree, $array);
+            $array['category_id'] = $category['id'] ?: null;
+        } else {
+            $array['category_id'] = null;
+        }
+        
         if ($product != null) {
             $product->fill($array);
             $product->restore();
