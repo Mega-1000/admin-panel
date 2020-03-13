@@ -4,10 +4,10 @@ namespace App\Integrations\Apaczka;
 
 class ApaczkaOrder {
 
-    private $notificationDelivered = array();
-    private $notificationException = array();
-    private $notificationNew = array();
-    private $notificationSent = array();
+    public $notificationDelivered = array();
+    public $notificationException = array();
+    public $notificationNew = array();
+    public $notificationSent = array();
     // cash on delivery
     private $accountNumber = "";
     private $codAmount = "";
@@ -19,12 +19,12 @@ class ApaczkaOrder {
     private $options = "";
     private $address_receiver = array();
     private $address_sender = array();
-    private $referenceNumber = '';
+    public $referenceNumber = '';
     private $serviceCode = "";
     private $isDomestic = "true";
     private $serviceId = "";
-    private $comment = "";
-    private $contents = "";
+    public $comment = "";
+    public $contents = "";
     private $shipment = array();
     private static $dictServiceCode = array('UPS_K_STANDARD', 'UPS_K_EX_SAV', 'UPS_K_EX', 'UPS_K_EXP_PLUS', 'UPS_Z_STANDARD', 'UPS_Z_EX_SAV', 'UPS_Z_EX', 'UPS_Z_EXPEDITED', 'UPS_K_TODAY_STANDARD', 'UPS_K_TODAY_EXPRESS', 'UPS_K_TODAY_EXP_SAV', 'DPD_CLASSIC', 'DPD_CLASSIC_FOREIGN', 'DHLSTD', 'DHL12', 'DHL09', 'DHL1722', 'KEX_EXPRESS', 'FEDEX', 'POCZTA_POLSKA', 'POCZTA_POLSKA_E24', 'TNT', 'TNT_Z', 'TNT_Z2', 'POCZTEX_EXPRESS_24');
     private static $dictOrderPickupType = array('COURIER', 'SELF');
@@ -164,7 +164,7 @@ class ApaczkaOrder {
             'receiver' => $this->address_receiver
             ],
             'option' => [
-                '58' => 0 // ostrożnie  
+                '58' => 0 // ostrożnie
             ],
             'notification' => [
                 'new' => $this->notificationNew,
