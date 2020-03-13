@@ -44,4 +44,11 @@ class DispatchJobController extends Controller
         \Session::flash('success', true);
         return redirect(route('import.index'));
     }
+
+    public function generateJpgs()
+    {
+        dispatch_now(new \App\Jobs\JpgGeneratorJob());
+        \Session::flash('success', true);
+        return redirect(route('import.index'));
+    }
 }
