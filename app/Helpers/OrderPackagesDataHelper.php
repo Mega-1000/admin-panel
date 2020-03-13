@@ -11,7 +11,7 @@ use Illuminate\Support\Carbon;
 use App\Entities\PackageTemplate;
 
 class OrderPackagesDataHelper extends DateHelper
-{ 
+{
     public function getData()
     {
         return $deliverytemplates = PackageTemplate::all();

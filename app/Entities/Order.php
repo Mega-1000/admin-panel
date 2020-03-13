@@ -454,4 +454,15 @@ class Order extends Model implements Transformable
     {
         return $this->hasMany('App\Entities\OrderOtherPackage')->where('type', 'not_calculable');
     }
+
+    public function getTransportPrice()
+    {
+        $factoryPrice = $this->factoryDelivery->reduce(function ($curr, $next) {
+            return $curr + $next->price;
+        }, 0);
+        $packagesPrice = $this->packages->reduce(function ($curr, $next) {
+            return $curr + $next->cost_for_client;
+        }, 0);
+        return $factoryPrice + $packagesPrice;
+    }
 }
