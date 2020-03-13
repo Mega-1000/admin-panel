@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Entities\OrderOtherPackage;
 use App\Entities\OrderPackage;
 use App\Entities\PackageTemplate;
+use App\Helpers\OrderPackagesDataHelper;
 use App\Helpers\Package;
 use App\Helpers\PackageDivider;
 use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
@@ -139,10 +140,10 @@ class OrdersController extends Controller
         $data = $request->all();
         DB::beginTransaction();
         try {
-            $id = $this->newStore($data);
+            ['id' => $id, 'canPay' => $canPay] = $this->newStore($data);
             DB::commit();
             $order = Order::find($id);
-            return $this->createdResponse(['order_id' => $id, 'token' => $order->getToken()]);
+            return $this->createdResponse(['order_id' => $id, 'canPay' => $canPay, 'token' => $order->getToken()]);
         } catch (\Exception $e) {
             DB::rollBack();
             $message = $this->errors[$this->error_code] ?? $e->getMessage();
@@ -256,9 +257,14 @@ class OrdersController extends Controller
         }
         $packages = $this->divideToPackages($data);
         $this->createPackages($packages, $order->id);
-        $this->saveNotCalculable($packages, $order->id);
+        if (count($packages['not_calculated']) == 0) {
+            $canPay = true;
+        } else {
+            $this->saveNotCalculable($packages, $order->id);
+            $canPay = false;
+        }
         $this->saveFactory($packages, $order->id);
-        return $order->id;
+        return ['id' => $order->id, 'canPay' => $canPay];
     }
 
     private function getCustomer($orderExists, $order, $data)
@@ -355,6 +361,7 @@ class OrdersController extends Controller
                 }
             }
             $orderTotal += $orderItem->net_selling_price_commercial_unit * $orderItem->quantity;
+            $order->total_price += $product->price->gross_price_of_packing * $orderItem->quantity;
 
             $order->items()->save($orderItem);
 
@@ -363,7 +370,6 @@ class OrdersController extends Controller
             }
         }
 
-        $order->total_price = $orderTotal * 1.23;
         $order->weight = $weight;
         $order->save();
     }
@@ -810,6 +816,15 @@ class OrdersController extends Controller
         $pack->delivery_courier_name = $packTemplate->delivery_courier_name;
         $pack->service_courier_name = $packTemplate->service_courier_name;
         $pack->weight = $packTemplate->weight;
+        $helper = new OrderPackagesDataHelper();
+        if ($packTemplate->accept_time) {
+            $date = $helper->calculateShipmentDate($packTemplate->accept_time, $packTemplate->accept_time);
+        } else {
+            $date = $helper->calculateShipmentDate(9, 9);
+        }
+        $pack->shipment_date = $date;
+        $pack->cost_for_client = $packTemplate->approx_cost_client;
+        $pack->quantity = 1;
         $pack->status = 'NEW';
         $pack->container_type = $packTemplate->container_type;
         $pack->shape = $packTemplate->shape;
@@ -819,9 +834,6 @@ class OrdersController extends Controller
 
     private function saveNotCalculable(array $packages, $orderId)
     {
-        if (count($packages['not_calculated']) == 0) {
-            return;
-        }
         $container = new OrderOtherPackage();
         $container->type = 'not_calculable';
         $container->order_id = $orderId;
@@ -847,5 +859,15 @@ class OrdersController extends Controller
                 $container->products()->attach($item->id, ['quantity' => $item->quantity]);
             }
         }
+    }
+
+    public function getPaymentDetailsForOrder(Request $request, $token)
+    {
+        if (empty($token)) {
+            return response("Missing token", 400);
+        }
+
+        $order = Order::where('token', $token)->first();
+        return ['total_price' => $order->total_price, 'transport_price' => $order->getTransportPrice(), 'id' => $order->id];
     }
 }
