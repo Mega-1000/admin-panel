@@ -14,7 +14,8 @@ class PackageTemplatesController extends Controller
      */
     public function index()
     {
-        $templates = \App\Entities\PackageTemplate::all();
+        $templatesUnsorted = \App\Entities\PackageTemplate::all();
+        $templates = $templatesUnsorted->sortBy('list_order');
         return view('package_templates.index',compact('templates'))
         ->withpackageTemplates($templates); 
     }
@@ -44,6 +45,16 @@ class PackageTemplatesController extends Controller
             'max_weight' => 'numeric|required',
             'volume' => 'integer|required'
         ));
+        if (!empty($request->accept_time)) {
+            $this->validate($request, array(
+                'max_time' => 'required'
+            ));
+        }
+        if (!empty($request->max_time)) {
+            $this->validate($request, array(
+                'accept_time' => 'required'
+            ));
+        }    
         $template = new PackageTemplate;
         $template->name = $request->name;
         $template->info = $request->info;
@@ -67,6 +78,7 @@ class PackageTemplatesController extends Controller
         $template->approx_cost_firm = $request->approx_cost_firm;
         $template->max_weight = $request->max_weight;
         $template->volume = $request->volume;
+        $template->list_order = $request->list_order;
         
         $template->save();
         
@@ -102,7 +114,16 @@ class PackageTemplatesController extends Controller
             'max_weight' => 'numeric|required',
             'volume' => 'integer|required'
         ));
- 
+        if (!empty($request->accept_time)) {
+            $this->validate($request, array(
+                'max_time' => 'required'
+            ));
+        }
+        if (!empty($request->max_time)) {
+            $this->validate($request, array(
+                'accept_time' => 'required'
+            ));
+        }    
         $template = PackageTemplate::find($id);
         $template->name = $request->name;
         $template->symbol = $request->symbol;
@@ -126,6 +147,7 @@ class PackageTemplatesController extends Controller
         $template->approx_cost_firm = $request->approx_cost_firm;
         $template->max_weight = $request->max_weight;
         $template->volume = $request->volume;
+        $template->list_order = $request->list_order;
           
         $template->save();
         

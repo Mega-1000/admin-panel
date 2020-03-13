@@ -35,7 +35,7 @@
             </ul>
         </div>
     @endif
-    <form action="{{ action('OrdersPackagesController@store') }}" method="POST" onsubmit="return validate(this);">
+    <form action="{{ action('OrdersPackagesController@store') }}" method="POST" onsubmit="return validate(this);" id="form-package">
         {{ csrf_field() }}
         <div class="form-group">
             <label for="data_template">@lang('order_packages.form.data_template')</label>
@@ -74,6 +74,10 @@
                        value="{{ old('shipment_date') }}">
             </div>
             <div id="hour_info" style="color: red"></div>
+            <div class="form-group">
+            <label for="force-shipment" id="force_shipment1" class="hidden">Wymuś wysłanie (mimo przekroczonej godziny przyjmowania zleceń)</label>
+            <input type="checkbox" id="force_shipment" name="force_shipment"  class="hidden">
+            </div>
             <br>
             <div class="form-group">
                 <label for="delivery_date">@lang('order_packages.form.delivery_date')</label><br/>
@@ -314,7 +318,7 @@
 
             <div class="form-group">
                 <label for="notices">@lang('order_packages.form.notices')</label>
-                <textarea cols="40" rows="5" maxlength="30" type="text" class="form-control" id="notices" name="notices">
+                <textarea cols="40" rows="5" maxlength="50" type="text" class="form-control" id="notices" name="notices">
                        {{ old('notices') }}</textarea>
             </div>
             <div class="form-group">
@@ -354,6 +358,9 @@
             <input type="hidden" value="{{ $id }}" name="order_id">
             <input type="hidden" id="chosen_data_template" value="" name="chosen_data_template">
             <input type="hidden" name="shouldTakePayment" value="0" id="shouldTakePayment">
+            <input type="hidden" name="template_accept_hour" id="template_accept_hour">
+            <input type="hidden" name="template_max_hour" id="template_max_hour">
+            <input type="hidden" name="multi_token" id="multi_token">
         </div>
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
     </form>
@@ -406,6 +413,7 @@
       let promisedPayments = @json($promisedPayments);
       let paymentsSum = 0;
       let promisedPaymentsSum = 0;
+      let multiData = @json($multiData);
 
         $(document).ready(function() {
              let toPay = {{ $toPaySum }};
@@ -413,7 +421,25 @@
              $('#packageCost').text(toPay - $('#cash_on_delivery').val());
              $('#toCheck').val(toPay - $('#cash_on_delivery').val());
 
-
+             if (multiData != null) {
+                $("#size_a").val(multiData['size_a']);
+                $("#size_b").val(multiData['size_b']);
+                $("#size_c").val(multiData['size_c']);
+                $("#service_courier_name").val(multiData['service_courier_name']);
+                $("#delivery_courier_name").val(multiData['delivery_courier_name']);
+                $("#quantity").val(multiData['quantity']);
+                $("#shape").val(multiData['shape']);
+                $("#shipment_date").val(multiData['shipment_date']);
+                $("#delivery_date").val(multiData['delivery_date']);
+                $("#notices").val(multiData['notices']);
+                $("#cost_for_client").val(multiData['cost_for_client']);
+                $("#cost_for_company").val(multiData['cost_for_us']);
+                $("#container_type").val(multiData['container_type']);
+                $("#content").val(multiData['content']);
+                $("#weight").val(multiData['weight']);
+                $("#chosen_data_template").val(multiData['chosen_data_template']);
+                $("#form-package").submit();
+             }
              $('#cash_on_delivery').on('change', function() {
                  let difference = toPay - $(this).val();
                  $('#toCheck').val(toPay - $('#cash_on_delivery').val());
@@ -424,8 +450,9 @@
                      $('#packageCost').removeClass('wrong-difference');
                      $('#packageCost').text(difference);
                  }
-
              });
+             
+             
 
             $('#data_template').on('change', function() {
                 $('#template-id').val($(this).val());
@@ -469,6 +496,7 @@
         $("#container_type").val(selectedTemplateData['container_type']);
         $("#template_info").html(selectedTemplateData['info']);
         $("#cod_cost").html(selectedTemplateData['cod_cost']);
+        $("#notices").attr('maxlength', selectedTemplateData['notice_max_lenght']);
         var dt = new Date;
         var h = dt.getHours();
         var acc = selectedTemplateData['accept_time'].split(':');
@@ -476,12 +504,15 @@
         var at = acc[0];
         var mt = max[0];
         if ( h >= at && h < mt)  {
-        $("#hour_info").html(selectedTemplateData['accept_time_info']);    
+        $("#hour_info").html(selectedTemplateData['accept_time_info']);
+        $('#force_shipment').removeClass('hidden');
+        $('#force_shipment1').removeClass('hidden');
         }
         if (h >= mt) {
         $("#hour_info").html(selectedTemplateData['max_time_info']);    
         }
-        
+        $("#template_accept_hour").val(at);
+        $("#template_max_hour").val(mt);
       });
 
       $("#shipment_date").on('dp.change', function () {

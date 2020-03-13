@@ -179,6 +179,12 @@
                 <input type="number" step=".01" class="form-control" id="volume" name="volume"
                        value="{{ $old->volume }}">
             </div>
+            <div class="form-group">
+                <label for="list_order">Miejsce szablonu na liście</label>
+                <input type="number" class="form-control" id="list_order"
+                       name="list_order"
+                       value="{{ $old->list_order }}">
+            </div>
         </div>
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
     </form>

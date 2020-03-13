@@ -14,6 +14,7 @@
         <thead>
         <tr>
             <th>ID</th>
+            <th>Symbol</th>
             <th>Nazwa</th>
             <th>Data utworzenia</th>
             <th>@lang('voyager.generic.actions')</th>
@@ -23,8 +24,9 @@
          @foreach ($packageTemplates as $packageTemplate)
         <tr>
             <td width="10%">{{$packageTemplate->id}}</td>
-            <td width="40%">{{$packageTemplate->name}}</td>
-            <td width="30%">{{$packageTemplate->created_at}}</td>
+            <td width="10%">{{$packageTemplate->symbol}}</td>
+            <td width="35%">{{$packageTemplate->name}}</td>
+            <td width="25%">{{$packageTemplate->created_at}}</td>
             <td>
                 <div class="col-md-10">
                     <a href="{{ url()->current() }}/{{$packageTemplate->id}}/edit" class="btn btn-sm btn-primary edit">
