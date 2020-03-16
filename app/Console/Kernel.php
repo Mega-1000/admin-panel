@@ -10,6 +10,7 @@ use App\Jobs\CheckPriceChangesInProductsJob;
 use App\Jobs\CheckPromisePaymentsDates;
 use App\Jobs\CheckStatusInpostPackagesJob;
 use App\Jobs\CheckTasksFromYesterdayJob;
+use App\Jobs\ImportOrdersFromSelloJob;
 use App\Jobs\Orders\TriggerOrderLabelSchedulersJob;
 use App\Jobs\SearchOrdersInStoredMailsJob;
 use App\Jobs\ValidateSubiekt;
@@ -54,6 +55,10 @@ class Kernel extends ConsoleKernel
         $schedule->job(ChangeOrderInvoiceData::class)->dailyAt("07:00");
         $schedule->job(SearchOrdersInStoredMailsJob::class)->everyFifteenMinutes();
         $schedule->job(JpgGeneratorJob::class)->dailyAt("01:00");
+        $schedule->job(ImportOrdersFromSelloJob::class)->dailyAt("06:00");
+        $schedule->job(ImportOrdersFromSelloJob::class)->dailyAt("11:00");
+        $schedule->job(ImportOrdersFromSelloJob::class)->dailyAt("17:00");
+        $schedule->job(ImportOrdersFromSelloJob::class)->dailyAt("22:00");
     }
 
     /**
