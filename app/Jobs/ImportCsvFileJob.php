@@ -381,7 +381,7 @@ class ImportCsvFileJob implements ShouldQueue
         } else {
             $array['category_id'] = null;
         }
-        
+
         if ($product != null) {
             $product->fill($array);
             $product->restore();
@@ -433,10 +433,10 @@ class ImportCsvFileJob implements ShouldQueue
             'numbers_of_basic_commercial_units_in_pack' => $line[73],
             'number_of_sale_units_in_the_pack' => $line[74],
             'number_of_trade_items_in_the_largest_unit' => $line[75],
-            'weight_collective_unit' => (float)$line[103],
-            'weight_trade_unit' => (float)$line[100],
-            'weight_biggest_unit' => (float)$line[104],
-            'weight_base_unit' => (float)$line[102],
+            'weight_collective_unit' => floatval(str_replace(',', '.', $line[103])),
+            'weight_trade_unit' => floatval(str_replace(',', '.', $line[100])),
+            'weight_biggest_unit' => floatval(str_replace(',', '.', $line[104])),
+            'weight_base_unit' => floatval(str_replace(',', '.', $line[102])),
             'net_purchase_price_commercial_unit' => $line[116],
             'net_purchase_price_calculated_unit' => $line[117],
             'net_purchase_price_basic_unit' => $line[118],
