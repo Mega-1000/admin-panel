@@ -29,12 +29,10 @@ class PackageDivider implements iPackageDivider
     {
         $warehouses = [];
         foreach ($this->itemList as $product) {
-            if ($product->hasAllTransportParameters()) {
-                if ($product->isInTransportGroup()) {
-                    $warehouses [self::TRANSPORT_GROUPS] [$product->trade_group_name] [] = $product;
-                } else {
+            if ($product->isInTransportGroup()) {
+                $warehouses [self::TRANSPORT_GROUPS] [$product->trade_group_name] [] = $product;
+            } else if ($product->hasAllTransportParameters()) {
                     $warehouses = $this->insertToWarehouseArray($product, $warehouses);
-                }
             } else {
                 $warehouses[self::NOT_CALCULABLE] [] = $product;
             }
@@ -56,7 +54,11 @@ class PackageDivider implements iPackageDivider
         unset($sorted[self::TRANSPORT_GROUPS]);
         if (isset($transportCalculations['cantsend'])) {
             foreach ($transportCalculations['cantsend'] as $item) {
-                $sorted = $this->insertToWarehouseArray($item, $sorted);
+                if ($item->hasAllTransportParameters()) {
+                    $sorted = $this->insertToWarehouseArray($item, $sorted);
+                } else {
+                    $sorted[self::NOT_CALCULABLE] [] = $item;
+                }
             }
             unset($transportCalculations['cantsend']);
         }
