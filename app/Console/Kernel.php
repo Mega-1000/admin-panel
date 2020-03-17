@@ -52,8 +52,8 @@ class Kernel extends ConsoleKernel
 		$schedule->job(CheckPromisePaymentsDates::class)->everyMinute();
         $schedule->job(ValidateSubiekt::class)->everyFiveMinutes();
         $schedule->job(ChangeOrderInvoiceData::class)->dailyAt("07:00");
-        $schedule->job(SearchOrdersInStoredMailsJob::class)->everyFifteenMinutes();
         $schedule->job(JpgGeneratorJob::class)->dailyAt("01:00");
+        //$schedule->job(SearchOrdersInStoredMailsJob::class)->everyFifteenMinutes();
     }
 
     /**
