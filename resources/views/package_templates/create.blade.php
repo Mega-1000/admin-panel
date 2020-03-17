@@ -116,7 +116,7 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="weight">Realna waga paczki</label>
+                <label for="weight">@lang('order_packages.form.real_weight')</label>
                 <input type="text" class="form-control" id="weight" name="weight"
                        value="{{ old('weight') }}">
             </div>
@@ -167,17 +167,17 @@
                        value="{{ old('approx_cost_firm') }}">
             </div>
             <div class="form-group">
-                <label for="cost_for_company">Maksymalna waga paczki u wybranego kuriera (potrzebne do plecaka)</label>
+                <label for="cost_for_company">@lang('order_packages.form.max_weight')</label>
                 <input type="number" step=".01" class="form-control" id="max_weight" name="max_weight"
                        value="{{ old('max_weight') }}">
             </div>
             <div class="form-group">
-                <label for="cost_for_company">Współczynnik objętości (potrzebne do plecaka)</label>
+                <label for="cost_for_company">@lang('order_packages.form.volume_factor')</label>
                 <input type="number" step=".01" class="form-control" id="volume" name="volume"
                        value="{{ old('volume') }}">
             </div>
             <div class="form-group">
-                <label for="list_order">Miejsce szablonu na liście</label>
+                <label for="list_order">@lang('order_packages.form.list_order')</label>
                 <input type="number" class="form-control" id="list_order"
                        name="list_order"
                        value="{{ old('list_order') }}">

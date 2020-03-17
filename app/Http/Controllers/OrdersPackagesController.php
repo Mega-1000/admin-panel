@@ -282,7 +282,7 @@ class OrdersPackagesController extends Controller
                 ]
             ];
             $request->session()->put('multi', $multi);
-           return redirect()->route('order_packages.create', ['order_id' => $order_id, 'multi' => $token]);
+            return redirect()->route('order_packages.create', ['order_id' => $order_id, 'multi' => $token]);
         }
         return redirect()->route('orders.edit', ['order_id' => $order_id])->with([
             'message' => __('order_packages.message.store'),

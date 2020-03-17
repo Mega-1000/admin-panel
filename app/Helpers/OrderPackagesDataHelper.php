@@ -22,7 +22,7 @@ class OrderPackagesDataHelper extends DateHelper
     {
         $now = Carbon::now("Europe/Warsaw");
         if (!is_null($max) && $now->hour > $max) {
-          return $this->nearestWorkingDay($now);  
+            return $this->nearestWorkingDay($now);  
         }
         if (!is_null($accept) &&  $now->hour > $accept ) {
             return $this->nearestWorkingDay($now);
