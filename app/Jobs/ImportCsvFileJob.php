@@ -369,10 +369,13 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function saveProduct($array, $categoryTree, $isChildProduct)
     {
+        $product = null;
         if (!empty($array['symbol'])) {
             $product = Entities\Product::withTrashed()->where('symbol', $array['symbol'])->first();
-        } else {
-            $product = null;
+        }
+
+        if (!$product) {
+            $product = new Entities\Product();
         }
 
         if (!$isChildProduct) {
@@ -382,25 +385,24 @@ class ImportCsvFileJob implements ShouldQueue
             $array['category_id'] = null;
         }
 
-        if ($product != null) {
-            $product->fill($array);
-            $product->restore();
-            $product->save();
-            if (!$array['subject_to_price_change']) {
-                $this->productPriceRepository->update(array_merge(['product_id', $product->id], $array), $product->id);
-            }
-            $this->productPackingRepository->update(array_merge(['product_id', $product->id], $array), $product->id);
-        } else {
-            $product = $this->productRepository->create($array);
+        $product->fill($array);
+        $product->save();
+        $product->restore();
 
-            $this->productPriceRepository->create(array_merge(['product_id' => $product->id], $array));
-            $this->productPackingRepository->create(array_merge(['product_id' => $product->id], $array));
-            $this->productStockRepository->create([
-                'product_id' => $product->id,
-                'quantity' => 0,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
-            ]);
+        if (!$product->price || !$array['subject_to_price_change']) {
+            $price = $product->price ?? new Entities\ProductPrice();
+            $price->fill($array);
+            $product->price()->save($price);
+        }
+
+        $packing = $product->packing ?? new Entities\ProductPacking();
+        $packing->fill($array);
+        $product->packing()->save($packing);
+
+        if (!$product->stock) {
+            $product->stock()->save(new Entities\ProductStock([
+                'quantity' => 0
+            ]));
         }
 
         return $product;
@@ -559,7 +561,7 @@ class ImportCsvFileJob implements ShouldQueue
     private function getCategoryColumn($line)
     {
         for ($col = 598; $col <= count($line) - 15; $col += 16) {
-            if (!empty($line[$col])) {
+            if (!empty($line[$col]) || !empty($line[$col + 8])) {
                 return $col;
             }
         }
