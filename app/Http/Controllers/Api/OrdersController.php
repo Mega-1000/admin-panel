@@ -2,14 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Entities\OrderOtherPackage;
-use App\Entities\OrderPackage;
-use App\Entities\PackageTemplate;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\OrderBuilder;
-use App\Helpers\OrderPackagesDataHelper;
-use App\Helpers\Package;
-use App\Helpers\PackageDivider;
+use App\Helpers\OrderPriceCalculator;
 use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
 use App\Http\Requests\Api\Orders\StoreOrderRequest;
 use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
@@ -30,12 +25,6 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Entities\Order;
-use App\Entities\OrderItem;
-use App\Entities\Product;
-use App\Entities\Customer;
-use App\Entities\CustomerAddress;
-use App\Entities\OrderAddress;
-use Illuminate\Support\Facades\Hash;
 
 /**
  * Class OrdersController
@@ -143,7 +132,9 @@ class OrdersController extends Controller
         DB::beginTransaction();
         try {
             $orderBuilder = new OrderBuilder();
-            $orderBuilder->setPackageGenerator(new BackPackPackageDivider());
+            $orderBuilder
+                ->setPackageGenerator(new BackPackPackageDivider())
+                ->setPriceCalculator(new OrderPriceCalculator());
             ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($data);
             DB::commit();
             $order = Order::find($id);

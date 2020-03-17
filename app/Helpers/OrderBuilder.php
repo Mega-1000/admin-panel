@@ -14,6 +14,7 @@ class OrderBuilder
 {
 
     private $packageGenerator;
+    private $priceCalculator;
 
     public function setPackageGenerator($generator)
     {
@@ -21,8 +22,17 @@ class OrderBuilder
         return $this;
     }
 
+    public function setPriceCalculator($priceCalculator)
+    {
+        $this->priceCalculator = $priceCalculator;
+        return $this;
+    }
+
     public function newStore($data)
     {
+        if (empty($this->packageGenerator) || empty($this->priceCalculator)) {
+            throw new \Exception('Nie zdefiniowano kalkulatorów');
+        }
         OrderBuilder::setEmptyOrderData($data);
         if (empty($data['order_items']) || !is_array($data['order_items'])) {
             throw new \Exception('missing_products');
@@ -58,7 +68,7 @@ class OrderBuilder
 
         $order->save();
 
-        OrderBuilder::assignItemsToOrder($order, $data['order_items']);
+        $this->assignItemsToOrder($order, $data['order_items']);
 
         OrderBuilder::updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone'] ?? '', 'order');
         OrderBuilder::updateOrderAddress($order, $data['invoice_address'] ?? [], 'INVOICE_ADDRESS', $data['phone'] ?? '', 'order');
@@ -140,9 +150,8 @@ class OrderBuilder
         }
     }
 
-    private static function assignItemsToOrder($order, $items)
+    private function assignItemsToOrder($order, $items)
     {
-        $orderTotal = 0;
         $weight = 0;
         $orderItems = $order->items();
         $order->items()->delete();
@@ -171,8 +180,7 @@ class OrderBuilder
                     $orderItem->$column = $price->$column;
                 }
             }
-            $orderTotal += $orderItem->net_selling_price_commercial_unit * $orderItem->quantity;
-            $order->total_price += $product->price->gross_price_of_packing * $orderItem->quantity;
+            $this->priceCalculator->addItem($product->price->gross_price_of_packing, $orderItem->quantity);
 
             $order->items()->save($orderItem);
 
@@ -180,7 +188,7 @@ class OrderBuilder
                 $weight += $product->weight_trade_unit * $orderItem->quantity;
             }
         }
-
+        $order->total_price = $this->priceCalculator->getTotal();
         $order->weight = $weight;
         $order->save();
     }
@@ -240,7 +248,7 @@ class OrderBuilder
 
     private static function getDefaultProduct()
     {
-        $product = Product::where('symbol', 'TWSU')->first();
+        $product = Product::getDefaultProduct();
         if (!$product) {
             throw new \Exception('wrong_product_id');
         }
