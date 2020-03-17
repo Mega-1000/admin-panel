@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Entities\Order;
+use App\Entities\OrderOtherPackage;
 use App\Entities\OrderPackage;
 use App\Entities\Task;
 use App\Entities\TaskTime;
@@ -969,6 +970,24 @@ class OrdersController extends Controller
     {
 
         $order = $this->orderRepository->find($request->input('orderId'));
+        $fail = $order->packages->first(function ($item) {
+            return $item->status != 'NEW';
+        });
+        if ($fail) {
+            return redirect()->route('orders.index')->with([
+                'message' => __('Nie można podzielić zlecenia z wysłanymi paczkami'),
+                'alert-type' => 'error',
+            ]);
+        } else {
+            OrderOtherPackage::where('order_id', $order->id)->get()->map(function ($item) {
+                DB::table('order_other_package_product')->where('order_other_package_id', $item->id)->delete();
+                $item->delete();
+            });
+            OrderPackage::where('order_id', $order->id)->get()->map(function ($item) {
+                DB::table('order_package_product')->where('order_package_id', $item->id)->delete();
+                $item->delete();
+            });
+        }
         if ($request->input('firstOrderExist') == 1) {
             $this->createSplittedOrder($request, $order, 'first');
         }

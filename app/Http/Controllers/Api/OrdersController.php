@@ -207,11 +207,10 @@ class OrdersController extends Controller
             $fail = $order->packages->first(function ($item) {
                 return $item->status != 'NEW';
             });
-            if ($fail){
+            if ($fail) {
                 $this->error_code = 'package_must_be_cancelled';
                 throw new \Exception('package_must_be_cancelled');
             }
-            echo 'not fail';
             OrderOtherPackage::where('order_id', $order->id)->get()->map(function ($item) {
                 DB::table('order_other_package_product')->where('order_other_package_id', $item->id)->delete();
                 $item->delete();
