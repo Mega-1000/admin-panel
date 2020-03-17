@@ -84,6 +84,7 @@ class OrdersController extends Controller
         'missing_customer_login' => 'Musisz podać login',
         'wrong_password' => 'Błędny adres e-mail lub hasło',
         'wrong_phone' => 'Podaj prawidłowy nr telefonu',
+        'package_must_be_cancelled' => 'Paczka musi pierw zostać zanulowana',
         'wrong_product_id' => null
     ];
 
@@ -203,6 +204,21 @@ class OrdersController extends Controller
         $orderExists = false;
         if (!empty($data['cart_token'])) {
             $order = Order::where('token', $data['cart_token'])->first();
+            $fail = $order->packages->first(function ($item) {
+                return $item->status != 'NEW';
+            });
+            if ($fail) {
+                $this->error_code = 'package_must_be_cancelled';
+                throw new \Exception('package_must_be_cancelled');
+            }
+            OrderOtherPackage::where('order_id', $order->id)->get()->map(function ($item) {
+                DB::table('order_other_package_product')->where('order_other_package_id', $item->id)->delete();
+                $item->delete();
+            });
+            OrderPackage::where('order_id', $order->id)->get()->map(function ($item) {
+                DB::table('order_package_product')->where('order_package_id', $item->id)->delete();
+                $item->delete();
+            });
             $orderExists = true;
             if (!$order) {
                 $this->error_code = 'wrong_cart_token';

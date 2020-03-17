@@ -1393,6 +1393,7 @@
                             invoices.forEach(function(invoice){
                                 html += '<a target="_blank" href="/storage/invoices/'+invoice.invoice_name+'" style="margin-top: 5px;">Faktura</a>';
                             });
+                            html += '<br />'
                         }
                         html += '<a href="{{env('FRONT_NUXT_URL')}}' + '/magazyn/awizacja/0/0/' + data.orderId + '/wyslij-fakture">Dodaj</a>'
                         return html;
