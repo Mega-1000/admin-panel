@@ -272,7 +272,7 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get('orderPackages/datatable/{id}',
             'OrdersPackagesController@datatable')->name('order_packages.datatable');
-        Route::get('orderPackages/create/{id}', 'OrdersPackagesController@create')->name('order_packages.create');
+        Route::get('orderPackages/create/{id}/{multi?}', 'OrdersPackagesController@create')->name('order_packages.create');
         Route::post('orderPackages/store', 'OrdersPackagesController@store')->name('order_packages.store');
         Route::get('orderPackages/{id}/edit', 'OrdersPackagesController@edit')->name('order_packages.edit');
         Route::put('orderPackages/{id}/update', [

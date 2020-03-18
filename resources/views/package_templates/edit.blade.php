@@ -17,7 +17,7 @@
         </div>
     @endif
     <form action="{{ action('PackageTemplatesController@update', $old->id) }}" method="POST" onsubmit="return validate(this);">
-     {{ method_field('PUT')}}
+        {{ method_field('PUT')}}
         {{ csrf_field() }}
         <div class="form-group">
             <label for="data_template">Nazwa Szablonu Danych</label>
@@ -51,22 +51,22 @@
                        value="{{ $old->sizeC }}">
             </div>
             <div class="form-group">
-                <label for="accept_time">Godzina przyjmowania zleceń</label>
+                <label for="accept_time">@lang('order_packages.form.accept_time')</label>
                 <input type="time" class="form-control" id="accept_time" name="accept_time"
                        value="{{$old->accept_time}}">
             </div>
             <div class="form-group">
-                <label for="size_c">Informacja dot. Godziny Zleceń</label>
+                <label for="size_c">@lang('order_packages.form.accept_time_info')</label>
                 <input type="text" class="form-control" id="accept_time_info" name="accept_time_info"
                        value="{{ $old->accept_time_info }}">
             </div>
             <div class="form-group">
-                <label for="size_c">Godzina graniczna wysyłania przesyłki</label>
+                <label for="size_c">@lang('order_packages.form.max_time')</label>
                 <input type="time" class="form-control" id="max_time" name="max_time"
                        value="{{$old->max_time}}">
             </div>
             <div class="form-group">
-                <label for="size_c">Informacja dot. Godziny Granicznej</label>
+                <label for="size_c">@lang('order_packages.form.max_time_info')</label>
                 <input type="text" class="form-control" id="max_time_info" name="max_time_info"
                        value="{{ $old->max_time_info}}">
             </div>
@@ -119,7 +119,7 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="weight">@lang('order_packages.form.weight')</label>
+                <label for="weight">@lang('order_packages.form.real_weight')</label>
                 <input type="text" class="form-control" id="weight" name="weight"
                        value="{{ $old->weight }}">
             </div>
@@ -179,10 +179,14 @@
                 <input type="number" step=".01" class="form-control" id="volume" name="volume"
                        value="{{ $old->volume }}">
             </div>
+            <div class="form-group">
+                <label for="list_order">@lang('order_packages.form.list_order')</label>
+                <input type="number" class="form-control" id="list_order"
+                       name="list_order"
+                       value="{{ $old->list_order }}">
+            </div>
         </div>
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
-    </form>
-    <form action="" id="cashon">
     </form>
 @endsection
 @section('scripts')

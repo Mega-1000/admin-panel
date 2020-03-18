@@ -50,20 +50,20 @@
                        value="{{ old('size_c') }}">
             </div>
             <div class="form-group">
-                <label for="size_c">Godzina przyjmowania zleceń</label>
+                <label for="size_c">@lang('order_packages.form.accept_time')</label>
                 <input type="time" class="form-control" id="accept_time" name="accept_time">
             </div>
             <div class="form-group">
-                <label for="size_c">Informacja dot. Godzin Zleceń</label>
+                <label for="size_c">@lang('order_packages.form.accept_time_info')</label>
                 <input type="text" class="form-control" id="accept_time_info" name="accept_time_info"
                        value="{{ old('accept_time_info') }}">
             </div>
             <div class="form-group">
-                <label for="size_c">Godzina graniczna wysyłania przesyłki</label>
+                <label for="size_c">@lang('order_packages.form.max_time')</label>
                 <input type="time" class="form-control" id="max_time" name="max_time">
             </div>
             <div class="form-group">
-                <label for="size_c">Informacja dot. Godzin Granicznej</label>
+                <label for="size_c">@lang('order_packages.form.max_time_info')</label>
                 <input type="text" class="form-control" id="max_time_info" name="max_time_info"
                        value="{{ old('max_time_info') }}">
             </div>
@@ -116,7 +116,7 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="weight">@lang('order_packages.form.weight')</label>
+                <label for="weight">@lang('order_packages.form.real_weight')</label>
                 <input type="text" class="form-control" id="weight" name="weight"
                        value="{{ old('weight') }}">
             </div>
@@ -167,19 +167,23 @@
                        value="{{ old('approx_cost_firm') }}">
             </div>
             <div class="form-group">
-                <label for="cost_for_company">Maksymalna waga Paczki u wybranego kuriera</label>
+                <label for="cost_for_company">@lang('order_packages.form.max_weight')</label>
                 <input type="number" step=".01" class="form-control" id="max_weight" name="max_weight"
                        value="{{ old('max_weight') }}">
             </div>
             <div class="form-group">
-                <label for="cost_for_company">Współczynnik objętości</label>
+                <label for="cost_for_company">@lang('order_packages.form.volume_factor')</label>
                 <input type="number" step=".01" class="form-control" id="volume" name="volume"
                        value="{{ old('volume') }}">
             </div>
+            <div class="form-group">
+                <label for="list_order">@lang('order_packages.form.list_order')</label>
+                <input type="number" class="form-control" id="list_order"
+                       name="list_order"
+                       value="{{ old('list_order') }}">
+            </div>
         </div>
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
-    </form>
-    <form action="" id="cashon">
     </form>
 @endsection
 @section('scripts')

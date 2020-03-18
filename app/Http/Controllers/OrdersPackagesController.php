@@ -65,8 +65,9 @@ class OrdersPackagesController extends Controller
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function create($id)
+    public function create(Request $request,$id, $multi = null)
     {
+        
         $templateData = $this->orderPackagesDataHelper->getData();
         $order = $this->orderRepository->find($id);
         $shipmentDate = $this->orderPackagesDataHelper->calculateShipmentDate();
@@ -130,7 +131,18 @@ class OrdersPackagesController extends Controller
             'shipment_price_for_us' => $order->shipment_price_for_us,
             'weight' => $order->weight,
         ];
-        return view('orderPackages.create', compact('id', 'templateData', 'orderData', 'order', 'payments', 'promisedPayments', 'connectedOrders', 'cashOnDeliverySum', 'isAdditionalDKPExists', 'allOrdersSum'));
+        $multiData = null;
+        if(!empty($multi)) {
+            $sessionData = $request->session()->get('multi');
+            if ($multi == $sessionData['token']) {
+                $multiData = $sessionData['template'];
+                $request->session()->forget('multi');
+            } else {
+                return redirect()->route('order_packages.create', ['order_id' => $id]);
+            }
+        } 
+
+        return view('orderPackages.create', compact('id', 'templateData', 'orderData', 'order', 'payments', 'promisedPayments', 'connectedOrders', 'cashOnDeliverySum', 'isAdditionalDKPExists', 'allOrdersSum', 'multiData'));
     }
 
     public function changeValue(Request $request)
@@ -164,7 +176,7 @@ class OrdersPackagesController extends Controller
     public function update(OrderPackageUpdateRequest $request, $id)
     {
         $orderPackage = $this->repository->find($id);
-
+        
         if (empty($orderPackage)) {
             abort(404);
         }
@@ -189,9 +201,21 @@ class OrdersPackagesController extends Controller
         $order_id = $request->input('order_id');
         $data = $request->validated();
         $toCheck = (float)$request->input('toCheck');
-
         $data['delivery_date'] = new \DateTime($data['delivery_date']);
         $data['shipment_date'] = new \DateTime($data['shipment_date']);
+        if (!empty($request->input('template_accept_hour')) || !empty($request->input('template_max_hour')) ) {
+            $today = new \DateTime;
+            $daydate = $data['shipment_date'];       
+            $daytoday = $today;
+            $daydate->setTime(0, 0, 0);
+            $daytoday->setTime(0, 0, 0);
+            if($daydate->diff($daytoday)->days == 0 && empty($request->input('force_shipment'))) {
+                $shipdate = $this->orderPackagesDataHelper->calculateShipmentDate($request->input('template_accept_hour'), $request->input('template_max_hour'));
+                $delidate = $this->orderPackagesDataHelper->calculateDeliveryDate($shipdate);
+                $data['shipment_date'] = new \DateTime($shipdate);
+                $data['delivery_date'] = new \DateTime($delidate);               
+            }
+        }
         $packagesNumber = 0;
         $package = $this->repository->orderBy("created_at", "desc")->findWhere(["order_id" => $order_id],
             ["number"])->first();
@@ -234,10 +258,37 @@ class OrdersPackagesController extends Controller
         } else {
             dispatch_now(new AddLabelJob($order->id, [133]));
         }
-        return redirect()->route('orders.edit', ['order_id' => $order_id])->with([
+        if (empty($request->input('quantity')) || $request->input('quantity') <= 1) {
+            return redirect()->route('orders.edit', ['order_id' => $order_id])->with([
             'message' => __('order_packages.message.store'),
             'alert-type' => 'success'
         ]);
+        }
+        $token = md5(uniqid(rand(), true));            
+        $multi = [
+            'token' => $token,    
+            'template' => [
+            'quantity' => $request->input('quantity')-1,
+            'size_a' => $request->input('size_a'),
+            'size_b' => $request->input('size_b'),
+            'size_c' => $request->input('size_c'),
+            'shipment_date' => $request->input('shipment_date'),
+            'delivery_date' => $request->input('delivery_date'),
+            'service_courier_name' => $request->input('service_courier_name'),
+            'delivery_courier_name' => $request->input('delivery_courier_name'),
+            'shape' => $request->input('shape'),
+            'container_type' => $request->input('container_type'),
+            'notices' => $request->input('notices'),
+            'content' => $request->input('content'),
+            'weight' => $request->input('weight'),
+            'cost_for_client' => $request->input('cost_for_client'),
+            'cost_for_us' => $request->input('cost_for_company'),
+            'chosen_data_template' => $request->input('chosen_data_template')
+            ]
+        ];
+        $request->session()->put('multi', $multi);
+        return redirect()->route('order_packages.create', ['order_id' => $order_id, 'multi' => $token]);
+  
     }
 
     /**
