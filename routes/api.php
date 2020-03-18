@@ -17,6 +17,8 @@ Route::middleware('auth:api')->group(function() {
     Route::get('/user', 'Api\CustomersController@getDetails')->name('api.customers.getdetails');
     Route::get('orders/getAll', 'Api\OrdersController@getAll')->name('api.orders.getall');
     Route::post('orders/update-order-address/{orderId}', 'Api\OrdersController@updateOrderAddressEndpoint')->name('api.orders.update-order-addresses');
+    Route::get('orders/get-payments-for-order/{token}', 'Api\OrdersController@getPaymentDetailsForOrder')->name('api.orders.getPayments');
+
 });
 
 Route::get('custom/pages', 'Api\CustomPagesController@getPages')->name('api.custompages.get');
@@ -64,7 +66,6 @@ Route::post('scheduled-time-reset-type-c', 'Api\LabelsController@scheduledTimeRe
 Route::get('products/get-hidden', 'Api\ProductsController@getHiddenProducts')->name('api.get-hidden-products');
 Route::get('products/price-changes/{id}/get', 'Api\ProductsController@getProductsForPriceUpdates')->name('api.get-products-for-price-updates');
 Route::post('products/send-products-new-price/{id}/send', 'Api\ProductsController@updateProductsPrice')->name('api.update-products-price');
-Route::get('products/price-changes/{id}/get', 'Api\ProductsController@getProductsForPriceUpdates')->name('api.get-products-for-price-updates');
 Route::get('products/categories/get', 'Api\ProductsController@getProductsByCategory')->name('api.get-products-by-category');
 Route::get('products/categories', 'Api\ProductsController@getCategoriesTree')->name('api.get-product-categories');
 Route::get('products/chimney', 'Api\ProductsController@getProductsForChimney')->name('api.get-products-for-chimney');

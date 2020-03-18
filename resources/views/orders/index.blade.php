@@ -522,9 +522,6 @@
                 </div>
             </th>
             <th>
-                <div><span>@lang('orders.table.add_invoice')</span></div>
-            </th>
-            <th>
                 @lang('orders.table.profit')
             </th>
             <th>
@@ -799,12 +796,18 @@
                     }
                 },
                 {
-                    data: 'packages',
+                    data: null,
                     name: 'packages_not_sent',
                     searchable: false,
                     orderable: false,
-                    render: function ( data, type, row ) {
-                        var html = '';
+                    render: function ( order, type, row ) {
+                        let data = order.packages
+                        var html = ''
+                        if (order.otherPackages && order.otherPackages.find(el => el.type == 'not_calculable')) {
+                            html = '<div style="background: red" >'
+                        } else {
+                            html = '<div style="background: green" >'
+                        }
                         $.each(data, function(key, value){
                             if(value.status !== 'SENDING' && value.status !== 'DELIVERED' && value.status !== 'CANCELLED') {
                                 html += '<div><p>' + row.orderId + '/' + value.number + '</p>';
@@ -848,19 +851,20 @@
                                 }
                             }
                         });
+                        html += '</div>';
                         return html;
                     }
                 },
                 {
-                    data: 'orderId',
+                    data: 'token',
                     name: 'print',
                     orderable: false,
-                    render: function(id, row, data) {
+                    render: function(token, row, data) {
                         let html = '';
                         if(data.print_order == '0') {
-                            html = '<a href="/admin/orders/' + id + '/print" target="_blank" class="btn btn-default" id="btn-print">W</a>';
+                            html = '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-default" id="btn-print">W</a>';
                         } else {
-                            html = '<a href="/admin/orders/' + id + '/print" target="_blank" class="btn btn-success">W</a>';
+                            html = '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-success">W</a>';
                         }
                         return html;
                     }
@@ -1081,11 +1085,6 @@
                 },
                 {
                     data: 'orderId',
-                    name: 'add_invoice',
-                    render: (orderId, type, row) => ('<a href="{{env('FRONT_NUXT_URL')}}' + '/magazyn/awizacja/0/0/' + orderId + '/wyslij-fakture">dodaj fakturę</a>')
-                },
-                {
-                    data: 'orderId',
                     name: 'profit',
                     searchable: false,
                     orderable: false,
@@ -1197,7 +1196,6 @@
                     name: 'sum_of_payments',
                     searchable: false,
                     render: function(data, type, row) {
-                        console.log(row);
                         let totalOfPayments = 0;
                         let totalOfDeclaredPayments = 0;
                         var payments = row['payments'];
@@ -1386,15 +1384,18 @@
                 },
                     @endforeach
                 {
-                    data: 'invoices',
+                    data: null,
                     name: 'invoices',
-                    render: function(invoices) {
-                        let html = '';
+                    render: function(data) {
+                        let invoices = data.invoices
+                        let html = ''
                         if(invoices !== undefined){
                             invoices.forEach(function(invoice){
                                 html += '<a target="_blank" href="/storage/invoices/'+invoice.invoice_name+'" style="margin-top: 5px;">Faktura</a>';
                             });
+                            html += '<br />'
                         }
+                        html += '<a href="{{env('FRONT_NUXT_URL')}}' + '/magazyn/awizacja/0/0/' + data.orderId + '/wyslij-fakture">Dodaj</a>'
                         return html;
                     }
                 },

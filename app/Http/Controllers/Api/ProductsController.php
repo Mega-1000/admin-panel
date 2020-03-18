@@ -33,7 +33,8 @@ class ProductsController
         ProductRepository $repository,
         WarehouseRepository $warehouseRepository,
         ProductPriceRepository $productPriceRepository
-    ) {
+    )
+    {
         $this->repository = $repository;
         $this->warehouseRepository = $warehouseRepository;
         $this->productPriceRepository = $productPriceRepository;
@@ -59,42 +60,43 @@ class ProductsController
 
         foreach ($products as $product) {
             $group = $product->product_group_for_change_price;
-            if ($group != null) {
-                $exp = explode('-', $group);
-                $groupExp = $exp[1];
-                $numberGroup = $exp[0];
-                if($product->date_of_price_change !== null) {
-                    $dateOfPriceChange = new Carbon($product->date_of_price_change);
-                } else {
-                    $dateOfPriceChange = null;
-                }
-                $array = [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'symbol' => $product->symbol,
-                    'product_name_supplier' => $product->product_name_supplier,
-                    'product_name_supplier_on_documents' => $product->product_name_supplier_on_documents,
-                    'date_of_price_change' => $dateOfPriceChange->addDay()->toDateString(),
-                    'date_of_the_new_prices' => null,
-                    'value_of_price_change_data_first' => $product->value_of_price_change_data_first,
-                    'value_of_price_change_data_second' => $product->value_of_price_change_data_second,
-                    'value_of_price_change_data_third' => $product->value_of_price_change_data_third,
-                    'value_of_price_change_data_fourth' => $product->value_of_price_change_data_fourth,
-                ];
-
-                if ($product->text_price_change_data_first != null) {
-                    $productsReturnArray[$groupExp][$numberGroup]['mainText'] = [
-                        'text_price_change' => $product->text_price_change,
-                    ];
-                    $productsReturnArray[$groupExp][$numberGroup]['header'] = [
-                        'text_price_change_data_first' => $product->text_price_change_data_first,
-                        'text_price_change_data_second' => $product->text_price_change_data_second,
-                        'text_price_change_data_third' => $product->text_price_change_data_third,
-                        'text_price_change_data_fourth' => $product->text_price_change_data_fourth,
-                    ];
-                }
-                $productsReturnArray[$groupExp][$numberGroup][] = $array;
+            if ($group == null) {
+                continue;
             }
+            $exp = explode('-', $group);
+            $groupExp = $exp[1];
+            $numberGroup = $exp[0];
+            if ($product->date_of_price_change !== null) {
+                $dateOfPriceChange = new Carbon($product->date_of_price_change);
+            } else {
+                $dateOfPriceChange = null;
+            }
+            $array = [
+                'id' => $product->id,
+                'name' => $product->name,
+                'symbol' => $product->symbol,
+                'product_name_supplier' => $product->product_name_supplier,
+                'product_name_supplier_on_documents' => $product->product_name_supplier_on_documents,
+                'date_of_price_change' => $dateOfPriceChange->addDay()->toDateString(),
+                'date_of_the_new_prices' => null,
+                'value_of_price_change_data_first' => $product->value_of_price_change_data_first,
+                'value_of_price_change_data_second' => $product->value_of_price_change_data_second,
+                'value_of_price_change_data_third' => $product->value_of_price_change_data_third,
+                'value_of_price_change_data_fourth' => $product->value_of_price_change_data_fourth,
+            ];
+
+            if ($product->text_price_change_data_first != null) {
+                $productsReturnArray[$groupExp][$numberGroup]['mainText'] = [
+                    'text_price_change' => $product->text_price_change,
+                ];
+                $productsReturnArray[$groupExp][$numberGroup]['header'] = [
+                    'text_price_change_data_first' => $product->text_price_change_data_first,
+                    'text_price_change_data_second' => $product->text_price_change_data_second,
+                    'text_price_change_data_third' => $product->text_price_change_data_third,
+                    'text_price_change_data_fourth' => $product->text_price_change_data_fourth,
+                ];
+            }
+            $productsReturnArray[$groupExp][$numberGroup][] = $array;
         }
 
         return $productsReturnArray;
@@ -118,7 +120,7 @@ class ProductsController
                 $item['date_of_the_new_prices'] = $dateNewPrice->toDateString();
                 $this->repository->update($item, $product->id);
                 $products = $this->repository->findByField('products_related_to_the_automatic_price_change', $product->symbol);
-                foreach($products as $prod){
+                foreach ($products as $prod) {
                     unset($item['date_of_price_change']);
                     $item['product_group_for_change_price'] = $product->product_group_for_change_price;
                     $this->repository->update($item, $prod->id);
@@ -141,8 +143,10 @@ class ProductsController
             ::with(['children' => function ($q) {
                 $q->join('product_prices', 'products.id', '=', 'product_prices.product_id');
                 $q->join('product_packings', 'products.id', '=', 'product_packings.product_id');
+                $q->orderBy('priority');
+                $q->orderBy('name');
             }])
-            ->find((int) $request->product)
+            ->find((int)$request->product)
             ->children
             ->toJson();
 
@@ -158,6 +162,8 @@ class ProductsController
         $products = Product::where('show_on_page', '=', 1)
             ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
             ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
+            ->orderBy('priority')
+            ->orderBy('name')
             ->paginate($perPage)->toJson();
 
         $products = json_decode($products, true, JSON_PRETTY_PRINT);
@@ -181,10 +187,10 @@ class ProductsController
     {
         return response(
             Product
-            ::join('product_prices', 'products.id', '=', 'product_prices.product_id')
-            ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
-            ->find($id)
-            ->toJson()
+                ::join('product_prices', 'products.id', '=', 'product_prices.product_id')
+                ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
+                ->find($id)
+                ->toJson()
         );
     }
 
@@ -193,7 +199,7 @@ class ProductsController
      */
     public function getProductsByCategory(Request $request)
     {
-        $category = Category::find((int) $request->category_id);
+        $category = Category::find((int)$request->category_id);
 
         if (!$category) {
             return response("Wrong category_id {$request->category_id}", 400);
@@ -205,12 +211,14 @@ class ProductsController
             ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
             ->with('media')
             ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
+            ->orderBy('priority')
+            ->orderBy('name')
             ->paginate($this->getPerPage())
-            ->toJson()
-        ;
+            ->toJson();
 
         $products = json_decode($products, true, JSON_PRETTY_PRINT);
         foreach ($products['data'] as $productKey => $productValue) {
+            $products['data'][$productKey]['id'] = $productValue['product_id'];
             if (!empty($productValue['url_for_website']) && !File::exists(public_path($productValue['url_for_website']))) {
                 $products['data'][$productKey]['url_for_website'] = null;
             }
@@ -232,10 +240,10 @@ class ProductsController
     private function parseTree($tree, $root = 0)
     {
         $return = [];
-        foreach($tree as $i => $row) {
+        foreach ($tree as $i => $row) {
             $child = $row['id'];
             $parent = $row['parent_id'];
-            if($parent == $root) {
+            if ($parent == $root) {
                 unset($tree[$i]);
                 $return[] = array_merge($row, ['children' => $this->parseTree($tree, $child)]);
             }
@@ -280,8 +288,7 @@ class ProductsController
                         $q->with('replacements');
                     }]);
                 }])
-                ->find($id)
-            ;
+                ->find($id);
             if (!$attribute) {
                 throw new \Exception("Wrong attribute ID ($id)");
             }
@@ -393,8 +400,9 @@ class ProductsController
             ->where('products.show_on_page', '=', 1)
             ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
             ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
-            ->get()
-        ;
+            ->orderBy('priority')
+            ->orderBy('name')
+            ->get();
 
         return $products;
     }
@@ -411,7 +419,7 @@ class ProductsController
 
         foreach ($replaceProducts as $product) {
             if (!isset($replacements['products_replace'][$product->symbol])) {
-                throw new \Exception('Unexpected unexisting replacement for symbol '.$product->symbol);
+                throw new \Exception('Unexpected unexisting replacement for symbol ' . $product->symbol);
             }
             $product->changer = $replacements['products_replace'][$product->symbol]['id'];
             $product->quantity = $replacements['products_replace'][$product->symbol]['quantity'];

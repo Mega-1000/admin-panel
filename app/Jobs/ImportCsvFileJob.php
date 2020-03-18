@@ -8,6 +8,7 @@ use App\Repositories\ProductPriceRepository;
 use App\Repositories\ProductRepository;
 use App\Repositories\ProductStockPositionRepository;
 use App\Repositories\ProductStockRepository;
+use DateTime;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
@@ -18,7 +19,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use App\Entities;
 
 /**
@@ -48,6 +48,7 @@ class ImportCsvFileJob implements ShouldQueue
 
     private $categories = ['id' => 0, 'children' => []];
     private $productsRelated = [];
+    private $jpgData = [];
 
     private $currentLine;
 
@@ -126,24 +127,28 @@ class ImportCsvFileJob implements ShouldQueue
                 $multiCalcCurrent = trim($line[$categoryColumn + 8]);
                 if (empty($array['symbol']) && empty($multiCalcBase) && empty($multiCalcCurrent)) {
                     $this->saveCategory($line, $categoryTree, $categoryColumn);
-                } else {
-                    $product = $this->saveProduct($array, $categoryTree);
+                } elseif ($line[6] == 1) {
+                    $product = $this->saveProduct($array, $categoryTree, !empty($multiCalcCurrent));
                     $media = $this->getProductsMedia($line);
                     if ($media) {
                         $this->createProductMedia($media, $product);
                     }
-                    $tradeGroups = $this->setProductTradeGroups($line, $product);
+                    $this->setProductTradeGroups($line, $product);
                     if (!empty($multiCalcBase)) {
-                        $this->productsRelated[$multiCalcBase] = $product->id;
-                    } elseif (!empty($multiCalcCurrent) && !empty($this->productsRelated[$multiCalcCurrent])) {
-                        $product->parent_id = $this->productsRelated[$multiCalcCurrent];
+                        $this->productsRelated[$categoryColumn.'-'.$multiCalcBase] = $product->id;
+                    } elseif (!empty($multiCalcCurrent) && !empty($this->productsRelated[$categoryColumn.'-'.$multiCalcCurrent])) {
+                        $product->parent_id = $this->productsRelated[$categoryColumn.'-'.$multiCalcCurrent];
+                        $product->category_id = Entities\Product::find($product->parent_id)->category_id;
                         $product->save();
                     }
                 }
+                $this->generateJpgData($line, $categoryColumn);
             } catch (\Exception $e) {
                 $this->log("Row $i EXCEPTION: " . $e->getMessage());
             }
         }
+        $this->saveJpgData();
+
         DB::table('import')->where('id', 1)->update(
             ['name' => 'Import products', 'processing' => 0]
         );
@@ -155,11 +160,16 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function clearTables()
     {
-        Entities\Product::query()->update([
+        Entities\Product::withTrashed()->where('symbol', '')->orWhereNull('symbol')->forceDelete();
+        Entities\Product::withTrashed()->update([
             'category_id' => null,
-            'parent_id' => null
+            'parent_id' => null,
+            'product_name_supplier' => '',
+            'product_name_supplier_on_documents' => '',
+            'product_group_for_change_price' => '',
+            'products_related_to_the_automatic_price_change' => '',
+            'deleted_at' => Carbon::now()
         ]);
-        Entities\Product::where('symbol', '')->orWhereNull('symbol')->delete();
         DB::table('product_media')->delete();
         DB::table('product_trade_groups')->delete();
         DB::table('chimney_replacements')->delete();
@@ -167,6 +177,7 @@ class ImportCsvFileJob implements ShouldQueue
         DB::table('chimney_attribute_options')->delete();
         DB::table('chimney_attributes')->delete();
         DB::table('categories')->delete();
+        DB::table('jpg_data')->delete();
         DB::statement("ALTER TABLE categories AUTO_INCREMENT = 1;");
         DB::statement("ALTER TABLE product_media AUTO_INCREMENT = 1;");
         DB::statement("ALTER TABLE product_trade_groups AUTO_INCREMENT = 1;");
@@ -174,6 +185,7 @@ class ImportCsvFileJob implements ShouldQueue
         DB::statement("ALTER TABLE chimney_products AUTO_INCREMENT = 1;");
         DB::statement("ALTER TABLE chimney_attribute_options AUTO_INCREMENT = 1;");
         DB::statement("ALTER TABLE chimney_attributes AUTO_INCREMENT = 1;");
+        DB::statement("ALTER TABLE jpg_data AUTO_INCREMENT = 1;");
     }
 
     private function getUrl($url)
@@ -182,7 +194,7 @@ class ImportCsvFileJob implements ShouldQueue
         $imgUrlExploded = end($imgUrlExploded);
         $imgUrlWebsite = $this->imgStoragePath . DIRECTORY_SEPARATOR . $imgUrlExploded;
         $imgUrlWebsite = Storage::url($imgUrlWebsite);
-        return $imgUrlWebsite;
+        return str_replace("\\", '/', $imgUrlWebsite);
     }
 
     private function getShowOnPageParameter(array $line, int $columnIterator)
@@ -355,33 +367,42 @@ class ImportCsvFileJob implements ShouldQueue
         return $replacements;
     }
 
-    private function saveProduct($array, $categoryTree)
+    private function saveProduct($array, $categoryTree, $isChildProduct)
     {
+        $product = null;
         if (!empty($array['symbol'])) {
-            $item = $this->productRepository->findWhere(['symbol' => $array['symbol']])->first();
-        } else {
-            $item = null;
+            $product = Entities\Product::withTrashed()->where('symbol', $array['symbol'])->first();
         }
 
-        $category = $this->getCategoryParent($categoryTree, $array);
-        $array['category_id'] = $category['id'] ?: null;
-        if ($item !== null) {
-            $product = $this->productRepository->update($array, $item->id);
-            if (!$array['subject_to_price_change']) {
-                $this->productPriceRepository->update(array_merge(['product_id', $product->id], $array), $product->id);
-            }
-            $this->productPackingRepository->update(array_merge(['product_id', $product->id], $array), $product->id);
-        } else {
-            $product = $this->productRepository->create($array);
+        if (!$product) {
+            $product = new Entities\Product();
+        }
 
-            $this->productPriceRepository->create(array_merge(['product_id' => $product->id], $array));
-            $this->productPackingRepository->create(array_merge(['product_id' => $product->id], $array));
-            $this->productStockRepository->create([
-                'product_id' => $product->id,
-                'quantity' => 0,
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
-            ]);
+        if (!$isChildProduct) {
+            $category = $this->getCategoryParent($categoryTree, $array);
+            $array['category_id'] = $category['id'] ?: null;
+        } else {
+            $array['category_id'] = null;
+        }
+
+        $product->fill($array);
+        $product->save();
+        $product->restore();
+
+        if (!$product->price || !$array['subject_to_price_change']) {
+            $price = $product->price ?? new Entities\ProductPrice();
+            $price->fill($array);
+            $product->price()->save($price);
+        }
+
+        $packing = $product->packing ?? new Entities\ProductPacking();
+        $packing->fill($array);
+        $product->packing()->save($packing);
+
+        if (!$product->stock) {
+            $product->stock()->save(new Entities\ProductStock([
+                'quantity' => 0
+            ]));
         }
 
         return $product;
@@ -395,7 +416,7 @@ class ImportCsvFileJob implements ShouldQueue
             'manufacturer' => $line[16],
             'product_name_manufacturer' => $line[17],
             'symbol_name_manufacturer' => $line[18],
-            'product_name_supplier' => $line[19],
+            'product_name_supplier' => $line[20],
             'product_name_supplier_on_documents' => $line[20],
             'product_name_on_collective_box' => $line[22],
             'supplier_product_symbol' => $line[24],
@@ -414,10 +435,10 @@ class ImportCsvFileJob implements ShouldQueue
             'numbers_of_basic_commercial_units_in_pack' => $line[73],
             'number_of_sale_units_in_the_pack' => $line[74],
             'number_of_trade_items_in_the_largest_unit' => $line[75],
-            'weight_collective_unit' => (float)$line[103],
-            'weight_trade_unit' => (float)$line[100],
-            'weight_biggest_unit' => (float)$line[104],
-            'weight_base_unit' => (float)$line[102],
+            'weight_collective_unit' => floatval(str_replace(',', '.', $line[103])),
+            'weight_trade_unit' => floatval(str_replace(',', '.', $line[100])),
+            'weight_biggest_unit' => floatval(str_replace(',', '.', $line[104])),
+            'weight_base_unit' => floatval(str_replace(',', '.', $line[102])),
             'net_purchase_price_commercial_unit' => $line[116],
             'net_purchase_price_calculated_unit' => $line[117],
             'net_purchase_price_basic_unit' => $line[118],
@@ -482,6 +503,8 @@ class ImportCsvFileJob implements ShouldQueue
             'per_package_factor' => $line[371],
             'trade_group_name' => $line[378],
             'additional_payment_for_milling' => $line[473],
+            'date_of_price_change' => $this->getDateOrNull($line[106]),
+            'date_of_the_new_prices' => $this->getDateOrNull($line[107]),
             'product_group_for_change_price' => $line[108],
             'products_related_to_the_automatic_price_change' => $line[110],
             'text_price_change' => $line[111],
@@ -490,8 +513,12 @@ class ImportCsvFileJob implements ShouldQueue
             'text_price_change_data_third' => $line[114],
             'text_price_change_data_fourth' => $line[115],
             'subject_to_price_change' => $line[124],
+            'value_of_price_change_data_first' => $line[125],
+            'value_of_price_change_data_second' => $line[126],
+            'value_of_price_change_data_third' => $line[127],
+            'value_of_price_change_data_fourth' => $line[128],
             'pattern_to_set_the_price' => $line[129],
-            'euro_exchange' => $line[250],
+            'euro_exchange' => $line[131],
             'variation_unit' => $line[292],
             'variation_group' => $line[293],
             'review' => $line[279],
@@ -534,7 +561,7 @@ class ImportCsvFileJob implements ShouldQueue
     private function getCategoryColumn($line)
     {
         for ($col = 598; $col <= count($line) - 15; $col += 16) {
-            if (!empty($line[$col])) {
+            if (!empty($line[$col]) || !empty($line[$col + 8])) {
                 return $col;
             }
         }
@@ -636,9 +663,67 @@ class ImportCsvFileJob implements ShouldQueue
         $tradeGroup->save();
     }
 
+    private function generateJpgData($line, $categoryColumn)
+    {
+        $columns = [9 => 10, 11 => 13];
+        foreach ($columns as $fileNameColumn => $orderColumn) {
+            $fileName = trim($line[$categoryColumn + $fileNameColumn]);
+            if (empty($fileName)) {
+                continue;
+            }
+            $order = ((int)trim($line[$categoryColumn + $orderColumn])) ?: 1000000;
+            if (!trim($line[309])) {
+                continue;
+            }
+            $priceType = $line[309][0];
+            $price = $line[$priceType == 'h' ? 252 : ($priceType == 'o' ? 253 : 254)];
+            if ($price == 0) {
+                continue;
+            }
+            $this->jpgData[$fileName][$line[1]][$line[2]][$line[3]] = [
+                'price' => $price,
+                'order' => $order,
+                'name' => $line[4],
+                'image' => $this->getUrl($line[303])
+            ];
+        }
+    }
+
+    private function saveJpgData()
+    {
+        $data = [];
+
+        foreach ($this->jpgData as $fileName => $table) {
+            foreach ($table as $row => $rowData) {
+                foreach ($rowData as $col => $subdata) {
+                    foreach ($subdata as $subcol => $details) {
+                        $data[] = [
+                            'filename' => $fileName,
+                            'row' => $row,
+                            'col' => $col,
+                            'subcol' => $subcol,
+                            'price' => $details['price'],
+                            'order' => $details['order'],
+                            'image' => $details['image'],
+                            'name' => $details['name']
+                        ];
+                    }
+                }
+            }
+        }
+
+        \App\Entities\JpgDatum::insert($data);
+    }
+
     private function log($text)
     {
         Log::channel('import')->info($text);
         echo $text."\n";
+    }
+
+    private function getDateOrNull($date)
+    {
+        $d = DateTime::createFromFormat('Y-m-d', $date);
+        return $d && $d->format('Y-m-d') == $date ? $date : null;
     }
 }

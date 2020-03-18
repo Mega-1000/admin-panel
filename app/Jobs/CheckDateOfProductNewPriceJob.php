@@ -7,7 +7,6 @@ use App\Repositories\ProductRepository;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -25,10 +24,8 @@ class CheckDateOfProductNewPriceJob
      *
      * @return void
      */
-    public function __construct(ProductRepository $repository, ProductPriceRepository $productPriceRepository)
+    public function __construct()
     {
-        $this->repository = $repository;
-        $this->productPriceRepository = $productPriceRepository;
     }
 
     /**
@@ -36,8 +33,11 @@ class CheckDateOfProductNewPriceJob
      *
      * @return void
      */
-    public function handle()
+    public function handle(ProductRepository $repository, ProductPriceRepository $productPriceRepository)
     {
+        $this->repository = $repository;
+        $this->productPriceRepository = $productPriceRepository;
+        
         $products = $this->repository->findWhere([['date_of_the_new_prices', '<=', Carbon::today()->addDay()]]);
 
         foreach ($products as $product) {
@@ -149,7 +149,14 @@ class CheckDateOfProductNewPriceJob
             $price['gross_selling_price_the_largest_unit'] = number_format($price['net_purchase_price_the_largest_unit_after_discounts'] * ((100 + $product->price->coating) / 100) * 1.23,
                 2, '.', '');
 
-            $this->productPriceRepository->update($price, $product->price->id);
+            $productsRelated = \App\Entities\Product::where('products_related_to_the_automatic_price_change', $product->symbol)->get();
+
+            $ids = [$product->id];
+            foreach ($productsRelated as $productRelated) {
+                $ids[] = $productRelated->id;
+            }
+            
+            \App\Entities\ProductPrice::whereIn('product_id', $ids)->update($price);
         }
     }
 

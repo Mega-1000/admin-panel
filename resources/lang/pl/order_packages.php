@@ -94,7 +94,10 @@ return [
             'messages' => 'Wiadomości',
             'packages' => 'Przesyłki'
         ],
-        'cancelled_package' => 'Wyślij prośbę o anulowanie przesyłki'
-    ],
-
+        'cancelled_package' => 'Wyślij prośbę o anulowanie przesyłki',
+        'maxWeight' => 'Maksymalna waga Paczki u wybranego kuriera',
+        'weightVolume' => 'Objętość wagowa [cm3]',
+        'cost' => 'Koszt pobrania',
+        'maxStringLength' => 'Maksymalna ilość znaków w uwagach do spedycji'
+    ]
 ];

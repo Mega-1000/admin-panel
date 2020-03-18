@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\Log;
 class PackageDivider implements iPackageDivider
 {
     const TRANSPORT_GROUPS = 'transport_group';
-    //todo make this adjustable
-    const MARGIN = 1.3;
     private $itemList;
     private const LONG = 'long';
     private const NOT_CALCULABLE = 'not_calculable';
@@ -31,12 +29,10 @@ class PackageDivider implements iPackageDivider
     {
         $warehouses = [];
         foreach ($this->itemList as $product) {
-            if ($product->hasAllTransportParameters()) {
-                if ($product->isInTransportGroup()) {
-                    $warehouses [self::TRANSPORT_GROUPS] [$product->trade_group_name] [] = $product;
-                } else {
+            if ($product->isInTransportGroup()) {
+                $warehouses [self::TRANSPORT_GROUPS] [$product->trade_group_name] [] = $product;
+            } else if ($product->hasAllTransportParameters()) {
                     $warehouses = $this->insertToWarehouseArray($product, $warehouses);
-                }
             } else {
                 $warehouses[self::NOT_CALCULABLE] [] = $product;
             }
@@ -58,29 +54,43 @@ class PackageDivider implements iPackageDivider
         unset($sorted[self::TRANSPORT_GROUPS]);
         if (isset($transportCalculations['cantsend'])) {
             foreach ($transportCalculations['cantsend'] as $item) {
-                $sorted = $this->insertToWarehouseArray($item, $sorted);
+                if ($item->hasAllTransportParameters()) {
+                    $sorted = $this->insertToWarehouseArray($item, $sorted);
+                } else {
+                    $sorted[self::NOT_CALCULABLE] [] = $item;
+                }
             }
             unset($transportCalculations['cantsend']);
         }
+        $failed = [];
+        $totalPacks = [];
         foreach ($sorted as $key => $items) {
             if (strpos($key, self::LONG)) {
                 $items = $this->sortByLength($items);
-                $divided = $this->calculatePackages($items, true);
+                ['packages' => $divided, 'failed' => $failed] = $this->calculatePackages($items, true);
             } elseif ($key !== self::TRANSPORT_GROUPS) {
                 uasort($items, array('App\Helpers\PackageDivider', 'weightAndVolumeSort'));
-                $divided = $this->calculatePackages($items);
+                ['packages' => $divided, 'failed' => $failed] = $this->calculatePackages($items);
             }
+            $totalPacks = array_merge($divided, $totalPacks);
         }
-        return ['packages' => array_values($divided),
+        return ['packages' => array_values($totalPacks),
             'transport_groups' => isset($transportCalculations['calculated']) ? $transportCalculations['calculated'] : [],
-            'not_calculated' => $notCalculated];
+            'not_calculated' => array_merge($notCalculated, $failed)];
     }
 
     private function calculatePackages($items, $isLong = false)
     {
         $packages = [];
+        $failed = [];
         foreach ($items as $item) {
-            $packages = array_merge($packages, $this->createHomoPackage($item, $isLong));
+            ['packages' => $package, 'failed' => $fail] = $this->createHomoPackage($item, $isLong);
+            if ($package) {
+                $packages = array_merge($packages, $package);
+            }
+            if ($fail) {
+                $failed[] = $fail;
+            }
         }
         array_reverse($packages);
         foreach ($packages as $key => $singlePackage) {
@@ -93,7 +103,7 @@ class PackageDivider implements iPackageDivider
             $pack->removeEmpty();
             $pack->productList = $pack->productList->values();
         }
-        return $packages;
+        return ['packages' => $packages, 'failed' => $failed];
     }
 
     private static function weightAndVolumeSort($first, $second)
@@ -124,7 +134,11 @@ class PackageDivider implements iPackageDivider
         $packageName = sprintf("%s_%s",
             $item->packing->recommended_courier,
             $item->packing->packing_name);
-        $package = new Package($packageName, self::MARGIN);
+        try {
+            $package = new Package($packageName, env('PACKAGE_DIVIDE_MARGIN'));
+        } catch (\Exception $exception) {
+            return ['packages' => false, 'failed' => $item];
+        }
         $package->setIsLong($isLong);
         $packageList = [$package];
         do {
@@ -133,16 +147,16 @@ class PackageDivider implements iPackageDivider
                 $item->quantity -= 1;
             } catch (\Exception $exception) {
                 if ($exception->getMessage() != Package::CAN_NOT_ADD_MORE) {
-                    error_log($exception->getMessage());
+                    Log::error('Błąd budownaia paczek: ' . $exception->getMessage(), ['class' => get_class($this), 'line' => __LINE__]);
                 } else if ($package->getProducts()->count() === 0) {
-                    return ["Element nie mieści się w paczce"];
+                    return ['packages' => false, 'failed' => $item];
                 } else {
-                    $package = new Package($packageName, self::MARGIN);
+                    $package = new Package($packageName, env('PACKAGE_DIVIDE_MARGIN'));
                     $packageList[] = $package;
                 }
             }
         } while ($item->quantity > 0);
-        return $packageList;
+        return ['packages' => $packageList, 'failed' => false];
     }
 
     private function calculateTransportGroups($sorted)
@@ -272,10 +286,16 @@ class PackageDivider implements iPackageDivider
                 $i = 0;
             }
         }
-        foreach ($palettes as $palette) {
+        $parcels['packages'] = [];
+        foreach ($palettes as $k => $palette) {
             $palette->tryFitInSmallerPalette();
+            $palette->setPackageCost();
+            if ($palette->price > $palette->packagesCost) {
+                $parcels['packages'] = array_merge($parcels['packages'], $palette->packagesList->toArray());
+            } else {
+                $parcels['packages'][] = $palette;
+            }
         }
-        $parcels['packages'] = $palettes;
         return $parcels;
     }
 }

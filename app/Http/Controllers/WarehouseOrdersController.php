@@ -132,7 +132,7 @@ class WarehouseOrdersController extends Controller
         return view('warehouse_orders.edit', compact('warehouseOrder'));
     }
 
-    public function makeOrder(Request $request) 
+    public function makeOrder(Request $request)
     {
         $products = json_decode($request->input('products'));
         foreach($products as $product) {
@@ -258,7 +258,7 @@ class WarehouseOrdersController extends Controller
         $count = count($count);
 
         return DataTables::of($collection)->with(['recordsFiltered' => $countFiltred])->skipPaging()->setTotalRecords($count)->make(true);
-      
+
     }
 
     /**
@@ -409,5 +409,5 @@ class WarehouseOrdersController extends Controller
 
         return $collection;
     }
-    
+
 }

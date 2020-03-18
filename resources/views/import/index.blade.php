@@ -10,6 +10,9 @@
     <div class="browse container-fluid">
         <div class="row">
             <div class="col-md-12">
+                @if (Session::get('success'))
+                    <div class='alert alert-success'>Ceny zostały przeliczone</div>
+                @endif
                 <div class="panel panel-bordered">
                     <div class="panel-body">
                         <div class="table-responsive">
@@ -27,6 +30,13 @@
                                 <label for="import" class="text-body"></label>
                                 <button href="#" class="btn btn-primary" id="import"
                                    name="import" @if($import->processing == 1) disabled @endif> @lang('import.do_import')</button>
+                                <label for="recalculate-prices" class="text-body"></label>
+                                <a href="{{ route('job.recalculatePrices') }}" class="btn btn-primary">
+                                    Przelicz ceny
+                                </a>
+                                <a href="{{ route('job.generateJpgs') }}" class="btn btn-primary">
+                                    Wygeneruj tabele i reklamówki
+                                </a>
                             </div>
                             <form action="{{ route('import.store') }}" enctype="multipart/form-data" method="POST">
                                 {{ csrf_field() }}
