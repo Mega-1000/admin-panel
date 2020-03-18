@@ -14,6 +14,7 @@
         <thead>
         <tr>
             <th>ID</th>
+            <th>@lang('order_packages.form.list_order')</th>
             <th>@lang('order_packages.form.template_symbol')</th>
             <th>Nazwa</th>
             <th>Data utworzenia</th>
@@ -24,9 +25,10 @@
          @foreach ($packageTemplates as $packageTemplate)
         <tr>
             <td width="10%">{{$packageTemplate->id}}</td>
+            <td width="10%">@if($packageTemplate->list_order!=1000){{$packageTemplate->list_order}}@endif</td>
             <td width="10%">{{$packageTemplate->symbol}}</td>
-            <td width="35%">{{$packageTemplate->name}}</td>
-            <td width="25%">{{$packageTemplate->created_at}}</td>
+            <td width="30%">{{$packageTemplate->name}}</td>
+            <td width="20%">{{$packageTemplate->created_at}}</td>
             <td>
                 <div class="col-md-10">
                     <a href="{{ url()->current() }}/{{$packageTemplate->id}}/edit" class="btn btn-sm btn-primary edit">
