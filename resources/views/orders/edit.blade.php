@@ -2374,7 +2374,6 @@
                                     addOrder.hide();
                                 }
                             });
-
                         });
 
                     </script>
@@ -3643,7 +3642,7 @@
                                 let shipmentUs = {{ $order->shipment_price_for_us ?? 0 }};
                                 splitCosts('shipment_price_for_us', shipmentUs, 'SHIP_US');
                             });
-
+                            $('.net_purchase_price_commercial_unit').first().change()
                         });
 
                         function changeDko(split = null) {
