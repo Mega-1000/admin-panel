@@ -2201,18 +2201,20 @@ class OrdersController extends Controller
     private function editabilityCheck($order)
     {
         $fail = $order->packages->first(function ($item) {
-            return $item->status != 'NEW';
+            return !($item->status == 'NEW' || $item->status == 'WAITING_FOR_CANCELLED' || $item->status == 'CANCELLED');
         });
         if ($fail) {
             return false;
         } else {
-            OrderOtherPackage::where('order_id', $order->id)->get()->map(function ($item) {
-                DB::table('order_other_package_product')->where('order_other_package_id', $item->id)->delete();
-                $item->delete();
+            $order->packages->map(function ($package) {
+                if ($package->status == 'NEW') {
+                    $package->packedProducts()->detach();
+                    $package->delete();
+                }
             });
-            OrderPackage::where('order_id', $order->id)->get()->map(function ($item) {
-                DB::table('order_package_product')->where('order_package_id', $item->id)->delete();
-                $item->delete();
+            $order->otherPackages->map(function ($package) {
+                $package->products()->detach();
+                $package->delete();
             });
             return true;
         }
