@@ -795,9 +795,10 @@ class OrdersController extends Controller
 
     private function createPackages(array $packages, $orderId)
     {
+        $packageNumber = 1;
         foreach ($packages['packages'] as $package) {
             if (!empty($package->type)) {
-                $pack = $this->createPackage($package->type, $orderId);
+                $pack = $this->createPackage($package->type, $orderId, $packageNumber);
                 $products = [];
                 foreach ($package->packagesList as $singlePack) {
                     foreach ($singlePack->productList as $product) {
@@ -810,7 +811,7 @@ class OrdersController extends Controller
                 }
             }
             if (!empty($package->packageName)) {
-                $pack = $this->createPackage($package->packageName, $orderId);
+                $pack = $this->createPackage($package->packageName, $orderId, $packageNumber);
                 $products = [];
                 foreach ($package->productList as $product) {
                     $quantity = empty($products[$product->id]) ? $product->quantity : $products[$product->id] + $product->quantity;
@@ -820,10 +821,11 @@ class OrdersController extends Controller
                     $pack->packedProducts()->attach($k, ['quantity' => $quantity]);
                 }
             }
+            $packageNumber++;
         }
     }
 
-    private function createPackage($symbol, $orderId)
+    private function createPackage($symbol, $orderId, $packageNumber)
     {
         $packTemplate = PackageTemplate::where('symbol', $symbol)->firstOrFail();
         $pack = new OrderPackage();
@@ -834,6 +836,7 @@ class OrdersController extends Controller
         $pack->delivery_courier_name = $packTemplate->delivery_courier_name;
         $pack->service_courier_name = $packTemplate->service_courier_name;
         $pack->weight = $packTemplate->weight;
+        $pack->number = $packageNumber;
         $helper = new OrderPackagesDataHelper();
         if ($packTemplate->accept_time) {
             $date = $helper->calculateShipmentDate($packTemplate->accept_time, $packTemplate->accept_time);
