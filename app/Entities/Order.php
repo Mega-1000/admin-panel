@@ -465,4 +465,9 @@ class Order extends Model implements Transformable
         }, 0);
         return $factoryPrice + $packagesPrice;
     }
+
+    public function otherPackages()
+    {
+        return $this->hasMany('App\Entities\OrderOtherPackage');
+    }
 }

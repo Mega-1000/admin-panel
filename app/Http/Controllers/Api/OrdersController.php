@@ -211,13 +211,15 @@ class OrdersController extends Controller
                 $this->error_code = 'package_must_be_cancelled';
                 throw new \Exception('package_must_be_cancelled');
             }
-            OrderOtherPackage::where('order_id', $order->id)->get()->map(function ($item) {
-                DB::table('order_other_package_product')->where('order_other_package_id', $item->id)->delete();
-                $item->delete();
+            $order->packages->map(function ($package) {
+                if ($package->status == 'NEW') {
+                    $package->packedProducts()->detach();
+                    $package->delete();
+                }
             });
-            OrderPackage::where('order_id', $order->id)->get()->map(function ($item) {
-                DB::table('order_package_product')->where('order_package_id', $item->id)->delete();
-                $item->delete();
+            $order->otherPackages->map(function ($package) {
+                $package->products()->detach();
+                $package->delete();
             });
             $orderExists = true;
             if (!$order) {

@@ -70,6 +70,7 @@ return [
         'update' => 'Zamówienie zostało zaktualizowany pomyślnie!',
         'delete' => 'Zamówienie zostało usunięte pomyślnie!',
         'split' => 'Zamówienie zostało podzielone pomyślnie!',
+        'package_failure' => 'Nie można edytować zlecenia z wysłanymi paczkami!'
     ],
     'form' => [
         'buttons' => [
