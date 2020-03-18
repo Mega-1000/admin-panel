@@ -185,8 +185,6 @@
         </div>
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
     </form>
-    <form action="" id="cashon">
-    </form>
 @endsection
 @section('scripts')
     <script>

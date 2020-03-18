@@ -121,7 +121,7 @@ class OrdersCourierJobs extends Job
         $package = $this->orderPackageRepository->find($this->data['additional_data']['order_package_id']);
         if ($package->delivery_courier_name !== 'INPOST') {
             if ($package->delivery_courier_name === 'DPD') {
-                $path = storage_path('app/public/dpd/protocols/protocol' . $package->letter_number . '.pdf');
+                $path = storage_path('app/public/dpd/stickers/sticker' . $package->letter_number . '.pdf');
             } elseif ($package->delivery_courier_name === 'JAS') {
                 $path = storage_path('app/public/jas/protocols/protocol' . $package->letter_number . '.pdf');
             } else {

@@ -17,7 +17,7 @@
         </div>
     @endif
     <form action="{{ action('PackageTemplatesController@update', $old->id) }}" method="POST" onsubmit="return validate(this);">
-     {{ method_field('PUT')}}
+        {{ method_field('PUT')}}
         {{ csrf_field() }}
         <div class="form-group">
             <label for="data_template">Nazwa Szablonu Danych</label>
@@ -187,8 +187,6 @@
             </div>
         </div>
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
-    </form>
-    <form action="" id="cashon">
     </form>
 @endsection
 @section('scripts')
