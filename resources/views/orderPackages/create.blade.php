@@ -438,7 +438,7 @@
                 $("#content").val(multiData['content']);
                 $("#weight").val(multiData['weight']);
                 $("#chosen_data_template").val(multiData['chosen_data_template']);
-                $("#form-package").submit();
+//                $("#form-package").submit();
              }
              $('#cash_on_delivery').on('change', function() {
                  let difference = toPay - $(this).val();

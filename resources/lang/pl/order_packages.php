@@ -75,6 +75,9 @@ return [
         'max_weight' => 'Maksymalna waga paczki u wybranego kuriera (potrzebne do plecaka)',
         'volume_factor' => 'Współczynnik objętości (potrzebne do plecaka)',
         'list_order' => 'Miejsce szablonu na liście',
+        'accept_time_info' => 'Informacja dotycząca Godzin Zleceń',
+        'max_time_info' => 'Informacja dotycząca Godziny Granicznej',
+        'template_symbol' => 'Symbol',
         'status_type' => [
             'delivered' => 'Dostarczone',
             'cancelled' => 'Anulowane',

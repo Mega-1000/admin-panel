@@ -258,36 +258,37 @@ class OrdersPackagesController extends Controller
         } else {
             dispatch_now(new AddLabelJob($order->id, [133]));
         }
-        if (!empty($request->input('quantity')) && $request->input('quantity') > 1) {
-            $token = md5(uniqid(rand(), true));            
-            $multi = [
-                'token' => $token,    
-                'template' => [
-                'quantity' => $request->input('quantity')-1,
-                'size_a' => $request->input('size_a'),
-                'size_b' => $request->input('size_b'),
-                'size_c' => $request->input('size_c'),
-                'shipment_date' => $request->input('shipment_date'),
-                'delivery_date' => $request->input('delivery_date'),
-                'service_courier_name' => $request->input('service_courier_name'),
-                'delivery_courier_name' => $request->input('delivery_courier_name'),
-                'shape' => $request->input('shape'),
-                'container_type' => $request->input('container_type'),
-                'notices' => $request->input('notices'),
-                'content' => $request->input('content'),
-                'weight' => $request->input('weight'),
-                'cost_for_client' => $request->input('cost_for_client'),
-                'cost_for_us' => $request->input('cost_for_company'),
-                'chosen_data_template' => $request->input('chosen_data_template')
-                ]
-            ];
-            $request->session()->put('multi', $multi);
-            return redirect()->route('order_packages.create', ['order_id' => $order_id, 'multi' => $token]);
-        }
-        return redirect()->route('orders.edit', ['order_id' => $order_id])->with([
+        if (empty($request->input('quantity')) || $request->input('quantity') <= 1) {
+            return redirect()->route('orders.edit', ['order_id' => $order_id])->with([
             'message' => __('order_packages.message.store'),
             'alert-type' => 'success'
         ]);
+        }
+        $token = md5(uniqid(rand(), true));            
+        $multi = [
+            'token' => $token,    
+            'template' => [
+            'quantity' => $request->input('quantity')-1,
+            'size_a' => $request->input('size_a'),
+            'size_b' => $request->input('size_b'),
+            'size_c' => $request->input('size_c'),
+            'shipment_date' => $request->input('shipment_date'),
+            'delivery_date' => $request->input('delivery_date'),
+            'service_courier_name' => $request->input('service_courier_name'),
+            'delivery_courier_name' => $request->input('delivery_courier_name'),
+            'shape' => $request->input('shape'),
+            'container_type' => $request->input('container_type'),
+            'notices' => $request->input('notices'),
+            'content' => $request->input('content'),
+            'weight' => $request->input('weight'),
+            'cost_for_client' => $request->input('cost_for_client'),
+            'cost_for_us' => $request->input('cost_for_company'),
+            'chosen_data_template' => $request->input('chosen_data_template')
+            ]
+        ];
+        $request->session()->put('multi', $multi);
+        return redirect()->route('order_packages.create', ['order_id' => $order_id, 'multi' => $token]);
+  
     }
 
     /**

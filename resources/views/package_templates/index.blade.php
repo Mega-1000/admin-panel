@@ -14,7 +14,7 @@
         <thead>
         <tr>
             <th>ID</th>
-            <th>Symbol</th>
+            <th>@lang('order_packages.form.template_symbol')</th>
             <th>Nazwa</th>
             <th>Data utworzenia</th>
             <th>@lang('voyager.generic.actions')</th>

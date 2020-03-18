@@ -50,20 +50,20 @@
                        value="{{ old('size_c') }}">
             </div>
             <div class="form-group">
-                <label for="size_c">Godzina przyjmowania zleceń (Gdy ta godzina zostanie przekroczona wyświetli się pod datą przesyłki informacja z pola poniżej)</label>
+                <label for="size_c">@lang('order_packages.form.accept_time')</label>
                 <input type="time" class="form-control" id="accept_time" name="accept_time">
             </div>
             <div class="form-group">
-                <label for="size_c">Informacja dot. Godzin Zleceń</label>
+                <label for="size_c">@lang('order_packages.form.accept_time_info')</label>
                 <input type="text" class="form-control" id="accept_time_info" name="accept_time_info"
                        value="{{ old('accept_time_info') }}">
             </div>
             <div class="form-group">
-                <label for="size_c">Godzina graniczna wysyłania przesyłki (Gdy ta godzina zostanie przekroczona wyświetli się pod datą przesyłki informacja z pola poniżej)</label>
+                <label for="size_c">@lang('order_packages.form.max_time')</label>
                 <input type="time" class="form-control" id="max_time" name="max_time">
             </div>
             <div class="form-group">
-                <label for="size_c">Informacja dot. Godzin Granicznej</label>
+                <label for="size_c">@lang('order_packages.form.max_time_info')</label>
                 <input type="text" class="form-control" id="max_time_info" name="max_time_info"
                        value="{{ old('max_time_info') }}">
             </div>
