@@ -803,10 +803,12 @@
                     render: function ( order, type, row ) {
                         let data = order.packages
                         var html = ''
-                        if (order.otherPackages && order.otherPackages.find(el => el.type == 'not_calculable')) {
-                            html = '<div style="background: red" >'
-                        } else {
-                            html = '<div style="background: green" >'
+                        if (data.length != 0) {
+                            if (order.otherPackages && order.otherPackages.find(el => el.type == 'not_calculable')) {
+                                html = '<div style="border: solid blue 4px" >'
+                            } else {
+                                html = '<div style="border: solid green 4px" >'
+                            }
                         }
                         $.each(data, function(key, value){
                             if(value.status !== 'SENDING' && value.status !== 'DELIVERED' && value.status !== 'CANCELLED') {
