@@ -77,6 +77,7 @@ return [
         'list_order' => 'Miejsce szablonu na liście',
         'accept_time_info' => 'Informacja dotycząca Godzin Zleceń',
         'max_time_info' => 'Informacja dotycząca Godziny Granicznej',
+        'force_shipment1' => 'Wymuś wysłanie (mimo przekroczonej godziny przyjmowania zleceń)',
         'template_symbol' => 'Symbol',
         'status_type' => [
             'delivered' => 'Dostarczone',

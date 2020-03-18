@@ -75,7 +75,7 @@
             </div>
             <div id="hour_info" style="color: red"></div>
             <div class="form-group">
-            <label for="force-shipment" id="force_shipment1" class="hidden">Wymuś wysłanie (mimo przekroczonej godziny przyjmowania zleceń)</label>
+            <label for="force-shipment" id="force_shipment1" class="hidden">@lang('order_packages.form.force_shipment1')</label>
             <input type="checkbox" id="force_shipment" name="force_shipment"  class="hidden">
             </div>
             <br>
