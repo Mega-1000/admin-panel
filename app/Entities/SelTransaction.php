@@ -22,4 +22,31 @@ class SelTransaction extends Model
     {
         return $this->hasOne('App\Entities\SelTransactionItem','tt_TransId', 'id');
     }
+
+    public function deliveryAddress()
+    {
+        return $this->hasOne('App\Entities\SelAddress','adr_PostBuy_TransId', 'id')
+            ->where('adr_Type', 2)
+            ->orderBy('id', 'dsc');
+    }
+    public function deliveryAddressBefore()
+    {
+        return $this->hasOne('App\Entities\SelAddress','adr_TransId', 'id')
+            ->where('adr_Type', 2)
+            ->orderBy('id', 'dsc');
+    }
+
+    public function invoiceAddress()
+    {
+        return $this->hasOne('App\Entities\SelAddress','adr_PostBuy_TransId', 'id')
+            ->where('adr_Type', 3)
+            ->orderBy('id', 'dsc');
+    }
+
+    public function invoiceAddressBefore()
+    {
+        return $this->hasOne('App\Entities\SelAddress','adr_TransId', 'id')
+            ->where('adr_Type', 3)
+            ->orderBy('id', 'dsc');
+    }
 }

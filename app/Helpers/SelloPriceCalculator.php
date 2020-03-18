@@ -5,9 +5,11 @@ namespace App\Helpers;
 class SelloPriceCalculator
 {
     private $total = 0;
+    private $overridePrice;
 
     public function addItem($price, $quantity)
     {
+        $this->total += $this->overridePrice * $quantity;
     }
 
     public function getTotal()
@@ -17,6 +19,6 @@ class SelloPriceCalculator
 
     public function setOverridePrice($overridePrice)
     {
-        $this->total = $overridePrice;
+        $this->overridePrice = $overridePrice;
     }
 }
