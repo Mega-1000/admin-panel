@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Entities\Order;
+use App\Entities\OrderItem;
 use App\Entities\OrderOtherPackage;
 use App\Entities\OrderPackage;
 use App\Entities\Task;
@@ -430,6 +431,12 @@ class OrdersController extends Controller
             abort(404);
         }
 
+        if (!$this->editabilityCheck($order)) {
+            return redirect()->route('orders.index')->with([
+                'message' => __('orders.message.package_failure'),
+                'alert-type' => 'error',
+            ]);
+        }
 
         if ($request->input('status') != $order->status_id && empty(Auth::user()->userEmailData) && $request->input('shouldBeSent') == 'on') {
             return redirect()->route('orders.edit', ['order_id' => $order->id])->with([
@@ -970,24 +977,13 @@ class OrdersController extends Controller
     {
 
         $order = $this->orderRepository->find($request->input('orderId'));
-        $fail = $order->packages->first(function ($item) {
-            return $item->status != 'NEW';
-        });
-        if ($fail) {
+        if (!$this->editabilityCheck($order)) {
             return redirect()->route('orders.index')->with([
-                'message' => __('Nie można podzielić zlecenia z wysłanymi paczkami'),
+                'message' => __('orders.message.package_failure'),
                 'alert-type' => 'error',
             ]);
-        } else {
-            OrderOtherPackage::where('order_id', $order->id)->get()->map(function ($item) {
-                DB::table('order_other_package_product')->where('order_other_package_id', $item->id)->delete();
-                $item->delete();
-            });
-            OrderPackage::where('order_id', $order->id)->get()->map(function ($item) {
-                DB::table('order_package_product')->where('order_package_id', $item->id)->delete();
-                $item->delete();
-            });
         }
+
         if ($request->input('firstOrderExist') == 1) {
             $this->createSplittedOrder($request, $order, 'first');
         }
@@ -1086,23 +1082,22 @@ class OrdersController extends Controller
                         'weight' => $order->weight - ($item->product->weight_trade_unit * $quantity),
                     ], $order->id);
                 }
-                $this->orderItemRepository->create([
-                    'net_purchase_price_commercial_unit' => (float)$data['net_purchase_price_commercial_unit'][$id],
-                    'net_purchase_price_basic_unit' => (float)$data['net_purchase_price_basic_unit'][$id],
-                    'net_purchase_price_calculated_unit' => (float)$data['net_purchase_price_calculated_unit'][$id],
-                    'net_purchase_price_aggregate_unit' => (float)$data['net_purchase_price_aggregate_unit'][$id],
-                    'net_selling_price_commercial_unit' => (float)$data['net_selling_price_commercial_unit'][$id],
-                    'net_selling_price_basic_unit' => (float)$data['net_selling_price_basic_unit'][$id],
-                    'net_selling_price_calculated_unit' => (float)$data['net_selling_price_calculated_unit'][$id],
-                    'net_selling_price_aggregate_unit' => (float)$data['net_selling_price_aggregate_unit'][$id],
-                    'order_id' => $newOrder->id,
-                    'product_id' => $data['product_id'][$id],
-                    'quantity' => $quantity,
-                    'price' => (float)$data['net_selling_price_commercial_unit'][$id] * $quantity * 1.23,
-                ]);
+                $item = new OrderItem();
+                $item->net_purchase_price_commercial_unit_after_discounts = (float)$data['net_purchase_price_commercial_unit'][$id];
+                $item->net_purchase_price_basic_unit_after_discounts = (float)$data['net_purchase_price_basic_unit'][$id];
+                $item->net_purchase_price_calculated_unit_after_discounts = (float)$data['net_purchase_price_calculated_unit'][$id];
+                $item->net_purchase_price_aggregate_unit_after_discounts = (float)$data['net_purchase_price_aggregate_unit'][$id];
+                $item->net_selling_price_commercial_unit = (float)$data['net_selling_price_commercial_unit'][$id];
+                $item->net_selling_price_basic_unit = (float)$data['net_selling_price_basic_unit'][$id];
+                $item->net_selling_price_calculated_unit = (float)$data['net_selling_price_calculated_unit'][$id];
+                $item->net_selling_price_aggregate_unit = (float)$data['net_selling_price_aggregate_unit'][$id];
+                $item->order_id = $newOrder->id;
+                $item->product_id = $data['product_id'][$id];
+                $item->quantity = $quantity;
+                $item->price = (float)$data['net_selling_price_commercial_unit'][$id] * $quantity * 1.23;
+                $item->save();
                 $productsWeightSum += (float)$data['modal_weight'][$id] * $quantity;
                 $productsSum += (float)$data['net_selling_price_commercial_unit'][$id] * $quantity * 1.23;
-
             }
         }
 
@@ -2201,6 +2196,26 @@ class OrdersController extends Controller
         dispatch_now(new AddLabelJob($request->input('orderId'), [136]));
 
         return view('customers.confirmation.confirmationThanks');
+    }
+
+    private function editabilityCheck($order)
+    {
+        $fail = $order->packages->first(function ($item) {
+            return $item->status != 'NEW';
+        });
+        if ($fail) {
+            return false;
+        } else {
+            OrderOtherPackage::where('order_id', $order->id)->get()->map(function ($item) {
+                DB::table('order_other_package_product')->where('order_other_package_id', $item->id)->delete();
+                $item->delete();
+            });
+            OrderPackage::where('order_id', $order->id)->get()->map(function ($item) {
+                DB::table('order_package_product')->where('order_package_id', $item->id)->delete();
+                $item->delete();
+            });
+            return true;
+        }
     }
 }
 
