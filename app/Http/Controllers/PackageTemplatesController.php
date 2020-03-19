@@ -17,7 +17,7 @@ class PackageTemplatesController extends Controller
         $templatesUnsorted = \App\Entities\PackageTemplate::all();
         $templates = $templatesUnsorted->sortBy('list_order');
         return view('package_templates.index',compact('templates'))
-        ->withpackageTemplates($templates); 
+        ->withpackageTemplates($templates);
     }
 
     /**
@@ -54,7 +54,7 @@ class PackageTemplatesController extends Controller
             $this->validate($request, array(
                 'accept_time' => 'required'
             ));
-        }    
+        }
         $template = new PackageTemplate;
         $template->name = $request->name;
         $template->info = $request->info;
@@ -79,9 +79,10 @@ class PackageTemplatesController extends Controller
         $template->max_weight = $request->max_weight;
         $template->volume = $request->volume;
         $template->list_order = $request->list_order;
-        
+        $template->displayed_name = $request->displayed_name;
+
         $template->save();
-        
+
         return redirect()->route('package_templates.index');
     }
 
@@ -123,7 +124,7 @@ class PackageTemplatesController extends Controller
             $this->validate($request, array(
                 'accept_time' => 'required'
             ));
-        }    
+        }
         $template = PackageTemplate::find($id);
         $template->name = $request->name;
         $template->symbol = $request->symbol;
@@ -148,11 +149,12 @@ class PackageTemplatesController extends Controller
         $template->max_weight = $request->max_weight;
         $template->volume = $request->volume;
         $template->list_order = $request->list_order;
-          
+        $template->displayed_name = $request->displayed_name;
+
         $template->save();
-        
+
         return redirect()->route('package_templates.index');
-                      
+
     }
 
     /**

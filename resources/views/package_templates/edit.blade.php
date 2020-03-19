@@ -1,9 +1,8 @@
-
 @extends('layouts.datatable')
 @section('app-header')
-  <h1 class="page-title">
+    <h1 class="page-title">
         <i class="voyager-tag"></i> Edytuj szablon
-</h1>
+    </h1>
 @endsection
 
 @section('table')
@@ -16,23 +15,29 @@
             </ul>
         </div>
     @endif
-    <form action="{{ action('PackageTemplatesController@update', $old->id) }}" method="POST" onsubmit="return validate(this);">
+    <form action="{{ action('PackageTemplatesController@update', $old->id) }}" method="POST"
+          onsubmit="return validate(this);">
         {{ method_field('PUT')}}
         {{ csrf_field() }}
         <div class="form-group">
             <label for="data_template">Nazwa Szablonu Danych</label>
             <input type="text" class="form-control" id="name" name="name"
-                       value="{{ $old->name }}">
+                   value="{{ $old->name }}">
         </div>
         <div class="form-group">
             <label for="data_template">Dodatkowe Informacje Dotyczące Szablonu</label>
             <input type="text" class="form-control" id="info" name="info"
-                       value="{{ $old->info }}">
+                   value="{{ $old->info }}">
         </div>
-         <div class="form-group">
+        <div class="form-group">
             <label for="data_template">Symbol szablonu</label>
             <input type="text" class="form-control" id="symbol" name="symbol"
-                       value="{{ $old->symbol }}">
+                   value="{{ $old->symbol }}">
+        </div>
+        <div class="form-group">
+            <label for="data_template">@lang('order_packages.form.displayed_name')</label>
+            <input type="text" class="form-control" id="displayed_name" name="displayed_name"
+                   value="{{ $old->displayed_name }}">
         </div>
         <div class="firms-general" id="orderPayment">
             <div class="form-group">
@@ -89,7 +94,8 @@
                     <option {{ $old->service_courier_name == 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
                         GIELDA
                     </option>
-                    <option {{ $old->ser_courier_name == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
+                    <option
+                        {{ $old->ser_courier_name == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         ODBIÓR OSOBISTY
                     </option>
                 </select>
@@ -113,7 +119,8 @@
                     <option {{ $old->delivery_courier_name == 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
                         GIELDA
                     </option>
-                    <option {{ $old->delivery_courier_name == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
+                    <option
+                        {{ $old->delivery_courier_name == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         ODBIÓR OSOBISTY
                     </option>
                 </select>
@@ -144,7 +151,8 @@
             </div>
             <div class="form-group">
                 <label for="notices">@lang('order_packages.form.maxStringLength')</label>
-                <input type="number" id="notice_max_lenght" name="notice_max_lenght" class="form-control" value="{{ $old->notice_max_lenght }}">
+                <input type="number" id="notice_max_lenght" name="notice_max_lenght" class="form-control"
+                       value="{{ $old->notice_max_lenght }}">
             </div>
             <div class="form-group">
                 <input type="hidden" name="status" value="NEW">
@@ -191,45 +199,45 @@
 @endsection
 @section('scripts')
     <script>
-      $(document).on("click", ".open", function () {
-        let id = $(this).data('package-id');
-        let value = $(this).data('package-value');
-        $('.package_id').text(id);
-        $('#packageId').val(id);
-        $('#modalPackageValue').val(value);
-        $('#packageDialog').modal('show');
-      });
+        $(document).on("click", ".open", function () {
+            let id = $(this).data('package-id');
+            let value = $(this).data('package-value');
+            $('.package_id').text(id);
+            $('#packageId').val(id);
+            $('#modalPackageValue').val(value);
+            $('#packageDialog').modal('show');
+        });
 
-      function validate(form) {
-	console.log(payments);
-        if (paymentsSum < 2 && promisedPaymentsSum > 2) {
-          if (confirm('Zlecenie posiada wyłącznie zaliczkę deklarowaną. Czy chcesz kontynuować przy jej użyciu?')) {
-            $('#shouldTakePayment').val(1);
-            return true;
-          } else {
-            return false;
-          }
-        }
-        if (promisedPaymentsSum == paymentsSum) {
-          $('#shouldTakePayment').val(2);
-          return true;
-        }
-        if (payments.length > 0) {
-          if (Math.abs(promisedPaymentsSum - paymentsSum) > 2 && Math.abs(promisedPaymentsSum - paymentsSum) < -2) {
-            if (confirm('Zaliczka deklarowana posiada inną wartość niż zaliczka zaksięgowana. System uwzględni zaliczkę zaksięgowaną.')) {
-              $('#shouldTakePayment').val(3);
-              return true;
-            } else {
-
-              return false;
+        function validate(form) {
+            console.log(payments);
+            if (paymentsSum < 2 && promisedPaymentsSum > 2) {
+                if (confirm('Zlecenie posiada wyłącznie zaliczkę deklarowaną. Czy chcesz kontynuować przy jej użyciu?')) {
+                    $('#shouldTakePayment').val(1);
+                    return true;
+                } else {
+                    return false;
+                }
             }
-          }
+            if (promisedPaymentsSum == paymentsSum) {
+                $('#shouldTakePayment').val(2);
+                return true;
+            }
+            if (payments.length > 0) {
+                if (Math.abs(promisedPaymentsSum - paymentsSum) > 2 && Math.abs(promisedPaymentsSum - paymentsSum) < -2) {
+                    if (confirm('Zaliczka deklarowana posiada inną wartość niż zaliczka zaksięgowana. System uwzględni zaliczkę zaksięgowaną.')) {
+                        $('#shouldTakePayment').val(3);
+                        return true;
+                    } else {
+
+                        return false;
+                    }
+                }
+            }
         }
-      }
     </script>
     <script src="{{URL::asset('js/jscolor.js')}}"></script>
     <script>
-      var breadcrumb = $('.breadcrumb:nth-child(2)');
+        var breadcrumb = $('.breadcrumb:nth-child(2)');
 
 
     </script>
