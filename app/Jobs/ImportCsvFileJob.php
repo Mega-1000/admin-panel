@@ -411,13 +411,8 @@ class ImportCsvFileJob implements ShouldQueue
     private function getProductArray($line, $categoryColumn)
     {
         $trade = explode('|', $line[378]);
-        if ($trade === false) {
-            $tradeGroup = null;
-            $tradeGroupDisplay = null;
-        } else {
-            $tradeGroup = $trade[0];
-            $tradeGroupDisplay = empty($trade[1]) ? null : $trade[1];
-        }
+        $tradeGroup = $trade[0];
+        $tradeGroupDisplay = empty($trade[1]) ? null : $trade[1];
         $array = [
             'name' => $line[4],
             'symbol' => $line[5],
