@@ -470,4 +470,24 @@ class Order extends Model implements Transformable
     {
         return $this->hasMany('App\Entities\OrderOtherPackage');
     }
+
+    public function clearPackages()
+    {
+        $this->otherPackages->map(function ($package) {
+            $package->products()->detach();
+            $package->delete();
+        });
+        $fail = $this->packages->first(function ($item) {
+            return !($item->status == 'NEW' || $item->status == 'WAITING_FOR_CANCELLED' || $item->status == 'CANCELLED');
+        });
+        if ($fail) {
+            return;
+        }
+        $this->packages->map(function ($package) {
+            if ($package->status == 'NEW') {
+                $package->packedProducts()->detach();
+                $package->delete();
+            }
+        });
+    }
 }

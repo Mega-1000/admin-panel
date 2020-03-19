@@ -204,23 +204,7 @@ class OrdersController extends Controller
         $orderExists = false;
         if (!empty($data['cart_token'])) {
             $order = Order::where('token', $data['cart_token'])->first();
-            $fail = $order->packages->first(function ($item) {
-                return $item->status != 'NEW';
-            });
-            if ($fail) {
-                $this->error_code = 'package_must_be_cancelled';
-                throw new \Exception('package_must_be_cancelled');
-            }
-            $order->packages->map(function ($package) {
-                if ($package->status == 'NEW') {
-                    $package->packedProducts()->detach();
-                    $package->delete();
-                }
-            });
-            $order->otherPackages->map(function ($package) {
-                $package->products()->detach();
-                $package->delete();
-            });
+            $order->clearPackages();
             $orderExists = true;
             if (!$order) {
                 $this->error_code = 'wrong_cart_token';
