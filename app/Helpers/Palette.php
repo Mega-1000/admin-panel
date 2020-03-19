@@ -68,7 +68,7 @@ class Palette
                 break;
         }
         $packageTemplate = PackageTemplate::where('symbol', strtolower($this->type))->firstOrFail();
-        $this->displayed_name = empty($packageTemplate->displayed_name) ? $this->type : $packageTemplate->displayed_name;
+        $this->displayed_name = $packageTemplate->displayed_name ?: $this->type;
 
     }
     private function getCarry()

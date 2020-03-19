@@ -209,7 +209,6 @@
         });
 
         function validate(form) {
-            console.log(payments);
             if (paymentsSum < 2 && promisedPaymentsSum > 2) {
                 if (confirm('Zlecenie posiada wyłącznie zaliczkę deklarowaną. Czy chcesz kontynuować przy jej użyciu?')) {
                     $('#shouldTakePayment').val(1);

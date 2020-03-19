@@ -199,7 +199,7 @@ class PackageDivider implements iPackageDivider
                 'factory_group' => $item->tradeGroups,
                 'items' => $items,
                 'name' => $items[0]->trade_group_name,
-                'displayed_group_name' => empty($items[0]->displayed_group_name) ? $items[0]->trade_group_name : $items[0]->displayed_group_name];
+                'displayed_group_name' => $items[0]->displayed_group_name ?: $items[0]->trade_group_name];
         }
         return $sums;
     }
