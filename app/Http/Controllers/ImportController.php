@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use App\Entities\Import;
 
 /**
  * Class ImportController
@@ -15,9 +16,8 @@ class ImportController extends Controller
 {
     public function index()
     {
-        $imports = DB::table('import')->get();
-        $import = $imports[0];
-        $importDone = $imports[1];
+        $import = Import::find(1);
+        $importDone = Import::find(2);
 
         return view('import.index', compact('import', 'importDone'));
     }

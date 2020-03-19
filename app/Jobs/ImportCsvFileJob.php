@@ -101,8 +101,7 @@ class ImportCsvFileJob implements ShouldQueue
         }
         $this->saveJpgData();
 
-        DB::table('import')->where('id', 1)->update(['name' => 'Import products', 'processing' => 0]);
-        DB::table('import')->where('id', 2)->update(['name' => 'Import products done', 'last_import' => Carbon::now()]);
+        $this->updateImportTable();
         $this->makeBackups();
         
         $this->log('Import end: ' . Carbon::now());
@@ -679,17 +678,20 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function tryStartImport()
     {
-        $processing = DB::table('import')->where('id', 1)->first();
-        if ($processing->processing) {
-            if (time() - strtotime($processing->last_import) > 1800) {
+        $import = Entities\Import::find(1);
+        if ($import->processing) {
+            if (time() - strtotime($import->last_import) > 1800) {
                 if (file_exists(Storage::path('user-files/baza/baza.csv'))) {
                     $this->makeBackups();
                 }
-                DB::table('import')->where('id', 1)->update(['processing' => 0]);
+                $import->processing = 0;
+                $import->save();
             }
             return false;
         }
-        DB::table('import')->where('id', 1)->update(['processing' => 1, 'last_import' => Carbon::now()]);
+        $import->processing = 1;
+        $import->last_import = Carbon::now();
+        $import->save();
         return true;
     }
 
@@ -716,5 +718,17 @@ class ImportCsvFileJob implements ShouldQueue
             unlink($new);
         }
         rename($old, $new);
+    }
+
+    private function updateImportTable()
+    {
+        $import = Entities\Import::find(1);
+        $import->name = 'Import products';
+        $import->processing = 0;
+        $import->save();
+        $import = Entities\Import::find(2);
+        $import->name = 'Import products done';
+        $import->last_import = Carbon::now();
+        $import->save();
     }
 }
