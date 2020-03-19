@@ -38,6 +38,25 @@ class PackageTemplatesController extends Controller
      */
     public function store(Request $request)
     {
+        $this->saveTemplate($request);
+        return redirect()->route('package_templates.index');
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+
+    public function edit($id)
+    {
+        $packageTemplate = PackageTemplate::find($id);
+        return view('package_templates.edit')->withOld($packageTemplate);
+    }
+
+    private function saveTemplate($request, $id = null)
+    {
         $this->validate($request, array(
             'name'=>'required|max:255',
             'notice_max_lenght'=>'integer|required',
@@ -55,10 +74,14 @@ class PackageTemplatesController extends Controller
                 'accept_time' => 'required'
             ));
         }
-        $template = new PackageTemplate;
+        if (empty($id)) {
+            $template = new PackageTemplate;
+        } else {
+            $template = PackageTemplate::find($id);
+        }
         $template->name = $request->name;
-        $template->info = $request->info;
         $template->symbol = $request->symbol;
+        $template->info = $request->info;
         $template->sizeA = $request->sizeA;
         $template->sizeB = $request->sizeB;
         $template->sizeC = $request->sizeC;
@@ -82,21 +105,6 @@ class PackageTemplatesController extends Controller
         $template->displayed_name = $request->displayed_name;
 
         $template->save();
-
-        return redirect()->route('package_templates.index');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-
-    public function edit($id)
-    {
-         $packageTemplate = PackageTemplate::find($id);
-        return view('package_templates.edit')->withOld($packageTemplate);
     }
 
     /**
@@ -108,53 +116,8 @@ class PackageTemplatesController extends Controller
      */
     public function update(Request $request, $id)
     {
-       $this->validate($request, array(
-            'name'=>'required|max:255',
-            'notice_max_lenght'=>'integer|required',
-            'symbol' => 'required',
-            'max_weight' => 'numeric|required',
-            'volume' => 'integer|required'
-        ));
-        if (!empty($request->accept_time)) {
-            $this->validate($request, array(
-                'max_time' => 'required'
-            ));
-        }
-        if (!empty($request->max_time)) {
-            $this->validate($request, array(
-                'accept_time' => 'required'
-            ));
-        }
-        $template = PackageTemplate::find($id);
-        $template->name = $request->name;
-        $template->symbol = $request->symbol;
-        $template->info = $request->info;
-        $template->sizeA = $request->sizeA;
-        $template->sizeB = $request->sizeB;
-        $template->sizeC = $request->sizeC;
-        $template->accept_time = $request->accept_time;
-        $template->accept_time_info = $request->accept_time_info;
-        $template->max_time = $request->max_time;
-        $template->max_time_info = $request->max_time_info;
-        $template->service_courier_name = $request->service_courier_name;
-        $template->delivery_courier_name = $request->delivery_courier_name;
-        $template->weight = $request->weight;
-        $template->container_type = $request->container_type;
-        $template->shape = $request->shape;
-        $template->notice_max_lenght = $request->notice_max_lenght;
-        $template->content = $request->content;
-        $template->cod_cost = $request->cod_cost;
-        $template->approx_cost_client = $request->approx_cost_client;
-        $template->approx_cost_firm = $request->approx_cost_firm;
-        $template->max_weight = $request->max_weight;
-        $template->volume = $request->volume;
-        $template->list_order = $request->list_order;
-        $template->displayed_name = $request->displayed_name;
-
-        $template->save();
-
+        $this->saveTemplate($request, $id);
         return redirect()->route('package_templates.index');
-
     }
 
     /**
