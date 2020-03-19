@@ -26,7 +26,7 @@ class Package
         $this->price = $packageTemplate->approx_cost_client;
         $this->volumeRatio = $packageTemplate->volume;
         $this->maxWeight = $packageTemplate->max_weight;
-        $this->displayed_name = $packageTemplate->displayed_name ? $packageName : $packageTemplate->displayed_name;
+        $this->displayed_name = empty($packageTemplate->displayed_name) ? $packageName : $packageTemplate->displayed_name;
 
         $this->volumeMargin = $margin;
         $this->packageName = $packageName;

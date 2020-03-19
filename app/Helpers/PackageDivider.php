@@ -198,7 +198,8 @@ class PackageDivider implements iPackageDivider
                 'weight' => $weight + $item->quantity * $item->weight_trade_unit,
                 'factory_group' => $item->tradeGroups,
                 'items' => $items,
-                'name' => $items[0]->trade_group_name];
+                'name' => $items[0]->trade_group_name,
+                'displayed_group_name' => empty($items[0]->displayed_group_name) ? $items[0]->trade_group_name : $items[0]->displayed_group_name];
         }
         return $sums;
     }
