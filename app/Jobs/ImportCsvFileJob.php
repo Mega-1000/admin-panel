@@ -412,7 +412,7 @@ class ImportCsvFileJob implements ShouldQueue
     {
         $trade = explode('|', $line[378]);
         $tradeGroup = $trade[0];
-        $tradeGroupDisplay = empty($trade[1]) ? null : $trade[1];
+        $tradeGroupDisplay = $trade[1] ?? null;
         $array = [
             'name' => $line[4],
             'symbol' => $line[5],
