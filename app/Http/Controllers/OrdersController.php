@@ -2,21 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Entities\Order;
 use App\Entities\OrderItem;
-use App\Entities\OrderOtherPackage;
-use App\Entities\OrderPackage;
-use App\Entities\Task;
-use App\Entities\TaskTime;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Helpers\OrderCalcHelper;
-use App\Helpers\StatusesHelper;
 use App\Http\Requests\OrderUpdateRequest;
 use App\Jobs\AddLabelJob;
-use App\Jobs\DispatchLabelEventByNameJob;
 use App\Jobs\Orders\MissingDeliveryAddressSendMailJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
-use App\Jobs\OrderStatusChangedToDispatchNotificationJob;
 use App\Jobs\RemoveLabelJob;
 use App\Mail\SendOfferToCustomerMail;
 use App\Repositories\CustomerAddressRepository;
@@ -41,7 +33,6 @@ use App\Repositories\WarehouseRepository;
 use App\Repositories\FirmRepository;
 use App\Repositories\OrderAddressRepository;
 use App\Repositories\UserRepository;
-use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
@@ -431,12 +422,7 @@ class OrdersController extends Controller
             abort(404);
         }
 
-        if (!$this->editabilityCheck($order)) {
-            return redirect()->route('orders.index')->with([
-                'message' => __('orders.message.package_failure'),
-                'alert-type' => 'error',
-            ]);
-        }
+        $order->clearPackages();
 
         if ($request->input('status') != $order->status_id && empty(Auth::user()->userEmailData) && $request->input('shouldBeSent') == 'on') {
             return redirect()->route('orders.edit', ['order_id' => $order->id])->with([
@@ -523,9 +509,6 @@ class OrdersController extends Controller
             $consultantVal = OrderCalcHelper::calcConsultantValue($orderItemKMD, number_format($profit, 2, '.', ''));
         } else {
             $consultantVal = 0;
-        }
-        if ($order->status_id == 3 || $order->status_id == 4) {
-
         }
         $this->orderRepository->update(['consultant_value' => $consultantVal, 'total_price' => $totalPrice], $id);
         foreach ($request->input('product_id') as $key => $value) {
@@ -977,12 +960,7 @@ class OrdersController extends Controller
     {
 
         $order = $this->orderRepository->find($request->input('orderId'));
-        if (!$this->editabilityCheck($order)) {
-            return redirect()->route('orders.index')->with([
-                'message' => __('orders.message.package_failure'),
-                'alert-type' => 'error',
-            ]);
-        }
+        $order->clearPackages();
 
         if ($request->input('firstOrderExist') == 1) {
             $this->createSplittedOrder($request, $order, 'first');
@@ -2196,28 +2174,6 @@ class OrdersController extends Controller
         dispatch_now(new AddLabelJob($request->input('orderId'), [136]));
 
         return view('customers.confirmation.confirmationThanks');
-    }
-
-    private function editabilityCheck($order)
-    {
-        $fail = $order->packages->first(function ($item) {
-            return !($item->status == 'NEW' || $item->status == 'WAITING_FOR_CANCELLED' || $item->status == 'CANCELLED');
-        });
-        if ($fail) {
-            return false;
-        } else {
-            $order->packages->map(function ($package) {
-                if ($package->status == 'NEW') {
-                    $package->packedProducts()->detach();
-                    $package->delete();
-                }
-            });
-            $order->otherPackages->map(function ($package) {
-                $package->products()->detach();
-                $package->delete();
-            });
-            return true;
-        }
     }
 }
 

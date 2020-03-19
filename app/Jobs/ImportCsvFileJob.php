@@ -410,6 +410,9 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function getProductArray($line, $categoryColumn)
     {
+        $trade = explode('|', $line[378]);
+        $tradeGroup = $trade[0];
+        $tradeGroupDisplay = $trade[1] ?? null;
         $array = [
             'name' => $line[4],
             'symbol' => $line[5],
@@ -501,7 +504,8 @@ class ImportCsvFileJob implements ShouldQueue
             'max_in_pallete_80' => $line[369],
             'max_in_pallete_100' => $line[370],
             'per_package_factor' => $line[371],
-            'trade_group_name' => $line[378],
+            'trade_group_name' => $tradeGroup,
+            'displayed_group_name' => $tradeGroupDisplay,
             'additional_payment_for_milling' => $line[473],
             'date_of_price_change' => $this->getDateOrNull($line[106]),
             'date_of_the_new_prices' => $this->getDateOrNull($line[107]),

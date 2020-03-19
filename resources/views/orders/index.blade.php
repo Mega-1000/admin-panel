@@ -1402,11 +1402,11 @@
                     }
                 },
                 {
-                    data: 'orderId',
+                    data: null,
                     name: 'invoice_gross_sum',
                     render: function(data, type, row) {
                         let sumOfPurchase = 0;
-                        var items = row['items'];
+                        let items = row['items'];
 
                         for (let index = 0; index < items.length; index++) {
                             let pricePurchase = items[index].net_purchase_price_commercial_unit;
@@ -1419,8 +1419,18 @@
                             }
                             sumOfPurchase += parseFloat(pricePurchase) * parseInt(quantity);
                         }
+                        let totalItemsCost = sumOfPurchase * 1.23;
+                        let transportCost = 0
 
-                        return (sumOfPurchase * 1.23).toFixed(2);
+                        let html = 'Cena zakupu: <br />' +
+                            (totalItemsCost).toFixed(2) + '<br/>';
+                        if (data.shipment_price_for_us) {
+                           html += 'Koszt Transportu: <br/>' +
+                            data.shipment_price_for_us + '<br />'
+                            transportCost = parseFloat(data.shipment_price_for_us)
+                        }
+                        html += 'Suma: <br /><b>' + (totalItemsCost + transportCost).toFixed(2) + '<b/>'
+                        return html;
                     }
                 },
                 {

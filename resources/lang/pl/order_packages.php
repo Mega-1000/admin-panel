@@ -46,6 +46,7 @@ return [
         'courier_success' => 'Kurierzy zostaną zamówieni w ciągu kilku minut'
     ],
     'form' => [
+        'displayed_name' => 'Nazwa paczki wyświetlana użytkownikowi',
         'data_template' => 'Szablon danych',
         'size_a' => 'Rozmiar A',
         'size_b' => 'Rozmiar B',
