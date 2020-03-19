@@ -41,14 +41,14 @@ class DispatchJobController extends Controller
     public function recalculatePrices()
     {
         dispatch_now(new \App\Jobs\CheckDateOfProductNewPriceJob());
-        \Session::flash('success', true);
+        \Session::flash('flash-message', ['type' => 'success', 'message' => 'Ceny zostały przeliczone']);
         return redirect(route('import.index'));
     }
 
     public function generateJpgs()
     {
         dispatch_now(new \App\Jobs\JpgGeneratorJob());
-        \Session::flash('success', true);
+        \Session::flash('flash-message', ['type' => 'success', 'message' => 'Tabele i reklamówki zostały wygenerowane']);
         return redirect(route('import.index'));
     }
 }

@@ -314,7 +314,6 @@ Route::group(['prefix' => 'admin'], function () {
             'OrdersPackagesController@preparePackageToSend')->name('orders.package.prepareToSend');
 
         Route::get('import', 'ImportController@index')->name('import.index');
-        Route::get('import/do', 'ImportController@doImport')->name('import.do');
         Route::post('import/store', 'ImportController@store')->name('import.store');
         Route::get('store/import/{id}/{amount}', 'OrdersPaymentsController@storeFromImport');
 
