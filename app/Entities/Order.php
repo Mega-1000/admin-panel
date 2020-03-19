@@ -477,8 +477,9 @@ class Order extends Model implements Transformable
             $package->products()->detach();
             $package->delete();
         });
-        $fail = $this->packages->first(function ($item) {
-            return !($item->status == 'NEW' || $item->status == 'WAITING_FOR_CANCELLED' || $item->status == 'CANCELLED');
+        $allowedStatuses = ['NEW', 'WAITING_FOR_CANCELLED', 'CANCELLED'];
+        $fail = $this->packages->first(function ($item) use ($allowedStatuses) {
+            return !in_array($item->status, $allowedStatuses);
         });
         if ($fail) {
             return;
