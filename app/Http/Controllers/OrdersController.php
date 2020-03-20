@@ -457,7 +457,6 @@ class OrdersController extends Controller
 
         $oldStatus = $order->status_id;
 
-
         $this->orderRepository->update([
             'total_price' => $totalPrice,
             'weight' => $request->input('weight'),
@@ -508,7 +507,6 @@ class OrdersController extends Controller
             $itemsArray[] = $item->product_id;
         }
 
-
         if ($order->status_id === 4) {
             $consultantVal = OrderCalcHelper::calcConsultantValue($orderItemKMD, number_format($profit, 2, '.', ''));
         } else {
@@ -517,11 +515,12 @@ class OrdersController extends Controller
         $this->orderRepository->update(['consultant_value' => $consultantVal, 'total_price' => $totalPrice], $id);
         foreach ($request->input('product_id') as $key => $value) {
             if (!in_array($value, $itemsArray)) {
+
                 $this->orderItemRepository->create([
-                    'net_purchase_price_commercial_unit' => (float)$request->input('net_purchase_price_commercial_unit')[$key],
-                    'net_purchase_price_basic_unit' => (float)$request->input('net_purchase_price_basic_unit')[$key],
-                    'net_purchase_price_calculated_unit' => (float)$request->input('net_purchase_price_calculated_unit')[$key],
-                    'net_purchase_price_aggregate_unit' => (float)$request->input('net_purchase_price_aggregate_unit')[$key],
+                    'net_purchase_price_commercial_unit_after_discounts' => (float)$request->input('net_purchase_price_commercial_unit')[$key],
+                    'net_purchase_price_basic_unit_after_discounts' => (float)$request->input('net_purchase_price_basic_unit')[$key],
+                    'net_purchase_price_calculated_unit_after_discounts' => (float)$request->input('net_purchase_price_calculated_unit')[$key],
+                    'net_purchase_price_aggregate_unit_after_discounts' => (float)$request->input('net_purchase_price_aggregate_unit')[$key],
                     'net_selling_price_commercial_unit' => (float)$request->input('net_selling_price_commercial_unit')[$key],
                     'net_selling_price_basic_unit' => (float)$request->input('net_selling_price_basic_unit')[$key],
                     'net_selling_price_calculated_unit' => (float)$request->input('net_selling_price_calculated_unit')[$key],
@@ -538,10 +537,10 @@ class OrdersController extends Controller
             foreach ($request->input('id') as $id) {
                 if ($request->input('quantity_commercial')[$id] > 0) {
                     $this->orderItemRepository->update([
-                        'net_purchase_price_commercial_unit' => (float)$request->input('net_purchase_price_commercial_unit')[$id],
-                        'net_purchase_price_basic_unit' => (float)$request->input('net_purchase_price_basic_unit')[$id],
-                        'net_purchase_price_calculated_unit' => (float)$request->input('net_purchase_price_calculated_unit')[$id],
-                        'net_purchase_price_aggregate_unit' => (float)$request->input('net_purchase_price_aggregate_unit')[$id],
+                        'net_purchase_price_commercial_unit_after_discounts' => (float)$request->input('net_purchase_price_commercial_unit')[$id],
+                        'net_purchase_price_basic_unit_after_discounts' => (float)$request->input('net_purchase_price_basic_unit')[$id],
+                        'net_purchase_price_calculated_unit_after_discounts' => (float)$request->input('net_purchase_price_calculated_unit')[$id],
+                        'net_purchase_price_aggregate_unit_after_discounts' => (float)$request->input('net_purchase_price_aggregate_unit')[$id],
                         'net_selling_price_commercial_unit' => (float)$request->input('net_selling_price_commercial_unit')[$id],
                         'net_selling_price_basic_unit' => (float)$request->input('net_selling_price_basic_unit')[$id],
                         'net_selling_price_calculated_unit' => (float)$request->input('net_selling_price_calculated_unit')[$id],
