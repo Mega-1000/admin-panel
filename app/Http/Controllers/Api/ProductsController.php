@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
-
 use App\Entities\Category;
 use App\Entities\Product;
 use App\Entities\ChimneyAttribute;
-use App\Http\Requests\Api\Products\ProductPricesUpdateRequest;
 use App\Repositories\ProductPriceRepository;
 use App\Repositories\ProductRepository;
 use App\Repositories\WarehouseRepository;
@@ -16,7 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 
-class ProductsController
+class ProductsController extends Controller
 {
     use ApiResponsesTrait;
     use Paginatable;
