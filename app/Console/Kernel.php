@@ -19,6 +19,7 @@ use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Jobs\SendLPWithReminderSendingToWarehouseJob;
 use App\Jobs\CheckDateOfProductNewPriceJob;
 use App\Jobs\JpgGeneratorJob;
+use App\Jobs\UpdatePackageRealCostJob;
 
 class Kernel extends ConsoleKernel
 {
@@ -54,6 +55,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(ChangeOrderInvoiceData::class)->dailyAt("07:00");
         $schedule->job(JpgGeneratorJob::class)->dailyAt("01:00");
         //$schedule->job(SearchOrdersInStoredMailsJob::class)->everyFifteenMinutes();
+        $schedule->job(UpdatePackageRealCostJob::class)->dailyAt("00:30");
     }
 
     /**
