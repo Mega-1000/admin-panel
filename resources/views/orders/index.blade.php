@@ -1378,8 +1378,19 @@
                                         ) {
                                             tooltipContent = row.complaintMessage;
                                         }
-
-                                        html += '<div data-toggle="label-tooltip" data-html="true" title="' + tooltipContent + '" class="pointer" onclick="removeLabel('+row.orderId+', '+label[0].id+', '+label[0].manual_label_selection_to_add_after_removal+', \''+label[0].added_type+'\');"><span class="order-label" style="color: '+ label[0].font_color +'; display: block; margin-top: 5px; background-color: ' + label[0].color + '"><i class="' + label[0].icon_name + '"></i></span></div>';
+                                        let comparasion = false
+                                        if (row.payment_deadline) {
+                                            let d1 = new Date();
+                                            let d2 = new Date(row.payment_deadline);
+                                            d1.setHours(0,0,0,0)
+                                            d2.setHours(0,0,0,0)
+                                            comparasion = d1 > d2
+                                        }
+                                        if (label[0].id == '{{ env('MIX_LABEL_WAITING_FOR_PAYMENT_ID') }}' && comparasion) {
+                                            html += '<div data-toggle="label-tooltip" style="border: solid red 4px" data-html="true" title="' + tooltipContent + '" class="pointer" onclick="removeLabel('+row.orderId+', '+label[0].id+', '+label[0].manual_label_selection_to_add_after_removal+', \''+label[0].added_type+'\');"><span class="order-label" style="color: '+ label[0].font_color +'; display: block; margin-top: 5px; background-color: ' + label[0].color + '"><i class="' + label[0].icon_name + '"></i></span></div>';
+                                        } else {
+                                            html += '<div data-toggle="label-tooltip" data-html="true" title="' + tooltipContent + '" class="pointer" onclick="removeLabel('+row.orderId+', '+label[0].id+', '+label[0].manual_label_selection_to_add_after_removal+', \''+label[0].added_type+'\');"><span class="order-label" style="color: '+ label[0].font_color +'; display: block; margin-top: 5px; background-color: ' + label[0].color + '"><i class="' + label[0].icon_name + '"></i></span></div>';
+                                        }
                                     }
                                 }
                             }
@@ -1778,9 +1789,44 @@
                         });
                     });
                 });
-            }
-            else {
-                if (addedType != "C") {
+            } else {
+                let payDateLabelId = '{{ env('MIX_LABEL_ENTER_PAYMENT_DATE_ID') }}'
+                if (labelId == payDateLabelId) {
+                    let modalSetTime = $('#set_time');
+                    modalSetTime.modal('show');
+                    $('#set_time').on('shown.bs.modal', function() {
+                        $('#invoice-month').focus()
+                    })
+                    modalSetTime.find("#remove-label-and-set-date").off().on('click', () => {
+                        if ($('#invoice-month').val() > 12 || $('#invoice-days').val() > 31) {
+                            $('#invoice-date-error').removeAttr('hidden')
+                            return
+                        }
+                        $.ajax({
+                            type: "POST",
+                            url: '/admin/orders/payment-deadline',
+                            data: {
+                                order_id: orderId,
+                                date: {
+                                    year: $('#invoice-years').val(),
+                                    month: $('#invoice-month').val(),
+                                    day: $('#invoice-days').val(),
+                                }
+                            },
+                        }).done(function (data) {
+                                removeLabelRequest();
+                                refreshDtOrReload()
+                                modalSetTime.modal('hide')
+                                $('#invoice-month').val('')
+                                $('#invoice-days').val('')
+                        }).fail(function (data) {
+                            $('#invoice-date-error').removeAttr('hidden')
+                            $('#invoice-date-error').text(data.responseText ? data.responseText : 'Nieznany błąd2')
+
+                        });
+                    });
+                    return
+                } else if (addedType != "C") {
                     let confirmed = confirm("Na pewno usunąć etykietę?");
                     if (!confirmed) {
                         return;

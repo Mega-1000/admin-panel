@@ -165,8 +165,46 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" tabindex="-1" id="set_time" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Ustaw termin płatnośći</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="years">Ustaw termin płatności: </label>
+                        <input data-index="1" value="{{date("Y")}}" type="text" size="4" maxlength="4" id="invoice-years">
+
+                        <input data-index="2" autofocus value="" type="text" size="2" maxlength="2" id="invoice-month">
+
+                        <input data-index="3" value="" type="text" size="2" maxlength="2" id="invoice-days" >
+                        <p id="invoice-date-error" hidden style="color: red">Błędny format daty</p>
+                        <p id="set-date-error" hidden style="color: red">Błędny format daty</p>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-dismiss="modal">Anuluj</button>
+                    <button data-index="4" type="button" class="btn btn-danger" id="remove-label-and-set-date">Usuń etykietę</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @section('scripts')
     <script src="{{ URL::asset('js/customSearchDataTable.js') }}"></script>
+    <script>
+        $('#set_time').on('keydown', 'input', function (event) {
+            if (event.which == 13) {
+                event.preventDefault();
+                var $this = $(event.target);
+                var index = parseFloat($this.attr('data-index'));
+                $('[data-index="' + (index + 1).toString() + '"]').focus();
+            }
+        });
+    </script>
     @yield('datatable-scripts')
 @endsection
