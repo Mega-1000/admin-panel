@@ -305,6 +305,7 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::post('orders/label-removal/{orderId}/{labelId}',
             'OrdersController@swapLabelsAfterLabelRemoval')->name('orders.label-removal');
+        Route::post('orders/payment-deadline', 'OrdersController@setPaymentDeadline')->name('orders.payment-deadline');
         Route::post('orders/label-addition/{labelId}',
             'OrdersController@swapLabelsAfterLabelAddition')->name('orders.label-addition');
         Route::get('orders/products/autocomplete',
