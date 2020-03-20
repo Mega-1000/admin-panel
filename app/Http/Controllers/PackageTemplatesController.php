@@ -81,6 +81,8 @@ class PackageTemplatesController extends Controller
         }
         $template->name = $request->name;
         $template->symbol = $request->symbol;
+        $template->sello_delivery_id = $request->sello_delivery_id;
+        $template->sello_deliverer_id = $request->sello_deliverer_id;
         $template->info = $request->info;
         $template->sizeA = $request->sizeA;
         $template->sizeB = $request->sizeB;

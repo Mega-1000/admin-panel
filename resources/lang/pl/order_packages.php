@@ -46,6 +46,8 @@ return [
         'courier_success' => 'Kurierzy zostaną zamówieni w ciągu kilku minut'
     ],
     'form' => [
+        'delivery' => 'Id dostawy z SELLO (tr_DeliveryId)',
+        'deliverer' => 'Id dostawcy z SELLO (tr_DelivererId)',
         'displayed_name' => 'Nazwa paczki wyświetlana użytkownikowi',
         'data_template' => 'Szablon danych',
         'size_a' => 'Rozmiar A',
