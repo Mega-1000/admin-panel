@@ -45,6 +45,7 @@ class ProductPrice extends Model implements Transformable
         'discount1',
         'discount2',
         'discount3',
+        'solid_discount',
         'bonus1',
         'bonus2',
         'bonus3',
