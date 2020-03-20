@@ -24,9 +24,8 @@ class BackPackPackageDivider
         return $canPay;
     }
 
-    private static function createPackage($symbol, $orderId)
+    public static function createPackage($packTemplate, $orderId)
     {
-        $packTemplate = PackageTemplate::where('symbol', $symbol)->firstOrFail();
         $pack = new OrderPackage();
         $pack->order_id = $orderId;
         $pack->size_a = $packTemplate->sizeA;
@@ -73,7 +72,8 @@ class BackPackPackageDivider
     {
         foreach ($packages['packages'] as $package) {
             if (!empty($package->type)) {
-                $pack = self::createPackage($package->type, $orderId);
+                $packTemplate = PackageTemplate::where('symbol', $package->type)->firstOrFail();
+                $pack = self::createPackage($packTemplate, $orderId);
                 $products = [];
                 foreach ($package->packagesList as $singlePack) {
                     foreach ($singlePack->productList as $product) {
@@ -86,7 +86,8 @@ class BackPackPackageDivider
                 }
             }
             if (!empty($package->packageName)) {
-                $pack = self::createPackage($package->packageName, $orderId);
+                $packTemplate = PackageTemplate::where('symbol', $package->packageName)->firstOrFail();
+                $pack = self::createPackage($packTemplate, $orderId);
                 $products = [];
                 foreach ($package->productList as $product) {
                     $quantity = empty($products[$product->id]) ? $product->quantity : $products[$product->id] + $product->quantity;

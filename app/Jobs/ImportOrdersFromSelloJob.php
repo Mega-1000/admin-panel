@@ -13,6 +13,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Log;
 
 class ImportOrdersFromSelloJob implements ShouldQueue
 {
@@ -64,17 +65,12 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
             $orderItems [] = $item;
             $transactionArray['order_items'] = $orderItems;
-
-            $calculator = new SelloPriceCalculator();
-            $calculator->setOverridePrice($transaction->transactionItem->tt_Price);
-            $orderBuilder = new OrderBuilder();
-            $orderBuilder
-                ->setPackageGenerator(new SelloPackageDivider())
-                ->setPriceCalculator($calculator);
-            ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($transactionArray);
-            $order = Order::find($id);
-            $order->sello_id = $transaction->id;
-            $order->save();
+            try {
+                $this->buildOrder($transaction, $transactionArray);
+            } catch (\Exception $exception) {
+                $message = $exception->getMessage();
+                Log::error("Problem with sello import: $message");
+            }
         });
     }
 
@@ -109,5 +105,25 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $transactionArray['invoice_address']['address'] = $transactionArray['delivery_address']['address'];
         }
         return $transactionArray;
+    }
+
+    private function buildOrder($transaction, array $transactionArray)
+    {
+        $calculator = new SelloPriceCalculator();
+        $calculator->setOverridePrice($transaction->transactionItem->tt_Price);
+
+        $packageBuilder = new SelloPackageDivider();
+        $packageBuilder->setDelivererId($transaction->tr_DelivererId);
+        $packageBuilder->setDeliveryId($transaction->tr_DeliveryId);
+
+        $orderBuilder = new OrderBuilder();
+        $orderBuilder
+            ->setPackageGenerator($packageBuilder)
+            ->setPriceCalculator($calculator);
+        ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($transactionArray);
+
+        $order = Order::find($id);
+        $order->sello_id = $transaction->id;
+        $order->save();
     }
 }
