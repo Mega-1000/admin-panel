@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\Order;
 use App\Entities\OrderItem;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Helpers\OrderCalcHelper;
@@ -33,6 +34,7 @@ use App\Repositories\WarehouseRepository;
 use App\Repositories\FirmRepository;
 use App\Repositories\OrderAddressRepository;
 use App\Repositories\UserRepository;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
@@ -930,6 +932,25 @@ class OrdersController extends Controller
 
         $response = dispatch_now(new RemoveLabelJob($order, [$labelId], $preventionArray, $labelsToAddAfterRemoval));
         return $response;
+    }
+
+    public function setPaymentDeadline(Request $request)
+    {
+        try {
+            $data = $request->all();
+            $order = Order::findOrFail($data['order_id']);
+            $date = $data['date'];
+            $d = Carbon::createFromDate($date['year'], $date['month'], $date['day']);
+        } catch (\Exception $ex) {
+            if ($ex instanceof ModelNotFoundException) {
+                return response('Dane zamówienie nie istnieje', 400);
+            }
+            return response('Błędny format daty', 400);
+        }
+        $dat = $d->format('Y-m-d');
+        $order->payment_deadline = $dat;
+        $order->save();
+        return ['status' => true];
     }
 
     /**
