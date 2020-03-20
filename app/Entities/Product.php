@@ -82,7 +82,8 @@ class Product extends Model implements Transformable
         'comments',
         'value_of_the_order_for_free_transport',
         'show_on_page',
-        'trade_group_name'
+        'trade_group_name',
+        'displayed_group_name'
     ];
 
     public $customColumnsVisibilities = [
@@ -230,5 +231,10 @@ class Product extends Model implements Transformable
     public function hasAllTransportParameters()
     {
         return $this->packing->warehouse && $this->packing->recommended_courier && $this->packing->packing_name;
+    }
+
+    public static function getDefaultProduct()
+    {
+        return Product::where('symbol', 'TWSU')->first();
     }
 }

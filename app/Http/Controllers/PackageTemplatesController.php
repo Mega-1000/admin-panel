@@ -17,7 +17,7 @@ class PackageTemplatesController extends Controller
         $templatesUnsorted = \App\Entities\PackageTemplate::all();
         $templates = $templatesUnsorted->sortBy('list_order');
         return view('package_templates.index',compact('templates'))
-        ->withpackageTemplates($templates); 
+        ->withpackageTemplates($templates);
     }
 
     /**
@@ -39,7 +39,6 @@ class PackageTemplatesController extends Controller
     public function store(Request $request)
     {
         $this->saveTemplate($request);
-        
         return redirect()->route('package_templates.index');
     }
 
@@ -55,8 +54,8 @@ class PackageTemplatesController extends Controller
         $packageTemplate = PackageTemplate::find($id);
         return view('package_templates.edit')->withOld($packageTemplate);
     }
-    
-    private function saveTemplate($request, $id = null) 
+
+    private function saveTemplate($request, $id = null)
     {
         $this->validate($request, array(
             'name'=>'required|max:255',
@@ -74,7 +73,7 @@ class PackageTemplatesController extends Controller
             $this->validate($request, array(
                 'accept_time' => 'required'
             ));
-        }  
+        }
         if (empty($id)) {
             $template = new PackageTemplate;
         } else {
@@ -82,6 +81,8 @@ class PackageTemplatesController extends Controller
         }
         $template->name = $request->name;
         $template->symbol = $request->symbol;
+        $template->sello_delivery_id = $request->sello_delivery_id;
+        $template->sello_deliverer_id = $request->sello_deliverer_id;
         $template->info = $request->info;
         $template->sizeA = $request->sizeA;
         $template->sizeB = $request->sizeB;
@@ -103,7 +104,8 @@ class PackageTemplatesController extends Controller
         $template->max_weight = $request->max_weight;
         $template->volume = $request->volume;
         $template->list_order = $request->list_order;
-          
+        $template->displayed_name = $request->displayed_name;
+
         $template->save();
     }
 
@@ -117,9 +119,7 @@ class PackageTemplatesController extends Controller
     public function update(Request $request, $id)
     {
         $this->saveTemplate($request, $id);
-        
         return redirect()->route('package_templates.index');
-                      
     }
 
     /**

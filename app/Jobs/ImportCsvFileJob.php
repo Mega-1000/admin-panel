@@ -3,12 +3,6 @@
 namespace App\Jobs;
 
 use App\Entities\ProductTradeGroup;
-use App\Repositories\ProductPackingRepository;
-use App\Repositories\ProductPriceRepository;
-use App\Repositories\ProductRepository;
-use App\Repositories\ProductStockPositionRepository;
-use App\Repositories\ProductStockRepository;
-use DateTime;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
@@ -28,23 +22,10 @@ use App\Entities;
  */
 class ImportCsvFileJob implements ShouldQueue
 {
-
     use Dispatchable,
         InteractsWithQueue,
         Queueable,
         SerializesModels;
-
-    protected $path;
-    protected $startRow;
-    protected $imgStoragePath;
-    public $timeout = 3600;
-    public $tries = 1;
-
-    private $productRepository;
-    private $productPackingRepository;
-    private $productPriceRepository;
-    private $productStockRepository;
-    private $productStockPositionRepository;
 
     private $categories = ['id' => 0, 'children' => []];
     private $productsRelated = [];
@@ -52,52 +33,26 @@ class ImportCsvFileJob implements ShouldQueue
 
     private $currentLine;
 
-    /**
-     * Create a new job instance.
-     *
-     * @param int $startRow
-     */
-    public function __construct(int $startRow = 0)
+    public function __construct()
     {
-        $this->path = Storage::path('public/Baza.csv');
-        $this->imgStoragePath = 'products';
-        $this->startRow = $startRow;
     }
 
-    /**
-     * Execute the job.
-     *
-     * @param ProductRepository $productRepository
-     * @param ProductPackingRepository $productPackingRepository
-     * @param ProductPriceRepository $productPriceRepository
-     * @param ProductStockRepository $productStockRepository
-     * @param ProductStockPositionRepository $productStockPositionRepository
-     *
-     * @return void
-     * @throws FileNotFoundException
-     */
-    public function handle(
-        ProductRepository $productRepository,
-        ProductPackingRepository $productPackingRepository,
-        ProductPriceRepository $productPriceRepository,
-        ProductStockRepository $productStockRepository,
-        ProductStockPositionRepository $productStockPositionRepository
-    ): void
+    public function handle()
     {
+        $path = Storage::path('user-files/baza/baza.csv');
+
+        if (!file_exists($path) || !$this->tryStartImport()) {
+            return;
+        }
+
         $this->log('Import start: '.Carbon::now());
 
-        $handle = fopen($this->path, 'rb');
+        $handle = fopen($path, 'rb');
         if (!$handle) {
-            $msg = 'CSV file "' . $this->path . '" not found';
+            $msg = 'CSV file not found';
             $this->log($msg);
             throw new FileNotFoundException($msg);
         }
-
-        $this->productRepository = $productRepository;
-        $this->productPackingRepository = $productPackingRepository;
-        $this->productPriceRepository = $productPriceRepository;
-        $this->productStockRepository = $productStockRepository;
-        $this->productStockPositionRepository = $productStockPositionRepository;
 
         $this->log('Clear tables start');
         $this->clearTables();
@@ -109,9 +64,6 @@ class ImportCsvFileJob implements ShouldQueue
             if ($i % 100 === 0) {
                 $this->log($i . ' - time ' . round(microtime(true) - $time, 3));
                 $time = microtime(true);
-            }
-            if ($i <= $this->startRow) {
-                continue;
             }
 
             //intentional variable assigning here, not an error
@@ -149,12 +101,9 @@ class ImportCsvFileJob implements ShouldQueue
         }
         $this->saveJpgData();
 
-        DB::table('import')->where('id', 1)->update(
-            ['name' => 'Import products', 'processing' => 0]
-        );
-        DB::table('import')->where('id', 2)->update(
-            ['name' => 'Import products done', 'last_import' => Carbon::now()]
-        );
+        $this->updateImportTable();
+        $this->makeBackups();
+        
         $this->log('Import end: ' . Carbon::now());
     }
 
@@ -192,7 +141,7 @@ class ImportCsvFileJob implements ShouldQueue
     {
         $imgUrlExploded = explode('\\', $url);
         $imgUrlExploded = end($imgUrlExploded);
-        $imgUrlWebsite = $this->imgStoragePath . DIRECTORY_SEPARATOR . $imgUrlExploded;
+        $imgUrlWebsite = 'products' . DIRECTORY_SEPARATOR . $imgUrlExploded;
         $imgUrlWebsite = Storage::url($imgUrlWebsite);
         return str_replace("\\", '/', $imgUrlWebsite);
     }
@@ -385,11 +334,20 @@ class ImportCsvFileJob implements ShouldQueue
             $array['category_id'] = null;
         }
 
+        $updatePrices = !$product->price || !$array['subject_to_price_change'];
+
+        if (!$updatePrices) {
+            unset($array['value_of_price_change_data_first']);
+            unset($array['value_of_price_change_data_second']);
+            unset($array['value_of_price_change_data_third']);
+            unset($array['value_of_price_change_data_fourth']);
+        }
+
         $product->fill($array);
         $product->save();
         $product->restore();
 
-        if (!$product->price || !$array['subject_to_price_change']) {
+        if ($updatePrices) {
             $price = $product->price ?? new Entities\ProductPrice();
             $price->fill($array);
             $product->price()->save($price);
@@ -410,6 +368,9 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function getProductArray($line, $categoryColumn)
     {
+        $trade = explode('|', $line[378]);
+        $tradeGroup = $trade[0];
+        $tradeGroupDisplay = $trade[1] ?? null;
         $array = [
             'name' => $line[4],
             'symbol' => $line[5],
@@ -501,7 +462,8 @@ class ImportCsvFileJob implements ShouldQueue
             'max_in_pallete_80' => $line[369],
             'max_in_pallete_100' => $line[370],
             'per_package_factor' => $line[371],
-            'trade_group_name' => $line[378],
+            'trade_group_name' => $tradeGroup,
+            'displayed_group_name' => $tradeGroupDisplay,
             'additional_payment_for_milling' => $line[473],
             'date_of_price_change' => $this->getDateOrNull($line[106]),
             'date_of_the_new_prices' => $this->getDateOrNull($line[107]),
@@ -723,7 +685,63 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function getDateOrNull($date)
     {
-        $d = DateTime::createFromFormat('Y-m-d', $date);
+        $d = \DateTime::createFromFormat('Y-m-d', $date);
         return $d && $d->format('Y-m-d') == $date ? $date : null;
+    }
+
+    private function tryStartImport()
+    {
+        $import = Entities\Import::find(1);
+        if ($import->processing) {
+            if (time() - strtotime($import->last_import) > 1800) {
+                if (file_exists(Storage::path('user-files/baza/baza.csv'))) {
+                    $this->makeBackups();
+                }
+                $import->processing = 0;
+                $import->save();
+            }
+            return false;
+        }
+        $import->processing = 1;
+        $import->last_import = Carbon::now();
+        $import->save();
+        return true;
+    }
+
+    private function makeBackups()
+    {
+        for ($i = 98; $i >= 0; $i--) {
+            $iStr = $i < 10 ? "0$i" : $i;
+            $oldName = "baza_backup_$iStr";
+            $iStr = ($i + 1) < 10 ? "0".($i + 1) : $i + 1;
+            $newName = "baza_backup_$iStr";
+            $this->replaceFile($oldName, $newName);
+        }
+        $this->replaceFile('baza', 'baza_backup_00');
+    }
+
+    private function replaceFile($old, $new)
+    {
+        $old = Storage::path("user-files/baza/$old.csv");
+        $new = Storage::path("user-files/baza/$new.csv");
+        if (!file_exists($old)) {
+            return;
+        }
+        if (file_exists($new)) {
+            unlink($new);
+        }
+        rename($old, $new);
+    }
+
+    private function updateImportTable()
+    {
+        $import = Entities\Import::find(1);
+        $import->name = 'Import products';
+        $import->processing = 0;
+        $import->save();
+        $import = Entities\Import::find(2);
+        $import->name = 'Import products done';
+        $import->last_import = Carbon::now();
+        $import->save();
     }
 }

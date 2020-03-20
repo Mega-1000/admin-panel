@@ -1,11 +1,13 @@
 <?php
 
 namespace App\Helpers;
+use App\Entities\PackageTemplate;
+
 class Palette
 {
     const CAN_NOT_ADD_MORE = 'nie można dodać nowych paczek';
-    const PALETTE_100 = 'PALETA_100';
-    const PALETTE_80 = 'PALETA_80';
+    const PALETTE_100 = 'p_100';
+    const PALETTE_80 = 'p_80';
     const PALETTE_100_VOLUME = 2400000;
     const PALETTE_100_WEIGHT = 1000;
     const PALETTE_80_VOLUME = 1920000;
@@ -20,6 +22,7 @@ class Palette
     protected $visible = ['type', 'packagesList', 'packagesCost'];
 
     public $type;
+    public $displayed_name;
 
     public function __construct()
     {
@@ -64,6 +67,9 @@ class Palette
                 $this->price = self::PALETTE_100_PRICE;
                 break;
         }
+        $packageTemplate = PackageTemplate::where('symbol', strtolower($this->type))->firstOrFail();
+        $this->displayed_name = $packageTemplate->displayed_name ?: $this->type;
+
     }
     private function getCarry()
     {

@@ -181,6 +181,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('packageTemplates/{id}/update', 'PackageTemplatesController@update')->name('package_templates.update');
         Route::delete('packageTemplates/{id}/delete', 'PackageTemplatesController@destroy')->name('package_templates.destroy');
 
+        Route::get('sello-import', 'OrdersController@selloImport')->name('orders.sello_import');
+
         Route::get('products/stocks', 'ProductStocksController@index')->name('product_stocks.index');
         Route::post('products/stocks/datatable', 'ProductStocksController@datatable')->name('product_stocks.datatable');
         Route::get('products/stocks/print', 'ProductStocksController@print')->name('product_stocks.print');
@@ -305,6 +307,7 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::post('orders/label-removal/{orderId}/{labelId}',
             'OrdersController@swapLabelsAfterLabelRemoval')->name('orders.label-removal');
+        Route::post('orders/payment-deadline', 'OrdersController@setPaymentDeadline')->name('orders.payment-deadline');
         Route::post('orders/label-addition/{labelId}',
             'OrdersController@swapLabelsAfterLabelAddition')->name('orders.label-addition');
         Route::get('orders/products/autocomplete',
@@ -314,7 +317,6 @@ Route::group(['prefix' => 'admin'], function () {
             'OrdersPackagesController@preparePackageToSend')->name('orders.package.prepareToSend');
 
         Route::get('import', 'ImportController@index')->name('import.index');
-        Route::get('import/do', 'ImportController@doImport')->name('import.do');
         Route::post('import/store', 'ImportController@store')->name('import.store');
         Route::get('store/import/{id}/{amount}', 'OrdersPaymentsController@storeFromImport');
 

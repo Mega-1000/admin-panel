@@ -370,6 +370,10 @@
         <a name="send_courier" class="btn btn-success" href="/admin/packageTemplates/">Lista</a>
         <a name="send_courier" class="btn btn-info" href="/admin/packageTemplates/create">Dodaj szablon</a>
     </div>
+    <div class="form-group">
+        <label for="send_courier">Import z SELLO: </label>
+        <a name="send_courier" class="btn btn-success" href="/admin/sello-import/">Importuj</a>
+    </div>
     <div style="display: flex; align-items: center;" id="add-label-container">
         <button onclick="addLabel()" type="button" class="btn btn-primary">@lang('orders.table.save_label')</button>
         <select style="margin-left: 10px;" class="form-control text-uppercase" id="choosen-label">
@@ -803,10 +807,12 @@
                     render: function ( order, type, row ) {
                         let data = order.packages
                         var html = ''
-                        if (order.otherPackages && order.otherPackages.find(el => el.type == 'not_calculable')) {
-                            html = '<div style="background: red" >'
-                        } else {
-                            html = '<div style="background: green" >'
+                        if (data.length != 0) {
+                            if (order.otherPackages && order.otherPackages.find(el => el.type == 'not_calculable')) {
+                                html = '<div style="border: solid blue 4px" >'
+                            } else {
+                                html = '<div style="border: solid green 4px" >'
+                            }
                         }
                         $.each(data, function(key, value){
                             if(value.status !== 'SENDING' && value.status !== 'DELIVERED' && value.status !== 'CANCELLED') {
@@ -1372,8 +1378,19 @@
                                         ) {
                                             tooltipContent = row.complaintMessage;
                                         }
-
-                                        html += '<div data-toggle="label-tooltip" data-html="true" title="' + tooltipContent + '" class="pointer" onclick="removeLabel('+row.orderId+', '+label[0].id+', '+label[0].manual_label_selection_to_add_after_removal+', \''+label[0].added_type+'\');"><span class="order-label" style="color: '+ label[0].font_color +'; display: block; margin-top: 5px; background-color: ' + label[0].color + '"><i class="' + label[0].icon_name + '"></i></span></div>';
+                                        let comparasion = false
+                                        if (row.payment_deadline) {
+                                            let d1 = new Date();
+                                            let d2 = new Date(row.payment_deadline);
+                                            d1.setHours(0,0,0,0)
+                                            d2.setHours(0,0,0,0)
+                                            comparasion = d1 > d2
+                                        }
+                                        if (label[0].id == '{{ env('MIX_LABEL_WAITING_FOR_PAYMENT_ID') }}' && comparasion) {
+                                            html += '<div data-toggle="label-tooltip" style="border: solid red 4px" data-html="true" title="' + tooltipContent + '" class="pointer" onclick="removeLabel('+row.orderId+', '+label[0].id+', '+label[0].manual_label_selection_to_add_after_removal+', \''+label[0].added_type+'\');"><span class="order-label" style="color: '+ label[0].font_color +'; display: block; margin-top: 5px; background-color: ' + label[0].color + '"><i class="' + label[0].icon_name + '"></i></span></div>';
+                                        } else {
+                                            html += '<div data-toggle="label-tooltip" data-html="true" title="' + tooltipContent + '" class="pointer" onclick="removeLabel('+row.orderId+', '+label[0].id+', '+label[0].manual_label_selection_to_add_after_removal+', \''+label[0].added_type+'\');"><span class="order-label" style="color: '+ label[0].font_color +'; display: block; margin-top: 5px; background-color: ' + label[0].color + '"><i class="' + label[0].icon_name + '"></i></span></div>';
+                                        }
                                     }
                                 }
                             }
@@ -1400,11 +1417,11 @@
                     }
                 },
                 {
-                    data: 'orderId',
+                    data: null,
                     name: 'invoice_gross_sum',
                     render: function(data, type, row) {
                         let sumOfPurchase = 0;
-                        var items = row['items'];
+                        let items = row['items'];
 
                         for (let index = 0; index < items.length; index++) {
                             let pricePurchase = items[index].net_purchase_price_commercial_unit;
@@ -1417,8 +1434,18 @@
                             }
                             sumOfPurchase += parseFloat(pricePurchase) * parseInt(quantity);
                         }
+                        let totalItemsCost = sumOfPurchase * 1.23;
+                        let transportCost = 0
 
-                        return (sumOfPurchase * 1.23).toFixed(2);
+                        let html = 'Cena zakupu: <br />' +
+                            (totalItemsCost).toFixed(2) + '<br/>';
+                        if (data.shipment_price_for_us) {
+                           html += 'Koszt Transportu: <br/>' +
+                            data.shipment_price_for_us + '<br />'
+                            transportCost = parseFloat(data.shipment_price_for_us)
+                        }
+                        html += 'Suma: <br /><b>' + (totalItemsCost + transportCost).toFixed(2) + '<b/>'
+                        return html;
                     }
                 },
                 {
@@ -1762,9 +1789,44 @@
                         });
                     });
                 });
-            }
-            else {
-                if (addedType != "C") {
+            } else {
+                let payDateLabelId = '{{ env('MIX_LABEL_ENTER_PAYMENT_DATE_ID') }}'
+                if (labelId == payDateLabelId) {
+                    let modalSetTime = $('#set_time');
+                    modalSetTime.modal('show');
+                    $('#set_time').on('shown.bs.modal', function() {
+                        $('#invoice-month').focus()
+                    })
+                    modalSetTime.find("#remove-label-and-set-date").off().on('click', () => {
+                        if ($('#invoice-month').val() > 12 || $('#invoice-days').val() > 31) {
+                            $('#invoice-date-error').removeAttr('hidden')
+                            return
+                        }
+                        $.ajax({
+                            type: "POST",
+                            url: '/admin/orders/payment-deadline',
+                            data: {
+                                order_id: orderId,
+                                date: {
+                                    year: $('#invoice-years').val(),
+                                    month: $('#invoice-month').val(),
+                                    day: $('#invoice-days').val(),
+                                }
+                            },
+                        }).done(function (data) {
+                                removeLabelRequest();
+                                refreshDtOrReload()
+                                modalSetTime.modal('hide')
+                                $('#invoice-month').val('')
+                                $('#invoice-days').val('')
+                        }).fail(function (data) {
+                            $('#invoice-date-error').removeAttr('hidden')
+                            $('#invoice-date-error').text(data.responseText ? data.responseText : 'Nieznany błąd2')
+
+                        });
+                    });
+                    return
+                } else if (addedType != "C") {
                     let confirmed = confirm("Na pewno usunąć etykietę?");
                     if (!confirmed) {
                         return;

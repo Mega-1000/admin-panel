@@ -3,19 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Entities\Order;
-use App\Entities\OrderOtherPackage;
-use App\Entities\OrderPackage;
-use App\Entities\Task;
-use App\Entities\TaskTime;
+use App\Entities\OrderItem;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Helpers\OrderCalcHelper;
-use App\Helpers\StatusesHelper;
 use App\Http\Requests\OrderUpdateRequest;
 use App\Jobs\AddLabelJob;
-use App\Jobs\DispatchLabelEventByNameJob;
+use App\Jobs\ImportOrdersFromSelloJob;
 use App\Jobs\Orders\MissingDeliveryAddressSendMailJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
-use App\Jobs\OrderStatusChangedToDispatchNotificationJob;
 use App\Jobs\RemoveLabelJob;
 use App\Mail\SendOfferToCustomerMail;
 use App\Repositories\CustomerAddressRepository;
@@ -41,6 +36,7 @@ use App\Repositories\FirmRepository;
 use App\Repositories\OrderAddressRepository;
 use App\Repositories\UserRepository;
 use Barryvdh\DomPDF\Facade as PDF;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
@@ -430,6 +426,7 @@ class OrdersController extends Controller
             abort(404);
         }
 
+        $order->clearPackages();
 
         if ($request->input('status') != $order->status_id && empty(Auth::user()->userEmailData) && $request->input('shouldBeSent') == 'on') {
             return redirect()->route('orders.edit', ['order_id' => $order->id])->with([
@@ -516,9 +513,6 @@ class OrdersController extends Controller
             $consultantVal = OrderCalcHelper::calcConsultantValue($orderItemKMD, number_format($profit, 2, '.', ''));
         } else {
             $consultantVal = 0;
-        }
-        if ($order->status_id == 3 || $order->status_id == 4) {
-
         }
         $this->orderRepository->update(['consultant_value' => $consultantVal, 'total_price' => $totalPrice], $id);
         foreach ($request->input('product_id') as $key => $value) {
@@ -942,6 +936,25 @@ class OrdersController extends Controller
         return $response;
     }
 
+    public function setPaymentDeadline(Request $request)
+    {
+        try {
+            $data = $request->all();
+            $order = Order::findOrFail($data['order_id']);
+            $date = $data['date'];
+            $d = Carbon::createFromDate($date['year'], $date['month'], $date['day']);
+        } catch (\Exception $ex) {
+            if ($ex instanceof ModelNotFoundException) {
+                return response('Dane zamówienie nie istnieje', 400);
+            }
+            return response('Błędny format daty', 400);
+        }
+        $dat = $d->format('Y-m-d');
+        $order->payment_deadline = $dat;
+        $order->save();
+        return ['status' => true];
+    }
+
     /**
      * @param Request $request
      * @param $labelId
@@ -970,24 +983,8 @@ class OrdersController extends Controller
     {
 
         $order = $this->orderRepository->find($request->input('orderId'));
-        $fail = $order->packages->first(function ($item) {
-            return $item->status != 'NEW';
-        });
-        if ($fail) {
-            return redirect()->route('orders.index')->with([
-                'message' => __('Nie można podzielić zlecenia z wysłanymi paczkami'),
-                'alert-type' => 'error',
-            ]);
-        } else {
-            OrderOtherPackage::where('order_id', $order->id)->get()->map(function ($item) {
-                DB::table('order_other_package_product')->where('order_other_package_id', $item->id)->delete();
-                $item->delete();
-            });
-            OrderPackage::where('order_id', $order->id)->get()->map(function ($item) {
-                DB::table('order_package_product')->where('order_package_id', $item->id)->delete();
-                $item->delete();
-            });
-        }
+        $order->clearPackages();
+
         if ($request->input('firstOrderExist') == 1) {
             $this->createSplittedOrder($request, $order, 'first');
         }
@@ -1086,20 +1083,20 @@ class OrdersController extends Controller
                         'weight' => $order->weight - ($item->product->weight_trade_unit * $quantity),
                     ], $order->id);
                 }
-                $this->orderItemRepository->create([
-                    'net_purchase_price_commercial_unit' => (float)$data['net_purchase_price_commercial_unit'][$id],
-                    'net_purchase_price_basic_unit' => (float)$data['net_purchase_price_basic_unit'][$id],
-                    'net_purchase_price_calculated_unit' => (float)$data['net_purchase_price_calculated_unit'][$id],
-                    'net_purchase_price_aggregate_unit' => (float)$data['net_purchase_price_aggregate_unit'][$id],
-                    'net_selling_price_commercial_unit' => (float)$data['net_selling_price_commercial_unit'][$id],
-                    'net_selling_price_basic_unit' => (float)$data['net_selling_price_basic_unit'][$id],
-                    'net_selling_price_calculated_unit' => (float)$data['net_selling_price_calculated_unit'][$id],
-                    'net_selling_price_aggregate_unit' => (float)$data['net_selling_price_aggregate_unit'][$id],
-                    'order_id' => $newOrder->id,
-                    'product_id' => $data['product_id'][$id],
-                    'quantity' => $quantity,
-                    'price' => (float)$data['net_selling_price_commercial_unit'][$id] * $quantity * 1.23,
-                ]);
+                $item = new OrderItem();
+                $item->net_purchase_price_commercial_unit_after_discounts = (float)$data['net_purchase_price_commercial_unit'][$id];
+                $item->net_purchase_price_basic_unit_after_discounts = (float)$data['net_purchase_price_basic_unit'][$id];
+                $item->net_purchase_price_calculated_unit_after_discounts = (float)$data['net_purchase_price_calculated_unit'][$id];
+                $item->net_purchase_price_aggregate_unit_after_discounts = (float)$data['net_purchase_price_aggregate_unit'][$id];
+                $item->net_selling_price_commercial_unit = (float)$data['net_selling_price_commercial_unit'][$id];
+                $item->net_selling_price_basic_unit = (float)$data['net_selling_price_basic_unit'][$id];
+                $item->net_selling_price_calculated_unit = (float)$data['net_selling_price_calculated_unit'][$id];
+                $item->net_selling_price_aggregate_unit = (float)$data['net_selling_price_aggregate_unit'][$id];
+                $item->order_id = $newOrder->id;
+                $item->product_id = $data['product_id'][$id];
+                $item->quantity = $quantity;
+                $item->price = (float)$data['net_selling_price_commercial_unit'][$id] * $quantity * 1.23;
+                $item->save();
                 $productsWeightSum += (float)$data['modal_weight'][$id] * $quantity;
                 $productsSum += (float)$data['net_selling_price_commercial_unit'][$id] * $quantity * 1.23;
 
@@ -2201,6 +2198,15 @@ class OrdersController extends Controller
         dispatch_now(new AddLabelJob($request->input('orderId'), [136]));
 
         return view('customers.confirmation.confirmationThanks');
+    }
+
+    public function selloImport()
+    {
+        dispatch_now(new ImportOrdersFromSelloJob());
+        return redirect()->route('orders.index')->with([
+            'message' => 'Rozpoczęto import z Sello',
+            'alert-type' => 'success',
+        ]);
     }
 }
 
