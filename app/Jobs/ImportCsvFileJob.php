@@ -103,7 +103,7 @@ class ImportCsvFileJob implements ShouldQueue
 
         $this->updateImportTable();
         $this->makeBackups();
-        
+
         $this->log('Import end: ' . Carbon::now());
     }
 
@@ -408,6 +408,7 @@ class ImportCsvFileJob implements ShouldQueue
             'discount1' => $line[134],
             'discount2' => $line[135],
             'discount3' => $line[136],
+            'solid_discount' => $line[138],
             'net_purchase_price_commercial_unit_after_discounts' => $line[148],
             'net_purchase_price_calculated_unit_after_discounts' => $line[149],
             'net_purchase_price_basic_unit_after_discounts' => $line[150],
