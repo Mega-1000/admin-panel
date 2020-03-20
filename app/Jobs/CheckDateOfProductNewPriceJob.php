@@ -37,7 +37,7 @@ class CheckDateOfProductNewPriceJob
     {
         $this->repository = $repository;
         $this->productPriceRepository = $productPriceRepository;
-        
+
         $products = $this->repository->findWhere([['date_of_the_new_prices', '<=', Carbon::today()->addDay()]]);
 
         foreach ($products as $product) {
@@ -90,15 +90,15 @@ class CheckDateOfProductNewPriceJob
                     die();
             }
             //cena kartotekowa netto zakupu bez bonusa dla jednostek
-            $price['net_purchase_price_commercial_unit_after_discounts'] = number_format((((float)$price['net_purchase_price_commercial_unit'] * (100 - $product->price->discount1) * (100 - $product->price->discount2) * (100 - $product->price->discount3)) / 1000000) * $product->price->euro_exchange,
+            $price['net_purchase_price_commercial_unit_after_discounts'] = number_format($this->calculatePriceAfterDiscounts($price, $product) * $product->price->euro_exchange,
                 2, '.', '');
-            $price['net_purchase_price_basic_unit_after_discounts'] = number_format(((((float)$price['net_purchase_price_commercial_unit'] * (100 - $product->price->discount1) * (100 - $product->price->discount2) * (100 - $product->price->discount3)) / 1000000) * $product->price->euro_exchange) / $product->packing->numbers_of_basic_commercial_units_in_pack,
+            $price['net_purchase_price_basic_unit_after_discounts'] = number_format(($this->calculatePriceAfterDiscounts($price, $product) * $product->price->euro_exchange) / $product->packing->numbers_of_basic_commercial_units_in_pack,
                 4, '.', '');
-            $price['net_purchase_price_calculated_unit_after_discounts'] = number_format((((float)$price['net_purchase_price_commercial_unit'] * (100 - $product->price->discount1) * (100 - $product->price->discount2) * (100 - $product->price->discount3)) / 1000000) * ($product->packing->unit_consumption / $product->packing->numbers_of_basic_commercial_units_in_pack) * $product->price->euro_exchange,
+            $price['net_purchase_price_calculated_unit_after_discounts'] = number_format($this->calculatePriceAfterDiscounts($price, $product) * ($product->packing->unit_consumption / $product->packing->numbers_of_basic_commercial_units_in_pack) * $product->price->euro_exchange,
                 4, '.', '');
-            $price['net_purchase_price_aggregate_unit_after_discounts'] = number_format((((float)$price['net_purchase_price_commercial_unit'] * (100 - $product->price->discount1) * (100 - $product->price->discount2) * (100 - $product->price->discount3)) / 1000000) * $product->price->euro_exchange,
+            $price['net_purchase_price_aggregate_unit_after_discounts'] = number_format($this->calculatePriceAfterDiscounts($price, $product) * $product->price->euro_exchange,
                 4, '.', '');
-            $price['net_purchase_price_the_largest_unit_after_discounts'] = number_format((((float)$price['net_purchase_price_commercial_unit'] * (100 - $product->price->discount1) * (100 - $product->price->discount2) * (100 - $product->price->discount3)) / 1000000) * $product->price->euro_exchange,
+            $price['net_purchase_price_the_largest_unit_after_discounts'] = number_format($this->calculatePriceAfterDiscounts($price, $product) * $product->price->euro_exchange,
                 4, '.', '');
 
             //cena tabelaryczna brutto zakupu dla jednostek
@@ -155,7 +155,7 @@ class CheckDateOfProductNewPriceJob
             foreach ($productsRelated as $productRelated) {
                 $ids[] = $productRelated->id;
             }
-            
+
             \App\Entities\ProductPrice::whereIn('product_id', $ids)->update($price);
         }
     }
@@ -186,5 +186,17 @@ class CheckDateOfProductNewPriceJob
                 die();
         }
         return $data;
+    }
+
+    private function calculatePriceAfterDiscounts($price, $product)
+    {
+        return (
+            (
+                (float)$price
+                * (100 - $product->price->discount1)
+                * (100 - $product->price->discount2)
+                * (100 - $product->price->discount3)
+                + $product->prie->solid_discount
+            ) / 1000000);
     }
 }
