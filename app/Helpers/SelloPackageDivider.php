@@ -20,8 +20,8 @@ class SelloPackageDivider
             where('sello_delivery_id', $this->deliveryId)
             ->where('sello_deliverer_id', $this->delivererId)
             ->firstOrFail();
-        for ($i = 0; $i < $this->packageNumber; $i++) {
-            BackPackPackageDivider::createPackage($template, $order->id);
+        for ($packageNumber = 1; $packageNumber <= $this->packageNumber; $packageNumber++) {
+            BackPackPackageDivider::createPackage($template, $order->id, $packageNumber);
         }
         return false;
     }

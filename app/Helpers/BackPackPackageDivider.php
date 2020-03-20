@@ -24,7 +24,7 @@ class BackPackPackageDivider
         return $canPay;
     }
 
-    public static function createPackage($packTemplate, $orderId)
+    public static function createPackage($packTemplate, $orderId, $packageNumber)
     {
         $pack = new OrderPackage();
         $pack->order_id = $orderId;
@@ -34,6 +34,7 @@ class BackPackPackageDivider
         $pack->delivery_courier_name = $packTemplate->delivery_courier_name;
         $pack->service_courier_name = $packTemplate->service_courier_name;
         $pack->weight = $packTemplate->weight;
+        $pack->number = $packageNumber;
         $helper = new OrderPackagesDataHelper();
         if ($packTemplate->accept_time) {
             $date = $helper->calculateShipmentDate($packTemplate->accept_time, $packTemplate->accept_time);
@@ -70,10 +71,11 @@ class BackPackPackageDivider
 
     private static function createPackages(array $packages, $orderId)
     {
+        $packageNumber = 1;
         foreach ($packages['packages'] as $package) {
             if (!empty($package->type)) {
                 $packTemplate = PackageTemplate::where('symbol', $package->type)->firstOrFail();
-                $pack = self::createPackage($packTemplate, $orderId);
+                $pack = self::createPackage($packTemplate, $orderId, $packageNumber);
                 $products = [];
                 foreach ($package->packagesList as $singlePack) {
                     foreach ($singlePack->productList as $product) {
@@ -87,7 +89,7 @@ class BackPackPackageDivider
             }
             if (!empty($package->packageName)) {
                 $packTemplate = PackageTemplate::where('symbol', $package->packageName)->firstOrFail();
-                $pack = self::createPackage($packTemplate, $orderId);
+                $pack = self::createPackage($packTemplate, $orderId, $packageNumber);
                 $products = [];
                 foreach ($package->productList as $product) {
                     $quantity = empty($products[$product->id]) ? $product->quantity : $products[$product->id] + $product->quantity;

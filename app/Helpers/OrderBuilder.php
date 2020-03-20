@@ -41,6 +41,7 @@ class OrderBuilder
         $orderExists = false;
         if (!empty($data['cart_token'])) {
             $order = Order::where('token', $data['cart_token'])->first();
+            $order->clearPackages();
             $orderExists = true;
             if (!$order) {
                 throw new \Exception('wrong_cart_token');
