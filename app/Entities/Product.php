@@ -232,4 +232,9 @@ class Product extends Model implements Transformable
     {
         return $this->packing->warehouse && $this->packing->recommended_courier && $this->packing->packing_name;
     }
+
+    public static function getDefaultProduct()
+    {
+        return Product::where('symbol', 'TWSU')->first();
+    }
 }

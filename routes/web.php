@@ -181,6 +181,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('packageTemplates/{id}/update', 'PackageTemplatesController@update')->name('package_templates.update');
         Route::delete('packageTemplates/{id}/delete', 'PackageTemplatesController@destroy')->name('package_templates.destroy');
 
+        Route::get('sello-import', 'OrdersController@selloImport')->name('orders.sello_import');
+
         Route::get('products/stocks', 'ProductStocksController@index')->name('product_stocks.index');
         Route::post('products/stocks/datatable', 'ProductStocksController@datatable')->name('product_stocks.datatable');
         Route::get('products/stocks/print', 'ProductStocksController@print')->name('product_stocks.print');

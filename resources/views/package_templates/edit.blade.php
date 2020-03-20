@@ -35,6 +35,16 @@
                    value="{{ $old->symbol }}">
         </div>
         <div class="form-group">
+            <label for="data_template">@lang('order_packages.form.deliverer')</label>
+            <input type="text" class="form-control" id="sello_deliverer_id" name="sello_deliverer_id"
+                   value="{{ $old->sello_deliverer_id }}">
+        </div>
+        <div class="form-group">
+            <label for="data_template">@lang('order_packages.form.delivery')</label>
+            <input type="text" class="form-control" id="sello_delivery_id" name="sello_delivery_id"
+                   value="{{ $old->sello_delivery_id }}">
+        </div>
+        <div class="form-group">
             <label for="data_template">@lang('order_packages.form.displayed_name')</label>
             <input type="text" class="form-control" id="displayed_name" name="displayed_name"
                    value="{{ $old->displayed_name }}">

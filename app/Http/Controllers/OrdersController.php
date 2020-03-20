@@ -8,6 +8,7 @@ use App\Helpers\EmailTagHandlerHelper;
 use App\Helpers\OrderCalcHelper;
 use App\Http\Requests\OrderUpdateRequest;
 use App\Jobs\AddLabelJob;
+use App\Jobs\ImportOrdersFromSelloJob;
 use App\Jobs\Orders\MissingDeliveryAddressSendMailJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Jobs\RemoveLabelJob;
@@ -34,6 +35,7 @@ use App\Repositories\WarehouseRepository;
 use App\Repositories\FirmRepository;
 use App\Repositories\OrderAddressRepository;
 use App\Repositories\UserRepository;
+use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\DB;
@@ -1097,6 +1099,7 @@ class OrdersController extends Controller
                 $item->save();
                 $productsWeightSum += (float)$data['modal_weight'][$id] * $quantity;
                 $productsSum += (float)$data['net_selling_price_commercial_unit'][$id] * $quantity * 1.23;
+
             }
         }
 
@@ -2195,6 +2198,15 @@ class OrdersController extends Controller
         dispatch_now(new AddLabelJob($request->input('orderId'), [136]));
 
         return view('customers.confirmation.confirmationThanks');
+    }
+
+    public function selloImport()
+    {
+        dispatch_now(new ImportOrdersFromSelloJob());
+        return redirect()->route('orders.index')->with([
+            'message' => 'Rozpoczęto import z Sello',
+            'alert-type' => 'success',
+        ]);
     }
 }
 
