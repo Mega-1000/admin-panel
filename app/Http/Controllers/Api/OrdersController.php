@@ -75,6 +75,7 @@ class OrdersController extends Controller
         'missing_customer_login' => 'Musisz podać login',
         'wrong_password' => 'Błędny adres e-mail lub hasło',
         'wrong_phone' => 'Podaj prawidłowy nr telefonu',
+        'package_must_be_cancelled' => 'Paczka musi pierw zostać zanulowana',
         'wrong_product_id' => null
     ];
 

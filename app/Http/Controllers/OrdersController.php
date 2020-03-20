@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\OrderItem;
 use App\Entities\Order;
 use App\Entities\OrderPackage;
 use App\Entities\Task;
@@ -430,6 +431,7 @@ class OrdersController extends Controller
             abort(404);
         }
 
+        $order->clearPackages();
 
         if ($request->input('status') != $order->status_id && empty(Auth::user()->userEmailData) && $request->input('shouldBeSent') == 'on') {
             return redirect()->route('orders.edit', ['order_id' => $order->id])->with([
@@ -516,9 +518,6 @@ class OrdersController extends Controller
             $consultantVal = OrderCalcHelper::calcConsultantValue($orderItemKMD, number_format($profit, 2, '.', ''));
         } else {
             $consultantVal = 0;
-        }
-        if ($order->status_id == 3 || $order->status_id == 4) {
-
         }
         $this->orderRepository->update(['consultant_value' => $consultantVal, 'total_price' => $totalPrice], $id);
         foreach ($request->input('product_id') as $key => $value) {
@@ -970,6 +969,8 @@ class OrdersController extends Controller
     {
 
         $order = $this->orderRepository->find($request->input('orderId'));
+        $order->clearPackages();
+
         if ($request->input('firstOrderExist') == 1) {
             $this->createSplittedOrder($request, $order, 'first');
         }
@@ -1068,20 +1069,20 @@ class OrdersController extends Controller
                         'weight' => $order->weight - ($item->product->weight_trade_unit * $quantity),
                     ], $order->id);
                 }
-                $this->orderItemRepository->create([
-                    'net_purchase_price_commercial_unit' => (float)$data['net_purchase_price_commercial_unit'][$id],
-                    'net_purchase_price_basic_unit' => (float)$data['net_purchase_price_basic_unit'][$id],
-                    'net_purchase_price_calculated_unit' => (float)$data['net_purchase_price_calculated_unit'][$id],
-                    'net_purchase_price_aggregate_unit' => (float)$data['net_purchase_price_aggregate_unit'][$id],
-                    'net_selling_price_commercial_unit' => (float)$data['net_selling_price_commercial_unit'][$id],
-                    'net_selling_price_basic_unit' => (float)$data['net_selling_price_basic_unit'][$id],
-                    'net_selling_price_calculated_unit' => (float)$data['net_selling_price_calculated_unit'][$id],
-                    'net_selling_price_aggregate_unit' => (float)$data['net_selling_price_aggregate_unit'][$id],
-                    'order_id' => $newOrder->id,
-                    'product_id' => $data['product_id'][$id],
-                    'quantity' => $quantity,
-                    'price' => (float)$data['net_selling_price_commercial_unit'][$id] * $quantity * 1.23,
-                ]);
+                $item = new OrderItem();
+                $item->net_purchase_price_commercial_unit_after_discounts = (float)$data['net_purchase_price_commercial_unit'][$id];
+                $item->net_purchase_price_basic_unit_after_discounts = (float)$data['net_purchase_price_basic_unit'][$id];
+                $item->net_purchase_price_calculated_unit_after_discounts = (float)$data['net_purchase_price_calculated_unit'][$id];
+                $item->net_purchase_price_aggregate_unit_after_discounts = (float)$data['net_purchase_price_aggregate_unit'][$id];
+                $item->net_selling_price_commercial_unit = (float)$data['net_selling_price_commercial_unit'][$id];
+                $item->net_selling_price_basic_unit = (float)$data['net_selling_price_basic_unit'][$id];
+                $item->net_selling_price_calculated_unit = (float)$data['net_selling_price_calculated_unit'][$id];
+                $item->net_selling_price_aggregate_unit = (float)$data['net_selling_price_aggregate_unit'][$id];
+                $item->order_id = $newOrder->id;
+                $item->product_id = $data['product_id'][$id];
+                $item->quantity = $quantity;
+                $item->price = (float)$data['net_selling_price_commercial_unit'][$id] * $quantity * 1.23;
+                $item->save();
                 $productsWeightSum += (float)$data['modal_weight'][$id] * $quantity;
                 $productsSum += (float)$data['net_selling_price_commercial_unit'][$id] * $quantity * 1.23;
 

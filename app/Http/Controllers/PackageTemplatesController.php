@@ -14,9 +14,10 @@ class PackageTemplatesController extends Controller
      */
     public function index()
     {
-        $templates = \App\Entities\PackageTemplate::all();
+        $templatesUnsorted = \App\Entities\PackageTemplate::all();
+        $templates = $templatesUnsorted->sortBy('list_order');
         return view('package_templates.index',compact('templates'))
-        ->withpackageTemplates($templates); 
+        ->withpackageTemplates($templates);
     }
 
     /**
@@ -37,39 +38,7 @@ class PackageTemplatesController extends Controller
      */
     public function store(Request $request)
     {
-        $this->validate($request, array(
-            'name'=>'required|max:255',
-            'notice_max_lenght'=>'integer|required',
-            'symbol' => 'required',
-            'max_weight' => 'numeric|required',
-            'volume' => 'integer|required'
-        ));
-        $template = new PackageTemplate;
-        $template->name = $request->name;
-        $template->info = $request->info;
-        $template->symbol = $request->symbol;
-        $template->sizeA = $request->sizeA;
-        $template->sizeB = $request->sizeB;
-        $template->sizeC = $request->sizeC;
-        $template->accept_time = $request->accept_time;
-        $template->accept_time_info = $request->accept_time_info;
-        $template->max_time = $request->max_time;
-        $template->max_time_info = $request->max_time_info;
-        $template->service_courier_name = $request->service_courier_name;
-        $template->delivery_courier_name = $request->delivery_courier_name;
-        $template->weight = $request->weight;
-        $template->container_type = $request->container_type;
-        $template->shape = $request->shape;
-        $template->notice_max_lenght = $request->notice_max_lenght;
-        $template->content = $request->content;
-        $template->cod_cost = $request->cod_cost;
-        $template->approx_cost_client = $request->approx_cost_client;
-        $template->approx_cost_firm = $request->approx_cost_firm;
-        $template->max_weight = $request->max_weight;
-        $template->volume = $request->volume;
-        
-        $template->save();
-        
+        $this->saveTemplate($request);
         return redirect()->route('package_templates.index');
     }
 
@@ -82,28 +51,34 @@ class PackageTemplatesController extends Controller
 
     public function edit($id)
     {
-         $packageTemplate = PackageTemplate::find($id);
+        $packageTemplate = PackageTemplate::find($id);
         return view('package_templates.edit')->withOld($packageTemplate);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
+    private function saveTemplate($request, $id = null)
     {
-       $this->validate($request, array(
+        $this->validate($request, array(
             'name'=>'required|max:255',
             'notice_max_lenght'=>'integer|required',
             'symbol' => 'required',
             'max_weight' => 'numeric|required',
             'volume' => 'integer|required'
         ));
- 
-        $template = PackageTemplate::find($id);
+        if (!empty($request->accept_time)) {
+            $this->validate($request, array(
+                'max_time' => 'required'
+            ));
+        }
+        if (!empty($request->max_time)) {
+            $this->validate($request, array(
+                'accept_time' => 'required'
+            ));
+        }
+        if (empty($id)) {
+            $template = new PackageTemplate;
+        } else {
+            $template = PackageTemplate::find($id);
+        }
         $template->name = $request->name;
         $template->symbol = $request->symbol;
         $template->info = $request->info;
@@ -126,11 +101,23 @@ class PackageTemplatesController extends Controller
         $template->approx_cost_firm = $request->approx_cost_firm;
         $template->max_weight = $request->max_weight;
         $template->volume = $request->volume;
-          
+        $template->list_order = $request->list_order;
+        $template->displayed_name = $request->displayed_name;
+
         $template->save();
-        
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        $this->saveTemplate($request, $id);
         return redirect()->route('package_templates.index');
-                      
     }
 
     /**

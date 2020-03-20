@@ -807,10 +807,12 @@
                     render: function ( order, type, row ) {
                         let data = order.packages
                         var html = ''
-                        if (order.otherPackages && order.otherPackages.find(el => el.type == 'not_calculable')) {
-                            html = '<div style="background: red" >'
-                        } else {
-                            html = '<div style="background: green" >'
+                        if (data.length != 0) {
+                            if (order.otherPackages && order.otherPackages.find(el => el.type == 'not_calculable')) {
+                                html = '<div style="border: solid blue 4px" >'
+                            } else {
+                                html = '<div style="border: solid green 4px" >'
+                            }
                         }
                         $.each(data, function(key, value){
                             if(value.status !== 'SENDING' && value.status !== 'DELIVERED' && value.status !== 'CANCELLED') {
@@ -1397,17 +1399,18 @@
                             invoices.forEach(function(invoice){
                                 html += '<a target="_blank" href="/storage/invoices/'+invoice.invoice_name+'" style="margin-top: 5px;">Faktura</a>';
                             });
+                            html += '<br />'
                         }
                         html += '<a href="{{env('FRONT_NUXT_URL')}}' + '/magazyn/awizacja/0/0/' + data.orderId + '/wyslij-fakture">Dodaj</a>'
                         return html;
                     }
                 },
                 {
-                    data: 'orderId',
+                    data: null,
                     name: 'invoice_gross_sum',
                     render: function(data, type, row) {
                         let sumOfPurchase = 0;
-                        var items = row['items'];
+                        let items = row['items'];
 
                         for (let index = 0; index < items.length; index++) {
                             let pricePurchase = items[index].net_purchase_price_commercial_unit;
@@ -1420,8 +1423,18 @@
                             }
                             sumOfPurchase += parseFloat(pricePurchase) * parseInt(quantity);
                         }
+                        let totalItemsCost = sumOfPurchase * 1.23;
+                        let transportCost = 0
 
-                        return (sumOfPurchase * 1.23).toFixed(2);
+                        let html = 'Cena zakupu: <br />' +
+                            (totalItemsCost).toFixed(2) + '<br/>';
+                        if (data.shipment_price_for_us) {
+                           html += 'Koszt Transportu: <br/>' +
+                            data.shipment_price_for_us + '<br />'
+                            transportCost = parseFloat(data.shipment_price_for_us)
+                        }
+                        html += 'Suma: <br /><b>' + (totalItemsCost + transportCost).toFixed(2) + '<b/>'
+                        return html;
                     }
                 },
                 {

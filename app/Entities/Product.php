@@ -82,7 +82,8 @@ class Product extends Model implements Transformable
         'comments',
         'value_of_the_order_for_free_transport',
         'show_on_page',
-        'trade_group_name'
+        'trade_group_name',
+        'displayed_group_name'
     ];
 
     public $customColumnsVisibilities = [

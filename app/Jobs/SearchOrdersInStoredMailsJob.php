@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\DB;
 
 class SearchOrdersInStoredMailsJob extends Job
 {
-    protected const STORAGE_MAILS_NAME = "app/order-mails";
-
     /**
      * Execute the job.
      *

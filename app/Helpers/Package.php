@@ -11,6 +11,7 @@ class Package
     const CAN_NOT_ADD_MORE = 'Nie można dodać produktu do koszyka';
     public $productList;
     public $packageName;
+    public $displayed_name;
     private $maxWeight;
     private $volumeRatio;
     private $volumeMargin;
@@ -25,6 +26,7 @@ class Package
         $this->price = $packageTemplate->approx_cost_client;
         $this->volumeRatio = $packageTemplate->volume;
         $this->maxWeight = $packageTemplate->max_weight;
+        $this->displayed_name = $packageTemplate->displayed_name ?: $packageName;
 
         $this->volumeMargin = $margin;
         $this->packageName = $packageName;

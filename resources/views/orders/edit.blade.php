@@ -1552,7 +1552,7 @@
                                                         <td>
                                                             <input name="net_selling_price_basic_unit[{{$item->id}}]"
                                                                    data-item-id="{{$item->id}}"
-                                                                   value="{{ $item->product->net_selling_price_basic_unit }}"
+                                                                   value="{{ $item->net_selling_price_basic_unit }}"
                                                                    type="text"
                                                                    class="form-control price net_selling_price_basic_unit priceChange change-order"
                                                                    id="net_selling_price_basic_unit[{{$item->id}}]">
@@ -1561,7 +1561,7 @@
                                                             <input
                                                                 name="net_selling_price_calculated_unit[{{$item->id}}]"
                                                                 data-item-id="{{$item->id}}"
-                                                                value="{{ $item->product->net_selling_price_calculated_unit }}"
+                                                                value="{{ $item->net_selling_price_calculated_unit }}"
                                                                 type="text"
                                                                 class="form-control price net_selling_price_calculated_unit priceChange change-order"
                                                                 id="net_selling_price_calculated_unit[{{$item->id}}]">
@@ -1570,7 +1570,7 @@
                                                             <input
                                                                 name="net_selling_price_aggregate_unit[{{$item->id}}]"
                                                                 data-item-id="{{$item->id}}"
-                                                                value="{{ $item->product->  net_selling_price_aggregate_unit }}"
+                                                                value="{{ $item->net_selling_price_aggregate_unit }}"
                                                                 type="text"
                                                                 class="form-control price net_selling_price_aggregate_unit priceChange change-order"
                                                                 id="net_selling_price_aggregate_unit[{{$item->id}}]">
@@ -2374,7 +2374,6 @@
                                     addOrder.hide();
                                 }
                             });
-
                         });
 
                     </script>
@@ -2963,6 +2962,7 @@
                                 $("#totalPriceInfo").val($("#total_price").val());
                                 $("#orderItemsSum").val(total_price);
                                 updateOrderSum();
+                                $("#weight").val($('.item-weight').toArray().reduce((prev, curr) => (prev + parseFloat(curr.value)), 0))
                                 $("#weightInfo").val($("#weight").val());
                             }
 
@@ -3643,7 +3643,7 @@
                                 let shipmentUs = {{ $order->shipment_price_for_us ?? 0 }};
                                 splitCosts('shipment_price_for_us', shipmentUs, 'SHIP_US');
                             });
-
+                            $('.net_purchase_price_commercial_unit').first().change()
                         });
 
                         function changeDko(split = null) {
