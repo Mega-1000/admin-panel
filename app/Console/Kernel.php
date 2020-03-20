@@ -40,10 +40,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\ChangeOrderInvoiceData::class)->dailyAt("07:00");
         $schedule->job(Jobs\JpgGeneratorJob::class)->dailyAt("01:00");
         $schedule->job(Jobs\ImportCsvFileJob::class)->everyMinute();
-        $schedule->job(Jobs\ImportOrdersFromSelloJob::class)->dailyAt("06:00");
-        $schedule->job(Jobs\ImportOrdersFromSelloJob::class)->dailyAt("11:00");
-        $schedule->job(Jobs\ImportOrdersFromSelloJob::class)->dailyAt("17:00");
-        $schedule->job(Jobs\ImportOrdersFromSelloJob::class)->dailyAt("22:00");
+        $schedule->job(Jobs\ImportOrdersFromSelloJob::class)->cron('0 6,11,17,22 * * *');
     }
 
     /**
