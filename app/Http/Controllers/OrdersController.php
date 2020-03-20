@@ -412,7 +412,6 @@ class OrdersController extends Controller
      */
     public function update(OrderUpdateRequest $request, $id)
     {
-        error_log('dpa');
         switch ($request->submit) {
             case 'update':
                 break;
@@ -457,8 +456,6 @@ class OrdersController extends Controller
         }
 
         $oldStatus = $order->status_id;
-
-        error_log('dpa2');
 
         $this->orderRepository->update([
             'total_price' => $totalPrice,
@@ -510,8 +507,6 @@ class OrdersController extends Controller
             $itemsArray[] = $item->product_id;
         }
 
-        error_log('dpa3');
-
         if ($order->status_id === 4) {
             $consultantVal = OrderCalcHelper::calcConsultantValue($orderItemKMD, number_format($profit, 2, '.', ''));
         } else {
@@ -520,7 +515,6 @@ class OrdersController extends Controller
         $this->orderRepository->update(['consultant_value' => $consultantVal, 'total_price' => $totalPrice], $id);
         foreach ($request->input('product_id') as $key => $value) {
             if (!in_array($value, $itemsArray)) {
-                error_log('dpa6');
 
                 $this->orderItemRepository->create([
                     'net_purchase_price_commercial_unit_after_discounts' => (float)$request->input('net_purchase_price_commercial_unit')[$key],
@@ -538,14 +532,10 @@ class OrdersController extends Controller
                 ]);
             }
         }
-        error_log('dpa3');
 
         if (!empty($request->input('id'))) {
             foreach ($request->input('id') as $id) {
-                error_log('dpa7');
-
                 if ($request->input('quantity_commercial')[$id] > 0) {
-                error_log('dpa8');
                     $this->orderItemRepository->update([
                         'net_purchase_price_commercial_unit_after_discounts' => (float)$request->input('net_purchase_price_commercial_unit')[$id],
                         'net_purchase_price_basic_unit_after_discounts' => (float)$request->input('net_purchase_price_basic_unit')[$id],
@@ -564,7 +554,6 @@ class OrdersController extends Controller
                 }
             }
         }
-        error_log('dpa4');
 
         if (!empty($this->orderAddressRepository->findWhere([
             'order_id' => $order->id,
@@ -603,7 +592,6 @@ class OrdersController extends Controller
                 ]
             );
         }
-        error_log('dpa5');
 
         if (!empty($this->orderAddressRepository->findWhere([
             'order_id' => $order->id,
