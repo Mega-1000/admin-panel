@@ -334,11 +334,20 @@ class ImportCsvFileJob implements ShouldQueue
             $array['category_id'] = null;
         }
 
+        $updatePrices = !$product->price || !$array['subject_to_price_change'];
+
+        if (!$updatePrices) {
+            unset($array['value_of_price_change_data_first']);
+            unset($array['value_of_price_change_data_second']);
+            unset($array['value_of_price_change_data_third']);
+            unset($array['value_of_price_change_data_fourth']);
+        }
+
         $product->fill($array);
         $product->save();
         $product->restore();
 
-        if (!$product->price || !$array['subject_to_price_change']) {
+        if ($updatePrices) {
             $price = $product->price ?? new Entities\ProductPrice();
             $price->fill($array);
             $product->price()->save($price);
