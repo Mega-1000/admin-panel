@@ -12,6 +12,7 @@ use App\Helpers\StatusesHelper;
 use App\Http\Requests\OrderUpdateRequest;
 use App\Jobs\AddLabelJob;
 use App\Jobs\DispatchLabelEventByNameJob;
+use App\Jobs\ImportOrdersFromSelloJob;
 use App\Jobs\Orders\MissingDeliveryAddressSendMailJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Jobs\OrderStatusChangedToDispatchNotificationJob;
@@ -2182,6 +2183,15 @@ class OrdersController extends Controller
         dispatch_now(new AddLabelJob($request->input('orderId'), [136]));
 
         return view('customers.confirmation.confirmationThanks');
+    }
+
+    public function selloImport()
+    {
+        dispatch_now(new ImportOrdersFromSelloJob());
+        return redirect()->route('orders.index')->with([
+            'message' => 'Rozpoczęto import z Sello',
+            'alert-type' => 'success',
+        ]);
     }
 }
 

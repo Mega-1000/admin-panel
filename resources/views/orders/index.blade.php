@@ -370,6 +370,10 @@
         <a name="send_courier" class="btn btn-success" href="/admin/packageTemplates/">Lista</a>
         <a name="send_courier" class="btn btn-info" href="/admin/packageTemplates/create">Dodaj szablon</a>
     </div>
+    <div class="form-group">
+        <label for="send_courier">Import z SELLO: </label>
+        <a name="send_courier" class="btn btn-success" href="/admin/sello-import/">Importuj</a>
+    </div>
     <div style="display: flex; align-items: center;" id="add-label-container">
         <button onclick="addLabel()" type="button" class="btn btn-primary">@lang('orders.table.save_label')</button>
         <select style="margin-left: 10px;" class="form-control text-uppercase" id="choosen-label">
