@@ -686,7 +686,7 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function getDateOrNull($date)
     {
-        $d = \DateTime::createFromFormat('Y-m-d', $date);
+        $d = \DateTime::createFromFormat('Y/m/d', $date);
         return $d && $d->format('Y-m-d') == $date ? $date : null;
     }
 
