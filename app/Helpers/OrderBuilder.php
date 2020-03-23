@@ -31,7 +31,6 @@ class OrderBuilder
 
     public function newStore($data)
     {
-        error_log('test');
         if (empty($this->packageGenerator) || empty($this->priceCalculator)) {
             throw new \Exception('Nie zdefiniowano kalkulatorów');
         }
@@ -95,7 +94,6 @@ class OrderBuilder
                 $data['update_email']
             );
         }
-        error_log('cc');
 
         try {
             $canPay = $this->packageGenerator->divide($data, $order);
