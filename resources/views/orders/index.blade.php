@@ -1437,10 +1437,10 @@
                         let totalItemsCost = sumOfPurchase * 1.23;
                         let transportCost = 0
 
-                        let html = 'Cena zakupu: <br />' +
+                        let html = 'wartość towaru: <br />' +
                             (totalItemsCost).toFixed(2) + '<br/>';
                         if (data.shipment_price_for_us) {
-                           html += 'Koszt Transportu: <br/>' +
+                           html += 'Koszt tran.: <br/>' +
                             data.shipment_price_for_us + '<br />'
                             transportCost = parseFloat(data.shipment_price_for_us)
                         }

@@ -32,7 +32,7 @@ class PackageDivider implements iPackageDivider
             if ($product->isInTransportGroup()) {
                 $warehouses [self::TRANSPORT_GROUPS] [$product->trade_group_name] [] = $product;
             } else if ($product->hasAllTransportParameters()) {
-                    $warehouses = $this->insertToWarehouseArray($product, $warehouses);
+                $warehouses = $this->insertToWarehouseArray($product, $warehouses);
             } else {
                 $warehouses[self::NOT_CALCULABLE] [] = $product;
             }
@@ -289,7 +289,13 @@ class PackageDivider implements iPackageDivider
         }
         $parcels['packages'] = [];
         foreach ($palettes as $k => $palette) {
-            $palette->tryFitInSmallerPalette();
+            try {
+                $palette->tryFitInSmallerPalette();
+            } catch (\Exception $exception) {
+                Log::info('Problem z pasowaniem palety na mniejszą: ',
+                    ['exception' => $exception->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
+                );
+            }
             $palette->setPackageCost();
             if ($palette->price > $palette->packagesCost) {
                 $parcels['packages'] = array_merge($parcels['packages'], $palette->packagesList->toArray());
