@@ -16,6 +16,10 @@ class OrderBuilder
 
     private $packageGenerator;
     private $priceCalculator;
+    /**
+     * @var OrderPriceOverrider
+     */
+    private $priceOverrider;
 
     public function setPackageGenerator($generator)
     {
@@ -27,6 +31,11 @@ class OrderBuilder
     {
         $this->priceCalculator = $priceCalculator;
         return $this;
+    }
+
+    public function setPriceOverrider(OrderPriceOverrider $priceOverrider)
+    {
+        $this->priceOverrider = $priceOverrider;
     }
 
     public function newStore($data)
@@ -99,7 +108,7 @@ class OrderBuilder
             $canPay = $this->packageGenerator->divide($data, $order);
         } catch (\Exception $exception) {
             $message = $exception->getMessage();
-            Log::error("Problem with sello package dividing: $message");
+            Log::error("Problem with package dividing: $message");
         }
         return ['id' => $order->id, 'canPay' => $canPay];
     }
@@ -187,6 +196,9 @@ class OrderBuilder
                 } else {
                     $orderItem->$column = $price->$column;
                 }
+            }
+            if ($this->priceOverrider) {
+                $orderItem = $this->priceOverrider->override($orderItem);
             }
             $this->priceCalculator->addItem($product->price->gross_price_of_packing, $orderItem->quantity);
 

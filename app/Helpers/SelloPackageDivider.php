@@ -17,11 +17,19 @@ class SelloPackageDivider
             throw new \Exception('Brak powiązanego szablonu z sello');
         }
         $template = PackageTemplate::
-            where('sello_delivery_id', $this->deliveryId)
+        where('sello_delivery_id', $this->deliveryId)
             ->where('sello_deliverer_id', $this->delivererId)
             ->firstOrFail();
+        $modulo = $data['order_items'][0]['amount'] % $this->packageNumber;
+
         for ($packageNumber = 1; $packageNumber <= $this->packageNumber; $packageNumber++) {
-            BackPackPackageDivider::createPackage($template, $order->id, $packageNumber);
+            $pack = BackPackPackageDivider::createPackage($template, $order->id, $packageNumber);
+            $quantity = floor($data['order_items'][0]['amount'] / $this->packageNumber);
+            if ($packageNumber <= $modulo) {
+                $quantity += 1;
+            }
+            $pack->packedProducts()->attach($data['order_items'][0]['id'],
+                ['quantity' => $quantity]);
         }
         return false;
     }
@@ -34,5 +42,10 @@ class SelloPackageDivider
     public function setDelivererId($delivererId): void
     {
         $this->delivererId = $delivererId;
+    }
+
+    public function setPackageNumber(int $packageNumber): void
+    {
+        $this->packageNumber = $packageNumber;
     }
 }
