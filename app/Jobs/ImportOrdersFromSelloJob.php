@@ -115,6 +115,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $packageBuilder = new SelloPackageDivider();
         $packageBuilder->setDelivererId($transaction->tr_DelivererId);
         $packageBuilder->setDeliveryId($transaction->tr_DeliveryId);
+        $packageBuilder->setPackageNumber($transaction->tr_CheckoutFormCalculatedNumberOfPackages);
 
         $orderBuilder = new OrderBuilder();
         $orderBuilder
