@@ -132,7 +132,7 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="labels_to_add_after_removal_modal">@lang('labels.form.labels_to_add_after_removal')</label>
-                        <select multiple class="form-control text-uppercase" id="labels_to_add_after_removal_modal" name="labels_to_add_after_removal_modal[]" size="6">
+                        <select class="form-control text-uppercase" id="labels_to_add_after_removal_modal" name="labels_to_add_after_removal_modal[]" size="6">
                         </select>
                     </div>
                 </div>
