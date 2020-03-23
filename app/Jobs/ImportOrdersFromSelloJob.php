@@ -6,6 +6,7 @@ use App\Entities\Order;
 use App\Entities\Product;
 use App\Entities\SelTransaction;
 use App\Helpers\OrderBuilder;
+use App\Helpers\OrderPriceOverrider;
 use App\Helpers\SelloPackageDivider;
 use App\Helpers\SelloPriceCalculator;
 use Illuminate\Bus\Queueable;
@@ -69,7 +70,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $orderItems [] = $item;
             $transactionArray['order_items'] = $orderItems;
             try {
-                $this->buildOrder($transaction, $transactionArray);
+                $this->buildOrder($transaction, $transactionArray, $product);
             } catch (\Exception $exception) {
                 $message = $exception->getMessage();
                 Log::error("Problem with sello import: $message");
@@ -110,7 +111,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         return $transactionArray;
     }
 
-    private function buildOrder($transaction, array $transactionArray)
+    private function buildOrder($transaction, array $transactionArray, $product)
     {
         $calculator = new SelloPriceCalculator();
         $calculator->setOverridePrice($transaction->transactionItem->tt_Price);
@@ -120,10 +121,13 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $packageBuilder->setDeliveryId($transaction->tr_DeliveryId);
         $packageBuilder->setPackageNumber($transaction->tr_CheckoutFormCalculatedNumberOfPackages);
 
+        $priceOverrider = new OrderPriceOverrider([$product->id => ['net_selling_price_commercial_unit' => $transaction->transactionItem->tt_Price]]);
+
         $orderBuilder = new OrderBuilder();
         $orderBuilder
             ->setPackageGenerator($packageBuilder)
-            ->setPriceCalculator($calculator);
+            ->setPriceCalculator($calculator)
+            ->setPriceOverrider($priceOverrider);
         ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($transactionArray);
 
         $order = Order::find($id);
