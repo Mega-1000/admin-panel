@@ -39,9 +39,9 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $transactions = SelTransaction::all();
         $transactions->map(function ($transaction) {
             $transactionArray = [];
-            if (Order::where('sello_id', $transaction->id)->count() > 0) {
-                return;
-            }
+//            if (Order::where('sello_id', $transaction->id)->count() > 0) {
+//                return;
+//            }
             $transactionArray['customer_login'] = $transaction->customer->email->ce_email;
 
             $transactionArray['phone'] = preg_replace('/[^0-9]/', '', $transaction->customer->phone->cp_Phone);
@@ -50,8 +50,11 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $transactionArray['is_standard'] = true;
             $transactionArray['rewrite'] = 0;
 
+            $symbol = explode('-', $transaction->transactionItem->item->it_Symbol);
+            $newSymbol = [$symbol[0], $symbol[1], '0'];
+            $newSymbol = join('-', $newSymbol);
             if ($transaction->transactionItem->itemExist()) {
-                $product = Product::where('symbol', $transaction->transactionItem->item->it_Symbol)->first();
+                $product = Product::where('symbol', $newSymbol)->first();
             }
 
             if (empty($product)) {
