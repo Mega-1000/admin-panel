@@ -42,7 +42,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             if (Order::where('sello_id', $transaction->id)->count() > 0) {
                 return;
             }
-            $transactionArray['customer_login'] = $transaction->customer->email->ce_email;
+            $transactionArray['customer_login'] = str_replace('allegromail.pl', 'mega1000.pl', $transaction->customer->email->ce_email);
 
             $transactionArray['phone'] = preg_replace('/[^0-9]/', '', $transaction->customer->phone->cp_Phone);
             $transactionArray['customer_notices'] = empty($transaction->note) ? '' : $transaction->note->ne_Content;
