@@ -772,8 +772,13 @@
                         var html = '';
                         $.each(data, function(key, value) {
                             if ((value.status === 'SENDING' && value.status !== 'CANCELLED') || (value.status === 'DELIVERED' && value.status !== 'CANCELLED')) {
-                                html += '<div><p>' + row.orderId + '/' + value.number + '</p>';
-                                html += '<div><p>' + value.delivery_courier_name  + ' ' + value.size_a + 'x'+value.size_b+'x'+value.size_c+'</p>';
+                                html += '<div style="display: flex; align-items: center; flex-direction: column;" > <div style="display: flex; align-items: center;"><p>'
+                                    + row.orderId + '/' + value.number + '</p>'
+                                let name = value.container_type
+                                if (value.symbol) {
+                                    name = value.symbol;
+                                }
+                                html += '<p style="padding-right: 6px;">' + name + '</p> </div> '
                                 if (value.letter_number === null) {
                                     html += '<a href="javascript:void()"><p>Brak listu przewozowego</p></a>';
                                 }else {
@@ -814,47 +819,44 @@
                                 html = '<div style="border: solid green 4px" >'
                             }
                         }
-                        $.each(data, function(key, value){
-                            if(value.status !== 'SENDING' && value.status !== 'DELIVERED' && value.status !== 'CANCELLED') {
-                                html += '<div><p>' + row.orderId + '/' + value.number + '</p>';
-                                html += '<div><p>' + value.delivery_courier_name  + ' ' + value.size_a + 'x'+value.size_b+'x'+value.size_c+'</p>';
-                                if(value.container_type === 'EUR') {
-                                    html += '<p>PALETA 80x120</p>';
-                                } else if(value.container_type === 'POLPALETA'){
-                                    html += '<p>PÓŁPALETA 60x80</p>';
-                                } else if(value.container_type === 'PACZ'){
-                                    html += '<p>PACZKA</p>';
-                                } else if (value.container_type === 'INNA'){
-                                    html += '<p>PALETA 100x120</p>';
+                        $.each(data, function (key, value) {
+                            if (value.status !== 'SENDING' && value.status !== 'DELIVERED' && value.status !== 'CANCELLED') {
+                                html += '<div style="display: flex; align-items: baseline;" ><p>'
+                                    + row.orderId + '/' + value.number + '</p>'
+                                let name = value.container_type
+                                if (value.symbol) {
+                                    name = value.symbol;
                                 }
-                                if(value.status === 'WAITING_FOR_CANCELLED') {
+                                html += '<p style="padding-right: 6px;">' + name + '</p>'
+
+                                if (value.status === 'WAITING_FOR_CANCELLED') {
                                     html += '<p>WYSŁANO DO ANULACJI</p>';
                                 }
-                                if(value.status === 'REJECT_CANCELLED') {
+                                if (value.status === 'REJECT_CANCELLED') {
                                     html += '<p style="color:red;">ANULACJA ODRZUCONA</p>';
                                 }
                                 if (value.letter_number === null) {
-                                    if(value.status !== 'CANCELLED' && value.status !== 'WAITING_FOR_CANCELLED' && value.delivery_courier_name !== 'GIELDA' && value.service_courier_name !== 'GIELDA' && value.delivery_courier_name !== 'ODBIOR_OSOBISTY' && value.service_courier_name !== 'ODBIOR_OSOBISTY') {
-                                        html += '<button class="btn btn-success" id="package-'+value.id+'" onclick="sendPackage(' + value.id + ',' + value.order_id + ')">Wyślij</button>';
+                                    if (value.status !== 'CANCELLED' && value.status !== 'WAITING_FOR_CANCELLED' && value.delivery_courier_name !== 'GIELDA' && value.service_courier_name !== 'GIELDA' && value.delivery_courier_name !== 'ODBIOR_OSOBISTY' && value.service_courier_name !== 'ODBIOR_OSOBISTY') {
+                                        html += '<button class="btn btn-success" id="package-' + value.id + '" onclick="sendPackage(' + value.id + ',' + value.order_id + ')">Wyślij</button>';
                                     }
-                                }else {
+                                } else {
                                     if (value.delivery_courier_name === 'INPOST') {
-                                        html += '<a target="_blank" href="/storage/inpost/stickers/sticker' + value.letter_number + '.pdf"><p>'+value.letter_number+'</p></a>';
+                                        html += '<a target="_blank" href="/storage/inpost/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                     } else if (value.delivery_courier_name === 'DPD') {
-                                        html += '<a target="_blank" href="/storage/dpd/protocols/protocol' + value.letter_number + '.pdf"><p>'+value.sending_number+'</p></a>';
-                                        html += '<a target="_blank" href="/storage/dpd/stickers/sticker' + value.letter_number + '.pdf"><p>'+value.letter_number+'</p></a>';
+                                        html += '<a target="_blank" href="/storage/dpd/protocols/protocol' + value.letter_number + '.pdf"><p>' + value.sending_number + '</p></a>';
+                                        html += '<a target="_blank" href="/storage/dpd/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                     } else if (value.delivery_courier_name === 'POCZTEX') {
-                                        html += '<a target="_blank" href="/storage/pocztex/protocols/protocol' + value.sending_number + '.pdf"><p>'+value.letter_number+'</p></a>';
+                                        html += '<a target="_blank" href="/storage/pocztex/protocols/protocol' + value.sending_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                     } else if (value.delivery_courier_name === 'JAS') {
-                                        html += '<a target="_blank" href="/storage/jas/protocols/protocol' + value.sending_number + '.pdf"><p>'+value.letter_number+'</p></a>';
-                                        html += '<a target="_blank" href="/storage/jas/labels/label' + value.sending_number + '.pdf"><p>'+value.letter_number+'</p></a>';
+                                        html += '<a target="_blank" href="/storage/jas/protocols/protocol' + value.sending_number + '.pdf"><p>' + value.letter_number + '</p></a>';
+                                        html += '<a target="_blank" href="/storage/jas/labels/label' + value.sending_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                     } else if (value.delivery_courier_name === 'GIELDA') {
-                                        html += '<a target="_blank" href="/storage/gielda/stickers/sticker' + value.letter_number + '.pdf"><p>'+value.letter_number+'</p></a>';
+                                        html += '<a target="_blank" href="/storage/gielda/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                     } else if (value.delivery_courier_name === 'ODBIOR_OSOBISTY') {
-                                        html += '<a target="_blank" href="/storage/odbior_osobisty/stickers/sticker' + value.letter_number + '.pdf"><p>'+value.letter_number+'</p></a>';
+                                        html += '<a target="_blank" href="/storage/odbior_osobisty/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                     }
-                                    html += '</div>';
                                 }
+                                html += '</div>';
                             }
                         });
                         html += '</div>';
