@@ -35,7 +35,6 @@ class BackPackPackageDivider
         $pack->service_courier_name = $packTemplate->service_courier_name;
         $pack->weight = $packTemplate->weight;
         $pack->number = $packageNumber;
-        $pack->symbol = $packTemplate->symbol;
         $helper = new OrderPackagesDataHelper();
         if ($packTemplate->accept_time) {
             $date = $helper->calculateShipmentDate($packTemplate->accept_time, $packTemplate->accept_time);
