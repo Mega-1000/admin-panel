@@ -38,7 +38,7 @@ class UpdatePackageRealCostJob implements ShouldQueue {
             }
         }
         if (!empty($pocztexPackages)) {
-            $spec = fopen('specyfikacjaPocztex.csv', 'r');
+            $spec = fopen('specyfikacjaPocztaPolska.csv', 'r');
             while (($csvLine = fgetcsv($spec, 1000, ",")) !== FALSE) {
                 foreach ($pocztexPackages as $pocztexPackage) {
                     if ($pocztexPackage->letter_number == $csvLine[0]) {
