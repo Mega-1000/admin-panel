@@ -7,8 +7,9 @@ use App\Entities\OrderOtherPackage;
 use App\Entities\OrderPackage;
 use App\Entities\PackageTemplate;
 use App\Entities\Product;
+use App\Helpers\interfaces\iDividable;
 
-class BackPackPackageDivider
+class BackPackPackageDivider implements iDividable
 {
     public function divide($data, Order $order): bool
     {
@@ -35,6 +36,8 @@ class BackPackPackageDivider
         $pack->service_courier_name = $packTemplate->service_courier_name;
         $pack->weight = $packTemplate->weight;
         $pack->number = $packageNumber;
+        $pack->content = 'Materiały budowlane';
+        $pack->symbol = $packTemplate->symbol;
         $helper = new OrderPackagesDataHelper();
         if ($packTemplate->accept_time) {
             $date = $helper->calculateShipmentDate($packTemplate->accept_time, $packTemplate->accept_time);
@@ -99,6 +102,7 @@ class BackPackPackageDivider
                     $pack->packedProducts()->attach($k, ['quantity' => $quantity]);
                 }
             }
+            $packageNumber++;
         }
     }
 

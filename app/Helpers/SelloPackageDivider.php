@@ -2,16 +2,18 @@
 
 namespace App\Helpers;
 
+use App\Entities\Order;
 use App\Entities\PackageTemplate;
+use App\Helpers\interfaces\iDividable;
 
-class SelloPackageDivider
+class SelloPackageDivider implements iDividable
 {
 
     private $packageNumber = 1;
     private $deliveryId;
     private $delivererId;
 
-    public function divide($data, $order)
+    public function divide($data, Order $order)
     {
         if (empty($this->delivererId) || empty($this->delivererId)) {
             throw new \Exception('Brak powiązanego szablonu z sello');

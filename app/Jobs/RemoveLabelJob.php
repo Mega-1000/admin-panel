@@ -16,7 +16,7 @@ class RemoveLabelJob extends Job
     protected $order;
     protected $labelIdsToRemove;
     protected $loopPreventionArray;
-    protected $customLabelIdsToAddAfterRemoval;
+    protected $customLabelIdsToAddAfterRemoval = [];
 
     /**
      * RemoveLabelJob constructor.
@@ -30,7 +30,11 @@ class RemoveLabelJob extends Job
         $this->order                           = $order;
         $this->labelIdsToRemove                = $labelIdsToRemove;
         $this->loopPreventionArray             = $loopPreventionArray;
-        $this->customLabelIdsToAddAfterRemoval = $customLabelIdsToAddAfterRemoval;
+        if (is_array($customLabelIdsToAddAfterRemoval)) {
+            $this->customLabelIdsToAddAfterRemoval = $customLabelIdsToAddAfterRemoval;
+        } else {
+            array_push($this->customLabelIdsToAddAfterRemoval, $customLabelIdsToAddAfterRemoval);
+        }
     }
 
     /**

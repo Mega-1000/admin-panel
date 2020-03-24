@@ -8,44 +8,64 @@ use App\Entities\Order;
 use App\Entities\OrderAddress;
 use App\Entities\OrderItem;
 use App\Entities\Product;
+use App\Helpers\interfaces\iDividable;
+use App\Helpers\interfaces\iOrderPriceOverrider;
+use App\Helpers\interfaces\iOrderTotalPriceCalculator;
+use App\Helpers\interfaces\iSumable;
+use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 class OrderBuilder
 {
 
+    /**
+     * @var iDividable
+     */
     private $packageGenerator;
+    /**
+     * @var iOrderTotalPriceCalculator
+     */
     private $priceCalculator;
     /**
-     * @var OrderPriceOverrider
+     * @var iOrderPriceOverrider
      */
     private $priceOverrider;
+    /**
+     * @var iSumable
+     */
+    private $totalTransportSumCalculator;
 
-    public function setPackageGenerator($generator)
+    public function setPackageGenerator(iDividable $generator)
     {
         $this->packageGenerator = $generator;
         return $this;
     }
 
-    public function setPriceCalculator($priceCalculator)
+    public function setPriceCalculator(iOrderTotalPriceCalculator $priceCalculator)
     {
         $this->priceCalculator = $priceCalculator;
         return $this;
     }
 
-    public function setPriceOverrider(OrderPriceOverrider $priceOverrider)
+    public function setPriceOverrider(iOrderPriceOverrider $priceOverrider)
     {
         $this->priceOverrider = $priceOverrider;
+    }
+
+    public function setTotalTransportSumCalculator(iSumable $calculator)
+    {
+        $this->totalTransportSumCalculator = $calculator;
     }
 
     public function newStore($data)
     {
         if (empty($this->packageGenerator) || empty($this->priceCalculator)) {
-            throw new \Exception('Nie zdefiniowano kalkulatorów');
+            throw new Exception('Nie zdefiniowano kalkulatorów');
         }
         OrderBuilder::setEmptyOrderData($data);
         if (empty($data['order_items']) || !is_array($data['order_items'])) {
-            throw new \Exception('missing_products');
+            throw new Exception('missing_products');
         }
         $order = null;
         $orderExists = false;
@@ -54,7 +74,7 @@ class OrderBuilder
             $order->clearPackages();
             $orderExists = true;
             if (!$order) {
-                throw new \Exception('wrong_cart_token');
+                throw new Exception('wrong_cart_token');
             }
         } else {
             $order = new Order();
@@ -106,11 +126,15 @@ class OrderBuilder
 
         try {
             $canPay = $this->packageGenerator->divide($data, $order);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $message = $exception->getMessage();
             Log::error("Problem with package dividing: $message");
         }
-        return ['id' => $order->id, 'canPay' => $canPay];
+        if ($this->totalTransportSumCalculator) {
+            $order->shipment_price_for_client = $this->totalTransportSumCalculator->getSum($order);
+        }
+        $order->save();
+        return ['id' => $order->id, 'canPay' => $canPay ?? false];
     }
 
     private static function setEmptyOrderData(&$data)
@@ -184,7 +208,7 @@ class OrderBuilder
             $product = Product::find($item['id']);
             $price = $product->price;
             if (!$product || !$price) {
-                throw new \Exception('wrong_product_id');
+                throw new Exception('wrong_product_id');
             }
 
             $orderItem = new OrderItem();
@@ -245,7 +269,7 @@ class OrderBuilder
                 }
                 break;
             default:
-                throw new \Exception('Unsupported order address relation');
+                throw new Exception('Unsupported order address relation');
         }
 
         foreach ([
@@ -270,7 +294,7 @@ class OrderBuilder
     {
         $product = Product::getDefaultProduct();
         if (!$product) {
-            throw new \Exception('wrong_product_id');
+            throw new Exception('wrong_product_id');
         }
 
         return [['id' => $product->id, 'amount' => 1]];
@@ -279,17 +303,17 @@ class OrderBuilder
     private static function getCustomerByLogin($login, $pass)
     {
         if (empty($login)) {
-            throw new \Exception('missing_customer_login');
+            throw new Exception('missing_customer_login');
         }
         $customer = Customer::where('login', $login)->first();
 
         if ($customer && !Hash::check($pass, $customer->password)) {
-            throw new \Exception('wrong_password');
+            throw new Exception('wrong_password');
         }
         if (!$customer) {
             $pass = preg_replace('/[^0-9]/', '', $pass);
             if (strlen($pass) < 9) {
-                throw new \Exception('wrong_phone');
+                throw new Exception('wrong_phone');
             }
             $customer = new Customer();
             $customer->login = $login;

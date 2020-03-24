@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceCalculator;
+use App\Helpers\TransportSumCalculator;
 use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
 use App\Http\Requests\Api\Orders\StoreOrderRequest;
 use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
@@ -136,6 +137,9 @@ class OrdersController extends Controller
             $orderBuilder
                 ->setPackageGenerator(new BackPackPackageDivider())
                 ->setPriceCalculator(new OrderPriceCalculator());
+            if (empty($data['cart_token'])) {
+                $orderBuilder->setTotalTransportSumCalculator(new TransportSumCalculator);
+            }
             ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($data);
             DB::commit();
             $order = Order::find($id);
