@@ -11,6 +11,17 @@ use App\Helpers\interfaces\iDividable;
 
 class BackPackPackageDivider implements iDividable
 {
+    public static function calculatePackagesForOrder($order): void
+    {
+        $divider = new BackPackPackageDivider();
+        $items = $order->items->map(function ($item) {
+            $item->id = $item->product_id;
+            $item->amount = $item->quantity;
+            return $item;
+        });
+        $divider->divide($items->toArray(), $order);
+    }
+
     public function divide($data, Order $order): bool
     {
         $packages = self::divideToPackages($data);
@@ -117,16 +128,16 @@ class BackPackPackageDivider implements iDividable
         }
     }
 
-    private static function divideToPackages($data): array
+    private static function divideToPackages($orderedItems): array
     {
         $prodIds = [];
-        $responseArray = collect($data['order_items']);
-        foreach ($responseArray as $items) {
+        $orderCollection = collect($orderedItems);
+        foreach ($orderCollection as $items) {
             $prodIds [] = $items['id'];
         }
         $prodList = Product::whereIn('id', $prodIds)->with('tradeGroups')->with('price')->get();
-        $prodList->map(function ($item) use ($responseArray) {
-            $product = $responseArray->where('id', $item->id)->first();
+        $prodList->map(function ($item) use ($orderCollection) {
+            $product = $orderCollection->where('id', $item->id)->first();
             $item->quantity = $product['amount'];
         });
         $warehouse = new PackageDivider();

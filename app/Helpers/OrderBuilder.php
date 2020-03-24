@@ -125,7 +125,7 @@ class OrderBuilder
         }
 
         try {
-            $canPay = $this->packageGenerator->divide($data, $order);
+            $canPay = $this->packageGenerator->divide($data['order_items'], $order);
         } catch (Exception $exception) {
             $message = $exception->getMessage();
             Log::error("Problem with package dividing: $message");
