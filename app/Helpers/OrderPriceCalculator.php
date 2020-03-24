@@ -3,7 +3,9 @@
 namespace App\Helpers;
 
 
-class OrderPriceCalculator
+use App\Helpers\interfaces\iOrderTotalPriceCalculator;
+
+class OrderPriceCalculator implements iOrderTotalPriceCalculator
 {
     private $total = 0;
 

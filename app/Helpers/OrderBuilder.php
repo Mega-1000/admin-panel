@@ -8,13 +8,21 @@ use App\Entities\Order;
 use App\Entities\OrderAddress;
 use App\Entities\OrderItem;
 use App\Entities\Product;
+use App\Helpers\interfaces\iDividable;
+use App\Helpers\interfaces\iOrderTotalPriceCalculator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 class OrderBuilder
 {
 
+    /**
+     * @var iDividable
+     */
     private $packageGenerator;
+    /**
+     * @var iOrderTotalPriceCalculator
+     */
     private $priceCalculator;
     /**
      * @var OrderPriceOverrider

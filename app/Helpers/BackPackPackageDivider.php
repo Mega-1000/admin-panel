@@ -7,8 +7,9 @@ use App\Entities\OrderOtherPackage;
 use App\Entities\OrderPackage;
 use App\Entities\PackageTemplate;
 use App\Entities\Product;
+use App\Helpers\interfaces\iDividable;
 
-class BackPackPackageDivider
+class BackPackPackageDivider implements iDividable
 {
     public function divide($data, Order $order): bool
     {

@@ -5,8 +5,9 @@ namespace App\Helpers;
 
 
 use App\Entities\OrderItem;
+use App\Helpers\interfaces\iOrderPriceOverrider;
 
-class OrderPriceOverrider
+class OrderPriceOverrider implements iOrderPriceOverrider
 {
     private $overrides;
 

@@ -2,7 +2,9 @@
 
 namespace App\Helpers;
 
-class SelloPriceCalculator
+use App\Helpers\interfaces\iOrderTotalPriceCalculator;
+
+class SelloPriceCalculator implements iOrderTotalPriceCalculator
 {
     private $total = 0;
     private $overridePrice;
