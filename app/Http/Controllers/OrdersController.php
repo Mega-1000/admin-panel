@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Entities\Order;
 use App\Entities\OrderItem;
+use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Helpers\OrderCalcHelper;
 use App\Http\Requests\OrderUpdateRequest;
@@ -633,6 +634,7 @@ class OrdersController extends Controller
             );
         }
 
+        BackPackPackageDivider::calculatePackagesForOrder($order);
         $sumOfOrdersReturn = $this->sumOfOrders($order);
         $sumToCheck = $sumOfOrdersReturn[0];
         if ($order->status_id == 5 || $order->status_id == 6) {
@@ -1000,6 +1002,7 @@ class OrdersController extends Controller
             $this->createSplittedOrder($request, $order, 'fifth');
         }
 
+        BackPackPackageDivider::calculatePackagesForOrder($order);
         return redirect()->route('orders.index')->with([
             'message' => __('orders.message.split'),
             'alert-type' => 'success',
@@ -1106,8 +1109,7 @@ class OrdersController extends Controller
             'total_price' => $productsSum,
             'weight' => $productsWeightSum,
         ], $newOrder->id);
-
-
+        BackPackPackageDivider::calculatePackagesForOrder($newOrder);
     }
 
     /**

@@ -67,7 +67,7 @@ class OrdersPackagesController extends Controller
      */
     public function create(Request $request,$id, $multi = null)
     {
-        
+
         $templateData = $this->orderPackagesDataHelper->getData();
         $order = $this->orderRepository->find($id);
         $shipmentDate = $this->orderPackagesDataHelper->calculateShipmentDate();
@@ -140,7 +140,7 @@ class OrdersPackagesController extends Controller
             } else {
                 return redirect()->route('order_packages.create', ['order_id' => $id]);
             }
-        } 
+        }
 
         return view('orderPackages.create', compact('id', 'templateData', 'orderData', 'order', 'payments', 'promisedPayments', 'connectedOrders', 'cashOnDeliverySum', 'isAdditionalDKPExists', 'allOrdersSum', 'multiData'));
     }
@@ -176,7 +176,7 @@ class OrdersPackagesController extends Controller
     public function update(OrderPackageUpdateRequest $request, $id)
     {
         $orderPackage = $this->repository->find($id);
-        
+
         if (empty($orderPackage)) {
             abort(404);
         }
@@ -205,7 +205,7 @@ class OrdersPackagesController extends Controller
         $data['shipment_date'] = new \DateTime($data['shipment_date']);
         if (!empty($request->input('template_accept_hour')) || !empty($request->input('template_max_hour')) ) {
             $today = new \DateTime;
-            $daydate = $data['shipment_date'];       
+            $daydate = $data['shipment_date'];
             $daytoday = $today;
             $daydate->setTime(0, 0, 0);
             $daytoday->setTime(0, 0, 0);
@@ -213,7 +213,7 @@ class OrdersPackagesController extends Controller
                 $shipdate = $this->orderPackagesDataHelper->calculateShipmentDate($request->input('template_accept_hour'), $request->input('template_max_hour'));
                 $delidate = $this->orderPackagesDataHelper->calculateDeliveryDate($shipdate);
                 $data['shipment_date'] = new \DateTime($shipdate);
-                $data['delivery_date'] = new \DateTime($delidate);               
+                $data['delivery_date'] = new \DateTime($delidate);
             }
         }
         $packagesNumber = 0;
@@ -250,6 +250,7 @@ class OrdersPackagesController extends Controller
             }
         }
 
+        $data['symbol'] =
 
 
         $this->repository->create($data);
@@ -264,9 +265,9 @@ class OrdersPackagesController extends Controller
             'alert-type' => 'success'
         ]);
         }
-        $token = md5(uniqid(rand(), true));            
+        $token = md5(uniqid(rand(), true));
         $multi = [
-            'token' => $token,    
+            'token' => $token,
             'template' => [
             'quantity' => $request->input('quantity')-1,
             'size_a' => $request->input('size_a'),
@@ -288,7 +289,7 @@ class OrdersPackagesController extends Controller
         ];
         $request->session()->put('multi', $multi);
         return redirect()->route('order_packages.create', ['order_id' => $order_id, 'multi' => $token]);
-  
+
     }
 
     /**

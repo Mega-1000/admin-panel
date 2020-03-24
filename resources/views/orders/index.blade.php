@@ -772,13 +772,14 @@
                         var html = '';
                         $.each(data, function(key, value) {
                             if ((value.status === 'SENDING' && value.status !== 'CANCELLED') || (value.status === 'DELIVERED' && value.status !== 'CANCELLED')) {
-                                html += '<div style="display: flex; align-items: center; flex-direction: column;" > <div style="display: flex; align-items: center;"><p>'
-                                    + row.orderId + '/' + value.number + '</p>'
+                                html += '<div style="display: flex; align-items: center; flex-direction: column;" > ' +
+                                    '<div style="display: flex; align-items: center;">' +
+                                    '<p style="margin: 8px 0px 0px 0px;">' + row.orderId + '/' + value.number + '</p>'
                                 let name = value.container_type
                                 if (value.symbol) {
                                     name = value.symbol;
                                 }
-                                html += '<p style="padding-right: 6px;">' + name + '</p> </div> '
+                                html += '<p style="margin: 8px 8px 0px 8px;">' + name + '</p> </div> '
                                 if (value.letter_number === null) {
                                     html += '<a href="javascript:void()"><p>Brak listu przewozowego</p></a>';
                                 }else {
@@ -797,8 +798,8 @@
                                     } else if (value.delivery_courier_name === 'ODBIOR_OSOBISTY') {
                                         html += '<a target="_blank" href="/storage/odbior_osobisty/stickers/sticker' + value.letter_number + '.pdf"><p>'+value.letter_number+'</p></a>';
                                     }
-                                    html += '</div>';
                                 }
+                                html += '</div>';
                             }
                         });
                         return html;
@@ -821,13 +822,14 @@
                         }
                         $.each(data, function (key, value) {
                             if (value.status !== 'SENDING' && value.status !== 'DELIVERED' && value.status !== 'CANCELLED') {
-                                html += '<div style="display: flex; align-items: baseline;" ><p>'
-                                    + row.orderId + '/' + value.number + '</p>'
+                                html += '<div style="display: flex; align-items: center; flex-direction: column;" > ' +
+                                    '<div style="display: flex; align-items: stretch;">' +
+                                    '<p style="margin: 8px 0px 0px 0px;"> ' + row.orderId + '/' + value.number + '</p>'
                                 let name = value.container_type
                                 if (value.symbol) {
                                     name = value.symbol;
                                 }
-                                html += '<p style="padding-right: 6px;">' + name + '</p>'
+                                html += '<p style="margin: 8px 8px 0px 8px;">' + name + '</p> </div> '
 
                                 if (value.status === 'WAITING_FOR_CANCELLED') {
                                     html += '<p>WYSŁANO DO ANULACJI</p>';
@@ -859,7 +861,6 @@
                                 html += '</div>';
                             }
                         });
-                        html += '</div>';
                         return html;
                     }
                 },
