@@ -9,6 +9,7 @@ use App\Entities\OrderAddress;
 use App\Entities\OrderItem;
 use App\Entities\Product;
 use App\Helpers\interfaces\iDividable;
+use App\Helpers\interfaces\iOrderPriceOverrider;
 use App\Helpers\interfaces\iOrderTotalPriceCalculator;
 use App\Helpers\interfaces\iSumable;
 use Exception;
@@ -27,7 +28,7 @@ class OrderBuilder
      */
     private $priceCalculator;
     /**
-     * @var OrderPriceOverrider
+     * @var iOrderPriceOverrider
      */
     private $priceOverrider;
     /**
@@ -47,7 +48,7 @@ class OrderBuilder
         return $this;
     }
 
-    public function setPriceOverrider(iOrderTotalPriceCalculator $priceOverrider)
+    public function setPriceOverrider(iOrderPriceOverrider $priceOverrider)
     {
         $this->priceOverrider = $priceOverrider;
     }
