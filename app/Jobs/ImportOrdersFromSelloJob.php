@@ -50,13 +50,10 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $transactionArray = $this->setAdressArray($transaction, $transactionArray);
             $transactionArray['is_standard'] = true;
             $transactionArray['rewrite'] = 0;
-            $newSymbol = '';
-            if ($transaction->transactionItem->item) {
+            if ($transaction->transactionItem->itemExist()) {
                 $symbol = explode('-', $transaction->transactionItem->item->it_Symbol);
                 $newSymbol = [$symbol[0], $symbol[1], '0'];
                 $newSymbol = join('-', $newSymbol);
-            }
-            if ($transaction->transactionItem->itemExist()) {
                 $product = Product::where('symbol', $newSymbol)->first();
             }
 
