@@ -1,0 +1,8 @@
+#productsTable {
+    border-collapse: collapse;
+}
+
+.price-keeper > td {
+    border: 1px solid black;
+}
+

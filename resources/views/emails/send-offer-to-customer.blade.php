@@ -1,9 +1,10 @@
+<link href="{{ asset('css/views/offer/style.css') }}" rel="stylesheet">
 <body>
 <p>
     <strong>Poniżej znajduje się oferta nr: {{$order->id}}</strong>
 </p>
 
-<table id="productsTable" class="table table1 table-venice-blue productsTableEdit">
+<table id="productsTable" class="table table1 table-venice-blue productsTableEdit" style="border-collapse: collapse;">
     <tbody id="products-tbody">
     @php
         $gross_purchase_sum = 0;
@@ -63,19 +64,33 @@
                    data-item-id="{{$item->id}}" value="{{ $item->product->packing->unit_consumption }}" type="hidden"
                    class="form-control unit_consumption" id="unit_consumption[{{$item->id}}]">
         </tr>
-        <tr>
-            <td></td>
+        <tr class="price-keeper">
+            <td>
+                <table>
+                    <tr class="row-{{$item->id}}">
+                        <th colspan="4" style="text-align: left;">Wartość asortymentu</th>
+                    </tr>
+                    <tr class="selling-row row-{{$item->id}}">
+                        <td>
+                            <input type="text" class="form-control item-value priceChange" data-item-id="{{$item->id}}"
+                                   disabled
+                                   name="item-value"
+                                   value="{{ number_format(($item->net_selling_price_commercial_unit * $item->quantity * 1.23), 2) }} zł"/>
+                        </td>
+                    </tr>
+                </table>
+            </td>
             <td>Jednostka handlowa ({{ $item->product->packing->unit_commercial }})</td>
             <td>Jednostka podstawowa ({{$item->product->packing->unit_basic}})</td>
             <td>Jednostka obliczeniowa ({{$item->product->packing->calculation_unit}})</td>
-            <td>Jednostka zbiorcza ({{$item->product->packing->unit_of_collective}})</td>
+            @if(!empty($item->product->packing->number_of_sale_units_in_the_pack) &&  $item->product->packing->number_of_sale_units_in_the_pack != 0)
+                <td>Jednostka zbiorcza ({{$item->product->packing->unit_of_collective}})</td>
+            @endif
         </tr>
-        <tr>
-            <td colspan="6">
+        <tr class="price-keeper selling-row row-{{$item->id}}">
+            <td>
                 Zamawiana ilość
             </td>
-        </tr>
-        <tr class="selling-row row-{{$item->id}}">
             @foreach($productPacking as $packing)
                 @if($packing->product_id === $item->product_id)
                     <td>
@@ -94,7 +109,8 @@
                                class="form-control" id="unit_basic" disabled>
                         <input type="hidden" name="unit_basic_units[{{$item->id}}]"
                                value="{{ $item->product->packing->numbers_of_basic_commercial_units_in_pack}}">
-                        <input type="hidden" name="unit_basic_name[{{$item->id}}]" value="{{ $packing->unit_basic }}">
+                        <input type="hidden" name="unit_basic_name[{{$item->id}}]"
+                               value="{{ $packing->unit_basic }}">
                     </td>
                     <td>
                         <input name="calculation_unit[{{$item->id}}]"
@@ -108,55 +124,32 @@
                         <input type="hidden" name="calculation_unit_name[{{$item->id}}]"
                                value="{{ $packing->calculation_unit }}">
                     </td>
-                    <td>
-                        @php
-                            if (empty($item->product->packing->number_of_sale_units_in_the_pack) || $item->product->packing->number_of_sale_units_in_the_pack == 0)
-                                $a = 0;
-                            else
+                    @if(!empty($item->product->packing->number_of_sale_units_in_the_pack) &&  $item->product->packing->number_of_sale_units_in_the_pack != 0)
+                        <td>
+                            @php
                                 $a = $item->quantity / $item->product->packing->number_of_sale_units_in_the_pack;
-                        @endphp
-                        <input name="unit_of_collective[{{$item->id}}]"
-                               value="{{ number_format($a, 4) .' '.$packing->unit_of_collective}} " type="text"
-                               class="form-control" id="unit_of_collective" disabled>
-                        <input type="hidden" name="unit_of_collective_units[{{$item->id}}]"
-                               value="{{ $item->product->packing->number_of_sale_units_in_the_pack }}">
-                        <input type="hidden" name="unit_of_collective_name[{{$item->id}}]"
-                               value="{{ $packing->unit_of_collective }}">
-                    </td>
+                            @endphp
+                            <input name="unit_of_collective[{{$item->id}}]"
+                                   value="{{ number_format($a, 4) .' '.$packing->unit_of_collective}} " type="text"
+                                   class="form-control" id="unit_of_collective" disabled>
+                            <input type="hidden" name="unit_of_collective_units[{{$item->id}}]"
+                                   value="{{ $item->product->packing->number_of_sale_units_in_the_pack }}">
+                            <input type="hidden" name="unit_of_collective_name[{{$item->id}}]"
+                                   value="{{ $packing->unit_of_collective }}">
+                        </td>
+                    @endif
                 @endif
             @endforeach
         </tr>
-        <tr class="row-{{$item->id}}">
-            <th colspan="4" style="text-align: left;">Wartość asortymentu</th>
-        </tr>
-        <tr class="selling-row row-{{$item->id}}">
-            <td>
-                <input type="text" class="form-control item-value priceChange" data-item-id="{{$item->id}}" disabled
-                       name="item-value"
-                       value="{{ number_format(($item->net_selling_price_commercial_unit * $item->quantity * 1.23), 2) }} zł">
-            </td>
-            <td colspan="3"></td>
-        </tr>
+
         @if(!empty($productsVariation[$item->product->id]))
-            <tr>
-                <td colspan="4"><h3>Wariacje produktów:</h3></td>
-            </tr>
-            <tr>
-                <td style="width: 15%;">
-
-                    Nazwa
-                </td>
-                <td style="width: 5%;">
-
-                    Cena sprzedaży brutto jednostki handlowej
-                </td>
-                <td style="width: 5%;">
-
-                    Cena sprzedaży brutto jednostki podstawowej
-                </td>
-                <td style="width: 5%;">
-
-                    Cena sprzedaży brutto jednostki obliczeniowej
+            <tr class="price-keeper">
+                @if(!empty($item->product->packing->number_of_sale_units_in_the_pack) &&  $item->product->packing->number_of_sale_units_in_the_pack != 0)
+                    <td colspan="5">
+                @else
+                    <td colspan="4">
+                @endif
+                    Ceny dla poszczególnych fabryk
                 </td>
                 <td style="width: 5%;">
 
@@ -167,29 +160,12 @@
                     Różnica
                 </td>
                 <td style="width: 5%;">
-
-                    Odległość
-                </td>
-                <td>
-
-                    Recenzja
-                </td>
-                <td>
-
-                    Jakość
-                </td>
-                <td>
-
-                    Jakość do ceny
-                </td>
-                <td>
-
-                    Przybliżona wartość towarów danego magazynu do darmowej przesyłki
+                    Akcje
                 </td>
             </tr>
             <hr>
             @foreach($productsVariation[$item->product->id] as $variation)
-                <tr class="row-{{$variation['id']}}">
+                <tr class="price-keeper row-{{$variation['id']}}">
                     <td>
 
                         {{$variation['name']}}
@@ -206,6 +182,12 @@
 
                         {{$variation['gross_selling_price_calculated_unit']}}
                     </td>
+                    @if(!empty($item->product->packing->number_of_sale_units_in_the_pack) &&  $item->product->packing->number_of_sale_units_in_the_pack != 0)
+                        <td>
+
+                            {{$variation['gross_selling_price_aggregate_unit'] ?? 0}}
+                        </td>
+                    @endif
                     <td>
 
                         {{$variation['sum']}}
@@ -218,16 +200,16 @@
                             <span style="color:green;">+{{(float)$variation['different']}}</span>
                         @endif
                     </td>
-                    <td>{{(int)$variation['radius']}} km</td>
-                    <td>{{$variation['review']}}</td>
-                    <td>{{$variation['quality']}}</td>
-                    <td>{{$variation['quality_to_price']}}</td>
-                    <td>{{$variation['value_of_the_order_for_free_transport']}}</td>
+                    <td>
+{{--                        <a href="{{env('APP_URL') . 'url/' . $order->token . '/' . $item->product->id . '/' . $variation['id'] }}">Zamień produkt</a>--}}
+                    </td>
                 </tr>
+                @if($variation['comments'])
                 <tr>
                     Uwagi: {{$variation['comments']}}
                 </tr>
                 <hr>
+                @endif
             @endforeach
         @endif
     @endforeach
@@ -249,28 +231,28 @@
     <h3>Suma wszystkich towarów dla danych producentów</h3>
     <table class="table table1 table-venice-blue productsTableEdit">
         <thead>
-        <tr>
-            <th>Symbol dostawcy</th>
-            <th>Wartość sumaryczna</th>
-            <th>Różnica wartości do wskazanego producenta w zamówieniu</th>
-            <th>Odległość od magazynu</th>
-            <th>Telefon do konsultanta</th>
-            <th>
+        <tr class="price-keeper">
+            <td>Symbol dostawcy</td>
+            <td>Wartość sumaryczna</td>
+            <td>Różnica wartości do wskazanego producenta w zamówieniu</td>
+            <td>Odległość od magazynu</td>
+            <td>Telefon do konsultanta</td>
+            <td>
 
                 Recenzja
-            </th>
-            <th>
+            </td>
+            <td>
 
                 Jakość
-            </th>
-            <th>
+            </td>
+            <td>
 
                 Jakość do ceny
-            </th>
-            <th>
+            </td>
+            <td>
 
                 Przybliżona wartość towarów danego magazynu do darmowej przesyłki
-            </th>
+            </td>
         </tr>
         <hr>
         </thead>
@@ -278,7 +260,7 @@
         @foreach($allProductsFromSupplier as $productsGroup)
             @foreach($productsGroup as $groupName => $productSupplier)
                 <tr style="text-transform: uppercase;">{{$groupName}}</tr>
-                <tr>
+                <tr class="price-keeper">
                     <td>{{$productSupplier['product_name_supplier']}}</td>
                     <td>{{$productSupplier['sum']}}</td>
                     <td>
@@ -286,6 +268,9 @@
                             <span style="color:red;">{{(float)$productSupplier['different']}}</span>
                         @else
                             <span style="color:green;">+{{(float)$productSupplier['different']}}</span>
+                        @endif
+                        @if(isset($productSupplier['missed_product']))
+                            *
                         @endif
                     </td>
                     <td>{{(int)$productSupplier['radius']}} km</td>
@@ -295,15 +280,20 @@
                     <td>{{$productSupplier['quality_to_price']}}</td>
                     <td>{{$productSupplier['value_of_the_order_for_free_transport']}}</td>
                 </tr>
+                @if($productSupplier['comments'])
                 <tr>
                     {{$productSupplier['comments']}}
                 </tr>
                 <hr>
+                @endif
             @endforeach
         @endforeach
         </tbody>
     </table>
 @endif
+<p>
+    *U tego dostawcy brakuje jednego z produktów. Z tego powodu do obliczeń przyjeliśmy wartość z naszego magazynu
+</p>
 <p>
     Z pozdrowieniami
     ZESPOL MEGA1000

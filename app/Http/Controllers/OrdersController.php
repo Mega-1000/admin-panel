@@ -2131,8 +2131,8 @@ class OrdersController extends Controller
                     'variation_group' => $prod->variation_group,
                     'value_of_the_order_for_free_transport' => $prod->value_of_the_order_for_free_transport
                 ];
-                $productsVariation[$product->product->id][] = $array;
-            }
+                    $productsVariation[$product->product->id][] = $array;
+                }
             foreach ($productsVariation as $variation) {
                 if (isset($productsVariation[$product->product->id])) {
                     $productsVariation[$product->product->id] = collect($variation)->sortBy('different', 1, true);
