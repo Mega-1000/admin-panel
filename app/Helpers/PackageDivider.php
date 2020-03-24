@@ -271,13 +271,21 @@ class PackageDivider implements iPackageDivider
         $i = 0;
         $palette = new Palette();
         $palettes = [$palette];
-        while ($packageCollection->count() > 0) {
-            $package = $packageCollection->get($i);
+        $onlyPackages = $packageCollection->filter(function ($package) use ($palette) {
+            return $package->getTotalVolume() < Palette::PALETTE_100_VOLUME && $package->getTotalWeight() < Palette::PALETTE_100_WEIGHT;
+        })
+        ->values();
+        $onlyPallets = $packageCollection->filter(function ($package) use ($palette) {
+            return $package->getTotalVolume() > Palette::PALETTE_100_VOLUME || $package->getTotalWeight() > Palette::PALETTE_100_WEIGHT;
+        })
+        ->values();
+        while ($onlyPackages->count() > 0) {
+            $package = $onlyPackages->get($i);
             if (isset($package)) {
                 if ($palette->canPutNewItem($package)) {
                     $palette->addItem($package);
-                    $packageCollection->forget($i);
-                    $packageCollection = $packageCollection->values();
+                    $onlyPackages->forget($i);
+                    $onlyPackages = $onlyPackages->values();
                 } else {
                     $palette = new Palette();
                     array_push($palettes, $palette);
@@ -287,7 +295,7 @@ class PackageDivider implements iPackageDivider
                 $i = 0;
             }
         }
-        $parcels['packages'] = [];
+        $parcels['packages'] = $onlyPallets->toArray();
         foreach ($palettes as $k => $palette) {
             try {
                 $palette->tryFitInSmallerPalette();
