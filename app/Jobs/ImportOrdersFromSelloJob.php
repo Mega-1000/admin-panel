@@ -50,11 +50,10 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $transactionArray = $this->setAdressArray($transaction, $transactionArray);
             $transactionArray['is_standard'] = true;
             $transactionArray['rewrite'] = 0;
-
-            $symbol = explode('-', $transaction->transactionItem->item->it_Symbol);
-            $newSymbol = [$symbol[0], $symbol[1], '0'];
-            $newSymbol = join('-', $newSymbol);
             if ($transaction->transactionItem->itemExist()) {
+                $symbol = explode('-', $transaction->transactionItem->item->it_Symbol);
+                $newSymbol = [$symbol[0], $symbol[1], '0'];
+                $newSymbol = join('-', $newSymbol);
                 $product = Product::where('symbol', $newSymbol)->first();
             }
 
@@ -81,32 +80,17 @@ class ImportOrdersFromSelloJob implements ShouldQueue
     private function setAdressArray($transaction, array $transactionArray): array
     {
         if ($transaction->deliveryAddress) {
-            $transactionArray['delivery_address']['city'] = $transaction->deliveryAddress->adr_City;
-            $transactionArray['delivery_address']['postal_code'] = $transaction->deliveryAddress->adr_ZipCode;
-            $transactionArray['delivery_address']['nip'] = $transaction->deliveryAddress->adr_NIP;
-            $transactionArray['delivery_address']['address'] = $transaction->deliveryAddress->adr_Address1 . $transaction->deliveryAddress->adr_Address2;
+            $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->deliveryAddress);
         } else if ($transaction->deliveryAddressBefore) {
-            $transactionArray['delivery_address']['city'] = $transaction->deliveryAddressBefore->adr_City;
-            $transactionArray['delivery_address']['postal_code'] = $transaction->deliveryAddressBefore->adr_ZipCode;
-            $transactionArray['delivery_address']['nip'] = $transaction->deliveryAddressBefore->adr_NIP;
-            $transactionArray['delivery_address']['address'] = $transaction->deliveryAddressBefore->adr_Address1 . $transaction->deliveryAddressBefore->adr_Address2;
+            $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->deliveryAddressBefore);
         }
 
         if ($transaction->invoiceAddress) {
-            $transactionArray['invoice_address']['city'] = $transaction->invoiceAddress->adr_City;
-            $transactionArray['invoice_address']['postal_code'] = $transaction->invoiceAddress->adr_ZipCode;
-            $transactionArray['invoice_address']['nip'] = $transaction->invoiceAddress->adr_NIP;
-            $transactionArray['invoice_address']['address'] = $transaction->invoiceAddress->adr_Address1 . $transaction->invoiceAddress->adr_Address2;
+            $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->invoiceAddress);
         } else if ($transaction->invoiceAddressBefore) {
-            $transactionArray['invoice_address']['city'] = $transaction->invoiceAddressBefore->adr_City;
-            $transactionArray['invoice_address']['postal_code'] = $transaction->invoiceAddressBefore->adr_ZipCode;
-            $transactionArray['invoice_address']['nip'] = $transaction->invoiceAddressBefore->adr_NIP;
-            $transactionArray['invoice_address']['address'] = $transaction->invoiceAddressBefore->adr_Address1 . $transaction->invoiceAddressBefore->adr_Address2;
+            $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->invoiceAddressBefore);
         } else if ($transactionArray['delivery_address']) {
-            $transactionArray['invoice_address']['city'] = $transactionArray['delivery_address']['city'];
-            $transactionArray['invoice_address']['postal_code'] = $transactionArray['delivery_address']['postal_code'];
-            $transactionArray['invoice_address']['nip'] = $transactionArray['delivery_address']['nip'];
-            $transactionArray['invoice_address']['address'] = $transactionArray['delivery_address']['address'];
+            $transactionArray['invoice_address']= $transactionArray['delivery_address'];
         }
         return $transactionArray;
     }
@@ -133,5 +117,46 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $order = Order::find($id);
         $order->sello_id = $transaction->id;
         $order->save();
+    }
+
+
+    private function setDeliveryAddress($address): array
+    {
+        list($name, $surname) = $this->getNameFromAdrres($address);
+        $street = $address->adr_Address1;
+        $street = substr($street, 2);
+
+        $flatNr = '';
+        $numberStart = false;
+        foreach (str_split($street) as $char) {
+            if (is_numeric($char) || $numberStart) {
+                $flatNr .= $char;
+                $numberStart = true;
+            }
+        }
+        $StreetName = str_replace($flatNr, '', $address->adr_Address1);
+        $addressArray['city'] = $address->adr_City;
+        $addressArray['firstname'] = $name;
+        $addressArray['lastname'] = $surname;
+        $addressArray['flat_number'] = $flatNr;
+        $addressArray['address'] = $StreetName;
+        $addressArray['nip'] = $address->adr_NIP ?: '';
+        $addressArray['postal_code'] = $address->adr_ZipCode;
+        $addressArray['nip'] = $address->adr_NIP;
+        $addressArray['address'] = $address->adr_Address1 . $address->adr_Address2;
+        return $addressArray;
+    }
+
+    private function getNameFromAdrres($deliveryAddress): array
+    {
+        $adressName = explode(' ', $deliveryAddress->adr_Name);
+        if (sizeof($adressName) == 2) {
+            $name = $adressName[0];
+            $surname = $adressName[1];
+        } else {
+            $name = $adressName;
+            $surname = '';
+        }
+        return array($name, $surname);
     }
 }
