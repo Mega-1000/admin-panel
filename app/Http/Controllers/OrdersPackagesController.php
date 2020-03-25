@@ -250,9 +250,6 @@ class OrdersPackagesController extends Controller
             }
         }
 
-        $data['symbol'] =
-
-
         $this->repository->create($data);
         if($toCheck != 0) {
             dispatch_now(new AddLabelJob($order->id, [134]));
