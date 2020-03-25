@@ -14,6 +14,7 @@ class AddLatitudeAndLongitudeToWarehousesTable extends Migration
     public function up()
     {
         Schema::table('warehouses', function (Blueprint $table) {
+            $table->string('postal_code')->nullable();
             $table->decimal('latitude', 12, 10);
             $table->decimal('longitude', 12, 10);
         });
@@ -27,6 +28,7 @@ class AddLatitudeAndLongitudeToWarehousesTable extends Migration
     public function down()
     {
         Schema::table('warehouses', function (Blueprint $table) {
+            $table->dropColumn('postal_code');
             $table->dropColumn('latitude');
             $table->dropColumn('longitude');
         });

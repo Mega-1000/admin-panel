@@ -13,7 +13,7 @@ class AddLatitudeAndLongitudeToEmployeeTable extends Migration
      */
     public function up()
     {
-        Schema::table('employee', function (Blueprint $table) {
+        Schema::table('employees', function (Blueprint $table) {
             $table->decimal('latitude', 12, 10);
             $table->decimal('longitude', 12, 10);
         });
@@ -26,7 +26,7 @@ class AddLatitudeAndLongitudeToEmployeeTable extends Migration
      */
     public function down()
     {
-       Schema::table('employee', function (Blueprint $table) {
+       Schema::table('employees', function (Blueprint $table) {
             $table->dropColumn('latitude');
             $table->dropColumn('longitude');
         });

@@ -13,7 +13,7 @@ class DropColumnsInEmployeeTable extends Migration
      */
     public function up()
     {
-        Schema::table('employee', function (Blueprint $table) {
+        Schema::table('employees', function (Blueprint $table) {
             $table->dropColumn('warehouse_id');
             $table->dropColumn('job_position');
         });
@@ -26,7 +26,7 @@ class DropColumnsInEmployeeTable extends Migration
      */
     public function down()
     {
-        Schema::table('employee', function (Blueprint $table) {
+        Schema::table('employees', function (Blueprint $table) {
             $table->unsignedInteger('warehouse_id')->nullable();
             $table->enum('job_position', ['SECRETARIAT', 'CONSULTANT', 'STOREKEEPER', 'SALES']);
             
