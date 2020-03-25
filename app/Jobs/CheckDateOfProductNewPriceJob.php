@@ -196,7 +196,7 @@ class CheckDateOfProductNewPriceJob
                 * (100 - $product->price->discount1)
                 * (100 - $product->price->discount2)
                 * (100 - $product->price->discount3)
-                + $product->prie->solid_discount
+                + $product->price->solid_discount
             ) / 1000000);
     }
 }
