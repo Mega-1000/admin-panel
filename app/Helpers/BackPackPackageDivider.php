@@ -48,6 +48,7 @@ class BackPackPackageDivider implements iDividable
         $pack->weight = $packTemplate->weight;
         $pack->number = $packageNumber;
         $pack->content = 'Materiały budowlane';
+        $pack->notices = $orderId . '/' . $packageNumber;
         $pack->symbol = $packTemplate->symbol;
         $helper = new OrderPackagesDataHelper();
         if ($packTemplate->accept_time) {
