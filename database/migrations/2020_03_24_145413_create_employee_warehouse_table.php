@@ -15,9 +15,12 @@ class CreateEmployeeWarehouseTable extends Migration
     {
         Schema::create('employee_warehouse', function (Blueprint $table) {
             $table->increments('id');
+            $table->unsignedInteger('employee_id');
+            $table->unsignedInteger('warehouse_id');
+            $table->timestamps();
+            
             $table->foreign('employee_id')->references('id')->on('employees')->onDelete('cascade');
             $table->foreign('warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');
-            $table->timestamps();
         });
     }
 
