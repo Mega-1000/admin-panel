@@ -43,9 +43,9 @@ class EmployeeRoleController extends Controller
      */
     public function edit($id)
     {
-        $employee = $this->repository->find($id);
+        $role = EmployeeRole::find($id);
 
-        return view('firms.employees.edit', compact('employee'));
+        return view('employee_roles.edit', compact('role'));
     }
 
 
@@ -54,11 +54,11 @@ class EmployeeRoleController extends Controller
      * @param $id
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(EmployeeUpdateRequest $request, $id)
+    public function update(Request $request, $id)
     {
-        $employee = $this->repository->find($id);
+        $role = EmployeeRole::find($id);
 
-        if(empty($employee)){
+        if(empty($role)){
             abort(404);
         }
 
