@@ -180,6 +180,14 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('packageTemplates/{id}/edit', 'PackageTemplatesController@edit')->name('package_templates.edit');
         Route::put('packageTemplates/{id}/update', 'PackageTemplatesController@update')->name('package_templates.update');
         Route::delete('packageTemplates/{id}/delete', 'PackageTemplatesController@destroy')->name('package_templates.destroy');
+        
+        Route::get('employeeRoles', 'EmployeeRoleController@index')->name('employee_role.index');
+        Route::get('employeeRoles/datatable', 'EmployeeRoleController@datatable')->name('employee_role.datatable');
+        Route::get('employeeRoles/create', 'EmployeeRoleController@create')->name('employee_role.create');
+        Route::post('employeeRoles/store', 'EmployeeRoleController@store')->name('employee_role.store');
+        Route::get('employeeRoles/{id}/edit', 'EmployeeRoleController@edit')->name('employee_role.edit');
+        Route::put('employeeRoles/{id}/update', 'EmployeeRoleController@update')->name('employee_role.update');
+        Route::delete('employeeRoles/{id}/delete', 'EmployeeRoleController@destroy')->name('employee_role.destroy');
 
         Route::get('sello-import', 'OrdersController@selloImport')->name('orders.sello_import');
 

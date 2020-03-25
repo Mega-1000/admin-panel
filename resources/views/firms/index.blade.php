@@ -1,12 +1,21 @@
 @extends('layouts.datatable')
 
 @section('app-header')
-    <h1 class="page-title">
-        <i class="voyager-company"></i> @lang('firms.title')
-        <a href="{!! route('firms.create') !!}" class="btn btn-success btn-add-new">
-            <i class="voyager-plus"></i> <span>@lang('firms.create')</span>
-        </a>
-    </h1>
+<h1 class="page-title">
+    <i class="voyager-company"></i> @lang('firms.title')
+    <a href="{!! route('firms.create') !!}" class="btn btn-success btn-add-new">
+        <i class="voyager-plus"></i> <span>@lang('firms.create')</span>
+    </a>
+    <a href="{!! route('employee_role.create') !!}" class="btn btn-success btn-add-new">
+            <i class="voyager-plus"></i> <span>@lang('firms.role_create')</span>
+    </a>
+
+    <a href="{!! route('employee_role.index') !!}" class="btn btn-primary " style="margin-left: 20px; margin-bottom: 9px">
+             <span>@lang('firms.list_role')</span>
+    </a>
+
+</h1>
+    
 @endsection
 
 @section('table')
