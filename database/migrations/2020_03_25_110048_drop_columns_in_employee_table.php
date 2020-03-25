@@ -14,6 +14,7 @@ class DropColumnsInEmployeeTable extends Migration
     public function up()
     {
         Schema::table('employees', function (Blueprint $table) {
+            $table->dropForeign(['warehouse_id']);
             $table->dropColumn('warehouse_id');
             $table->dropColumn('job_position');
         });
