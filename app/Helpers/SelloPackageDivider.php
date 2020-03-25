@@ -22,7 +22,7 @@ class SelloPackageDivider implements iDividable
         where('sello_delivery_id', $this->deliveryId)
             ->where('sello_deliverer_id', $this->delivererId)
             ->firstOrFail();
-        $modulo = $data['order_items'][0]['amount'] % $this->packageNumber;
+        $modulo = $data[0]['amount'] % $this->packageNumber;
 
         for ($packageNumber = 1; $packageNumber <= $this->packageNumber; $packageNumber++) {
             $pack = BackPackPackageDivider::createPackage($template, $order->id, $packageNumber);
