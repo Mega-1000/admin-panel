@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Helpers\BackPackPackageDivider;
+use App\Helpers\GetCustomerForAdminEdit;
+use App\Helpers\GetCustomerForNewOrder;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceCalculator;
 use App\Helpers\TransportSumCalculator;
@@ -138,7 +140,10 @@ class OrdersController extends Controller
                 ->setPackageGenerator(new BackPackPackageDivider())
                 ->setPriceCalculator(new OrderPriceCalculator());
             if (empty($data['cart_token'])) {
-                $orderBuilder->setTotalTransportSumCalculator(new TransportSumCalculator);
+                $orderBuilder->setTotalTransportSumCalculator(new TransportSumCalculator)
+                    ->setUserSelector(new GetCustomerForNewOrder());
+            } else {
+                $orderBuilder->setUserSelector(new GetCustomerForAdminEdit());
             }
             ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($data);
             DB::commit();

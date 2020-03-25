@@ -5,10 +5,12 @@ namespace App\Jobs;
 use App\Entities\Order;
 use App\Entities\Product;
 use App\Entities\SelTransaction;
+use App\Helpers\GetCustomerForSello;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceOverrider;
 use App\Helpers\SelloPackageDivider;
 use App\Helpers\SelloPriceCalculator;
+use App\Helpers\TransportSumCalculator;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -44,8 +46,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                 return;
             }
             $transactionArray['customer_login'] = str_replace('allegromail.pl', 'mega1000.pl', $transaction->customer->email->ce_email);
-
-            $transactionArray['phone'] = preg_replace('/[^0-9]/', '', $transaction->customer->phone->cp_Phone);
+            $phone = preg_replace('/[^0-9]/', '', $transaction->customer->phone->cp_Phone);
+            $transactionArray['phone'] = trim($phone, '48');
             $transactionArray['customer_notices'] = empty($transaction->note) ? '' : $transaction->note->ne_Content;
             $transactionArray = $this->setAdressArray($transaction, $transactionArray);
             $transactionArray['is_standard'] = true;
@@ -105,13 +107,16 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $packageBuilder->setDeliveryId($transaction->tr_DeliveryId);
         $packageBuilder->setPackageNumber($transaction->tr_CheckoutFormCalculatedNumberOfPackages);
 
-        $priceOverrider = new OrderPriceOverrider([$product->id => ['net_selling_price_commercial_unit' => $transaction->transactionItem->tt_Price]]);
+        $priceOverrider = new OrderPriceOverrider([$product->id => ['gross_selling_price_commercial_unit' => $transaction->transactionItem->tt_Price]]);
 
         $orderBuilder = new OrderBuilder();
         $orderBuilder
             ->setPackageGenerator($packageBuilder)
             ->setPriceCalculator($calculator)
-            ->setPriceOverrider($priceOverrider);
+            ->setPriceOverrider($priceOverrider)
+            ->setTotalTransportSumCalculator(new TransportSumCalculator)
+            ->setUserSelector(new GetCustomerForSello());
+
         ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($transactionArray);
 
         $order = Order::find($id);
@@ -134,16 +139,15 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                 $numberStart = true;
             }
         }
-        $StreetName = str_replace($flatNr, '', $address->adr_Address1);
+        $streetName = str_replace($flatNr, '', $address->adr_Address1);
         $addressArray['city'] = $address->adr_City;
         $addressArray['firstname'] = $name;
         $addressArray['lastname'] = $surname;
         $addressArray['flat_number'] = $flatNr;
-        $addressArray['address'] = $StreetName;
+        $addressArray['address'] = $streetName;
         $addressArray['nip'] = $address->adr_NIP ?: '';
         $addressArray['postal_code'] = $address->adr_ZipCode;
         $addressArray['nip'] = $address->adr_NIP;
-        $addressArray['address'] = $address->adr_Address1 . $address->adr_Address2;
         return $addressArray;
     }
 
@@ -154,7 +158,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $name = $adressName[0];
             $surname = $adressName[1];
         } else {
-            $name = $adressName;
+            $name = join('', $adressName);
             $surname = '';
         }
         return array($name, $surname);

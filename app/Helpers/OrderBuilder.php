@@ -9,6 +9,7 @@ use App\Entities\OrderAddress;
 use App\Entities\OrderItem;
 use App\Entities\Product;
 use App\Helpers\interfaces\iDividable;
+use App\Helpers\interfaces\iGetUser;
 use App\Helpers\interfaces\iOrderPriceOverrider;
 use App\Helpers\interfaces\iOrderTotalPriceCalculator;
 use App\Helpers\interfaces\iSumable;
@@ -36,6 +37,11 @@ class OrderBuilder
      */
     private $totalTransportSumCalculator;
 
+    /**
+     * @var iGetUser
+     */
+    private $userSelector;
+
     public function setPackageGenerator(iDividable $generator)
     {
         $this->packageGenerator = $generator;
@@ -51,17 +57,24 @@ class OrderBuilder
     public function setPriceOverrider(iOrderPriceOverrider $priceOverrider)
     {
         $this->priceOverrider = $priceOverrider;
+        return $this;
     }
 
     public function setTotalTransportSumCalculator(iSumable $calculator)
     {
         $this->totalTransportSumCalculator = $calculator;
+        return $this;
+    }
+
+    public function setUserSelector($userSelector): void
+    {
+        $this->userSelector = $userSelector;
     }
 
     public function newStore($data)
     {
-        if (empty($this->packageGenerator) || empty($this->priceCalculator)) {
-            throw new Exception('Nie zdefiniowano kalkulatorów');
+        if (empty($this->packageGenerator) || empty($this->priceCalculator) || empty($this->userSelector)) {
+            throw new Exception('Nie zdefiniowano bazowych komponentów klasy');
         }
         OrderBuilder::setEmptyOrderData($data);
         if (empty($data['order_items']) || !is_array($data['order_items'])) {
@@ -80,8 +93,9 @@ class OrderBuilder
             $order = new Order();
         }
 
-        $customer = OrderBuilder::getCustomer($orderExists, $order, $data);
+        $customer = $this->userSelector->getCustomer($order, $data);
 
+        error_log(print_r($customer, 1));
         $order->customer_id = $customer->id;
 
         if (!$orderExists) {
@@ -160,25 +174,6 @@ class OrderBuilder
         }
     }
 
-    private static function getCustomer($orderExists, $order, $data)
-    {
-        if ($orderExists) {
-            $customer = $order->customer;
-            if ($data['update_email'] && !empty($data['customer_login'])) {
-                $existingCustomer = Customer::where('login', $data['customer_login'])->first();
-                if ($existingCustomer) {
-                    $customer = $existingCustomer;
-                } else {
-                    $customer->login = $data['customer_login'];
-                    $customer->save();
-                }
-            }
-        } else {
-            $customer = OrderBuilder::getCustomerByLogin($data['customer_login'] ?? '', $data['phone'] ?? '');
-        }
-        return $customer;
-    }
-
     private static function assignEmployeeToOrder($order, $customer)
     {
         $orderCustomerOpenExists = Order::where('customer_id', $customer->id)
@@ -233,7 +228,7 @@ class OrderBuilder
             }
         }
         $order->total_price = $this->priceCalculator->getTotal();
-        $order->weight = $weight;
+        $order->weight = round($weight, 2);
         $order->save();
     }
 
@@ -298,29 +293,6 @@ class OrderBuilder
         }
 
         return [['id' => $product->id, 'amount' => 1]];
-    }
-
-    private static function getCustomerByLogin($login, $pass)
-    {
-        if (empty($login)) {
-            throw new Exception('missing_customer_login');
-        }
-        $customer = Customer::where('login', $login)->first();
-
-        if ($customer && !Hash::check($pass, $customer->password)) {
-            throw new Exception('wrong_password');
-        }
-        if (!$customer) {
-            $pass = preg_replace('/[^0-9]/', '', $pass);
-            if (strlen($pass) < 9) {
-                throw new Exception('wrong_phone');
-            }
-            $customer = new Customer();
-            $customer->login = $login;
-            $customer->password = Hash::make($pass);
-            $customer->save();
-        }
-        return $customer;
     }
 
     public static function getPriceColumns()
