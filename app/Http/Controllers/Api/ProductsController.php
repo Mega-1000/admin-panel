@@ -50,7 +50,6 @@ class ProductsController extends Controller
         }
 
         $products = $this->repository->findWhere([
-            ['date_of_price_change', '!=', null],
             ['product_name_supplier', '=', $warehouse->symbol]
         ]);
 
