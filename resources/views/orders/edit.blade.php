@@ -2934,7 +2934,7 @@
                                     $('[name="unit_of_collective[' + $(this).data('item-id') + ']"]').val((quantity * unitCollectiveUnits).toFixed(4) + ' ' + unitCollectiveName);
                                     $('input.item-weight[data-item-id="' + $(this).data('item-id') + '"]').val(weightSum + ' kg');
                                     $('input.item-profit[data-item-id="' + $(this).data('item-id') + '"]').val(profitItem + ' zł');
-                                    $('input.item-value[data-item-id="' + $(this).data('item-id') + '"]').val(sellingSum + ' zł');
+                                    $('input.item-value[data-item-id="' + $(this).data('item-id') + '"]').val(parseFloat(sellingSum).toFixed(2) + ' zł');
                                 });
                                 $('.productsTableEdit .net_purchase_price_commercial_unit').each(function () {
                                     var quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
