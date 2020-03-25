@@ -473,6 +473,10 @@ class Order extends Model implements Transformable
 
     public function clearPackages()
     {
+        if ($this->sello_id) {
+            return;
+        }
+
         $this->otherPackages->map(function ($package) {
             $package->products()->detach();
             $package->delete();

@@ -3,12 +3,16 @@
 namespace App\Jobs;
 
 use App\Entities\Order;
+use App\Entities\Payment;
 use App\Entities\Product;
 use App\Entities\SelTransaction;
+use App\Helpers\GetCustomerForSello;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceOverrider;
 use App\Helpers\SelloPackageDivider;
 use App\Helpers\SelloPriceCalculator;
+use App\Helpers\TransportSumCalculator;
+use App\Http\Controllers\OrdersPaymentsController;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -19,6 +23,13 @@ use Illuminate\Support\Facades\Log;
 class ImportOrdersFromSelloJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    const FINISH_LOGISTIC_LABEL_ID = 68;
+    const TRANSPORT_SPEDITION_INIT_LABEL_ID = 103;
+    const WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID = 107;
+    const VALIDATE_ORDER_LABEL_ID = 45;
+    const WAIT_FOR_WAREHOUSE_ACCEPT_LABEL_ID = 47;
+    const PRODUCTION_ACCEPTED_LABEL_ID = 48;
 
     /**
      * Create a new job instance.
@@ -44,8 +55,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                 return;
             }
             $transactionArray['customer_login'] = str_replace('allegromail.pl', 'mega1000.pl', $transaction->customer->email->ce_email);
-
-            $transactionArray['phone'] = preg_replace('/[^0-9]/', '', $transaction->customer->phone->cp_Phone);
+            $phone = preg_replace('/[^0-9]/', '', $transaction->customer->phone->cp_Phone);
+            $transactionArray['phone'] = trim($phone, '48');
             $transactionArray['customer_notices'] = empty($transaction->note) ? '' : $transaction->note->ne_Content;
             $transactionArray = $this->setAdressArray($transaction, $transactionArray);
             $transactionArray['is_standard'] = true;
@@ -72,7 +83,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                 $this->buildOrder($transaction, $transactionArray, $product);
             } catch (\Exception $exception) {
                 $message = $exception->getMessage();
-                Log::error("Problem with sello import: $message");
+                Log::error("Problem with sello import: $message", ['class' => $exception->getFile(), 'line' => $exception->getLine(), 'stack' => $exception->getTraceAsString()]);
             }
         });
     }
@@ -105,18 +116,26 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $packageBuilder->setDeliveryId($transaction->tr_DeliveryId);
         $packageBuilder->setPackageNumber($transaction->tr_CheckoutFormCalculatedNumberOfPackages);
 
-        $priceOverrider = new OrderPriceOverrider([$product->id => ['net_selling_price_commercial_unit' => $transaction->transactionItem->tt_Price]]);
+        $priceOverrider = new OrderPriceOverrider([$product->id => ['gross_selling_price_commercial_unit' => $transaction->transactionItem->tt_Price]]);
 
         $orderBuilder = new OrderBuilder();
         $orderBuilder
             ->setPackageGenerator($packageBuilder)
             ->setPriceCalculator($calculator)
-            ->setPriceOverrider($priceOverrider);
+            ->setPriceOverrider($priceOverrider)
+            ->setTotalTransportSumCalculator(new TransportSumCalculator)
+            ->setUserSelector(new GetCustomerForSello());
+
         ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($transactionArray);
 
         $order = Order::find($id);
         $order->sello_id = $transaction->id;
         $order->save();
+        if ($transaction->tr_Paid) {
+            $this->payOrder($order, $transaction);
+            $this->setLabels($order);
+        }
+
     }
 
 
@@ -134,16 +153,15 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                 $numberStart = true;
             }
         }
-        $StreetName = str_replace($flatNr, '', $address->adr_Address1);
+        $streetName = str_replace($flatNr, '', $address->adr_Address1);
         $addressArray['city'] = $address->adr_City;
         $addressArray['firstname'] = $name;
         $addressArray['lastname'] = $surname;
         $addressArray['flat_number'] = $flatNr;
-        $addressArray['address'] = $StreetName;
+        $addressArray['address'] = $streetName;
         $addressArray['nip'] = $address->adr_NIP ?: '';
         $addressArray['postal_code'] = $address->adr_ZipCode;
         $addressArray['nip'] = $address->adr_NIP;
-        $addressArray['address'] = $address->adr_Address1 . $address->adr_Address2;
         return $addressArray;
     }
 
@@ -154,9 +172,35 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $name = $adressName[0];
             $surname = $adressName[1];
         } else {
-            $name = $adressName;
+            $name = join('', $adressName);
             $surname = '';
         }
         return array($name, $surname);
+    }
+
+    private function payOrder(Order $order, $transaction)
+    {
+        $payment = new Payment();
+        $payment->amount = $transaction->tr_Remittance;
+        $payment->amount_left = $transaction->tr_Remittance;
+        $payment->customer_id = $order->customer->id;
+        $payment->notices = 'Płatność z Allegro';
+        $payment->save();
+        $promise = '';
+        $chooseOrder = $order->id;
+        OrdersPaymentsController::payOrder($order->id, $transaction->tr_Remittance,
+            $payment->id, $promise,
+            $chooseOrder, null);
+    }
+
+    private function setLabels($order)
+    {
+        $preventionArray = [];
+        dispatch_now(new RemoveLabelJob($order, [self::FINISH_LOGISTIC_LABEL_ID], $preventionArray, self::TRANSPORT_SPEDITION_INIT_LABEL_ID));
+        dispatch_now(new RemoveLabelJob($order, [self::TRANSPORT_SPEDITION_INIT_LABEL_ID], $preventionArray, []));
+        dispatch_now(new RemoveLabelJob($order, [self::WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID], $preventionArray, []));
+        dispatch_now(new RemoveLabelJob($order, [self::VALIDATE_ORDER_LABEL_ID], $preventionArray, []));
+        dispatch_now(new RemoveLabelJob($order, [self::WAIT_FOR_WAREHOUSE_ACCEPT_LABEL_ID], $preventionArray, []));
+        dispatch_now(new RemoveLabelJob($order, [self::PRODUCTION_ACCEPTED_LABEL_ID], $preventionArray, []));
     }
 }

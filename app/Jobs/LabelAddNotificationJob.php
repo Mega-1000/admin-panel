@@ -7,6 +7,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 
@@ -66,8 +67,14 @@ class LabelAddNotificationJob implements ShouldQueue
        }
 
        $subject = "Mega1000 - zmieniono status zamówienia: " . $this->orderId . ' na status: ' . $label->name;
-       \Mailer::create()
-           ->to($order->customer->login)
-           ->send(new LabelAdd($subject, $message));
+       try {
+           \Mailer::create()
+               ->to($order->customer->login)
+               ->send(new LabelAdd($subject, $message));
+       } catch (\Exception $exception) {
+           $message = $exception->getMessage();
+           Log::error("Problem with mailer: $message", ['class' => $exception->getFile(), 'line' => $exception->getLine(), 'stack' => $exception->getTraceAsString()]);
+
+       }
    }
 }
