@@ -156,7 +156,7 @@ class OrdersController extends Controller
             }
             $message = $this->errors[$this->error_code] ?? $e->getMessage();
             Log::error("Problem with create new order: [{$this->error_code}] $message",
-                ['request' => $data, 'class' => get_class($this), 'line' => __LINE__]
+                ['request' => $data, 'class' => get_class($this), 'line' => $e->getLine()]
             );
             $message = $this->errors[$this->error_code] ?? $this->defaultError;
             return response(json_encode([

@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Entities\ColumnVisibility;
+use App\Entities\Order;
+use App\Entities\OrderPayment;
+use App\Entities\Payment;
 use App\Http\Requests\OrderPaymentCreateRequest;
 use App\Http\Requests\OrderPaymentUpdateRequest;
 use App\Jobs\AddLabelJob;
@@ -146,7 +149,7 @@ class OrdersPaymentsController extends Controller
             'created_at' => $request->input('created_at')
         ], $id);
 
-        $this->dispatchLabelsForPaymentAmount($payment);
+        OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
 
         return redirect()->route('orders.edit', ['order_id' => $oldOrderId])->with([
             'message' => __('order_payments.message.update'),
@@ -160,68 +163,23 @@ class OrdersPaymentsController extends Controller
         $chooseOrder = $request->input('chooseOrder');
         $masterPaymentId = $request->input('masterPaymentId');
 
-
         if (!empty($chooseOrder)) {
             $orderId = $chooseOrder;
         } else {
             $orderId = $order_id;
         }
 
-        $order = $this->orderRepository->find($orderId);
-
-
         $promise = $request->input('promise');
 
         if ($promise == 'on') {
             $promise = '1';
-        } else if (Auth::user()->role_id == 4) {
-            $promise = '';
         } else {
             $promise = '';
         }
 
-
-        $order = $this->orderRepository->find($orderId);
-
-        if ($order->payments->count() == 0) {
-
-            dispatch_now(new DispatchLabelEventByNameJob($orderId, "payment-received"));
-            dispatch_now(new RemoveLabelJob($orderId, [44]));
-        }
-
-
-        $payment = $this->repository->create([
-            'amount' => str_replace(",", ".", $request->input('amount')),
-            'master_payment_id' => $masterPaymentId ? $masterPaymentId : null,
-            'order_id' => $orderId,
-            'promise' => $promise,
-            'promise_date' => $request->input('promise_date') ? $request->input('promise_date') : null,
-        ]);
-
-        if ($promise == '') {
-            dispatch_now(new RemoveLabelJob($orderId, [119]));
-        }
-
-        $this->dispatchLabelsForPaymentAmount($payment);
-
-        if (!empty($chooseOrder)) {
-            $masterPayment = $this->paymentRepository->find($masterPaymentId);
-            $masterPayment->update([
-                'amount_left' => $masterPayment->amount_left - str_replace(",", ".", $request->input('amount'))
-            ]);
-            $deleted = $this->repository->findWhere(['order_id' => $orderId, 'amount' => $request->input('amount'), 'promise' => '1'])->first();
-
-            if (!empty($deleted)) {
-                $deleted->delete();
-            }
-        }
-
-
-        if ($payment != null && $order->status_id != 5) {
-            $this->orderRepository->update([
-                'status_id' => 5,
-            ], $orderId);
-        }
+        OrdersPaymentsController::payOrder($orderId, $request->input('amount'),
+            $masterPaymentId, $promise,
+            $chooseOrder, $request->input('promise_date'));
 
         return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
             'message' => __('order_payments.message.store'),
@@ -318,7 +276,7 @@ class OrdersPaymentsController extends Controller
                                         ]);
                                     }
 
-                                    $this->dispatchLabelsForPaymentAmount($payment);
+                                    OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
                                     dispatch_now(new AddLabelJob($connectedOrder->id, [130]));
                                     if ($payment != null && $order->status_id != 5) {
                                         $this->orderRepository->update([
@@ -381,7 +339,7 @@ class OrdersPaymentsController extends Controller
                                         ]);
                                     }
 
-                                    $this->dispatchLabelsForPaymentAmount($payment);
+                                    OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
                                     dispatch_now(new AddLabelJob($order->id, [130]));
                                     if ($payment != null && $order->status_id != 5) {
                                         $this->orderRepository->update([
@@ -459,7 +417,7 @@ class OrdersPaymentsController extends Controller
                                         ]);
                                     }
 
-                                    $this->dispatchLabelsForPaymentAmount($payment);
+                                    OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
 
                                     if ($payment != null && $order->status_id != 5) {
                                         $this->orderRepository->update([
@@ -1041,7 +999,7 @@ class OrdersPaymentsController extends Controller
 
 
 
-                $this->dispatchLabelsForPaymentAmount($payment);
+                OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
 
                 if ($payment != null && $order->status_id != 5) {
                     $this->orderRepository->update([
@@ -1224,12 +1182,54 @@ class OrdersPaymentsController extends Controller
         return $collection;
     }
 
-    protected function dispatchLabelsForPaymentAmount($payment): void
+    protected static function dispatchLabelsForPaymentAmount($payment): void
     {
         if ($payment->order->isPaymentRegulated()) {
             dispatch_now(new DispatchLabelEventByNameJob($payment->order->id, "payment-equal-to-order-value"));
         } else {
             dispatch_now(new DispatchLabelEventByNameJob($payment->order->id, "required-payment-before-unloading"));
+        }
+    }
+
+    public static function payOrder($orderId, $amount, $masterPaymentId, string $promise, $chooseOrder, $promiseDate): void
+    {
+        $order = Order::find($orderId);
+
+        if ($order->payments->count() == 0) {
+            dispatch_now(new DispatchLabelEventByNameJob($orderId, "payment-received"));
+            dispatch_now(new RemoveLabelJob($orderId, [44]));
+        }
+
+        $payment = OrderPayment::create([
+            'amount' => str_replace(",", ".", $amount),
+            'master_payment_id' => $masterPaymentId ? $masterPaymentId : null,
+            'order_id' => $orderId,
+            'promise' => $promise,
+            'promise_date' => $promiseDate ?: null,
+        ]);
+
+        if ($promise == '') {
+            dispatch_now(new RemoveLabelJob($orderId, [119]));
+        }
+
+        OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
+
+        if (!empty($chooseOrder)) {
+            $masterPayment = Payment::find($masterPaymentId);
+            $masterPayment->amount_left = $masterPayment->amount_left - str_replace(",", ".", $amount);
+            $masterPayment->save();
+            $deleted = OrderPayment::where('order_id', $orderId)
+                ->where('amount', $amount)
+                ->where('promise', '1')->first();
+
+            if (!empty($deleted)) {
+                $deleted->delete();
+            }
+        }
+
+        if ($payment != null && $order->status_id != 5) {
+            $order->status_id = 5;
+            $order->save();
         }
     }
 }

@@ -26,11 +26,11 @@ class SelloPackageDivider implements iDividable
 
         for ($packageNumber = 1; $packageNumber <= $this->packageNumber; $packageNumber++) {
             $pack = BackPackPackageDivider::createPackage($template, $order->id, $packageNumber);
-            $quantity = floor($data['order_items'][0]['amount'] / $this->packageNumber);
+            $quantity = floor($data[0]['amount'] / $this->packageNumber);
             if ($packageNumber <= $modulo) {
                 $quantity += 1;
             }
-            $pack->packedProducts()->attach($data['order_items'][0]['id'],
+            $pack->packedProducts()->attach($data[0]['id'],
                 ['quantity' => $quantity]);
         }
         return false;

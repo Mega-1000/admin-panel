@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Entities\Order;
+use App\Entities\Payment;
 use App\Entities\Product;
 use App\Entities\SelTransaction;
 use App\Helpers\GetCustomerForSello;
@@ -11,6 +12,7 @@ use App\Helpers\OrderPriceOverrider;
 use App\Helpers\SelloPackageDivider;
 use App\Helpers\SelloPriceCalculator;
 use App\Helpers\TransportSumCalculator;
+use App\Http\Controllers\OrdersPaymentsController;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -74,7 +76,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                 $this->buildOrder($transaction, $transactionArray, $product);
             } catch (\Exception $exception) {
                 $message = $exception->getMessage();
-                Log::error("Problem with sello import: $message");
+                Log::error("Problem with sello import: $message", ['class' => $exception->getFile(), 'line' => $exception->getLine(), 'stack' => $exception->getTraceAsString()]);
             }
         });
     }
@@ -122,6 +124,9 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $order = Order::find($id);
         $order->sello_id = $transaction->id;
         $order->save();
+        if ($transaction->tr_Paid) {
+            $this->payOrder($order, $transaction);
+        }
     }
 
 
@@ -162,5 +167,20 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $surname = '';
         }
         return array($name, $surname);
+    }
+
+    private function payOrder(Order $order, $transaction)
+    {
+        $payment = new Payment();
+        $payment->amount = $transaction->tr_Remittance;
+        $payment->amount_left = $transaction->tr_Remittance;
+        $payment->customer_id = $order->customer->id;
+        $payment->notices = 'Płatność z Allegro';
+        $payment->save();
+        $promise = '';
+        $chooseOrder = $order->id;
+        OrdersPaymentsController::payOrder($order->id, $transaction->tr_Remittance,
+            $payment->id, $promise,
+            $chooseOrder, null);
     }
 }

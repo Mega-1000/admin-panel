@@ -94,8 +94,6 @@ class OrderBuilder
         }
 
         $customer = $this->userSelector->getCustomer($order, $data);
-
-        error_log(print_r($customer, 1));
         $order->customer_id = $customer->id;
 
         if (!$orderExists) {
@@ -142,7 +140,7 @@ class OrderBuilder
             $canPay = $this->packageGenerator->divide($data['order_items'], $order);
         } catch (Exception $exception) {
             $message = $exception->getMessage();
-            Log::error("Problem with package dividing: $message");
+            Log::error("Problem with package dividing: $message", ['class' => $exception->getFile(), 'line' => $exception->getLine()]);
         }
         if ($this->totalTransportSumCalculator) {
             $order->shipment_price_for_client = $this->totalTransportSumCalculator->getSum($order);
