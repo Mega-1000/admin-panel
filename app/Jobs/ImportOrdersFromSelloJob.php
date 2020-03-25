@@ -24,6 +24,10 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    const FINISH_LOGISTIC_LABEL_ID = 68;
+    const TRANSPORT_SPEDITION_INIT_LABEL_ID = 103;
+    const WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID = 107;
+
     /**
      * Create a new job instance.
      *
@@ -123,10 +127,13 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
         $order = Order::find($id);
         $order->sello_id = $transaction->id;
+//        $order->sello_id = 1;
         $order->save();
         if ($transaction->tr_Paid) {
             $this->payOrder($order, $transaction);
+            $this->setLabels($order);
         }
+
     }
 
 
@@ -182,5 +189,13 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         OrdersPaymentsController::payOrder($order->id, $transaction->tr_Remittance,
             $payment->id, $promise,
             $chooseOrder, null);
+    }
+
+    private function setLabels($order)
+    {
+        $preventionArray = [];
+        dispatch_now(new RemoveLabelJob($order, [self::FINISH_LOGISTIC_LABEL_ID], $preventionArray, self::TRANSPORT_SPEDITION_INIT_LABEL_ID));
+        dispatch_now(new RemoveLabelJob($order, [self::TRANSPORT_SPEDITION_INIT_LABEL_ID], $preventionArray, []));
+        dispatch_now(new RemoveLabelJob($order, [self::WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID], $preventionArray, []));
     }
 }
