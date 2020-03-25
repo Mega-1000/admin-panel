@@ -13,6 +13,9 @@ class BackPackPackageDivider implements iDividable
 {
     public static function calculatePackagesForOrder($order): void
     {
+        if ($order->sello_id) {
+            return;
+        }
         $divider = new BackPackPackageDivider();
         $items = $order->items->map(function ($item) {
             $item->id = $item->product_id;
