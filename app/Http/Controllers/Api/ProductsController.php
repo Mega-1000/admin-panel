@@ -64,9 +64,9 @@ class ProductsController extends Controller
             $groupExp = $exp[1];
             $numberGroup = $exp[0];
             if ($product->date_of_price_change !== null) {
-                $dateOfPriceChange = new Carbon($product->date_of_price_change);
+                $dateOfPriceChange = (new Carbon($product->date_of_price_change))->addDay()->toDateString();
             } else {
-                $dateOfPriceChange = null;
+                $dateOfPriceChange = '';
             }
             $array = [
                 'id' => $product->id,
@@ -74,7 +74,7 @@ class ProductsController extends Controller
                 'symbol' => $product->symbol,
                 'product_name_supplier' => $product->product_name_supplier,
                 'product_name_supplier_on_documents' => $product->product_name_supplier_on_documents,
-                'date_of_price_change' => $dateOfPriceChange->addDay()->toDateString(),
+                'date_of_price_change' => $dateOfPriceChange,
                 'date_of_the_new_prices' => null,
                 'value_of_price_change_data_first' => $product->value_of_price_change_data_first ?: 0,
                 'value_of_price_change_data_second' => $product->value_of_price_change_data_second ?: 0,
