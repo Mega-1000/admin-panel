@@ -199,6 +199,9 @@ class OrderBuilder
 
         foreach ($items as $item) {
             $product = Product::find($item['id']);
+            if (empty($product)) {
+                throw new Exception('product_not_found');
+            }
             $price = $product->price;
             if (!$product || !$price) {
                 throw new Exception('wrong_product_id');

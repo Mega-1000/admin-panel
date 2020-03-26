@@ -79,6 +79,7 @@ class OrdersController extends Controller
         'wrong_password' => 'Błędny adres e-mail lub hasło',
         'wrong_phone' => 'Podaj prawidłowy nr telefonu',
         'package_must_be_cancelled' => 'Paczka musi pierw zostać zanulowana',
+        'product_not_found' => 'Nie znaleziono produktu. Sprawdź czy nie został usunięty',
         'wrong_product_id' => null
     ];
 
@@ -156,7 +157,7 @@ class OrdersController extends Controller
             }
             $message = $this->errors[$this->error_code] ?? $e->getMessage();
             Log::error("Problem with create new order: [{$this->error_code}] $message",
-                ['request' => $data, 'class' => get_class($this), 'line' => $e->getLine()]
+                ['request' => $data, 'class' => $e->getFile(), 'line' => $e->getLine()]
             );
             $message = $this->errors[$this->error_code] ?? $this->defaultError;
             return response(json_encode([
@@ -194,9 +195,8 @@ class OrdersController extends Controller
 
             return $this->createdResponse();
         } catch (\Exception $e) {
-            Log::error('Problem with store order message.',
-                ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
-            );
+            $message = $e->getMessage();
+            Log::error("Problem with store order message: $message", ['class' => $e->getFile(), 'line' => $e->getLine()]);
             die();
         }
     }
