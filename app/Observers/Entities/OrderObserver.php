@@ -8,6 +8,7 @@ use App\Jobs\DispatchLabelEventByNameJob;
 use App\Mail\ShipmentDateInOrderChangedMail;
 use App\Repositories\StatusRepository;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class OrderObserver
 {
@@ -48,15 +49,20 @@ class OrderObserver
                 $original = $order->getOriginal('shipment_date');
                 $newDate = $order->shipment_date;
 
-                if((new Carbon($original))->diffInDays($newDate) !== 0)
-                {
-                    \Mailer::create()
-                        ->to($order->customer->login)
-                        ->send(new ShipmentDateInOrderChangedMail([
-                            'oldDate' => $original,
-                            'newDate' => $newDate,
-                            'orderId' => $order->id,
-                        ]));
+                if ((new Carbon($original))->diffInDays($newDate) !== 0) {
+                    try {
+                        \Mailer::create()
+                            ->to($order->customer->login)
+                            ->send(new ShipmentDateInOrderChangedMail([
+                                'oldDate' => $original,
+                                'newDate' => $newDate,
+                                'orderId' => $order->id,
+                            ]));
+                    } catch (\Exception $exception) {
+                        Log::error('Can\'t send email about shipment date change .',
+                            ['exception' => $exception->getMessage(), 'class' => $exception->getFile(), 'line' => $exception->getLine()]
+                        );
+                    }
                 }
             }
         }
