@@ -115,7 +115,6 @@ class OrderBuilder
 
         $deliveryEmail = isset($data['delivery_address']) ? $data['delivery_address']['email'] ?? '' : '';
         $invoiceEmail = isset($data['invoice_address']) ? $data['invoice_address']['email'] ?? '' : '';
-        error_log($deliveryEmail);
         OrderBuilder::updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone'] ?? '', 'order', $deliveryEmail);
         OrderBuilder::updateOrderAddress($order, $data['invoice_address'] ?? [], 'INVOICE_ADDRESS', $data['phone'] ?? '', 'order', $invoiceEmail);
         if (isset($data['is_standard']) && $data['is_standard'] || $order->customer->addresses()->count() < 2) {
