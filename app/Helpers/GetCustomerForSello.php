@@ -9,6 +9,11 @@ class GetCustomerForSello implements iGetUser
 {
     public function getCustomer($order, $data)
     {
-        return Customer::where('login', $data['customer_login'])->first();
+        $customer = Customer::where('login', $data['customer_login'])->first();
+        if (empty($customer)) {
+            $newOrder = new GetCustomerForNewOrder();
+            $newOrder->getCustomer($order, $data);
+        }
+        return $customer;
     }
 }
