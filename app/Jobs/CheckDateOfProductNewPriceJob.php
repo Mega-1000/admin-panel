@@ -190,13 +190,13 @@ class CheckDateOfProductNewPriceJob
 
     private function calculatePriceAfterDiscounts($price, $product)
     {
-        return (
-            (
-                (float)$price
-                * (100 - $product->price->discount1)
-                * (100 - $product->price->discount2)
-                * (100 - $product->price->discount3)
-                + $product->price->solid_discount
-            ) / 1000000);
+        return
+            (float) $price['net_purchase_price_commercial_unit']
+            * (100 - $product->price->discount1)
+            * (100 - $product->price->discount2)
+            * (100 - $product->price->discount3)
+            / 1000000
+            + $product->price->solid_discount
+        ;
     }
 }
