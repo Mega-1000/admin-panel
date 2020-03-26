@@ -6,6 +6,7 @@ use App\Entities\Order;
 use App\Entities\Payment;
 use App\Entities\Product;
 use App\Entities\SelTransaction;
+use App\Entities\Warehouse;
 use App\Helpers\GetCustomerForSello;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceOverrider;
@@ -13,6 +14,7 @@ use App\Helpers\SelloPackageDivider;
 use App\Helpers\SelloPriceCalculator;
 use App\Helpers\SelloTransportSumCalculator;
 use App\Http\Controllers\OrdersPaymentsController;
+use App\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -58,9 +60,10 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $transactionArray['customer_login'] = str_replace('allegromail.pl', 'mega1000.pl', $transaction->customer->email->ce_email);
             $phone = preg_replace('/[^0-9]/', '', $transaction->customer->phone->cp_Phone);
             $transactionArray['phone'] = trim($phone, '48');
+            $transactionArray['update_email'] = true;
             $transactionArray['customer_notices'] = empty($transaction->note) ? '' : $transaction->note->ne_Content;
             $transactionArray = $this->setAdressArray($transaction, $transactionArray);
-            $transactionArray['is_standard'] = true;
+            $transactionArray['is_standard'] = 1;
             $transactionArray['rewrite'] = 0;
             if ($transaction->transactionItem->itemExist()) {
                 $symbol = explode('-', $transaction->transactionItem->item->it_Symbol);
@@ -99,6 +102,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         } else if ($transaction->deliveryAddressBefore) {
             $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->deliveryAddressBefore);
         }
+        $transactionArray['delivery_address']['email'] = $transactionArray['customer_login'];
 
         if ($transaction->invoiceAddress) {
             $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->invoiceAddress);
@@ -107,6 +111,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         } else if ($transactionArray['delivery_address']) {
             $transactionArray['invoice_address']= $transactionArray['delivery_address'];
         }
+        $transactionArray['invoice_address']['email'] = $transactionArray['customer_login'];
         return $transactionArray;
     }
 
@@ -137,14 +142,17 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
         $order = Order::find($id);
         $order->sello_id = $transaction->id;
+        $user = User::where('name', '001')->first();
+        $order->employee()->associate($user);
+        $warehouse = Warehouse::where('symbol', 'MEGA-OLAWA')->first();
+        $order->warehouse()->associate($warehouse);
+
         $order->save();
         if ($transaction->tr_Paid) {
             $this->payOrder($order, $transaction);
             $this->setLabels($order);
         }
-
     }
-
 
     private function setDeliveryAddress($address): array
     {

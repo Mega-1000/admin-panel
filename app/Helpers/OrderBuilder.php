@@ -113,8 +113,10 @@ class OrderBuilder
 
         $this->assignItemsToOrder($order, $data['order_items']);
 
-        OrderBuilder::updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone'] ?? '', 'order');
-        OrderBuilder::updateOrderAddress($order, $data['invoice_address'] ?? [], 'INVOICE_ADDRESS', $data['phone'] ?? '', 'order');
+        $deliveryEmail = isset($data['delivery_address']) ? $data['delivery_address']['email'] ?? '' : '';
+        $invoiceEmail = isset($data['invoice_address']) ? $data['invoice_address']['email'] ?? '' : '';
+        OrderBuilder::updateOrderAddress($order, $data['delivery_address'] ?? [], 'DELIVERY_ADDRESS', $data['phone'] ?? '', 'order', $deliveryEmail);
+        OrderBuilder::updateOrderAddress($order, $data['invoice_address'] ?? [], 'INVOICE_ADDRESS', $data['phone'] ?? '', 'order', $invoiceEmail);
         if (isset($data['is_standard']) && $data['is_standard'] || $order->customer->addresses()->count() < 2) {
             OrderBuilder::updateOrderAddress(
                 $order,
@@ -245,10 +247,14 @@ class OrderBuilder
             case 'order':
                 $address = $order->addresses()->where('type', $type)->first();
                 $obj = $order;
+                $exists = (bool)$address;
                 if (!$address) {
                     $address = new OrderAddress();
                     $address->phone = $phone;
                     $address->type = $type;
+                }
+                if (!empty($login) && (!$exists || $forceUpdateEmail)) {
+                    $address->email = $login;
                 }
                 break;
             case 'customer':
