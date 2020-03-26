@@ -18,6 +18,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ImportOrdersFromSelloJob implements ShouldQueue
@@ -80,8 +81,11 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $orderItems [] = $item;
             $transactionArray['order_items'] = $orderItems;
             try {
+                DB::beginTransaction();
                 $this->buildOrder($transaction, $transactionArray, $product);
+                DB::commit();
             } catch (\Exception $exception) {
+                DB::rollBack();
                 $message = $exception->getMessage();
                 Log::error("Problem with sello import: $message", ['class' => $exception->getFile(), 'line' => $exception->getLine(), 'stack' => $exception->getTraceAsString()]);
             }
