@@ -14,5 +14,6 @@ class GetCustomerForSello implements iGetUser
             $newOrder = new GetCustomerForNewOrder();
             $newOrder->getCustomer($order, $data);
         }
+        return $customer;
     }
 }
