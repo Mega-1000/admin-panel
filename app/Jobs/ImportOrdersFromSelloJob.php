@@ -11,7 +11,7 @@ use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceOverrider;
 use App\Helpers\SelloPackageDivider;
 use App\Helpers\SelloPriceCalculator;
-use App\Helpers\TransportSumCalculator;
+use App\Helpers\SelloTransportSumCalculator;
 use App\Http\Controllers\OrdersPaymentsController;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -122,12 +122,15 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
         $priceOverrider = new OrderPriceOverrider([$product->id => ['gross_selling_price_commercial_unit' => $transaction->transactionItem->tt_Price]]);
 
+        $transportPrice = new SelloTransportSumCalculator();
+        $transportPrice->setTransportPrice($transaction->tr_DeliveryCost);
+
         $orderBuilder = new OrderBuilder();
         $orderBuilder
             ->setPackageGenerator($packageBuilder)
             ->setPriceCalculator($calculator)
             ->setPriceOverrider($priceOverrider)
-            ->setTotalTransportSumCalculator(new TransportSumCalculator)
+            ->setTotalTransportSumCalculator($transportPrice)
             ->setUserSelector(new GetCustomerForSello());
 
         ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($transactionArray);
