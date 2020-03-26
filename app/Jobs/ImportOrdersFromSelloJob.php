@@ -6,6 +6,7 @@ use App\Entities\Order;
 use App\Entities\Payment;
 use App\Entities\Product;
 use App\Entities\SelTransaction;
+use App\Entities\Warehouse;
 use App\Helpers\GetCustomerForSello;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceOverrider;
@@ -13,6 +14,7 @@ use App\Helpers\SelloPackageDivider;
 use App\Helpers\SelloPriceCalculator;
 use App\Helpers\SelloTransportSumCalculator;
 use App\Http\Controllers\OrdersPaymentsController;
+use App\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -140,15 +142,17 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
         $order = Order::find($id);
         $order->sello_id = $transaction->id;
-        $order->sello_id = 1;
+        $user = User::where('name', '001')->first();
+        $order->employee()->associate($user);
+        $warehouse = Warehouse::where('symbol', 'MEGA-OLAWA')->first();
+        $order->warehouse()->associate($warehouse);
+
         $order->save();
         if ($transaction->tr_Paid) {
             $this->payOrder($order, $transaction);
             $this->setLabels($order);
         }
-
     }
-
 
     private function setDeliveryAddress($address): array
     {
