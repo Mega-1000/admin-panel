@@ -147,7 +147,7 @@ class PackageDivider implements iPackageDivider
                 $item->quantity -= 1;
             } catch (\Exception $exception) {
                 if ($exception->getMessage() != Package::CAN_NOT_ADD_MORE) {
-                    Log::error('Błąd budownaia paczek: ' . $exception->getMessage(), ['class' => get_class($this), 'line' => __LINE__]);
+                    Log::error('Błąd budownaia paczek: ' . $exception->getMessage(), ['class' => $exception->getFile(), 'line' => $exception->getLine()]);
                 } else if ($package->getProducts()->count() === 0) {
                     return ['packages' => false, 'failed' => $item];
                 } else {
@@ -301,7 +301,7 @@ class PackageDivider implements iPackageDivider
                 $palette->tryFitInSmallerPalette();
             } catch (\Exception $exception) {
                 Log::info('Problem z pasowaniem palety na mniejszą: ',
-                    ['exception' => $exception->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
+                    ['exception' => $exception->getMessage(), ['class' => $exception->getFile(), 'line' => $exception->getLine()]]
                 );
             }
             $palette->setPackageCost();

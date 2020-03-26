@@ -123,7 +123,7 @@ class ProductsController extends Controller
             return $this->createdResponse();
         } catch (\Exception $e) {
             Log::error('Problem with update product prices.',
-                ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
+                ['exception' => $e->getMessage(), 'class' => $e->getFile(), 'line' => $e->getLine()]
             );
             die();
         }
