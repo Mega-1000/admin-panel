@@ -95,7 +95,7 @@ class OrderWarehouseNotificationController extends Controller
             return $this->okResponse();
         } catch (\Exception $e) {
             Log::error('Problem with create new order.',
-                ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
+                ['exception' => $e->getMessage(), 'class' => $e->getFile(), 'line' => $e->getLine()]
             );
             die();
         }
