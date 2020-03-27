@@ -46,6 +46,7 @@
                 </div>
                 <div class="form-group">
                     <label for="job_position">@lang('employees.form.job_position')</label>
+                    @if (!empty($roles))
                     @php
                     $roles;
                     $count=1;
@@ -76,6 +77,7 @@
                         @endphp
                     @endforeach
                     <input type="hidden" id="rolecount" name="rolecount" value="{{$count-1}}">
+                    @endif
                 </div>
                 <div class="form-group">
                     <label for="person_number">@lang('employees.form.numer')</label>
@@ -84,6 +86,7 @@
                 </div>
                 <div class="form-group">
                     <label for="job_position">@lang('employees.form.magazines')</label>
+                    @if (!empty($warehouses))
                     @php
                     $warehouses;
                     $count=1;
@@ -113,6 +116,7 @@
                         @endphp
                     @endforeach 
                     <input type="hidden" id="magazinecount" name="magazinecount" value="{{$count-1}}">
+                    @endif
                 </div>
                 <div class="form-group">
                     <label for="comments">@lang('employees.form.comments')</label>
@@ -139,6 +143,11 @@
                         <label for="longitude">@lang('firms.form.address.longitude')</label>
                         <input type="text" class="form-control" id="longitude" name="longitude"
                                value="{{ $employee->longitude }}" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="radius">@lang('employees.form.radius')</label>
+                        <input type="text" class="form-control" id="radius" name="radius"
+                               value="{{ $employee->radius }}">
                     </div>
                     <div class="form-group">
                         <label for="status">@lang('employees.form.status')</label>

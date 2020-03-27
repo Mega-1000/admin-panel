@@ -28,7 +28,7 @@ return [
     'form' => [
         'firstname' => 'Imię',
         'lastname' => 'Nazwisko',
-        'email' => 'Email',
+        'email' => 'Email pracownika',
         'status' => 'Status',
         'created_at' => 'Utworzone w',
         'active' => 'Aktywny',
@@ -39,11 +39,12 @@ return [
         'consultant' => 'Konsultant',
         'storekeeper' => 'Magazynier',
         'sales' => 'Sprzedawca',
-        'comments' => 'Uwagi',
-        'additional_comments' => 'Dodatkowe uwagi',
+        'comments' => 'Uwagi (widoczne dla klienta)',
+        'additional_comments' => 'Dodatkowe uwagi(widoczne dla pracowników Mega)',
         'postal_code' => 'Kod pocztowy',
         'magazines' => 'Magazyny (Które obsługuje pracownik)',
-        'numer' => 'Numer osoby (Potrzebne do czatu)'
+        'numer' => 'Numer osoby (Potrzebne do czatu, jezeli kilka osob bedzie mialo tą samą pozycje to wybierze według tego numeru)',
+        'radius' => 'Zakres działania'
     ],
     'message' => [
         'store' => 'Pracownik został dodany pomyślnie!',
