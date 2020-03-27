@@ -67,6 +67,7 @@ class EmployeesController extends Controller
             $employee->longitude = $postal->longitude;
         }
         $employee->person_number = $request->input('person_number');
+        $employee->radius = $request->input('radius');
         $employee->save();
         for ($i = $request->input('rolecount'); $i>0 ; $i--){
             if(!empty($request->input('role'.$i))) {
@@ -130,6 +131,7 @@ class EmployeesController extends Controller
             $employee->longitude = $postal->longitude;
         }
         $employee->person_number = $request->input('person_number');
+        $employee->radius = $request->input('radius');
         $employee->save();
         $employee->employeeRoles()->detach();
         for ($i = $request->input('rolecount'); $i>0 ; $i--){
