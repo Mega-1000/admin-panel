@@ -64,7 +64,7 @@ class EmployeeRoleController extends Controller
 
         $role->name = $request->name;
         $role->symbol = $request->name;
-        $role->save;
+        $role->save();
 
         return redirect()->route('employee_role.index')->with([
             'message' => __('firms.message.role_update'),
