@@ -70,7 +70,7 @@ class EmployeesController extends Controller
         $employee->save();
         for ($i = $request->input('rolecount'); $i>0 ; $i--){
             if(!empty($request->input('role'.$i))) {
-                $employee->employeeroles()->attach([$request->input('role'.$i)]);
+                $employee->employeeRoles()->attach([$request->input('role'.$i)]);
             }
         }
         for ($i = $request->input('magazinecount'); $i>0 ; $i--){
@@ -96,7 +96,7 @@ class EmployeesController extends Controller
         $roles = EmployeeRole::all();
         $firm_id = $employee->firm_id;
         $warehouses = Warehouse::where('firm_id', $firm_id)->get();
-        $attachedRoles = $employee->employeeroles;
+        $attachedRoles = $employee->employeeRoles;
         $attachedWarehouses = $employee->warehouses;
 
         return view('firms.employees.edit', compact('employee'))->withRoles($roles)->withWarehouses($warehouses)
@@ -131,10 +131,10 @@ class EmployeesController extends Controller
         }
         $employee->person_number = $request->input('person_number');
         $employee->save();
-        $employee->employeeroles()->detach();
+        $employee->employeeRoles()->detach();
         for ($i = $request->input('rolecount'); $i>0 ; $i--){
             if(!empty($request->input('role'.$i))) {
-                $employee->employeeroles()->attach([$request->input('role'.$i)]);
+                $employee->employeeRoles()->attach([$request->input('role'.$i)]);
             }
         }
         $employee->warehouses()->detach();

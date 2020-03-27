@@ -110,7 +110,7 @@ class FirmsController extends Controller
         $warehouses = $this->warehouseRepository->all();
         $employees = Employee::where('firm_id', $id)->get();
         foreach ($employees as $employee) {
-           $roles = $employee->employeeroles;
+           $roles = $employee->employeeRoles;
            $employee->role = '';
            foreach ($roles as $role) {
                $rname = $role->name;

@@ -40,7 +40,7 @@ class Employee extends Model implements Transformable
         return $this->belongsToMany(Warehouse::class, 'employee_warehouse')->withTimestamps();
     }
     
-    public function employeeroles()
+    public function employeeRoles()
     {
         return $this->belongsToMany(EmployeeRole::class, 'employeerole_employee')->withTimestamps();
     }
