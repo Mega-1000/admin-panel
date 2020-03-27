@@ -11,7 +11,8 @@ use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
-
+use App\Entities\PostalCodeLatLon;
+use App\Entities\WarehouseAddress;
 /**
  * Class WarehousesController.
  *
@@ -65,20 +66,23 @@ class WarehousesController extends Controller
     public function store(WarehouseCreateRequest $request, $id)
     {
         $openDays = $this->generateOpenDays($request);
+        $postal = PostalCodeLatLon::where('postal_code', $request->input('postal_code'))->first();
         $warehouse = $this->repository->create([
             'firm_id' => $id,
             'symbol' => $request->input('symbol'),
             'status' => $request->input('status'),
-            'radius' => $request->input('radius'),
+            'radius' => $request->input('radius'),            
         ]);
 
-        $this->warehouseAddressRepository->create([
-            'warehouse_id' => $warehouse->id,
-            'address' => $request->input('address'),
-            'warehouse_number' => $request->input('warehouse_number'),
-            'postal_code' => $request->input('postal_code'),
-            'city' => $request->input('city'),
-        ]);
+        $warehouseAddress = new WarehouseAddress;
+        $warehouseAddress->warehouse_id = $warehouse->id;
+        $warehouseAddress->address = $request->input('address');
+        $warehouseAddress->warehouse_number = $request->input('warehouse_number');
+        $warehouseAddress->postal_code = $request->input('postal_code');
+        $warehouseAddress->latitude = $postal->latitude;
+        $warehouseAddress->longitude = $postal->longitude;
+        $warehouseAddress->save();
+        
 
         $this->warehousePropertyRepository->create([
             'warehouse_id' => $warehouse->id,
@@ -126,9 +130,19 @@ class WarehousesController extends Controller
         if (empty($warehouse)) {
             abort(404);
         }
-
+        $postal = PostalCodeLatLon::where('postal_code', $request->input('postal_code'))->first();  
         $this->repository->update($request->all(), $warehouse->id);
-        $this->warehouseAddressRepository->update($request->all(), $warehouse->address->id);
+        
+        $warehouseAddress =  WarehouseAddress::find($id);
+        $warehouseAddress->warehouse_id = $warehouse->id;
+        $warehouseAddress->address = $request->input('address');
+        $warehouseAddress->warehouse_number = $request->input('warehouse_number');
+        $warehouseAddress->postal_code = $request->input('postal_code');
+        $warehouseAddress->latitude = $postal->latitude;
+        $warehouseAddress->longitude = $postal->longitude;
+        $warehouseAddress->save();
+        
+
         $this->warehousePropertyRepository->update([
             'firstname' => $request->input('firstname'),
             'lastname' => $request->input('lastname'),

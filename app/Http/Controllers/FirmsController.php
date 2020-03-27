@@ -10,6 +10,7 @@ use App\Http\Requests\FirmUpdateRequest;
 use App\Repositories\FirmAddressRepository;
 use App\Repositories\FirmRepository;
 use Yajra\DataTables\Facades\DataTables;
+use App\Entities\Employee;
 
 /**
  * Class FirmsController.
@@ -107,6 +108,15 @@ class FirmsController extends Controller
         $firm = $this->repository->find($id);
         $firmAddress = $this->firmAddressRepository->findByField('firm_id', $firm->id);
         $warehouses = $this->warehouseRepository->all();
+        $employees = Employee::where('firm_id', $id)->get();
+        foreach ($employees as $employee) {
+           $roles = $employee->employeeRoles;
+           $employee->role = '';
+           foreach ($roles as $role) {
+               $rname = $role->name;
+               $employee->role .= ''.$rname.' ';
+           }
+        }
 
         $visibilitiesWarehouse = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('warehouses'));
         foreach ($visibilitiesWarehouse as $key => $row) {
@@ -119,7 +129,7 @@ class FirmsController extends Controller
             $visibilitiesEmployee[$key]->hidden = json_decode($row->hidden, true);
         }
         return view('firms.edit',
-            compact('visibilitiesWarehouse', 'visibilitiesEmployee', 'firm', 'firmAddress', 'warehouses'));
+            compact('visibilitiesWarehouse', 'visibilitiesEmployee', 'firm', 'firmAddress', 'warehouses'))->withEmployees($employees);
     }
 
     /**

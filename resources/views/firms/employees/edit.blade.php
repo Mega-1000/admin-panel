@@ -47,42 +47,72 @@
                 <div class="form-group">
                     <label for="job_position">@lang('employees.form.job_position')</label>
                     @php
-                        $jobs = [
-                            'SECRETARIAT', 'CONSULTANT', 'STOREKEEPER', 'SALES',
-                        ];
+                    $roles;
+                    $count=1;
+                    $attachedRoles;
                     @endphp
-                    <select class="form-control text-uppercase" name="job_position">
-                        @foreach($jobs as $job)
+                    @foreach($roles as $role)
+                        @php
+                            $checked=0;
+                        @endphp
+                        @foreach($attachedRoles as $attachedRole)
+                            @if ($attachedRole->id == $role->id)
                             @php
-                                if ($job === 'SECRETARIAT') {
-                                    if($employee->job_position == 'SECRETARIAT'){
-                                        echo '<option selected="selected" value='.$job.'>'. __('employees.form.secretariat').'</option>';
-                                    } else {
-                                        echo '<option value='.$job.'>'. __('employees.form.secretariat').'</option>';
-                                    }
-                                } elseif ($job === 'CONSULTANT'){
-                                                                      if($employee->job_position == 'CONSULTANT'){
-                                        echo '<option selected="selected" value='.$job.'>'. __('employees.form.consultant').'</option>';
-                                    } else {
-                                        echo '<option value='.$job.'>'. __('employees.form.consultant').'</option>';
-                                    }
-
-                                } elseif ($job === 'STOREKEEPER'){
-                                                                  if($employee->job_position == 'STOREKEEPER'){
-                                        echo '<option selected="selected" value='.$job.'>'. __('employees.form.storekeeper').'</option>';
-                                    } else {
-                                        echo '<option  value='.$job.'>'. __('employees.form.storekeeper').'</option>';
-                                    }
-                                } elseif ($job === 'SALES'){
-                                if($employee->job_position == 'SALES'){
-                                        echo '<option selected="selected" value='.$job.'>'. __('employees.form.sales').'</option>';
-                                    } else {
-                                        echo '<option value='.$job.'>'. __('employees.form.sales').'</option>';
-                                    }
-                                }
+                                $checked=2;
                             @endphp
+                            @endif
                         @endforeach
-                    </select>
+
+                        <div>
+                            <label>{{$role->name}}</label>
+                            @if ($checked == 0)
+                            <input type="checkbox" id="role{{$count}}" name="role{{$count}}" value="{{$role->id}}">
+                            @elseif ($checked == 2)
+                            <input type="checkbox" id="role{{$count}}" name="role{{$count}}" value="{{$role->id}}" checked>
+                            @endif
+                        </div>
+                        @php        
+                        $count++;
+                        @endphp
+                    @endforeach
+                    <input type="hidden" id="rolecount" name="rolecount" value="{{$count-1}}">
+                </div>
+                <div class="form-group">
+                    <label for="person_number">@lang('employees.form.numer')</label>
+                    <input type="number" class="form-control" id="person_number" name="person_number"
+                           value="{{ $employee->person_number }}">
+                </div>
+                <div class="form-group">
+                    <label for="job_position">@lang('employees.form.magazines')</label>
+                    @php
+                    $warehouses;
+                    $count=1;
+                    $attachedWarehouses;
+                    @endphp
+                    @foreach($warehouses as $warehouse)
+                        @php
+                            $checked=0;
+                        @endphp
+                        @foreach($attachedWarehouses as $attachedWarehouse)
+                            @if ($attachedWarehouse->id == $warehouse->id)
+                                @php
+                                $checked=2;
+                                @endphp
+                            @endif
+                        @endforeach
+                        <div>
+                            <label>{{$warehouse->symbol}}</label>
+                            @if ($checked == 0)
+                            <input type="checkbox" id="warehouse{{$count}}" name="warehouse{{$count}}" value="{{$warehouse->id}}">
+                            @elseif ($checked == 2)
+                            <input type="checkbox" id="warehouse{{$count}}" name="warehouse{{$count}}" value="{{$warehouse->id}}" checked>
+                            @endif
+                        </div>
+                        @php        
+                            $count++;
+                        @endphp
+                    @endforeach 
+                    <input type="hidden" id="magazinecount" name="magazinecount" value="{{$count-1}}">
                 </div>
                 <div class="form-group">
                     <label for="comments">@lang('employees.form.comments')</label>
@@ -99,6 +129,16 @@
                         <label for="postal_code">@lang('employees.form.postal_code')</label>
                         <input type="text" class="form-control" id="postal_code" name="postal_code"
                                value="{{ $employee->postal_code }}">
+                    </div>
+                    <div class="form-group">
+                        <label for="latitude">@lang('firms.form.address.latitude')</label>
+                        <input type="text" class="form-control disabled" id="latitude" name="latitude"
+                               value="{{ $employee->latitude }}" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label for="longitude">@lang('firms.form.address.longitude')</label>
+                        <input type="text" class="form-control" id="longitude" name="longitude"
+                               value="{{ $employee->longitude }}" disabled>
                     </div>
                     <div class="form-group">
                         <label for="status">@lang('employees.form.status')</label>

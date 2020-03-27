@@ -91,6 +91,16 @@
                                     <input type="text" class="form-control" id="city" name="city"
                                            value="{{ $warehouseAddress->city }}">
                                 </div>
+                                <div class="form-group">
+                                    <label for="latitude">@lang('firms.form.address.latitude')</label>
+                                    <input type="text" class="form-control" id="latitude" name="latitude"
+                                           value="{{ $warehouseAddress->latitude }}" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label for="longitude">@lang('firms.form.address.longitude')</label>
+                                    <input type="text" class="form-control" id="longitude" name="longitude"
+                                           value="{{ $warehouseAddress->longitude }}" disabled>
+                                </div>
                             </div>
                             <div class="warehouses-property" id="property">
                                 <div class="form-group">

@@ -42,6 +42,8 @@ return [
         'comments' => 'Uwagi',
         'additional_comments' => 'Dodatkowe uwagi',
         'postal_code' => 'Kod pocztowy',
+        'magazines' => 'Magazyny (Które obsługuje pracownik)',
+        'numer' => 'Numer osoby (Potrzebne do czatu)'
     ],
     'message' => [
         'store' => 'Pracownik został dodany pomyślnie!',

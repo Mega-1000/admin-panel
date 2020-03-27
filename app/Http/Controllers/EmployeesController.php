@@ -6,6 +6,10 @@ use App\Http\Requests\EmployeeCreateRequest;
 use App\Http\Requests\EmployeeUpdateRequest;
 use App\Repositories\EmployeeRepository;
 use Yajra\DataTables\Facades\DataTables;
+use App\Entities\EmployeeRole;
+use App\Entities\Warehouse;
+use App\Entities\Employee;
+use App\Entities\PostalCodeLatLon;
 
 /**
  * Class EmployeesController.
@@ -35,7 +39,9 @@ class EmployeesController extends Controller
      */
     public function create($id)
     {
-        return view('firms.employees.create', compact('id'));
+        $roles = EmployeeRole::all();
+        $warehouses = Warehouse::where('firm_id', $id)->get();
+        return view('firms.employees.create', compact('id'))->withRoles($roles)->withWarehouses($warehouses); 
     }
 
     /**
@@ -45,19 +51,33 @@ class EmployeesController extends Controller
      */
     public function store(EmployeeCreateRequest $request, $id)
     {
-        $this->repository->create([
-            'firm_id' => $id,
-            'warehouse_id' => null,
-            'email' => $request->input('email'),
-            'firstname' => $request->input('firstname'),
-            'lastname' => $request->input('lastname'),
-            'phone' => $request->input('phone'),
-            'job_position' => $request->input('job_position'),
-            'comments' => $request->input('comments'),
-            'additional_comments' => $request->input('additional_comments'),
-            'postal_code' => $request->input('postal_code'),
-            'status' => $request->input('status')
-        ]);
+        $postal = PostalCodeLatLon::where('postal_code', $request->input('postal_code'))->first(); 
+        $employee = new Employee;
+        $employee->firm_id = $id;
+        $employee->email = $request->input('email');
+        $employee->firstname = $request->input('firstname');
+        $employee->lastname = $request->input('lastname');
+        $employee->phone= $request->input('phone');
+        $employee->comments =  $request->input('comments');
+        $employee->additional_comments = $request->input('additional_comments');
+        $employee->postal_code = $request->input('postal_code');
+        $employee->status = $request->input('status');
+        if (!empty($postal)) {
+            $employee->latitude = $postal->latitude;
+            $employee->longitude = $postal->longitude;
+        }
+        $employee->person_number = $request->input('person_number');
+        $employee->save();
+        for ($i = $request->input('rolecount'); $i>0 ; $i--){
+            if(!empty($request->input('role'.$i))) {
+                $employee->employeeRoles()->attach([$request->input('role'.$i)]);
+            }
+        }
+        for ($i = $request->input('magazinecount'); $i>0 ; $i--){
+            if(!empty($request->input('magazine'.$i))) {
+                $employee->warehouses()->attach([$request->input('magazine'.$i)]);
+            }
+        }
 
         return redirect()->route('firms.edit', ['firm_id' => $id])->with([
             'message' => __('firms.message.store'),
@@ -72,9 +92,15 @@ class EmployeesController extends Controller
      */
     public function edit($id)
     {
-        $employee = $this->repository->find($id);
+        $employee = Employee::find($id);
+        $roles = EmployeeRole::all();
+        $firm_id = $employee->firm_id;
+        $warehouses = Warehouse::where('firm_id', $firm_id)->get();
+        $attachedRoles = $employee->employeeRoles;
+        $attachedWarehouses = $employee->warehouses;
 
-        return view('firms.employees.edit', compact('employee'));
+        return view('firms.employees.edit', compact('employee'))->withRoles($roles)->withWarehouses($warehouses)
+            ->withAttachedRoles($attachedRoles)->withAttachedWarehouses($attachedWarehouses);
     }
 
 
@@ -85,18 +111,40 @@ class EmployeesController extends Controller
      */
     public function update(EmployeeUpdateRequest $request, $id)
     {
-        $employee = $this->repository->find($id);
-
+        $employee = Employee::find($id);
+        $postal = PostalCodeLatLon::where('postal_code', $request->input('postal_code'))->first(); 
+         
         if(empty($employee)){
             abort(404);
         }
-
-        $this->repository->update($request->all(), $id);
-
-        return redirect()->back()->with([
-            'message' => __('employees.message.update'),
-            'alert-type' => 'success'
-        ]);
+        $employee->email = $request->input('email');
+        $employee->firstname = $request->input('firstname');
+        $employee->lastname = $request->input('lastname');
+        $employee->phone= $request->input('phone');
+        $employee->comments =  $request->input('comments');
+        $employee->additional_comments = $request->input('additional_comments');
+        $employee->postal_code = $request->input('postal_code');
+        $employee->status = $request->input('status');
+        if (!empty($postal)) {
+            $employee->latitude = $postal->latitude;
+            $employee->longitude = $postal->longitude;
+        }
+        $employee->person_number = $request->input('person_number');
+        $employee->save();
+        $employee->employeeRoles()->detach();
+        for ($i = $request->input('rolecount'); $i>0 ; $i--){
+            if(!empty($request->input('role'.$i))) {
+                $employee->employeeRoles()->attach([$request->input('role'.$i)]);
+            }
+        }
+        $employee->warehouses()->detach();
+        for ($i = $request->input('magazinecount'); $i>0 ; $i--){
+            if(!empty($request->input('warehouse'.$i))) {
+                $employee->warehouses()->attach([$request->input('warehouse'.$i)]);
+            }
+        }
+        $firm_id = $employee->firm_id;
+        return redirect()->route('firms.edit', ['firm_id' => $firm_id]);
     }
 
 
