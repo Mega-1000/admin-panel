@@ -12,8 +12,6 @@ class GetCustomerForSello implements iGetUser
     {
         $customer = Customer::where('login', $data['customer_login'])->first();
         if (empty($customer)) {
-            $newOrder = new GetCustomerForNewOrder();
-            $newOrder->getCustomer($order, $data);
             $customer = new Customer();
             $pass = $customer->generatePassword($data['phone']);
             $customer->login = $data['customer_login'];
