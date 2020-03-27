@@ -105,13 +105,17 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->deliveryAddress);
         } else if ($transaction->deliveryAddressBefore) {
             $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->deliveryAddressBefore);
+        } else if ($transaction->defaultAdress) {
+            $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->defaultAdress);
+        } else if ($transaction->defaultAdressBefore) {
+            $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->defaultAdressBefore);
         }
         $transactionArray['delivery_address']['email'] = $transactionArray['customer_login'];
 
         if ($transaction->invoiceAddress) {
-            $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->invoiceAddress);
+            $transactionArray['invoice_address'] = $this->setDeliveryAddress($transaction->invoiceAddress);
         } else if ($transaction->invoiceAddressBefore) {
-            $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->invoiceAddressBefore);
+            $transactionArray['invoice_address'] = $this->setDeliveryAddress($transaction->invoiceAddressBefore);
         } else if ($transactionArray['delivery_address']) {
             $transactionArray['invoice_address']= $transactionArray['delivery_address'];
         }

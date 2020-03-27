@@ -43,6 +43,20 @@ class SelTransaction extends Model
             ->orderBy('id', 'dsc');
     }
 
+    public function defaultAdress()
+    {
+        return $this->hasOne('App\Entities\SelAddress','adr_PostBuy_TransId', 'id')
+            ->where('adr_Type', 1)
+            ->orderBy('id', 'dsc');
+    }
+
+    public function defaultAdressBefore()
+    {
+        return $this->hasOne('App\Entities\SelAddress','adr_TransId', 'id')
+            ->where('adr_Type', 1)
+            ->orderBy('id', 'dsc');
+    }
+
     public function invoiceAddressBefore()
     {
         return $this->hasOne('App\Entities\SelAddress','adr_TransId', 'id')

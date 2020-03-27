@@ -33,6 +33,8 @@ class SelloPackageDivider implements iDividable
             $pack->packedProducts()->attach($data[0]['id'],
                 ['quantity' => $quantity]);
         }
+        $order->shipment_date = $pack->shipment_date;
+        $order->save();
         return false;
     }
 
