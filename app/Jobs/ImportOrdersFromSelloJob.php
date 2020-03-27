@@ -59,7 +59,11 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             }
             $transactionArray['customer_login'] = str_replace('allegromail.pl', 'mega1000.pl', $transaction->customer->email->ce_email);
             $phone = preg_replace('/[^0-9]/', '', $transaction->customer->phone->cp_Phone);
-            $transactionArray['phone'] = trim($phone, '48');
+            $pos =  strpos($phone, '48');
+            if ($pos === 0) {
+                $phone = substr($phone, 2);
+            }
+            $transactionArray['phone'] = $phone;
             $transactionArray['update_email'] = true;
             $transactionArray['customer_notices'] = empty($transaction->note) ? '' : $transaction->note->ne_Content;
             $transactionArray = $this->setAdressArray($transaction, $transactionArray);
