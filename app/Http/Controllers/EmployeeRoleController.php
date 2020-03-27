@@ -28,6 +28,7 @@ class EmployeeRoleController extends Controller
     {
         $role = new EmployeeRole();
         $role->name = $request->name;
+        $role->symbol = $request->symbol;
         $role->save();
 
         return redirect()->route('employee_role.index')->with([
@@ -45,7 +46,7 @@ class EmployeeRoleController extends Controller
     {
         $role = EmployeeRole::find($id);
 
-        return view('employee_roles.edit', compact('role'));
+        return view('employee_roles.create', compact('role'));
     }
 
 
@@ -56,16 +57,17 @@ class EmployeeRoleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $role = EmployeeRole::find($id);
-
+        $role = EmployeeRole::find($id);      
         if(empty($role)){
             abort(404);
         }
 
-        $this->repository->update($request->all(), $id);
+        $role->name = $request->name;
+        $role->symbol = $request->name;
+        $role->save;
 
-        return redirect()->back()->with([
-            'message' => __('employees.message.update'),
+        return redirect()->route('employee_role.index')->with([
+            'message' => __('firms.message.role_update'),
             'alert-type' => 'success'
         ]);
     }
@@ -73,12 +75,10 @@ class EmployeeRoleController extends Controller
 
     public function destroy($id)
     {
-        $this->repository->delete($id);
+        $role = EmployeeRole::find($id); 
+        $role->delete();
 
-        return redirect()->back()->with([
-            'message' => __('employees.message.delete'),
-            'alert-type' => 'info'
-        ])->withInput(['tab' => 'employees']);
+        return redirect()->route('employee_role.index');
     }
 
 
@@ -91,21 +91,5 @@ class EmployeeRoleController extends Controller
 
         return DataTables::collection($collection)->make(true);
     }
-
-    /**
-     * @return mixed
-     */
-    public function prepareCollection($id)
-    {
-        $collection = $this->repository->findByField('firm_id', $id);
-
-        return $collection;
-    }
-
-    /**
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse
-     */
     
-
-}
+}   

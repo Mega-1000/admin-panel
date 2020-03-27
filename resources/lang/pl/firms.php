@@ -2,7 +2,8 @@
 return [
     'title' => 'Firmy/Magazyny',
     'create' => 'Dodaj firmę',
-    'role_create' => 'Dodaj rolę pracownika',
+    'role_create' => 'Dodaj rolę (stanowisko) pracownika',
+    'role_edit' => 'Edytuj rolę (stanowisko) pracownika',
     'list_role' => 'Lista ról pracowników',
     'roles' => 'Role Pracownikow (Pozycje w firmie/magazynie)',
     'list' => 'Lista firm',
@@ -40,6 +41,7 @@ return [
         'name' => 'Nazwa',
         'short_name' => 'Nazwa skrócona',
         'symbol' => 'Symbol',
+        'role_symbol' => 'Symbol (skrócona nazwa)',
         'delivery_warehouse' => 'Magazyn dostarczający',
         'email' => 'Adres email główny siedziby firmy (sekretariat, w przypadku małej firmy właściciel itp.)',
         'secondary_email' => 'Dodatkowy adres email do siedziby firmy',
@@ -75,5 +77,6 @@ return [
         'send_request_to_update_data' => 'Wysłano prośbę do firmy o aktualizację danych.',
         'send_request_to_update_data_error' => 'Proszę uzupełnić adres email.',
         'role_store' => 'Rola pracownika została dodana pomyślnie',
+        'role_update' => 'Rola pracownika została edytowana pomyślnie',
     ],
 ];

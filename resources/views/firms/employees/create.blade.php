@@ -50,25 +50,41 @@
                                 <div class="form-group">
                                     <label for="job_position">@lang('employees.form.job_position')</label>
                                     @php
-                                        $jobs = [
-                                            'SECRETARIAT', 'CONSULTANT', 'STOREKEEPER', 'SALES',
-                                        ];
+                                    $roles;
+                                    $count=1;
                                     @endphp
-                                    <select class="form-control text-uppercase" name="job_position">
-                                        @foreach($jobs as $job)
-                                            @php
-                                                if ($job === 'SECRETARIAT') {
-                                                    echo '<option value='.$job.'>'. __('employees.form.secretariat').'</option>';
-                                                } elseif ($job === 'CONSULTANT'){
-                                                    echo '<option value='.$job.'>' .__('employees.form.consultant') .'</option>';
-                                                } elseif ($job === 'STOREKEEPER'){
-                                                    echo '<option value='.$job.'>'. __('employees.form.storekeeper') .'</option>';
-                                                } elseif ($job === 'SALES'){
-                                                    echo '<option value='.$job.'>' . __('employees.form.sales') .'</option>';
-                                                }
-                                            @endphp
-                                        @endforeach
-                                    </select>
+                                    @foreach($roles as $role)
+                                    <div>
+                                        <label>{{$role->name}}</label>
+                                        <input type="checkbox" id="role{{$count}}" name="role{{$count}}" value="{{$role->id}}">
+                                    </div>
+                                    @php        
+                                    $count++;
+                                    @endphp
+                                    @endforeach
+                                    <input type="hidden" id="rolecount" name="rolecount" value="{{$count-1}}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="person_number">@lang('employees.form.numer')</label>
+                                    <input type="number" class="form-control" id="person_number" name="person_number"
+                                           value="{{ old('person_number') }}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="job_position">@lang('employees.form.magazines')</label>
+                                    @php
+                                    $warehouses;
+                                    $count=1;
+                                    @endphp
+                                    @foreach($warehouses as $warehouse)
+                                    <div>
+                                        <label>{{$warehouse->symbol}}</label>
+                                        <input type="checkbox" id="magazine{{$count}}" name="magazine{{$count}}" value="{{$warehouse->id}}">
+                                    </div>
+                                    @php        
+                                    $count++;
+                                    @endphp
+                                    @endforeach 
+                                    <input type="hidden" id="magazinecount" name="magazinecount" value="{{$count-1}}">
                                 </div>
                                 <div class="form-group">
                                     <label for="comments">@lang('employees.form.comments')</label>
@@ -85,6 +101,16 @@
                                         <label for="postal_code">@lang('employees.form.postal_code')</label>
                                         <input type="text" class="form-control" id="postal_code" name="postal_code"
                                                value="{{ old('postal_code') }}">
+                                    </div>
+                                    <div class="form-group">
+                                    <label for="latitude">@lang('firms.form.address.latitude')</label>
+                                    <input type="text" class="form-control disabled" id="latitude" name="latitude"
+                                            value="{{ old('latitude') }}" disabled>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="longitude">@lang('firms.form.address.longitude')</label>
+                                        <input type="text" class="form-control" id="longitude" name="longitude"
+                                                value="{{ old('longitude') }}" disabled>
                                     </div>
                                     <div class="form-group">
                                         <label for="status">@lang('employees.form.status')</label>

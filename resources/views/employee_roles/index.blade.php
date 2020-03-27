@@ -2,9 +2,9 @@
 
 @section('app-header')
     <h1 class="page-title">
-        <i class="voyager-tag"></i> Szablony
-        <a href="{!! route('package_templates.create') !!}" class="btn btn-success btn-add-new">
-            <i class="voyager-plus"></i> <span>@lang('firms.roles')</span>
+        <i class="voyager-tag"></i> @lang('firms.roles')
+        <a href="{!! route('employee_role.create') !!}" class="btn btn-success btn-add-new">
+            <i class="voyager-plus"></i> <span>@lang('firms.role_create')</span>
         </a>
     </h1>
 @endsection
@@ -13,6 +13,7 @@
         <thead>
         <tr>
             <th>ID</th>
+            <th>@lang('firms.form.symbol')</th>
             <th>@lang('firms.form.role_name')</th>
             <th>Data utworzenia</th>
             <th>@lang('voyager.generic.actions')</th>
@@ -22,7 +23,8 @@
          @foreach ($roles as $role)
         <tr>
             <td width="10%">{{$role->id}}</td>
-            <td width="50%">{{$role->name}}</td>
+            <td width="15%">{{$role->symbol}}</td>
+            <td width="35%">{{$role->name}}</td>
             <td width="20%">{{$role->created_at}}</td>
             <td>
                 <div class="col-md-10">

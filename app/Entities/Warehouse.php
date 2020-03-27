@@ -57,7 +57,7 @@ class Warehouse extends Model implements Transformable
      */
     public function employees()
     {
-        return $this->hasMany(Employee::class);
+        return $this->belongsToMany(Employee::class, 'employee_warehouse');
     }
 
     public function users()

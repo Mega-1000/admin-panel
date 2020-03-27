@@ -35,14 +35,14 @@ class Employee extends Model implements Transformable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function warehouse()
+    public function warehouses()
     {
-        return $this->belongsToMany(Warehouse::class, 'employee_warehouse');
+        return $this->belongsToMany(Warehouse::class, 'employee_warehouse')->withTimestamps();
     }
     
-    public function employeerole()
+    public function employeeroles()
     {
-        return $this->belongsToMany(EmployeeRole::class, 'employeerole_employee');
+        return $this->belongsToMany(EmployeeRole::class, 'employeerole_employee')->withTimestamps();
     }
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany

@@ -207,6 +207,38 @@
                 <th>@lang('voyager.generic.actions')</th>
             </tr>
             </thead>
+            @foreach ($employees as $employee)
+            <tbody>
+                <tr>
+                <td></td>
+                <td>{{$employee->id}}</td>
+                <td>{{$employee->firstname}}</td>
+                <td>{{$employee->lastname}}</td>
+                <td>{{$employee->phone}}</td>
+                <td>{{$employee->email}}</td>
+                <td>{{$employee->role}}</td>
+                <td>{{$employee->comments}}</td>
+                <td>{{$employee->additional_comments}}</td>
+                <td>{{$employee->postal_code}}</td>
+                <td>{{$employee->status}}</td>
+                <td>{{$employee->created_at}}</td>
+                <td>
+                    <a href="/admin/employees/{{$employee->id}}/edit" class="btn btn-sm btn-primary edit">
+                        <i class="voyager-edit"></i>
+                        <span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>
+                    </a>
+                    <form action="{{ action('EmployeesController@destroy', $employee->id) }}" method="POST" >
+                        {{ method_field('DELETE')}}
+                        {{ csrf_field() }}
+                        <button type="submit"  class="btn btn-sm btn-danger edit">
+                            <i class="voyager-edit"></i>
+                            <span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>
+                        </button>
+                </td>
+                </tr>
+
+            </tbody>
+            @endforeach
         </table>
     </div>
     <button type="submit" form="firms"
@@ -477,178 +509,5 @@
         });
 
         $('#dataTableWarehouses > thead > tr:nth-child(2) > th:nth-child(10)')[0].innerText = '';
-    </script>
-    <script>
-        const deleteRecordEmployees = (id) =>{
-            $('#delete_form')[0].action = "/admin/employees/" + id;
-            $('#delete_modal').modal('show');
-        };
-        $.fn.dataTable.ext.errMode = 'throw';
-        // DataTable
-        let tableEmployees = $('#dataTableEmployees').DataTable({
-            language: {!! json_encode( __('voyager.datatable'), true) !!},
-            processing: true,
-            serverSide: true,
-            columnDefs: [
-                {className: "dt-center", targets: "_all"}
-            ],
-            order: [[0, "asc"]],
-            ajax: '{!! route('employees.datatable', ['id' => $firm->id]) !!}',
-            dom: 'Bfrtip',
-            buttons: [
-                {extend: 'colvis', text : 'Widzialność kolumn'}
-            ],
-            columns: [
-                {
-                    data: 'id',
-                    name: 'id',
-                    render: function (id) {
-                        return '<input type="checkbox">';
-                    }
-                },
-                {
-                    data: 'id',
-                    name: 'id'
-                },
-                {
-                    data: 'firstname',
-                    name: 'firstname'
-                },
-                {
-                    data: 'lastname',
-                    name: 'lastname'
-                },
-                {
-                    data: 'phone',
-                    name: 'phone'
-                },
-                {
-                    data: 'email',
-                    name: 'email'
-                },
-                {
-                    data: 'job_position',
-                    name: 'job_position',
-                    render: function (job_position) {
-                        if (job_position === 'SECRETARIAT') {
-                            return '<span>' + {!! json_encode(__('employees.table.secretariat'), true) !!} +'</span>';
-                        } else if (job_position === 'CONSULTANT') {
-                            return '<span>' + {!! json_encode(__('employees.table.consultant'), true) !!} +'</span>';
-                        } else if (job_position === 'STOREKEEPER') {
-                            return '<span>' + {!! json_encode(__('employees.table.storekeeper'), true) !!} +'</span>';
-                        } else if (job_position === 'SALES') {
-                            return '<span>' + {!! json_encode(__('employees.table.sales'), true) !!} +'</span>';
-                        }
-                    }
-                },
-                {
-                    data: 'comments',
-                    name: 'comments'
-                },
-                {
-                    data: 'additional_comments',
-                    name: 'additional_comments'
-                },
-                {
-                    data: 'postal_code',
-                    name: 'postal_code'
-                },
-                {
-                    data: 'status',
-                    name: 'status',
-                    render: function (status) {
-                        if (status === 'ACTIVE') {
-                            return '<span style="color: green;">' + {!! json_encode(__('employees.table.active'), true) !!} +'</span>';
-                        } else {
-                            return '<span style="color: red;">' + {!! json_encode(__('employees.table.pending'), true) !!} +'</span>';
-                        }
-                    }
-                },
-                {
-                    data: 'created_at',
-                    name: 'created_at'
-                },
-                {
-                    data: 'id',
-                    name: 'id',
-                    render: function (id) {
-                        let html = '<form action="/admin/employees/' + id + '/change-status" method="POST" style="display: inline;">';
-                        html += '{{ method_field('put') }}';
-                        html += '{{ csrf_field() }}';
-                        html += '<button type="submit" href="{{ url()->current() }}/' + id + '/change-status" class="btn btn-sm btn-primary delete">';
-                        html += '<span class="hidden-xs hidden-sm"> @lang('employees.table.change_status')</span>';
-                        html += '</button>';
-                        html += '</form>';
-
-                        html += '<a href="/admin/employees/' + id + '/edit" class="btn btn-sm btn-primary edit">';
-                        html += '<i class="voyager-edit"></i>';
-                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
-                        html += '</a>';
-
-                        html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecordEmployees(' + id + ')">';
-                        html += '<i class="voyager-trash"></i>';
-                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
-                        html += '</button>';
-                        return html;
-                    }
-                }
-            ]
-        });
-        @foreach($visibilitiesEmployee as $key =>$row)
-
-        var {{'show'.$row->name}}  = @json($row->show);
-        {{'show'.$row->name}} = {{'show'.$row->name}}.map(function(x){
-            // if (typeof table.column(x+':name').index() === "number")
-            return tableEmployees.column(x+':name').index();
-        });
-        {{'show'.$row->name}} = {{'show'.$row->name}}.filter(function (el) {
-            return el != null;
-        });
-
-        var {{'hidden'.$row->name}} = @json($row->hidden);
-        {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.map(function(x){
-            // if (typeof table.column(x+':name').index() === "number")
-            return tableEmployees.column(x+':name').index();
-        });
-        {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.filter(function (el) {
-            return el != null;
-        });
-        tableEmployees.button().add({{1+$key}},{
-            extend: 'colvisGroup',
-            text: '{{$row->display_name}}',
-            show: {{'show'.$row->name}},
-            hide: {{'hidden'.$row->name}}
-        });
-        @endforeach
-        $('#dataTableEmployees thead tr th').each(function (i) {
-            var title = $(this).text();
-            if (title !== '' && title !== 'Akcje') {
-                $(this).html('<div><span>'+title+'</span></div><div><input type="text" placeholder="Szukaj '+ title +'" id="columnSearch' + i + '"/></div>');
-            } else if(title == 'Akcje') {
-                $(this).html('<span id="columnSearch' + i + '">Akcje</span>');
-            }
-            $('input', this).on('keyup change', function () {
-                if (table.column(i).search() !== this.value) {
-                    table
-                        .column(i)
-                        .search(this.value)
-                        .draw();
-                }
-            });
-        });
-
-        $('#dataTableEmployees > thead > tr:nth-child(2) > th:nth-child(14)')[0].innerText = '';
-        $(function () {
-            var available = [
-                @php
-                    foreach($warehouses as $item){
-                         echo '"'.$item->symbol.'",';
-                         }
-                @endphp
-            ];
-            $("#delivery_warehouse").autocomplete({
-                source: available
-            });
-        });
-    </script>
+        </script>
 @endsection

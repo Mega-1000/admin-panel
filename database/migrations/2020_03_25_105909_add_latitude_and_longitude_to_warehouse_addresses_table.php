@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddLatitudeAndLongitudeToWarehousesTable extends Migration
+class AddLatitudeAndLongitudeToWarehouseAddressesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,7 @@ class AddLatitudeAndLongitudeToWarehousesTable extends Migration
      */
     public function up()
     {
-        Schema::table('warehouses', function (Blueprint $table) {
-            $table->string('postal_code')->nullable();
+        Schema::table('warehouse_addresses', function (Blueprint $table) {
             $table->decimal('latitude', 12, 10);
             $table->decimal('longitude', 12, 10);
         });
@@ -27,8 +26,7 @@ class AddLatitudeAndLongitudeToWarehousesTable extends Migration
      */
     public function down()
     {
-        Schema::table('warehouses', function (Blueprint $table) {
-            $table->dropColumn('postal_code');
+        Schema::table('warehouse_addresses', function (Blueprint $table) {
             $table->dropColumn('latitude');
             $table->dropColumn('longitude');
         });

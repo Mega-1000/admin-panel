@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class EmployeeRole extends Model
 {
-    public function employee()
+    public function employees()
     {
-        return $this->belongsToMany(Employee::class);
+        return $this->belongsToMany(Employee::class, 'employeerole_employee');
     }
 }
