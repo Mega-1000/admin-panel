@@ -2,6 +2,7 @@
 
 namespace App\Entities;
 
+use Exception;
 use Illuminate\Notifications\Notifiable;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
@@ -71,5 +72,14 @@ class Customer extends Authenticatable implements Transformable
     public function findForPassport($username)
     {
         return $this->where('login', $username)->first();
+    }
+
+    public function generatePassword($pass)
+    {
+        $pass = preg_replace('/[^0-9]/', '', $pass);
+        if (strlen($pass) < 9) {
+            throw new Exception('wrong_phone');
+        }
+        return $pass;
     }
 }

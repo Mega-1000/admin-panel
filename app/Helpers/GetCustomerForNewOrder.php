@@ -25,11 +25,8 @@ class GetCustomerForNewOrder implements iGetUser
             throw new Exception('wrong_password');
         }
         if (!$customer) {
-            $pass = preg_replace('/[^0-9]/', '', $pass);
-            if (strlen($pass) < 9) {
-                throw new Exception('wrong_phone');
-            }
             $customer = new Customer();
+            $pass = $customer->generatePassword($pass);
             $customer->login = $login;
             $customer->password = Hash::make($pass);
             $customer->save();
