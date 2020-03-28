@@ -292,7 +292,8 @@
     </table>
 @endif
 <p>
-    *U tego dostawcy brakuje jednego z produktów. Z tego powodu do obliczeń przyjeliśmy wartość z naszego magazynu
+    *U tego dostawcy brakuje jednego lub więcej produktów. Z tego 
+powodu do obliczeń przyjeliśmy wartość z naszego magazynu
 </p>
 <p>
     Z pozdrowieniami
