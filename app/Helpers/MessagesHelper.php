@@ -76,7 +76,7 @@ class MessagesHelper
 
     public function setChatId()
     {
-        if ($this->currentUserType != self::TYPE_CUSTOMER) {
+        if ($this->chatId || $this->currentUserType != self::TYPE_CUSTOMER) {
             return;
         }
 
