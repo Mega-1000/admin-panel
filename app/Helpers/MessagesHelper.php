@@ -107,6 +107,10 @@ class MessagesHelper
     public function getProduct()
     {
         if (!array_key_exists('product', $this->cache)) {
+            $chat = $this->getChat();
+            if ($chat) {
+                $this->productId = $chat->product_id;
+            }
             $this->cache['product'] = $this->productId ? Product::find($this->productId) : null;
         }
         return $this->cache['product'];
@@ -115,6 +119,10 @@ class MessagesHelper
     public function getOrder()
     {
         if (!array_key_exists('order', $this->cache)) {
+            $chat = $this->getChat();
+            if ($chat) {
+                $this->orderId = $chat->order_id;
+            }
             $this->cache['order'] = $this->orderId ? Order::find($this->orderId) : null;
         }
         return $this->cache['order'];

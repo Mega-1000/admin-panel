@@ -78,7 +78,6 @@
 
             function getMessages() {
                 if (running || $.now() < nextRefresh) {
-                    console.log([running, $.now(), nextRefresh]);
                     return;
                 }
                 running = true;
