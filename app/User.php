@@ -116,4 +116,9 @@ class User extends \TCG\Voyager\Models\User
     {
         return $this->hasMany(ReportDaily::class);
     }
+
+    public function chats()
+    {
+        return $this->belongsToMany(Chat::class, 'chat_user')->withTimestamps();
+    }
 }

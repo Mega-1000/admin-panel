@@ -82,4 +82,9 @@ class Customer extends Authenticatable implements Transformable
         }
         return $pass;
     }
+
+    public function chats()
+    {
+        return $this->belongsToMany(Chat::class, 'chat_user')->withTimestamps();
+    }
 }

@@ -11,13 +11,20 @@ class GetCustomerForSello implements iGetUser
     public function getCustomer($order, $data)
     {
         $customer = Customer::where('login', $data['customer_login'])->first();
+        $updatePass = empty($customer) || empty($customer->password);
+
         if (empty($customer)) {
             $customer = new Customer();
-            $pass = $customer->generatePassword($data['phone']);
             $customer->login = $data['customer_login'];
-            $customer->password = Hash::make($pass);
-            $customer->save();
         }
+
+        if ($updatePass) {
+            $pass = $customer->generatePassword($data['phone']);
+            $customer->password = Hash::make($pass);
+        }
+
+        $customer->save();
+
         return $customer;
     }
 }

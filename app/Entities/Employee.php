@@ -24,42 +24,6 @@ class Employee extends Model implements Transformable
         'firm_id', 'warehouse_id', 'email', 'firstname', 'lastname', 'phone', 'job_position', 'comments', 'additional_comments', 'postal_code', 'status'
     ];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function firm()
-    {
-        return $this->belongsTo(Firm::class);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function warehouses()
-    {
-        return $this->belongsToMany(Warehouse::class, 'employee_warehouse')->withTimestamps();
-    }
-    
-    public function employeeRoles()
-    {
-        return $this->belongsToMany(EmployeeRole::class, 'employeerole_employee')->withTimestamps();
-    }
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function messages()
-    {
-        return $this->hasMany(OrderMessage::class);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function tasks()
-    {
-        return $this->belongsToMany(OrderTask::class);
-    }
-
     public $customColumnsVisibilities = [
         'firstname',
         'lastname' ,
@@ -80,4 +44,46 @@ class Employee extends Model implements Transformable
         'postal_code',
         'radius'
     ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function firm()
+    {
+        return $this->belongsTo(Firm::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function warehouses()
+    {
+        return $this->belongsToMany(Warehouse::class, 'employee_warehouse')->withTimestamps();
+    }
+
+    public function employeeRoles()
+    {
+        return $this->belongsToMany(EmployeeRole::class, 'employeerole_employee')->withTimestamps();
+    }
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function messages()
+    {
+        return $this->hasMany(OrderMessage::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function tasks()
+    {
+        return $this->belongsToMany(OrderTask::class);
+    }
+
+
+    public function chats()
+    {
+        return $this->belongsToMany(Chat::class, 'chat_user')->withTimestamps();
+    }
 }

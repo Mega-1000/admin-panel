@@ -562,7 +562,7 @@ class ImportCsvFileJob implements ShouldQueue
     public function getProductsMedia($line)
     {
         $media = [];
-        for ($i = 304; $i <= 306; $i++) {
+        for ($i = 304; $i <= 308; $i++) {
             if (!empty($line[$i])) {
                 $media[] = $this->prepareMediaData($line[$i]);
             }
