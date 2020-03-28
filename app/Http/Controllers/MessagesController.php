@@ -68,7 +68,7 @@ class MessagesController extends Controller
                 'routeRefresh' => route('api.messages.get-messages', ['token' => $helper->encrypt()])
             ]);
         } catch (ChatException $e) {
-            \Log::error('Trying to access chat: '.$e->getMessage());
+            $e->log();
             return redirect(env('FRONT_URL'));
         }
     }

@@ -16,6 +16,7 @@ class MessagesController extends Controller
             $url = route('chat.show', ['token' => $token]);
             return response($url);
         } catch (ChatException $e) {
+            $e->log();
             return response($e->getMessage(), 400);
         }
     }
@@ -34,7 +35,7 @@ class MessagesController extends Controller
             $helper->addMessage($request->message);
             return response('ok');
         } catch (ChatException $e) {
-            \Log::error('Trying to access chat: '.$e->getMessage());
+            $e->log();
             return response($e->getMessage(), 400);
         }
     }
@@ -56,7 +57,7 @@ class MessagesController extends Controller
             }
             return response(['messages' => $out]);
         } catch (ChatException $e) {
-            \Log::error('Trying to get messages: '.$e->getMessage());
+            $e->log();
             return response($e->getMessage(), 400);
         }
     }
