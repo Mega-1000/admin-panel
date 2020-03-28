@@ -18,7 +18,7 @@ Route::middleware('auth:api')->group(function() {
     Route::get('orders/getAll', 'Api\OrdersController@getAll')->name('api.orders.getall');
     Route::post('orders/update-order-address/{orderId}', 'Api\OrdersController@updateOrderAddressEndpoint')->name('api.orders.update-order-addresses');
     Route::get('orders/get-payments-for-order/{token}', 'Api\OrdersController@getPaymentDetailsForOrder')->name('api.orders.getPayments');
-
+    Route::get('chat/getHistory', 'Api\MessagesController@getHistory')->name('api.messages.get-history');
 });
 
 Route::get('custom/pages', 'Api\CustomPagesController@getPages')->name('api.custompages.get');

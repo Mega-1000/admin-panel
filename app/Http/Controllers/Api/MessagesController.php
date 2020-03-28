@@ -61,4 +61,21 @@ class MessagesController extends Controller
             return response($e->getMessage(), 400);
         }
     }
+
+    public function getHistory(Request $request)
+    {
+        $user = $request->user();
+        $out = [];
+        foreach ($user->chats as $chat) {
+            $helper = new MessagesHelper();
+            $helper->chatId = $chat->id;
+            $helper->currentUserId = $user->id;
+            $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
+            $out[] = [
+                'title' => $helper->getTitle(),
+                'url' => route('chat.show', ['token' => $helper->encrypt()])
+            ];
+        }
+        return response($out);
+    }
 }
