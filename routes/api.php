@@ -85,3 +85,4 @@ Route::get('categories/details/search', 'Api\CategoriesController@getCategoryDet
 
 Route::get('chat/getUrl/{mediaId}/{postCode}/{email}', 'Api\MessagesController@getUrl')->name('api.messages.get-url');
 Route::post('chat/newMessage/{token}', 'Api\MessagesController@postNewMessage')->name('api.messages.post-new-message');
+Route::get('chat/getMessages/{token}', 'Api\MessagesController@getMessages')->name('api.messages.get-messages');

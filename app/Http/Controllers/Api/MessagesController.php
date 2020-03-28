@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Helpers\MessagesHelper;
+use App\Helpers\Exceptions\ChatException;
 
 class MessagesController extends Controller
 {
@@ -14,7 +15,7 @@ class MessagesController extends Controller
             $token = MessagesHelper::getToken($mediaId, $postCode, $email);
             $url = route('chat.show', ['token' => $token]);
             return response($url);
-        } catch (\Exception $e) {
+        } catch (ChatException $e) {
             return response($e->getMessage(), 400);
         }
     }
@@ -28,12 +29,34 @@ class MessagesController extends Controller
                 $helper->createNewChat();
             }
             if (!$helper->canUserSendMessage()) {
-                throw new \Exception('User not allowed to send message');
+                throw new ChatException('User not allowed to send message');
             }
             $helper->addMessage($request->message);
             return response('ok');
-        } catch (\Exception $e) {
+        } catch (ChatException $e) {
             \Log::error('Trying to access chat: '.$e->getMessage());
+            return response($e->getMessage(), 400);
+        }
+    }
+
+    public function getMessages(Request $request, $token)
+    {
+        try {
+            $helper = new MessagesHelper($token);
+            $chat = $helper->getChat();
+            if (!$chat) {
+                throw new ChatException('Wrong chat token');
+            }
+            $out = '';
+            foreach ($chat->messages as $message) {
+                if ($message->id <= $request->lastId) {
+                    continue;
+                }
+                $out .= view('chat/single_message')->withMessage($message)->render();
+            }
+            return response(['messages' => $out]);
+        } catch (ChatException $e) {
+            \Log::error('Trying to get messages: '.$e->getMessage());
             return response($e->getMessage(), 400);
         }
     }

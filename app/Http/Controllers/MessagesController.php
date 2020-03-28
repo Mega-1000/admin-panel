@@ -5,12 +5,13 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Helpers\MessagesHelper;
 use App\Entities\Product;
-use App\Entities\User;
+use App\User;
 use App\Entities\Customer;
 use App\Entities\Employee;
 use App\Entities\Order;
 use App\Entities\Chat;
 use App\Entities\ChatUser;
+use App\Helpers\Exceptions\ChatException;
 
 class MessagesController extends Controller
 {
@@ -63,9 +64,10 @@ class MessagesController extends Controller
                 'product' => $product,
                 'order' => $order,
                 'title' => $helper->getTitle(),
-                'route' => route('api.messages.post-new-message', ['token' => $helper->encrypt()])
+                'route' => route('api.messages.post-new-message', ['token' => $helper->encrypt()]),
+                'routeRefresh' => route('api.messages.get-messages', ['token' => $helper->encrypt()])
             ]);
-        } catch (\Exception $e) {
+        } catch (ChatException $e) {
             \Log::error('Trying to access chat: '.$e->getMessage());
             return redirect(env('FRONT_URL'));
         }

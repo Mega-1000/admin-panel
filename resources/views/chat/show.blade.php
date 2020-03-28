@@ -27,21 +27,7 @@
                     @if ($chat)
                         @for ($i = 0; $i < 3; $i++)
                         @foreach ($chat->messages as $message)
-                            <div class='row'>
-                                @if ($message->customer())
-                                    <div class='col-sm-2'>&nbsp;</div>
-                                @endif
-                                <div class='col-sm-10'>
-                                    <div class="{{ $message->customer() ? 'text-right alert-warning' : 'text-left alert-info' }} alert">
-                                        @if ($message->employee())
-                                            <strong>{{ $message->employee()->firstname }}:</strong><br>
-                                        @elseif ($message->user())
-                                            <strong>{{ $message->user()->firstname }}:</strong><br>
-                                        @endif
-                                        {{ $message->message }}
-                                    </div>
-                                </div>
-                            </div>
+                            @include ('chat/single_message', ['message' => $message])
                         @endforeach
                         @endfor
                     @endif
@@ -74,13 +60,44 @@
 
             $('form').submit(function(e) {
                 e.preventDefault();
+                var message = $('#message').val();
+                $('#message').val('');
 
                 $.post(
                     $(this).attr('action'),
-                    { message: $('#message').val() },
-                    function(data) { window.location.reload(); }
+                    { message: message },
+                    function(data) { refreshRate = 1; nextRefresh = 0; }
                 );
             });
+            
+            var nextRefresh = $.now() + 3000;
+            var refreshRate = 1;
+            var running = false;
+            
+            setInterval(getMessages, 500);
+
+            function getMessages() {
+                if (running || $.now() < nextRefresh) {
+                    console.log([running, $.now(), nextRefresh]);
+                    return;
+                }
+                running = true;
+                refreshRate = refreshRate < 60 ? refreshRate + 1 : 60;
+
+                $.getJSON(
+                    '{{ $routeRefresh }}',
+                    { lastId: $('.message-row:last-child').data('messageid') },
+                    function (data) {
+                        if (data.messages.length > 0) {
+                            refreshRate = 1;
+                            $('.panel-body').append(data.messages);
+                            $('.panel-default').animate({ scrollTop: $('.panel-body').height() });
+                        }
+                        nextRefresh = $.now() + refreshRate * 1000;
+                        running = false;
+                    }
+                );
+            }
         });
     </script>
 </body>

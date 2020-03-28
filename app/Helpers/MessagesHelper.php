@@ -5,10 +5,13 @@ namespace App\Helpers;
 use App\Entities\Chat;
 use App\Entities\Product;
 use App\Entities\Order;
+use App\User;
 use App\Entities\Customer;
+use App\Entities\Employee;
 use App\Entities\ProductMedia;
 use App\Entities\PostalCodeLatLon;
 use App\Entities\Message;
+use App\HelpersChatExceptions\ChatException;
 
 class MessagesHelper
 {
@@ -21,12 +24,16 @@ class MessagesHelper
     public $currentUserId;
     private $cache = [];
 
+    const TYPE_CUSTOMER = 'c';
+    const TYPE_EMPLOYEE = 'e';
+    const TYPE_USER = 'u';
+
     public function __construct($token = null)
     {
         if ($token) {
             $this->decrypt($token);
             if (!$this->getChat() && !$this->getProduct() && !$this->getOrder()) {
-                throw new \Exception('Either chat, product or order must exist');
+                throw new ChatException('Either chat, product or order must exist');
             }
         }
     }
@@ -69,7 +76,7 @@ class MessagesHelper
 
     public function setChatId()
     {
-        if ($this->currentUserType != 'c') {
+        if ($this->currentUserType != self::TYPE_CUSTOMER) {
             return;
         }
 
@@ -148,18 +155,18 @@ class MessagesHelper
         $chat->order_id = $this->orderId;
         $chat->employee_id = $this->employeeId;
         $chat->save();
-        if (empty($this->users['c'])) {
-            throw new \Exception('Missing customer ID');
+        if (empty($this->users[self::TYPE_CUSTOMER])) {
+            throw new ChatException('Missing customer ID');
         }
-        $customer = \App\Entities\Customer::find($this->users['c']);
+        $customer = Customer::find($this->users[self::TYPE_CUSTOMER]);
         if (!$customer) {
-            throw new \Exception('Wrong customer ID');
+            throw new ChatException('Wrong customer ID');
         }
         $chat->customers()->attach($customer);
-        if (!empty($this->users['e'])) {
-            $employee = \App\Entities\Employee::find($this->users['e']);
+        if (!empty($this->users[self::TYPE_EMPLOYEE])) {
+            $employee = Employee::find($this->users[self::TYPE_EMPLOYEE]);
             if (!$employee) {
-                throw new \Exception('Wrong employee ID');
+                throw new ChatException('Wrong employee ID');
             }
             $chat->employees()->attach($employee);
         }
@@ -172,13 +179,13 @@ class MessagesHelper
     {
         $chat = $this->getChat();
         switch ($this->currentUserType) {
-            case 'c':
+            case self::TYPE_CUSTOMER:
                 return $chat->customers()->where('customers.id', $this->currentUserId)->first() != null;
-            case 'e':
+            case self::TYPE_EMPLOYEE:
                 return $chat->employees()->where('employees.id', $this->currentUserId)->first() != null;
-            case 'u':
+            case self::TYPE_USER:
                 if (!$chat->users()->where('users.id', $this->currentUserId)->first()) {
-                    if (!(\Auth::user() instanceof \App\Entities\User)) {
+                    if (!(\Auth::user() instanceof User)) {
                         return false;
                     }
                     $chat->users()->attach(\Auth::user());
@@ -191,13 +198,13 @@ class MessagesHelper
     public function addMessage($message)
     {
         $chat = $this->getChat();
-        $column = $this->currentUserType == 'c' ? 'customer_id' : ($this->currentUserType == 'e' ? 'employee_id' : 'user_id');
+        $column = $this->currentUserType == self::TYPE_CUSTOMER ? 'customer_id' : ($this->currentUserType == self::TYPE_EMPLOYEE ? 'employee_id' : 'user_id');
         $messageObj = new Message();
         $messageObj->message = $message;
         $messageObj->chat_id = $chat->id;
-        $chatUser = $chat->chatUser()->where($column, $this->currentUserId)->first();
+        $chatUser = $chat->chatUsers()->where($column, $this->currentUserId)->first();
         if (!$chatUser) {
-            throw new \Exception('Cannot save message');
+            throw new ChatException('Cannot save message');
         }
         $chatUser->messages()->save($messageObj);
     }
@@ -209,25 +216,25 @@ class MessagesHelper
         $media = ProductMedia::find($mediaId);
 
         if (!$media) {
-            throw new \Exception('Wrong media ID');
+            throw new ChatException('Wrong media ID');
         }
 
         $mediaData = explode('|', $media->url);
 
         if (count($mediaData) != 3) {
-            throw new \Exception('Media URL corrupted');
+            throw new ChatException('Media URL corrupted');
         }
 
         $employee = self::findEmployee($media->product->warehouse->employees, $mediaData, $postCode);
 
         $helper = new self();
         $helper->users = [
-            'c' => $customer->id,
-            'e' => $employee->id
+            self::TYPE_CUSTOMER => $customer->id,
+            self::TYPE_EMPLOYEE => $employee->id
         ];
         $helper->productId = $media->product_id;
         $helper->employeeId = $employee->id;
-        $helper->currentUserType = 'c';
+        $helper->currentUserType = self::TYPE_CUSTOMER;
         $helper->currentUserId = $customer->id;
 
         $helper->setChatId();
@@ -257,10 +264,10 @@ class MessagesHelper
     private static function findEmployee($employees, $mediaData, $postCode)
     {
         $foundEmployee = null;
-        if ($mediaData[1] == 'c') {
+        if ($mediaData[1] == self::TYPE_CUSTOMER) {
             $codeObj = PostalCodeLatLon::where('postal_code', $postCode)->first();
             if (!$codeObj) {
-                throw new \Exception('Wrong post code');
+                throw new ChatException('Wrong post code');
             }
             $closestDist = 0;
             foreach ($employees as $employee) {
@@ -284,7 +291,7 @@ class MessagesHelper
             }
         }
         if (!$foundEmployee) {
-            throw new \Exception('Cannot find employee');
+            throw new ChatException('Cannot find employee');
         }
         return $foundEmployee;
     }
