@@ -214,6 +214,11 @@ class ProductsController extends Controller
             if (!empty($productValue['url_for_website']) && !File::exists(public_path($productValue['url_for_website']))) {
                 $products['data'][$productKey]['url_for_website'] = null;
             }
+            foreach ($productValue['media'] as $mediaKey => $mediaValue) {
+                if (explode('|', $mediaValue['url']) == 3) {
+                    $products['data'][$productKey]['media'][$mediaKey]['url'] = null;
+                }
+            }
         }
 
         return response($products);

@@ -180,7 +180,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('packageTemplates/{id}/edit', 'PackageTemplatesController@edit')->name('package_templates.edit');
         Route::put('packageTemplates/{id}/update', 'PackageTemplatesController@update')->name('package_templates.update');
         Route::delete('packageTemplates/{id}/delete', 'PackageTemplatesController@destroy')->name('package_templates.destroy');
-        
+
         Route::get('employeeRoles', 'EmployeeRoleController@index')->name('employee_role.index');
         Route::get('employeeRoles/datatable', 'EmployeeRoleController@datatable')->name('employee_role.datatable');
         Route::get('employeeRoles/create', 'EmployeeRoleController@create')->name('employee_role.create');
@@ -440,3 +440,5 @@ Route::post('/communication/storeWarehouseMessage',
 Route::get('/customer/{orderId}/confirmation/{invoice}', 'OrdersController@confirmCustomerInformation')->name('customerConfirmation');
 Route::get('/customer/{orderId}/confirmation', 'OrdersController@confirmCustomerInformationWithoutData')->name('customerConfirmationWithoutData');
 Route::post('/customer/confirmation', 'OrdersController@confirmCustomer')->name('confirmation');
+
+Route::get('/chat/{token}', 'MessagesController@show')->name('chat.show');

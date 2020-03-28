@@ -19,18 +19,25 @@ class GetCustomerForNewOrder implements iGetUser
         if (empty($login)) {
             throw new Exception('missing_customer_login');
         }
-        $customer = Customer::where('login', $login)->first();
 
-        if ($customer && !Hash::check($pass, $customer->password)) {
+        $customer = Customer::where('login', $login)->first();
+        $updatePass = empty($customer) || empty($customer->password);
+
+        if ($customer && !$updatePass && !Hash::check($pass, $customer->password)) {
             throw new Exception('wrong_password');
         }
+
         if (!$customer) {
             $customer = new Customer();
-            $pass = $customer->generatePassword($pass);
             $customer->login = $login;
-            $customer->password = Hash::make($pass);
-            $customer->save();
         }
+
+        if ($updatePass) {
+            $pass = $customer->generatePassword($pass);
+            $customer->password = Hash::make($pass);
+        }
+        
+        $customer->save();
         return $customer;
     }
 

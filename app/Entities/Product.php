@@ -223,6 +223,11 @@ class Product extends Model implements Transformable
         return $this->hasMany(self::class, 'parent_id', 'id');
     }
 
+    public function warehouse()
+    {
+        return $this->belongsTo(Warehouse::class, 'product_name_supplier', 'symbol');
+    }
+
     public function isInTransportGroup()
     {
         return $this->tradeGroups()->count() > 0;
