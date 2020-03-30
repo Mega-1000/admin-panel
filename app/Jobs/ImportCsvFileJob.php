@@ -96,7 +96,7 @@ class ImportCsvFileJob implements ShouldQueue
                 }
                 $this->generateJpgData($line, $categoryColumn);
             } catch (\Exception $e) {
-                $this->log("Row $i EXCEPTION: " . $e->getMessage());
+                $this->log("Row $i EXCEPTION: " . $e->getMessage().", File: ".$e->getFile().", Line: ".$e->getLine());
             }
         }
         $this->saveJpgData();

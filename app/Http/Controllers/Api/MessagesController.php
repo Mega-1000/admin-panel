@@ -9,18 +9,6 @@ use App\Helpers\Exceptions\ChatException;
 
 class MessagesController extends Controller
 {
-    public function getUrl($mediaId, $postCode, $email)
-    {
-        try {
-            $token = MessagesHelper::getToken($mediaId, $postCode, $email);
-            $url = route('chat.show', ['token' => $token]);
-            return response($url);
-        } catch (ChatException $e) {
-            $e->log();
-            return response($e->getMessage(), 400);
-        }
-    }
-
     public function postNewMessage(Request $request, $token)
     {
         try {

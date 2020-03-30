@@ -28,6 +28,9 @@ class MessagesHelper
     const TYPE_EMPLOYEE = 'e';
     const TYPE_USER = 'u';
 
+    const SHOW_FRONT = 'f';
+    const SHOW_VAR = 'w';
+
     public function __construct($token = null)
     {
         if ($token) {
@@ -233,7 +236,7 @@ class MessagesHelper
             throw new ChatException('Media URL corrupted');
         }
 
-        $employee = self::findEmployee($media->product->warehouse->employees, $mediaData, $postCode);
+        $employee = self::findEmployee($media->product->firm->employees, $mediaData, $postCode);
 
         $helper = new self();
         $helper->users = [
