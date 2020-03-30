@@ -223,9 +223,9 @@ class Product extends Model implements Transformable
         return $this->hasMany(self::class, 'parent_id', 'id');
     }
 
-    public function warehouse()
+    public function firm()
     {
-        return $this->belongsTo(Warehouse::class, 'product_name_supplier', 'symbol');
+        return $this->belongsTo(Firm::class, 'product_name_supplier', 'symbol');
     }
 
     public function isInTransportGroup()

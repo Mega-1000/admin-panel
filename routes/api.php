@@ -83,6 +83,5 @@ Route::post('banks', 'Api\BankController@getBanks')->name('api.banks');
 Route::post('categories/details', 'Api\CategoriesController@getCategoriesDetails')->name('api.categories.details');
 Route::get('categories/details/search', 'Api\CategoriesController@getCategoryDetails')->name('api.categories.search');
 
-Route::get('chat/getUrl/{mediaId}/{postCode}/{email}', 'Api\MessagesController@getUrl')->name('api.messages.get-url');
 Route::post('chat/newMessage/{token}', 'Api\MessagesController@postNewMessage')->name('api.messages.post-new-message');
 Route::get('chat/getMessages/{token}', 'Api\MessagesController@getMessages')->name('api.messages.get-messages');

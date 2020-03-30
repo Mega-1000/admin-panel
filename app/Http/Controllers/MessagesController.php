@@ -106,4 +106,16 @@ class MessagesController extends Controller
     {
         //
     }
+
+    public function getUrl($mediaId, $postCode, $email)
+    {
+        try {
+            $token = MessagesHelper::getToken($mediaId, $postCode, $email);
+            $url = route('chat.show', ['token' => $token]);
+            return redirect($url);
+        } catch (ChatException $e) {
+            $e->log();
+            return redirect(env('FRONT_URL'));
+        }
+    }
 }

@@ -215,8 +215,13 @@ class ProductsController extends Controller
                 $products['data'][$productKey]['url_for_website'] = null;
             }
             foreach ($productValue['media'] as $mediaKey => $mediaValue) {
-                if (explode('|', $mediaValue['url']) == 3) {
-                    $products['data'][$productKey]['media'][$mediaKey]['url'] = null;
+                $mediaData = explode('|', $mediaValue['url']);
+                if (count($mediaData) == 3) {
+                    if (strpos($mediaData[2], \App\Helpers\MessagesHelper::SHOW_FRONT) !== FALSE) {
+                        $products['data'][$productKey]['media'][$mediaKey]['url'] = null;
+                    } else {
+                        unset($products['data'][$productKey]['media'][$mediaKey]);
+                    }
                 }
             }
         }

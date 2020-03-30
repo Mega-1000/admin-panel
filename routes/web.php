@@ -442,3 +442,4 @@ Route::get('/customer/{orderId}/confirmation', 'OrdersController@confirmCustomer
 Route::post('/customer/confirmation', 'OrdersController@confirmCustomer')->name('confirmation');
 
 Route::get('/chat/{token}', 'MessagesController@show')->name('chat.show');
+Route::get('/chat/getUrl/{mediaId}/{postCode}/{email}', 'MessagesController@getUrl')->name('messages.get-url');
