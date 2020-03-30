@@ -1802,7 +1802,7 @@
                                         label: labelId,
                                         labelsToAddIds: ids
                                     },
-                                }).done(()=> console.log(orderId, labelId, ids))
+                                })
                                 $('#set-magazine').modal('hide');
                                 refreshDtOrReload()
                             })
