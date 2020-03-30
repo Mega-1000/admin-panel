@@ -30,9 +30,6 @@ class ImportOrdersFromSelloJob implements ShouldQueue
     const FINISH_LOGISTIC_LABEL_ID = 68;
     const TRANSPORT_SPEDITION_INIT_LABEL_ID = 103;
     const WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID = 107;
-    const VALIDATE_ORDER_LABEL_ID = 45;
-    const WAIT_FOR_WAREHOUSE_ACCEPT_LABEL_ID = 47;
-    const PRODUCTION_ACCEPTED_LABEL_ID = 48;
 
     /**
      * Create a new job instance.
@@ -222,8 +219,5 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         dispatch_now(new RemoveLabelJob($order, [self::FINISH_LOGISTIC_LABEL_ID], $preventionArray, self::TRANSPORT_SPEDITION_INIT_LABEL_ID));
         dispatch_now(new RemoveLabelJob($order, [self::TRANSPORT_SPEDITION_INIT_LABEL_ID], $preventionArray, []));
         dispatch_now(new RemoveLabelJob($order, [self::WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID], $preventionArray, []));
-        dispatch_now(new RemoveLabelJob($order, [self::VALIDATE_ORDER_LABEL_ID], $preventionArray, []));
-        dispatch_now(new RemoveLabelJob($order, [self::WAIT_FOR_WAREHOUSE_ACCEPT_LABEL_ID], $preventionArray, []));
-        dispatch_now(new RemoveLabelJob($order, [self::PRODUCTION_ACCEPTED_LABEL_ID], $preventionArray, []));
     }
 }
