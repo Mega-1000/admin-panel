@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Entities\Order;
 use App\Entities\OrderItem;
+use App\Entities\Warehouse;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
+use App\Helpers\LabelsHelper;
 use App\Helpers\OrderCalcHelper;
 use App\Http\Requests\OrderUpdateRequest;
 use App\Jobs\AddLabelJob;
@@ -806,6 +808,30 @@ class OrdersController extends Controller
     }
 
 
+    public function setWarehouseAndLabels(Request $request)
+    {
+        $orderId = $request->order_id;
+        $warehouseId = $request->warehouse_id;
+        if (empty($orderId)) {
+            return response('Błędne zamówienie', 404);
+        }
+        if (empty($warehouseId)) {
+            return response('Błędny magazyn', 404);
+        }
+        $order = Order::find($orderId);
+        $warehouse = Warehouse::find($warehouseId);
+        if (empty($order)) {
+            return response('Błędne zamówienie', 404);
+        }
+        if (empty($warehouse)) {
+            return response('Błędny magazyn', 404);
+        }
+        $order->warehouse()->associate($warehouse);
+        $order->save();
+        $loop = [];
+
+        return dispatch_now(new RemoveLabelJob($order, [$request->label], $loop, $request->labelsToAddIds));
+    }
 
     /**
      * @param Request $request
@@ -932,9 +958,13 @@ class OrdersController extends Controller
         if (!empty($request->input('manuallyChosen'))) {
             $labelsToAddAfterRemoval = $request->input('labelsToAddIds');
         }
+        if ($labelId == LabelsHelper::VALIDATE_ORDER
+            && in_array(LabelsHelper::SEND_TO_WAREHOUSE_FOR_VALIDATION, $labelsToAddAfterRemoval)
+            && empty($order->warehouse)) {
+            return response('warehouse not found', 400);
+        }
 
-        $response = dispatch_now(new RemoveLabelJob($order, [$labelId], $preventionArray, $labelsToAddAfterRemoval));
-        return $response;
+        return dispatch_now(new RemoveLabelJob($order, [$labelId], $preventionArray, $labelsToAddAfterRemoval));
     }
 
     public function setPaymentDeadline(Request $request)

@@ -311,6 +311,8 @@ Route::group(['prefix' => 'admin'], function () {
             'uses' => 'OrdersMessagesController@destroy',
         ])->name('order_messages.destroy');
 
+        Route::post('orders/set-warehouse-and-remove-label', 'OrdersController@setWarehouseAndLabels')->name('order.warehouse.set');
+
         Route::get('orders/status/{id}/message', 'OrdersController@getStatusMessage')->name('order.status.message');
 
         Route::post('orders/label-removal/{orderId}/{labelId}',

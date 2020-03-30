@@ -106,6 +106,31 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" tabindex="-1" id="set-magazine" role="dialog">
+        <div class="modal-dialog" id="modalDialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="titleModal">Proszę wybrac magazyn: </h4>
+                </div>
+                <div class="modal-body">
+                    <form id="addWarehouse" class="form-group">
+                        <select required name="warehouse_id" class="form-control">
+                            <option value="" selected="selected">Wybierz magazyn</option>
+                            @foreach($warehouses as $warehouse)
+                                <option value="{{$warehouse->id}}" class="warehouseSelect">{{$warehouse->symbol}}</option>
+                            @endforeach
+                        </select>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" form="addWarehouse" class="btn btn-success pull-right">Wyślij</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" tabindex="-1" id="addStorekeeperTimeError" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -1743,6 +1768,48 @@
                 });
             };
 
+            function removeMultiLabel(orderId, labelId, ids) {
+                $.ajax({
+                    url: "/admin/orders/label-removal/" + orderId + "/" + labelId,
+                    method: "POST",
+                    data: {
+                        labelsToAddIds: ids,
+                        manuallyChosen: true
+                    }
+                }).done(function () {
+                    if ($.inArray('47', ids) != -1) {
+                        $('#magazine').modal();
+                        $('input[name="order_id"]').val(orderId);
+                        $('#selectWarehouse').val(16);
+                        $('#warehouseSelect').attr('selected', true);
+                        $('#selectWarehouse').click();
+                    }
+                    refreshDtOrReload();
+                })
+                    .fail((error) => {
+                        if (error.responseText === 'warehouse not found') {
+                            $('#set-magazine').modal()
+                            let form = $('#addWarehouse')
+                            form.submit((event) => {
+                                event.preventDefault()
+                                $.ajax({
+                                    method: 'post',
+                                    url: '/admin/orders/set-warehouse-and-remove-label',
+                                    dataType: 'json',
+                                    data: {
+                                        order_id: orderId,
+                                        warehouse_id: event.target.warehouse_id.value,
+                                        label: labelId,
+                                        labelsToAddIds: ids
+                                    },
+                                }).done(()=> console.log(orderId, labelId, ids))
+                                $('#set-magazine').modal('hide');
+                                refreshDtOrReload()
+                            })
+                        }
+                    });
+            }
+
             let refreshDtOrReload = function () {
                 $.ajax({
                     url: '/api/get-labels-scheduler-await/{{ Auth::id() }}'
@@ -1772,24 +1839,8 @@
                     $('#manual_label_selection_to_add_modal').modal('show');
 
                     modal.find("#labels_to_add_after_removal_modal_ok").off().on('click', function () {
-                        $.ajax({
-                            url: "/admin/orders/label-removal/" + orderId + "/" + labelId,
-                            method: "POST",
-                            data: {
-                                labelsToAddIds: input.val(),
-                                manuallyChosen: true
-                            }
-                        }).done(function() {
-                            let ids = input.val();
-                            if($.inArray('47', ids) != -1){
-                                $('#magazine').modal();
-                                $('input[name="order_id"]').val(orderId);
-                                $('#selectWarehouse').val(16);
-                                $('#warehouseSelect').attr('selected', true);
-                                $('#selectWarehouse').click();
-                            }
-                            refreshDtOrReload();
-                        });
+                        let ids = input.val();
+                        removeMultiLabel(orderId, labelId, ids);
                     });
                 });
             } else {

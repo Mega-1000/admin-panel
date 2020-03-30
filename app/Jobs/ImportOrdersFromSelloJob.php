@@ -8,6 +8,7 @@ use App\Entities\Product;
 use App\Entities\SelTransaction;
 use App\Entities\Warehouse;
 use App\Helpers\GetCustomerForSello;
+use App\Helpers\LabelsHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceOverrider;
 use App\Helpers\SelloPackageDivider;
@@ -26,10 +27,6 @@ use Illuminate\Support\Facades\Log;
 class ImportOrdersFromSelloJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    const FINISH_LOGISTIC_LABEL_ID = 68;
-    const TRANSPORT_SPEDITION_INIT_LABEL_ID = 103;
-    const WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID = 107;
 
     /**
      * Create a new job instance.
@@ -216,8 +213,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
     private function setLabels($order)
     {
         $preventionArray = [];
-        dispatch_now(new RemoveLabelJob($order, [self::FINISH_LOGISTIC_LABEL_ID], $preventionArray, self::TRANSPORT_SPEDITION_INIT_LABEL_ID));
-        dispatch_now(new RemoveLabelJob($order, [self::TRANSPORT_SPEDITION_INIT_LABEL_ID], $preventionArray, []));
-        dispatch_now(new RemoveLabelJob($order, [self::WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID], $preventionArray, []));
+        dispatch_now(new RemoveLabelJob($order, [LabelsHelper::FINISH_LOGISTIC_LABEL_ID], $preventionArray, LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID));
+        dispatch_now(new RemoveLabelJob($order, [LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID], $preventionArray, []));
+        dispatch_now(new RemoveLabelJob($order, [LabelsHelper::WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID], $preventionArray, []));
     }
 }
