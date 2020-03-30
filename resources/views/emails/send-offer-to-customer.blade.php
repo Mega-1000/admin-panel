@@ -269,7 +269,7 @@
                         @else
                             <span style="color:green;">+{{(float)$productSupplier['different']}}</span>
                         @endif
-                        @if(isset($productSupplier['missed_product']))
+                        @if(!empty($productSupplier['missed_product']))
                             *
                         @endif
                     </td>
@@ -292,7 +292,7 @@
     </table>
 @endif
 <p>
-    *U tego dostawcy brakuje jednego lub więcej produktów. Z tego 
+    *U tego dostawcy brakuje jednego lub więcej produktów. Z tego
 powodu do obliczeń przyjeliśmy wartość z naszego magazynu
 </p>
 <p>

@@ -2003,18 +2003,32 @@ class OrdersController extends Controller
 
         $productsVariation = $this->getVariations($order);
         $allProductsFromSupplier = [];
-        foreach ($productsVariation as $variation) {
+        $tempVariationCounter = [];
+        foreach ($productsVariation as $key => $variation) {
+            $variations = current($variation);
+            if(isset($tempVariationCounter[current($variations)['variation_group']])) {
+                $tempVariationCounter[current($variations)['variation_group']] += 1;
+            } else {
+                $tempVariationCounter[current($variations)['variation_group']] = 1;
+            }
+
             foreach ($variation as $item) {
                 if ($item['variation_group'] == null) {
                     continue;
                 }
                 if (isset($allProductsFromSupplier[$item['product_name_supplier']])) {
                     $sum = (float)$allProductsFromSupplier[$item['product_name_supplier']][$item['variation_group']]['sum'];
+                    $count = (float)$allProductsFromSupplier[$item['product_name_supplier']][$item['variation_group']]['count'];
                     $sum += $item['sum'];
+                    $count += 1;
                 } else {
                     $sum = $item['sum'];
+                    $count = 1;
                 }
+
                 $arr = [
+                    'missed_product' => $count < $tempVariationCounter[$item['variation_group']],
+                    'count' => $count,
                     'sum' => $sum,
                     'different' => number_format($order->total_price - $sum, 2, '.', ''),
                     'radius' => $item['radius'],
