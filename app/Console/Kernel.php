@@ -5,6 +5,7 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Jobs;
+use App\Jobs\UpdatePackageRealCostJob;
 
 class Kernel extends ConsoleKernel
 {
@@ -41,6 +42,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\JpgGeneratorJob::class)->dailyAt("01:00");
         $schedule->job(Jobs\ImportCsvFileJob::class)->everyMinute();
         $schedule->job(Jobs\ImportOrdersFromSelloJob::class)->cron('0 6,11,17,22 * * *');
+        $schedule->job(UpdatePackageRealCostJob::class)->dailyAt("00:30");
     }
 
     /**
