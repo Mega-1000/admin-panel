@@ -170,6 +170,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('customers/store', 'CustomersController@store')->name('customers.store');
         Route::get('customers/{id}/edit', 'CustomersController@edit')->name('customers.edit');
         Route::put('customers/{id}/update', 'CustomersController@update')->name('customers.update');
+        Route::post('customers/{id}/override-customer-data', 'CustomersController@changeLoginOrPassword')->name('customers.change.login-or-password');
         Route::delete('customers/{id}/', 'CustomersController@destroy')->name('customers.destroy');
         Route::put('customers/{id}/change-status', 'CustomersController@changeStatus')->name('customers.change.status');
 

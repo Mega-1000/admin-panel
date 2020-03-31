@@ -80,6 +80,7 @@ return [
             'messages' => 'Wiadomości',
             'packages' => 'Przesyłki',
             'status' => 'Status zamówienia',
+            'customer' => 'Zmiana danych klienta'
         ],
         'last_status_update_date' => 'Ostatnia data zmiany statusu',
         'total_price' => 'Suma zamówienia',
