@@ -60,7 +60,7 @@ class RemoveLabelJob extends Job
                 continue;
             }
 
-            if ($labelId == 74) {
+            if ($labelId == 41) {
                 $noData = DB::table('gt_invoices')->where('order_id', $this->order->id)->where('gt_invoice_status_id', '13')->first();
                 if (!empty($noData)) {
                     try {
