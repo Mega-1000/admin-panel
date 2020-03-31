@@ -15,6 +15,7 @@ use Yajra\DataTables\Facades\DataTables;
 use TCG\Voyager\Models\Role;
 use App\Helpers\Helper;
 use Illuminate\Http\Request;
+use function Clue\StreamFilter\fun;
 
 /**
  * Class CustomersController.
@@ -53,25 +54,7 @@ class CustomersController extends Controller
     public function changeLoginOrPassword(Request $request, $id)
     {
         try {
-            $order = Order::findOrFail($request->order_id);
-            $customer = Customer::findOrFail($id);
-            if ($request->login) {
-                $customer->login = $request->login;
-            }
-            if ($request->phone) {
-                $customer->password = $customer->generatePassword($request->phone);
-                if ($request->invoice) {
-                    $invoice = $order->getInvoiceAddress();
-                    $invoice->phone = $request->phone;
-                    $invoice->save();
-                }
-                if ($request->delivery) {
-                    $delivery = $order->getDeliveryAddress();
-                    $delivery->phone = $request->phone;
-                    $delivery->save();
-                }
-            }
-            $customer->save();
+            $this->overrideContact($request, $id);
         } catch (\Exception $exception) {
             Log::error("Can't change login or password",
                 ['message' => $exception->getMessage(),
@@ -476,6 +459,50 @@ class CustomersController extends Controller
             ->count();
 
         return $collection;
+    }
+
+    /**
+     * @param Request $request
+     * @param $id
+     */
+    private function overrideContact(Request $request, $id): void
+    {
+        $order = Order::findOrFail($request->order_id);
+        $customer = Customer::findOrFail($id);
+        if ($request->login) {
+            $customer->login = $request->login;
+        }
+        if ($request->phone) {
+            $customer->password = $customer->generatePassword($request->phone);
+        }
+
+        $customer->addresses->map(function ($address) use ($request) {
+            if ($request->phone) {
+                $address->phone = $request->phone;
+            }
+            if ($request->login) {
+                $address->email = $request->login;
+            }
+            $address->save();
+        });
+
+        $invoice = $order->getInvoiceAddress();
+        if ($request->invoice_phone && $request->phone) {
+            $invoice->phone = $request->phone;
+        }
+        if ($request->invoice_email && $request->login) {
+            $invoice->email = $request->login;
+        }
+        $invoice->save();
+        $delivery = $order->getDeliveryAddress();
+        if ($request->delivery_phone && $request->phone) {
+            $delivery->phone = $request->phone;
+        }
+        if ($request->delivery_email && $request->login) {
+            $delivery->email = $request->login;
+        }
+        $delivery->save();
+        $customer->save();
     }
 }
 
