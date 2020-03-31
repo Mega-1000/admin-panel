@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Entities\Order;
+use App\Entities\OrderPackage;
 use App\Helpers\OrderPackagesDataHelper;
 use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderRepository;
@@ -21,20 +23,9 @@ class ChangeShipmentDatePackagesJob
 
     protected $orderRepository;
 
-    /**
-     * Create a new job instance.
-     *
-     * @return void
-     */
-    public function __construct(
-        OrderPackageRepository $orderPackageRepository,
-        OrderPackagesDataHelper $orderPackagesDataHelper,
-        OrderRepository $orderRepository
-    )
+    public function __construct()
     {
-        $this->orderPackageRepository = $orderPackageRepository;
-        $this->orderPackagesDataHelper = $orderPackagesDataHelper;
-        $this->orderRepository = $orderRepository;
+        $this->orderPackagesDataHelper = new OrderPackagesDataHelper();
     }
 
     /**
@@ -44,19 +35,17 @@ class ChangeShipmentDatePackagesJob
      */
     public function handle()
     {
-        $orders = $this->orderRepository->findWhere([
-            ['shipment_date', '<', Carbon::today()],
-        ]);
-        foreach($orders as $order) {
+        $orders = Order::where('shipment_date', '<', Carbon::today())->get();
+        foreach ($orders as $order) {
             $date = new Carbon($order->shipment_date);
-            if($order->hasLabel(66)) {
+            if ($order->hasLabel(66)) {
                 continue;
             }
             if ($order->packages->isEmpty()) {
                 if ($date->toDateString() < Carbon::today()->toDateString()) {
                     $shipmentDate = Carbon::today();
                     $order->update(['shipment_date' => $shipmentDate]);
-                    if($order->task != null) {
+                    if ($order->task != null) {
                         $dateStart = new Carbon($order->task->taskTime->date_start);
                         $dateEnd = new Carbon($order->task->taskTime->date_end);
                         $order->task->taskTime->update([
@@ -67,29 +56,34 @@ class ChangeShipmentDatePackagesJob
                 }
             } else {
                 foreach ($order->packages as $package) {
-                    if($package->status == 'NEW') {
-                        if ($date->toDateString() < Carbon::today()->toDateString()) {
-                            $shipmentDate = Carbon::today();
-                            $array = [
-                                'shipment_date' => $shipmentDate,
-                                'delivery_date' => $this->orderPackagesDataHelper->calculateDeliveryDate($shipmentDate),
-                            ];
-                            if ($package->order != null) {
-                                $package->order->shipment_date = $shipmentDate;
-                                $package->order->update();
-                                $this->orderPackageRepository->update($array, $package->id);
-                                if ($package->order->task != null) {
-                                    $dateStart = new Carbon($package->order->task->taskTime->date_start);
-                                    $dateEnd = new Carbon($package->order->task->taskTime->date_end);
-                                    $package->order->task->taskTime->update([
-                                        'date_start' => $dateStart->addDay()->toDateTimeString(),
-                                        'date_end' => $dateEnd->addDay()->toDateTimeString(),
-                                    ]);
-                                }
-                            }
-                        }
+                    if ($package->status != 'NEW') {
+                        continue;
                     }
+
+                    if ($date->toDateString() >= Carbon::today()->toDateString()) {
+                        continue;
+                    }
+
+                    $shipmentDate = Carbon::today();
+                    $order->shipment_date = $shipmentDate;
+                    $package->shipment_date = $shipmentDate;
+                    $package->delivery_date = $this->orderPackagesDataHelper->calculateDeliveryDate($shipmentDate);
+                    if (empty($package->order)) {
+                        continue;
+                    }
+                    $package->order->shipment_date = $shipmentDate;
+                    $package->save();
+                    if (empty($package->order->task)) {
+                        continue;
+                    }
+                    $dateStart = new Carbon($package->order->task->taskTime->date_start);
+                    $dateEnd = new Carbon($package->order->task->taskTime->date_end);
+                    $package->order->task->taskTime->update([
+                        'date_start' => $dateStart->addDay()->toDateTimeString(),
+                        'date_end' => $dateEnd->addDay()->toDateTimeString(),
+                    ]);
                 }
+                $order->save();
             }
         }
     }
