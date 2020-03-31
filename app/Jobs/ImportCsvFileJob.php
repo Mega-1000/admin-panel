@@ -158,10 +158,6 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function saveCategory($line, $categoryTree, $categoryColumn)
     {
-        if (empty($line[301]) && empty($line[302])) {
-            return;
-        }
-
         $parent = &$this->getCategoryParent($categoryTree);
 
         $category = new Entities\Category;
