@@ -1222,18 +1222,26 @@
                 <input name="login"/>
             </label>
             <label style="display: block">
+                czy zaktualizować email w adresie faktury
+                <input checked type="checkbox" name="invoice_email"/>
+            </label>
+            <label style="display: block">
+                czy zaktualizować email w adresie dostawy
+                <input checked type="checkbox" name="delivery_email"/>
+            </label>
+            <label style="display: block">
                 Nr telefonu (hasło)
                 <input name="phone"/>
             </label>
             <label style="display: block">
                 czy zaktualizować telefon w adresie faktury
-                <input type="checkbox" name="invoice"/>
+                <input type="checkbox" name="invoice_phone"/>
             </label>
             <label style="display: block">
                 czy zaktualizować telefon w adresie dostawy
-                <input type="checkbox" name="delivery"/>
+                <input type="checkbox" name="delivery_phone"/>
             </label>
-            <input type="submit" />
+            <input value="Nadpisz dane" type="submit" />
         </form>
     </div>
     <div class="order-messages" id="order-messages">
