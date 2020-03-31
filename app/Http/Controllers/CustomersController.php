@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Entities\ColumnVisibility;
+use App\Entities\Customer;
+use App\Entities\Order;
 use App\Http\Requests\CustomerCreateRequest;
 use App\Http\Requests\CustomerUpdateRequest;
 use App\Repositories\CustomerAddressRepository;
 use App\Repositories\CustomerRepository;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 use TCG\Voyager\Models\Role;
 use App\Helpers\Helper;
@@ -44,6 +47,46 @@ class CustomersController extends Controller
     {
         $this->repository = $repository;
         $this->customerAddressRepository = $customerAddressRepository;
+    }
+
+
+    public function changeLoginOrPassword(Request $request, $id)
+    {
+        try {
+            $order = Order::findOrFail($request->order_id);
+            $customer = Customer::findOrFail($id);
+            if ($request->login) {
+                $customer->login = $request->login;
+            }
+            if ($request->phone) {
+                $customer->password = $customer->generatePassword($request->phone);
+                if ($request->invoice) {
+                    $invoice = $order->getInvoiceAddress();
+                    $invoice->phone = $request->phone;
+                    $invoice->save();
+                }
+                if ($request->delivery) {
+                    $delivery = $order->getDeliveryAddress();
+                    $delivery->phone = $request->phone;
+                    $delivery->save();
+                }
+            }
+            $customer->save();
+        } catch (\Exception $exception) {
+            Log::error("Can't change login or password",
+                ['message' => $exception->getMessage(),
+                    'file' => $exception->getFile(),
+                    'line' => $exception->getLine()]);
+            return back()->with([
+                'message' => __('voyager.generic.update_failed'),
+                'alert-type' => 'error',
+            ]);
+        }
+
+        return back()->with([
+            'message' => __('customers.message.update'),
+            'alert-type' => 'success',
+        ]);
     }
 
 

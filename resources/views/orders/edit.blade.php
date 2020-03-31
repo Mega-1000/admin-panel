@@ -48,6 +48,9 @@
         <button class="btn btn-primary"
                 name="change-button-form" id="button-packages"
                 value="packages">@lang('orders.form.buttons.packages')</button>
+        <button class="btn btn-primary"
+                name="change-button-form" id="button-customer"
+                value="customer">@lang('orders.form.buttons.customer')</button>
         <a id="create-button-orderPayments" style="float:right;margin-right: 15px;"
            href="{{route('order_payments.create', ['id' => $order->id]) }}" target="_blank"
            class="btn btn-success install pull-right">
@@ -1210,6 +1213,29 @@
             </thead>
         </table>
     </div>
+    <div class="order-customer" id="order-customer">
+        <form method="post" action="/admin/customers/{{ $order->customer->id }}/override-customer-data">
+            @csrf
+            <input name="order_id" hidden value="{{ $order->id }}">
+            <label style="display: block">
+                Login (adres email)
+                <input name="login"/>
+            </label>
+            <label style="display: block">
+                Nr telefonu (hasło)
+                <input name="phone"/>
+            </label>
+            <label style="display: block">
+                czy zaktualizować telefon w adresie faktury
+                <input type="checkbox" name="invoice"/>
+            </label>
+            <label style="display: block">
+                czy zaktualizować telefon w adresie dostawy
+                <input type="checkbox" name="delivery"/>
+            </label>
+            <input type="submit" />
+        </form>
+    </div>
     <div class="order-messages" id="order-messages">
         <div class="panel panel-bordered">
             <div class="panel-body">
@@ -2125,6 +2151,7 @@
                             var packages = $('#order-packages').hide();
                             var messages = $('#order-messages').hide();
                             var status = $('#order-status').hide();
+                            var customer = $('#order-customer').hide();
                             var pageTitle = $('.page-title').children('i');
                             var createButtonOrderPayments = $('#create-button-orderPayments').hide();
                             var createButtonOrderTasks = $('#create-button-orderTasks').hide();
@@ -2146,12 +2173,14 @@
                                 $('#button-messages').removeClass('active');
                                 $('#button-payments').addClass('active');
                                 $('#button-packages').removeClass('active');
+                                $('#button-customer').removeClass('active');
                                 $('#submit').hide();
                                 $('#submitOrder').hide();
                                 general.hide();
                                 tasks.hide();
                                 payments.show();
                                 packages.hide();
+                                customer.hide();
                                 messages.hide();
                                 status.hide();
                                 createButtonOrderPayments.show();
@@ -2169,12 +2198,14 @@
                                 $('#button-messages').removeClass('active');
                                 $('#button-payments').removeClass('active');
                                 $('#button-packages').removeClass('active');
+                                $('#button-customer').removeClass('active');
                                 $('#submit').hide();
                                 $('#submitOrder').hide();
                                 general.hide();
                                 tasks.show();
                                 payments.hide();
                                 packages.hide();
+                                customer.hide();
                                 messages.hide();
                                 status.hide();
                                 createButtonOrderPayments.hide();
@@ -2193,12 +2224,14 @@
                                 $('#button-messages').removeClass('active');
                                 $('#button-payments').removeClass('active');
                                 $('#button-packages').addClass('active');
+                                $('#button-customer').removeClass('active');
                                 $('#submit').hide();
                                 $('#submitOrder').hide();
                                 general.hide();
                                 tasks.hide();
                                 payments.hide();
                                 packages.show();
+                                customer.hide();
                                 messages.hide();
                                 createButtonOrderPayments.hide();
                                 createButtonOrderPackages.show();
@@ -2215,12 +2248,14 @@
                                 $('#button-messages').addClass('active');
                                 $('#button-payments').removeClass('active');
                                 $('#button-packages').removeClass('active');
+                                $('#button-customer').removeClass('active');
                                 $('#submit').hide();
                                 $('#submitOrder').hide();
                                 general.hide();
                                 tasks.hide();
                                 payments.hide();
                                 packages.hide();
+                                customer.hide();
                                 messages.show();
                                 createButtonOrderPayments.hide();
                                 createButtonOrderPackages.hide();
@@ -2241,10 +2276,12 @@
                                     $('#button-messages').removeClass('active');
                                     $('#button-payments').removeClass('active');
                                     $('#button-packages').removeClass('active');
+                                    $('#button-customer').removeClass('active');
                                     general.show();
                                     tasks.hide();
                                     payments.hide();
                                     packages.hide();
+                                    customer.hide();
                                     messages.hide();
                                     status.hide();
                                     $('#submit').show();
@@ -2265,6 +2302,7 @@
                                     $('#button-messages').removeClass('active');
                                     $('#button-payments').removeClass('active');
                                     $('#button-packages').removeClass('active');
+                                    $('#button-customer').removeClass('active');
                                     $('#submit').hide();
                                     $('#submitOrder').hide();
                                     general.hide();
@@ -2272,6 +2310,7 @@
                                     payments.hide();
                                     packages.hide();
                                     messages.hide();
+                                    customer.hide();
                                     status.hide();
                                     pageTitle.removeClass();
                                     pageTitle.addClass('voyager-calendar');
@@ -2286,6 +2325,7 @@
                                     $('#button-tasks').removeClass('active');
                                     $('#button-messages').removeClass('active');
                                     $('#button-payments').addClass('active');
+                                    $('#button-customer').removeClass('active');
                                     $('#button-packages').removeClass('active');
                                     $('#submit').hide();
                                     $('#submitOrder').hide();
@@ -2294,6 +2334,7 @@
                                     payments.show();
                                     packages.hide();
                                     messages.hide();
+                                    customer.hide();
                                     status.hide();
                                     pageTitle.removeClass();
                                     pageTitle.addClass('voyager-wallet');
@@ -2310,6 +2351,7 @@
                                     $('#button-tasks').removeClass('active');
                                     $('#button-messages').addClass('active');
                                     $('#button-payments').removeClass('active');
+                                    $('#button-customer').removeClass('active');
                                     $('#button-packages').removeClass('active');
                                     $('#submit').hide();
                                     $('#submitOrder').hide();
@@ -2318,6 +2360,7 @@
                                     payments.hide();
                                     packages.hide();
                                     messages.show();
+                                    customer.hide();
                                     status.hide();
                                     pageTitle.removeClass();
                                     pageTitle.addClass('voyager-chat');
@@ -2333,12 +2376,14 @@
                                     $('#button-tasks').removeClass('active');
                                     $('#button-messages').removeClass('active');
                                     $('#button-payments').removeClass('active');
+                                    $('#button-customer').removeClass('active');
                                     $('#button-packages').addClass('active');
                                     $('#submit').hide();
                                     $('#submitOrder').hide();
                                     general.hide();
                                     tasks.hide();
                                     payments.hide();
+                                    customer.hide();
                                     packages.show();
                                     messages.hide();
                                     status.hide();
@@ -2356,6 +2401,7 @@
                                     $('#button-messages').removeClass('active');
                                     $('#button-payments').removeClass('active');
                                     $('#button-packages').removeClass('active');
+                                    $('#button-customer').removeClass('active');
                                     $('#submit').show();
                                     $('#submitOrder').hide();
                                     general.hide();
@@ -2363,7 +2409,32 @@
                                     payments.hide();
                                     packages.hide();
                                     messages.hide();
+                                    customer.hide();
                                     status.show();
+                                    pageTitle.removeClass();
+                                    pageTitle.addClass('voyager-tag');
+                                    createButtonOrderPayments.hide();
+                                    createButtonOrderPackages.hide();
+                                    createButtonOrderTasks.hide();
+                                    breadcrumb.children().last().remove();
+                                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#status'>Status zamówienia</a></li>");
+                                    addOrder.hide();
+                                } else if (value === 'customer') {
+                                    $('#button-general').removeClass('active');
+                                    $('#button-tasks').removeClass('active');
+                                    $('#button-messages').removeClass('active');
+                                    $('#button-payments').removeClass('active');
+                                    $('#button-packages').removeClass('active');
+                                    $('#button-customer').addClass('active');
+                                    $('#submit').hide();
+                                    $('#submitOrder').hide();
+                                    general.hide();
+                                    tasks.hide();
+                                    payments.hide();
+                                    packages.hide();
+                                    messages.hide();
+                                    customer.show();
+                                    status.hide();
                                     pageTitle.removeClass();
                                     pageTitle.addClass('voyager-tag');
                                     createButtonOrderPayments.hide();
