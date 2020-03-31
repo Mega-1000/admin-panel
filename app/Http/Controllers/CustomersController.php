@@ -15,7 +15,6 @@ use Yajra\DataTables\Facades\DataTables;
 use TCG\Voyager\Models\Role;
 use App\Helpers\Helper;
 use Illuminate\Http\Request;
-use function Clue\StreamFilter\fun;
 
 /**
  * Class CustomersController.
