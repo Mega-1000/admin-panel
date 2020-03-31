@@ -39,6 +39,11 @@
                        value="{{ $orderPackage->chosen_data_template }}">
             </div>
             <div class="form-group">
+                <label for="symbol">@lang('order_packages.form.symbol')</label>
+                <input type="text" class="form-control" disabled="disabled"
+                       value="{{ $orderPackage->symbol }}">
+            </div>
+            <div class="form-group">
                 <label for="size_a">@lang('order_packages.form.size_a')</label>
                 <input type="text" class="form-control" id="size_a" name="size_a"
                        value="{{ $orderPackage->size_a }}">
@@ -161,63 +166,41 @@
                 <select name="status" id="status" class="form-control">
                     @if($orderPackage->status == 'DELIVERED')
                         <option value="DELIVERED" selected>@lang('order_packages.form.status_type.delivered')</option>
-                        <option value="CANCELLED">@lang('order_packages.form.status_type.cancelled')</option>
-                        <option value="NEW">@lang('order_packages.form.status_type.new')</option>
-                        <option value="SENDING">@lang('order_packages.form.status_type.sending')</option>
-                        <option value="WAITING_FOR_SENDING">@lang('order_packages.form.status_type.waiting_for_sending')</option>
-                        <option value="WAITING_FOR_CANCELLED">@lang('order_packages.form.status_type.waiting_for_cancelled')</option>
-                        <option value="REJECT_CANCELLED">@lang('order_packages.form.status_type.reject_cancelled')</option>
-                    @elseif ($orderPackage->status == 'CANCELLED')
+                    @else
                         <option value="DELIVERED">@lang('order_packages.form.status_type.delivered')</option>
+                    @endif
+                    @if($orderPackage->status == 'CANCELLED')
                         <option value="CANCELLED" selected>@lang('order_packages.form.status_type.cancelled')</option>
-                        <option value="NEW">@lang('order_packages.form.status_type.new')</option>
-                        <option value="SENDING">@lang('order_packages.form.status_type.sending')</option>
-                        <option value="WAITING_FOR_SENDING">@lang('order_packages.form.status_type.waiting_for_sending')</option>
-                        <option value="WAITING_FOR_CANCELLED">@lang('order_packages.form.status_type.waiting_for_cancelled')</option>
-                        <option value="REJECT_CANCELLED">@lang('order_packages.form.status_type.reject_cancelled')</option>
-                    @elseif ($orderPackage->status == 'NEW')
-                        <option value="DELIVERED">@lang('order_packages.form.status_type.delivered')</option>
+                    @else
                         <option value="CANCELLED">@lang('order_packages.form.status_type.cancelled')</option>
+                    @endif
+                    @if($orderPackage->status == 'NEW')
                         <option value="NEW" selected>@lang('order_packages.form.status_type.new')</option>
-                        <option value="SENDING">@lang('order_packages.form.status_type.sending')</option>
-                        <option value="WAITING_FOR_SENDING">@lang('order_packages.form.status_type.waiting_for_sending')</option>
-                        <option value="WAITING_FOR_CANCELLED">@lang('order_packages.form.status_type.waiting_for_cancelled')</option>
-                        <option value="REJECT_CANCELLED">@lang('order_packages.form.status_type.reject_cancelled')</option>
-                    @elseif ($orderPackage->status == 'SENDING')
-                        <option value="DELIVERED">@lang('order_packages.form.status_type.delivered')</option>
-                        <option value="CANCELLED">@lang('order_packages.form.status_type.cancelled')</option>
+                    @else
                         <option value="NEW">@lang('order_packages.form.status_type.new')</option>
+                    @endif
+                    @if($orderPackage->status == 'SENDING')
                         <option value="SENDING" selected>@lang('order_packages.form.status_type.sending')</option>
-                        <option value="WAITING_FOR_SENDING">@lang('order_packages.form.status_type.waiting_for_sending')</option>
-                        <option value="WAITING_FOR_CANCELLED">@lang('order_packages.form.status_type.waiting_for_cancelled')</option>
-                        <option value="REJECT_CANCELLED">@lang('order_packages.form.status_type.reject_cancelled')</option>
-                    @elseif ($orderPackage->status == 'WAITING_FOR_SENDING')
-                        <option value="DELIVERED">@lang('order_packages.form.status_type.delivered')</option>
-                        <option value="CANCELLED">@lang('order_packages.form.status_type.cancelled')</option>
-                        <option value="NEW">@lang('order_packages.form.status_type.new')</option>
+                    @else
                         <option value="SENDING">@lang('order_packages.form.status_type.sending')</option>
+                    @endif
+                    @if($orderPackage->status == 'WAITING_FOR_SENDING')
                         <option value="WAITING_FOR_SENDING"
                                 selected>@lang('order_packages.form.status_type.waiting_for_sending')</option>
-                        <option value="WAITING_FOR_CANCELLED">@lang('order_packages.form.status_type.waiting_for_cancelled')</option>
-                        <option value="REJECT_CANCELLED">@lang('order_packages.form.status_type.reject_cancelled')</option>
-                    @elseif ($orderPackage->status == 'WAITING_FOR_CANCELLED')
-                        <option value="DELIVERED">@lang('order_packages.form.status_type.delivered')</option>
-                        <option value="CANCELLED">@lang('order_packages.form.status_type.cancelled')</option>
-                        <option value="NEW">@lang('order_packages.form.status_type.new')</option>
-                        <option value="SENDING">@lang('order_packages.form.status_type.sending')</option>
+                    @else
                         <option value="WAITING_FOR_SENDING">@lang('order_packages.form.status_type.waiting_for_sending')</option>
+                    @endif
+                    @if($orderPackage->status == 'WAITING_FOR_CANCELLED')
                         <option value="WAITING_FOR_CANCELLED"
                                 selected>@lang('order_packages.form.status_type.waiting_for_cancelled')</option>
-                        <option value="REJECT_CANCELLED">@lang('order_packages.form.status_type.reject_cancelled')</option>
-                    @elseif ($orderPackage->status == 'REJECT_CANCELLED')
-                        <option value="DELIVERED">@lang('order_packages.form.status_type.delivered')</option>
-                        <option value="CANCELLED">@lang('order_packages.form.status_type.cancelled')</option>
-                        <option value="NEW">@lang('order_packages.form.status_type.new')</option>
-                        <option value="SENDING">@lang('order_packages.form.status_type.sending')</option>
-                        <option value="WAITING_FOR_SENDING">@lang('order_packages.form.status_type.waiting_for_sending')</option>
+                    @else
                         <option value="WAITING_FOR_CANCELLED">@lang('order_packages.form.status_type.waiting_for_cancelled')</option>
+                    @endif
+                    @if($orderPackage->status == 'REJECT_CANCELLED')
                         <option value="REJECT_CANCELLED"
                                 selected>@lang('order_packages.form.status_type.reject_cancelled')</option>
+                    @else
+                        <option value="REJECT_CANCELLED">@lang('order_packages.form.status_type.reject_cancelled')</option>
                     @endif
                 </select>
             </div>
