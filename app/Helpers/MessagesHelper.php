@@ -162,9 +162,9 @@ class MessagesHelper
     public function createNewChat()
     {
         $chat = new Chat();
-        $chat->product_id = $this->productId;
-        $chat->order_id = $this->orderId;
-        $chat->employee_id = $this->employeeId;
+        $chat->product_id = $this->productId ?: null;
+        $chat->order_id = $this->orderId ?: null;
+        $chat->employee_id = $this->employeeId ?: null;
         $chat->save();
         if (empty($this->users[self::TYPE_CUSTOMER])) {
             throw new ChatException('Missing customer ID');
