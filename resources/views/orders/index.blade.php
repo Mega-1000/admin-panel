@@ -391,9 +391,12 @@
         <a name="send_courier" class="btn btn-info" href="/admin/orderPackages/ALL/send">Wyślij wszystkie</a>
     </div>
     <div class="form-group">
-        <label for="send_courier">Szablony paczek: </label>
-        <a name="send_courier" class="btn btn-success" href="/admin/packageTemplates/">Lista</a>
+        <label for="send_courier">Szablony paczek:</label>
+        <a name="send_courier" class="btn btn-success" href="/admin/packageTemplates/">Lista Szablonów</a>
         <a name="send_courier" class="btn btn-info" href="/admin/packageTemplates/create">Dodaj szablon</a>
+        <label style="margin-left: 20px" for="send_courier">Typy zawartości przesyłek:</label>
+        <a style="margin-left: 5px" name="send_courier" class="btn btn-success" href="/admin/contentTypes/">Lista Typów zawartości przesyłek</a>
+        <a name="send_courier" class="btn btn-info" href="/admin/contentTypes/create">Dodaj typ zawartości przesyłki</a>
     </div>
     <div class="form-group">
         <label for="send_courier">Import z SELLO: </label>

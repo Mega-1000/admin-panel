@@ -56,7 +56,7 @@
             <div class="form-group">
                 <label for="short_name">@lang('firms.form.short_name')</label>
                 <input class="form-control" id="short_name"
-                       name="short_name"
+                       name="short_name" maxlength="50"
                        value="{{ $firm->short_name }}">
             </div>
             <div class="form-group">

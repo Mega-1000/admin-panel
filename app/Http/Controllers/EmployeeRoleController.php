@@ -61,9 +61,8 @@ class EmployeeRoleController extends Controller
         if(empty($role)){
             abort(404);
         }
-
         $role->name = $request->name;
-        $role->symbol = $request->name;
+        $role->symbol = $request->symbol;
         $role->save();
 
         return redirect()->route('employee_role.index')->with([

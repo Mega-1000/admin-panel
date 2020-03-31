@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use App\Jobs\OrdersCourierJobs;
+use App\Entities\ContentType;
 
 /**
  * Class OrderTasksController.
@@ -67,7 +68,7 @@ class OrdersPackagesController extends Controller
      */
     public function create(Request $request,$id, $multi = null)
     {
-
+        $contentTypes = ContentType::all();
         $templateData = $this->orderPackagesDataHelper->getData();
         $order = $this->orderRepository->find($id);
         $shipmentDate = $this->orderPackagesDataHelper->calculateShipmentDate();
@@ -142,7 +143,7 @@ class OrdersPackagesController extends Controller
             }
         }
 
-        return view('orderPackages.create', compact('id', 'templateData', 'orderData', 'order', 'payments', 'promisedPayments', 'connectedOrders', 'cashOnDeliverySum', 'isAdditionalDKPExists', 'allOrdersSum', 'multiData'));
+        return view('orderPackages.create', compact('id', 'templateData', 'orderData', 'order', 'payments', 'promisedPayments', 'connectedOrders', 'cashOnDeliverySum', 'isAdditionalDKPExists', 'allOrdersSum', 'multiData'))->withcontentTypes($contentTypes);
     }
 
     public function changeValue(Request $request)
@@ -164,8 +165,9 @@ class OrdersPackagesController extends Controller
     public function edit($id)
     {
         $orderPackage = $this->repository->find($id);
+        $contentTypes = ContentType::all();
 
-        return view('orderPackages.edit', compact('orderPackage', 'id'));
+        return view('orderPackages.edit', compact('orderPackage', 'id'))->withcontentTypes($contentTypes);
     }
 
     /**
@@ -281,7 +283,8 @@ class OrdersPackagesController extends Controller
             'weight' => $request->input('weight'),
             'cost_for_client' => $request->input('cost_for_client'),
             'cost_for_us' => $request->input('cost_for_company'),
-            'chosen_data_template' => $request->input('chosen_data_template')
+            'chosen_data_template' => $request->input('chosen_data_template'),
+            'content' => $request->input('content')
             ]
         ];
         $request->session()->put('multi', $multi);
