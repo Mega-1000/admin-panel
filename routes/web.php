@@ -188,6 +188,13 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('employeeRoles/{id}/edit', 'EmployeeRoleController@edit')->name('employee_role.edit');
         Route::put('employeeRoles/{id}/update', 'EmployeeRoleController@update')->name('employee_role.update');
         Route::delete('employeeRoles/{id}/delete', 'EmployeeRoleController@destroy')->name('employee_role.destroy');
+        
+        Route::get('contentTypes', 'ContentTypesController@index')->name('content_type.index');
+        Route::get('contentTypes/create', 'ContentTypesController@create')->name('content_type.create');
+        Route::post('contentTypes/store', 'ContentTypesController@store')->name('content_type.store');
+        Route::get('contentTypes/{id}/edit', 'ContentTypesController@edit')->name('content_type.edit');
+        Route::put('contentTypes/{id}/update', 'ContentTypesController@update')->name('content_type.update');
+        Route::delete('contentTypes/{id}/delete', 'ContentTypesController@destroy')->name('content_type.destroy');
 
         Route::get('sello-import', 'OrdersController@selloImport')->name('orders.sello_import');
 

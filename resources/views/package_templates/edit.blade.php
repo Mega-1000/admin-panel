@@ -169,11 +169,18 @@
             </div>
             <div class="form-group">
                 <label for="content">@lang('order_packages.form.content')</label>
-                <input type="text" class="form-control" id="content" name="content"
-                       value="Materiały budowlane">
+                <select class="form-control text-uppercase" id="content" name="content">
+                    @foreach($contentTypes as $contentType)
+                    @if ($contentType->name == $old->content)
+                    <option value="{{$contentType->content}}" selected="selected">{{$contentType->content}}</option>
+                    @else
+                    <option value="{{ $contentType->name }}">{{ $contentType->name }}</option>
+                    @endif
+                    @endforeach
+                </select>
             </div>
             <div class="form-group">
-                <label for="cod_cost">@lang('order_packages.form.cost')</label>
+                <label for="cod_cost">@lang('order_packages.form.cod_cost')</label>
                 <input type="number" step=".01" class="form-control" id="cod_cost" name="cod_cost"
                        value="{{ $old->cod_cost }}">
             </div>

@@ -51,7 +51,7 @@
         <div class="firms-general" id="orderPayment">
             <div class="form-group">
                 <label for="quantity">@lang('order_packages.form.quantity')</label><br/>
-                <input type="text" id="quantity" name="quantity" class="form-control" value="{{ old('quantity') }}">
+                <input type="text" id="quantity" name="quantity" class="form-control" value="{{ 1 }}">
             </div>
             <div class="form-group">
                 <label for="size_a">@lang('order_packages.form.size_a')</label>
@@ -325,9 +325,16 @@
                 <input type="hidden" name="status" value="NEW">
             </div>
             <div class="form-group">
-                <label for="content">@lang('order_packages.form.content')</label>
-                <input type="text" class="form-control" id="content" name="content"
-                       value="Materiały budowlane">
+                <label for="data_template">@lang('order_packages.form.content')</label>
+                <select class="form-control text-uppercase" id="content" name="content">
+                    @foreach($contentTypes as $contentType)
+                    @if ($contentType->name == "Materiały Budowlane")
+                    <option value="Materiały Budowlane" selected="selected">Materiały Budowlane</option>
+                    @else
+                    <option value="{{ $contentType->name }}">{{ $contentType->name }}</option>
+                    @endif
+                    @endforeach
+                </select>
             </div>
             <div class="form-group">
                 <label for="sending_number">@lang('order_packages.form.sending_number')</label>
@@ -484,7 +491,6 @@
         $("#size_c").val(selectedTemplateData['sizeC']);
         $("#service_courier_name").val(selectedTemplateData['service_courier_name']);
         $("#delivery_courier_name").val(selectedTemplateData['delivery_courier_name']);
-        $("#quantity").val(selectedTemplateData['quantity']);
         $("#shape").val(selectedTemplateData['shape']);
         $("#shipment_date").val(orderData['shipment_date']);
         $("#delivery_date").val(orderData['delivery_date']);
@@ -496,6 +502,9 @@
         $("#template_info").html(selectedTemplateData['info']);
         $("#cod_cost").html(selectedTemplateData['cod_cost']);
         $("#notices").attr('maxlength', selectedTemplateData['notice_max_lenght']);
+        if (selectedTemplateData['content'] != null) {
+            $("#content").val(selectedTemplateData['content']);
+        }
         var dt = new Date;
         var h = dt.getHours();
         var acc = selectedTemplateData['accept_time'].split(':');

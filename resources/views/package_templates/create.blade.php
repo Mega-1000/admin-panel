@@ -168,12 +168,19 @@
                 <input type="hidden" name="status" value="NEW">
             </div>
             <div class="form-group">
-                <label for="content">@lang('order_packages.form.content')</label>
-                <input type="text" class="form-control" id="content" name="content"
-                       value="Materiały budowlane">
+                <label for="data_template">@lang('order_packages.form.content')</label>
+                <select class="form-control text-uppercase" id="content" name="content">
+                    @foreach($contentTypes as $contentType)
+                    @if ($contentType->name == "Materiały Budowlane")
+                    <option value="Materiały Budowlane" selected="selected">Materiały Budowlane</option>
+                    @else
+                    <option value="{{ $contentType->name }}">{{ $contentType->name }}</option>
+                    @endif
+                    @endforeach
+                </select>
             </div>
             <div class="form-group">
-                <label for="cost_for_client">Koszt pobrania</label>
+                <label for="cost_for_client">@lang('order_packages.form.cod_cost')</label>
                 <input type="number" step=".01" class="form-control" id="cod_cost" name="cod_cost"
                        value="{{ old('cod_cost') }}">
             </div>

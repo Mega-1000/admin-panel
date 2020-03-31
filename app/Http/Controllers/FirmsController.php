@@ -11,6 +11,7 @@ use App\Repositories\FirmAddressRepository;
 use App\Repositories\FirmRepository;
 use Yajra\DataTables\Facades\DataTables;
 use App\Entities\Employee;
+use App\Entities\Firm;
 
 /**
  * Class FirmsController.
@@ -79,7 +80,25 @@ class FirmsController extends Controller
      */
     public function store(FirmCreateRequest $request)
     {
-        $firm = $this->repository->create($request->all());
+        $firm = new Firm;
+        $firm->name = $request->name;
+        $firm->short_name = $request->short_name;
+        $firm->symbol = $request->symbol;
+        $firm->delivery_warehouse = $request->delivery_warehouse;
+        $firm->email = $request->email;
+        $firm->secondary_email = $request->secondary_email;
+        $firm->nip = $request->nip;
+        $firm->account_number = $request->account_number;
+        $firm->status = $request->status;
+        $firm->phone = $request->phone;
+        $firm->notices = $request->notices;
+        $firm->secondary_phone = $request->secondary_phone;
+        $firm->secondary_notices = $request->secondary_notices;
+        if (empty($request->short_name)) {
+            $firm->short_name = substr($request->name, 0, 50);
+        }
+        $firm->save();
+        
 
         $this->firmAddressRepository->create([
             'firm_id' => $firm->id,
@@ -139,13 +158,28 @@ class FirmsController extends Controller
      */
     public function update(FirmUpdateRequest $request, $id)
     {
-        $firm = $this->repository->find($id);
-
+        $firm = Firm::find($id);
+        
         if (empty($firm)) {
             abort(404);
         }
-
-        $this->repository->update($request->all(), $firm->id);
+        $firm->name = $request->name;
+        $firm->short_name = $request->short_name;
+        $firm->symbol = $request->symbol;
+        $firm->delivery_warehouse = $request->delivery_warehouse;
+        $firm->email = $request->email;
+        $firm->secondary_email = $request->secondary_email;
+        $firm->nip = $request->nip;
+        $firm->account_number = $request->account_number;
+        $firm->status = $request->status;
+        $firm->phone = $request->phone;
+        $firm->notices = $request->notices;
+        $firm->secondary_phone = $request->secondary_phone;
+        $firm->secondary_notices = $request->secondary_notices;
+        if (empty($request->short_name)) {
+            $firm->short_name = substr($request->name, 0, 50);
+        }
+        $firm->save();
         $this->firmAddressRepository->update($request->all(), $firm->address->id);
 
         return redirect()->back()->with([
