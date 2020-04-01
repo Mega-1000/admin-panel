@@ -429,8 +429,6 @@ class OrdersController extends Controller
             abort(404);
         }
 
-        $order->clearPackages();
-
         if ($request->input('status') != $order->status_id && empty(Auth::user()->userEmailData) && $request->input('shouldBeSent') == 'on') {
             return redirect()->route('orders.edit', ['order_id' => $order->id])->with([
                 'message' => __('order_messages.message.email_failure'),
@@ -636,7 +634,6 @@ class OrdersController extends Controller
             );
         }
 
-        BackPackPackageDivider::calculatePackagesForOrder($order);
         $sumOfOrdersReturn = $this->sumOfOrders($order);
         $sumToCheck = $sumOfOrdersReturn[0];
         if ($order->status_id == 5 || $order->status_id == 6) {
