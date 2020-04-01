@@ -3041,7 +3041,11 @@
                                 $("#totalPriceInfo").val($("#total_price").val());
                                 $("#orderItemsSum").val(total_price);
                                 updateOrderSum();
-                                $("#weight").val($('.item-weight').toArray().reduce((prev, curr) => parseFloat(prev + parseFloat(curr.value)).toFixed(2), 0))
+                                $("#weight").val(
+                                    parseFloat(
+                                        $('.item-weight').toArray().reduce(
+                                            (prev, curr) => prev + parseFloat(curr.value), 0)
+                                    ).toFixed(2))
                                 $("#weightInfo").val($("#weight").val());
                             }
 
