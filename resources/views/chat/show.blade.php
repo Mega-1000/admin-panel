@@ -25,11 +25,9 @@
             <div class="panel panel-default" style="max-height: calc(100vh - 200px); overflow-y: scroll">
                 <div class="panel-body">
                     @if ($chat)
-                        @for ($i = 0; $i < 3; $i++)
                         @foreach ($chat->messages as $message)
                             @include ('chat/single_message', ['message' => $message])
                         @endforeach
-                        @endfor
                     @endif
                 </div>
             </div>
