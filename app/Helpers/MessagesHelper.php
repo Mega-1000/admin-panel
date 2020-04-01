@@ -11,7 +11,7 @@ use App\Entities\Employee;
 use App\Entities\ProductMedia;
 use App\Entities\PostalCodeLatLon;
 use App\Entities\Message;
-use App\HelpersChatExceptions\ChatException;
+use App\Helpers\Exceptions\ChatException;
 
 class MessagesHelper
 {
