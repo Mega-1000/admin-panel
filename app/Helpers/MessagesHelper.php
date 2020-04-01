@@ -211,6 +211,9 @@ class MessagesHelper
     {
         $chat = $this->getChat();
         $chatUser = $this->getCurrentChatUser();
+        if (!$chatUser) {
+            throw new ChatException('Cannot save message - User not added to chat');
+        }
         $messageObj = new Message();
         $messageObj->message = $message;
         $messageObj->chat_id = $chat->id;
@@ -224,6 +227,9 @@ class MessagesHelper
     private function getCurrentChatUser()
     {
         $column = $this->currentUserType == self::TYPE_CUSTOMER ? 'customer_id' : ($this->currentUserType == self::TYPE_EMPLOYEE ? 'employee_id' : 'user_id');
+        if (!$this->getChat()) {
+            return null;
+        }
         return $this->getChat()->chatUsers()->where($column, $this->currentUserId)->first();
     }
 
