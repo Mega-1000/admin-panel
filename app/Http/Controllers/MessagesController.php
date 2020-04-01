@@ -4,13 +4,6 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Helpers\MessagesHelper;
-use App\Entities\Product;
-use App\User;
-use App\Entities\Customer;
-use App\Entities\Employee;
-use App\Entities\Order;
-use App\Entities\Chat;
-use App\Entities\ChatUser;
 use App\Helpers\Exceptions\ChatException;
 
 class MessagesController extends Controller
@@ -59,6 +52,7 @@ class MessagesController extends Controller
             $chat = $helper->getChat();
             $product = $helper->getProduct();
             $order = $helper->getOrder();
+            $helper->setLastRead();
             return view('chat.show')->with([
                 'chat' => $chat,
                 'product' => $product,

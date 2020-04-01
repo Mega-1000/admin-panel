@@ -30,6 +30,7 @@ class MessagesHelper
 
     const SHOW_FRONT = 'f';
     const SHOW_VAR = 'w';
+    const NOTIFICATION_TIME = 300;
 
     public function __construct($token = null)
     {
@@ -209,15 +210,55 @@ class MessagesHelper
     public function addMessage($message)
     {
         $chat = $this->getChat();
-        $column = $this->currentUserType == self::TYPE_CUSTOMER ? 'customer_id' : ($this->currentUserType == self::TYPE_EMPLOYEE ? 'employee_id' : 'user_id');
+        $chatUser = $this->getCurrentChatUser();
         $messageObj = new Message();
         $messageObj->message = $message;
         $messageObj->chat_id = $chat->id;
-        $chatUser = $chat->chatUsers()->where($column, $this->currentUserId)->first();
         if (!$chatUser) {
             throw new ChatException('Cannot save message');
         }
         $chatUser->messages()->save($messageObj);
+        \App\Jobs\ChatNotificationJob::dispatch($chat->id)->delay(now()->addSeconds(self::NOTIFICATION_TIME + 5));
+    }
+    
+    private function getCurrentChatUser()
+    {
+        $column = $this->currentUserType == self::TYPE_CUSTOMER ? 'customer_id' : ($this->currentUserType == self::TYPE_EMPLOYEE ? 'employee_id' : 'user_id');
+        return $this->getChat()->chatUsers()->where($column, $this->currentUserId)->first();
+    }
+
+    public function setLastRead()
+    {
+        $chatUser = $this->getCurrentChatUser();
+        if (!$chatUser) {
+            return;
+        }
+        $chatUser->last_read_time = now();
+        $chatUser->save();
+    }
+
+    public function hasNewMessage()
+    {
+        return self::hasNewMessageStatic($this->getChat(), $this->getCurrentChatUser());
+    }
+
+    public static function hasNewMessageStatic($chat, $chatUser, $notification = false)
+    {
+        if (!$chatUser) {
+            return false;
+        }
+        for ($i = count($chat->messages) - 1; $i >= 0; $i--) {
+            $message = $chat->messages[$i];
+            if ($message->created_at > $chatUser->last_read_time && $message->chat_user_id != $chatUser->id) {
+                if (!$notification) {
+                    return true;
+                }
+                if (strtotime($chatUser->last_notification_time) + self::NOTIFICATION_TIME < strtotime($message->created_at)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public static function getToken($mediaId, $postCode, $email)

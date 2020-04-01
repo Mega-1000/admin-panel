@@ -21,6 +21,7 @@ class MessagesController extends Controller
                 throw new ChatException('User not allowed to send message');
             }
             $helper->addMessage($request->message);
+            $helper->setLastRead();
             return response('ok');
         } catch (ChatException $e) {
             $e->log();
@@ -43,6 +44,7 @@ class MessagesController extends Controller
                 }
                 $out .= view('chat/single_message')->withMessage($message)->render();
             }
+            $helper->setLastRead();
             return response(['messages' => $out]);
         } catch (ChatException $e) {
             $e->log();
@@ -61,7 +63,8 @@ class MessagesController extends Controller
             $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
             $out[] = [
                 'title' => $helper->getTitle(),
-                'url' => route('chat.show', ['token' => $helper->encrypt()])
+                'url' => route('chat.show', ['token' => $helper->encrypt()]),
+                'new_message' => $helper->hasNewMessage()
             ];
         }
         return response($out);
