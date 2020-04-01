@@ -33,7 +33,7 @@ class Chat extends Model
 
     public function employees()
     {
-        return $this->belongsToMany(Employeed::class, 'chat_user')->withTimestamps();
+        return $this->belongsToMany(Employee::class, 'chat_user')->withTimestamps();
     }
 
     public function messages()

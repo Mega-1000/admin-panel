@@ -50,4 +50,17 @@ class Helper
 
         return $columns;
     }
+
+    public static function sendEmail($email, $template, $subject, $additionalData = [])
+    {
+        return \Mail::send(
+            "emails/$template",
+            array_merge(['email' => $email], $additionalData),
+            function ($m) use ($email, $subject) {
+                $to = env('MAIL_DEV_ADDRESS', $email);
+                $name = env('MAIL_DEV_NAME', $email);
+                $m->to($to, $name)->subject($subject);
+            }
+        );
+    }
 }
