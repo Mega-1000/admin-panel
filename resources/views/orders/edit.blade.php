@@ -1426,7 +1426,7 @@
                                                     @endphp
                                                     <tr class="id row-{{$item->id}}" id="id[{{$item->id}}]">
                                                         <td colspan="4"><h4><img
-                                                                    src="{!! str_replace('C:\\z\\', env('APP_URL') . 'storage/products/', $item->product->url) !!}"
+                                                                    src="{!! str_replace('D:\\z\\', env('APP_URL') . 'storage/products/', $item->product->url) !!}"
                                                                     style="width: 179px; height: 130px;"><strong>{{ $loop->iteration }}
                                                                     . </strong>{{ $item->product->name }}
                                                                 (symbol: {{ $item->product->symbol }}) </h4></td>
@@ -3575,7 +3575,7 @@
                         }
 
                         function replaceImageUrl(url) {
-                            let validUrl = url.replace('C\:\\z\\', env('APP_URL') + 'storage/products/');
+                            let validUrl = url.replace('D\:\\z\\', env('APP_URL') + 'storage/products/');
                         }
 
                         $(document).ready(function () {

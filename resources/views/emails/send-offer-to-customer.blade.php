@@ -29,7 +29,7 @@
         <tr>
             <td>
                 <img width="100%"
-                     src="{!! str_replace('C:\\z\\', env('APP_URL') . 'storage/products/', $item->product->url) !!}">
+                     src="{!! str_replace('D:\\z\\', env('APP_URL') . 'storage/products/', $item->product->url) !!}">
             </td>
         </tr>
         <tr class="id row-{{$item->id}}" id="id[{{$item->id}}]">
