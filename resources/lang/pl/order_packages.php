@@ -9,6 +9,10 @@ return [
     'content_edit' => 'Edytuj typ zawartości przesyłki',
     'content_list' => 'Lista typów zawartości przesyłki',
     'contents' => 'Typy zawartości przesyłki',
+    'packing_create' => 'Dodaj nowy typ opakowania przesyłki',
+    'packing_edit' => 'Edytuj typ opakowania przesyłki',
+    'packing_list' => 'Lista typów opakowania przesyłki',
+    'packings' => 'Typy opakowania przesyłki',
     'table' => [
         'number' => 'Numer',
         'size_a' => 'Rozmiar A',
@@ -50,7 +54,10 @@ return [
         'courier_success' => 'Kurierzy zostaną zamówieni w ciągu kilku minut',
         'content_update' => 'Typ zawartości przesyłki zaktualizowany pomyślnie!',
         'content_store' => 'Typ zawartości przesyłki dodany pomyślnie!',
-        'content_delete' => 'Typ zawartości przesyłki usunięty pomyślnie!'
+        'content_delete' => 'Typ zawartości przesyłki usunięty pomyślnie!',
+        'packing_update' => 'Typ opakowania przesyłki zaktualizowany pomyślnie!',
+        'packing_store' => 'Typ opakowania przesyłki dodany pomyślnie!',
+        'packing_delete' => 'Typ opakowania przesyłki usunięty pomyślnie!'
     ],
     'form' => [
         'delivery' => 'Id dostawy z SELLO (tr_DeliveryId)',
@@ -90,6 +97,8 @@ return [
         'force_shipment1' => 'Wymuś wysłanie (mimo przekroczonej godziny przyjmowania zleceń)',
         'template_symbol' => 'Symbol',
         'content_type_name' => 'Nazwa typu zawartości przesyłki (Na przykład materiały budowlane)',
+        'packing_type_name' => 'Nazwa typu opakowania przesyłki (Na przykład PACZKA)',
+        'symbol' => 'Symbol szablonu',
         'status_type' => [
             'delivered' => 'Dostarczone',
             'cancelled' => 'Anulowane',

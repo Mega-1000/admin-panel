@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Entities\PackageTemplate;
 use App\Entities\ContentType;
+use App\Entities\PackingType;
 
 class PackageTemplatesController extends Controller
 {
@@ -29,7 +30,8 @@ class PackageTemplatesController extends Controller
     public function create()
     {
         $contentTypes = ContentType::all();
-        return view('package_templates.create')->withcontentTypes($contentTypes);
+        $packingTypes = PackingType::all();
+        return view('package_templates.create')->withcontentTypes($contentTypes)->withpackingTypes($packingTypes);
     }
 
     /**
@@ -55,7 +57,8 @@ class PackageTemplatesController extends Controller
     {
         $packageTemplate = PackageTemplate::find($id);
         $contentTypes = ContentType::all();
-        return view('package_templates.edit')->withOld($packageTemplate)->withcontentTypes($contentTypes);
+        $packingTypes = PackingType::all();
+        return view('package_templates.edit')->withOld($packageTemplate)->withcontentTypes($contentTypes)->withpackingTypes($packingTypes);
     }
 
     private function saveTemplate($request, $id = null)

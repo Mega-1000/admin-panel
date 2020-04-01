@@ -140,16 +140,13 @@
             <div class="form-group">
                 <label for="container_type">@lang('order_packages.form.container_type')</label><br/>
                 <select class="form-control" id="container_type" name="container_type">
-                    <option {{old('container_type') === 'POLPALETA' ? 'selected="selected"' : ''}} value="POLPALETA">
-                        PÓŁPALETA 60x80
-                    </option>
-                    <option {{old('container_type') === 'EUR' ? 'selected="selected"' : ''}} value="EUR">PALETA 680x120
-                    </option>
-                    <option {{old('container_type') === 'INNA' ? 'selected="selected"' : ''}} value="INNA">PALETA
-                        100x120
-                    </option>
-                    <option {{old('container_type') === 'PACZ' ? 'selected="selected"' : ''}} value="PACZ">PACZKA
-                    </option>
+                    @foreach($packingTypes as $packingType)
+                    @if ($packingType->name == "KARTON")
+                    <option value="KARTON" selected="selected">KARTON</option>
+                    @else
+                    <option value="{{ $packingType->name }}">{{ $packingType->name }}</option>
+                    @endif
+                    @endforeach
                 </select>
             </div>
             <div class="form-group">
@@ -367,6 +364,7 @@
             <input type="hidden" name="shouldTakePayment" value="0" id="shouldTakePayment">
             <input type="hidden" name="template_accept_hour" id="template_accept_hour">
             <input type="hidden" name="template_max_hour" id="template_max_hour">
+            <input type="hidden" name="symbol" id="symbol">
             <input type="hidden" name="multi_token" id="multi_token">
         </div>
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
@@ -445,6 +443,7 @@
                 $("#content").val(multiData['content']);
                 $("#weight").val(multiData['weight']);
                 $("#chosen_data_template").val(multiData['chosen_data_template']);
+                $("#symbol").val(multiData['symbol']);
              }
              $('#cash_on_delivery').on('change', function() {
                  let difference = toPay - $(this).val();
@@ -501,6 +500,7 @@
         $("#container_type").val(selectedTemplateData['container_type']);
         $("#template_info").html(selectedTemplateData['info']);
         $("#cod_cost").html(selectedTemplateData['cod_cost']);
+        $("#symbol").val(selectedTemplateData['symbol']);
         $("#notices").attr('maxlength', selectedTemplateData['notice_max_lenght']);
         if (selectedTemplateData['content'] != null) {
             $("#content").val(selectedTemplateData['content']);

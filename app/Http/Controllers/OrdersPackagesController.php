@@ -20,6 +20,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Validator;
 use App\Jobs\OrdersCourierJobs;
 use App\Entities\ContentType;
+use App\Entities\OrderPackage;
+use App\Entities\PackingType;
 
 /**
  * Class OrderTasksController.
@@ -69,6 +71,7 @@ class OrdersPackagesController extends Controller
     public function create(Request $request,$id, $multi = null)
     {
         $contentTypes = ContentType::all();
+        $packingTypes = PackingType::all();
         $templateData = $this->orderPackagesDataHelper->getData();
         $order = $this->orderRepository->find($id);
         $shipmentDate = $this->orderPackagesDataHelper->calculateShipmentDate();
@@ -143,7 +146,8 @@ class OrdersPackagesController extends Controller
             }
         }
 
-        return view('orderPackages.create', compact('id', 'templateData', 'orderData', 'order', 'payments', 'promisedPayments', 'connectedOrders', 'cashOnDeliverySum', 'isAdditionalDKPExists', 'allOrdersSum', 'multiData'))->withcontentTypes($contentTypes);
+        return view('orderPackages.create', compact('id', 'templateData', 'orderData', 'order', 'payments', 'promisedPayments', 'connectedOrders', 'cashOnDeliverySum', 'isAdditionalDKPExists', 'allOrdersSum', 'multiData'))
+                ->withcontentTypes($contentTypes)->withpackingTypes($packingTypes);
     }
 
     public function changeValue(Request $request)
@@ -166,8 +170,9 @@ class OrdersPackagesController extends Controller
     {
         $orderPackage = $this->repository->find($id);
         $contentTypes = ContentType::all();
+        $packingTypes = PackingType::all();
 
-        return view('orderPackages.edit', compact('orderPackage', 'id'))->withcontentTypes($contentTypes);
+        return view('orderPackages.edit', compact('orderPackage', 'id'))->withcontentTypes($contentTypes)->withpackingTypes($packingTypes);
     }
 
     /**
@@ -217,7 +222,7 @@ class OrdersPackagesController extends Controller
                 $data['shipment_date'] = new \DateTime($shipdate);
                 $data['delivery_date'] = new \DateTime($delidate);
             }
-        }
+        }        
         $packagesNumber = 0;
         $package = $this->repository->orderBy("created_at", "desc")->findWhere(["order_id" => $order_id],
             ["number"])->first();
@@ -227,6 +232,7 @@ class OrdersPackagesController extends Controller
         }
 
         $data['number'] = $packagesNumber + 1;
+        $data['symbol'] = $request->input('symbol');
         $notices = $data['notices'];
         $data['notices'] = $data['order_id'] . '/' . $data['number'] . ' ' . $notices;
         if ($data['delivery_courier_name'] === 'GIELDA' || $data['delivery_courier_name'] === 'ODBIOR_OSOBISTY') {
@@ -252,7 +258,33 @@ class OrdersPackagesController extends Controller
             }
         }
 
-        $this->repository->create($data);
+        $orderPackage = new OrderPackage;
+        $orderPackage->order_id = $data['order_id'];
+        $orderPackage->size_a = $data['size_a'];
+        $orderPackage->size_b = $data['size_b'];
+        $orderPackage->size_c = $data['size_c'];
+        $orderPackage->shipment_date = $data['shipment_date'];
+        $orderPackage->delivery_date = $data['delivery_date'];
+        $orderPackage->delivery_courier_name = $data['delivery_courier_name'];
+        $orderPackage->service_courier_name = $data['service_courier_name'];
+        $orderPackage->weight = $data['weight'];
+        $orderPackage->quantity = 1;
+        $orderPackage->container_type = $data['container_type'];
+        $orderPackage->notices = $data['notices'];
+        $orderPackage->shape = $data['shape'];
+        $orderPackage->sending_number = $data['sending_number'];
+        $orderPackage->letter_number = $data['letter_number'];
+        $orderPackage->cash_on_delivery = $data['cash_on_delivery'];
+        $orderPackage->status = $data['status'];
+        $orderPackage->cost_for_client = $data['cost_for_client'];
+        $orderPackage->cost_for_company = $data['cost_for_company'];
+        $orderPackage->real_cost_for_company = $data['real_cost_for_company'];
+        $orderPackage->chosen_data_template = $data['chosen_data_template'];
+        $orderPackage->content = $data['content'];
+        $orderPackage->number = $data['number'];
+        $orderPackage->symbol = $data['symbol'];
+        $orderPackage->save();
+        
         if($toCheck != 0) {
             dispatch_now(new AddLabelJob($order->id, [134]));
         } else {
@@ -284,7 +316,8 @@ class OrdersPackagesController extends Controller
             'cost_for_client' => $request->input('cost_for_client'),
             'cost_for_us' => $request->input('cost_for_company'),
             'chosen_data_template' => $request->input('chosen_data_template'),
-            'content' => $request->input('content')
+            'content' => $request->input('content'),
+            'symbol' => $request->input('symbol')
             ]
         ];
         $request->session()->put('multi', $multi);
