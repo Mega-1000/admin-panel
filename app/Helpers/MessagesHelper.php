@@ -337,7 +337,7 @@ class MessagesHelper
     private static function findEmployee($employees, $mediaData, $postCode)
     {
         $foundEmployee = null;
-        if ($mediaData[1] == self::TYPE_CUSTOMER) {
+        if ($mediaData[1] == 'c') { //'c' == closest
             $codeObj = PostalCodeLatLon::where('postal_code', $postCode)->first();
             if (!$codeObj) {
                 throw new ChatException('Wrong post code');
