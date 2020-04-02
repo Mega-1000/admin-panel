@@ -7,6 +7,7 @@ use App\Integrations\Inpost\Inpost;
 use Illuminate\Support\Facades\Log;
 use App\Mail\SendLPToTheWarehouseAfterOrderCourierMail;
 use Carbon\Carbon;
+use App\Entities\OrderPackage;
 
 class CheckStatusInpostPackagesJob extends Job
 {
@@ -29,47 +30,43 @@ class CheckStatusInpostPackagesJob extends Job
      *
      * @return void
      */
-    public function handle(OrderPackageRepository $orderPackageRepository)
-    {
-        $this->orderPackageRepository = $orderPackageRepository;
+    public function handle(OrderPackageRepository $orderPackageRepository) {
+        $orderPackages = OrderPackage::where('delivery_courier_name', self::COURIER)
+                ->where('shipment_date', '>', Carbon::today()->subDays(5))
+                ->get();
 
-        $orderPackages = $this->orderPackageRepository->findWhere([
-            ['delivery_courier_name', '=', self::COURIER],
-            ['shipment_date', '>', Carbon::today()->subDays(5)],
-            ['created_at', '>', '2020-02-20 14:38:44']
-        ])->all();
         if (empty($orderPackages)) {
             return;
         }
         $integration = new Inpost();
         foreach ($orderPackages as $orderPackage) {
-            if ( is_null($orderPackage->inpost_url)) {
+            if (is_null($orderPackage->inpost_url)) {
                 continue;
             }
-            if ($orderPackage->status !== 'DELIVERED' && $orderPackage->status !== 'SENDING' &&  $orderPackage->status !== 'WAITING_FOR_CANCELLED' && $orderPackage->status !== 'CANCELLED') {
+            if ($orderPackage->status !== 'DELIVERED' && $orderPackage->status !== 'SENDING' && $orderPackage->status !== 'WAITING_FOR_CANCELLED' && $orderPackage->status !== 'CANCELLED') {
                 $href = $integration->hrefExecute($orderPackage->inpost_url);
-                $this->orderPackageRepository->update(['letter_number' => $href->tracking_number],
-                    $orderPackage->id);
+                $orderPackage->letter_number = $href->tracking_number;
+                $orderPackage->save();
                 if ($href->status !== 'confirmed') {
                     continue;
                 }
                 $integration->getLabel($href->id, $href->tracking_number);
-                $this->orderPackageRepository->update(['status' => 'WAITING_FOR_SENDING'],
-                    $orderPackage->id);
-                if($orderPackage->send_protocol == true) {
+                $orderPackage->status = 'WAITING_FOR_SENDING';
+                $orderPackage->save();
+                if ($orderPackage->send_protocol == true) {
                     continue;
                 }
                 $path = storage_path('app/public/inpost/stickers/sticker' . $orderPackage->letter_number . '.pdf');
                 if (is_null($path)) {
-                continue;
-                }                       
+                    continue;
+                }
                 \Mailer::create()
-                    ->to($orderPackage->order->warehouse->firm->email)
-                    ->send(new SendLPToTheWarehouseAfterOrderCourierMail("List przewozowy przesyłki nr: " . $orderPackage->order->id . '/' . $orderPackage->number,
-                    $path, $orderPackage->order->id . '/' . $orderPackage->number));
-                $this->orderPackageRepository->update(['send_protocol' => true],
-                $orderPackage->id);                    
+                        ->to($orderPackage->order->warehouse->firm->email)
+                        ->send(new SendLPToTheWarehouseAfterOrderCourierMail("List przewozowy przesyłki nr: " . $orderPackage->order->id . '/' . $orderPackage->number, $path, $orderPackage->order->id . '/' . $orderPackage->number));
+                $orderPackage->send_protocol = true;
+                $orderPackage->save();
             }
-        }       
+        }
     }
+
 }
