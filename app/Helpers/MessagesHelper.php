@@ -29,7 +29,7 @@ class MessagesHelper
     const TYPE_USER = 'u';
 
     const SHOW_FRONT = 'f';
-    const SHOW_VAR = 'w';
+    const SHOW_VAR = 'v';
     const NOTIFICATION_TIME = 300;
 
     public function __construct($token = null)
