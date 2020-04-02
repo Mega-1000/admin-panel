@@ -34,7 +34,7 @@
             <form action="{{ $route }}">
                 <div class="row">
                     <div class="col-sm-9">
-                        <textarea class="form-control" id="message" style="resize: none; width: 100%; height: 46px;"></textarea>
+                        <textarea class="form-control" id="message" style="resize: none; width: 100%; height: 46px;" placeholder="Tutaj wpisz wiadomość"></textarea>
                     </div>
                     <div class="col-sm-3">
                         <input type="submit" value="Wyślij" class="btn btn-success btn-lg btn-block">
@@ -55,6 +55,8 @@
     <script>
         $(document).ready(function() {
             $('.panel-default').animate({ scrollTop: $('.panel-body').height() });
+
+            $('#message').focus();
 
             $('form').submit(function(e) {
                 e.preventDefault();
