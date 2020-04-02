@@ -196,12 +196,7 @@ class MessagesHelper
             case self::TYPE_EMPLOYEE:
                 return $chat->employees()->where('employees.id', $this->currentUserId)->first() != null;
             case self::TYPE_USER:
-                if (!$chat->users()->where('users.id', $this->currentUserId)->first()) {
-                    if (!(\Auth::user() instanceof User)) {
-                        return false;
-                    }
-                    $chat->users()->attach(\Auth::user());
-                }
+                return $this->getAdminChatUser() != null;
             default:
                 return false;
         }
@@ -223,6 +218,22 @@ class MessagesHelper
         $chatUser->messages()->save($messageObj);
         \App\Jobs\ChatNotificationJob::dispatch($chat->id)->delay(now()->addSeconds(self::NOTIFICATION_TIME + 5));
     }
+
+    private function getAdminChatUser($secondTry = false)
+    {
+        $chat = $this->getChat();
+        $chatUser = $chat->chatUsers()->whereHas('user', function ($q) {
+            $q->where('users.id', $this->currentUserId);
+        })->first();
+        if ($chatUser) {
+            return $chatUser;
+        }
+        if ($secondTry || !(\Auth::user() instanceof User)) {
+            return null;
+        }
+        $chat->users()->attach(\Auth::user());
+        return $this->getAdminChatUser(true);
+    }
     
     private function getCurrentChatUser()
     {
@@ -230,7 +241,11 @@ class MessagesHelper
         if (!$this->getChat()) {
             return null;
         }
-        return $this->getChat()->chatUsers()->where($column, $this->currentUserId)->first();
+        $chatUser = $this->getChat()->chatUsers()->where($column, $this->currentUserId)->first();
+        if (!$chatUser && $this->currentUserType == self::TYPE_USER) {
+            return $this->getAdminChatUser();
+        }
+        return $chatUser;
     }
 
     public function setLastRead()
