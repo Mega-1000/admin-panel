@@ -238,6 +238,7 @@ return [
         'Mailer' => Facades\App\Facades\Mailer::class,
         'Debugbar' => Barryvdh\Debugbar\Facade::class,
         'PDF' => Barryvdh\DomPDF\Facade::class,
+        'MessagesHelper' => App\Helpers\MessagesHelper::class
     ],
 
 ];

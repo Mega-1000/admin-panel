@@ -201,7 +201,26 @@
                         @endif
                     </td>
                     <td>
-{{--                        <a href="{{env('APP_URL') . 'url/' . $order->token . '/' . $item->product->id . '/' . $variation['id'] }}">Zamień produkt</a>--}}
+                        @php
+                            $productMedia = \App\Entities\ProductMedia::where('product_id', $variation['id'])->get();
+                            foreach ($productMedia as $media) {
+                                $exploded = explode('|', $media->url);
+                                if (count($exploded) != 3 || strpos($exploded[2], MessagesHelper::SHOW_VAR) === false) {
+                                    continue;
+                                }
+                                $address = $order->getDeliveryAddress();
+                                $token = MessagesHelper::getToken($media->id, $address->postal_code, $address->email);
+                                $url = route('chat.show', ['token' => $token]);
+                                echo "<a href='$url' style='
+                                        display: inline-block;
+                                        color: black;
+                                        background: aqua;
+                                        padding: 3px;
+                                        border-radius: 5px;'
+                                        target='_blank'>$media->description</a> ";
+                            }
+                        @endphp
+
                     </td>
                 </tr>
                 @if($variation['comments'])
