@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Helpers\MessagesHelper;
 use App\Helpers\Exceptions\ChatException;
+use App\Entities\Chat;
 
 class MessagesController extends Controller
 {
@@ -13,9 +14,32 @@ class MessagesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request, $all = false)
     {
-        //
+        if ($all) {
+            $chats = Chat::all();
+        } else {
+            $chats = Chat::whereHas('messages', function ($q) {
+                $q->where('created_at', '>', now()->subDays(30));
+            })->get();
+        }
+
+        foreach ($chats as $chat) {
+            $helper = new MessagesHelper();
+            $helper->chatId = $chat->id;
+            $helper->currentUserId = $request->user()->id;
+            $helper->currentUserType = MessagesHelper::TYPE_USER;
+            $chat->title = $helper->getTitle();
+            $chat->url = route('chat.show', ['token' => $helper->encrypt()]);
+            $chat->lastMessage = $chat->messages()->latest()->first();
+        }
+
+        $chats = $chats->all();
+        uasort($chats, function ($a, $b) {
+            return $a->lastMessage->created_at > $b->lastMessage->created_at ? -1 : 1;
+        });
+        
+        return view('chat.index')->withChats($chats)->withShowAll($all);
     }
 
     /**
