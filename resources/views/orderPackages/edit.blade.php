@@ -133,6 +133,18 @@
             <div class="form-group">
                 <label for="container_type">@lang('order_packages.form.container_type')</label><br/>
                 <select class="form-control" id="container_type" name="container_type">
+                    @foreach($containerTypes as $containerType)
+                    @if ($containerType->name == $orderPackage->container_type)
+                    <option value="{{$orderPackage->container_type}}" selected="selected">{{$orderPackage->container_type}}</option>
+                    @else
+                    <option value="{{ $containerType->name }}">{{ $containerType->name }}</option>
+                    @endif
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="packing_type">@lang('order_packages.form.packing_type')</label><br/>
+                <select class="form-control" id="packing_type" name="packing_type">
                     @foreach($packingTypes as $packingType)
                     @if ($packingType->name == $orderPackage->container_type)
                     <option value="{{$orderPackage->container_type}}" selected="selected">{{$orderPackage->container_type}}</option>

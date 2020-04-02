@@ -140,6 +140,18 @@
             <div class="form-group">
                 <label for="container_type">@lang('order_packages.form.container_type')</label><br/>
                 <select class="form-control" id="container_type" name="container_type">
+                    @foreach($containerTypes as $containerType)
+                    @if ($containerType->name == "PACZKA" || $containerType->name == "PACZ" )
+                    <option value="PACZKA" selected="selected">PACZKA</option>
+                    @else
+                    <option value="{{ $containerType->name }}">{{ $containerType->name }}</option>
+                    @endif
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="packing_type">@lang('order_packages.form.packing_type')</label><br/>
+                <select class="form-control" id="packing_type" name="packing_type">
                     @foreach($packingTypes as $packingType)
                     @if ($packingType->name == "KARTON")
                     <option value="KARTON" selected="selected">KARTON</option>
@@ -440,6 +452,7 @@
                 $("#cost_for_client").val(multiData['cost_for_client']);
                 $("#cost_for_company").val(multiData['cost_for_us']);
                 $("#container_type").val(multiData['container_type']);
+                $("#packing_type").val(multiData['packing_type']);
                 $("#content").val(multiData['content']);
                 $("#weight").val(multiData['weight']);
                 $("#chosen_data_template").val(multiData['chosen_data_template']);
@@ -498,6 +511,7 @@
         $("#cost_for_client").val(selectedTemplateData['approx_cost_client']);
         $("#cost_for_company").val(selectedTemplateData['approx_cost_firm']);
         $("#container_type").val(selectedTemplateData['container_type']);
+        $("#packing_type").val(selectedTemplateData['packing_type']);
         $("#template_info").html(selectedTemplateData['info']);
         $("#cod_cost").html(selectedTemplateData['cod_cost']);
         $("#symbol").val(selectedTemplateData['symbol']);

@@ -140,14 +140,26 @@
                 <input type="text" class="form-control" id="weight" name="weight"
                        value="{{ $old->weight }}">
             </div>
-            <div class="form-group">
+             <div class="form-group">
                 <label for="container_type">@lang('order_packages.form.container_type')</label><br/>
                 <select class="form-control" id="container_type" name="container_type">
-                    @foreach($packingTypes as $packingType)
-                    @if ($packingType->name == $old->container_type)
-                    <option value="{{$packingType->content}}" selected="selected">{{$packingType->content}}</option>
+                    @foreach($containerTypes as $containerType)
+                    @if ($containerType->name == $old->container_type)
+                    <option value="{{$containerType->name}}" selected="selected">{{$containerType->name}}</option>
                     @else
-                    <option value="{{ $packingType->name }}">{{ $packingType->name }}</option>
+                    <option value="{{ $containerType->name }}">{{ $containerType->name }}</option>
+                    @endif
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="packing_type">@lang('order_packages.form.packing_type')</label><br/>
+                <select class="form-control" id="packing_type" name="packing_type">
+                    @foreach($packingTypes as $packingType)
+                    @if (!empty($old->packing_type) && $packingType->name == $old->packing_type)
+                    <option value="{{$packingType->name}}" selected="selected">{{$packingType->name}}</option>
+                    @else
+                    <option value="{{$packingType->name }}">{{ $packingType->name }}</option>
                     @endif
                     @endforeach
                 </select>
@@ -169,7 +181,7 @@
                 <select class="form-control text-uppercase" id="content" name="content">
                     @foreach($contentTypes as $contentType)
                     @if ($contentType->name == $old->content)
-                    <option value="{{$contentType->content}}" selected="selected">{{$contentType->content}}</option>
+                    <option value="{{$contentType->name}}" selected="selected">{{$contentType->name}}</option>
                     @else
                     <option value="{{ $contentType->name }}">{{ $contentType->name }}</option>
                     @endif

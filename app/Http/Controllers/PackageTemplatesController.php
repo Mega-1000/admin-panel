@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Entities\PackageTemplate;
 use App\Entities\ContentType;
 use App\Entities\PackingType;
+use App\Entities\ContainerType;
 
 class PackageTemplatesController extends Controller
 {
@@ -16,7 +17,7 @@ class PackageTemplatesController extends Controller
      */
     public function index()
     {
-        $templatesUnsorted = \App\Entities\PackageTemplate::all();
+        $templatesUnsorted = PackageTemplate::all();
         $templates = $templatesUnsorted->sortBy('list_order');
         return view('package_templates.index',compact('templates'))
         ->withpackageTemplates($templates);
@@ -27,11 +28,14 @@ class PackageTemplatesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
+    public function create() {
         $contentTypes = ContentType::all();
         $packingTypes = PackingType::all();
-        return view('package_templates.create')->withcontentTypes($contentTypes)->withpackingTypes($packingTypes);
+        $containerTypes = ContainerType::all();
+        return view('package_templates.create')
+                        ->withcontentTypes($contentTypes)
+                        ->withpackingTypes($packingTypes)
+                        ->withcontainerTypes($containerTypes);
     }
 
     /**
@@ -58,7 +62,11 @@ class PackageTemplatesController extends Controller
         $packageTemplate = PackageTemplate::find($id);
         $contentTypes = ContentType::all();
         $packingTypes = PackingType::all();
-        return view('package_templates.edit')->withOld($packageTemplate)->withcontentTypes($contentTypes)->withpackingTypes($packingTypes);
+        $containerTypes = ContainerType::all();
+        return view('package_templates.edit')->withOld($packageTemplate)
+                        ->withcontentTypes($contentTypes)
+                        ->withpackingTypes($packingTypes)
+                        ->withcontainerTypes($containerTypes);
     }
 
     private function saveTemplate($request, $id = null)
@@ -111,6 +119,7 @@ class PackageTemplatesController extends Controller
         $template->volume = $request->volume;
         $template->list_order = $request->list_order;
         $template->displayed_name = $request->displayed_name;
+        $template->packing_type = $request->packing_type;
 
         $template->save();
     }

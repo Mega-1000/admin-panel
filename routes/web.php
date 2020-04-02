@@ -196,6 +196,13 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('contentTypes/{id}/update', 'ContentTypesController@update')->name('content_type.update');
         Route::delete('contentTypes/{id}/delete', 'ContentTypesController@destroy')->name('content_type.destroy');
         
+        Route::get('containerTypes', 'ContainerTypesController@index')->name('container_type.index');
+        Route::get('containerTypes/create', 'ContainerTypesController@create')->name('container_type.create');
+        Route::post('containerTypes/store', 'ContainerTypesController@store')->name('container_type.store');
+        Route::get('containerTypes/{id}/edit', 'ContainerTypesController@edit')->name('container_type.edit');
+        Route::put('containerTypes/{id}/update', 'ContainerTypesController@update')->name('container_type.update');
+        Route::delete('containerTypes/{id}/delete', 'ContainerTypesController@destroy')->name('container_type.destroy');
+        
         Route::get('packingTypes', 'PackingTypesController@index')->name('packing_type.index');
         Route::get('packingTypes/create', 'PackingTypesController@create')->name('packing_type.create');
         Route::post('packingTypes/store', 'PackingTypesController@store')->name('packing_type.store');
