@@ -364,55 +364,8 @@
             </button>
             <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal1">
                 Zwróć produkty
-            </button
+            </button>
 
-            {{--<div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">--}}
-                {{--<div class="modal-dialog" role="document" style="width: 90%;">--}}
-                    {{--<div class="modal-content">--}}
-                        {{--<div class="modal-header">--}}
-                            {{--<button type="button" class="close" data-dismiss="modal" aria-label="Close">--}}
-                                {{--<span aria-hidden="true">&times;</span>--}}
-                            {{--</button>--}}
-                        {{--</div>--}}
-                        {{--<div class="modal-body">--}}
-                            {{--<form id="acceptItemsToStock" action="{{ action('OrdersController@returnItemsFromStock')}}" method="post">--}}
-                                {{--{{ csrf_field() }}--}}
-                                {{--<input type="hidden" value="{{ $order->id }}" name="orderId">--}}
-                                {{--<table id="productsTable" class="table table1 table-venice-blue" style="width: 100%;">--}}
-                                    {{--<tbody id="products-tbody">--}}
-                                    {{--<tr>--}}
-                                        {{--<td colspan="3" style="border: 0px;"></td>--}}
-                                        {{--<td>Ilość</td>--}}
-                                    {{--</tr>--}}
-                                    {{--@foreach($order->items as $item)--}}
-                                        {{--@if($item->quantity == 0)--}}
-
-                                        {{--@else--}}
-                                            {{--<tr class="id row-{{$item->id}}" id="id[{{$item->id}}]">--}}
-                                                {{--<td colspan="3"><h4><img src="{!! str_replace('D:\\z\\', 'https://mega1000.pl/', $item->product->url) !!}" style="width: 179px; height: 130px;"><strong>{{ $loop->iteration }}. </strong>{{ $item->product->name }} (symbol: {{ $item->product->symbol }}) </h4></td>--}}
-                                                {{--<td><input--}}
-                                                            {{--value="{{ $item->quantity }}" type="number"--}}
-                                                            {{--class="form-control item_quantity"  name="item_quantity[{{$item->id}}]" data-item-id="{{$item->id}}"></td>--}}
-                                                {{--<input name="id[{{$item->id}}]"--}}
-                                                       {{--value="{{ $item->id }}" type="hidden"--}}
-                                                       {{--class="form-control" id="id[{{$item->id}}]">--}}
-                                                {{--<input name="product_id[{{$item->id}}]"--}}
-                                                       {{--value="{{ $item->product_id }}" type="hidden"--}}
-                                                       {{--class="form-control" id="product_id[{{$item->id}}]">--}}
-
-                                            {{--</tr>--}}
-                                        {{--@endif--}}
-                                    {{--@endforeach--}}
-                                    {{--<tr>--}}
-                                        {{--<td colspan="6"></td><td><input type="submit" class="btn btn-primary pull-right" value="Zwróć produkty"></td>--}}
-                                    {{--</tr>--}}
-                                    {{--</tbody>--}}
-                                {{--</table>--}}
-                            {{--</form>--}}
-                        {{--</div>--}}
-                    {{--</div>--}}
-                {{--</div>--}}
-            {{--</div>--}}
             <h3 style="clear: both;">Produkty</h3>
             <table id="productsTable" class="table table1 table-venice-blue productsTableEdit">
                 <tbody id="products-tbody">
@@ -432,7 +385,7 @@
                         $weight += $item->product->weight_trade_unit * $item->quantity;
                     @endphp
                     <tr class="id row-{{$item->id}}" id="id[{{$item->id}}]">
-                        <td colspan="4"><h4><img src="{!! str_replace('D:\\z\\', env('APP_URL') . 'storage/products/', $item->product->url) !!}" style="width: 179px; height: 130px;"><strong>{{ $loop->iteration }}. </strong>{{ $item->product->name }} (symbol: {{ $item->product->symbol }}) </h4></td>
+                        <td colspan="4"><h4><img src="{!! $item->product->getImageUrl() !!}" style="width: 179px; height: 130px;"><strong>{{ $loop->iteration }}. </strong>{{ $item->product->name }} (symbol: {{ $item->product->symbol }}) </h4></td>
 
                         <input name="id[{{$item->id}}]"
                                value="{{ $item->id }}" type="hidden"
@@ -1221,7 +1174,7 @@
 
                                                         {{--</tr>--}}
                                                         <tr>
-                                                            <td colspan="3" rowspan="3"><h4><img src="{!! str_replace('D:\\z\\', env('APP_URL') . 'storage/', $item->product->url) !!}" style="width: 179px; height: 130px;"><strong>{{ $loop->iteration }}. </strong>{{ $item->product->name }} (symbol: {{ $item->product->symbol }}) </h4></td>
+                                                            <td colspan="3" rowspan="3"><h4><img src="{!! $item->product->getImageUrl() !!}" style="width: 179px; height: 130px;"><strong>{{ $loop->iteration }}. </strong>{{ $item->product->name }} (symbol: {{ $item->product->symbol }}) </h4></td>
                                                             <td><input
                                                                         value="{{ $item->quantity }}" type="number"
                                                                         class="form-control item_quantity"  name="item_quantity[{{$item->id}}]" data-item-id="{{$item->id}}"></td>
@@ -2799,7 +2752,7 @@
 
                                         $('#products-tbody:last-child').append(
                                             '<tr class="id" id="id['+ id +']">\n' +
-                                            '<td><img src="' + replaceImageUrl(data.product.url) + '" class="product-image">' + '<h4><strong>'+id+'. </strong> '+data.product.name+' </h4></td>\n' +
+                                            '<td><img src="' + data.imageUrl + '" class="product-image">' + '<h4><strong>'+id+'. </strong> '+data.product.name+' </h4></td>\n' +
                                             '<input name="id['+id+']"\n' +
                                             'value="'+id+'" type="hidden"\n' +
                                             'class="form-control" id="id['+id+']">' +
@@ -2924,10 +2877,6 @@
                             document.querySelectorAll(cssClass).forEach(function(input) {
                                 input.value = input.value.replace(/,/g, '.');
                             });
-                        }
-
-                        function replaceImageUrl(url) {
-                            let validUrl = url.replace('D\:\\z\\', env('APP_URL') + 'storage/products/');
                         }
 
                         $( document ).ready(function() {

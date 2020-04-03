@@ -97,7 +97,7 @@
                 <tbody>
                 @foreach($warehouseOrder->items as $item)
                 <tr>
-                    <td><img src="{!! str_replace('D:\\z\\', env('APP_URL') . 'storage/products/', $item->product->url) !!}" style="width: 179px; height: 130px;"></td>
+                    <td><img src="{!! $item->product->getImageUrl() !!}" style="width: 179px; height: 130px;"></td>
                     <td>{{ $item->product->name }}</td>
                     <td><input type="text" name="itemQuantity[{{$item->id}}]" value="{{ $item->quantity }}" class="form-control itemQuantity" data-id="{{$item->id}}"></td>
                     <td><input type="text" name="itemPrice[{{$item->id}}]" data-id="{{$item->id}}" class="form-control itemPrice" value="{{ $item->product->price->net_purchase_price_commercial_unit }}"></td>

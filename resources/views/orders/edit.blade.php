@@ -1426,7 +1426,7 @@
                                                     @endphp
                                                     <tr class="id row-{{$item->id}}" id="id[{{$item->id}}]">
                                                         <td colspan="4"><h4><img
-                                                                    src="{!! str_replace('D:\\z\\', env('APP_URL') . 'storage/products/', $item->product->url) !!}"
+                                                                    src="{!! $item->product->getImageUrl() !!}"
                                                                     style="width: 179px; height: 130px;"><strong>{{ $loop->iteration }}
                                                                     . </strong>{{ $item->product->name }}
                                                                 (symbol: {{ $item->product->symbol }}) </h4></td>
@@ -3447,7 +3447,7 @@
 
                                         $('#products-tbody:last-child').append(
                                             '<tr class="id" id="id[' + id + ']">\n' +
-                                            '<td><img src="' + replaceImageUrl(data.product.url) + '" class="product-image">' + '<h4><strong>' + id + '. </strong> ' + data.product.name + ' </h4></td>\n' +
+                                            '<td><img src="' + data.imageUrl + '" class="product-image">' + '<h4><strong>' + id + '. </strong> ' + data.product.name + ' </h4></td>\n' +
                                             '<input name="id[' + id + ']"\n' +
                                             'value="' + id + '" type="hidden"\n' +
                                             'class="form-control" id="id[' + id + ']">' +
@@ -3572,10 +3572,6 @@
                             document.querySelectorAll(cssClass).forEach(function (input) {
                                 input.value = input.value.replace(/,/g, '.');
                             });
-                        }
-
-                        function replaceImageUrl(url) {
-                            let validUrl = url.replace('D\:\\z\\', env('APP_URL') + 'storage/products/');
                         }
 
                         $(document).ready(function () {
