@@ -114,7 +114,7 @@ class EmailTagHandlerHelper
         foreach ($this->order->items as $item) {
             $content .= "<tr>";
                 $content .= "<td>";
-                    $content .= "<img alt=\"{$item->product->name}\" style=\"width:80px\" src=\"" . str_replace("C:\\z\\", env('APP_URL') . 'storage/products/', $item->product->url) . "\">";
+                    $content .= "<img alt=\"{$item->product->name}\" style=\"width:80px\" src=\"" .$item->product->getImageUrl() . "\">";
                 $content .= "</td>";
                 $content .= "<td>";
                     $content .= "<b>Nazwa:</b> {$item->product->name}<br>";

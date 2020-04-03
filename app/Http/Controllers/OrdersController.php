@@ -1766,6 +1766,7 @@ class OrdersController extends Controller
             'product' => $product->first->id,
             'price' => $product->first->id->price,
             'packing' => $product->first->id->packing,
+            'imageUrl' => $product->getImageUrl()
         ]);
     }
 

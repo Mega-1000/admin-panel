@@ -242,4 +242,9 @@ class Product extends Model implements Transformable
     {
         return Product::where('symbol', 'TWSU')->first();
     }
+
+    public function getImageUrl()
+    {
+        return str_replace("D:\\z\\", env('APP_URL') . 'storage/products/', $this->url);
+    }
 }
