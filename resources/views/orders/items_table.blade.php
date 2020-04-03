@@ -2,7 +2,7 @@
     <table border="0" cellpadding="1" cellspacing="1" style="width: 100%;">
         <tr>
             <td style="width:100px"><img
-                    src="{!! str_replace('C:\\z\\', env('APP_URL') . 'storage/products/', $item->url) !!}"
+                    src="{!!  $item->getImageUrl() !!}"
                     alt="{{ $item->name }}"
                     style="width:70px"/></td>
             <td><span
