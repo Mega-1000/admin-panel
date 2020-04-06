@@ -1455,7 +1455,7 @@
                         let items = row['items'];
 
                         for (let index = 0; index < items.length; index++) {
-                            let pricePurchase = items[index].net_purchase_price_commercial_unit;
+                            let pricePurchase = items[index].net_purchase_price_commercial_unit_after_discounts;
                             let quantity = items[index].quantity;
                             if(pricePurchase == null) {
                                 pricePurchase = 0;
