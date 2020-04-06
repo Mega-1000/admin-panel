@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\GetCustomerForAdminEdit;
 use App\Helpers\GetCustomerForNewOrder;
+use App\Helpers\MessagesHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceCalculator;
 use App\Helpers\TransportSumCalculator;
@@ -423,6 +424,17 @@ class OrdersController extends Controller
         foreach ($orders as $order) {
             $order->total_sum = $order->getSumOfGrossValues();
             $order->bookedPaymentsSum = $order->bookedPaymentsSum();
+
+            $buttons = [];
+            foreach ($order->items as $item) {
+                foreach ($item->product->parentProduct->media as $media) {
+                    $mediaData = explode('|', $media->url);
+                    if (count($mediaData) == 3 && strpos($mediaData[2], MessagesHelper::SHOW_FRONT) !== FALSE) {
+                        $buttons [] = $media;
+                    }
+                }
+            }
+            $order->buttons = $buttons;
         }
 
         return $orders->toJson();
