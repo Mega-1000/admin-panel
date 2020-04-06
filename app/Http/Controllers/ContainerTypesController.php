@@ -46,17 +46,16 @@ class ContainerTypesController extends Controller
         ]);
     }
     
-    private function saveContainerType(Request $request, $id = null) {
-
-       if (is_null($id)) {
-       $containerType = new ContainerType;
-       } else {
-           $containerType= ContainerType::find($id);
-       }
-       $containerType->name = $request->name;
-       $containerType->symbol = $request->symbol;
-       $containerType->save();
-
+    private function saveContainerType(Request $request, $id = null)
+    {
+        if (is_null($id)) {
+            $containerType = new ContainerType;
+        } else {
+            $containerType = ContainerType::find($id);
+        }
+        $containerType->name = $request->name;
+        $containerType->symbol = $request->symbol;
+        $containerType->save();
     }
 
     public function destroy($id)

@@ -201,30 +201,8 @@ class OrdersPackagesController extends Controller
         $data['delivery_date'] = new \DateTime($data['delivery_date']);
         $data['shipment_date'] = new \DateTime($data['shipment_date']);
 
-        $orderPackage->size_a = $data['size_a'];
-        $orderPackage->size_b = $data['size_b'];
-        $orderPackage->size_c = $data['size_c'];
-        $orderPackage->shipment_date = $data['shipment_date'];
-        $orderPackage->delivery_date = $data['delivery_date'];
-        $orderPackage->delivery_courier_name = $data['delivery_courier_name'];
-        $orderPackage->service_courier_name = $data['service_courier_name'];
-        $orderPackage->weight = $data['weight'];
-        $orderPackage->quantity = 1;
-        $orderPackage->container_type = $data['container_type'];
-        $orderPackage->notices = $data['notices'];
-        $orderPackage->shape = $data['shape'];
-        $orderPackage->sending_number = $data['sending_number'];
-        $orderPackage->letter_number = $data['letter_number'];
-        $orderPackage->cash_on_delivery = $data['cash_on_delivery'];
-        $orderPackage->status = $data['status'];
-        $orderPackage->cost_for_client = $data['cost_for_client'];
-        $orderPackage->cost_for_company = $data['cost_for_company'];
-        $orderPackage->real_cost_for_company = $data['real_cost_for_company'];
-        $orderPackage->content = $data['content'];
-        $orderPackage->packing_type = $data['packing_type'];
-        $orderPackage->save();
+        $this->saveOrderPackage($data, $id);
        
-
         return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
             'message' => __('order_packages.message.update'),
             'alert-type' => 'success'
@@ -286,33 +264,7 @@ class OrdersPackagesController extends Controller
             }
         }
 
-        $orderPackage = new OrderPackage;
-        $orderPackage->order_id = $data['order_id'];
-        $orderPackage->size_a = $data['size_a'];
-        $orderPackage->size_b = $data['size_b'];
-        $orderPackage->size_c = $data['size_c'];
-        $orderPackage->shipment_date = $data['shipment_date'];
-        $orderPackage->delivery_date = $data['delivery_date'];
-        $orderPackage->delivery_courier_name = $data['delivery_courier_name'];
-        $orderPackage->service_courier_name = $data['service_courier_name'];
-        $orderPackage->weight = $data['weight'];
-        $orderPackage->quantity = 1;
-        $orderPackage->container_type = $data['container_type'];
-        $orderPackage->notices = $data['notices'];
-        $orderPackage->shape = $data['shape'];
-        $orderPackage->sending_number = $data['sending_number'];
-        $orderPackage->letter_number = $data['letter_number'];
-        $orderPackage->cash_on_delivery = $data['cash_on_delivery'];
-        $orderPackage->status = $data['status'];
-        $orderPackage->cost_for_client = $data['cost_for_client'];
-        $orderPackage->cost_for_company = $data['cost_for_company'];
-        $orderPackage->real_cost_for_company = $data['real_cost_for_company'];
-        $orderPackage->chosen_data_template = $data['chosen_data_template'];
-        $orderPackage->content = $data['content'];
-        $orderPackage->number = $data['number'];
-        $orderPackage->symbol = $data['symbol'];
-        $orderPackage->packing_type = $data['packing_type'];
-        $orderPackage->save();
+        $this->saveOrderPackage($data);
         
         if($toCheck != 0) {
             dispatch_now(new AddLabelJob($order->id, [134]));
@@ -727,4 +679,41 @@ class OrdersPackagesController extends Controller
         }
         return true;
     }
+    
+    private function saveOrderPackage($data, $id = null) {
+        if (is_null($id)) {
+            $orderPackage = new OrderPackage;
+        } else {
+            $orderPackage = OrderPackage::find($id);
+        }
+        $orderPackage->size_a = $data['size_a'];
+        $orderPackage->size_b = $data['size_b'];
+        $orderPackage->size_c = $data['size_c'];
+        $orderPackage->shipment_date = $data['shipment_date'];
+        $orderPackage->delivery_date = $data['delivery_date'];
+        $orderPackage->delivery_courier_name = $data['delivery_courier_name'];
+        $orderPackage->service_courier_name = $data['service_courier_name'];
+        $orderPackage->weight = $data['weight'];
+        $orderPackage->quantity = 1;
+        $orderPackage->container_type = $data['container_type'];
+        $orderPackage->notices = $data['notices'];
+        $orderPackage->shape = $data['shape'];
+        $orderPackage->sending_number = $data['sending_number'];
+        $orderPackage->letter_number = $data['letter_number'];
+        $orderPackage->cash_on_delivery = $data['cash_on_delivery'];
+        $orderPackage->status = $data['status'];
+        $orderPackage->cost_for_client = $data['cost_for_client'];
+        $orderPackage->cost_for_company = $data['cost_for_company'];
+        $orderPackage->real_cost_for_company = $data['real_cost_for_company'];
+        $orderPackage->content = $data['content'];
+        $orderPackage->packing_type = $data['packing_type'];
+        if (is_null($id)) {
+            $orderPackage->order_id = $data['order_id'];
+            $orderPackage->number = $data['number'];
+            $orderPackage->symbol = $data['symbol'];
+            $orderPackage->chosen_data_template = $data['chosen_data_template'];
+        }
+        $orderPackage->save();
+    }
+
 }

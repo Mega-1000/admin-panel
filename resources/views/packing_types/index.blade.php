@@ -15,7 +15,7 @@
             <th>ID</th>
             <th>@lang('order_packages.form.template_symbol')</th>
             <th>@lang('order_packages.form.packing_type_name')</th>
-            <th>Data utworzenia</th>
+            <th>@lang('voyager.generic.created_at_date')</th>
             <th>@lang('voyager.generic.actions')</th>
         </tr>
         </thead>
