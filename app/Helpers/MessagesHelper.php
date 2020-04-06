@@ -32,6 +32,8 @@ class MessagesHelper
     const SHOW_VAR = 'v';
     const NOTIFICATION_TIME = 300;
 
+    const NEW_MESSAGE_LABEL_ID = 55;
+
     public function __construct($token = null)
     {
         if ($token) {
@@ -234,7 +236,7 @@ class MessagesHelper
         $chat->users()->attach(\Auth::user());
         return $this->getAdminChatUser(true);
     }
-    
+
     private function getCurrentChatUser()
     {
         $column = $this->currentUserType == self::TYPE_CUSTOMER ? 'customer_id' : ($this->currentUserType == self::TYPE_EMPLOYEE ? 'employee_id' : 'user_id');
