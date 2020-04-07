@@ -45,6 +45,7 @@ class MessagesHelper
     public function encrypt()
     {
         $this->setChatId();
+        $this->setUsers();
         if ($this->chatId) {
             return encrypt([
                 'cId' => $this->chatId,
@@ -54,7 +55,6 @@ class MessagesHelper
         }
 
         return encrypt([
-            'cId' => $this->chatId,
             'u' => $this->users,
             'pId' => $this->productId,
             'oId' => $this->orderId,
@@ -78,25 +78,52 @@ class MessagesHelper
         return $this;
     }
 
-    public function setChatId()
+    private function setChatId()
     {
-        if ($this->chatId || $this->currentUserType != self::TYPE_CUSTOMER) {
+        if ($this->chatId) {
             return;
         }
 
-        if ($this->productId || $this->employeeId) {
-            $chat = Chat
-                ::where('product_id', $this->productId)
-                ->where('employee_id', $this->employeeId)
-                ->whereHas('customers', function($q) {
-                    $q->where('customers.id', $this->currentUserId);
-                })
-                ->first()
-            ;
+        $q = Chat::query();
 
-            if ($chat) {
-                $this->chatId = $chat->id;
-            }
+        if ($this->orderId) {
+            $q->where('order_id', $this->orderId);
+        } else {
+            $q->whereNull('order_id');
+        }
+
+        if ($this->productId) {
+            $q->where('product_id', $this->productId);
+        } else {
+            $q->whereNull('product_id');
+        }
+
+        if ($this->employeeId) {
+            $q->where('employee_id', $this->employeeId);
+        } else {
+            $q->whereNull('employee_id');
+        }
+
+        $table = $this->currentUserType == self::TYPE_USER ? 'users' : ($this->currentUserType == self::TYPE_EMPLOYEE ? 'employees' : 'customers');
+        $userId = $this->currentUserId;
+        $q->whereHas($table, function ($q) use ($table, $userId) {
+            $q->where("$table.id", $userId);
+        });
+
+        $chat = $q->first();
+        if ($chat) {
+            $this->chatId = $chat->id;
+        }
+    }
+
+    private function setUsers()
+    {
+        $this->users = [];
+        if ($this->currentUserType == self::TYPE_CUSTOMER) {
+            $this->users[self::TYPE_CUSTOMER] = $this->currentUserId;
+        }
+        if ($this->employeeId) {
+            $this->users[self::TYPE_EMPLOYEE] = $this->employeeId;
         }
     }
 
@@ -163,10 +190,10 @@ class MessagesHelper
     public function createNewChat()
     {
         $chat = new Chat();
+        $this->setUsers();
         $chat->product_id = $this->productId ?: null;
         $chat->order_id = $this->orderId ?: null;
         $chat->employee_id = $this->employeeId ?: null;
-        $chat->save();
         if (empty($this->users[self::TYPE_CUSTOMER])) {
             throw new ChatException('Missing customer ID');
         }
@@ -174,6 +201,7 @@ class MessagesHelper
         if (!$customer) {
             throw new ChatException('Wrong customer ID');
         }
+        $chat->save();
         $chat->customers()->attach($customer);
         if (!empty($this->users[self::TYPE_EMPLOYEE])) {
             $employee = Employee::find($this->users[self::TYPE_EMPLOYEE]);
@@ -301,16 +329,10 @@ class MessagesHelper
         $employee = self::findEmployee($media->product->firm->employees, $mediaData, $postCode);
 
         $helper = new self();
-        $helper->users = [
-            self::TYPE_CUSTOMER => $customer->id,
-            self::TYPE_EMPLOYEE => $employee->id
-        ];
         $helper->productId = $media->product_id;
         $helper->employeeId = $employee->id;
         $helper->currentUserType = self::TYPE_CUSTOMER;
         $helper->currentUserId = $customer->id;
-
-        $helper->setChatId();
 
         return $helper->encrypt();
     }
