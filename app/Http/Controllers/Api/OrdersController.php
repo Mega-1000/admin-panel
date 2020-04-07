@@ -440,13 +440,14 @@ class OrdersController extends Controller
                     $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
                     $helper->employeeId = $employee->id;
                     $token = $helper->encrypt();
-                    $button = $employee->employeeRoles->map(function ($role) use ($token) {
-                        $button = [
-                            'description' => $role->name,
-                            'url' => route('chat.show', ['token' => $token])
-                        ];
-                        return $button;
-                    })->toArray();
+                    $button = $employee->employeeRoles->where('is_contact_displayed_in_fronted', 1)
+                        ->map(function ($role) use ($token) {
+                            $button = [
+                                'description' => $role->name,
+                                'url' => route('chat.show', ['token' => $token])
+                            ];
+                            return $button;
+                        })->toArray();
 
                     $buttons = array_merge($button, $buttons);
                     $buttons = collect($buttons)->unique('description')->toArray();

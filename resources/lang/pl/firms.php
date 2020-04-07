@@ -42,6 +42,7 @@ return [
         'short_name' => 'Nazwa skrócona',
         'symbol' => 'Symbol',
         'role_symbol' => 'Symbol (skrócona nazwa)',
+        'role_displayed' => 'Czy kontakt do roli ma być wyświetlany w historii zamówień?',
         'delivery_warehouse' => 'Magazyn dostarczający',
         'email' => 'Adres email główny siedziby firmy (sekretariat, w przypadku małej firmy właściciel itp.)',
         'secondary_email' => 'Dodatkowy adres email do siedziby firmy',

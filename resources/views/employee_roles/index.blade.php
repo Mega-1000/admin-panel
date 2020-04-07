@@ -15,6 +15,7 @@
             <th>ID</th>
             <th>@lang('firms.form.symbol')</th>
             <th>@lang('firms.form.role_name')</th>
+            <th>@lang('firms.form.role_displayed')</th>
             <th>Data utworzenia</th>
             <th>@lang('voyager.generic.actions')</th>
         </tr>
@@ -23,8 +24,9 @@
          @foreach ($roles as $role)
         <tr>
             <td width="10%">{{$role->id}}</td>
-            <td width="15%">{{$role->symbol}}</td>
-            <td width="35%">{{$role->name}}</td>
+            <td width="10%">{{$role->symbol}}</td>
+            <td width="30%">{{$role->name}}</td>
+            <td width="10%">{{$role->is_contact_displayed_in_fronted  ? 'tak' : 'nie'}}</td>
             <td width="20%">{{$role->created_at}}</td>
             <td>
                 <div class="col-md-10">
@@ -51,5 +53,5 @@
 @endsection
 
 @section('datatable-scripts')
-    
+
 @endsection
