@@ -381,6 +381,7 @@ class ImportCsvFileJob implements ShouldQueue
             'ean_of_commercial_packing' => $line[29],
             'ean_of_collective_packing' => $line[30],
             'ean_of_biggest_packing' => $line[31],
+            'producent_override' => $line[42],
             'vat' => $line[45],
             'calculation_unit' => $line[57],
             'unit_commercial' => $line[59],

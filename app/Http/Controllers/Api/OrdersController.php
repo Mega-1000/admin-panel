@@ -440,18 +440,21 @@ class OrdersController extends Controller
                     $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
                     $helper->employeeId = $employee->id;
                     $token = $helper->encrypt();
-                    $roles = $employee->employeeRoles->map(function ($role){
-                        return $role->name;
+                    $button = $employee->employeeRoles->map(function ($role) use ($token) {
+                        $button = [
+                            'description' => $role->name,
+                            'url' => route('chat.show', ['token' => $token])
+                        ];
+                        return $button;
                     })->toArray();
-                    $button = [
-                        'description' => implode(', ', $roles),
-                        'url' => route('chat.show', ['token' => $token])
-                    ];
-                    $buttons [] = $button;
+
+                    $buttons = array_merge($button, $buttons);
+                    $buttons = collect($buttons)->unique('description')->toArray();
                 }
-                $orderButtons[$product->product_name_supplier] = $buttons;
+                $key = $product->producent_override ?? $product->product_name_supplier;
+                $orderButtons[$key] = $buttons;
             }
-            $order->buttons = array_values($orderButtons);
+            $order->buttons = $orderButtons;
         }
 
         return $orders->toJson();
