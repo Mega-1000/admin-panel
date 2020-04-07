@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Entities\Firm;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\GetCustomerForAdminEdit;
 use App\Helpers\GetCustomerForNewOrder;
@@ -424,17 +425,33 @@ class OrdersController extends Controller
         foreach ($orders as $order) {
             $order->total_sum = $order->getSumOfGrossValues();
             $order->bookedPaymentsSum = $order->bookedPaymentsSum();
-
-            $buttons = [];
+            $orderButtons = [];
             foreach ($order->items as $item) {
-                foreach ($item->product->parentProduct->media as $media) {
-                    $mediaData = explode('|', $media->url);
-                    if (count($mediaData) == 3 && strpos($mediaData[2], MessagesHelper::SHOW_FRONT) !== FALSE) {
-                        $buttons [] = $media;
-                    }
+                $product = $item->product;
+                $firm = Firm::where('symbol', 'like', $product->product_name_supplier)->first();
+                if (empty($firm)) {
+                    continue;
                 }
+                $buttons = [];
+                foreach ($firm->employees as $employee) {
+                    $helper = new MessagesHelper();
+                    $helper->orderId = $order->id;
+                    $helper->currentUserId = $request->user()->id;
+                    $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
+                    $helper->employeeId = $employee->id;
+                    $token = $helper->encrypt();
+                    $roles = $employee->employeeRoles->map(function ($role){
+                        return $role->name;
+                    })->toArray();
+                    $button = [
+                        'description' => implode(', ', $roles),
+                        'url' => route('chat.show', ['token' => $token])
+                    ];
+                    $buttons [] = $button;
+                }
+                $orderButtons[$product->product_name_supplier] = $buttons;
             }
-            $order->buttons = $buttons;
+            $order->buttons = array_values($orderButtons);
         }
 
         return $orders->toJson();
