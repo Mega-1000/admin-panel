@@ -52,6 +52,7 @@ class Product extends Model implements Transformable
         'supplier_product_name',
         'product_name_on_collective_box',
         'product_name_supplier',
+        'producent_override',
         'product_name_supplier_on_documents',
         'supplier_product_symbol',
         'product_name_manufacturer',

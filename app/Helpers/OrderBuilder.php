@@ -101,16 +101,21 @@ class OrderBuilder
             OrderBuilder::assignEmployeeToOrder($order, $customer);
         }
 
-        if (!empty($data['customer_notices'])) {
-            $order->customer_notices = $data['customer_notices'];
-        }
-
         if (!empty($data['shipping_abroad'])) {
             $order->shipping_abroad = 1;
         }
 
         $order->save();
 
+        if (!empty($data['customer_notices'])) {
+            $helper = new MessagesHelper();
+            $helper->orderId = $order->id;
+            $helper->currentUserId = $customer->id;
+            $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
+            $helper->createNewChat();
+            $helper->addMessage($data['customer_notices']);
+            $order->labels()->attach(MessagesHelper::NEW_MESSAGE_LABEL_ID);
+        }
         $this->assignItemsToOrder($order, $data['order_items']);
 
         $deliveryEmail = isset($data['delivery_address']) ? $data['delivery_address']['email'] ?? '' : '';

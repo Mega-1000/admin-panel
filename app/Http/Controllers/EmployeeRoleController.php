@@ -13,7 +13,7 @@ class EmployeeRoleController extends Controller
         return view('employee_roles.index',compact('roles'))
         ->withpackageTemplates($roles);
     }
-    
+
      public function create()
     {
         return view('employee_roles.create');
@@ -27,9 +27,7 @@ class EmployeeRoleController extends Controller
     public function store(Request $request)
     {
         $role = new EmployeeRole();
-        $role->name = $request->name;
-        $role->symbol = $request->symbol;
-        $role->save();
+        $this->setRoleParams($request, $role);
 
         return redirect()->route('employee_role.index')->with([
             'message' => __('firms.message.role_store'),
@@ -57,13 +55,11 @@ class EmployeeRoleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $role = EmployeeRole::find($id);      
+        $role = EmployeeRole::find($id);
         if(empty($role)){
             abort(404);
         }
-        $role->name = $request->name;
-        $role->symbol = $request->symbol;
-        $role->save();
+        $this->setRoleParams($request, $role);
 
         return redirect()->route('employee_role.index')->with([
             'message' => __('firms.message.role_update'),
@@ -74,7 +70,7 @@ class EmployeeRoleController extends Controller
 
     public function destroy($id)
     {
-        $role = EmployeeRole::find($id); 
+        $role = EmployeeRole::find($id);
         $role->delete();
 
         return redirect()->route('employee_role.index');
@@ -90,5 +86,17 @@ class EmployeeRoleController extends Controller
 
         return DataTables::collection($collection)->make(true);
     }
-    
-}   
+
+    /**
+     * @param $request
+     * @param $role
+     */
+    private function setRoleParams($request, $role): void
+    {
+        $role->name = $request->name;
+        $role->symbol = $request->symbol;
+        $role->is_contact_displayed_in_fronted = $request->is_contact_displayed_in_fronted ?? 0;
+        $role->save();
+    }
+
+}
