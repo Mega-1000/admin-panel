@@ -62,7 +62,7 @@
                                 <div class="form-group">
                                     <label for="nick_allegro">@lang('customers.form.nick_allegro')</label>
                                     <input type="text" class="form-control" id="nick_allegro" name="nick_allegro"
-                                           value="{{ $customer->nick_allegro  }}">
+                                           value="{{ $customer->nick_allegro ?? '' }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="status">@lang('customers.form.status')</label>
@@ -78,7 +78,7 @@
                                         <label for="standard_firstname">@lang('customers.form.standard_firstname')</label>
                                         <input type="text" class="form-control" id="standard_firstname"
                                                name="standard_firstname"
-                                               value="{{ $customerAddressStandard->first->id->firstname  }}">
+                                               value="{{ $customerAddressStandard->first->id->firstname ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'standard_lastname') === true)
@@ -86,7 +86,7 @@
                                         <label for="standard_lastname">@lang('customers.form.standard_lastname')</label>
                                         <input type="text" class="form-control" id="standard_lastname"
                                                name="standard_lastname"
-                                               value="{{ $customerAddressStandard->first->id->lastname  }}">
+                                               value="{{ $customerAddressStandard->first->id->lastname ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'standard_firmname') === true)
@@ -94,14 +94,14 @@
                                         <label for="standard_firmname">@lang('customers.form.standard_firmname')</label>
                                         <input type="text" class="form-control" id="standard_firmname"
                                                name="standard_firmname"
-                                               value="{{ $customerAddressStandard->first->id->firmname  }}">
+                                               value="{{ $customerAddressStandard->first->id->firmname ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'standard_nip') === true)
                                     <div class="form-group">
                                         <label for="standard_nip">@lang('customers.form.standard_nip')</label>
                                         <input type="text" class="form-control" id="standard_nip" name="standard_nip"
-                                               value="{{ $customerAddressStandard->first->id->nip  }}">
+                                               value="{{ $customerAddressStandard->first->id->nip ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'standard_phone') === true)
@@ -109,7 +109,7 @@
                                         <label for="standard_phone">@lang('customers.form.standard_phone')</label>
                                         <input type="text" class="form-control" id="standard_phone"
                                                name="standard_phone"
-                                               value="{{ $customerAddressStandard->first->id->phone  }}">
+                                               value="{{ $customerAddressStandard->first->id->phone ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'standard_address') === true)
@@ -117,7 +117,7 @@
                                         <label for="standard_address">@lang('customers.form.standard_address')</label>
                                         <input type="text" class="form-control" id="standard_address"
                                                name="standard_address"
-                                               value="{{ $customerAddressStandard->first->id->address  }}">
+                                               value="{{ $customerAddressStandard->first->id->address ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'standard_flat_number') === true)
@@ -125,14 +125,14 @@
                                         <label for="standard_flat_number">@lang('customers.form.standard_flat_number')</label>
                                         <input type="text" class="form-control" id="standard_flat_number"
                                                name="standard_flat_number"
-                                               value="{{ $customerAddressStandard->first->id->flat_number  }}">
+                                               value="{{ $customerAddressStandard->first->id->flat_number ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'standard_city') === true)
                                     <div class="form-group">
                                         <label for="standard_city">@lang('customers.form.standard_city')</label>
                                         <input type="text" class="form-control" id="standard_city" name="standard_city"
-                                               value="{{ $customerAddressStandard->first->id->city  }}">
+                                               value="{{ $customerAddressStandard->first->id->city ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'standard_postal_code') === true)
@@ -140,7 +140,7 @@
                                         <label for="standard_postal_code">@lang('customers.form.standard_postal_code')</label>
                                         <input type="text" class="form-control" id="standard_postal_code"
                                                name="standard_postal_code"
-                                               value="{{ $customerAddressStandard->first->id->postal_code  }}">
+                                               value="{{ $customerAddressStandard->first->id->postal_code ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'standard_email') === true)
@@ -148,7 +148,7 @@
                                         <label for="standard_email">@lang('customers.form.standard_email')</label>
                                         <input type="email" class="form-control" id="standard_email"
                                                name="standard_email"
-                                               value="{{ $customerAddressStandard->first->id->email  }}">
+                                               value="{{ $customerAddressStandard->first->id->email ?? '' }}">
                                     </div>
                                 @endif
                             </div>
@@ -158,7 +158,7 @@
                                         <label for="invoice_firstname">@lang('customers.form.invoice_firstname')</label>
                                         <input type="text" class="form-control" id="invoice_firstname"
                                                name="invoice_firstname"
-                                               value="{{ $customerAddressInvoice->first->id->firstname  }}">
+                                               value="{{ $customerAddressInvoice->first->id->firstname  ?? ''}}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'invoice_lastname') === true)
@@ -166,7 +166,7 @@
                                         <label for="invoice_lastname">@lang('customers.form.invoice_lastname')</label>
                                         <input type="text" class="form-control" id="invoice_lastname"
                                                name="invoice_lastname"
-                                               value="{{ $customerAddressInvoice->first->id->lastname  }}">
+                                               value="{{ $customerAddressInvoice->first->id->lastname ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'invoice_firmname') === true)
@@ -174,21 +174,21 @@
                                         <label for="invoice_firmname">@lang('customers.form.invoice_firmname')</label>
                                         <input type="text" class="form-control" id="invoice_firmname"
                                                name="invoice_firmname"
-                                               value="{{ $customerAddressInvoice->first->id->firmname  }}">
+                                               value="{{ $customerAddressInvoice->first->id->firmname ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'invoice_nip') === true)
                                     <div class="form-group">
                                         <label for="invoice_nip">@lang('customers.form.invoice_nip')</label>
                                         <input type="text" class="form-control" id="invoice_nip" name="invoice_nip"
-                                               value="{{ $customerAddressInvoice->first->id->nip  }}">
+                                               value="{{ $customerAddressInvoice->first->id->nip ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'invoice_phone') === true)
                                     <div class="form-group">
                                         <label for="invoice_phone">@lang('customers.form.invoice_phone')</label>
                                         <input type="text" class="form-control" id="invoice_phone" name="invoice_phone"
-                                               value="{{ $customerAddressInvoice->first->id->phone  }}">
+                                               value="{{ $customerAddressInvoice->first->id->phone ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'invoice_address') === true)
@@ -196,7 +196,7 @@
                                         <label for="invoice_address">@lang('customers.form.invoice_address')</label>
                                         <input type="text" class="form-control" id="invoice_address"
                                                name="invoice_address"
-                                               value="{{ $customerAddressInvoice->first->id->address  }}">
+                                               value="{{ $customerAddressInvoice->first->id->address ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'invoice_flat_number') === true)
@@ -204,14 +204,14 @@
                                         <label for="invoice_flat_number">@lang('customers.form.invoice_flat_number')</label>
                                         <input type="text" class="form-control" id="invoice_flat_number"
                                                name="invoice_flat_number"
-                                               value="{{ $customerAddressInvoice->first->id->flat_number  }}">
+                                               value="{{ $customerAddressInvoice->first->id->flat_number ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'invoice_city') === true)
                                     <div class="form-group">
                                         <label for="invoice_city">@lang('customers.form.invoice_city')</label>
                                         <input type="text" class="form-control" id="invoice_city" name="invoice_city"
-                                               value="{{ $customerAddressInvoice->first->id->city  }}">
+                                               value="{{ $customerAddressInvoice->first->id->city ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'invoice_postal_code') === true)
@@ -219,14 +219,14 @@
                                         <label for="invoice_postal_code">@lang('customers.form.invoice_postal_code')</label>
                                         <input type="text" class="form-control" id="invoice_postal_code"
                                                name="invoice_postal_code"
-                                               value="{{ $customerAddressInvoice->first->id->postal_code  }}">
+                                               value="{{ $customerAddressInvoice->first->id->postal_code ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'invoice_email') === true)
                                     <div class="form-group">
                                         <label for="invoice_email">@lang('customers.form.invoice_email')</label>
                                         <input type="email" class="form-control" id="invoice_email" name="invoice_email"
-                                               value="{{ $customerAddressInvoice->first->id->email  }}">
+                                               value="{{ $customerAddressInvoice->first->id->email ?? '' }}">
                                     </div>
                                 @endif
                             </div>
@@ -236,7 +236,7 @@
                                         <label for="delivery_firstname">@lang('customers.form.delivery_firstname')</label>
                                         <input type="text" class="form-control" id="delivery_firstname"
                                                name="delivery_firstname"
-                                               value="{{ $customerAddressDelivery->first->id->firstname  }}">
+                                               value="{{ $customerAddressDelivery->first->id->firstname ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'delivery_lastname') === true)
@@ -244,7 +244,7 @@
                                         <label for="delivery_lastname">@lang('customers.form.delivery_lastname')</label>
                                         <input type="text" class="form-control" id="delivery_lastname"
                                                name="delivery_lastname"
-                                               value="{{ $customerAddressDelivery->first->id->lastname  }}">
+                                               value="{{ $customerAddressDelivery->first->id->lastname ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'delivery_firmname') === true)
@@ -252,14 +252,14 @@
                                         <label for="delivery_firmname">@lang('customers.form.delivery_firmname')</label>
                                         <input type="text" class="form-control" id="delivery_firmname"
                                                name="delivery_firmname"
-                                               value="{{ $customerAddressDelivery->first->id->firmname  }}">
+                                               value="{{ $customerAddressDelivery->first->id->firmname ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'delivery_nip') === true)
                                     <div class="form-group">
                                         <label for="delivery_nip">@lang('customers.form.delivery_nip')</label>
                                         <input type="text" class="form-control" id="delivery_nip" name="delivery_nip"
-                                               value="{{ $customerAddressDelivery->first->id->nip  }}">
+                                               value="{{ $customerAddressDelivery->first->id->nip ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'delivery_phone') === true)
@@ -267,7 +267,7 @@
                                         <label for="delivery_phone">@lang('customers.form.delivery_phone')</label>
                                         <input type="text" class="form-control" id="delivery_phone"
                                                name="delivery_phone"
-                                               value="{{ $customerAddressDelivery->first->id->phone  }}">
+                                               value="{{ $customerAddressDelivery->first->id->phone ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'delivery_address') === true)
@@ -275,7 +275,7 @@
                                         <label for="delivery_address">@lang('customers.form.delivery_address')</label>
                                         <input type="text" class="form-control" id="delivery_address"
                                                name="delivery_address"
-                                               value="{{ $customerAddressDelivery->first->id->address  }}">
+                                               value="{{ $customerAddressDelivery->first->id->address ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'delivery_flat_number') === true)
@@ -283,14 +283,14 @@
                                         <label for="delivery_flat_number">@lang('customers.form.delivery_flat_number')</label>
                                         <input type="text" class="form-control" id="delivery_flat_number"
                                                name="delivery_flat_number"
-                                               value="{{ $customerAddressDelivery->first->id->flat_number  }}">
+                                               value="{{ $customerAddressDelivery->first->id->flat_number ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'delivery_city') === true)
                                     <div class="form-group">
                                         <label for="delivery_city">@lang('customers.form.delivery_city')</label>
                                         <input type="text" class="form-control" id="delivery_city" name="delivery_city"
-                                               value="{{ $customerAddressDelivery->first->id->city  }}">
+                                               value="{{ $customerAddressDelivery->first->id->city ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'delivery_postal_code') === true)
@@ -298,7 +298,7 @@
                                         <label for="delivery_postal_code">@lang('customers.form.delivery_postal_code')</label>
                                         <input type="text" class="form-control" id="delivery_postal_code"
                                                name="delivery_postal_code"
-                                               value="{{ $customerAddressDelivery->first->id->postal_code  }}">
+                                               value="{{ $customerAddressDelivery->first->id->postal_code ?? '' }}">
                                     </div>
                                 @endif
                                 @if(App\Helpers\Helper::checkRole('customers', 'delivery_email') === true)
@@ -306,7 +306,7 @@
                                         <label for="delivery_email">@lang('customers.form.delivery_email')</label>
                                         <input type="email" class="form-control" id="delivery_email"
                                                name="delivery_email"
-                                               value="{{ $customerAddressDelivery->first->id->email  }}">
+                                               value="{{ $customerAddressDelivery->first->id->email ?? '' }}">
                                     </div>
                                 @endif
                             </div>
