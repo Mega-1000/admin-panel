@@ -69,7 +69,7 @@ class MessagesHelper
     public function decrypt($token)
     {
         $data = decrypt($token);
-        $this->chatId = $data['cId'];
+        $this->chatId = $data['cId'] ?? '';
         $this->users = $data['u'] ?? [];
         $this->productId = $data['pId'] ?? 0;
         $this->orderId = $data['oId'] ?? 0;
