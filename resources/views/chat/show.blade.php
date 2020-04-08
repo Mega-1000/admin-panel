@@ -26,7 +26,24 @@
                 <div class="panel-body">
                     @if ($chat)
                         @foreach ($chat->messages as $message)
-                            @include ('chat/single_message', ['message' => $message])
+                            @php
+                                $header = '';
+                                if ($message->customer()) {
+                                    $header .=  'Klient ';
+                                    $header .=  ChatHelper::formatEmailAndPhone($message->customer()->login,
+                                    $message->customer()->addresses()->whereNotNull('phone')->first()->phone);
+                                } else if ($message->employee()) {
+                                    $header .= $message->employee()->firstname . ' ' . $message->employee()->lastname;
+                                    $header .= ChatHelper::formatEmailAndPhone($message->employee()->email, $message->employee()->phone);
+                                    $header .= ChatHelper::formatEmployeeRoles($message->employee());
+                                    $header .= ':';
+                                } else if ($message->user()) {
+                                    $header .= $message->user()->name . ' ' . $message->user()->fistname . ' ' . $message->user()->lastname;
+                                    $header .= ChatHelper::formatEmailAndPhone($message->user()->email, $message->user()->phone);
+                                    $header .= ':';
+                                }
+                            @endphp
+                            @include ('chat/single_message', ['message' => $message, 'header' => $header])
                         @endforeach
                     @endif
                 </div>
@@ -69,11 +86,11 @@
                     function(data) { refreshRate = 1; nextRefresh = 0; }
                 );
             });
-            
+
             var nextRefresh = $.now() + 3000;
             var refreshRate = 1;
             var running = false;
-            
+
             setInterval(getMessages, 500);
 
             function getMessages() {
