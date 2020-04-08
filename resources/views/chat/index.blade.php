@@ -29,7 +29,7 @@
         <tr>
             <td>{{ $chat->id }}</td>
             <td>{{ $chat->title }}</td>
-            <td>{{ $chat->customers()->first()->addresses()->whereNotNull('phone')->first()->phone ?? '' }}</td>
+            <td>{{ $chat->customers->first()->addresses->first()->phone ?? '' }}</td>
             <td>{!! implode('<br />' , ChatHelper::formatChatUsers($chat->users)) !!}</td>
             <td>{!! implode('<br />' , ChatHelper::formatChatUsers($chat->employees)) !!}</td>
             <td>{{ '['.$chat->lastMessage->created_at.'] '.$chat->lastMessage->message }}</td>

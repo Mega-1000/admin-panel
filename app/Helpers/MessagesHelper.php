@@ -139,8 +139,12 @@ class MessagesHelper
         return Chat
             ::with(['messages' => function($q) {
                 $q->with(['chatUser' => function($q) {
+                    $q->with(['customer' => function($q) {
+                        $q->with(['addresses' => function ($q) {
+                            $q->select('phone')->whereNotNull('phone');
+                        }]);
+                    }]);
                     $q->with('user');
-                    $q->with('customer');
                     $q->with('employee');
                 }]);
                 $q->oldest();

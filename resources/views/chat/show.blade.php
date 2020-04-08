@@ -28,18 +28,20 @@
                         @foreach ($chat->messages as $message)
                             @php
                                 $header = '';
-                                if ($message->customer()) {
+                                if ($message->chatUser->customer) {
                                     $header .=  'Klient ';
-                                    $header .=  ChatHelper::formatEmailAndPhone($message->customer()->login,
-                                    $message->customer()->addresses()->whereNotNull('phone')->first()->phone);
-                                } else if ($message->employee()) {
-                                    $header .= $message->employee()->firstname . ' ' . $message->employee()->lastname;
-                                    $header .= ChatHelper::formatEmailAndPhone($message->employee()->email, $message->employee()->phone);
-                                    $header .= ChatHelper::formatEmployeeRoles($message->employee());
+                                    $header .=  ChatHelper::formatEmailAndPhone($message->chatUser->customer->login,
+                                    $message->chatUser->customer->addresses->first());
+                                } else if ($message->chatUser->employee) {
+                                    $header .=  'Obsługa ';
+                                    $header .= $message->chatUser->employee->firstname . ' ' . $message->chatUser->employee->lastname;
+                                    $header .= ChatHelper::formatEmailAndPhone($message->chatUser->employee->email, $message->chatUser->employee->phone);
+                                    $header .= ChatHelper::formatEmployeeRoles($message->chatUser->employee);
                                     $header .= ':';
-                                } else if ($message->user()) {
-                                    $header .= $message->user()->name . ' ' . $message->user()->fistname . ' ' . $message->user()->lastname;
-                                    $header .= ChatHelper::formatEmailAndPhone($message->user()->email, $message->user()->phone);
+                                } else if ($message->chatUser->user) {
+                                    $header .=  'Moderator ';
+                                    $header .= $message->chatUser->user->name . ' ' . $message->chatUser->user->fistname . ' ' . $message->chatUser->user->lastname;
+                                    $header .= ChatHelper::formatEmailAndPhone($message->chatUser->user->email, $message->chatUser->user->phone);
                                     $header .= ':';
                                 }
                             @endphp

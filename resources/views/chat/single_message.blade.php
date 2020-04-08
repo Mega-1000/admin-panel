@@ -6,7 +6,7 @@
         <div
             class="{{ $message->customer() ? 'text-right alert-warning' : ($message->user() ? 'text-left alert-success' : 'text-left alert-info') }} alert">
             @if ($message->customer())
-                <strong> {{ $header }} </strong> [{{ $message->created_at }}]
+                <strong> {!! $header !!} </strong> [{{ $message->created_at }}]
             @else
                 [{{ $message->created_at }}]
                     <strong> {!! $header !!} </strong>
