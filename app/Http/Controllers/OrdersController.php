@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Entities\Order;
 use App\Entities\OrderItem;
+use App\Entities\OrderPayment;
 use App\Entities\Warehouse;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
@@ -1846,6 +1847,42 @@ class OrdersController extends Controller
                 }
             }
         }
+
+        return response()->json('done', 200);
+    }
+
+    /**
+     * @param $orderIdToGet
+     * @param $orderIdToSend
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function movePaymentData(Request $request, $orderIdToGet, $orderIdToSend)
+    {
+        $orderToGetData = $this->orderRepository->find($orderIdToGet);
+        $orderToSendData = $this->orderRepository->find($orderIdToSend);
+        $paymentAmount = $request->input('paymentAmount');
+        if (empty($orderToGetData) || empty($orderToSendData)) {
+            abort(404);
+        }
+
+        $masterPaymentId = 0;
+        foreach($orderToGetData->payments()->where('promise', '=', '')->get() as $orderGetPayment) {
+            if($orderGetPayment->amount >= $paymentAmount) {
+                $orderGetPayment->update([
+                    'amount' => $orderGetPayment->amount - $paymentAmount
+                ]);
+                $masterPaymentId = $orderGetPayment->master_payment_id;
+                break;
+            }
+        }
+
+        $payment = OrderPayment::create([
+            'amount' => str_replace(",", ".", $paymentAmount),
+            'master_payment_id' => $masterPaymentId,
+            'order_id' => $orderToSendData->id,
+            'promise' => '',
+            'promise_date' => null,
+        ]);
 
         return response()->json('done', 200);
     }
