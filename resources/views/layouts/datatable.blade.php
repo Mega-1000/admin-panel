@@ -188,7 +188,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-info" data-dismiss="modal">Anuluj</button>
-                    <button data-index="4" type="button" class="btn btn-danger" id="remove-label-and-set-date">Usuń etykietę</button>
+                    <button data-index="4" type="button" class="btn btn-danger" id="remove-label-and-set-date">Ustaw termin płatności</button>
                 </div>
             </div>
         </div>
