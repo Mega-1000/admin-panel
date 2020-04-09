@@ -3979,7 +3979,6 @@
                                     paymentAmount: paymentAmount
                                 }
                             }).done(function(data) {
-                                console.log(data, 'dasdlkjsalk')
                                 $('#order_move_data_success').modal('show');
 
                                 $('#order_move_data_ok').on('click', function(){
