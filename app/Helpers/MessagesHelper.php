@@ -3,6 +3,7 @@
 namespace App\Helpers;
 
 use App\Entities\Chat;
+use App\Entities\CustomerAddress;
 use App\Entities\Product;
 use App\Entities\Order;
 use App\User;
@@ -12,6 +13,7 @@ use App\Entities\ProductMedia;
 use App\Entities\PostalCodeLatLon;
 use App\Entities\Message;
 use App\Helpers\Exceptions\ChatException;
+use Illuminate\Support\Facades\Hash;
 
 class MessagesHelper
 {
@@ -312,9 +314,9 @@ class MessagesHelper
         return false;
     }
 
-    public static function getToken($mediaId, $postCode, $email)
+    public static function getToken($mediaId, $postCode, $email, $phone)
     {
-        $customer = self::getCustomer($email);
+        $customer = self::getCustomer($email, $phone);
 
         $media = ProductMedia::find($mediaId);
 
@@ -339,12 +341,23 @@ class MessagesHelper
         return $helper->encrypt();
     }
 
-    private static function getCustomer($email)
+    private static function getCustomer($email, $phone)
     {
         $customer = Customer::where('login', $email)->first();
+        if ($customer && $customer->password && !Hash::check($phone, $customer->password)) {
+            throw new ChatException('wrong_password');
+        }
+
         if (!$customer) {
             $customer = new Customer();
             $customer->login = $email;
+            $customer->save();
+            $address = new CustomerAddress();
+            $address->type = CustomerAddress::ADDRESS_TYPE_STANDARD;
+            $address->phone = $phone;
+            $address->email = $email;
+            $customer->addresses()->save($address);
+
             $customer->save();
         }
         return $customer;

@@ -69,4 +69,22 @@ class MessagesController extends Controller
         }
         return response($out);
     }
+
+    public function getUrl(Request $request)
+    {
+        try {
+            $url = \App\Http\Controllers\MessagesController::getChatUrl($request->mediaId,
+                $request->postCode,
+                $request->email,
+                $request->phone);
+        } catch (ChatException $exception) {
+            $exception->log();
+            if ($exception->getMessage() == 'wrong_password') {
+                return response(['errorMessage' => 'Podany email istnieje w naszej bazie. Proszę podać prawidłowe hasło/numer telefonu'], 400);
+            } else {
+                return response(['errorMessage' => 'Wystąpil błąd. Spróbuj ponownie później'], 400);
+            }
+        }
+        return response(['url' => $url], 200);
+    }
 }
