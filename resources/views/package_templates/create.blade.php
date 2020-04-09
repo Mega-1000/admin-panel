@@ -141,18 +141,27 @@
                        value="{{ old('weight') }}">
             </div>
             <div class="form-group">
-                <label for="container_type">@lang('order_packages.form.container_type')</label><br/>
-                <select class="form-control" id="container_type" name="container_type">
-                    <option {{old('container_type') === 'POLPALETA' ? 'selected="selected"' : ''}} value="POLPALETA">
-                        PÓŁPALETA 60x80
-                    </option>
-                    <option {{old('container_type') === 'EUR' ? 'selected="selected"' : ''}} value="EUR">PALETA 680x120
-                    </option>
-                    <option {{old('container_type') === 'INNA' ? 'selected="selected"' : ''}} value="INNA">PALETA
-                        100x120
-                    </option>
-                    <option {{old('container_type') === 'PACZ' ? 'selected="selected"' : ''}} value="PACZ">PACZKA
-                    </option>
+                <label for="container_type">@lang('order_packages.form.container_type')</label>
+                    <select class="form-control" id="container_type" name="container_type">
+                    @foreach($containerTypes as $containerType)
+                    @if ($containerType->name == "PACZKA" || $containerType->name == "PACZ")
+                    <option value="PACZKA" selected="selected">PACZKA</option>
+                    @else
+                    <option value="{{ $containerType->name }}">{{ $containerType->name }}</option>
+                    @endif
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="packing_type">@lang('order_packages.form.packing_type')</label>
+                    <select class="form-control" id="packing_type" name="packing_type">
+                    @foreach($packingTypes as $packingType)
+                    @if ($packingType->name == "KARTON")
+                    <option value="KARTON" selected="selected">KARTON</option>
+                    @else
+                    <option value="{{ $packingType->name }}">{{ $packingType->name }}</option>
+                    @endif
+                    @endforeach
                 </select>
             </div>
             <div class="form-group">

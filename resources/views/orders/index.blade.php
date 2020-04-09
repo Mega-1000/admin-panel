@@ -394,10 +394,19 @@
         <label for="send_courier">Szablony paczek:</label>
         <a name="send_courier" class="btn btn-success" href="/admin/packageTemplates/">Lista Szablonów</a>
         <a name="send_courier" class="btn btn-info" href="/admin/packageTemplates/create">Dodaj szablon</a>
-        <label style="margin-left: 20px" for="send_courier">Typy zawartości przesyłek:</label>
-        <a style="margin-left: 5px" name="send_courier" class="btn btn-success" href="/admin/contentTypes/">Lista Typów zawartości przesyłek</a>
-        <a name="send_courier" class="btn btn-info" href="/admin/contentTypes/create">Dodaj typ zawartości przesyłki</a>
+        <label style="margin-left: 20px" for="container_type">Rodzaje przesyłek:</label>
+        <a style="margin-left: 5px" name="container_type" class="btn btn-success" href="/admin/containerTypes/">Lista rodzajów przesyłek</a>
+        <a name="container_type" class="btn btn-info" href="/admin/containerTypes/create">Dodaj rodzaj przesyłki</a>
     </div>
+    <div>
+        <label for="content_type">Typy zawartości przesyłek:</label>
+        <a name="content_type" class="btn btn-success" href="/admin/contentTypes/">Lista Typów zawartości przesyłek</a>
+        <a name="content_type" class="btn btn-info" href="/admin/contentTypes/create">Dodaj typ zawartości przesyłki</a>
+        <label style="margin-left: 20px" for="packing_type">Typy opakowań przesyłek:</label>
+        <a style="margin-left: 5px" name="packing_type" class="btn btn-success" href="/admin/packingTypes/">Lista Typów opakowań przesyłek</a>
+        <a name="packing_type" class="btn btn-info" href="/admin/packingTypes/create">Dodaj typ opakowania przesyłki</a>
+    </div>
+    <br>
     <div class="form-group">
         <label for="send_courier">Import z SELLO: </label>
         <a name="send_courier" class="btn btn-success" href="/admin/sello-import/">Importuj</a>
