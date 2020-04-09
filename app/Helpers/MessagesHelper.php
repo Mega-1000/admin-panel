@@ -141,7 +141,7 @@ class MessagesHelper
                 $q->with(['chatUser' => function($q) {
                     $q->with(['customer' => function($q) {
                         $q->with(['addresses' => function ($q) {
-                            $q->select('phone')->whereNotNull('phone');
+                            $q->whereNotNull('phone');
                         }]);
                     }]);
                     $q->with('user');
