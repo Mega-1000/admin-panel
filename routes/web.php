@@ -189,7 +189,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('employeeRoles/{id}/edit', 'EmployeeRoleController@edit')->name('employee_role.edit');
         Route::put('employeeRoles/{id}/update', 'EmployeeRoleController@update')->name('employee_role.update');
         Route::delete('employeeRoles/{id}/delete', 'EmployeeRoleController@destroy')->name('employee_role.destroy');
-        
+
         Route::get('contentTypes', 'ContentTypesController@index')->name('content_type.index');
         Route::get('contentTypes/create', 'ContentTypesController@create')->name('content_type.create');
         Route::post('contentTypes/store', 'ContentTypesController@store')->name('content_type.store');
@@ -437,7 +437,7 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get('/dispatch-job/recalculate-prices', 'DispatchJobController@recalculatePrices')->name('job.recalculatePrices');
         Route::get('/dispatch-job/generate-jpgs', 'DispatchJobController@generateJpgs')->name('job.generateJpgs');
-        Route::get('/chat/{all?}', 'MessagesController@index')->name('chat.index');
+        Route::get('/chat/{all?}/{orderId?}', 'MessagesController@index')->name('chat.index');
     });
 });
 
