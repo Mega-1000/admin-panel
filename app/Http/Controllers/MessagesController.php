@@ -38,7 +38,7 @@ class MessagesController extends Controller
         uasort($chats, function ($a, $b) {
             return $a->lastMessage->created_at > $b->lastMessage->created_at ? -1 : 1;
         });
-        
+
         return view('chat.index')->withChats($chats)->withShowAll($all);
     }
 
@@ -125,15 +125,21 @@ class MessagesController extends Controller
         //
     }
 
-    public function getUrl($mediaId, $postCode, $email)
+    public static function getUrl(Request $request, $mediaId, $postCode, $email, $phone)
     {
         try {
-            $token = MessagesHelper::getToken($mediaId, $postCode, $email);
-            $url = route('chat.show', ['token' => $token]);
+            $url = self::getChatUrl($mediaId, $postCode, $email, $phone);
             return redirect($url);
         } catch (ChatException $e) {
             $e->log();
             return redirect(env('FRONT_URL'));
         }
+    }
+
+    public static function getChatUrl($mediaId, $postCode, $email, $phone): string
+    {
+        $token = MessagesHelper::getToken($mediaId, $postCode, $email, $phone);
+        $url = route('chat.show', ['token' => $token]);
+        return $url;
     }
 }
