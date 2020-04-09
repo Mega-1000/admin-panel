@@ -26,6 +26,8 @@ return [
         'postal_code' => 'Kod pocztowy',
     ],
     'form' => [
+        'visibility' => 'Ukryj Te Dane',
+        'firm_visibilty' => 'Ukryj dane o firmie tego pracownika',
         'firstname' => 'Imię',
         'lastname' => 'Nazwisko',
         'email' => 'Email pracownika',
