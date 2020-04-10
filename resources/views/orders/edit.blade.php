@@ -1270,866 +1270,782 @@
                         </div>
                     @endforeach
                 @endif
-                <hr>
-                @foreach($messages as $message)
-                    @switch($message->type)
-                        @case('GENERAL')
-                        <div class="alert alert-info">
-                            @break
-                            @case('SHIPPING')
-                            <div class="alert alert-success" role="alert">
-                                @break
-                                @case('WAREHOUSE')
-                                <div class="alert alert-warning" role="alert">
-                                    @break
-                                    @case('COMPLAINT')
-                                    <div class="alert alert-danger" role="alert">
-                                        @break
-                                        @endswitch
-                                        <h3>
-                                            @if($message->source == "MAIL")
-                                                [MAIL] -
-                                            @endif
-                                            @if($message->user_id == null)
-                                                [KLIENT]
-                                            @else
-                                                [KONSULTANT]
-                                            @endif
-                                        </h3>
-                                        <p><span class="icon voyager-categories"
-                                                 style="margin-right: 5px;"></span>{{ $message->type }}</p>
-                                        <p><span class="icon voyager-calendar"
-                                                 style="margin-right: 5px;"></span> {{ $message->created_at }}</p>
-                                        @if(count($message->attachments))
-                                            <p><span class="icon voyager-images" style="margin-right: 5px;"></span>
-                                                <style type="text/css">
-                                                    span.order-message-attachment-link:not(:last-child):after {
-                                                        content: " | ";
-                                                    }
-                                                </style>
-                                                Załączniki:
-                                                @foreach($message->attachments as $attachment)
-                                                    <span class="order-message-attachment-link"><a style="color: white;"
-                                                                                                   href="{{asset('storage/attachments/' . $attachment->message->order_id . '/' . $attachment->order_message_id . '/' . $attachment->file)}}"
-                                                                                                   target="_blank">{{$attachment->file}}</a></span>
-                                                @endforeach
-                                            </p>
+            </div>
+        </div>
+        @inject('provider', 'App\Http\Controllers\MessagesController')
+        @php
+            $chats = $provider::getChatView(1, $order->id);
+            error_log(print_r($chats, 1));
+        @endphp
+        @include('chat.table', ['chats' => $chats])
+    </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document" style="width: 90%;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <button type="button" class="btn btn-success" id="newSplitOrder">
+                        Dodaj nowe zamówienie
+                    </button>
+                    <form id="splitOrders" action="{{ action('OrdersController@splitOrders')}}"
+                          method="post">
+                        {{ csrf_field() }}
+                        <div>
+                            <label for="splitAndUpdate">Wydziel produkty do nowych zamówień i
+                                zaktualizuj zlecenie główne</label>
+                            <input type="checkbox" name="splitAndUpdate">
+                        </div>
+
+                        <input type="hidden" value="{{ $order->id }}" name="orderId">
+                        <table id="productsTable" class="table table1 table-venice-blue"
+                               style="width: 100%;">
+                            <tbody id="products-tbody">
+                            <tr>
+                                <td colspan="4" style="border: 0px;"></td>
+                                <td style="border: 0px;" class="firstOrder">Zamówienie 1 <input
+                                        type="hidden" name="firstOrderExist" value="0"></td>
+                                <td style="border: 0px;" class="secondOrder">Zamówienie 2 <input
+                                        type="hidden" name="secondOrderExist" value="0"></td>
+                                <td style="border: 0px;" class="thirdOrder">Zamówienie 3 <input
+                                        type="hidden" name="thirdOrderExist" value="0"></td>
+                                <td style="border: 0px;" class="fourthOrder">Zamówienie 4 <input
+                                        type="hidden" name="fourthOrderExist" value="0"></td>
+                                <td style="border: 0px;" class="fifthOrder">Zamówienie 5 <input
+                                        type="hidden" name="fifthOrderExist" value="0"></td>
+                            </tr>
+                            <tr>
+                                <td colspan="4" style="border: 0px;"></td>
+                                <td style="border: 0px; color: red;" class="firstOrderWeightSum">
+                                    Waga: 0 <input type="hidden" name="firstOrderWeightSum"
+                                                   value="0"></td>
+                                <td style="border: 0px; color: red;" class="secondOrderWeightSum">
+                                    Waga: 0 <input type="hidden" name="secondOrderWeightSum"
+                                                   value="0"></td>
+                                <td style="border: 0px; color: red;" class="thirdOrderWeightSum">
+                                    Waga: 0 <input type="hidden" name="thirdOrderWeightSum"
+                                                   value="0"></td>
+                                <td style="border: 0px; color: red;" class="fourthOrderWeightSum">
+                                    Waga: 0 <input type="hidden" name="fourthOrderWeightSum"
+                                                   value="0"></td>
+                                <td style="border: 0px; color: red;" class="fifthOrderWeightSum">
+                                    Waga: 0 <input type="hidden" name="fifthOrderWeightSum"
+                                                   value="0"></td>
+                            </tr>
+                            @foreach($order->items as $item)
+                                @php
+                                    $gross_purchase_sum += ($item->net_purchase_price_commercial_unit_after_discounts * $item->quantity * 1.23);
+                                    $net_purchase_sum += $item->net_purchase_price_commercial_unit_after_discounts * $item->quantity ;
+                                    $gross_selling_sum += ($item->net_selling_price_commercial_unit_after_discounts * $item->quantity * 1.23);
+                                    $net_selling_sum += $item->net_selling_price_commercial_unit_after_discounts * $item->quantity;
+                                    $weight += $item->product->weight_trade_unit * $item->quantity;
+                                @endphp
+                                <tr class="id row-{{$item->id}}" id="id[{{$item->id}}]">
+                                    <td colspan="4"><h4><img
+                                                src="{!! $item->product->getImageUrl() !!}"
+                                                style="width: 179px; height: 130px;"><strong>{{ $loop->iteration }}
+                                                . </strong>{{ $item->product->name }}
+                                            (symbol: {{ $item->product->symbol }}) </h4></td>
+
+
+                                    <input name="id[{{$item->id}}]"
+                                           value="{{ $item->id }}" type="hidden"
+                                           class="form-control" id="id[{{$item->id}}]">
+                                    <input name="product_id[{{$item->id}}]"
+                                           value="{{ $item->product_id }}" type="hidden"
+                                           class="form-control" id="product_id[{{$item->id}}]">
+
+                                    <input
+                                        value="{{ $item->quantity }}" type="hidden"
+                                        class="form-control item_quantity"
+                                        name="item_quantity[{{$item->id}}]"
+                                        data-item-id="{{$item->id}}">
+
+                                    <input
+                                        name="numbers_of_basic_commercial_units_in_pack[{{$item->id}}]"
+                                        data-item-id="{{$item->id}}"
+                                        value="{{ $item->product->packing->numbers_of_basic_commercial_units_in_pack }}"
+                                        type="hidden"
+                                        class="form-control numbers_of_basic_commercial_units_in_pack"
+                                        id="numbers_of_basic_commercial_units_in_pack[{{$item->id}}]">
+                                    <input name="number_of_sale_units_in_the_pack[{{$item->id}}]"
+                                           data-item-id="{{$item->id}}"
+                                           value="{{ $item->product->packing->number_of_sale_units_in_the_pack }}"
+                                           type="hidden"
+                                           class="form-control number_of_sale_units_in_the_pack"
+                                           id="number_of_sale_units_in_the_pack[{{$item->id}}]">
+                                    <input
+                                        name="number_of_trade_items_in_the_largest_unit[{{$item->id}}]"
+                                        data-item-id="{{$item->id}}"
+                                        value="{{ $item->product->packing->number_of_trade_items_in_the_largest_unit }}"
+                                        type="hidden"
+                                        class="form-control number_of_trade_items_in_the_largest_unit"
+                                        id="number_of_trade_items_in_the_largest_unit[{{$item->id}}]">
+                                    <input name="unit_consumption[{{$item->id}}]"
+                                           data-item-id="{{$item->id}}"
+                                           value="{{ $item->product->packing->unit_consumption }}"
+                                           type="hidden"
+                                           class="form-control unit_consumption"
+                                           id="unit_consumption[{{$item->id}}]">
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        Obliczenia dokonano przy
+                                        założeniu {{$item->product->packing->unit_consumption}}  {{$item->product->packing->unit_basic}}
+                                        / {{$item->product->packing->calculation_unit}}
+                                        <br> 1 {{$item->product->packing->unit_of_collective}}
+                                        = {{$item->product->packing->number_of_sale_units_in_the_pack}}
+                                        ({{$item->product->packing->unit_commercial}})
+                                        = @if(is_numeric($item->product->packing->number_of_sale_units_in_the_pack) && is_numeric($item->product->packing->unit_consumption)){{$item->product->packing->number_of_sale_units_in_the_pack / $item->product->packing->unit_consumption}} @else {{0}} @endif ({{$item->product->packing->calculation_unit}} / {{$item->product->packing->unit_of_collective}})
+                                    </td>
+                                </tr>
+                                <tr class="row-{{$item->id}}">
+                                    <th colspan="4">Cena zakupu</th>
+                                </tr>
+                                <tr>
+                                    <td>Jednostka handlowa
+                                        ({{ $item->product->packing->unit_commercial }})
+                                    </td>
+                                    <td>Jednostka podstawowa
+                                        ({{$item->product->packing->unit_basic}})
+                                    </td>
+                                    <td>Jednostka obliczeniowa
+                                        ({{$item->product->packing->calculation_unit}})
+                                    </td>
+                                    <td>Jednostka zbirocza
+                                        ({{$item->product->packing->unit_of_collective}})
+                                    </td>
+                                </tr>
+                                <tr class="purchase-row row-{{$item->id}}">
+                                    <td>
+                                        <input
+                                            name="net_purchase_price_commercial_unit[{{$item->id}}]"
+                                            data-item-id="{{$item->id}}"
+                                            value="{{ $item->net_purchase_price_commercial_unit_after_discounts }}"
+                                            type="text"
+                                            class="form-control price net_purchase_price_commercial_unit priceChange"
+                                            id="net_purchase_price_commercial_unit[{{$item->id}}]">
+                                    </td>
+                                    <td>
+                                        <input name="net_purchase_price_basic_unit[{{$item->id}}]"
+                                               data-item-id="{{$item->id}}"
+                                               value="{{ $item->net_purchase_price_basic_unit_after_discounts }}"
+                                               type="text"
+                                               class="form-control price net_purchase_price_basic_unit priceChange"
+                                               id="net_purchase_price_basic_unit[{{$item->id}}]">
+                                    </td>
+                                    <td>
+                                        <input
+                                            name="net_purchase_price_calculated_unit[{{$item->id}}]"
+                                            data-item-id="{{$item->id}}"
+                                            value="{{ $item->net_purchase_price_calculated_unit_after_discounts }}"
+                                            type="text"
+                                            class="form-control price net_purchase_price_calculated_unit priceChange"
+                                            id="net_purchase_price_calculated_unit[{{$item->id}}]">
+                                    </td>
+                                    <td>
+                                        <input
+                                            name="net_purchase_price_aggregate_unit[{{$item->id}}]"
+                                            data-item-id="{{$item->id}}"
+                                            value="{{ $item->net_purchase_price_aggregate_unit_after_discounts }}"
+                                            type="text"
+                                            class="form-control price net_purchase_price_aggregate_unit priceChange"
+                                            id="net_purchase_price_aggregate_unit[{{$item->id}}]">
+                                    </td>
+                                </tr>
+                                <tr class="purchase-row row-{{$item->id}}">
+                                    <td>
+                                        <input
+                                            name="gross_purchase_price_commercial_unit[{{$item->id}}]"
+                                            value="" type="text"
+                                            data-item-id="{{$item->id}}"
+                                            class="form-control price gross_purchase_price_commercial_unit priceChange"
+                                            id="gross_purchase_price_commercial_unit[{{$item->id}}]">
+                                    </td>
+                                    <td>
+                                        <input name="gross_purchase_price_basic_unit[{{$item->id}}]"
+                                               value="" type="text"
+                                               data-item-id="{{$item->id}}"
+                                               class="form-control price gross_purchase_price_basic_unit priceChange"
+                                               id="gross_purchase_price_basic_unit[{{$item->id}}]">
+                                    </td>
+                                    <td>
+                                        <input
+                                            name="gross_purchase_price_calculated_unit[{{$item->id}}]"
+                                            value="" type="text"
+                                            data-item-id="{{$item->id}}"
+                                            class="form-control price gross_purchase_price_calculated_unit priceChange"
+                                            id="gross_purchase_price_calculated_unit[{{$item->id}}]">
+                                    </td>
+                                    <td>
+                                        <input
+                                            name="gross_purchase_price_aggregate_unit[{{$item->id}}]"
+                                            value="" type="text"
+                                            data-item-id="{{$item->id}}"
+                                            class="form-control price gross_purchase_price_aggregate_unit priceChange"
+                                            id="gross_purchase_price_aggregate_unit[{{$item->id}}]">
+                                    </td>
+                                </tr>
+                                <tr class="row-{{$item->id}}">
+                                    <th colspan="4">Cena sprzedaży</th>
+                                </tr>
+                                <tr class="selling-row row-{{$item->id}}">
+                                    <td>
+                                        <input
+                                            name="net_selling_price_commercial_unit[{{$item->id}}]"
+                                            data-item-id="{{$item->id}}"
+                                            value="{{ $item->net_selling_price_commercial_unit }}"
+                                            type="text"
+                                            class="form-control price net_selling_price_commercial_unit priceChange change-order"
+                                            id="net_selling_price_commercial_unit[{{$item->id}}]">
+                                    </td>
+                                    <td>
+                                        <input name="net_selling_price_basic_unit[{{$item->id}}]"
+                                               data-item-id="{{$item->id}}"
+                                               value="{{ $item->net_selling_price_basic_unit }}"
+                                               type="text"
+                                               class="form-control price net_selling_price_basic_unit priceChange change-order"
+                                               id="net_selling_price_basic_unit[{{$item->id}}]">
+                                    </td>
+                                    <td>
+                                        <input
+                                            name="net_selling_price_calculated_unit[{{$item->id}}]"
+                                            data-item-id="{{$item->id}}"
+                                            value="{{ $item->net_selling_price_calculated_unit }}"
+                                            type="text"
+                                            class="form-control price net_selling_price_calculated_unit priceChange change-order"
+                                            id="net_selling_price_calculated_unit[{{$item->id}}]">
+                                    </td>
+                                    <td>
+                                        <input
+                                            name="net_selling_price_aggregate_unit[{{$item->id}}]"
+                                            data-item-id="{{$item->id}}"
+                                            value="{{ $item->net_selling_price_aggregate_unit }}"
+                                            type="text"
+                                            class="form-control price net_selling_price_aggregate_unit priceChange change-order"
+                                            id="net_selling_price_aggregate_unit[{{$item->id}}]">
+                                    </td>
+                                </tr>
+                                <tr class="selling-row row-{{$item->id}}">
+                                    <td>
+                                        <input
+                                            name="gross_selling_price_commercial_unit[{{$item->id}}]"
+                                            data-item-id="{{$item->id}}" value="" type="text"
+                                            class="form-control price gross_selling_price_commercial_unit priceChange change-order"
+                                            id="gross_selling_price_commercial_unit[{{$item->id}}]">
+                                    </td>
+                                    <td>
+                                        <input name="gross_selling_price_basic_unit[{{$item->id}}]"
+                                               data-item-id="{{$item->id}}" value="" type="text"
+                                               class="form-control price gross_selling_price_basic_unit priceChange change-order"
+                                               id="gross_selling_price_basic_unit[{{$item->id}}]">
+                                    </td>
+                                    <td>
+                                        <input
+                                            name="gross_selling_price_calculated_unit[{{$item->id}}]"
+                                            data-item-id="{{$item->id}}" value="" type="text"
+                                            class="form-control price gross_selling_price_calculated_unit priceChange change-order"
+                                            id="gross_selling_price_calculated_unit[{{$item->id}}]">
+                                    </td>
+                                    <td>
+                                        <input
+                                            name="gross_selling_price_aggregate_unit[{{$item->id}}]"
+                                            data-item-id="{{$item->id}}" value="" type="text"
+                                            class="form-control price gross_selling_price_aggregate_unit priceChange change-order"
+                                            id="gross_selling_price_aggregate_unit[{{$item->id}}]">
+                                    </td>
+                                </tr>
+                                <tr class="selling-row row-{{$item->id}}">
+                                    @foreach($productPacking as $packing)
+                                        @if($packing->product_id === $item->product_id)
+                                            <td>
+                                                <input name="unit_commercial"
+                                                       value="{{$item->quantity . ' ' . $packing->unit_commercial }}"
+                                                       type="text"
+                                                       class="form-control" id="unit_commercial"
+                                                       disabled>
+                                            </td>
+                                            <td>
+                                                <input name="unit_basic"
+                                                       value="@if($item->product->packing->numbers_of_basic_commercial_units_in_pack != 0){{$item->quantity / $item->product->packing->numbers_of_basic_commercial_units_in_pack  .' '.$packing->unit_basic }} @else {{0}} @endif"
+                                                       type="text"
+                                                       class="form-control" id="unit_basic"
+                                                       disabled>
+                                            </td>
+                                            <td>
+                                                <input name="calculation_unit[{{$item->id}}]"
+                                                       value="@if(is_numeric($item->product->packing->numbers_of_basic_commercial_units_in_pack) && is_numeric($item->product->packing->unit_consumption)){{ number_format($item->quantity * $item->product->packing->numbers_of_basic_commercial_units_in_pack / $item->product->packing->unit_consumption, 2) .' '.$packing->calculation_unit }} @else {{0}} @endif"
+                                                       type="text"
+                                                       class="form-control" id="calculation_unit"
+                                                       disabled>
+                                            </td>
+                                            <td>
+                                                @php
+                                                    if (empty($item->product->packing->number_of_sale_units_in_the_pack))
+                                                        $a = 0;
+                                                    else
+                                                        $a = $item->quantity * $item->product->packing->number_of_sale_units_in_the_pack;
+                                                @endphp
+                                                <input name="unit_of_collective"
+                                                       value="{{ number_format($a, 4) .' '.$packing->unit_of_collective}} "
+                                                       type="text"
+                                                       class="form-control" id="unit_of_collective"
+                                                       disabled>
+                                            </td>
                                         @endif
-                                        <h4 style="margin-top: 10px;">{{ $message->title }}</h4>
-                                        <p>@if($message->additional_description) <span style="font-weight: bolder;">Opis reklamacji:</span>  @endif {{ $message->message }}
-                                        </p>
-                                        @if($message->additional_description)
-                                            <p><span
-                                                    style="font-weight: bolder;">Opis roszczenia reklamacyjnego:</span> {{ $message->additional_description }}
-                                            </p>
-                                        @endif
-                                    </div>
                                     @endforeach
-
-
-                                    <form method="POST" action="{{ route('order_messages.store') }}"
-                                          enctype="multipart/form-data">
-                                        {{ csrf_field() }}
-                                        <div class="form-group">
-                                            <label for="title">Tytuł</label>
-                                            <input type="text" name="title" class="form-control">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="type">Typ</label>
-                                            <select name="type" id="type" class="form-control">
-                                                <option value="GENERAL">Ogólne</option>
-                                                <option value="SHIPPING">Wysyłka</option>
-                                                <option value="WAREHOUSE">Magazyn</option>
-                                                <option value="COMPLAINT">Skarga</option>
-                                            </select>
-                                        </div>
-                                        <input type="hidden" name="employee_id" value="{{ Auth::id() }}">
-                                        <input type="hidden" name="order_id" value="{{ $order->id }}">
-                                        <div class="form-group">
-                                            <label for="message">Wiadomość</label>
-                                            <textarea name="message" id="message" class="form-control"
-                                                      rows="10"></textarea>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label for="attachment">Załącznik</label>
-                                            <input type="file" name="attachment" id="attachment">
-                                        </div>
-
-                                        <div class="form-group">
-                                            <button type="submit" class="btn btn-primary">Wyślij</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
-                             aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document" style="width: 90%;">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
+                                </tr>
+                                <tr class="row-{{$item->id}}">
+                                    <th colspan="4">Ilość</th>
+                                </tr>
+                                <tr class="selling-row row-{{$item->id}}">
+                                    <td>
+                                        <input name="modal_quantity_commercial[{{$item->id}}]"
+                                               value="{{ $item->quantity }}" type="text"
+                                               data-item-id="{{$item->id}}"
+                                               class="form-control"
+                                               id="modal_quantity_commercial[{{$item->id}}]">
+                                        <input type="hidden" name="modal_weight[{{$item->id}}]"
+                                               data-item-id="{{$item->id}}"
+                                               value="{{ $item->product->weight_trade_unit ?? 0 }}">
+                                    </td>
+                                    <td colspan="3"></td>
+                                    <td class="firstOrder"><input
+                                            name="firstOrderQuantity[{{$item->id}}]"
+                                            type="text" data-item-id="{{$item->id}}"
+                                            data-order-type="first"
+                                            class="form-control splitQuantity"
+                                            id="firstOrderQuantity[{{$item->id}}]">
+                                        <p>Ilość startowa: <span name="base[{{$item->id}}]"
+                                                                 data-order-type="first">{{ $item->quantity }}</span>
+                                            <button type="button"
+                                                    onclick="fillQuantity({{$item->id}},{{ $item->quantity }}, 'first' )">
+                                                <
+                                            </button>
+                                        </p>
+                                        </p>
+                                        <p>Zostało: <span
+                                                name="left[{{$item->id}}]">{{ $item->quantity }}</span>
+                                        </p>
+                                        <p>Waga: <span
+                                                name="firstOrderWeight[{{$item->id}}]"></span>
+                                            <input type="hidden" class="firstWeightValue"
+                                                   name="firstOrderWeightValue[{{$item->id}}]"
+                                                   value="{{ $item->product->weight_trade_unit ?? 0 }}">
+                                            <input type="hidden" class="firstWeightValueBase"
+                                                   name="firstOrderWeightValueBase[{{$item->id}}]"
+                                                   value="0">
+                                        </p>
+                                    </td>
+                                    <td class="secondOrder"><input
+                                            name="secondOrderQuantity[{{$item->id}}]"
+                                            type="text" data-item-id="{{$item->id}}"
+                                            data-order-type="second"
+                                            class="form-control splitQuantity"
+                                            id="secondOrderQuantity[{{$item->id}}]">
+                                        <p>Ilość startowa: <span name="base[{{$item->id}}]"
+                                                                 data-order-type="second">{{ $item->quantity }}</span>
+                                            <button type="button"
+                                                    onclick="fillQuantity({{$item->id}},{{ $item->quantity }}, 'second' )">
+                                                <
+                                            </button>
+                                        </p>
+                                        </p>
+                                        <p>Zostało: <span
+                                                name="left[{{$item->id}}]">{{ $item->quantity }}</span>
+                                        </p>
+                                        <p>Waga: <span
+                                                name="secondOrderWeight[{{$item->id}}]"></span>
+                                            <input type="hidden" class="secondWeightValue"
+                                                   name="secondOrderWeightValue[{{$item->id}}]"
+                                                   value="{{ $item->product->weight_trade_unit ?? 0 }}">
+                                            <input type="hidden" class="secondWeightValueBase"
+                                                   name="secondOrderWeightValueBase[{{$item->id}}]"
+                                                   value="0">
+                                        </p>
+                                    </td>
+                                    <td class="thirdOrder"><input
+                                            name="thirdOrderQuantity[{{$item->id}}]"
+                                            type="text" data-item-id="{{$item->id}}"
+                                            data-order-type="third"
+                                            class="form-control splitQuantity"
+                                            id="thirdOrderQuantity[{{$item->id}}]">
+                                        <p>Ilość startowa: <span name="base[{{$item->id}}]"
+                                                                 data-order-type="third">{{ $item->quantity }}</span>
+                                            <button type="button"
+                                                    onclick="fillQuantity({{$item->id}},{{ $item->quantity }}, 'third' )">
+                                                <
+                                            </button>
+                                        </p>
+                                        </p>
+                                        <p>Zostało: <span
+                                                name="left[{{$item->id}}]">{{ $item->quantity }}</span>
+                                        </p>
+                                        <p>Waga: <span
+                                                name="thirdOrderWeight[{{$item->id}}]"></span>
+                                            <input type="hidden" class="thirdWeightValue"
+                                                   name="thirdOrderWeightValue[{{$item->id}}]"
+                                                   value="{{ $item->product->weight_trade_unit ?? 0 }}">
+                                            <input type="hidden" class="thirdWeightValueBase"
+                                                   name="thirdOrderWeightValueBase[{{$item->id}}]"
+                                                   value="0">
+                                        </p>
+                                    </td>
+                                    <td class="fourthOrder"><input
+                                            name="fourthOrderQuantity[{{$item->id}}]"
+                                            type="text" data-item-id="{{$item->id}}"
+                                            data-order-type="fourth"
+                                            class="form-control splitQuantity"
+                                            id="fourthOrderQuantity[{{$item->id}}]">
+                                        <p>Ilość startowa: <span name="base[{{$item->id}}]"
+                                                                 data-order-type="fourth">{{ $item->quantity }}</span>
+                                            <button type="button"
+                                                    onclick="fillQuantity({{$item->id}},{{ $item->quantity }}, 'fourth' )">
+                                                <
+                                            </button>
+                                        </p>
+                                        <p>Zostało: <span
+                                                name="left[{{$item->id}}]">{{ $item->quantity }}</span>
+                                        </p>
+                                        <p>Waga: <span
+                                                name="fourthOrderWeight[{{$item->id}}]"></span>
+                                            <input type="hidden" class="fourthWeightValue"
+                                                   name="fourthOrderWeightValue[{{$item->id}}]"
+                                                   value="{{ $item->product->weight_trade_unit ?? 0 }}">
+                                            <input type="hidden" class="fourthWeightValueBase"
+                                                   name="fourthOrderWeightValueBase[{{$item->id}}]"
+                                                   value="0">
+                                        </p>
+                                    </td>
+                                    <td class="fifthOrder"><input
+                                            name="fifthOrderQuantity[{{$item->id}}]"
+                                            type="text" data-item-id="{{$item->id}}"
+                                            data-order-type="fifth"
+                                            class="form-control splitQuantity"
+                                            id="fifthOrderQuantity[{{$item->id}}]">
+                                        <p>Ilość startowa: <span name="base[{{$item->id}}]"
+                                                                 data-order-type="fifth">{{ $item->quantity }}</span>
+                                            <button type="button"
+                                                    onclick="fillQuantity({{$item->id}},{{ $item->quantity }}, 'fifth' )">
+                                                <
+                                            </button>
+                                        </p>
+                                        <p>Zostało: <span
+                                                name="left[{{$item->id}}]">{{ $item->quantity }}</span>
+                                        </p>
+                                        <p>Waga: <span
+                                                name="fifthOrderWeight[{{$item->id}}]"></span>
+                                            <input type="hidden" class="fifthWeightValue"
+                                                   name="fifthOrderWeightValue[{{$item->id}}]"
+                                                   value="{{ $item->product->weight_trade_unit ?? 0 }}">
+                                            <input type="hidden" class="fifthWeightValueBase"
+                                                   name="fifthrderWeightValueBase[{{$item->id}}]"
+                                                   value="0">
+                                        </p>
+                                    </td>
+                                </tr>
+                                <tr class="row-{{$item->id}}">
+                                    <th colspan="4">Zysk</th>
+                                </tr>
+                                <tr class="selling-row row-{{$item->id}}">
+                                    <td>
+                                        <input type="text"
+                                               class="form-control item-profit priceChange"
+                                               data-item-id="{{$item->id}}" disabled
+                                               name="item-profit"
+                                               value="{{ number_format(($item->net_selling_price_commercial_unit * $item->quantity * 1.23) - ($item->net_purchase_price_commercial_unit_after_discounts * $item->quantity * 1.23), 2) }}">
+                                    </td>
+                                    <td colspan="3"></td>
+                                </tr>
+                            @endforeach
+                            <tr>
+                                <td colspan="4">
+                                    <button class="btn btn-info btn-split splitDko" type="button"
+                                            style="display: none; margin-top: -10px; margin-bottom: 55px; margin-left: auto;">
+                                        Rozdziel po równo DKO
+                                    </button>
+                                    <button class="btn btn-info btn-split splitDkp" type="button"
+                                            style="display: none; margin-bottom: 55px; margin-left: auto;">
+                                        Rozdziel po równo DKP
+                                    </button>
+                                    <button class="btn btn-info btn-split splitClient" type="button"
+                                            style="display: none; margin-bottom: 55px; margin-left: auto;">
+                                        Rozdziel po równo koszt klienta
+                                    </button>
+                                    <button class="btn btn-info btn-split splitUs" type="button"
+                                            style="display: none; margin-left: auto;">Rozdziel po
+                                        równo nasz koszt
+                                    </button>
+                                </td>
+                                <td class="firstOrder">
+                                    <div class="form-group">
+                                        <label for="additional_service_cost_firstOrder">Dodaktowy
+                                            koszt obsługi</label>
+                                        <input type="text" class="form-control dkoInput"
+                                               id="additional_service_cost_firstOrder"
+                                               name="additional_service_cost_firstOrder">
+                                        <p>Zostało: <span
+                                                class="dkoLeft">{{ $order->additional_service_cost }}</span>
+                                        </p>
                                     </div>
-                                    <div class="modal-body">
-                                        <button type="button" class="btn btn-success" id="newSplitOrder">
-                                            Dodaj nowe zamówienie
-                                        </button>
-                                        <form id="splitOrders" action="{{ action('OrdersController@splitOrders')}}"
-                                              method="post">
-                                            {{ csrf_field() }}
-                                            <div>
-                                                <label for="splitAndUpdate">Wydziel produkty do nowych zamówień i
-                                                    zaktualizuj zlecenie główne</label>
-                                                <input type="checkbox" name="splitAndUpdate">
-                                            </div>
-
-                                            <input type="hidden" value="{{ $order->id }}" name="orderId">
-                                            <table id="productsTable" class="table table1 table-venice-blue"
-                                                   style="width: 100%;">
-                                                <tbody id="products-tbody">
-                                                <tr>
-                                                    <td colspan="4" style="border: 0px;"></td>
-                                                    <td style="border: 0px;" class="firstOrder">Zamówienie 1 <input
-                                                            type="hidden" name="firstOrderExist" value="0"></td>
-                                                    <td style="border: 0px;" class="secondOrder">Zamówienie 2 <input
-                                                            type="hidden" name="secondOrderExist" value="0"></td>
-                                                    <td style="border: 0px;" class="thirdOrder">Zamówienie 3 <input
-                                                            type="hidden" name="thirdOrderExist" value="0"></td>
-                                                    <td style="border: 0px;" class="fourthOrder">Zamówienie 4 <input
-                                                            type="hidden" name="fourthOrderExist" value="0"></td>
-                                                    <td style="border: 0px;" class="fifthOrder">Zamówienie 5 <input
-                                                            type="hidden" name="fifthOrderExist" value="0"></td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="4" style="border: 0px;"></td>
-                                                    <td style="border: 0px; color: red;" class="firstOrderWeightSum">
-                                                        Waga: 0 <input type="hidden" name="firstOrderWeightSum"
-                                                                       value="0"></td>
-                                                    <td style="border: 0px; color: red;" class="secondOrderWeightSum">
-                                                        Waga: 0 <input type="hidden" name="secondOrderWeightSum"
-                                                                       value="0"></td>
-                                                    <td style="border: 0px; color: red;" class="thirdOrderWeightSum">
-                                                        Waga: 0 <input type="hidden" name="thirdOrderWeightSum"
-                                                                       value="0"></td>
-                                                    <td style="border: 0px; color: red;" class="fourthOrderWeightSum">
-                                                        Waga: 0 <input type="hidden" name="fourthOrderWeightSum"
-                                                                       value="0"></td>
-                                                    <td style="border: 0px; color: red;" class="fifthOrderWeightSum">
-                                                        Waga: 0 <input type="hidden" name="fifthOrderWeightSum"
-                                                                       value="0"></td>
-                                                </tr>
-                                                @foreach($order->items as $item)
-                                                    @php
-                                                        $gross_purchase_sum += ($item->net_purchase_price_commercial_unit_after_discounts * $item->quantity * 1.23);
-                                                        $net_purchase_sum += $item->net_purchase_price_commercial_unit_after_discounts * $item->quantity ;
-                                                        $gross_selling_sum += ($item->net_selling_price_commercial_unit_after_discounts * $item->quantity * 1.23);
-                                                        $net_selling_sum += $item->net_selling_price_commercial_unit_after_discounts * $item->quantity;
-                                                        $weight += $item->product->weight_trade_unit * $item->quantity;
-                                                    @endphp
-                                                    <tr class="id row-{{$item->id}}" id="id[{{$item->id}}]">
-                                                        <td colspan="4"><h4><img
-                                                                    src="{!! $item->product->getImageUrl() !!}"
-                                                                    style="width: 179px; height: 130px;"><strong>{{ $loop->iteration }}
-                                                                    . </strong>{{ $item->product->name }}
-                                                                (symbol: {{ $item->product->symbol }}) </h4></td>
-
-
-                                                        <input name="id[{{$item->id}}]"
-                                                               value="{{ $item->id }}" type="hidden"
-                                                               class="form-control" id="id[{{$item->id}}]">
-                                                        <input name="product_id[{{$item->id}}]"
-                                                               value="{{ $item->product_id }}" type="hidden"
-                                                               class="form-control" id="product_id[{{$item->id}}]">
-
-                                                        <input
-                                                            value="{{ $item->quantity }}" type="hidden"
-                                                            class="form-control item_quantity"
-                                                            name="item_quantity[{{$item->id}}]"
-                                                            data-item-id="{{$item->id}}">
-
-                                                        <input
-                                                            name="numbers_of_basic_commercial_units_in_pack[{{$item->id}}]"
-                                                            data-item-id="{{$item->id}}"
-                                                            value="{{ $item->product->packing->numbers_of_basic_commercial_units_in_pack }}"
-                                                            type="hidden"
-                                                            class="form-control numbers_of_basic_commercial_units_in_pack"
-                                                            id="numbers_of_basic_commercial_units_in_pack[{{$item->id}}]">
-                                                        <input name="number_of_sale_units_in_the_pack[{{$item->id}}]"
-                                                               data-item-id="{{$item->id}}"
-                                                               value="{{ $item->product->packing->number_of_sale_units_in_the_pack }}"
-                                                               type="hidden"
-                                                               class="form-control number_of_sale_units_in_the_pack"
-                                                               id="number_of_sale_units_in_the_pack[{{$item->id}}]">
-                                                        <input
-                                                            name="number_of_trade_items_in_the_largest_unit[{{$item->id}}]"
-                                                            data-item-id="{{$item->id}}"
-                                                            value="{{ $item->product->packing->number_of_trade_items_in_the_largest_unit }}"
-                                                            type="hidden"
-                                                            class="form-control number_of_trade_items_in_the_largest_unit"
-                                                            id="number_of_trade_items_in_the_largest_unit[{{$item->id}}]">
-                                                        <input name="unit_consumption[{{$item->id}}]"
-                                                               data-item-id="{{$item->id}}"
-                                                               value="{{ $item->product->packing->unit_consumption }}"
-                                                               type="hidden"
-                                                               class="form-control unit_consumption"
-                                                               id="unit_consumption[{{$item->id}}]">
-                                                    </tr>
-                                                    <tr>
-                                                        <td colspan="4">
-                                                            Obliczenia dokonano przy
-                                                            założeniu {{$item->product->packing->unit_consumption}}  {{$item->product->packing->unit_basic}}
-                                                            / {{$item->product->packing->calculation_unit}}
-                                                            <br> 1 {{$item->product->packing->unit_of_collective}}
-                                                            = {{$item->product->packing->number_of_sale_units_in_the_pack}}
-                                                            ({{$item->product->packing->unit_commercial}})
-                                                            = @if(is_numeric($item->product->packing->number_of_sale_units_in_the_pack) && is_numeric($item->product->packing->unit_consumption)){{$item->product->packing->number_of_sale_units_in_the_pack / $item->product->packing->unit_consumption}} @else {{0}} @endif ({{$item->product->packing->calculation_unit}} / {{$item->product->packing->unit_of_collective}})
-                                                        </td>
-                                                    </tr>
-                                                    <tr class="row-{{$item->id}}">
-                                                        <th colspan="4">Cena zakupu</th>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>Jednostka handlowa
-                                                            ({{ $item->product->packing->unit_commercial }})
-                                                        </td>
-                                                        <td>Jednostka podstawowa
-                                                            ({{$item->product->packing->unit_basic}})
-                                                        </td>
-                                                        <td>Jednostka obliczeniowa
-                                                            ({{$item->product->packing->calculation_unit}})
-                                                        </td>
-                                                        <td>Jednostka zbirocza
-                                                            ({{$item->product->packing->unit_of_collective}})
-                                                        </td>
-                                                    </tr>
-                                                    <tr class="purchase-row row-{{$item->id}}">
-                                                        <td>
-                                                            <input
-                                                                name="net_purchase_price_commercial_unit[{{$item->id}}]"
-                                                                data-item-id="{{$item->id}}"
-                                                                value="{{ $item->net_purchase_price_commercial_unit_after_discounts }}"
-                                                                type="text"
-                                                                class="form-control price net_purchase_price_commercial_unit priceChange"
-                                                                id="net_purchase_price_commercial_unit[{{$item->id}}]">
-                                                        </td>
-                                                        <td>
-                                                            <input name="net_purchase_price_basic_unit[{{$item->id}}]"
-                                                                   data-item-id="{{$item->id}}"
-                                                                   value="{{ $item->net_purchase_price_basic_unit_after_discounts }}"
-                                                                   type="text"
-                                                                   class="form-control price net_purchase_price_basic_unit priceChange"
-                                                                   id="net_purchase_price_basic_unit[{{$item->id}}]">
-                                                        </td>
-                                                        <td>
-                                                            <input
-                                                                name="net_purchase_price_calculated_unit[{{$item->id}}]"
-                                                                data-item-id="{{$item->id}}"
-                                                                value="{{ $item->net_purchase_price_calculated_unit_after_discounts }}"
-                                                                type="text"
-                                                                class="form-control price net_purchase_price_calculated_unit priceChange"
-                                                                id="net_purchase_price_calculated_unit[{{$item->id}}]">
-                                                        </td>
-                                                        <td>
-                                                            <input
-                                                                name="net_purchase_price_aggregate_unit[{{$item->id}}]"
-                                                                data-item-id="{{$item->id}}"
-                                                                value="{{ $item->net_purchase_price_aggregate_unit_after_discounts }}"
-                                                                type="text"
-                                                                class="form-control price net_purchase_price_aggregate_unit priceChange"
-                                                                id="net_purchase_price_aggregate_unit[{{$item->id}}]">
-                                                        </td>
-                                                    </tr>
-                                                    <tr class="purchase-row row-{{$item->id}}">
-                                                        <td>
-                                                            <input
-                                                                name="gross_purchase_price_commercial_unit[{{$item->id}}]"
-                                                                value="" type="text"
-                                                                data-item-id="{{$item->id}}"
-                                                                class="form-control price gross_purchase_price_commercial_unit priceChange"
-                                                                id="gross_purchase_price_commercial_unit[{{$item->id}}]">
-                                                        </td>
-                                                        <td>
-                                                            <input name="gross_purchase_price_basic_unit[{{$item->id}}]"
-                                                                   value="" type="text"
-                                                                   data-item-id="{{$item->id}}"
-                                                                   class="form-control price gross_purchase_price_basic_unit priceChange"
-                                                                   id="gross_purchase_price_basic_unit[{{$item->id}}]">
-                                                        </td>
-                                                        <td>
-                                                            <input
-                                                                name="gross_purchase_price_calculated_unit[{{$item->id}}]"
-                                                                value="" type="text"
-                                                                data-item-id="{{$item->id}}"
-                                                                class="form-control price gross_purchase_price_calculated_unit priceChange"
-                                                                id="gross_purchase_price_calculated_unit[{{$item->id}}]">
-                                                        </td>
-                                                        <td>
-                                                            <input
-                                                                name="gross_purchase_price_aggregate_unit[{{$item->id}}]"
-                                                                value="" type="text"
-                                                                data-item-id="{{$item->id}}"
-                                                                class="form-control price gross_purchase_price_aggregate_unit priceChange"
-                                                                id="gross_purchase_price_aggregate_unit[{{$item->id}}]">
-                                                        </td>
-                                                    </tr>
-                                                    <tr class="row-{{$item->id}}">
-                                                        <th colspan="4">Cena sprzedaży</th>
-                                                    </tr>
-                                                    <tr class="selling-row row-{{$item->id}}">
-                                                        <td>
-                                                            <input
-                                                                name="net_selling_price_commercial_unit[{{$item->id}}]"
-                                                                data-item-id="{{$item->id}}"
-                                                                value="{{ $item->net_selling_price_commercial_unit }}"
-                                                                type="text"
-                                                                class="form-control price net_selling_price_commercial_unit priceChange change-order"
-                                                                id="net_selling_price_commercial_unit[{{$item->id}}]">
-                                                        </td>
-                                                        <td>
-                                                            <input name="net_selling_price_basic_unit[{{$item->id}}]"
-                                                                   data-item-id="{{$item->id}}"
-                                                                   value="{{ $item->net_selling_price_basic_unit }}"
-                                                                   type="text"
-                                                                   class="form-control price net_selling_price_basic_unit priceChange change-order"
-                                                                   id="net_selling_price_basic_unit[{{$item->id}}]">
-                                                        </td>
-                                                        <td>
-                                                            <input
-                                                                name="net_selling_price_calculated_unit[{{$item->id}}]"
-                                                                data-item-id="{{$item->id}}"
-                                                                value="{{ $item->net_selling_price_calculated_unit }}"
-                                                                type="text"
-                                                                class="form-control price net_selling_price_calculated_unit priceChange change-order"
-                                                                id="net_selling_price_calculated_unit[{{$item->id}}]">
-                                                        </td>
-                                                        <td>
-                                                            <input
-                                                                name="net_selling_price_aggregate_unit[{{$item->id}}]"
-                                                                data-item-id="{{$item->id}}"
-                                                                value="{{ $item->net_selling_price_aggregate_unit }}"
-                                                                type="text"
-                                                                class="form-control price net_selling_price_aggregate_unit priceChange change-order"
-                                                                id="net_selling_price_aggregate_unit[{{$item->id}}]">
-                                                        </td>
-                                                    </tr>
-                                                    <tr class="selling-row row-{{$item->id}}">
-                                                        <td>
-                                                            <input
-                                                                name="gross_selling_price_commercial_unit[{{$item->id}}]"
-                                                                data-item-id="{{$item->id}}" value="" type="text"
-                                                                class="form-control price gross_selling_price_commercial_unit priceChange change-order"
-                                                                id="gross_selling_price_commercial_unit[{{$item->id}}]">
-                                                        </td>
-                                                        <td>
-                                                            <input name="gross_selling_price_basic_unit[{{$item->id}}]"
-                                                                   data-item-id="{{$item->id}}" value="" type="text"
-                                                                   class="form-control price gross_selling_price_basic_unit priceChange change-order"
-                                                                   id="gross_selling_price_basic_unit[{{$item->id}}]">
-                                                        </td>
-                                                        <td>
-                                                            <input
-                                                                name="gross_selling_price_calculated_unit[{{$item->id}}]"
-                                                                data-item-id="{{$item->id}}" value="" type="text"
-                                                                class="form-control price gross_selling_price_calculated_unit priceChange change-order"
-                                                                id="gross_selling_price_calculated_unit[{{$item->id}}]">
-                                                        </td>
-                                                        <td>
-                                                            <input
-                                                                name="gross_selling_price_aggregate_unit[{{$item->id}}]"
-                                                                data-item-id="{{$item->id}}" value="" type="text"
-                                                                class="form-control price gross_selling_price_aggregate_unit priceChange change-order"
-                                                                id="gross_selling_price_aggregate_unit[{{$item->id}}]">
-                                                        </td>
-                                                    </tr>
-                                                    <tr class="selling-row row-{{$item->id}}">
-                                                        @foreach($productPacking as $packing)
-                                                            @if($packing->product_id === $item->product_id)
-                                                                <td>
-                                                                    <input name="unit_commercial"
-                                                                           value="{{$item->quantity . ' ' . $packing->unit_commercial }}"
-                                                                           type="text"
-                                                                           class="form-control" id="unit_commercial"
-                                                                           disabled>
-                                                                </td>
-                                                                <td>
-                                                                    <input name="unit_basic"
-                                                                           value="@if($item->product->packing->numbers_of_basic_commercial_units_in_pack != 0){{$item->quantity / $item->product->packing->numbers_of_basic_commercial_units_in_pack  .' '.$packing->unit_basic }} @else {{0}} @endif"
-                                                                           type="text"
-                                                                           class="form-control" id="unit_basic"
-                                                                           disabled>
-                                                                </td>
-                                                                <td>
-                                                                    <input name="calculation_unit[{{$item->id}}]"
-                                                                           value="@if(is_numeric($item->product->packing->numbers_of_basic_commercial_units_in_pack) && is_numeric($item->product->packing->unit_consumption)){{ number_format($item->quantity * $item->product->packing->numbers_of_basic_commercial_units_in_pack / $item->product->packing->unit_consumption, 2) .' '.$packing->calculation_unit }} @else {{0}} @endif"
-                                                                           type="text"
-                                                                           class="form-control" id="calculation_unit"
-                                                                           disabled>
-                                                                </td>
-                                                                <td>
-                                                                    @php
-                                                                        if (empty($item->product->packing->number_of_sale_units_in_the_pack))
-                                                                            $a = 0;
-                                                                        else
-                                                                            $a = $item->quantity * $item->product->packing->number_of_sale_units_in_the_pack;
-                                                                    @endphp
-                                                                    <input name="unit_of_collective"
-                                                                           value="{{ number_format($a, 4) .' '.$packing->unit_of_collective}} "
-                                                                           type="text"
-                                                                           class="form-control" id="unit_of_collective"
-                                                                           disabled>
-                                                                </td>
-                                                            @endif
-                                                        @endforeach
-                                                    </tr>
-                                                    <tr class="row-{{$item->id}}">
-                                                        <th colspan="4">Ilość</th>
-                                                    </tr>
-                                                    <tr class="selling-row row-{{$item->id}}">
-                                                        <td>
-                                                            <input name="modal_quantity_commercial[{{$item->id}}]"
-                                                                   value="{{ $item->quantity }}" type="text"
-                                                                   data-item-id="{{$item->id}}"
-                                                                   class="form-control"
-                                                                   id="modal_quantity_commercial[{{$item->id}}]">
-                                                            <input type="hidden" name="modal_weight[{{$item->id}}]"
-                                                                   data-item-id="{{$item->id}}"
-                                                                   value="{{ $item->product->weight_trade_unit ?? 0 }}">
-                                                        </td>
-                                                        <td colspan="3"></td>
-                                                        <td class="firstOrder"><input
-                                                                name="firstOrderQuantity[{{$item->id}}]"
-                                                                type="text" data-item-id="{{$item->id}}"
-                                                                data-order-type="first"
-                                                                class="form-control splitQuantity"
-                                                                id="firstOrderQuantity[{{$item->id}}]">
-                                                            <p>Ilość startowa: <span name="base[{{$item->id}}]"
-                                                                                     data-order-type="first">{{ $item->quantity }}</span>
-                                                                <button type="button"
-                                                                        onclick="fillQuantity({{$item->id}},{{ $item->quantity }}, 'first' )">
-                                                                    <
-                                                                </button>
-                                                            </p>
-                                                            </p>
-                                                            <p>Zostało: <span
-                                                                    name="left[{{$item->id}}]">{{ $item->quantity }}</span>
-                                                            </p>
-                                                            <p>Waga: <span
-                                                                    name="firstOrderWeight[{{$item->id}}]"></span>
-                                                                <input type="hidden" class="firstWeightValue"
-                                                                       name="firstOrderWeightValue[{{$item->id}}]"
-                                                                       value="{{ $item->product->weight_trade_unit ?? 0 }}">
-                                                                <input type="hidden" class="firstWeightValueBase"
-                                                                       name="firstOrderWeightValueBase[{{$item->id}}]"
-                                                                       value="0">
-                                                            </p>
-                                                        </td>
-                                                        <td class="secondOrder"><input
-                                                                name="secondOrderQuantity[{{$item->id}}]"
-                                                                type="text" data-item-id="{{$item->id}}"
-                                                                data-order-type="second"
-                                                                class="form-control splitQuantity"
-                                                                id="secondOrderQuantity[{{$item->id}}]">
-                                                            <p>Ilość startowa: <span name="base[{{$item->id}}]"
-                                                                                     data-order-type="second">{{ $item->quantity }}</span>
-                                                                <button type="button"
-                                                                        onclick="fillQuantity({{$item->id}},{{ $item->quantity }}, 'second' )">
-                                                                    <
-                                                                </button>
-                                                            </p>
-                                                            </p>
-                                                            <p>Zostało: <span
-                                                                    name="left[{{$item->id}}]">{{ $item->quantity }}</span>
-                                                            </p>
-                                                            <p>Waga: <span
-                                                                    name="secondOrderWeight[{{$item->id}}]"></span>
-                                                                <input type="hidden" class="secondWeightValue"
-                                                                       name="secondOrderWeightValue[{{$item->id}}]"
-                                                                       value="{{ $item->product->weight_trade_unit ?? 0 }}">
-                                                                <input type="hidden" class="secondWeightValueBase"
-                                                                       name="secondOrderWeightValueBase[{{$item->id}}]"
-                                                                       value="0">
-                                                            </p>
-                                                        </td>
-                                                        <td class="thirdOrder"><input
-                                                                name="thirdOrderQuantity[{{$item->id}}]"
-                                                                type="text" data-item-id="{{$item->id}}"
-                                                                data-order-type="third"
-                                                                class="form-control splitQuantity"
-                                                                id="thirdOrderQuantity[{{$item->id}}]">
-                                                            <p>Ilość startowa: <span name="base[{{$item->id}}]"
-                                                                                     data-order-type="third">{{ $item->quantity }}</span>
-                                                                <button type="button"
-                                                                        onclick="fillQuantity({{$item->id}},{{ $item->quantity }}, 'third' )">
-                                                                    <
-                                                                </button>
-                                                            </p>
-                                                            </p>
-                                                            <p>Zostało: <span
-                                                                    name="left[{{$item->id}}]">{{ $item->quantity }}</span>
-                                                            </p>
-                                                            <p>Waga: <span
-                                                                    name="thirdOrderWeight[{{$item->id}}]"></span>
-                                                                <input type="hidden" class="thirdWeightValue"
-                                                                       name="thirdOrderWeightValue[{{$item->id}}]"
-                                                                       value="{{ $item->product->weight_trade_unit ?? 0 }}">
-                                                                <input type="hidden" class="thirdWeightValueBase"
-                                                                       name="thirdOrderWeightValueBase[{{$item->id}}]"
-                                                                       value="0">
-                                                            </p>
-                                                        </td>
-                                                        <td class="fourthOrder"><input
-                                                                name="fourthOrderQuantity[{{$item->id}}]"
-                                                                type="text" data-item-id="{{$item->id}}"
-                                                                data-order-type="fourth"
-                                                                class="form-control splitQuantity"
-                                                                id="fourthOrderQuantity[{{$item->id}}]">
-                                                            <p>Ilość startowa: <span name="base[{{$item->id}}]"
-                                                                                     data-order-type="fourth">{{ $item->quantity }}</span>
-                                                                <button type="button"
-                                                                        onclick="fillQuantity({{$item->id}},{{ $item->quantity }}, 'fourth' )">
-                                                                    <
-                                                                </button>
-                                                            </p>
-                                                            <p>Zostało: <span
-                                                                    name="left[{{$item->id}}]">{{ $item->quantity }}</span>
-                                                            </p>
-                                                            <p>Waga: <span
-                                                                    name="fourthOrderWeight[{{$item->id}}]"></span>
-                                                                <input type="hidden" class="fourthWeightValue"
-                                                                       name="fourthOrderWeightValue[{{$item->id}}]"
-                                                                       value="{{ $item->product->weight_trade_unit ?? 0 }}">
-                                                                <input type="hidden" class="fourthWeightValueBase"
-                                                                       name="fourthOrderWeightValueBase[{{$item->id}}]"
-                                                                       value="0">
-                                                            </p>
-                                                        </td>
-                                                        <td class="fifthOrder"><input
-                                                                name="fifthOrderQuantity[{{$item->id}}]"
-                                                                type="text" data-item-id="{{$item->id}}"
-                                                                data-order-type="fifth"
-                                                                class="form-control splitQuantity"
-                                                                id="fifthOrderQuantity[{{$item->id}}]">
-                                                            <p>Ilość startowa: <span name="base[{{$item->id}}]"
-                                                                                     data-order-type="fifth">{{ $item->quantity }}</span>
-                                                                <button type="button"
-                                                                        onclick="fillQuantity({{$item->id}},{{ $item->quantity }}, 'fifth' )">
-                                                                    <
-                                                                </button>
-                                                            </p>
-                                                            <p>Zostało: <span
-                                                                    name="left[{{$item->id}}]">{{ $item->quantity }}</span>
-                                                            </p>
-                                                            <p>Waga: <span
-                                                                    name="fifthOrderWeight[{{$item->id}}]"></span>
-                                                                <input type="hidden" class="fifthWeightValue"
-                                                                       name="fifthOrderWeightValue[{{$item->id}}]"
-                                                                       value="{{ $item->product->weight_trade_unit ?? 0 }}">
-                                                                <input type="hidden" class="fifthWeightValueBase"
-                                                                       name="fifthrderWeightValueBase[{{$item->id}}]"
-                                                                       value="0">
-                                                            </p>
-                                                        </td>
-                                                    </tr>
-                                                    <tr class="row-{{$item->id}}">
-                                                        <th colspan="4">Zysk</th>
-                                                    </tr>
-                                                    <tr class="selling-row row-{{$item->id}}">
-                                                        <td>
-                                                            <input type="text"
-                                                                   class="form-control item-profit priceChange"
-                                                                   data-item-id="{{$item->id}}" disabled
-                                                                   name="item-profit"
-                                                                   value="{{ number_format(($item->net_selling_price_commercial_unit * $item->quantity * 1.23) - ($item->net_purchase_price_commercial_unit_after_discounts * $item->quantity * 1.23), 2) }}">
-                                                        </td>
-                                                        <td colspan="3"></td>
-                                                    </tr>
-                                                @endforeach
-                                                <tr>
-                                                    <td colspan="4">
-                                                        <button class="btn btn-info btn-split splitDko" type="button"
-                                                                style="display: none; margin-top: -10px; margin-bottom: 55px; margin-left: auto;">
-                                                            Rozdziel po równo DKO
-                                                        </button>
-                                                        <button class="btn btn-info btn-split splitDkp" type="button"
-                                                                style="display: none; margin-bottom: 55px; margin-left: auto;">
-                                                            Rozdziel po równo DKP
-                                                        </button>
-                                                        <button class="btn btn-info btn-split splitClient" type="button"
-                                                                style="display: none; margin-bottom: 55px; margin-left: auto;">
-                                                            Rozdziel po równo koszt klienta
-                                                        </button>
-                                                        <button class="btn btn-info btn-split splitUs" type="button"
-                                                                style="display: none; margin-left: auto;">Rozdziel po
-                                                            równo nasz koszt
-                                                        </button>
-                                                    </td>
-                                                    <td class="firstOrder">
-                                                        <div class="form-group">
-                                                            <label for="additional_service_cost_firstOrder">Dodaktowy
-                                                                koszt obsługi</label>
-                                                            <input type="text" class="form-control dkoInput"
-                                                                   id="additional_service_cost_firstOrder"
-                                                                   name="additional_service_cost_firstOrder">
-                                                            <p>Zostało: <span
-                                                                    class="dkoLeft">{{ $order->additional_service_cost }}</span>
-                                                            </p>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="packing_warehouse_cost_firstOrder">Dodatkowy
-                                                                koszt pobrania</label>
-                                                            <input class="form-control dkpInput"
-                                                                   id="additional_cash_on_delivery_cost_firstOrder"
-                                                                   name="additional_cash_on_delivery_cost_firstOrder">
-                                                            <p>Zostało: <span
-                                                                    class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
-                                                            </p>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="shipment_price_for_client_firstOrder">Koszt
-                                                                transportu dla klienta brutto</label>
-                                                            <input type="text" class="form-control shipmentClient"
-                                                                   id="shipment_price_for_client_firstOrder"
-                                                                   name="shipment_price_for_client_firstOrder">
-                                                            <p>Zostało: <span
-                                                                    class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
-                                                            </p>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="shipment_price_for_us_firstOrder">Koszt
-                                                                transportu dla firmy brutto</label>
-                                                            <input type="text" class="form-control shipmentUs"
-                                                                   id="shipment_price_for_us_firstOrder"
-                                                                   name="shipment_price_for_us_firstOrder">
-                                                            <p>Zostało: <span
-                                                                    class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
-                                                            </p>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="proposed_payment_firstOrder">Proponowana
-                                                                zaliczka</label>
-                                                            <input type="text" class="form-control"
-                                                                   id="proposed_payment_firstOrder"
-                                                                   name="proposed_payment_firstOrder">
-                                                        </div>
-                                                    </td>
-                                                    <td class="secondOrder">
-                                                        <div class="form-group">
-                                                            <label for="additional_service_cost_secondOrder">Dodaktowy
-                                                                koszt obsługi</label>
-                                                            <input type="text" class="form-control dkoInput"
-                                                                   id="additional_service_cost_secondOrder"
-                                                                   name="additional_service_cost_secondOrder">
-                                                            <p>Zostało: <span
-                                                                    class="dkoLeft">{{ $order->additional_service_cost }}</span>
-                                                            </p>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="packing_warehouse_cost_secondOrder">Dodatkowy
-                                                                koszt pobrania</label>
-                                                            <input class="form-control dkpInput"
-                                                                   id="additional_cash_on_delivery_cost_secondOrder"
-                                                                   name="additional_cash_on_delivery_cost_secondOrder">
-                                                            <p>Zostało: <span
-                                                                    class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
-                                                            </p>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="shipment_price_for_client_secondOrder">Koszt
-                                                                transportu dla klienta brutto</label>
-                                                            <input type="text" class="form-control shipmentClient"
-                                                                   id="shipment_price_for_client_secondOrder"
-                                                                   name="shipment_price_for_client_secondOrder">
-                                                            <p>Zostało: <span
-                                                                    class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
-                                                            </p>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="shipment_price_for_us_secondOrder">Koszt
-                                                                transportu dla firmy brutto</label>
-                                                            <input type="text" class="form-control shipmentUs"
-                                                                   id="shipment_price_for_us_secondOrder"
-                                                                   name="shipment_price_for_us_secondOrder">
-                                                            <p>Zostało: <span
-                                                                    class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
-                                                            </p>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="proposed_payment_secondOrder">Proponowana
-                                                                zaliczka</label>
-                                                            <input type="text" class="form-control"
-                                                                   id="proposed_payment_secondOrder"
-                                                                   name="proposed_payment_secondOrder">
-                                                        </div>
-                                                    </td>
-                                                    <td class="thirdOrder">
-                                                        <div class="form-group">
-                                                            <label for="additional_service_cost_thirdOrder">Dodaktowy
-                                                                koszt obsługi</label>
-                                                            <input type="text" class="form-control dkoInput"
-                                                                   id="additional_service_cost_thirdOrder"
-                                                                   name="additional_service_cost_thirdOrder">
-                                                            <p>Zostało: <span
-                                                                    class="dkoLeft">{{ $order->additional_service_cost }}</span>
-                                                            </p>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="packing_warehouse_cost_thirdOrder">Dodatkowy
-                                                                koszt pobrania</label>
-                                                            <input class="form-control dkpInput"
-                                                                   id="additional_cash_on_delivery_cost_thirdOrder"
-                                                                   name="additional_cash_on_delivery_cost_thirdOrder">
-                                                            <p>Zostało: <span
-                                                                    class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
-                                                            </p>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="shipment_price_for_client_thirdOrder">Koszt
-                                                                transportu dla klienta brutto</label>
-                                                            <input type="text" class="form-control shipmentClient"
-                                                                   id="shipment_price_for_client_thirdOrder"
-                                                                   name="shipment_price_for_client_thirdOrder">
-                                                            <p>Zostało: <span
-                                                                    class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
-                                                            </p>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="shipment_price_for_us_thirdOrder">Koszt
-                                                                transportu dla firmy brutto</label>
-                                                            <input type="text" class="form-control shipmentUs"
-                                                                   id="shipment_price_for_us_thirdOrder"
-                                                                   name="shipment_price_for_us_thirdOrder">
-                                                            <p>Zostało: <span
-                                                                    class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
-                                                            </p>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="proposed_payment_thirdOrder">Proponowana
-                                                                zaliczka</label>
-                                                            <input type="text" class="form-control"
-                                                                   id="proposed_payment_thirdOrder"
-                                                                   name="proposed_payment_thirdOrder">
-                                                        </div>
-                                                    </td>
-                                                    <td class="fourthOrder">
-                                                        <div class="form-group">
-                                                            <label for="additional_service_cost_fourthOrder">Dodaktowy
-                                                                koszt obsługi</label>
-                                                            <input type="text" class="form-control dkoInput"
-                                                                   id="additional_service_cost_fourthOrder"
-                                                                   name="additional_service_cost_fourthOrder">
-                                                            <p>Zostało: <span
-                                                                    class="dkoLeft">{{ $order->additional_service_cost }}</span>
-                                                            </p>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="packing_warehouse_cost_fourthOrder">Dodatkowy
-                                                                koszt pobrania</label>
-                                                            <input class="form-control dkpInput"
-                                                                   id="additional_cash_on_delivery_cost_fourthOrder"
-                                                                   name="additional_cash_on_delivery_cost_fourthOrder">
-                                                            <p>Zostało: <span
-                                                                    class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
-                                                            </p>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="shipment_price_for_client_fourthOrder">Koszt
-                                                                transportu dla klienta brutto</label>
-                                                            <input type="text" class="form-control shipmentClient"
-                                                                   id="shipment_price_for_client_fourthOrder"
-                                                                   name="shipment_price_for_client_fourthOrder">
-                                                            <p>Zostało: <span
-                                                                    class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
-                                                            </p>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="shipment_price_for_us_fourthOrder">Koszt
-                                                                transportu dla firmy brutto</label>
-                                                            <input type="text" class="form-control shipmentUs"
-                                                                   id="shipment_price_for_us_fourthOrder"
-                                                                   name="shipment_price_for_us_fourthOrder">
-                                                            <p>Zostało: <span
-                                                                    class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
-                                                            </p>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="proposed_payment_fourthOrder">Proponowana
-                                                                zaliczka</label>
-                                                            <input type="text" class="form-control"
-                                                                   id="proposed_payment_fourthOrder"
-                                                                   name="proposed_payment_fourthOrder">
-                                                        </div>
-                                                    </td>
-                                                    <td class="fifthOrder">
-                                                        <div class="form-group">
-                                                            <label for="additional_service_cost_fifthOrder">Dodaktowy
-                                                                koszt obsługi</label>
-                                                            <input type="text" class="form-control dkoInput"
-                                                                   id="additional_service_cost_fifthOrder"
-                                                                   name="additional_service_cost_fifthOrder">
-                                                            <p>Zostało: <span
-                                                                    class="dkoLeft">{{ $order->additional_service_cost }}</span>
-                                                            </p>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="packing_warehouse_cost_fifthOrder">Dodatkowy
-                                                                koszt pobrania</label>
-                                                            <input class="form-control dkpInput"
-                                                                   id="additional_cash_on_delivery_cost_fifthOrder"
-                                                                   name="additional_cash_on_delivery_cost_fifthOrder">
-                                                            <p>Zostało: <span
-                                                                    class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
-                                                            </p>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="shipment_price_for_client_fifthOrder">Koszt
-                                                                transportu dla klienta brutto</label>
-                                                            <input type="text" class="form-control shipmentClient"
-                                                                   id="shipment_price_for_client_fifthOrder"
-                                                                   name="shipment_price_for_client_fifthOrder">
-                                                            <p>Zostało: <span
-                                                                    class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
-                                                            </p>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="shipment_price_for_us_fifthOrder">Koszt
-                                                                transportu dla firmy brutto</label>
-                                                            <input type="text" class="form-control shipmentUs"
-                                                                   id="shipment_price_for_us_fifthOrder"
-                                                                   name="shipment_price_for_us_fifthOrder">
-                                                            <p>Zostało: <span
-                                                                    class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
-                                                            </p>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label for="proposed_payment_fifthOrder">Proponowana
-                                                                zaliczka</label>
-                                                            <input type="text" class="form-control"
-                                                                   id="proposed_payment_fifthOrder"
-                                                                   name="proposed_payment_fifthOrder">
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td colspan="6"></td>
-                                                    <td><input type="submit" class="btn btn-primary pull-right"
-                                                               value="Rozdziel"></td>
-                                                </tr>
-                                                </tbody>
-                                            </table>
-                                        </form>
+                                    <div class="form-group">
+                                        <label for="packing_warehouse_cost_firstOrder">Dodatkowy
+                                            koszt pobrania</label>
+                                        <input class="form-control dkpInput"
+                                               id="additional_cash_on_delivery_cost_firstOrder"
+                                               name="additional_cash_on_delivery_cost_firstOrder">
+                                        <p>Zostało: <span
+                                                class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
+                                        </p>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                        <style>
-                            .firstOrder, .secondOrder, .thirdOrder, .fourthOrder, .fifthOrder {
-                                display: none;
-                            }
-                        </style>
-                        @endsection
+                                    <div class="form-group">
+                                        <label for="shipment_price_for_client_firstOrder">Koszt
+                                            transportu dla klienta brutto</label>
+                                        <input type="text" class="form-control shipmentClient"
+                                               id="shipment_price_for_client_firstOrder"
+                                               name="shipment_price_for_client_firstOrder">
+                                        <p>Zostało: <span
+                                                class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="shipment_price_for_us_firstOrder">Koszt
+                                            transportu dla firmy brutto</label>
+                                        <input type="text" class="form-control shipmentUs"
+                                               id="shipment_price_for_us_firstOrder"
+                                               name="shipment_price_for_us_firstOrder">
+                                        <p>Zostało: <span
+                                                class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="proposed_payment_firstOrder">Proponowana
+                                            zaliczka</label>
+                                        <input type="text" class="form-control"
+                                               id="proposed_payment_firstOrder"
+                                               name="proposed_payment_firstOrder">
+                                    </div>
+                                </td>
+                                <td class="secondOrder">
+                                    <div class="form-group">
+                                        <label for="additional_service_cost_secondOrder">Dodaktowy
+                                            koszt obsługi</label>
+                                        <input type="text" class="form-control dkoInput"
+                                               id="additional_service_cost_secondOrder"
+                                               name="additional_service_cost_secondOrder">
+                                        <p>Zostało: <span
+                                                class="dkoLeft">{{ $order->additional_service_cost }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="packing_warehouse_cost_secondOrder">Dodatkowy
+                                            koszt pobrania</label>
+                                        <input class="form-control dkpInput"
+                                               id="additional_cash_on_delivery_cost_secondOrder"
+                                               name="additional_cash_on_delivery_cost_secondOrder">
+                                        <p>Zostało: <span
+                                                class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="shipment_price_for_client_secondOrder">Koszt
+                                            transportu dla klienta brutto</label>
+                                        <input type="text" class="form-control shipmentClient"
+                                               id="shipment_price_for_client_secondOrder"
+                                               name="shipment_price_for_client_secondOrder">
+                                        <p>Zostało: <span
+                                                class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="shipment_price_for_us_secondOrder">Koszt
+                                            transportu dla firmy brutto</label>
+                                        <input type="text" class="form-control shipmentUs"
+                                               id="shipment_price_for_us_secondOrder"
+                                               name="shipment_price_for_us_secondOrder">
+                                        <p>Zostało: <span
+                                                class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="proposed_payment_secondOrder">Proponowana
+                                            zaliczka</label>
+                                        <input type="text" class="form-control"
+                                               id="proposed_payment_secondOrder"
+                                               name="proposed_payment_secondOrder">
+                                    </div>
+                                </td>
+                                <td class="thirdOrder">
+                                    <div class="form-group">
+                                        <label for="additional_service_cost_thirdOrder">Dodaktowy
+                                            koszt obsługi</label>
+                                        <input type="text" class="form-control dkoInput"
+                                               id="additional_service_cost_thirdOrder"
+                                               name="additional_service_cost_thirdOrder">
+                                        <p>Zostało: <span
+                                                class="dkoLeft">{{ $order->additional_service_cost }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="packing_warehouse_cost_thirdOrder">Dodatkowy
+                                            koszt pobrania</label>
+                                        <input class="form-control dkpInput"
+                                               id="additional_cash_on_delivery_cost_thirdOrder"
+                                               name="additional_cash_on_delivery_cost_thirdOrder">
+                                        <p>Zostało: <span
+                                                class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="shipment_price_for_client_thirdOrder">Koszt
+                                            transportu dla klienta brutto</label>
+                                        <input type="text" class="form-control shipmentClient"
+                                               id="shipment_price_for_client_thirdOrder"
+                                               name="shipment_price_for_client_thirdOrder">
+                                        <p>Zostało: <span
+                                                class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="shipment_price_for_us_thirdOrder">Koszt
+                                            transportu dla firmy brutto</label>
+                                        <input type="text" class="form-control shipmentUs"
+                                               id="shipment_price_for_us_thirdOrder"
+                                               name="shipment_price_for_us_thirdOrder">
+                                        <p>Zostało: <span
+                                                class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="proposed_payment_thirdOrder">Proponowana
+                                            zaliczka</label>
+                                        <input type="text" class="form-control"
+                                               id="proposed_payment_thirdOrder"
+                                               name="proposed_payment_thirdOrder">
+                                    </div>
+                                </td>
+                                <td class="fourthOrder">
+                                    <div class="form-group">
+                                        <label for="additional_service_cost_fourthOrder">Dodaktowy
+                                            koszt obsługi</label>
+                                        <input type="text" class="form-control dkoInput"
+                                               id="additional_service_cost_fourthOrder"
+                                               name="additional_service_cost_fourthOrder">
+                                        <p>Zostało: <span
+                                                class="dkoLeft">{{ $order->additional_service_cost }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="packing_warehouse_cost_fourthOrder">Dodatkowy
+                                            koszt pobrania</label>
+                                        <input class="form-control dkpInput"
+                                               id="additional_cash_on_delivery_cost_fourthOrder"
+                                               name="additional_cash_on_delivery_cost_fourthOrder">
+                                        <p>Zostało: <span
+                                                class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="shipment_price_for_client_fourthOrder">Koszt
+                                            transportu dla klienta brutto</label>
+                                        <input type="text" class="form-control shipmentClient"
+                                               id="shipment_price_for_client_fourthOrder"
+                                               name="shipment_price_for_client_fourthOrder">
+                                        <p>Zostało: <span
+                                                class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="shipment_price_for_us_fourthOrder">Koszt
+                                            transportu dla firmy brutto</label>
+                                        <input type="text" class="form-control shipmentUs"
+                                               id="shipment_price_for_us_fourthOrder"
+                                               name="shipment_price_for_us_fourthOrder">
+                                        <p>Zostało: <span
+                                                class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="proposed_payment_fourthOrder">Proponowana
+                                            zaliczka</label>
+                                        <input type="text" class="form-control"
+                                               id="proposed_payment_fourthOrder"
+                                               name="proposed_payment_fourthOrder">
+                                    </div>
+                                </td>
+                                <td class="fifthOrder">
+                                    <div class="form-group">
+                                        <label for="additional_service_cost_fifthOrder">Dodaktowy
+                                            koszt obsługi</label>
+                                        <input type="text" class="form-control dkoInput"
+                                               id="additional_service_cost_fifthOrder"
+                                               name="additional_service_cost_fifthOrder">
+                                        <p>Zostało: <span
+                                                class="dkoLeft">{{ $order->additional_service_cost }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="packing_warehouse_cost_fifthOrder">Dodatkowy
+                                            koszt pobrania</label>
+                                        <input class="form-control dkpInput"
+                                               id="additional_cash_on_delivery_cost_fifthOrder"
+                                               name="additional_cash_on_delivery_cost_fifthOrder">
+                                        <p>Zostało: <span
+                                                class="dkpLeft">{{ $order->additional_cash_on_delivery_cost }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="shipment_price_for_client_fifthOrder">Koszt
+                                            transportu dla klienta brutto</label>
+                                        <input type="text" class="form-control shipmentClient"
+                                               id="shipment_price_for_client_fifthOrder"
+                                               name="shipment_price_for_client_fifthOrder">
+                                        <p>Zostało: <span
+                                                class="shipmentClientLeft">{{ $order->shipment_price_for_client }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="shipment_price_for_us_fifthOrder">Koszt
+                                            transportu dla firmy brutto</label>
+                                        <input type="text" class="form-control shipmentUs"
+                                               id="shipment_price_for_us_fifthOrder"
+                                               name="shipment_price_for_us_fifthOrder">
+                                        <p>Zostało: <span
+                                                class="shipmentUsLeft">{{ $order->shipment_price_for_us }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="proposed_payment_fifthOrder">Proponowana
+                                            zaliczka</label>
+                                        <input type="text" class="form-control"
+                                               id="proposed_payment_fifthOrder"
+                                               name="proposed_payment_fifthOrder">
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="6"></td>
+                                <td><input type="submit" class="btn btn-primary pull-right"
+                                           value="Rozdziel"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <style>
+        .firstOrder, .secondOrder, .thirdOrder, .fourthOrder, .fifthOrder {
+            display: none;
+        }
+    </style>
+@endsection
                 @section('datatable-scripts')
                     <script type="application/javascript">
                         $(document).ready(function () {
