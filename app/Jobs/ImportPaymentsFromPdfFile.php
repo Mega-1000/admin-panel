@@ -82,22 +82,16 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
                         $payments[$i]['orderId'] = $letter->order_id;
                     }
                     preg_match('/(QQ\d{3,5})QQ/', $text, $matches);
-                    if (count($matches) > 1) {
-                        if (substr($matches[1], 0, 1) !== '0') {
-                            $matches[1] = str_replace('Q', '', $matches[1]);
-                            if (in_array($matches[1], $ordersIds)) {
-                                $payments[$i]['orderId'] = $matches[1];
-                            }
+                    if (count($matches) > 1 && substr($matches[1], 0, 1) !== '0') {
+                        $matches[1] = str_replace('Q', '', $matches[1]);
+                        if (in_array($matches[1], $ordersIds)) {
+                            $payments[$i]['orderId'] = $matches[1];
                         }
                     }
                     $nextLine = fgets($fn);
                     preg_match('/(QQ\d{3,5})QQ/', $text, $matches);
-                    if (count($matches) > 1) {
-                        if (substr($matches[1], 0, 1) !== '0') {
-                            if (in_array($matches[1], $ordersIds)) {
-                                $payments[$i]['orderId'] = str_replace('Q', '', $matches[1]);
-                            }
-                        }
+                    if (count($matches) > 1 && substr($matches[1], 0, 1) !== '0' && in_array($matches[1], $ordersIds)) {
+                        $payments[$i]['orderId'] = str_replace('Q', '', $matches[1]);
                     }
                 }
                 preg_match('/(\-?\d+\,\d+\,\d+)/', preg_replace('/\s/', '', $result), $matches);
