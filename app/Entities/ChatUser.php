@@ -36,17 +36,17 @@ class ChatUser extends Model
 
     public function getUserNicknameForChat()
     {
-        $user = $this->customer()->get()->first();
+        $user = $this->customer;
         if (! empty($user)) {
-            return '<th class="alert-warning alert"> Klient tel:' . $user->login . '</th>';
+            return '<th class="alert-warning alert"> Klient mail:' . $user->login . '</th>';
         }
-        $user = $this->user()->get();
-        if (! empty($user->first())) {
-            return '<th class="alert-success alert">' . implode(' ', ChatHelper::formatChatUsers($user)) . '</th>';
-        }
-        $user = $this->employee()->get();
+        $user = $this->user;
         if (! empty($user)) {
-            return '<th class="alert-info alert">' . implode(' ', ChatHelper::formatChatUsers($user)) . '</th>';
+            return '<th class="alert-success alert">' . ChatHelper::formatChatUser($user) . '</th>';
+        }
+        $user = $this->employee;
+        if (! empty($user)) {
+            return '<th class="alert-info alert">' . ChatHelper::formatChatUser($user) . '</th>';
         }
     }
 }

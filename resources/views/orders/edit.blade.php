@@ -1275,7 +1275,6 @@
         @inject('provider', 'App\Http\Controllers\MessagesController')
         @php
             $chats = $provider::getChatView(1, $order->id);
-            error_log(print_r($chats, 1));
         @endphp
         @include('chat.table', ['chats' => $chats])
     </div>

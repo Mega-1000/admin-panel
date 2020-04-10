@@ -7,8 +7,7 @@ class ChatHelper
     public static function formatChatUsers($users)
     {
         return $users->map(function ($user) {
-            $ret = [$user->name . ' ' . $user->firstname . ' ' . $user->lastname, $user->email, $user->phone];
-            return implode('<br />', $ret);
+            return self::formatChatUser($user);
         })->toArray();
     }
 
@@ -34,5 +33,11 @@ class ChatHelper
             $header .= ' tel: ' . $phone;
         }
         return $header;
+    }
+
+    public static function formatChatUser($user)
+    {
+        $ret = [$user->name . ' ' . $user->firstname . ' ' . $user->lastname, $user->email, $user->phone];
+        return implode('<br />', $ret);
     }
 }
