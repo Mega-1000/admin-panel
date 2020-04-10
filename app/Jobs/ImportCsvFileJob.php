@@ -339,6 +339,13 @@ class ImportCsvFileJob implements ShouldQueue
             unset($array['value_of_price_change_data_fourth']);
         }
 
+        if (empty($array['date_of_price_change'])) {
+            unset($array['date_of_price_change']);
+        }
+        if (empty($array['date_of_the_new_prices'])) {
+            unset($array['date_of_the_new_prices']);
+        }
+        
         $product->fill($array);
         $product->save();
         $product->restore();
@@ -684,7 +691,7 @@ class ImportCsvFileJob implements ShouldQueue
     private function getDateOrNull($date)
     {
         $d = \DateTime::createFromFormat('Y/m/d', $date);
-        return $d && $d->format('Y-m-d') == $date ? $date : null;
+        return $d && $d->format('Y/m/d') == $date ? $d->format('Y-m-d') : null;
     }
 
     private function tryStartImport()
