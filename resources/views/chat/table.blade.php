@@ -19,8 +19,21 @@
             <td>{{ implode(PHP_EOL, ChatHelper::formatChatUsers($chat->users)) }}</td>
             <td>{{ implode(PHP_EOL, ChatHelper::formatChatUsers($chat->employees)) }}</td>
             <td>{{ '['.$chat->lastMessage->created_at.'] '.$chat->lastMessage->message }}</td>
-            <td><a href="{{ $chat->url }}" class="btn btn-large btn-success">Pokaż</a></td>
+            <td>
+                <a href="{{ $chat->url }}" target="_blank" class="btn btn-large btn-success go_to_chat">Pokaż</a>
+                @if ($chat->has_new_message)
+                    <i style="color: red" class="fas fa-comment new_messege"></i>
+                @endif
+            </td>
         </tr>
     @endforeach
     </tbody>
 </table>
+
+@section('javascript')
+    <script>
+        $('.go_to_chat').click((event) =>
+            $($(event.target).parent().find('.new_messege').hide()));
+    </script>
+    @parent
+@endsection

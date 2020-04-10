@@ -51,6 +51,7 @@ class MessagesController extends Controller
             $helper->chatId = $chat->id;
             $helper->currentUserId = $userId ?? Auth::user()->id;
             $helper->currentUserType = MessagesHelper::TYPE_USER;
+            $chat->has_new_message = $helper->hasNewMessage();
             $chat->title = $helper->getTitle();
             $chat->url = route('chat.show', ['token' => $helper->encrypt()]);
             $chat->lastMessage = $chat->messages()->latest()->first();
