@@ -86,7 +86,7 @@ return [
         'total_price' => 'Suma zamówienia',
         'weight' => 'Waga',
         'shipment_price_for_client' => 'Koszt transportu dla klienta brutto',
-        'shipment_price_for_us' => 'Koszt transportu dla firmy brutto',
+        'shipment_price_for_us' => 'Koszt transportu dla nas brutto',
         'shipment_date' => 'Data rozpoczęcia nadawania przesyłki',
         'order_sum' => 'Całość wartości zamówienia brutto',
         'customer_notices' => 'Uwagi klienta',
