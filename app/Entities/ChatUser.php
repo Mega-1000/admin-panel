@@ -34,7 +34,7 @@ class ChatUser extends Model
         return $this->hasMany(Message::class);
     }
 
-    public function getUserNicknameForChat()
+    public function getUserNicknameForChat($userType)
     {
         $user = $this->customer;
         if (! empty($user)) {
@@ -42,11 +42,11 @@ class ChatUser extends Model
         }
         $user = $this->user;
         if (! empty($user)) {
-            return '<th class="alert-success alert">' . ChatHelper::formatChatUser($user) . '</th>';
+            return '<th class="alert-success alert">' . ChatHelper::formatChatUser($user, $userType) . '</th>';
         }
         $user = $this->employee;
         if (! empty($user)) {
-            return '<th class="alert-info alert">' . ChatHelper::formatChatUser($user) . '</th>';
+            return '<th class="alert-info alert">' . ChatHelper::formatChatUser($user, $userType) . '</th>';
         }
     }
 }

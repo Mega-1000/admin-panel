@@ -17,4 +17,5 @@
 @endsection
 @section('javascript')
     <script type="text/javascript" src="{{ URL::asset('js/helpers/data-tables.js') }}"></script>
+    @parent
 @endsection

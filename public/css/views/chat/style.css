@@ -7,3 +7,7 @@
     border-collapse: separate;
     border-spacing: 8px;
 }
+
+#chat-container {
+    width: 100%;
+}

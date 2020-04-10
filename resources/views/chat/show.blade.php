@@ -55,7 +55,7 @@
             <form action="{{ $route }}">
                 <div class="row">
                     <div class="col-sm-9">
-                        <textarea class="form-control" id="message" style="resize: none; width: 100%; height: 46px;"
+                        <textarea required class="form-control" id="message" style="resize: none; width: 100%; height: 46px;"
                                   placeholder="Tutaj wpisz wiadomość"></textarea>
                     </div>
                     <div class="col-sm-3">
@@ -70,7 +70,7 @@
             </tr>
             @foreach($users as $chatUser)
             <tr>
-                {!! $chatUser->getUserNicknameForChat() !!}
+                {!! $chatUser->getUserNicknameForChat($user_type) !!}
             </tr>
             @endforeach
         </table>
