@@ -103,7 +103,7 @@ class MessagesController extends Controller
             if (empty($chat)) {
                 $users = collect();
             } else {
-                $users = $chat->chatUsers()->get();
+                $users = $chat->chatUsers;
             }
             return view('chat.show')->with([
                 'user_type' => $helper->currentUserType,
