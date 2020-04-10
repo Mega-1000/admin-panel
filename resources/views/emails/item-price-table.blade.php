@@ -2,13 +2,15 @@
     <tbody>
     <Tr>
         <Th/>
-        <th colSpan='{{4 + ($bw > 0) + ($bx > 0 && $item->net_purchase_price_the_largest_unit_after_discounts > 0)}}'>Jednostki</th>
+        <th colSpan='{{4 + ($bw > 0) + ($bx > 0 && $item->net_purchase_price_the_largest_unit_after_discounts > 0)}}'>
+            Jednostki
+        </th>
     </Tr>
     <Tr>
         <Th/>
         <Th>Handlowa [{{$item->product->packing->unit_commercial}}]</Th>
-        <Th>Obliczeniowa [{{$item->product->packing->calculation_unit}}]</Th>
         <Th>Podstawowa [{{$item->product->packing->unit_basic}}]</Th>
+        <Th>Obliczeniowa [{{$item->product->packing->calculation_unit}}]</Th>
         @if($bw > 0)
             <Th>Zbiorcza [{{$item->product->packing->unit_of_collective}}]</Th>
         @endif
@@ -25,12 +27,12 @@
         </Th>
         <Th>
             <input disabled
-                   value="{{round($item->net_purchase_price_calculated_unit_after_discounts, 2)}}"
+                   value="{{round($item->net_purchase_price_basic_unit_after_discounts, 2)}}"
             />
         </Th>
         <Th>
             <input disabled
-                   value="{{round($item->net_purchase_price_basic_unit_after_discounts, 2)}}"
+                   value="{{round($item->net_purchase_price_calculated_unit_after_discounts, 2)}}"
             />
         </Th>
         @if($bw > 0)
@@ -58,12 +60,12 @@
         </Th>
         <Th>
             <input disabled
-                   value="{{number_format($item->net_purchase_price_calculated_unit_after_discounts  * 1.23, 2)}}"
+                   value="{{number_format($item->net_purchase_price_basic_unit_after_discounts * 1.23, 2)}}"
             />
         </Th>
         <Th>
             <input disabled
-                   value="{{number_format($item->net_purchase_price_basic_unit_after_discounts * 1.23, 2)}}"
+                   value="{{number_format($item->net_purchase_price_calculated_unit_after_discounts  * 1.23, 2)}}"
             />
         </Th>
         @if($bw > 0)
@@ -91,12 +93,12 @@
         </Th>
         <Th>
             <input disabled
-                   value={{number_format($item->quantity * $item->product->packing->numbers_of_basic_commercial_units_in_pack / $item->product->packing->unit_consumption, 3)}}
+                   value={{number_format($item->quantity * $item->product->packing->numbers_of_basic_commercial_units_in_pack, 3)}}
             />
         </Th>
         <Th>
             <input disabled
-                   value={{number_format($item->quantity * $item->product->packing->numbers_of_basic_commercial_units_in_pack, 3)}}
+                   value={{number_format($item->quantity * $item->product->packing->numbers_of_basic_commercial_units_in_pack / $item->product->packing->unit_consumption, 3)}}
             />
         </Th>
         @if($bw > 0)
@@ -123,12 +125,12 @@
         </Th>
         <Th>
             <input disabled
-                   value={{$item->quantity * $item->product->packing->numbers_of_basic_commercial_units_in_pack / $item->product->packing->unit_consumption * $item->net_purchase_price_calculated_unit_after_discounts}}
+                   value={{$item->quantity * $item->product->packing->numbers_of_basic_commercial_units_in_pack * $item->net_purchase_price_basic_unit_after_discounts}}
             />
         </Th>
         <Th>
             <input disabled
-                   value={{$item->quantity * $item->product->packing->numbers_of_basic_commercial_units_in_pack * $item->net_purchase_price_basic_unit_after_discounts}}
+                   value={{$item->quantity * $item->product->packing->numbers_of_basic_commercial_units_in_pack / $item->product->packing->unit_consumption * $item->net_purchase_price_calculated_unit_after_discounts}}
             />
         </Th>
         @if($bw > 0)
@@ -155,12 +157,12 @@
         </Th>
         <Th>
             <input disabled
-                   value={{number_format($item->quantity * $item->product->packing->numbers_of_basic_commercial_units_in_pack / $item->product->packing->unit_consumption * round(1.23 * $item->net_purchase_price_calculated_unit_after_discounts, 2), 2)}}
+                   value={{number_format($item->quantity * $item->product->packing->numbers_of_basic_commercial_units_in_pack * round(1.23 * $item->net_purchase_price_basic_unit_after_discounts, 2), 2)}}
             />
         </Th>
         <Th>
             <input disabled
-                   value={{number_format($item->quantity * $item->product->packing->numbers_of_basic_commercial_units_in_pack * round(1.23 * $item->net_purchase_price_basic_unit_after_discounts, 2), 2)}}
+                   value={{number_format($item->quantity * $item->product->packing->numbers_of_basic_commercial_units_in_pack / $item->product->packing->unit_consumption * round(1.23 * $item->net_purchase_price_calculated_unit_after_discounts, 2), 2)}}
             />
         </Th>
         @if($bw > 0)
