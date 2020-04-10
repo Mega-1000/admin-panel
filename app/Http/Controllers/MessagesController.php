@@ -8,6 +8,7 @@ use App\Helpers\Exceptions\ChatException;
 use App\Entities\Chat;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class MessagesController extends Controller
 {
@@ -99,7 +100,15 @@ class MessagesController extends Controller
             $product = $helper->getProduct();
             $order = $helper->getOrder();
             $helper->setLastRead();
+            $users = $chat->chatUsers()->get();
+//            foreach ($users as $user) {
+//                error_log(print_r($user->user()->get(), 1));
+//                error_log(print_r($user->customer()->get(), 1));
+//                error_log(print_r($user->employee()->get(), 1));
+//                exit();
+//            }
             return view('chat.show')->with([
+                'users' => $users,
                 'chat' => $chat,
                 'product' => $product,
                 'order' => $order,
