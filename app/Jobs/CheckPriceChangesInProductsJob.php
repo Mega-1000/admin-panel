@@ -17,6 +17,8 @@ class CheckPriceChangesInProductsJob
 
     protected $date;
 
+    const ROLE_CHANGE_PRICE = 'ZC';
+
     /**
      * Create a new job instance.
      *
@@ -32,7 +34,7 @@ class CheckPriceChangesInProductsJob
      *
      * @return void
      */
-    public function handle(WarehouseRepository $warehouseRepository)
+    public function handle()
     {
         $products = \App\Entities\Product::where('date_of_price_change', '<=', $this->date)->get();
 
@@ -50,21 +52,20 @@ class CheckPriceChangesInProductsJob
         }
 
         foreach ($suppliers as $supplier) {
-            $warehouse = $warehouseRepository->findByField('symbol', $supplier);
-            if (!empty($warehouse->first->id->id)) {
-                $sendFormWithProducts = env('FRONT_NUXT_URL') . "/magazyn/aktualizacja-cen/{$warehouse->first->id->id}/zaktualizuj";
-                if ($warehouse->first->id->property->email !== null) {
-                    if ($this->date == null) {
-                        \Mailer::create()
-                            ->to($warehouse->first->id->property->email)
-                            ->send(new SendTableWithProductPriceChangeMail("Prośba o aktualizację cen produktów " . $warehouse->first->id->symbol,
-                                $sendFormWithProducts, $warehouse->first->id->symbol));
-                    }
-                    \Mailer::create()
-                        ->to('info@' . env('DOMAIN_NAME'))
-                        ->send(new SendTableWithProductPriceChangeMail("Prośba o aktualizację cen produktów " . $warehouse->first->id->symbol,
-                            $sendFormWithProducts, $warehouse->first->id->symbol));
+            $warehouse = \App\Entities\Warehouse::where('symbol', $supplier)
+                ->with(['employees' => function ($q) {
+                    $q->with('employeeRoles');
+                }])
+                ->with('property')
+                ->with('firm')
+                ->first()
+            ;
+            if (!$warehouse) {
+                $email = $this->getEmail($warehouse);
+                if ($email) {
+                    $this->sendEmail($warehouse, $email);
                 }
+                $this->sendEmail($warehouse, 'info@' . env('DOMAIN_NAME'));
             } else {
                 Log::notice(
                     'Warehouse not found',
@@ -72,9 +73,33 @@ class CheckPriceChangesInProductsJob
                 );
                 \Mailer::create()
                     ->to('info@' . env('DOMAIN_NAME'))
-                    ->send(new SendToMega1000WarehouseNotFoundMail("Brak danych magazynu " . $supplier,
-                        $supplier));
+                    ->send(new SendToMega1000WarehouseNotFoundMail("Brak danych magazynu " . $supplier, $supplier));
             }
         }
+    }
+
+    private function sendEmail($warehouse, $email)
+    {
+        $sendFormWithProducts = env('FRONT_NUXT_URL') . "/magazyn/aktualizacja-cen/{$warehouse->id}/zaktualizuj";
+        \Mailer::create()
+            ->to($email)
+            ->send(
+                new SendTableWithProductPriceChangeMail("Prośba o aktualizację cen produktów " . $warehouse->symbol,
+                $sendFormWithProducts,
+                $warehouse->symbol
+            )
+        );
+    }
+
+    private function getEmail($warehouse)
+    {
+        foreach ($warehouse->employees as $employee) {
+            foreach ($employee->employeeRoles as $role) {
+                if ($role->symbol == self::ROLE_CHANGE_PRICE && !empty($employee->email)) {
+                    return $employee->email;
+                }
+            }
+        }
+        return $warehouse->property->email ?: $warehouse->firm->email;
     }
 }
