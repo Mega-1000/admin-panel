@@ -51,6 +51,9 @@ class EmployeesController extends Controller
      */
     public function store(EmployeeCreateRequest $request, $id)
     {
+        $this->validate($request, array(
+            'radius' => 'integer|required'
+        ));
         $postal = PostalCodeLatLon::where('postal_code', $request->input('postal_code'))->first(); 
         $employee = new Employee;
         $employee->firm_id = $id;
@@ -68,6 +71,27 @@ class EmployeesController extends Controller
         }
         $employee->person_number = $request->input('person_number');
         $employee->radius = $request->input('radius');
+        if (!empty($request->input('firm_visibility'))) {
+            $employee->firm_visibility = 0;           
+        }
+        if (!empty($request->input('firstname_visibility'))) {
+            $employee->firstname_visibility = 0;           
+        }
+        if (!empty($request->input('lastname_visibility'))) {
+            $employee->lastname_visibility = 0;           
+        }
+        if (!empty($request->input('email_visibility'))) {
+            $employee->email_visibility = 0;           
+        }
+        if (!empty($request->input('phone_visibility'))) {
+            $employee->phone_visibility = 0;           
+        }
+        if (!empty($request->input('comments_visibility'))) {
+            $employee->comments_visibility = 0;           
+        }
+        if (!empty($request->input('postal_code_visibility'))) {
+            $employee->postal_code_visibility = 0;           
+        }
         $employee->save();
         for ($i = $request->input('rolecount'); $i>0 ; $i--){
             if(!empty($request->input('role'.$i))) {
@@ -112,6 +136,9 @@ class EmployeesController extends Controller
      */
     public function update(EmployeeUpdateRequest $request, $id)
     {
+        $this->validate($request, array(
+            'radius' => 'integer|required'
+        ));
         $employee = Employee::find($id);
         $postal = PostalCodeLatLon::where('postal_code', $request->input('postal_code'))->first(); 
          
@@ -132,6 +159,13 @@ class EmployeesController extends Controller
         }
         $employee->person_number = $request->input('person_number');
         $employee->radius = $request->input('radius');
+        $employee->firm_visibility = $request->input('firm_visibility') ?? 1;
+        $employee->firstname_visibility = $request->input('firstname_visibility') ?? 1;
+        $employee->lastname_visibility = $request->input('lastname_visibility') ?? 1;
+        $employee->email_visibility = $request->input('email_visibility') ?? 1;
+        $employee->phone_visibility = $request->input('phone_visibility') ?? 1;
+        $employee->comments_visibility = $request->input('comments_visibility') ?? 1;
+        $employee->postal_code_visibility = $request->input('postal_code_visibility') ?? 1;
         $employee->save();
         $employee->employeeRoles()->detach();
         for ($i = $request->input('rolecount'); $i>0 ; $i--){
