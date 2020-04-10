@@ -79,6 +79,25 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" tabindex="-1" id="payment_move_data" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Czy jesteś pewny że chcesz przenieść dane zamówienia <span id="order_id_get"></span> do zamówienia <span id="order_id_send"></span>?</h4>
+                    <div class="form-group">
+                        <label for="new_date_for_timed_label_type_c">Kwota</label>
+                        <input type="number" id="payment__amount" name="payment__amount" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="button" class="btn btn-success pull-right" id="payment-move-data-ok" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" tabindex="-1" id="order_move_data_success" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -114,6 +133,20 @@
                     <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
                                 aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">Nie możesz wybrać tego samego zamówienia do przeniesienia danych.</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger pull-right" id="order_move_data_ok_error"  data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" tabindex="-1" id="payment_move_data_error_select" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Nie możesz wybrać zamówienia, które nie ma nadpłaty lub jest takie samo.</h4>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger pull-right" id="order_move_data_ok_error"  data-dismiss="modal">Ok</button>

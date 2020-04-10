@@ -100,7 +100,7 @@
     $toPay = $orderValue - $paymentsValue - $paymentsPromise;
 @endphp
 <p>
-    Koszt transportu brutto: {{$order->shipment_price_for_us}}<br>
+    @lang('orders.form.shipment_price_for_us'): {{$order->shipment_price_for_us}}<br>
     @if($toPay > 2)
         Kwota ktora zobowiazujecie sie pobrac przed rozladunkiem i nam
         przekazac: {{$toPay}} zł<br>

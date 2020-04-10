@@ -394,10 +394,19 @@
         <label for="send_courier">Szablony paczek:</label>
         <a name="send_courier" class="btn btn-success" href="/admin/packageTemplates/">Lista Szablonów</a>
         <a name="send_courier" class="btn btn-info" href="/admin/packageTemplates/create">Dodaj szablon</a>
-        <label style="margin-left: 20px" for="send_courier">Typy zawartości przesyłek:</label>
-        <a style="margin-left: 5px" name="send_courier" class="btn btn-success" href="/admin/contentTypes/">Lista Typów zawartości przesyłek</a>
-        <a name="send_courier" class="btn btn-info" href="/admin/contentTypes/create">Dodaj typ zawartości przesyłki</a>
+        <label style="margin-left: 20px" for="container_type">Rodzaje przesyłek:</label>
+        <a style="margin-left: 5px" name="container_type" class="btn btn-success" href="/admin/containerTypes/">Lista rodzajów przesyłek</a>
+        <a name="container_type" class="btn btn-info" href="/admin/containerTypes/create">Dodaj rodzaj przesyłki</a>
     </div>
+    <div>
+        <label for="content_type">Typy zawartości przesyłek:</label>
+        <a name="content_type" class="btn btn-success" href="/admin/contentTypes/">Lista Typów zawartości przesyłek</a>
+        <a name="content_type" class="btn btn-info" href="/admin/contentTypes/create">Dodaj typ zawartości przesyłki</a>
+        <label style="margin-left: 20px" for="packing_type">Typy opakowań przesyłek:</label>
+        <a style="margin-left: 5px" name="packing_type" class="btn btn-success" href="/admin/packingTypes/">Lista Typów opakowań przesyłek</a>
+        <a name="packing_type" class="btn btn-info" href="/admin/packingTypes/create">Dodaj typ opakowania przesyłki</a>
+    </div>
+    <br>
     <div class="form-group">
         <label for="send_courier">Import z SELLO: </label>
         <a name="send_courier" class="btn btn-success" href="/admin/sello-import/">Importuj</a>
@@ -1132,7 +1141,7 @@
 
                         for (let index = 0; index < items.length; index++) {
                             let priceSelling = items[index].net_selling_price_commercial_unit;
-                            let pricePurchase = items[index].net_purchase_price_commercial_unit;
+                            let pricePurchase = items[index].net_purchase_price_commercial_unit_after_discounts;
                             let quantity = items[index].quantity;
 
                             if(priceSelling == null) {
@@ -1415,7 +1424,7 @@
                                             let d2 = new Date(row.payment_deadline);
                                             d1.setHours(0,0,0,0)
                                             d2.setHours(0,0,0,0)
-                                            comparasion = d1 > d2
+                                            comparasion = d1 >= d2
                                         }
                                         if (label[0].id == '{{ env('MIX_LABEL_WAITING_FOR_PAYMENT_ID') }}' && comparasion) {
                                             html += '<div data-toggle="label-tooltip" style="border: solid red 4px" data-html="true" title="' + tooltipContent + '" class="pointer" onclick="removeLabel('+row.orderId+', '+label[0].id+', '+label[0].manual_label_selection_to_add_after_removal+', \''+label[0].added_type+'\');"><span class="order-label" style="color: '+ label[0].font_color +'; display: block; margin-top: 5px; background-color: ' + label[0].color + '"><i class="' + label[0].icon_name + '"></i></span></div>';

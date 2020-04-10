@@ -1025,6 +1025,7 @@
                 <th>@lang('order_payments.table.booked')</th>
                 <th>@lang('order_payments.table.left')</th>
                 <th>@lang('order_payments.table.promise')</th>
+                <th>@lang('order_payments.table.move')</th>
             </tr>
             </thead>
             <tbody>
@@ -1056,11 +1057,15 @@
                         @endphp
                     @endforeach
                     <td>{{ $paymentsValue }}</td>
-                    <td>{{ $orderValue - $paymentsValue }}</td>
+                    <td id="left-amount-{{$itemOrder->id}}" data-value="{{ $orderValue - $paymentsValue }}">{{ $orderValue - $paymentsValue }}</td>
                     <td>
                         @foreach($itemOrder->promisePayments($itemOrder->id) as $payment)
                             {{ $payment->amount }}
                         @endforeach
+                    </td>
+                    <td>
+                        <button id="moveButton-{{$itemOrder->id}}" class="btn btn-sm btn-warning edit move__payment--button" onclick="moveData({{$itemOrder->id}})">Przenieś wpłatę stąd</button>
+                        <button id="moveButtonAjax-{{$itemOrder->id}}" class="btn btn-sm btn-success btn-move edit hidden" onclick="moveDataAjax({{$itemOrder->id}})">Przenieś dane tutaj</button>
                     </td>
                 </tr>
             @endforeach
@@ -2397,7 +2402,6 @@
                                     data: 'id',
                                     name: 'id',
                                     render: function (id, type, row) {
-                                        console.log(row);
                                         return '<input type="checkbox">';
                                     }
                                 },
@@ -3843,12 +3847,76 @@
                             }
 
                         });
+                        function moveData(id){
+                            if($('#moveButton-'+id).hasClass('btn-warning')) {
+                                $('#moveButton-' + id).removeClass('btn-warning').addClass('btn-dark');
+                                $('.btn-warning').attr('disabled', true);
+                                $('.btn-move').removeClass('hidden');
+                            } else if ($('#moveButton-'+id).hasClass('btn-dark')) {
+                                $('#moveButton-' + id).removeClass('btn-dark').addClass('btn-warning');
+                                $('.btn-warning').attr('disabled', false);
+                                $('.btn-move').addClass('hidden');
+                            }
+                        }
+                        function moveDataAjax(id){
+                            var idToSend = id;
+                            var buttonId = $('.btn-dark').attr('id');
+                            var idToGet;
+                            var res = buttonId.split("-");
+                            idToGet = res[1];
+                            var amountToGet = $('#left-amount-' + idToGet).data('value');
+                            var amountToSend = $('#left-amount-' + idToSend).data('value');
+                            if(idToGet != idToSend && Math.sign(amountToGet) == -1) {
+                                let paymentMoveAmount;
+                                amountToGet = Math.abs(amountToGet)
+                                if(amountToGet > amountToSend) {
+                                    paymentMoveAmount = amountToSend
+                                } else {
+                                    paymentMoveAmount = amountToGet
+                                }
+                                $('#order_id_get').text(idToGet);
+                                $('#order_id_send').text(idToSend);
+                                $('#payment__amount').val(paymentMoveAmount)
+                                $('#payment_move_data').modal('show');
+                            } else {
+                                $('#payment_move_data_error_select').modal('show');
+                            }
+                        }
+                        $('#payment-move-data-ok').on('click', function(){
+                            var idToGet = $('#order_id_get').text();
+                            var idToSend = $('#order_id_send').text();
+                            var paymentAmount = $('#payment__amount').val();
+                            $.ajax({
+                                method: 'POST',
+                                url: '/admin/orders/'+idToGet+'/data/'+idToSend+'/payment/move',
+                                data: {
+                                    idToGet: idToGet,
+                                    idToSend: idToSend,
+                                    paymentAmount: paymentAmount
+                                }
+                            }).done(function(data) {
+                                $('#order_move_data_success').modal('show');
+
+                                $('#order_move_data_ok').on('click', function(){
+                                    window.location.href='/admin/orders';
+                                });
+                            }).fail(function() {
+                                $('#order_move_data_error').modal('show');
+                                $('#order_move_data_ok_error').on('click', function() {
+                                    window.location.href = '/admin/orders';
+
+                                });
+                            });
+                        });
                     </script>
 
                     <script src="{{ URL::asset('js/views/orders/edit.js') }}"></script>
                     <style>
                         .firstOrder, .secondOrder, .thirdOrder, .fourthOrder, .fifthOrder {
                             display: none;
+                        }
+                        .move__payment--button {
+                            padding: 6px 5px;
                         }
                     </style>
 @endsection

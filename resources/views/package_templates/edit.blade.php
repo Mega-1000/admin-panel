@@ -140,19 +140,28 @@
                 <input type="text" class="form-control" id="weight" name="weight"
                        value="{{ $old->weight }}">
             </div>
-            <div class="form-group">
+             <div class="form-group">
                 <label for="container_type">@lang('order_packages.form.container_type')</label><br/>
                 <select class="form-control" id="container_type" name="container_type">
-                    <option {{ $old->container_type === 'POLPALETA' ? 'selected="selected"' : ''}} value="POLPALETA">
-                        PÓŁPALETA 60x80
-                    </option>
-                    <option {{ $old->container_type === 'EUR' ? 'selected="selected"' : ''}} value="EUR">PALETA 680x120
-                    </option>
-                    <option {{ $old->container_type === 'INNA' ? 'selected="selected"' : ''}} value="INNA">PALETA
-                        100x120
-                    </option>
-                    <option {{ $old->container_type === 'PACZ' ? 'selected="selected"' : ''}} value="PACZ">PACZKA
-                    </option>
+                    @foreach($containerTypes as $containerType)
+                    @if ($containerType->name == $old->container_type)
+                    <option value="{{$containerType->name}}" selected="selected">{{$containerType->name}}</option>
+                    @else
+                    <option value="{{ $containerType->name }}">{{ $containerType->name }}</option>
+                    @endif
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="packing_type">@lang('order_packages.form.packing_type')</label><br/>
+                <select class="form-control" id="packing_type" name="packing_type">
+                    @foreach($packingTypes as $packingType)
+                    @if (!empty($old->packing_type) && $packingType->name == $old->packing_type)
+                    <option value="{{$packingType->name}}" selected="selected">{{$packingType->name}}</option>
+                    @else
+                    <option value="{{$packingType->name }}">{{ $packingType->name }}</option>
+                    @endif
+                    @endforeach
                 </select>
             </div>
             <div class="form-group">
@@ -172,7 +181,7 @@
                 <select class="form-control text-uppercase" id="content" name="content">
                     @foreach($contentTypes as $contentType)
                     @if ($contentType->name == $old->content)
-                    <option value="{{$contentType->content}}" selected="selected">{{$contentType->content}}</option>
+                    <option value="{{$contentType->name}}" selected="selected">{{$contentType->name}}</option>
                     @else
                     <option value="{{ $contentType->name }}">{{ $contentType->name }}</option>
                     @endif

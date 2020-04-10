@@ -197,6 +197,20 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('contentTypes/{id}/update', 'ContentTypesController@update')->name('content_type.update');
         Route::delete('contentTypes/{id}/delete', 'ContentTypesController@destroy')->name('content_type.destroy');
 
+        Route::get('containerTypes', 'ContainerTypesController@index')->name('container_type.index');
+        Route::get('containerTypes/create', 'ContainerTypesController@create')->name('container_type.create');
+        Route::post('containerTypes/store', 'ContainerTypesController@store')->name('container_type.store');
+        Route::get('containerTypes/{id}/edit', 'ContainerTypesController@edit')->name('container_type.edit');
+        Route::put('containerTypes/{id}/update', 'ContainerTypesController@update')->name('container_type.update');
+        Route::delete('containerTypes/{id}/delete', 'ContainerTypesController@destroy')->name('container_type.destroy');
+
+        Route::get('packingTypes', 'PackingTypesController@index')->name('packing_type.index');
+        Route::get('packingTypes/create', 'PackingTypesController@create')->name('packing_type.create');
+        Route::post('packingTypes/store', 'PackingTypesController@store')->name('packing_type.store');
+        Route::get('packingTypes/{id}/edit', 'PackingTypesController@edit')->name('packing_type.edit');
+        Route::put('packingTypes/{id}/update', 'PackingTypesController@update')->name('packing_type.update');
+        Route::delete('packingTypes/{id}/delete', 'PackingTypesController@destroy')->name('packing_type.destroy');
+
         Route::get('sello-import', 'OrdersController@selloImport')->name('orders.sello_import');
 
         Route::get('products/stocks', 'ProductStocksController@index')->name('product_stocks.index');
@@ -244,6 +258,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('orders/splitOrders', 'OrdersController@splitOrders');
         Route::get('orders/{orderIdToGet}/data/{orderIdToSend}/move',
             'OrdersController@moveData')->name('orders.moveData');
+        Route::post('orders/{orderIdToGet}/data/{orderIdToSend}/payment/move',
+            'OrdersController@movePaymentData')->name('orders.movePaymentData');
         Route::get('orders/{id}/getDataFromLastOrder',
             'OrdersController@getDataFromLastOrder')->name('orders.getDataFromLastOrder');
         Route::get('orders/{id}/getDataFromCustomer',
@@ -453,4 +469,4 @@ Route::get('/customer/{orderId}/confirmation', 'OrdersController@confirmCustomer
 Route::post('/customer/confirmation', 'OrdersController@confirmCustomer')->name('confirmation');
 
 Route::get('/chat/{token}', 'MessagesController@show')->name('chat.show');
-Route::get('/chat/getUrl/{mediaId}/{postCode}/{email}', 'MessagesController@getUrl')->name('messages.get-url');
+Route::get('/chat/getUrl/{mediaId}/{postCode}/{email}/{phone}', 'MessagesController@getUrl')->name('messages.get-url');

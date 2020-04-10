@@ -29,6 +29,7 @@ return [
         'close'                  => 'Zamknij',
         'compass'                => 'Kompas',
         'created_at'             => 'Utworzono',
+        'created_at_date'        => 'Data utworzenia',
         'custom'                 => 'Specjalny',
         'dashboard'              => 'Panel',
         'database'               => 'Baza danych',

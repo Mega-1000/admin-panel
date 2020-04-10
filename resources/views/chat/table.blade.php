@@ -15,9 +15,9 @@
         <tr>
             <td>{{ $chat->id }}</td>
             <td>{{ $chat->title }}</td>
-            <td>{{ $chat->customers()->first()->addresses()->whereNotNull('phone')->first()->phone ?? '' }}</td>
-            <td>{{ implode(PHP_EOL, ChatHelper::formatChatUsers($chat->users)) }}</td>
-            <td>{{ implode(PHP_EOL, ChatHelper::formatChatUsers($chat->employees)) }}</td>
+            <td>{{ $chat->customers->first()->addresses->first()->phone ?? '' }}</td>
+            <td>{!! implode('<br />' , ChatHelper::formatChatUsers($chat->users)) !!}</td>
+            <td>{!! implode('<br />' , ChatHelper::formatChatUsers($chat->employees)) !!}</td>
             <td>{{ '['.$chat->lastMessage->created_at.'] '.$chat->lastMessage->message }}</td>
             <td>
                 <a href="{{ $chat->url }}" target="_blank" class="btn btn-large btn-success go_to_chat">Pokaż</a>
