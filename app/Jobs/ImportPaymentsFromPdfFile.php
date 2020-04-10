@@ -4,11 +4,13 @@ namespace App\Jobs;
 
 use App\Http\Controllers\OrdersPaymentsController;
 use App\Repositories\OrderRepository;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Smalot\PdfParser\Parser;
 use Spatie\PdfToText\Pdf;
@@ -46,12 +48,12 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
     {
         $basePath = base_path();
         $this->convertPdfFileToTextFile(
-            $basePath . '/pdf/app.js', $basePath . '/storage/app/' . $this->filename, $basePath . '/storage/app/' . $this->filename
+            $basePath . '/pdf/app.js', $basePath . '/storage/app/user-files/payments/' . $this->filename, $basePath . '/storage/app/user-files/payments/' . $this->filename
         );
 
 
         $ordersIds = $this->getOrdersIds();
-        $payments  = $this->getPaymentsFromTextFile($basePath . '/storage/app/' . $this->filename, $ordersIds);
+        $payments  = $this->getPaymentsFromTextFile($basePath . '/storage/app/user-files/payments/' . $this->filename, $ordersIds);
         $infos     = $this->storePayments($payments);
 
         return $infos;
@@ -65,39 +67,41 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
     protected function getPaymentsFromTextFile($filePath, $ordersIds)
     {
         $payments = [];
-        $fn       = fopen($filePath . '.txt', "r");
-        $i        = 0;
-        while (!feof($fn)) {
-            $result = fgets($fn);
-            if (strlen($result) == 27 && ctype_digit(substr($result, 0, 26)) || strlen($result) == 29 && ctype_digit(substr($result, 2, 26))) {
-                $text   = fgets($fn);
-                echo $text;
-                $letter = DB::table('order_packages')->where('letter_number', 'LIKE', trim($text))->first();
-                if (!empty($letter)) {
-                    $payments[$i]['orderId'] = $letter->order_id;
-                }
-                preg_match('/(QQ\d{3,5})QQ/', $text, $matches);
-                if (count($matches) > 1) {
-                    if (substr($matches[1], 0, 1) !== '0') {
-                        $matches[1] = str_replace('Q', '', $matches[1]);
-                        if (in_array($matches[1], $ordersIds)) {
-                            $payments[$i]['orderId'] = $matches[1];
-                        }
-                    }
-                }
-                $nextLine = fgets($fn);
-                preg_match('/(QQ\d{3,5})QQ/', $text, $matches);
-                if (count($matches) > 1) {
-                    if (substr($matches[1], 0, 1) !== '0') {
-                        if (in_array($matches[1], $ordersIds)) {
-                            $payments[$i]['orderId'] = str_replace('Q', '', $matches[1]);
-                        }
-                    }
-                }
+        try {
+            $fn       = fopen($filePath . '.txt', "r");
+            $i        = 0;
+            if(!$fn) {
+                throw new Exception('PDF payments import file open failed.');
             }
-            preg_match('/(\-?\d+\,\d+\,\d+)/', preg_replace('/\s/', '', $result), $matches);
-            if(count($matches) > 1) {
-                if(strpos($matches[1], '-') === false) {
+            while (!feof($fn)) {
+                $result = fgets($fn);
+                if (strlen($result) == 27 && ctype_digit(substr($result, 0, 26)) || strlen($result) == 29 && ctype_digit(substr($result, 2, 26))) {
+                    $text   = fgets($fn);
+                    $letter = DB::table('order_packages')->where('letter_number', 'LIKE', trim($text))->first();
+                    if (!empty($letter)) {
+                        $payments[$i]['orderId'] = $letter->order_id;
+                    }
+                    preg_match('/(QQ\d{3,5})QQ/', $text, $matches);
+                    if (count($matches) > 1) {
+                        if (substr($matches[1], 0, 1) !== '0') {
+                            $matches[1] = str_replace('Q', '', $matches[1]);
+                            if (in_array($matches[1], $ordersIds)) {
+                                $payments[$i]['orderId'] = $matches[1];
+                            }
+                        }
+                    }
+                    $nextLine = fgets($fn);
+                    preg_match('/(QQ\d{3,5})QQ/', $text, $matches);
+                    if (count($matches) > 1) {
+                        if (substr($matches[1], 0, 1) !== '0') {
+                            if (in_array($matches[1], $ordersIds)) {
+                                $payments[$i]['orderId'] = str_replace('Q', '', $matches[1]);
+                            }
+                        }
+                    }
+                }
+                preg_match('/(\-?\d+\,\d+\,\d+)/', preg_replace('/\s/', '', $result), $matches);
+                if(count($matches) > 1 && strpos($matches[1], '-') === false) {
                     $pattern = '/(\,\d{2})/i';
                     $replacement = '${1} ';
                     $priceLine = preg_replace($pattern, $replacement, $matches[1]);
@@ -107,8 +111,11 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
                     $i++;
                 }
             }
+            fclose($fn);
+        } catch(Exception $e ) {
+            Log::error($e);
         }
-        fclose($fn);
+
         return $payments;
     }
 
