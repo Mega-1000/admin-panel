@@ -28,24 +28,36 @@
                             {{ csrf_field() }}
                             <div class="employees-general" id="general">
                                 <div class="form-group">
+                                    <label for="firm_visibility">@lang('employees.form.firm_visibilty')</label>
+                                    <input type="checkbox" id="firm_visibility" name="firm_visibility">
+                                </div>
+                                <div class="form-group">
                                     <label for="firstname">@lang('employees.form.firstname')</label>
                                     <input type="text" class="form-control" id="firstname" name="firstname"
                                            value="{{ old('firstname') }}">
+                                    <label for="firstname">@lang('employees.form.visibility')</label>
+                                    <input type="checkbox" id="firstname_visibility" name="firstname_visibility">
                                 </div>
                                 <div class="form-group">
                                     <label for="lastname">@lang('employees.form.lastname')</label>
                                     <input type="text" class="form-control" id="lastname" name="lastname"
                                            value="{{ old('lastname') }}">
+                                    <label for="lastname">@lang('employees.form.visibility')</label>
+                                    <input type="checkbox" id="lastname_visibility" name="lastname_visibility">
                                 </div>
                                 <div class="form-group">
                                     <label for="email">@lang('employees.form.email')</label>
                                     <input type="email" class="form-control" id="email" name="email"
                                            value="{{ old('email') }}">
+                                    <label for="lastname">@lang('employees.form.visibility')</label>
+                                    <input type="checkbox" id="email_visibility" name="email_visibility">
                                 </div>
                                 <div class="form-group">
                                     <label for="phone">@lang('employees.form.phone')</label>
                                     <input type="text" class="form-control" id="phone" name="phone"
                                            value="{{ old('phone') }}">
+                                     <label for="lastname">@lang('employees.form.visibility')</label>
+                                    <input type="checkbox" id="phone_visibility" name="phone_visibility">
                                 </div>
                                 <div class="form-group">
                                     <label for="job_position">@lang('employees.form.job_position')</label>
@@ -95,6 +107,8 @@
                                     <textarea rows="4" cols="50" class="form-control" id="comments"
                                               name="comments"
                                     >{{ old('comments')}}</textarea>
+                                     <label for="lastname">@lang('employees.form.visibility')</label>
+                                    <input type="checkbox" id="comments_visibility" name="comments_visibility">
                                     <div class="form-group">
                                         <label for="additional_comments">@lang('employees.form.additional_comments')</label>
                                         <textarea rows="4" cols="50" class="form-control" id="additional_comments"
@@ -105,6 +119,8 @@
                                         <label for="postal_code">@lang('employees.form.postal_code')</label>
                                         <input type="text" class="form-control" id="postal_code" name="postal_code"
                                                value="{{ old('postal_code') }}">
+                                         <label for="lastname">@lang('employees.form.visibility')</label>
+                                            <input type="checkbox" id="postal_code_visibility" name="postal_code_visibility">
                                     </div>
                                     <div class="form-group">
                                     <label for="latitude">@lang('firms.form.address.latitude')</label>
