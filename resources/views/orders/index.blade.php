@@ -1141,7 +1141,7 @@
 
                         for (let index = 0; index < items.length; index++) {
                             let priceSelling = items[index].net_selling_price_commercial_unit;
-                            let pricePurchase = items[index].net_purchase_price_commercial_unit;
+                            let pricePurchase = items[index].net_purchase_price_commercial_unit_after_discounts;
                             let quantity = items[index].quantity;
 
                             if(priceSelling == null) {
