@@ -46,7 +46,7 @@ class MessagesController extends Controller
             }
             $helper->setLastRead();
 
-            return response(['messages' => $out, 'users' => $chat->chatUsers()]);
+            return response(['messages' => $out, 'users' => $chat->chatUsers()->get()]);
         } catch (ChatException $e) {
             $e->log();
             return response($e->getMessage(), 400);

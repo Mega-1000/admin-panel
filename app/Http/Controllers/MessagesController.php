@@ -100,14 +100,13 @@ class MessagesController extends Controller
             $product = $helper->getProduct();
             $order = $helper->getOrder();
             $helper->setLastRead();
-            $users = $chat->chatUsers()->get();
-//            foreach ($users as $user) {
-//                error_log(print_r($user->user()->get(), 1));
-//                error_log(print_r($user->customer()->get(), 1));
-//                error_log(print_r($user->employee()->get(), 1));
-//                exit();
-//            }
+            if (empty($chat)) {
+                $users = collect();
+            } else {
+                $users = $chat->chatUsers()->get();
+            }
             return view('chat.show')->with([
+                'user_type' => $helper->currentUserType,
                 'users' => $users,
                 'chat' => $chat,
                 'product' => $product,
