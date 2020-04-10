@@ -64,42 +64,50 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
     protected function getPaymentsFromTextFile($filePath, $ordersIds)
     {
         $payments = [];
-        $fn       = fopen($filePath, "r");
+        $fn       = fopen($filePath . '.txt', "r");
         $i        = 0;
         while (!feof($fn)) {
             $result = fgets($fn);
             if (strlen($result) == 27 && ctype_digit(substr($result, 0, 26)) || strlen($result) == 29 && ctype_digit(substr($result, 2, 26))) {
                 $text   = fgets($fn);
+                echo $text;
                 $letter = DB::table('order_packages')->where('letter_number', 'LIKE', trim($text))->first();
                 if (!empty($letter)) {
                     $payments[$i]['orderId'] = $letter->order_id;
                 }
-                preg_match('/(\d{3,5})/', $text, $matches);
+                preg_match('/(QQ\d{3,5})QQ/', $text, $matches);
                 if (count($matches) > 1) {
                     if (substr($matches[1], 0, 1) !== '0') {
+                        $matches[1] = str_replace('Q', '', $matches[1]);
                         if (in_array($matches[1], $ordersIds)) {
                             $payments[$i]['orderId'] = $matches[1];
                         }
                     }
                 }
                 $nextLine = fgets($fn);
-                preg_match('/(\d{3,5})/', $nextLine, $matches);
+                preg_match('/(QQ\d{3,5})QQ/', $text, $matches);
                 if (count($matches) > 1) {
                     if (substr($matches[1], 0, 1) !== '0') {
                         if (in_array($matches[1], $ordersIds)) {
-                            $payments[$i]['orderId'] = $matches[1];
+                            $payments[$i]['orderId'] = str_replace('Q', '', $matches[1]);
                         }
                     }
                 }
             }
-            if (strpos($result, 'PLN') !== false && strpos($result, '-') === false && strpos($result, 'a') === false) {
-                $amount                 = (float) str_replace(',', '.', str_replace(' ', '', str_replace('PLN', '', $result)));
-                $payments[$i]['amount'] = $amount;
-                $i++;
+            preg_match('/(\-?\d+\,\d+\,\d+)/', preg_replace('/\s/', '', $result), $matches);
+            if(count($matches) > 1) {
+                if(strpos($matches[1], '-') === false) {
+                    $pattern = '/(\,\d{2})/i';
+                    $replacement = '${1} ';
+                    $priceLine = preg_replace($pattern, $replacement, $matches[1]);
+                    $validPrice = substr($priceLine, 0, strpos($priceLine, ' '));
+                    $amount = (float)str_replace(',', '.', $validPrice);
+                    $payments[$i]['amount'] = $amount;
+                    $i++;
+                }
             }
         }
         fclose($fn);
-
         return $payments;
     }
 
