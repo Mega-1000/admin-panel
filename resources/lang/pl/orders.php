@@ -77,7 +77,7 @@ return [
             'details' => 'Szczegóły',
             'payments' => 'Płatności',
             'tasks' => 'Zadania',
-            'messages' => 'Wiadomości',
+            'messages' => 'Chat',
             'packages' => 'Przesyłki',
             'status' => 'Status zamówienia',
             'customer' => 'Zmiana danych klienta'

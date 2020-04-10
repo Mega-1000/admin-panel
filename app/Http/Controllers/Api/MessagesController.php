@@ -45,7 +45,8 @@ class MessagesController extends Controller
                 $out .= view('chat/single_message')->withMessage($message)->render();
             }
             $helper->setLastRead();
-            return response(['messages' => $out]);
+
+            return response(['messages' => $out, 'users' => $chat->chatUsers]);
         } catch (ChatException $e) {
             $e->log();
             return response($e->getMessage(), 400);

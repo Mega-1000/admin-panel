@@ -6,29 +6,53 @@ use Illuminate\Http\Request;
 use App\Helpers\MessagesHelper;
 use App\Helpers\Exceptions\ChatException;
 use App\Entities\Chat;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class MessagesController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
+     * @param Request $request
+     * @param bool $all
+     * @param bool $orderId
      * @return \Illuminate\Http\Response
      */
-    public function index(Request $request, $all = false)
+    public static function index(Request $request, $all = false, $orderId = 0)
+    {
+        $chats = self::getChatView($all, $orderId, $request->user()->id);
+        return view('chat.index')->withChats($chats)->withShowAll($all);
+    }
+
+    /**
+     * @param bool $all
+     * @param bool $orderId
+     * @param Request $request
+     * @return mixed
+     */
+    public static function getChatView(bool $all, $orderId, $userId = null)
     {
         if ($all) {
-            $chats = Chat::all();
+            $chats = Chat::where('id', '>', 0);
         } else {
             $chats = Chat::whereHas('messages', function ($q) {
                 $q->where('created_at', '>', now()->subDays(30));
-            })->get();
+            });
         }
+
+        if ($orderId) {
+            $chats->where('order_id', $orderId);
+        }
+        $chats = $chats->get();
 
         foreach ($chats as $chat) {
             $helper = new MessagesHelper();
             $helper->chatId = $chat->id;
-            $helper->currentUserId = $request->user()->id;
+            $helper->currentUserId = $userId ?? Auth::user()->id;
             $helper->currentUserType = MessagesHelper::TYPE_USER;
+            $chat->has_new_message = $helper->hasNewMessage();
             $chat->title = $helper->getTitle();
             $chat->url = route('chat.show', ['token' => $helper->encrypt()]);
             $chat->lastMessage = $chat->messages()->latest()->first();
@@ -38,8 +62,7 @@ class MessagesController extends Controller
         uasort($chats, function ($a, $b) {
             return $a->lastMessage->created_at > $b->lastMessage->created_at ? -1 : 1;
         });
-
-        return view('chat.index')->withChats($chats)->withShowAll($all);
+        return $chats;
     }
 
     /**
@@ -77,7 +100,9 @@ class MessagesController extends Controller
             $product = $helper->getProduct();
             $order = $helper->getOrder();
             $helper->setLastRead();
+            $users = $chat->chatUsers;
             return view('chat.show')->with([
+                'users' => $users,
                 'chat' => $chat,
                 'product' => $product,
                 'order' => $order,

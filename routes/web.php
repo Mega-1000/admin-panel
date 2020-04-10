@@ -453,7 +453,7 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get('/dispatch-job/recalculate-prices', 'DispatchJobController@recalculatePrices')->name('job.recalculatePrices');
         Route::get('/dispatch-job/generate-jpgs', 'DispatchJobController@generateJpgs')->name('job.generateJpgs');
-        Route::get('/chat/{all?}', 'MessagesController@index')->name('chat.index');
+        Route::get('/chat/{all?}/{orderId?}', 'MessagesController@index')->name('chat.index');
     });
 });
 
