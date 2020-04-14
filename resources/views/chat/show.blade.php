@@ -74,7 +74,8 @@
                     {!! $chatUser->getUserNicknameForChat($user_type) !!}
                     @if(! empty($chatUser->employee))
                         <th>
-                            <button class="btn btn-danger" value="{{ $chatUser->employee->id }}">Usuń</button>
+                            <button class="btn btn-danger remove-user" value="{{ $chatUser->id }}">Usuń
+                            </button>
                         </th>
                     @endif
                 </tr>
@@ -88,7 +89,7 @@
                         {!! ChatHelper::formatChatUser($user, $user_type) !!}
                     </th>
                     <th>
-                        <button class="btn btn-success" value="{{ $user->id }}" >Dodaj</button>
+                        <button class="btn btn-success add-user" value="{{ $user->id }}">Dodaj</button>
                     </th>
                 </tr>
             @endforeach
@@ -155,6 +156,23 @@
                 }
             );
         }
+
+        $('.add-user').click((event) => {
+            $.ajax({
+                method: "POST",
+                url: "{{ $routeAddUser }}",
+                data: {'employee_id': event.target.value}
+            })
+                .done(() => location.reload());
+        })
+        $('.remove-user').click((event) => {
+            $.ajax({
+                method: "POST",
+                url: "{{ $routeRemoveUser }}",
+                data: {'user_id': event.target.value}
+            })
+                .done(() => location.reload());
+        })
     });
 </script>
 </body>

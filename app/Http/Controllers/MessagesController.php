@@ -121,6 +121,8 @@ class MessagesController extends Controller
                 'order' => $order,
                 'title' => $helper->getTitle(),
                 'route' => route('api.messages.post-new-message', ['token' => $helper->encrypt()]),
+                'routeAddUser' => route('api.messages.add-new-user', ['token' => $helper->encrypt()]),
+                'routeRemoveUser' => route('api.messages.remove-user', ['token' => $helper->encrypt()]),
                 'routeRefresh' => route('api.messages.get-messages', ['token' => $helper->encrypt()])
             ]);
         } catch (ChatException $e) {
@@ -203,14 +205,13 @@ class MessagesController extends Controller
             });
             $possibleUsers = $possibleUsers->merge($availableUser);
         }
-        $possibleUsers = $possibleUsers->unique(function ($item) {
-            return $item->id . get_class($item);
-        });
+        $possibleUsers = $possibleUsers->unique('id');
 
         $possibleUsers = $possibleUsers->filter(function ($item) use ($chat, $users) {
-            return $chat->employees->filter(function ($user) use ($item) {
-                    return $item->id != $user->id;
-                })->count() > 0;
+            $filteredEmployeesCount = $chat->employees->filter(function ($user) use ($item) {
+                return $item->id != $user->id;
+            })->count();
+            return $filteredEmployeesCount == $chat->employees->count();
         });
         return $possibleUsers;
     }

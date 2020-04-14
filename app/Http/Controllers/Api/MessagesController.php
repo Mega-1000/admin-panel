@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Entities\ChatUser;
+use App\Entities\Employee;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Helpers\MessagesHelper;
@@ -22,6 +24,42 @@ class MessagesController extends Controller
             }
             $helper->addMessage($request->message);
             $helper->setLastRead();
+            return response('ok');
+        } catch (ChatException $e) {
+            $e->log();
+            return response($e->getMessage(), 400);
+        }
+    }
+
+    public function addUser(Request $request, $token)
+    {
+        try {
+            $helper = new MessagesHelper($token);
+            $chat = $helper->getChat();
+            $employee = Employee::findOrFail($request->employee_id);
+            if (!$chat) {
+                throw new ChatException('Podany czat nie istnieje');
+            }
+            $chatUser = new ChatUser();
+            $chatUser->chat()->associate($chat);
+            $chatUser->employee()->associate($employee);
+            $chatUser->save();
+            return response('ok');
+        } catch (ChatException $e) {
+            $e->log();
+            return response($e->getMessage(), 400);
+        }
+    }
+    public function removeUser(Request $request, $token)
+    {
+        try {
+            $helper = new MessagesHelper($token);
+            $chat = $helper->getChat();
+            if (!$chat) {
+                throw new ChatException('Podany czat nie istnieje');
+            }
+            $chatUser = ChatUser::findOrFail($request->user_id);
+            $chatUser->delete();
             return response('ok');
         } catch (ChatException $e) {
             $e->log();
