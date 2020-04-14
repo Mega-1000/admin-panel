@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\Employee;
+use App\Entities\PostalCodeLatLon;
+use App\User;
 use Illuminate\Http\Request;
 use App\Helpers\MessagesHelper;
 use App\Helpers\Exceptions\ChatException;
@@ -78,7 +81,7 @@ class MessagesController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
@@ -89,7 +92,7 @@ class MessagesController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function show($token)
@@ -105,7 +108,12 @@ class MessagesController extends Controller
             } else {
                 $users = $chat->chatUsers;
             }
+            $possibleUsers = collect();
+            if ($product && $chat) {
+                $possibleUsers = $this->getNotAttachedChatUsers($product, $chat, $possibleUsers, $users);
+            }
             return view('chat.show')->with([
+                'possible_users' => $possibleUsers,
                 'user_type' => $helper->currentUserType,
                 'users' => $users,
                 'chat' => $chat,
@@ -124,7 +132,7 @@ class MessagesController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
@@ -135,8 +143,8 @@ class MessagesController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param \Illuminate\Http\Request $request
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
@@ -147,7 +155,7 @@ class MessagesController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
@@ -171,5 +179,39 @@ class MessagesController extends Controller
         $token = MessagesHelper::getToken($mediaId, $postCode, $email, $phone);
         $url = route('chat.show', ['token' => $token]);
         return $url;
+    }
+
+    /**
+     * @param $product
+     * @param $chat
+     * @param \Illuminate\Support\Collection $possibleUsers
+     * @param \Illuminate\Support\Collection $users
+     * @return \Illuminate\Support\Collection
+     */
+    private function getNotAttachedChatUsers($product, $chat, \Illuminate\Support\Collection $possibleUsers, \Illuminate\Support\Collection $users): \Illuminate\Support\Collection
+    {
+        foreach ($product->media()->get() as $media) {
+            $mediaData = explode('|', $media->url);
+            if (count($mediaData) != 3) {
+                continue;
+            }
+            $codeObj = PostalCodeLatLon::where('postal_code', $chat->customers->first()->standardAddress()->postal_code)->first();
+
+            $availableUser = $media->product->firm->employees->filter(function ($employee) use ($codeObj) {
+                $dist = MessagesHelper::calcDistance($codeObj->latitude, $codeObj->longitude, $employee->latitude, $employee->longitude);
+                return $dist < $employee->radius;
+            });
+            $possibleUsers = $possibleUsers->merge($availableUser);
+        }
+        $possibleUsers = $possibleUsers->unique(function ($item) {
+            return $item->id . get_class($item);
+        });
+
+        $possibleUsers = $possibleUsers->filter(function ($item) use ($chat, $users) {
+            return $chat->employees->filter(function ($user) use ($item) {
+                    return $item->id != $user->id;
+                })->count() > 0;
+        });
+        return $possibleUsers;
     }
 }

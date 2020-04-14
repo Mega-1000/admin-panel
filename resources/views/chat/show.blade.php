@@ -55,23 +55,42 @@
             <form action="{{ $route }}">
                 <div class="row">
                     <div class="col-sm-9">
-                        <textarea required class="form-control" id="message" style="resize: none; width: 100%; height: 46px;"
+                        <textarea required class="form-control" id="message"
+                                  style="resize: none; width: 100%; height: 46px;"
                                   placeholder="Tutaj wpisz wiadomość"></textarea>
                     </div>
                     <div class="col-sm-3">
-                        <input type="submit" value="Wyślij" class="btn btn-success btn-lg btn-block">
+                        <input type="submit" u value="Wyślij" class="btn btn-success btn-lg btn-block">
                     </div>
                 </div>
             </form>
         </div>
         <table id="chat-users">
             <tr>
-                <th colspan="2">Użytkownicy:</th>
+                <th colspan="2">Uczestnicy:</th>
             </tr>
             @foreach($users as $chatUser)
+                <tr>
+                    {!! $chatUser->getUserNicknameForChat($user_type) !!}
+                    @if(! empty($chatUser->employee))
+                        <th>
+                            <button class="btn btn-danger" value="{{ $chatUser->employee->id }}">Usuń</button>
+                        </th>
+                    @endif
+                </tr>
+            @endforeach
             <tr>
-                {!! $chatUser->getUserNicknameForChat($user_type) !!}
+                <th colspan="2">Powiązane osoby:</th>
             </tr>
+            @foreach($possible_users as $user)
+                <tr>
+                    <th class="alert-info alert">
+                        {!! ChatHelper::formatChatUser($user, $user_type) !!}
+                    </th>
+                    <th>
+                        <button class="btn btn-success" value="{{ $user->id }}" >Dodaj</button>
+                    </th>
+                </tr>
             @endforeach
         </table>
 

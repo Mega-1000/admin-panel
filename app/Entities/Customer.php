@@ -37,7 +37,7 @@ class Customer extends Authenticatable implements Transformable
 
     public function standardAddress()
     {
-        $standardAddress = $this->addresses()->where('type', '=', 'STANDARD_ADDRESS')->first();
+        $standardAddress = $this->addresses()->where('type', '=', CustomerAddress::ADDRESS_TYPE_STANDARD)->first();
 
         return $standardAddress;
     }
