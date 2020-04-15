@@ -12,6 +12,7 @@ use App\Repositories\ProductStockRepository;
 use App\Repositories\ProductRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use mysql_xdevapi\Exception;
 
 class ChangeWarehouseStockJob extends Job
 {
@@ -43,26 +44,23 @@ class ChangeWarehouseStockJob extends Job
             preg_match('/([^-]+)/', $productName, $matches);
             $product = Product::withTrashed()->where('symbol', $matches[1])->first();
             if($product !== null) {
-                $productStock = $productStockRepository->findWhere(['product_id' => $product->id])->first();
-            } else {
-                $productStock = $productStockRepository->findWhere(['product_id' => $item->product->id])->first();
+                $productStock = $product->stock;
+
+                $productStockPosition = $productStockPositionRepository->findWhere(['product_stock_id' => $productStock->id])->first();
+                if(empty($productStockPosition)) {
+                    return response()->json(['error' => 'position', 'product' => $product->id, 'productName' => $product->symbol]);
+                }
+
+                $productStockLog = $productStockLogRepository->findWhere([
+                    'product_stock_id' => $productStock->id,
+                    'order_id' => $this->orderId,
+                    'action' => 'DELETE',
+                ])->first();
+
+                if(!empty($productStockLog)) {
+                    return response()->json(['error' => 'exists']);
+                }
             }
-
-            $productStockPosition = $productStockPositionRepository->findWhere(['product_stock_id' => $productStock->id])->first();
-            if(empty($productStockPosition)) {
-                return response()->json(['error' => 'position', 'product' => $product ? $product->id : $item->product->id, 'productName' => $product ? $product->symbol : $item->product->symbol]);
-            }
-
-            $productStockLog = $productStockLogRepository->findWhere([
-                'product_stock_id' => $productStock->id,
-                'order_id' => $this->orderId,
-                'action' => 'DELETE',
-            ])->first();
-
-            if(!empty($productStockLog)) {
-                return response()->json(['error' => 'exists']);
-            }
-
         }
 
         foreach($order->items as $item) {
@@ -70,9 +68,7 @@ class ChangeWarehouseStockJob extends Job
             preg_match('/([^-]+)/', $productName, $matches);
             $product = Product::withTrashed()->where('symbol', $matches[1])->first();
             if($product !== null) {
-                $productStock = $productStockRepository->findWhere(['product_id' => $product->id])->first();
-            } else {
-                $productStock = $productStockRepository->findWhere(['product_id' => $item->product->id])->first();
+                $productStock = $product->stock;
             }
             $productStockRepository->update([
                 'quantity' => $productStock->quantity - $item->quantity,
