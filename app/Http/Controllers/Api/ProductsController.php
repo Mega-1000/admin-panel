@@ -128,6 +128,33 @@ class ProductsController extends Controller
             die();
         }
     }
+    
+    public function getCurrentPrices() {
+        $products = Product::where('subject_to_price_change', 1)->whereNotNull('date_of_price_change')->get();
+        $data = array();
+        foreach ($products as $product) {
+            $data[] = array(
+                $product->id,
+                $product->name,
+                $product->symbol,
+                $product->product_group_for_change_price,
+                $product->date_of_price_change,
+                $product->date_of_the_new_prices,
+                $product->value_of_price_change_data_first,
+                $product->value_of_price_change_data_second,
+                $product->value_of_price_change_data_third,
+                $product->value_of_price_change_data_fourth,
+            );
+        }
+        header('Content-type: text/csv');
+        header('Content-Disposition: attachment; filename="aktualneCeny.csv"');
+        $file = fopen('php://output', 'w');
+        fputcsv($file, array('id', 'Nazwa produktu', 'Symbol Produktu', 'Według czego przeliczane beda ceny(kolumna 108)', 'Data Zmiany', 'Wstępna data następnej zmiany ceny', 'Zmienna1', 'Zmienna2', 'Zmienna3', 'Zmienna4'));
+        foreach ($data as $row) {
+            fputcsv($file, $row);
+        }
+        exit();
+    }
 
     public function getHiddenProducts(Request $request)
     {

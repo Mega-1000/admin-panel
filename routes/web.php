@@ -332,6 +332,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::delete('orderMessages/{id}/', [
             'uses' => 'OrdersMessagesController@destroy',
         ])->name('order_messages.destroy');
+        Route::get('products/getPrice', 'Api\ProductsController@getCurrentPrices')->name('products.currentPrices');
 
         Route::post('orders/set-warehouse-and-remove-label', 'OrdersController@setWarehouseAndLabels')->name('order.warehouse.set');
 
