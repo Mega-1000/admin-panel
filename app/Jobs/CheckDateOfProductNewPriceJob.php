@@ -90,15 +90,15 @@ class CheckDateOfProductNewPriceJob
                     die();
             }
             //cena kartotekowa netto zakupu bez bonusa dla jednostek
-            $price['net_purchase_price_commercial_unit_after_discounts'] = number_format($this->calculatePriceAfterDiscounts($price, $product) * $product->price->euro_exchange,
+            $price['net_purchase_price_commercial_unit_after_discounts'] = number_format(CheckDateOfProductNewPriceJob::calculatePriceAfterDiscounts($price, $product) * $product->price->euro_exchange,
                 2, '.', '');
-            $price['net_purchase_price_basic_unit_after_discounts'] = number_format(($this->calculatePriceAfterDiscounts($price, $product) * $product->price->euro_exchange) / $product->packing->numbers_of_basic_commercial_units_in_pack,
+            $price['net_purchase_price_basic_unit_after_discounts'] = number_format((CheckDateOfProductNewPriceJob::calculatePriceAfterDiscounts($price, $product) * $product->price->euro_exchange) / $product->packing->numbers_of_basic_commercial_units_in_pack,
                 4, '.', '');
-            $price['net_purchase_price_calculated_unit_after_discounts'] = number_format($this->calculatePriceAfterDiscounts($price, $product) * ($product->packing->unit_consumption / $product->packing->numbers_of_basic_commercial_units_in_pack) * $product->price->euro_exchange,
+            $price['net_purchase_price_calculated_unit_after_discounts'] = number_format(CheckDateOfProductNewPriceJob::calculatePriceAfterDiscounts($price, $product) * ($product->packing->unit_consumption / $product->packing->numbers_of_basic_commercial_units_in_pack) * $product->price->euro_exchange,
                 4, '.', '');
-            $price['net_purchase_price_aggregate_unit_after_discounts'] = number_format($this->calculatePriceAfterDiscounts($price, $product) * $product->price->euro_exchange,
+            $price['net_purchase_price_aggregate_unit_after_discounts'] = number_format(CheckDateOfProductNewPriceJob::calculatePriceAfterDiscounts($price, $product) * $product->price->euro_exchange,
                 4, '.', '');
-            $price['net_purchase_price_the_largest_unit_after_discounts'] = number_format($this->calculatePriceAfterDiscounts($price, $product) * $product->price->euro_exchange,
+            $price['net_purchase_price_the_largest_unit_after_discounts'] = number_format(CheckDateOfProductNewPriceJob::calculatePriceAfterDiscounts($price, $product) * $product->price->euro_exchange,
                 4, '.', '');
 
             //cena tabelaryczna brutto zakupu dla jednostek
@@ -188,7 +188,7 @@ class CheckDateOfProductNewPriceJob
         return $data;
     }
 
-    private function calculatePriceAfterDiscounts($price, $product)
+    public static function calculatePriceAfterDiscounts($price, $product)
     {
         return
             (float) $price['net_purchase_price_commercial_unit']
