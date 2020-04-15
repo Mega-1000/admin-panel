@@ -40,6 +40,16 @@ class MessagesController extends Controller
             if (!$chat) {
                 throw new ChatException('Podany czat nie istnieje');
             }
+            $chatUser = ChatUser::onlyTrashed()
+                ->where('chat_id', $chat->id)
+                ->where('employee_id', $employee->id)
+                ->whereNotNull('deleted_at')
+                ->withTrashed()
+                ->first();
+            if ($chatUser) {
+                $chatUser->restore();
+                return response('ok');
+            }
             $chatUser = new ChatUser();
             $chatUser->chat()->associate($chat);
             $chatUser->employee()->associate($employee);

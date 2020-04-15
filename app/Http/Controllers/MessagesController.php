@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Entities\Employee;
+use App\Entities\Firm;
 use App\Entities\PostalCodeLatLon;
 use App\User;
 use Illuminate\Http\Request;
@@ -110,8 +111,17 @@ class MessagesController extends Controller
             }
             $possibleUsers = collect();
             if ($product && $chat) {
-                $possibleUsers = $this->getNotAttachedChatUsers($product, $chat, $possibleUsers, $users);
+                $possibleUsers = $this->getNotAttachedChatUsersForProduct($product, $chat, $users);
+            } else if ($order && $chat) {
+                foreach ($order->items as $product) {
+                    $firm = Firm::where('symbol', 'like', $product->product->product_name_supplier)->first();
+                    if (empty($firm)) {
+                        continue;
+                    }
+                    $possibleUsers = $possibleUsers->merge($firm->employees);
+                }
             }
+            error_log(print_r($possibleUsers, 1));
             return view('chat.show')->with([
                 'possible_users' => $possibleUsers,
                 'user_type' => $helper->currentUserType,
@@ -190,14 +200,19 @@ class MessagesController extends Controller
      * @param \Illuminate\Support\Collection $users
      * @return \Illuminate\Support\Collection
      */
-    private function getNotAttachedChatUsers($product, $chat, \Illuminate\Support\Collection $possibleUsers, \Illuminate\Support\Collection $users): \Illuminate\Support\Collection
+    private function getNotAttachedChatUsersForProduct($product, $chat, \Illuminate\Support\Collection $users): \Illuminate\Support\Collection
     {
+        $possibleUsers = collect();
         foreach ($product->media()->get() as $media) {
             $mediaData = explode('|', $media->url);
             if (count($mediaData) != 3) {
                 continue;
             }
-            $codeObj = PostalCodeLatLon::where('postal_code', $chat->customers->first()->standardAddress()->postal_code)->first();
+            if ($chat->customers->first()->standardAddress()) {
+                $codeObj = PostalCodeLatLon::where('postal_code', $chat->customers->first()->standardAddress()->postal_code)->first();
+            } else {
+                continue;
+            }
 
             $availableUser = $media->product->firm->employees->filter(function ($employee) use ($codeObj) {
                 $dist = MessagesHelper::calcDistance($codeObj->latitude, $codeObj->longitude, $employee->latitude, $employee->longitude);
@@ -208,8 +223,11 @@ class MessagesController extends Controller
         $possibleUsers = $possibleUsers->unique('id');
 
         $possibleUsers = $possibleUsers->filter(function ($item) use ($chat, $users) {
-            $filteredEmployeesCount = $chat->employees->filter(function ($user) use ($item) {
-                return $item->id != $user->id;
+            $filteredEmployeesCount = $chat->chatUsersWithTrashed->filter(function ($user) use ($item) {
+                if (empty($user->employee)) {
+                    return false;
+                }
+                return $item->id != $user->employee->id || $item->id == $user->employee->id && $user->trashed();
             })->count();
             return $filteredEmployeesCount == $chat->employees->count();
         });

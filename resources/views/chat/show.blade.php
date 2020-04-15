@@ -33,7 +33,7 @@
                                 if ($message->chatUser->customer) {
                                     $header .=  'Klient ';
                                     $header .=  ChatHelper::formatEmailAndPhone($message->chatUser->customer->login,
-                                    $message->chatUser->customer->addresses->first()->phone);
+                                    $message->chatUser->customer->addresses->first()->phone ?? '');
                                 } else if ($message->chatUser->employee) {
                                     $header .=  'Obsługa ';
                                     $header .= $message->chatUser->employee->firstname . ' ' . $message->chatUser->employee->lastname;

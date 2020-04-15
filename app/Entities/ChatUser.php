@@ -4,10 +4,15 @@ namespace App\Entities;
 
 use App\Helpers\ChatHelper;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ChatUser extends Model
 {
+    use SoftDeletes;
     protected $table = 'chat_user';
+
+    protected $softDelete = true;
+
 
     public function user()
     {
@@ -38,7 +43,9 @@ class ChatUser extends Model
     {
         $user = $this->customer;
         if (! empty($user)) {
-            return '<th class="alert-warning alert"> Klient mail:' . $user->login . '</th>';
+            $display = '<th class="alert-warning alert"> Klient ';
+            $display .= ChatHelper::formatEmailAndPhone($user->login, $user->addresses->first()->phone ?? ''). '</th>';
+            return $display;
         }
         $user = $this->user;
         if (! empty($user)) {
