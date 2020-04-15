@@ -45,4 +45,9 @@ class Chat extends Model
     {
         return $this->hasMany(ChatUser::class);
     }
+
+    public function chatUsersWithTrashed()
+    {
+        return $this->hasMany(ChatUser::class)->withTrashed();
+    }
 }

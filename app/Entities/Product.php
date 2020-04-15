@@ -248,4 +248,9 @@ class Product extends Model implements Transformable
     {
         return str_replace("D:\\z\\", env('APP_URL') . 'storage/products/', $this->url);
     }
+
+    public function getProducent()
+    {
+        return $this->producent_override ?? $this->product_name_supplier;
+    }
 }

@@ -452,7 +452,7 @@ class OrdersController extends Controller
                     $buttons = array_merge($button, $buttons);
                     $buttons = collect($buttons)->unique('description')->toArray();
                 }
-                $key = $product->producent_override ?? $product->product_name_supplier;
+                $key = $product->getProducent();
                 $orderButtons[$key] = $buttons;
             }
             $order->buttons = $orderButtons;

@@ -33,7 +33,7 @@
                                 if ($message->chatUser->customer) {
                                     $header .=  'Klient ';
                                     $header .=  ChatHelper::formatEmailAndPhone($message->chatUser->customer->login,
-                                    $message->chatUser->customer->addresses->first()->phone);
+                                    $message->chatUser->customer->addresses->first()->phone ?? '');
                                 } else if ($message->chatUser->employee) {
                                     $header .=  'Obsługa ';
                                     $header .= $message->chatUser->employee->firstname . ' ' . $message->chatUser->employee->lastname;
@@ -55,7 +55,8 @@
             <form action="{{ $route }}">
                 <div class="row">
                     <div class="col-sm-9">
-                        <textarea required class="form-control" id="message" style="resize: none; width: 100%; height: 46px;"
+                        <textarea required class="form-control" id="message"
+                                  style="resize: none; width: 100%; height: 46px;"
                                   placeholder="Tutaj wpisz wiadomość"></textarea>
                     </div>
                     <div class="col-sm-3">
@@ -66,12 +67,31 @@
         </div>
         <table id="chat-users">
             <tr>
-                <th colspan="2">Użytkownicy:</th>
+                <th colspan="2">Uczestnicy:</th>
             </tr>
             @foreach($users as $chatUser)
+                <tr>
+                    {!! $chatUser->getUserNicknameForChat($user_type) !!}
+                    @if(! empty($chatUser->employee))
+                        <th>
+                            <button class="btn btn-danger remove-user" value="{{ $chatUser->id }}">Usuń
+                            </button>
+                        </th>
+                    @endif
+                </tr>
+            @endforeach
             <tr>
-                {!! $chatUser->getUserNicknameForChat($user_type) !!}
+                <th colspan="2">Powiązane osoby:</th>
             </tr>
+            @foreach($possible_users as $user)
+                <tr>
+                    <th class="alert-info alert">
+                        {!! ChatHelper::formatChatUser($user, $user_type) !!}
+                    </th>
+                    <th>
+                        <button class="btn btn-success add-user" value="{{ $user->id }}">Dodaj</button>
+                    </th>
+                </tr>
             @endforeach
         </table>
 
@@ -136,6 +156,23 @@
                 }
             );
         }
+
+        $('.add-user').click((event) => {
+            $.ajax({
+                method: "POST",
+                url: "{{ $routeAddUser }}",
+                data: {'employee_id': event.target.value}
+            })
+                .done(() => location.reload());
+        })
+        $('.remove-user').click((event) => {
+            $.ajax({
+                method: "POST",
+                url: "{{ $routeRemoveUser }}",
+                data: {'user_id': event.target.value}
+            })
+                .done(() => location.reload());
+        })
     });
 </script>
 </body>
