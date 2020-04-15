@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 use App\Helpers\MessagesHelper;
 use App\Helpers\Exceptions\ChatException;
 use App\Entities\Chat;
+use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -22,7 +24,7 @@ class MessagesController extends Controller
      * @param Request $request
      * @param bool $all
      * @param bool $orderId
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public static function index(Request $request, $all = false, $orderId = 0)
     {
@@ -72,7 +74,7 @@ class MessagesController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create()
     {
@@ -82,8 +84,8 @@ class MessagesController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return Response
      */
     public function store(Request $request)
     {
@@ -94,7 +96,7 @@ class MessagesController extends Controller
      * Display the specified resource.
      *
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show($token)
     {
@@ -113,13 +115,7 @@ class MessagesController extends Controller
             if ($product && $chat) {
                 $possibleUsers = $this->getNotAttachedChatUsersForProduct($product, $chat, $users);
             } else if ($order && $chat) {
-                foreach ($order->items as $product) {
-                    $firm = Firm::where('symbol', 'like', $product->product->product_name_supplier)->first();
-                    if (empty($firm)) {
-                        continue;
-                    }
-                    $possibleUsers = $possibleUsers->merge($firm->employees);
-                }
+                $possibleUsers = $this->getNotAttachedChatUsersForOrder($order, $chat, $users);
             }
             return view('chat.show')->with([
                 'possible_users' => $possibleUsers,
@@ -144,7 +140,7 @@ class MessagesController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit($id)
     {
@@ -154,9 +150,9 @@ class MessagesController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, $id)
     {
@@ -167,7 +163,7 @@ class MessagesController extends Controller
      * Remove the specified resource from storage.
      *
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy($id)
     {
@@ -195,11 +191,11 @@ class MessagesController extends Controller
     /**
      * @param $product
      * @param $chat
-     * @param \Illuminate\Support\Collection $possibleUsers
-     * @param \Illuminate\Support\Collection $users
-     * @return \Illuminate\Support\Collection
+     * @param Collection $possibleUsers
+     * @param Collection $users
+     * @return Collection
      */
-    private function getNotAttachedChatUsersForProduct($product, $chat, \Illuminate\Support\Collection $users): \Illuminate\Support\Collection
+    private function getNotAttachedChatUsersForProduct($product, $chat, Collection $users): Collection
     {
         $possibleUsers = collect();
         foreach ($product->media()->get() as $media) {
@@ -221,6 +217,18 @@ class MessagesController extends Controller
         }
         $possibleUsers = $possibleUsers->unique('id');
 
+        $possibleUsers = $this->filterPossibleUsersWithCurrentlyAdded($possibleUsers, $chat, $users);
+        return $possibleUsers;
+    }
+
+    /**
+     * @param Collection $possibleUsers
+     * @param $chat
+     * @param Collection $users
+     * @return Collection
+     */
+    private function filterPossibleUsersWithCurrentlyAdded(Collection $possibleUsers, $chat, Collection $users): Collection
+    {
         $possibleUsers = $possibleUsers->filter(function ($item) use ($chat, $users) {
             $filteredEmployeesCount = $chat->chatUsersWithTrashed->filter(function ($user) use ($item) {
                 if (empty($user->employee)) {
@@ -230,6 +238,26 @@ class MessagesController extends Controller
             })->count();
             return $filteredEmployeesCount == $chat->employees->count();
         });
+        return $possibleUsers;
+    }
+
+    /**
+     * @param $order
+     * @param $chat
+     * @param Collection $users
+     * @return array
+     */
+    private function getNotAttachedChatUsersForOrder($order, $chat, Collection $users): Collection
+    {
+        $possibleUsers = collect();
+        foreach ($order->items as $product) {
+            $firm = Firm::where('symbol', 'like', $product->product->product_name_supplier)->first();
+            if (empty($firm)) {
+                continue;
+            }
+            $possibleUsers = $possibleUsers->merge($firm->employees);
+        }
+        $possibleUsers = $this->filterPossibleUsersWithCurrentlyAdded($possibleUsers, $chat, $users);
         return $possibleUsers;
     }
 }
