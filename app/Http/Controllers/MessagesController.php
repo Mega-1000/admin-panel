@@ -121,7 +121,6 @@ class MessagesController extends Controller
                     $possibleUsers = $possibleUsers->merge($firm->employees);
                 }
             }
-            error_log(print_r($possibleUsers, 1));
             return view('chat.show')->with([
                 'possible_users' => $possibleUsers,
                 'user_type' => $helper->currentUserType,

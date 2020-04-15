@@ -60,7 +60,7 @@
                                   placeholder="Tutaj wpisz wiadomość"></textarea>
                     </div>
                     <div class="col-sm-3">
-                        <input type="submit" u value="Wyślij" class="btn btn-success btn-lg btn-block">
+                        <input type="submit" value="Wyślij" class="btn btn-success btn-lg btn-block">
                     </div>
                 </div>
             </form>
