@@ -113,7 +113,7 @@ class MessagesController extends Controller
             $helper->currentUserId = $user->id;
             $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
             $out[] = [
-                'title' => $helper->getTitle(),
+                'title' => $helper->getTitle(false),
                 'url' => route('chat.show', ['token' => $helper->encrypt()]),
                 'new_message' => $helper->hasNewMessage()
             ];

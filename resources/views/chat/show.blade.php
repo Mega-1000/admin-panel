@@ -23,7 +23,10 @@
 <div id="app">
     <div class="container" id="flex-container">
         <div id="chat-container">
-            <div class="text-center alert alert-info">{{ $title }}</div>
+            <div class="text-center alert alert-info">{!! $title !!}</div>
+            @if (isset($notices))
+                <div class="alert-info alert">Uwagi konsultanta: <b>{{ $notices  }}</b></div>
+            @endif
             <div class="panel panel-default" style="max-height: calc(100vh - 200px); overflow-y: scroll">
                 <div class="panel-body">
                     @if ($chat)

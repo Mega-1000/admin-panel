@@ -184,17 +184,14 @@ class MessagesHelper
         ;
     }
 
-    public function getTitle()
+    public function getTitle($withBold = false)
     {
-        $product = $this->getProduct();
-        if ($product) {
-            return 'Czat dotyczy produktu: '.$product->name.' ('.$product->symbol.')';
+        $title = $this->prepareTitleText();
+        if (!$withBold) {
+            $title = str_replace('<b>','',$title);
+            $title = str_replace('</b>','',$title);
         }
-        $order = $this->getOrder();
-        if ($order) {
-            return 'Czat dotyczy zamówienia nr '.$order->id.'.';
-        }
-        return 'Czat ogólny z administracją '.env('APP_NAME');
+        return $title;
     }
 
     public function createNewChat()
@@ -426,5 +423,21 @@ class MessagesHelper
         $order->labels()->detach(MessagesHelper::NEW_MESSAGE_FROM_EMPLOYEE_LABEL_ID);
         $order->labels()->detach(MessagesHelper::NEW_MESSAGE_LABEL_ID);
         $order->labels()->attach($labelId);
+    }
+
+    /**
+     * @return string
+     */
+    private function prepareTitleText(): string
+    {
+        $product = $this->getProduct();
+        if ($product) {
+            return 'Czat dotyczy produktu: ' . $product->name . ' (<b>' . $product->symbol . '</b>)';
+        }
+        $order = $this->getOrder();
+        if ($order) {
+            return 'Czat dotyczy zamówienia nr <b>' . $order->id . '</b>';
+        }
+        return 'Czat ogólny z administracją ' . env('APP_NAME');
     }
 }
