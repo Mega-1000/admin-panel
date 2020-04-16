@@ -1730,7 +1730,12 @@
                 $("#columnSearch" + column).parent().hide();
             }
         });
-
+        $('#columnSearch-clientPhone').click(function(){
+          clearFilters(false);
+        });
+        $('#columnSearch-orderId').click(function(){
+          clearFilters(false);
+        });
         function filterByPhone(number) {
             $("#columnSearch-clientPhone").val(number).change();
         }
@@ -1754,7 +1759,7 @@
             $('#searchOrderValue').val('');
             $('#searchPayment').val('');
             $('#searchLeft').val('');
-
+           
 
             table
                 .columns()
@@ -1765,7 +1770,7 @@
             if (reload) {
                 table.draw();
             }
-
+             $('#orderFilter').trigger("change");
         }
 
         function removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType) {
