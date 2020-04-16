@@ -35,8 +35,9 @@ class MessagesHelper
     const SHOW_VAR = 'v';
     const NOTIFICATION_TIME = 300;
 
-    const NEW_MESSAGE_LABEL_ID = 55;
-    const NEW_MESSAGE_FROM_EMPLOYEE_LABEL_ID = 56;
+    const MESSAGE_RED_LABEL_ID = 55;
+    const MESSAGE_BLUE_LABEL_ID = 56;
+    const MESSAGE_YELLOW_LABEL_ID = 57;
 
     public function __construct($token = null)
     {
@@ -253,11 +254,11 @@ class MessagesHelper
         }
         $chatUser->messages()->save($messageObj);
         if ($chat->order) {
-            if ($chatUser->customer) {
-                $this->setChatLabel($chat->order, MessagesHelper::NEW_MESSAGE_LABEL_ID);
-            }
-            if ($chatUser->employee || $chatUser->user) {
-                $this->setChatLabel($chat->order, MessagesHelper::NEW_MESSAGE_FROM_EMPLOYEE_LABEL_ID);
+            if ($chatUser->user) {
+                $this->setChatLabel($chat, true);
+                $this->clearIntervention($chat);
+            } else {
+                $this->setChatLabel($chat, false);
             }
         }
         \App\Jobs\ChatNotificationJob::dispatch($chat->id)->delay(now()->addSeconds(self::NOTIFICATION_TIME + 5));
@@ -419,11 +420,17 @@ class MessagesHelper
         return $foundEmployee;
     }
 
-    private function setChatLabel(Order $order, int $labelId)
+    private function setChatLabel(Chat $chat, $clearDanger = false)
     {
-        $order->labels()->detach(MessagesHelper::NEW_MESSAGE_FROM_EMPLOYEE_LABEL_ID);
-        $order->labels()->detach(MessagesHelper::NEW_MESSAGE_LABEL_ID);
-        $order->labels()->attach($labelId, ['added_type' => Label::CHAT_TYPE]);
+        if ($clearDanger) {
+            $total = Chat::where('order_id', $chat->order->id)->where('need_intervention', true)->count();
+            if ($total <= 1) {
+                $chat->order->labels()->detach(MessagesHelper::MESSAGE_RED_LABEL_ID);
+            }
+        }
+        $chat->order->labels()->detach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
+        $chat->order->labels()->detach(MessagesHelper::MESSAGE_BLUE_LABEL_ID);
+        $chat->order->labels()->attach(MessagesHelper::MESSAGE_BLUE_LABEL_ID, ['added_type' => Label::CHAT_TYPE]);
     }
 
     /**
@@ -440,5 +447,11 @@ class MessagesHelper
             return 'Czat dotyczy zamówienia nr <b>' . $order->id . '</b>';
         }
         return 'Czat ogólny z administracją ' . env('APP_NAME');
+    }
+
+    private function clearIntervention($chat)
+    {
+        $chat->need_intervention = false;
+        $chat->save();
     }
 }

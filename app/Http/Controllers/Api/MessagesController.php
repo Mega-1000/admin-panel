@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Entities\ChatUser;
 use App\Entities\Employee;
+use App\Entities\Label;
 use App\Helpers\ChatHelper;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
@@ -71,6 +72,30 @@ class MessagesController extends Controller
             }
             $chatUser = ChatUser::findOrFail($request->user_id);
             $chatUser->delete();
+            return response('ok');
+        } catch (ChatException $e) {
+            $e->log();
+            return response($e->getMessage(), 400);
+        }
+    }
+
+    public function askForIntervention(Request $request, $token)
+    {
+        try {
+            $helper = new MessagesHelper($token);
+            $chat = $helper->getChat();
+            if (!$chat) {
+                throw new ChatException('Wrong chat token');
+            }
+            $redLabels = $chat->order->labels()->get()
+                ->filter(function ($label) {
+                    return $label->id == MessagesHelper::MESSAGE_RED_LABEL_ID;
+                });
+            if ($redLabels->count() == 0) {
+                $chat->order->labels()->attach(MessagesHelper::MESSAGE_RED_LABEL_ID, ['added_type' => Label::CHAT_TYPE]);
+            }
+            $chat->need_intervention = true;
+            $chat->save();
             return response('ok');
         } catch (ChatException $e) {
             $e->log();

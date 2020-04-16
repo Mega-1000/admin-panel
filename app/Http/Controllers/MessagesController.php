@@ -133,7 +133,8 @@ class MessagesController extends Controller
                 'route' => route('api.messages.post-new-message', ['token' => $helper->encrypt()]),
                 'routeAddUser' => route('api.messages.add-new-user', ['token' => $helper->encrypt()]),
                 'routeRemoveUser' => route('api.messages.remove-user', ['token' => $helper->encrypt()]),
-                'routeRefresh' => route('api.messages.get-messages', ['token' => $helper->encrypt()])
+                'routeRefresh' => route('api.messages.get-messages', ['token' => $helper->encrypt()]),
+                'routeAskForIntervention' => route('api.messages.ask-for-intervention', ['token' => $helper->encrypt()])
             ]);
         } catch (ChatException $e) {
             $e->log();

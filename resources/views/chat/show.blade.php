@@ -164,10 +164,10 @@
         $('#call-mod').click((event) => {
             $.ajax({
                 method: "POST",
-                url: "{{ $routeRemoveUser }}",
+                url: "{{ $routeAskForIntervention }}",
                 data: {'user_id': event.target.value}
             })
-                .done(() => location.reload());
+                .done(() => alert('Moderator został poinformowany'));
         })
     });
 </script>

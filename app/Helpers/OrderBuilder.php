@@ -114,7 +114,7 @@ class OrderBuilder
             $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
             $helper->createNewChat();
             $helper->addMessage($data['customer_notices']);
-            $order->labels()->attach(MessagesHelper::NEW_MESSAGE_LABEL_ID);
+            $order->labels()->attach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
         }
         $this->assignItemsToOrder($order, $data['order_items']);
 
