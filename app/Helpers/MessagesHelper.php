@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App\Entities\Chat;
 use App\Entities\CustomerAddress;
+use App\Entities\Label;
 use App\Entities\Product;
 use App\Entities\Order;
 use App\User;
@@ -422,7 +423,7 @@ class MessagesHelper
     {
         $order->labels()->detach(MessagesHelper::NEW_MESSAGE_FROM_EMPLOYEE_LABEL_ID);
         $order->labels()->detach(MessagesHelper::NEW_MESSAGE_LABEL_ID);
-        $order->labels()->attach($labelId);
+        $order->labels()->attach($labelId, ['added_type' => Label::CHAT_TYPE]);
     }
 
     /**

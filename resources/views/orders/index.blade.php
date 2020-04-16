@@ -1894,6 +1894,9 @@
 
                         });
                     });
+                    return;
+                } else if (addedType == "{{ \App\Entities\Label::CHAT_TYPE }}") {
+                    window.location.href = `/admin/chat/1/${orderId}`
                     return
                 } else if (addedType != "C") {
                     let confirmed = confirm("Na pewno usunąć etykietę?");
