@@ -42,15 +42,22 @@ class CheckDateOfProductNewPriceJob
 
         foreach ($products as $product) {
             $group = $product->product_group_for_change_price;
-            if ($group !== null) {
-                $exp = explode('-', $group);
-                $groupExp = $exp[1];
-            } else {
+            if (empty($group)) {
                 Log::error(
-                    'Price group is null',
+                    'Price group is empty',
                     ['product_id' => $product->id, 'class' => get_class($this), 'line' => __LINE__]
                 );
                 die();
+            } else {
+                $exp = explode('-', $group);
+                if (count($exp) < 2) {
+                    Log::error(
+                        'Wrong product_group_for_change_price',
+                        ['product_id' => $product->id, 'class' => get_class($this), 'line' => __LINE__]
+                    );
+                    die();
+                }
+                $groupExp = $exp[1];
             }
             $pattern = $this->setPatternKey($product);
             switch ($groupExp) {
