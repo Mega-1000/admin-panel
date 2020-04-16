@@ -26,7 +26,7 @@ class UpdatePackageRealCostJob implements ShouldQueue {
     }
 
     public function updateCost($inpostPackages, $pocztexPackages, $dpdPackages) {
-        if (!empty($inpostPackages)) {
+        if (!empty($inpostPackages) && file_exists('specyfikacjaInpost.csv')) {
             $spec = fopen('specyfikacjaInpost.csv', 'r');
             while (($csvLine = fgetcsv($spec, 1000, ";")) !== FALSE) {
                 foreach ($inpostPackages as $inpostPackage) {
@@ -37,7 +37,7 @@ class UpdatePackageRealCostJob implements ShouldQueue {
                 }
             }
         }
-        if (!empty($pocztexPackages)) {
+        if (!empty($pocztexPackages) && file_exists('specyfikacjaPocztaPolska.csv')) {
             $spec = fopen('specyfikacjaPocztaPolska.csv', 'r');
             while (($csvLine = fgetcsv($spec, 1000, ",")) !== FALSE) {
                 foreach ($pocztexPackages as $pocztexPackage) {
@@ -48,7 +48,7 @@ class UpdatePackageRealCostJob implements ShouldQueue {
                 }
             }
         }
-        if (!empty($dpdPackages)) {
+        if (!empty($dpdPackages) && file_exists('specyfikacjaDpd.csv')) {
             $spec = fopen('specyfikacjaDpd.csv', 'r');
             while (($csvLine = fgetcsv($spec, 1000, ",")) !== FALSE) {
                 foreach ($dpdPackages as $dpdPackage) {
