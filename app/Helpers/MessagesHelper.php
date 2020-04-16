@@ -320,7 +320,7 @@ class MessagesHelper
 
     public static function getToken($mediaId, $postCode, $email, $phone)
     {
-        $customer = self::getCustomer($email, $phone);
+        $customer = self::getCustomer($email, $phone, $postCode);
 
         $media = ProductMedia::find($mediaId);
 
@@ -345,7 +345,7 @@ class MessagesHelper
         return $helper->encrypt();
     }
 
-    private static function getCustomer($email, $phone)
+    private static function getCustomer($email, $phone, $postCode)
     {
         $customer = Customer::where('login', $email)->first();
         if ($customer && $customer->password && !Hash::check($phone, $customer->password)) {
@@ -360,6 +360,7 @@ class MessagesHelper
             $address->type = CustomerAddress::ADDRESS_TYPE_STANDARD;
             $address->phone = $phone;
             $address->email = $email;
+            $address->postal_code = $email;
             $customer->addresses()->save($address);
 
             $customer->save();
@@ -367,7 +368,7 @@ class MessagesHelper
         return $customer;
     }
 
-    private static function calcDistance($lat1, $lon1, $lat2, $lon2)
+    public static function calcDistance($lat1, $lon1, $lat2, $lon2)
     {
         return 73 * sqrt(
             pow($lat1 - $lat2, 2) +

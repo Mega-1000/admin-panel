@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Entities\ChatUser;
+use App\Entities\Employee;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Helpers\MessagesHelper;
@@ -29,6 +31,52 @@ class MessagesController extends Controller
         }
     }
 
+    public function addUser(Request $request, $token)
+    {
+        try {
+            $helper = new MessagesHelper($token);
+            $chat = $helper->getChat();
+            $employee = Employee::findOrFail($request->employee_id);
+            if (!$chat) {
+                throw new ChatException('Podany czat nie istnieje');
+            }
+            $chatUser = ChatUser::onlyTrashed()
+                ->where('chat_id', $chat->id)
+                ->where('employee_id', $employee->id)
+                ->whereNotNull('deleted_at')
+                ->withTrashed()
+                ->first();
+            if ($chatUser) {
+                $chatUser->restore();
+                return response('ok');
+            }
+            $chatUser = new ChatUser();
+            $chatUser->chat()->associate($chat);
+            $chatUser->employee()->associate($employee);
+            $chatUser->save();
+            return response('ok');
+        } catch (ChatException $e) {
+            $e->log();
+            return response($e->getMessage(), 400);
+        }
+    }
+    public function removeUser(Request $request, $token)
+    {
+        try {
+            $helper = new MessagesHelper($token);
+            $chat = $helper->getChat();
+            if (!$chat) {
+                throw new ChatException('Podany czat nie istnieje');
+            }
+            $chatUser = ChatUser::findOrFail($request->user_id);
+            $chatUser->delete();
+            return response('ok');
+        } catch (ChatException $e) {
+            $e->log();
+            return response($e->getMessage(), 400);
+        }
+    }
+
     public function getMessages(Request $request, $token)
     {
         try {
@@ -45,7 +93,8 @@ class MessagesController extends Controller
                 $out .= view('chat/single_message')->withMessage($message)->render();
             }
             $helper->setLastRead();
-            return response(['messages' => $out]);
+
+            return response(['messages' => $out, 'users' => $chat->chatUsers]);
         } catch (ChatException $e) {
             $e->log();
             return response($e->getMessage(), 400);

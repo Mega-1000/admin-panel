@@ -1,0 +1,13 @@
+#flex-container {
+    display: flex;
+    margin-top: 20px;
+}
+
+#chat-users {
+    border-collapse: separate;
+    border-spacing: 8px;
+}
+
+#chat-container {
+    width: 100%;
+}

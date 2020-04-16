@@ -334,6 +334,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::delete('orderMessages/{id}/', [
             'uses' => 'OrdersMessagesController@destroy',
         ])->name('order_messages.destroy');
+        Route::get('products/getPrice', 'Api\ProductsController@getCurrentPrices')->name('products.currentPrices');
 
         Route::post('orders/set-warehouse-and-remove-label', 'OrdersController@setWarehouseAndLabels')->name('order.warehouse.set');
 
@@ -453,7 +454,7 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get('/dispatch-job/recalculate-prices', 'DispatchJobController@recalculatePrices')->name('job.recalculatePrices');
         Route::get('/dispatch-job/generate-jpgs', 'DispatchJobController@generateJpgs')->name('job.generateJpgs');
-        Route::get('/chat/{all?}', 'MessagesController@index')->name('chat.index');
+        Route::get('/chat/{all?}/{orderId?}', 'MessagesController@index')->name('chat.index');
     });
 });
 
