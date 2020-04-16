@@ -1731,10 +1731,16 @@
             }
         });
         $('#columnSearch-clientPhone').click(function(){
-          clearFilters(false);
+            var str = $('#columnSearch-clientPhone').val();
+            var replaced = str.replace(/-|\s/g,'');
+            clearFilters(false);
+            $('#columnSearch-clientPhone').val(replaced);
         });
         $('#columnSearch-orderId').click(function(){
-          clearFilters(false);
+            var str = $('#columnSearch-orderId').val();
+            var replaced = str.replace(/-|\s/g,'');
+            clearFilters(false);
+            $('#columnSearch-orderId').val(replaced);
         });
         function filterByPhone(number) {
             $("#columnSearch-clientPhone").val(number).change();
