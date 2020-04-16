@@ -24,7 +24,7 @@
     <div class="container" id="flex-container">
         <div id="chat-container">
             <div class="text-center alert alert-info">{!! $title !!}</div>
-            @if (isset($notices))
+            @if (!empty($notices))
                 <div class="alert-info alert">Uwagi konsultanta: <b>{{ $notices  }}</b></div>
             @endif
             <div class="panel panel-default" style="max-height: calc(100vh - 200px); overflow-y: scroll">
@@ -51,6 +51,7 @@
                     </div>
                 </div>
             </form>
+            <button id="call-mod" class="btn btn-warning add-user">Wezwij moderatora</button>
         </div>
         <table id="chat-users">
             <tr>
@@ -153,6 +154,14 @@
                 .done(() => location.reload());
         })
         $('.remove-user').click((event) => {
+            $.ajax({
+                method: "POST",
+                url: "{{ $routeRemoveUser }}",
+                data: {'user_id': event.target.value}
+            })
+                .done(() => location.reload());
+        })
+        $('#call-mod').click((event) => {
             $.ajax({
                 method: "POST",
                 url: "{{ $routeRemoveUser }}",
