@@ -35,6 +35,7 @@ class MessagesHelper
     const NOTIFICATION_TIME = 300;
 
     const NEW_MESSAGE_LABEL_ID = 55;
+    const NEW_MESSAGE_FROM_EMPLOYEE_LABEL_ID = 56;
 
     public function __construct($token = null)
     {
@@ -178,6 +179,7 @@ class MessagesHelper
                 }]);
                 $q->oldest();
             }])
+            ->with('order')
             ->find($this->chatId)
         ;
     }
@@ -252,6 +254,14 @@ class MessagesHelper
             throw new ChatException('Cannot save message');
         }
         $chatUser->messages()->save($messageObj);
+        if ($chat->order) {
+            if ($chatUser->customer) {
+                $this->setChatLabel($chat->order, MessagesHelper::NEW_MESSAGE_LABEL_ID);
+            }
+            if ($chatUser->employee || $chatUser->user) {
+                $this->setChatLabel($chat->order, MessagesHelper::NEW_MESSAGE_FROM_EMPLOYEE_LABEL_ID);
+            }
+        }
         \App\Jobs\ChatNotificationJob::dispatch($chat->id)->delay(now()->addSeconds(self::NOTIFICATION_TIME + 5));
     }
 
@@ -409,5 +419,12 @@ class MessagesHelper
             throw new ChatException('Cannot find employee');
         }
         return $foundEmployee;
+    }
+
+    private function setChatLabel(Order $order, int $labelId)
+    {
+        $order->labels()->detach(MessagesHelper::NEW_MESSAGE_FROM_EMPLOYEE_LABEL_ID);
+        $order->labels()->detach(MessagesHelper::NEW_MESSAGE_LABEL_ID);
+        $order->labels()->attach($labelId);
     }
 }

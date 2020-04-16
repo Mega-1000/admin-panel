@@ -29,23 +29,7 @@
                     @if ($chat)
                         @foreach ($chat->messages as $message)
                             @php
-                                $header = '';
-                                if ($message->chatUser->customer) {
-                                    $header .=  'Klient ';
-                                    $header .=  ChatHelper::formatEmailAndPhone($message->chatUser->customer->login,
-                                    $message->chatUser->customer->addresses->first()->phone ?? '');
-                                } else if ($message->chatUser->employee) {
-                                    $header .=  'Obsługa ';
-                                    $header .= $message->chatUser->employee->firstname . ' ' . $message->chatUser->employee->lastname;
-                                    $header .= ChatHelper::formatEmailAndPhone($message->chatUser->employee->email, $message->chatUser->employee->phone);
-                                    $header .= ChatHelper::formatEmployeeRoles($message->chatUser->employee);
-                                    $header .= ':';
-                                } else if ($message->chatUser->user) {
-                                    $header .=  'Moderator ';
-                                    $header .= $message->chatUser->user->name . ' ' . $message->chatUser->user->fistname . ' ' . $message->chatUser->user->lastname;
-                                    $header .= ChatHelper::formatEmailAndPhone($message->chatUser->user->email, $message->chatUser->user->phone);
-                                    $header .= ':';
-                                }
+                                $header = \App\Helpers\ChatHelper::getMessageHelper($message);
                             @endphp
                             @include ('chat/single_message', ['message' => $message, 'header' => $header])
                         @endforeach

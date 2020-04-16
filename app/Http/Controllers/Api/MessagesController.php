@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Entities\ChatUser;
 use App\Entities\Employee;
+use App\Helpers\ChatHelper;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Helpers\MessagesHelper;
@@ -90,7 +91,8 @@ class MessagesController extends Controller
                 if ($message->id <= $request->lastId) {
                     continue;
                 }
-                $out .= view('chat/single_message')->withMessage($message)->render();
+                $header = ChatHelper::getMessageHelper($message);
+                $out .= view('chat/single_message')->withMessage($message)->withHeader($header)->render();
             }
             $helper->setLastRead();
 
