@@ -26,55 +26,35 @@
             <div class="employees-general" id="general">
                 <div>
                     <label>@lang('employees.form.firm_visibilty')</label>
-                    @if ($employee->firm_visibility == 1)
-                    <input type="checkbox" id="firm_visibility" name="firm_visibility" val="0">
-                    @else
-                    <input type="checkbox" id="firm_visibility" name="firm_visibility" val="0" checked>
-                    @endif
+                    <input type="checkbox" id="firm_visibility" name="firm_visibility" val="0"{{$employee->firm_visibility == 1 ? '' : 'checked' }}>
                 </div>
                 <div class="form-group">
                     <label for="firstname">@lang('employees.form.firstname')</label>
                     <input type="text" class="form-control" id="firstname" name="firstname"
                            value="{{ $employee->firstname }}">
                     <label>@lang('employees.form.visibility')</label>
-                    @if ($employee->firstname_visibility == 1)
-                    <input type="checkbox" id="firstname_visibility" name="firstname_visibility" val="0">
-                    @else
-                    <input type="checkbox" id="firstname_visibility" name="firstname_visibility" val="0" checked>
-                    @endif
+                    <input type="checkbox" id="firstname_visibility" name="firstname_visibility" val="0"{{$employee->firstname_visibility == 1 ? '' : 'checked' }}>
                 </div>
                 <div class="form-group">
                     <label for="lastname">@lang('employees.form.lastname')</label>
                     <input type="text" class="form-control" id="lastname" name="lastname"
                            value="{{ $employee->lastname }}">
                     <label>@lang('employees.form.visibility')</label>
-                    @if ($employee->lastname_visibility == 1)
-                    <input type="checkbox" id="lastname_visibility" name="lastname_visibility" val="0">
-                    @else
-                    <input type="checkbox" id="lastname_visibility" name="lastname_visibility" val="0" checked>
-                    @endif
+                    <input type="checkbox" id="lastname_visibility" name="lastname_visibility" val="0"{{$employee->lastname_visibility == 1 ? '' : 'checked' }}>
                 </div>
                 <div class="form-group">
                     <label for="email">@lang('employees.form.email')</label>
                     <input type="email" class="form-control" id="email" name="email"
                            value="{{ $employee->email }}">
                     <label>@lang('employees.form.visibility')</label>
-                    @if ($employee->email_visibility == 1)
-                    <input type="checkbox" id="email_visibility" name="email_visibility" val="0">
-                    @else
-                    <input type="checkbox" id="email_visibility" name="email_visibility" val="0" checked>
-                    @endif
+                    <input type="checkbox" id="email_visibility" name="email_visibility" val="0" {{$employee->email_visibility == 1 ? '' : 'checked' }}>
                 </div>
                 <div class="form-group">
                     <label for="phone">@lang('employees.form.phone')</label>
                     <input type="text" class="form-control" id="phone" name="phone"
                            value="{{ $employee->phone }}">
                     <label>@lang('employees.form.visibility')</label>
-                    @if ($employee->phone_visibility == 1)
-                    <input type="checkbox" id="phone_visibility" name="phone_visibility" val="0">
-                    @else
-                    <input type="checkbox" id="phone_visibility" name="phone_visibility" val="0" checked>
-                    @endif
+                    <input type="checkbox" id="phone_visibility" name="phone_visibility" val="0"{{$employee->phone_visibility == 1 ? '' : 'checked' }}>
                 </div>
                 <div class="form-group">
                     <label for="job_position">@lang('employees.form.job_position')</label>
@@ -156,11 +136,7 @@
                               name="comments"
                               >{{ $employee->comments}}</textarea>
                     <label>@lang('employees.form.visibility')</label>
-                    @if ($employee->comments_visibility == 1)
-                    <input type="checkbox" id="comments_visibility" name="comments_visibility" val="0">
-                    @else
-                    <input type="checkbox" id="comments_visibility" name="comments_visibility" val="0" checked>
-                    @endif
+                    <input type="checkbox" id="comments_visibility" name="comments_visibility" val="0"{{$employee->comments_visibility == 1 ? '' : 'checked' }}>
                 </div>
                     <div class="form-group">
                         <label for="additional_comments">@lang('employees.form.additional_comments')</label>
@@ -173,11 +149,7 @@
                         <input type="text" class="form-control" id="postal_code" name="postal_code"
                                value="{{ $employee->postal_code }}">
                         <label>@lang('employees.form.visibility')</label>
-                        @if ($employee->postal_code_visibility == 1)
-                        <input type="checkbox" id="postal_code_visibility" name="postal_code_visibility" val="0">
-                        @else
-                        <input type="checkbox" id="postal_code_visibility" name="postal_code_visibility" val="0" checked>
-                        @endif
+                        <input type="checkbox" id="postal_code_visibility" name="postal_code_visibility" val="0"{{$employee->postal_code_visibility == 1 ? '' : 'checked' }}>
                     </div>
                     <div class="form-group">
                         <label for="latitude">@lang('firms.form.address.latitude')</label>
