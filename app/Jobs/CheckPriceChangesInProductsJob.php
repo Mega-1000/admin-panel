@@ -60,7 +60,7 @@ class CheckPriceChangesInProductsJob
                 ->with('firm')
                 ->first()
             ;
-            if (!$warehouse) {
+            if ($warehouse) {
                 $email = $this->getEmail($warehouse);
                 if ($email) {
                     $this->sendEmail($warehouse, $email);
