@@ -4,13 +4,11 @@ namespace App\Jobs;
 
 use App\Http\Controllers\OrdersPaymentsController;
 use App\Repositories\OrderRepository;
-use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Smalot\PdfParser\Parser;
 use Spatie\PdfToText\Pdf;
@@ -46,14 +44,13 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
      */
     public function handle()
     {
-        $basePath = base_path();
         $this->convertPdfFileToTextFile(
-            $basePath . '/pdf/app.js', $basePath . '/storage/app/user-files/payments/' . $this->filename, $basePath . '/storage/app/user-files/payments/' . $this->filename
+            config('payments-import.pdf-application-path'), config('payments-import.pdf-file-path').$this->filename, config('payments-import.output-file-path').$this->filename
         );
 
 
         $ordersIds = $this->getOrdersIds();
-        $payments  = $this->getPaymentsFromTextFile($basePath . '/storage/app/user-files/payments/' . $this->filename, $ordersIds);
+        $payments  = $this->getPaymentsFromTextFile(config('payments-import.output-file-path').$this->filename, $ordersIds);
         $infos     = $this->storePayments($payments);
 
         return $infos;
@@ -67,50 +64,54 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
     protected function getPaymentsFromTextFile($filePath, $ordersIds)
     {
         $payments = [];
-        try {
-            $fn       = fopen($filePath . '.txt', "r");
-            $i        = 0;
-            if(!$fn) {
-                throw new Exception('PDF payments import file open failed.');
-            }
-            while (!feof($fn)) {
-                $result = fgets($fn);
-                if (strlen($result) == 27 && ctype_digit(substr($result, 0, 26)) || strlen($result) == 29 && ctype_digit(substr($result, 2, 26))) {
-                    $text   = fgets($fn);
-                    $letter = DB::table('order_packages')->where('letter_number', 'LIKE', trim($text))->first();
-                    if (!empty($letter)) {
-                        $payments[$i]['orderId'] = $letter->order_id;
-                    }
-                    preg_match('/(QQ\d{3,5})QQ/', $text, $matches);
-                    if (count($matches) > 1 && substr($matches[1], 0, 1) !== '0') {
-                        $matches[1] = str_replace('Q', '', $matches[1]);
-                        if (in_array($matches[1], $ordersIds)) {
-                            $payments[$i]['orderId'] = $matches[1];
-                        }
-                    }
-                    $nextLine = fgets($fn);
-                    preg_match('/(QQ\d{3,5})QQ/', $text, $matches);
-                    if (count($matches) > 1 && substr($matches[1], 0, 1) !== '0' && in_array($matches[1], $ordersIds)) {
-                        $payments[$i]['orderId'] = str_replace('Q', '', $matches[1]);
-                    }
+        $fn       = fopen($filePath, "r");
+        $i        = 0;
+        while (!feof($fn)) {
+            $result = fgets($fn);
+            if ($this->checkIfGivenLineContainAccoutNumber($result)) {
+                $text   = fgets($fn);
+                $letter = DB::table('order_packages')->where('letter_number', 'LIKE', trim($text))->first();
+                if (!empty($letter)) {
+                    $payments[$i]['orderId'] = $letter->order_id;
                 }
-                preg_match('/(\-?\d+\,\d+\,\d+)/', preg_replace('/\s/', '', $result), $matches);
-                if(count($matches) > 1 && strpos($matches[1], '-') === false) {
-                    $pattern = '/(\,\d{2})/i';
-                    $replacement = '${1} ';
-                    $priceLine = preg_replace($pattern, $replacement, $matches[1]);
-                    $validPrice = substr($priceLine, 0, strpos($priceLine, ' '));
-                    $amount = (float)str_replace(',', '.', $validPrice);
-                    $payments[$i]['amount'] = $amount;
-                    $i++;
+                preg_match('/(\d{3,5})/', $text, $matches);
+                if($this->verifyOrderId($matches, $ordersIds)) {
+                    $payments[$i]['orderId'] = $matches[1];
+                }
+                $nextLine = fgets($fn);
+                preg_match('/(\d{3,5})/', $nextLine, $matches);
+                if($this->verifyOrderId($matches, $ordersIds)) {
+                    $payments[$i]['orderId'] = $matches[1];
                 }
             }
-            fclose($fn);
-        } catch(Exception $e ) {
-            Log::error($e);
+            if ($this->checkIfGivenLineContainValidAmount($result)) {
+                $payments[$i]['amount'] = (float) str_replace(',', '.', str_replace(' ', '', str_replace('PLN', '', $result)));
+                $i++;
+            }
         }
+        fclose($fn);
 
         return $payments;
+    }
+
+    private function verifyOrderId($matchedResult, $ordersIds)
+    {
+        if (count($matchedResult) > 1) {
+            if (substr($matchedResult[1], 0, 1) !== '0') {
+                if (in_array($matchedResult[1], $ordersIds)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private function checkIfGivenLineContainAccoutNumber(string $fileLine) {
+        return strlen($fileLine) == 27 && ctype_digit(substr($fileLine, 0, 26)) || strlen($fileLine) == 29 && ctype_digit(substr($fileLine, 2, 26));
+    }
+
+    private function checkIfGivenLineContainValidAmount(string $fileLine) {
+        return strpos($fileLine, 'PLN') !== false && strpos($fileLine, '-') === false && strpos($fileLine, 'a') === false;
     }
 
     protected function storePayments($payments)
