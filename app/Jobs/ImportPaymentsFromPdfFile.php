@@ -96,14 +96,7 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
 
     private function verifyOrderId($matchedResult, $ordersIds)
     {
-        if (count($matchedResult) > 1) {
-            if (substr($matchedResult[1], 0, 1) !== '0') {
-                if (in_array($matchedResult[1], $ordersIds)) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        return count($matchedResult) > 1 && substr($matchedResult[1], 0, 1) !== '0' && in_array($matchedResult[1], $ordersIds);
     }
 
     private function checkIfGivenLineContainAccoutNumber(string $fileLine) {
