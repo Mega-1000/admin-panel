@@ -9,6 +9,7 @@ use App\Helpers\GetCustomerForNewOrder;
 use App\Helpers\MessagesHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceCalculator;
+use App\Helpers\SendCommunicationEmail;
 use App\Helpers\TransportSumCalculator;
 use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
 use App\Http\Requests\Api\Orders\StoreOrderRequest;
@@ -144,7 +145,8 @@ class OrdersController extends Controller
                 ->setPriceCalculator(new OrderPriceCalculator());
             if (empty($data['cart_token'])) {
                 $orderBuilder->setTotalTransportSumCalculator(new TransportSumCalculator)
-                    ->setUserSelector(new GetCustomerForNewOrder());
+                    ->setUserSelector(new GetCustomerForNewOrder())
+                    ->setPostOrderActions(new SendCommunicationEmail());
             } else {
                 $orderBuilder->setUserSelector(new GetCustomerForAdminEdit());
             }
