@@ -44,8 +44,9 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
      */
     public function handle()
     {
+        $basePath = base_path();
         $this->convertPdfFileToTextFile(
-            config('payments-import.pdf-application-path'), config('payments-import.pdf-file-path').$this->filename, config('payments-import.output-file-path').$this->filename
+            $basePath . '/app.js', $basePath . '/storage/app/user-files/payments/' . $this->filename, $basePath . '/storage/app/user-files/payments/' . $this->filename
         );
 
 
