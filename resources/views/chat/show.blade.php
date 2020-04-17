@@ -32,7 +32,7 @@
                     @if ($chat)
                         @foreach ($chat->messages as $message)
                             @php
-                                $header = \App\Helpers\ChatHelper::getMessageHelper($message);
+                                $header = ChatHelper::getMessageHelper($message);
                             @endphp
                             @include ('chat/single_message', ['message' => $message, 'header' => $header])
                         @endforeach

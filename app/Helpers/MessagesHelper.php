@@ -190,8 +190,7 @@ class MessagesHelper
     {
         $title = $this->prepareTitleText();
         if (!$withBold) {
-            $title = str_replace('<b>','',$title);
-            $title = str_replace('</b>','',$title);
+            $title = strip_tags($title);
         }
         return $title;
     }
@@ -429,8 +428,9 @@ class MessagesHelper
             }
         }
         $chat->order->labels()->detach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
-        $chat->order->labels()->detach(MessagesHelper::MESSAGE_BLUE_LABEL_ID);
-        $chat->order->labels()->attach(MessagesHelper::MESSAGE_BLUE_LABEL_ID, ['added_type' => Label::CHAT_TYPE]);
+        if ($chat->order->labels()->where('label_id', MessagesHelper::MESSAGE_BLUE_LABEL_ID)->count() == 0) {
+            $chat->order->labels()->attach(MessagesHelper::MESSAGE_BLUE_LABEL_ID, ['added_type' => Label::CHAT_TYPE]);
+        }
     }
 
     /**

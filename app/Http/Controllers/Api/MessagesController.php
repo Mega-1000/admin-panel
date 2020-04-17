@@ -87,11 +87,8 @@ class MessagesController extends Controller
             if (!$chat) {
                 throw new ChatException('Wrong chat token');
             }
-            $redLabels = $chat->order->labels()->get()
-                ->filter(function ($label) {
-                    return $label->id == MessagesHelper::MESSAGE_RED_LABEL_ID;
-                });
-            if ($redLabels->count() == 0) {
+            $redLabels = $chat->order->labels()->where('label_id', MessagesHelper::MESSAGE_RED_LABEL_ID)->count();
+            if ($redLabels == 0) {
                 $chat->order->labels()->attach(MessagesHelper::MESSAGE_RED_LABEL_ID, ['added_type' => Label::CHAT_TYPE]);
             }
             $chat->need_intervention = true;
