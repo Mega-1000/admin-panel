@@ -2,8 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Repositories\ProductPriceRepository;
-use App\Repositories\ProductRepository;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -14,10 +12,6 @@ use Illuminate\Support\Facades\Log;
 class CheckDateOfProductNewPriceJob
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    protected $repository;
-
-    protected $productPriceRepository;
 
     /**
      * Create a new job instance.
@@ -33,12 +27,9 @@ class CheckDateOfProductNewPriceJob
      *
      * @return void
      */
-    public function handle(ProductRepository $repository, ProductPriceRepository $productPriceRepository)
+    public function handle()
     {
-        $this->repository = $repository;
-        $this->productPriceRepository = $productPriceRepository;
-
-        $products = $this->repository->findWhere([['date_of_the_new_prices', '<=', Carbon::today()->addDay()]]);
+        $products = \App\Entities\Product::where('date_of_the_new_prices', '<=', Carbon::today()->addDay())->get();
 
         foreach ($products as $product) {
             $group = $product->product_group_for_change_price;
