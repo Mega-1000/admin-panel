@@ -44,18 +44,12 @@ class ChangeWarehouseStockJob extends Job
             preg_match('/([^-]+)/', $productName, $matches);
             $product = Product::withTrashed()->where('symbol', $matches[1])->first();
             if($product !== null) {
-                $productStock = $product->stock;
-
-                $productStockPosition = $productStockPositionRepository->findWhere(['product_stock_id' => $productStock->id])->first();
+                $productStockPosition = $product->stock->position;
                 if(empty($productStockPosition)) {
                     return response()->json(['error' => 'position', 'product' => $product->id, 'productName' => $product->symbol]);
                 }
 
-                $productStockLog = $productStockLogRepository->findWhere([
-                    'product_stock_id' => $productStock->id,
-                    'order_id' => $this->orderId,
-                    'action' => 'DELETE',
-                ])->first();
+                $product->stock->logs()->where('order_id', $this->orderId)->where('action', 'DELETE')->first();
 
                 if(!empty($productStockLog)) {
                     return response()->json(['error' => 'exists']);
@@ -67,9 +61,10 @@ class ChangeWarehouseStockJob extends Job
             $productName = $item->product->symbol;
             preg_match('/([^-]+)/', $productName, $matches);
             $product = Product::withTrashed()->where('symbol', $matches[1])->first();
-            if($product !== null) {
-                $productStock = $product->stock;
+            if($product === null) {
+                return response()->json(['error' => 'Product does not exist.']);
             }
+            $productStock = $product->stock;
             $productStockRepository->update([
                 'quantity' => $productStock->quantity - $item->quantity,
             ], $productStock->id);
