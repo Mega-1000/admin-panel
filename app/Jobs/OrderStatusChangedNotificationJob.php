@@ -66,7 +66,7 @@ class OrderStatusChangedNotificationJob extends Job
         $tags = $tagRepository->all();
         $oldStatus = $statusRepository->find($this->oldStatus);
 
-        if($this->message !== null){
+        if ($this->message !== null) {
             $message = $this->message;
         } else {
             $message = $order->status->message;
@@ -74,12 +74,12 @@ class OrderStatusChangedNotificationJob extends Job
 
         $emailTagHandler->setOrder($order);
 
-        foreach($tags as $tag) {
+        foreach ($tags as $tag) {
             $method = $tag->handler;
             $message = preg_replace("[" . preg_quote($tag->name) . "]", $emailTagHandler->$method(), $message);
         }
-        if($order->status_id == 3 || $order->status_id == 4) {
-            $subject = "Zmiana statusu - numer oferty: ". $this->orderId . " z: " . $oldStatus->name . " na: " . $order->status->name . ' oraz proforma';
+        if ($order->status_id == 3 || $order->status_id == 4) {
+            $subject = "Zmiana statusu - numer oferty: " . $this->orderId . " z: " . $oldStatus->name . " na: " . $order->status->name . ' oraz proforma';
             $order = Order::find($order->id);
             $proformDate = \Carbon\Carbon::now()->format('m-Y');
             $proformDate = str_replace('-', '/', $proformDate);
@@ -90,10 +90,5 @@ class OrderStatusChangedNotificationJob extends Job
                 ->to($order->customer->login)
                 ->send(new OrderStatusChanged($subject, $message, $pdf->output()));
         }
-
-        //$subject = "Zmiana statusu - numer oferty: ". $this->orderId . " z: " . $oldStatus->name . " na: " . $order->status->name;
-        //\Mailer::create()
-        //    ->to($order->customer->login)
-        //    ->send(new OrderStatusChanged($subject, $message));
     }
 }
