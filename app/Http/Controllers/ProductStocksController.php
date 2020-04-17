@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Entities\ColumnVisibility;
+use App\Entities\ProductStock;
 use App\Http\Requests\ProductStockUpdateRequest;
 use App\Repositories\ProductRepository;
 use App\Repositories\ProductStockPositionRepository;
@@ -10,6 +11,7 @@ use App\Repositories\ProductStockRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * Class ProductStocksController
@@ -68,8 +70,7 @@ class ProductStocksController extends Controller
      */
     public function edit($id)
     {
-        $productStocks = $this->repository->with(['product.price', 'position'])->find($id);
-
+        $productStocks = ProductStock::find($id);
         $visibilitiesLogs = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('product_stock_logs'));
         foreach($visibilitiesLogs as $key => $row)
         {
@@ -82,7 +83,6 @@ class ProductStocksController extends Controller
             $visibilitiesPosition[$key]->show = json_decode($row->show,true);
             $visibilitiesPosition[$key]->hidden = json_decode($row->hidden,true);
         }
-
         return view('product_stocks.edit', compact('visibilitiesLogs','visibilitiesPosition','productStocks'));
     }
 
