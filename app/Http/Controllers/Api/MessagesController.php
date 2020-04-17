@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api;
 
 use App\Entities\ChatUser;
 use App\Entities\Employee;
+use App\Entities\Label;
+use App\Helpers\ChatHelper;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Helpers\MessagesHelper;
@@ -77,6 +79,27 @@ class MessagesController extends Controller
         }
     }
 
+    public function askForIntervention(Request $request, $token)
+    {
+        try {
+            $helper = new MessagesHelper($token);
+            $chat = $helper->getChat();
+            if (!$chat) {
+                throw new ChatException('Wrong chat token');
+            }
+            $redLabels = $chat->order->labels()->where('label_id', MessagesHelper::MESSAGE_RED_LABEL_ID)->count();
+            if ($redLabels == 0) {
+                $chat->order->labels()->attach(MessagesHelper::MESSAGE_RED_LABEL_ID, ['added_type' => Label::CHAT_TYPE]);
+            }
+            $chat->need_intervention = true;
+            $chat->save();
+            return response('ok');
+        } catch (ChatException $e) {
+            $e->log();
+            return response($e->getMessage(), 400);
+        }
+    }
+
     public function getMessages(Request $request, $token)
     {
         try {
@@ -90,7 +113,8 @@ class MessagesController extends Controller
                 if ($message->id <= $request->lastId) {
                     continue;
                 }
-                $out .= view('chat/single_message')->withMessage($message)->render();
+                $header = ChatHelper::getMessageHelper($message);
+                $out .= view('chat/single_message')->withMessage($message)->withHeader($header)->render();
             }
             $helper->setLastRead();
 
@@ -111,7 +135,7 @@ class MessagesController extends Controller
             $helper->currentUserId = $user->id;
             $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
             $out[] = [
-                'title' => $helper->getTitle(),
+                'title' => $helper->getTitle(false),
                 'url' => route('chat.show', ['token' => $helper->encrypt()]),
                 'new_message' => $helper->hasNewMessage()
             ];

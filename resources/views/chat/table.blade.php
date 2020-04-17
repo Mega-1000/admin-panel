@@ -12,9 +12,13 @@
     </thead>
     <tbody>
     @foreach ($chats as $chat)
-        <tr>
+        <tr
+            @if ($chat->need_intervention)
+                class="danger"
+            @endif
+        >
             <td>{{ $chat->id }}</td>
-            <td>{{ $chat->title }}</td>
+            <td>{!! $chat->title !!}</td>
             <td>{{ $chat->customers->first()->addresses->first()->phone ?? '' }}</td>
             <td>{!! implode('<br />' , ChatHelper::formatChatUsers($chat->users)) !!}</td>
             <td>{!! implode('<br />' , ChatHelper::formatChatUsers($chat->employees)) !!}</td>

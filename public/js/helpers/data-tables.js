@@ -16,6 +16,7 @@ $(document).ready(function() {
 
     var table = $('#dataTable').DataTable( {
         orderCellsTop: true,
-        fixedHeader: true
+        fixedHeader: true,
+        order: [[ 5, "desc" ]],
     } );
 } );

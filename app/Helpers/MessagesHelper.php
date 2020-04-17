@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use App\Entities\Chat;
 use App\Entities\CustomerAddress;
+use App\Entities\Label;
 use App\Entities\Product;
 use App\Entities\Order;
 use App\User;
@@ -34,7 +35,9 @@ class MessagesHelper
     const SHOW_VAR = 'v';
     const NOTIFICATION_TIME = 300;
 
-    const NEW_MESSAGE_LABEL_ID = 55;
+    const MESSAGE_RED_LABEL_ID = 55;
+    const MESSAGE_BLUE_LABEL_ID = 56;
+    const MESSAGE_YELLOW_LABEL_ID = 57;
 
     public function __construct($token = null)
     {
@@ -178,21 +181,18 @@ class MessagesHelper
                 }]);
                 $q->oldest();
             }])
+            ->with('order')
             ->find($this->chatId)
         ;
     }
 
-    public function getTitle()
+    public function getTitle($withBold = false)
     {
-        $product = $this->getProduct();
-        if ($product) {
-            return 'Czat dotyczy produktu: '.$product->name.' ('.$product->symbol.')';
+        $title = $this->prepareTitleText();
+        if (!$withBold) {
+            $title = strip_tags($title);
         }
-        $order = $this->getOrder();
-        if ($order) {
-            return 'Czat dotyczy zamówienia nr '.$order->id.'.';
-        }
-        return 'Czat ogólny z administracją '.env('APP_NAME');
+        return $title;
     }
 
     public function createNewChat()
@@ -252,6 +252,14 @@ class MessagesHelper
             throw new ChatException('Cannot save message');
         }
         $chatUser->messages()->save($messageObj);
+        if ($chat->order) {
+            if ($chatUser->user) {
+                $this->setChatLabel($chat, true);
+                $this->clearIntervention($chat);
+            } else {
+                $this->setChatLabel($chat, false);
+            }
+        }
         \App\Jobs\ChatNotificationJob::dispatch($chat->id)->delay(now()->addSeconds(self::NOTIFICATION_TIME + 5));
     }
 
@@ -409,5 +417,41 @@ class MessagesHelper
             throw new ChatException('Cannot find employee');
         }
         return $foundEmployee;
+    }
+
+    private function setChatLabel(Chat $chat, $clearDanger = false)
+    {
+        if ($clearDanger) {
+            $total = Chat::where('order_id', $chat->order->id)->where('need_intervention', true)->count();
+            if ($total <= 1) {
+                $chat->order->labels()->detach(MessagesHelper::MESSAGE_RED_LABEL_ID);
+            }
+        }
+        $chat->order->labels()->detach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
+        if ($chat->order->labels()->where('label_id', MessagesHelper::MESSAGE_BLUE_LABEL_ID)->count() == 0) {
+            $chat->order->labels()->attach(MessagesHelper::MESSAGE_BLUE_LABEL_ID, ['added_type' => Label::CHAT_TYPE]);
+        }
+    }
+
+    /**
+     * @return string
+     */
+    private function prepareTitleText(): string
+    {
+        $product = $this->getProduct();
+        if ($product) {
+            return 'Czat dotyczy produktu: ' . $product->name . ' (<b>' . $product->symbol . '</b>)';
+        }
+        $order = $this->getOrder();
+        if ($order) {
+            return 'Czat dotyczy zamówienia nr <b>' . $order->id . '</b>';
+        }
+        return 'Czat ogólny z administracją ' . env('APP_NAME');
+    }
+
+    private function clearIntervention($chat)
+    {
+        $chat->need_intervention = false;
+        $chat->save();
     }
 }

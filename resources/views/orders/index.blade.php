@@ -1905,6 +1905,11 @@
 
                         });
                     });
+                    return;
+                } else if (addedType == "{{ \App\Entities\Label::CHAT_TYPE }}") {
+                    var url = '{{ route("chat.index", ["all" => 1, "id" => ":id"]) }}';
+                    url = url.replace(':id', orderId);
+                    window.location.href = url
                     return
                 } else if (addedType != "C") {
                     let confirmed = confirm("Na pewno usunąć etykietę?");
