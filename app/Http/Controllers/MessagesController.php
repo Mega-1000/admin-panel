@@ -62,6 +62,9 @@ class MessagesController extends Controller
             $chat->title = $helper->getTitle(true);
             $chat->url = route('chat.show', ['token' => $helper->encrypt()]);
             $chat->lastMessage = $chat->messages()->latest()->first();
+            if (empty($chat->lastMessage)) {
+                $chat->lastMessage = (object) ['created_at' => null, 'message' => ''];
+            }
         }
 
         $chats = $chats->all();

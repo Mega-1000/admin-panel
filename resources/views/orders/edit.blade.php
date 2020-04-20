@@ -1252,6 +1252,21 @@
     <div class="order-messages" id="order-messages">
         <div class="panel panel-bordered">
             <div class="panel-body">
+                @php
+                    $orderButtons = ChatHelper::createButtonsArrayForOrder($order, Auth::user()->id, MessagesHelper::TYPE_USER);
+                @endphp
+                @foreach($orderButtons as $producent => $buttons)
+                    <p> {{ $producent }}
+                    @foreach($buttons as $button)
+                        <a id="create-button-orderPackages"
+                           href="{{ $button['url'] }}" target="_blank" class="btn btn-success">
+                            <i class="voyager-plus"></i> <span>{{ $button['description'] }}</span>
+                        </a>
+                    @endforeach
+                    </p>
+                @endforeach
+
+
                 @if(!empty($emails))
                     @foreach($emails as $email)
                         <div style="display: inline-block;">
