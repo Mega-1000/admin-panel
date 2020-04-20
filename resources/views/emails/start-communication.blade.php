@@ -1,5 +1,5 @@
 <body>
 <br/><br/>
-Aby rozpocząć dialog w sprawie zamówienia: {{ $orderId }}, zaloguj się na swoim koncie, a następnie w liście zleceń osobę z którą chcesz porozmawiać <a href="{{ env("FRONT_URL") }}/logowanie.html">Logowanie</a>
+W celu skontaktowania się w sprawie zamówienia: {{ $orderId }}, zaloguj się na swoim koncie, a następnie wejdź w zakładkę "Moje Konto" <a href="{{ env("FRONT_URL") }}/logowanie.html">Logowanie</a>
 
 </body>
