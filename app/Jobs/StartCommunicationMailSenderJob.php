@@ -39,7 +39,7 @@ class StartCommunicationMailSenderJob implements ShouldQueue
      */
     public function handle()
     {
-        if (filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+        if (filter_var($this->email, FILTER_VALIDATE_EMAIL) === false) {
             \Log::error('Error while sending e-mail in StartCommunicationMailSenderJob: invalid e-mail address');
             return;
         }
