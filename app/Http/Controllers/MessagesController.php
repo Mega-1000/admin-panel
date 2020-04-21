@@ -62,6 +62,9 @@ class MessagesController extends Controller
             $chat->title = $helper->getTitle(true);
             $chat->url = route('chat.show', ['token' => $helper->encrypt()]);
             $chat->lastMessage = $chat->messages()->latest()->first();
+            if (empty($chat->lastMessage)) {
+                $chat->lastMessage = (object) ['created_at' => null, 'message' => ''];
+            }
         }
 
         $chats = $chats->all();
@@ -120,6 +123,10 @@ class MessagesController extends Controller
                 if ($helper->currentUserType == MessagesHelper::TYPE_USER || $helper->currentUserType == MessagesHelper::TYPE_EMPLOYEE) {
                     $notices = $order->consultant_notices;
                 }
+            }
+            if ($chat->customers()->where('deleted_at', null)->count() < 1) {
+                $customer = $order->customer;
+                $possibleUsers->push($customer);
             }
             return view('chat.show')->with([
                 'notices' => $notices,

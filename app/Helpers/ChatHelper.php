@@ -2,7 +2,9 @@
 
 namespace App\Helpers;
 
+use App\Entities\Customer;
 use App\Entities\Employee;
+use App\Entities\Firm;
 
 class ChatHelper
 {
@@ -49,6 +51,8 @@ class ChatHelper
             $ret2 [] = $user->email_visibility ? $user->email : '';
             $ret2 = implode(' ', $ret2);
             $ret = [$ret, $ret2];
+        } else if (is_a($user, Customer::class)) {
+            $ret = ['klient: ' . self::formatEmailAndPhone($user->login, $user->addresses->first()->phone)];
         } else {
             $ret = [$user->name . ' ' . $user->firstname . ' ' . $user->lastname, $user->email, $user->phone];
         }
@@ -75,5 +79,44 @@ class ChatHelper
             $header .= ':';
         }
         return $header;
+    }
+
+    public static function prepareEmployeeButton($order, $userId, $type, $employee)
+    {
+        $helper = new MessagesHelper();
+        $helper->orderId = $order->id;
+        $helper->currentUserId = $userId;
+        $helper->currentUserType = $type;
+        $helper->employeeId = $employee->id;
+        $token = $helper->encrypt();
+        return $employee->employeeRoles->where('is_contact_displayed_in_fronted', 1)
+            ->map(function ($role) use ($token) {
+                $button = [
+                    'description' => $role->name,
+                    'url' => route('chat.show', ['token' => $token])
+                ];
+                return $button;
+            })->toArray();
+    }
+
+    public static function createButtonsArrayForOrder($order, $userId, $type): array
+    {
+        $orderButtons = [];
+        foreach ($order->items as $item) {
+            $product = $item->product;
+            $firm = Firm::where('symbol', 'like', $product->product_name_supplier)->first();
+            if (empty($firm)) {
+                continue;
+            }
+            $buttons = [];
+            foreach ($firm->employees as $employee) {
+                $button = self::prepareEmployeeButton($order, $userId, $type, $employee);
+                $buttons = array_merge($button, $buttons);
+                $buttons = collect($buttons)->unique('description')->toArray();
+            }
+            $key = $product->getProducent();
+            $orderButtons[$key] = $buttons;
+        }
+        return $orderButtons;
     }
 }

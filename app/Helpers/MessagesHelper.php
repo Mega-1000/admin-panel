@@ -132,6 +132,9 @@ class MessagesHelper
         if ($this->employeeId) {
             $this->users[self::TYPE_EMPLOYEE] = $this->employeeId;
         }
+        if ($this->currentUserType === self::TYPE_USER) {
+            $this->users[self::TYPE_USER] = $this->currentUserId;
+        }
     }
 
     public function getChat()
@@ -202,21 +205,27 @@ class MessagesHelper
         $chat->product_id = $this->productId ?: null;
         $chat->order_id = $this->orderId ?: null;
         $chat->employee_id = $this->employeeId ?: null;
-        if (empty($this->users[self::TYPE_CUSTOMER])) {
-            throw new ChatException('Missing customer ID');
-        }
-        $customer = Customer::find($this->users[self::TYPE_CUSTOMER]);
-        if (!$customer) {
-            throw new ChatException('Wrong customer ID');
-        }
         $chat->save();
-        $chat->customers()->attach($customer);
+        if (!empty($this->users[self::TYPE_CUSTOMER])) {
+            $customer = Customer::find($this->users[self::TYPE_CUSTOMER]);
+            if (!$customer) {
+                throw new ChatException('Wrong customer ID');
+            }
+            $chat->customers()->attach($customer);
+        }
         if (!empty($this->users[self::TYPE_EMPLOYEE])) {
             $employee = Employee::find($this->users[self::TYPE_EMPLOYEE]);
             if (!$employee) {
                 throw new ChatException('Wrong employee ID');
             }
             $chat->employees()->attach($employee);
+        }
+        if (!empty($this->users[self::TYPE_USER])) {
+            $user = User::find($this->users[self::TYPE_USER]);
+            if (!$user) {
+                throw new ChatException('Wrong user ID');
+            }
+            $chat->users()->attach($user);
         }
         $this->cache['chat'] = $chat;
         $this->chatId = $chat->id;
