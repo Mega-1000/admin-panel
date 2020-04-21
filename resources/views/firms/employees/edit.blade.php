@@ -145,6 +145,12 @@
                         >{{ $employee->additional_comments}}</textarea>
                     </div>
                     <div class="form-group">
+                        <label for="faq">@lang('employees.form.faq')</label>
+                        <textarea rows="4" cols="50" class="form-control" id="faq"
+                                  name="faq"
+                                  >{{ $employee->faq }}</textarea>
+                    </div>
+                    <div class="form-group">
                         <label for="postal_code">@lang('employees.form.postal_code')</label>
                         <input type="text" class="form-control" id="postal_code" name="postal_code"
                                value="{{ $employee->postal_code }}">
