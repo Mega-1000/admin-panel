@@ -14,6 +14,7 @@ class CheckStatusInpostPackagesJob extends Job
     protected $orderPackageRepository;
 
     const COURIER = 'INPOST';
+    const COURIER2 = 'ALLEGRO-INPOST';
 
     /**
      * Create a new job instance.
@@ -31,10 +32,14 @@ class CheckStatusInpostPackagesJob extends Job
      * @return void
      */
     public function handle(OrderPackageRepository $orderPackageRepository) {
-        $orderPackages = OrderPackage::where('delivery_courier_name', self::COURIER)
+        $orderPackages = array();
+        $orderPackages[] = OrderPackage::where('delivery_courier_name', self::COURIER)
                 ->where('shipment_date', '>', Carbon::today()->subDays(5))
                 ->get();
-
+        $orderPackages[] = OrderPackage::where('delivery_courier_name', self::COURIER2)
+               ->where('shipment_date', '>', Carbon::today()->subDays(5))
+               ->get();
+        
         if (empty($orderPackages)) {
             return;
         }

@@ -96,6 +96,9 @@ class OrdersCourierJobs extends Job
             case 'INPOST':
                 $result = $this->createPackageForInpost();
                 break;
+            case 'ALLEGRO-INPOST':
+                $result = $this->createPackageForInpost(1);
+                break;
             case 'APACZKA':
                 $result = $this->createPackageForApaczka();
                 break;
@@ -119,7 +122,7 @@ class OrdersCourierJobs extends Job
             'status' => 'WAITING_FOR_SENDING'
         ], $this->data['additional_data']['order_package_id']);
         $package = $this->orderPackageRepository->find($this->data['additional_data']['order_package_id']);
-        if ($package->delivery_courier_name !== 'INPOST') {
+        if ($package->delivery_courier_name !== 'INPOST' && $package->delivery_courier_name !== 'ALLEGRO-INPOST') {
             if ($package->delivery_courier_name === 'DPD') {
                 $path = storage_path('app/public/dpd/stickers/sticker' . $package->letter_number . '.pdf');
             } elseif ($package->delivery_courier_name === 'JAS') {
@@ -260,10 +263,14 @@ class OrdersCourierJobs extends Job
     /**
      * @return array
      */
-    public function createPackageForInpost()
+    public function createPackageForInpost($allegro = null)
     {
         try {
-            $integration = new Inpost($this->data);
+            if (is_null($allegro)) {
+                $integration = new Inpost($this->data);
+            } else {
+                $integration = new Inpost($this->data, 1);
+            }
             $json = $integration->prepareJsonForInpost();
             $package = $integration->createSimplePackage($json);
             if ($package->status == '400') {
