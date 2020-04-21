@@ -220,6 +220,13 @@ class MessagesHelper
             }
             $chat->employees()->attach($employee);
         }
+        if (!empty($this->users[self::TYPE_USER])) {
+            $user = User::find($this->users[self::TYPE_USER]);
+            if (!$user) {
+                throw new ChatException('Wrong user ID');
+            }
+            $chat->users()->attach($user);
+        }
         $this->cache['chat'] = $chat;
         $this->chatId = $chat->id;
         return $chat;

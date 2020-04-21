@@ -124,6 +124,10 @@ class MessagesController extends Controller
                     $notices = $order->consultant_notices;
                 }
             }
+            if ($chat->customers()->where('deleted_at', null)->count() < 1) {
+                $customer = $order->customer;
+                $possibleUsers->push($customer);
+            }
             return view('chat.show')->with([
                 'notices' => $notices,
                 'possible_users' => $possibleUsers,

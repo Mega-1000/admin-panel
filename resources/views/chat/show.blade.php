@@ -60,7 +60,7 @@
             @foreach($users as $chatUser)
                 <tr>
                     {!! $chatUser->getUserNicknameForChat($user_type) !!}
-                    @if(! empty($chatUser->employee))
+                    @if( empty($chatUser->user))
                         <th>
                             <button class="btn btn-danger remove-user" value="{{ $chatUser->id }}">Usuń
                             </button>
@@ -73,11 +73,15 @@
             </tr>
             @foreach($possible_users as $user)
                 <tr>
-                    <th class="alert-info alert">
-                        {!! ChatHelper::formatChatUser($user, $user_type) !!}
-                    </th>
-                    <th>
-                        <button class="btn btn-success add-user" value="{{ $user->id }}">Dodaj</button>
+                    @if(is_a($user, \App\Entities\Customer::class))
+                        <th class="alert-warning alert">
+                    @else
+                        <th class="alert-info alert">
+                    @endif
+                            {!! ChatHelper::formatChatUser($user, $user_type) !!}
+                        </th>
+                        <th>
+                        <button name="{{ get_class($user) }}" class="btn btn-success add-user" value="{{ $user->id }}">Dodaj</button>
                     </th>
                 </tr>
             @endforeach
@@ -149,7 +153,7 @@
             $.ajax({
                 method: "POST",
                 url: "{{ $routeAddUser }}",
-                data: {'employee_id': event.target.value}
+                data: {'user_id': event.target.value, 'type': event.target.name}
             })
                 .done(() => location.reload());
         })

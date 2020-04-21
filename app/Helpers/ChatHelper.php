@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Entities\Customer;
 use App\Entities\Employee;
 use App\Entities\Firm;
 
@@ -50,6 +51,8 @@ class ChatHelper
             $ret2 [] = $user->email_visibility ? $user->email : '';
             $ret2 = implode(' ', $ret2);
             $ret = [$ret, $ret2];
+        } else if (is_a($user, Customer::class)) {
+            $ret = ['klient: ' . self::formatEmailAndPhone($user->login, $user->addresses->first()->phone)];
         } else {
             $ret = [$user->name . ' ' . $user->firstname . ' ' . $user->lastname, $user->email, $user->phone];
         }
