@@ -59,9 +59,12 @@ class MessagesController extends Controller
             $helper->currentUserId = $userId ?? Auth::user()->id;
             $helper->currentUserType = MessagesHelper::TYPE_USER;
             $chat->has_new_message = $helper->hasNewMessage();
-            $chat->title = $helper->getTitle();
+            $chat->title = $helper->getTitle(true);
             $chat->url = route('chat.show', ['token' => $helper->encrypt()]);
             $chat->lastMessage = $chat->messages()->latest()->first();
+            if (empty($chat->lastMessage)) {
+                $chat->lastMessage = (object) ['created_at' => null, 'message' => ''];
+            }
         }
 
         $chats = $chats->all();
@@ -112,23 +115,33 @@ class MessagesController extends Controller
                 $users = $chat->chatUsers;
             }
             $possibleUsers = collect();
+            $notices = '';
             if ($product && $chat) {
                 $possibleUsers = $this->getNotAttachedChatUsersForProduct($product, $chat, $users);
             } else if ($order && $chat) {
                 $possibleUsers = $this->getNotAttachedChatUsersForOrder($order, $chat, $users);
+                if ($helper->currentUserType == MessagesHelper::TYPE_USER || $helper->currentUserType == MessagesHelper::TYPE_EMPLOYEE) {
+                    $notices = $order->consultant_notices;
+                }
+            }
+            if ($chat->customers()->where('deleted_at', null)->count() < 1) {
+                $customer = $order->customer;
+                $possibleUsers->push($customer);
             }
             return view('chat.show')->with([
+                'notices' => $notices,
                 'possible_users' => $possibleUsers,
                 'user_type' => $helper->currentUserType,
                 'users' => $users,
                 'chat' => $chat,
                 'product' => $product,
                 'order' => $order,
-                'title' => $helper->getTitle(),
+                'title' => $helper->getTitle(true),
                 'route' => route('api.messages.post-new-message', ['token' => $helper->encrypt()]),
                 'routeAddUser' => route('api.messages.add-new-user', ['token' => $helper->encrypt()]),
                 'routeRemoveUser' => route('api.messages.remove-user', ['token' => $helper->encrypt()]),
-                'routeRefresh' => route('api.messages.get-messages', ['token' => $helper->encrypt()])
+                'routeRefresh' => route('api.messages.get-messages', ['token' => $helper->encrypt()]),
+                'routeAskForIntervention' => route('api.messages.ask-for-intervention', ['token' => $helper->encrypt()])
             ]);
         } catch (ChatException $e) {
             $e->log();

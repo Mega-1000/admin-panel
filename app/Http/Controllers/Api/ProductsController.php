@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Entities\Category;
 use App\Entities\Product;
 use App\Entities\ChimneyAttribute;
-use App\Jobs\CheckDateOfProductNewPriceJob;
 use App\Repositories\ProductPriceRepository;
 use App\Repositories\ProductRepository;
 use App\Repositories\WarehouseRepository;
@@ -112,18 +111,12 @@ class ProductsController extends Controller
                 if (empty($product)) {
                     continue;
                 }
-                $firstPrice = (float) str_replace(',', '.', $item['value_of_price_change_data_first'] ?? 0);
-                $secondPrice = (float) str_replace(',', '.', $item['value_of_price_change_data_second'] ?? 0);
-                $thirdPrice = (float) str_replace(',', '.', $item['value_of_price_change_data_third'] ?? 0);
-                $fourthPrice = (float) str_replace(',', '.', $item['value_of_price_change_data_fourth'] ?? 0);
-
                 $product->date_of_price_change = (new Carbon($item['date_of_price_change']))->toDateString();
                 $product->date_of_the_new_prices = (new Carbon($item['date_of_the_new_prices']))->toDateString();
-                $product->value_of_price_change_data_first = CheckDateOfProductNewPriceJob::calculatePriceAfterDiscounts($firstPrice, $product);
-                $product->value_of_price_change_data_second = CheckDateOfProductNewPriceJob::calculatePriceAfterDiscounts($secondPrice, $product);
-                $product->value_of_price_change_data_third = CheckDateOfProductNewPriceJob::calculatePriceAfterDiscounts($thirdPrice, $product);
-                $product->value_of_price_change_data_fourth = CheckDateOfProductNewPriceJob::calculatePriceAfterDiscounts($fourthPrice, $product);
-
+                $product->value_of_price_change_data_first = (float) str_replace(',', '.', $item['value_of_price_change_data_first'] ?? 0);
+                $product->value_of_price_change_data_second = (float) str_replace(',', '.', $item['value_of_price_change_data_second'] ?? 0);
+                $product->value_of_price_change_data_third = (float) str_replace(',', '.', $item['value_of_price_change_data_third'] ?? 0);
+                $product->value_of_price_change_data_fourth = (float) str_replace(',', '.', $item['value_of_price_change_data_fourth'] ?? 0);
                 $product->save();
             }
 
@@ -135,7 +128,7 @@ class ProductsController extends Controller
             die();
         }
     }
-    
+
     public function getCurrentPrices() {
         $products = Product::where('subject_to_price_change', 1)->whereNotNull('date_of_price_change')->get();
         $data = array();
@@ -156,7 +149,7 @@ class ProductsController extends Controller
         header('Content-type: text/csv');
         header('Content-Disposition: attachment; filename="aktualneCeny.csv"');
         $file = fopen('php://output', 'w');
-        fputcsv($file, array('id', 'Nazwa produktu', 'Symbol Produktu', 'WedÅ‚ug czego przeliczane beda ceny(kolumna 108)', 'Data Zmiany', 'WstÄ™pna data nastÄ™pnej zmiany ceny', 'Zmienna1', 'Zmienna2', 'Zmienna3', 'Zmienna4'));
+        fputcsv($file, array('id', 'Nazwa produktu', 'Symbol Produktu', 'Wed³ug czego przeliczane beda ceny(kolumna 108)', 'Data Zmiany', 'Wstêpna data nastêpnej zmiany ceny', 'Zmienna1', 'Zmienna2', 'Zmienna3', 'Zmienna4'));
         foreach ($data as $row) {
             fputcsv($file, $row);
         }

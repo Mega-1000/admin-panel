@@ -12,10 +12,18 @@
     </thead>
     <tbody>
     @foreach ($chats as $chat)
-        <tr>
+        <tr
+            @if ($chat->need_intervention)
+                class="danger"
+            @endif
+        >
             <td>{{ $chat->id }}</td>
-            <td>{{ $chat->title }}</td>
-            <td>{{ $chat->customers->first()->addresses->first()->phone ?? '' }}</td>
+            <td>{!! $chat->title !!}</td>
+            @if($chat->customers->first())
+                <td>{{ $chat->customers->first()->addresses->first()->phone ?? '' }}</td>
+            @else
+                <td></td>
+            @endif
             <td>{!! implode('<br />' , ChatHelper::formatChatUsers($chat->users)) !!}</td>
             <td>{!! implode('<br />' , ChatHelper::formatChatUsers($chat->employees)) !!}</td>
             <td>{{ '['.$chat->lastMessage->created_at.'] '.$chat->lastMessage->message }}</td>

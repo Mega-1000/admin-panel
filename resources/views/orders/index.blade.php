@@ -1730,7 +1730,18 @@
                 $("#columnSearch" + column).parent().hide();
             }
         });
-
+        $('#columnSearch-clientPhone').click(function(){
+            var str = $('#columnSearch-clientPhone').val();
+            var replaced = str.replace(/-|\s/g,'');
+            clearFilters(false);
+            $('#columnSearch-clientPhone').val(replaced);
+        });
+        $('#columnSearch-orderId').click(function(){
+            var str = $('#columnSearch-orderId').val();
+            var replaced = str.replace(/-|\s/g,'');
+            clearFilters(false);
+            $('#columnSearch-orderId').val(replaced);
+        });
         function filterByPhone(number) {
             $("#columnSearch-clientPhone").val(number).change();
         }
@@ -1754,7 +1765,7 @@
             $('#searchOrderValue').val('');
             $('#searchPayment').val('');
             $('#searchLeft').val('');
-
+           
 
             table
                 .columns()
@@ -1765,7 +1776,7 @@
             if (reload) {
                 table.draw();
             }
-
+             $('#orderFilter').trigger("change");
         }
 
         function removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType) {
@@ -1894,6 +1905,11 @@
 
                         });
                     });
+                    return;
+                } else if (addedType == "{{ \App\Entities\Label::CHAT_TYPE }}") {
+                    var url = '{{ route("chat.index", ["all" => 1, "id" => ":id"]) }}';
+                    url = url.replace(':id', orderId);
+                    window.location.href = url
                     return
                 } else if (addedType != "C") {
                     let confirmed = confirm("Na pewno usunąć etykietę?");

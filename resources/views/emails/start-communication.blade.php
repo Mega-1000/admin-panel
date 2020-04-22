@@ -1,5 +1,5 @@
 <body>
 <br/><br/>
-Aby rozpocząć dialog w sprawie zamówienia: {{ $orderId }}, przejdź pod adres: {{env('APP_URL')}}/communication/{{ $orderId }}
+W celu skontaktowania się w sprawie zamówienia: {{ $orderId }}, zaloguj się na swoim koncie, a następnie wejdź w zakładkę "Moje Konto" <a href="{{ env("FRONT_URL") }}/logowanie.html">Logowanie</a>
 
 </body>

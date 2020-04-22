@@ -67,10 +67,10 @@ class ChatNotificationJob implements ShouldQueue
                 'Nowa wiadomość w '.env('APP_NAME'),
                 [
                     'url' => route('chat.show', ['token' => $helper->encrypt()]),
-                    'title' => $helper->getTitle()
+                    'title' => $helper->getTitle(false)
                 ]
             );
-            
+
             $chatUser->last_notification_time = now();
             $chatUser->save();
         } catch (\Exception $e) {

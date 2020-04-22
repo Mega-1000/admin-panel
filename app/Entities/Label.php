@@ -15,6 +15,8 @@ class Label extends Model implements Transformable
 {
     use TransformableTrait;
 
+    const CHAT_TYPE = 'chat';
+
     /**
      * The attributes that are mass assignable.
      *

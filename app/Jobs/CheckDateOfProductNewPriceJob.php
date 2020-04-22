@@ -2,8 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Repositories\ProductPriceRepository;
-use App\Repositories\ProductRepository;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -14,10 +12,6 @@ use Illuminate\Support\Facades\Log;
 class CheckDateOfProductNewPriceJob
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    protected $repository;
-
-    protected $productPriceRepository;
 
     /**
      * Create a new job instance.
@@ -33,24 +27,28 @@ class CheckDateOfProductNewPriceJob
      *
      * @return void
      */
-    public function handle(ProductRepository $repository, ProductPriceRepository $productPriceRepository)
+    public function handle()
     {
-        $this->repository = $repository;
-        $this->productPriceRepository = $productPriceRepository;
-
-        $products = $this->repository->findWhere([['date_of_the_new_prices', '<=', Carbon::today()->addDay()]]);
+        $products = \App\Entities\Product::where('date_of_the_new_prices', '<=', Carbon::today()->addDay())->get();
 
         foreach ($products as $product) {
             $group = $product->product_group_for_change_price;
-            if ($group !== null) {
-                $exp = explode('-', $group);
-                $groupExp = $exp[1];
-            } else {
+            if (empty($group)) {
                 Log::error(
-                    'Price group is null',
+                    'Price group is empty',
                     ['product_id' => $product->id, 'class' => get_class($this), 'line' => __LINE__]
                 );
                 die();
+            } else {
+                $exp = explode('-', $group);
+                if (count($exp) < 2) {
+                    Log::error(
+                        'Wrong product_group_for_change_price',
+                        ['product_id' => $product->id, 'class' => get_class($this), 'line' => __LINE__]
+                    );
+                    die();
+                }
+                $groupExp = $exp[1];
             }
             $pattern = $this->setPatternKey($product);
             switch ($groupExp) {
@@ -90,15 +88,15 @@ class CheckDateOfProductNewPriceJob
                     die();
             }
             //cena kartotekowa netto zakupu bez bonusa dla jednostek
-            $price['net_purchase_price_commercial_unit_after_discounts'] = number_format(CheckDateOfProductNewPriceJob::calculatePriceAfterDiscounts($price, $product) * $product->price->euro_exchange,
+            $price['net_purchase_price_commercial_unit_after_discounts'] = number_format($this->calculatePriceAfterDiscounts($price, $product) * $product->price->euro_exchange,
                 2, '.', '');
-            $price['net_purchase_price_basic_unit_after_discounts'] = number_format((CheckDateOfProductNewPriceJob::calculatePriceAfterDiscounts($price, $product) * $product->price->euro_exchange) / $product->packing->numbers_of_basic_commercial_units_in_pack,
+            $price['net_purchase_price_basic_unit_after_discounts'] = number_format(($this->calculatePriceAfterDiscounts($price, $product) * $product->price->euro_exchange) / $product->packing->numbers_of_basic_commercial_units_in_pack,
                 4, '.', '');
-            $price['net_purchase_price_calculated_unit_after_discounts'] = number_format(CheckDateOfProductNewPriceJob::calculatePriceAfterDiscounts($price, $product) * ($product->packing->unit_consumption / $product->packing->numbers_of_basic_commercial_units_in_pack) * $product->price->euro_exchange,
+            $price['net_purchase_price_calculated_unit_after_discounts'] = number_format($this->calculatePriceAfterDiscounts($price, $product) * ($product->packing->unit_consumption / $product->packing->numbers_of_basic_commercial_units_in_pack) * $product->price->euro_exchange,
                 4, '.', '');
-            $price['net_purchase_price_aggregate_unit_after_discounts'] = number_format(CheckDateOfProductNewPriceJob::calculatePriceAfterDiscounts($price, $product) * $product->price->euro_exchange,
+            $price['net_purchase_price_aggregate_unit_after_discounts'] = number_format($this->calculatePriceAfterDiscounts($price, $product) * $product->price->euro_exchange,
                 4, '.', '');
-            $price['net_purchase_price_the_largest_unit_after_discounts'] = number_format(CheckDateOfProductNewPriceJob::calculatePriceAfterDiscounts($price, $product) * $product->price->euro_exchange,
+            $price['net_purchase_price_the_largest_unit_after_discounts'] = number_format($this->calculatePriceAfterDiscounts($price, $product) * $product->price->euro_exchange,
                 4, '.', '');
 
             //cena tabelaryczna brutto zakupu dla jednostek
@@ -188,7 +186,7 @@ class CheckDateOfProductNewPriceJob
         return $data;
     }
 
-    public static function calculatePriceAfterDiscounts($price, $product)
+    private function calculatePriceAfterDiscounts($price, $product)
     {
         return
             (float) $price['net_purchase_price_commercial_unit']

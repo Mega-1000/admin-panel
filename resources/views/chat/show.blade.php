@@ -23,29 +23,16 @@
 <div id="app">
     <div class="container" id="flex-container">
         <div id="chat-container">
-            <div class="text-center alert alert-info">{{ $title }}</div>
+            <div class="text-center alert alert-info">{!! $title !!}</div>
+            @if (!empty($notices))
+                <div class="alert-info alert">Uwagi konsultanta: <b>{{ $notices  }}</b></div>
+            @endif
             <div class="panel panel-default" style="max-height: calc(100vh - 200px); overflow-y: scroll">
                 <div class="panel-body">
                     @if ($chat)
                         @foreach ($chat->messages as $message)
                             @php
-                                $header = '';
-                                if ($message->chatUser->customer) {
-                                    $header .=  'Klient ';
-                                    $header .=  ChatHelper::formatEmailAndPhone($message->chatUser->customer->login,
-                                    $message->chatUser->customer->addresses->first()->phone ?? '');
-                                } else if ($message->chatUser->employee) {
-                                    $header .=  'Obsługa ';
-                                    $header .= $message->chatUser->employee->firstname . ' ' . $message->chatUser->employee->lastname;
-                                    $header .= ChatHelper::formatEmailAndPhone($message->chatUser->employee->email, $message->chatUser->employee->phone);
-                                    $header .= ChatHelper::formatEmployeeRoles($message->chatUser->employee);
-                                    $header .= ':';
-                                } else if ($message->chatUser->user) {
-                                    $header .=  'Moderator ';
-                                    $header .= $message->chatUser->user->name . ' ' . $message->chatUser->user->fistname . ' ' . $message->chatUser->user->lastname;
-                                    $header .= ChatHelper::formatEmailAndPhone($message->chatUser->user->email, $message->chatUser->user->phone);
-                                    $header .= ':';
-                                }
+                                $header = ChatHelper::getMessageHelper($message);
                             @endphp
                             @include ('chat/single_message', ['message' => $message, 'header' => $header])
                         @endforeach
@@ -64,6 +51,7 @@
                     </div>
                 </div>
             </form>
+            <button id="call-mod" class="btn btn-warning add-user">Wezwij moderatora</button>
         </div>
         <table id="chat-users">
             <tr>
@@ -72,7 +60,7 @@
             @foreach($users as $chatUser)
                 <tr>
                     {!! $chatUser->getUserNicknameForChat($user_type) !!}
-                    @if(! empty($chatUser->employee))
+                    @if( empty($chatUser->user))
                         <th>
                             <button class="btn btn-danger remove-user" value="{{ $chatUser->id }}">Usuń
                             </button>
@@ -85,11 +73,15 @@
             </tr>
             @foreach($possible_users as $user)
                 <tr>
-                    <th class="alert-info alert">
-                        {!! ChatHelper::formatChatUser($user, $user_type) !!}
-                    </th>
-                    <th>
-                        <button class="btn btn-success add-user" value="{{ $user->id }}">Dodaj</button>
+                    @if(is_a($user, \App\Entities\Customer::class))
+                        <th class="alert-warning alert">
+                    @else
+                        <th class="alert-info alert">
+                    @endif
+                            {!! ChatHelper::formatChatUser($user, $user_type) !!}
+                        </th>
+                        <th>
+                        <button name="{{ get_class($user) }}" class="btn btn-success add-user" value="{{ $user->id }}">Dodaj</button>
                     </th>
                 </tr>
             @endforeach
@@ -161,7 +153,7 @@
             $.ajax({
                 method: "POST",
                 url: "{{ $routeAddUser }}",
-                data: {'employee_id': event.target.value}
+                data: {'user_id': event.target.value, 'type': event.target.name}
             })
                 .done(() => location.reload());
         })
@@ -172,6 +164,14 @@
                 data: {'user_id': event.target.value}
             })
                 .done(() => location.reload());
+        })
+        $('#call-mod').click((event) => {
+            $.ajax({
+                method: "POST",
+                url: "{{ $routeAskForIntervention }}",
+                data: {'user_id': event.target.value}
+            })
+                .done(() => alert('Moderator został poinformowany'));
         })
     });
 </script>

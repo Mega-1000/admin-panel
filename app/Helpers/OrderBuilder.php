@@ -2,7 +2,6 @@
 
 namespace App\Helpers;
 
-use App\Entities\Customer;
 use App\Entities\CustomerAddress;
 use App\Entities\Order;
 use App\Entities\OrderAddress;
@@ -12,9 +11,9 @@ use App\Helpers\interfaces\iDividable;
 use App\Helpers\interfaces\iGetUser;
 use App\Helpers\interfaces\iOrderPriceOverrider;
 use App\Helpers\interfaces\iOrderTotalPriceCalculator;
+use App\Helpers\interfaces\iPostOrderAction;
 use App\Helpers\interfaces\iSumable;
 use Exception;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 class OrderBuilder
@@ -42,6 +41,11 @@ class OrderBuilder
      */
     private $userSelector;
 
+    /**
+     * @var iPostOrderAction
+     */
+    private $postOrderActions;
+
     public function setPackageGenerator(iDividable $generator)
     {
         $this->packageGenerator = $generator;
@@ -66,9 +70,16 @@ class OrderBuilder
         return $this;
     }
 
-    public function setUserSelector($userSelector): void
+    public function setUserSelector(iGetUser $userSelector)
     {
         $this->userSelector = $userSelector;
+        return $this;
+    }
+
+    public function setPostOrderActions(iPostOrderAction $postOrderActions)
+    {
+        $this->postOrderActions = $postOrderActions;
+        return $this;
     }
 
     public function newStore($data)
@@ -114,7 +125,7 @@ class OrderBuilder
             $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
             $helper->createNewChat();
             $helper->addMessage($data['customer_notices']);
-            $order->labels()->attach(MessagesHelper::NEW_MESSAGE_LABEL_ID);
+            $order->labels()->attach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
         }
         $this->assignItemsToOrder($order, $data['order_items']);
 
@@ -153,6 +164,9 @@ class OrderBuilder
             $order->shipment_price_for_client = $this->totalTransportSumCalculator->getSum($order);
         }
         $order->save();
+        if ($this->postOrderActions) {
+            $this->postOrderActions->run($order);
+        }
         return ['id' => $order->id, 'canPay' => $canPay ?? false];
     }
 
@@ -306,7 +320,6 @@ class OrderBuilder
 
         return [['id' => $product->id, 'amount' => 1]];
     }
-
     public static function getPriceColumns()
     {
         return [
