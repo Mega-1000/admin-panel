@@ -40,9 +40,9 @@ class MessagesController extends Controller
             $helper = new MessagesHelper($token);
             $chat = $helper->getChat();
             if (!$chat) {
-                throw new ChatException('Podany czat nie istnieje');
+                $chat = $helper->createNewChat();
             }
-            list($user, $chatUser) = $this->findCustomerOrEmployee($request, $chat);
+            list($user, $chatUser) = $this->findCustomerOrEmployeeInTrash($request, $chat);
             if ($chatUser) {
                 $chatUser->restore();
                 return response('ok');
@@ -60,9 +60,13 @@ class MessagesController extends Controller
             $helper = new MessagesHelper($token);
             $chat = $helper->getChat();
             if (!$chat) {
-                throw new ChatException('Podany czat nie istnieje');
+                $chat = $helper->createNewChat();
             }
-            $chatUser = ChatUser::findOrFail($request->user_id);
+            if ($request->type == ChatUser::class) {
+                $chatUser = ChatUser::findOrFail($request->user_id);
+            } else {
+                list($user, $chatUser) = $this->findCustomerOrEmployee($request, $chat);
+            }
             $chatUser->delete();
             return response('ok');
         } catch (ChatException $e) {
@@ -153,12 +157,27 @@ class MessagesController extends Controller
         return response(['url' => $url], 200);
     }
 
-    /**
-     * @param Request $request
-     * @param $chat
-     * @return array
-     */
     private function findCustomerOrEmployee(Request $request, $chat): array
+    {
+        if ($request->type == Customer::class) {
+            $user = Customer::findOrFail($request->user_id);
+            $chatUser = ChatUser::where('chat_id', $chat->id)
+                ->where('customer_id', $user->id)
+                ->withTrashed()
+                ->first();
+        }
+        if ($request->type == Employee::class) {
+            $user = Employee::findOrFail($request->user_id);
+            $chatUser = ChatUser::where('chat_id', $chat->id)
+                ->where('employee_id', $user->id)
+                ->whereNull('deleted_at')
+                ->withTrashed()
+                ->first();
+        }
+        return array($user, $chatUser);
+    }
+
+    private function findCustomerOrEmployeeInTrash(Request $request, $chat): array
     {
         if ($request->type == Customer::class) {
             $user = Customer::findOrFail($request->user_id);

@@ -2,11 +2,12 @@
 
 namespace App\Entities;
 
+use App\Entities\interfaces\iChatNickname;
 use App\Helpers\ChatHelper;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ChatUser extends Model
+class ChatUser extends Model implements iChatNickname
 {
     use SoftDeletes;
     protected $table = 'chat_user';
