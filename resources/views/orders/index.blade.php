@@ -373,6 +373,7 @@
     </div>
     <div style="display: flex; align-items: center;" id="add-label-container">
         <a name="actualization-price" target="_blank" class="btn btn-success" href="products/getPrice">Pobierz csv z nowymi cenami</a>
+        <a style ="margin-left: 10px" name="actualization-price" target="_blank" class="btn btn-success" href="orders/getCosts">Pobierz realne wartości zleceń z pliku csv</a>
     </div>
     <div class="form-group">
         <label for="protocols">Protokoły z dnia dzisiejszego</label>

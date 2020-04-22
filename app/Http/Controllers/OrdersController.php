@@ -13,6 +13,7 @@ use App\Helpers\OrderCalcHelper;
 use App\Http\Requests\OrderUpdateRequest;
 use App\Jobs\AddLabelJob;
 use App\Jobs\ImportOrdersFromSelloJob;
+use App\Jobs\UpdatePackageRealCostJob;
 use App\Jobs\Orders\MissingDeliveryAddressSendMailJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Jobs\RemoveLabelJob;
@@ -2289,7 +2290,16 @@ class OrdersController extends Controller
 
         return view('customers.confirmation.confirmationThanks');
     }
-
+    
+    public function getCosts()
+    {
+        dispatch_now(new UpdatePackageRealCostJob());
+        return redirect()->route('orders.index')->with([
+            'message' => 'Rozpoczęto pobieranie realnych wartości zleceń',
+            'alert-type' => 'success',
+        ]); 
+    }
+    
     public function selloImport()
     {
         dispatch_now(new ImportOrdersFromSelloJob());
