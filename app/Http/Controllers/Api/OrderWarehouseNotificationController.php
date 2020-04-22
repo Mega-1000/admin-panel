@@ -78,13 +78,6 @@ class OrderWarehouseNotificationController extends Controller
 
             if (!empty($data['customer_notices'])) {
                 $this->sendMessage($data, $notification);
-
-//                $notification->order->messages()->create([
-//                    'title' => 'Awizacja przyjęta',
-//                    'type' => 'WAREHOUSE',
-//                    'status' => 'OPEN',
-//                    'message' => $data['customer_notices'],
-//                ]);
             }
 
             $notification->order->shipment_date = $notification->realization_date;
