@@ -38,7 +38,7 @@
                                    @if (!empty($role))  value="{{ $role->symbol }}"@endif />
                         </div>
                         <div class="form-group">
-                            <label for="is_contact_displayed_in_fronted"> @lang('firms.form.role_symbol')</label>
+                            <label for="is_contact_displayed_in_fronted"> @lang('firms.form.role_displayed')</label>
                             <input type="checkbox" id="is_contact_displayed_in_fronted"
                                    name="is_contact_displayed_in_fronted"
                             @if (!empty($role))  {{ $role->is_contact_displayed_in_fronted ? "checked" : "" }}@endif />
