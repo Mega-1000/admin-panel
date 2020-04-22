@@ -2,6 +2,8 @@
 
 namespace App\Entities;
 
+use App\Entities\interfaces\iChatNickname;
+use App\Helpers\ChatHelper;
 use Illuminate\Database\Eloquent\Model;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
@@ -11,7 +13,7 @@ use Prettus\Repository\Traits\TransformableTrait;
  *
  * @package namespace App\Entities;
  */
-class Employee extends Model implements Transformable
+class Employee extends Model implements Transformable, iChatNickname
 {
     use TransformableTrait;
 
@@ -86,4 +88,10 @@ class Employee extends Model implements Transformable
     {
         return $this->belongsToMany(Chat::class, 'chat_user')->withTimestamps();
     }
+
+    public function getUserNicknameForChat($userType)
+    {
+        return '<th class="alert-info alert">' . ChatHelper::formatChatUser($this, $userType) . '</th>';
+    }
+
 }

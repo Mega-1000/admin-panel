@@ -111,20 +111,29 @@ class MessagesController extends Controller
             $helper->setLastRead();
             if (empty($chat)) {
                 $users = collect();
+                if ($helper->employeeId) {
+                    $users->push(Employee::find($helper->employeeId));
+                }
             } else {
                 $users = $chat->chatUsers;
             }
             $possibleUsers = collect();
             $notices = '';
-            if ($product && $chat) {
-                $possibleUsers = $this->getNotAttachedChatUsersForProduct($product, $chat, $users);
-            } else if ($order && $chat) {
-                $possibleUsers = $this->getNotAttachedChatUsersForOrder($order, $chat, $users);
+            if ($product) {
+                $possibleUsers = $this->getNotAttachedChatUsersForProduct($product, $chat->customers->first());
+            } else if ($order) {
+                $possibleUsers = $this->getNotAttachedChatUsersForOrder($order, $users);
                 if ($helper->currentUserType == MessagesHelper::TYPE_USER || $helper->currentUserType == MessagesHelper::TYPE_EMPLOYEE) {
                     $notices = $order->consultant_notices;
                 }
             }
-            if ($chat->customers()->where('deleted_at', null)->count() < 1) {
+            if ($chat) {
+                $possibleUsers = $this->filterPossibleUsersWithCurrentlyAdded($possibleUsers, $chat, $users);
+                if ($chat->customers()->where('deleted_at', null)->count() < 1) {
+                    $customer = $order->customer;
+                    $possibleUsers->push($customer);
+                }
+            } else {
                 $customer = $order->customer;
                 $possibleUsers->push($customer);
             }
@@ -208,7 +217,7 @@ class MessagesController extends Controller
      * @param Collection $users
      * @return Collection
      */
-    private function getNotAttachedChatUsersForProduct($product, $chat, Collection $users): Collection
+    private function getNotAttachedChatUsersForProduct($product, $customer): Collection
     {
         $possibleUsers = collect();
         foreach ($product->media()->get() as $media) {
@@ -216,8 +225,8 @@ class MessagesController extends Controller
             if (count($mediaData) != 3) {
                 continue;
             }
-            if ($chat->customers->first()->standardAddress()) {
-                $codeObj = PostalCodeLatLon::where('postal_code', $chat->customers->first()->standardAddress()->postal_code)->first();
+            if ($customer->standardAddress()) {
+                $codeObj = PostalCodeLatLon::where('postal_code',$customer->standardAddress()->postal_code)->first();
             } else {
                 continue;
             }
@@ -229,8 +238,6 @@ class MessagesController extends Controller
             $possibleUsers = $possibleUsers->merge($availableUser);
         }
         $possibleUsers = $possibleUsers->unique('id');
-
-        $possibleUsers = $this->filterPossibleUsersWithCurrentlyAdded($possibleUsers, $chat, $users);
         return $possibleUsers;
     }
 
@@ -260,7 +267,7 @@ class MessagesController extends Controller
      * @param Collection $users
      * @return array
      */
-    private function getNotAttachedChatUsersForOrder($order, $chat, Collection $users): Collection
+    private function getNotAttachedChatUsersForOrder($order, Collection $users): Collection
     {
         $possibleUsers = collect();
         foreach ($order->items as $product) {
@@ -270,7 +277,6 @@ class MessagesController extends Controller
             }
             $possibleUsers = $possibleUsers->merge($firm->employees);
         }
-        $possibleUsers = $this->filterPossibleUsersWithCurrentlyAdded($possibleUsers, $chat, $users);
         return $possibleUsers;
     }
 }

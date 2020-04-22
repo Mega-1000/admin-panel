@@ -62,7 +62,7 @@
                     {!! $chatUser->getUserNicknameForChat($user_type) !!}
                     @if( empty($chatUser->user))
                         <th>
-                            <button class="btn btn-danger remove-user" value="{{ $chatUser->id }}">Usuń
+                            <button class="btn btn-danger remove-user" value="{{ $chatUser->id }}" name="{{ get_class($chatUser) }}">Usuń
                             </button>
                         </th>
                     @endif
@@ -161,7 +161,7 @@
             $.ajax({
                 method: "POST",
                 url: "{{ $routeRemoveUser }}",
-                data: {'user_id': event.target.value}
+                data: {'user_id': event.target.value, 'type': event.target.name}
             })
                 .done(() => location.reload());
         })
