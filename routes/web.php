@@ -268,6 +268,7 @@ Route::group(['prefix' => 'admin'], function () {
             'OrdersController@getDataFromFirm')->name('orders.getDataFromFirm');
         Route::get('orders/{id}/sendOfferToCustomer',
             'OrdersController@sendOfferToCustomer')->name('orders.sendOfferToCustomer');
+        Route::get('orders/getCosts', 'OrdersController@getCosts')->name('orders.getCosts');
 
         Route::get('orderPayments/datatable/{id}',
             'OrdersPaymentsController@datatable')->name('order_payments.datatable');

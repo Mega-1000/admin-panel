@@ -9,6 +9,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Entities\OrderPackage;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 
 class UpdatePackageRealCostJob implements ShouldQueue {
@@ -26,7 +27,7 @@ class UpdatePackageRealCostJob implements ShouldQueue {
     }
 
     public function updateCost($inpostPackages, $pocztexPackages, $dpdPackages) {
-        $pathInpost = Storage::path('user-files/costs/specyfikacjainpost.csv');
+        $pathInpost = Storage::path('user-files/costs/inpost.csv');
         if (!empty($inpostPackages) && file_exists($pathInpost)) {
             $spec = fopen($pathInpost, 'r');
             while (($csvLine = fgetcsv($spec, 1000, ";")) !== FALSE) {
@@ -38,7 +39,7 @@ class UpdatePackageRealCostJob implements ShouldQueue {
                 }
             }
         }
-        $pathPP = Storage::path('user-files/costs/specyfikacjapocztapolska.csv');
+        $pathPP = Storage::path('user-files/costs/pocztapolska.csv');
         if (!empty($pocztexPackages) && file_exists($pathPP)) {
             $spec = fopen($pathPP, 'r');
             while (($csvLine = fgetcsv($spec, 1000, ",")) !== FALSE) {
@@ -50,7 +51,7 @@ class UpdatePackageRealCostJob implements ShouldQueue {
                 }
             }
         }
-        $pathDpd = Storage::path('user-files/costs/specyfikacjadpd.csv');
+        $pathDpd = Storage::path('user-files/costs/dpd.csv');
         if (!empty($dpdPackages) && file_exists($pathDpd)) {
             $spec = fopen($pathDpd, 'r');
             while (($csvLine = fgetcsv($spec, 1000, ",")) !== FALSE) {
