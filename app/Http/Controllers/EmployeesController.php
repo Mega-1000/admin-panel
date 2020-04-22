@@ -65,6 +65,7 @@ class EmployeesController extends Controller
         $employee->additional_comments = $request->input('additional_comments');
         $employee->postal_code = $request->input('postal_code');
         $employee->status = $request->input('status');
+        $employee->faq = $request->input('faq');
         if (!empty($postal)) {
             $employee->latitude = $postal->latitude;
             $employee->longitude = $postal->longitude;
@@ -153,6 +154,7 @@ class EmployeesController extends Controller
         $employee->additional_comments = $request->input('additional_comments');
         $employee->postal_code = $request->input('postal_code');
         $employee->status = $request->input('status');
+        $employee->faq = $request->input('faq');
         if (!empty($postal)) {
             $employee->latitude = $postal->latitude;
             $employee->longitude = $postal->longitude;

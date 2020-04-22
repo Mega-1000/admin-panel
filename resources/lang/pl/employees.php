@@ -46,6 +46,7 @@ return [
         'postal_code' => 'Kod pocztowy',
         'magazines' => 'Magazyny (Które obsługuje pracownik)',
         'numer' => 'Numer osoby (Potrzebne do czatu, jezeli kilka osob bedzie mialo tą samą pozycje to wybierze według tego numeru)',
+        'faq' => 'FAQ podane przez pracownika (np. nie dzwonić w godzinach od 10 do 12)',
         'radius' => 'Zakres działania'
     ],
     'message' => [
