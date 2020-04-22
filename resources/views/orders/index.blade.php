@@ -504,7 +504,7 @@
             <th>
                 <div><span>@lang('orders.table.orderId')</span></div>
                 <div class="input_div">
-                    <input type="text" id="columnSearch-orderId"/>
+                    <span title="KLIKNIECIE TEGO POLA USUWA FILTRY"><input type="text" id="columnSearch-orderId"/></span>
                 </div>
             </th>
             <th>
@@ -539,7 +539,7 @@
             <th>
                 <div><span>@lang('orders.table.clientPhone')</span></div>
                 <div class="input_div">
-                    <input type="text" id="columnSearch-clientPhone"/>
+                    <span title="KLIKNIJ PONOWNIE ABY USUNĄĆ SPACJE I MYŚLNIKI"><input type="text" id="columnSearch-clientPhone"/></span>
                 </div>
             <th>
                 <div><span>@lang('orders.table.clientEmail')</span></div>
@@ -1737,10 +1737,7 @@
             $('#columnSearch-clientPhone').val(replaced);
         });
         $('#columnSearch-orderId').click(function(){
-            var str = $('#columnSearch-orderId').val();
-            var replaced = str.replace(/-|\s/g,'');
             clearFilters(false);
-            $('#columnSearch-orderId').val(replaced);
         });
         function filterByPhone(number) {
             $("#columnSearch-clientPhone").val(number).change();

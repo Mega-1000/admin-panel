@@ -487,7 +487,17 @@ class OrdersController extends Controller
             'spedition_comment' => $request->input('spedition_comment'),
         ], $id);
 
-
+        $orderObj = Order::find($id);
+        $orderObj->initial_sending_date_client = $request->input('initial_sending_date_client');
+        $orderObj->initial_sending_date_consultant = $request->input('initial_sending_date_consultant');
+        $orderObj->initial_sending_date_magazine = $request->input('initial_sending_date_magazine');
+        $orderObj->confirmed_sending_date_con_mag = $request->input('confirmed_sending_date_con_mag');
+        $orderObj->initial_pickup_date_client = $request->input('initial_pickup_date_client');
+        $orderObj->confirmed_pickup_date_client = $request->input('confirmed_pickup_date_client');
+        $orderObj->confirmed_pickup_date_con_mag = $request->input('confirmed_pickup_date_con_mag');
+        $orderObj->initial_delivery_date_con_mag = $request->input('initial_delivery_date_con_mag');
+        $orderObj->confirmed_delivery_date = $request->input('confirmed_delivery_date');
+        $orderObj->save();
         $task = $this->taskRepository->findByField(['order_id' => $order->id]);
 
         if ($task->first->id != null) {

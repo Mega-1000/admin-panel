@@ -126,6 +126,15 @@ return [
         'warehouse_notice' => 'Opis obsługi magazynu',
         'warehouse_value' => 'Koszt obsługi magazynu',
         'production_date' => 'Data produkcji',
+        'initial_sending_date_client' => 'Wstępna data rozpoczecia nadawania przesyłki wskazana przez klienta',
+        'initial_sending_date_consultant' => 'Wstępna data rozpoczecia nadawania przesyłki wskazana przez konsultanta',
+        'initial_sending_date_magazine' => 'Wstępna data ropoczecia nadawania przesyłki wskazana przez magazyn',
+        'confirmed_sending_date_con_mag' => 'Zatwierdzona data rozpoczecia nadawania przesyłki przez konsultanta bądź magazyn',
+        'initial_pickup_date_client' => 'Wstepna data odbioru towaru wraz z przybliżoną godziną wskazaną przez klienta',
+        'confirmed_pickup_date_client' => 'Potwierdzona data i godzina odbioru wskazana przez klienta',
+        'confirmed_pickup_date_con_mag' => 'Potwierdzona data i godzina odbioru zatwierdzona przez magazyn wydający bądź konsultanta',
+        'initial_delivery_date_con_mag' => 'Wstępna data i przybliżona godzina dostawy towaru wskazana przez magazyn bądź konsultanta',
+        'confirmed_delivery_date' => 'Potwierdzona data i przybliżona godzina dostawy',
     ],
 
 ];
