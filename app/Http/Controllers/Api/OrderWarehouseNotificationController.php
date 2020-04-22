@@ -2,6 +2,10 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Entities\Employee;
+use App\Entities\Order;
+use App\Entities\Warehouse;
+use App\Helpers\MessagesHelper;
 use App\Helpers\StatusesHelper;
 use App\Http\Requests\Api\OrderWarehouseNotification\AcceptShipmentRequest;
 use App\Http\Requests\Api\OrderWarehouseNotification\DenyShipmentRequest;
@@ -52,12 +56,7 @@ class OrderWarehouseNotificationController extends Controller
             $data['waiting_for_response'] = false;
             $notification = $this->orderWarehouseNotificationRepository->update($data, $notificationId);
 
-            $notification->order->messages()->create([
-                'title' => 'Awizacja odrzucona',
-                'type' => 'WAREHOUSE',
-                'status' => 'OPEN',
-                'message' => $data['customer_notices'],
-            ]);
+            $this->sendMessage($data, $notification);
 
             dispatch_now(new DispatchLabelEventByNameJob($data['order_id'], "warehouse-notification-denied"));
 
@@ -78,12 +77,7 @@ class OrderWarehouseNotificationController extends Controller
             $notification = $this->orderWarehouseNotificationRepository->update($data, $notificationId);
 
             if (!empty($data['customer_notices'])) {
-                $notification->order->messages()->create([
-                    'title' => 'Awizacja przyjęta',
-                    'type' => 'WAREHOUSE',
-                    'status' => 'OPEN',
-                    'message' => $data['customer_notices'],
-                ]);
+                $this->sendMessage($data, $notification);
             }
 
             $notification->order->shipment_date = $notification->realization_date;
@@ -154,5 +148,31 @@ class OrderWarehouseNotificationController extends Controller
             );
             die();
         }
+    }
+
+    /**
+     * @param $data
+     * @param $notification
+     * @throws \App\Helpers\Exceptions\ChatException
+     */
+    private function sendMessage($data, $notification): void
+    {
+        $warehouse = Warehouse::findOrFail($data['warehouse_id']);
+        $role_id = config('employees_roles')['zamawianie-towaru'];
+
+        $employees = $warehouse->firm->employees->filter(function ($employee) use ($role_id) {
+            return $employee->employeeRoles->find($role_id);
+        });
+        if (empty($employees)) {
+            $employees = $warehouse->firm->employees;
+        }
+
+        $helper = new MessagesHelper();
+        $helper->orderId = $data['order_id'];
+        $helper->currentUserId = $employees->first()->id;
+        $helper->currentUserType = MessagesHelper::TYPE_EMPLOYEE;
+        $helper->createNewChat();
+        $helper->addMessage($data['customer_notices']);
+        $notification->order->labels()->attach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
     }
 }

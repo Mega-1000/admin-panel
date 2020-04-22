@@ -129,6 +129,9 @@ class MessagesHelper
         if ($this->currentUserType == self::TYPE_CUSTOMER) {
             $this->users[self::TYPE_CUSTOMER] = $this->currentUserId;
         }
+        if ($this->currentUserType == self::TYPE_EMPLOYEE) {
+            $this->users[self::TYPE_EMPLOYEE] = $this->currentUserId;
+        }
         if ($this->employeeId) {
             $this->users[self::TYPE_EMPLOYEE] = $this->employeeId;
         }
