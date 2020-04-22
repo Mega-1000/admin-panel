@@ -26,8 +26,9 @@ class UpdatePackageRealCostJob implements ShouldQueue {
     }
 
     public function updateCost($inpostPackages, $pocztexPackages, $dpdPackages) {
-        if (!empty($inpostPackages) && file_exists('specyfikacjaInpost.csv')) {
-            $spec = fopen('specyfikacjaInpost.csv', 'r');
+        $pathInpost = Storage::path('user-files/costs/specyfikacjainpost.csv');
+        if (!empty($inpostPackages) && file_exists($pathInpost)) {
+            $spec = fopen($pathInpost, 'r');
             while (($csvLine = fgetcsv($spec, 1000, ";")) !== FALSE) {
                 foreach ($inpostPackages as $inpostPackage) {
                     if ($inpostPackage->letter_number == $csvLine[2]) {
@@ -37,8 +38,9 @@ class UpdatePackageRealCostJob implements ShouldQueue {
                 }
             }
         }
-        if (!empty($pocztexPackages) && file_exists('specyfikacjaPocztaPolska.csv')) {
-            $spec = fopen('specyfikacjaPocztaPolska.csv', 'r');
+        $pathPP = Storage::path('user-files/costs/specyfikacjapocztapolska.csv');
+        if (!empty($pocztexPackages) && file_exists($pathPP)) {
+            $spec = fopen($pathPP, 'r');
             while (($csvLine = fgetcsv($spec, 1000, ",")) !== FALSE) {
                 foreach ($pocztexPackages as $pocztexPackage) {
                     if ($pocztexPackage->letter_number == $csvLine[0]) {
@@ -48,8 +50,9 @@ class UpdatePackageRealCostJob implements ShouldQueue {
                 }
             }
         }
-        if (!empty($dpdPackages) && file_exists('specyfikacjaDpd.csv')) {
-            $spec = fopen('specyfikacjaDpd.csv', 'r');
+        $pathDpd = Storage::path('user-files/costs/specyfikacjadpd.csv');
+        if (!empty($dpdPackages) && file_exists($pathDpd)) {
+            $spec = fopen($pathDpd, 'r');
             while (($csvLine = fgetcsv($spec, 1000, ",")) !== FALSE) {
                 foreach ($dpdPackages as $dpdPackage) {
                     if ($dpdPackage->letter_number == $csvLine[11]) {
@@ -68,6 +71,9 @@ class UpdatePackageRealCostJob implements ShouldQueue {
         foreach ($this->orderPackageRepository as $package) {
             switch ($package->service_courier_name) {
                 case "INPOST":
+                    $inpostPackages[] = $package;
+                    break;
+                case "ALLEGRO-INPOST":
                     $inpostPackages[] = $package;
                     break;
                 case "POCZTEX":
