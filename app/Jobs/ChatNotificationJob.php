@@ -45,7 +45,7 @@ class ChatNotificationJob implements ShouldQueue
             if (!MessagesHelper::hasNewMessageStatic($chat, $chatUser, true)) {
                 continue;
             }
-            $userObject = $chatUser->user ?: $chatUser->employee ?: $chatUser->customer;
+            $userObject = $chatUser->employee ?: $chatUser->customer ?: false;
             if (!$userObject) {
                 continue;
             }
@@ -59,22 +59,26 @@ class ChatNotificationJob implements ShouldQueue
         $helper->chatId = $chat->id;
         $helper->currentUserType = $chatUser->user ? MessagesHelper::TYPE_USER : ($chatUser->employee ? MessagesHelper::TYPE_EMPLOYEE : MessagesHelper::TYPE_CUSTOMER);
         $helper->currentUserId = $userObject->id;
-
         try {
-            \App\Helpers\Helper::sendEmail(
-                $userObject->email ?? $userObject->login,
-                'chat-notification',
-                'Nowa wiadomość w '.env('APP_NAME'),
-                [
-                    'url' => route('chat.show', ['token' => $helper->encrypt()]),
-                    'title' => $helper->getTitle(false)
-                ]
-            );
-
+            $email = $userObject->email ?? $userObject->login;
+            self::sendNewMessageEmail($email, $helper);
             $chatUser->last_notification_time = now();
             $chatUser->save();
         } catch (\Exception $e) {
             \Log::error('ChatNotification Exception: '.$e->getMessage().', Class: '.$e->getFile().', Line: '.$e->getLine());
         }
+    }
+
+    public static function sendNewMessageEmail($email, MessagesHelper $helper): void
+    {
+        \App\Helpers\Helper::sendEmail(
+            $email,
+            'chat-notification',
+            'Nowa wiadomość w ' . env('APP_NAME'),
+            [
+                'url' => route('chat.show', ['token' => $helper->encrypt()]),
+                'title' => $helper->getTitle(false)
+            ]
+        );
     }
 }

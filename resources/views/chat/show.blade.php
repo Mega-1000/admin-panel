@@ -51,7 +51,7 @@
                     </div>
                 </div>
             </form>
-            <button id="call-mod" class="btn btn-warning add-user">Wezwij moderatora</button>
+            <button id="call-mod" class="btn bg-primary">Wezwij moderatora</button>
         </div>
         <table id="chat-users">
             <tr>
@@ -166,12 +166,12 @@
                 .done(() => location.reload());
         })
         $('#call-mod').click((event) => {
+            alert('Moderator został poinformowany')
             $.ajax({
                 method: "POST",
                 url: "{{ $routeAskForIntervention }}",
                 data: {'user_id': event.target.value}
             })
-                .done(() => alert('Moderator został poinformowany'));
         })
     });
 </script>

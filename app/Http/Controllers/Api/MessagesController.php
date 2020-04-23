@@ -7,6 +7,8 @@ use App\Entities\Customer;
 use App\Entities\Employee;
 use App\Entities\Label;
 use App\Helpers\ChatHelper;
+use App\Jobs\ChatNotificationJob;
+use App\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Helpers\MessagesHelper;
@@ -85,10 +87,18 @@ class MessagesController extends Controller
             }
             $redLabels = $chat->order->labels()->where('label_id', MessagesHelper::MESSAGE_RED_LABEL_ID)->count();
             if ($redLabels == 0) {
-                $chat->order->labels()->attach(MessagesHelper::MESSAGE_RED_LABEL_ID, ['added_type' => Label::CHAT_TYPE]);
+                $chat->order->labels()->attach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID, ['added_type' => Label::CHAT_TYPE]);
             }
             $chat->need_intervention = true;
             $chat->save();
+            if ($chat->users->count() > 0) {
+                $chat->users->map(function ($user) use ($helper) {
+                    ChatNotificationJob::sendNewMessageEmail($user->email, $helper);
+                });
+            } else {
+                $user = User::where('name', '001')->first();
+                ChatNotificationJob::sendNewMessageEmail($user->email, $helper);
+            }
             return response('ok');
         } catch (ChatException $e) {
             $e->log();
