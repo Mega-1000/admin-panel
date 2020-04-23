@@ -58,7 +58,6 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(\App\Repositories\UserEmailRepository::class, \App\Repositories\UserEmailRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\OrderMessageAttachmentRepository::class, \App\Repositories\OrderMessageAttachmentRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\OrderInvoiceRepository::class, \App\Repositories\OrderInvoiceRepositoryEloquent::class);
-        $this->app->bind(\App\Repositories\Oldfront\UzytkownicyRepository::class, \App\Repositories\Oldfront\UzytkownicyRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\OrderLabelSchedulerRepository::class, \App\Repositories\OrderLabelSchedulerRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\OrderLabelSchedulerAwaitRepository::class, \App\Repositories\OrderLabelSchedulerAwaitRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\TaskRepository::class, \App\Repositories\TaskRepositoryEloquent::class);

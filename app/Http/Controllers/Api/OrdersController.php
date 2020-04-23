@@ -16,7 +16,6 @@ use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
 use App\Http\Requests\Api\Orders\StoreOrderRequest;
 use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
 use App\Repositories\CustomerRepository;
-use App\Repositories\Oldfront\UzytkownicyRepository;
 use App\Repositories\OrderAddressRepository;
 use App\Repositories\OrderItemRepository;
 use App\Repositories\OrderMessageAttachmentRepository;
@@ -71,9 +70,6 @@ class OrdersController extends Controller
     /** @var OrderPackageRepository */
     protected $orderPackageRepository;
 
-    /** @var UzytkownicyRepository */
-    protected $uzytkownicyRepository;
-
     private $error_code = null;
 
     private $errors = [
@@ -101,7 +97,6 @@ class OrdersController extends Controller
      * @param ProductPriceRepository $productPriceRepository
      * @param OrderMessageAttachmentRepository $orderMessageAttachmentRepository
      * @param OrderPackageRepository $orderPackageRepository
-     * @param UzytkownicyRepository $uzytkownicyRepository
      */
     public function __construct(
         OrderRepository $orderRepository,
@@ -113,8 +108,7 @@ class OrdersController extends Controller
         CustomerAddressRepository $customerAddressRepository,
         ProductPriceRepository $productPriceRepository,
         OrderMessageAttachmentRepository $orderMessageAttachmentRepository,
-        OrderPackageRepository $orderPackageRepository,
-        UzytkownicyRepository $uzytkownicyRepository
+        OrderPackageRepository $orderPackageRepository
     )
     {
         $this->orderRepository = $orderRepository;
@@ -127,7 +121,6 @@ class OrdersController extends Controller
         $this->productPriceRepository = $productPriceRepository;
         $this->orderMessageAttachmentRepository = $orderMessageAttachmentRepository;
         $this->orderPackageRepository = $orderPackageRepository;
-        $this->uzytkownicyRepository = $uzytkownicyRepository;
     }
 
     public function store(StoreOrderRequest $request)
@@ -308,53 +301,10 @@ class OrdersController extends Controller
             if ($request->get('remember_delivery_address')) {
                 $data = array_merge($request->get('DELIVERY_ADDRESS'), ['type' => 'DELIVERY_ADDRESS']);
                 $order->customer->addresses()->updateOrCreate(["type" => "DELIVERY_ADDRESS"], $data);
-
-                try {
-                    $dataOldfront = [
-                        'dostawa_imie' => $request->get('DELIVERY_ADDRESS')['firstname'],
-                        'dostawa_nazwisko' => $request->get('DELIVERY_ADDRESS')['lastname'],
-                        'dostawa_telefon' => $request->get('DELIVERY_ADDRESS')['phone'],
-                        'dostawa_mail' => $deliveryMail,
-                        'dostawa_ulica' => $request->get('DELIVERY_ADDRESS')['address'],
-                        'dostawa_ulica_numer' => $request->get('DELIVERY_ADDRESS')['flat_number'],
-                        'dostawa_kod_pocztowy' => $request->get('DELIVERY_ADDRESS')['postal_code'],
-                        'dostawa_miasto' => $request->get('DELIVERY_ADDRESS')['city'],
-                    ];
-                    $uzytkownik = $this->uzytkownicyRepository->findByField('login', $order->customer->login)->first();
-                    $uzytkownik->update($dataOldfront);
-                } catch (\Exception $e) {
-                    Log::error('Problem with update customer delivery_adress.',
-                        ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
-                    );
-                    die();
-                }
             }
-
             if ($request->get('remember_invoice_address')) {
                 $data = array_merge($request->get('INVOICE_ADDRESS'), ['type' => 'INVOICE_ADDRESS']);
                 $order->customer->addresses()->updateOrCreate(["type" => "INVOICE_ADDRESS"], $data);
-
-                try {
-                    $dataOldfront = [
-                        'faktura_imie' => $request->get('INVOICE_ADDRESS')['firstname'],
-                        'faktura_nazwisko' => $request->get('INVOICE_ADDRESS')['lastname'],
-                        'faktura_telefon' => $request->get('INVOICE_ADDRESS')['phone'],
-                        'faktura_mail' => $request->get('INVOICE_ADDRESS')['email'],
-                        'faktura_ulica' => $request->get('INVOICE_ADDRESS')['address'],
-                        'faktura_ulica_numer' => $request->get('INVOICE_ADDRESS')['flat_number'],
-                        'faktura_kod_pocztowy' => $request->get('INVOICE_ADDRESS')['postal_code'],
-                        'faktura_miasto' => $request->get('INVOICE_ADDRESS')['city'],
-                        'faktura_nazwa_firmy' => $request->get('INVOICE_ADDRESS')['firmname'],
-                        'faktura_nip' => $request->get('INVOICE_ADDRESS')['nip'],
-                    ];
-                    $uzytkownik = $this->uzytkownicyRepository->findByField('login', $order->customer->login)->first();
-                    $uzytkownik->update($dataOldfront);
-                } catch (\Exception $e) {
-                    Log::error('Problem with update customer invoice_address.',
-                        ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
-                    );
-                    die();
-                }
             }
 
             return $this->okResponse();
