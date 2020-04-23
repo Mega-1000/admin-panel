@@ -40,6 +40,9 @@
                 name="change-button-form" id="button-payments"
                 value="payments">@lang('orders.form.buttons.payments')</button>
         <button class="btn btn-primary"
+                name="change-button-form" id="button-warehouse-payments"
+                value="warehouse-payments">@lang('orders.form.buttons.warehouse-payments')</button>
+        <button class="btn btn-primary"
                 name="change-button-form" id="button-tasks"
                 value="tasks">@lang('orders.form.buttons.tasks')</button>
         <button class="btn btn-primary"
@@ -1294,6 +1297,9 @@
             <input value="Nadpisz dane" type="submit" />
         </form>
     </div>
+    <div class="warehouse-payments" id="warehouse-payments">
+       
+    </div>
     <div class="order-messages" id="order-messages">
         <div class="panel panel-bordered">
             <div class="panel-body">
@@ -2150,6 +2156,7 @@
                             var tasks = $('#order-tasks').hide();
                             var packages = $('#order-packages').hide();
                             var messages = $('#order-messages').hide();
+                            var warehousePayments = $('#warehouse-payments').hide();
                             var status = $('#order-status').hide();
                             var customer = $('#order-customer').hide();
                             var pageTitle = $('.page-title').children('i');
@@ -2183,6 +2190,7 @@
                                 customer.hide();
                                 messages.hide();
                                 status.hide();
+                                warehousePayments.hide();
                                 createButtonOrderPayments.show();
                                 createButtonOrderPackages.hide();
                                 createButtonOrderTasks.hide();
@@ -2207,6 +2215,7 @@
                                 packages.hide();
                                 customer.hide();
                                 messages.hide();
+                                warehousePayments.hide();
                                 status.hide();
                                 createButtonOrderPayments.hide();
                                 createButtonOrderPackages.hide();
@@ -2233,6 +2242,7 @@
                                 packages.show();
                                 customer.hide();
                                 messages.hide();
+                                warehousePayments.hide();
                                 createButtonOrderPayments.hide();
                                 createButtonOrderPackages.show();
                                 createButtonOrderTasks.hide();
@@ -2257,6 +2267,7 @@
                                 packages.hide();
                                 customer.hide();
                                 messages.show();
+                                warehousePayments.hide();
                                 createButtonOrderPayments.hide();
                                 createButtonOrderPackages.hide();
                                 createButtonOrderTasks.hide();
@@ -2277,6 +2288,8 @@
                                     $('#button-payments').removeClass('active');
                                     $('#button-packages').removeClass('active');
                                     $('#button-customer').removeClass('active');
+                                    $('#button-warehouse-payments').removeClass('active');
+                                    warehousePayments.hide();
                                     general.show();
                                     tasks.hide();
                                     payments.hide();
@@ -2305,6 +2318,8 @@
                                     $('#button-customer').removeClass('active');
                                     $('#submit').hide();
                                     $('#submitOrder').hide();
+                                    $('#button-warehouse-payments').removeClass('active');
+                                    warehousePayments.hide();
                                     general.hide();
                                     tasks.show();
                                     payments.hide();
@@ -2329,6 +2344,8 @@
                                     $('#button-packages').removeClass('active');
                                     $('#submit').hide();
                                     $('#submitOrder').hide();
+                                    $('#button-warehouse-payments').removeClass('active');
+                                    warehousePayments.hide();
                                     general.hide();
                                     tasks.hide();
                                     payments.show();
@@ -2355,6 +2372,8 @@
                                     $('#button-packages').removeClass('active');
                                     $('#submit').hide();
                                     $('#submitOrder').hide();
+                                    $('#button-warehouse-payments').removeClass('active');
+                                    warehousePayments.hide();
                                     general.hide();
                                     tasks.hide();
                                     payments.hide();
@@ -2380,6 +2399,8 @@
                                     $('#button-packages').addClass('active');
                                     $('#submit').hide();
                                     $('#submitOrder').hide();
+                                    $('#button-warehouse-payments').removeClass('active');
+                                    warehousePayments.hide();
                                     general.hide();
                                     tasks.hide();
                                     payments.hide();
@@ -2404,6 +2425,8 @@
                                     $('#button-customer').removeClass('active');
                                     $('#submit').show();
                                     $('#submitOrder').hide();
+                                    $('#button-warehouse-payments').removeClass('active');
+                                    warehousePayments.hide();
                                     general.hide();
                                     tasks.hide();
                                     payments.hide();
@@ -2428,12 +2451,40 @@
                                     $('#button-customer').addClass('active');
                                     $('#submit').hide();
                                     $('#submitOrder').hide();
+                                    $('#button-warehouse-payments').removeClass('active');
+                                    warehousePayments.hide();
                                     general.hide();
                                     tasks.hide();
                                     payments.hide();
                                     packages.hide();
                                     messages.hide();
                                     customer.show();
+                                    status.hide();
+                                    pageTitle.removeClass();
+                                    pageTitle.addClass('voyager-tag');
+                                    createButtonOrderPayments.hide();
+                                    createButtonOrderPackages.hide();
+                                    createButtonOrderTasks.hide();
+                                    breadcrumb.children().last().remove();
+                                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#status'>Status zamówienia</a></li>");
+                                    addOrder.hide();
+                                } else if (value === 'warehouse-payments') {
+                                    $('#button-general').removeClass('active');
+                                    $('#button-tasks').removeClass('active');
+                                    $('#button-messages').removeClass('active');
+                                    $('#button-payments').removeClass('active');
+                                    $('#button-packages').removeClass('active');
+                                    $('#button-customer').removeClass('active');
+                                    $('#submit').hide();
+                                    $('#submitOrder').hide();
+                                    $('#button-warehouse-payments').addClass('active');
+                                    warehousePayments.show();
+                                    general.hide();
+                                    tasks.hide();
+                                    payments.hide();
+                                    packages.hide();
+                                    messages.hide();
+                                    customer.hide();
                                     status.hide();
                                     pageTitle.removeClass();
                                     pageTitle.addClass('voyager-tag');

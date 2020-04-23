@@ -80,7 +80,8 @@ return [
             'messages' => 'Chat',
             'packages' => 'Przesyłki',
             'status' => 'Status zamówienia',
-            'customer' => 'Zmiana danych klienta'
+            'customer' => 'Zmiana danych klienta',
+            'warehouse-payments' => 'Płatności magazynów'
         ],
         'last_status_update_date' => 'Ostatnia data zmiany statusu',
         'total_price' => 'Suma zamówienia',
