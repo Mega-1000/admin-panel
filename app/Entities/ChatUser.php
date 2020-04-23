@@ -50,7 +50,7 @@ class ChatUser extends Model implements iChatNickname
         }
         $user = $this->user;
         if (! empty($user)) {
-            return '<th class="alert-success alert">' . ChatHelper::formatChatUser($user, $userType) . '</th>';
+            return '<th class="bg-primary alert">' . ChatHelper::formatChatUser($user, $userType) . '</th>';
         }
         $user = $this->employee;
         if (! empty($user)) {

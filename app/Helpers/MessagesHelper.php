@@ -466,4 +466,18 @@ class MessagesHelper
         $chat->need_intervention = false;
         $chat->save();
     }
+
+    public static function getChatUserByClass($object)
+    {
+        switch (get_class($object)) {
+            case User::class:
+                return self::TYPE_USER;
+            case Employee::class:
+                return self::TYPE_EMPLOYEE;
+            case Customer::class:
+                return self::TYPE_CUSTOMER;
+            default:
+                throw new \Exception('Zły typ użytkownika');
+        }
+    }
 }
