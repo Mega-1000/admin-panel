@@ -27,6 +27,9 @@
             @if (!empty($notices))
                 <div class="alert-info alert">Uwagi konsultanta: <b>{{ $notices  }}</b></div>
             @endif
+            @if (!empty($faq))
+                <div class="alert-info alert"><b>FAQ:</b> <br>{!! implode('<br/>',$faq) !!}</div>
+            @endif
             <div class="panel panel-default" style="max-height: calc(100vh - 200px); overflow-y: scroll">
                 <div class="panel-body">
                     @if ($chat)

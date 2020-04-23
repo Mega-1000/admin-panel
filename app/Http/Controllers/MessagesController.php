@@ -95,63 +95,10 @@ class MessagesController extends Controller
         //
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param int $id
-     * @return Response
-     */
     public function show($token)
     {
         try {
-            $helper = new MessagesHelper($token);
-            $chat = $helper->getChat();
-            $product = $helper->getProduct();
-            $order = $helper->getOrder();
-            $helper->setLastRead();
-            if (empty($chat)) {
-                $users = collect();
-                if ($helper->employeeId) {
-                    $users->push(Employee::find($helper->employeeId));
-                }
-            } else {
-                $users = $chat->chatUsers;
-            }
-            $possibleUsers = collect();
-            $notices = '';
-            if ($product) {
-                $possibleUsers = $this->getNotAttachedChatUsersForProduct($product, $chat->customers->first());
-            } else if ($order) {
-                $possibleUsers = $this->getNotAttachedChatUsersForOrder($order, $users);
-                if ($helper->currentUserType == MessagesHelper::TYPE_USER || $helper->currentUserType == MessagesHelper::TYPE_EMPLOYEE) {
-                    $notices = $order->consultant_notices;
-                }
-            }
-            if ($chat) {
-                $possibleUsers = $this->filterPossibleUsersWithCurrentlyAdded($possibleUsers, $chat, $users);
-                if ($chat->customers()->where('deleted_at', null)->count() < 1) {
-                    $customer = $order->customer;
-                    $possibleUsers->push($customer);
-                }
-            } else {
-                $customer = $order->customer;
-                $possibleUsers->push($customer);
-            }
-            return view('chat.show')->with([
-                'notices' => $notices,
-                'possible_users' => $possibleUsers,
-                'user_type' => $helper->currentUserType,
-                'users' => $users,
-                'chat' => $chat,
-                'product' => $product,
-                'order' => $order,
-                'title' => $helper->getTitle(true),
-                'route' => route('api.messages.post-new-message', ['token' => $helper->encrypt()]),
-                'routeAddUser' => route('api.messages.add-new-user', ['token' => $helper->encrypt()]),
-                'routeRemoveUser' => route('api.messages.remove-user', ['token' => $helper->encrypt()]),
-                'routeRefresh' => route('api.messages.get-messages', ['token' => $helper->encrypt()]),
-                'routeAskForIntervention' => route('api.messages.ask-for-intervention', ['token' => $helper->encrypt()])
-            ]);
+            return $this->prepareChatView($token);
         } catch (ChatException $e) {
             $e->log();
             return redirect(env('FRONT_URL'));
@@ -278,5 +225,77 @@ class MessagesController extends Controller
             $possibleUsers = $possibleUsers->merge($firm->employees);
         }
         return $possibleUsers;
+    }
+
+    private function prepareChatView($token)
+    {
+        $helper = new MessagesHelper($token);
+        $chat = $helper->getChat();
+        $product = $helper->getProduct();
+        $order = $helper->getOrder();
+        $helper->setLastRead();
+        if (empty($chat)) {
+            $users = collect();
+            if ($helper->employeeId) {
+                $users->push(Employee::find($helper->employeeId));
+            }
+        } else {
+            $users = $chat->chatUsers;
+        }
+        $possibleUsers = collect();
+        $notices = '';
+        if ($product) {
+            $possibleUsers = $this->getNotAttachedChatUsersForProduct($product, $chat->customers->first());
+        } else if ($order) {
+            $possibleUsers = $this->getNotAttachedChatUsersForOrder($order, $users);
+            if ($helper->currentUserType == MessagesHelper::TYPE_USER || $helper->currentUserType == MessagesHelper::TYPE_EMPLOYEE) {
+                $notices = $order->consultant_notices;
+            }
+        }
+        $possibleUsers = $this->addCustomerToChatList($chat, $possibleUsers, $users, $order);
+
+        $view = view('chat.show')->with([
+            'faq' => $this->prepareFaq($users),
+            'notices' => $notices,
+            'possible_users' => $possibleUsers,
+            'user_type' => $helper->currentUserType,
+            'users' => $users,
+            'chat' => $chat,
+            'product' => $product,
+            'order' => $order,
+            'title' => $helper->getTitle(true),
+            'route' => route('api.messages.post-new-message', ['token' => $helper->encrypt()]),
+            'routeAddUser' => route('api.messages.add-new-user', ['token' => $helper->encrypt()]),
+            'routeRemoveUser' => route('api.messages.remove-user', ['token' => $helper->encrypt()]),
+            'routeRefresh' => route('api.messages.get-messages', ['token' => $helper->encrypt()]),
+            'routeAskForIntervention' => route('api.messages.ask-for-intervention', ['token' => $helper->encrypt()])
+        ]);
+        return $view;
+    }
+
+    private function addCustomerToChatList($chat, $possibleUsers, Collection $users, $order): Collection
+    {
+        if ($chat) {
+            $possibleUsers = $this->filterPossibleUsersWithCurrentlyAdded($possibleUsers, $chat, $users);
+            if ($chat->customers()->where('deleted_at', null)->count() < 1) {
+                $customer = $order->customer;
+                $possibleUsers->push($customer);
+            }
+        } else {
+            $customer = $order->customer;
+            $possibleUsers->push($customer);
+        }
+        return $possibleUsers;
+    }
+
+    private function prepareFaq(Collection $users): array
+    {
+        $faqs = [];
+        foreach ($users as $user) {
+            if ($user->employee && $user->employee->faq) {
+                $faqs [] = $user->employee->faq;
+            }
+        }
+        return $faqs;
     }
 }
