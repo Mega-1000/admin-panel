@@ -264,9 +264,13 @@ class OrdersController extends Controller
     public function getReadyToShipFormAutocompleteData($orderId)
     {
         $order = $this->orderRepository->find($orderId);
+        list($isDeliveryChangeLocked, $isInvoiceChangeLocked) = $this->getLocks($order);
+
         return [
             "DELIVERY_ADDRESS" => $order->addresses->where('type', '=', 'DELIVERY_ADDRESS')->first(),
             "INVOICE_ADDRESS" => $order->addresses->where('type', '=', 'INVOICE_ADDRESS')->first(),
+            "DELIVERY_LOCK" => $isDeliveryChangeLocked,
+            "INVOICE_LOCK" => $isInvoiceChangeLocked,
             "shipment_date" => $order->shipment_date,
         ];
     }
@@ -276,23 +280,30 @@ class OrdersController extends Controller
         $orderId
     )
     {
+
         try {
             $order = $this->orderRepository->find($orderId);
+            list($isDeliveryChangeLocked, $isInvoiceChangeLocked) = $this->getLocks($order);
+
             $deliveryAddress = $order->addresses->where('type', '=', 'DELIVERY_ADDRESS')->first();
             $invoiceAddress = $order->addresses->where('type', '=', 'INVOICE_ADDRESS')->first();
 
             $order->shipment_date = $request->get('shipment_date');
             $order->save();
 
-            $deliveryAddress->update($request->get('DELIVERY_ADDRESS'));
-            if (empty($request->get('DELIVERY_ADDRESS')['email'])) {
-                $deliveryAddress->update(['email' => $order->customer->login]);
-                $deliveryMail = $order->customer->login;
-            } else {
-                $deliveryMail = $request->get('DELIVERY_ADDRESS')['email'];
+            if (!$isDeliveryChangeLocked) {
+                $deliveryAddress->update($request->get('DELIVERY_ADDRESS'));
+                if (empty($request->get('DELIVERY_ADDRESS')['email'])) {
+                    $deliveryAddress->update(['email' => $order->customer->login]);
+                    $deliveryMail = $order->customer->login;
+                } else {
+                    $deliveryMail = $request->get('DELIVERY_ADDRESS')['email'];
+                }
             }
 
-            $invoiceAddress->update($request->get('INVOICE_ADDRESS'));
+            if (!$isInvoiceChangeLocked) {
+                $invoiceAddress->update($request->get('INVOICE_ADDRESS'));
+            }
 
             if ($request->get('remember_delivery_address')) {
                 $data = array_merge($request->get('DELIVERY_ADDRESS'), ['type' => 'DELIVERY_ADDRESS']);
@@ -491,5 +502,29 @@ class OrdersController extends Controller
 
         $order = Order::where('token', $token)->first();
         return ['total_price' => $order->total_price, 'transport_price' => $order->getTransportPrice(), 'id' => $order->id];
+    }
+
+    private function getLocks( $order): array
+    {
+        $deliveryLock [] = config('labels-map')['list']['produkt w przygotowaniu-po wyprodukowaniu magazyn kasuje etykiete'];
+        $deliveryLock [] = config('labels-map')['list']['wyprodukowana'];
+        $deliveryLock [] = config('labels-map')['list']['wyslana do awizacji'];
+        $deliveryLock [] = config('labels-map')['list']['awizacja przyjeta'];
+        $deliveryLock [] = config('labels-map')['list']['awizacja odrzucona'];
+        $deliveryLock [] = config('labels-map')['list']['awizacja brak odpowiedzi'];
+
+        $invoiceLock [] = config('labels-map')['list']['faktura wystawiona'];
+        $invoiceLock [] = config('labels-map')['list']['faktura wystawiona z odlozonym skutkiem magazynowym'];
+        $isDeliveryChangeLocked = $order->labels
+                ->filter(function ($label) use ($deliveryLock) {
+                    return in_array($label->id, $deliveryLock);
+                })
+                ->count() > 0;
+        $isInvoiceChangeLocked = $order->labels
+                ->filter(function ($label) use ($invoiceLock) {
+                    return in_array($label->id, $invoiceLock);
+                })
+                ->count() > 0;
+        return array($isDeliveryChangeLocked, $isInvoiceChangeLocked);
     }
 }
