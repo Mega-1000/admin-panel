@@ -55,6 +55,7 @@ $labels = [
     'brak odpowiedzi na prosbe o anulacje lp' => '88',
     'przekazano do obslugi konsultantowi' => '89',
     'przyjete zapytanie ofertowe' => '92',
+    'faktura wystawiona z odlozonym skutkiem magazynowym' => '120'
 ];
 
 return [
@@ -197,7 +198,16 @@ return [
             $labels['faktura do zatwierdzenia-konstultant po zatwierdzeniu kasuje'],
         ],
     ],
-    //49???
+    "preparing" => [ //49
+        "add" => [
+            $labels['produkt w przygotowaniu-po wyprodukowaniu magazyn kasuje etykiete'],
+        ],
+    ],
+    "factored" => [ //50
+        "add" => [
+            $labels['wyprodukowana'],
+        ],
+    ],
     "all-shipments-went-out" => [ //54
         "add" => [
             $labels['towar wydany'],
@@ -233,4 +243,5 @@ return [
             $labels['przekazano do obslugi konsultantowi'],
         ]
     ],
+    "list" => $labels
 ];
