@@ -40,6 +40,8 @@
                                 <a href="{{ route('job.generateJpgs') }}" class="btn btn-primary">
                                     Wygeneruj tabele i reklamówki
                                 </a>
+                                <a name="actualization-price" target="_blank" class="btn btn-primary" href="products/getPrice">Pobierz csv z nowymi cenami produktów</a>
+                                <a name="actualization-price" target="_blank" class="btn btn-primary" href="orders/getCosts">Pobierz realne wartości zleceń paczek ze specyfikacji firm spedycyjnych</a>
                             </div>
                             <form action="{{ route('import.store') }}" enctype="multipart/form-data" method="POST">
                                 {{ csrf_field() }}
