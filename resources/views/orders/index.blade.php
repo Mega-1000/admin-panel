@@ -371,10 +371,6 @@
     <div style="display: flex; align-items: center;" id="add-label-container">
         <a name="actualization-price" target="_blank" class="btn btn-success" href="/admin/actualizationPrice">Wyślij prośbę o aktualizację cen</a>
     </div>
-    <div style="display: flex; align-items: center;" id="add-label-container">
-        <a name="actualization-price" target="_blank" class="btn btn-success" href="products/getPrice">Pobierz csv z nowymi cenami</a>
-        <a style ="margin-left: 10px" name="actualization-price" target="_blank" class="btn btn-success" href="orders/getCosts">Pobierz realne wartości zleceń z pliku csv</a>
-    </div>
     <div class="form-group">
         <label for="protocols">Protokoły z dnia dzisiejszego</label>
         <a name="protocols" target="_blank" class="btn btn-success" href="/admin/orderPackages/inpost/protocols">Inpost</a>
@@ -812,6 +808,9 @@
                     render: function ( data, type, row ) {
                         var html = '';
                         $.each(data, function(key, value) {
+                            if (value.real_cost_for_company > value.cost_for_company) {
+                                 html = '<div style="border: solid red 4px" >'
+                            }
                             if ((value.status === 'SENDING' && value.status !== 'CANCELLED') || (value.status === 'DELIVERED' && value.status !== 'CANCELLED')) {
                                 html += '<div style="display: flex; align-items: center; flex-direction: column;" > ' +
                                     '<div style="display: flex; align-items: center;">' +

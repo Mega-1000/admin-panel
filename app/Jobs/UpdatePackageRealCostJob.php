@@ -27,37 +27,40 @@ class UpdatePackageRealCostJob implements ShouldQueue {
     }
 
     public function updateCost($inpostPackages, $pocztexPackages, $dpdPackages) {
-        $pathInpost = Storage::path('user-files/costs/inpost.csv');
+        $pathInpost = Storage::path('user-files/costs/INPOST.csv');
         if (!empty($inpostPackages) && file_exists($pathInpost)) {
             $spec = fopen($pathInpost, 'r');
-            while (($csvLine = fgetcsv($spec, 1000, ";")) !== FALSE) {
+            while (($csvLine = fgetcsv($spec, 1000, ",")) !== FALSE) {
                 foreach ($inpostPackages as $inpostPackage) {
                     if ($inpostPackage->letter_number == $csvLine[2]) {
                         $inpostPackage->real_cost_for_company = $csvLine[7];
+                        $inpostPackage->status = "DELIVERED";
                         $inpostPackage->save();
                     }
                 }
             }
         }
-        $pathPP = Storage::path('user-files/costs/pocztapolska.csv');
+        $pathPP = Storage::path('user-files/costs/POCZTAPOLSKA.csv');
         if (!empty($pocztexPackages) && file_exists($pathPP)) {
             $spec = fopen($pathPP, 'r');
             while (($csvLine = fgetcsv($spec, 1000, ",")) !== FALSE) {
                 foreach ($pocztexPackages as $pocztexPackage) {
                     if ($pocztexPackage->letter_number == $csvLine[0]) {
                         $pocztexPackage->real_cost_for_company = $csvLine[17];
+                        $pocztexPackage->status = "DELIVERED";
                         $pocztexPackage->save();
                     }
                 }
             }
         }
-        $pathDpd = Storage::path('user-files/costs/dpd.csv');
+        $pathDpd = Storage::path('user-files/costs/DPD.csv');
         if (!empty($dpdPackages) && file_exists($pathDpd)) {
             $spec = fopen($pathDpd, 'r');
             while (($csvLine = fgetcsv($spec, 1000, ",")) !== FALSE) {
                 foreach ($dpdPackages as $dpdPackage) {
                     if ($dpdPackage->letter_number == $csvLine[11]) {
-                        $dpdPackage->real_cost_for_company = $csvLine[14];
+                        $dpdPackage->real_cost_for_company = $csvLine[14]*1.23;
+                        $dpdPackage->status = "DELIVERED";
                         $dpdPackage->save();
                     }
                 }
