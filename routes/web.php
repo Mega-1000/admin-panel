@@ -269,6 +269,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orders/{id}/sendOfferToCustomer',
             'OrdersController@sendOfferToCustomer')->name('orders.sendOfferToCustomer');
         Route::get('orders/getCosts', 'OrdersController@getCosts')->name('orders.getCosts');
+        Route::post('orders/{id}/invoice/request', 'OrdersController@invoiceRequest')->name('orders.invoiceRequest');
 
         Route::get('orderPayments/datatable/{id}',
             'OrdersPaymentsController@datatable')->name('order_payments.datatable');
@@ -469,6 +470,9 @@ Route::post('/communication/storeWarehouseMessage',
 Route::get('/customer/{orderId}/confirmation/{invoice}', 'OrdersController@confirmCustomerInformation')->name('customerConfirmation');
 Route::get('/customer/{orderId}/confirmation', 'OrdersController@confirmCustomerInformationWithoutData')->name('customerConfirmationWithoutData');
 Route::post('/customer/confirmation', 'OrdersController@confirmCustomer')->name('confirmation');
+
+Route::get('/payment/confirmation/{token}', 'OrdersPaymentsController@warehousePaymentConfirmation')->name('ordersPayment.warehousePaymentConfirmation');
+Route::post('/payment/confirmation/{token}', 'OrdersPaymentsController@warehousePaymentConfirmationStore')->name('ordersPayment.warehousePaymentConfirmationStore');
 
 Route::get('/chat/{token}', 'MessagesController@show')->name('chat.show');
 Route::get('/chat/getUrl/{mediaId}/{postCode}/{email}/{phone}', 'MessagesController@getUrl')->name('messages.get-url');
