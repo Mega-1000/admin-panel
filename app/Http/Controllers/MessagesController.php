@@ -312,7 +312,7 @@ class MessagesController extends Controller
     {
         if (is_a($chatUser, Employee::class)) {
             return $order->items->filter(function ($item) use ($chatUser) {
-                return empty($item->product->firm) ? true : $item->product->firm->id == $chatUser->firm->id;
+                return empty($item->product->firm) || $item->product->firm->id == $chatUser->firm->id;
             });
         }
         return $order->items;
@@ -321,7 +321,13 @@ class MessagesController extends Controller
     private function prepareProductList(MessagesHelper $helper): Collection
     {
         if ($helper->getOrder()) {
-            return $this->setProductsForChatUser($helper->getCurrentUser(), $helper->getOrder());
+            try {
+                return $this->setProductsForChatUser($helper->getCurrentUser(), $helper->getOrder());
+            } catch (\Exception $e) {
+                Log::error('Cannot prepare product list',
+                    ['exception' => $e->getMessage(), 'class' => $e->getFile(), 'line' => $e->getLine()]);
+                return collect();
+            }
         }
         if ($helper->getProduct()) {
             return collect([$helper->getProduct()]);

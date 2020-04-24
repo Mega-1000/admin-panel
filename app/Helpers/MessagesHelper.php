@@ -481,7 +481,7 @@ class MessagesHelper
             case self::TYPE_USER:
                 return User::find($this->currentUserId);
             default:
-                return null;
+                throw new \Exception('Userd does not exist');
         }
     }
 }
