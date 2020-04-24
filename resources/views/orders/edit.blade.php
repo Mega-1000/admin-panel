@@ -1191,6 +1191,74 @@
             </div>
         </div>
     </div>
+    <!-- Warehouse payment modal -->
+    <div class="modal fade" id="warehousePaymentModal" tabindex="-1" role="dialog" aria-labelledby="warehousePaymentModal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Przydziel wpłatę do zamówienia</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ action('OrdersPaymentsController@store') }}" method="POST">
+                        {{ csrf_field() }}
+                        <div class="firms-general" id="orderPayment">
+                            <div class="form-group">
+                                <label for="amount">@lang('order_payments.form.amount')</label>
+                                @foreach($order->warehouse->orders as $itemCustomerOrder)
+                                    @php
+                                        $sumOfItems = 0;
+                                        foreach ($itemCustomerOrder->items as $item) {
+                                            $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+                                        }
+                                        $orderValue = str_replace(',', '', number_format($sumOfItems + $itemCustomerOrder->shipment_price_for_client + $itemCustomerOrder->additional_service_cost + $itemCustomerOrder->additional_cash_on_delivery_cost, 2));
+                                    @endphp
+                                    @break
+                                @endforeach
+                                <input type="text" class="form-control" id="amount" name="amount"
+                                       value="{{ $orderValue }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="chooseOrder">Wybierz zlecenie</label>
+                                <select class="form-control" id="chooseOrder" name="chooseOrder">
+                                    @foreach($order->warehouse->orders as $itemCustomerOrder)
+                                        @php
+                                            $sumOfItems = 0;
+                                            foreach ($itemCustomerOrder->items as $item) {
+                                                $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+                                            }
+                                            $orderValue = str_replace(',', '', number_format($sumOfItems + $itemCustomerOrder->shipment_price_for_client + $itemCustomerOrder->additional_service_cost + $itemCustomerOrder->additional_cash_on_delivery_cost, 2));
+                                        @endphp
+                                        <option value="{{ $itemCustomerOrder->id }}">
+                                            Zlecenie: {{ $itemCustomerOrder->id }} Kwota
+                                            zlecenia: {{ $orderValue }}</option>
+                                    @endforeach
+                                </select>
+                                @foreach($order->customer->orders as $itemCustomerOrder)
+                                    @php
+                                        $sumOfItems = 0;
+                                        foreach ($itemCustomerOrder->items as $item) {
+                                            $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+                                        }
+                                        $orderValue = str_replace(',', '', number_format($sumOfItems + $itemCustomerOrder->shipment_price_for_client + $itemCustomerOrder->additional_service_cost + $itemCustomerOrder->additional_cash_on_delivery_cost, 2));
+                                    @endphp
+                                    <input type="hidden" name="order-payment-{{$itemCustomerOrder->id}}"
+                                           value="{{ $orderValue }}">
+                                @endforeach
+                            </div>
+                            <input type="hidden" value="0" name="masterPaymentId">
+                            <input type="hidden" value="0" name="masterPaymentAmount">
+                            <input type="hidden" value="1" name="warehousePayment">
+                        </div>
+                        <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="promiseModal" tabindex="-1" role="dialog" aria-labelledby="promiseModal"
          aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -1298,7 +1366,150 @@
         </form>
     </div>
     <div class="warehouse-payments" id="warehouse-payments">
-       
+        <h1>Rozrachunki z magazynem: {{ $order->warehouse->warehouse_email ?? '' }}
+            @if(Auth::user()->role_id == 3 || Auth::user()->role_id == 2 || Auth::user()->role_id == 1)
+                <a id="create-button-orderPayments" style="float:right;margin-right: 15px;"
+                   href="{{route('order_payments.createMaster', ['id' => $order->id]) }}"
+                   class="btn btn-success install pull-right">
+                    <i class="voyager-plus"></i> <span>@lang('order_payments.createMaster')</span>
+                </a>
+            @endif
+        </h1>
+        <table style="width: 35%; float: left;" id="paymentsTable" class="table table-hover">
+            <thead>
+            <tr>
+                <th>@lang('order_payments.table.payments')</th>
+                <th>@lang('order_payments.table.status')</th>
+                <th>@lang('order_payments.table.payment_left')</th>
+                <th>Zaliczka</th>
+                <th>@lang('order_payments.table.add')</th>
+            </tr>
+            </thead>
+            <tbody>
+            @php
+                $sumOfPayments = 0;
+            @endphp
+            @foreach($order->warehouse->payments as $payment)
+                @php
+                    $sumOfPayments = $sumOfPayments + $payment->amount;
+                @endphp
+                <tr>
+                    <td>{{ $payment->amount }}</td>
+                    <td>
+                        @if($itemOrder->isOrderHasLabel(66))
+                            <span class="order-label" style="color: #FFFFFF; display: block; margin-top: 5px; background-color: #87D11B; text-align: center;"><i class="fas fa-battery-full"></i></span>
+                        @else
+                            <span class="order-label" style="color: #FFFFFF; display: block; margin-top: 5px; background-color: #4DCFFF; text-align: center;"><i class="fas fa-battery-empty"></i></span>
+                        @endif
+                    </td>
+                    <td>{{ $payment->amount_left }}</td>
+                    <td>
+                        @if($payment->promise == '1')
+                            <b style="color: red;">Tak</b>
+                        @else
+                            <b style="color: red;">Nie</b>
+                        @endif
+                    </td>
+                    <td>
+                        @if($payment->promise == '1' && Auth::user()->role_id != 4)
+                            <button type="button" class="btn btn-success openPromiseModal" style="display: block;"
+                                    data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->amount }}">
+                                Zaksięguj
+                            </button>
+                        @else
+                            <button type="button" class="btn" style="display: block;" disabled>
+                                Zaksięgowano
+                            </button>
+                            <button type="button" class="btn btn-primary openWarehousePaymentModal" style="display: block;" @if(!$itemOrder->isOrderHasLabel(66)) {{ 'disabled' }} @endif
+                                    data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->amount }}">
+                                Przydziel
+                            </button>
+                        @endif
+                        <a href="{{ route('payments.edit', ['id' => $payment->id]) }}" class="btn btn-info">Edytuj</a>
+                        <a href="{{ route('payments.destroy', ['id' => $payment->id]) }}"
+                           class="btn btn-danger">Usuń</a>
+                    </td>
+                </tr>
+            @endforeach
+            <tr>
+                <td><h2>Suma wpłat: <b style="color: red;">{{ $sumOfPayments }} zł</b></h2></td>
+            </tr>
+            </tbody>
+        </table>
+        <table style="width: 64%; margin-left: 1%; display: inline-block;" id="ordersTable" class="table table-hover">
+            <thead>
+            <tr>
+                <th>@lang('order_payments.table.order_id')</th>
+                <th>@lang('order_payments.table.invoice')</th>
+                <th>@lang('order_payments.table.order_status')</th>
+                <th>@lang('order_payments.table.order_value')</th>
+                <th>@lang('order_payments.table.booked')</th>
+                <th>@lang('order_payments.table.left')</th>
+                <th>@lang('order_payments.table.move')</th>
+            </tr>
+            </thead>
+            <tbody>
+            @php
+                $sumOfOrders = 0;
+                $sumOfItems = 0;
+            @endphp
+            @foreach($order->warehouse->orders()->where('status_id', '!=', '8')->where('status_id', '!=', '6')->get() as $itemOrder)
+                <tr>
+                    <td>{{ $itemOrder->id }}</td>
+                    <td>
+                        @if(count($itemOrder->invoices) > 0)
+                            @foreach($itemOrder->invoices as $invoice)
+                                <a target="_blank" href="/storage/invoices/{{ $invoice->invoice_name }}" style="margin-top: 5px;">Faktura</a>
+                            @endforeach
+                        @elseif(count($itemOrder->invoiceRequests) > 0)
+                            <p class="invoice__request--sent">Prośba o fakturę została już wysłana.</p>
+                        @else
+                            <button class="btn btn-sm btn-success" onclick="sendInvoiceRequest({{$itemOrder->id}})">Poproś o fakturę</button>
+                        @endif
+                    </td>
+                    <td>{{ $itemOrder->status->name }}</td>
+                    @php
+                        $sumOfItems = 0;
+                        foreach ($itemOrder->items as $item) {
+                            $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+                        }
+                        $orderValue = str_replace(',', '', number_format($sumOfItems + $itemOrder->shipment_price_for_client + $itemOrder->additional_service_cost + $itemOrder->additional_cash_on_delivery_cost, 2));
+                    @endphp
+                    @php
+                        $sumOfOrders = $sumOfOrders + $orderValue
+                    @endphp
+                    <td>{{ $orderValue }}</td>
+                    @php
+                        $acceptedPaymentsValue = 0;
+                        $pendingPaymentsValue = 0;
+                        foreach($itemOrder->warehousePayments() as $payment) {
+                            switch($payment->status) {
+                                case 'ACCEPTED':
+                                    $acceptedPaymentsValue += $payment->amount;
+                                    break;
+                                case 'PENDING':
+                                    $pendingPaymentsValue += $payment->amount;
+                                    break;
+                            }
+                        }
+                    @endphp
+                    <td>
+                        <h5 class="payment__pending">Oczekujące: {{ $pendingPaymentsValue }}</h5>
+                        <h5 class="payment__accepted">Zaakceptowane: {{ $acceptedPaymentsValue }}</h5>
+                    </td>
+                    <td id="left-amount-{{$itemOrder->id}}" data-value="{{ $orderValue - $paymentsValue }}">{{ $orderValue - $paymentsValue }}</td>
+                    <td>
+                        <button id="moveButton-{{$itemOrder->id}}" class="btn btn-sm btn-warning edit move__payment--button" onclick="moveData({{$itemOrder->id}})">Przenieś wpłatę stąd</button>
+                        <button id="moveButtonAjax-{{$itemOrder->id}}" class="btn btn-sm btn-success btn-move edit hidden" onclick="moveDataAjax({{$itemOrder->id}})">Przenieś dane tutaj</button>
+                    </td>
+                </tr>
+            @endforeach
+            <tr>
+                <td><h2>Suma faktur: <b style="color: red;">{{ $sumOfOrders }} zł</b></h2></td>
+            </tr>
+
+            </tbody>
+        </table>
     </div>
     <div class="order-messages" id="order-messages">
         <div class="panel panel-bordered">
@@ -3950,6 +4161,14 @@
                             $('#paymentModal').modal();
                         });
 
+                        $('.openWarehousePaymentModal').on('click', function () {
+                            let masterPaymentId = $(this).data('payment');
+                            let masterPaymentAmount = $(this).data('payment-amount');
+                            $('#warehousePaymentModal input[name="masterPaymentAmount"]').val(masterPaymentAmount);
+                            $('input[name="masterPaymentId"]').val(masterPaymentId);
+                            $('#warehousePaymentModal').modal();
+                        });
+
                         $('.openPromiseModal').on('click', function () {
                             let masterPaymentId = $(this).data('payment');
                             let masterPaymentAmount = $(this).data('payment-amount');
@@ -3969,6 +4188,17 @@
                             }
 
                         });
+                        $('#chooseOrder').on('change', function () {
+                            let orderId = $(this).val();
+                            let orderValue = parseFloat($('input[name="order-payment-' + orderId + '"]').val());
+                            let masterPaymentAmount = parseFloat($('#warehousePaymentModal input[name="masterPaymentAmount"]').val());
+                            if (masterPaymentAmount > orderValue) {
+                                $('#orderPayment #amount').val(orderValue);
+                            } else if (masterPaymentAmount < orderValue) {
+                                $('#orderPayment #amount').val(masterPaymentAmount);
+                            }
+
+                        });
                         function moveData(id){
                             if($('#moveButton-'+id).hasClass('btn-warning')) {
                                 $('#moveButton-' + id).removeClass('btn-warning').addClass('btn-dark');
@@ -3979,6 +4209,19 @@
                                 $('.btn-warning').attr('disabled', false);
                                 $('.btn-move').addClass('hidden');
                             }
+                        }
+                        function sendInvoiceRequest(id){
+                            $.ajax({
+                                method: 'POST',
+                                url: '/admin/orders/'+id+'/invoice/request',
+                                data: {
+                                    id: id
+                                }
+                            }).done(function(data) {
+                               alert('Pomyślnie wywołano prośbę o fakturę.');
+                            }).fail(function() {
+                               console.log('failed');
+                            });
                         }
                         function moveDataAjax(id){
                             var idToSend = id;
@@ -4039,6 +4282,29 @@
                         }
                         .move__payment--button {
                             padding: 6px 5px;
+                        }
+                        .payment__pending {
+                            color: orange;
+                            border: 2px solid orange;
+                            padding: 5px;
+                        }
+                        .payment__declined {
+                            color: red;
+                            border: 2px solid red;
+                            padding: 5px;
+                        }
+                        .payment__accepted {
+                            color: deepskyblue;
+                            border: 2px solid deepskyblue;
+                            padding: 5px;
+                        }
+                        .order-label {
+                            padding-top: 5px;
+                            padding-bottom: 5px;
+                        }
+                        .invoice__request--sent {
+                            font-weight: bold;
+                            color: green;
                         }
                     </style>
 @endsection
