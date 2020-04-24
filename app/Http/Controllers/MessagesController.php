@@ -253,13 +253,7 @@ class MessagesController extends Controller
             }
         }
         $possibleUsers = $this->addCustomerToChatList($chat, $possibleUsers, $users, $order);
-
-        if ($order) {
-            $productList = $this->setProductsForChatUser($helper->getCurrentUser(), $order);
-        }
-        if ($product) {
-            $productList = collect([$product]);
-        }
+        $productList = $this->prepareProductList($helper);
 
         $view = view('chat.show')->with([
             'product_list' => $productList,
@@ -315,5 +309,16 @@ class MessagesController extends Controller
             });
         }
         return $order->items;
+    }
+
+    private function prepareProductList(MessagesHelper $helper): Collection
+    {
+        if ($helper->getOrder()) {
+            return $this->setProductsForChatUser($helper->getCurrentUser(), $helper->getOrder());
+        }
+        if ($helper->getProduct()) {
+            return collect([$helper->getProduct()]);
+        }
+        return collect();
     }
 }
