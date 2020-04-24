@@ -16,3 +16,26 @@
     width: 100%;
     margin: 25px 0px 25px 0px;
 }
+
+.product {
+    display: flex;
+    margin: 16px 0px 16px 0px;
+}
+.product-description {
+    justify-content: center;
+    flex-direction: column;
+    display: flex;
+}
+
+.price-table > tbody > tr > td, .price-table > tbody > tr > th {
+    border: solid;
+}
+
+.price-table > tbody > tr > td > div >input {
+    width: 100px;
+}
+
+.image-product {
+    width: 100px;
+    height: auto;
+}

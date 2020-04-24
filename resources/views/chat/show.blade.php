@@ -30,6 +30,13 @@
             @if (!empty($faq))
                 <div class="alert-info alert"><b>FAQ:</b> <br>{!! implode('<br/>',$faq) !!}</div>
             @endif
+            @if ($product_list->count() > 0)
+                <div class="alert alert-warning"><b>Lista produktów:</b>
+                @foreach($product_list as $product)
+                    @include('chat/single_product', ['product' => $product, 'user_type' => $user_type])
+                @endforeach
+                </div>
+            @endif
             <div class="panel panel-default" style="max-height: calc(100vh - 200px); overflow-y: scroll">
                 <div class="panel-body">
                     @if ($chat)
