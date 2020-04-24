@@ -57,6 +57,11 @@
                                            value="{{ $warehouse->symbol }}">
                                 </div>
                                 <div class="form-group">
+                                    <label for="warehouse-email">@lang('warehouses.form.warehouse_email')</label>
+                                    <input type="email" class="form-control" id="warehouse-email" name="warehouse-email"
+                                           value="{{ $warehouse->warehouse_email ?? '' }}">
+                                </div>
+                                <div class="form-group">
                                     <label for="status">@lang('warehouses.form.status')</label>
                                     <select class="form-control text-uppercase" name="status">
                                         <option value="ACTIVE">@lang('warehouses.form.active')</option>
@@ -73,60 +78,60 @@
                                 <div class="form-group">
                                     <label for="address">@lang('warehouses.form.address')</label>
                                     <input type="text" class="form-control" id="address" name="address"
-                                           value="{{ $warehouseAddress->address }}">
+                                           value="{{ $warehouseAddress->address ?? '' }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="warehouse_number">@lang('warehouses.form.warehouse_number')</label>
                                     <input type="text" class="form-control" id="warehouse_number"
                                            name="warehouse_number"
-                                           value="{{$warehouseAddress->warehouse_number }}">
+                                           value="{{$warehouseAddress->warehouse_number ?? '' }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="postal_code">@lang('warehouses.form.postal_code')</label>
                                     <input type="text" class="form-control" id="postal_code" name="postal_code"
-                                           value="{{ $warehouseAddress->postal_code }}">
+                                           value="{{ $warehouseAddress->postal_code ?? '' }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="city">@lang('warehouses.form.city')</label>
                                     <input type="text" class="form-control" id="city" name="city"
-                                           value="{{ $warehouseAddress->city }}">
+                                           value="{{ $warehouseAddress->city ?? '' }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="latitude">@lang('firms.form.address.latitude')</label>
                                     <input type="text" class="form-control" id="latitude" name="latitude"
-                                           value="{{ $warehouseAddress->latitude }}" disabled>
+                                           value="{{ $warehouseAddress->latitude ?? '' }}" disabled>
                                 </div>
                                 <div class="form-group">
                                     <label for="longitude">@lang('firms.form.address.longitude')</label>
                                     <input type="text" class="form-control" id="longitude" name="longitude"
-                                           value="{{ $warehouseAddress->longitude }}" disabled>
+                                           value="{{ $warehouseAddress->longitude ?? '' }}" disabled>
                                 </div>
                             </div>
                             <div class="warehouses-property" id="property">
                                 <div class="form-group">
                                     <label for="firstname">@lang('warehouses.form.firstname')</label>
                                     <input type="text" class="form-control" id="firstname" name="firstname"
-                                           value="{{ $warehouseProperty->firstname }}">
+                                           value="{{ $warehouseProperty->firstname ?? '' }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="lastname">@lang('warehouses.form.lastname')</label>
                                     <input type="text" class="form-control" id="lastname" name="lastname"
-                                           value="{{ $warehouseProperty->lastname }}">
+                                           value="{{ $warehouseProperty->lastname ?? '' }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="phone">@lang('warehouses.form.phone')</label>
                                     <input type="text" class="form-control" id="phone" name="phone"
-                                           value="{{ $warehouseProperty->phone }}">
+                                           value="{{ $warehouseProperty->phone ?? '' }}">
                                 </div>
                                 <div class="form-group">
                                     <label for="comments">@lang('warehouses.form.comments')</label>
                                     <textarea rows="4" cols="50" class="form-control" id="comments"
-                                              name="comments">{{ $warehouseProperty->comments }}</textarea>
+                                              name="comments">{{ $warehouseProperty->comments ?? '' }}</textarea>
                                 </div>
                                 <div class="form-group">
                                     <label for="additional_comments">@lang('warehouses.form.additional_comments')</label>
                                     <textarea rows="4" cols="50" class="form-control" id="additional_comments"
-                                              name="additional_comments">{{ $warehouseProperty->additional_comments }}</textarea>
+                                              name="additional_comments">{{ $warehouseProperty->additional_comments ?? '' }}</textarea>
                                 </div>
                                 <div class="form-group">
                                     <label for="open_days">@lang('warehouses.form.open_days')</label>
@@ -136,12 +141,12 @@
                                                                                                            class="form-control"
                                                                                                            id="open_days_monday_from"
                                                                                                            name="open_days_monday_from"
-                                                                                                           value="{{ $openDays['monday']['from'] }}">
+                                                                                                           value="{{ $openDays['monday']['from'] ?? '' }}">
                                         <span><strong>@lang('warehouses.form.to')</strong></span> <input type="text"
                                                                                                          class="form-control"
                                                                                                          id="open_days_monday_to"
                                                                                                          name="open_days_monday_to"
-                                                                                                         value="{{ $openDays['monday']['to'] }}">
+                                                                                                         value="{{ $openDays['monday']['to'] ?? '' }}">
                                     </div>
                                     <div class="open_days">
                                         <label for="open_days">@lang('warehouses.form.tuesday')</label>
@@ -149,12 +154,12 @@
                                                                                                            class="form-control"
                                                                                                            id="open_days_tuesday_from"
                                                                                                            name="open_days_tuesday_from"
-                                                                                                           value="{{ $openDays['tuesday']['from'] }}">
+                                                                                                           value="{{ $openDays['tuesday']['from'] ?? '' }}">
                                         <span><strong>@lang('warehouses.form.to')</strong></span> <input type="text"
                                                                                                          class="form-control"
                                                                                                          id="open_days_tuesday_to"
                                                                                                          name="open_days_tuesday_to"
-                                                                                                         value="{{ $openDays['tuesday']['to'] }}">
+                                                                                                         value="{{ $openDays['tuesday']['to'] ?? '' }}">
                                     </div>
                                     <div class="open_days">
                                         <label for="open_days">@lang('warehouses.form.wednesday')</label>
@@ -162,12 +167,12 @@
                                                                                                            class="form-control"
                                                                                                            id="open_days_wednesday_from"
                                                                                                            name="open_days_wednesday_from"
-                                                                                                           value="{{ $openDays['wednesday']['from'] }}">
+                                                                                                           value="{{ $openDays['wednesday']['from'] ?? '' }}">
                                         <span><strong>@lang('warehouses.form.to')</strong></span> <input type="text"
                                                                                                          class="form-control"
                                                                                                          id="open_days_wednesday_to"
                                                                                                          name="open_days_wednesday_to"
-                                                                                                         value="{{ $openDays['wednesday']['to'] }}">
+                                                                                                         value="{{ $openDays['wednesday']['to'] ?? '' }}">
                                     </div>
                                     <div class="open_days">
                                         <label for="open_days">@lang('warehouses.form.thursday')</label>
@@ -175,12 +180,12 @@
                                                                                                            class="form-control"
                                                                                                            id="open_days_thursday_from"
                                                                                                            name="open_days_thursday_from"
-                                                                                                           value="{{ $openDays['thursday']['from'] }}">
+                                                                                                           value="{{ $openDays['thursday']['from'] ?? '' }}">
                                         <span><strong>@lang('warehouses.form.to')</strong></span> <input type="text"
                                                                                                          class="form-control"
                                                                                                          id="open_days_thursday_to"
                                                                                                          name="open_days_thursday_to"
-                                                                                                         value="{{ $openDays['thursday']['to'] }}">
+                                                                                                         value="{{ $openDays['thursday']['to'] ?? '' }}">
                                     </div>
                                     <div class="open_days">
                                         <label for="open_days">@lang('warehouses.form.friday')</label>
@@ -188,12 +193,12 @@
                                                                                                            class="form-control"
                                                                                                            id="open_days_friday_from"
                                                                                                            name="open_days_friday_from"
-                                                                                                           value="{{ $openDays['friday']['from'] }}">
+                                                                                                           value="{{ $openDays['friday']['from'] ?? '' }}">
                                         <span><strong>@lang('warehouses.form.to')</strong></span> <input type="text"
                                                                                                          class="form-control"
                                                                                                          id="open_days_friday_to"
                                                                                                          name="open_days_friday_to"
-                                                                                                         value="{{ $openDays['friday']['to'] }}">
+                                                                                                         value="{{ $openDays['friday']['to'] ?? '' }}">
                                     </div>
                                     <div class="open_days">
                                         <label for="open_days">@lang('warehouses.form.saturday')</label>
@@ -201,12 +206,12 @@
                                                                                                            class="form-control"
                                                                                                            id="open_days_saturday_from"
                                                                                                            name="open_days_saturday_from"
-                                                                                                           value="{{ $openDays['saturday']['from'] }}">
+                                                                                                           value="{{ $openDays['saturday']['from'] ?? '' }}">
                                         <span><strong>@lang('warehouses.form.to')</strong></span> <input type="text"
                                                                                                          class="form-control"
                                                                                                          id="open_days_saturday_to"
                                                                                                          name="open_days_saturday_to"
-                                                                                                         value="{{ $openDays['saturday']['to'] }}">
+                                                                                                         value="{{ $openDays['saturday']['to'] ?? '' }}">
                                     </div>
                                     <div class="open_days">
                                         <label for="open_days">@lang('warehouses.form.sunday')</label>
@@ -214,18 +219,18 @@
                                                                                                            class="form-control"
                                                                                                            id="open_days_sunday_from"
                                                                                                            name="open_days_sunday_from"
-                                                                                                           value="{{ $openDays['sunday']['from'] }}">
+                                                                                                           value="{{ $openDays['sunday']['from'] ?? '' }}">
                                         <span><strong>@lang('warehouses.form.to')</strong></span> <input type="text"
                                                                                                          class="form-control"
                                                                                                          id="open_days_sunday_to"
                                                                                                          name="open_days_sunday_to"
-                                                                                                         value="{{ $openDays['sunday']['to'] }}">
+                                                                                                         value="{{ $openDays['sunday']['to'] ?? '' }}">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="email">@lang('warehouses.form.email')</label>
                                     <input type="email" class="form-control" id="email" name="email"
-                                           value="{{ $warehouseProperty->email }}">
+                                           value="{{ $warehouseProperty->email ?? '' }}">
                                 </div>
                             </div>
                             <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
