@@ -495,4 +495,22 @@ class Order extends Model implements Transformable
             }
         });
     }
+
+    public function warehousePayments()
+    {
+        return $this->hasMany(OrderPayment::class)->where('type', '=', 'WAREHOUSE')->get();
+    }
+
+    public function isOrderHasLabel($labelId)
+    {
+        if(count($this->belongsToMany(Label::class, 'order_labels')->where('labels.id', '=', $labelId)->get()) > 0) {
+            return true;
+        }
+        return false;
+    }
+
+    public function invoiceRequests()
+    {
+        return $this->hasOne(InvoiceRequest::class);
+    }
 }

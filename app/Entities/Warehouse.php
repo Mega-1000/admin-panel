@@ -25,7 +25,8 @@ class Warehouse extends Model implements Transformable
         'firm_id',
         'symbol',
         'status',
-        'radius'
+        'radius',
+        'warehouse_email'
     ];
 
     /**
@@ -85,5 +86,15 @@ class Warehouse extends Model implements Transformable
     public function reports()
     {
         return $this->belongsToMany(Report::class);
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
     }
 }
