@@ -254,7 +254,15 @@ class MessagesController extends Controller
         }
         $possibleUsers = $this->addCustomerToChatList($chat, $possibleUsers, $users, $order);
 
+        if ($order) {
+            $productList = $this->setProductsForChatUser($helper->getCurrentUser(), $order);
+        }
+        if ($product) {
+            $productList = collect([$product]);
+        }
+
         $view = view('chat.show')->with([
+            'product_list' => $productList,
             'faq' => $this->prepareFaq($users),
             'notices' => $notices,
             'possible_users' => $possibleUsers,
@@ -297,5 +305,15 @@ class MessagesController extends Controller
             }
         }
         return $faqs;
+    }
+
+    private function setProductsForChatUser($chatUser, $order)
+    {
+        if (is_a($chatUser, Employee::class)) {
+            return $order->items->filter(function ($item) use ($chatUser) {
+                return empty($item->product->firm) ? true : $item->product->firm->id == $chatUser->firm->id;
+            });
+        }
+        return $order->items;
     }
 }

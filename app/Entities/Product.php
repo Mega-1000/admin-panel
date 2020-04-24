@@ -224,7 +224,7 @@ class Product extends Model implements Transformable
         return $this->hasMany(self::class, 'parent_id', 'id');
     }
 
-    public function firm()
+        public function firm()
     {
         return $this->belongsTo(Firm::class, 'product_name_supplier', 'symbol');
     }
