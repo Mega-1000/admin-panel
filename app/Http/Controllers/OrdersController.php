@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\InvoiceRequest;
 use App\Entities\Order;
 use App\Entities\OrderItem;
 use App\Entities\OrderPayment;
@@ -42,6 +43,7 @@ use App\Repositories\OrderAddressRepository;
 use App\Repositories\UserRepository;
 use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
@@ -2290,16 +2292,16 @@ class OrdersController extends Controller
 
         return view('customers.confirmation.confirmationThanks');
     }
-    
+
     public function getCosts()
     {
         dispatch_now(new UpdatePackageRealCostJob());
         return redirect()->route('orders.index')->with([
             'message' => 'Rozpoczęto pobieranie realnych wartości zleceń',
             'alert-type' => 'success',
-        ]); 
+        ]);
     }
-    
+
     public function selloImport()
     {
         dispatch_now(new ImportOrdersFromSelloJob());
@@ -2307,6 +2309,16 @@ class OrdersController extends Controller
             'message' => 'Rozpoczęto import z Sello',
             'alert-type' => 'success',
         ]);
+    }
+
+    public function invoiceRequest($id)
+    {
+        $invoiceRequest = InvoiceRequest::create([
+            'order_id' => $id,
+            'status' => 'MISSING'
+        ]);
+
+        return response()->json(['status' => 200]);
     }
 }
 
