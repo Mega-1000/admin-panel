@@ -30,6 +30,11 @@
 .price-table > tbody > tr > td, .price-table > tbody > tr > th {
     border: solid;
 }
+
+.price-table > tbody > tr > td > div >input {
+    width: 100px;
+}
+
 .image-product {
     width: 100px;
     height: auto;

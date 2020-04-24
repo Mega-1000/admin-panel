@@ -33,7 +33,7 @@
             @if ($product_list->count() > 0)
                 <div class="alert alert-warning"><b>Lista produktów:</b>
                 @foreach($product_list as $product)
-                    @include('chat/single_product', ['product' => $product])
+                    @include('chat/single_product', ['product' => $product, 'user_type' => $user_type])
                 @endforeach
                 </div>
             @endif
