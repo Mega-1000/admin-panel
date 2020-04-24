@@ -1229,7 +1229,7 @@ class OrdersPaymentsController extends Controller
             try {
                 \Mailer::create()
                     ->to($order->warehouse->warehouse_email)
-                    ->send(new WarehousePaymentAccept($orderId, $amount, $order->invoices()->first()->invoice_name));
+                    ->send(new WarehousePaymentAccept($orderId, $amount, $order->invoices()->first()->invoice_name, $token));
             } catch (\Swift_TransportException $e) {
 
             }
