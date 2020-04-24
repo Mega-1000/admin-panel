@@ -345,6 +345,12 @@ class ImportCsvFileJob implements ShouldQueue
         if (empty($array['date_of_the_new_prices'])) {
             unset($array['date_of_the_new_prices']);
         }
+
+        if (!empty($array['products_related_to_the_automatic_price_change'])) {
+            $array['date_of_the_new_prices'] = null;
+            $array['date_of_price_change'] = null;
+            $array['product_group_for_change_price'] = '';
+        }
         
         $product->fill($array);
         $product->save();
