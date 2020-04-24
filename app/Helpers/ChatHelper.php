@@ -52,7 +52,8 @@ class ChatHelper
             $ret2 = implode(' ', $ret2);
             $ret = [$ret, $ret2];
         } else if (is_a($user, Customer::class)) {
-            $ret = ['klient: ' . self::formatEmailAndPhone($user->login, $user->addresses->first()->phone)];
+            $ret = ['klient: ' . self::formatEmailAndPhone($user->login, $user->addresses->first()->phone),
+                $user->addresses->first()->postal_code . ' ' . $user->addresses->first()->city];
         } else {
             $ret = [$user->name . ' ' . $user->firstname . ' ' . $user->lastname, $user->email, $user->phone];
         }

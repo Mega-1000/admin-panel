@@ -252,7 +252,7 @@ class MessagesController extends Controller
                 $notices = $order->consultant_notices;
             }
         }
-        $possibleUsers = $this->addCustomerToChatList($chat, $possibleUsers, $users, $order);
+        $possibleUsers = $this->addCustomerToChatList($chat, $possibleUsers, $users, $helper);
         $productList = $this->prepareProductList($helper);
 
         $view = view('chat.show')->with([
@@ -275,17 +275,24 @@ class MessagesController extends Controller
         return $view;
     }
 
-    private function addCustomerToChatList($chat, $possibleUsers, Collection $users, $order): Collection
+    private function addCustomerToChatList($chat, $possibleUsers, Collection $users, $helper): Collection
     {
         if ($chat) {
             $possibleUsers = $this->filterPossibleUsersWithCurrentlyAdded($possibleUsers, $chat, $users);
-            if ($chat->customers()->where('deleted_at', null)->count() < 1) {
-                $customer = $order->customer;
-                $possibleUsers->push($customer);
+            if ($chat->customers()->whereNull('deleted_at')->count() < 1) {
+                if ($helper->getOrder()) {
+                    $customer = $helper->getOrder()->customer;
+                    $possibleUsers->push($customer);
+                }
+                if ($helper->getProduct()) {
+                    $possibleUsers->push($chat->customers()->first());
+                }
             }
         } else {
-            $customer = $order->customer;
-            $possibleUsers->push($customer);
+            if ($helper->getOrder()) {
+                $customer = $helper->getOrder()->customer;
+                $possibleUsers->push($customer);
+            }
         }
         return $possibleUsers;
     }
