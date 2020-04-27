@@ -92,6 +92,9 @@
                     <option {{ $orderPackage->service_courier_name === 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         ODBIÓR OSOBISTY
                     </option>
+                    <option {{ old('delivery_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
+                        PACZKOMAT
+                    </option>
                 </select>
             </div>
             <div class="form-group">
@@ -117,6 +120,9 @@
                     </option>
                     <option {{ $orderPackage->delivery_courier_name === 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         ODBIÓR OSOBISTY
+                    </option>
+                    <option {{ $orderPackage->delivery_courier_name === 'PACZKOMAT' ? 'selected="selected"' : '' }} value="PACZKOMAT">
+                        PACZKOMAT
                     </option>
                 </select>
             </div>

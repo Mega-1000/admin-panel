@@ -281,12 +281,12 @@ class OrdersCourierJobs extends Job
                 );
                 die();
             }
-
+            error_log(print_r($package,1));
             $this->orderPackageRepository->update([
                 'inpost_url' => $package->href,
             ], $this->data['additional_data']['order_package_id']);
             $href = $integration->hrefExecute($package->href);
-
+            error_log(print_r($href,1));
             return [
                 'status' => 200,
                 'error_code' => 0,
@@ -301,6 +301,7 @@ class OrdersCourierJobs extends Job
             );
             return ['status' => '500', 'error_code' => self::ERRORS['PROBLEM_WITH_DPD_INTEGRATION']];
         }
+
     }
 
 
