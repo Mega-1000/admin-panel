@@ -1249,7 +1249,6 @@
                         let totalOfDeclaredPayments = 0;
                         let totalofWarehousePayments = 0;
                         var payments = row['payments'];
-                        console.log(payments, 'dsajdsakdj');
 
                         for (let index = 0; index < payments.length; index++) {
                             if(payments[index].type === 'WAREHOUSE') {

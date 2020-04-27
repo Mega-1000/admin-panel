@@ -2311,10 +2311,10 @@ class OrdersController extends Controller
         ]);
     }
 
-    public function invoiceRequest($id)
+    public function invoiceRequest(Request $request)
     {
         $invoiceRequest = InvoiceRequest::create([
-            'order_id' => $id,
+            'order_id' => $request->input('id'),
             'status' => 'MISSING'
         ]);
 

@@ -239,7 +239,11 @@ return [
         'Debugbar' => Barryvdh\Debugbar\Facade::class,
         'PDF' => Barryvdh\DomPDF\Facade::class,
         'MessagesHelper' => App\Helpers\MessagesHelper::class,
-        'ChatHelper' => App\Helpers\ChatHelper::class
+        'ChatHelper' => App\Helpers\ChatHelper::class,
+        'Label' => App\Entities\Label::class,
+        'User' => App\User::class,
+        'Payment' => App\Entities\Payment::class,
+        'Order' => App\Entities\Order::class
     ],
 
 ];

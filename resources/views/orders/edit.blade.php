@@ -1216,7 +1216,6 @@
                                         }
                                         $orderValue = str_replace(',', '', number_format($sumOfItems + $itemCustomerOrder->shipment_price_for_client + $itemCustomerOrder->additional_service_cost + $itemCustomerOrder->additional_cash_on_delivery_cost, 2));
                                     @endphp
-                                    @break
                                 @endforeach
                                 <input type="text" class="form-control" id="amount" name="amount"
                                        value="{{ $orderValue }}">
@@ -1367,7 +1366,7 @@
     </div>
     <div class="warehouse-payments" id="warehouse-payments">
         <h1>Rozrachunki z magazynem: {{ $order->warehouse->warehouse_email ?? '' }}
-            @if(Auth::user()->role_id == 3 || Auth::user()->role_id == 2 || Auth::user()->role_id == 1)
+            @if(in_array(Auth::user()->role_id, [User::ROLE_SUPER_ADMIN, User::ROLE_ADMIN, User::ROLE_ACCOUNTANT]))
                 <a id="create-button-orderPayments" style="float:right;margin-right: 15px;"
                    href="{{route('order_payments.createMaster', ['id' => $order->id]) }}"
                    class="btn btn-success install pull-right">
@@ -1396,7 +1395,7 @@
                 <tr>
                     <td>{{ $payment->amount }}</td>
                     <td>
-                        @if($itemOrder->isOrderHasLabel(66))
+                        @if($itemOrder->isOrderHasLabel(Label::ORDER_ITEMS_REDEEMED_LABEL))
                             <span class="order-label" style="color: #FFFFFF; display: block; margin-top: 5px; background-color: #87D11B; text-align: center;"><i class="fas fa-battery-full"></i></span>
                         @else
                             <span class="order-label" style="color: #FFFFFF; display: block; margin-top: 5px; background-color: #4DCFFF; text-align: center;"><i class="fas fa-battery-empty"></i></span>
@@ -1411,7 +1410,7 @@
                         @endif
                     </td>
                     <td>
-                        @if($payment->promise == '1' && Auth::user()->role_id != 4)
+                        @if($payment->promise == Payment::PROMISE_PAYMENT && Auth::user()->role_id != User::ROLE_CONSULTANT)
                             <button type="button" class="btn btn-success openPromiseModal" style="display: block;"
                                     data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->amount }}">
                                 Zaksięguj
@@ -1420,7 +1419,7 @@
                             <button type="button" class="btn" style="display: block;" disabled>
                                 Zaksięgowano
                             </button>
-                            <button type="button" class="btn btn-primary openWarehousePaymentModal" style="display: block;" @if(!$itemOrder->isOrderHasLabel(66)) {{ 'disabled' }} @endif
+                            <button type="button" class="btn btn-primary openWarehousePaymentModal" style="display: block;" @if(!$itemOrder->isOrderHasLabel(Label::ORDER_ITEMS_REDEEMED_LABEL)) {{ 'disabled' }} @endif
                                     data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->amount }}">
                                 Przydziel
                             </button>
@@ -1453,7 +1452,7 @@
                 $sumOfOrders = 0;
                 $sumOfItems = 0;
             @endphp
-            @foreach($order->warehouse->orders()->where('status_id', '!=', '8')->where('status_id', '!=', '6')->get() as $itemOrder)
+            @foreach($order->warehouse->orders()->whereNotIn('status_id', [Order::STATUS_WITHOUT_REALIZATION, Order::STATUS_ORDER_FINISHED])->get() as $itemOrder)
                 <tr>
                     <td>{{ $itemOrder->id }}</td>
                     <td>
@@ -1482,7 +1481,7 @@
                     @php
                         $acceptedPaymentsValue = 0;
                         $pendingPaymentsValue = 0;
-                        foreach($itemOrder->warehousePayments() as $payment) {
+                        foreach($itemOrder->warehousePayments()->get() as $payment) {
                             switch($payment->status) {
                                 case 'ACCEPTED':
                                     $acceptedPaymentsValue += $payment->amount;
@@ -4211,17 +4210,14 @@
                             }
                         }
                         function sendInvoiceRequest(id){
+                            let url = {{ route('orders.invoiceRequest') }}
                             $.ajax({
                                 method: 'POST',
-                                url: '/admin/orders/'+id+'/invoice/request',
+                                url: url,
                                 data: {
                                     id: id
                                 }
-                            }).done(function(data) {
-                               alert('Pomyślnie wywołano prośbę o fakturę.');
-                            }).fail(function() {
-                               console.log('failed');
-                            });
+                            }).done(data => alert('Pomyślnie wywołano prośbę o fakturę.')).fail(data => alert('Prośba o fakturę nie została wysłana. Wystąpił błąd.'));
                         }
                         function moveDataAjax(id){
                             var idToSend = id;
@@ -4276,35 +4272,4 @@
                     </script>
 
                     <script src="{{ URL::asset('js/views/orders/edit.js') }}"></script>
-                    <style>
-                        .firstOrder, .secondOrder, .thirdOrder, .fourthOrder, .fifthOrder {
-                            display: none;
-                        }
-                        .move__payment--button {
-                            padding: 6px 5px;
-                        }
-                        .payment__pending {
-                            color: orange;
-                            border: 2px solid orange;
-                            padding: 5px;
-                        }
-                        .payment__declined {
-                            color: red;
-                            border: 2px solid red;
-                            padding: 5px;
-                        }
-                        .payment__accepted {
-                            color: deepskyblue;
-                            border: 2px solid deepskyblue;
-                            padding: 5px;
-                        }
-                        .order-label {
-                            padding-top: 5px;
-                            padding-bottom: 5px;
-                        }
-                        .invoice__request--sent {
-                            font-weight: bold;
-                            color: green;
-                        }
-                    </style>
 @endsection

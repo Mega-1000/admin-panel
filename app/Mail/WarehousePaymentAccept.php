@@ -18,19 +18,19 @@ class WarehousePaymentAccept extends Mailable
 
     public $invoice;
 
-    public $token;
+    public $url;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($orderId, $amount, $invoice, $token)
+    public function __construct($orderId, $amount, $invoice, $url)
     {
         $this->orderId = $orderId;
         $this->amount = $amount;
         $this->invoice = $invoice;
-        $this->token = $token;
+        $this->url = $url;
     }
 
     /**

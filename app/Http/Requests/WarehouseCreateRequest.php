@@ -28,7 +28,7 @@ class WarehouseCreateRequest extends FormRequest
             'status' => 'in:ACTIVE,PENDING',
             'postal_code' => 'nullable|regex:/[0-9]{2}\-[0-9]{3}/',
             'email' => 'nullable|email|min:5',
-            'warehouse-email' => 'nullable|email|min:5',
+            'warehouse-email' => 'nullable|email',
         ];
     }
 }

@@ -18,6 +18,9 @@ class Order extends Model implements Transformable
 
     use TransformableTrait;
 
+    const STATUS_WITHOUT_REALIZATION = 8;
+    const STATUS_ORDER_FINISHED = 6;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -498,15 +501,12 @@ class Order extends Model implements Transformable
 
     public function warehousePayments()
     {
-        return $this->hasMany(OrderPayment::class)->where('type', '=', 'WAREHOUSE')->get();
+        return $this->hasMany(OrderPayment::class)->where('type','WAREHOUSE');
     }
 
     public function isOrderHasLabel($labelId)
     {
-        if(count($this->belongsToMany(Label::class, 'order_labels')->where('labels.id', '=', $labelId)->get()) > 0) {
-            return true;
-        }
-        return false;
+        return $this->labels()->where('labels.id', $labelId)->count() > 0;
     }
 
     public function invoiceRequests()

@@ -113,7 +113,7 @@ class OrderWarehouseNotificationController extends Controller
                 'invoice_type' => 'invoice',
                 'invoice_name' => $filename
             ]);
-            $invoiceRequest = $order->invoiceRequests->first();
+            $invoiceRequest = $order->invoiceRequests()->first();
             if(!empty($invoiceRequest) && $invoiceRequest->status === 'MISSING')
             {
                 $invoiceRequest->update([

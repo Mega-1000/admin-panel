@@ -2,13 +2,15 @@
 
 namespace App\Jobs;
 
+use App\Entities\Label;
 use App\Entities\Order;
-use App\Mail\InvoiceRequest;
+use App\Entities\InvoiceRequest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Log;
 
 class UrgentInvoiceRequest implements ShouldQueue
 {
@@ -31,17 +33,17 @@ class UrgentInvoiceRequest implements ShouldQueue
      */
     public function handle()
     {
-        $orders = Order::all();
+        $orders = Order::whereHas(['invoiceRequests', function ($query) {
+            $query->where('invoiceRequests.status', InvoiceRequest::STATUS_MISSING);
+        }])->get();
         foreach($orders as $order) {
-            $invoiceRequest = $order->invoiceRequests->first();
-            if(!empty($invoiceRequest) && $invoiceRequest->status === 'MISSING') {
-                try {
-                    \Mailer::create()
-                        ->to($order->warehouse->warehouse_email)
-                        ->send(new InvoiceRequest($order->id));
-                } catch (\Swift_TransportException $e) {
-
-                }
+            $invoiceRequest = $order->invoiceRequests()->first();
+            try {
+                \Mailer::create()
+                    ->to($order->warehouse->warehouse_email)
+                    ->send(new InvoiceRequest($order->id));
+            } catch (\Swift_TransportException $e) {
+                Log::error('Urgent invoice email request to warehouse was not sent due to. Error: ' . $e->getMessage());
             }
         }
     }

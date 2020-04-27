@@ -269,7 +269,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orders/{id}/sendOfferToCustomer',
             'OrdersController@sendOfferToCustomer')->name('orders.sendOfferToCustomer');
         Route::get('orders/getCosts', 'OrdersController@getCosts')->name('orders.getCosts');
-        Route::post('orders/{id}/invoice/request', 'OrdersController@invoiceRequest')->name('orders.invoiceRequest');
+        Route::post('orders/invoice/request', 'OrdersController@invoiceRequest')->name('orders.invoiceRequest');
 
         Route::get('orderPayments/datatable/{id}',
             'OrdersPaymentsController@datatable')->name('order_payments.datatable');

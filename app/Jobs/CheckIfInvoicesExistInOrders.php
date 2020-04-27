@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Entities\Label;
 use App\Entities\Order;
 use App\Mail\InvoiceRequest;
 use Illuminate\Bus\Queueable;
@@ -31,16 +32,16 @@ class CheckIfInvoicesExistInOrders implements ShouldQueue
      */
     public function handle()
     {
-        $orders = Order::all();
+        $orders = Order::whereDoesntHave('invoices')->whereHas(['labels', function ($query) {
+            $query->where('labels.id', Label::ORDER_ITEMS_REDEEMED_LABEL);
+        }])->get();
         foreach($orders as $order) {
-            if(count($order->invoices) === 0 && count($order->labels()->where('label_id', 66)->get()) === 1) {
-                try {
-                    \Mailer::create()
-                        ->to($order->warehouse->warehouse_email)
-                        ->send(new InvoiceRequest($order->id));
-                } catch (\Swift_TransportException $e) {
+            try {
+                \Mailer::create()
+                    ->to($order->warehouse->warehouse_email)
+                    ->send(new InvoiceRequest($order->id));
+            } catch (\Swift_TransportException $e) {
 
-                }
             }
         }
     }

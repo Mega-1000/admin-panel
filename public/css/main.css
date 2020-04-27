@@ -44,3 +44,34 @@
 #dataTable > tbody > tr {
     color: black !important;
 }
+
+.move__payment--button {
+    padding: 6px 5px;
+}
+.payment__pending {
+    color: orange;
+    border: 2px solid orange;
+    padding: 5px;
+}
+.payment__declined {
+    color: red;
+    border: 2px solid red;
+    padding: 5px;
+}
+.payment__accepted {
+    color: deepskyblue;
+    border: 2px solid deepskyblue;
+    padding: 5px;
+}
+.order-label {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+.invoice__request--sent {
+    font-weight: bold;
+    color: green;
+}
+
+.firstOrder, .secondOrder, .thirdOrder, .fourthOrder, .fifthOrder {
+    display: none;
+}
