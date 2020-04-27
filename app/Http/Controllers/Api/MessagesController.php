@@ -6,6 +6,7 @@ use App\Entities\ChatUser;
 use App\Entities\Customer;
 use App\Entities\Employee;
 use App\Entities\Label;
+use App\Entities\OrderItem;
 use App\Helpers\ChatHelper;
 use App\Jobs\ChatNotificationJob;
 use App\User;
@@ -13,6 +14,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Helpers\MessagesHelper;
 use App\Helpers\Exceptions\ChatException;
+use Illuminate\Support\Facades\Log;
 
 class MessagesController extends Controller
 {
@@ -149,6 +151,49 @@ class MessagesController extends Controller
         return response($out);
     }
 
+    public function editPrices(Request $request, $token)
+    {
+        try {
+            $helper = new MessagesHelper($token);
+            $chat = $helper->getChat();
+            if (!$chat) {
+                throw new ChatException('Nieprawidłowy token chatu');
+            }
+            $order = $helper->getOrder();
+            if (!$order) {
+                throw new ChatException('Nieprawidłowy token chatu');
+            }
+            $user = $helper->getCurrentUser();
+            if ( !(is_a($user, Employee::class) || is_a($user, User::class)) ) {
+                throw new ChatException('Nieprawidłowy token chatu');
+            }
+            if (is_a($user, Employee::class)) {
+                $firm = $user->firm();
+                $orderFirm = $order->warehouse->firm;
+                if ($firm->id != $orderFirm->id) {
+                    throw new ChatException('Nieprawidłowy token chatu');
+                }
+            }
+            $item = OrderItem::findOrFail($request->item_id);
+            $item->net_purchase_price_commercial_unit_after_discounts = $request->commercial_price_net;
+            $item->net_purchase_price_basic_unit_after_discounts = $request->basic_price_net;
+            $item->net_purchase_price_calculated_unit_after_discounts = $request->calculated_price_net;
+            $item->net_purchase_price_aggregate_unit_after_discounts = $request->aggregate_price_net;
+            $item->save();
+            $helper->addMessage('Użytkownik ' . $user->firstname . ' ' . $user->lastname . ' zmienił cenę jednostki komercyjnej na ' . $request->commercial_price_net);
+        } catch (ChatException $exception) {
+            $exception->log();
+            return response($exception->getMessage(), 400);
+        } catch (\Exception $exception) {
+            error_log('test2');
+            Log::error('Brak przedmiotu',
+                ['message' => $exception->getMessage(), 'file' => $exception->getFile(), 'line' => $exception->getLine()]);
+            return response('Edytowany przedmiot nie istnieje', 400);
+        }
+        $url = route('chat.show', ['token' => $token]);
+        return redirect($url);
+    }
+
     public function getUrl(Request $request)
     {
         try {
@@ -171,18 +216,11 @@ class MessagesController extends Controller
     {
         if ($request->type == Customer::class) {
             $user = Customer::findOrFail($request->user_id);
-            $chatUser = ChatUser::where('chat_id', $chat->id)
-                ->where('customer_id', $user->id)
-                ->withTrashed()
-                ->first();
+            $chatUser = $chat->customers->first;
         }
         if ($request->type == Employee::class) {
             $user = Employee::findOrFail($request->user_id);
-            $chatUser = ChatUser::where('chat_id', $chat->id)
-                ->where('employee_id', $user->id)
-                ->whereNull('deleted_at')
-                ->withTrashed()
-                ->first();
+            $chatUser = $chat->employees->where('employee_id', $user->id)->withTrashed()->first();
         }
         return array($user, $chatUser);
     }

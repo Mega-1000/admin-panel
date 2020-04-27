@@ -255,6 +255,7 @@ class MessagesController extends Controller
         $possibleUsers = $this->addCustomerToChatList($chat, $possibleUsers, $users, $helper);
         $productList = $this->prepareProductList($helper);
 
+        $token = $helper->encrypt();
         $view = view('chat.show')->with([
             'product_list' => $productList,
             'faq' => $this->prepareFaq($users),
@@ -266,11 +267,12 @@ class MessagesController extends Controller
             'product' => $product,
             'order' => $order,
             'title' => $helper->getTitle(true),
-            'route' => route('api.messages.post-new-message', ['token' => $helper->encrypt()]),
-            'routeAddUser' => route('api.messages.add-new-user', ['token' => $helper->encrypt()]),
-            'routeRemoveUser' => route('api.messages.remove-user', ['token' => $helper->encrypt()]),
-            'routeRefresh' => route('api.messages.get-messages', ['token' => $helper->encrypt()]),
-            'routeAskForIntervention' => route('api.messages.ask-for-intervention', ['token' => $helper->encrypt()])
+            'route' => route('api.messages.post-new-message', ['token' => $token]),
+            'routeAddUser' => route('api.messages.add-new-user', ['token' => $token]),
+            'routeRemoveUser' => route('api.messages.remove-user', ['token' => $token]),
+            'routeRefresh' => route('api.messages.get-messages', ['token' => $token]),
+            'routeAskForIntervention' => route('api.messages.ask-for-intervention', ['token' => $token]),
+            'routeForEditPrices' => route('api.messages.edit-prices', ['token' => $token])
         ]);
         return $view;
     }
