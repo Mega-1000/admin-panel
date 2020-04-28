@@ -934,6 +934,9 @@
                     render: function(orderId, row, data){
                         if(data.master_order_id == null) {
                             let html = '';
+                            if (data.sello_id) {
+                                html += ' (A)'
+                            }
                             for(let i = 0; i < data.connected.length; i++) {
                                 html += '<span style="display: block;">(P)' + data.connected[i].id + '</span>';
                             }
@@ -1762,7 +1765,7 @@
             $('#searchOrderValue').val('');
             $('#searchPayment').val('');
             $('#searchLeft').val('');
-           
+
 
             table
                 .columns()
