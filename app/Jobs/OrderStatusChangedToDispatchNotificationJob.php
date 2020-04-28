@@ -64,7 +64,7 @@ class OrderStatusChangedToDispatchNotificationJob extends Job
         }
 
         $warehouse = $order->warehouse;
-        if ($warehouse && $warehouse->firm()->first()) {
+        if ($warehouse && $warehouse->firm) {
             $warehouseMail = $warehouse->firm->email;
         }
         if (empty($warehouseMail)) {
