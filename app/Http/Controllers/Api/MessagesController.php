@@ -50,6 +50,14 @@ class MessagesController extends Controller
                 return response('ok');
             }
             $this->createNewCustomerOrEmployee($chat, $request, $user);
+            if (is_a($user, Employee::class) || is_a($user, User::class)) {
+                $email = $user->email;
+            } else if (is_a($user, Customer::class)) {
+                $email = $user->login;
+            } else {
+                throw new ChatException('Zły rodzaj użytkownika');
+            }
+            ChatNotificationJob::sendNewMessageEmail($email, $helper);
             return response('ok');
         } catch (ChatException $e) {
             $e->log();
