@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Mail\OrderStatusChangedToDispatchMail;
 use App\Repositories\OrderRepository;
 use App\Repositories\OrderWarehouseNotificationRepository;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class OrderStatusChangedToDispatchNotificationJob
@@ -56,8 +57,21 @@ class OrderStatusChangedToDispatchNotificationJob extends Job
         OrderRepository $orderRepository,
         OrderWarehouseNotificationRepository $orderWarehouseNotificationRepository
     ) {
-        $order = $orderRepository->find($this->orderId);
-        $warehouseMail = $order->warehouse()->first()->firm()->first()->email;   //TODO find out which email should be taken
+        try {
+            $order = $orderRepository->find($this->orderId);
+        } catch (\Exception $exception) {
+            Log::error($exception->getMessage(), ['line' => $exception->getLine(), 'file' => $exception->getFile()]);
+            return;
+        }
+
+        $warehouse = $order->warehouse;
+        if ($warehouse && $warehouse->firm()->first()) {
+            $warehouseMail = $warehouse->firm->email;
+        }
+        if (empty($warehouseMail)) {
+            Log::notice('Brak adresu mailowego w firmie, lub magazyn nie istnieje', ['line' => __LINE__, 'file' => __FILE__]);
+            return;
+        }
         $subject = "Przypomnienie o potwierdzenie awizacji dla zamówienia nr. " . $this->orderId;
 
         $dataArray = [
