@@ -84,6 +84,8 @@ class OrderStatusChangedNotificationJob extends Job
             $proformDate = \Carbon\Carbon::now()->format('m-Y');
             $proformDate = str_replace('-', '/', $proformDate);
             $date = \Carbon\Carbon::now()->toDateString();
+            $order->proforma_date = $date;
+            $order->save();
 
             $pdf = PDF::loadView('pdf.proform', compact('date', 'proformDate', 'order'));
             \Mailer::create()
