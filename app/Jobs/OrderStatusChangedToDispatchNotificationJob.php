@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Entities\Order;
 use App\Mail\OrderStatusChangedToDispatchMail;
 use App\Repositories\OrderRepository;
 use App\Repositories\OrderWarehouseNotificationRepository;
@@ -51,14 +52,12 @@ class OrderStatusChangedToDispatchNotificationJob extends Job
     /**
      * Execute the job.
      *
+     * @param OrderWarehouseNotificationRepository $orderWarehouseNotificationRepository
      * @return void
      */
-    public function handle(
-        OrderRepository $orderRepository,
-        OrderWarehouseNotificationRepository $orderWarehouseNotificationRepository
-    ) {
+    public function handle(OrderWarehouseNotificationRepository $orderWarehouseNotificationRepository) {
         try {
-            $order = $orderRepository->find($this->orderId);
+            $order = Order::findOrFail($this->orderId);
         } catch (\Exception $exception) {
             Log::error($exception->getMessage(), ['line' => $exception->getLine(), 'file' => $exception->getFile()]);
             return;
