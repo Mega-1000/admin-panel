@@ -14,7 +14,7 @@ class AddProformaDateToOrder extends Migration
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->date('proforma_date')->nullable();
+            $table->string('proforma_filename')->nullable();
         });
     }
 
@@ -26,7 +26,7 @@ class AddProformaDateToOrder extends Migration
     public function down()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('proforma_date');
+            $table->dropColumn('proforma_filename');
         });
     }
 }
