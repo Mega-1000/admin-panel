@@ -17,76 +17,17 @@
             </p>
         </div>
         @if($user_type != MessagesHelper::TYPE_CUSTOMER)
-            <table class="price-table">
-                <tr>
-                    <th>Jednostka handlowa ({{ $product->product->packing->unit_commercial }})</th>
-                    <th>Jednostka podstawowa ({{$product->product->packing->unit_basic}})</th>
-                    <th>Jednostka obliczeniowa ({{$product->product->packing->calculation_unit}})</th>
-                    <th>Jednostka zbiorcza ({{$product->product->packing->unit_of_collective}})</th>
-                </tr>
-                <tr>
-                    <td colspan="4">Cena zakupowa netto</td>
-                </tr>
-                <tr>
-                    <td>
-                        <div style="display: flex">
-                            <input disabled value="{{ $product->net_purchase_price_commercial_unit_after_discounts }}"/>
-                            <p>PLN</p>
-                        </div>
-                    </td>
-                    <td>
-                        <div style="display: flex">
-                            <input disabled value="{{ $product->net_purchase_price_basic_unit_after_discounts }}"/>
-                            <p>PLN</p>
-                        </div>
-                    </td>
-                    <td>
-                        <div style="display: flex">
-                            <input disabled value="{{ $product->net_purchase_price_calculated_unit_after_discounts }}"/>
-                            <p>PLN</p>
-                        </div>
-                    </td>
-                    <td>
-                        <div style="display: flex">
-                            <input disabled value="{{ $product->net_purchase_price_aggregate_unit_after_discounts }}"/>
-                            <p>PLN</p>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="4">Cena zakupowa brutto</td>
-                </tr>
-                <tr>
-                    <td>
-                        <div style="display: flex">
-                            <input disabled
-                                   value="{{number_format($product->net_purchase_price_commercial_unit_after_discounts * 1.23, 2)}}"/>
-                            <p>PLN</p>
-                        </div>
-                    </td>
-                    <td>
-                        <div style="display: flex">
-                            <input disabled
-                                   value="{{number_format($product->net_purchase_price_basic_unit_after_discounts * 1.23, 2)}}"/>
-                            <p>PLN</p>
-                        </div>
-                    </td>
-                    <td>
-                        <div style="display: flex">
-                            <input disabled
-                                   value="{{number_format($product->net_purchase_price_calculated_unit_after_discounts * 1.23, 2)}}"/>
-                            <p>PLN</p>
-                        </div>
-                    </td>
-                    <td>
-                        <div style="display: flex">
-                            <input disabled
-                                   value="{{number_format($product->net_purchase_price_aggregate_unit_after_discounts * 1.23, 2)}}"/>
-                            <p>PLN</p>
-                        </div>
-                    </td>
-                </tr>
-            </table>
+            <form style="display: flex; flex-direction: column" action="{{ $routeForEditPrices }}" method="POST">
+                <input type="hidden" class="unit_consumption"
+                       value="{{ $product->product->packing->unit_consumption }}">
+                <input type="hidden" class="number_of_sale_units_in_the_pack"
+                       value="{{ $product->product->packing->number_of_sale_units_in_the_pack }}">
+                <input type="hidden" class="numbers_of_basic_commercial_units_in_pack"
+                       value="{{ $product->product->packing->numbers_of_basic_commercial_units_in_pack }}">
+                <input type="hidden" name="item_id" value="{{ $product->id }}">
+                @include('chat/pricing_table')
+                <input type="submit" value="aktualizuj">
+            </form>
         @endif
     </div>
 @else
