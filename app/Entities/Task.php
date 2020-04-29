@@ -16,6 +16,9 @@ class Task extends Model implements Transformable
 {
     use TransformableTrait;
 
+    public const WAITING_FOR_ACCEPT = 'WAITING_FOR_ACCEPT';
+    public const DEFAULT_COLOR = '194775';
+
     /**
      * The attributes that are mass assignable.
      *

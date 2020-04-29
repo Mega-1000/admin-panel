@@ -16,6 +16,8 @@ class Warehouse extends Model implements Transformable
 {
     use TransformableTrait;
 
+    public const OLAWA_WAREHOUSE_ID = 16;
+
     /**
      * The attributes that are mass assignable.
      *
