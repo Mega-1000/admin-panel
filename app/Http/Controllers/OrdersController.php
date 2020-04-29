@@ -53,6 +53,7 @@ use App\Entities\ColumnVisibility;
 use Illuminate\Support\Facades\Log;
 use App\User;
 use App\Entities\Label;
+use App\Entities\LabelGroup;
 
 /**
  * Class OrderController.
@@ -251,8 +252,8 @@ class OrdersController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function index(Request $request) {
-        $labelGroups = $this->labelGroupRepository->all();
-        $labels = $this->labelRepository->all();
+        $labelGroups = LabelGroup::all();
+        $labels = Label::all();
         $couriers = \DB::table('order_packages')->distinct()->select('delivery_courier_name')->get();
         $warehouses = $this->warehouseRepository->findByField('symbol', 'MEGA-OLAWA');
 
@@ -272,12 +273,9 @@ class OrdersController extends Controller
         }
         $loggedUser = $request->user();
         if ($loggedUser->name == User::ADMIN_NAME) {
-            $users = User::all();
-        } else {
-            $users = [$loggedUser];
-        }
-        $out =[];
-        $expitime = Carbon::now()->subMonths(2);
+            $admin = true;
+        } 
+        $exptime = Carbon::now()->subMonths(2);
         $labIds = array(
             'production' => Label::PRODUCTION_IDS_FOR_TABLE,
             'payments' => Label::PAYMENTS_IDS_FOR_TABLE,
@@ -285,21 +283,27 @@ class OrdersController extends Controller
             'info' => Label::ADDITIONAL_INFO_IDS_FOR_TABLE,
             'invoice' => Label::INVOICE_IDS_FOR_TABLE,
         );
-        foreach ($labels as $label) {
-            foreach ($users as $user) {
-                $out[$user->id]['user'] = $user;
-                $orders = $user->orders;
-                $count = 0;
-                foreach ($orders as $order) {
-                    if ($order->created_at > $expitime) {
-                        foreach($order->labels as $olabel) {
-                            if ($olabel->id == $label->id) {
-                                 $count ++;
-                            }
-                        }
+        $usersQuery = User::with(['orders' => function ($q) use($exptime) {
+            $q->where('created_at','>', $exptime);
+            $q->select('id', 'employee_id');
+            $q->with(['labels' => function ($q) {
+                $q->select('labels.id', 'order_id');
+            }]);
+        }]);
+        if (!$admin) {
+            $usersQuery->where('id', $loggedUser->id);
+        }
+        $users = $usersQuery->get();
+        $out = [];
+        foreach ($users as $user) {
+            $out[$user->id]['user'] = $user;
+            foreach ($user->orders as $order) {
+                foreach ($order->labels as $label) {
+                    if (empty($out[$user->id][$label->id])) {
+                        $out[$user->id][$label->id] = 0;
                     }
+                    $out[$user->id][$label->id]++;
                 }
-                $out[$user->id]['labels'][$label->id] = $count;
             }
         }
         //pobieramy widzialności dla danego moduły oraz użytkownika

@@ -400,7 +400,11 @@
                         <th>{{$out['user']->firstname}} {{$out['user']->lastname}}</th>
                         @foreach ($labIds as $labIdGroup)
                         @foreach ($labIdGroup as $labId)
-                        <td style="text-align: center">{{$out['labels'][$labId]}}</td>
+                        @if (!empty($out[$labId])) 
+                        <td style="text-align: center">{{$out[$labId]}}</td>
+                        @else
+                        <td style="text-align: center">0</td>
+                        @endif
                         @endforeach
                         @endforeach  
                     </tr>
