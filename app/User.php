@@ -10,6 +10,7 @@ use App\Entities\Task;
 use App\Entities\UserEmail;
 use App\Entities\UserWork;
 use App\Entities\Warehouse;
+use App\Entities\Order;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -22,7 +23,7 @@ use Laravel\Passport\HasApiTokens;
 class User extends \TCG\Voyager\Models\User
 {
     use HasApiTokens, Notifiable;
-
+    
     /**
      * The attributes that are mass assignable.
      *
@@ -121,4 +122,10 @@ class User extends \TCG\Voyager\Models\User
     {
         return $this->belongsToMany(Chat::class, 'chat_user')->withTimestamps();
     }
+    
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'employee_id');
+    }
+
 }

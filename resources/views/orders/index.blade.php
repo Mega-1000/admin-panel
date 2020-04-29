@@ -362,6 +362,52 @@
     </div>
     <div style="display: flex; align-items: center;" id="add-label-container">
         <button class="btn btn-warning" onclick="clearFilters()">Wyszczyść filtry</button>
+        <button id="showTable" class="btn btn-warning" style="margin-left: 5px">Pokaż Tabelkę z Etykietami Pracownika</button>
+        <div class="col-md-12 hidden" style="float: right" id="labelTable">
+            <table width="50%"  style="float:right;" border="1">
+                    
+                    <tr>
+                        <th colspan="1" width="10%"></th>
+                        <th colspan="1" width="10%">Pracownik</th>                       
+                        <th colspan="{{count($labIds['payments'])}}" width="17,5%" style="text-align: center">Płatności</th>
+                        <th colspan="{{count($labIds['production'])}}" width="15%" style="text-align: center">Produkcja</th>
+                        <th colspan="{{count($labIds['transport'])}}" width="17,5%" style="text-align: center">Transport</th>
+                        <th colspan="{{count($labIds['info'])}}" width="25%" style="text-align: center">Info Dodatkowe</th>
+                        <th colspan="{{count($labIds['invoice'])}}" width="5%" style="text-align: center">Faktury Zakupu</th>
+                    </tr>
+                    <tr>
+                        <th>Ikona Etykiety</th>
+                        <th></th>
+                        @foreach ($labIds as $labIdGroup)
+                            @foreach ($labIdGroup as $labId)
+                                @foreach ($labels as $label)
+                                    @if ($labId == $label->id)
+                                        <th scope="col">
+                                            <div style="width:40px;" align="center">
+                                            <span title="{{$label->name}}">
+                                            <i  style="font-size: 2.5rem; color: {{$label->color}}" class="{{$label->icon_name}}"></i>
+                                            </div>
+                                        </th>
+                                    @endif
+                                @endforeach
+                            @endforeach
+                        @endforeach     
+                    </tr>
+                        @foreach ($outs as $out)
+                            @if (!empty($out['user']->orders[0]))
+                                <tr>
+                                    <th style="text-align: center">{{$out['user']->id}}</th>
+                                    <th>{{$out['user']->firstname}} {{$out['user']->lastname}}</th>
+                                    @foreach ($labIds as $labIdGroup)
+                                        @foreach ($labIdGroup as $labId)
+                                            <td style="text-align: center">{{$out[$labId] ?? 0}}</td>
+                                        @endforeach
+                                    @endforeach  
+                                </tr>
+                            @endif
+                    @endforeach
+                </table>
+        </div>
     </div>
     <div style="display: flex; align-items: center;" id="add-label-container">
         <input type="hidden" id="spedition-exchange-selected-items" value="[]">
@@ -1733,11 +1779,14 @@
                 $("#columnSearch" + column).parent().hide();
             }
         });
-        $('#columnSearch-clientPhone').click(function(){
+        $('#columnSearch-clientPhone').on('input', function() {
             var str = $('#columnSearch-clientPhone').val();
             var replaced = str.replace(/-|\s/g,'');
-            clearFilters(false);
             $('#columnSearch-clientPhone').val(replaced);
+            filterByPhone(replaced);
+        });
+        $('#columnSearch-clientPhone').click(function(){ 
+            clearFilters(false);  
         });
         $('#columnSearch-orderId').click(function(){
             clearFilters(false);
@@ -1778,6 +1827,15 @@
             }
              $('#orderFilter').trigger("change");
         }
+        $('#showTable').click(function() {
+            if ($('#labelTable').hasClass("hidden")) {
+                $('#labelTable').removeClass("hidden");
+                $('#showTable').html('Schowaj Tabelkę z Etykietami Pracownika');
+            } else {
+                $('#labelTable').addClass("hidden");
+                $('#showTable').html('Pokaż Tabelkę z Etykietami Pracownika');
+            }
+        });
 
         function removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType) {
             let removeLabelRequest = function () {
