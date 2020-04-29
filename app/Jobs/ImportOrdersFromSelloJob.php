@@ -121,7 +121,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         return $transactionArray;
     }
 
-    private function buildOrder($transaction, array $transactionArray, $product)
+    private function buildOrder($transaction, array $transactionArray, Product $product)
     {
         $calculator = new SelloPriceCalculator();
         $calculator->setOverridePrice($transaction->transactionItem->tt_Price);
@@ -150,7 +150,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $order->sello_id = $transaction->id;
         $user = User::where('name', '001')->first();
         $order->employee()->associate($user);
-        $warehouse = Warehouse::where('symbol', 'MEGA-OLAWA')->first();
+        $warehouseSymbol = $product->packing->warehouse_physical ?? 'MEGA-OLAWA';
+        $warehouse = Warehouse::where('symbol', $warehouseSymbol)->first();
         $order->warehouse()->associate($warehouse);
 
         $order->save();
@@ -223,6 +224,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         if ($order->warehouse->id == Warehouse::OLAWA_WAREHOUSE_ID) {
             dispatch_now(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::WAIT_FOR_WAREHOUSE_TO_ACCEPT]));
             $this->createNewTask($order);
+        } else {
+            dispatch_now(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::SEND_TO_WAREHOUSE_FOR_VALIDATION]));
         }
     }
 

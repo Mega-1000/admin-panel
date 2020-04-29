@@ -351,7 +351,7 @@ class ImportCsvFileJob implements ShouldQueue
             $array['date_of_price_change'] = null;
             $array['product_group_for_change_price'] = '';
         }
-        
+
         $product->fill($array);
         $product->save();
         $product->restore();
@@ -455,6 +455,7 @@ class ImportCsvFileJob implements ShouldQueue
             'pricelist_name' => $line[318],
             'product_group' => $line[291],
             'table_price' => $line[325],
+            'warehouse_physical' => $line[346],
             'warehouse' => $line[347],
             'packing_type' => $line[348],
             'number_of_pieces_in_total_volume' => $line[349],
