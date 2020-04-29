@@ -362,7 +362,7 @@
     </div>
     <div style="display: flex; align-items: center;" id="add-label-container">
         <button class="btn btn-warning" onclick="clearFilters()">Wyszczyść filtry</button>
-        <button class="btn btn-warning" style="margin-left: 5px" onclick="showTable()">Pokaż Tabelkę z Etykietami Pracownika</button>
+        <button id="showTable" class="btn btn-warning" style="margin-left: 5px" onclick="showTable()">Pokaż Tabelkę z Etykietami Pracownika</button>
         <div class="col-md-12 hidden" style="float: right" id="labelTable">
             <table width="50%"  style="float:right;" border="1">
                     
@@ -1832,8 +1832,10 @@
         function showTable() {
             if ($('#labelTable').hasClass("hidden")) {
                 $('#labelTable').removeClass("hidden");
+                $('#showTable').html('Schowaj Tabelkę z Etykietami Pracownika');
             } else {
                 $('#labelTable').addClass("hidden");
+                $('#showTable').html('Pokaż Tabelkę z Etykietami Pracownika');
             }
         }
 
