@@ -8,6 +8,7 @@ use App\Entities\Employee;
 use App\Entities\Label;
 use App\Entities\OrderItem;
 use App\Helpers\ChatHelper;
+use App\Helpers\OrderLabelHelper;
 use App\Jobs\ChatNotificationJob;
 use App\User;
 use Illuminate\Http\Request;
@@ -95,10 +96,8 @@ class MessagesController extends Controller
             if (!$chat) {
                 throw new ChatException('Wrong chat token');
             }
-            $redLabels = $chat->order->labels()->where('label_id', MessagesHelper::MESSAGE_RED_LABEL_ID)->count();
-            if ($redLabels == 0) {
-                $chat->order->labels()->attach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID, ['added_type' => Label::CHAT_TYPE]);
-            }
+            OrderLabelHelper::setRedLabel($chat);
+
             $chat->need_intervention = true;
             $chat->save();
             if ($chat->users->count() > 0) {

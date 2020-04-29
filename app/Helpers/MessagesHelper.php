@@ -439,14 +439,11 @@ class MessagesHelper
     {
         if ($clearDanger) {
             $total = Chat::where('order_id', $chat->order->id)->where('need_intervention', true)->count();
-            if ($total <= 1) {
+            if ($total <= 1 && $chat->need_intervention) {
                 $chat->order->labels()->detach(MessagesHelper::MESSAGE_RED_LABEL_ID);
             }
         }
-        $chat->order->labels()->detach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
-        if ($chat->order->labels()->where('label_id', MessagesHelper::MESSAGE_BLUE_LABEL_ID)->count() == 0) {
-            $chat->order->labels()->attach(MessagesHelper::MESSAGE_BLUE_LABEL_ID, ['added_type' => Label::CHAT_TYPE]);
-        }
+        OrderLabelHelper::setBlueLabel($chat);
     }
 
     /**
