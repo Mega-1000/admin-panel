@@ -51,6 +51,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Entities\ColumnVisibility;
 use Illuminate\Support\Facades\Log;
+use App\User;
+use App\Entities\Label;
 
 /**
  * Class OrderController.
@@ -248,8 +250,7 @@ class OrdersController extends Controller
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function index()
-    {
+    public function index(Request $request) {
         $labelGroups = $this->labelGroupRepository->all();
         $labels = $this->labelRepository->all();
         $couriers = \DB::table('order_packages')->distinct()->select('delivery_courier_name')->get();
@@ -268,18 +269,49 @@ class OrdersController extends Controller
             } else {
                 $groupedLabels["bez grupy"][] = $label;
             }
-
         }
-
-
+        $loggedUser = $request->user();
+        if ($loggedUser->name == User::ADMIN_NAME) {
+            $users = User::all();
+        } else {
+            $users = [$loggedUser];
+        }
+        $out =[];
+        $expitime = Carbon::now()->subMonths(2);
+        $labIds = array(
+            'production' => Label::PRODUCTION_IDS_FOR_TABLE,
+            'payments' => Label::PAYMENTS_IDS_FOR_TABLE,
+            'transport' => Label::TRANSPORT_IDS_FOR_TABLE,
+            'info' => Label::ADDITIONAL_INFO_IDS_FOR_TABLE,
+            'invoice' => Label::INVOICE_IDS_FOR_TABLE,
+        );
+        foreach ($labels as $label) {
+            foreach ($users as $user) {
+                $out[$user->id]['user'] = $user;
+                $orders = $user->orders;
+                $count = 0;
+                foreach ($orders as $order) {
+                    if ($order->created_at > $expitime) {
+                        foreach($order->labels as $olabel) {
+                            if ($olabel->id == $label->id) {
+                                 $count ++;
+                            }
+                        }
+                    }
+                }
+                $out[$user->id]['labels'][$label->id] = $count;
+            }
+        }
         //pobieramy widzialności dla danego moduły oraz użytkownika
         $visibilities = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('orders'));
         foreach ($visibilities as $key => $row) {
             $visibilities[$key]->show = json_decode($row->show, true);
             $visibilities[$key]->hidden = json_decode($row->hidden, true);
         }
-        return view('orders.index',
-            compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses'));
+        return view('orders.index', compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses'))
+                    ->withOuts($out)
+                    ->withLabIds($labIds)
+                    ->withLabels($labels);
     }
 
     /**
