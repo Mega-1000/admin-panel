@@ -188,8 +188,7 @@ class ProductStocksController extends Controller
             ->distinct()
             ->select('*')
             ->join('products', 'product_stocks.product_id', '=', 'products.id')
-            ->leftJoin('product_prices', 'product_stocks.product_id', '=', 'product_prices.product_id')
-            ->whereNull('deleted_at');
+            ->leftJoin('product_prices', 'product_stocks.product_id', '=', 'product_prices.product_id');
 
 
         $notSearchable = [17, 19];
