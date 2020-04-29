@@ -34,6 +34,7 @@ class ProductPacking extends Model implements Transformable
         'number_of_sale_units_in_the_pack',
         'number_of_trade_items_in_the_largest_unit',
         'warehouse',
+        'warehouse_physical',
         'ean_of_commercial_packing',
         'ean_of_collective_packing',
         'ean_of_biggest_packing',

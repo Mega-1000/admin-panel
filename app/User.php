@@ -23,7 +23,9 @@ use Laravel\Passport\HasApiTokens;
 class User extends \TCG\Voyager\Models\User
 {
     use HasApiTokens, Notifiable;
-    
+
+    public const OLAWA_USER_ID = 37;
+  
     /**
      * The attributes that are mass assignable.
      *

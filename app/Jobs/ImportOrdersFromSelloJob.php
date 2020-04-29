@@ -6,6 +6,8 @@ use App\Entities\Order;
 use App\Entities\Payment;
 use App\Entities\Product;
 use App\Entities\SelTransaction;
+use App\Entities\Task;
+use App\Entities\TaskTime;
 use App\Entities\Warehouse;
 use App\Helpers\GetCustomerForSello;
 use App\Helpers\LabelsHelper;
@@ -14,8 +16,10 @@ use App\Helpers\OrderPriceOverrider;
 use App\Helpers\SelloPackageDivider;
 use App\Helpers\SelloPriceCalculator;
 use App\Helpers\SelloTransportSumCalculator;
+use App\Helpers\TaskTimeHelper;
 use App\Http\Controllers\OrdersPaymentsController;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -117,7 +121,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         return $transactionArray;
     }
 
-    private function buildOrder($transaction, array $transactionArray, $product)
+    private function buildOrder($transaction, array $transactionArray, Product $product)
     {
         $calculator = new SelloPriceCalculator();
         $calculator->setOverridePrice($transaction->transactionItem->tt_Price);
@@ -146,7 +150,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $order->sello_id = $transaction->id;
         $user = User::where('name', '001')->first();
         $order->employee()->associate($user);
-        $warehouse = Warehouse::where('symbol', 'MEGA-OLAWA')->first();
+        $warehouseSymbol = $product->packing->warehouse_physical ?? 'MEGA-OLAWA';
+        $warehouse = Warehouse::where('symbol', $warehouseSymbol)->first();
         $order->warehouse()->associate($warehouse);
 
         $order->save();
@@ -216,5 +221,34 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         dispatch_now(new RemoveLabelJob($order, [LabelsHelper::FINISH_LOGISTIC_LABEL_ID], $preventionArray, LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID));
         dispatch_now(new RemoveLabelJob($order, [LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID], $preventionArray, []));
         dispatch_now(new RemoveLabelJob($order, [LabelsHelper::WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID], $preventionArray, []));
+        if ($order->warehouse->id == Warehouse::OLAWA_WAREHOUSE_ID) {
+            dispatch_now(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::WAIT_FOR_WAREHOUSE_TO_ACCEPT]));
+            $this->createNewTask($order);
+        } else {
+            dispatch_now(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::SEND_TO_WAREHOUSE_FOR_VALIDATION]));
+        }
+    }
+
+    /**
+     * @param Order $order
+     */
+    private function createNewTask(Order $order): void
+    {
+        $date = Carbon::now();
+        $task = Task::create([
+            'warehouse_id' => Warehouse::OLAWA_WAREHOUSE_ID,
+            'user_id' => User::OLAWA_USER_ID,
+            'order_id' => $order->id,
+            'created_by' => 1,
+            'name' => $order->id . ' - ' . $date->format('d-m'),
+            'color' => Task::DEFAULT_COLOR,
+            'status' => Task::WAITING_FOR_ACCEPT
+        ]);
+        $time = TaskTimeHelper::getFirstAvailableTime(5);
+        TaskTime::create([
+            'task_id' => $task->id,
+            'date_start' => $time['start'],
+            'date_end' => $time['end']
+        ]);
     }
 }
