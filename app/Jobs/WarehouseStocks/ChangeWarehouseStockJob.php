@@ -40,9 +40,7 @@ class ChangeWarehouseStockJob extends Job
         $order = $orderRepository->find($this->orderId);
 
         foreach($order->items as $item) {
-            $productName = $item->product->symbol;
-            preg_match('/([^-]+)/', $productName, $matches);
-            $product = Product::withTrashed()->where('symbol', $matches[1])->first();
+            $product = $item->product;
             if($product !== null) {
                 $productStockPosition = $product->stock->position->first();
                 if(empty($productStockPosition)) {
@@ -58,9 +56,7 @@ class ChangeWarehouseStockJob extends Job
         }
 
         foreach($order->items as $item) {
-            $productName = $item->product->symbol;
-            preg_match('/([^-]+)/', $productName, $matches);
-            $product = Product::withTrashed()->where('symbol', $matches[1])->first();
+            $product = $item->product;
             if($product === null) {
                 return response()->json(['error' => 'Product does not exist.']);
             }
