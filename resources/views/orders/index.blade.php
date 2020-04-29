@@ -362,7 +362,7 @@
     </div>
     <div style="display: flex; align-items: center;" id="add-label-container">
         <button class="btn btn-warning" onclick="clearFilters()">Wyszczyść filtry</button>
-        <button id="showTable" class="btn btn-warning" style="margin-left: 5px" onclick="showTable()">Pokaż Tabelkę z Etykietami Pracownika</button>
+        <button id="showTable" class="btn btn-warning" style="margin-left: 5px">Pokaż Tabelkę z Etykietami Pracownika</button>
         <div class="col-md-12 hidden" style="float: right" id="labelTable">
             <table width="50%"  style="float:right;" border="1">
                     
@@ -379,36 +379,32 @@
                         <th>Ikona Etykiety</th>
                         <th></th>
                         @foreach ($labIds as $labIdGroup)
-                        @foreach ($labIdGroup as $labId)
-                        @foreach ($labels as $label)
-                        @if ($labId == $label->id)
-                        <th scope="col">
-                            <div style="width:40px;" align="center">
-                            <span title="{{$label->name}}">
-                            <i  style="font-size: 2.5rem; color: {{$label->color}}" class="{{$label->icon_name}}"></i>
-                            </div>
-                        </th>
-                        @endif
-                        @endforeach
-                        @endforeach
+                            @foreach ($labIdGroup as $labId)
+                                @foreach ($labels as $label)
+                                    @if ($labId == $label->id)
+                                        <th scope="col">
+                                            <div style="width:40px;" align="center">
+                                            <span title="{{$label->name}}">
+                                            <i  style="font-size: 2.5rem; color: {{$label->color}}" class="{{$label->icon_name}}"></i>
+                                            </div>
+                                        </th>
+                                    @endif
+                                @endforeach
+                            @endforeach
                         @endforeach     
                     </tr>
-                    @foreach ($outs as $out)
-                    @if (!empty($out['user']->orders[0]))
-                    <tr>
-                        <th style="text-align: center">{{$out['user']->id}}</th>
-                        <th>{{$out['user']->firstname}} {{$out['user']->lastname}}</th>
-                        @foreach ($labIds as $labIdGroup)
-                        @foreach ($labIdGroup as $labId)
-                        @if (!empty($out[$labId])) 
-                        <td style="text-align: center">{{$out[$labId]}}</td>
-                        @else
-                        <td style="text-align: center">0</td>
-                        @endif
-                        @endforeach
-                        @endforeach  
-                    </tr>
-                    @endif
+                        @foreach ($outs as $out)
+                            @if (!empty($out['user']->orders[0]))
+                                <tr>
+                                    <th style="text-align: center">{{$out['user']->id}}</th>
+                                    <th>{{$out['user']->firstname}} {{$out['user']->lastname}}</th>
+                                    @foreach ($labIds as $labIdGroup)
+                                        @foreach ($labIdGroup as $labId)
+                                            <td style="text-align: center">{{$out[$labId] ?? 0}}</td>
+                                        @endforeach
+                                    @endforeach  
+                                </tr>
+                            @endif
                     @endforeach
                 </table>
         </div>
@@ -1828,8 +1824,7 @@
             }
              $('#orderFilter').trigger("change");
         }
-        
-        function showTable() {
+        $('#showTable').click(function() {
             if ($('#labelTable').hasClass("hidden")) {
                 $('#labelTable').removeClass("hidden");
                 $('#showTable').html('Schowaj Tabelkę z Etykietami Pracownika');
@@ -1837,7 +1832,7 @@
                 $('#labelTable').addClass("hidden");
                 $('#showTable').html('Pokaż Tabelkę z Etykietami Pracownika');
             }
-        }
+        });
 
         function removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType) {
             let removeLabelRequest = function () {

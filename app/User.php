@@ -24,7 +24,6 @@ class User extends \TCG\Voyager\Models\User
 {
     use HasApiTokens, Notifiable;
     
-    const ADMIN_NAME = 001; 
     /**
      * The attributes that are mass assignable.
      *
@@ -128,4 +127,5 @@ class User extends \TCG\Voyager\Models\User
     {
         return $this->hasMany(Order::class, 'employee_id');
     }
+
 }

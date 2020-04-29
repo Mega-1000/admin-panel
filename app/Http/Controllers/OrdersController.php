@@ -54,6 +54,7 @@ use Illuminate\Support\Facades\Log;
 use App\User;
 use App\Entities\Label;
 use App\Entities\LabelGroup;
+use App\Entities\Role;
 
 /**
  * Class OrderController.
@@ -251,7 +252,8 @@ class OrdersController extends Controller
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
         $labelGroups = LabelGroup::all();
         $labels = Label::all();
         $couriers = \DB::table('order_packages')->distinct()->select('delivery_courier_name')->get();
@@ -272,10 +274,9 @@ class OrdersController extends Controller
             }
         }
         $loggedUser = $request->user();
-        if ($loggedUser->name == User::ADMIN_NAME) {
+        if ($loggedUser->role_id == Role::ADMIN || $loggedUser->role_id == Role::SUPER_ADMIN) {
             $admin = true;
         } 
-        $exptime = Carbon::now()->subMonths(2);
         $labIds = array(
             'production' => Label::PRODUCTION_IDS_FOR_TABLE,
             'payments' => Label::PAYMENTS_IDS_FOR_TABLE,
@@ -283,8 +284,8 @@ class OrdersController extends Controller
             'info' => Label::ADDITIONAL_INFO_IDS_FOR_TABLE,
             'invoice' => Label::INVOICE_IDS_FOR_TABLE,
         );
-        $usersQuery = User::with(['orders' => function ($q) use($exptime) {
-            $q->where('created_at','>', $exptime);
+        $usersQuery = User::with(['orders' => function ($q) {
+            $q->where('created_at','>', Carbon::now()->subMonths(2));
             $q->select('id', 'employee_id');
             $q->with(['labels' => function ($q) {
                 $q->select('labels.id', 'order_id');
@@ -292,8 +293,9 @@ class OrdersController extends Controller
         }]);
         if (!$admin) {
             $usersQuery->where('id', $loggedUser->id);
+        } else {
+            $users = $usersQuery->get();
         }
-        $users = $usersQuery->get();
         $out = [];
         foreach ($users as $user) {
             $out[$user->id]['user'] = $user;
@@ -313,9 +315,9 @@ class OrdersController extends Controller
             $visibilities[$key]->hidden = json_decode($row->hidden, true);
         }
         return view('orders.index', compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses'))
-                    ->withOuts($out)
-                    ->withLabIds($labIds)
-                    ->withLabels($labels);
+            ->withOuts($out)
+            ->withLabIds($labIds)
+            ->withLabels($labels);
     }
 
     /**
