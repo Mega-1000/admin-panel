@@ -291,7 +291,7 @@ class OrdersController extends Controller
                 $q->select('labels.id', 'order_id');
             }]);
         }]);
-        if (!$admin) {
+        if (empty($admin)) {
             $usersQuery->where('id', $loggedUser->id);
         } else {
             $users = $usersQuery->get();
