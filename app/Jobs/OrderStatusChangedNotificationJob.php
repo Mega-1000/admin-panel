@@ -5,18 +5,14 @@ namespace App\Jobs;
 use App\Entities\Order;
 use App\Repositories\StatusRepository;
 use Barryvdh\DomPDF\Facade as PDF;
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 use App\Repositories\OrderRepository;
 use App\Repositories\TagRepository;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Mail\OrderStatusChanged;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 
 /**
@@ -81,14 +77,19 @@ class OrderStatusChangedNotificationJob extends Job
         if ($order->status_id == 3 || $order->status_id == 4) {
             $subject = "Zmiana statusu - numer oferty: " . $this->orderId . " z: " . $oldStatus->name . " na: " . $order->status->name . ' oraz proforma';
             $order = Order::find($order->id);
-            $proformDate = \Carbon\Carbon::now()->format('m-Y');
-            $proformDate = str_replace('-', '/', $proformDate);
-            $date = \Carbon\Carbon::now()->toDateString();
+            $proformDate = Carbon::now()->format('m/Y');
+            $date = Carbon::now()->toDateString();
+            if ($order->proforma_filename) {
+                Storage::disk('local')->delete('public/proforma/' . $order->proforma_filename);
+            }
+            $order->proforma_filename = Str::random(40) . '.pdf';
+            $order->save();
+            $pdf = PDF::loadView('pdf.proform', compact('date', 'proformDate', 'order'))->output();
+            Storage::disk('local')->put('public/proforma/' . $order->proforma_filename, $pdf);
 
-            $pdf = PDF::loadView('pdf.proform', compact('date', 'proformDate', 'order'));
             \Mailer::create()
                 ->to($order->customer->login)
-                ->send(new OrderStatusChanged($subject, $message, $pdf->output()));
+                ->send(new OrderStatusChanged($subject, $message, $pdf));
         }
     }
 }
