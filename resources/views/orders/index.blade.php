@@ -532,6 +532,29 @@
                     </select>
                 </div>
             </th>
+            <th>@lang('orders.table.production_date')</th>
+            <th>
+                <div><span>@lang('orders.table.shipment_date')</span></div>
+                <div class="input_div">
+                    <select class="columnSearchSelect" id="columnSearch-shipment_date">
+                        <option value="all">Wszystkie</option>
+                        <option value="yesterday">Wczoraj</option>
+                        <option value="today">Dzisiaj</option>
+                        <option value="tomorrow">Jutro</option>
+                        <option value="from_tomorrow">Wszystkie od jutra</option>
+                    </select>
+                </div>
+            </th>
+            @foreach($customColumnLabels as $key => $label)
+                <th>
+                    <div><span>@lang('orders.table.label_' . str_replace(" ", "_", $key))</span></div>
+                    <div class="input_div input_div__label-search">
+                        <filter-by-labels-in-group
+                            group-name="{{ $key }}"
+                        />
+                    </div>
+                </th>
+            @endforeach
             <th>@lang('orders.table.print')</th>
             <th>
                 <div><span>@lang('orders.table.name')</span></div>
@@ -656,29 +679,6 @@
                 </div>
             </th>
             <th>@lang('orders.table.transport_exchange_offers')</th>
-            <th>@lang('orders.table.production_date')</th>
-            <th>
-                <div><span>@lang('orders.table.shipment_date')</span></div>
-                <div class="input_div">
-                    <select class="columnSearchSelect" id="columnSearch-shipment_date">
-                        <option value="all">Wszystkie</option>
-                        <option value="yesterday">Wczoraj</option>
-                        <option value="today">Dzisiaj</option>
-                        <option value="tomorrow">Jutro</option>
-                        <option value="from_tomorrow">Wszystkie od jutra</option>
-                    </select>
-                </div>
-            </th>
-            @foreach($customColumnLabels as $key => $label)
-                <th>
-                    <div><span>@lang('orders.table.label_' . str_replace(" ", "_", $key))</span></div>
-                    <div class="input_div input_div__label-search">
-                        <filter-by-labels-in-group
-                            group-name="{{ $key }}"
-                        />
-                    </div>
-                </th>
-            @endforeach
             <th>@lang('orders.table.invoices')</th>
             <th>@lang('orders.table.invoice_gross_sum')</th>
             <th>@lang('orders.table.icons')</th>
@@ -951,6 +951,98 @@
                     }
                 },
                 {
+                    data: 'production_date',
+                    name: 'production_date',
+                    searchable: false,
+                },
+                {
+                    data: 'shipment_date',
+                    name: 'shipment_date',
+                    searchable: false,
+                    render: function(shipment_date, option, row)
+                    {
+                        let date = moment(shipment_date);
+                        if (date.isValid()) {
+                            let formatedDate = date.format('YYYY-MM-DD');
+                            let startDaysVariation = "";
+                            if (row.shipment_start_days_variation) {
+                                startDaysVariation = "<br>&plusmn; " + row.shipment_start_days_variation + " dni";
+                            }
+                            return formatedDate + startDaysVariation;
+                        }
+                        return "";
+                    }
+                },
+                    @foreach($customColumnLabels as $labelGroupName => $label)
+                {
+                    data: 'labels',
+                    name: 'label_{{str_replace(" ", "_", $labelGroupName)}}',
+                    searchable: false,
+                    orderable: false,
+                    render: function(labels, option, row)
+                    {
+                        let html = '';
+                        let currentLabelGroup = "{{ $labelGroupName }}";
+                        if (row.closest_label_schedule_type_c && currentLabelGroup == "info dodatkowe") {
+                            html += row.closest_label_schedule_type_c.trigger_time;
+                        }
+                        labels.forEach(function (label) {
+                            if(label.length > 0){
+                                if (label[0].label_group_id != null) {
+                                    if(label[0].label_group[0].name == currentLabelGroup) {
+                                        let tooltipContent = label[0].name
+                                        if (
+                                            label[0].id == 55 ||
+                                            label[0].id == 56 ||
+                                            label[0].id == 57 ||
+                                            label[0].id == 58
+                                        ) {
+                                            tooltipContent = row.generalMessage;
+                                        } else if (
+                                            label[0].id == 78 ||
+                                            label[0].id == 79 ||
+                                            label[0].id == 80 ||
+                                            label[0].id == 81
+                                        ) {
+                                            tooltipContent = row.shippingMessage;
+                                        } else if (
+                                            label[0].id == 82 ||
+                                            label[0].id == 83 ||
+                                            label[0].id == 84 ||
+                                            label[0].id == 85
+                                        ) {
+                                            tooltipContent = row.warehouseMessage;
+                                        } else if (
+                                            label[0].id == 59 ||
+                                            label[0].id == 60 ||
+                                            label[0].id == 61 ||
+                                            label[0].id == 62
+                                        ) {
+                                            tooltipContent = row.complaintMessage;
+                                        }
+                                        let comparasion = false
+                                        if (row.payment_deadline) {
+                                            let d1 = new Date();
+                                            let d2 = new Date(row.payment_deadline);
+                                            d1.setHours(0,0,0,0)
+                                            d2.setHours(0,0,0,0)
+                                            comparasion = d1 >= d2
+                                        }
+                                        if (label[0].id == '{{ env('MIX_LABEL_WAITING_FOR_PAYMENT_ID') }}' && comparasion) {
+                                            html += '<div data-toggle="label-tooltip" style="border: solid red 4px" data-html="true" title="' + tooltipContent + '" class="pointer" onclick="removeLabel('+row.orderId+', '+label[0].id+', '+label[0].manual_label_selection_to_add_after_removal+', \''+label[0].added_type+'\');"><span class="order-label" style="color: '+ label[0].font_color +'; display: block; margin-top: 5px; background-color: ' + label[0].color + '"><i class="' + label[0].icon_name + '"></i></span></div>';
+                                        } else {
+                                            html += '<div data-toggle="label-tooltip" data-html="true" title="' + tooltipContent + '" class="pointer" onclick="removeLabel('+row.orderId+', '+label[0].id+', '+label[0].manual_label_selection_to_add_after_removal+', \''+label[0].added_type+'\');"><span class="order-label" style="color: '+ label[0].font_color +'; display: block; margin-top: 5px; background-color: ' + label[0].color + '"><i class="' + label[0].icon_name + '"></i></span></div>';
+                                        }
+                                    }
+                                }
+                            }
+                        });
+
+                        return html;
+                    }
+                },
+                    @endforeach
+                {
                     data: 'token',
                     name: 'print',
                     orderable: false,
@@ -999,7 +1091,7 @@
                     orderable: false,
                     render: function (id) {
                         let html = '';
-                        html += '<button id="moveButton-'+id+'" class="btn btn-sm btn-warning edit" onclick="moveData('+id+')">Przenieś dane stąd</button>';
+                        html += '<button id="moveButton-'+id+'" class="btn btn-sm btn-warning edit" onclick="moveData('+id+')">Przenieś</button>';
                         html += '<button id="moveButtonAjax-'+id+'" class="btn btn-sm btn-success btn-move edit hidden" onclick="moveDataAjax('+id+')">Przenieś dane tutaj</button>';
                         html += '<a href="{{ url()->current() }}/' + id + '/edit" class="btn btn-sm btn-primary edit">';
                         html += '<i class="voyager-edit"></i>';
@@ -1400,98 +1492,6 @@
                         return html;
                     }
                 },
-                {
-                    data: 'production_date',
-                    name: 'production_date',
-                    searchable: false,
-                },
-                {
-                    data: 'shipment_date',
-                    name: 'shipment_date',
-                    searchable: false,
-                    render: function(shipment_date, option, row)
-                    {
-                        let date = moment(shipment_date);
-                        if (date.isValid()) {
-                            let formatedDate = date.format('YYYY-MM-DD');
-                            let startDaysVariation = "";
-                            if (row.shipment_start_days_variation) {
-                                startDaysVariation = "<br>&plusmn; " + row.shipment_start_days_variation + " dni";
-                            }
-                            return formatedDate + startDaysVariation;
-                        }
-                        return "";
-                    }
-                },
-                    @foreach($customColumnLabels as $labelGroupName => $label)
-                {
-                    data: 'labels',
-                    name: 'label_{{str_replace(" ", "_", $labelGroupName)}}',
-                    searchable: false,
-                    orderable: false,
-                    render: function(labels, option, row)
-                    {
-                        let html = '';
-                        let currentLabelGroup = "{{ $labelGroupName }}";
-                        if (row.closest_label_schedule_type_c && currentLabelGroup == "info dodatkowe") {
-                            html += row.closest_label_schedule_type_c.trigger_time;
-                        }
-                        labels.forEach(function (label) {
-                            if(label.length > 0){
-                                if (label[0].label_group_id != null) {
-                                    if(label[0].label_group[0].name == currentLabelGroup) {
-                                        let tooltipContent = label[0].name
-                                        if (
-                                            label[0].id == 55 ||
-                                            label[0].id == 56 ||
-                                            label[0].id == 57 ||
-                                            label[0].id == 58
-                                        ) {
-                                            tooltipContent = row.generalMessage;
-                                        } else if (
-                                            label[0].id == 78 ||
-                                            label[0].id == 79 ||
-                                            label[0].id == 80 ||
-                                            label[0].id == 81
-                                        ) {
-                                            tooltipContent = row.shippingMessage;
-                                        } else if (
-                                            label[0].id == 82 ||
-                                            label[0].id == 83 ||
-                                            label[0].id == 84 ||
-                                            label[0].id == 85
-                                        ) {
-                                            tooltipContent = row.warehouseMessage;
-                                        } else if (
-                                            label[0].id == 59 ||
-                                            label[0].id == 60 ||
-                                            label[0].id == 61 ||
-                                            label[0].id == 62
-                                        ) {
-                                            tooltipContent = row.complaintMessage;
-                                        }
-                                        let comparasion = false
-                                        if (row.payment_deadline) {
-                                            let d1 = new Date();
-                                            let d2 = new Date(row.payment_deadline);
-                                            d1.setHours(0,0,0,0)
-                                            d2.setHours(0,0,0,0)
-                                            comparasion = d1 >= d2
-                                        }
-                                        if (label[0].id == '{{ env('MIX_LABEL_WAITING_FOR_PAYMENT_ID') }}' && comparasion) {
-                                            html += '<div data-toggle="label-tooltip" style="border: solid red 4px" data-html="true" title="' + tooltipContent + '" class="pointer" onclick="removeLabel('+row.orderId+', '+label[0].id+', '+label[0].manual_label_selection_to_add_after_removal+', \''+label[0].added_type+'\');"><span class="order-label" style="color: '+ label[0].font_color +'; display: block; margin-top: 5px; background-color: ' + label[0].color + '"><i class="' + label[0].icon_name + '"></i></span></div>';
-                                        } else {
-                                            html += '<div data-toggle="label-tooltip" data-html="true" title="' + tooltipContent + '" class="pointer" onclick="removeLabel('+row.orderId+', '+label[0].id+', '+label[0].manual_label_selection_to_add_after_removal+', \''+label[0].added_type+'\');"><span class="order-label" style="color: '+ label[0].font_color +'; display: block; margin-top: 5px; background-color: ' + label[0].color + '"><i class="' + label[0].icon_name + '"></i></span></div>';
-                                        }
-                                    }
-                                }
-                            }
-                        });
-
-                        return html;
-                    }
-                },
-                    @endforeach
                 {
                     data: null,
                     name: 'invoices',
