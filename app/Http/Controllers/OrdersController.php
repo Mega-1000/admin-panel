@@ -292,7 +292,7 @@ class OrdersController extends Controller
             }]);
         }]);
         if (empty($admin)) {
-            $usersQuery->where('id', $loggedUser->id);
+            $users = $usersQuery->where('id', $loggedUser->id)->get();
         } else {
             $users = $usersQuery->get();
         }
