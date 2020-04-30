@@ -156,7 +156,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
         $order->save();
         if ($transaction->tr_Paid) {
-            $this->payOrder($order, $transaction);
+            $this->createPaymentPromise($order, $transaction);
             $this->setLabels($order);
         }
     }
@@ -200,19 +200,11 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         return array($name, $surname);
     }
 
-    private function payOrder(Order $order, $transaction)
+    private function createPaymentPromise(Order $order, $transaction)
     {
-        $payment = new Payment();
-        $payment->amount = $transaction->tr_Remittance;
-        $payment->amount_left = $transaction->tr_Remittance;
-        $payment->customer_id = $order->customer->id;
-        $payment->notices = 'Płatność z Allegro';
-        $payment->save();
-        $promise = '';
-        $chooseOrder = $order->id;
         OrdersPaymentsController::payOrder($order->id, $transaction->tr_Remittance,
-            $payment->id, $promise,
-            $chooseOrder, null);
+            null, 1,
+            null, Carbon::today()->addDay(7)->toDateTimeString());
     }
 
     private function setLabels($order)
