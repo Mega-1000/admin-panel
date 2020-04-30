@@ -32,6 +32,7 @@
         "@fullcalendar/core": "^4.0.2",
         "@fullcalendar/resource-timeline": "^4.0.2",
         "puppeteer": "^2.1.1",
-        "tinymce": "^5.1.4"
+        "tinymce": "^5.1.4",
+        "pdf-parse": "^1.1.1"
     }
 }
