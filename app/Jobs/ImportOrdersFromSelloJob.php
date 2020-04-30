@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Entities\Order;
-use App\Entities\Payment;
 use App\Entities\Product;
 use App\Entities\SelTransaction;
 use App\Entities\Task;
@@ -134,7 +133,9 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $priceOverrider = new OrderPriceOverrider([$product->id => ['gross_selling_price_commercial_unit' => $transaction->transactionItem->tt_Price]]);
 
         $transportPrice = new SelloTransportSumCalculator();
-        $transportPrice->setTransportPrice($transaction->tr_DeliveryCost);
+
+        list($masterId, $deliveryCost) = self::calculateDeliveryCostAndGetMasterID($transaction);
+        $transportPrice->setTransportPrice($deliveryCost);
 
         $orderBuilder = new OrderBuilder();
         $orderBuilder
@@ -148,6 +149,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
         $order = Order::find($id);
         $order->sello_id = $transaction->id;
+        $order->master_order_id = $masterId;
         $user = User::where('name', '001')->first();
         $order->employee()->associate($user);
         $warehouseSymbol = $product->packing->warehouse_physical ?? 'MEGA-OLAWA';
@@ -156,7 +158,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
         $order->save();
         if ($transaction->tr_Paid) {
-            $this->payOrder($order, $transaction);
+            $this->createPaymentPromise($order, $transaction);
             $this->setLabels($order);
         }
     }
@@ -200,19 +202,12 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         return array($name, $surname);
     }
 
-    private function payOrder(Order $order, $transaction)
+    private function createPaymentPromise(Order $order, $transaction)
     {
-        $payment = new Payment();
-        $payment->amount = $transaction->tr_Remittance;
-        $payment->amount_left = $transaction->tr_Remittance;
-        $payment->customer_id = $order->customer->id;
-        $payment->notices = 'Płatność z Allegro';
-        $payment->save();
-        $promise = '';
-        $chooseOrder = $order->id;
-        OrdersPaymentsController::payOrder($order->id, $transaction->tr_Remittance,
-            $payment->id, $promise,
-            $chooseOrder, null);
+        $amount = $transaction->tr_Payment - $transaction->tr_DeliveryCost;
+        OrdersPaymentsController::payOrder($order->id, $amount,
+            null, 1,
+            null, Carbon::today()->addDay(7)->toDateTimeString());
     }
 
     private function setLabels($order)
@@ -250,5 +245,29 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             'date_start' => $time['start'],
             'date_end' => $time['end']
         ]);
+    }
+
+    /**
+     * @param $transaction
+     * @return array
+     */
+    private static function calculateDeliveryCostAndGetMasterID($transaction): array
+    {
+        $connectedSello = SelTransaction::where('tr_CheckoutFormPaymentId', $transaction->tr_CheckoutFormPaymentId)->get();
+        $masterId = null;
+        $counter = 0;
+        foreach ($connectedSello as $sello) {
+            $order = $sello->order;
+            if ($order) {
+                $counter++;
+                $masterId = $order->master_order_id ?? $order->id;
+            }
+        }
+        $deliveryCost = $transaction->tr_DeliveryCost / $connectedSello->count();
+        $modulo = $transaction->tr_DeliveryCost % $connectedSello->count();
+        if ($counter < $modulo) {
+            $deliveryCost++;
+        }
+        return array($masterId, $deliveryCost);
     }
 }

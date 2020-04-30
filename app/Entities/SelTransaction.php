@@ -63,4 +63,9 @@ class SelTransaction extends Model
             ->where('adr_Type', 3)
             ->orderBy('id', 'dsc');
     }
+
+    public function order()
+    {
+        return $this->hasOne(Order::class, 'sello_id', 'id');
+    }
 }
