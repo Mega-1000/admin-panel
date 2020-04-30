@@ -483,8 +483,8 @@ class TasksController extends Controller
             $start = new Carbon($request->start);
             $end = new Carbon($request->end);
             $dataToStore = [
-                'start' => $start->addHour()->toDateTimeString(),
-                'end' => $end->addHour()->toDateTimeString(),
+                'start' => $start->toDateTimeString(),
+                'end' => $end->toDateTimeString(),
                 'id' => $id,
                 'user_id' => $request->new_resource !== null ? $request->new_resource : $task->user_id
             ];
