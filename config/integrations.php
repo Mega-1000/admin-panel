@@ -12,7 +12,7 @@ return [
     'inpost' => [
         'url' => env('INPOST_URL'),
         'authorization' => env('INPOST_AUTHORIZATION_KEY'),
-        'tracking_url' => env('INPOST_URL').'organizations/'.env('INPOST_ORG_ID').'/shipments?tracking_number=',
+        'tracking_url' => env('INPOST_URL').'/v1/organizations/'.env('INPOST_ORG_ID').'/shipments?tracking_number=',
         'org_id' => env('INPOST_ORG_ID'),
     ],
     'dpd' => [
