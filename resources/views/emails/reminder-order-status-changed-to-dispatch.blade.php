@@ -1,11 +1,12 @@
 <body>
 @if($path !== null)
     <strong>W załączniku przesyłamy protokół nadania paczki.</strong>
-
+@endif
+<p>
     Wyglada na to iż powiniście w dniu dzisiejszym rozpoczać nadawanie przesyłki o numerze {{$packageNumber}} prosimy w
     przypadku wydania w dniu dzisieszym prosimy o potwierdzenie wydania towaru a jeżeli termin rozpoczęcia bedzie
     przesunięty to prosimy ustalic to z odbiorcą i wskazać nową datę dostarczenia przesyłki.
-@endif
+</p>
 <ul>
     <li>W przypadku w którym wydanie paczki nastąpi dzisiaj prosimy o zaznaczenie tej informacji w naszym formularzu: <a href="{{ $sendFormInvoice }}">FORMULARZ POTWIERDZANIA AWIZACJI</a></li>
 </ul>

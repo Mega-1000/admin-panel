@@ -49,6 +49,9 @@ class SendLPWithReminderSendingToWarehouseJob
             if ($path !== null) {
                 dispatch(new OrderStatusChangedToDispatchNotificationJob($orderPackage->order->id, null,
                     $path, null, $pathSecond));
+            } else {
+                dispatch(new OrderStatusChangedToDispatchNotificationJob($orderPackage->order->id, null,
+                    null, $orderPackage->letter_number, null));
             }
         }
     }
