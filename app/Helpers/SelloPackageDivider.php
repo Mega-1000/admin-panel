@@ -9,7 +9,7 @@ use App\Helpers\interfaces\iDividable;
 class SelloPackageDivider implements iDividable
 {
 
-    private $packageNumber = 1;
+    private $maxInPackage = 1;
     private $deliveryId;
     private $delivererId;
 
@@ -22,11 +22,12 @@ class SelloPackageDivider implements iDividable
         where('sello_delivery_id', $this->deliveryId)
             ->where('sello_deliverer_id', $this->delivererId)
             ->firstOrFail();
-        $modulo = $data[0]['amount'] % $this->packageNumber;
+        $modulo = $data[0]['amount'] % $this->maxInPackage;
+        $total = round($data[0]['amount'] / $this->maxInPackage);
 
-        for ($packageNumber = 1; $packageNumber <= $this->packageNumber; $packageNumber++) {
+        for ($packageNumber = 1; $packageNumber <= $total; $packageNumber++) {
             $pack = BackPackPackageDivider::createPackage($template, $order->id, $packageNumber);
-            $quantity = floor($data[0]['amount'] / $this->packageNumber);
+            $quantity = floor($data[0]['amount'] / $this->maxInPackage);
             if ($packageNumber <= $modulo) {
                 $quantity += 1;
             }
@@ -48,8 +49,8 @@ class SelloPackageDivider implements iDividable
         $this->delivererId = $delivererId;
     }
 
-    public function setPackageNumber(int $packageNumber): void
+    public function setMaxInPackage(int $maxInPackage): void
     {
-        $this->packageNumber = $packageNumber;
+        $this->maxInPackage = $maxInPackage > 0 ? $maxInPackage : 1;
     }
 }

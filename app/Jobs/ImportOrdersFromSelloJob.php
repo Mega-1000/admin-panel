@@ -6,6 +6,7 @@ use App\Entities\Order;
 use App\Entities\Product;
 use App\Entities\SelTransaction;
 use App\Entities\Task;
+use App\Entities\TaskSalaryDetails;
 use App\Entities\TaskTime;
 use App\Entities\Warehouse;
 use App\Helpers\GetCustomerForSello;
@@ -128,7 +129,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $packageBuilder = new SelloPackageDivider();
         $packageBuilder->setDelivererId($transaction->tr_DelivererId);
         $packageBuilder->setDeliveryId($transaction->tr_DeliveryId);
-        $packageBuilder->setPackageNumber($transaction->tw_Pole2);
+        $packageBuilder->setMaxInPackage($transaction->tw_Pole2 ?? 1);
 
         $priceOverrider = new OrderPriceOverrider([$product->id => ['gross_selling_price_commercial_unit' => $transaction->transactionItem->tt_Price]]);
 
@@ -244,6 +245,11 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             'task_id' => $task->id,
             'date_start' => $time['start'],
             'date_end' => $time['end']
+        ]);
+        TaskSalaryDetails::create([
+            'task_id' => $task->id,
+            'consultant_value' => 0,
+            'warehouse_value' => 0
         ]);
     }
 
