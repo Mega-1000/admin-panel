@@ -34,10 +34,10 @@ class CheckStatusInpostPackagesJob extends Job
     public function handle(OrderPackageRepository $orderPackageRepository) {
         $orderPackages = array();
         $orderPackages[] = OrderPackage::where('delivery_courier_name', self::COURIER)
-                ->where('shipment_date', '>', Carbon::today()->subDays(5))
+                ->whereDate('shipment_date', '>', Carbon::today()->subDays(5))
                 ->get();
         $orderPackages[] = OrderPackage::where('delivery_courier_name', self::COURIER2)
-               ->where('shipment_date', '>', Carbon::today()->subDays(5))
+               ->whereDate('shipment_date', '>', Carbon::today()->subDays(5))
                ->get();
         
         if (empty($orderPackages)) {
