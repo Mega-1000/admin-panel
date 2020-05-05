@@ -267,30 +267,10 @@ class OrdersCourierJobs extends Job
     {
         try {
             if (is_null($allegro)) {
-                $integration = new Inpost($this->data);
+                $this->callInpostForPackage();
             } else {
-                $integration = new Inpost($this->data, 1);
-            }
-            $json = $integration->prepareJsonForInpost();
-            $package = $integration->createSimplePackage($json);
-            if ($package->status == '400') {
-                Session::put('message', $package);
-                Log::info(
-                    'Problem in INPOST integration with validation',
-                    ['courier' => $package, 'class' => get_class($this), 'line' => __LINE__]
-                );
-                die();
-            }
-            $this->orderPackageRepository->update([
-                'inpost_url' => $package->href,
-            ], $this->data['additional_data']['order_package_id']);
-            $href = $integration->hrefExecute($package->href);
-            return [
-                'status' => 200,
-                'error_code' => 0,
-                'sending_number' => $href->id,
-                'letter_number' => null,
-            ];
+                 $this->callInpostForPackage($allegro);
+            }           
         } catch (Exception $exception) {
             Session::put('message', $exception->getMessage());
             Log::info(
@@ -302,8 +282,33 @@ class OrdersCourierJobs extends Job
 
     }
     
-    public function 
-
+    public function callInpostForPackage($allegro = null)
+    {
+        if (is_null($allegro)) {
+            $integration = new Inpost($this->data);
+        } else {
+            $integration = new Inpost($this->data, 1);
+        }
+        $json = $integration->prepareJsonForInpost();
+        $package = $integration->createSimplePackage($json);
+        if ($package->status == '400') {
+            Session::put('message', $package);
+            Log::info(
+                    'Problem in INPOST integration with validation', ['courier' => $package, 'class' => get_class($this), 'line' => __LINE__]
+            );
+            die();
+        }
+        $this->orderPackageRepository->update([
+            'inpost_url' => $package->href,
+                ], $this->data['additional_data']['order_package_id']);
+        $href = $integration->hrefExecute($package->href);
+        return [
+            'status' => 200,
+            'error_code' => 0,
+            'sending_number' => $href->id,
+            'letter_number' => null,
+        ];
+    }
 
     /**
      * @return array
