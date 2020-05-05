@@ -128,7 +128,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $packageBuilder = new SelloPackageDivider();
         $packageBuilder->setDelivererId($transaction->tr_DelivererId);
         $packageBuilder->setDeliveryId($transaction->tr_DeliveryId);
-        $packageBuilder->setPackageNumber($transaction->tr_CheckoutFormCalculatedNumberOfPackages);
+        $packageBuilder->setPackageNumber($transaction->tw_Pole2);
 
         $priceOverrider = new OrderPriceOverrider([$product->id => ['gross_selling_price_commercial_unit' => $transaction->transactionItem->tt_Price]]);
 
