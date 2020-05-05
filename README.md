@@ -18,6 +18,7 @@ Run
 6. dodać git hooki, by przy pullowaniu odpalały komendę `php artisan import:dump`
 7. `yarn install`
 8. `yarn dev`
+9. wygnerować klucze RSA dla użytkownika `www-data` (lub innego który uruchamia serwer) i dodanie ich do deploy-keys w repozytorium
 
 
 Aktualizacja CSV: 

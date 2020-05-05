@@ -3,9 +3,11 @@
 namespace App\Jobs;
 
 use App\Entities\Order;
-use App\Entities\Payment;
 use App\Entities\Product;
 use App\Entities\SelTransaction;
+use App\Entities\Task;
+use App\Entities\TaskSalaryDetails;
+use App\Entities\TaskTime;
 use App\Entities\Warehouse;
 use App\Helpers\GetCustomerForSello;
 use App\Helpers\LabelsHelper;
@@ -14,8 +16,10 @@ use App\Helpers\OrderPriceOverrider;
 use App\Helpers\SelloPackageDivider;
 use App\Helpers\SelloPriceCalculator;
 use App\Helpers\SelloTransportSumCalculator;
+use App\Helpers\TaskTimeHelper;
 use App\Http\Controllers\OrdersPaymentsController;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -117,7 +121,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         return $transactionArray;
     }
 
-    private function buildOrder($transaction, array $transactionArray, $product)
+    private function buildOrder($transaction, array $transactionArray, Product $product)
     {
         $calculator = new SelloPriceCalculator();
         $calculator->setOverridePrice($transaction->transactionItem->tt_Price);
@@ -125,12 +129,14 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $packageBuilder = new SelloPackageDivider();
         $packageBuilder->setDelivererId($transaction->tr_DelivererId);
         $packageBuilder->setDeliveryId($transaction->tr_DeliveryId);
-        $packageBuilder->setPackageNumber($transaction->tr_CheckoutFormCalculatedNumberOfPackages);
+        $packageBuilder->setMaxInPackage($transaction->tw_Pole2 ?? 1);
 
         $priceOverrider = new OrderPriceOverrider([$product->id => ['gross_selling_price_commercial_unit' => $transaction->transactionItem->tt_Price]]);
 
         $transportPrice = new SelloTransportSumCalculator();
-        $transportPrice->setTransportPrice($transaction->tr_DeliveryCost);
+
+        list($masterId, $deliveryCost) = self::calculateDeliveryCostAndGetMasterID($transaction);
+        $transportPrice->setTransportPrice($deliveryCost);
 
         $orderBuilder = new OrderBuilder();
         $orderBuilder
@@ -144,14 +150,16 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
         $order = Order::find($id);
         $order->sello_id = $transaction->id;
+        $order->master_order_id = $masterId;
         $user = User::where('name', '001')->first();
         $order->employee()->associate($user);
-        $warehouse = Warehouse::where('symbol', 'MEGA-OLAWA')->first();
+        $warehouseSymbol = $product->packing->warehouse_physical ?? 'MEGA-OLAWA';
+        $warehouse = Warehouse::where('symbol', $warehouseSymbol)->first();
         $order->warehouse()->associate($warehouse);
 
         $order->save();
         if ($transaction->tr_Paid) {
-            $this->payOrder($order, $transaction);
+            $this->createPaymentPromise($order, $transaction);
             $this->setLabels($order);
         }
     }
@@ -195,19 +203,12 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         return array($name, $surname);
     }
 
-    private function payOrder(Order $order, $transaction)
+    private function createPaymentPromise(Order $order, $transaction)
     {
-        $payment = new Payment();
-        $payment->amount = $transaction->tr_Remittance;
-        $payment->amount_left = $transaction->tr_Remittance;
-        $payment->customer_id = $order->customer->id;
-        $payment->notices = 'Płatność z Allegro';
-        $payment->save();
-        $promise = '';
-        $chooseOrder = $order->id;
-        OrdersPaymentsController::payOrder($order->id, $transaction->tr_Remittance,
-            $payment->id, $promise,
-            $chooseOrder, null);
+        $amount = $transaction->tr_Payment - $transaction->tr_DeliveryCost;
+        OrdersPaymentsController::payOrder($order->id, $amount,
+            null, 1,
+            null, Carbon::today()->addDay(7)->toDateTimeString());
     }
 
     private function setLabels($order)
@@ -216,5 +217,63 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         dispatch_now(new RemoveLabelJob($order, [LabelsHelper::FINISH_LOGISTIC_LABEL_ID], $preventionArray, LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID));
         dispatch_now(new RemoveLabelJob($order, [LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID], $preventionArray, []));
         dispatch_now(new RemoveLabelJob($order, [LabelsHelper::WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID], $preventionArray, []));
+        if ($order->warehouse->id == Warehouse::OLAWA_WAREHOUSE_ID) {
+            dispatch_now(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::WAIT_FOR_WAREHOUSE_TO_ACCEPT]));
+            $this->createNewTask($order);
+        } else {
+            dispatch_now(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::SEND_TO_WAREHOUSE_FOR_VALIDATION]));
+        }
+    }
+
+    /**
+     * @param Order $order
+     */
+    private function createNewTask(Order $order): void
+    {
+        $date = Carbon::now();
+        $task = Task::create([
+            'warehouse_id' => Warehouse::OLAWA_WAREHOUSE_ID,
+            'user_id' => User::OLAWA_USER_ID,
+            'order_id' => $order->id,
+            'created_by' => 1,
+            'name' => $order->id . ' - ' . $date->format('d-m'),
+            'color' => Task::DEFAULT_COLOR,
+            'status' => Task::WAITING_FOR_ACCEPT
+        ]);
+        $time = TaskTimeHelper::getFirstAvailableTime(5);
+        TaskTime::create([
+            'task_id' => $task->id,
+            'date_start' => $time['start'],
+            'date_end' => $time['end']
+        ]);
+        TaskSalaryDetails::create([
+            'task_id' => $task->id,
+            'consultant_value' => 0,
+            'warehouse_value' => 0
+        ]);
+    }
+
+    /**
+     * @param $transaction
+     * @return array
+     */
+    private static function calculateDeliveryCostAndGetMasterID($transaction): array
+    {
+        $connectedSello = SelTransaction::where('tr_CheckoutFormPaymentId', $transaction->tr_CheckoutFormPaymentId)->get();
+        $masterId = null;
+        $counter = 0;
+        foreach ($connectedSello as $sello) {
+            $order = $sello->order;
+            if ($order) {
+                $counter++;
+                $masterId = $order->master_order_id ?? $order->id;
+            }
+        }
+        $deliveryCost = $transaction->tr_DeliveryCost / $connectedSello->count();
+        $modulo = $transaction->tr_DeliveryCost % $connectedSello->count();
+        if ($counter < $modulo) {
+            $deliveryCost++;
+        }
+        return array($masterId, $deliveryCost);
     }
 }

@@ -45,7 +45,7 @@ class ChatUser extends Model implements iChatNickname
         $user = $this->customer;
         if (! empty($user)) {
             $display = '<th class="alert-warning alert"> Klient ';
-            $display .= ChatHelper::formatEmailAndPhone($user->login, $user->addresses->first()->phone ?? ''). '</th>';
+            $display .= ChatHelper::formatChatUser($user). '</th>';
             return $display;
         }
         $user = $this->user;

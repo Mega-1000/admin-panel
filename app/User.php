@@ -10,6 +10,7 @@ use App\Entities\Task;
 use App\Entities\UserEmail;
 use App\Entities\UserWork;
 use App\Entities\Warehouse;
+use App\Entities\Order;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -27,6 +28,8 @@ class User extends \TCG\Voyager\Models\User
     const ROLE_ADMIN = 2;
     const ROLE_ACCOUNTANT = 3;
     const ROLE_CONSULTANT = 4;
+    public const OLAWA_USER_ID = 37;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -125,4 +128,10 @@ class User extends \TCG\Voyager\Models\User
     {
         return $this->belongsToMany(Chat::class, 'chat_user')->withTimestamps();
     }
+    
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'employee_id');
+    }
+
 }

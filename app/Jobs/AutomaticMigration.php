@@ -49,9 +49,7 @@ class AutomaticMigration implements ShouldQueue
         $dumpJSON = json_encode($dump, JSON_PRETTY_PRINT);
 
         $path = database_path("seeds/dump.json");
-        $key = env('GIT_BOT_KEY');
-        $login = env('GIT_BOT_LOGIN');
-        $origin = "https://$login:$key@github.com/DawidZwiewka/mega-1000-backend.git";
+        $origin = "git@github.com:Ventus-sp-z-o-o/mega-1000-backend.git";
         $branch = "automatic-db-migration";
 
         file_put_contents($path, $dumpJSON);

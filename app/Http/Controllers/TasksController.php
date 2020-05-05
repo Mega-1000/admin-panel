@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\Task;
 use App\Helpers\OrderCalcHelper;
+use App\Helpers\TaskTimeHelper;
 use App\Jobs\AddLabelJob;
 use App\Jobs\RemoveLabelJob;
 use App\Repositories\OrderRepository;
 use App\Repositories\TaskTimeRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
+use App\User;
 use Illuminate\Http\Request;
 use App\Http\Requests\TaskCreateRequest;
 use App\Http\Requests\TaskUpdateRequest;
@@ -75,7 +78,7 @@ class TasksController extends Controller
             'id' => $request->user_id,
             'user_id' => $request->user_id
         ];
-        $allow = $this->allowTaskMove($dataToStore);
+        $allow = TaskTimeHelper::allowTaskMove($dataToStore);
         if ($allow === true) {
             $task = $this->repository->create([
                 'user_id' => $request->user_id,
@@ -168,7 +171,7 @@ class TasksController extends Controller
             'id' => $id,
             'user_id' => $task->user_id
         ];
-        $allow = $this->allowTaskMove($dataToStore);
+        $allow = TaskTimeHelper::allowTaskMove($dataToStore);
         if ($allow === true) {
             $dataToStore = $request->all();
             if ($request->color == '008000' || $request->color == '32CD32') {
@@ -246,7 +249,7 @@ class TasksController extends Controller
             'user_id' => $request->user_id
         ];
 
-        $allow = $this->allowTaskMove($dataToStore);
+        $allow = TaskTimeHelper::allowTaskMove($dataToStore);
         if ($allow === true) {
             $dataToStore = $request->all();
             $task = $this->repository->create([
@@ -392,7 +395,7 @@ class TasksController extends Controller
         } else {
             $customId = 'task-' . $task->id;
         }
-        $allow = $this->allowTaskMove($dataToStore);
+        $allow = TaskTimeHelper::allowTaskMove($dataToStore);
         if ($allow === true) {
             if ($request->order_id !== null) {
                 $task->order->update(['production_date' => $request->date_start]);
@@ -480,12 +483,12 @@ class TasksController extends Controller
             $start = new Carbon($request->start);
             $end = new Carbon($request->end);
             $dataToStore = [
-                'start' => $start->addHour()->toDateTimeString(),
-                'end' => $end->addHour()->toDateTimeString(),
+                'start' => $start->toDateTimeString(),
+                'end' => $end->toDateTimeString(),
                 'id' => $id,
                 'user_id' => $request->new_resource !== null ? $request->new_resource : $task->user_id
             ];
-            $allow = $this->allowTaskMove($dataToStore);
+            $allow = TaskTimeHelper::allowTaskMove($dataToStore);
             $dataToSave = null;
             if ($allow === true) {
                 if ($request->new_resource !== null) {
@@ -596,37 +599,6 @@ class TasksController extends Controller
         }
     }
 
-    public function allowTaskMove($data)
-    {
-        $tasks = $this->repository->with(['taskTime'])->whereHas('taskTime', function ($query) use ($data) {
-            $dateStart = new Carbon($data['start']);
-            $dateEnd = new Carbon($data['end']);
-            $query->whereRaw('((`date_start` BETWEEN "' . $dateStart->addMinute()->toDateTimeString() . '" AND "' . $dateEnd->subMinute()->toDateTimeString() . '" OR `date_end` BETWEEN "' . $dateStart->addMinute()->toDateTimeString() . '" AND "' . $dateEnd->subMinute()->toDateTimeString() . '") OR ("' . $dateStart->addMinute()->toDateTimeString() . '" BETWEEN `date_start` AND `date_end` OR "' . $dateEnd->subMinute()->toDateTimeString() . '" BETWEEN `date_start` AND `date_end` ))');
-        })->findWhere([
-            ['id', '!=', $data['id'] !== null ? $data['id'] : null],
-            ['user_id', '=', $data['user_id']]
-        ])->all();
-        $user = $this->userRepository->find($data['user_id']);
-        $date = new Carbon($data['start']);
-        $userWorks = $user->userWorks->where('date_of_work', '=', $date->toDateString());
-        $taskStart = new Carbon($data['start']);
-        $taskEnd = new Carbon($data['end']);
-
-        $dateStartUser = new Carbon($userWorks->first->id->date_of_work . ' ' . $userWorks->first->id->start);
-        $dateEndUser = new Carbon($userWorks->first->id->date_of_work . ' ' . $userWorks->first->id->end);
-        //&& strtotime($taskEnd->toDateTimeString()) <= strtotime($dateEndUser->toDateTimeString()
-        //if (strtotime($dateStartUser->toDateTimeString()) <= strtotime($taskStart->toDateTimeString())) {
-        if (count($tasks) > 0) {
-            return false;
-        } else {
-            return true;
-        }
-        //} else {
-        //    return false;
-        //}
-
-    }
-
     public function allowTaskMoveGet(Request $request)
     {
         $tasks = $this->repository->with(['taskTime'])->whereHas('taskTime', function ($query) use ($request) {
@@ -694,7 +666,7 @@ class TasksController extends Controller
             'id' => $request->id,
             'user_id' => $task->user_id,
         ];
-        $allow = $this->allowTaskMove($dataToStore);
+        $allow = TaskTimeHelper::allowTaskMove($dataToStore);
 
         if ($allow === true) {
             $task->update($request->all());
@@ -730,7 +702,7 @@ class TasksController extends Controller
             'id' => $request->id,
             'user_id' => $task->user_id,
         ];
-        $allow = $this->allowTaskMove($dataToStore);
+        $allow = TaskTimeHelper::allowTaskMove($dataToStore);
 
         if ($allow === true) {
             $task->update($request->all());
@@ -811,7 +783,7 @@ class TasksController extends Controller
             if (substr($request->color, 1) == '008000' || substr($request->color, 1) == '32CD32') {
                 $dataToStore['status'] = 'FINISHED';
             }
-            $allow = $this->allowTaskMove($dataToStore);
+            $allow = TaskTimeHelper::allowTaskMove($dataToStore);
             if ($allow === true) {
                 $dataToStore['date_start'] = $dataToStore['start'];
                 $dataToStore['date_end'] = $dataToStore['end'];

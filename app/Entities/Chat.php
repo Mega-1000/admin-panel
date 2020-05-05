@@ -50,4 +50,9 @@ class Chat extends Model
     {
         return $this->hasMany(ChatUser::class)->withTrashed();
     }
+
+    public function getLastMessage()
+    {
+        return $this->messages()->orderBy('id', 'desc')->first();
+    }
 }
