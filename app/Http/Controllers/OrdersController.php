@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Entities\Order;
+use App\Entities\OrderInvoice;
 use App\Entities\OrderItem;
 use App\Entities\OrderPayment;
 use App\Entities\Warehouse;
@@ -276,7 +277,7 @@ class OrdersController extends Controller
         $loggedUser = $request->user();
         if ($loggedUser->role_id == Role::ADMIN || $loggedUser->role_id == Role::SUPER_ADMIN) {
             $admin = true;
-        } 
+        }
         $labIds = array(
             'production' => Label::PRODUCTION_IDS_FOR_TABLE,
             'payments' => Label::PAYMENTS_IDS_FOR_TABLE,
@@ -2328,16 +2329,16 @@ class OrdersController extends Controller
 
         return view('customers.confirmation.confirmationThanks');
     }
-    
+
     public function getCosts()
     {
         dispatch_now(new UpdatePackageRealCostJob());
         return redirect()->route('orders.index')->with([
             'message' => 'Rozpoczęto pobieranie realnych wartości zleceń',
             'alert-type' => 'success',
-        ]); 
+        ]);
     }
-    
+
     public function selloImport()
     {
         dispatch_now(new ImportOrdersFromSelloJob());
@@ -2345,6 +2346,20 @@ class OrdersController extends Controller
             'message' => 'Rozpoczęto import z Sello',
             'alert-type' => 'success',
         ]);
+    }
+
+    public function getInvoices($id)
+    {
+        $order = Order::find($id);
+
+        return response()->json($order->invoices);
+    }
+
+    public function deleteInvoice($id)
+    {
+        $invoice = OrderInvoice::find($id)->delete();
+
+        return response()->json(['status' => 'success']);
     }
 }
 
