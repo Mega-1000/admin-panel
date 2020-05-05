@@ -392,7 +392,7 @@ class OrdersPackagesController extends Controller
             'additional_data' => [
                 'order_package_id' => $package->id,
                 'forwarding_delivery' => $package->delivery_courier_name,
-                'allegro_user_id' => $transaction->tr_RegId,
+                'allegro_user_id' => $transaction->tr_RegId ?? null,
                 'allegro_transaction_id' => $order->allegro_transaction_id,
                 'package_type' => $package->container_type,
                 'packing_type' => $package->packing_type
