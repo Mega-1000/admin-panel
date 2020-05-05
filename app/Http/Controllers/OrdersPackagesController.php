@@ -23,6 +23,7 @@ use App\Entities\ContentType;
 use App\Entities\OrderPackage;
 use App\Entities\PackingType;
 use App\Entities\ContainerType;
+use App\Entities\SelTransaction;
 
 /**
  * Class OrderTasksController.
@@ -354,7 +355,7 @@ class OrdersPackagesController extends Controller
 
     public function preparePackageToSend($orderId, $packageId)
     {
-        $order = $this->orderRepository->find($orderId);
+        $order = Order::find($orderId);
         if (empty($order)) {
             abort(404);
         }
@@ -366,6 +367,11 @@ class OrdersPackagesController extends Controller
         $deliveryAddress = $deliveryAddress->first->id;
         if (empty($deliveryAddress)) {
             abort(404);
+        }
+        if ($order->sello_id){
+            $transaction = SelTransaction::find($order->sello_id);
+            $order->allegro_transaction_id = $transaction->tr_CheckoutFormId;
+            $order->save();
         }
         $data = [
             'order_id' => $order->id,
@@ -385,71 +391,42 @@ class OrdersPackagesController extends Controller
             'additional_data' => [
                 'order_package_id' => $package->id,
                 'forwarding_delivery' => $package->delivery_courier_name,
-                'allegro_id' => 421,
+                'allegro_user_id' => $transaction->tr_RegId,
                 'allegro_transaction_id' => $order->allegro_transaction_id,
                 'package_type' => $package->container_type,
                 'packing_type' => $package->packing_type
             ],
-//            'delivery_address' => [
-//                'firstname' => $deliveryAddress->firstname,
-//                'lastname' => $deliveryAddress->lastname,
-//                'address' => $deliveryAddress->address,
-//                'flat_number' => $deliveryAddress->flat_number,
-//                'city' => $deliveryAddress->city,
-//                'email' => $deliveryAddress->email,
-//                'phone' => $deliveryAddress->phone,
-//                'firmname' => $deliveryAddress->firmname,
-//                'nip' => $deliveryAddress->nip,
-//                'postal_code' => $deliveryAddress->postal_code,
-//                'country' => $deliveryAddress->country !== null ? $deliveryAddress->country : 'Polska',
-//                'delivery_date' => $package->delivery_date !== null ? $package->delivery_date : null,
-//            ],
             'delivery_address' => [
-                'firstname' => 'testest',
-                'lastname' => 'testest',
-                'address' => 'testest',
-                'flat_number' => '12',
-                'city' => 'testest',
-                'email' => 'arbuzaldo@gmail.com',
-                'phone' => '543543543',
-                'firmname' => 'testest',
-                'nip' => 1234,
-                'postal_code' => '12-34',
-                'country' =>  'Polska',
+                'firstname' => $deliveryAddress->firstname,
+                'lastname' => $deliveryAddress->lastname,
+                'address' => $deliveryAddress->address,
+                'flat_number' => $deliveryAddress->flat_number,
+                'city' => $deliveryAddress->city,
+                'email' => $deliveryAddress->email,
+                'phone' => $deliveryAddress->phone,
+                'firmname' => $deliveryAddress->firmname,
+                'nip' => $deliveryAddress->nip,
+                'postal_code' => $deliveryAddress->postal_code,
+                'country' => $deliveryAddress->country !== null ? $deliveryAddress->country : 'Polska',
                 'delivery_date' => $package->delivery_date !== null ? $package->delivery_date : null,
             ],
         ];
 
 
         if ($order->warehouse_id !== null) {
-//            $pickupAddress = [
-//                'pickup_address' => [
-//                    'firstname' => $order->warehouse->property->firstname !== null ? $order->warehouse->property->firstname : null,
-//                    'lastname' => $order->warehouse->property->lastname !== null ? $order->warehouse->property->lastname : null,
-//                    'address' => $order->warehouse->address->address !== null ? $order->warehouse->address->address : null,
-//                    'flat_number' => $order->warehouse->address->warehouse_number !== null ? $order->warehouse->address->warehouse_number : null,
-//                    'city' => $order->warehouse->address->city !== null ? $order->warehouse->address->city : null,
-//                    'email' => $order->warehouse->firm->email !== null ? $order->warehouse->firm->email : null,
-//                    'phone' => $order->warehouse->property->phone !== null ? $order->warehouse->property->phone : null,
-//                    'firmname' => $order->warehouse->firm->name !== null ? $order->warehouse->firm->name : null,
-//                    'nip' => $order->warehouse->firm->nip !== null ? $order->warehouse->firm->nip : null,
-//                    'postal_code' => $order->warehouse->address->postal_code !== null ? $order->warehouse->address->postal_code : null,
-//                    'country' => 'Polska',
-//                    'parcel_date' => $package->shipment_date !== null ? $package->shipment_date : null,
-//                ],
             $pickupAddress = [
-                    'pickup_address' => [
-                        'firstname' => 'testest',
-                    'lastname' => 'testest',
-                    'address' => 'testest',
-                    'flat_number' => '12',
-                    'city' => 'testest',
-                    'email' => 'arbuzaldo@gmail.com',
-                    'phone' => '543543543',
-                    'firmname' => 'testest',
-                    'nip' => 1234,
-                    'postal_code' => '12-34',
-                    'country' =>  'Polska',
+                'pickup_address' => [
+                    'firstname' => $order->warehouse->property->firstname !== null ? $order->warehouse->property->firstname : null,
+                    'lastname' => $order->warehouse->property->lastname !== null ? $order->warehouse->property->lastname : null,
+                    'address' => $order->warehouse->address->address !== null ? $order->warehouse->address->address : null,
+                    'flat_number' => $order->warehouse->address->warehouse_number !== null ? $order->warehouse->address->warehouse_number : null,
+                    'city' => $order->warehouse->address->city !== null ? $order->warehouse->address->city : null,
+                    'email' => $order->warehouse->firm->email !== null ? $order->warehouse->firm->email : null,
+                    'phone' => $order->warehouse->property->phone !== null ? $order->warehouse->property->phone : null,
+                    'firmname' => $order->warehouse->firm->name !== null ? $order->warehouse->firm->name : null,
+                    'nip' => $order->warehouse->firm->nip !== null ? $order->warehouse->firm->nip : null,
+                    'postal_code' => $order->warehouse->address->postal_code !== null ? $order->warehouse->address->postal_code : null,
+                    'country' => 'Polska',
                     'parcel_date' => $package->shipment_date !== null ? $package->shipment_date : null,
                 ],
             ];
