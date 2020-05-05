@@ -24,6 +24,7 @@ use App\Entities\OrderPackage;
 use App\Entities\PackingType;
 use App\Entities\ContainerType;
 use App\Entities\SelTransaction;
+use App\Entities\Order;
 
 /**
  * Class OrderTasksController.
