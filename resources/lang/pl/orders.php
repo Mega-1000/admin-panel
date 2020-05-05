@@ -81,7 +81,8 @@ return [
             'packages' => 'Przesyłki',
             'status' => 'Status zamówienia',
             'customer' => 'Zmiana danych klienta',
-            'warehouse-payments' => 'Płatności magazynów'
+            'warehouse-payments' => 'Płatności magazynów',
+            'spedition-payments' => 'Płatności spedycji'
         ],
         'last_status_update_date' => 'Ostatnia data zmiany statusu',
         'total_price' => 'Suma zamówienia',

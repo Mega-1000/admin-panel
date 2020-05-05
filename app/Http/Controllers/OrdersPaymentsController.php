@@ -1223,6 +1223,8 @@ class OrdersPaymentsController extends Controller
             $type = 'WAREHOUSE';
         }
 
+        $token = null;
+
         if($isWarehousePayment) {
             $token = md5(uniqid());
             $url = route('ordersPayment.warehousePaymentConfirmation', ['token' => $token]);

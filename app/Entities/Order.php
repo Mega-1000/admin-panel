@@ -504,6 +504,16 @@ class Order extends Model implements Transformable
         return $this->hasMany(OrderPayment::class)->where('type','WAREHOUSE');
     }
 
+    public function speditionPayments()
+    {
+        return $this->hasMany(OrderPayment::class)->where('type','SPEDITION');
+    }
+
+    public function speditionPaymentsSum()
+    {
+        return $this->hasMany(OrderPayment::class)->where('type','SPEDITION');
+    }
+
     public function isOrderHasLabel($labelId)
     {
         return $this->labels()->where('labels.id', $labelId)->count() > 0;
