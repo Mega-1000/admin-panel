@@ -43,7 +43,7 @@ class CustomerOrderDataReminder implements ShouldQueue
             if (!empty($noData)) {
                 $senderJob = new DifferentCustomerData('Wybór danych do wystawienia faktury - zlecenie '.$order->id, $order->id, $noData->id);
             } else {
-                $senderJob = new ConfirmData('Wybór danych do wystawienia faktury  - zlecenie'.$order->id, $order->id)
+                $senderJob = new ConfirmData('Wybór danych do wystawienia faktury  - zlecenie'.$order->id, $order->id);
             }
 
             try {
