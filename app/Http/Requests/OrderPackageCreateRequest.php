@@ -30,7 +30,7 @@ class OrderPackageCreateRequest extends FormRequest
             'size_c' => 'nullable|numeric',
             'shipment_date' => 'required|date|date_format:"Y-m-d"',
             'delivery_date' => 'nullable|date|date_format:"Y-m-d"',
-            'delivery_courier_name' => 'required|in:DPD,INPOST,APACZKA,JAS,POCZTEX,GIELDA,ODBIOR_OSOBISTY,ALLEGRO-INPOST',
+            'delivery_courier_name' => 'required|in:DPD,INPOST,APACZKA,JAS,POCZTEX,GIELDA,ODBIOR_OSOBISTY,PACZKOMAT,ALLEGRO-INPOST',
             'service_courier_name' => 'nullable|in:DPD,INPOST,APACZKA,JAS,POCZTEX,GIELDA,ODBIOR_OSOBISTY,PACZKOMAT,ALLEGRO-INPOST',
             'weight' => 'required|regex:/^\d*(\.\d{1,2})?$/',
             'quantity' => 'nullable|numeric',
