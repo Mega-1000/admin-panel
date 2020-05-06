@@ -523,4 +523,25 @@ class Order extends Model implements Transformable
     {
         return $this->hasOne(InvoiceRequest::class);
     }
+
+    public function groupWarehousePayments()
+    {
+        $acceptedPaymentsValue = 0;
+        $pendingPaymentsValue = 0;
+        foreach($this->warehousePayments as $payment) {
+            switch($payment->status) {
+                case 'ACCEPTED':
+                    $acceptedPaymentsValue += $payment->amount;
+                    break;
+                case 'PENDING':
+                    $pendingPaymentsValue += $payment->amount;
+                    break;
+            }
+        }
+
+        return [
+            'ACCEPTED' => $acceptedPaymentsValue,
+            'PENDING' => $pendingPaymentsValue
+        ];
+    }
 }

@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class InvoiceRequest extends Model
 {
-    protected $table = 'invoice_requests';
-
     const STATUS_MISSING = 'MISSING';
 
     /**

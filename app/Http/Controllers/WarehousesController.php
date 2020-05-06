@@ -150,6 +150,15 @@ class WarehousesController extends Controller
                 $warehouseAddress->longitude = $postal->longitude ?: null;
             }
             $warehouseAddress->save();
+        } else {
+            $warehouseAddress->warehouse_id = $warehouse->id;
+            $warehouseAddress->address = '';
+            $warehouseAddress->warehouse_number = '';
+            $warehouseAddress->postal_code = '';
+            if(!empty($postal)) {
+                $warehouseAddress->latitude = $postal->latitude ?: null;
+                $warehouseAddress->longitude = $postal->longitude ?: null;
+            }
         }
 
         if(!empty($warehouse->property)) {
@@ -162,6 +171,15 @@ class WarehousesController extends Controller
                 'open_days' => json_encode($openDays),
                 'email' => $request->input('email')
             ], $warehouse->property->id);
+        } else {
+            $this->warehousePropertyRepository->create([
+                'firstname' => $request->input('firstname') ?: null,
+                'lastname' => $request->input('lastname') ?: null,
+                'phone' => $request->input('phone') ?: null,
+                'comments' => $request->input('comments') ?: null,
+                'additional_comments' => $request->input('additional_comments') ?: null,
+                'email' => $request->input('email') ?: null
+            ]);
         }
 
         return redirect()->back()->with([

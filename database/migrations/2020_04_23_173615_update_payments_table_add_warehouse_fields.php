@@ -16,7 +16,7 @@ class UpdatePaymentsTableAddWarehouseFields extends Migration
         Schema::table('payments', function (Blueprint $table) {
             $table->enum('type', ['CLIENT', 'WAREHOUSE', 'SPEDITION'])->comment('Type of payment - who got payment from order client.');
             $table->unsignedInteger('warehouse_id')->nullable();
-            $table->foreign('warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');
+            $table->foreign('warehouse_id')->references('id')->on('warehouses');
         });
     }
 

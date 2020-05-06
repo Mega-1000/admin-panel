@@ -1482,22 +1482,11 @@
                     @endphp
                     <td>{{ $orderValue }}</td>
                     @php
-                        $acceptedPaymentsValue = 0;
-                        $pendingPaymentsValue = 0;
-                        foreach($itemOrder->warehousePayments()->get() as $payment) {
-                            switch($payment->status) {
-                                case 'ACCEPTED':
-                                    $acceptedPaymentsValue += $payment->amount;
-                                    break;
-                                case 'PENDING':
-                                    $pendingPaymentsValue += $payment->amount;
-                                    break;
-                            }
-                        }
+                       $payments = $itemOrder->groupWarehousePayments();
                     @endphp
                     <td>
-                        <h5 class="payment__pending">Oczekujące: {{ $pendingPaymentsValue }}</h5>
-                        <h5 class="payment__accepted">Zaakceptowane: {{ $acceptedPaymentsValue }}</h5>
+                        <h5 class="payment__pending">Oczekujące: {{ $payments['PENDING'] }}</h5>
+                        <h5 class="payment__accepted">Zaakceptowane: {{ $payments['ACCEPTED'] }}</h5>
                     </td>
                     <td id="left-amount-{{$itemOrder->id}}" data-value="{{ $orderValue - $paymentsValue }}">{{ $orderValue - $paymentsValue }}</td>
                     <td>

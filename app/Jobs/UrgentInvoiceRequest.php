@@ -33,9 +33,9 @@ class UrgentInvoiceRequest implements ShouldQueue
      */
     public function handle()
     {
-        $orders = Order::whereHas(['invoiceRequests', function ($query) {
+        $orders = Order::whereHas('invoiceRequests', function ($query) {
             $query->where('invoiceRequests.status', InvoiceRequest::STATUS_MISSING);
-        }])->get();
+        })->get();
         foreach($orders as $order) {
             $invoiceRequest = $order->invoiceRequests()->first();
             try {
