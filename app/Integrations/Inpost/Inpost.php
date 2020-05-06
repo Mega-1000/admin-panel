@@ -65,11 +65,8 @@ class Inpost
                         'email' => 'info@mega1000.pl',
                         'phone' => $this->data['delivery_address']['phone']
                     ],
-                    'custom_attributes' => [
-                        'target_point' => $this->data['delivery_address']['lastname']
-                    ]
                 ];
-            } elseif ($this->data['courier_type'] == 'PACZKOMAT') {
+            } else if ($this->data['courier_type'] == 'PACZKOMAT') {
                 $sections = [
                     'receiver' => [
                         'email' => $this->data['delivery_address']['email'],
