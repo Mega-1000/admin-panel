@@ -1496,7 +1496,6 @@
                     data: null,
                     name: 'invoices',
                     render: function(data) {
-                        console.log(data)
                         let invoices = data.invoices
                         let html = ''
                         if(invoices !== undefined){
