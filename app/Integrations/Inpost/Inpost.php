@@ -93,7 +93,7 @@ class Inpost
                 $sections += [
                     'custom_attributes' => [
                         'target_point' => $this->data['delivery_address']['lastname'],
-                        'sending_method' => 'parcel_locker',
+                        'sending_method' => 'dispatch_order',
                         'allegro_transaction_id' => $this->data['additional_data']['allegro_transaction_id'],
                         'allegro_user_id' => $this->data['additional_data']['allegro_id']
                     ]
