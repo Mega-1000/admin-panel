@@ -267,10 +267,11 @@ class OrdersCourierJobs extends Job
     {
         try {
             if (is_null($allegro)) {
-                $this->callInpostForPackage();
+                $integration = new Inpost($this->data);
             } else {
-                 $this->callInpostForPackage($allegro);
-            }           
+                 $integration = new Inpost($this->data, 1);
+            } 
+            $this->callInpostForPackage($integration);
         } catch (Exception $exception) {
             Session::put('message', $exception->getMessage());
             Log::info(
@@ -282,13 +283,8 @@ class OrdersCourierJobs extends Job
 
     }
     
-    public function callInpostForPackage($allegro = null)
-    {
-        if (is_null($allegro)) {
-            $integration = new Inpost($this->data);
-        } else {
-            $integration = new Inpost($this->data, 1);
-        }
+    public function callInpostForPackage($integration)
+    {     
         $json = $integration->prepareJsonForInpost();
         $package = $integration->createSimplePackage($json);
         if ($package->status == '400') {
