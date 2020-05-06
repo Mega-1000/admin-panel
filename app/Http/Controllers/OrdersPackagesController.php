@@ -87,7 +87,7 @@ class OrdersPackagesController extends Controller
         }
         $promisedPayments = [];
         $payments = [];
-        $allegroId = $order->sello_id;
+        $allegroInpost = $order->sello_id;
 
         $cashOnDeliverySum = 0;
 
@@ -154,7 +154,7 @@ class OrdersPackagesController extends Controller
                         ->withcontentTypes($contentTypes)
                         ->withpackingTypes($packingTypes)
                         ->withcontainerTypes($containerTypes)
-                        ->withallegroId($allegroId);
+                        ->withallegroInpost($allegroInpost);
     }
 
     public function changeValue(Request $request)
@@ -174,7 +174,10 @@ class OrdersPackagesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id) {
-        $orderPackage = $this->repository->find($id);
+        $orderPackage = OrderPackage::find($id);
+        if ($orderPackage->service_courier_name === 'ALLEGRO-INPOST') {
+         $allegroInpost = 1;   
+        }
         $contentTypes = ContentType::all();
         $packingTypes = PackingType::all();
         $containerTypes = ContainerType::all();
@@ -182,7 +185,8 @@ class OrdersPackagesController extends Controller
         return view('orderPackages.edit', compact('orderPackage', 'id'))
                         ->withcontentTypes($contentTypes)
                         ->withpackingTypes($packingTypes)
-                        ->withcontainerTypes($containerTypes);
+                        ->withcontainerTypes($containerTypes)
+                        ->withallegroInpost($allegroInpost);
     }
 
     /**

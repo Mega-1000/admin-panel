@@ -95,6 +95,10 @@
                     <option {{ old('delivery_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         PACZKOMAT
                     </option>
+                    @if (!empty($allegroInpost))
+                     <option {{ $orderPackage->service_courier_name === 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
+                        ALLEGRO-INPOST
+                    </option>
                 </select>
             </div>
             <div class="form-group">
@@ -123,6 +127,10 @@
                     </option>
                     <option {{ $orderPackage->delivery_courier_name === 'PACZKOMAT' ? 'selected="selected"' : '' }} value="PACZKOMAT">
                         PACZKOMAT
+                    </option>
+                    @if (!empty($allegroInpost))
+                     <option {{ $orderPackage->service_courier_name === 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
+                        ALLEGRO-INPOST
                     </option>
                 </select>
             </div>
