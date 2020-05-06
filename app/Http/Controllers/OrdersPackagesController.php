@@ -87,7 +87,7 @@ class OrdersPackagesController extends Controller
         }
         $promisedPayments = [];
         $payments = [];
-        $allegroId = $order->allegro_transaction_id;
+        $allegroId = $order->sello_id;
 
         $cashOnDeliverySum = 0;
 
