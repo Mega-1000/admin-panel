@@ -70,7 +70,7 @@ class ProductStocksController extends Controller
      */
     public function edit($id)
     {
-        $productStocks = ProductStock::find($id);
+        $productStocks = ProductStock::where('product_id', $id)->first();
         $visibilitiesLogs = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('product_stock_logs'));
         foreach($visibilitiesLogs as $key => $row)
         {
@@ -83,6 +83,7 @@ class ProductStocksController extends Controller
             $visibilitiesPosition[$key]->show = json_decode($row->show,true);
             $visibilitiesPosition[$key]->hidden = json_decode($row->hidden,true);
         }
+        error_log(print_r($productStocks, 1));
         return view('product_stocks.edit', compact('visibilitiesLogs','visibilitiesPosition','productStocks'));
     }
 
@@ -188,7 +189,8 @@ class ProductStocksController extends Controller
             ->distinct()
             ->select('*')
             ->join('products', 'product_stocks.product_id', '=', 'products.id')
-            ->leftJoin('product_prices', 'product_stocks.product_id', '=', 'product_prices.product_id');
+            ->leftJoin('product_prices', 'product_stocks.product_id', '=', 'product_prices.product_id')
+            ->whereNull('deleted_at');
 
 
         $notSearchable = [17, 19];

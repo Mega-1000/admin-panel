@@ -5,7 +5,6 @@ namespace App\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use App\Jobs;
-use App\Jobs\UpdatePackageRealCostJob;
 
 class Kernel extends ConsoleKernel
 {
@@ -45,6 +44,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(UpdatePackageRealCostJob::class)->dailyAt("00:30");
         $schedule->job(Jobs\CheckIfInvoicesExistInOrders::class)->dailyAt("07:00");
         $schedule->job(Jobs\UrgentInvoiceRequest::class)->everyFifteenMinutes()->between('9:00', '17:00');
+        $schedule->job(Jobs\CheckForHangedChats::class)->cron('0,15,30,45 7-17 * * 1-5');
     }
 
     /**

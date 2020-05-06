@@ -6,6 +6,7 @@ use App\Entities\Employee;
 use App\Entities\Order;
 use App\Entities\Warehouse;
 use App\Helpers\MessagesHelper;
+use App\Helpers\OrderLabelHelper;
 use App\Helpers\StatusesHelper;
 use App\Http\Requests\Api\OrderWarehouseNotification\AcceptShipmentRequest;
 use App\Http\Requests\Api\OrderWarehouseNotification\DenyShipmentRequest;
@@ -180,6 +181,6 @@ class OrderWarehouseNotificationController extends Controller
         $helper->currentUserType = MessagesHelper::TYPE_EMPLOYEE;
         $helper->createNewChat();
         $helper->addMessage($data['customer_notices']);
-        $notification->order->labels()->attach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
+        OrderLabelHelper::setYellowLabel($helper->getChat());
     }
 }

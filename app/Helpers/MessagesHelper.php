@@ -24,6 +24,10 @@ class MessagesHelper
     public $orderId = 0;
     public $employeeId = 0;
     public $currentUserType;
+
+    /**
+     * User's or Customer's or Employee's id
+     **/
     public $currentUserId;
     private $cache = [];
 
@@ -435,14 +439,11 @@ class MessagesHelper
     {
         if ($clearDanger) {
             $total = Chat::where('order_id', $chat->order->id)->where('need_intervention', true)->count();
-            if ($total <= 1) {
+            if ($total <= 1 && $chat->need_intervention) {
                 $chat->order->labels()->detach(MessagesHelper::MESSAGE_RED_LABEL_ID);
             }
         }
-        $chat->order->labels()->detach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
-        if ($chat->order->labels()->where('label_id', MessagesHelper::MESSAGE_BLUE_LABEL_ID)->count() == 0) {
-            $chat->order->labels()->attach(MessagesHelper::MESSAGE_BLUE_LABEL_ID, ['added_type' => Label::CHAT_TYPE]);
-        }
+        OrderLabelHelper::setBlueLabel($chat);
     }
 
     /**
@@ -465,5 +466,19 @@ class MessagesHelper
     {
         $chat->need_intervention = false;
         $chat->save();
+    }
+
+    public function getCurrentUser()
+    {
+        switch ($this->currentUserType) {
+            case self::TYPE_CUSTOMER:
+                return Customer::find($this->currentUserId);
+            case self::TYPE_EMPLOYEE:
+                return Employee::find($this->currentUserId);
+            case self::TYPE_USER:
+                return User::find($this->currentUserId);
+            default:
+                throw new \Exception('Userd does not exist');
+        }
     }
 }

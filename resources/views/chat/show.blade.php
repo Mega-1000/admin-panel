@@ -27,6 +27,16 @@
             @if (!empty($notices))
                 <div class="alert-info alert">Uwagi konsultanta: <b>{{ $notices  }}</b></div>
             @endif
+            @if (!empty($faq))
+                <div class="alert-info alert"><b>FAQ:</b> <br>{!! implode('<br/>',$faq) !!}</div>
+            @endif
+            @if ($product_list->count() > 0)
+                <div class="alert alert-warning"><b>Lista produktów:</b>
+                    @foreach($product_list as $product)
+                        @include('chat/single_product', ['product' => $product, 'user_type' => $user_type])
+                    @endforeach
+                </div>
+            @endif
             <div class="panel panel-default" style="max-height: calc(100vh - 200px); overflow-y: scroll">
                 <div class="panel-body">
                     @if ($chat)
@@ -39,7 +49,7 @@
                     @endif
                 </div>
             </div>
-            <form action="{{ $route }}">
+            <form id="new-message" action="{{ $route }}">
                 <div class="row">
                     <div class="col-sm-9">
                         <textarea required class="form-control" id="message"
@@ -62,7 +72,8 @@
                     {!! $chatUser->getUserNicknameForChat($user_type) !!}
                     @if( empty($chatUser->user))
                         <th>
-                            <button class="btn btn-danger remove-user" value="{{ $chatUser->id }}" name="{{ get_class($chatUser) }}">Usuń
+                            <button class="btn btn-danger remove-user" value="{{ $chatUser->id }}"
+                                    name="{{ get_class($chatUser) }}">Usuń
                             </button>
                         </th>
                     @endif
@@ -77,12 +88,14 @@
                         <th class="alert-warning alert">
                     @else
                         <th class="alert-info alert">
-                    @endif
+                            @endif
                             {!! ChatHelper::formatChatUser($user, $user_type) !!}
                         </th>
                         <th>
-                        <button name="{{ get_class($user) }}" class="btn btn-success add-user" value="{{ $user->id }}">Dodaj</button>
-                    </th>
+                            <button name="{{ get_class($user) }}" class="btn btn-success add-user"
+                                    value="{{ $user->id }}">Dodaj
+                            </button>
+                        </th>
                 </tr>
             @endforeach
         </table>
@@ -100,13 +113,14 @@
         integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
         crossorigin="anonymous"></script>
 
+<script type="text/javascript" src="{{ URL::asset('js/helpers/dynamic-calculator.js') }}"></script>
 <script>
     $(document).ready(function () {
         $('.panel-default').animate({scrollTop: $('.panel-body').height()});
 
         $('#message').focus();
 
-        $('form').submit(function (e) {
+        $('#new-message').submit(function (e) {
             e.preventDefault();
             var message = $('#message').val();
             $('#message').val('');

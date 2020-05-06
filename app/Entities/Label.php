@@ -16,6 +16,13 @@ class Label extends Model implements Transformable
     use TransformableTrait;
 
     const CHAT_TYPE = 'chat';
+    const PAYMENTS_IDS_FOR_TABLE = [119, 134, 120, 101, 99, 102];
+    const PRODUCTION_IDS_FOR_TABLE = [96, 51, 54, 77, 118];
+    const TRANSPORT_IDS_FOR_TABLE = [68, 103, 104, 105, 106];
+    const ADDITIONAL_INFO_IDS_FOR_TABLE = [92, 89, 93, 45, 55, 57, 59, 61, 90];
+    const INVOICE_IDS_FOR_TABLE = [63];
+    
+    
 
     const ORDER_ITEMS_REDEEMED_LABEL = 66;
 

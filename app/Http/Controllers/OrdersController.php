@@ -53,6 +53,10 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use App\Entities\ColumnVisibility;
 use Illuminate\Support\Facades\Log;
+use App\User;
+use App\Entities\Label;
+use App\Entities\LabelGroup;
+use App\Entities\Role;
 
 /**
  * Class OrderController.
@@ -250,10 +254,10 @@ class OrdersController extends Controller
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
-        $labelGroups = $this->labelGroupRepository->all();
-        $labels = $this->labelRepository->all();
+        $labelGroups = LabelGroup::all();
+        $labels = Label::all();
         $couriers = \DB::table('order_packages')->distinct()->select('delivery_courier_name')->get();
         $warehouses = $this->warehouseRepository->findByField('symbol', 'MEGA-OLAWA');
 
@@ -270,18 +274,52 @@ class OrdersController extends Controller
             } else {
                 $groupedLabels["bez grupy"][] = $label;
             }
-
         }
-
-
+        $loggedUser = $request->user();
+        if ($loggedUser->role_id == Role::ADMIN || $loggedUser->role_id == Role::SUPER_ADMIN) {
+            $admin = true;
+        } 
+        $labIds = array(
+            'production' => Label::PRODUCTION_IDS_FOR_TABLE,
+            'payments' => Label::PAYMENTS_IDS_FOR_TABLE,
+            'transport' => Label::TRANSPORT_IDS_FOR_TABLE,
+            'info' => Label::ADDITIONAL_INFO_IDS_FOR_TABLE,
+            'invoice' => Label::INVOICE_IDS_FOR_TABLE,
+        );
+        $usersQuery = User::with(['orders' => function ($q) {
+            $q->where('created_at','>', Carbon::now()->subMonths(2));
+            $q->select('id', 'employee_id');
+            $q->with(['labels' => function ($q) {
+                $q->select('labels.id', 'order_id');
+            }]);
+        }]);
+        if (empty($admin)) {
+            $users = $usersQuery->where('id', $loggedUser->id)->get();
+        } else {
+            $users = $usersQuery->get();
+        }
+        $out = [];
+        foreach ($users as $user) {
+            $out[$user->id]['user'] = $user;
+            foreach ($user->orders as $order) {
+                foreach ($order->labels as $label) {
+                    if (empty($out[$user->id][$label->id])) {
+                        $out[$user->id][$label->id] = 0;
+                    }
+                    $out[$user->id][$label->id]++;
+                }
+            }
+        }
         //pobieramy widzialności dla danego moduły oraz użytkownika
         $visibilities = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('orders'));
         foreach ($visibilities as $key => $row) {
             $visibilities[$key]->show = json_decode($row->show, true);
             $visibilities[$key]->hidden = json_decode($row->hidden, true);
         }
-        return view('orders.index',
-            compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses'));
+        return view('orders.index', compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses'))
+            ->withOuts($out)
+            ->withLabIds($labIds)
+            ->withLabels($labels);
     }
 
     /**
