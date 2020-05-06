@@ -59,7 +59,17 @@ class Inpost
                 'post_code' => $this->data['pickup_address']['postal_code'],
                 'country_code' => 'PL'
             ];
-            if ($this->data['courier_type'] == 'PACZKOMAT') {
+            if ($this->data['courier_type'] == 'PACZKOMAT' && $this->allegro) {
+                $sections = [
+                    'receiver' => [
+                        'email' => 'info@mega1000.pl',
+                        'phone' => $this->data['delivery_address']['phone']
+                    ],
+                    'custom_attributes' => [
+                        'target_point' => $this->data['delivery_address']['lastname']
+                    ]
+                ];
+            } elseif ($this->data['courier_type'] == 'PACZKOMAT') {
                 $sections = [
                     'receiver' => [
                         'email' => $this->data['delivery_address']['email'],
