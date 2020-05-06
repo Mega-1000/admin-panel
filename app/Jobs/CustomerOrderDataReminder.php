@@ -36,26 +36,22 @@ class CustomerOrderDataReminder implements ShouldQueue
     {
         $orders = Order::whereHas('labels', function ($query) {
             $query->whereIn('id', Label::CUSTOMER_DATA_REMINDER_IDS);
-        })->all();
+        })->get();
 
         foreach($orders as $order) {
             $noData = DB::table('gt_invoices')->where('order_id', $order->id)->where('gt_invoice_status_id', '13')->first();
             if (!empty($noData)) {
-                try {
-                    \Mailer::create()
-                        ->to($order->customer->login)
-                        ->send(new DifferentCustomerData('Wybór danych do wystawienia faktury - zlecenie'.$order->id, $order->id, $noData->id));
-                } catch (\Swift_TransportException $e) {
-                    Log::error('Customer order data change email has not been sent due to: ', $e->getMessage());
-                }
+                $senderJob = new DifferentCustomerData('Wybór danych do wystawienia faktury - zlecenie '.$order->id, $order->id, $noData->id);
             } else {
-                try {
-                    \Mailer::create()
-                        ->to($order->customer->login)
-                        ->send(new ConfirmData('Wybór danych do wystawienia faktury  - zlecenie'.$order->id, $order->id));
-                } catch (\Swift_TransportException $e) {
-                    Log::error('Customer order data change email has not been sent due to: ', $e->getMessage());
-                }
+                $senderJob = new ConfirmData('Wybór danych do wystawienia faktury  - zlecenie'.$order->id, $order->id)
+            }
+
+            try {
+                \Mailer::create()
+                    ->to($order->customer->login)
+                    ->send($senderJob);
+            } catch (\Swift_TransportException $e) {
+                Log::error('Customer order data change email has not been sent due to: ', $e->getMessage());
             }
         }
     }
