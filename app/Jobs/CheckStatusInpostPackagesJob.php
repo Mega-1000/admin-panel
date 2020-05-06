@@ -45,7 +45,7 @@ class CheckStatusInpostPackagesJob extends Job
         }
         $integration = new Inpost();
         foreach ($orderPackages as $orderPackage) {
-            if (is_null($orderPackage->inpost_url)) {
+            if (empty($orderPackage->inpost_url)) {
                 continue;
             }
             if ($orderPackage->status !== 'DELIVERED' && $orderPackage->status !== 'SENDING' && $orderPackage->status !== 'WAITING_FOR_CANCELLED' && $orderPackage->status !== 'CANCELLED') {
