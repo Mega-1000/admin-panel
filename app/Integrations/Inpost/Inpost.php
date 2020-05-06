@@ -66,7 +66,7 @@ class Inpost
                         'phone' => $this->data['delivery_address']['phone']
                     ],
                     'custom_attributes' => [
-                        'target_point' => $this->data['delivery_address']['firstname'] . ' ' . $this->data['delivery_address']['lastname']
+                        'target_point' => $this->data['delivery_address']['lastname']
                     ]
                 ];
             } else {
@@ -92,7 +92,7 @@ class Inpost
             if ($this->data['courier_type'] == 'PACZKOMAT' && $this->allegro) {
                 $sections += [
                     'custom_attributes' => [
-                        'target_point' => $this->data['delivery_address']['firstname'] . ' ' . $this->data['delivery_address']['lastname'],
+                        'target_point' => $this->data['delivery_address']['lastname'],
                         'sending_method' => 'parcel_locker',
                         'allegro_transaction_id' => $this->data['additional_data']['allegro_transaction_id'],
                         'allegro_user_id' => $this->data['additional_data']['allegro_id']
@@ -101,7 +101,6 @@ class Inpost
             } else if ($this->allegro) {
                $sections += [
                     'custom_attributes' => [
-                        'target_point' => $this->data['delivery_address']['firstname'] . ' ' . $this->data['delivery_address']['lastname'],
                         'sending_method' => 'dispatch_order',
                         'allegro_transaction_id' => $this->data['additional_data']['allegro_transaction_id'],
                         'allegro_user_id' => $this->data['additional_data']['allegro_user_id']
