@@ -87,7 +87,9 @@ class OrdersPackagesController extends Controller
         }
         $promisedPayments = [];
         $payments = [];
-        $allegroInpost = $order->sello_id;
+        if ($order->sello_id) {
+            $isAllegro = true;
+        }
 
         $cashOnDeliverySum = 0;
 
@@ -154,7 +156,7 @@ class OrdersPackagesController extends Controller
                         ->withcontentTypes($contentTypes)
                         ->withpackingTypes($packingTypes)
                         ->withcontainerTypes($containerTypes)
-                        ->withallegroInpost($allegroInpost);
+                        ->withisAllegro($isAllegro);
     }
 
     public function changeValue(Request $request)
@@ -175,8 +177,9 @@ class OrdersPackagesController extends Controller
      */
     public function edit($id) {
         $orderPackage = OrderPackage::find($id);
-        if ($orderPackage->service_courier_name === 'ALLEGRO-INPOST') {
-         $allegroInpost = 1;   
+        $order = Order::find($orderPackage->order_id);
+        if ($order->sello_id) {
+            $isAllegro = true;   
         }
         $contentTypes = ContentType::all();
         $packingTypes = PackingType::all();
@@ -186,7 +189,7 @@ class OrdersPackagesController extends Controller
                         ->withcontentTypes($contentTypes)
                         ->withpackingTypes($packingTypes)
                         ->withcontainerTypes($containerTypes)
-                        ->withallegroInpost($allegroInpost);
+                        ->withisAllegro($isAllegro);
     }
 
     /**
