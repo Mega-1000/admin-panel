@@ -269,7 +269,7 @@ class OrdersCourierJobs extends Job
             if (is_null($allegro)) {
                 $integration = new Inpost($this->data);
             } else {
-                 $integration = new Inpost($this->data, 1);
+                $integration = new Inpost($this->data, 1);
             } 
             $this->callInpostForPackage($integration);
         } catch (Exception $exception) {
