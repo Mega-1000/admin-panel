@@ -106,6 +106,11 @@
                     <option {{ old('delivery_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         ODBIÓR OSOBISTY
                     </option>
+                    @if (!empty($allegroId))
+                     <option {{ old('delivery_courier_name') == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
+                        ALLEGRO-INPOST
+                    </option>
+                    @endif
                 </select>
             </div>
             <div class="form-group">
@@ -127,9 +132,17 @@
                     <option {{ old('delivery_courier_name') == 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
                         GIELDA
                     </option>
-                    <option {{ old('delivery_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
+                   <option {{ old('delivery_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         ODBIÓR OSOBISTY
+                    </option> 
+                    <option {{ old('delivery_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
+                        PACZKOMAT
                     </option>
+                    @if (!empty($allegroId))
+                     <option {{ old('delivery_courier_name') == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
+                        ALLEGRO-INPOST
+                    </option>
+                    @endif
                 </select>
             </div>
             <div class="form-group">
