@@ -89,6 +89,8 @@ class OrdersPackagesController extends Controller
         $payments = [];
         if ($order->sello_id) {
             $isAllegro = true;
+        } else {
+            $isAllegro = false;
         }
 
         $cashOnDeliverySum = 0;
@@ -180,7 +182,10 @@ class OrdersPackagesController extends Controller
         $order = Order::find($orderPackage->order_id);
         if ($order->sello_id) {
             $isAllegro = true;   
+        } else {
+            $isAllegro = false;
         }
+
         $contentTypes = ContentType::all();
         $packingTypes = PackingType::all();
         $containerTypes = ContainerType::all();
