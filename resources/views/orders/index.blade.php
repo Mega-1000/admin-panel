@@ -365,10 +365,10 @@
         <button id="showTable" class="btn btn-warning" style="margin-left: 5px">Pokaż Tabelkę z Etykietami Pracownika</button>
         <div class="col-md-12 hidden" style="float: right" id="labelTable">
             <table width="50%"  style="float:right;" border="1">
-                    
+
                     <tr>
                         <th colspan="1" width="10%"></th>
-                        <th colspan="1" width="10%">Pracownik</th>                       
+                        <th colspan="1" width="10%">Pracownik</th>
                         <th colspan="{{count($labIds['payments'])}}" width="17,5%" style="text-align: center">Płatności</th>
                         <th colspan="{{count($labIds['production'])}}" width="15%" style="text-align: center">Produkcja</th>
                         <th colspan="{{count($labIds['transport'])}}" width="17,5%" style="text-align: center">Transport</th>
@@ -391,7 +391,7 @@
                                     @endif
                                 @endforeach
                             @endforeach
-                        @endforeach     
+                        @endforeach
                     </tr>
                         @foreach ($outs as $out)
                             @if (!empty($out['user']->orders[0]))
@@ -402,7 +402,7 @@
                                         @foreach ($labIdGroup as $labId)
                                             <td style="text-align: center">{{$out[$labId] ?? 0}}</td>
                                         @endforeach
-                                    @endforeach  
+                                    @endforeach
                                 </tr>
                             @endif
                     @endforeach
@@ -1502,9 +1502,13 @@
                             invoices.forEach(function(invoice){
                                 html += '<a target="_blank" href="/storage/invoices/'+invoice.invoice_name+'" style="margin-top: 5px;">Faktura</a>';
                             });
+                            let jsonInvoices = JSON.stringify(invoices);
                             html += '<br />'
+                            html += '<a href="#" class="remove__invoices"' + 'onclick="getInvoicesList('+data.orderId+ ')">Usuń faktury</a>'
                         }
                         html += '<a href="{{env('FRONT_NUXT_URL')}}' + '/magazyn/awizacja/0/0/' + data.orderId + '/wyslij-fakture">Dodaj</a>'
+
+
                         return html;
                     }
                 },
@@ -1785,8 +1789,8 @@
             $('#columnSearch-clientPhone').val(replaced);
             filterByPhone(replaced);
         });
-        $('#columnSearch-clientPhone').click(function(){ 
-            clearFilters(false);  
+        $('#columnSearch-clientPhone').click(function(){
+            clearFilters(false);
         });
         $('#columnSearch-orderId').click(function(){
             clearFilters(false);
@@ -2056,6 +2060,28 @@
             }
         }
 
+        function getInvoicesList(id) {
+            $.ajax({
+                url: '/admin/orders/'+id+'/invoices',
+            }).done(function(data) {
+                $('#order_invoices_delete').modal('show');
+                if(data === null) {
+                    return;
+                }
+                $('#invoice__list').remove();
+                let parent = document.getElementById("invoice__container");
+                let invoiceSelect = document.createElement("SELECT");
+                invoiceSelect.id = "invoice__list";
+                parent.appendChild(invoiceSelect);
+                data.forEach((invoice) => {
+                    let option = document.createElement("option");
+                    option.value = invoice.id;
+                    option.text = invoice.invoice_name;
+                    invoiceSelect.appendChild(option);
+                })
+            })
+        }
+
         function moveDataAjax(id){
             var idToSend = id;
             var buttonId = $('.btn-dark').attr('id');
@@ -2070,6 +2096,19 @@
                 $('#order_move_data_error_select').modal('show');
             }
         }
+
+        $('#remove-selected-invoice').on('click', () => {
+            let invoiceId = $('#invoice__list option:selected').val();
+            $.ajax({
+                url: '/admin/invoice/'+invoiceId+'/delete'
+            }).done(function(data) {
+                $('#invoice_delete_success').modal('show');
+
+                $('#invoice-delete-ok').on('click', function(){
+                    location.reload();
+                });
+            })
+        })
 
         $('#move-data-ok').on('click', function(){
             var idToGet = $('#order_id_get').text();

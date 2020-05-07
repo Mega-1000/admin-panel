@@ -51,7 +51,8 @@ class CheckPackagesStatusJob
         foreach ($packages as $package) {
             if ($package->letter_number !== null) {
                 switch ($package->delivery_courier_name) {
-                    case 'INPOST':
+                    case 'INPOST' :
+                    case 'ALLEGRO-INPOST' :
                         $this->checkStatusInInpostPackages($package);
                         break;
                     case 'DPD':

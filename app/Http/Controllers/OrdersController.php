@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Entities\Auth_code;
 use App\Entities\Order;
+use App\Entities\OrderInvoice;
 use App\Entities\OrderItem;
 use App\Entities\OrderPayment;
 use App\Entities\Warehouse;
@@ -2380,6 +2381,20 @@ class OrdersController extends Controller
             'message' => __('firms.message.send_request_to_update_data_error'),
             'alert-type' => 'error'
         ]);
+    }
+  
+    public function getInvoices($id)
+    {
+        $order = Order::find($id);
+
+        return response()->json($order->invoices);
+    }
+
+    public function deleteInvoice($id)
+    {
+        OrderInvoice::where('id', $id)->delete();
+
+        return response()->json(['status' => 'success']);
     }
 }
 

@@ -30,12 +30,13 @@ class Inpost
      * Inpost constructor.
      * @param $data
      */
-    public function __construct($data = null)
+    public function __construct($data = null, $allegro = null)
     {
         $this->data = $data;
         $this->url = config('integrations.inpost.url');
         $this->authorization = config('integrations.inpost.authorization');
         $this->org_id = config('integrations.inpost.org_id');
+        $this->allegro = $allegro;
     }
 
     /**
@@ -58,14 +59,21 @@ class Inpost
                 'post_code' => $this->data['pickup_address']['postal_code'],
                 'country_code' => 'PL'
             ];
-            if ($this->data['courier_type'] == 'PACZKOMAT') {
+            if ($this->data['courier_type'] == 'PACZKOMAT' && $this->allegro) {
+                $sections = [
+                    'receiver' => [
+                        'email' => 'info@mega1000.pl',
+                        'phone' => $this->data['delivery_address']['phone']
+                    ],
+                ];
+            } else if ($this->data['courier_type'] == 'PACZKOMAT') {
                 $sections = [
                     'receiver' => [
                         'email' => $this->data['delivery_address']['email'],
                         'phone' => $this->data['delivery_address']['phone']
                     ],
                     'custom_attributes' => [
-                        'target_point' => $this->data['delivery_address']['firstname'] . ' ' . $this->data['delivery_address']['lastname']
+                        'target_point' => $this->data['delivery_address']['lastname']
                     ]
                 ];
             } else {
@@ -88,15 +96,23 @@ class Inpost
                         'address' => $addressSender
                     ]
             ];
-            if ($this->data['courier_type'] == 'PACZKOMAT' && $this->data['amount'] == '8.99') {
+            if ($this->data['courier_type'] == 'PACZKOMAT' && $this->allegro) {
                 $sections += [
                     'custom_attributes' => [
-                        'target_point' => $this->data['delivery_address']['firstname'] . ' ' . $this->data['delivery_address']['lastname'],
-                        'sending_method' => 'parcel_locker',
+                        'target_point' => $this->data['delivery_address']['lastname'],
+                        'sending_method' => 'dispatch_order',
                         'allegro_transaction_id' => $this->data['additional_data']['allegro_transaction_id'],
-                        'allegro_user_id' => $this->data['additional_data']['allegro_id']
+                        'allegro_user_id' => $this->data['additional_data']['allegro_user_id']
                     ]
                 ];
+            } else if ($this->allegro) {
+               $sections += [
+                    'custom_attributes' => [
+                        'sending_method' => 'dispatch_order',
+                        'allegro_transaction_id' => $this->data['additional_data']['allegro_transaction_id'],
+                        'allegro_user_id' => $this->data['additional_data']['allegro_user_id']
+                    ]
+                ]; 
             }
 
             $sections += [
@@ -132,13 +148,17 @@ class Inpost
                 ];
             }
 
-            if ($this->data['courier_type'] == 'PACZKOMAT' && $this->data['amount'] == '8.99') {
+            if ($this->data['courier_type'] == 'PACZKOMAT' && $this->allegro) {
                 $sections += [
                     'service' => 'inpost_locker_allegro'
                 ];
             } else if ($this->data['courier_type'] == 'PACZKOMAT') {
                 $sections += [
                     'service' => 'inpost_locker_standard'
+                ];
+            } else if ($this->allegro) {               
+            $sections += [
+                    'service' => 'inpost_courier_allegro'
                 ];
             } else {
                 $sections += [

@@ -44,3 +44,9 @@
 #dataTable > tbody > tr {
     color: black !important;
 }
+
+.remove__invoices {
+    color: red;
+    font-weight: bold;
+    display: block;
+}
