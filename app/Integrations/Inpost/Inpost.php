@@ -62,7 +62,7 @@ class Inpost
             if ($this->data['courier_type'] == 'PACZKOMAT' && $this->allegro) {
                 $sections = [
                     'receiver' => [
-                        'email' => 'info@mega1000.pl',
+                        'email' => $this->data['additional_data']['allegro_mail'],
                         'phone' => $this->data['delivery_address']['phone']
                     ],
                 ];
@@ -74,6 +74,16 @@ class Inpost
                     ],
                     'custom_attributes' => [
                         'target_point' => $this->data['delivery_address']['lastname']
+                    ]
+                ];
+            } else if ($this->allegro) {
+                $sections = [
+                    'receiver' => [
+                        'first_name' => $this->data['delivery_address']['firstname'],
+                        'last_name' => $this->data['delivery_address']['lastname'],
+                        'email' => $this->data['additional_data']['allegro_mail'],
+                        'phone' => $this->data['delivery_address']['phone'],
+                        'address' => $address
                     ]
                 ];
             } else {
