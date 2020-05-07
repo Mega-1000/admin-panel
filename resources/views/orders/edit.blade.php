@@ -40,6 +40,12 @@
                 name="change-button-form" id="button-payments"
                 value="payments">@lang('orders.form.buttons.payments')</button>
         <button class="btn btn-primary"
+                name="change-button-form" id="button-warehouse-payments"
+                value="warehouse-payments">@lang('orders.form.buttons.warehouse-payments')</button>
+        <button class="btn btn-primary"
+                name="change-button-form" id="button-spedition-payments"
+                value="spedition-payments">@lang('orders.form.buttons.spedition-payments')</button>
+        <button class="btn btn-primary"
                 name="change-button-form" id="button-tasks"
                 value="tasks">@lang('orders.form.buttons.tasks')</button>
         <button class="btn btn-primary"
@@ -1188,6 +1194,73 @@
             </div>
         </div>
     </div>
+    <!-- Warehouse payment modal -->
+    <div class="modal fade" id="warehousePaymentModal" tabindex="-1" role="dialog" aria-labelledby="warehousePaymentModal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Przydziel wpłatę do zamówienia</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ action('OrdersPaymentsController@store') }}" method="POST">
+                        {{ csrf_field() }}
+                        <div class="firms-general" id="orderPayment">
+                            <div class="form-group">
+                                <label for="amount">@lang('order_payments.form.amount')</label>
+                                @foreach($order->warehouse->orders as $itemCustomerOrder)
+                                    @php
+                                        $sumOfItems = 0;
+                                        foreach ($itemCustomerOrder->items as $item) {
+                                            $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+                                        }
+                                        $orderValue = str_replace(',', '', number_format($sumOfItems + $itemCustomerOrder->shipment_price_for_client + $itemCustomerOrder->additional_service_cost + $itemCustomerOrder->additional_cash_on_delivery_cost, 2));
+                                    @endphp
+                                @endforeach
+                                <input type="text" class="form-control" id="amount" name="amount"
+                                       value="{{ $orderValue }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="chooseOrder">Wybierz zlecenie</label>
+                                <select class="form-control" id="chooseOrder" name="chooseOrder">
+                                    @foreach($order->warehouse->orders as $itemCustomerOrder)
+                                        @php
+                                            $sumOfItems = 0;
+                                            foreach ($itemCustomerOrder->items as $item) {
+                                                $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+                                            }
+                                            $orderValue = str_replace(',', '', number_format($sumOfItems + $itemCustomerOrder->shipment_price_for_client + $itemCustomerOrder->additional_service_cost + $itemCustomerOrder->additional_cash_on_delivery_cost, 2));
+                                        @endphp
+                                        <option value="{{ $itemCustomerOrder->id }}">
+                                            Zlecenie: {{ $itemCustomerOrder->id }} Kwota
+                                            zlecenia: {{ $orderValue }}</option>
+                                    @endforeach
+                                </select>
+                                @foreach($order->customer->orders as $itemCustomerOrder)
+                                    @php
+                                        $sumOfItems = 0;
+                                        foreach ($itemCustomerOrder->items as $item) {
+                                            $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+                                        }
+                                        $orderValue = str_replace(',', '', number_format($sumOfItems + $itemCustomerOrder->shipment_price_for_client + $itemCustomerOrder->additional_service_cost + $itemCustomerOrder->additional_cash_on_delivery_cost, 2));
+                                    @endphp
+                                    <input type="hidden" name="order-payment-{{$itemCustomerOrder->id}}"
+                                           value="{{ $orderValue }}">
+                                @endforeach
+                            </div>
+                            <input type="hidden" value="0" name="masterPaymentId">
+                            <input type="hidden" value="0" name="masterPaymentAmount">
+                            <input type="hidden" value="1" name="warehousePayment">
+                        </div>
+                        <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="promiseModal" tabindex="-1" role="dialog" aria-labelledby="promiseModal"
          aria-hidden="true">
         <div class="modal-dialog" role="document">
@@ -1293,6 +1366,210 @@
             </label>
             <input value="Nadpisz dane" type="submit" />
         </form>
+    </div>
+    <div class="warehouse-payments" id="warehouse-payments">
+        <h1>Rozrachunki z magazynem: {{ $order->warehouse->warehouse_email ?? '' }}
+            @if(in_array(Auth::user()->role_id, [User::ROLE_SUPER_ADMIN, User::ROLE_ADMIN, User::ROLE_ACCOUNTANT]))
+                <a id="create-button-orderPayments" style="float:right;margin-right: 15px;"
+                   href="{{route('order_payments.createMaster', ['id' => $order->id]) }}"
+                   class="btn btn-success install pull-right">
+                    <i class="voyager-plus"></i> <span>@lang('order_payments.createMaster')</span>
+                </a>
+            @endif
+        </h1>
+        <table style="width: 35%; float: left;" id="paymentsTable" class="table table-hover">
+            <thead>
+            <tr>
+                <th>@lang('order_payments.table.payments')</th>
+                <th>@lang('order_payments.table.status')</th>
+                <th>@lang('order_payments.table.payment_left')</th>
+                <th>Zaliczka</th>
+                <th>@lang('order_payments.table.add')</th>
+            </tr>
+            </thead>
+            <tbody>
+            @php
+                $sumOfPayments = 0;
+            @endphp
+            @foreach($order->warehouse->payments as $payment)
+                @php
+                    $sumOfPayments = $sumOfPayments + $payment->amount;
+                @endphp
+                <tr>
+                    <td>{{ $payment->amount }}</td>
+                    <td>
+                        @if($itemOrder->isOrderHasLabel(Label::ORDER_ITEMS_REDEEMED_LABEL))
+                            <span class="order-label" style="color: #FFFFFF; display: block; margin-top: 5px; background-color: #87D11B; text-align: center;"><i class="fas fa-battery-full"></i></span>
+                        @else
+                            <span class="order-label" style="color: #FFFFFF; display: block; margin-top: 5px; background-color: #4DCFFF; text-align: center;"><i class="fas fa-battery-empty"></i></span>
+                        @endif
+                    </td>
+                    <td>{{ $payment->amount_left }}</td>
+                    <td>
+                        @if($payment->promise == '1')
+                            <b style="color: red;">Tak</b>
+                        @else
+                            <b style="color: red;">Nie</b>
+                        @endif
+                    </td>
+                    <td>
+                        @if($payment->promise == Payment::PROMISE_PAYMENT && Auth::user()->role_id != User::ROLE_CONSULTANT)
+                            <button type="button" class="btn btn-success openPromiseModal" style="display: block;"
+                                    data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->amount }}">
+                                Zaksięguj
+                            </button>
+                        @else
+                            <button type="button" class="btn" style="display: block;" disabled>
+                                Zaksięgowano
+                            </button>
+                            <button type="button" class="btn btn-primary openWarehousePaymentModal" style="display: block;" @if(!$itemOrder->isOrderHasLabel(Label::ORDER_ITEMS_REDEEMED_LABEL)) {{ 'disabled' }} @endif
+                                    data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->amount }}">
+                                Przydziel
+                            </button>
+                        @endif
+                        <a href="{{ route('payments.edit', ['id' => $payment->id]) }}" class="btn btn-info">Edytuj</a>
+                        <a href="{{ route('payments.destroy', ['id' => $payment->id]) }}"
+                           class="btn btn-danger">Usuń</a>
+                    </td>
+                </tr>
+            @endforeach
+            <tr>
+                <td><h2>Suma wpłat: <b style="color: red;">{{ $sumOfPayments }} zł</b></h2></td>
+            </tr>
+            </tbody>
+        </table>
+        <table style="width: 64%; margin-left: 1%; display: inline-block;" id="ordersTable" class="table table-hover">
+            <thead>
+            <tr>
+                <th>@lang('order_payments.table.order_id')</th>
+                <th>@lang('order_payments.table.invoice')</th>
+                <th>@lang('order_payments.table.order_status')</th>
+                <th>@lang('order_payments.table.order_value')</th>
+                <th>@lang('order_payments.table.booked')</th>
+                <th>@lang('order_payments.table.left')</th>
+                <th>@lang('order_payments.table.move')</th>
+            </tr>
+            </thead>
+            <tbody>
+            @php
+                $sumOfOrders = 0;
+                $sumOfItems = 0;
+            @endphp
+            @foreach($order->warehouse->orders()->whereNotIn('status_id', [Order::STATUS_WITHOUT_REALIZATION, Order::STATUS_ORDER_FINISHED])->get() as $itemOrder)
+                <tr>
+                    <td>{{ $itemOrder->id }}</td>
+                    <td>
+                        @if(count($itemOrder->invoices) > 0)
+                            @foreach($itemOrder->invoices as $invoice)
+                                <a target="_blank" href="/storage/invoices/{{ $invoice->invoice_name }}" style="margin-top: 5px;">Faktura</a>
+                            @endforeach
+                        @elseif($itemOrder->invoiceRequests !== null || count($itemOrder->invoiceRequests) > 0)
+                            <p class="invoice__request--sent">Prośba o fakturę została już wysłana.</p>
+                        @else
+                            <button class="btn btn-sm btn-success" onclick="sendInvoiceRequest({{$itemOrder->id}})">Poproś o fakturę</button>
+                        @endif
+                    </td>
+                    <td>{{ $itemOrder->status->name }}</td>
+                    @php
+                        $sumOfItems = 0;
+                        foreach ($itemOrder->items as $item) {
+                            $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+                        }
+                        $orderValue = str_replace(',', '', number_format($sumOfItems + $itemOrder->shipment_price_for_client + $itemOrder->additional_service_cost + $itemOrder->additional_cash_on_delivery_cost, 2));
+                    @endphp
+                    @php
+                        $sumOfOrders = $sumOfOrders + $orderValue
+                    @endphp
+                    <td>{{ $orderValue }}</td>
+                    @php
+                       $payments = $itemOrder->groupWarehousePayments();
+                    @endphp
+                    <td>
+                        <h5 class="payment__pending">Oczekujące: {{ $payments['PENDING'] }}</h5>
+                        <h5 class="payment__accepted">Zaakceptowane: {{ $payments['ACCEPTED'] }}</h5>
+                    </td>
+                    <td id="left-amount-{{$itemOrder->id}}" data-value="{{ $orderValue - $paymentsValue }}">{{ $orderValue - $paymentsValue }}</td>
+                    <td>
+                        <button id="moveButton-{{$itemOrder->id}}" class="btn btn-sm btn-warning edit move__payment--button" onclick="moveData({{$itemOrder->id}})">Przenieś wpłatę stąd</button>
+                        <button id="moveButtonAjax-{{$itemOrder->id}}" class="btn btn-sm btn-success btn-move edit hidden" onclick="moveDataAjax({{$itemOrder->id}})">Przenieś dane tutaj</button>
+                    </td>
+                </tr>
+            @endforeach
+            <tr>
+                <td><h2>Suma faktur: <b style="color: red;">{{ $sumOfOrders }} zł</b></h2></td>
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+    <div class="spedition-payments" id="spedition-payments">
+        <h1>Rozrachunki ze spedycją
+            @if(in_array(Auth::user()->role_id, [User::ROLE_SUPER_ADMIN, User::ROLE_ADMIN, User::ROLE_ACCOUNTANT]))
+                <a id="create-button-orderPayments-spedition" style="float:right;margin-right: 15px;"
+                   href="{{route('order_payments.createMaster', ['id' => $order->id]) }}"
+                   class="btn btn-success install pull-right">
+                    <i class="voyager-plus"></i> <span>@lang('order_payments.createMaster')</span>
+                </a>
+            @endif
+        </h1>
+        <table style="width: 100%; display: inline-block;" id="ordersTable" class="table table-hover">
+            <thead>
+            <tr>
+                <th>@lang('order_payments.table.order_id')</th>
+                <th>@lang('order_payments.table.invoice')</th>
+                <th>@lang('order_payments.table.order_status')</th>
+                <th>@lang('order_payments.table.order_value')</th>
+                <th>@lang('order_payments.table.booked')</th>
+                <th>@lang('order_payments.table.left')</th>
+            </tr>
+            </thead>
+            <tbody>
+            @php
+                $sumOfOrders = 0;
+                $sumOfItems = 0;
+            @endphp
+            <tr>
+                <td>{{ $order->id }}</td>
+                <td>
+                    @if($order->invoices !== null || count($order->invoices) > 0)
+                        @foreach($order->invoices as $invoice)
+                            <a target="_blank" href="/storage/invoices/{{ $invoice->invoice_name }}" style="margin-top: 5px;">Faktura</a>
+                        @endforeach
+                    @elseif($order->invoiceRequests !== null || count($order->invoiceRequests) > 0)
+                        <p class="invoice__request--sent">Prośba o fakturę została już wysłana.</p>
+                    @else
+                        <button class="btn btn-sm btn-success" onclick="sendInvoiceRequest({{$itemOrder->id}})">Poproś o fakturę</button>
+                    @endif
+                </td>
+                <td>{{ $order->status->name }}</td>
+                @php
+                    $sumOfItems = 0;
+                    foreach ($order->items as $item) {
+                        $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+                    }
+                    $orderValue = str_replace(',', '', number_format($sumOfItems + $order->shipment_price_for_client + $order->additional_service_cost + $order->additional_cash_on_delivery_cost, 2));
+                @endphp
+                @php
+                    $sumOfOrders = $sumOfOrders + $orderValue
+                @endphp
+                <td>{{ $orderValue }}</td>
+                @php
+                    $paymentsValue = 0;
+                    foreach($order->speditionPayments()->get() as $payment) {
+                       $paymentsValue += $payment->amount;
+                    }
+                @endphp
+                <td>
+                    <h5 class="payment__accepted">Do zapłaty: {{ $paymentsValue }}</h5>
+                </td>
+                <td id="left-amount-{{$order->id}}" data-value="{{ $orderValue - $paymentsValue }}">{{ $orderValue - $paymentsValue }}</td>
+            </tr>
+            <tr>
+                <td><h2>Suma faktur: <b style="color: red;">{{ $sumOfOrders }} zł</b></h2></td>
+            </tr>
+
+            </tbody>
+        </table>
     </div>
     <div class="order-messages" id="order-messages">
         <div class="panel panel-bordered">
@@ -2150,6 +2427,8 @@
                             var tasks = $('#order-tasks').hide();
                             var packages = $('#order-packages').hide();
                             var messages = $('#order-messages').hide();
+                            var warehousePayments = $('#warehouse-payments').hide();
+                            var speditionPayments = $('#warehouse-payments').hide();
                             var status = $('#order-status').hide();
                             var customer = $('#order-customer').hide();
                             var pageTitle = $('.page-title').children('i');
@@ -2183,6 +2462,8 @@
                                 customer.hide();
                                 messages.hide();
                                 status.hide();
+                                warehousePayments.hide();
+                                speditionPayments.hide();
                                 createButtonOrderPayments.show();
                                 createButtonOrderPackages.hide();
                                 createButtonOrderTasks.hide();
@@ -2207,6 +2488,8 @@
                                 packages.hide();
                                 customer.hide();
                                 messages.hide();
+                                warehousePayments.hide();
+                                speditionPayments.hide();
                                 status.hide();
                                 createButtonOrderPayments.hide();
                                 createButtonOrderPackages.hide();
@@ -2233,6 +2516,8 @@
                                 packages.show();
                                 customer.hide();
                                 messages.hide();
+                                warehousePayments.hide();
+                                speditionPayments.hide();
                                 createButtonOrderPayments.hide();
                                 createButtonOrderPackages.show();
                                 createButtonOrderTasks.hide();
@@ -2257,6 +2542,8 @@
                                 packages.hide();
                                 customer.hide();
                                 messages.show();
+                                warehousePayments.hide();
+                                speditionPayments.hide();
                                 createButtonOrderPayments.hide();
                                 createButtonOrderPackages.hide();
                                 createButtonOrderTasks.hide();
@@ -2277,6 +2564,10 @@
                                     $('#button-payments').removeClass('active');
                                     $('#button-packages').removeClass('active');
                                     $('#button-customer').removeClass('active');
+                                    $('#button-warehouse-payments').removeClass('active');
+                                    $('#button-spedition-payments').removeClass('active');
+                                    speditionPayments.hide();
+                                    warehousePayments.hide();
                                     general.show();
                                     tasks.hide();
                                     payments.hide();
@@ -2305,6 +2596,10 @@
                                     $('#button-customer').removeClass('active');
                                     $('#submit').hide();
                                     $('#submitOrder').hide();
+                                    $('#button-warehouse-payments').removeClass('active');
+                                    $('#button-spedition-payments').removeClass('active');
+                                    speditionPayments.hide();
+                                    warehousePayments.hide();
                                     general.hide();
                                     tasks.show();
                                     payments.hide();
@@ -2329,6 +2624,10 @@
                                     $('#button-packages').removeClass('active');
                                     $('#submit').hide();
                                     $('#submitOrder').hide();
+                                    $('#button-warehouse-payments').removeClass('active');
+                                    $('#button-spedition-payments').removeClass('active');
+                                    speditionPayments.hide();
+                                    warehousePayments.hide();
                                     general.hide();
                                     tasks.hide();
                                     payments.show();
@@ -2355,6 +2654,10 @@
                                     $('#button-packages').removeClass('active');
                                     $('#submit').hide();
                                     $('#submitOrder').hide();
+                                    $('#button-warehouse-payments').removeClass('active');
+                                    $('#button-spedition-payments').removeClass('active');
+                                    speditionPayments.hide();
+                                    warehousePayments.hide();
                                     general.hide();
                                     tasks.hide();
                                     payments.hide();
@@ -2380,6 +2683,10 @@
                                     $('#button-packages').addClass('active');
                                     $('#submit').hide();
                                     $('#submitOrder').hide();
+                                    $('#button-warehouse-payments').removeClass('active');
+                                    $('#button-spedition-payments').removeClass('active');
+                                    speditionPayments.hide();
+                                    warehousePayments.hide();
                                     general.hide();
                                     tasks.hide();
                                     payments.hide();
@@ -2404,6 +2711,10 @@
                                     $('#button-customer').removeClass('active');
                                     $('#submit').show();
                                     $('#submitOrder').hide();
+                                    $('#button-warehouse-payments').removeClass('active');
+                                    $('#button-spedition-payments').removeClass('active');
+                                    speditionPayments.hide();
+                                    warehousePayments.hide();
                                     general.hide();
                                     tasks.hide();
                                     payments.hide();
@@ -2428,6 +2739,10 @@
                                     $('#button-customer').addClass('active');
                                     $('#submit').hide();
                                     $('#submitOrder').hide();
+                                    $('#button-warehouse-payments').removeClass('active');
+                                    $('#button-spedition-payments').removeClass('active');
+                                    speditionPayments.hide();
+                                    warehousePayments.hide();
                                     general.hide();
                                     tasks.hide();
                                     payments.hide();
@@ -2443,6 +2758,63 @@
                                     breadcrumb.children().last().remove();
                                     breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#status'>Status zamówienia</a></li>");
                                     addOrder.hide();
+                                } else if (value === 'warehouse-payments') {
+                                    $('#button-general').removeClass('active');
+                                    $('#button-tasks').removeClass('active');
+                                    $('#button-messages').removeClass('active');
+                                    $('#button-payments').removeClass('active');
+                                    $('#button-packages').removeClass('active');
+                                    $('#button-customer').removeClass('active');
+                                    $('#submit').hide();
+                                    $('#submitOrder').hide();
+                                    $('#button-warehouse-payments').addClass('active');
+                                    $('#button-spedition-payments').removeClass('active');
+                                    speditionPayments.hide();
+                                    warehousePayments.show();
+                                    general.hide();
+                                    tasks.hide();
+                                    payments.hide();
+                                    packages.hide();
+                                    messages.hide();
+                                    customer.hide();
+                                    status.hide();
+                                    pageTitle.removeClass();
+                                    pageTitle.addClass('voyager-tag');
+                                    createButtonOrderPayments.hide();
+                                    createButtonOrderPackages.hide();
+                                    createButtonOrderTasks.hide();
+                                    breadcrumb.children().last().remove();
+                                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#status'>Status zamówienia</a></li>");
+                                    addOrder.hide();
+                                } else if (value === 'spedition-payments') {
+                                    $('#button-general').removeClass('active');
+                                    $('#button-tasks').removeClass('active');
+                                    $('#button-messages').removeClass('active');
+                                    $('#button-payments').removeClass('active');
+                                    $('#button-packages').removeClass('active');
+                                    $('#button-customer').removeClass('active');
+                                    $('#submit').hide();
+                                    $('#submitOrder').hide();
+                                    $('#button-warehouse-payments').removeClass('active');
+                                    $('#button-spedition-payments').addClass('active');
+                                    speditionPayments.show();
+                                    warehousePayments.hide();
+                                    general.hide();
+                                    tasks.hide();
+                                    payments.hide();
+                                    packages.hide();
+                                    messages.hide();
+                                    customer.hide();
+                                    status.hide();
+                                    pageTitle.removeClass();
+                                    pageTitle.addClass('voyager-tag');
+                                    createButtonOrderPayments.show();
+                                    createButtonOrderPackages.hide();
+                                    createButtonOrderTasks.hide();
+                                    breadcrumb.children().last().remove();
+                                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#status'>Status zamówienia</a></li>");
+                                    addOrder.hide();
+                                    $('#create-button-orderPayments-spedition').hide();
                                 }
                             });
                         });
@@ -3899,6 +4271,14 @@
                             $('#paymentModal').modal();
                         });
 
+                        $('.openWarehousePaymentModal').on('click', function () {
+                            let masterPaymentId = $(this).data('payment');
+                            let masterPaymentAmount = $(this).data('payment-amount');
+                            $('#warehousePaymentModal input[name="masterPaymentAmount"]').val(masterPaymentAmount);
+                            $('input[name="masterPaymentId"]').val(masterPaymentId);
+                            $('#warehousePaymentModal').modal();
+                        });
+
                         $('.openPromiseModal').on('click', function () {
                             let masterPaymentId = $(this).data('payment');
                             let masterPaymentAmount = $(this).data('payment-amount');
@@ -3918,6 +4298,17 @@
                             }
 
                         });
+                        $('#chooseOrder').on('change', function () {
+                            let orderId = $(this).val();
+                            let orderValue = parseFloat($('input[name="order-payment-' + orderId + '"]').val());
+                            let masterPaymentAmount = parseFloat($('#warehousePaymentModal input[name="masterPaymentAmount"]').val());
+                            if (masterPaymentAmount > orderValue) {
+                                $('#orderPayment #amount').val(orderValue);
+                            } else if (masterPaymentAmount < orderValue) {
+                                $('#orderPayment #amount').val(masterPaymentAmount);
+                            }
+
+                        });
                         function moveData(id){
                             if($('#moveButton-'+id).hasClass('btn-warning')) {
                                 $('#moveButton-' + id).removeClass('btn-warning').addClass('btn-dark');
@@ -3928,6 +4319,16 @@
                                 $('.btn-warning').attr('disabled', false);
                                 $('.btn-move').addClass('hidden');
                             }
+                        }
+                        function sendInvoiceRequest(id){
+                            let url = '{{ route('orders.invoiceRequest') }}'
+                            $.ajax({
+                                method: 'POST',
+                                url: url,
+                                data: {
+                                    id: id
+                                }
+                            }).done(data => alert('Pomyślnie wywołano prośbę o fakturę.')).fail(data => alert('Prośba o fakturę nie została wysłana. Wystąpił błąd.'));
                         }
                         function moveDataAjax(id){
                             var idToSend = id;
@@ -3982,12 +4383,4 @@
                     </script>
 
                     <script src="{{ URL::asset('js/views/orders/edit.js') }}"></script>
-                    <style>
-                        .firstOrder, .secondOrder, .thirdOrder, .fourthOrder, .fifthOrder {
-                            display: none;
-                        }
-                        .move__payment--button {
-                            padding: 6px 5px;
-                        }
-                    </style>
 @endsection

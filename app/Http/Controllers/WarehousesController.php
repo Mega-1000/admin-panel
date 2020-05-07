@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\Warehouse;
+use App\Entities\WarehouseProperty;
 use App\Http\Requests\WarehouseCreateRequest;
 use App\Http\Requests\WarehouseUpdateRequest;
 use App\Repositories\WarehouseAddressRepository;
@@ -71,7 +73,8 @@ class WarehousesController extends Controller
             'firm_id' => $id,
             'symbol' => $request->input('symbol'),
             'status' => $request->input('status'),
-            'radius' => $request->input('radius'),            
+            'radius' => $request->input('radius'),
+            'warehouse_email'  => $request->input('warehouse-email')
         ]);
 
         $warehouseAddress = new WarehouseAddress;
@@ -79,10 +82,12 @@ class WarehousesController extends Controller
         $warehouseAddress->address = $request->input('address');
         $warehouseAddress->warehouse_number = $request->input('warehouse_number');
         $warehouseAddress->postal_code = $request->input('postal_code');
-        $warehouseAddress->latitude = $postal->latitude;
-        $warehouseAddress->longitude = $postal->longitude;
+        if(!empty($postal)) {
+            $warehouseAddress->latitude = $postal->latitude;
+            $warehouseAddress->longitude = $postal->longitude;
+        }
         $warehouseAddress->save();
-        
+
 
         $this->warehousePropertyRepository->create([
             'warehouse_id' => $warehouse->id,
@@ -111,7 +116,9 @@ class WarehousesController extends Controller
         $warehouse = $this->repository->find($id);
         $warehouseAddress = $warehouse->address;
         $warehouseProperty = $warehouse->property;
-        $openDays = json_decode($warehouseProperty->open_days, true);
+        if(!empty($warehouseProperty)) {
+            $openDays = json_decode($warehouseProperty->open_days, true);
+        }
 
         return view('firms.warehouses.edit', compact('warehouse', 'warehouseAddress', 'warehouseProperty', 'openDays'));
     }
@@ -124,34 +131,60 @@ class WarehousesController extends Controller
      */
     public function update(WarehouseUpdateRequest $request, $id)
     {
-        $warehouse = $this->repository->find($id);
+        $warehouse = Warehouse::find($id);
         $openDays = $this->generateOpenDays($request);
 
         if (empty($warehouse)) {
             abort(404);
         }
-        $postal = PostalCodeLatLon::where('postal_code', $request->input('postal_code'))->first();  
-        $this->repository->update($request->all(), $warehouse->id);
-        
-        $warehouseAddress =  WarehouseAddress::find($id);
-        $warehouseAddress->warehouse_id = $warehouse->id;
-        $warehouseAddress->address = $request->input('address');
-        $warehouseAddress->warehouse_number = $request->input('warehouse_number');
-        $warehouseAddress->postal_code = $request->input('postal_code');
-        $warehouseAddress->latitude = $postal->latitude;
-        $warehouseAddress->longitude = $postal->longitude;
-        $warehouseAddress->save();
-        
+        $postal = PostalCodeLatLon::where('postal_code', $request->input('postal_code'))->first();
+        Warehouse::update($request->all(), $warehouse->id);
+        Warehouse::update(['warehouse_email' => $request->input('warehouse-email')], $warehouse->id);
 
-        $this->warehousePropertyRepository->update([
-            'firstname' => $request->input('firstname'),
-            'lastname' => $request->input('lastname'),
-            'phone' => $request->input('phone'),
-            'comments' => $request->input('comments'),
-            'additional_comments' => $request->input('additional_comments'),
-            'open_days' => json_encode($openDays),
-            'email' => $request->input('email')
-        ], $warehouse->property->id);
+        $warehouseAddress =  WarehouseAddress::find($id);
+        if(!empty($warehouseAddress)) {
+            $warehouseAddress->warehouse_id = $warehouse->id;
+            $warehouseAddress->address = $request->input('address');
+            $warehouseAddress->warehouse_number = $request->input('warehouse_number');
+            $warehouseAddress->postal_code = $request->input('postal_code');
+            if(!empty($postal)) {
+                $warehouseAddress->latitude = $postal->latitude ?: null;
+                $warehouseAddress->longitude = $postal->longitude ?: null;
+            }
+            $warehouseAddress->save();
+        } else {
+            $warehouseAddress = new WarehouseAddress;
+            $warehouseAddress->warehouse_id = $warehouse->id;
+            $warehouseAddress->address = '';
+            $warehouseAddress->warehouse_number = '';
+            $warehouseAddress->postal_code = '';
+            if(!empty($postal)) {
+                $warehouseAddress->latitude = $postal->latitude ?: null;
+                $warehouseAddress->longitude = $postal->longitude ?: null;
+            }
+            $warehouseAddress->save();
+        }
+
+        if(!empty($warehouse->property)) {
+            WarehouseProperty::update([
+                'firstname' => $request->input('firstname'),
+                'lastname' => $request->input('lastname'),
+                'phone' => $request->input('phone'),
+                'comments' => $request->input('comments'),
+                'additional_comments' => $request->input('additional_comments'),
+                'open_days' => json_encode($openDays),
+                'email' => $request->input('email')
+            ], $warehouse->property->id);
+        } else {
+            WarehouseProperty::create([
+                'firstname' => $request->input('firstname') ?: null,
+                'lastname' => $request->input('lastname') ?: null,
+                'phone' => $request->input('phone') ?: null,
+                'comments' => $request->input('comments') ?: null,
+                'additional_comments' => $request->input('additional_comments') ?: null,
+                'email' => $request->input('email') ?: null
+            ]);
+        }
 
         return redirect()->back()->with([
             'message' => __('warehouses.message.update'),

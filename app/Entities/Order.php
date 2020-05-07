@@ -18,6 +18,9 @@ class Order extends Model implements Transformable
 
     use TransformableTrait;
 
+    const STATUS_WITHOUT_REALIZATION = 8;
+    const STATUS_ORDER_FINISHED = 6;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -424,6 +427,14 @@ class Order extends Model implements Transformable
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function deliveryAddress()
+    {
+        return $this->hasOne(OrderAddress::class)->where('type', 'DELIVERY_ADDRESS');
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function invoices()
@@ -494,5 +505,51 @@ class Order extends Model implements Transformable
                 $package->delete();
             }
         });
+    }
+
+    public function warehousePayments()
+    {
+        return $this->hasMany(OrderPayment::class)->where('type','WAREHOUSE');
+    }
+
+    public function speditionPayments()
+    {
+        return $this->hasMany(OrderPayment::class)->where('type','SPEDITION');
+    }
+
+    public function speditionPaymentsSum()
+    {
+        return $this->hasMany(OrderPayment::class)->where('type','SPEDITION');
+    }
+
+    public function isOrderHasLabel($labelId)
+    {
+        return $this->labels()->where('labels.id', $labelId)->count() > 0;
+    }
+
+    public function invoiceRequests()
+    {
+        return $this->hasOne(InvoiceRequest::class);
+    }
+
+    public function groupWarehousePayments()
+    {
+        $acceptedPaymentsValue = 0;
+        $pendingPaymentsValue = 0;
+        foreach($this->warehousePayments as $payment) {
+            switch($payment->status) {
+                case 'ACCEPTED':
+                    $acceptedPaymentsValue += $payment->amount;
+                    break;
+                case 'PENDING':
+                    $pendingPaymentsValue += $payment->amount;
+                    break;
+            }
+        }
+
+        return [
+            'ACCEPTED' => $acceptedPaymentsValue,
+            'PENDING' => $pendingPaymentsValue
+        ];
     }
 }

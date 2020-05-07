@@ -114,6 +114,13 @@ class OrderWarehouseNotificationController extends Controller
                 'invoice_type' => 'invoice',
                 'invoice_name' => $filename
             ]);
+            $invoiceRequest = $order->invoiceRequests()->first();
+            if(!empty($invoiceRequest) && $invoiceRequest->status === 'MISSING')
+            {
+                $invoiceRequest->update([
+                    'status' => 'SENT'
+                ]);
+            }
             dispatch_now(new DispatchLabelEventByNameJob($order, "new-file-added-to-order"));
 
             return $this->okResponse();

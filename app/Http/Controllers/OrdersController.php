@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\InvoiceRequest;
 use App\Entities\Order;
 use App\Entities\OrderInvoice;
 use App\Entities\OrderItem;
@@ -43,6 +44,7 @@ use App\Repositories\OrderAddressRepository;
 use App\Repositories\UserRepository;
 use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
@@ -2348,6 +2350,15 @@ class OrdersController extends Controller
         ]);
     }
 
+    public function invoiceRequest(Request $request)
+    {
+        $invoiceRequest = InvoiceRequest::create([
+            'order_id' => $request->input('id'),
+            'status' => 'MISSING'
+        ]);
+
+        return response()->json(['status' => 200]);
+    }
     public function getInvoices($id)
     {
         $order = Order::find($id);

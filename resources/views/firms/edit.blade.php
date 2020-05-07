@@ -177,6 +177,7 @@
                 <th></th>
                 <th>ID</th>
                 <th>@lang('warehouses.table.symbol')</th>
+                <th>@lang('warehouses.table.warehouse_email')</th>
                 <th>@lang('warehouses.table.address')</th>
                 <th>@lang('warehouses.table.warehouse_number')</th>
                 <th>@lang('warehouses.table.postal_code')</th>
@@ -408,20 +409,29 @@
                     name: 'symbol'
                 },
                 {
+                    data: 'warehouse_email',
+                    name: 'warehouse_email',
+                    defaultContent: '',
+                },
+                {
                     data: 'address.address',
-                    name: 'address.address'
+                    name: 'address.address',
+                    defaultContent: ''
                 },
                 {
                     data: 'address.warehouse_number',
-                    name: 'address.warehouse_number'
+                    name: 'address.warehouse_number',
+                    defaultContent: ''
                 },
                 {
                     data: 'address.postal_code',
-                    name: 'address.postal_code'
+                    name: 'address.postal_code',
+                    defaultContent: ''
                 },
                 {
                     data: 'address.city',
-                    name: 'address.city'
+                    name: 'address.city',
+                    defaultContent: ''
                 },
                 {
                     data: 'status',

@@ -37,6 +37,14 @@
                        value="{{ old('amount') }}">
             </div>
             <div class="form-group">
+                <label for="payment-type">Typ płatności</label>
+                <select class="form-control" id="payment-type" name="payment-type">
+                    <option value="CLIENT">@lang('order_payments.form.client')</option>
+                    <option value="WAREHOUSE">@lang('order_payments.form.warehouse')</option>
+                    <option value="SPEDITION">@lang('order_payments.form.spedition')</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label for="notices">@lang('order_payments.form.notices')</label>
                 <textarea class="form-control" id="notices" name="notices"
                           value="{{old('notices')}}" rows="5"></textarea>

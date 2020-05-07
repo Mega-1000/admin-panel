@@ -44,7 +44,8 @@ return [
         'sunday' => 'Niedziela',
         'from' => 'Od',
         'to' => 'Do',
-        'email' => 'Email zmiana cen'
+        'email' => 'Email zmiana cen',
+        'warehouse_email' => 'Email magazynu (po którym będzie rozpoznawany konkretny magazyn lub grupa magazynów firmy)'
     ],
     'message' => [
         'store' => 'Magazyn został dodany pomyślnie!',

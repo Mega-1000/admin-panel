@@ -25,7 +25,10 @@ return [
         'order_status' => 'Status zlecenia',
         'order_value' => 'Wartość zlecenia',
         'left' => 'Pozostało',
-        'add' => 'Przydziel do zlecenia'
+        'add' => 'Przydziel do zlecenia',
+        'move' => 'Przenieś wpłatę',
+        'invoice' => 'Faktura',
+        'status' => 'Status'
     ],
     'message' => [
         'store' => 'Płatność została dodana pomyślnie!',
