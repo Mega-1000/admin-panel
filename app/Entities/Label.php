@@ -21,8 +21,9 @@ class Label extends Model implements Transformable
     const TRANSPORT_IDS_FOR_TABLE = [68, 103, 104, 105, 106];
     const ADDITIONAL_INFO_IDS_FOR_TABLE = [92, 89, 93, 45, 55, 57, 59, 61, 90];
     const INVOICE_IDS_FOR_TABLE = [63];
-    
-    
+    const CUSTOMER_DATA_REMINDER_IDS = [53, 74];
+
+
 
     const ORDER_ITEMS_REDEEMED_LABEL = 66;
 

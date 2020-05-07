@@ -270,6 +270,7 @@ Route::group(['prefix' => 'admin'], function () {
             'OrdersController@sendOfferToCustomer')->name('orders.sendOfferToCustomer');
         Route::get('orders/getCosts', 'OrdersController@getCosts')->name('orders.getCosts');
         Route::post('orders/invoice/request', 'OrdersController@invoiceRequest')->name('orders.invoiceRequest');
+        Route::get('orders/{id}/invoices', 'OrdersController@getInvoices')->name('orders.getInvoices');
 
         Route::get('orderPayments/datatable/{id}',
             'OrdersPaymentsController@datatable')->name('order_payments.datatable');
@@ -341,6 +342,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('orders/set-warehouse-and-remove-label', 'OrdersController@setWarehouseAndLabels')->name('order.warehouse.set');
 
         Route::get('orders/status/{id}/message', 'OrdersController@getStatusMessage')->name('order.status.message');
+
+        Route::get('invoice/{id}/delete', 'OrdersController@deleteInvoice')->name('order.deleteInvoice');
 
         Route::post('orders/label-removal/{orderId}/{labelId}',
             'OrdersController@swapLabelsAfterLabelRemoval')->name('orders.label-removal');
@@ -457,6 +460,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/dispatch-job/recalculate-prices', 'DispatchJobController@recalculatePrices')->name('job.recalculatePrices');
         Route::get('/dispatch-job/generate-jpgs', 'DispatchJobController@generateJpgs')->name('job.generateJpgs');
         Route::get('/chat/{all?}/{orderId?}', 'MessagesController@index')->name('chat.index');
+
     });
 });
 

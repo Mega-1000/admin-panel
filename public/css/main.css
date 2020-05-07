@@ -75,3 +75,8 @@
 .firstOrder, .secondOrder, .thirdOrder, .fourthOrder, .fifthOrder {
     display: none;
 }
+.remove__invoices {
+    color: red;
+    font-weight: bold;
+    display: block;
+}

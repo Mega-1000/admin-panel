@@ -13,7 +13,7 @@ class CheckStatusInpostPackagesJob extends Job
 {
     protected $orderPackageRepository;
 
-    const COURIER = 'INPOST';
+    const COURIER = ['INPOST', 'ALLEGRO-INPOST'];
 
     /**
      * Create a new job instance.
@@ -30,17 +30,18 @@ class CheckStatusInpostPackagesJob extends Job
      *
      * @return void
      */
-    public function handle(OrderPackageRepository $orderPackageRepository) {
-        $orderPackages = OrderPackage::where('delivery_courier_name', self::COURIER)
-                ->where('shipment_date', '>', Carbon::today()->subDays(5))
+    public function handle(OrderPackageRepository $orderPackageRepository)
+    {
+        $orderPackages = OrderPackage::whereIn('delivery_courier_name', self::COURIER)
+                ->whereDate('shipment_date', '>', Carbon::today()->subDays(5)->toDateString())
                 ->get();
-
+        
         if (empty($orderPackages)) {
             return;
         }
         $integration = new Inpost();
         foreach ($orderPackages as $orderPackage) {
-            if (is_null($orderPackage->inpost_url)) {
+            if (empty($orderPackage->inpost_url)) {
                 continue;
             }
             if ($orderPackage->status !== 'DELIVERED' && $orderPackage->status !== 'SENDING' && $orderPackage->status !== 'WAITING_FOR_CANCELLED' && $orderPackage->status !== 'CANCELLED') {

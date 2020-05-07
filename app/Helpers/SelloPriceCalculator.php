@@ -7,20 +7,23 @@ use App\Helpers\interfaces\iOrderTotalPriceCalculator;
 class SelloPriceCalculator implements iOrderTotalPriceCalculator
 {
     private $total = 0;
-    private $overridePrice;
+    private $products;
 
     public function addItem($price, $quantity)
     {
-        $this->total += $this->overridePrice * $quantity;
+        //stub
     }
 
     public function getTotal()
     {
-        return $this->total;
+        return $this->products->reduce(function ($prev, $next) {
+           $prev += $next->total_price;
+           return $prev;
+        },0);
     }
 
-    public function setOverridePrice($overridePrice)
+    public function setProductList($products)
     {
-        $this->overridePrice = $overridePrice;
+        $this->products = $products;
     }
 }

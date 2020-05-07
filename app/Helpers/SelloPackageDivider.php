@@ -9,48 +9,54 @@ use App\Helpers\interfaces\iDividable;
 class SelloPackageDivider implements iDividable
 {
 
-    private $maxInPackage = 1;
-    private $deliveryId;
-    private $delivererId;
+    private $transactionList;
 
     public function divide($data, Order $order)
     {
-        if (empty($this->delivererId) || empty($this->delivererId)) {
+        $this->transactionList->map(function ($transaction) use ($order, $data) {
+            $transaction->maxInPackage = $this->setMaxInPackage($transaction->tw_Pole2 ?? 1);
+            $this->divideForTransaction($data, $order, $transaction);
+        });
+        return false;
+    }
+
+    protected function setMaxInPackage(int $maxInPackage)
+    {
+        return $maxInPackage > 0 ? $maxInPackage : 1;
+    }
+
+    /**
+     * @param $data
+     * @param Order $order
+     * @throws \Exception
+     */
+    private function divideForTransaction($data, Order $order, $transaction): void
+    {
+        if (empty($transaction->delivererId) || empty($transaction->delivererId)) {
             throw new \Exception('Brak powiązanego szablonu z sello');
         }
         $template = PackageTemplate::
-        where('sello_delivery_id', $this->deliveryId)
-            ->where('sello_deliverer_id', $this->delivererId)
+        where('sello_delivery_id', $transaction->deliveryId)
+            ->where('sello_deliverer_id', $transaction->delivererId)
             ->firstOrFail();
-        $modulo = $data[0]['amount'] % $this->maxInPackage;
-        $total = round($data[0]['amount'] / $this->maxInPackage);
+        $modulo = $data['amount'] % $transaction->maxInPackage;
+        $total = ceil($data['amount'] / $transaction->maxInPackage);
 
         for ($packageNumber = 1; $packageNumber <= $total; $packageNumber++) {
             $pack = BackPackPackageDivider::createPackage($template, $order->id, $packageNumber);
-            $quantity = floor($data[0]['amount'] / $this->maxInPackage);
+            $quantity = floor($data['amount'] / $transaction->maxInPackage);
             if ($packageNumber <= $modulo) {
                 $quantity += 1;
             }
-            $pack->packedProducts()->attach($data[0]['id'],
+            $pack->packedProducts()->attach($data['id'],
                 ['quantity' => $quantity]);
         }
         $order->shipment_date = $pack->shipment_date;
         $order->save();
-        return false;
     }
 
-    public function setDeliveryId($deliveryId): void
+    public function setTransactionList($group)
     {
-        $this->deliveryId = $deliveryId;
-    }
-
-    public function setDelivererId($delivererId): void
-    {
-        $this->delivererId = $delivererId;
-    }
-
-    public function setMaxInPackage(int $maxInPackage): void
-    {
-        $this->maxInPackage = $maxInPackage > 0 ? $maxInPackage : 1;
+        $this->transactionList = $group;
     }
 }

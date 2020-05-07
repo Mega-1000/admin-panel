@@ -41,7 +41,7 @@ class ImportPaymentsController extends Controller
     {
         $date = $request->get('created_at');
 
-        $path = $request->file('payments')->store('payments');
+        $path = $request->file('payments')->store('user-files/payments');
 
 
         $this->paymentImportRepository->create([

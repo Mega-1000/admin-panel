@@ -23,6 +23,8 @@ use App\Entities\ContentType;
 use App\Entities\OrderPackage;
 use App\Entities\PackingType;
 use App\Entities\ContainerType;
+use App\Entities\SelTransaction;
+use App\Entities\Order;
 
 /**
  * Class OrderTasksController.
@@ -85,7 +87,7 @@ class OrdersPackagesController extends Controller
         }
         $promisedPayments = [];
         $payments = [];
-
+        $isAllegro = !empty($order->sello_id);
 
         $cashOnDeliverySum = 0;
 
@@ -151,7 +153,8 @@ class OrdersPackagesController extends Controller
         return view('orderPackages.create', compact('id', 'templateData', 'orderData', 'order', 'payments', 'promisedPayments', 'connectedOrders', 'cashOnDeliverySum', 'isAdditionalDKPExists', 'allOrdersSum', 'multiData'))
                         ->withcontentTypes($contentTypes)
                         ->withpackingTypes($packingTypes)
-                        ->withcontainerTypes($containerTypes);
+                        ->withcontainerTypes($containerTypes)
+                        ->withisAllegro($isAllegro);
     }
 
     public function changeValue(Request $request)
@@ -171,7 +174,10 @@ class OrdersPackagesController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function edit($id) {
-        $orderPackage = $this->repository->find($id);
+        $orderPackage = OrderPackage::find($id);
+        $order = Order::find($orderPackage->order_id);
+        $isAllegro = !empty($order->sello_id);
+
         $contentTypes = ContentType::all();
         $packingTypes = PackingType::all();
         $containerTypes = ContainerType::all();
@@ -179,7 +185,8 @@ class OrdersPackagesController extends Controller
         return view('orderPackages.edit', compact('orderPackage', 'id'))
                         ->withcontentTypes($contentTypes)
                         ->withpackingTypes($packingTypes)
-                        ->withcontainerTypes($containerTypes);
+                        ->withcontainerTypes($containerTypes)
+                        ->withisAllegro($isAllegro);
     }
 
     /**
@@ -353,7 +360,7 @@ class OrdersPackagesController extends Controller
 
     public function preparePackageToSend($orderId, $packageId)
     {
-        $order = $this->orderRepository->find($orderId);
+        $order = Order::find($orderId);
         if (empty($order)) {
             abort(404);
         }
@@ -365,6 +372,11 @@ class OrdersPackagesController extends Controller
         $deliveryAddress = $deliveryAddress->first->id;
         if (empty($deliveryAddress)) {
             abort(404);
+        }
+        if ($order->sello_id){
+            $transaction = SelTransaction::find($order->sello_id);
+            $order->allegro_transaction_id = $transaction->tr_CheckoutFormId;
+            $order->save();
         }
         $data = [
             'order_id' => $order->id,
@@ -384,7 +396,7 @@ class OrdersPackagesController extends Controller
             'additional_data' => [
                 'order_package_id' => $package->id,
                 'forwarding_delivery' => $package->delivery_courier_name,
-                'allegro_id' => $order->customer->nick_allegro,
+                'allegro_user_id' => $transaction->tr_RegId ?? null,
                 'allegro_transaction_id' => $order->allegro_transaction_id,
                 'package_type' => $package->container_type,
                 'packing_type' => $package->packing_type
@@ -635,7 +647,7 @@ class OrdersPackagesController extends Controller
 
     protected function validatePackage($data){
         $validator = Validator::make($data, [
-            'courier_name' => 'required|min:3|in:INPOST,APACZKA,DPD,POCZTEX,JAS',
+            'courier_name' => 'required|min:3|in:INPOST,APACZKA,DPD,POCZTEX,JAS,ALLEGRO-INPOST',
             'courier_type' => 'nullable',
             'weight' => 'required|numeric',
             'length' => 'required|numeric',

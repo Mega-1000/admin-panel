@@ -98,16 +98,32 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" tabindex="-1" id="order_invoices_delete" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header" id="invoice__container">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
+                                aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Wybierz fakturę do usunięcia</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="button" class="btn btn-success pull-right" id="remove-selected-invoice" data-dismiss="modal">Usuń wybraną fakturę.</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" tabindex="-1" id="order_move_data_success" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
-                                aria-hidden="true">&times;</span></button>
+                            aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title">Udało się przenieść dane.</h4>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success pull-right" id="order_move_data_ok" data-dismiss="modal">Ok</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="button" class="btn btn-success pull-right" id="payment-move-data-ok" data-dismiss="modal">Ok</button>
                 </div>
             </div>
         </div>
@@ -122,6 +138,21 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger pull-right" id="order_move_data_ok_error"  data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" tabindex="-1" id="invoice_delete_success" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Pomyślnie usunięto fakturę.</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="button" class="btn btn-success pull-right" id="invoice-delete-ok" data-dismiss="modal">Ok</button>
                 </div>
             </div>
         </div>

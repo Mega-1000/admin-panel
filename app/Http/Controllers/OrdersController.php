@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Entities\InvoiceRequest;
 use App\Entities\Order;
+use App\Entities\OrderInvoice;
 use App\Entities\OrderItem;
 use App\Entities\OrderPayment;
 use App\Entities\Warehouse;
@@ -278,7 +279,7 @@ class OrdersController extends Controller
         $loggedUser = $request->user();
         if ($loggedUser->role_id == Role::ADMIN || $loggedUser->role_id == Role::SUPER_ADMIN) {
             $admin = true;
-        } 
+        }
         $labIds = array(
             'production' => Label::PRODUCTION_IDS_FOR_TABLE,
             'payments' => Label::PAYMENTS_IDS_FOR_TABLE,
@@ -2357,6 +2358,19 @@ class OrdersController extends Controller
         ]);
 
         return response()->json(['status' => 200]);
+    }
+    public function getInvoices($id)
+    {
+        $order = Order::find($id);
+
+        return response()->json($order->invoices);
+    }
+
+    public function deleteInvoice($id)
+    {
+        OrderInvoice::where('id', $id)->delete();
+
+        return response()->json(['status' => 'success']);
     }
 }
 
