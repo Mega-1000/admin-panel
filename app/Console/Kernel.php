@@ -31,6 +31,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\SendLPWithReminderSendingToWarehouseJob::class)->dailyAt("05:00");
         $schedule->job(Jobs\CheckPriceChangesInProductsJob::class)->dailyAt("04:00");
         $schedule->job(Jobs\CheckDateOfProductNewPriceJob::class)->dailyAt("04:30");
+        $schedule->job(Jobs\CustomerOrderDataReminder::class)->dailyAt("09:00");
         $schedule->job(Jobs\Orders\TriggerOrderLabelSchedulersJob::class)->everyFiveMinutes();
         $schedule->job(Jobs\AddNewWorkHourForUsers::class)->dailyAt("00:01");
         $schedule->job(Jobs\CheckTasksFromYesterdayJob::class)->dailyAt("00:01");
