@@ -427,11 +427,11 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function deliveryAddress()
     {
-        return $this->hasMany(OrderAddress::class)->where('type', 'DELIVERY_ADDRESS')->first();
+        return $this->hasOne(OrderAddress::class)->where('type', 'DELIVERY_ADDRESS');
     }
 
     /**

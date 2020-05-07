@@ -1482,7 +1482,7 @@
                     @endphp
                     <td>{{ $orderValue }}</td>
                     @php
-                       $payments = $itemOrder->groupWarehousePayments;
+                       $payments = $itemOrder->groupWarehousePayments();
                     @endphp
                     <td>
                         <h5 class="payment__pending">Oczekujące: {{ $payments['PENDING'] }}</h5>
