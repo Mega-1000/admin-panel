@@ -1459,7 +1459,7 @@
                 <tr>
                     <td>{{ $itemOrder->id }}</td>
                     <td>
-                        @if($itemOrder->invoices !== null || count($itemOrder->invoices) > 0)
+                        @if(count($itemOrder->invoices) > 0)
                             @foreach($itemOrder->invoices as $invoice)
                                 <a target="_blank" href="/storage/invoices/{{ $invoice->invoice_name }}" style="margin-top: 5px;">Faktura</a>
                             @endforeach
@@ -1482,7 +1482,7 @@
                     @endphp
                     <td>{{ $orderValue }}</td>
                     @php
-                       $payments = $itemOrder->groupWarehousePayments();
+                       $payments = $itemOrder->groupWarehousePayments;
                     @endphp
                     <td>
                         <h5 class="payment__pending">Oczekujące: {{ $payments['PENDING'] }}</h5>
@@ -4321,7 +4321,7 @@
                             }
                         }
                         function sendInvoiceRequest(id){
-                            let url = {{ route('orders.invoiceRequest') }}
+                            let url = '{{ route('orders.invoiceRequest') }}'
                             $.ajax({
                                 method: 'POST',
                                 url: url,

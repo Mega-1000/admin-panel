@@ -15,17 +15,17 @@ Dane odbiorcy:
 
 Zlecenie nr: {{ $order->id  }}
 
-{{ $order->addresses[0]->firstname }} {{ $order->addresses[0]->lastname }}
+{{ $order->deliveryAddress->firstname }} {{ $order->deliveryAddress->lastname }}
 
-{{ $order->addresses[0]->address }} {{ $order->addresses[0]->flat_number }}
+{{ $order->deliveryAddress->address }} {{ $order->deliveryAddress->flat_number }}
 
-{{ $order->addresses[0]->postal_code }}
+{{ $order->deliveryAddress->postal_code }}
 
-{{ $order->addresses[0]->city }}
+{{ $order->deliveryAddress->city }}
 
-{{ $order->addresses[0]->phone }}
+{{ $order->deliveryAddress->phone }}
 
-{{ $order->addresses[0]->email }}
+{{ $order->deliveryAddress->email }}
 
 Załadunek
 {{ $order->warehouse->symbol }}

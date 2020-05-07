@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\Warehouse;
+use App\Entities\WarehouseProperty;
 use App\Http\Requests\WarehouseCreateRequest;
 use App\Http\Requests\WarehouseUpdateRequest;
 use App\Repositories\WarehouseAddressRepository;
@@ -129,15 +131,15 @@ class WarehousesController extends Controller
      */
     public function update(WarehouseUpdateRequest $request, $id)
     {
-        $warehouse = $this->repository->find($id);
+        $warehouse = Warehouse::find($id);
         $openDays = $this->generateOpenDays($request);
 
         if (empty($warehouse)) {
             abort(404);
         }
         $postal = PostalCodeLatLon::where('postal_code', $request->input('postal_code'))->first();
-        $this->repository->update($request->all(), $warehouse->id);
-        $this->repository->update(['warehouse_email' => $request->input('warehouse-email')], $warehouse->id);
+        Warehouse::update($request->all(), $warehouse->id);
+        Warehouse::update(['warehouse_email' => $request->input('warehouse-email')], $warehouse->id);
 
         $warehouseAddress =  WarehouseAddress::find($id);
         if(!empty($warehouseAddress)) {
@@ -151,6 +153,7 @@ class WarehousesController extends Controller
             }
             $warehouseAddress->save();
         } else {
+            $warehouseAddress = new WarehouseAddress;
             $warehouseAddress->warehouse_id = $warehouse->id;
             $warehouseAddress->address = '';
             $warehouseAddress->warehouse_number = '';
@@ -159,10 +162,11 @@ class WarehousesController extends Controller
                 $warehouseAddress->latitude = $postal->latitude ?: null;
                 $warehouseAddress->longitude = $postal->longitude ?: null;
             }
+            $warehouseAddress->save();
         }
 
         if(!empty($warehouse->property)) {
-            $this->warehousePropertyRepository->update([
+            WarehouseProperty::update([
                 'firstname' => $request->input('firstname'),
                 'lastname' => $request->input('lastname'),
                 'phone' => $request->input('phone'),
@@ -172,7 +176,7 @@ class WarehousesController extends Controller
                 'email' => $request->input('email')
             ], $warehouse->property->id);
         } else {
-            $this->warehousePropertyRepository->create([
+            WarehouseProperty::create([
                 'firstname' => $request->input('firstname') ?: null,
                 'lastname' => $request->input('lastname') ?: null,
                 'phone' => $request->input('phone') ?: null,

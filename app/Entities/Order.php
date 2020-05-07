@@ -427,6 +427,14 @@ class Order extends Model implements Transformable
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function deliveryAddress()
+    {
+        return $this->hasMany(OrderAddress::class)->where('type', 'DELIVERY_ADDRESS')->first();
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function invoices()
