@@ -32,6 +32,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    const DEFAULT_WAREHOUSE = 'MEGA-OLAWA';
+
     /**
      * Create a new job instance.
      *
@@ -78,10 +80,10 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             });
 
             $orderItems = $products->map(function ($product) {
-                $item = [];
-                $item['id'] = $product->id;
-                $item['amount'] = $product->tt_quantity;
-                return $item;
+                return [
+                    'id' => $product->id,
+                    'amount' => $product->tt_quantity
+                ];
             })->toArray();
             $transactionArray['order_items'] = $orderItems;
             try {
@@ -156,7 +158,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $withWarehouse = $products->filter(function ($prod) {
            return !empty($prod->packing->warehouse_physical);
         });
-        $warehouseSymbol = $withWarehouse->first()->packing->warehouse_physical ?? 'MEGA-OLAWA';
+        $warehouseSymbol = $withWarehouse->first()->packing->warehouse_physical ?? self::DEFAULT_WAREHOUSE;
         $warehouse = Warehouse::where('symbol', $warehouseSymbol)->first();
         $order->warehouse()->associate($warehouse);
 
