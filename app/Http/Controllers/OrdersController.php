@@ -2357,7 +2357,7 @@ class OrdersController extends Controller
 
     public function deleteInvoice($id)
     {
-        $invoice = OrderInvoice::find($id)->delete();
+        OrderInvoice::where('id', $id)->delete();
 
         return response()->json(['status' => 'success']);
     }

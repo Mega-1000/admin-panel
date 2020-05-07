@@ -1504,7 +1504,7 @@
                             });
                             let jsonInvoices = JSON.stringify(invoices);
                             html += '<br />'
-                            html += '<a href="#" class="remove__invoices"' + 'onclick="removeInvoices('+data.orderId+ ')">Usuń faktury</a>'
+                            html += '<a href="#" class="remove__invoices"' + 'onclick="getInvoicesList('+data.orderId+ ')">Usuń faktury</a>'
                         }
                         html += '<a href="{{env('FRONT_NUXT_URL')}}' + '/magazyn/awizacja/0/0/' + data.orderId + '/wyslij-fakture">Dodaj</a>'
 
@@ -2060,24 +2060,25 @@
             }
         }
 
-        function removeInvoices(id) {
+        function getInvoicesList(id) {
             $.ajax({
                 url: '/admin/orders/'+id+'/invoices',
             }).done(function(data) {
                 $('#order_invoices_delete').modal('show');
-                if(data !== null) {
-                    $('#invoice__list').remove();
-                    let parent = document.getElementById("invoice__container");
-                    let invoiceSelect = document.createElement("SELECT");
-                    invoiceSelect.id = "invoice__list";
-                    parent.appendChild(invoiceSelect);
-                    data.forEach((invoice) => {
-                        let option = document.createElement("option");
-                        option.value = invoice.id;
-                        option.text = invoice.invoice_name;
-                        invoiceSelect.appendChild(option);
-                    })
+                if(data === null) {
+                    return;
                 }
+                $('#invoice__list').remove();
+                let parent = document.getElementById("invoice__container");
+                let invoiceSelect = document.createElement("SELECT");
+                invoiceSelect.id = "invoice__list";
+                parent.appendChild(invoiceSelect);
+                data.forEach((invoice) => {
+                    let option = document.createElement("option");
+                    option.value = invoice.id;
+                    option.text = invoice.invoice_name;
+                    invoiceSelect.appendChild(option);
+                })
             })
         }
 
