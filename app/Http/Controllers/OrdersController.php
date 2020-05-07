@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\Auth_code;
 use App\Entities\Order;
 use App\Entities\OrderItem;
 use App\Entities\OrderPayment;
@@ -44,6 +45,7 @@ use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 use App\Entities\Product;
 use Illuminate\Http\Request;
@@ -276,7 +278,7 @@ class OrdersController extends Controller
         $loggedUser = $request->user();
         if ($loggedUser->role_id == Role::ADMIN || $loggedUser->role_id == Role::SUPER_ADMIN) {
             $admin = true;
-        } 
+        }
         $labIds = array(
             'production' => Label::PRODUCTION_IDS_FOR_TABLE,
             'payments' => Label::PAYMENTS_IDS_FOR_TABLE,
@@ -2328,22 +2330,55 @@ class OrdersController extends Controller
 
         return view('customers.confirmation.confirmationThanks');
     }
-    
+
     public function getCosts()
     {
         dispatch_now(new UpdatePackageRealCostJob());
         return redirect()->route('orders.index')->with([
             'message' => 'Rozpoczęto pobieranie realnych wartości zleceń',
             'alert-type' => 'success',
-        ]); 
+        ]);
     }
-    
+
     public function selloImport()
     {
         dispatch_now(new ImportOrdersFromSelloJob());
         return redirect()->route('orders.index')->with([
             'message' => 'Rozpoczęto import z Sello',
             'alert-type' => 'success',
+        ]);
+    }
+
+    public function goToBasket(Request $request)
+    {
+
+        try {
+            $user = Auth::user();
+            if (empty($user)) {
+                throw new \Exception('Wrong User');
+            }
+            $order = Order::findOrFail($request->id);
+
+
+            $code = Str::random(60);
+            Auth_code::where('customer_id', $order->customer->id)->delete();
+            $authCode = new Auth_code();
+            $authCode->token = $code;
+            $authCode->customer_id = $order->customer->id;
+            $authCode->save();
+            $query = http_build_query([
+                'cart_token' => $order->getToken(),
+                'user_code' => $code
+            ]);
+
+            $frontUrl = env('FRONT_URL') . '/koszyk.html?' . $query;
+            return redirect($frontUrl);
+        } catch (\Exception $exception) {
+            Log::notice('Can not edit basket', ['message' => $exception->getMessage(), 'stack' => $exception->getTraceAsString()]);
+        }
+        return redirect()->back()->with([
+            'message' => __('firms.message.send_request_to_update_data_error'),
+            'alert-type' => 'error'
         ]);
     }
 }
