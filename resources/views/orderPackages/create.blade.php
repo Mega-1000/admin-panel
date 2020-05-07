@@ -322,7 +322,7 @@
                 </table>
             <div class="text-right">
                 <h3 style="display: none;">Bilans zamówień: {{ $allOrdersSum }} zł</h3>
-                <h3 style="display: none;">Pobrane łącznie w LP: {{ number_format(($allOrdersSum) - ($allOrdersSum - $cashOnDeliverySum), 2, ',', '') }} zł</h3>
+                <h3 style="display: none;">Pobrane łącznie w LP: {{ number_format($cashOnDeliverySum, 2, ',', '') }} zł</h3>
             </div>
 
             <div class="form-group">
