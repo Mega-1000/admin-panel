@@ -32,6 +32,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    const DEFAULT_WAREHOUSE = 'MEGA-OLAWA';
+
     /**
      * Create a new job instance.
      *
@@ -49,45 +51,44 @@ class ImportOrdersFromSelloJob implements ShouldQueue
      */
     public function handle()
     {
-        $transactions = SelTransaction::all();
-        $transactions->map(function ($transaction) {
-            $transactionArray = [];
+        $transactions = SelTransaction::all()->groupBy('tr_CheckoutFormPaymentId');
+        $transactions->map(function ($transactionGroup) {
+            $isGroup = !empty($transactionGroup->firstWhere('tr_Group', 1));
+            if ($isGroup) {
+                $transaction = $transactionGroup->firstWhere('tr_Group', 1);
+            } else {
+                $transaction = $transactionGroup->first();
+            }
             if (Order::where('sello_id', $transaction->id)->count() > 0) {
                 return;
             }
-            $transactionArray['customer_login'] = str_replace('allegromail.pl', 'mega1000.pl', $transaction->customer->email->ce_email);
-            $phone = preg_replace('/[^0-9]/', '', $transaction->customer->phone->cp_Phone);
-            $pos =  strpos($phone, '48');
-            if ($pos === 0) {
-                $phone = substr($phone, 2);
-            }
-            $transactionArray['phone'] = $phone;
-            $transactionArray['update_email'] = true;
-            $transactionArray['customer_notices'] = empty($transaction->note) ? '' : $transaction->note->ne_Content;
-            $transactionArray = $this->setAdressArray($transaction, $transactionArray);
-            $transactionArray['is_standard'] = 1;
-            $transactionArray['rewrite'] = 0;
-            if ($transaction->transactionItem->itemExist()) {
-                $symbol = explode('-', $transaction->transactionItem->item->it_Symbol);
-                $newSymbol = [$symbol[0], $symbol[1], '0'];
-                $newSymbol = join('-', $newSymbol);
-                $product = Product::where('symbol', $newSymbol)->first();
-            }
+            $transactionArray = $this->createAddressArray($transaction);
+            $products = $transactionGroup->map(function ($singleTransaction) {
+                if ($singleTransaction->transactionItem->itemExist()) {
+                    $symbol = explode('-', $singleTransaction->transactionItem->item->it_Symbol);
+                    $newSymbol = [$symbol[0], $symbol[1], '0'];
+                    $newSymbol = join('-', $newSymbol);
+                    $product = Product::where('symbol', $newSymbol)->first();
+                }
+                if (empty($product)) {
+                    $product = Product::getDefaultProduct();
+                }
+                $product->tt_quantity = $singleTransaction->transactionItem->tt_Quantity;
+                $product->total_price = $singleTransaction->tr_Payment - $singleTransaction->tr_DeliveryCost;
+                $product->price_override = ['gross_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price];
+                return $product;
+            });
 
-            if (empty($product)) {
-                $product = Product::getDefaultProduct();
-            }
-
-            $orderItems = [];
-            $item = [];
-            $item['id'] = $product->id;
-            $item['amount'] = $transaction->transactionItem->tt_Quantity;
-
-            $orderItems [] = $item;
+            $orderItems = $products->map(function ($product) {
+                return [
+                    'id' => $product->id,
+                    'amount' => $product->tt_quantity
+                ];
+            })->toArray();
             $transactionArray['order_items'] = $orderItems;
             try {
                 DB::beginTransaction();
-                $this->buildOrder($transaction, $transactionArray, $product);
+                $this->buildOrder($transaction, $transactionArray, $products, $transactionGroup);
                 DB::commit();
             } catch (\Exception $exception) {
                 DB::rollBack();
@@ -115,28 +116,30 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         } else if ($transaction->invoiceAddressBefore) {
             $transactionArray['invoice_address'] = $this->setDeliveryAddress($transaction->invoiceAddressBefore);
         } else if ($transactionArray['delivery_address']) {
-            $transactionArray['invoice_address']= $transactionArray['delivery_address'];
+            $transactionArray['invoice_address'] = $transactionArray['delivery_address'];
         }
         $transactionArray['invoice_address']['email'] = $transactionArray['customer_login'];
         return $transactionArray;
     }
 
-    private function buildOrder($transaction, array $transactionArray, Product $product)
+    private function buildOrder($transaction, array $transactionArray, $products, $group)
     {
         $calculator = new SelloPriceCalculator();
-        $calculator->setOverridePrice($transaction->transactionItem->tt_Price);
+
+        $calculator->setProductList($products);
 
         $packageBuilder = new SelloPackageDivider();
-        $packageBuilder->setDelivererId($transaction->tr_DelivererId);
-        $packageBuilder->setDeliveryId($transaction->tr_DeliveryId);
-        $packageBuilder->setMaxInPackage($transaction->tw_Pole2 ?? 1);
+        $packageBuilder->setTransactionList($group);
 
-        $priceOverrider = new OrderPriceOverrider([$product->id => ['gross_selling_price_commercial_unit' => $transaction->transactionItem->tt_Price]]);
+        $prices = [];
+        foreach ($products as $product) {
+            $prices[$product->id] = $product->price_override;
+        }
+
+        $priceOverrider = new OrderPriceOverrider($prices);
 
         $transportPrice = new SelloTransportSumCalculator();
-
-        list($masterId, $deliveryCost) = self::calculateDeliveryCostAndGetMasterID($transaction);
-        $transportPrice->setTransportPrice($deliveryCost);
+        $transportPrice->setTransportPrice($transaction->tr_DeliveryCost);
 
         $orderBuilder = new OrderBuilder();
         $orderBuilder
@@ -150,10 +153,12 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
         $order = Order::find($id);
         $order->sello_id = $transaction->id;
-        $order->master_order_id = $masterId;
         $user = User::where('name', '001')->first();
         $order->employee()->associate($user);
-        $warehouseSymbol = $product->packing->warehouse_physical ?? 'MEGA-OLAWA';
+        $withWarehouse = $products->filter(function ($prod) {
+           return !empty($prod->packing->warehouse_physical);
+        });
+        $warehouseSymbol = $withWarehouse->first()->packing->warehouse_physical ?? self::DEFAULT_WAREHOUSE;
         $warehouse = Warehouse::where('symbol', $warehouseSymbol)->first();
         $order->warehouse()->associate($warehouse);
 
@@ -205,7 +210,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
     private function createPaymentPromise(Order $order, $transaction)
     {
-        $amount = $transaction->tr_Payment - $transaction->tr_DeliveryCost;
+        $amount = $transaction->tr_Payment;
         OrdersPaymentsController::payOrder($order->id, $amount,
             null, 1,
             null, Carbon::today()->addDay(7)->toDateTimeString());
@@ -257,23 +262,21 @@ class ImportOrdersFromSelloJob implements ShouldQueue
      * @param $transaction
      * @return array
      */
-    private static function calculateDeliveryCostAndGetMasterID($transaction): array
+    private function createAddressArray($transaction): array
     {
-        $connectedSello = SelTransaction::where('tr_CheckoutFormPaymentId', $transaction->tr_CheckoutFormPaymentId)->get();
-        $masterId = null;
-        $counter = 0;
-        foreach ($connectedSello as $sello) {
-            $order = $sello->order;
-            if ($order) {
-                $counter++;
-                $masterId = $order->master_order_id ?? $order->id;
-            }
+        $transactionArray = [];
+        $transactionArray['customer_login'] = str_replace('allegromail.pl', 'mega1000.pl', $transaction->customer->email->ce_email);
+        $phone = preg_replace('/[^0-9]/', '', $transaction->customer->phone->cp_Phone);
+        $pos = strpos($phone, '48');
+        if ($pos === 0) {
+            $phone = substr($phone, 2);
         }
-        $deliveryCost = $transaction->tr_DeliveryCost / $connectedSello->count();
-        $modulo = $transaction->tr_DeliveryCost % $connectedSello->count();
-        if ($counter < $modulo) {
-            $deliveryCost++;
-        }
-        return array($masterId, $deliveryCost);
+        $transactionArray['phone'] = $phone;
+        $transactionArray['update_email'] = true;
+        $transactionArray['customer_notices'] = empty($transaction->note) ? '' : $transaction->note->ne_Content;
+        $transactionArray = $this->setAdressArray($transaction, $transactionArray);
+        $transactionArray['is_standard'] = 1;
+        $transactionArray['rewrite'] = 0;
+        return $transactionArray;
     }
 }
