@@ -376,7 +376,6 @@ class OrdersPackagesController extends Controller
         }
         if ($order->sello_id){
             $transaction = SelTransaction::find($order->sello_id);
-            $emailAllegro = SelCustomerEmail::find($order->sello_id);
             $order->allegro_transaction_id = $transaction->tr_CheckoutFormId;
             $order->save();
         }
@@ -402,7 +401,7 @@ class OrdersPackagesController extends Controller
                 'allegro_transaction_id' => $order->allegro_transaction_id,
                 'package_type' => $package->container_type,
                 'packing_type' => $package->packing_type,
-                'allegro_mail' => $emailAllegro->ce_email ?? null,
+                'allegro_mail' => $transaction->customer->email->ce_email ?? null,
             ],
             'delivery_address' => [
                 'firstname' => $deliveryAddress->firstname,
