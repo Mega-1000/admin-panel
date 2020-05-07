@@ -87,9 +87,7 @@ class OrdersPackagesController extends Controller
         }
         $promisedPayments = [];
         $payments = [];
-        if ($order->sello_id) {
-            $isAllegro = true;
-        }
+        $isAllegro = !empty($order->sello_id);
 
         $cashOnDeliverySum = 0;
 
@@ -178,9 +176,8 @@ class OrdersPackagesController extends Controller
     public function edit($id) {
         $orderPackage = OrderPackage::find($id);
         $order = Order::find($orderPackage->order_id);
-        if ($order->sello_id) {
-            $isAllegro = true;   
-        }
+        $isAllegro = !empty($order->sello_id);
+
         $contentTypes = ContentType::all();
         $packingTypes = PackingType::all();
         $containerTypes = ContainerType::all();
