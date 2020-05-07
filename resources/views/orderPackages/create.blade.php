@@ -47,7 +47,7 @@
             </select>
         <br>
         <div id="template_info" style="color: red"></div>
-        </div>        
+        </div>
         <div class="firms-general" id="orderPayment">
             <div class="form-group">
                 <label for="quantity">@lang('order_packages.form.quantity')</label><br/>
@@ -205,10 +205,10 @@
 			@endphp
                         <td>Główne</td>
                         <td>{{ $order->id }}</td>
-                        <td>{{ $order->getSumOfGrossValues() }}</td>
-                        <td>{{ $order->bookedPaymentsSum() }}</td>
-                        <td>{{ $order->promisePaymentsSum() }}</td>
-                        <td>{{ $order->toPayPackages() }}</td>
+                        <td>{{  number_format($order->getSumOfGrossValues(), 2, ',', '') }}</td>
+                        <td>{{  number_format($order->bookedPaymentsSum(), 2, ',', '') }}</td>
+                        <td>{{  number_format($order->promisePaymentsSum(), 2, ',', '') }}</td>
+                        <td>{{  number_format($order->toPayPackages(), 2, ',', '') }}</td>
 			<td>
 			                            @foreach($order->packages as $package)
                                 @if($package->status == 'CANCELLED' || $package->status == 'WAITING_FOR_CANCELLED')
@@ -306,27 +306,27 @@
 
                         </td>
 			<td>
-			{{ $sumOfGrossValues }}
+			{{ number_format($sumOfGrossValues, 2, ',', '') }}
 			</td>
 			<td>
-			{{ $bookedPaymentsSum  }}
+			{{ number_format($bookedPaymentsSum, 2, ',', '')  }}
 			</td>
                         <td>
-			{{ $promisePaymentsSum }}
+			{{ number_format($promisePaymentsSum, 2, ',', '') }}
                         </td>
                         <td>
-			{{ $toPaySum }}
+			{{ number_format($toPaySum, 2, ',', '') }}
                         </td>
 			<td>
 			</td>
 			<td>
 			<label for="cash_on_delivery">Wpisz kwotę pobrania na tworzonym LP</label>
                                 <input type="number" step=".01" class="form-control" id="cash_on_delivery" style="border: 1px solid green;" name="cash_on_delivery"
-                                       value="{{ $toPaySum }}">
+                                       value="{{ number_format($toPaySum, 2, '.', '') }}">
                                 Automatycznie wpisana kwota jest kwotą sugerowaną, która zamyka bilans wszystkich zleceń (głównego i połączonych)<br><br>
                                 Koszt pobrania u wybranego kuriera: <span id="cod_cost"></span> zł
 			</td>
-                        
+
 			<td>
 			<h3><span id="packageCost"></span> zł <input type="hidden" value="" id="toCheck" name="toCheck"></h3>
                         </td>
@@ -335,7 +335,7 @@
                 </table>
             <div class="text-right">
                 <h3 style="display: none;">Bilans zamówień: {{ $allOrdersSum }} zł</h3>
-                <h3 style="display: none;">Pobrane łącznie w LP: {{ number_format(($allOrdersSum) - ($allOrdersSum - $cashOnDeliverySum), 2) }} zł</h3>
+                <h3 style="display: none;">Pobrane łącznie w LP: {{ number_format($cashOnDeliverySum, 2, ',', '') }} zł</h3>
             </div>
 
             <div class="form-group">
@@ -448,7 +448,7 @@
         $(document).ready(function() {
              let toPay = {{ $toPaySum }};
              let templateId = '{{ Session::get('template-id') }}';
-             $('#packageCost').text(toPay - $('#cash_on_delivery').val());
+             $('#packageCost').text(parseFloat(toPay - $('#cash_on_delivery').val()).toFixed(2));
              $('#toCheck').val(toPay - $('#cash_on_delivery').val());
 
              if (multiData != null) {
@@ -472,7 +472,7 @@
                 $("#symbol").val(multiData['symbol']);
              }
              $('#cash_on_delivery').on('change', function() {
-                 let difference = toPay - $(this).val();
+                 let difference = parseFloat(toPay - $(this).val()).toFixed(2);
                  $('#toCheck').val(toPay - $('#cash_on_delivery').val());
                  if(difference != 0) {
                      $('#packageCost').addClass('wrong-difference');
@@ -482,8 +482,8 @@
                      $('#packageCost').text(difference);
                  }
              });
-             
-             
+
+
 
             $('#data_template').on('change', function() {
                 $('#template-id').val($(this).val());
@@ -544,7 +544,7 @@
         $('#force_shipment1').removeClass('hidden');
         }
         if (h >= mt) {
-        $("#hour_info").html(selectedTemplateData['max_time_info']);    
+        $("#hour_info").html(selectedTemplateData['max_time_info']);
         }
         $("#template_accept_hour").val(at);
         $("#template_max_hour").val(mt);
@@ -567,7 +567,6 @@
       });
 
       function validate(form) {
-	console.log(payments);
         if (paymentsSum < 2 && promisedPaymentsSum > 2) {
           if (confirm('Zlecenie posiada wyłącznie zaliczkę deklarowaną. Czy chcesz kontynuować przy jej użyciu?')) {
             $('#shouldTakePayment').val(1);
@@ -586,7 +585,7 @@
               $('#shouldTakePayment').val(3);
               return true;
             } else {
-	      
+
               return false;
             }
           }
