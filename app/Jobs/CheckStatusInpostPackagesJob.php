@@ -32,7 +32,7 @@ class CheckStatusInpostPackagesJob extends Job
      */
     public function handle(OrderPackageRepository $orderPackageRepository)
     {
-        $orderPackages = OrderPackage::whereIn('delivery_courier_name', self::COURIER)
+        $orderPackages = OrderPackage::whereIn('service_courier_name', self::COURIER)
                 ->whereDate('shipment_date', '>', Carbon::today()->subDays(5)->toDateString())
                 ->get();
         
