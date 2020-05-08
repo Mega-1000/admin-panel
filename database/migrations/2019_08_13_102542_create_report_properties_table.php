@@ -35,6 +35,11 @@ class CreateReportPropertiesTable extends Migration
 	 */
 	public function down()
 	{
+        Schema::table('report_properties', function (Blueprint $table) {
+            $table->dropForeign(['report_id']);
+            $table->dropForeign(['task_id']);
+        });
 		Schema::drop('report_properties');
-	}
+
+    }
 }

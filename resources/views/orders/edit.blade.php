@@ -1472,7 +1472,7 @@
                                 @foreach($itemOrder->invoices as $invoice)
                                     <a target="_blank" href="/storage/invoices/{{ $invoice->invoice_name }}" style="margin-top: 5px;">Faktura</a>
                                 @endforeach
-                            @elseif($itemOrder->invoiceRequests !== null || count($itemOrder->invoiceRequests) > 0)
+                            @elseif($itemOrder->invoiceRequests !== null || $itemOrder->invoiceRequests && $itemOrder->invoiceRequests->count()) > 0)
                                 <p class="invoice__request--sent">Prośba o fakturę została już wysłana.</p>
                             @else
                                 <button class="btn btn-sm btn-success" onclick="sendInvoiceRequest({{$itemOrder->id}})">Poproś o fakturę</button>
