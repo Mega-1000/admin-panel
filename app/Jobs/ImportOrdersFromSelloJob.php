@@ -73,6 +73,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                 if (empty($product)) {
                     $product = Product::getDefaultProduct();
                 }
+                $product->transaction_id = $singleTransaction->id;
                 $product->tt_quantity = $singleTransaction->transactionItem->tt_Quantity;
                 $product->total_price = $singleTransaction->tr_Payment - $singleTransaction->tr_DeliveryCost;
                 $product->price_override = ['gross_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price];
@@ -82,7 +83,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $orderItems = $products->map(function ($product) {
                 return [
                     'id' => $product->id,
-                    'amount' => $product->tt_quantity
+                    'amount' => $product->tt_quantity,
+                    'transactionId' => $product->transaction_id
                 ];
             })->toArray();
             $transactionArray['order_items'] = $orderItems;
