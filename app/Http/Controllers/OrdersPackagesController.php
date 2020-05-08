@@ -25,6 +25,7 @@ use App\Entities\PackingType;
 use App\Entities\ContainerType;
 use App\Entities\SelTransaction;
 use App\Entities\Order;
+use App\Entities\SelCustomerEmail;
 
 /**
  * Class OrderTasksController.
@@ -399,7 +400,8 @@ class OrdersPackagesController extends Controller
                 'allegro_user_id' => $transaction->tr_RegId ?? null,
                 'allegro_transaction_id' => $order->allegro_transaction_id,
                 'package_type' => $package->container_type,
-                'packing_type' => $package->packing_type
+                'packing_type' => $package->packing_type,
+                'allegro_mail' => $transaction->customer->email->ce_email ?? null,
             ],
             'delivery_address' => [
                 'firstname' => $deliveryAddress->firstname,
