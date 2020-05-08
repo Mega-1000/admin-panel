@@ -130,7 +130,6 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
         $packageBuilder = new SelloPackageDivider();
         $packageBuilder->setTransactionList($group);
-        $packageBuilder->setSelloId($transaction->id);
 
         $prices = [];
         foreach ($products as $product) {
