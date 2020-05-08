@@ -35,10 +35,14 @@ class SelloPackageDivider implements iDividable
         if (empty($transaction->tr_DelivererId) || empty($transaction->tr_DeliveryId)) {
             throw new \Exception('Brak powiązanego szablonu z sello id: ' . $transaction->id);
         }
-        $template = PackageTemplate::
-        where('sello_delivery_id', $transaction->tr_DeliveryId)
-            ->where('sello_deliverer_id', $transaction->tr_DeliveryId)
-            ->firstOrFail();
+        try {
+            $template = PackageTemplate::where('sello_delivery_id', $transaction->tr_DeliveryId)
+                ->where('sello_deliverer_id', $transaction->tr_DelivererIdId)
+                ->firstOrFail();
+        } catch (\Exception $e) {
+            throw new \Exception('Import Sello: Nie znaleziono szablonu sello id:'
+                . $transaction->id . ' deliverer id:' . $transaction->tr_DelivererId .' delivery id:' . $transaction->tr_DeliveryId);
+        }
         $modulo = $data['amount'] % $transaction->maxInPackage;
         $total = ceil($data['amount'] / $transaction->maxInPackage);
 
