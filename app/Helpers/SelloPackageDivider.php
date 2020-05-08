@@ -37,7 +37,7 @@ class SelloPackageDivider implements iDividable
         }
         try {
             $template = PackageTemplate::where('sello_delivery_id', $transaction->tr_DeliveryId)
-                ->where('sello_deliverer_id', $transaction->tr_DelivererIdId)
+                ->where('sello_deliverer_id', $transaction->tr_DelivererId)
                 ->firstOrFail();
         } catch (\Exception $e) {
             throw new \Exception('Import Sello: Nie znaleziono szablonu sello id:'
