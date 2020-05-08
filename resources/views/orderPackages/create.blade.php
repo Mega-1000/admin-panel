@@ -143,6 +143,9 @@
                         ALLEGRO-INPOST
                     </option>
                     @endif
+                    <option {{ old('delivery_courier_name') == 'PACZKOMAT' ? 'selected="selected"' : '' }} value="PACZKOMAT">
+                        PACZKOMAT
+                    </option>
                 </select>
             </div>
             <div class="form-group">
