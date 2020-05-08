@@ -377,7 +377,7 @@ class OrdersPackagesController extends Controller
         }
         if ($order->sello_id){
             $transaction = SelTransaction::find($order->sello_id);
-            $addressAllegro = SelAddress::where('adr_transId', $order->sello_id)->where('adr_Type', 1)->get();
+            $addressAllegro = SelAddress::where('adr_TransId', $order->sello_id)->where('adr_Type', 1)->get();
             $order->allegro_transaction_id = $transaction->tr_CheckoutFormId;
             $order->save();
         }
