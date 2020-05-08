@@ -1210,7 +1210,7 @@ class OrdersPaymentsController extends Controller
         }
     }
 
-    public static function payOrder($orderId, $amount, $masterPaymentId, string $promise, $chooseOrder, $promiseDate, $type, $isWarehousePayment): void
+    public static function payOrder($orderId, $amount, $masterPaymentId, string $promise, $chooseOrder, $promiseDate, $type = null, $isWarehousePayment = null): void
     {
         $order = Order::find($orderId);
 

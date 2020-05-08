@@ -10,6 +10,7 @@ class SelloPackageDivider implements iDividable
 {
 
     private $transactionList;
+    private $selloId;
 
     public function divide($data, Order $order)
     {
@@ -33,7 +34,7 @@ class SelloPackageDivider implements iDividable
     private function divideForTransaction($data, Order $order, $transaction): void
     {
         if (empty($transaction->delivererId) || empty($transaction->delivererId)) {
-            throw new \Exception('Brak powiązanego szablonu z sello');
+            throw new \Exception('Brak powiązanego szablonu z sello id: ' . $this->selloId);
         }
         $template = PackageTemplate::
         where('sello_delivery_id', $transaction->deliveryId)
@@ -58,5 +59,10 @@ class SelloPackageDivider implements iDividable
     public function setTransactionList($group)
     {
         $this->transactionList = $group;
+    }
+
+    public function setSelloId($id)
+    {
+        $this->selloId = $id;
     }
 }
