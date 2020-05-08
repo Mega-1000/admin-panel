@@ -34,7 +34,7 @@ class SendLPWithReminderSendingToWarehouseJob
         $orderPackages = $orderPackageRepository->findWhere(['shipment_date' => Carbon::today()])->all();
         foreach ($orderPackages as $orderPackage) {
             $pathSecond = null;
-            if ($orderPackage->delivery_courier_name === 'INPOST') {
+            if ($orderPackage->service_courier_name === 'INPOST' || $orderPackage->service_courier_name === 'ALLEGRO-INPOST') {
                 $path = storage_path('app/public/inpost/stickers/sticker' . $orderPackage->letter_number . '.pdf');
             } elseif ($orderPackage->delivery_courier_name === 'DPD') {
                 $path = storage_path('app/public/dpd/protocols/protocol' . $orderPackage->letter_number . '.pdf');
