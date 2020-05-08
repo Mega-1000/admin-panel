@@ -1211,21 +1211,7 @@
                         <div class="firms-general" id="orderPayment">
                             <div class="form-group">
                                 <label for="amount">@lang('order_payments.form.amount')</label>
-                                @foreach($order->warehouse->orders as $itemCustomerOrder)
-                                    @php
-                                        $sumOfItems = 0;
-                                        foreach ($itemCustomerOrder->items as $item) {
-                                            $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
-                                        }
-                                        $orderValue = str_replace(',', '', number_format($sumOfItems + $itemCustomerOrder->shipment_price_for_client + $itemCustomerOrder->additional_service_cost + $itemCustomerOrder->additional_cash_on_delivery_cost, 2));
-                                    @endphp
-                                @endforeach
-                                <input type="text" class="form-control" id="amount" name="amount"
-                                       value="{{ $orderValue }}">
-                            </div>
-                            <div class="form-group">
-                                <label for="chooseOrder">Wybierz zlecenie</label>
-                                <select class="form-control" id="chooseOrder" name="chooseOrder">
+                                @if($order->warehouse !== null)
                                     @foreach($order->warehouse->orders as $itemCustomerOrder)
                                         @php
                                             $sumOfItems = 0;
@@ -1234,22 +1220,42 @@
                                             }
                                             $orderValue = str_replace(',', '', number_format($sumOfItems + $itemCustomerOrder->shipment_price_for_client + $itemCustomerOrder->additional_service_cost + $itemCustomerOrder->additional_cash_on_delivery_cost, 2));
                                         @endphp
-                                        <option value="{{ $itemCustomerOrder->id }}">
-                                            Zlecenie: {{ $itemCustomerOrder->id }} Kwota
-                                            zlecenia: {{ $orderValue }}</option>
                                     @endforeach
+                                @endif
+                                <input type="text" class="form-control" id="amount" name="amount"
+                                       value="{{ $orderValue }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="chooseOrder">Wybierz zlecenie</label>
+                                <select class="form-control" id="chooseOrder" name="chooseOrder">
+                                    @if($order->warehouse !== null)
+                                        @foreach($order->warehouse->orders as $itemCustomerOrder)
+                                            @php
+                                                $sumOfItems = 0;
+                                                foreach ($itemCustomerOrder->items as $item) {
+                                                    $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+                                                }
+                                                $orderValue = str_replace(',', '', number_format($sumOfItems + $itemCustomerOrder->shipment_price_for_client + $itemCustomerOrder->additional_service_cost + $itemCustomerOrder->additional_cash_on_delivery_cost, 2));
+                                            @endphp
+                                            <option value="{{ $itemCustomerOrder->id }}">
+                                                Zlecenie: {{ $itemCustomerOrder->id }} Kwota
+                                                zlecenia: {{ $orderValue }}</option>
+                                        @endforeach
+                                    @endif
                                 </select>
-                                @foreach($order->customer->orders as $itemCustomerOrder)
-                                    @php
-                                        $sumOfItems = 0;
-                                        foreach ($itemCustomerOrder->items as $item) {
-                                            $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
-                                        }
-                                        $orderValue = str_replace(',', '', number_format($sumOfItems + $itemCustomerOrder->shipment_price_for_client + $itemCustomerOrder->additional_service_cost + $itemCustomerOrder->additional_cash_on_delivery_cost, 2));
-                                    @endphp
-                                    <input type="hidden" name="order-payment-{{$itemCustomerOrder->id}}"
-                                           value="{{ $orderValue }}">
-                                @endforeach
+                                @if($order->customer !== null)
+                                    @foreach($order->customer->orders as $itemCustomerOrder)
+                                        @php
+                                            $sumOfItems = 0;
+                                            foreach ($itemCustomerOrder->items as $item) {
+                                                $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+                                            }
+                                            $orderValue = str_replace(',', '', number_format($sumOfItems + $itemCustomerOrder->shipment_price_for_client + $itemCustomerOrder->additional_service_cost + $itemCustomerOrder->additional_cash_on_delivery_cost, 2));
+                                        @endphp
+                                        <input type="hidden" name="order-payment-{{$itemCustomerOrder->id}}"
+                                               value="{{ $orderValue }}">
+                                    @endforeach
+                                @endif
                             </div>
                             <input type="hidden" value="0" name="masterPaymentId">
                             <input type="hidden" value="0" name="masterPaymentAmount">
@@ -1391,48 +1397,50 @@
             @php
                 $sumOfPayments = 0;
             @endphp
-            @foreach($order->warehouse->payments as $payment)
-                @php
-                    $sumOfPayments = $sumOfPayments + $payment->amount;
-                @endphp
-                <tr>
-                    <td>{{ $payment->amount }}</td>
-                    <td>
-                        @if($itemOrder->isOrderHasLabel(Label::ORDER_ITEMS_REDEEMED_LABEL))
-                            <span class="order-label" style="color: #FFFFFF; display: block; margin-top: 5px; background-color: #87D11B; text-align: center;"><i class="fas fa-battery-full"></i></span>
-                        @else
-                            <span class="order-label" style="color: #FFFFFF; display: block; margin-top: 5px; background-color: #4DCFFF; text-align: center;"><i class="fas fa-battery-empty"></i></span>
-                        @endif
-                    </td>
-                    <td>{{ $payment->amount_left }}</td>
-                    <td>
-                        @if($payment->promise == '1')
-                            <b style="color: red;">Tak</b>
-                        @else
-                            <b style="color: red;">Nie</b>
-                        @endif
-                    </td>
-                    <td>
-                        @if($payment->promise == Payment::PROMISE_PAYMENT && Auth::user()->role_id != User::ROLE_CONSULTANT)
-                            <button type="button" class="btn btn-success openPromiseModal" style="display: block;"
-                                    data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->amount }}">
-                                Zaksięguj
-                            </button>
-                        @else
-                            <button type="button" class="btn" style="display: block;" disabled>
-                                Zaksięgowano
-                            </button>
-                            <button type="button" class="btn btn-primary openWarehousePaymentModal" style="display: block;" @if(!$itemOrder->isOrderHasLabel(Label::ORDER_ITEMS_REDEEMED_LABEL)) {{ 'disabled' }} @endif
-                                    data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->amount }}">
-                                Przydziel
-                            </button>
-                        @endif
-                        <a href="{{ route('payments.edit', ['id' => $payment->id]) }}" class="btn btn-info">Edytuj</a>
-                        <a href="{{ route('payments.destroy', ['id' => $payment->id]) }}"
-                           class="btn btn-danger">Usuń</a>
-                    </td>
-                </tr>
-            @endforeach
+            @if($order->warehouse !== null)
+                @foreach($order->warehouse->payments as $payment)
+                    @php
+                        $sumOfPayments = $sumOfPayments + $payment->amount;
+                    @endphp
+                    <tr>
+                        <td>{{ $payment->amount }}</td>
+                        <td>
+                            @if($itemOrder->isOrderHasLabel(Label::ORDER_ITEMS_REDEEMED_LABEL))
+                                <span class="order-label" style="color: #FFFFFF; display: block; margin-top: 5px; background-color: #87D11B; text-align: center;"><i class="fas fa-battery-full"></i></span>
+                            @else
+                                <span class="order-label" style="color: #FFFFFF; display: block; margin-top: 5px; background-color: #4DCFFF; text-align: center;"><i class="fas fa-battery-empty"></i></span>
+                            @endif
+                        </td>
+                        <td>{{ $payment->amount_left }}</td>
+                        <td>
+                            @if($payment->promise == '1')
+                                <b style="color: red;">Tak</b>
+                            @else
+                                <b style="color: red;">Nie</b>
+                            @endif
+                        </td>
+                        <td>
+                            @if($payment->promise == Payment::PROMISE_PAYMENT && Auth::user()->role_id != User::ROLE_CONSULTANT)
+                                <button type="button" class="btn btn-success openPromiseModal" style="display: block;"
+                                        data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->amount }}">
+                                    Zaksięguj
+                                </button>
+                            @else
+                                <button type="button" class="btn" style="display: block;" disabled>
+                                    Zaksięgowano
+                                </button>
+                                <button type="button" class="btn btn-primary openWarehousePaymentModal" style="display: block;" @if(!$itemOrder->isOrderHasLabel(Label::ORDER_ITEMS_REDEEMED_LABEL)) {{ 'disabled' }} @endif
+                                        data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->amount }}">
+                                    Przydziel
+                                </button>
+                            @endif
+                            <a href="{{ route('payments.edit', ['id' => $payment->id]) }}" class="btn btn-info">Edytuj</a>
+                            <a href="{{ route('payments.destroy', ['id' => $payment->id]) }}"
+                               class="btn btn-danger">Usuń</a>
+                        </td>
+                    </tr>
+                @endforeach
+            @endif
             <tr>
                 <td><h2>Suma wpłat: <b style="color: red;">{{ $sumOfPayments }} zł</b></h2></td>
             </tr>
@@ -1455,46 +1463,48 @@
                 $sumOfOrders = 0;
                 $sumOfItems = 0;
             @endphp
-            @foreach($order->warehouse->orders()->whereNotIn('status_id', [Order::STATUS_WITHOUT_REALIZATION, Order::STATUS_ORDER_FINISHED])->get() as $itemOrder)
-                <tr>
-                    <td>{{ $itemOrder->id }}</td>
-                    <td>
-                        @if(count($itemOrder->invoices) > 0)
-                            @foreach($itemOrder->invoices as $invoice)
-                                <a target="_blank" href="/storage/invoices/{{ $invoice->invoice_name }}" style="margin-top: 5px;">Faktura</a>
-                            @endforeach
-                        @elseif($itemOrder->invoiceRequests !== null || count($itemOrder->invoiceRequests) > 0)
-                            <p class="invoice__request--sent">Prośba o fakturę została już wysłana.</p>
-                        @else
-                            <button class="btn btn-sm btn-success" onclick="sendInvoiceRequest({{$itemOrder->id}})">Poproś o fakturę</button>
-                        @endif
-                    </td>
-                    <td>{{ $itemOrder->status->name }}</td>
-                    @php
-                        $sumOfItems = 0;
-                        foreach ($itemOrder->items as $item) {
-                            $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
-                        }
-                        $orderValue = str_replace(',', '', number_format($sumOfItems + $itemOrder->shipment_price_for_client + $itemOrder->additional_service_cost + $itemOrder->additional_cash_on_delivery_cost, 2));
-                    @endphp
-                    @php
-                        $sumOfOrders = $sumOfOrders + $orderValue
-                    @endphp
-                    <td>{{ $orderValue }}</td>
-                    @php
-                       $payments = $itemOrder->groupWarehousePayments();
-                    @endphp
-                    <td>
-                        <h5 class="payment__pending">Oczekujące: {{ $payments['PENDING'] }}</h5>
-                        <h5 class="payment__accepted">Zaakceptowane: {{ $payments['ACCEPTED'] }}</h5>
-                    </td>
-                    <td id="left-amount-{{$itemOrder->id}}" data-value="{{ $orderValue - $paymentsValue }}">{{ $orderValue - $paymentsValue }}</td>
-                    <td>
-                        <button id="moveButton-{{$itemOrder->id}}" class="btn btn-sm btn-warning edit move__payment--button" onclick="moveData({{$itemOrder->id}})">Przenieś wpłatę stąd</button>
-                        <button id="moveButtonAjax-{{$itemOrder->id}}" class="btn btn-sm btn-success btn-move edit hidden" onclick="moveDataAjax({{$itemOrder->id}})">Przenieś dane tutaj</button>
-                    </td>
-                </tr>
-            @endforeach
+            @if($order->warehouse !== null)
+                @foreach($order->warehouse->orders()->whereNotIn('status_id', [Order::STATUS_WITHOUT_REALIZATION, Order::STATUS_ORDER_FINISHED])->get() as $itemOrder)
+                    <tr>
+                        <td>{{ $itemOrder->id }}</td>
+                        <td>
+                            @if(count($itemOrder->invoices) > 0)
+                                @foreach($itemOrder->invoices as $invoice)
+                                    <a target="_blank" href="/storage/invoices/{{ $invoice->invoice_name }}" style="margin-top: 5px;">Faktura</a>
+                                @endforeach
+                            @elseif($itemOrder->invoiceRequests !== null || count($itemOrder->invoiceRequests) > 0)
+                                <p class="invoice__request--sent">Prośba o fakturę została już wysłana.</p>
+                            @else
+                                <button class="btn btn-sm btn-success" onclick="sendInvoiceRequest({{$itemOrder->id}})">Poproś o fakturę</button>
+                            @endif
+                        </td>
+                        <td>{{ $itemOrder->status->name }}</td>
+                        @php
+                            $sumOfItems = 0;
+                            foreach ($itemOrder->items as $item) {
+                                $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+                            }
+                            $orderValue = str_replace(',', '', number_format($sumOfItems + $itemOrder->shipment_price_for_client + $itemOrder->additional_service_cost + $itemOrder->additional_cash_on_delivery_cost, 2));
+                        @endphp
+                        @php
+                            $sumOfOrders = $sumOfOrders + $orderValue
+                        @endphp
+                        <td>{{ $orderValue }}</td>
+                        @php
+                           $payments = $itemOrder->groupWarehousePayments();
+                        @endphp
+                        <td>
+                            <h5 class="payment__pending">Oczekujące: {{ $payments['PENDING'] }}</h5>
+                            <h5 class="payment__accepted">Zaakceptowane: {{ $payments['ACCEPTED'] }}</h5>
+                        </td>
+                        <td id="left-amount-{{$itemOrder->id}}" data-value="{{ $orderValue - $paymentsValue }}">{{ $orderValue - $paymentsValue }}</td>
+                        <td>
+                            <button id="moveButton-{{$itemOrder->id}}" class="btn btn-sm btn-warning edit move__payment--button" onclick="moveData({{$itemOrder->id}})">Przenieś wpłatę stąd</button>
+                            <button id="moveButtonAjax-{{$itemOrder->id}}" class="btn btn-sm btn-success btn-move edit hidden" onclick="moveDataAjax({{$itemOrder->id}})">Przenieś dane tutaj</button>
+                        </td>
+                    </tr>
+                @endforeach
+            @endif
             <tr>
                 <td><h2>Suma faktur: <b style="color: red;">{{ $sumOfOrders }} zł</b></h2></td>
             </tr>
