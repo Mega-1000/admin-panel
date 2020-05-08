@@ -28,6 +28,7 @@ class UpdatePaymentsTableAddWarehouseFields extends Migration
     public function down()
     {
         Schema::table('payments', function (Blueprint $table) {
+            $table->dropForeign(['warehouse_id']);
             $table->dropColumn('warehouse_id');
             $table->dropColumn('type');
         });
