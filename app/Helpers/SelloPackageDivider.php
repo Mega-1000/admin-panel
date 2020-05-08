@@ -30,11 +30,22 @@ class SelloPackageDivider implements iDividable
      * @param Order $order
      * @throws \Exception
      */
-    private function divideForTransaction($data, Order $order, $transaction): void
+    private function divideForTransaction($items, Order $order, $transaction): void
     {
         if (empty($transaction->tr_DelivererId) || empty($transaction->tr_DeliveryId)) {
             throw new \Exception('Brak powiązanego szablonu z sello id: ' . $transaction->id);
         }
+
+        $data = false;
+        foreach ($items as $product) {
+            if ($data) {
+                continue;
+            }
+            if ($product['transactionId'] == $transaction->id) {
+                $data = $product;
+            }
+        }
+
         try {
             $template = PackageTemplate::where('sello_delivery_id', $transaction->tr_DeliveryId)
                 ->where('sello_deliverer_id', $transaction->tr_DelivererId)
