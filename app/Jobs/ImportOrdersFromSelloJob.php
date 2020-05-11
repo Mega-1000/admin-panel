@@ -279,6 +279,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $transactionArray = $this->setAdressArray($transaction, $transactionArray);
         $transactionArray['is_standard'] = 1;
         $transactionArray['rewrite'] = 0;
+        $transactionArray['nick_allegro'] = $transaction->customer->cs_Nick;
         return $transactionArray;
     }
 }
