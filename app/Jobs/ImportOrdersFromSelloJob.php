@@ -78,7 +78,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                     $product->transaction_id = $singleTransaction->id;
                     $product->tt_quantity = $singleTransaction->transactionItem->tt_Quantity;
                     $product->total_price = $singleTransaction->tr_Payment - $singleTransaction->tr_DeliveryCost;
-                    $product->price_override = ['gross_selling_price_commercial_unit_after_discounts' => $singleTransaction->transactionItem->tt_Price];
+                    $product->price_override = ['gross_selling_price_commercial_unit_after' => $singleTransaction->transactionItem->tt_Price];
                     return $product;
                 });
 
