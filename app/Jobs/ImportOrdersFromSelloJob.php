@@ -63,9 +63,10 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                 return;
             }
             $transactionArray = $this->createAddressArray($transaction);
+            $tax = 1 + env('VAT');
             $products = $transactionGroup
                 ->filter(function ($transaction) { return $transaction->tr_Group != 1; })
-                ->map(function ($singleTransaction) {
+                ->map(function ($singleTransaction) use ($tax) {
                     if ($singleTransaction->transactionItem->itemExist()) {
                         $symbol = explode('-', $singleTransaction->transactionItem->item->it_Symbol);
                         $newSymbol = [$symbol[0], $symbol[1], '0'];
@@ -78,7 +79,10 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                     $product->transaction_id = $singleTransaction->id;
                     $product->tt_quantity = $singleTransaction->transactionItem->tt_Quantity;
                     $product->total_price = $singleTransaction->tr_Payment - $singleTransaction->tr_DeliveryCost;
-                    $product->price_override = ['gross_selling_price_commercial_unit_after' => $singleTransaction->transactionItem->tt_Price];
+                    $product->price_override = [
+                        'gross_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price,
+                        'net_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price / $tax
+                    ];
                     return $product;
                 });
 
