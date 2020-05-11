@@ -592,7 +592,7 @@
             </th>
             <th>@lang('orders.form.warehouse_notice')
                 <div class="input_div">
-                    <input type="text" id="columnSearch-warehouse_notices"/>
+                    <input type="text" id="columnSearch-warehouse_notice"/>
                 </div>
             </th>
             <th>
@@ -610,7 +610,7 @@
             <th>
                 <div><span>@lang('orders.table.clientPhone')</span></div>
                 <div class="input_div">
-                    <span title="KLIKNIJ PONOWNIE ABY USUNĄĆ SPACJE I MYŚLNIKI"><input type="text" id="columnSearch-clientPhone"/></span>
+                    <span title="KLIKNIJ PONOWNIE ABY USUNĄĆ FILTRY"><input type="text" id="columnSearch-clientPhone"/></span>
                 </div>
             <th>
                 <div><span>@lang('orders.table.clientEmail')</span></div>
@@ -648,7 +648,7 @@
             <th>
                 <div><span>@lang('orders.table.values_data')</span></div>
                 <div class="input_div">
-                    <input type="text" id="columnSearch-products_value_gross"/>
+                    <input type="text" id="columnSearch-values_data"/>
                 </div>
             </th>
             <th>
@@ -1317,6 +1317,10 @@
                     }
                 },
                 {
+                   data: 'shipment_price_for_us',
+                   name: 'shipment_price_for_us',
+                },
+                {
                     data: 'orderId',
                     name: 'sum_of_payments',
                     searchable: false,
@@ -1568,14 +1572,12 @@
         let localDatatables = localStorage.getItem('DataTables_dataTable_/admin/orders');
         if(localDatatables != null) {
             let objDatatables = JSON.parse(localDatatables);
-
             $('#dataTable thead tr th input, #dataTable thead tr th select').each(function (i) {
                 let colName = $(this)[0].id;
                 if(colName != "") {
                     let colSelector = colName.substring(13, colName.length) + ":name";
                     let index = table.column(colSelector).index();
                     let searched = objDatatables.columns[index].search.search;
-
                     if (searched != "") {
                         this.value = searched;
                     }
