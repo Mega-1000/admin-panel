@@ -13,10 +13,14 @@ class SelloPackageDivider implements iDividable
 
     public function divide($data, Order $order)
     {
-        $this->transactionList->map(function ($transaction) use ($order, $data) {
+        $realPackageNumber = 1;
+        foreach ($this->transactionList as $transaction) {
+            if ($transaction->tr_Group) {
+                continue;
+            }
             $transaction->maxInPackage = $this->setMaxInPackage($transaction->tw_Pole2 ?? 1);
-            $this->divideForTransaction($data, $order, $transaction);
-        });
+            $this->divideForTransaction($data, $order, $transaction, $realPackageNumber);
+        }
         return false;
     }
 
@@ -30,7 +34,7 @@ class SelloPackageDivider implements iDividable
      * @param Order $order
      * @throws \Exception
      */
-    private function divideForTransaction($items, Order $order, $transaction): void
+    private function divideForTransaction($items, Order $order, $transaction, &$realPackageNumber)
     {
         if (empty($transaction->tr_DelivererId) || empty($transaction->tr_DeliveryId)) {
             throw new \Exception('Brak powiązanego szablonu z sello id: ' . $transaction->id);
@@ -58,13 +62,14 @@ class SelloPackageDivider implements iDividable
         $total = ceil($data['amount'] / $transaction->maxInPackage);
 
         for ($packageNumber = 1; $packageNumber <= $total; $packageNumber++) {
-            $pack = BackPackPackageDivider::createPackage($template, $order->id, $packageNumber);
+            $pack = BackPackPackageDivider::createPackage($template, $order->id, $realPackageNumber);
             $quantity = floor($data['amount'] / $transaction->maxInPackage);
             if ($packageNumber <= $modulo) {
                 $quantity += 1;
             }
             $pack->packedProducts()->attach($data['id'],
                 ['quantity' => $quantity]);
+            $realPackageNumber++;
         }
         $order->shipment_date = $pack->shipment_date;
         $order->save();

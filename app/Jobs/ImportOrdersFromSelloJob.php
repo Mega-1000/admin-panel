@@ -76,7 +76,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                 $product->transaction_id = $singleTransaction->id;
                 $product->tt_quantity = $singleTransaction->transactionItem->tt_Quantity;
                 $product->total_price = $singleTransaction->tr_Payment - $singleTransaction->tr_DeliveryCost;
-                $product->price_override = ['gross_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price];
+                $product->price_override = ['gross_selling_price_commercial_unit_after_discounts' => $singleTransaction->transactionItem->tt_Price];
                 return $product;
             });
 
@@ -103,20 +103,20 @@ class ImportOrdersFromSelloJob implements ShouldQueue
     private function setAdressArray($transaction, array $transactionArray): array
     {
         if ($transaction->deliveryAddress) {
-            $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->deliveryAddress);
+            $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->deliveryAddress, $transaction->customer);
         } else if ($transaction->deliveryAddressBefore) {
-            $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->deliveryAddressBefore);
+            $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->deliveryAddressBefore, $transaction->customer);
         } else if ($transaction->defaultAdress) {
-            $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->defaultAdress);
+            $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->defaultAdress, $transaction->customer);
         } else if ($transaction->defaultAdressBefore) {
-            $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->defaultAdressBefore);
+            $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->defaultAdressBefore, $transaction->customer);
         }
         $transactionArray['delivery_address']['email'] = $transactionArray['customer_login'];
 
         if ($transaction->invoiceAddress) {
-            $transactionArray['invoice_address'] = $this->setDeliveryAddress($transaction->invoiceAddress);
+            $transactionArray['invoice_address'] = $this->setDeliveryAddress($transaction->invoiceAddress, $transaction->customer);
         } else if ($transaction->invoiceAddressBefore) {
-            $transactionArray['invoice_address'] = $this->setDeliveryAddress($transaction->invoiceAddressBefore);
+            $transactionArray['invoice_address'] = $this->setDeliveryAddress($transaction->invoiceAddressBefore, $transaction->customer);
         } else if ($transactionArray['delivery_address']) {
             $transactionArray['invoice_address'] = $transactionArray['delivery_address'];
         }
@@ -171,7 +171,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         }
     }
 
-    private function setDeliveryAddress($address): array
+    private function setDeliveryAddress($address, $customer): array
     {
         list($name, $surname) = $this->getNameFromAdrres($address);
         $street = $address->adr_Address1;
@@ -191,9 +191,10 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $addressArray['lastname'] = $surname;
         $addressArray['flat_number'] = $flatNr;
         $addressArray['address'] = $streetName;
-        $addressArray['nip'] = $address->adr_NIP ?: '';
+        $addressArray['nip'] = $address->adr_NIP ?: $customer->cs_NIP ?: '';
         $addressArray['postal_code'] = $address->adr_ZipCode;
         $addressArray['nip'] = $address->adr_NIP;
+        $addressArray['firmname'] = $address->adr_Company ?: $customer->cs_Company ?: '';
         return $addressArray;
     }
 

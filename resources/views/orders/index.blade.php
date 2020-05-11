@@ -688,6 +688,12 @@
             <th>@lang('orders.table.correction_amount')</th>
             <th>@lang('orders.table.correction_description')</th>
             <th>@lang('orders.table.document_number')</th>
+            <th>
+                <div><span>@lang('orders.table.payment_id')</span></div>
+                <div class="input_div">
+                    <input type="text" id="columnSearch-sello_payment"/>
+                </div>
+            </th>
             <th></th>
         </tr>
         </thead>
@@ -1605,6 +1611,10 @@
                 {
                     data: 'document_number',
                     name: 'document_number'
+                },
+                {
+                    data: 'sello_payment',
+                    name: 'sello_payment'
                 },
                 {
                     data: 'id',
