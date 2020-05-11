@@ -2017,7 +2017,6 @@
                                                 <
                                             </button>
                                         </p>
-                                        </p>
                                         <p>Zostało: <span
                                                 name="left[{{$item->id}}]">{{ $item->quantity }}</span>
                                         </p>
