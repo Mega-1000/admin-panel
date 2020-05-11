@@ -63,22 +63,24 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                 return;
             }
             $transactionArray = $this->createAddressArray($transaction);
-            $products = $transactionGroup->map(function ($singleTransaction) {
-                if ($singleTransaction->transactionItem->itemExist()) {
-                    $symbol = explode('-', $singleTransaction->transactionItem->item->it_Symbol);
-                    $newSymbol = [$symbol[0], $symbol[1], '0'];
-                    $newSymbol = join('-', $newSymbol);
-                    $product = Product::where('symbol', $newSymbol)->first();
-                }
-                if (empty($product)) {
-                    $product = Product::getDefaultProduct();
-                }
-                $product->transaction_id = $singleTransaction->id;
-                $product->tt_quantity = $singleTransaction->transactionItem->tt_Quantity;
-                $product->total_price = $singleTransaction->tr_Payment - $singleTransaction->tr_DeliveryCost;
-                $product->price_override = ['gross_selling_price_commercial_unit_after_discounts' => $singleTransaction->transactionItem->tt_Price];
-                return $product;
-            });
+            $products = $transactionGroup
+                ->filter(function ($transaction) { return $transaction->tr_Group != 1; })
+                ->map(function ($singleTransaction) {
+                    if ($singleTransaction->transactionItem->itemExist()) {
+                        $symbol = explode('-', $singleTransaction->transactionItem->item->it_Symbol);
+                        $newSymbol = [$symbol[0], $symbol[1], '0'];
+                        $newSymbol = join('-', $newSymbol);
+                        $product = Product::where('symbol', $newSymbol)->first();
+                    }
+                    if (empty($product)) {
+                        $product = Product::getDefaultProduct();
+                    }
+                    $product->transaction_id = $singleTransaction->id;
+                    $product->tt_quantity = $singleTransaction->transactionItem->tt_Quantity;
+                    $product->total_price = $singleTransaction->tr_Payment - $singleTransaction->tr_DeliveryCost;
+                    $product->price_override = ['gross_selling_price_commercial_unit_after_discounts' => $singleTransaction->transactionItem->tt_Price];
+                    return $product;
+                });
 
             $orderItems = $products->map(function ($product) {
                 return [
