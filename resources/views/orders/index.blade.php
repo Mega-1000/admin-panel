@@ -1579,6 +1579,7 @@
             @endforeach
         let localDatatables = localStorage.getItem('DataTables_dataTable_/admin/orders');
         if(localDatatables != null) {
+
             let objDatatables = JSON.parse(localDatatables);
             $('#dataTable thead tr th input, #dataTable thead tr th select').each(function (i) {
                 let colName = $(this)[0].id;
@@ -1586,6 +1587,7 @@
                     let colSelector = colName.substring(13, colName.length) + ":name";
                     let index = table.column(colSelector).index();
                     let searched = objDatatables.columns[index].search.search;
+
                     if (searched != "") {
                         this.value = searched;
                     }
@@ -2005,7 +2007,7 @@
             $.ajax({
                 url: '/admin/orders/'+id+'/invoices',
             }).done(function(data) {
-                $('#order_invoices_delete').modal('show');	
+                $('#order_invoices_delete').modal('show');
                 if(data === null) {
                     return;
                 }
@@ -2037,18 +2039,18 @@
                 $('#order_move_data_error_select').modal('show');
             }
         }
-        
-        $('#remove-selected-invoice').on('click', () => {	
-            let invoiceId = $('#invoice__list option:selected').val();	
-            $.ajax({	
-                url: '/admin/invoice/'+invoiceId+'/delete'	
-            }).done(function(data) {	
+
+        $('#remove-selected-invoice').on('click', () => {
+            let invoiceId = $('#invoice__list option:selected').val();
+            $.ajax({
+                url: '/admin/invoice/'+invoiceId+'/delete'
+            }).done(function(data) {
                 $('#invoice_delete_success').modal('show');
-                
-                $('#invoice-delete-ok').on('click', function(){	
-                    location.reload();	
-                });	
-            })	
+
+                $('#invoice-delete-ok').on('click', function(){
+                    location.reload();
+                });
+            })
         })
 
         $('#move-data-ok').on('click', function(){
