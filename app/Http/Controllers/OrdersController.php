@@ -279,7 +279,7 @@ class OrdersController extends Controller
         $loggedUser = $request->user();
         if ($loggedUser->role_id == Role::ADMIN || $loggedUser->role_id == Role::SUPER_ADMIN) {
             $admin = true;
-        } 
+        }
         $labIds = array(
             'production' => Label::PRODUCTION_IDS_FOR_TABLE,
             'payments' => Label::PAYMENTS_IDS_FOR_TABLE,

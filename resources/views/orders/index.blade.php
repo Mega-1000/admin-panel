@@ -1331,16 +1331,16 @@
 
                         for (let index = 0; index < payments.length; index++) {
                             if(payments[index].type === 'WAREHOUSE') {
-                                totalofWarehousePayments += parseFloat(payments[index].amount);	
-                            }	
+                                totalofWarehousePayments += parseFloat(payments[index].amount);
+                            }
                             else if(payments[index].promise != "1") {
                                 totalOfPayments += parseFloat(payments[index].amount);
                             } else {
                                 totalOfDeclaredPayments += parseFloat(payments[index].amount);
                             }
                         }
-                        if(totalofWarehousePayments > 0) {	
-                            return '<p>DM: ' + totalofWarehousePayments + '</p>';	
+                        if(totalofWarehousePayments > 0) {
+                            return '<p>DM: ' + totalofWarehousePayments + '</p>';
                         }
                         if(totalOfDeclaredPayments > 0 ) {
                             return '<p>Z: ' + totalOfPayments + '</p><p>D: ' + totalOfDeclaredPayments +'</p>';
@@ -1730,8 +1730,8 @@
             $('#columnSearch-clientPhone').val(replaced);
             filterByPhone(replaced);
         });
-        $('#columnSearch-clientPhone').click(function(){ 
-            clearFilters(false);  
+        $('#columnSearch-clientPhone').click(function(){
+            clearFilters(false);
         });
         $('#columnSearch-orderId').click(function(){
             clearFilters(false);
@@ -2000,27 +2000,27 @@
                 $('.btn-move').addClass('hidden');
             }
         }
-        
-        function getInvoicesList(id) {	
-            $.ajax({	
-                url: '/admin/orders/'+id+'/invoices',	
-            }).done(function(data) {	
+
+        function getInvoicesList(id) {
+            $.ajax({
+                url: '/admin/orders/'+id+'/invoices',
+            }).done(function(data) {
                 $('#order_invoices_delete').modal('show');	
-                if(data === null) {	
-                    return;	
-                }	
-                $('#invoice__list').remove();	
-                let parent = document.getElementById("invoice__container");	
-                let invoiceSelect = document.createElement("SELECT");	
-                invoiceSelect.id = "invoice__list";	
-                parent.appendChild(invoiceSelect);	
-                data.forEach((invoice) => {	
-                    let option = document.createElement("option");	
-                    option.value = invoice.id;	
-                    option.text = invoice.invoice_name;	
-                    invoiceSelect.appendChild(option);	
-                })	
-            })	
+                if(data === null) {
+                    return;
+                }
+                $('#invoice__list').remove();
+                let parent = document.getElementById("invoice__container");
+                let invoiceSelect = document.createElement("SELECT");
+                invoiceSelect.id = "invoice__list";
+                parent.appendChild(invoiceSelect);
+                data.forEach((invoice) => {
+                    let option = document.createElement("option");
+                    option.value = invoice.id;
+                    option.text = invoice.invoice_name;
+                    invoiceSelect.appendChild(option);
+                })
+            })
         }
 
         function moveDataAjax(id){
@@ -2043,13 +2043,14 @@
             $.ajax({	
                 url: '/admin/invoice/'+invoiceId+'/delete'	
             }).done(function(data) {	
-                $('#invoice_delete_success').modal('show');	
+                $('#invoice_delete_success').modal('show');
+                
                 $('#invoice-delete-ok').on('click', function(){	
                     location.reload();	
                 });	
             })	
         })
-        
+
         $('#move-data-ok').on('click', function(){
             var idToGet = $('#order_id_get').text();
             var idToSend = $('#order_id_send').text();
