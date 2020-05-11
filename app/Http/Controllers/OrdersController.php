@@ -1473,8 +1473,9 @@ class OrdersController extends Controller
                 $quantity = $item->quantity ?? 0;
                 $totalProductPrice += $price * $quantity;
             }
-            $products_value_gross = round($totalProductPrice * 1.23, 2);
-            $sum_of_gross_values = round($totalProductPrice * 1.23 + $additional_service + $additional_cod_cost + $shipment_price_client, 2);
+            $vatFactor = (1+env('VAT'));
+            $products_value_gross = round($totalProductPrice * $vatFactor, 2);
+            $sum_of_gross_values = round($totalProductPrice * $vatFactor + $additional_service + $additional_cod_cost + $shipment_price_client, 2);
             $order->values_data = array(
                 'sum_of_gross_values' => $sum_of_gross_values,
                 'products_value_gross' => $products_value_gross,
