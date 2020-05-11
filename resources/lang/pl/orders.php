@@ -52,6 +52,7 @@ return [
         'correction_amount' => 'Kwota korekty',
         'correction_description' => 'Treść korekty',
         'document_number' => 'Nr dokumentu',
+        'payment_id' => 'Id płatności',
         'search_on_lp' => 'do-ukrycia-domyslnie',
 
         'warehouse_cost' => 'Koszt magazynu',
