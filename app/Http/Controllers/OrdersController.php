@@ -279,7 +279,7 @@ class OrdersController extends Controller
         $loggedUser = $request->user();
         if ($loggedUser->role_id == Role::ADMIN || $loggedUser->role_id == Role::SUPER_ADMIN) {
             $admin = true;
-        }
+        } 
         $labIds = array(
             'production' => Label::PRODUCTION_IDS_FOR_TABLE,
             'payments' => Label::PAYMENTS_IDS_FOR_TABLE,
@@ -1455,10 +1455,35 @@ class OrdersController extends Controller
         $collection = $this->prepareCollection($data);
         $countFiltred = $this->countFiltered($data);
         $count = $this->orderRepository->all();
-
         $count = count($count);
-
+        $collection = $this->prepareAdditionalOrderData($collection);
+        
         return DataTables::of($collection)->with(['recordsFiltered' => $countFiltred])->skipPaging()->setTotalRecords($count)->make(true);
+    }
+
+    public function prepareAdditionalOrderData($collection) 
+    {
+        foreach ($collection as $order) {
+            $additional_service = $order->additional_service_cost ?? 0;
+            $additional_cod_cost = $order->additional_cash_on_delivery_cost ?? 0;
+            $shipment_price_client = $order->shipment_price_for_client ?? 0;
+            $totalProductPrice = 0;
+            foreach ($order->items as $item) {
+                $price = $item->net_selling_price_commercial_unit ?? 0;
+                $quantity = $item->quantity ?? 0;
+                $totalProductPrice += $price * $quantity;
+            }
+            $products_value_gross = round($totalProductPrice * 1.23, 2);
+            $sum_of_gross_values = round($totalProductPrice * 1.23 + $additional_service + $additional_cod_cost + $shipment_price_client, 2);
+            $order->values_data = array(
+                'sum_of_gross_values' => $sum_of_gross_values,
+                'products_value_gross' => $products_value_gross,
+                'shipment_price_for_client' => $order->shipment_price_for_client ?? 0,
+                'additional_cash_on_delivery_cost' => $order->additional_cash_on_delivery_cost ?? 0,
+                'additional_service_cost' => $order->additional_service_cost ?? 0
+            );
+        }
+        return $collection;
     }
 
     protected $dtColumns = [
