@@ -1580,7 +1580,7 @@
         let localDatatables = localStorage.getItem('DataTables_dataTable_/admin/orders');
         if(localDatatables != null) {
             let objDatatables = JSON.parse(localDatatables);
-            
+
             $('#dataTable thead tr th input, #dataTable thead tr th select').each(function (i) {
                 let colName = $(this)[0].id;
                 if(colName != "") {
