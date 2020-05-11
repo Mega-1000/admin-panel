@@ -126,7 +126,7 @@ class Order extends Model implements Transformable
     public function getSumOfGrossValues()
     {
         $totalOfProductsPrices = 0;
-        $vatFactor = (1+env('VAT'));
+        $vatFactor = (1 + env('VAT'));
 
         if (count($this->items)) {
             foreach ($this->items as $item) {
