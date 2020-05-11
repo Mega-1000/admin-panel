@@ -391,7 +391,7 @@
                                     @endif
                                 @endforeach
                             @endforeach
-                        @endforeach     
+                        @endforeach
                     </tr>
                         @foreach ($outs as $out)
                             @if (!empty($out['user']->orders[0]))
@@ -402,10 +402,10 @@
                                         @foreach ($labIdGroup as $labId)
                                             <td style="text-align: center">{{$out[$labId] ?? 0}}</td>
                                         @endforeach
-                                    @endforeach  
+                                    @endforeach
                                 </tr>
                             @endif
-                    @endforeach
+                        @endforeach
                 </table>
         </div>
     </div>
