@@ -859,7 +859,7 @@
                                 if (value.letter_number === null) {
                                     html += '<a href="javascript:void()"><p>Brak listu przewozowego</p></a>';
                                 }else {
-                                    if (value.delivery_courier_name === 'INPOST') {
+                                    if (value.service_courier_name === 'INPOST' || value.service_courier_name === 'ALLEGRO-INPOST') {
                                         html += '<a target="_blank" href="/storage/inpost/stickers/sticker' + value.letter_number + '.pdf"><p>'+value.letter_number+'</p></a>';
                                     } else if (value.delivery_courier_name === 'DPD') {
                                         html += '<p>'+value.sending_number+'</p>';
@@ -918,7 +918,7 @@
                                         html += '<button class="btn btn-success" id="package-' + value.id + '" onclick="sendPackage(' + value.id + ',' + value.order_id + ')">Wyślij</button>';
                                     }
                                 } else {
-                                    if (value.delivery_courier_name === 'INPOST') {
+                                    if (value.service_courier_name === 'INPOST' || value.service_courier_name === 'ALLEGRO-INPOST') {
                                         html += '<a target="_blank" href="/storage/inpost/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                     } else if (value.delivery_courier_name === 'DPD') {
                                         html += '<a target="_blank" href="/storage/dpd/protocols/protocol' + value.letter_number + '.pdf"><p>' + value.sending_number + '</p></a>';
@@ -1326,16 +1326,22 @@
                     render: function(data, type, row) {
                         let totalOfPayments = 0;
                         let totalOfDeclaredPayments = 0;
+                        let totalofWarehousePayments = 0;
                         var payments = row['payments'];
 
                         for (let index = 0; index < payments.length; index++) {
-                            if(payments[index].promise != "1") {
+                            if(payments[index].type === 'WAREHOUSE') {
+                                totalofWarehousePayments += parseFloat(payments[index].amount);	
+                            }	
+                            else if(payments[index].promise != "1") {
                                 totalOfPayments += parseFloat(payments[index].amount);
                             } else {
                                 totalOfDeclaredPayments += parseFloat(payments[index].amount);
                             }
                         }
-
+                        if(totalofWarehousePayments > 0) {	
+                            return '<p>DM: ' + totalofWarehousePayments + '</p>';	
+                        }
                         if(totalOfDeclaredPayments > 0 ) {
                             return '<p>Z: ' + totalOfPayments + '</p><p>D: ' + totalOfDeclaredPayments +'</p>';
                         } else {
@@ -1440,9 +1446,12 @@
                             invoices.forEach(function(invoice){
                                 html += '<a target="_blank" href="/storage/invoices/'+invoice.invoice_name+'" style="margin-top: 5px;">Faktura</a>';
                             });
+                            let jsonInvoices = JSON.stringify(invoices);
                             html += '<br />'
+                            html += '<a href="#" class="remove__invoices"' + 'onclick="getInvoicesList('+data.orderId+ ')">Usuń faktury</a>'
                         }
                         html += '<a href="{{env('FRONT_NUXT_URL')}}' + '/magazyn/awizacja/0/0/' + data.orderId + '/wyslij-fakture">Dodaj</a>'
+                        
                         return html;
                     }
                 },
@@ -1991,6 +2000,28 @@
                 $('.btn-move').addClass('hidden');
             }
         }
+        
+        function getInvoicesList(id) {	
+            $.ajax({	
+                url: '/admin/orders/'+id+'/invoices',	
+            }).done(function(data) {	
+                $('#order_invoices_delete').modal('show');	
+                if(data === null) {	
+                    return;	
+                }	
+                $('#invoice__list').remove();	
+                let parent = document.getElementById("invoice__container");	
+                let invoiceSelect = document.createElement("SELECT");	
+                invoiceSelect.id = "invoice__list";	
+                parent.appendChild(invoiceSelect);	
+                data.forEach((invoice) => {	
+                    let option = document.createElement("option");	
+                    option.value = invoice.id;	
+                    option.text = invoice.invoice_name;	
+                    invoiceSelect.appendChild(option);	
+                })	
+            })	
+        }
 
         function moveDataAjax(id){
             var idToSend = id;
@@ -2006,7 +2037,19 @@
                 $('#order_move_data_error_select').modal('show');
             }
         }
-
+        
+        $('#remove-selected-invoice').on('click', () => {	
+            let invoiceId = $('#invoice__list option:selected').val();	
+            $.ajax({	
+                url: '/admin/invoice/'+invoiceId+'/delete'	
+            }).done(function(data) {	
+                $('#invoice_delete_success').modal('show');	
+                $('#invoice-delete-ok').on('click', function(){	
+                    location.reload();	
+                });	
+            })	
+        })
+        
         $('#move-data-ok').on('click', function(){
             var idToGet = $('#order_id_get').text();
             var idToSend = $('#order_id_send').text();
