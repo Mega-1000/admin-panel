@@ -365,10 +365,9 @@
         <button id="showTable" class="btn btn-warning" style="margin-left: 5px">Pokaż Tabelkę z Etykietami Pracownika</button>
         <div class="col-md-12 hidden" style="float: right" id="labelTable">
             <table width="50%"  style="float:right;" border="1">
-                    
                     <tr>
                         <th colspan="1" width="10%"></th>
-                        <th colspan="1" width="10%">Pracownik</th>                       
+                        <th colspan="1" width="10%">Pracownik</th>
                         <th colspan="{{count($labIds['payments'])}}" width="17,5%" style="text-align: center">Płatności</th>
                         <th colspan="{{count($labIds['production'])}}" width="15%" style="text-align: center">Produkcja</th>
                         <th colspan="{{count($labIds['transport'])}}" width="17,5%" style="text-align: center">Transport</th>
