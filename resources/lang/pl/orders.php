@@ -28,7 +28,7 @@ return [
         'add_invoice' => 'Dodaj fakturę',
         'profit' => 'Zysk na towarze',
         'weight' => 'Waga',
-         'values_data' => 'Wart. Br. Sprzedaży',
+        'values_data' => 'Wart. Br. Sprzedaży',
         'additional_service_cost' => 'Dodatko wy koszt obsługi',
         'additional_cash_on_delivery_cost' => 'Dodatkowy koszt pobrania',
         'shipment_price_for_client' => 'Transport klient brutto',
