@@ -26,7 +26,7 @@ return [
         'log_errors' => false,
         'log_path' => 'logs',
         'timezone' => 'Europe/Warsaw',
-        'tracking_url' => 'https://www.kurierem.pl/sledzenie-paczek-DPD'
+        'tracking_url' => 'https://tracktrace.dpd.com.pl/findPackage'
     ],
     'pocztex' => [
         'tracking_url' => 'http://mobilna.poczta-polska.pl/MobiPost/getpackage?action=getPackageData&search='
