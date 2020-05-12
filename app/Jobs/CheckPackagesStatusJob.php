@@ -10,6 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use App\Integrations\Jas\Jas;
+use App\Entities\OrderPackage;
 
 /**
  * Class CheckPackagesStatusJob
@@ -34,10 +35,9 @@ class CheckPackagesStatusJob
      *
      * @return void
      */
-    public function __construct(OrderPackageRepository $orderPackageRepository)
+    public function __construct()
     {
-        $this->config = config('integrations');
-        $this->orderPackageRepository = $orderPackageRepository;
+        $this->config = config('integrations');     
     }
 
     /**
@@ -47,7 +47,7 @@ class CheckPackagesStatusJob
      */
     public function handle()
     {
-        $packages = $this->orderPackageRepository->findWhere([['shipment_date', '>', Carbon::today()->subDays(7)]]);
+        $packages = OrderPackage::whereDate('shipment_date', '>', Carbon::today()->subDays(7)->toDateString())->get();
         foreach ($packages as $package) {
             if ($package->letter_number !== null) {
                 switch ($package->delivery_courier_name) {
@@ -122,12 +122,12 @@ class CheckPackagesStatusJob
 
         if (in_array($result['items'][0]['status'], $statusDelivered)) {
             $package->status = 'DELIVERED';
-            $package->update();
+            $package->save();
 
         }
         if (in_array($result['items'][0]['status'], $status)) {
             $package->status = 'SENDING';
-            $package->update();
+            $package->save();
 
         }
     }
@@ -139,36 +139,23 @@ class CheckPackagesStatusJob
     {
         $url = $this->config['dpd']['tracking_url'];
 
-        $curl = curl_init();
+        $guzzle = new \GuzzleHttp\Client(["base_uri" => $url]);
+        $params = [
+            'q' => $package->letter_number,
+            'typ' => 1
+        ];
+        $options = ['form_params' => $params];
+        $response = $guzzle->post('', $options)->getBody()->getContents();
 
-        curl_setopt_array($curl, array(
-            CURLOPT_URL => $url,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_ENCODING => "",
-            CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 30,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => "POST",
-            CURLOPT_POSTFIELDS => "------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"kurier\"\r\n\r\ndpd\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW\r\nContent-Disposition: form-data; name=\"nr\"\r\n\r\n" . $package->letter_number . "\r\n------WebKitFormBoundary7MA4YWxkTrZu0gW--",
-            CURLOPT_HTTPHEADER => array(
-                "Postman-Token: 23ef4480-e85e-4dfe-8863-924e7474ff7d",
-                "cache-control: no-cache",
-                "content-type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW"
-            ),
-        ));
-
-        $response = curl_exec($curl);
-        $err = curl_error($curl);
-
-        curl_close($curl);
-
-        if ($err) {
-            Log::info("cURL Error #:" . $err);
+        $result = preg_match('/Przesyłka doręczona/', $response);
+        if ($result == '1') {
+            $package->status = 'DELIVERED';
+            $package->save();
         } else {
             $result = preg_match('/Przesyłka odebrana przez Kuriera/', $response);
             if ($result == '1') {
                 $package->status = 'SENDING';
-                $package->update();
+                $package->save();
             }
         }
     }
@@ -193,11 +180,11 @@ class CheckPackagesStatusJob
             foreach ($result[0]['zdarzenia'] as $item) {
                 if ($item['nazwa'] == 'Wysłanie z ładunkiem' || $item['nazwa'] == 'Nadanie') {
                     $package->status = 'SENDING';
-                    $package->update();
+                    $package->save();
                 } else {
                     if ($item['nazwa'] == 'Doręczenie') {
                         $package->status = 'DELIVERED';
-                        $package->update();
+                        $package->save();
                     }
                 }
             }
@@ -230,12 +217,12 @@ class CheckPackagesStatusJob
         if (preg_match('/DOSTARCZONO/', $status, $matches) || preg_match('/ZAKOŃCZONO/', $status,
                 $matches) || $status == 'DOSTARCZONO' || $status == 'ZAKOŃCZONO') {
             $package->status = 'DELIVERED';
-            $package->update();
+            $package->save();
         } else {
             if (preg_match('/TRANSPORT/', $status, $matches) || preg_match('/MAGAZYN/', $status,
                     $matches) || $status == 'TRANSPORT' || $status == 'MAGAZYN') {
                 $package->status = 'SENDING';
-                $package->update();
+                $package->save();
             }
         }
     }
