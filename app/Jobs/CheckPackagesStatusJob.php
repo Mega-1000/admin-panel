@@ -137,7 +137,6 @@ class CheckPackagesStatusJob
      */
     protected function checkStatusInDpdPackages($package)
     {
-        error_log('hello');
         $url = $this->config['dpd']['tracking_url'];
 
         $guzzle = new \GuzzleHttp\Client(["base_uri" => $url]);
