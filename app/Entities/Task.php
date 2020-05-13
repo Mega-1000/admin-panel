@@ -65,4 +65,14 @@ class Task extends Model implements Transformable
         return $this->hasMany(ReportProperty::class);
     }
 
+    public function childs()
+    {
+        return $this->hasMany(Task::class, 'parent_id', 'id');
+    }
+
+    public function parent()
+    {
+        return $this->hasMany(Task::class, 'id', 'parent_id');
+    }
+
 }

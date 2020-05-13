@@ -342,14 +342,19 @@ class TasksController extends Controller
 
     public function getTasks(Request $request, $id)
     {
-        $tasks = $this->repository->with(['taskTime', 'taskSalaryDetail'])->whereHas('taskTime',
-            function ($query) use ($request) {
-                $query->where('date_start', '>=', $request->start);
-                $query->where('date_end', '<=', $request->end);
-            })->findWhere([['warehouse_id', '=', $id]]);
+        $tasks = Task::with(['taskTime', 'taskSalaryDetail'])
+            ->whereHas('taskTime',
+                function ($query) use ($request) {
+                    $query->whereDate('date_start', '>=', $request->start);
+                    $query->whereDate('date_end', '<=', $request->end);
+                })
+            ->where('warehouse_id', $id)
+            ->get();
 
         $array = [];
-        foreach ($tasks as $task) {
+
+        $parents = $tasks->where('parent_id', null);
+        foreach ($parents as $task) {
             $start = new Carbon($task->taskTime->date_start);
             $end = new Carbon($task->taskTime->date_end);
             if ($task->taskSalaryDetail != null) {
@@ -369,6 +374,7 @@ class TasksController extends Controller
                 'end' => $end->format('Y-m-d\TH:i'),
                 'color' => '#' . $task->color,
                 'text' => $text,
+                'childs' => $task->childs,
                 'customOrderId' => $task->order_id != null ? 'taskOrder-' . $task->order_id : null,
                 'customTaskId' => 'task-' . $task->id
             ];

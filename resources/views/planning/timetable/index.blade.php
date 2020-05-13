@@ -289,12 +289,12 @@
           plugins: ['interaction', 'dayGrid', 'timeGrid', 'resourceTimeline'],
           now: '{{$activeDay != null ? $activeDay : new Carbon\Carbon()}}',
           editable: true,
-          aspectRatio: 1.8,
+          aspectRatio: 3,
           scrollTime: '7:00',
           slotDuration: '0:05',
           timeZone: 'UTC',
           minTime: "07:00:00",
-          maxTime: "20:00:00",
+          maxTime: "18:00:00",
           locale: 'PL',
           titleFormat: {year: 'numeric', month: 'long', day: '2-digit'},
           buttonText: {
@@ -445,7 +445,7 @@
               $('.default-date-time-picker-now').datetimepicker({
                 sideBySide: true,
                 format: "YYYY-MM-DD H:mm",
-                stepping: 5
+                stepping: 1
               });
               $('#name').val((endDate.getUTCDate() + '-' + ('0' + (endDate.getMonth() + 1)).slice(-2)) + ' - ' + $('#warehouse_value').val());
               $(document).on('focusout', '.default-date-time-picker-now', function () {
@@ -628,7 +628,7 @@
             $('.default-date-time-picker-now').datetimepicker({
               sideBySide: true,
               format: "YYYY-MM-DD H:mm",
-              stepping: 5
+              stepping: 1
             });
           },
           eventClick: function (info) {
@@ -752,7 +752,7 @@
                 $('.default-date-time-picker-now').datetimepicker({
                   sideBySide: true,
                   format: "YYYY-MM-DD H:mm",
-                  stepping: 5
+                  stepping: 1
                 });
                 $('.default-date-picker-now').datetimepicker({
                   sideBySide: true,
