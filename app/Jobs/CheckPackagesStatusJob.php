@@ -122,6 +122,9 @@ class CheckPackagesStatusJob
 
         $result = json_decode((string)$response->getBody(), true);
 
+        if (! isset($result['items'][0])) {
+            return;
+        }
         try {
             if (in_array($result['items'][0]['status'], $statusDelivered)) {
                 $package->status = 'DELIVERED';
