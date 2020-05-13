@@ -122,6 +122,10 @@ class CheckPackagesStatusJob
 
         $result = json_decode((string)$response->getBody(), true);
 
+        if (! isset($result['items'][0])) {
+            Log::info('Something went wrong with package:'. ['order_id' => $package->order_id, 'package_id' => $package->id]);
+            return;
+        }
         try {
             if (in_array($result['items'][0]['status'], $statusDelivered)) {
                 $package->status = 'DELIVERED';
