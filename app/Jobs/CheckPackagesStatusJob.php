@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use App\Integrations\Jas\Jas;
 use App\Entities\OrderPackage;
+use OutOfRangeException;
 
 /**
  * Class CheckPackagesStatusJob
@@ -37,7 +38,7 @@ class CheckPackagesStatusJob
      */
     public function __construct()
     {
-        $this->config = config('integrations');     
+        $this->config = config('integrations');
     }
 
     /**
@@ -49,27 +50,28 @@ class CheckPackagesStatusJob
     {
         $packages = OrderPackage::whereDate('shipment_date', '>', Carbon::today()->subDays(7)->toDateString())->get();
         foreach ($packages as $package) {
-            if (!empty($package->letter_number)) {
-                switch ($package->delivery_courier_name) {
-                    case 'INPOST' :
-                    case 'ALLEGRO-INPOST' :
-                        $this->checkStatusInInpostPackages($package);
-                        break;
-                    case 'DPD':
-                        $this->checkStatusInDpdPackages($package);
-                        break;
-                    case 'APACZKA':
-                        $this->checkStatusInApaczkaPackages($package);
-                        break;
-                    case 'POCZTEX':
-                        $this->checkStatusInPocztexPackages($package);
-                        break;
-                    case 'JAS':
-                        $this->checkStatusInJasPackages($package);
-                        break;
-                    default:
-                        break;
-                }
+            if (empty($package->letter_number)) {
+                continue;
+            }
+            switch ($package->delivery_courier_name) {
+                case 'INPOST' :
+                case 'ALLEGRO-INPOST' :
+                    $this->checkStatusInInpostPackages($package);
+                    break;
+                case 'DPD':
+                    $this->checkStatusInDpdPackages($package);
+                    break;
+                case 'APACZKA':
+                    $this->checkStatusInApaczkaPackages($package);
+                    break;
+                case 'POCZTEX':
+                    $this->checkStatusInPocztexPackages($package);
+                    break;
+                case 'JAS':
+                    $this->checkStatusInJasPackages($package);
+                    break;
+                default:
+                    break;
             }
         }
     }
@@ -120,15 +122,17 @@ class CheckPackagesStatusJob
 
         $result = json_decode((string)$response->getBody(), true);
 
-        if (in_array($result['items'][0]['status'], $statusDelivered)) {
-            $package->status = 'DELIVERED';
-            $package->save();
-
-        }
-        if (in_array($result['items'][0]['status'], $status)) {
-            $package->status = 'SENDING';
-            $package->save();
-
+        try {
+            if (in_array($result['items'][0]['status'], $statusDelivered)) {
+                $package->status = 'DELIVERED';
+                $package->save();
+            }
+            if (in_array($result['items'][0]['status'], $status)) {
+                $package->status = 'SENDING';
+                $package->save();
+            }
+        } catch(OutOfRangeException $e) {
+            Log::info('Something went wrong with package:'. ['order_id' => $package->order_id, 'package_id' => $package->id]);
         }
     }
 
