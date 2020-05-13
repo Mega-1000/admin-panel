@@ -50,7 +50,6 @@ class CheckPromisePaymentsDates implements ShouldQueue
     protected function shouldAttachLabel($notConfirmedPayment, $now)
     {
         if ($notConfirmedPayment->created_at == null) {
-            error_log(print_r($notConfirmedPayment, true));
             return;
         }
         if($notConfirmedPayment->order->toPay() == 0 || $notConfirmedPayment->order->hasLabel(40)) {
