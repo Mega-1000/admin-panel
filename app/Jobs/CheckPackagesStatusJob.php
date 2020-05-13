@@ -49,7 +49,7 @@ class CheckPackagesStatusJob
     {
         $packages = OrderPackage::whereDate('shipment_date', '>', Carbon::today()->subDays(7)->toDateString())->get();
         foreach ($packages as $package) {
-            if ($package->letter_number !== null) {
+            if (!empty($package->letter_number)) {
                 switch ($package->delivery_courier_name) {
                     case 'INPOST' :
                     case 'ALLEGRO-INPOST' :
