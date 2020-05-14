@@ -239,11 +239,10 @@ class OrdersPackagesController extends Controller
             }
         }        
         $packagesNumber = 0;
-        $package = $this->repository->orderBy("created_at", "desc")->findWhere(["order_id" => $order_id],
-            ["number"])->first();
+        $packageNumber = OrderPackage::where('order_id', $order_id)->max('number');
 
-        if (!empty($package)) {
-            $packagesNumber = $package->number;
+        if (!empty($packageNumber)) {
+            $packagesNumber = $packageNumber;
         }
         $data['packing_type'] = $request->input('packing_type');
         $data['number'] = $packagesNumber + 1;
@@ -256,7 +255,7 @@ class OrdersPackagesController extends Controller
         }
 
         $order = $this->orderRepository->find($order_id);
-        if(empty($package)) {
+        if(empty($packageNumber)) {
             $isAdditionalDKPExists = false;
             $connectedOrders = $this->orderRepository->findWhere(['master_order_id' => $order->id]);
             foreach($connectedOrders as $connectedOrder)
