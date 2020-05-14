@@ -53,7 +53,7 @@ class CheckPackagesStatusJob
             if (empty($package->letter_number)) {
                 continue;
             }
-            switch ($package->delivery_courier_name) {
+            switch ($package->service_courier_name) {
                 case 'INPOST' :
                 case 'ALLEGRO-INPOST' :
                     $this->checkStatusInInpostPackages($package);
