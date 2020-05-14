@@ -238,14 +238,10 @@ class OrdersPackagesController extends Controller
                 $data['delivery_date'] = new \DateTime($delidate);
             }
         }        
-        $packagesNumber = 0;
-        $packageNumber = OrderPackage::where('order_id', $order_id)->max('number');
 
-        if (!empty($packageNumber)) {
-            $packagesNumber = $packageNumber;
-        }
+        $packageNumber = OrderPackage::where('order_id', $order_id)->max('number');
         $data['packing_type'] = $request->input('packing_type');
-        $data['number'] = $packagesNumber + 1;
+        $data['number'] = $packageNumber + 1;
         $data['symbol'] = $request->input('symbol');
         $notices = $data['notices'];
         $data['notices'] = $data['order_id'] . '/' . $data['number'] . ' ' . $notices;
