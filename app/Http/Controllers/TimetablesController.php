@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\Warehouse;
 use App\Repositories\TaskRepository;
 use App\Repositories\WarehouseRepository;
 use Carbon\Carbon;
@@ -48,7 +49,7 @@ class TimetablesController extends Controller
 
     public function getStorekeepers($id)
     {
-        $warehouse = $this->warehouseRepository->find($id);
+        $warehouse = Warehouse::find($id);
 
         if (empty($warehouse)) {
             abort(404);
@@ -56,12 +57,16 @@ class TimetablesController extends Controller
         $array = [];
         foreach ($warehouse->users as $user) {
             $date = Carbon::today();
+            $works = $user->userWorks()->where('date_of_work', '=', $date->toDateString())->first();
+            if (!$works) {
+                continue;
+            }
             $array[] = [
                 'id' => $user->id,
                 'title' => $user->firstname . ' ' . $user->lastname,
                 'businessHours' => [
-                    'startTime' => $user->userWorks->where('date_of_work', '=', $date->toDateString())->first()->start,
-                    'endTime' => $user->userWorks->where('date_of_work', '=', $date->toDateString())->first()->end,
+                    'startTime' => $works->start,
+                    'endTime' => $works->end,
                     'daysOfWeek' => [0, 1, 2, 3, 4, 5, 6]
                 ],
             ];
