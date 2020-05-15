@@ -1223,17 +1223,23 @@ class OrdersPaymentsController extends Controller
             $type = 'WAREHOUSE';
         }
 
+        if($isWarehousePayment == null) {
+            $type = 'CLIENT';
+        }
+
         $token = null;
 
         if($isWarehousePayment) {
             $token = md5(uniqid());
             $url = route('ordersPayment.warehousePaymentConfirmation', ['token' => $token]);
-            try {
-                \Mailer::create()
-                    ->to($order->warehouse->warehouse_email)
-                    ->send(new WarehousePaymentAccept($orderId, $amount, $order->invoices()->first()->invoice_name, $url));
-            } catch (\Swift_TransportException $e) {
-                Log::error('Warehouse payment accept email was not sent due to. Error: ' . $e->getMessage());
+            if($order->invoices()->first() !== null) {
+                try {
+                    \Mailer::create()
+                        ->to($order->warehouse->warehouse_email)
+                        ->send(new WarehousePaymentAccept($orderId, $amount, $order->invoices()->first()->invoice_name, $url));
+                } catch (\Swift_TransportException $e) {
+                    Log::error('Warehouse payment accept email was not sent due to. Error: ' . $e->getMessage());
+                }
             }
         }
 
