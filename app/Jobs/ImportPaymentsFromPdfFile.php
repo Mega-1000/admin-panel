@@ -52,7 +52,6 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
         $ordersIds = $this->getOrdersIds();
 
         $payments  = $this->getPaymentsFromTextFile($basePath . '/storage/app/' . str_replace('.pdf', '.txt', $this->filename), $ordersIds);
-        dd($payments);
         $infos     = $this->storePayments($payments);
 
         return $infos;
