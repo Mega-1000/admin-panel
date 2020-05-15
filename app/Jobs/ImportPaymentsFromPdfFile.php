@@ -46,12 +46,12 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
     {
         $basePath = base_path();
         $this->convertPdfFileToTextFile(
-            $basePath . '/app.js', $basePath . '/storage/app/user-files/payments/' . $this->filename, $basePath . '/storage/app/user-files/payments/' . $this->filename
+            $basePath . '/pdf/app.js', $basePath . '/storage/app/' . $this->filename, $basePath . '/storage/app/'. $this->filename
         );
 
-
         $ordersIds = $this->getOrdersIds();
-        $payments  = $this->getPaymentsFromTextFile($basePath . '/storage/app/' . $this->filename, $ordersIds);
+
+        $payments  = $this->getPaymentsFromTextFile($basePath . '/storage/app/' . str_replace('.pdf', '.txt', $this->filename), $ordersIds);
         $infos     = $this->storePayments($payments);
 
         return $infos;
@@ -59,7 +59,9 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
 
     protected function convertPdfFileToTextFile($pdfApplicationPath, $pdfFilePath, $outputFilePath)
     {
-        exec('node '.$pdfApplicationPath.' '.$pdfFilePath.' '.$outputFilePath);
+        $outputFilePath = str_replace('.pdf', '', $outputFilePath);
+
+        exec('node '.$pdfApplicationPath.' '.$pdfFilePath.' '. $outputFilePath);
     }
 
     protected function getPaymentsFromTextFile($filePath, $ordersIds)
