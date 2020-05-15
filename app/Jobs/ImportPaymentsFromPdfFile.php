@@ -51,7 +51,7 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
 
 
         $ordersIds = $this->getOrdersIds();
-        $payments  = $this->getPaymentsFromTextFile($basePath . '/storage/app/user-files/payments/' . $this->filename, $ordersIds);
+        $payments  = $this->getPaymentsFromTextFile($basePath . '/storage/app/' . $this->filename, $ordersIds);
         $infos     = $this->storePayments($payments);
 
         return $infos;
