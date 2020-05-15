@@ -233,38 +233,10 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         dispatch_now(new RemoveLabelJob($order, [LabelsHelper::WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID], $preventionArray, []));
         if ($order->warehouse->id == Warehouse::OLAWA_WAREHOUSE_ID) {
             dispatch_now(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::WAIT_FOR_WAREHOUSE_TO_ACCEPT]));
-            $this->createNewTask($order);
+            $order->createNewTask();
         } else {
             dispatch_now(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::SEND_TO_WAREHOUSE_FOR_VALIDATION]));
         }
-    }
-
-    /**
-     * @param Order $order
-     */
-    private function createNewTask(Order $order): void
-    {
-        $date = Carbon::now();
-        $task = Task::create([
-            'warehouse_id' => Warehouse::OLAWA_WAREHOUSE_ID,
-            'user_id' => User::OLAWA_USER_ID,
-            'order_id' => $order->id,
-            'created_by' => 1,
-            'name' => $order->id . ' - ' . $date->format('d-m'),
-            'color' => Task::DEFAULT_COLOR,
-            'status' => Task::WAITING_FOR_ACCEPT
-        ]);
-        $time = TaskTimeHelper::getFirstAvailableTime(5);
-        TaskTime::create([
-            'task_id' => $task->id,
-            'date_start' => $time['start'],
-            'date_end' => $time['end']
-        ]);
-        TaskSalaryDetails::create([
-            'task_id' => $task->id,
-            'consultant_value' => 0,
-            'warehouse_value' => 0
-        ]);
     }
 
     /**
