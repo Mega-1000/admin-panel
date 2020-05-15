@@ -1211,14 +1211,29 @@
                         <div class="firms-general" id="orderPayment">
                             <div class="form-group">
                                 <label for="amount">@lang('order_payments.form.amount')</label>
-
+                                @if($order->warehouse !== null)
+                                    @foreach($order->warehouse->orders as $itemCustomerOrder)
+                                        @php
+                                            $orderValue = str_replace(',', '', number_format($itemCustomerOrder->getSumOfGrossValues(), 2));
+                                        @endphp
+                                    @endforeach
+                                @endif
                                 <input type="text" class="form-control" id="amount" name="amount"
                                        value="{{ $orderValue }}">
                             </div>
                             <div class="form-group">
                                 <label for="chooseOrder">Wybierz zlecenie</label>
                                 <select class="form-control" id="chooseOrder" name="chooseOrder">
-
+                                    @if($order->warehouse !== null)
+                                        @foreach($order->warehouse->orders as $itemCustomerOrder)
+                                            @php
+                                                $orderValue = str_replace(',', '', number_format($itemCustomerOrder->getSumOfGrossValues(), 2));
+                                            @endphp
+                                            <option value="{{ $itemCustomerOrder->id }}">
+                                                Zlecenie: {{ $itemCustomerOrder->id }} Kwota
+                                                zlecenia: {{ $orderValue }}</option>
+                                        @endforeach
+                                    @endif
                                 </select>
                                 @if($order->customer !== null)
                                     @foreach($order->customer->orders as $itemCustomerOrder)
@@ -1406,7 +1421,7 @@
                                 <button type="button" class="btn" style="display: block;" disabled>
                                     Zaksięgowano
                                 </button>
-                                <button type="button" class="btn btn-primary openWarehousePaymentModal" style="display: block;" @if(!$itemOrder->isOrderHasLabel(Label::ORDER_ITEMS_REDEEMED_LABEL)) {{ 'disabled' }} @endif
+                                <button type="button" class="btn btn-primary openWarehousePaymentModal" style="display: block;" @if($itemOrder->isOrderHasLabel(Label::ORDER_ITEMS_REDEEMED_LABEL)) {{ 'disabled' }} @endif
                                         data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->amount }}">
                                     Przydziel
                                 </button>
@@ -1449,7 +1464,7 @@
                                 @foreach($itemOrder->invoices as $invoice)
                                     <a target="_blank" href="/storage/invoices/{{ $invoice->invoice_name }}" style="margin-top: 5px;">Faktura</a>
                                 @endforeach
-                            @elseif($itemOrder->invoiceRequests !== null || $itemOrder->invoiceRequests && $itemOrder->invoiceRequests->count()) > 0)
+                            @elseif($itemOrder->invoiceRequests !== null || $itemOrder->invoiceRequests && $itemOrder->invoiceRequests->count())
                                 <p class="invoice__request--sent">Prośba o fakturę została już wysłana.</p>
                             @else
                                 <button class="btn btn-sm btn-success" onclick="sendInvoiceRequest({{$itemOrder->id}})">Poproś o fakturę</button>
@@ -2414,7 +2429,7 @@
                             var packages = $('#order-packages').hide();
                             var messages = $('#order-messages').hide();
                             var warehousePayments = $('#warehouse-payments').hide();
-                            var speditionPayments = $('#warehouse-payments').hide();
+                            var speditionPayments = $('#spedition-payments').hide();
                             var status = $('#order-status').hide();
                             var customer = $('#order-customer').hide();
                             var pageTitle = $('.page-title').children('i');

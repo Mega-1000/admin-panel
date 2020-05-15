@@ -37,6 +37,9 @@ return [
         'access_forbidden' => 'Nie posiadasz uprawnień do utworzenia płatności zaksięgowanej'
     ],
     'form' => [
+        'client' => 'Płatność klienta',
+        'warehouse' => 'Płatność magazynu',
+        'spedition' => 'Płatność transportu',
         'amount' => 'Kwota',
         'notices' => 'Uwagi',
         'promise' => 'Obietnica wpłaty',
