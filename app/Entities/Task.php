@@ -32,7 +32,8 @@ class Task extends Model implements Transformable
         'name',
         'color',
         'status',
-        'rendering'
+        'rendering',
+        'parent_id'
     ];
 
     public function warehouse()

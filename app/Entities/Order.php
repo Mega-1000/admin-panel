@@ -559,7 +559,7 @@ class Order extends Model implements Transformable
 
     /**
      */
-    public function createNewTask($duration): void
+    public function createNewTask($duration, $parentId): void
     {
         $date = Carbon::now();
         $task = Task::create([
@@ -569,7 +569,8 @@ class Order extends Model implements Transformable
             'created_by' => 1,
             'name' => $this->id . ' - ' . $date->format('d-m'),
             'color' => Task::DEFAULT_COLOR,
-            'status' => Task::WAITING_FOR_ACCEPT
+            'status' => Task::WAITING_FOR_ACCEPT,
+            'parent_id' => $parentId
         ]);
         $time = TaskTimeHelper::getFirstAvailableTime($duration);
         TaskTime::create([

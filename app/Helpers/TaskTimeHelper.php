@@ -40,7 +40,7 @@ class TaskTimeHelper
 
     public static function allowTaskMove($data)
     {
-        $tasks = Task::with(['taskTime'])->whereHas('taskTime', function ($query) use ($data) {
+        $tasks = Task::with(['taskTime'])->whereNull('parent_id')->whereHas('taskTime', function ($query) use ($data) {
             $dateStart = new Carbon($data['start']);
             $dateEnd = new Carbon($data['end']);
             $query->whereRaw('((`date_start` BETWEEN "' . $dateStart->addMinute()->toDateTimeString() . '" AND "' . $dateEnd->subMinute()->toDateTimeString() . '" OR `date_end` BETWEEN "' . $dateStart->addMinute()->toDateTimeString() . '" AND "' . $dateEnd->subMinute()->toDateTimeString() . '") OR ("' . $dateStart->addMinute()->toDateTimeString() . '" BETWEEN `date_start` AND `date_end` OR "' . $dateEnd->subMinute()->toDateTimeString() . '" BETWEEN `date_start` AND `date_end` ))');

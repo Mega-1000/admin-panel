@@ -60,15 +60,14 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             'color' => Task::DEFAULT_COLOR,
             'status' => Task::WAITING_FOR_ACCEPT
         ]);
-        TaskSalaryDetails::create([
+        $taskSalaryDetails = TaskSalaryDetails::create([
             'task_id' => $taskPrimal->id,
             'consultant_value' => 0,
             'warehouse_value' => 0
         ]);
 
-        $count = 0;
         $transactions = SelTransaction::all()->groupBy('tr_CheckoutFormPaymentId');
-        $transactions->map(function ($transactionGroup) use ($count) {
+        $count = $transactions->reduce(function ($count, $transactionGroup) use ($taskPrimal) {
             $isGroup = !empty($transactionGroup->firstWhere('tr_Group', 1));
             if ($isGroup) {
                 $transaction = $transactionGroup->firstWhere('tr_Group', 1);
@@ -76,7 +75,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                 $transaction = $transactionGroup->first();
             }
             if (Order::where('sello_id', $transaction->id)->count() > 0) {
-                return;
+                return $count;
             }
             $transactionArray = $this->createAddressArray($transaction);
             $tax = 1 + env('VAT');
@@ -112,7 +111,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $transactionArray['order_items'] = $orderItems;
             try {
                 DB::beginTransaction();
-                $this->buildOrder($transaction, $transactionArray, $products, $transactionGroup);
+                $this->buildOrder($transaction, $transactionArray, $products, $transactionGroup, $taskPrimal->id);
                 $count++;
                 DB::commit();
             } catch (\Exception $exception) {
@@ -120,15 +119,21 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                 $message = $exception->getMessage();
                 Log::error("Problem with sello import: $message", ['class' => $exception->getFile(), 'line' => $exception->getLine(), 'stack' => $exception->getTraceAsString()]);
             }
-        });
+            return $count;
+        }, 0);
 
-        $time = TaskTimeHelper::getFirstAvailableTime($count * 2);
-        TaskTime::create([
-            'task_id' => $taskPrimal->id,
-            'date_start' => $time['start'],
-            'date_end' => $time['end']
-        ]);
-
+        if ($count > 0) {
+            $time = ceil($count * 2 / 5) * 5;
+            $time = TaskTimeHelper::getFirstAvailableTime($time);
+            TaskTime::create([
+                'task_id' => $taskPrimal->id,
+                'date_start' => $time['start'],
+                'date_end' => $time['end']
+            ]);
+        } else {
+            $taskPrimal->delete();
+            $taskSalaryDetails->delete();
+        }
     }
 
     private function setAdressArray($transaction, array $transactionArray): array
@@ -155,7 +160,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         return $transactionArray;
     }
 
-    private function buildOrder($transaction, array $transactionArray, $products, $group)
+    private function buildOrder($transaction, array $transactionArray, $products, $group, $taskPrimalId)
     {
         $calculator = new SelloPriceCalculator();
 
@@ -198,7 +203,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $order->save();
         if ($transaction->tr_Paid) {
             $this->createPaymentPromise($order, $transaction);
-            $this->setLabels($order);
+            $this->setLabels($order, $taskPrimalId);
         }
     }
 
@@ -250,7 +255,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             null, Carbon::today()->addDay(7)->toDateTimeString());
     }
 
-    private function setLabels($order)
+    private function setLabels($order, $taskPrimalId)
     {
         $preventionArray = [];
         dispatch_now(new RemoveLabelJob($order, [LabelsHelper::FINISH_LOGISTIC_LABEL_ID], $preventionArray, LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID));
@@ -258,7 +263,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         dispatch_now(new RemoveLabelJob($order, [LabelsHelper::WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID], $preventionArray, []));
         if ($order->warehouse->id == Warehouse::OLAWA_WAREHOUSE_ID) {
             dispatch_now(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::WAIT_FOR_WAREHOUSE_TO_ACCEPT]));
-            $order->createNewTask(5);
+            $order->createNewTask(5, $taskPrimalId);
         } else {
             dispatch_now(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::SEND_TO_WAREHOUSE_FOR_VALIDATION]));
         }
