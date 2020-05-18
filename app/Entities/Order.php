@@ -2,7 +2,10 @@
 
 namespace App\Entities;
 
+use App\Helpers\TaskTimeHelper;
+use App\Jobs\ImportOrdersFromSelloJob;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
@@ -133,7 +136,7 @@ class Order extends Model implements Transformable
                 $totalOfProductsPrices += floatval($item->net_selling_price_commercial_unit) * intval($item->quantity);
             }
         }
-        
+
         return round(($totalOfProductsPrices * $vatFactor) + floatval($this->shipment_price_for_client) + floatval($this->additional_service_cost) + floatval($this->additional_cash_on_delivery_cost), 2);
     }
 
@@ -552,5 +555,33 @@ class Order extends Model implements Transformable
             'ACCEPTED' => $acceptedPaymentsValue,
             'PENDING' => $pendingPaymentsValue
         ];
+    }
+
+    /**
+     */
+    public function createNewTask($duration, $parentId): void
+    {
+        $date = Carbon::now();
+        $task = Task::create([
+            'warehouse_id' => Warehouse::OLAWA_WAREHOUSE_ID,
+            'user_id' => User::OLAWA_USER_ID,
+            'order_id' => $this->id,
+            'created_by' => 1,
+            'name' => $this->id . ' - ' . $date->format('d-m'),
+            'color' => Task::DEFAULT_COLOR,
+            'status' => Task::WAITING_FOR_ACCEPT,
+            'parent_id' => $parentId
+        ]);
+        $time = TaskTimeHelper::getFirstAvailableTime($duration);
+        TaskTime::create([
+            'task_id' => $task->id,
+            'date_start' => $time['start'],
+            'date_end' => $time['end']
+        ]);
+        TaskSalaryDetails::create([
+            'task_id' => $task->id,
+            'consultant_value' => 0,
+            'warehouse_value' => 0
+        ]);
     }
 }
