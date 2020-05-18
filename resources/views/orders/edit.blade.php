@@ -1211,29 +1211,12 @@
                         <div class="firms-general" id="orderPayment">
                             <div class="form-group">
                                 <label for="amount">@lang('order_payments.form.amount')</label>
-                                @if($order->warehouse !== null)
-                                    @foreach($order->warehouse->orders as $itemCustomerOrder)
-                                        @php
-                                            $orderValue = str_replace(',', '', number_format($itemCustomerOrder->getSumOfGrossValues(), 2));
-                                        @endphp
-                                    @endforeach
-                                @endif
                                 <input type="text" class="form-control" id="amount" name="amount"
                                        value="{{ $orderValue }}">
                             </div>
                             <div class="form-group">
                                 <label for="chooseOrder">Wybierz zlecenie</label>
                                 <select class="form-control" id="chooseOrder" name="chooseOrder">
-                                    @if($order->warehouse !== null)
-                                        @foreach($order->warehouse->orders as $itemCustomerOrder)
-                                            @php
-                                                $orderValue = str_replace(',', '', number_format($itemCustomerOrder->getSumOfGrossValues(), 2));
-                                            @endphp
-                                            <option value="{{ $itemCustomerOrder->id }}">
-                                                Zlecenie: {{ $itemCustomerOrder->id }} Kwota
-                                                zlecenia: {{ $orderValue }}</option>
-                                        @endforeach
-                                    @endif
                                 </select>
                                 @if($order->customer !== null)
                                     @foreach($order->customer->orders as $itemCustomerOrder)
