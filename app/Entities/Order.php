@@ -536,6 +536,11 @@ class Order extends Model implements Transformable
         return $this->hasOne(InvoiceRequest::class);
     }
 
+    public function subiektInvoices()
+    {
+        return $this->hasMany(SubiektInvoices::class);
+    }
+
     public function groupWarehousePayments()
     {
         $acceptedPaymentsValue = 0;
