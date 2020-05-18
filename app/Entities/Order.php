@@ -133,7 +133,7 @@ class Order extends Model implements Transformable
                 $totalOfProductsPrices += floatval($item->net_selling_price_commercial_unit) * intval($item->quantity);
             }
         }
-        
+
         return round(($totalOfProductsPrices * $vatFactor) + floatval($this->shipment_price_for_client) + floatval($this->additional_service_cost) + floatval($this->additional_cash_on_delivery_cost), 2);
     }
 
@@ -531,6 +531,11 @@ class Order extends Model implements Transformable
     public function invoiceRequests()
     {
         return $this->hasOne(InvoiceRequest::class);
+    }
+
+    public function subiektInvoices()
+    {
+        return $this->hasMany(SubiektInvoices::class);
     }
 
     public function groupWarehousePayments()
