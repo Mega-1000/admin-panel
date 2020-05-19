@@ -19,7 +19,8 @@ Run
 7. `yarn install`
 8. `yarn dev`
 9. wygnerować klucze RSA dla użytkownika `www-data` (lub innego który uruchamia serwer) i dodanie ich do deploy-keys w repozytorium
-
+10. `php artisan passport:client --password`
+11. `php artisan passport:client --personal`
 
 Aktualizacja CSV: 
 -----------------

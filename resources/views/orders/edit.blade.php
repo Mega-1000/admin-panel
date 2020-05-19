@@ -462,7 +462,7 @@
             </div>
             <input type="hidden" value="{{ $order->customer->id }}" name="customer_id">
             <div class="form-group" style="widht: 100%; float: left;">
-                <a target="_blank" href="{{env('FRONT_URL')}}/koszyk.html?cart_token={{$order->getToken()}}"
+                <a target="_blank" href="{{ route('orders.goToBasket', ['id' => $order->id]) }}"
                    for="add-item">
                     Edytuj zamówienie w koszyku
                 </a>
