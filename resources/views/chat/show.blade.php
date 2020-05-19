@@ -61,7 +61,11 @@
                     </div>
                 </div>
             </form>
-            <button id="call-mod" class="btn bg-primary">Wezwij moderatora</button>
+            @if (is_a(Auth::user(), \App\User::class))
+                <button id="call-worker" class="btn bg-primary call-button">Wyślij maila pracownikom</button>
+            @else
+                <button id="call-mod" class="btn bg-primary call-button">Wezwij moderatora</button>
+            @endif
         </div>
         <table id="chat-users">
             <tr>
@@ -181,6 +185,14 @@
         })
         $('#call-mod').click((event) => {
             alert('Moderator został poinformowany')
+            $.ajax({
+                method: "POST",
+                url: "{{ $routeAskForIntervention }}",
+                data: {'user_id': event.target.value}
+            })
+        })
+        $('#call-worker').click((event) => {
+            alert('Pracownicy zostali poinformowani')
             $.ajax({
                 method: "POST",
                 url: "{{ $routeAskForIntervention }}",
