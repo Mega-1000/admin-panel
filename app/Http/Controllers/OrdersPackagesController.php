@@ -25,6 +25,8 @@ use App\Entities\PackingType;
 use App\Entities\ContainerType;
 use App\Entities\SelTransaction;
 use App\Entities\Order;
+use App\Entities\SelCustomerEmail;
+use App\Entities\SelAddress;
 
 /**
  * Class OrderTasksController.
@@ -236,15 +238,10 @@ class OrdersPackagesController extends Controller
                 $data['delivery_date'] = new \DateTime($delidate);
             }
         }        
-        $packagesNumber = 0;
-        $package = $this->repository->orderBy("created_at", "desc")->findWhere(["order_id" => $order_id],
-            ["number"])->first();
 
-        if (!empty($package)) {
-            $packagesNumber = $package->number;
-        }
+        $packageNumber = OrderPackage::where('order_id', $order_id)->max('number');
         $data['packing_type'] = $request->input('packing_type');
-        $data['number'] = $packagesNumber + 1;
+        $data['number'] = $packageNumber + 1;
         $data['symbol'] = $request->input('symbol');
         $notices = $data['notices'];
         $data['notices'] = $data['order_id'] . '/' . $data['number'] . ' ' . $notices;
@@ -254,7 +251,7 @@ class OrdersPackagesController extends Controller
         }
 
         $order = $this->orderRepository->find($order_id);
-        if(empty($package)) {
+        if(empty($packageNumber)) {
             $isAdditionalDKPExists = false;
             $connectedOrders = $this->orderRepository->findWhere(['master_order_id' => $order->id]);
             foreach($connectedOrders as $connectedOrder)
@@ -375,6 +372,7 @@ class OrdersPackagesController extends Controller
         }
         if ($order->sello_id){
             $transaction = SelTransaction::find($order->sello_id);
+            $addressAllegro = SelAddress::where('adr_TransId', $order->sello_id)->where('adr_Type', 1)->first();
             $order->allegro_transaction_id = $transaction->tr_CheckoutFormId;
             $order->save();
         }
@@ -399,7 +397,8 @@ class OrdersPackagesController extends Controller
                 'allegro_user_id' => $transaction->tr_RegId ?? null,
                 'allegro_transaction_id' => $order->allegro_transaction_id,
                 'package_type' => $package->container_type,
-                'packing_type' => $package->packing_type
+                'packing_type' => $package->packing_type,
+                'allegro_mail' => $addressAllegro->adr_Email ?? null,
             ],
             'delivery_address' => [
                 'firstname' => $deliveryAddress->firstname,

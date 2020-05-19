@@ -25,6 +25,8 @@ class Label extends Model implements Transformable
 
 
 
+    const ORDER_ITEMS_REDEEMED_LABEL = 66;
+
     /**
      * The attributes that are mass assignable.
      *

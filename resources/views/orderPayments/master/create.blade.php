@@ -50,6 +50,14 @@
                 @endif
             </div>
             <div class="form-group">
+                <label for="payment-type">Typ płatności</label>
+                <select class="form-control" id="payment-type" name="payment-type">
+                    <option value="CLIENT">@lang('order_payments.form.client')</option>
+                    <option value="WAREHOUSE">@lang('order_payments.form.warehouse')</option>
+                    <option value="SPEDITION">@lang('order_payments.form.spedition')</option>
+                </select>
+            </div>
+            <div class="form-group">
                 <label for="promise_date">Data wpłaty</label><br/>
                 <input type="datetime" id="promise_date" name="created_at" value="{{ Carbon\Carbon::now() }}" class="form-control default-date-picker-now">
             </div>

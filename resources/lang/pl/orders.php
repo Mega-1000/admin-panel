@@ -28,7 +28,7 @@ return [
         'add_invoice' => 'Dodaj fakturę',
         'profit' => 'Zysk na towarze',
         'weight' => 'Waga',
-        'products_value_gross' => 'Wart. sprz. tow. br.',
+        'values_data' => 'Wart. Br. Sprzedaży',
         'additional_service_cost' => 'Dodatko wy koszt obsługi',
         'additional_cash_on_delivery_cost' => 'Dodatkowy koszt pobrania',
         'shipment_price_for_client' => 'Transport klient brutto',
@@ -52,6 +52,7 @@ return [
         'correction_amount' => 'Kwota korekty',
         'correction_description' => 'Treść korekty',
         'document_number' => 'Nr dokumentu',
+        'payment_id' => 'Id płatności',
         'search_on_lp' => 'do-ukrycia-domyslnie',
 
         'warehouse_cost' => 'Koszt magazynu',
@@ -80,7 +81,9 @@ return [
             'messages' => 'Chat',
             'packages' => 'Przesyłki',
             'status' => 'Status zamówienia',
-            'customer' => 'Zmiana danych klienta'
+            'customer' => 'Zmiana danych klienta',
+            'warehouse-payments' => 'Płatności magazynów',
+            'spedition-payments' => 'Płatności spedycji'
         ],
         'last_status_update_date' => 'Ostatnia data zmiany statusu',
         'total_price' => 'Suma zamówienia',
@@ -121,7 +124,7 @@ return [
         'remainder_date' => 'Data przypomnienia',
         'invoice_number' => 'Numer faktury',
         'additional_info' => 'Dodatkowe informacje',
-        'consultant_notice' => 'Opis obsługi konsultanta',
+        'warehouse_notice' => 'Dialog Magazyn',
         'consultant_value' => 'Koszt obsługi konsultanta',
         'warehouse_notice' => 'Opis obsługi magazynu',
         'warehouse_value' => 'Koszt obsługi magazynu',

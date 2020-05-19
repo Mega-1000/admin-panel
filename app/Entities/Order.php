@@ -2,7 +2,10 @@
 
 namespace App\Entities;
 
+use App\Helpers\TaskTimeHelper;
+use App\Jobs\ImportOrdersFromSelloJob;
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
@@ -17,6 +20,9 @@ class Order extends Model implements Transformable
 {
 
     use TransformableTrait;
+
+    const STATUS_WITHOUT_REALIZATION = 8;
+    const STATUS_ORDER_FINISHED = 6;
 
     /**
      * The attributes that are mass assignable.
@@ -123,6 +129,7 @@ class Order extends Model implements Transformable
     public function getSumOfGrossValues()
     {
         $totalOfProductsPrices = 0;
+        $vatFactor = (1 + env('VAT'));
 
         if (count($this->items)) {
             foreach ($this->items as $item) {
@@ -130,7 +137,7 @@ class Order extends Model implements Transformable
             }
         }
 
-        return round(($totalOfProductsPrices * 1.23) + floatval($this->shipment_price_for_client) + floatval($this->additional_service_cost) + floatval($this->additional_cash_on_delivery_cost), 2);
+        return round(($totalOfProductsPrices * $vatFactor) + floatval($this->shipment_price_for_client) + floatval($this->additional_service_cost) + floatval($this->additional_cash_on_delivery_cost), 2);
     }
 
     public function getPackagesCashOnSum()
@@ -424,6 +431,14 @@ class Order extends Model implements Transformable
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    public function deliveryAddress()
+    {
+        return $this->hasOne(OrderAddress::class)->where('type', 'DELIVERY_ADDRESS');
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function invoices()
@@ -494,5 +509,84 @@ class Order extends Model implements Transformable
                 $package->delete();
             }
         });
+    }
+
+    public function warehousePayments()
+    {
+        return $this->hasMany(OrderPayment::class)->where('type','WAREHOUSE');
+    }
+
+    public function speditionPayments()
+    {
+        return $this->hasMany(OrderPayment::class)->where('type','SPEDITION');
+    }
+
+    public function speditionPaymentsSum()
+    {
+        return $this->hasMany(OrderPayment::class)->where('type','SPEDITION');
+    }
+
+    public function isOrderHasLabel($labelId)
+    {
+        return $this->labels()->where('labels.id', $labelId)->count() > 0;
+    }
+
+    public function invoiceRequests()
+    {
+        return $this->hasOne(InvoiceRequest::class);
+    }
+
+    public function subiektInvoices()
+    {
+        return $this->hasMany(SubiektInvoices::class);
+    }
+
+    public function groupWarehousePayments()
+    {
+        $acceptedPaymentsValue = 0;
+        $pendingPaymentsValue = 0;
+        foreach($this->warehousePayments as $payment) {
+            switch($payment->status) {
+                case 'ACCEPTED':
+                    $acceptedPaymentsValue += $payment->amount;
+                    break;
+                case 'PENDING':
+                    $pendingPaymentsValue += $payment->amount;
+                    break;
+            }
+        }
+
+        return [
+            'ACCEPTED' => $acceptedPaymentsValue,
+            'PENDING' => $pendingPaymentsValue
+        ];
+    }
+
+    /**
+     */
+    public function createNewTask($duration, $parentId): void
+    {
+        $date = Carbon::now();
+        $task = Task::create([
+            'warehouse_id' => Warehouse::OLAWA_WAREHOUSE_ID,
+            'user_id' => User::OLAWA_USER_ID,
+            'order_id' => $this->id,
+            'created_by' => 1,
+            'name' => $this->id . ' - ' . $date->format('d-m'),
+            'color' => Task::DEFAULT_COLOR,
+            'status' => Task::WAITING_FOR_ACCEPT,
+            'parent_id' => $parentId
+        ]);
+        $time = TaskTimeHelper::getFirstAvailableTime($duration);
+        TaskTime::create([
+            'task_id' => $task->id,
+            'date_start' => $time['start'],
+            'date_end' => $time['end']
+        ]);
+        TaskSalaryDetails::create([
+            'task_id' => $task->id,
+            'consultant_value' => 0,
+            'warehouse_value' => 0
+        ]);
     }
 }

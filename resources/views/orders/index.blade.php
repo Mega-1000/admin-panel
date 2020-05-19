@@ -365,7 +365,6 @@
         <button id="showTable" class="btn btn-warning" style="margin-left: 5px">Pokaż Tabelkę z Etykietami Pracownika</button>
         <div class="col-md-12 hidden" style="float: right" id="labelTable">
             <table width="50%"  style="float:right;" border="1">
-
                     <tr>
                         <th colspan="1" width="10%"></th>
                         <th colspan="1" width="10%">Pracownik</th>
@@ -405,7 +404,7 @@
                                     @endforeach
                                 </tr>
                             @endif
-                    @endforeach
+                        @endforeach
                 </table>
         </div>
     </div>
@@ -590,6 +589,11 @@
                     <button class="btn btn-default" id="filterByWarehouseMegaOlawa" onclick="event.stopPropagation(); filterByWarehouseMegaOlawa()">M</button>
                 </div>
             </th>
+            <th>@lang('orders.form.warehouse_notice')
+                <div class="input_div">
+                    <input type="text" id="columnSearch-warehouse_notice"/>
+                </div>
+            </th>
             <th>
                 <div><span>@lang('orders.table.customer_notices')</span></div>
                 <div class="input_div">
@@ -605,7 +609,7 @@
             <th>
                 <div><span>@lang('orders.table.clientPhone')</span></div>
                 <div class="input_div">
-                    <span title="KLIKNIJ PONOWNIE ABY USUNĄĆ SPACJE I MYŚLNIKI"><input type="text" id="columnSearch-clientPhone"/></span>
+                    <span title="KLIKNIJ PONOWNIE ABY USUNĄĆ FILTRY"><input type="text" id="columnSearch-clientPhone"/></span>
                 </div>
             <th>
                 <div><span>@lang('orders.table.clientEmail')</span></div>
@@ -641,29 +645,15 @@
                 </div>
             </th>
             <th>
-                <div><span>@lang('orders.table.products_value_gross')</span></div>
+                <div><span>@lang('orders.table.values_data')</span></div>
                 <div class="input_div">
-                    <input type="text" id="columnSearch-products_value_gross"/>
+                    <input type="text" id="columnSearch-values_data"/>
                 </div>
             </th>
-            <th>@lang('orders.table.additional_service_cost')</th>
-            <th>
-                <div><span>@lang('orders.table.additional_cash_on_delivery_cost')</span></div>
-                <div class="input_div">
-                    <input type="text" id="columnSearch-additional_cash_on_delivery_cost"/>
-                </div>
-            </th>
-            <th>@lang('orders.table.shipment_price_for_client')</th>
             <th>
                 <div><span>@lang('orders.table.shipment_price_for_us')</span></div>
                 <div class="input_div">
                     <input type="text" id="columnSearch-shipment_price_for_us"/>
-                </div>
-            </th>
-            <th>
-                <div><span>@lang('orders.table.sum_of_gross_values')</span></div>
-                <div class="input_div">
-                    <input type="text" id="columnSearch-sum_of_gross_values"/>
                 </div>
             </th>
             <th>
@@ -688,6 +678,12 @@
             <th>@lang('orders.table.correction_amount')</th>
             <th>@lang('orders.table.correction_description')</th>
             <th>@lang('orders.table.document_number')</th>
+            <th>
+                <div><span>@lang('orders.table.payment_id')</span></div>
+                <div class="input_div">
+                    <input type="text" id="columnSearch-sello_payment"/>
+                </div>
+            </th>
             <th></th>
         </tr>
         </thead>
@@ -760,15 +756,15 @@
             columnDefs: [
                 {className: "dt-center", targets: "_all"},
                 {
-                    'targets': 8,
+                    'targets': 15,
                     'createdCell': function (td, cellData, rowData, row, col) {
                         $(td).attr('id', 'action-'+rowData.orderId);
                     }
                 },
                 {
-                    'targets': 13,
+                    'targets': 21,
                     'createdCell': function (td, cellData, rowData, row, col) {
-                        $(td).attr('id', 'customer_notices-'+rowData.orderId);
+                        $(td).attr('id', 'consultant_notices-'+rowData.orderId);
                     }
                 }
             ],
@@ -869,10 +865,10 @@
                                 if (value.letter_number === null) {
                                     html += '<a href="javascript:void()"><p>Brak listu przewozowego</p></a>';
                                 }else {
-                                    if (value.delivery_courier_name === 'INPOST') {
+                                    if (value.service_courier_name === 'INPOST' || value.service_courier_name === 'ALLEGRO-INPOST') {
                                         html += '<a target="_blank" href="/storage/inpost/stickers/sticker' + value.letter_number + '.pdf"><p>'+value.letter_number+'</p></a>';
                                     } else if (value.delivery_courier_name === 'DPD') {
-                                        html += '<a target="_blank" href="/storage/dpd/protocols/protocol' + value.letter_number + '.pdf"><p>'+value.sending_number+'</p></a>';
+                                        html += '<p>'+value.sending_number+'</p>';
                                         html += '<a target="_blank" href="/storage/dpd/stickers/sticker' + value.letter_number + '.pdf"><p>'+value.letter_number+'</p></a>';
                                     } else if (value.delivery_courier_name === 'POCZTEX') {
                                         html += '<a target="_blank" href="/storage/pocztex/protocols/protocol' + value.sending_number + '.pdf"><p>'+value.letter_number+'</p></a>';
@@ -928,7 +924,7 @@
                                         html += '<button class="btn btn-success" id="package-' + value.id + '" onclick="sendPackage(' + value.id + ',' + value.order_id + ')">Wyślij</button>';
                                     }
                                 } else {
-                                    if (value.delivery_courier_name === 'INPOST') {
+                                    if (value.service_courier_name === 'INPOST' || value.service_courier_name === 'ALLEGRO-INPOST') {
                                         html += '<a target="_blank" href="/storage/inpost/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                     } else if (value.delivery_courier_name === 'DPD') {
                                         html += '<a target="_blank" href="/storage/dpd/protocols/protocol' + value.letter_number + '.pdf"><p>' + value.sending_number + '</p></a>';
@@ -1171,6 +1167,10 @@
                     }
                 },
                 {
+                    data: 'warehouse_notice',
+                    name: 'warehouse_notice'
+                },
+                {
                     data: 'customer_notices',
                     name: 'customer_notices'
                 },
@@ -1181,12 +1181,12 @@
                         if(data !== null) {
                             var text = data;
                             var shortText = data.substr(0, 49) + "...";
-                            $('#customer_notices-'+row.orderId).hover(function () {
-                                $('#customer_notices-'+row.orderId).text(text);
+                            $('#consultant_notices-'+row.orderId).hover(function () {
+                                $('#consultant_notices-'+row.orderId).text(text);
                             }, function () {
-                                $('#customer_notices-'+row.orderId).text(shortText);
+                                $('#consultant_notices-'+row.orderId).text(shortText);
                             });
-                            $('#customer_notices-'+row.orderId).text(shortText);
+                            $('#consultant_notices-'+row.orderId).text(shortText);
                         }
                         return data;
                     }
@@ -1310,76 +1310,20 @@
                     name: 'weight',
                 },
                 {
-                    data: 'orderId',
-                    name: 'products_value_gross',
-                    render: function(date, type, row) {
-                        let totalOfProductsPrices = 0;
-                        var items = row['items'];
+                    data: 'values_data',
+                    name: 'values_data',
+                    render: function(data, type, row) {
 
-                        for (let index = 0; index < items.length; index++) {
-                            let price = items[index].net_selling_price_commercial_unit;
-                            let quantity = items[index].quantity;
-                            if(price == null) {
-                                price = 0;
-                            }
-                            if(quantity == null) {
-                                quantity = 0;
-                            }
-                            totalOfProductsPrices += parseFloat(price) * parseInt(quantity);
-                        }
-
-                        return (totalOfProductsPrices * 1.23).toFixed(2);
+                        return '<p><span title="Wartość Zamówienia">WZ: ' + row['values_data']['sum_of_gross_values'] + '</p>\n\
+                        <p><span title="Wartość Towaru">WT: ' + row['values_data']['products_value_gross'] +'</p>\n\
+                        <p><span title="Koszt Transportu Dla Klienta">KT: ' + row['values_data']['shipment_price_for_client'] +'</p>\n\
+                        <p><span title="Dodatkowy Koszt Pobrania">DKP: ' + row['values_data']['additional_cash_on_delivery_cost'] +'</p>\n\
+                        <p><span title="Dodatkowy Koszt Obsługi">DKO: ' + row['values_data']['additional_service_cost'] +'</p>'
                     }
                 },
                 {
-                    data: 'additional_service_cost',
-                    name: 'additional_service_cost',
-                },
-                {
-                    data: 'additional_cash_on_delivery_cost',
-                    name: 'additional_cash_on_delivery_cost',
-                },
-                {
-                    data: 'shipment_price_for_client',
-                    name: 'shipment_price_for_client',
-                },
-                {
-                    data: 'shipment_price_for_us',
-                    name: 'shipment_price_for_us',
-                },
-                {
-                    data: 'orderId',
-                    name: 'sum_of_gross_values',
-                    searchable: false,
-                    render: function(date, type, row) {
-                        let totalOfProductsPrices = 0;
-                        let additionalServiceCost = row['additional_service_cost'];
-                        let additionalPackageCost = row['additional_cash_on_delivery_cost'];
-                        let shipmentPriceForClient = row['shipment_price_for_client'];
-                        if(additionalServiceCost == null) {
-                            additionalServiceCost = 0;
-                        }
-                        if(shipmentPriceForClient == null) {
-                            shipmentPriceForClient = 0;
-                        }
-                        if(additionalPackageCost == null) {
-                            additionalPackageCost = 0;
-                        }
-                        var items = row['items'];
-
-                        for (let index = 0; index < items.length; index++) {
-                            let price = items[index].net_selling_price_commercial_unit;
-                            let quantity = items[index].quantity;
-                            if(price == null) {
-                                price = 0;
-                            }
-                            if(quantity == null) {
-                                quantity = 0;
-                            }
-                            totalOfProductsPrices += parseFloat(price) * parseInt(quantity);
-                        }
-                        return ((totalOfProductsPrices * 1.23) + parseFloat(shipmentPriceForClient) + parseFloat(additionalServiceCost) + parseFloat(additionalPackageCost)).toFixed(2);
-                    }
+                   data: 'shipment_price_for_us',
+                   name: 'shipment_price_for_us',
                 },
                 {
                     data: 'orderId',
@@ -1388,16 +1332,22 @@
                     render: function(data, type, row) {
                         let totalOfPayments = 0;
                         let totalOfDeclaredPayments = 0;
+                        let totalofWarehousePayments = 0;
                         var payments = row['payments'];
 
                         for (let index = 0; index < payments.length; index++) {
-                            if(payments[index].promise != "1") {
+                            if(payments[index].type === 'WAREHOUSE') {
+                                totalofWarehousePayments += parseFloat(payments[index].amount);
+                            }
+                            else if(payments[index].promise != "1") {
                                 totalOfPayments += parseFloat(payments[index].amount);
                             } else {
                                 totalOfDeclaredPayments += parseFloat(payments[index].amount);
                             }
                         }
-
+                        if(totalofWarehousePayments > 0) {
+                            return '<p>DM: ' + totalofWarehousePayments + '</p>';
+                        }
                         if(totalOfDeclaredPayments > 0 ) {
                             return '<p>Z: ' + totalOfPayments + '</p><p>D: ' + totalOfDeclaredPayments +'</p>';
                         } else {
@@ -1504,10 +1454,9 @@
                             });
                             let jsonInvoices = JSON.stringify(invoices);
                             html += '<br />'
-                            html += '<a href="#" class="remove__invoices"' + 'onclick="getInvoicesList('+data.orderId+ ')">Usuń faktury</a>'
+                            html += '<a href="#" class="remove__invoices"' + 'onclick="getInvoicesList('+data.orderId+ ')">Usuń</a>'
                         }
                         html += '<a href="{{env('FRONT_NUXT_URL')}}' + '/magazyn/awizacja/0/0/' + data.orderId + '/wyslij-fakture">Dodaj</a>'
-
 
                         return html;
                     }
@@ -1599,6 +1548,10 @@
                 {
                     data: 'document_number',
                     name: 'document_number'
+                },
+                {
+                    data: 'sello_payment',
+                    name: 'sello_payment'
                 },
                 {
                     data: 'id',

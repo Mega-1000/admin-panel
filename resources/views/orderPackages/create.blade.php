@@ -135,14 +135,14 @@
                    <option {{ old('delivery_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         ODBIÓR OSOBISTY
                     </option> 
-                    <option {{ old('delivery_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
-                        PACZKOMAT
-                    </option>
                     @if ($isAllegro)
                      <option {{ old('delivery_courier_name') == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
                         ALLEGRO-INPOST
                     </option>
                     @endif
+                    <option {{ old('delivery_courier_name') == 'PACZKOMAT' ? 'selected="selected"' : '' }} value="PACZKOMAT">
+                        PACZKOMAT
+                    </option>
                 </select>
             </div>
             <div class="form-group">
@@ -340,7 +340,7 @@
 
             <div class="form-group">
                 <label for="notices">@lang('order_packages.form.notices')</label>
-                <textarea cols="40" rows="5" maxlength="50" type="text" class="form-control" id="notices" name="notices">
+                <textarea cols="40" rows="5" maxlength="40" type="text" class="form-control" id="notices" name="notices">
                        {{ old('notices') }}</textarea>
             </div>
             <div class="form-group">

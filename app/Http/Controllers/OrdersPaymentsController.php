@@ -11,6 +11,8 @@ use App\Http\Requests\OrderPaymentUpdateRequest;
 use App\Jobs\AddLabelJob;
 use App\Jobs\DispatchLabelEventByNameJob;
 use App\Jobs\RemoveLabelJob;
+use App\Mail\ConfirmData;
+use App\Mail\WarehousePaymentAccept;
 use App\Repositories\CustomerRepository;
 use App\Repositories\OrderPaymentRepository;
 use App\Repositories\OrderRepository;
@@ -19,6 +21,7 @@ use App\Repositories\OrderPackageRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use TCG\Voyager\Models\Role;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -177,9 +180,15 @@ class OrdersPaymentsController extends Controller
             $promise = '';
         }
 
+        $isWarehousePayment = $request->input('warehousePayment');
+
+        $type = $request->input('payment-type');
+
         OrdersPaymentsController::payOrder($orderId, $request->input('amount'),
             $masterPaymentId, $promise,
-            $chooseOrder, $request->input('promise_date'));
+            $chooseOrder, $request->input('promise_date'),
+            $type, $isWarehousePayment
+            );
 
         return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
             'message' => __('order_payments.message.store'),
@@ -1018,18 +1027,28 @@ class OrdersPaymentsController extends Controller
     {
         $orderId = $request->input('order_id');
         $promise = $request->input('promise');
-
         if (!empty($orderId)) {
-
-            $payment = $this->paymentRepository->create([
-                'amount' => str_replace(",", ".", $request->input('amount')),
-                'amount_left' => str_replace(",", ".", $request->input('amount')),
-                'customer_id' => $request->input('customer_id'),
-                'notices' => $request->input('notices'),
-                'promise' => $promise,
-                'created_at' => $request->input('created_at'),
-            ]);
-
+            if($request->input('payment-type') == 'WAREHOUSE') {
+                $order = Order::find($orderId);
+                $payment = Payment::create([
+                    'amount' => str_replace(",", ".", $request->input('amount')),
+                    'amount_left' => str_replace(",", ".", $request->input('amount')),
+                    'customer_id' => $request->input('customer_id'),
+                    'warehouse_id' => $order->warehouse->id,
+                    'notices' => $request->input('notices'),
+                    'type' => $request->input('payment-type'),
+                    'promise' => $promise
+                ]);
+            } else {
+                $payment = Payment::create([
+                    'amount' => str_replace(",", ".", $request->input('amount')),
+                    'amount_left' => str_replace(",", ".", $request->input('amount')),
+                    'customer_id' => $request->input('customer_id'),
+                    'notices' => $request->input('notices'),
+                    'type' => $request->input('payment-type'),
+                    'promise' => $promise
+                ]);
+            }
 
             return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
                 'message' => __('order_payments.message.store'),
@@ -1191,7 +1210,7 @@ class OrdersPaymentsController extends Controller
         }
     }
 
-    public static function payOrder($orderId, $amount, $masterPaymentId, string $promise, $chooseOrder, $promiseDate): void
+    public static function payOrder($orderId, $amount, $masterPaymentId, string $promise, $chooseOrder, $promiseDate, $type = null, $isWarehousePayment = null): void
     {
         $order = Order::find($orderId);
 
@@ -1200,12 +1219,39 @@ class OrdersPaymentsController extends Controller
             dispatch_now(new RemoveLabelJob($orderId, [44]));
         }
 
+        if($type == null) {
+            $type = 'WAREHOUSE';
+        }
+
+        if($isWarehousePayment == null) {
+            $type = 'CLIENT';
+        }
+
+        $token = null;
+
+        if($isWarehousePayment) {
+            $token = md5(uniqid());
+            $url = route('ordersPayment.warehousePaymentConfirmation', ['token' => $token]);
+            if($order->invoices()->first() !== null) {
+                try {
+                    \Mailer::create()
+                        ->to($order->warehouse->warehouse_email)
+                        ->send(new WarehousePaymentAccept($orderId, $amount, $order->invoices()->first()->invoice_name, $url));
+                } catch (\Swift_TransportException $e) {
+                    Log::error('Warehouse payment accept email was not sent due to. Error: ' . $e->getMessage());
+                }
+            }
+        }
+
         $payment = OrderPayment::create([
             'amount' => str_replace(",", ".", $amount),
             'master_payment_id' => $masterPaymentId ? $masterPaymentId : null,
             'order_id' => $orderId,
             'promise' => $promise,
             'promise_date' => $promiseDate ?: null,
+            'type' => $type,
+            'status' => $isWarehousePayment ? 'PENDING' : null,
+            'token' => $token ? $token : null
         ]);
 
         if ($promise == '') {
@@ -1231,6 +1277,23 @@ class OrdersPaymentsController extends Controller
             $order->status_id = 5;
             $order->save();
         }
+    }
+
+    public function warehousePaymentConfirmation($token)
+    {
+        $orderPayment = OrderPayment::where('token', '=', $token)->first();
+
+        return view('orderPayments.confirmWarehousePayment', compact('orderPayment', 'token'));
+    }
+
+    public function warehousePaymentConfirmationStore(Request $request)
+    {
+        $orderPayment = OrderPayment::find($request->input('orderPaymentId'));
+        $orderPayment->update([
+            'status' => 'ACCEPTED'
+        ]);
+
+        return view('orderPayments.warehousePaymentConfirmed');
     }
 }
 

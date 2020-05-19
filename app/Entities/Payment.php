@@ -11,13 +11,15 @@ class Payment extends Model implements Transformable
 {
     use TransformableTrait;
 
+    const PROMISE_PAYMENT = 1;
+
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
-        'amount', 'amount_left', 'customer_id', 'notices', 'promise', 'promise_date', 'created_at','updated_at'
+        'amount', 'amount_left', 'customer_id', 'notices', 'promise', 'promise_date', 'created_at','updated_at', 'warehouse_id', 'type'
     ];
 
 

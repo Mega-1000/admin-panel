@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Entities\Auth_code;
+use App\Entities\InvoiceRequest;
 use App\Entities\Order;
 use App\Entities\OrderInvoice;
 use App\Entities\OrderItem;
@@ -44,6 +45,7 @@ use App\Repositories\OrderAddressRepository;
 use App\Repositories\UserRepository;
 use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -175,6 +177,9 @@ class OrdersController extends Controller
     /** @var TaskRepository */
     protected $taskRepository;
 
+    private $replaceSearch = [
+        'sello_payment' => 'sel_tr__transaction.tr_CheckoutFormPaymentId'
+    ];
     /**
      * OrdersController constructor.
      * @param FirmRepository $repository
@@ -1455,10 +1460,36 @@ class OrdersController extends Controller
         $collection = $this->prepareCollection($data);
         $countFiltred = $this->countFiltered($data);
         $count = $this->orderRepository->all();
-
         $count = count($count);
-
+        $collection = $this->prepareAdditionalOrderData($collection);
+        
         return DataTables::of($collection)->with(['recordsFiltered' => $countFiltred])->skipPaging()->setTotalRecords($count)->make(true);
+    }
+
+    public function prepareAdditionalOrderData($collection) 
+    {
+        foreach ($collection as $order) {
+            $additional_service = $order->additional_service_cost ?? 0;
+            $additional_cod_cost = $order->additional_cash_on_delivery_cost ?? 0;
+            $shipment_price_client = $order->shipment_price_for_client ?? 0;
+            $totalProductPrice = 0;
+            foreach ($order->items as $item) {
+                $price = $item->net_selling_price_commercial_unit ?? 0;
+                $quantity = $item->quantity ?? 0;
+                $totalProductPrice += $price * $quantity;
+            }
+            $vatFactor = (1 + env('VAT'));
+            $products_value_gross = round($totalProductPrice * $vatFactor, 2);
+            $sum_of_gross_values = round($totalProductPrice * $vatFactor + $additional_service + $additional_cod_cost + $shipment_price_client, 2);
+            $order->values_data = array(
+                'sum_of_gross_values' => $sum_of_gross_values,
+                'products_value_gross' => $products_value_gross,
+                'shipment_price_for_client' => $order->shipment_price_for_client ?? 0,
+                'additional_cash_on_delivery_cost' => $order->additional_cash_on_delivery_cost ?? 0,
+                'additional_service_cost' => $order->additional_service_cost ?? 0
+            );
+        }
+        return $collection;
     }
 
     protected $dtColumns = [
@@ -1491,6 +1522,7 @@ class OrdersController extends Controller
             13 => 'customer_addresses.email',
             14 => 'customer_addresses.firstname',
             15 => 'customer_addresses.lastname',
+            46 => 'sel_tr__transaction.tr_CheckoutFormPaymentId'
         ];
 
         if (array_key_exists($sortingColumnId, $sortingColumns)) {
@@ -1498,24 +1530,7 @@ class OrdersController extends Controller
         } else {
             $sortingColumn = 'orders.id';
         }
-        $query = \DB::table('orders')
-            ->distinct()
-            ->select('*', 'orders.created_at as orderDate', 'orders.id as orderId',
-                'customer_addresses.email as clientEmail', 'statuses.name as statusName',
-                'customer_addresses.firstname as clientFirstname', 'customer_addresses.lastname as clientLastname',
-                'customer_addresses.phone as clientPhone')
-            ->leftJoin('customers', 'orders.customer_id', '=', 'customers.id')
-            ->leftJoin('warehouses', 'orders.warehouse_id', '=', 'warehouses.id')
-            ->leftJoin('statuses', 'orders.status_id', '=', 'statuses.id')
-            ->leftJoin('users', 'orders.employee_id', '=', 'users.id')
-            ->leftJoin('customer_addresses', function ($join) {
-                $join->on('customers.id', '=', 'customer_addresses.customer_id')
-                    ->where('type', '=', 'STANDARD_ADDRESS');
-            })->where(function ($query) {
-                if (Auth::user()->role_id == 4) {
-                    $query->where('orders.employee_id', '=', Auth::user()->id);
-                }
-            })->orderBy($sortingColumn, $sortingColumnDirection);
+        $query = $this->getQueryForDataTables()->orderBy($sortingColumn, $sortingColumnDirection);
 
 
         $notSearchable = [
@@ -1534,7 +1549,8 @@ class OrdersController extends Controller
                             $query->where($this->dtColumns[$column['name']], 'LIKE', "%{$column['search']['value']}%");
                         }
                     } else {
-                        $query->where($column['name'], 'LIKE', "%{$column['search']['value']}%");
+                        $columnName = $this->replaceSearch[$column['name']] ?? $column['name'];
+                        $query->where($columnName, 'LIKE', "%{$column['search']['value']}%");
                     }
                 }
             } else {
@@ -1685,25 +1701,7 @@ class OrdersController extends Controller
      */
     public function countFiltered($data)
     {
-        $query = \DB::table('orders')
-            ->distinct()
-            ->select('*', 'orders.created_at as orderDate', 'orders.id as orderId',
-                'customer_addresses.email as clientEmail', 'statuses.name as statusName',
-                'customer_addresses.firstname as clientFirstname', 'customer_addresses.lastname as clientLastname',
-                'customer_addresses.phone as clientPhone')
-            ->leftJoin('customers', 'orders.customer_id', '=', 'customers.id')
-            ->leftJoin('warehouses', 'orders.warehouse_id', '=', 'warehouses.id')
-            ->leftJoin('statuses', 'orders.status_id', '=', 'statuses.id')
-            ->leftJoin('users', 'orders.employee_id', '=', 'users.id')
-            ->leftJoin('customer_addresses', function ($join) {
-                $join->on('customers.id', '=', 'customer_addresses.customer_id')
-                    ->where('type', '=', 'STANDARD_ADDRESS');
-            })->where(function ($query) {
-                if (Auth::user()->role_id == 4) {
-                    $query->where('orders.employee_id', '=', Auth::user()->id);
-                }
-            })->orderBy('orders.id', 'desc');
-
+        $query = $this->getQueryForDataTables()->orderBy('orders.id', 'desc');
         $notSearchable = [
 
         ];
@@ -1720,7 +1718,8 @@ class OrdersController extends Controller
                             $query->where($this->dtColumns[$column['name']], 'LIKE', "%{$column['search']['value']}%");
                         }
                     } else {
-                        $query->where($column['name'], 'LIKE', "%{$column['search']['value']}%");
+                        $columnName = $this->replaceSearch[$column['name']] ?? $column['name'];
+                        $query->where($columnName, 'LIKE', "%{$column['search']['value']}%");
                     }
                 }
             } else {
@@ -2383,6 +2382,16 @@ class OrdersController extends Controller
         ]);
     }
   
+    public function invoiceRequest(Request $request)
+    {
+        $invoiceRequest = InvoiceRequest::create([
+            'order_id' => $request->input('id'),
+            'status' => 'MISSING'
+        ]);
+
+        return response()->json(['status' => 200]);
+    }
+
     public function getInvoices($id)
     {
         $order = Order::find($id);
@@ -2395,6 +2404,33 @@ class OrdersController extends Controller
         OrderInvoice::where('id', $id)->delete();
 
         return response()->json(['status' => 'success']);
+    }
+
+    /**
+     * @return mixed
+     */
+    private function getQueryForDataTables()
+    {
+        $query = \DB::table('orders')
+            ->distinct()
+            ->select('*', 'orders.created_at as orderDate', 'orders.id as orderId',
+                'customer_addresses.email as clientEmail', 'statuses.name as statusName',
+                'customer_addresses.firstname as clientFirstname', 'customer_addresses.lastname as clientLastname',
+                'customer_addresses.phone as clientPhone', 'sel_tr__transaction.tr_CheckoutFormPaymentId as sello_payment')
+            ->leftJoin('customers', 'orders.customer_id', '=', 'customers.id')
+            ->leftJoin('warehouses', 'orders.warehouse_id', '=', 'warehouses.id')
+            ->leftJoin('statuses', 'orders.status_id', '=', 'statuses.id')
+            ->leftJoin('sel_tr__transaction', 'orders.sello_id', '=', 'sel_tr__transaction.id')
+            ->leftJoin('users', 'orders.employee_id', '=', 'users.id')
+            ->leftJoin('customer_addresses', function ($join) {
+                $join->on('customers.id', '=', 'customer_addresses.customer_id')
+                    ->where('type', '=', 'STANDARD_ADDRESS');
+            })->where(function ($query) {
+                if (Auth::user()->role_id == 4) {
+                    $query->where('orders.employee_id', '=', Auth::user()->id);
+                }
+            });
+        return $query;
     }
 }
 

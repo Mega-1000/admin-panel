@@ -294,7 +294,7 @@
           slotDuration: '0:05',
           timeZone: 'UTC',
           minTime: "07:00:00",
-          maxTime: "20:00:00",
+          maxTime: "18:00:00",
           locale: 'PL',
           titleFormat: {year: 'numeric', month: 'long', day: '2-digit'},
           buttonText: {
@@ -316,7 +316,7 @@
             right: 'resourceTimelineDay,resourceTimelineThreeDays,timeGridWeek,dayGridMonth'
           },
           slotWidth: 15,
-          resourceAreaWidth: "10%",
+          resourceAreaWidth: "5%",
           customButtons: {
             promptResource: {
               text: 'Dodaj godziny pracy',
@@ -445,7 +445,7 @@
               $('.default-date-time-picker-now').datetimepicker({
                 sideBySide: true,
                 format: "YYYY-MM-DD H:mm",
-                stepping: 5
+                stepping: 1
               });
               $('#name').val((endDate.getUTCDate() + '-' + ('0' + (endDate.getMonth() + 1)).slice(-2)) + ' - ' + $('#warehouse_value').val());
               $(document).on('focusout', '.default-date-time-picker-now', function () {
@@ -628,7 +628,7 @@
             $('.default-date-time-picker-now').datetimepicker({
               sideBySide: true,
               format: "YYYY-MM-DD H:mm",
-              stepping: 5
+              stepping: 1
             });
           },
           eventClick: function (info) {
@@ -675,6 +675,8 @@
                   html += '<input type="text" name="shipment_date" id="shipment_date" class="form-control default-date-picker-now" value="' + data.order.shipment_date + '">';
                   html += '</div>';
                 }
+                html += '<div style="display: flex">'
+                html += '<div>'
                 html += '<div class="form-group">';
                 html += '<label for="color-dark-green">';
                 html += '<input type="radio" name="color" id="color-dark-green" value="#008000" required> ';
@@ -704,6 +706,16 @@
                 html += '<label for="color-violet">';
                 html += '<input type="radio" name="color" id="color-violet" value="#9966CC" required> ';
                 html += 'Fioletowy(zamówienie MEGA-OLAWA)</label>';
+                html += '</div>';
+                html += '</div>';
+                html += '<div>';
+                if (data.childs.length > 0) {
+                    html += '<p>Wyeksportuj paczki do nowej grupy</p>';
+                    let test = data.childs.map((item) =>`<label>${item.name}<input name="new_group[]" type="checkbox" value="${item.id}">` )
+                    html += test.join('<br>')
+                }
+
+                html += '</div>';
                 html += '</div>';
                 let consultant_value;
                 let consultant_notice;
@@ -752,7 +764,7 @@
                 $('.default-date-time-picker-now').datetimepicker({
                   sideBySide: true,
                   format: "YYYY-MM-DD H:mm",
-                  stepping: 5
+                  stepping: 1
                 });
                 $('.default-date-picker-now').datetimepicker({
                   sideBySide: true,

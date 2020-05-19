@@ -55,6 +55,11 @@
                                            value="{{ old('symbol') }}">
                                 </div>
                                 <div class="form-group">
+                                    <label for="warehouse-email">@lang('warehouses.form.warehouse_email')</label>
+                                    <input type="email" class="form-control" id="warehouse-email" name="warehouse-email"
+                                           value="{{ old('warehouse-email') }}">
+                                </div>
+                                <div class="form-group">
                                     <label for="status">@lang('warehouses.form.status')</label>
                                     <select class="form-control text-uppercase" name="status">
                                         <option value="ACTIVE">@lang('warehouses.form.active')</option>

@@ -25,7 +25,10 @@ return [
         'order_status' => 'Status zlecenia',
         'order_value' => 'Wartość zlecenia',
         'left' => 'Pozostało',
-        'add' => 'Przydziel do zlecenia'
+        'add' => 'Przydziel do zlecenia',
+        'move' => 'Przenieś wpłatę',
+        'invoice' => 'Faktura',
+        'status' => 'Status'
     ],
     'message' => [
         'store' => 'Płatność została dodana pomyślnie!',
@@ -34,6 +37,9 @@ return [
         'access_forbidden' => 'Nie posiadasz uprawnień do utworzenia płatności zaksięgowanej'
     ],
     'form' => [
+        'client' => 'Płatność klienta',
+        'warehouse' => 'Płatność magazynu',
+        'spedition' => 'Płatność transportu',
         'amount' => 'Kwota',
         'notices' => 'Uwagi',
         'promise' => 'Obietnica wpłaty',

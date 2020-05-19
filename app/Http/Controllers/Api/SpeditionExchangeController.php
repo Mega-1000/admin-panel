@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Requests\Api\ExchangeRequest\GenerateLinkRequest;
 use App\Http\Requests\Api\ExchangeRequest\NewOfferRequest;
+use App\Jobs\SendOfferToSpedition;
 use App\Mail\SpeditionExchange\AcceptOfferMail;
 use App\Mail\SpeditionExchange\RejectOfferMail;
 use App\Repositories\FirmRepository;
@@ -76,7 +77,7 @@ class SpeditionExchangeController extends Controller
     public function getDetails($hash)
     {
         return $this->speditionExchangeRepository
-            ->with(['items', 'items.order', 'items.order.addresses' => function($q) {
+            ->with(['items', 'items.order.speditionPayments', 'items.order', 'items.order.addresses' => function($q) {
                     $q->where('type', '=', 'DELIVERY_ADDRESS');
                 }, 'items.order.warehouse', 'items.order.warehouse.address', 'items.order.warehouse.property',
                 'items.order.packages'  => function($q) {
@@ -113,6 +114,8 @@ class SpeditionExchangeController extends Controller
             'address' => $data['street'],
             'postal_code' => $data['postal_code'],
         ]);
+
+        dispatch_now(new SendOfferToSpedition($data['orderId'], $data['email']));
 
         $this->createdResponse();
     }

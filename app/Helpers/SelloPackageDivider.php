@@ -9,48 +9,74 @@ use App\Helpers\interfaces\iDividable;
 class SelloPackageDivider implements iDividable
 {
 
-    private $maxInPackage = 1;
-    private $deliveryId;
-    private $delivererId;
+    private $transactionList;
 
     public function divide($data, Order $order)
     {
-        if (empty($this->delivererId) || empty($this->delivererId)) {
-            throw new \Exception('Brak powiązanego szablonu z sello');
-        }
-        $template = PackageTemplate::
-        where('sello_delivery_id', $this->deliveryId)
-            ->where('sello_deliverer_id', $this->delivererId)
-            ->firstOrFail();
-        $modulo = $data[0]['amount'] % $this->maxInPackage;
-        $total = ceil($data[0]['amount'] / $this->maxInPackage);
-
-        for ($packageNumber = 1; $packageNumber <= $total; $packageNumber++) {
-            $pack = BackPackPackageDivider::createPackage($template, $order->id, $packageNumber);
-            $quantity = floor($data[0]['amount'] / $this->maxInPackage);
-            if ($packageNumber <= $modulo) {
-                $quantity += 1;
+        $realPackageNumber = 1;
+        foreach ($this->transactionList as $transaction) {
+            if ($transaction->tr_Group) {
+                continue;
             }
-            $pack->packedProducts()->attach($data[0]['id'],
-                ['quantity' => $quantity]);
+            $transaction->maxInPackage = $this->setMaxInPackage($transaction->tw_Pole2 ?? 1);
+            $this->divideForTransaction($data, $order, $transaction, $realPackageNumber);
         }
-        $order->shipment_date = $pack->shipment_date;
-        $order->save();
         return false;
     }
 
-    public function setDeliveryId($deliveryId): void
+    protected function setMaxInPackage(int $maxInPackage)
     {
-        $this->deliveryId = $deliveryId;
+        return $maxInPackage > 0 ? $maxInPackage : 1;
     }
 
-    public function setDelivererId($delivererId): void
+    /**
+     * @param $data
+     * @param Order $order
+     * @throws \Exception
+     */
+    private function divideForTransaction($items, Order $order, $transaction, &$realPackageNumber)
     {
-        $this->delivererId = $delivererId;
+        if (empty($transaction->tr_DelivererId) || empty($transaction->tr_DeliveryId)) {
+            throw new \Exception('Brak powiązanego szablonu z sello id: ' . $transaction->id);
+        }
+
+        $data = false;
+        foreach ($items as $product) {
+            if ($data) {
+                continue;
+            }
+            if ($product['transactionId'] == $transaction->id) {
+                $data = $product;
+            }
+        }
+
+        try {
+            $template = PackageTemplate::where('sello_delivery_id', $transaction->tr_DeliveryId)
+                ->where('sello_deliverer_id', $transaction->tr_DelivererId)
+                ->firstOrFail();
+        } catch (\Exception $e) {
+            throw new \Exception('Import Sello: Nie znaleziono szablonu sello id:'
+                . $transaction->id . ' deliverer id:' . $transaction->tr_DelivererId .' delivery id:' . $transaction->tr_DeliveryId);
+        }
+        $modulo = $data['amount'] % $transaction->maxInPackage;
+        $total = ceil($data['amount'] / $transaction->maxInPackage);
+
+        for ($packageNumber = 1; $packageNumber <= $total; $packageNumber++) {
+            $pack = BackPackPackageDivider::createPackage($template, $order->id, $realPackageNumber);
+            $quantity = floor($data['amount'] / $transaction->maxInPackage);
+            if ($packageNumber <= $modulo) {
+                $quantity += 1;
+            }
+            $pack->packedProducts()->attach($data['id'],
+                ['quantity' => $quantity]);
+            $realPackageNumber++;
+        }
+        $order->shipment_date = $pack->shipment_date;
+        $order->save();
     }
 
-    public function setMaxInPackage(int $maxInPackage): void
+    public function setTransactionList($group)
     {
-        $this->maxInPackage = $maxInPackage > 0 ? $maxInPackage : 1;
+        $this->transactionList = $group;
     }
 }

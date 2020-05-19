@@ -22,6 +22,9 @@ class GetCustomerForSello implements iGetUser
             $pass = $customer->generatePassword($data['phone']);
             $customer->password = Hash::make($pass);
         }
+        if (empty($customer->nick_allegro)) {
+            $customer->nick_allegro = $data['nick_allegro'] ?? '';
+        }
 
         $customer->save();
 
