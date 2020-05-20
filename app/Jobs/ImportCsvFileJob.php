@@ -337,6 +337,8 @@ class ImportCsvFileJob implements ShouldQueue
             unset($array['value_of_price_change_data_second']);
             unset($array['value_of_price_change_data_third']);
             unset($array['value_of_price_change_data_fourth']);
+            unset($array['date_of_price_change']);
+            unset($array['date_of_the_new_prices']);
         }
 
         if (empty($array['date_of_price_change'])) {
