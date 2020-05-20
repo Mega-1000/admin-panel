@@ -71,24 +71,20 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
         $i        = 0;
         while (!feof($fn)) {
             $result = fgets($fn);
-            if ($this->checkIfGivenLineContainAccoutNumber($result)) {
+            $orderRegexMatches = $this->checkIfGivenLineContainOrderNumber($result);
+            if (count($orderRegexMatches) > 0) {
                 $text   = fgets($fn);
                 $letter = DB::table('order_packages')->where('letter_number', 'LIKE', trim($text))->first();
                 if (!empty($letter)) {
                     $payments[$i]['orderId'] = $letter->order_id;
                 }
-                preg_match('/(\d{3,5})/', $text, $matches);
-                if($this->verifyOrderId($matches, $ordersIds)) {
-                    $payments[$i]['orderId'] = $matches[1];
-                }
-                $nextLine = fgets($fn);
-                preg_match('/(\d{3,5})/', $nextLine, $matches);
-                if($this->verifyOrderId($matches, $ordersIds)) {
-                    $payments[$i]['orderId'] = $matches[1];
+                if($this->verifyOrderId($orderRegexMatches, $ordersIds)) {
+                    $payments[$i]['orderId'] = $orderRegexMatches[1];
                 }
             }
-            if ($this->checkIfGivenLineContainValidAmount($result)) {
-                $payments[$i]['amount'] = (float) str_replace(',', '.', str_replace(' ', '', str_replace('PLN', '', $result)));
+            $amountRegexMatches = $this->checkIfGivenLineContainValidAmount($result);
+            if (count($amountRegexMatches) > 0) {
+                $payments[$i]['amount'] = (float) str_replace(',', '.', str_replace(' ', '', str_replace('PLN', '', $amountRegexMatches[0])));
                 $i++;
             }
         }
@@ -99,7 +95,6 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
 
     private function verifyOrderId($matchedResult, $ordersIds)
     {
-        var_dump($matchedResult);
         return count($matchedResult) > 1 && substr($matchedResult[1], 0, 1) !== '0' && in_array($matchedResult[1], $ordersIds);
     }
 
@@ -107,8 +102,20 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
         return strlen($fileLine) == 27 && ctype_digit(substr($fileLine, 0, 26)) || strlen($fileLine) == 29 && ctype_digit(substr($fileLine, 2, 26));
     }
 
+    private function checkIfGivenLineContainOrderNumber(string $fileLine) {
+        preg_match('/[qQ][qQ](\d{3,5})[qQ][qQ]/', $fileLine, $matches);
+
+        return $matches;
+    }
+
     private function checkIfGivenLineContainValidAmount(string $fileLine) {
-        return strpos($fileLine, 'PLN') !== false && strpos($fileLine, '-') === false && strpos($fileLine, 'a') === false;
+        $fileLine = str_replace(' ', '', $fileLine);
+        if(strpos($fileLine, 'PLN') !== false) {
+            preg_match('/([1-9][0-9]*|0)(\,[0-9]{2})?/', $fileLine, $matches);
+
+            return $matches;
+        }
+        return [];
     }
 
     protected function storePayments($payments)
