@@ -103,8 +103,7 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
     }
 
     private function checkIfGivenLineContainOrderNumber(string $fileLine) {
-        preg_match('/QQ(\d{3,5})QQ/', $fileLine, $matches);
-
+        preg_match('/[qQ][qQ](\d{3,5})[qQ][qQ]/', $fileLine, $matches);
         return $matches;
     }
 
