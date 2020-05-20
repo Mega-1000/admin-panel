@@ -187,7 +187,6 @@ class MessagesController extends Controller
             $item->net_purchase_price_calculated_unit_after_discounts = $request->calculated_price_net;
             $item->net_purchase_price_aggregate_unit_after_discounts = $request->aggregate_price_net;
             $item->save();
-            $helper->addMessage('Użytkownik ' . $user->firstname . ' ' . $user->lastname . ' zmienił cenę jednostki komercyjnej na ' . $request->commercial_price_net);
         } catch (ChatException $exception) {
             $exception->log();
             return response($exception->getMessage(), 400);

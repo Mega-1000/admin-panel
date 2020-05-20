@@ -32,7 +32,8 @@ class Task extends Model implements Transformable
         'name',
         'color',
         'status',
-        'rendering'
+        'rendering',
+        'parent_id'
     ];
 
     public function warehouse()
@@ -63,6 +64,16 @@ class Task extends Model implements Transformable
     public function reportProperty()
     {
         return $this->hasMany(ReportProperty::class);
+    }
+
+    public function childs()
+    {
+        return $this->hasMany(Task::class, 'parent_id', 'id');
+    }
+
+    public function parent()
+    {
+        return $this->hasMany(Task::class, 'id', 'parent_id');
     }
 
 }

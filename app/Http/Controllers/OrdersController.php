@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\Auth_code;
 use App\Entities\InvoiceRequest;
 use App\Entities\Order;
 use App\Entities\OrderInvoice;
@@ -47,6 +48,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
 use App\Entities\Product;
 use Illuminate\Http\Request;
@@ -2347,6 +2349,39 @@ class OrdersController extends Controller
         ]);
     }
 
+    public function goToBasket(Request $request)
+    {
+
+        try {
+            $user = Auth::user();
+            if (empty($user)) {
+                throw new \Exception('Wrong User');
+            }
+            $order = Order::findOrFail($request->id);
+
+
+            $code = Str::random(60);
+            Auth_code::where('customer_id', $order->customer->id)->delete();
+            $authCode = new Auth_code();
+            $authCode->token = $code;
+            $authCode->customer_id = $order->customer->id;
+            $authCode->save();
+            $query = http_build_query([
+                'cart_token' => $order->getToken(),
+                'user_code' => $code
+            ]);
+
+            $frontUrl = env('FRONT_URL') . '/koszyk.html?' . $query;
+            return redirect($frontUrl);
+        } catch (\Exception $exception) {
+            Log::notice('Can not edit basket', ['message' => $exception->getMessage(), 'stack' => $exception->getTraceAsString()]);
+        }
+        return redirect()->back()->with([
+            'message' => __('firms.message.send_request_to_update_data_error'),
+            'alert-type' => 'error'
+        ]);
+    }
+  
     public function invoiceRequest(Request $request)
     {
         $invoiceRequest = InvoiceRequest::create([
@@ -2356,6 +2391,7 @@ class OrdersController extends Controller
 
         return response()->json(['status' => 200]);
     }
+
     public function getInvoices($id)
     {
         $order = Order::find($id);

@@ -393,6 +393,7 @@ class OrdersController extends Controller
             $userId = $request->user()->id;
             $orderButtons = ChatHelper::createButtonsArrayForOrder($order, $userId, MessagesHelper::TYPE_CUSTOMER);
             $order->buttons = $orderButtons;
+            $order->user_invoices = $order->subiektInvoices;
         }
 
         return $orders->toJson();
