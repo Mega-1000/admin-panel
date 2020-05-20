@@ -1122,6 +1122,15 @@
 
                         let color = "";
 
+                        function checkReminder(row, color) {
+                            if (row.remainder_date) {
+                                if (moment(row.remainder_date).isBefore()) {
+                                    color = "orange";
+                                }
+                            }
+                            return color
+                        }
+
                         switch(field) {
                             case "przyjete zapytanie ofertowe":
                                 color = "red";
@@ -1130,21 +1139,14 @@
                                 color = "#AAB78F";
                                 break;
                             case "oferta zakonczona":
-                                color = "green";
+                                color = checkReminder(row, "green");
                                 break;
                             case "w trakcie realizacji":
-                                color = "blue";
-                                break;
                             case "w trakcie analizowania przez konsultanta":
                             case "mozliwa do realizacji":
                             case "mozliwa do realizacji kominy":
                             case "oferta oczekujaca":
-                                color = "blue";
-                                if (row.remainder_date) {
-                                    if (moment(row.remainder_date).isBefore()) {
-                                        color = "orange";
-                                    }
-                                }
+                                color = checkReminder(row, "blue");
                                 break;
                         }
 
