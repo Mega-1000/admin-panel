@@ -375,16 +375,18 @@
                 <tr>
                     <th colspan="1" width="10%"></th>
                     <th colspan="1" width="10%">Pracownik</th>
+                    <th colspan="1" width="5%">Przedawnienia</th>
                     <th colspan="{{count($labIds['payments'])}}" width="17,5%" style="text-align: center">Płatności</th>
                     <th colspan="{{count($labIds['production'])}}" width="15%" style="text-align: center">Produkcja</th>
                     <th colspan="{{count($labIds['transport'])}}" width="17,5%" style="text-align: center">Transport
                     </th>
-                    <th colspan="{{count($labIds['info'])}}" width="25%" style="text-align: center">Info Dodatkowe</th>
+                    <th colspan="{{count($labIds['info'])}}" width="20%" style="text-align: center">Info Dodatkowe</th>
                     <th colspan="{{count($labIds['invoice'])}}" width="5%" style="text-align: center">Faktury Zakupu
                     </th>
                 </tr>
                 <tr>
                     <th>Ikona Etykiety</th>
+                    <th></th>
                     <th></th>
                     @foreach ($labIds as $labIdGroup)
                         @foreach ($labIdGroup as $labId)
@@ -407,6 +409,7 @@
                         <tr>
                             <th style="text-align: center">{{$out['user']->id}}</th>
                             <th>{{$out['user']->firstname}} {{$out['user']->lastname}}</th>
+                            <th>{{$out['outdated']}}</th>
                             @foreach ($labIds as $labIdGroup)
                                 @foreach ($labIdGroup as $labId)
                                     <td style="text-align: center">{{$out[$labId] ?? 0}}</td>

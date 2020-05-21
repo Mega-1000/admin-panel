@@ -294,7 +294,7 @@ class OrdersController extends Controller
         );
         $usersQuery = User::with(['orders' => function ($q) {
             $q->where('created_at','>', Carbon::now()->subMonths(2));
-            $q->select('id', 'employee_id');
+            $q->select('id', 'employee_id', 'remainder_date');
             $q->with(['labels' => function ($q) {
                 $q->select('labels.id', 'order_id');
             }]);
@@ -305,9 +305,12 @@ class OrdersController extends Controller
             $users = $usersQuery->get();
         }
         $out = [];
+        $today = Carbon::now();
         foreach ($users as $user) {
             $out[$user->id]['user'] = $user;
+            $out[$user->id]['outdated'] = 0;
             foreach ($user->orders as $order) {
+                $out[$user->id]['outdated'] += $today->greaterThan($order->remainder_date);
                 foreach ($order->labels as $label) {
                     if (empty($out[$user->id][$label->id])) {
                         $out[$user->id][$label->id] = 0;
