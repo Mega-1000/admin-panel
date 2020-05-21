@@ -53,14 +53,10 @@ class MessagesController extends Controller
                 return response('ok');
             }
             $this->createNewCustomerOrEmployee($chat, $request, $user);
-            if (is_a($user, Employee::class) || is_a($user, User::class)) {
-                $email = $user->email;
-            } else if (is_a($user, Customer::class)) {
+            if (is_a($user, Customer::class)) {
                 $email = $user->login;
-            } else {
-                throw new ChatException('Zły rodzaj użytkownika');
+                ChatNotificationJob::sendNewMessageEmail($email, $helper);
             }
-            ChatNotificationJob::sendNewMessageEmail($email, $helper);
             return response('ok');
         } catch (ChatException $e) {
             $e->log();
@@ -92,21 +88,14 @@ class MessagesController extends Controller
     {
         try {
             $helper = new MessagesHelper($token);
-            $chat = $helper->getChat();
-            if (!$chat) {
+            if (!$helper->getChat()) {
                 throw new ChatException('Wrong chat token');
             }
-            OrderLabelHelper::setRedLabel($chat);
 
-            $chat->need_intervention = true;
-            $chat->save();
-            if ($chat->users->count() > 0) {
-                $chat->users->map(function ($user) use ($helper) {
-                    ChatNotificationJob::sendNewMessageEmail($user->email, $helper);
-                });
+            if ($helper->currentUserType == MessagesHelper::TYPE_USER) {
+                $this->notifyEmployee($helper);
             } else {
-                $user = User::where('name', '001')->first();
-                ChatNotificationJob::sendNewMessageEmail($user->email, $helper);
+                $this->notifyModerator($helper);
             }
             return response('ok');
         } catch (ChatException $e) {
@@ -270,5 +259,35 @@ class MessagesController extends Controller
             $chatUser->customer()->associate($user);
         }
         $chatUser->save();
+    }
+
+    /**
+     * @param MessagesHelper $helper
+     */
+    private function notifyModerator(MessagesHelper $helper): void
+    {
+        $chat = $helper->getChat();
+        OrderLabelHelper::setRedLabel($chat);
+
+        $chat->need_intervention = true;
+        $chat->save();
+        if ($chat->users->count() > 0) {
+            $chat->users->map(function ($user) use ($helper) {
+                ChatNotificationJob::sendNewMessageEmail($user->email, $helper);
+            });
+        } else {
+            $user = User::where('name', '001')->first();
+            ChatNotificationJob::sendNewMessageEmail($user->email, $helper);
+        }
+    }
+
+    private function notifyEmployee(MessagesHelper $helper)
+    {
+        $chat = $helper->getChat();
+        if ($chat->employees->count() > 0) {
+            $chat->employees->map(function ($user) use ($helper) {
+                ChatNotificationJob::sendNewMessageEmail($user->email, $helper);
+            });
+        }
     }
 }

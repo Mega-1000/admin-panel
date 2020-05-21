@@ -36,11 +36,10 @@ class ChatNotificationJob implements ShouldQueue
             ::with(['chatUsers' => function ($q) {
                 $q->with('user');
                 $q->with('customer');
-                $q->with('employee');
+                $q->whereNull('employee_id');
             }])
             ->with('messages')
-            ->find($this->chatId)
-        ;
+            ->find($this->chatId);
         foreach ($chat->chatUsers as $chatUser) {
             if (!MessagesHelper::hasNewMessageStatic($chat, $chatUser, true)) {
                 continue;
@@ -65,7 +64,7 @@ class ChatNotificationJob implements ShouldQueue
             $chatUser->last_notification_time = now();
             $chatUser->save();
         } catch (\Exception $e) {
-            \Log::error('ChatNotification Exception: '.$e->getMessage().', Class: '.$e->getFile().', Line: '.$e->getLine());
+            \Log::error('ChatNotification Exception: ' . $e->getMessage() . ', Class: ' . $e->getFile() . ', Line: ' . $e->getLine());
         }
     }
 
