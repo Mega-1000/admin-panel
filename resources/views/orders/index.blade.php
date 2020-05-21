@@ -10,9 +10,11 @@
             -moz-border-radius: 0px !important;
             border-radius: 0px !important;
         }
+
         .pointer {
             cursor: pointer;
         }
+
         .ui-tooltip {
             width: 700px !important;
             max-width: 700px !important;
@@ -88,7 +90,8 @@
         <div class="modal-dialog" id="modalDialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
                             aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title" id="titleModal">Proszę wybrac magazyn: </h4>
                 </div>
@@ -97,7 +100,8 @@
                         <select id="selectWarehouse" class="form-control">
                             <option value="0" selected="selected">Wybierz magazyn</option>
                             @foreach($warehouses as $warehouse)
-                                <option value="{{$warehouse->id}}" class="warehouseSelect" id="warehouseSelect">{{$warehouse->symbol}}</option>
+                                <option value="{{$warehouse->id}}" class="warehouseSelect"
+                                        id="warehouseSelect">{{$warehouse->symbol}}</option>
                             @endforeach
                         </select>
                     </div>
@@ -110,7 +114,8 @@
         <div class="modal-dialog" id="modalDialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
                             aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title" id="titleModal">Proszę wybrac magazyn: </h4>
                 </div>
@@ -119,7 +124,8 @@
                         <select required name="warehouse_id" class="form-control">
                             <option value="" selected="selected">Wybierz magazyn</option>
                             @foreach($warehouses as $warehouse)
-                                <option value="{{$warehouse->id}}" class="warehouseSelect">{{$warehouse->symbol}}</option>
+                                <option value="{{$warehouse->id}}"
+                                        class="warehouseSelect">{{$warehouse->symbol}}</option>
                             @endforeach
                         </select>
                     </form>
@@ -362,69 +368,78 @@
     </div>
     <div style="display: flex; align-items: center;" id="add-label-container">
         <button class="btn btn-warning" onclick="clearFilters()">Wyszczyść filtry</button>
-        <button id="showTable" class="btn btn-warning" style="margin-left: 5px">Pokaż Tabelkę z Etykietami Pracownika</button>
+        <button id="showTable" class="btn btn-warning" style="margin-left: 5px">Pokaż Tabelkę z Etykietami Pracownika
+        </button>
         <div class="col-md-12 hidden" style="float: right" id="labelTable">
-            <table width="50%"  style="float:right;" border="1">
-                    <tr>
-                        <th colspan="1" width="10%"></th>
-                        <th colspan="1" width="10%">Pracownik</th>
-                        <th colspan="{{count($labIds['payments'])}}" width="17,5%" style="text-align: center">Płatności</th>
-                        <th colspan="{{count($labIds['production'])}}" width="15%" style="text-align: center">Produkcja</th>
-                        <th colspan="{{count($labIds['transport'])}}" width="17,5%" style="text-align: center">Transport</th>
-                        <th colspan="{{count($labIds['info'])}}" width="25%" style="text-align: center">Info Dodatkowe</th>
-                        <th colspan="{{count($labIds['invoice'])}}" width="5%" style="text-align: center">Faktury Zakupu</th>
-                    </tr>
-                    <tr>
-                        <th>Ikona Etykiety</th>
-                        <th></th>
-                        @foreach ($labIds as $labIdGroup)
-                            @foreach ($labIdGroup as $labId)
-                                @foreach ($labels as $label)
-                                    @if ($labId == $label->id)
-                                        <th scope="col">
-                                            <div style="width:40px;" align="center">
+            <table width="50%" style="float:right;" border="1">
+                <tr>
+                    <th colspan="1" width="10%"></th>
+                    <th colspan="1" width="10%">Pracownik</th>
+                    <th colspan="{{count($labIds['payments'])}}" width="17,5%" style="text-align: center">Płatności</th>
+                    <th colspan="{{count($labIds['production'])}}" width="15%" style="text-align: center">Produkcja</th>
+                    <th colspan="{{count($labIds['transport'])}}" width="17,5%" style="text-align: center">Transport
+                    </th>
+                    <th colspan="{{count($labIds['info'])}}" width="25%" style="text-align: center">Info Dodatkowe</th>
+                    <th colspan="{{count($labIds['invoice'])}}" width="5%" style="text-align: center">Faktury Zakupu
+                    </th>
+                </tr>
+                <tr>
+                    <th>Ikona Etykiety</th>
+                    <th></th>
+                    @foreach ($labIds as $labIdGroup)
+                        @foreach ($labIdGroup as $labId)
+                            @foreach ($labels as $label)
+                                @if ($labId == $label->id)
+                                    <th scope="col">
+                                        <div style="width:40px;" align="center">
                                             <span title="{{$label->name}}">
-                                            <i  style="font-size: 2.5rem; color: {{$label->color}}" class="{{$label->icon_name}}"></i>
-                                            </div>
-                                        </th>
-                                    @endif
-                                @endforeach
+                                            <i style="font-size: 2.5rem; color: {{$label->color}}"
+                                               class="{{$label->icon_name}}"></i>
+                                        </div>
+                                    </th>
+                                @endif
                             @endforeach
                         @endforeach
-                    </tr>
-                        @foreach ($outs as $out)
-                            @if (!empty($out['user']->orders[0]))
-                                <tr>
-                                    <th style="text-align: center">{{$out['user']->id}}</th>
-                                    <th>{{$out['user']->firstname}} {{$out['user']->lastname}}</th>
-                                    @foreach ($labIds as $labIdGroup)
-                                        @foreach ($labIdGroup as $labId)
-                                            <td style="text-align: center">{{$out[$labId] ?? 0}}</td>
-                                        @endforeach
-                                    @endforeach
-                                </tr>
-                            @endif
-                        @endforeach
-                </table>
+                    @endforeach
+                </tr>
+                @foreach ($outs as $out)
+                    @if (!empty($out['user']->orders[0]))
+                        <tr>
+                            <th style="text-align: center">{{$out['user']->id}}</th>
+                            <th>{{$out['user']->firstname}} {{$out['user']->lastname}}</th>
+                            @foreach ($labIds as $labIdGroup)
+                                @foreach ($labIdGroup as $labId)
+                                    <td style="text-align: center">{{$out[$labId] ?? 0}}</td>
+                                @endforeach
+                            @endforeach
+                        </tr>
+                    @endif
+                @endforeach
+            </table>
         </div>
     </div>
     <div style="display: flex; align-items: center;" id="add-label-container">
         <input type="hidden" id="spedition-exchange-selected-items" value="[]">
-        <button class="btn btn-secondary" onclick="gerateSpeditionExchangeLink()">Giełda spedycyjna (generuj link)</button>
+        <button class="btn btn-secondary" onclick="gerateSpeditionExchangeLink()">Giełda spedycyjna (generuj link)
+        </button>
         <div class="spedition-exchange-generated-link"></div>
     </div>
     <div style="display: flex; align-items: center;" id="add-label-container">
-        <a name="actualization-price" target="_blank" class="btn btn-success" href="/admin/actualizationPrice">Wyślij prośbę o aktualizację cen</a>
+        <a name="actualization-price" target="_blank" class="btn btn-success" href="/admin/actualizationPrice">Wyślij
+            prośbę o aktualizację cen</a>
     </div>
     <div class="form-group">
         <label for="protocols">Protokoły z dnia dzisiejszego</label>
-        <a name="protocols" target="_blank" class="btn btn-success" href="/admin/orderPackages/inpost/protocols">Inpost</a>
+        <a name="protocols" target="_blank" class="btn btn-success"
+           href="/admin/orderPackages/inpost/protocols">Inpost</a>
         <a name="protocols" target="_blank" class="btn btn-success" href="/admin/orderPackages/dpd/protocols">DPD</a>
         <a name="protocols" target="_blank" class="btn btn-success" href="/admin/orderPackages/pocztex/protocols">Pocztex</a>
         <a name="protocols" target="_blank" class="btn btn-success" href="/admin/orderPackages/apaczka/protocols">Apaczka</a>
         <a name="protocols" target="_blank" class="btn btn-success" href="/admin/orderPackages/jas/protocols">Jas</a>
-        <a name="protocols" target="_blank" class="btn btn-success" href="/admin/orderPackages/gielda/protocols">Gielda</a>
-        <a name="protocols" target="_blank" class="btn btn-info" href="/admin/orderPackages/all/protocols">Wszystkie protokoły</a>
+        <a name="protocols" target="_blank" class="btn btn-success"
+           href="/admin/orderPackages/gielda/protocols">Gielda</a>
+        <a name="protocols" target="_blank" class="btn btn-info" href="/admin/orderPackages/all/protocols">Wszystkie
+            protokoły</a>
     </div>
     <div class="form-group">
         <label for="send_courier">Wyślij kurierów: </label>
@@ -440,7 +455,8 @@
         <a name="send_courier" class="btn btn-success" href="/admin/packageTemplates/">Lista Szablonów</a>
         <a name="send_courier" class="btn btn-info" href="/admin/packageTemplates/create">Dodaj szablon</a>
         <label style="margin-left: 20px" for="container_type">Rodzaje przesyłek:</label>
-        <a style="margin-left: 5px" name="container_type" class="btn btn-success" href="/admin/containerTypes/">Lista rodzajów przesyłek</a>
+        <a style="margin-left: 5px" name="container_type" class="btn btn-success" href="/admin/containerTypes/">Lista
+            rodzajów przesyłek</a>
         <a name="container_type" class="btn btn-info" href="/admin/containerTypes/create">Dodaj rodzaj przesyłki</a>
     </div>
     <div>
@@ -448,7 +464,8 @@
         <a name="content_type" class="btn btn-success" href="/admin/contentTypes/">Lista Typów zawartości przesyłek</a>
         <a name="content_type" class="btn btn-info" href="/admin/contentTypes/create">Dodaj typ zawartości przesyłki</a>
         <label style="margin-left: 20px" for="packing_type">Typy opakowań przesyłek:</label>
-        <a style="margin-left: 5px" name="packing_type" class="btn btn-success" href="/admin/packingTypes/">Lista Typów opakowań przesyłek</a>
+        <a style="margin-left: 5px" name="packing_type" class="btn btn-success" href="/admin/packingTypes/">Lista Typów
+            opakowań przesyłek</a>
         <a name="packing_type" class="btn btn-info" href="/admin/packingTypes/create">Dodaj typ opakowania przesyłki</a>
     </div>
     <br>
@@ -515,7 +532,8 @@
                     <select class="columnSearchSelect" id="columnSearch-packages_sent">
                         <option value="">Wszystkie</option>
                         @foreach($couriers as $courier)
-                            <option value="{{$courier->delivery_courier_name}}">{{$courier->delivery_courier_name}}</option>
+                            <option
+                                value="{{$courier->delivery_courier_name}}">{{$courier->delivery_courier_name}}</option>
                         @endforeach
                     </select>
                 </div>
@@ -526,7 +544,8 @@
                     <select class="columnSearchSelect" id="columnSearch-packages_not_sent">
                         <option value="">Wszystkie</option>
                         @foreach($couriers as $courier)
-                            <option value="{{$courier->delivery_courier_name}}">{{$courier->delivery_courier_name}}</option>
+                            <option
+                                value="{{$courier->delivery_courier_name}}">{{$courier->delivery_courier_name}}</option>
                         @endforeach
                     </select>
                 </div>
@@ -569,7 +588,8 @@
             <th>
                 <div><span>@lang('orders.table.orderId')</span></div>
                 <div class="input_div">
-                    <span title="KLIKNIECIE TEGO POLA USUWA FILTRY"><input type="text" id="columnSearch-orderId"/></span>
+                    <span title="KLIKNIECIE TEGO POLA USUWA FILTRY"><input type="text"
+                                                                           id="columnSearch-orderId"/></span>
                 </div>
             </th>
             <th>
@@ -580,13 +600,29 @@
                 <div><span>@lang('orders.table.statusName')</span></div>
                 <div class="input_div">
                     <input type="text" id="columnSearch-statusName"/>
+                    <button class="btn btn-default" id="set_outdate" onclick="
+                        let is_filter = !$(this).hasClass('btn-success');
+                        console.log(is_filter)
+                        if (is_filter) {
+                            $(this).addClass('btn-success')
+                        } else {
+                            $(this).removeClass('btn-success')
+                        }
+                        $('#columnSearch-remainder_date').val(is_filter)
+                        event.stopPropagation();
+                                table
+                                    .column('remainder_date:name')
+                                .search(is_filter)
+                                .draw()">Przedawnione</button>
                 </div>
             </th>
             <th>
                 <div><span>@lang('orders.table.symbol')</span></div>
                 <div class="input_div">
                     <input type="text" id="columnSearch-symbol"/>
-                    <button class="btn btn-default" id="filterByWarehouseMegaOlawa" onclick="event.stopPropagation(); filterByWarehouseMegaOlawa()">M</button>
+                    <button class="btn btn-default" id="filterByWarehouseMegaOlawa"
+                            onclick="event.stopPropagation(); filterByWarehouseMegaOlawa()">M
+                    </button>
                 </div>
             </th>
             <th>@lang('orders.form.warehouse_notice')
@@ -684,6 +720,12 @@
                     <input type="text" id="columnSearch-sello_payment"/>
                 </div>
             </th>
+            <th>
+                <div><span>@lang('orders.form.remainder_date')</span></div>
+                <div class="input_div">
+                    <input hidden type="text" id="columnSearch-remainder_date" value="false"/>
+                </div>
+            </th>
             <th></th>
         </tr>
         </thead>
@@ -694,7 +736,7 @@
     <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
     <script>
 
-        $(function() {
+        $(function () {
             if (localStorage.getItem("filter") != null) {
                 $("#orderFilter").val(localStorage.getItem('filter')).prop('selected', true);
             }
@@ -716,29 +758,29 @@
 
         $.fn.dataTable.ext.errMode = 'throw';
 
-        function sendPackage(id, orderId){
-            $('#package-'+id).attr("disabled", true);
+        function sendPackage(id, orderId) {
+            $('#package-' + id).attr("disabled", true);
             $('#order_courier > div > div > div.modal-header > h4 > span').remove();
             $('#order_courier > div > div > div.modal-header > span').remove();
             $.ajax({
-                url: '/admin/orders/'+orderId+'/package/'+id+'/send',
-            }).done(function(data) {
+                url: '/admin/orders/' + orderId + '/package/' + id + '/send',
+            }).done(function (data) {
                 $('#order_courier').modal('show');
-                if(data.message == 'Kurier zostanie zamówiony w przeciągu kilku minut' || data.message == null) {
+                if (data.message == 'Kurier zostanie zamówiony w przeciągu kilku minut' || data.message == null) {
                     $('#order_courier > div > div > div.modal-header > h4').append('<span>Kurier zostanie zamówiony w przeciągu kilku minut</span>');
                 } else {
                     $('#order_courier > div > div > div.modal-header > h4').append('<span>Jedno z wymaganych pól nie zostało zdefiniowane:</span>');
-                    $('#order_courier > div > div > div.modal-header').append('<span style="color:red;">'+data.message.message+'</span><br>');
+                    $('#order_courier > div > div > div.modal-header').append('<span style="color:red;">' + data.message.message + '</span><br>');
                 }
-                $('#package-'+id).attr("disabled", false);
-                $('#success-ok').on('click', function(){
-                    window.location.href= '/admin/orders?order_id='+orderId;
+                $('#package-' + id).attr("disabled", false);
+                $('#success-ok').on('click', function () {
+                    window.location.href = '/admin/orders?order_id=' + orderId;
                 });
-            }).fail(function() {
-                $('#package-'+id).attr("disabled", false);
+            }).fail(function () {
+                $('#package-' + id).attr("disabled", false);
                 $('#order_courier_problem').modal('show');
-                $('#problem-ok').on('click', function() {
-                    window.location.href = '/admin/orders?order_id='+orderId;
+                $('#problem-ok').on('click', function () {
+                    window.location.href = '/admin/orders?order_id=' + orderId;
                 });
             });
         }
@@ -758,13 +800,13 @@
                 {
                     'targets': 15,
                     'createdCell': function (td, cellData, rowData, row, col) {
-                        $(td).attr('id', 'action-'+rowData.orderId);
+                        $(td).attr('id', 'action-' + rowData.orderId);
                     }
                 },
                 {
                     'targets': 21,
                     'createdCell': function (td, cellData, rowData, row, col) {
-                        $(td).attr('id', 'consultant_notices-'+rowData.orderId);
+                        $(td).attr('id', 'consultant_notices-' + rowData.orderId);
                     }
                 }
             ],
@@ -802,12 +844,12 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
             },
-            rowCallback: function( row, data, index ) {
-                if(data.login == 'magazyn-olawa@mega1000.pl') {
+            rowCallback: function (row, data, index) {
+                if (data.login == 'magazyn-olawa@mega1000.pl') {
                     $('td', row).css('background-color', 'rgb(0, 0, 255, 0.1)');
                 }
             },
-            drawCallback: function( settings ) {
+            drawCallback: function (settings) {
                 setTimeout(function () {
                     $('.ui-tooltip-content').parent().remove()
 
@@ -831,7 +873,7 @@
                     name: 'mark',
                     orderable: false,
                     render: function (id) {
-                        return '<input class="order-id-checkbox" value="'+id+'" type="checkbox">';
+                        return '<input class="order-id-checkbox" value="' + id + '" type="checkbox">';
                     },
                 },
                 {
@@ -839,7 +881,7 @@
                     name: 'spedition_exchange_invoiced_selector',
                     orderable: false,
                     render: function (id) {
-                        return '<input class="spedition-exchange-selector-no-invoice" value="'+id+'" type="checkbox"><br><input class="spedition-exchange-selector-invoiced" value="'+id+'" type="checkbox">';
+                        return '<input class="spedition-exchange-selector-no-invoice" value="' + id + '" type="checkbox"><br><input class="spedition-exchange-selector-invoiced" value="' + id + '" type="checkbox">';
                     },
                 },
                 {
@@ -847,11 +889,11 @@
                     name: 'packages_sent',
                     searchable: false,
                     orderable: false,
-                    render: function ( data, type, row ) {
+                    render: function (data, type, row) {
                         var html = '';
-                        $.each(data, function(key, value) {
+                        $.each(data, function (key, value) {
                             if (value.real_cost_for_company > value.cost_for_company) {
-                                 html = '<div style="border: solid red 4px" >'
+                                html = '<div style="border: solid red 4px" >'
                             }
                             if ((value.status === 'SENDING' && value.status !== 'CANCELLED') || (value.status === 'DELIVERED' && value.status !== 'CANCELLED')) {
                                 html += '<div style="display: flex; align-items: center; flex-direction: column;" > ' +
@@ -864,21 +906,21 @@
                                 html += '<p style="margin: 8px 8px 0px 8px;">' + name + '</p> </div> '
                                 if (value.letter_number === null) {
                                     html += '<a href="javascript:void()"><p>Brak listu przewozowego</p></a>';
-                                }else {
+                                } else {
                                     if (value.service_courier_name === 'INPOST' || value.service_courier_name === 'ALLEGRO-INPOST') {
-                                        html += '<a target="_blank" href="/storage/inpost/stickers/sticker' + value.letter_number + '.pdf"><p>'+value.letter_number+'</p></a>';
+                                        html += '<a target="_blank" href="/storage/inpost/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                     } else if (value.delivery_courier_name === 'DPD') {
-                                        html += '<p>'+value.sending_number+'</p>';
-                                        html += '<a target="_blank" href="/storage/dpd/stickers/sticker' + value.letter_number + '.pdf"><p>'+value.letter_number+'</p></a>';
+                                        html += '<p>' + value.sending_number + '</p>';
+                                        html += '<a target="_blank" href="/storage/dpd/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                     } else if (value.delivery_courier_name === 'POCZTEX') {
-                                        html += '<a target="_blank" href="/storage/pocztex/protocols/protocol' + value.sending_number + '.pdf"><p>'+value.letter_number+'</p></a>';
+                                        html += '<a target="_blank" href="/storage/pocztex/protocols/protocol' + value.sending_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                     } else if (value.delivery_courier_name === 'JAS') {
-                                        html += '<a target="_blank" href="/storage/jas/protocols/protocol' + value.sending_number + '.pdf"><p>'+value.letter_number+'</p></a>';
-                                        html += '<a target="_blank" href="/storage/jas/labels/label' + value.sending_number + '.pdf"><p>'+value.letter_number+'</p></a>';
+                                        html += '<a target="_blank" href="/storage/jas/protocols/protocol' + value.sending_number + '.pdf"><p>' + value.letter_number + '</p></a>';
+                                        html += '<a target="_blank" href="/storage/jas/labels/label' + value.sending_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                     } else if (value.delivery_courier_name === 'GIELDA') {
-                                        html += '<a target="_blank" href="/storage/gielda/stickers/sticker' + value.letter_number + '.pdf"><p>'+value.letter_number+'</p></a>';
+                                        html += '<a target="_blank" href="/storage/gielda/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                     } else if (value.delivery_courier_name === 'ODBIOR_OSOBISTY') {
-                                        html += '<a target="_blank" href="/storage/odbior_osobisty/stickers/sticker' + value.letter_number + '.pdf"><p>'+value.letter_number+'</p></a>';
+                                        html += '<a target="_blank" href="/storage/odbior_osobisty/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                     }
                                 }
                                 html += '</div>';
@@ -892,7 +934,7 @@
                     name: 'packages_not_sent',
                     searchable: false,
                     orderable: false,
-                    render: function ( order, type, row ) {
+                    render: function (order, type, row) {
                         let data = order.packages
                         var html = ''
                         if (data.length != 0) {
@@ -955,8 +997,7 @@
                     data: 'shipment_date',
                     name: 'shipment_date',
                     searchable: false,
-                    render: function(shipment_date, option, row)
-                    {
+                    render: function (shipment_date, option, row) {
                         let date = moment(shipment_date);
                         if (date.isValid()) {
                             let formatedDate = date.format('YYYY-MM-DD');
@@ -975,17 +1016,16 @@
                     name: 'label_{{str_replace(" ", "_", $labelGroupName)}}',
                     searchable: false,
                     orderable: false,
-                    render: function(labels, option, row)
-                    {
+                    render: function (labels, option, row) {
                         let html = '';
                         let currentLabelGroup = "{{ $labelGroupName }}";
                         if (row.closest_label_schedule_type_c && currentLabelGroup == "info dodatkowe") {
                             html += row.closest_label_schedule_type_c.trigger_time;
                         }
                         labels.forEach(function (label) {
-                            if(label.length > 0){
+                            if (label.length > 0) {
                                 if (label[0].label_group_id != null) {
-                                    if(label[0].label_group[0].name == currentLabelGroup) {
+                                    if (label[0].label_group[0].name == currentLabelGroup) {
                                         let tooltipContent = label[0].name
                                         if (
                                             label[0].id == 55 ||
@@ -1020,14 +1060,14 @@
                                         if (row.payment_deadline) {
                                             let d1 = new Date();
                                             let d2 = new Date(row.payment_deadline);
-                                            d1.setHours(0,0,0,0)
-                                            d2.setHours(0,0,0,0)
+                                            d1.setHours(0, 0, 0, 0)
+                                            d2.setHours(0, 0, 0, 0)
                                             comparasion = d1 >= d2
                                         }
                                         if (label[0].id == '{{ env('MIX_LABEL_WAITING_FOR_PAYMENT_ID') }}' && comparasion) {
-                                            html += '<div data-toggle="label-tooltip" style="border: solid red 4px" data-html="true" title="' + tooltipContent + '" class="pointer" onclick="removeLabel('+row.orderId+', '+label[0].id+', '+label[0].manual_label_selection_to_add_after_removal+', \''+label[0].added_type+'\');"><span class="order-label" style="color: '+ label[0].font_color +'; display: block; margin-top: 5px; background-color: ' + label[0].color + '"><i class="' + label[0].icon_name + '"></i></span></div>';
+                                            html += '<div data-toggle="label-tooltip" style="border: solid red 4px" data-html="true" title="' + tooltipContent + '" class="pointer" onclick="removeLabel(' + row.orderId + ', ' + label[0].id + ', ' + label[0].manual_label_selection_to_add_after_removal + ', \'' + label[0].added_type + '\');"><span class="order-label" style="color: ' + label[0].font_color + '; display: block; margin-top: 5px; background-color: ' + label[0].color + '"><i class="' + label[0].icon_name + '"></i></span></div>';
                                         } else {
-                                            html += '<div data-toggle="label-tooltip" data-html="true" title="' + tooltipContent + '" class="pointer" onclick="removeLabel('+row.orderId+', '+label[0].id+', '+label[0].manual_label_selection_to_add_after_removal+', \''+label[0].added_type+'\');"><span class="order-label" style="color: '+ label[0].font_color +'; display: block; margin-top: 5px; background-color: ' + label[0].color + '"><i class="' + label[0].icon_name + '"></i></span></div>';
+                                            html += '<div data-toggle="label-tooltip" data-html="true" title="' + tooltipContent + '" class="pointer" onclick="removeLabel(' + row.orderId + ', ' + label[0].id + ', ' + label[0].manual_label_selection_to_add_after_removal + ', \'' + label[0].added_type + '\');"><span class="order-label" style="color: ' + label[0].font_color + '; display: block; margin-top: 5px; background-color: ' + label[0].color + '"><i class="' + label[0].icon_name + '"></i></span></div>';
                                         }
                                     }
                                 }
@@ -1042,9 +1082,9 @@
                     data: 'token',
                     name: 'print',
                     orderable: false,
-                    render: function(token, row, data) {
+                    render: function (token, row, data) {
                         let html = '';
-                        if(data.print_order == '0') {
+                        if (data.print_order == '0') {
                             html = '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-default" id="btn-print">W</a>';
                         } else {
                             html = '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-success">W</a>';
@@ -1065,18 +1105,18 @@
                 {
                     data: 'orderId',
                     name: 'orderId',
-                    render: function(orderId, row, data){
-                        if(data.master_order_id == null) {
+                    render: function (orderId, row, data) {
+                        if (data.master_order_id == null) {
                             let html = '';
                             if (data.sello_id) {
                                 html += ' (A)'
                             }
-                            for(let i = 0; i < data.connected.length; i++) {
+                            for (let i = 0; i < data.connected.length; i++) {
                                 html += '<span style="display: block;">(P)' + data.connected[i].id + '</span>';
                             }
-                            return '<a target="_blank" href="/admin/planning/timetable?id=taskOrder-'+orderId+'">(G)'+orderId+'</a>' + html;
+                            return '<a target="_blank" href="/admin/planning/timetable?id=taskOrder-' + orderId + '">(G)' + orderId + '</a>' + html;
                         } else {
-                            return '<a target="_blank" href="/admin/planning/timetable?id=taskOrder-'+orderId+'">(P)'+orderId+'</a><span style="display: block;">(G)' + data.master_order_id + '</span>';
+                            return '<a target="_blank" href="/admin/planning/timetable?id=taskOrder-' + orderId + '">(P)' + orderId + '</a><span style="display: block;">(G)' + data.master_order_id + '</span>';
                         }
 
                     }
@@ -1087,8 +1127,8 @@
                     orderable: false,
                     render: function (id) {
                         let html = '';
-                        html += '<button id="moveButton-'+id+'" class="btn btn-sm btn-warning edit" onclick="moveData('+id+')">Przenieś</button>';
-                        html += '<button id="moveButtonAjax-'+id+'" class="btn btn-sm btn-success btn-move edit hidden" onclick="moveDataAjax('+id+')">Przenieś dane tutaj</button>';
+                        html += '<button id="moveButton-' + id + '" class="btn btn-sm btn-warning edit" onclick="moveData(' + id + ')">Przenieś</button>';
+                        html += '<button id="moveButtonAjax-' + id + '" class="btn btn-sm btn-success btn-move edit hidden" onclick="moveDataAjax(' + id + ')">Przenieś dane tutaj</button>';
                         html += '<a href="{{ url()->current() }}/' + id + '/edit" class="btn btn-sm btn-primary edit">';
                         html += '<i class="voyager-edit"></i>';
                         html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
@@ -1107,7 +1147,7 @@
                     data: 'orderId',
                     name: 'section',
                     orderable: false,
-                    render: function() {
+                    render: function () {
                         let html = 'tymczasowy brak';
                         return html;
                     }
@@ -1115,8 +1155,8 @@
                 {
                     data: 'statusName',
                     name: 'statusName',
-                    render: function(field, type, row) {
-                        if(field == null) {
+                    render: function (field, type, row) {
+                        if (field == null) {
                             return "";
                         }
 
@@ -1131,7 +1171,7 @@
                             return color
                         }
 
-                        switch(field) {
+                        switch (field) {
                             case "przyjete zapytanie ofertowe":
                                 color = "red";
                                 break;
@@ -1160,8 +1200,8 @@
                     defaultContent: '',
                     render: function (data) {
                         var warehouse = '';
-                        if(data !== null){
-                            warehouse = '<a href="/admin/warehouses/'+data+'/editBySymbol">'+data+'</a>';
+                        if (data !== null) {
+                            warehouse = '<a href="/admin/warehouses/' + data + '/editBySymbol">' + data + '</a>';
                         } else {
                             warehouse = '';
                         }
@@ -1179,16 +1219,16 @@
                 {
                     data: 'consultant_notices',
                     name: 'consultant_notices',
-                    render: function (data, type, row){
-                        if(data !== null) {
+                    render: function (data, type, row) {
+                        if (data !== null) {
                             var text = data;
                             var shortText = data.substr(0, 49) + "...";
-                            $('#consultant_notices-'+row.orderId).hover(function () {
-                                $('#consultant_notices-'+row.orderId).text(text);
+                            $('#consultant_notices-' + row.orderId).hover(function () {
+                                $('#consultant_notices-' + row.orderId).text(text);
                             }, function () {
-                                $('#consultant_notices-'+row.orderId).text(shortText);
+                                $('#consultant_notices-' + row.orderId).text(shortText);
                             });
-                            $('#consultant_notices-'+row.orderId).text(shortText);
+                            $('#consultant_notices-' + row.orderId).text(shortText);
                         }
                         return data;
                     }
@@ -1196,20 +1236,20 @@
                 {
                     data: 'clientPhone',
                     name: 'clientPhone',
-                    render: function(data, type, row) {
+                    render: function (data, type, row) {
                         var phone = row['clientPhone'];
                         var email = row['clientEmail'];
 
-                        if(email === null){
+                        if (email === null) {
                             email = 'Brak adresu email.'
                         }
 
                         let tooltipTitle = email;
                         tooltipTitle += '&#013;';
                         tooltipTitle += '&#013;' + 'Dane do wysylki:';
-                        $.each(row.addresses[0],function( index, value){
-                            if(index !== 'type' && index !== 'created_at' && index !== 'updated_at') {
-                                if(value === null){
+                        $.each(row.addresses[0], function (index, value) {
+                            if (index !== 'type' && index !== 'created_at' && index !== 'updated_at') {
+                                if (value === null) {
                                     tooltipTitle += ' Brak';
                                 } else {
                                     tooltipTitle += ' ' + value + ',';
@@ -1217,9 +1257,9 @@
                             }
                         });
                         tooltipTitle += '&#013;' + 'Dane do faktury:';
-                        $.each(row.addresses[1],function( index, value){
-                            if(index !== 'type' && index !== 'created_at' && index !== 'updated_at') {
-                                if(value === null){
+                        $.each(row.addresses[1], function (index, value) {
+                            if (index !== 'type' && index !== 'created_at' && index !== 'updated_at') {
+                                if (value === null) {
                                     tooltipTitle += ' Brak,';
                                 } else {
                                     tooltipTitle += ' ' + value + ',';
@@ -1230,10 +1270,10 @@
                         let html = '';
 
                         if (data) {
-                            html += '<button class="btn btn-default btn-xs" onclick="filterByPhone('+data+')">F</button><button class="btn btn-default btn-xs" onclick="clearAndfilterByPhone('+data+')">OF</button>';
+                            html += '<button class="btn btn-default btn-xs" onclick="filterByPhone(' + data + ')">F</button><button class="btn btn-default btn-xs" onclick="clearAndfilterByPhone(' + data + ')">OF</button>';
                         }
 
-                        html += '<p data-toggle="tooltip" data-html="true" title="' + tooltipTitle +'">' + phone + '</p>';
+                        html += '<p data-toggle="tooltip" data-html="true" title="' + tooltipTitle + '">' + phone + '</p>';
 
                         return html;
                     }
@@ -1241,7 +1281,7 @@
                 {
                     data: 'clientEmail',
                     name: 'clientEmail',
-                    render: function(data, type, row) {
+                    render: function (data, type, row) {
                         var email = row['clientEmail'];
 
                         let html = email;
@@ -1252,7 +1292,7 @@
                 {
                     data: 'clientFirstname',
                     name: 'clientFirstname',
-                    render: function(data, type, row) {
+                    render: function (data, type, row) {
                         var firstname = row['clientFirstname'];
 
                         let html = firstname;
@@ -1263,7 +1303,7 @@
                 {
                     data: 'clientLastname',
                     name: 'clientLastname',
-                    render: function(data, type, row) {
+                    render: function (data, type, row) {
                         var lastname = row['clientLastname'];
 
                         let html = lastname;
@@ -1280,7 +1320,7 @@
                     name: 'profit',
                     searchable: false,
                     orderable: false,
-                    render: function(date, type, row) {
+                    render: function (date, type, row) {
                         let sumOfSelling = 0;
                         let sumOfPurchase = 0;
                         var items = row['items'];
@@ -1290,13 +1330,13 @@
                             let pricePurchase = items[index].net_purchase_price_commercial_unit_after_discounts;
                             let quantity = items[index].quantity;
 
-                            if(priceSelling == null) {
+                            if (priceSelling == null) {
                                 priceSelling = 0;
                             }
-                            if(pricePurchase == null) {
+                            if (pricePurchase == null) {
                                 pricePurchase = 0;
                             }
-                            if(quantity == null) {
+                            if (quantity == null) {
                                 quantity = 0;
                             }
                             sumOfSelling += parseFloat(priceSelling) * parseInt(quantity);
@@ -1314,44 +1354,43 @@
                 {
                     data: 'values_data',
                     name: 'values_data',
-                    render: function(data, type, row) {
+                    render: function (data, type, row) {
 
                         return '<p><span title="Wartość Zamówienia">WZ: ' + row['values_data']['sum_of_gross_values'] + '</p>\n\
-                        <p><span title="Wartość Towaru">WT: ' + row['values_data']['products_value_gross'] +'</p>\n\
-                        <p><span title="Koszt Transportu Dla Klienta">KT: ' + row['values_data']['shipment_price_for_client'] +'</p>\n\
-                        <p><span title="Dodatkowy Koszt Pobrania">DKP: ' + row['values_data']['additional_cash_on_delivery_cost'] +'</p>\n\
-                        <p><span title="Dodatkowy Koszt Obsługi">DKO: ' + row['values_data']['additional_service_cost'] +'</p>'
+                        <p><span title="Wartość Towaru">WT: ' + row['values_data']['products_value_gross'] + '</p>\n\
+                        <p><span title="Koszt Transportu Dla Klienta">KT: ' + row['values_data']['shipment_price_for_client'] + '</p>\n\
+                        <p><span title="Dodatkowy Koszt Pobrania">DKP: ' + row['values_data']['additional_cash_on_delivery_cost'] + '</p>\n\
+                        <p><span title="Dodatkowy Koszt Obsługi">DKO: ' + row['values_data']['additional_service_cost'] + '</p>'
                     }
                 },
                 {
-                   data: 'shipment_price_for_us',
-                   name: 'shipment_price_for_us',
+                    data: 'shipment_price_for_us',
+                    name: 'shipment_price_for_us',
                 },
                 {
                     data: 'orderId',
                     name: 'sum_of_payments',
                     searchable: false,
-                    render: function(data, type, row) {
+                    render: function (data, type, row) {
                         let totalOfPayments = 0;
                         let totalOfDeclaredPayments = 0;
                         let totalofWarehousePayments = 0;
                         var payments = row['payments'];
 
                         for (let index = 0; index < payments.length; index++) {
-                            if(payments[index].type === 'WAREHOUSE') {
+                            if (payments[index].type === 'WAREHOUSE') {
                                 totalofWarehousePayments += parseFloat(payments[index].amount);
-                            }
-                            else if(payments[index].promise != "1") {
+                            } else if (payments[index].promise != "1") {
                                 totalOfPayments += parseFloat(payments[index].amount);
                             } else {
                                 totalOfDeclaredPayments += parseFloat(payments[index].amount);
                             }
                         }
-                        if(totalofWarehousePayments > 0) {
+                        if (totalofWarehousePayments > 0) {
                             return '<p>DM: ' + totalofWarehousePayments + '</p>';
                         }
-                        if(totalOfDeclaredPayments > 0 ) {
-                            return '<p>Z: ' + totalOfPayments + '</p><p>D: ' + totalOfDeclaredPayments +'</p>';
+                        if (totalOfDeclaredPayments > 0) {
+                            return '<p>Z: ' + totalOfPayments + '</p><p>D: ' + totalOfDeclaredPayments + '</p>';
                         } else {
                             return '<p>Z: ' + totalOfPayments + '</p>';
                         }
@@ -1362,18 +1401,18 @@
                     data: 'orderId',
                     name: 'left_to_pay',
                     searchable: false,
-                    render: function(date, type, row) {
+                    render: function (date, type, row) {
                         let totalOfProductsPrices = 0;
                         let additionalServiceCost = row['additional_service_cost'];
                         let additionalPackageCost = row['additional_cash_on_delivery_cost'];
                         let shipmentPriceForClient = row['shipment_price_for_client'];
-                        if(additionalServiceCost == null) {
+                        if (additionalServiceCost == null) {
                             additionalServiceCost = 0;
                         }
-                        if(shipmentPriceForClient == null) {
+                        if (shipmentPriceForClient == null) {
                             shipmentPriceForClient = 0;
                         }
-                        if(additionalPackageCost == null) {
+                        if (additionalPackageCost == null) {
                             additionalPackageCost = 0;
                         }
                         var items = row['items'];
@@ -1381,10 +1420,10 @@
                         for (let index = 0; index < items.length; index++) {
                             let price = items[index].net_selling_price_commercial_unit;
                             let quantity = items[index].quantity;
-                            if(price == null) {
+                            if (price == null) {
                                 price = 0;
                             }
-                            if(quantity == null) {
+                            if (quantity == null) {
                                 quantity = 0;
                             }
                             totalOfProductsPrices += parseFloat(price) * parseInt(quantity);
@@ -1394,7 +1433,7 @@
                         var payments = row['payments'];
 
                         for (let index = 0; index < payments.length; index++) {
-                            if(payments[index].promise != "1") {
+                            if (payments[index].promise != "1") {
                                 totalOfPayments += parseFloat(payments[index].amount);
                             }
                         }
@@ -1408,10 +1447,9 @@
                     name: 'transport_exchange_offers',
                     searchable: false,
                     orderable: false,
-                    render: function(data, option, row)
-                    {
+                    render: function (data, option, row) {
                         let html = "";
-                        if(!data.length) {
+                        if (!data.length) {
                             return html;
                         }
 
@@ -1447,16 +1485,16 @@
                 {
                     data: null,
                     name: 'invoices',
-                    render: function(data) {
+                    render: function (data) {
                         let invoices = data.invoices
                         let html = ''
-                        if(invoices !== undefined){
-                            invoices.forEach(function(invoice){
-                                html += '<a target="_blank" href="/storage/invoices/'+invoice.invoice_name+'" style="margin-top: 5px;">Faktura</a>';
+                        if (invoices !== undefined) {
+                            invoices.forEach(function (invoice) {
+                                html += '<a target="_blank" href="/storage/invoices/' + invoice.invoice_name + '" style="margin-top: 5px;">Faktura</a>';
                             });
                             let jsonInvoices = JSON.stringify(invoices);
                             html += '<br />'
-                            html += '<a href="#" class="remove__invoices"' + 'onclick="getInvoicesList('+data.orderId+ ')">Usuń</a>'
+                            html += '<a href="#" class="remove__invoices"' + 'onclick="getInvoicesList(' + data.orderId + ')">Usuń</a>'
                         }
                         html += '<a href="{{env('FRONT_NUXT_URL')}}' + '/magazyn/awizacja/0/0/' + data.orderId + '/wyslij-fakture">Dodaj</a>'
 
@@ -1466,17 +1504,17 @@
                 {
                     data: null,
                     name: 'invoice_gross_sum',
-                    render: function(data, type, row) {
+                    render: function (data, type, row) {
                         let sumOfPurchase = 0;
                         let items = row['items'];
 
                         for (let index = 0; index < items.length; index++) {
                             let pricePurchase = items[index].net_purchase_price_commercial_unit_after_discounts;
                             let quantity = items[index].quantity;
-                            if(pricePurchase == null) {
+                            if (pricePurchase == null) {
                                 pricePurchase = 0;
                             }
-                            if(quantity == null) {
+                            if (quantity == null) {
                                 quantity = 0;
                             }
                             sumOfPurchase += parseFloat(pricePurchase) * parseInt(quantity);
@@ -1487,8 +1525,8 @@
                         let html = 'wartość towaru: <br />' +
                             (totalItemsCost).toFixed(2) + '<br/>';
                         if (data.shipment_price_for_us) {
-                           html += 'Koszt tran.: <br/>' +
-                            data.shipment_price_for_us + '<br />'
+                            html += 'Koszt tran.: <br/>' +
+                                data.shipment_price_for_us + '<br />'
                             transportCost = parseFloat(data.shipment_price_for_us)
                         }
                         html += 'Suma: <br /><b>' + (totalItemsCost + transportCost).toFixed(2) + '<b/>'
@@ -1498,7 +1536,7 @@
                 {
                     data: 'orderId',
                     name: 'icons',
-                    render: function() {
+                    render: function () {
                         let html = 'do zrobienia';
 
                         return html;
@@ -1511,10 +1549,11 @@
                 {
                     data: 'packages',
                     name: 'real_cost_for_company',
-                    render: function(packages) {
+                    render: function (packages) {
                         let html = '';
-                        packages.forEach(function(package){
-                            html += '<span style="margin-top: 5px;">' + package.real_cost_for_company; + '</span>';
+                        packages.forEach(function (package) {
+                            html += '<span style="margin-top: 5px;">' + package.real_cost_for_company;
+                            +'</span>';
                         });
                         return html;
                     }
@@ -1522,19 +1561,19 @@
                 {
                     data: 'shipment_price_for_client',
                     name: 'difference',
-                    render: function(data, type, row) {
+                    render: function (data, type, row) {
                         let priceForClient = row['shipment_price_for_client'];
                         let priceForUs = row['shipment_price_for_us'];
 
-                        if(priceForClient == null) {
+                        if (priceForClient == null) {
                             priceForClient = 0;
                         }
-                        if(priceForUs == null) {
+                        if (priceForUs == null) {
                             priceForUs = 0;
                         }
 
                         let price = (parseFloat(priceForClient) - parseFloat(priceForUs)).toFixed(2);
-                        let html = '<span style="margin-top: 5px;">' + price  + '</span>';
+                        let html = '<span style="margin-top: 5px;">' + price + '</span>';
 
                         return html;
                     }
@@ -1556,6 +1595,11 @@
                     name: 'sello_payment'
                 },
                 {
+                    data: 'remainder_date',
+                    name: 'remainder_date',
+                    searchable: false
+                },
+                {
                     data: 'id',
                     name: 'search_on_lp',
                     searchable: false,
@@ -1566,23 +1610,23 @@
         });
             @foreach($visibilities as $key =>$row)
         var {{'show'.$row->name}}  = @json($row->show);
-        {{'show'.$row->name}} = {{'show'.$row->name}}.map(function(x){
+        {{'show'.$row->name}} = {{'show'.$row->name}}.map(function (x) {
             // if (typeof table.column(x+':name').index() === "number")
-            return table.column(x+':name').index();
+            return table.column(x + ':name').index();
         });
         {{'show'.$row->name}} = {{'show'.$row->name}}.filter(function (el) {
             return el != null;
         });
 
         var {{'hidden'.$row->name}} = @json($row->hidden);
-        {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.map(function(x){
+        {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.map(function (x) {
             // if (typeof table.column(x+':name').index() === "number")
-            return table.column(x+':name').index();
+            return table.column(x + ':name').index();
         });
         {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.filter(function (el) {
             return el != null;
         });
-        table.button().add({{1+$key}},{
+        table.button().add({{1+$key}}, {
             extend: 'colvisGroup',
             text: '{{$row->display_name}}',
             show: {{'show'.$row->name}},
@@ -1590,12 +1634,12 @@
         });
             @endforeach
         let localDatatables = localStorage.getItem('DataTables_dataTable_/admin/orders');
-        if(localDatatables != null) {
+        if (localDatatables != null) {
             let objDatatables = JSON.parse(localDatatables);
 
             $('#dataTable thead tr th input, #dataTable thead tr th select').each(function (i) {
                 let colName = $(this)[0].id;
-                if(colName != "") {
+                if (colName != "") {
                     let colSelector = colName.substring(13, colName.length) + ":name";
                     let index = table.column(colSelector).index();
                     let searched = objDatatables.columns[index].search.search;
@@ -1608,9 +1652,9 @@
         }
         $('#dataTable thead tr th').each(function (i) {
 
-            $('.dt-button', this).on('click', function(){
+            $('.dt-button', this).on('click', function () {
                 table
-                    .order([7, 'desc' ])
+                    .order([7, 'desc'])
                     .draw();
             });
 
@@ -1629,8 +1673,8 @@
                 let colName = $(this)[0].id;
                 let colSelector = colName.substring(13, colName.length) + ":name";
 
-                if(table.column(colSelector).search() !== this.value) {
-                    if(this.value == '') {
+                if (table.column(colSelector).search() !== this.value) {
+                    if (this.value == '') {
                         table
                             .column(colSelector)
                             .search('')
@@ -1650,8 +1694,8 @@
                 e.stopPropagation();
             })
             .change(function () {
-                if(table.column("packages_sent:name").search() !== this.value) {
-                    if(this.value == '') {
+                if (table.column("packages_sent:name").search() !== this.value) {
+                    if (this.value == '') {
                         table
                             .column("packages_sent:name")
                             .search('')
@@ -1669,8 +1713,8 @@
                 e.stopPropagation();
             })
             .change(function () {
-                if(table.column("packages_not_sent:name").search() !== this.value) {
-                    if(this.value == '') {
+                if (table.column("packages_not_sent:name").search() !== this.value) {
+                    if (this.value == '') {
                         table
                             .column("packages_not_sent:name")
                             .search('')
@@ -1688,8 +1732,8 @@
                 e.stopPropagation();
             })
             .change(function () {
-                if(table.column("shipment_date:name").search() !== this.value) {
-                    if(this.value == '') {
+                if (table.column("shipment_date:name").search() !== this.value) {
+                    if (this.value == '') {
                         table
                             .column("shipment_date:name")
                             .search('')
@@ -1703,53 +1747,54 @@
                 }
             });
         $('#orderFilter').change(function () {
-            if(this.value == 'ALL') {
+            if (this.value == 'ALL') {
                 table
-                    .search( '' )
-                    .columns('statusName:name').search( '' )
+                    .search('')
+                    .columns('statusName:name').search('')
                     .draw();
                 localStorage.setItem("filter", "ALL");
-            } else if(this.value == 'WITHOUT_REALIZATION') {
+            } else if (this.value == 'WITHOUT_REALIZATION') {
                 table
                     .columns('statusName:name')
-                    .search( 'bez realizacji', true, false )
+                    .search('bez realizacji', true, false)
                     .draw();
                 localStorage.setItem("filter", "WITHOUT_REALIZATION");
-            } else if(this.value == 'COMPLETED') {
+            } else if (this.value == 'COMPLETED') {
                 table
                     .columns('statusName:name')
-                    .search( 'oferta zakonczona', true, false )
+                    .search('oferta zakonczona', true, false)
                     .draw();
                 localStorage.setItem("filter", "COMPLETED");
             } else {
                 table
                     .columns('statusName:name')
-                    .search( 'przyjete zapytanie ofertowe|w trakcie analizowania przez konsultanta|mozliwa do realizacji|mozliwa do realizacji kominy|w trakcie realizacji|oferta oczekujaca|przekazane konsultantowi do obslugi', true, false )
+                    .search('przyjete zapytanie ofertowe|w trakcie analizowania przez konsultanta|mozliwa do realizacji|mozliwa do realizacji kominy|w trakcie realizacji|oferta oczekujaca|przekazane konsultantowi do obslugi', true, false)
                     .draw();
                 localStorage.setItem("filter", "PENDING");
             }
 
         });
 
-        $('#dataTable').on( 'column-visibility.dt', function ( e, settings, column, state ) {
-            if(state == true) {
+        $('#dataTable').on('column-visibility.dt', function (e, settings, column, state) {
+            if (state == true) {
                 $("#columnSearch" + column).parent().show();
             } else {
                 $("#columnSearch" + column).parent().hide();
             }
         });
-        $('#columnSearch-clientPhone').on('input', function() {
+        $('#columnSearch-clientPhone').on('input', function () {
             var str = $('#columnSearch-clientPhone').val();
-            var replaced = str.replace(/-|\s/g,'');
+            var replaced = str.replace(/-|\s/g, '');
             $('#columnSearch-clientPhone').val(replaced);
             filterByPhone(replaced);
         });
-        $('#columnSearch-clientPhone').click(function(){
+        $('#columnSearch-clientPhone').click(function () {
             clearFilters(false);
         });
-        $('#columnSearch-orderId').click(function(){
+        $('#columnSearch-orderId').click(function () {
             clearFilters(false);
         });
+
         function filterByPhone(number) {
             $("#columnSearch-clientPhone").val(number).change();
         }
@@ -1784,9 +1829,10 @@
             if (reload) {
                 table.draw();
             }
-             $('#orderFilter').trigger("change");
+            $('#orderFilter').trigger("change");
         }
-        $('#showTable').click(function() {
+
+        $('#showTable').click(function () {
             if ($('#labelTable').hasClass("hidden")) {
                 $('#labelTable').removeClass("hidden");
                 $('#showTable').html('Schowaj Tabelkę z Etykietami Pracownika');
@@ -1802,9 +1848,9 @@
                     url: "/admin/orders/label-removal/" + orderId + "/" + labelId,
                     method: "POST"
                 }).done(function (res) {
-                    if(res.error == 'position') {
+                    if (res.error == 'position') {
                         alert('Nie znaleziono pozycji dla produktu: ' + res.product + ' Symbol: ' + res.productName);
-                    } else if(res.error == 'exists') {
+                    } else if (res.error == 'exists') {
                         alert('Wywołano już stan magazynowy');
                     }
                     table.ajax.reload(null, false);
@@ -1856,7 +1902,7 @@
             let refreshDtOrReload = function () {
                 $.ajax({
                     url: '/api/get-labels-scheduler-await/{{ Auth::id() }}'
-                }).done(function(res) {
+                }).done(function (res) {
                     if (res.length) {
                         location.reload();
                     } else {
@@ -1867,15 +1913,15 @@
 
             if (manualLabelSelectionToAdd) {
                 $.ajax({
-                    url: "/admin/labels/"+labelId+"/associated-labels-to-add-after-removal"
-                }).done(function(data) {
+                    url: "/admin/labels/" + labelId + "/associated-labels-to-add-after-removal"
+                }).done(function (data) {
                     let modal = $('#manual_label_selection_to_add_modal');
                     let input = modal.find("#labels_to_add_after_removal_modal");
                     input.empty();
-                    data.forEach(function(item){
+                    data.forEach(function (item) {
                         input.append($('<option>', {
                             value: item.id,
-                            text : item.name,
+                            text: item.name,
                             selected: true
                         }));
                     });
@@ -1891,7 +1937,7 @@
                 if (labelId == payDateLabelId) {
                     let modalSetTime = $('#set_time');
                     modalSetTime.modal('show');
-                    $('#set_time').on('shown.bs.modal', function() {
+                    $('#set_time').on('shown.bs.modal', function () {
                         $('#invoice-month').focus()
                     })
                     modalSetTime.find("#remove-label-and-set-date").off().on('click', () => {
@@ -1911,11 +1957,11 @@
                                 }
                             },
                         }).done(function (data) {
-                                removeLabelRequest();
-                                refreshDtOrReload()
-                                modalSetTime.modal('hide')
-                                $('#invoice-month').val('')
-                                $('#invoice-days').val('')
+                            removeLabelRequest();
+                            refreshDtOrReload()
+                            modalSetTime.modal('hide')
+                            $('#invoice-month').val('')
+                            $('#invoice-days').val('')
                         }).fail(function (data) {
                             $('#invoice-date-error').removeAttr('hidden')
                             $('#invoice-date-error').text(data.responseText ? data.responseText : 'Nieznany błąd2')
@@ -1970,30 +2016,30 @@
 
         function addLabel() {
             let chosenLabel = $("#choosen-label");
-            if(chosenLabel.val() == "") {
+            if (chosenLabel.val() == "") {
                 alert("Nie wybrano etykiety");
                 return;
             }
 
             let selectedOrders = $(".order-id-checkbox:checked");
-            if(selectedOrders.length == 0) {
+            if (selectedOrders.length == 0) {
                 alert("Nie wybrano żadnego zamówienia");
                 return;
             }
 
             let orderIds = [];
-            $.each(selectedOrders, function(index, order){
+            $.each(selectedOrders, function (index, order) {
                 orderIds.push($(order).val());
             });
 
             $.ajax({
-                url: "/admin/orders/label-addition/"+chosenLabel.val(),
+                url: "/admin/orders/label-addition/" + chosenLabel.val(),
                 method: "POST",
-                data: { orderIds: orderIds }
-            }).done(function() {
+                data: {orderIds: orderIds}
+            }).done(function () {
                 $.ajax({
                     url: '/api/get-labels-scheduler-await/{{ Auth::id() }}'
-                }).done(function(res) {
+                }).done(function (res) {
                     if (res.length) {
                         location.reload();
                     } else {
@@ -2003,12 +2049,12 @@
             });
         }
 
-        function moveData(id){
-            if($('#moveButton-'+id).hasClass('btn-warning')) {
+        function moveData(id) {
+            if ($('#moveButton-' + id).hasClass('btn-warning')) {
                 $('#moveButton-' + id).removeClass('btn-warning').addClass('btn-dark');
                 $('.btn-warning').attr('disabled', true);
                 $('.btn-move').removeClass('hidden');
-            } else if ($('#moveButton-'+id).hasClass('btn-dark')) {
+            } else if ($('#moveButton-' + id).hasClass('btn-dark')) {
                 $('#moveButton-' + id).removeClass('btn-dark').addClass('btn-warning');
                 $('.btn-warning').attr('disabled', false);
                 $('.btn-move').addClass('hidden');
@@ -2017,10 +2063,10 @@
 
         function getInvoicesList(id) {
             $.ajax({
-                url: '/admin/orders/'+id+'/invoices',
-            }).done(function(data) {
+                url: '/admin/orders/' + id + '/invoices',
+            }).done(function (data) {
                 $('#order_invoices_delete').modal('show');
-                if(data === null) {
+                if (data === null) {
                     return;
                 }
                 $('#invoice__list').remove();
@@ -2037,13 +2083,13 @@
             })
         }
 
-        function moveDataAjax(id){
+        function moveDataAjax(id) {
             var idToSend = id;
             var buttonId = $('.btn-dark').attr('id');
             var idToGet;
             var res = buttonId.split("-")
             idToGet = res[1];
-            if(idToGet != idToSend) {
+            if (idToGet != idToSend) {
                 $('#order_id_get').text(idToGet);
                 $('#order_id_send').text(idToSend);
                 $('#order_move_data').modal('show');
@@ -2055,36 +2101,35 @@
         $('#remove-selected-invoice').on('click', () => {
             let invoiceId = $('#invoice__list option:selected').val();
             $.ajax({
-                url: '/admin/invoice/'+invoiceId+'/delete'
-            }).done(function(data) {
+                url: '/admin/invoice/' + invoiceId + '/delete'
+            }).done(function (data) {
                 $('#invoice_delete_success').modal('show');
 
-                $('#invoice-delete-ok').on('click', function(){
+                $('#invoice-delete-ok').on('click', function () {
                     location.reload();
                 });
             })
         })
 
-        $('#move-data-ok').on('click', function(){
+        $('#move-data-ok').on('click', function () {
             var idToGet = $('#order_id_get').text();
             var idToSend = $('#order_id_send').text();
             $.ajax({
-                url: '/admin/orders/'+idToGet+'/data/'+idToSend+'/move',
-            }).done(function(data) {
+                url: '/admin/orders/' + idToGet + '/data/' + idToSend + '/move',
+            }).done(function (data) {
                 $('#order_move_data_success').modal('show');
 
-                $('#order_move_data_ok').on('click', function(){
-                    window.location.href='/admin/orders';
+                $('#order_move_data_ok').on('click', function () {
+                    window.location.href = '/admin/orders';
                 });
-            }).fail(function() {
+            }).fail(function () {
                 $('#order_move_data_error').modal('show');
-                $('#order_move_data_ok_error').on('click', function() {
+                $('#order_move_data_ok_error').on('click', function () {
                     window.location.href = '/admin/orders';
 
                 });
             });
         });
-
 
 
         function gerateSpeditionExchangeLink() {
@@ -2094,7 +2139,7 @@
                 url: "/api/spedition-exchange/generate-link",
                 method: "POST",
                 data: {data: orders}
-            }).done(function(data) {
+            }).done(function (data) {
                 $(".spedition-exchange-generated-link").html(data);
             });
         }
@@ -2104,7 +2149,7 @@
             let hidden = $("#spedition-exchange-selected-items");
             let val = JSON.parse(hidden.val());
 
-            val.forEach(function(value, index) {
+            val.forEach(function (value, index) {
                 if (value.id == id && value.type == type) {
                     shouldAdd = false;
                     val.splice(index, 1);
@@ -2125,13 +2170,13 @@
             $.ajax({
                 url: "/api/spedition-exchange/accept-offer/" + offerId,
                 method: "GET"
-            }).done(function(data) {
+            }).done(function (data) {
                 table.ajax.reload(null, false);
             });
         }
     </script>
     <script>
-        $(document).ready(function(){
+        $(document).ready(function () {
             var getUrlParameter = function getUrlParameter(sParam) {
                 var sPageURL = window.location.search.substring(1),
                     sURLVariables = sPageURL.split('&'),
@@ -2148,10 +2193,8 @@
             };
             var idFromUrl = getUrlParameter('order_id');
             var planning = getUrlParameter('planning');
-            if(idFromUrl !== undefined){
-                console.log(planning);
-                if(planning !== undefined) {
-                    console.log('aaa');
+            if (idFromUrl !== undefined) {
+                if (planning !== undefined) {
                     setTimeout(function () {
                         $('#columnSearch-orderId').val(idFromUrl);
                         $('#columnSearch-orderId').change();
@@ -2164,28 +2207,28 @@
                 }
             }
         });
-        $('#searchLP').change(function(){
+        $('#searchLP').change(function () {
             table
                 .columns('search_on_lp:name')
-                .search( $('#searchLP').val())
+                .search($('#searchLP').val())
                 .draw();
         });
-        $('#searchOrderValue').change(function(){
+        $('#searchOrderValue').change(function () {
             table
                 .columns('sum_of_gross_values:name')
-                .search( $('#searchOrderValue').val())
+                .search($('#searchOrderValue').val())
                 .draw();
         });
-        $('#searchPayment').change(function(){
+        $('#searchPayment').change(function () {
             table
                 .columns('sum_of_payments:name')
-                .search( $('#searchPayment').val())
+                .search($('#searchPayment').val())
                 .draw();
         });
-        $('#searchLeft').change(function(){
+        $('#searchLeft').change(function () {
             table
                 .columns('left_to_pay:name')
-                .search( $('#searchLeft').val())
+                .search($('#searchLeft').val())
                 .draw();
         });
     </script>
@@ -2194,8 +2237,8 @@
         $('#selectWarehouse').on('click', function () {
             var id = $(this).val();
             $.ajax({
-                url:'/admin/warehouse/' + id
-            }).done(function(data){
+                url: '/admin/warehouse/' + id
+            }).done(function (data) {
                 $('#selectWarehouse').hide();
                 $('#titleModal').hide();
                 $('#modalDialog').css({width: "auto !important"});
@@ -2212,7 +2255,7 @@
                     minTime: "07:00:00",
                     maxTime: "20:00:00",
                     locale: 'PL',
-                    titleFormat: { year: 'numeric', month: 'long', day: '2-digit' },
+                    titleFormat: {year: 'numeric', month: 'long', day: '2-digit'},
                     buttonText: {
                         today: 'Dzisiaj',
                         month: 'Miesiąc',
@@ -2222,9 +2265,9 @@
                         resourceTimelineThreeDays: '3 Dni'
                     },
                     slotLabelFormat: [
-                        { day: '2-digit', month: 'long', year: 'numeric' },
-                        { weekday: 'long' },
-                        { hour: '2-digit', minute: '2-digit' }
+                        {day: '2-digit', month: 'long', year: 'numeric'},
+                        {weekday: 'long'},
+                        {hour: '2-digit', minute: '2-digit'}
                     ],
                     header: {
                         left: 'promptResource today prev,next',
@@ -2276,14 +2319,14 @@
                             if (startMinutes < 10) {
                                 startMinutes = '0' + startMinutes;
                             }
-                            let dateTime = firstDate.getFullYear() + '-' + ( '0' + (firstDate.getMonth() + 1) ).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getHours() + ':' + startMinutes;
+                            let dateTime = firstDate.getFullYear() + '-' + ('0' + (firstDate.getMonth() + 1)).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getHours() + ':' + startMinutes;
                             let newDate = new Date(info.dateStr);
                             let endDate = new Date(newDate.setHours(newDate.getHours() + 1 - 2));
                             let minutes = endDate.getMinutes();
                             if (minutes < 10) {
                                 minutes = '0' + minutes;
                             }
-                            let dateTimeEnd = endDate.getFullYear() + '-' + ( '0' + (endDate.getMonth() + 1) ).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getHours() + ':' + minutes;
+                            let dateTimeEnd = endDate.getFullYear() + '-' + ('0' + (endDate.getMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getHours() + ':' + minutes;
                             let warehouse = null;
                             if ($('#warehouseSelect').is(':selected')) {
                                 warehouse = $('#warehouseSelect').val();
@@ -2363,24 +2406,24 @@
                                 format: "YYYY-MM-DD H:mm",
                                 stepping: 5,
                             });
-                            $('#name_new').val($('input[name="order_id"]').val()+' - '+ firstDate.getUTCDate()+  '-'+ ( '0' + (firstDate.getMonth() + 1) ).slice(-2) + ' - '+$('#warehouse_value').val());
-                            $('#name_new').change(function(){
+                            $('#name_new').val($('input[name="order_id"]').val() + ' - ' + firstDate.getUTCDate() + '-' + ('0' + (firstDate.getMonth() + 1)).slice(-2) + ' - ' + $('#warehouse_value').val());
+                            $('#name_new').change(function () {
                                 var dateObj = new Date($('#start_new').val());
-                                var month = ( '0' + (dateObj.getMonth() + 1) ).slice(-2);
+                                var month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
                                 var day = dateObj.getUTCDate();
-                                $('#name_new').val($('input[name="order_id"]').val()+' - '+day+'-'+month+' - '+$('#warehouse_value').val());
+                                $('#name_new').val($('input[name="order_id"]').val() + ' - ' + day + '-' + month + ' - ' + $('#warehouse_value').val());
                             });
-                            $(document).on('focusout','.default-date-time-picker-now',function(){
+                            $(document).on('focusout', '.default-date-time-picker-now', function () {
                                 var dateObj = new Date($('#start_new').val());
-                                var month = ( '0' + (dateObj.getMonth() + 1) ).slice(-2);
+                                var month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
                                 var day = dateObj.getUTCDate();
-                                $('#name_new').val($('input[name="order_id"]').val()+' - '+day+'-'+month+' - '+$('#warehouse_value').val());
+                                $('#name_new').val($('input[name="order_id"]').val() + ' - ' + day + '-' + month + ' - ' + $('#warehouse_value').val());
                             });
-                            $('#warehouse_value').change(function(){
+                            $('#warehouse_value').change(function () {
                                 var dateObj = new Date($('#start_new').val());
-                                var month = ( '0' + (dateObj.getMonth() + 1) ).slice(-2);
+                                var month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
                                 var day = dateObj.getUTCDate();
-                                $('#name_new').val($('input[name="order_id"]').val()+' - '+day+'-'+month+' - '+$('#warehouse_value').val());
+                                $('#name_new').val($('input[name="order_id"]').val() + ' - ' + day + '-' + month + ' - ' + $('#warehouse_value').val());
                             });
                         }
                     },
@@ -2410,14 +2453,14 @@
                                         if (startMinutes < 10) {
                                             startMinutes = '0' + startMinutes;
                                         }
-                                        let dateTime = firstDate.getFullYear() + '-' + ( '0' + (firstDate.getMonth() + 1) ).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getHours() + ':' + startMinutes;
+                                        let dateTime = firstDate.getFullYear() + '-' + ('0' + (firstDate.getMonth() + 1)).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getHours() + ':' + startMinutes;
                                         let newDate = new Date(value.end);
                                         let endDate = new Date(newDate.setHours(newDate.getHours() - 1));
                                         let minutes = endDate.getMinutes();
                                         if (minutes < 10) {
                                             minutes = '0' + minutes;
                                         }
-                                        let dateTimeEnd = endDate.getFullYear() + '-' + ( '0' + (endDate.getMonth() + 1) ).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getHours() + ':' + minutes;
+                                        let dateTimeEnd = endDate.getFullYear() + '-' + ('0' + (endDate.getMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getHours() + ':' + minutes;
                                         let html = '<tr class="appendRow">';
                                         html += '<td>' + value.id + '</td>';
                                         html += '<td>' + value.title + '</td>';
@@ -2480,14 +2523,14 @@
                         if (startMinutes < 10) {
                             startMinutes = '0' + startMinutes;
                         }
-                        let dateTime = firstDate.getFullYear() + '-' + ( '0' + (firstDate.getMonth() + 1) ).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getHours() + ':' + startMinutes;
+                        let dateTime = firstDate.getFullYear() + '-' + ('0' + (firstDate.getMonth() + 1)).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getHours() + ':' + startMinutes;
                         let newDate = new Date(info.event.end);
                         let endDate = new Date(newDate.setHours(newDate.getHours() - 1));
                         let minutes = endDate.getMinutes();
                         if (minutes < 10) {
                             minutes = '0' + minutes;
                         }
-                        let dateTimeEnd = endDate.getFullYear() + '-' + ( '0' + (endDate.getMonth() + 1) ).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getHours() + ':' + minutes;
+                        let dateTimeEnd = endDate.getFullYear() + '-' + ('0' + (endDate.getMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getHours() + ':' + minutes;
                         $('input[name="view_type"]').val(info.view.type);
                         $('input[name="active_start"]').val(info.view.activeStart);
                         $('#moveTaskForm').attr('action', '/admin/planning/tasks/' + info.event.id + '/moveTask');
@@ -2510,14 +2553,14 @@
                         if (startMinutes < 10) {
                             startMinutes = '0' + startMinutes;
                         }
-                        let dateTime = firstDate.getFullYear() + '-' + ( '0' + (firstDate.getMonth() + 1) ).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getHours() + ':' + startMinutes;
+                        let dateTime = firstDate.getFullYear() + '-' + ('0' + (firstDate.getMonth() + 1)).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getHours() + ':' + startMinutes;
                         let newDate = new Date(info.event.end);
                         let endDate = new Date(newDate.setHours(newDate.getHours() - 1));
                         let minutes = endDate.getMinutes();
                         if (minutes < 10) {
                             minutes = '0' + minutes;
                         }
-                        let dateTimeEnd = endDate.getFullYear() + '-' + ( '0' + (endDate.getMonth() + 1) ).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getHours() + ':' + minutes;
+                        let dateTimeEnd = endDate.getFullYear() + '-' + ('0' + (endDate.getMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getHours() + ':' + minutes;
                         let warehouse = null;
                         if ($('#warehouseSelect').is(':selected')) {
                             warehouse = $('#warehouseSelect').val();
@@ -2641,10 +2684,10 @@
                                     consultant_notice = data.task_salary_detail.consultant_notice;
                                     warehouse_value = data.task_salary_detail.warehouse_value;
                                     warehouse_notice = data.task_salary_detail.warehouse_notice;
-                                    if(consultant_notice == null) {
+                                    if (consultant_notice == null) {
                                         consultant_notice = '';
                                     }
-                                    if(warehouse_notice == null){
+                                    if (warehouse_notice == null) {
                                         warehouse_notice = '';
                                     }
                                 }
@@ -2734,6 +2777,7 @@
                 });
 
             });
+
             function acceptTask(id) {
                 let dateStart = $('input[name="date_start[' + id + ']"]').val();
                 let dateEnd = $('input[name="date_end[' + id + ']"]').val();
@@ -2751,7 +2795,7 @@
                         status: 'TO_DO'
                     }
                 }).done(function (data) {
-                    if(data.status == 'TO_DO') {
+                    if (data.status == 'TO_DO') {
                         $('input[name="status[' + data.id + ']"]').val('Zaakceptowano');
                     }
                 }).fail(function () {
@@ -2776,7 +2820,7 @@
                         status: 'REJECTED'
                     }
                 }).done(function (data) {
-                    if(data.status == 'REJECTED' && data.message == null) {
+                    if (data.status == 'REJECTED' && data.message == null) {
                         $('input[name="status[' + data.id + ']"]').val('Odrzucono i przesunięto');
                     } else {
                         $('input[name="status[' + data.id + ']"]').val(data.message);
