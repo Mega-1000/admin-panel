@@ -294,7 +294,7 @@ class OrdersController extends Controller
         );
         $usersQuery = User::with(['orders' => function ($q) {
             $q->where('created_at','>', Carbon::now()->subMonths(2));
-            $q->select('id', 'employee_id');
+            $q->select('id', 'employee_id', 'remainder_date');
             $q->with(['labels' => function ($q) {
                 $q->select('labels.id', 'order_id');
             }]);
@@ -305,9 +305,12 @@ class OrdersController extends Controller
             $users = $usersQuery->get();
         }
         $out = [];
+        $today = Carbon::now();
         foreach ($users as $user) {
             $out[$user->id]['user'] = $user;
+            $out[$user->id]['outdated'] = 0;
             foreach ($user->orders as $order) {
+                $out[$user->id]['outdated'] += $today->greaterThan($order->remainder_date);
                 foreach ($order->labels as $label) {
                     if (empty($out[$user->id][$label->id])) {
                         $out[$user->id][$label->id] = 0;
@@ -1462,11 +1465,11 @@ class OrdersController extends Controller
         $count = $this->orderRepository->all();
         $count = count($count);
         $collection = $this->prepareAdditionalOrderData($collection);
-        
+
         return DataTables::of($collection)->with(['recordsFiltered' => $countFiltred])->skipPaging()->setTotalRecords($count)->make(true);
     }
 
-    public function prepareAdditionalOrderData($collection) 
+    public function prepareAdditionalOrderData($collection)
     {
         foreach ($collection as $order) {
             $additional_service = $order->additional_service_cost ?? 0;
@@ -1540,7 +1543,6 @@ class OrdersController extends Controller
         foreach ($data['columns'] as $column) {
             if ($column['searchable'] == 'true' && !empty($column['search']['value'])) {
                 if (array_key_exists($column['name'], $notSearchable) || $column['name'] == "shipment_date") {
-
                 } else {
                     if (array_key_exists($column['name'], $this->dtColumns)) {
                         if ($column['name'] == 'statusName' && $column['search']['regex'] == true) {
@@ -1574,11 +1576,15 @@ class OrdersController extends Controller
                         default:
                             break;
                     }
+                } elseif ($column['name'] == "remainder_date" && isset($column['search']['value'])) {
+                    $val = filter_var($column['search']['value'], FILTER_VALIDATE_BOOLEAN);
+                    if ($val) {
+                        $query->whereRaw('remainder_date < Now()');
+                    }
                 } elseif ($column['name'] == "search_on_lp" && !empty($column['search']['value'])) {
                     $query->leftJoin('order_packages', 'orders.id', '=', 'order_packages.order_id');
                     $query->whereRaw('order_packages.letter_number' . ' REGEXP ' . "'{$column['search']['value']}'");
-                } elseif (in_array($column['name'],
-                        $this->getLabelGroupsNames()) && !empty($column['search']['value'])) {
+                } elseif (in_array($column['name'], $this->getLabelGroupsNames()) && !empty($column['search']['value'])) {
                     $query->whereExists(function ($innerQuery) use ($column) {
                         $innerQuery->select("*")
                             ->from('order_labels')
@@ -1742,6 +1748,11 @@ class OrdersController extends Controller
                         case "all":
                         default:
                             break;
+                    }
+                } elseif ($column['name'] == "remainder_date" && isset($column['search']['value'])) {
+                    $val = filter_var($column['search']['value'], FILTER_VALIDATE_BOOLEAN);
+                    if ($val) {
+                        $query->whereRaw('remainder_date < Now()');
                     }
                 } else {
                     if ($column['name'] == "search_on_lp" && !empty($column['search']['value'])) {
@@ -2381,7 +2392,7 @@ class OrdersController extends Controller
             'alert-type' => 'error'
         ]);
     }
-  
+
     public function invoiceRequest(Request $request)
     {
         $invoiceRequest = InvoiceRequest::create([
