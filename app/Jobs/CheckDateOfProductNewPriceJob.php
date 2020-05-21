@@ -194,9 +194,8 @@ class CheckDateOfProductNewPriceJob
 
         $priceAfterSolidDiscount = $price['net_purchase_price_commercial_unit'] - $solid_discount_recalculated;
         return (float)$priceAfterSolidDiscount
-            * (100 - $product->price->discount1)
-            * (100 - $product->price->discount2)
-            * (100 - $product->price->discount3)
-            / 1000000;
+            * (100 - $product->price->discount1) / 100
+            * (100 - $product->price->discount2) / 100
+            * (100 - $product->price->discount3) / 100;
     }
 }
