@@ -81,6 +81,16 @@ class OrderStatusChangedToDispatchNotificationJob extends Job
 
         $notification = $orderWarehouseNotificationRepository->findWhere($dataArray)->first();
 
+        if($order->isOrderHasLabel(53)) {
+            $orderWarehouseNotificationRepository->update([
+                'order_id' => $this->orderId,
+                'warehouse_id' => $order->warehouse_id,
+                'waiting_for_response' => false,
+            ], $notification->id);
+            Log::notice('Znaleziono etykietę Awizacja przyjęta w zamówieniu. Status wysyłania notyfikacji został zmieniony na przyjęty.', ['line' => __LINE__, 'file' => __FILE__]);
+            return;
+        }
+
         if (!$notification) {
             $subject = "Prośba o potwierdzenie awizacji dla zamówienia nr. " . $this->orderId;
             $notification = $orderWarehouseNotificationRepository->create($dataArray);
