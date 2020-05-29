@@ -104,6 +104,7 @@ class OrderBuilder
             $order = new Order();
         }
 
+        $order->getToken();
         $customer = $this->userSelector->getCustomer($order, $data);
         $order->customer_id = $customer->id;
 

@@ -4,11 +4,17 @@ namespace App\Helpers;
 
 use App\Entities\Order;
 use App\Entities\PackageTemplate;
+use App\Entities\ProductPacking;
 use App\Helpers\interfaces\iDividable;
+use Illuminate\Support\Facades\Log;
 
 class SelloPackageDivider implements iDividable
 {
 
+    const TEMPLATE_PACZKOMAT_A = 53;
+    const TEMPLATE_PACZKOMAT_B = 54;
+    const TEMPLATE_PACZKOMAT_C = 55;
+    const TEMPLATE_IDS_FOR_PACZKOMAT = [self::TEMPLATE_PACZKOMAT_A, self::TEMPLATE_PACZKOMAT_B, self::TEMPLATE_PACZKOMAT_C];
     private $transactionList;
 
     public function divide($data, Order $order)
@@ -18,28 +24,51 @@ class SelloPackageDivider implements iDividable
             if ($transaction->tr_Group) {
                 continue;
             }
-            $transaction->maxInPackage = $this->setMaxInPackage($transaction->tw_Pole2 ?? 1);
             $this->divideForTransaction($data, $order, $transaction, $realPackageNumber);
         }
         return false;
     }
 
-    protected function setMaxInPackage(int $maxInPackage)
-    {
-        return $maxInPackage > 0 ? $maxInPackage : 1;
-    }
-
     /**
-     * @param $data
+     * @param $items
      * @param Order $order
-     * @throws \Exception
+     * @param $transaction
+     * @param $realPackageNumber
      */
     private function divideForTransaction($items, Order $order, $transaction, &$realPackageNumber)
     {
-        if (empty($transaction->tr_DelivererId) || empty($transaction->tr_DeliveryId)) {
-            throw new \Exception('Brak powiązanego szablonu z sello id: ' . $transaction->id);
+        $data = $this->findProductInData($items, $transaction);
+        $packing = ProductPacking::where('product_id', $data['id'])->first();
+        $template = $this->prepareTemplate($transaction);
+        $isPaczkomat = in_array($template->id, self::TEMPLATE_IDS_FOR_PACZKOMAT);
+        $amountLeft = $data['amount'];
+        while ($amountLeft > 0) {
+            if ($isPaczkomat) {
+                list($quantity, $newTemplate) = $this->getPaczkomatQuantity($amountLeft, $packing);
+                if ($newTemplate) {
+                    $template = $newTemplate;
+                }
+            } else {
+                $quantity = min($packing->allegro_courier ?: 1, $amountLeft);
+            }
+            $pack = BackPackPackageDivider::createPackage($template, $order->id, $realPackageNumber);
+            $pack->packedProducts()->attach($data['id'],
+                ['quantity' => $quantity]);
+            $amountLeft -= $quantity;
+            $realPackageNumber++;
+            $shipment_date = $pack->shipment_date;
         }
 
+        $order->shipment_date = $shipment_date;
+        $order->save();
+    }
+
+    /**
+     * @param $items
+     * @param $transaction
+     */
+    private function findProductInData($items, $transaction)
+    {
         $data = false;
         foreach ($items as $product) {
             if ($data) {
@@ -49,34 +78,60 @@ class SelloPackageDivider implements iDividable
                 $data = $product;
             }
         }
+        return $data;
+    }
 
+    /**
+     * @param $transaction
+     * @return mixed
+     * @throws \Exception
+     */
+    private function prepareTemplate($transaction)
+    {
+        if (empty($transaction->tr_DelivererId) || empty($transaction->tr_DeliveryId)) {
+            throw new \Exception('Brak powiązanego szablonu z sello id: ' . $transaction->id);
+        }
         try {
             $template = PackageTemplate::where('sello_delivery_id', $transaction->tr_DeliveryId)
                 ->where('sello_deliverer_id', $transaction->tr_DelivererId)
                 ->firstOrFail();
         } catch (\Exception $e) {
             throw new \Exception('Import Sello: Nie znaleziono szablonu sello id:'
-                . $transaction->id . ' deliverer id:' . $transaction->tr_DelivererId .' delivery id:' . $transaction->tr_DeliveryId);
+                . $transaction->id . ' deliverer id:' . $transaction->tr_DelivererId . ' delivery id:' . $transaction->tr_DeliveryId);
         }
-        $modulo = $data['amount'] % $transaction->maxInPackage;
-        $total = ceil($data['amount'] / $transaction->maxInPackage);
+        return $template;
+    }
 
-        for ($packageNumber = 1; $packageNumber <= $total; $packageNumber++) {
-            $pack = BackPackPackageDivider::createPackage($template, $order->id, $realPackageNumber);
-            $quantity = floor($data['amount'] / $transaction->maxInPackage);
-            if ($packageNumber <= $modulo) {
-                $quantity += 1;
-            }
-            $pack->packedProducts()->attach($data['id'],
-                ['quantity' => $quantity]);
-            $realPackageNumber++;
+    /**
+     * @param int $amountLeft
+     * @param $packing
+     * @return array
+     */
+    private function getPaczkomatQuantity(int $amountLeft, $packing): array
+    {
+        if ($amountLeft >= $packing->paczkomat_size_c) {
+            $quantity = min($packing->paczkomat_size_c ?: 1, $amountLeft);
+            $selectedTemplateId = self::TEMPLATE_PACZKOMAT_C;
+            $templateName = 'Paczkomat Allegro C';
+        } elseif ($amountLeft >= $packing->paczkomat_size_b) {
+            $quantity = min($packing->paczkomat_size_b ?: 1, $amountLeft);
+            $selectedTemplateId = self::TEMPLATE_PACZKOMAT_B;
+            $templateName = 'Paczkomat Allegro B';
+        } else {
+            $quantity = min($packing->paczkomat_size_a ?: 1, $amountLeft);
+            $selectedTemplateId = self::TEMPLATE_PACZKOMAT_A;
+            $templateName = 'Paczkomat Allegro A';
         }
-        $order->shipment_date = $pack->shipment_date;
-        $order->save();
+        $template = PackageTemplate::find($selectedTemplateId);
+        if (!$template) {
+            Log::error("Brak szablonu paczki lub błędny numer id: $templateName : o ID $selectedTemplateId");
+        }
+        return array($quantity, $template);
     }
 
     public function setTransactionList($group)
     {
         $this->transactionList = $group;
     }
+
 }
