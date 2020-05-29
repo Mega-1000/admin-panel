@@ -40,7 +40,7 @@ class SelloPackageDivider implements iDividable
         $data = $this->findProductInData($items, $transaction);
         $packing = ProductPacking::where('product_id', $data['id'])->first();
         $template = $this->prepareTemplate($transaction);
-        $isPaczkomat = !in_array($template->id, self::TEMPLATE_IDS_FOR_PACZKOMAT);
+        $isPaczkomat = in_array($template->id, self::TEMPLATE_IDS_FOR_PACZKOMAT);
         $amountLeft = $data['amount'];
         while ($amountLeft > 0) {
             if ($isPaczkomat) {
