@@ -49,7 +49,7 @@ class SelloPackageDivider implements iDividable
                     $template = $newTemplate;
                 }
             } else {
-                $quantity = $this->getQuantity($packing->allegro_courier, $amountLeft);
+                $quantity = min($packing->allegro_courier ?: 1, $amountLeft);
             }
             $pack = BackPackPackageDivider::createPackage($template, $order->id, $realPackageNumber);
             $pack->packedProducts()->attach($data['id'],
@@ -110,15 +110,15 @@ class SelloPackageDivider implements iDividable
     private function getPaczkomatQuantity(int $amountLeft, $packing): array
     {
         if ($amountLeft >= $packing->paczkomat_size_c) {
-            $quantity = $this->getQuantity($packing->paczkomat_size_c, $amountLeft);
+            $quantity = min($packing->paczkomat_size_c ?: 1, $amountLeft);
             $selectedTemplateId = self::TEMPLATE_PACZKOMAT_C;
             $templateName = 'Paczkomat Allegro C';
         } elseif ($amountLeft >= $packing->paczkomat_size_b) {
-            $quantity = $this->getQuantity($packing->paczkomat_size_b, $amountLeft);
+            $quantity = min($packing->paczkomat_size_b ?: 1, $amountLeft);
             $selectedTemplateId = self::TEMPLATE_PACZKOMAT_B;
             $templateName = 'Paczkomat Allegro B';
         } else {
-            $quantity = $this->getQuantity($packing->paczkomat_size_a, $amountLeft);
+            $quantity = min($packing->paczkomat_size_a ?: 1, $amountLeft);
             $selectedTemplateId = self::TEMPLATE_PACZKOMAT_A;
             $templateName = 'Paczkomat Allegro A';
         }
@@ -127,19 +127,6 @@ class SelloPackageDivider implements iDividable
             Log::error("Brak szablonu paczki lub błędny numer id: $templateName : o ID $selectedTemplateId");
         }
         return array($quantity, $template);
-    }
-
-    /**
-     * @param $max
-     * @param int $amountLeft
-     * @return int
-     */
-    private function getQuantity($max, int $amountLeft): int
-    {
-        if (empty($max)) {
-            return 1;
-        }
-        return $max < $amountLeft ? $max : $amountLeft;
     }
 
     public function setTransactionList($group)
