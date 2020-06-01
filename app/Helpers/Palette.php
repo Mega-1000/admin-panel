@@ -7,6 +7,7 @@ class Palette
 {
     const CAN_NOT_ADD_MORE = 'nie można dodać nowych paczek';
     const PALETTE_100 = 'p_100';
+    const PALETTE_130 = 'P_130';
     const PALETTE_80 = 'p_80';
     const PALETTE_100_VOLUME = 2400000;
     const PALETTE_100_WEIGHT = 1000;
@@ -27,7 +28,7 @@ class Palette
     public function __construct()
     {
         $this->packagesList = collect([]);
-        $this->setType(self::PALETTE_100);
+        $this->setType(self::PALETTE_130);
     }
 
     public function addItem($package)
@@ -49,9 +50,14 @@ class Palette
     public function tryFitInSmallerPalette()
     {
         $carry = $this->getCarry();
-        $canFitInSmaller = $carry['volume'] < self::PALETTE_80_VOLUME && $carry['weight'] < self::PALETTE_80_WEIGHT;
-        if ($canFitInSmaller) {
-            $this->setType(self::PALETTE_80);
+        $name = false;
+        if ($carry['volume'] <= self::PALETTE_80_VOLUME && $carry['weight'] <= self::PALETTE_80_WEIGHT) {
+            $name = self::PALETTE_80;
+        } elseif ($carry['volume'] <= self::PALETTE_100_VOLUME && $carry['weight'] <= self::PALETTE_100_WEIGHT) {
+            $name = self::PALETTE_100;
+        }
+        if ($name) {
+            $this->setType($name);
         }
     }
 
@@ -62,9 +68,13 @@ class Palette
                 $this->price = self::PALETTE_80_PRICE;
                 break;
             case self::PALETTE_100:
-            default:
                 $this->type = self::PALETTE_100;
                 $this->price = self::PALETTE_100_PRICE;
+                break;
+            case self::PALETTE_130:
+            default:
+                $this->type = self::PALETTE_130;
+                $this->price = self::PALETTE_130_PRICE;
                 break;
         }
         $packageTemplate = PackageTemplate::where('symbol', strtolower($this->type))->firstOrFail();

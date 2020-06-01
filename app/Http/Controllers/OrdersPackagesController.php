@@ -211,7 +211,7 @@ class OrdersPackagesController extends Controller
         $data['shipment_date'] = new \DateTime($data['shipment_date']);
 
         $this->saveOrderPackage($data, $id);
-       
+
         return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
             'message' => __('order_packages.message.update'),
             'alert-type' => 'success'
@@ -237,7 +237,7 @@ class OrdersPackagesController extends Controller
                 $data['shipment_date'] = new \DateTime($shipdate);
                 $data['delivery_date'] = new \DateTime($delidate);
             }
-        }        
+        }
 
         $packageNumber = OrderPackage::where('order_id', $order_id)->max('number');
         $data['packing_type'] = $request->input('packing_type');
@@ -269,7 +269,7 @@ class OrdersPackagesController extends Controller
         }
 
         $this->saveOrderPackage($data);
-        
+
         if($toCheck != 0) {
             dispatch_now(new AddLabelJob($order->id, [134]));
         } else {
@@ -318,10 +318,12 @@ class OrdersPackagesController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $deleted = $this->repository->delete($id);
-
+        if (isset($request->redirect) && $request->redirect == 'false') {
+            return response('success');
+        }
         if (empty($deleted)) {
             return redirect()->back()->with([
                 'message' => __('orders.message.not_delete'),
@@ -690,7 +692,7 @@ class OrdersPackagesController extends Controller
         }
         return true;
     }
-    
+
     private function saveOrderPackage($data, $id = null) {
         if (is_null($id)) {
             $orderPackage = new OrderPackage;
