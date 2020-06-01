@@ -768,7 +768,8 @@
                 $.ajax({
                     url: url.replace('%id', id),
                 }).done(function (data) {
-                    window.location.href = '/admin/orders?order_id=' + orderId;
+                    urlRefresh = '{{route('orders.index', ['order_id' => 'replace'])}}'
+                    window.location.href = urlRefresh.replace('replace', orderId)
                 }).fail(function () {
                     alert('Coś poszło nie tak')
                 });
@@ -785,7 +786,8 @@
                         'redirect': false
                     }
                 }).done(function (data) {
-                    window.location.replace('/admin/orders?order_id=' + orderId);
+                    urlRefresh = '{{route('orders.index', ['order_id' => 'replace'])}}'
+                    window.location.href = urlRefresh.replace('replace', orderId)
                 }).fail(function () {
                     alert('Coś poszło nie tak')
                 });
