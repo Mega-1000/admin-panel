@@ -616,7 +616,8 @@
                                 table
                                     .column('remainder_date:name')
                                 .search(is_filter)
-                                .draw()">Przedawnione</button>
+                                .draw()">Przedawnione
+                    </button>
                 </div>
             </th>
             <th>
@@ -760,6 +761,36 @@
         breadcrumb.append("<li class='active'><a href='javascript:void();'>Zamówienia</a></li>");
 
         $.fn.dataTable.ext.errMode = 'throw';
+
+        function cancelPackage(id, orderId) {
+            if (confirm('Potwierdź anulację paczki')) {
+                url = '{{route('order_packages.sendRequestForCancelled', ['id' => '%id'])}}';
+                $.ajax({
+                    url: url.replace('%id', id),
+                }).done(function (data) {
+                    window.location.href = '/admin/orders?order_id=' + orderId;
+                }).fail(function () {
+                    alert('Coś poszło nie tak')
+                });
+            }
+        }
+
+        function deletePackage(id, orderId) {
+            if (confirm('Potwierdź usunięcię paczki')) {
+                url = '{{route('order_packages.destroy', ['id' => '%id'])}}';
+                $.ajax({
+                    url: url.replace('%id', id),
+                    type: 'delete',
+                    data: {
+                        'redirect': false
+                    }
+                }).done(function (data) {
+                    window.location.replace('/admin/orders?order_id=' + orderId);
+                }).fail(function () {
+                    alert('Coś poszło nie tak')
+                });
+            }
+        }
 
         function sendPackage(id, orderId) {
             $('#package-' + id).attr("disabled", true);
@@ -966,7 +997,10 @@
                                 }
                                 if (value.letter_number === null) {
                                     if (value.status !== 'CANCELLED' && value.status !== 'WAITING_FOR_CANCELLED' && value.delivery_courier_name !== 'GIELDA' && value.service_courier_name !== 'GIELDA' && value.delivery_courier_name !== 'ODBIOR_OSOBISTY' && value.service_courier_name !== 'ODBIOR_OSOBISTY') {
+                                        html += '<div style="display: flex;">'
                                         html += '<button class="btn btn-success" id="package-' + value.id + '" onclick="sendPackage(' + value.id + ',' + value.order_id + ')">Wyślij</button>';
+                                        html += '<button class="btn btn-danger" onclick="deletePackage(' + value.id + ', ' + value.order_id + ')">Usuń</button>'
+                                        html += '</div>'
                                     }
                                 } else {
                                     if (value.service_courier_name === 'INPOST' || value.service_courier_name === 'ALLEGRO-INPOST') {
@@ -984,6 +1018,7 @@
                                     } else if (value.delivery_courier_name === 'ODBIOR_OSOBISTY') {
                                         html += '<a target="_blank" href="/storage/odbior_osobisty/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                     }
+                                    html += '<button class="btn btn-danger" onclick="cancelPackage(' + value.id + ', ' + value.order_id + ')">Anuluj</button>'
                                 }
                                 html += '</div>';
                             }
