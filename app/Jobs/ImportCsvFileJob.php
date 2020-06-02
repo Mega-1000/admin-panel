@@ -470,7 +470,7 @@ class ImportCsvFileJob implements ShouldQueue
             'paczkomat_size_a' => $line[356],
             'paczkomat_size_b' => $line[357],
             'paczkomat_size_c' => $line[358],
-            'allegro_courier' => $line[377],
+            'allegro_courier' => $line[365],
             'set_rule' => $line[368],
             'max_in_pallete_80' => $line[369],
             'max_in_pallete_100' => $line[370],
