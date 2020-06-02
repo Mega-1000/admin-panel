@@ -35,7 +35,7 @@ class CheckStatusInpostPackagesJob extends Job
         $orderPackages = OrderPackage::whereIn('service_courier_name', self::COURIER)
                 ->whereDate('shipment_date', '>', Carbon::today()->subDays(5)->toDateString())
                 ->get();
-        
+
         if (empty($orderPackages)) {
             return;
         }
@@ -61,9 +61,13 @@ class CheckStatusInpostPackagesJob extends Job
                 if (is_null($path)) {
                     continue;
                 }
-                \Mailer::create()
+                try {
+                    \Mailer::create()
                         ->to($orderPackage->order->warehouse->firm->email)
                         ->send(new SendLPToTheWarehouseAfterOrderCourierMail("List przewozowy przesyłki nr: " . $orderPackage->order->id . '/' . $orderPackage->number, $path, $orderPackage->order->id . '/' . $orderPackage->number));
+                } catch (\Exception $e) {
+                    Log::error('Send email failed', [$e]);
+                }
                 $orderPackage->send_protocol = true;
                 $orderPackage->save();
             }
