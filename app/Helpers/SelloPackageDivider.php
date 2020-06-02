@@ -109,19 +109,20 @@ class SelloPackageDivider implements iDividable
      */
     private function getPaczkomatQuantity(int $amountLeft, $packing): array
     {
-        if ($amountLeft >= $packing->paczkomat_size_c) {
-            $quantity = min($packing->paczkomat_size_c ?: 1, $amountLeft);
-            $selectedTemplateId = self::TEMPLATE_PACZKOMAT_C;
-            $templateName = 'Paczkomat Allegro C';
-        } elseif ($amountLeft >= $packing->paczkomat_size_b) {
+        if ($amountLeft <= $packing->paczkomat_size_a) {
+            $quantity = min($packing->paczkomat_size_a ?: 1, $amountLeft);
+            $selectedTemplateId = self::TEMPLATE_PACZKOMAT_A;
+            $templateName = 'Paczkomat Allegro A';
+        } elseif ($amountLeft <= $packing->paczkomat_size_b) {
             $quantity = min($packing->paczkomat_size_b ?: 1, $amountLeft);
             $selectedTemplateId = self::TEMPLATE_PACZKOMAT_B;
             $templateName = 'Paczkomat Allegro B';
         } else {
-            $quantity = min($packing->paczkomat_size_a ?: 1, $amountLeft);
-            $selectedTemplateId = self::TEMPLATE_PACZKOMAT_A;
-            $templateName = 'Paczkomat Allegro A';
+            $quantity = min($packing->paczkomat_size_c ?: 1, $amountLeft);
+            $selectedTemplateId = self::TEMPLATE_PACZKOMAT_C;
+            $templateName = 'Paczkomat Allegro C';
         }
+
         $template = PackageTemplate::find($selectedTemplateId);
         if (!$template) {
             Log::error("Brak szablonu paczki lub błędny numer id: $templateName : o ID $selectedTemplateId");
