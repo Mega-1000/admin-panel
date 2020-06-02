@@ -7,13 +7,7 @@ use App\Integrations\Jas\Jas;
 use App\Integrations\Pocztex\addShipment;
 use App\Integrations\Pocztex\adresType;
 use App\Integrations\Pocztex\clearEnvelope;
-use App\Integrations\Pocztex\paletaType;
-use App\Integrations\Pocztex\platnikType;
-use App\Integrations\Pocztex\pobranieType;
-use App\Integrations\Pocztex\przesylkaPaletowaType;
-use App\Integrations\Pocztex\rodzajPaletyType;
 use App\Integrations\Pocztex\sendEnvelope;
-use App\Integrations\Pocztex\sposobPobraniaType;
 use App\Mail\SendLPToTheWarehouseAfterOrderCourierMail;
 use App\Repositories\OrderPackageRepository;
 use Illuminate\Support\Facades\Log;
@@ -270,7 +264,7 @@ class OrdersCourierJobs extends Job
                 $integration = new Inpost($this->data);
             } else {
                 $integration = new Inpost($this->data, 1);
-            } 
+            }
             $this->callInpostForPackage($integration);
         } catch (Exception $exception) {
             Session::put('message', $exception->getMessage());
@@ -282,9 +276,9 @@ class OrdersCourierJobs extends Job
         }
 
     }
-    
+
     public function callInpostForPackage($integration)
-    {     
+    {
         $json = $integration->prepareJsonForInpost();
         $package = $integration->createSimplePackage($json);
         if ($package->status == '400') {
@@ -453,7 +447,6 @@ class OrdersCourierJobs extends Job
         $xml = '<tns:addShipment xmlns:tns="http://e-nadawca.poczta-polska.pl">';
         $integration = new \App\Integrations\Pocztex\ElektronicznyNadawca();
         $integration->clearEnvelope(new clearEnvelope());
-        $package = new przesylkaPaletowaType();
         $xml .= '<przesylki';
         $xml .= ' zawartosc = "' . $this->data['content'] . '"';
         $shipment = new addShipment();
@@ -479,7 +472,6 @@ class OrdersCourierJobs extends Job
         //   $integration->__call('addShipment', $soapXML);
         //     Log::debug($integration->__getLastRequest());
 
-        $package->adres = $address;
         //      $package->miejsceDoreczenia = $address;
         $pickupAddress = new adresType();
 
@@ -493,51 +485,6 @@ class OrdersCourierJobs extends Job
         $pickupAddress->email = $this->data['pickup_address']['email'];
         $pickupAddress->kraj = 'Polska';
         $pickupAddress->osobaKontaktowa = $this->data['pickup_address']['firstname'] . ' ' . $this->data['pickup_address']['lastname'];
-        $package->adres = $pickupAddress;
-        $package->miejsceOdbioru = $pickupAddress;
-
-        $package->opis = $this->data['notices'];
-        $package->zawartosc = $this->data['content'];
-        $package->masa = $this->data['weight'];
-        $package->dataZaladunku = $this->data['pickup_address']['parcel_date'];
-        $package->dataDostawy = "2019-02-06";
-
-        $package->wartosc = $this->data['amount'] * 1000;
-
-        $package->powiadomienieNadawcy = $this->data['pickup_address']['phone'];
-        $palette = new paletaType();
-
-        switch ($this->data['additional_data']['package_type']) {
-            case 'EUR':
-                $palette->rodzajPalety = rodzajPaletyType::EUR;
-                break;
-            case 'POLPALETA':
-                $palette->rodzajPalety = rodzajPaletyType::POLPALETA;
-                break;
-            case 'INNA':
-                $palette->rodzajPalety = rodzajPaletyType::INNA;
-                break;
-        }
-
-
-        $palette->szerokosc = $this->data['width'];
-        $palette->dlugosc = $this->data['length'];
-        $palette->wysokosc = $this->data['height'];
-        $package->paleta = $palette;
-
-
-        $package->platnik = new platnikType();
-        $package->platnik->uiszczaOplate = "NADAWCA";
-
-        if ($this->data['cash_on_delivery'] == true) {
-            $package->pobranie = new pobranieType();
-            $package->pobranie->kwotaPobrania = $this->data['price_for_cash_on_delivery'] * 100;
-            $package->pobranie->nrb = $this->data['number_account_for_cash_on_delivery'];
-            $package->pobranie->sposobPobrania = sposobPobraniaType::RACHUNEK_BANKOWY;
-            $package->pobranie->tytulem = 'Zamowienie nr: ' . $this->data['order_id'];
-        }
-
-        $package->guid = $this->getGuid();
 
         $tag['guid'] = $this->getGuid();
         $tag['_'] = '';
@@ -698,8 +645,6 @@ class OrdersCourierJobs extends Job
         $param->appendChild($platnik);
         $dom->appendChild($param);
         $shipment->przesylki[] = new \SoapVar($dom->saveXML($dom->documentElement), XSD_ANYXML);
-
-        //    $shipment->przesylki[] = new \SoapVar($tag, SOAP_ENC_OBJECT, '');
         $sendingNumber = $integration->addShipment($shipment);
 
         $eSender = new \App\Integrations\Pocztex\ElektronicznyNadawca();
