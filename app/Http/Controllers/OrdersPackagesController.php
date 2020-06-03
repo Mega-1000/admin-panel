@@ -630,7 +630,7 @@ class OrdersPackagesController extends Controller
             abort(404);
         }
         $deliveryAddress = $order->addresses->where('type', '=', 'DELIVERY_ADDRESS');
-        $deliveryAddress = $deliveryAddress->first()->id;
+        $deliveryAddress = $deliveryAddress->first();
         if (empty($deliveryAddress)) {
             abort(404);
         }
