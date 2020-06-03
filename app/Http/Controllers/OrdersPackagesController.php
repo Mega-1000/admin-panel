@@ -2,31 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\ContainerType;
+use App\Entities\ContentType;
+use App\Entities\Order;
+use App\Entities\OrderOtherPackage;
+use App\Entities\OrderPackage;
+use App\Entities\PackingType;
+use App\Entities\SelAddress;
+use App\Entities\SelTransaction;
 use App\Helpers\OrderPackagesDataHelper;
 use App\Http\Requests\OrderPackageCreateRequest;
 use App\Http\Requests\OrderPackageUpdateRequest;
 use App\Jobs\AddLabelJob;
+use App\Jobs\OrdersCourierJobs;
 use App\Jobs\SendRequestForCancelledPackageJob;
+use App\Mail\SendDailyProtocolToDeliveryFirmMail;
 use App\Repositories\FirmRepository;
 use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderRepository;
-use Illuminate\Http\Request;
-use Yajra\DataTables\Facades\DataTables;
-use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade as PDF;
-use App\Mail\SendDailyProtocolToDeliveryFirmMail;
-use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use App\Jobs\OrdersCourierJobs;
-use App\Entities\ContentType;
-use App\Entities\OrderPackage;
-use App\Entities\PackingType;
-use App\Entities\ContainerType;
-use App\Entities\SelTransaction;
-use App\Entities\Order;
-use App\Entities\SelCustomerEmail;
-use App\Entities\SelAddress;
+use Yajra\DataTables\Facades\DataTables;
 
 /**
  * Class OrderTasksController.
@@ -62,7 +62,8 @@ class OrdersPackagesController extends Controller
         OrderRepository $orderRepository,
         OrderPackagesDataHelper $orderPackagesDataHelper,
         FirmRepository $firmRepository
-    ) {
+    )
+    {
         $this->repository = $repository;
         $this->orderRepository = $orderRepository;
         $this->orderPackagesDataHelper = $orderPackagesDataHelper;
@@ -73,7 +74,7 @@ class OrdersPackagesController extends Controller
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function create(Request $request,$id, $multi = null)
+    public function create(Request $request, $id, $multi = null)
     {
         $contentTypes = ContentType::all();
         $packingTypes = PackingType::all();
@@ -82,7 +83,7 @@ class OrdersPackagesController extends Controller
         $order = $this->orderRepository->find($id);
         $shipmentDate = $this->orderPackagesDataHelper->calculateShipmentDate();
         $connectedOrders = $this->orderRepository->findWhere(['master_order_id' => $order->id]);
-        if($order->master_order_id != null) {
+        if ($order->master_order_id != null) {
             $mainId = $order->master_order_id;
             $order = $this->orderRepository->find($mainId);
             $connectedOrders = $this->orderRepository->findWhere(['master_order_id' => $order->id]);
@@ -93,32 +94,31 @@ class OrdersPackagesController extends Controller
 
         $cashOnDeliverySum = 0;
 
-        foreach($order->packages()->where('letter_number', '=', 'null')->get() as $package) {
+        foreach ($order->packages()->where('letter_number', '=', 'null')->get() as $package) {
             $cashOnDeliverySum += $package->cash_on_delivery;
         }
 
         $allOrdersSum = 0;
         $isAdditionalDKPExists = false;
         $connectedOrders = $this->orderRepository->findWhere(['master_order_id' => $order->id]);
-        foreach($connectedOrders as $connectedOrder)
-        {
-            if($connectedOrder->additional_cash_on_delivery_cost == 50) {
+        foreach ($connectedOrders as $connectedOrder) {
+            if ($connectedOrder->additional_cash_on_delivery_cost == 50) {
                 $isAdditionalDKPExists = true;
             }
             $allOrdersSum += $connectedOrder->getSumOfGrossValues();
         }
         $allOrdersSum += $order->getSumOfGrossValues();
-        if($order->additional_cash_on_delivery_cost == 50) {
+        if ($order->additional_cash_on_delivery_cost == 50) {
             $isAdditionalDKPExists = true;
         }
-        foreach($connectedOrders as $connectedOrder) {
-            foreach($connectedOrder->packages()->where('status', '!=', 'CANCELLED')->get() as $package) {
+        foreach ($connectedOrders as $connectedOrder) {
+            foreach ($connectedOrder->packages()->where('status', '!=', 'CANCELLED')->get() as $package) {
                 $cashOnDeliverySum += $package->cash_on_delivery;
             }
         }
 
-        foreach($order->payments as $payment){
-            if($payment->promise == '') {
+        foreach ($order->payments as $payment) {
+            if ($payment->promise == '') {
                 $payments[] = [
                     'amount' => $payment->amount,
                     'promise' => $payment->promise
@@ -142,7 +142,7 @@ class OrdersPackagesController extends Controller
             'weight' => $order->weight,
         ];
         $multiData = null;
-        if(!empty($multi)) {
+        if (!empty($multi)) {
             $sessionData = $request->session()->get('multi');
             if ($multi == $sessionData['token']) {
                 $multiData = $sessionData['template'];
@@ -153,10 +153,10 @@ class OrdersPackagesController extends Controller
         }
 
         return view('orderPackages.create', compact('id', 'templateData', 'orderData', 'order', 'payments', 'promisedPayments', 'connectedOrders', 'cashOnDeliverySum', 'isAdditionalDKPExists', 'allOrdersSum', 'multiData'))
-                        ->withcontentTypes($contentTypes)
-                        ->withpackingTypes($packingTypes)
-                        ->withcontainerTypes($containerTypes)
-                        ->withisAllegro($isAllegro);
+            ->withcontentTypes($contentTypes)
+            ->withpackingTypes($packingTypes)
+            ->withcontainerTypes($containerTypes)
+            ->withisAllegro($isAllegro);
     }
 
     public function changeValue(Request $request)
@@ -171,11 +171,12 @@ class OrdersPackagesController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int $id
+     * @param int $id
      *
      * @return \Illuminate\Http\Response
      */
-    public function edit($id) {
+    public function edit($id)
+    {
         $orderPackage = OrderPackage::find($id);
         $order = Order::find($orderPackage->order_id);
         $isAllegro = !empty($order->sello_id);
@@ -185,10 +186,10 @@ class OrdersPackagesController extends Controller
         $containerTypes = ContainerType::all();
 
         return view('orderPackages.edit', compact('orderPackage', 'id'))
-                        ->withcontentTypes($contentTypes)
-                        ->withpackingTypes($packingTypes)
-                        ->withcontainerTypes($containerTypes)
-                        ->withisAllegro($isAllegro);
+            ->withcontentTypes($contentTypes)
+            ->withpackingTypes($packingTypes)
+            ->withcontainerTypes($containerTypes)
+            ->withisAllegro($isAllegro);
     }
 
     /**
@@ -218,6 +219,43 @@ class OrdersPackagesController extends Controller
         ]);
     }
 
+    private function saveOrderPackage($data, $id = null)
+    {
+        if (is_null($id)) {
+            $orderPackage = new OrderPackage;
+        } else {
+            $orderPackage = OrderPackage::find($id);
+        }
+        $orderPackage->size_a = $data['size_a'];
+        $orderPackage->size_b = $data['size_b'];
+        $orderPackage->size_c = $data['size_c'];
+        $orderPackage->shipment_date = $data['shipment_date'];
+        $orderPackage->delivery_date = $data['delivery_date'];
+        $orderPackage->delivery_courier_name = $data['delivery_courier_name'];
+        $orderPackage->service_courier_name = $data['service_courier_name'];
+        $orderPackage->weight = $data['weight'];
+        $orderPackage->quantity = 1;
+        $orderPackage->container_type = $data['container_type'];
+        $orderPackage->notices = $data['notices'];
+        $orderPackage->shape = $data['shape'];
+        $orderPackage->sending_number = $data['sending_number'];
+        $orderPackage->letter_number = $data['letter_number'];
+        $orderPackage->cash_on_delivery = $data['cash_on_delivery'];
+        $orderPackage->status = $data['status'];
+        $orderPackage->cost_for_client = $data['cost_for_client'];
+        $orderPackage->cost_for_company = $data['cost_for_company'];
+        $orderPackage->real_cost_for_company = $data['real_cost_for_company'];
+        $orderPackage->content = $data['content'];
+        $orderPackage->packing_type = $data['packing_type'];
+        if (is_null($id)) {
+            $orderPackage->order_id = $data['order_id'];
+            $orderPackage->number = $data['number'];
+            $orderPackage->symbol = $data['symbol'];
+            $orderPackage->chosen_data_template = $data['chosen_data_template'];
+        }
+        $orderPackage->save();
+    }
+
     public function store(OrderPackageCreateRequest $request)
     {
         $order_id = $request->input('order_id');
@@ -225,13 +263,13 @@ class OrdersPackagesController extends Controller
         $toCheck = (float)$request->input('toCheck');
         $data['delivery_date'] = new \DateTime($data['delivery_date']);
         $data['shipment_date'] = new \DateTime($data['shipment_date']);
-        if (!empty($request->input('template_accept_hour')) || !empty($request->input('template_max_hour')) ) {
+        if (!empty($request->input('template_accept_hour')) || !empty($request->input('template_max_hour'))) {
             $today = new \DateTime;
             $daydate = $data['shipment_date'];
             $daytoday = $today;
             $daydate->setTime(0, 0, 0);
             $daytoday->setTime(0, 0, 0);
-            if($daydate->diff($daytoday)->days == 0 && empty($request->input('force_shipment'))) {
+            if ($daydate->diff($daytoday)->days == 0 && empty($request->input('force_shipment'))) {
                 $shipdate = $this->orderPackagesDataHelper->calculateShipmentDate($request->input('template_accept_hour'), $request->input('template_max_hour'));
                 $delidate = $this->orderPackagesDataHelper->calculateDeliveryDate($shipdate);
                 $data['shipment_date'] = new \DateTime($shipdate);
@@ -251,16 +289,15 @@ class OrdersPackagesController extends Controller
         }
 
         $order = $this->orderRepository->find($order_id);
-        if(empty($packageNumber)) {
+        if (empty($packageNumber)) {
             $isAdditionalDKPExists = false;
             $connectedOrders = $this->orderRepository->findWhere(['master_order_id' => $order->id]);
-            foreach($connectedOrders as $connectedOrder)
-            {
-                if($connectedOrder->additional_cash_on_delivery_cost == 50) {
+            foreach ($connectedOrders as $connectedOrder) {
+                if ($connectedOrder->additional_cash_on_delivery_cost == 50) {
                     $isAdditionalDKPExists = true;
                 }
             }
-            if($order->toPay() > 5 && $isAdditionalDKPExists == false) {
+            if ($order->toPay() > 5 && $isAdditionalDKPExists == false) {
                 $this->orderRepository->update([
                     'additional_cash_on_delivery_cost' => $order->additional_cash_on_delivery_cost + 50,
                 ], $order->id);
@@ -270,40 +307,40 @@ class OrdersPackagesController extends Controller
 
         $this->saveOrderPackage($data);
 
-        if($toCheck != 0) {
+        if ($toCheck != 0) {
             dispatch_now(new AddLabelJob($order->id, [134]));
         } else {
             dispatch_now(new AddLabelJob($order->id, [133]));
         }
         if (empty($request->input('quantity')) || $request->input('quantity') <= 1) {
             return redirect()->route('orders.edit', ['order_id' => $order_id])->with([
-            'message' => __('order_packages.message.store'),
-            'alert-type' => 'success'
-        ]);
+                'message' => __('order_packages.message.store'),
+                'alert-type' => 'success'
+            ]);
         }
         $token = md5(uniqid(rand(), true));
         $multi = [
             'token' => $token,
             'template' => [
-            'quantity' => $request->input('quantity')-1,
-            'size_a' => $request->input('size_a'),
-            'size_b' => $request->input('size_b'),
-            'size_c' => $request->input('size_c'),
-            'shipment_date' => $request->input('shipment_date'),
-            'delivery_date' => $request->input('delivery_date'),
-            'service_courier_name' => $request->input('service_courier_name'),
-            'delivery_courier_name' => $request->input('delivery_courier_name'),
-            'shape' => $request->input('shape'),
-            'container_type' => $request->input('container_type'),
-            'notices' => $request->input('notices'),
-            'content' => $request->input('content'),
-            'weight' => $request->input('weight'),
-            'cost_for_client' => $request->input('cost_for_client'),
-            'cost_for_us' => $request->input('cost_for_company'),
-            'chosen_data_template' => $request->input('chosen_data_template'),
-            'content' => $request->input('content'),
-            'symbol' => $request->input('symbol'),
-            'packing_type' => $request->input('packing_type')
+                'quantity' => $request->input('quantity') - 1,
+                'size_a' => $request->input('size_a'),
+                'size_b' => $request->input('size_b'),
+                'size_c' => $request->input('size_c'),
+                'shipment_date' => $request->input('shipment_date'),
+                'delivery_date' => $request->input('delivery_date'),
+                'service_courier_name' => $request->input('service_courier_name'),
+                'delivery_courier_name' => $request->input('delivery_courier_name'),
+                'shape' => $request->input('shape'),
+                'container_type' => $request->input('container_type'),
+                'notices' => $request->input('notices'),
+                'content' => $request->input('content'),
+                'weight' => $request->input('weight'),
+                'cost_for_client' => $request->input('cost_for_client'),
+                'cost_for_us' => $request->input('cost_for_company'),
+                'chosen_data_template' => $request->input('chosen_data_template'),
+                'content' => $request->input('content'),
+                'symbol' => $request->input('symbol'),
+                'packing_type' => $request->input('packing_type')
             ]
         ];
         $request->session()->put('multi', $multi);
@@ -311,26 +348,77 @@ class OrdersPackagesController extends Controller
 
     }
 
+    public function generateSticker($data)
+    {
+        $order = $this->orderRepository->find($data['order_id']);
+        $data['letter_number'] = $data['order_id'] . rand(1000000, 9999999);
+        $data['sending_number'] = $data['order_id'] . rand(1000000, 9999999);
+        $data['shipment_date'] = $data['shipment_date']->format('Y-m-d');
+        $data['delivery_date'] = $data['delivery_date']->format('Y-m-d');
+        $pdf = PDF::loadView('pdf.sticker', [
+            'order' => $order,
+            'package' => $data
+        ])->setPaper('a5');
+
+        if (!file_exists(storage_path('app/public/' . strtolower($data['delivery_courier_name']) . '/stickers/'))) {
+            mkdir(storage_path('app/public/' . strtolower($data['delivery_courier_name'])));
+            mkdir(storage_path('app/public/' . strtolower($data['delivery_courier_name']) . '/stickers/'));
+        }
+        $path = storage_path('app/public/' . strtolower($data['delivery_courier_name']) . '/stickers/sticker' . $data['letter_number'] . '.pdf');
+        $pdf->save($path);
+
+        return $data;
+    }
+
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int $id
+     * @param int $id
      *
      * @return \Illuminate\Http\Response
      */
     public function destroy(Request $request, $id)
     {
-        $deleted = $this->repository->delete($id);
-        if (isset($request->redirect) && $request->redirect == 'false') {
-            return response('success');
-        }
-        if (empty($deleted)) {
+        $package = OrderPackage::find($id);
+        if (empty($package)) {
             return redirect()->back()->with([
                 'message' => __('orders.message.not_delete'),
                 'alert-type' => 'error'
             ])->withInput(['tab' => 'orderPackages']);
         }
+        $prods = $package->packedProducts;
 
+        $order = $package->order;
+        $container = $order->notCalculable->first();
+        if (empty($container)) {
+            $container = new OrderOtherPackage();
+            $container->type = 'not_calculable';
+            $container->order_id = $order->id;
+            $container->save();
+        }
+        $prods->map(function ($product) use ($container) {
+            $exist = $container->products()->where('product_id', $product->id)->first();
+            if ($exist) {
+                $exist->pivot->quantity += $product->pivot->quantity;
+                $exist->pivot->save();
+            } else {
+                $container->products()->attach($product->id, ['quantity' => $product->pivot->quantity]);
+            }
+        });
+
+        $deleted = $package->delete();
+        if (empty($deleted)) {
+            if (isset($request->redirect) && $request->redirect == 'false') {
+                return response('failure', 400);
+            }
+            return redirect()->back()->with([
+                'message' => __('orders.message.not_delete'),
+                'alert-type' => 'error'
+            ])->withInput(['tab' => 'orderPackages']);
+        }
+        if (isset($request->redirect) && $request->redirect == 'false') {
+            return response('success');
+        }
         return redirect()->back()->with([
             'message' => __('order_packages.message.delete'),
             'alert-type' => 'success'
@@ -346,7 +434,6 @@ class OrdersPackagesController extends Controller
         return DataTables::collection($collection)->make(true);
     }
 
-
     /**
      * @return mixed
      */
@@ -355,102 +442,6 @@ class OrdersPackagesController extends Controller
         $collection = $this->repository->findByField('order_id', $id);
 
         return $collection;
-    }
-
-    public function preparePackageToSend($orderId, $packageId)
-    {
-        $order = Order::find($orderId);
-        if (empty($order)) {
-            abort(404);
-        }
-        $package = $this->repository->find($packageId);
-        if (empty($package)) {
-            abort(404);
-        }
-        $deliveryAddress = $order->addresses->where('type', '=', 'DELIVERY_ADDRESS');
-        $deliveryAddress = $deliveryAddress->first->id;
-        if (empty($deliveryAddress)) {
-            abort(404);
-        }
-        if ($order->sello_id){
-            $transaction = SelTransaction::find($order->sello_id);
-            $addressAllegro = SelAddress::where('adr_TransId', $order->sello_id)->where('adr_Type', 1)->first();
-            $order->allegro_transaction_id = $transaction->tr_CheckoutFormId;
-            $order->save();
-        }
-        $data = [
-            'order_id' => $order->id,
-            'courier_type' => $package->delivery_courier_name,
-            'courier_name' => $package->service_courier_name,
-            'weight' => $package->weight,
-            'length' => $package->size_a,
-            'width' => $package->size_b,
-            'height' => $package->size_c,
-            'notices' => $package->notices !== null ? $package->notices : 'Brak',
-            'cash_on_delivery' => $package->cash_on_delivery !== null ? true : false,
-            'number_account_for_cash_on_delivery' => $package->cash_on_delivery !== null ? env('ACCOUNT_NUMBER') : null,
-            'bank_name' => $package->cash_on_delivery !== null ? env('BANK_NAME') : null,
-            'price_for_cash_on_delivery' => $package->cash_on_delivery !== null ? $package->cash_on_delivery === 0 ? null : $package->cash_on_delivery : null,
-            'amount' => 1000,
-            'content' => $package->content,
-            'additional_data' => [
-                'order_package_id' => $package->id,
-                'forwarding_delivery' => $package->delivery_courier_name,
-                'allegro_user_id' => $transaction->tr_RegId ?? null,
-                'allegro_transaction_id' => $order->allegro_transaction_id,
-                'package_type' => $package->container_type,
-                'packing_type' => $package->packing_type,
-                'allegro_mail' => $addressAllegro->adr_Email ?? null,
-            ],
-            'delivery_address' => [
-                'firstname' => $deliveryAddress->firstname,
-                'lastname' => $deliveryAddress->lastname,
-                'address' => $deliveryAddress->address,
-                'flat_number' => $deliveryAddress->flat_number,
-                'city' => $deliveryAddress->city,
-                'email' => $deliveryAddress->email,
-                'phone' => $deliveryAddress->phone,
-                'firmname' => $deliveryAddress->firmname,
-                'nip' => $deliveryAddress->nip,
-                'postal_code' => $deliveryAddress->postal_code,
-                'country' => $deliveryAddress->country !== null ? $deliveryAddress->country : 'Polska',
-                'delivery_date' => $package->delivery_date !== null ? $package->delivery_date : null,
-            ],
-        ];
-
-
-        if ($order->warehouse_id !== null) {
-            $pickupAddress = [
-                'pickup_address' => [
-                    'firstname' => $order->warehouse->property->firstname !== null ? $order->warehouse->property->firstname : null,
-                    'lastname' => $order->warehouse->property->lastname !== null ? $order->warehouse->property->lastname : null,
-                    'address' => $order->warehouse->address->address !== null ? $order->warehouse->address->address : null,
-                    'flat_number' => $order->warehouse->address->warehouse_number !== null ? $order->warehouse->address->warehouse_number : null,
-                    'city' => $order->warehouse->address->city !== null ? $order->warehouse->address->city : null,
-                    'email' => $order->warehouse->firm->email !== null ? $order->warehouse->firm->email : null,
-                    'phone' => $order->warehouse->property->phone !== null ? $order->warehouse->property->phone : null,
-                    'firmname' => $order->warehouse->firm->name !== null ? $order->warehouse->firm->name : null,
-                    'nip' => $order->warehouse->firm->nip !== null ? $order->warehouse->firm->nip : null,
-                    'postal_code' => $order->warehouse->address->postal_code !== null ? $order->warehouse->address->postal_code : null,
-                    'country' => 'Polska',
-                    'parcel_date' => $package->shipment_date !== null ? $package->shipment_date : null,
-                ],
-            ];
-            $data = array_merge($data, $pickupAddress);
-
-        }
-        $validator = $this->validatePackage($data);
-        if($data['price_for_cash_on_delivery'] == '0.00') {
-            $data['cash_on_delivery'] = false;
-            unset($data['price_for_cash_on_delivery']);
-        }
-        if($validator === true) {
-            dispatch_now(new OrdersCourierJobs($data));
-            $message = ['status' => 200, 'message' => null];
-        } else {
-            $message = ['status' => 200, 'message' => $validator->getData()];
-        }
-        return new JsonResponse($message, 200);
     }
 
     public function sendRequestForCancelled($id)
@@ -488,8 +479,8 @@ class OrdersPackagesController extends Controller
         if (!$packages->isEmpty()) {
             $packagesArray = [];
             foreach ($packages as $package) {
-                if($package->order->warehouse !== null){
-                    if($package->order->warehouse->symbol !== 'MEGA-OLAWA') {
+                if ($package->order->warehouse !== null) {
+                    if ($package->order->warehouse->symbol !== 'MEGA-OLAWA') {
                         continue;
                     }
                 }
@@ -624,29 +615,104 @@ class OrdersPackagesController extends Controller
         }
     }
 
-    public function generateSticker($data)
+    public function preparePackageToSend($orderId, $packageId)
     {
-        $order = $this->orderRepository->find($data['order_id']);
-        $data['letter_number'] = $data['order_id'] . rand(1000000, 9999999);
-        $data['sending_number'] = $data['order_id'] . rand(1000000, 9999999);
-        $data['shipment_date'] = $data['shipment_date']->format('Y-m-d');
-        $data['delivery_date'] = $data['delivery_date']->format('Y-m-d');
-        $pdf = PDF::loadView('pdf.sticker', [
-            'order' => $order,
-            'package' => $data
-        ])->setPaper('a5');
-
-        if (!file_exists(storage_path('app/public/' . strtolower($data['delivery_courier_name']) . '/stickers/'))) {
-            mkdir(storage_path('app/public/' . strtolower($data['delivery_courier_name'])));
-            mkdir(storage_path('app/public/' . strtolower($data['delivery_courier_name']) . '/stickers/'));
+        $order = Order::find($orderId);
+        if (empty($order)) {
+            abort(404);
         }
-        $path = storage_path('app/public/' . strtolower($data['delivery_courier_name']) . '/stickers/sticker'. $data['letter_number'] . '.pdf');
-        $pdf->save($path);
+        $package = $this->repository->find($packageId);
+        if (empty($package)) {
+            abort(404);
+        }
+        $deliveryAddress = $order->addresses->where('type', '=', 'DELIVERY_ADDRESS');
+        $deliveryAddress = $deliveryAddress->first->id;
+        if (empty($deliveryAddress)) {
+            abort(404);
+        }
+        if ($order->sello_id) {
+            $transaction = SelTransaction::find($order->sello_id);
+            $addressAllegro = SelAddress::where('adr_TransId', $order->sello_id)->where('adr_Type', 1)->first();
+            $order->allegro_transaction_id = $transaction->tr_CheckoutFormId;
+            $order->save();
+        }
+        $data = [
+            'order_id' => $order->id,
+            'courier_type' => $package->delivery_courier_name,
+            'courier_name' => $package->service_courier_name,
+            'weight' => $package->weight,
+            'length' => $package->size_a,
+            'width' => $package->size_b,
+            'height' => $package->size_c,
+            'notices' => $package->notices !== null ? $package->notices : 'Brak',
+            'cash_on_delivery' => $package->cash_on_delivery !== null ? true : false,
+            'number_account_for_cash_on_delivery' => $package->cash_on_delivery !== null ? env('ACCOUNT_NUMBER') : null,
+            'bank_name' => $package->cash_on_delivery !== null ? env('BANK_NAME') : null,
+            'price_for_cash_on_delivery' => $package->cash_on_delivery !== null ? $package->cash_on_delivery === 0 ? null : $package->cash_on_delivery : null,
+            'amount' => 1000,
+            'content' => $package->content,
+            'additional_data' => [
+                'order_package_id' => $package->id,
+                'forwarding_delivery' => $package->delivery_courier_name,
+                'allegro_user_id' => $transaction->tr_RegId ?? null,
+                'allegro_transaction_id' => $order->allegro_transaction_id,
+                'package_type' => $package->container_type,
+                'packing_type' => $package->packing_type,
+                'allegro_mail' => $addressAllegro->adr_Email ?? null,
+            ],
+            'delivery_address' => [
+                'firstname' => $deliveryAddress->firstname,
+                'lastname' => $deliveryAddress->lastname,
+                'address' => $deliveryAddress->address,
+                'flat_number' => $deliveryAddress->flat_number,
+                'city' => $deliveryAddress->city,
+                'email' => $deliveryAddress->email,
+                'phone' => $deliveryAddress->phone,
+                'firmname' => $deliveryAddress->firmname,
+                'nip' => $deliveryAddress->nip,
+                'postal_code' => $deliveryAddress->postal_code,
+                'country' => $deliveryAddress->country !== null ? $deliveryAddress->country : 'Polska',
+                'delivery_date' => $package->delivery_date !== null ? $package->delivery_date : null,
+            ],
+        ];
 
-        return $data;
+
+        if ($order->warehouse_id !== null) {
+            $pickupAddress = [
+                'pickup_address' => [
+                    'firstname' => $order->warehouse->property->firstname !== null ? $order->warehouse->property->firstname : null,
+                    'lastname' => $order->warehouse->property->lastname !== null ? $order->warehouse->property->lastname : null,
+                    'address' => $order->warehouse->address->address !== null ? $order->warehouse->address->address : null,
+                    'flat_number' => $order->warehouse->address->warehouse_number !== null ? $order->warehouse->address->warehouse_number : null,
+                    'city' => $order->warehouse->address->city !== null ? $order->warehouse->address->city : null,
+                    'email' => $order->warehouse->firm->email !== null ? $order->warehouse->firm->email : null,
+                    'phone' => $order->warehouse->property->phone !== null ? $order->warehouse->property->phone : null,
+                    'firmname' => $order->warehouse->firm->name !== null ? $order->warehouse->firm->name : null,
+                    'nip' => $order->warehouse->firm->nip !== null ? $order->warehouse->firm->nip : null,
+                    'postal_code' => $order->warehouse->address->postal_code !== null ? $order->warehouse->address->postal_code : null,
+                    'country' => 'Polska',
+                    'parcel_date' => $package->shipment_date !== null ? $package->shipment_date : null,
+                ],
+            ];
+            $data = array_merge($data, $pickupAddress);
+
+        }
+        $validator = $this->validatePackage($data);
+        if ($data['price_for_cash_on_delivery'] == '0.00') {
+            $data['cash_on_delivery'] = false;
+            unset($data['price_for_cash_on_delivery']);
+        }
+        if ($validator === true) {
+            dispatch_now(new OrdersCourierJobs($data));
+            $message = ['status' => 200, 'message' => null];
+        } else {
+            $message = ['status' => 200, 'message' => $validator->getData()];
+        }
+        return new JsonResponse($message, 200);
     }
 
-    protected function validatePackage($data){
+    protected function validatePackage($data)
+    {
         $validator = Validator::make($data, [
             'courier_name' => 'required|min:3|in:INPOST,APACZKA,DPD,POCZTEX,JAS,ALLEGRO-INPOST',
             'courier_type' => 'nullable',
@@ -691,42 +757,6 @@ class OrdersPackagesController extends Controller
             return response()->json($message);
         }
         return true;
-    }
-
-    private function saveOrderPackage($data, $id = null) {
-        if (is_null($id)) {
-            $orderPackage = new OrderPackage;
-        } else {
-            $orderPackage = OrderPackage::find($id);
-        }
-        $orderPackage->size_a = $data['size_a'];
-        $orderPackage->size_b = $data['size_b'];
-        $orderPackage->size_c = $data['size_c'];
-        $orderPackage->shipment_date = $data['shipment_date'];
-        $orderPackage->delivery_date = $data['delivery_date'];
-        $orderPackage->delivery_courier_name = $data['delivery_courier_name'];
-        $orderPackage->service_courier_name = $data['service_courier_name'];
-        $orderPackage->weight = $data['weight'];
-        $orderPackage->quantity = 1;
-        $orderPackage->container_type = $data['container_type'];
-        $orderPackage->notices = $data['notices'];
-        $orderPackage->shape = $data['shape'];
-        $orderPackage->sending_number = $data['sending_number'];
-        $orderPackage->letter_number = $data['letter_number'];
-        $orderPackage->cash_on_delivery = $data['cash_on_delivery'];
-        $orderPackage->status = $data['status'];
-        $orderPackage->cost_for_client = $data['cost_for_client'];
-        $orderPackage->cost_for_company = $data['cost_for_company'];
-        $orderPackage->real_cost_for_company = $data['real_cost_for_company'];
-        $orderPackage->content = $data['content'];
-        $orderPackage->packing_type = $data['packing_type'];
-        if (is_null($id)) {
-            $orderPackage->order_id = $data['order_id'];
-            $orderPackage->number = $data['number'];
-            $orderPackage->symbol = $data['symbol'];
-            $orderPackage->chosen_data_template = $data['chosen_data_template'];
-        }
-        $orderPackage->save();
     }
 
 }
