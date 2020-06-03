@@ -7,10 +7,10 @@ use App\Integrations\Jas\Jas;
 use App\Integrations\Pocztex\addShipment;
 use App\Integrations\Pocztex\adresType;
 use App\Integrations\Pocztex\clearEnvelope;
+use App\Integrations\Pocztex\ElektronicznyNadawca;
 use App\Integrations\Pocztex\sendEnvelope;
 use App\Mail\SendLPToTheWarehouseAfterOrderCourierMail;
 use App\Repositories\OrderPackageRepository;
-use Illuminate\Support\Facades\Log;
 use App\Integrations\DPD\DPDService;
 use App\Integrations\Apaczka\ApaczkaGuzzleClient;
 use App\Integrations\Apaczka\ApaczkaOrder;
@@ -103,7 +103,7 @@ class OrdersCourierJobs extends Job
                 $result = $this->createPackageForJas();
                 break;
             default:
-                Log::notice(
+                \Log::notice(
                     'Wrong courier',
                     ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
                 );
@@ -128,10 +128,14 @@ class OrdersCourierJobs extends Job
             }
 
             if ($path !== null) {
-                \Mailer::create()
-                    ->to($package->order->warehouse->firm->email)
-                    ->send(new SendLPToTheWarehouseAfterOrderCourierMail("List przewozowy przesyłki nr: " . $package->order->id . '/' . $package->number,
-                        $path, $package->order->id . '/' . $package->number));
+                try {
+                    \Mailer::create()
+                        ->to($package->order->warehouse->firm->email)
+                        ->send(new SendLPToTheWarehouseAfterOrderCourierMail("List przewozowy przesyłki nr: " . $package->order->id . '/' . $package->number,
+                            $path, $package->order->id . '/' . $package->number));
+                } catch (\Exception $e) {
+                    \Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);
+                }
             }
         }
     }
@@ -190,7 +194,7 @@ class OrdersCourierJobs extends Job
 
             if ($result->success == false) {
                 Session::put('message', $result);
-                Log::info(
+                \Log::info(
                     'Problem with send package in DPD',
                     [
                         'courier' => $this->courierName,
@@ -244,7 +248,7 @@ class OrdersCourierJobs extends Job
                 'letter_number' => $result->parcels[0]->Waybill
             ];
         } catch (Exception $exception) {
-            Log::info(
+            \Log::info(
                 'Problem in DPD integration',
                 ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
             );
@@ -268,7 +272,7 @@ class OrdersCourierJobs extends Job
             $this->callInpostForPackage($integration);
         } catch (Exception $exception) {
             Session::put('message', $exception->getMessage());
-            Log::info(
+            \Log::info(
                 'Problem in INPOST integration',
                 ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
             );
@@ -283,7 +287,7 @@ class OrdersCourierJobs extends Job
         $package = $integration->createSimplePackage($json);
         if ($package->status == '400') {
             Session::put('message', $package);
-            Log::info(
+            \Log::info(
                     'Problem in INPOST integration with validation', ['courier' => $package, 'class' => get_class($this), 'line' => __LINE__]
             );
             die();
@@ -357,7 +361,7 @@ class OrdersCourierJobs extends Job
                     $carrierID = ApaczkaGuzzleClient::POCZTEX_EXPRESS_24;
                     break;
                 default:
-                    Log::notice(
+                    \Log::notice(
                             'Wrong courier', ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
                     );
                     return ['status' => '500', 'error_code' => self::ERRORS['INVALID_FORWARDING_DELIVERY']];
@@ -409,7 +413,7 @@ class OrdersCourierJobs extends Job
             if ($result->status !== 400 && $result->response->order) {
                 $orderId = $result->response->order->id;
             } else {
-                Log::notice( $result->message, ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]);
+                \Log::notice( $result->message, ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]);
                 return ['status' => '500', 'error_code' => self::ERRORS['PROBLEM_IN_PLACE_ORDER']];
             }
             $waybilljson = $apaczka->getWaybillDocument($orderId)->getBody();
@@ -417,7 +421,7 @@ class OrdersCourierJobs extends Job
             if ($waybill->status == 200) {
                 Storage::disk('local')->put('public/apaczka/stickers/sticker' . $orderId . '.pdf', base64_decode($waybill->response->waybill));
             } else {
-                Log::notice(
+                \Log::notice(
                         $waybill->message, ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
                 );
                 return ['status' => '500', 'error_code' => self::ERRORS['PROBLEM_WITH_DOWNLOAD_WAYBILL']];
@@ -433,7 +437,7 @@ class OrdersCourierJobs extends Job
                 'letter_number' => $result->response->order->waybill_number
             ];
         } catch (Exception $exception) {
-            Log::info('Problem in Apaczka integration', ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]);
+            \Log::info('Problem in Apaczka integration', ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]);
             return ['status' => '500', 'error_code' => self::ERRORS['PROBLEM_WITH_APACZKA_INTEGRATION']];
         }
     }
@@ -445,7 +449,7 @@ class OrdersCourierJobs extends Job
     {
 
         $xml = '<tns:addShipment xmlns:tns="http://e-nadawca.poczta-polska.pl">';
-        $integration = new \App\Integrations\Pocztex\ElektronicznyNadawca();
+        $integration = new ElektronicznyNadawca();
         $integration->clearEnvelope(new clearEnvelope());
         $xml .= '<przesylki';
         $xml .= ' zawartosc = "' . $this->data['content'] . '"';
@@ -647,7 +651,7 @@ class OrdersCourierJobs extends Job
         $shipment->przesylki[] = new \SoapVar($dom->saveXML($dom->documentElement), XSD_ANYXML);
         $sendingNumber = $integration->addShipment($shipment);
 
-        $eSender = new \App\Integrations\Pocztex\ElektronicznyNadawca();
+        $eSender = new ElektronicznyNadawca();
         $send = new sendEnvelope();
         $idSend = $eSender->sendEnvelope($send);
         $param = new \App\Integrations\Pocztex\getAddresLabelCompact();
@@ -664,7 +668,7 @@ class OrdersCourierJobs extends Job
         } else {
             Session::put('message', $idSend);
             Session::put('message', $retval);
-            Log::info(
+            \Log::info(
                 'Problem in Pocztex integration',
                 ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
             );
