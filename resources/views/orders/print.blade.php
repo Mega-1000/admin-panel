@@ -84,9 +84,9 @@
                                 <br/>Ilość: {{ $item->pivot->quantity }} {{ $item->packing->calciation_unit }}<br/></td>
                             @if($showPosition)
                                 <td>
-                                    ILOSC NA STANIE: {{ $item->stock->quantity }} <br/>
+                                    ILOŚĆ NA STANIE: {{ $item->stock->quantity }} <br/>
                                     @if(count($item->getPositions()))
-                                        LOKACJA PRODUKTOW: <br/>
+                                        LOKACJA PRODUKTÓW: <br/>
                                         @foreach($item->getPositions() as $position)
                                             Alejka: {{ $position->lane }} <br/>
                                             Regał: {{ $position->bookstand }} </br>

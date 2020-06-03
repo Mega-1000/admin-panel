@@ -351,7 +351,16 @@ class OrdersPackagesController extends Controller
     public function generateSticker($data)
     {
         $order = $this->orderRepository->find($data['order_id']);
-        $data['letter_number'] = $data['order_id'] . rand(1000000, 9999999);
+        if (!file_exists(storage_path('app/public/' . strtolower($data['delivery_courier_name']) . '/stickers/'))) {
+            mkdir(storage_path('app/public/' . strtolower($data['delivery_courier_name'])));
+            mkdir(storage_path('app/public/' . strtolower($data['delivery_courier_name']) . '/stickers/'));
+        }
+
+        do {
+            $data['letter_number'] = $data['order_id'] . rand(1000000, 9999999);
+            $path = storage_path('app/public/' . strtolower($data['delivery_courier_name']) . '/stickers/sticker' . $data['letter_number'] . '.pdf');
+        } while (file_exists($path));
+
         $data['sending_number'] = $data['order_id'] . rand(1000000, 9999999);
         $data['shipment_date'] = $data['shipment_date']->format('Y-m-d');
         $data['delivery_date'] = $data['delivery_date']->format('Y-m-d');
@@ -360,11 +369,6 @@ class OrdersPackagesController extends Controller
             'package' => $data
         ])->setPaper('a5');
 
-        if (!file_exists(storage_path('app/public/' . strtolower($data['delivery_courier_name']) . '/stickers/'))) {
-            mkdir(storage_path('app/public/' . strtolower($data['delivery_courier_name'])));
-            mkdir(storage_path('app/public/' . strtolower($data['delivery_courier_name']) . '/stickers/'));
-        }
-        $path = storage_path('app/public/' . strtolower($data['delivery_courier_name']) . '/stickers/sticker' . $data['letter_number'] . '.pdf');
         $pdf->save($path);
 
         return $data;
@@ -626,7 +630,7 @@ class OrdersPackagesController extends Controller
             abort(404);
         }
         $deliveryAddress = $order->addresses->where('type', '=', 'DELIVERY_ADDRESS');
-        $deliveryAddress = $deliveryAddress->first->id;
+        $deliveryAddress = $deliveryAddress->first()->id;
         if (empty($deliveryAddress)) {
             abort(404);
         }
@@ -645,10 +649,10 @@ class OrdersPackagesController extends Controller
             'width' => $package->size_b,
             'height' => $package->size_c,
             'notices' => $package->notices !== null ? $package->notices : 'Brak',
-            'cash_on_delivery' => $package->cash_on_delivery !== null ? true : false,
+            'cash_on_delivery' => $package->cash_on_delivery !== null,
             'number_account_for_cash_on_delivery' => $package->cash_on_delivery !== null ? env('ACCOUNT_NUMBER') : null,
             'bank_name' => $package->cash_on_delivery !== null ? env('BANK_NAME') : null,
-            'price_for_cash_on_delivery' => $package->cash_on_delivery !== null ? $package->cash_on_delivery === 0 ? null : $package->cash_on_delivery : null,
+            'price_for_cash_on_delivery' => ($package->cash_on_delivery !== null) ? ($package->cash_on_delivery === 0 ? null : $package->cash_on_delivery) : null,
             'amount' => 1000,
             'content' => $package->content,
             'additional_data' => [
@@ -680,16 +684,16 @@ class OrdersPackagesController extends Controller
         if ($order->warehouse_id !== null) {
             $pickupAddress = [
                 'pickup_address' => [
-                    'firstname' => $order->warehouse->property->firstname !== null ? $order->warehouse->property->firstname : null,
-                    'lastname' => $order->warehouse->property->lastname !== null ? $order->warehouse->property->lastname : null,
-                    'address' => $order->warehouse->address->address !== null ? $order->warehouse->address->address : null,
-                    'flat_number' => $order->warehouse->address->warehouse_number !== null ? $order->warehouse->address->warehouse_number : null,
-                    'city' => $order->warehouse->address->city !== null ? $order->warehouse->address->city : null,
-                    'email' => $order->warehouse->firm->email !== null ? $order->warehouse->firm->email : null,
-                    'phone' => $order->warehouse->property->phone !== null ? $order->warehouse->property->phone : null,
-                    'firmname' => $order->warehouse->firm->name !== null ? $order->warehouse->firm->name : null,
-                    'nip' => $order->warehouse->firm->nip !== null ? $order->warehouse->firm->nip : null,
-                    'postal_code' => $order->warehouse->address->postal_code !== null ? $order->warehouse->address->postal_code : null,
+                    'firstname' => $order->warehouse->property->firstname,
+                    'lastname' => $order->warehouse->property->lastname,
+                    'address' => $order->warehouse->address->address,
+                    'flat_number' => $order->warehouse->address->warehouse_number,
+                    'city' => $order->warehouse->address->city,
+                    'email' => $order->warehouse->firm->email,
+                    'phone' => $order->warehouse->property->phone,
+                    'firmname' => $order->warehouse->firm->name,
+                    'nip' => $order->warehouse->firm->nip,
+                    'postal_code' => $order->warehouse->address->postal_code,
                     'country' => 'Polska',
                     'parcel_date' => $package->shipment_date !== null ? $package->shipment_date : null,
                 ],
