@@ -33,10 +33,9 @@ class GetCustomerForNewOrder implements iGetUser
         }
 
         if ($updatePass) {
-            $pass = $customer->generatePassword($pass);
-            $customer->password = Hash::make($pass);
+            $customer->password = $customer->generatePassword($pass);
         }
-        
+
         $customer->save();
         return $customer;
     }
