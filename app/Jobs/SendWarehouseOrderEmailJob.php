@@ -7,6 +7,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 
@@ -60,8 +61,8 @@ class SendWarehouseOrderEmailJob extends Job
 
 
         $subject = "Zamówienie Produktów. Zlecenie nr: ". $this->warehouseOrderId;
-        \Mailer::create()
-            ->to($this->email)
-            ->send(new WarehouseOrder($subject, $this->message));
+            \Mailer::create()
+                ->to($this->email)
+                ->send(new WarehouseOrder($subject, $this->message));
     }
 }

@@ -11,6 +11,7 @@ use App\Repositories\OrderRepository;
 use App\Repositories\TagRepository;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Mail\OrderStatusChanged;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -87,9 +88,13 @@ class OrderStatusChangedNotificationJob extends Job
             $pdf = PDF::loadView('pdf.proform', compact('date', 'proformDate', 'order'))->output();
             Storage::disk('local')->put('public/proforma/' . $order->proforma_filename, $pdf);
 
-            \Mailer::create()
-                ->to($order->customer->login)
-                ->send(new OrderStatusChanged($subject, $message, $pdf));
+            try {
+                \Mailer::create()
+                    ->to($order->customer->login)
+                    ->send(new OrderStatusChanged($subject, $message, $pdf));
+            } catch (\Exception $e) {
+                Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);
+            }
         }
     }
 }

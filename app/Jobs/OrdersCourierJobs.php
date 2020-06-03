@@ -128,10 +128,14 @@ class OrdersCourierJobs extends Job
             }
 
             if ($path !== null) {
-                \Mailer::create()
-                    ->to($package->order->warehouse->firm->email)
-                    ->send(new SendLPToTheWarehouseAfterOrderCourierMail("List przewozowy przesyłki nr: " . $package->order->id . '/' . $package->number,
-                        $path, $package->order->id . '/' . $package->number));
+                try {
+                    \Mailer::create()
+                        ->to($package->order->warehouse->firm->email)
+                        ->send(new SendLPToTheWarehouseAfterOrderCourierMail("List przewozowy przesyłki nr: " . $package->order->id . '/' . $package->number,
+                            $path, $package->order->id . '/' . $package->number));
+                } catch (\Exception $e) {
+                    Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);
+                }
             }
         }
     }

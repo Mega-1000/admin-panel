@@ -71,9 +71,9 @@ class CheckPriceChangesInProductsJob
                     'Warehouse not found',
                     ['supplier' => $supplier, 'class' => get_class($this), 'line' => __LINE__]
                 );
-                \Mailer::create()
-                    ->to('info@' . env('DOMAIN_NAME'))
-                    ->send(new SendToMega1000WarehouseNotFoundMail("Brak danych magazynu " . $supplier, $supplier));
+                    \Mailer::create()
+                        ->to('info@' . env('DOMAIN_NAME'))
+                        ->send(new SendToMega1000WarehouseNotFoundMail("Brak danych magazynu " . $supplier, $supplier));
             }
         }
     }
