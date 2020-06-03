@@ -3,15 +3,13 @@
 namespace App\Jobs;
 
 use App\Entities\Order;
-use App\Repositories\StatusRepository;
-use Barryvdh\DomPDF\Facade as PDF;
-use Carbon\Carbon;
-
-use App\Repositories\OrderRepository;
-use App\Repositories\TagRepository;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Mail\OrderStatusChanged;
-use Illuminate\Support\Facades\Log;
+use App\Repositories\OrderRepository;
+use App\Repositories\StatusRepository;
+use App\Repositories\TagRepository;
+use Barryvdh\DomPDF\Facade as PDF;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -93,7 +91,7 @@ class OrderStatusChangedNotificationJob extends Job
                     ->to($order->customer->login)
                     ->send(new OrderStatusChanged($subject, $message, $pdf));
             } catch (\Exception $e) {
-                Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);
+                \Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);
             }
         }
     }

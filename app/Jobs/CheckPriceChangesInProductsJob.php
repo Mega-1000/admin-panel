@@ -4,20 +4,18 @@ namespace App\Jobs;
 
 use App\Mail\SendTableWithProductPriceChangeMail;
 use App\Mail\SendToMega1000WarehouseNotFoundMail;
-use App\Repositories\WarehouseRepository;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 
 class CheckPriceChangesInProductsJob
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $date;
-
     const ROLE_CHANGE_PRICE = 'ZC';
+    protected $date;
 
     /**
      * Create a new job instance.
@@ -58,8 +56,7 @@ class CheckPriceChangesInProductsJob
                 }])
                 ->with('property')
                 ->with('firm')
-                ->first()
-            ;
+                ->first();
             if ($warehouse) {
                 $email = $this->getEmail($warehouse);
                 if ($email) {
@@ -71,24 +68,11 @@ class CheckPriceChangesInProductsJob
                     'Warehouse not found',
                     ['supplier' => $supplier, 'class' => get_class($this), 'line' => __LINE__]
                 );
-                    \Mailer::create()
-                        ->to('info@' . env('DOMAIN_NAME'))
-                        ->send(new SendToMega1000WarehouseNotFoundMail("Brak danych magazynu " . $supplier, $supplier));
+                \Mailer::create()
+                    ->to('info@' . env('DOMAIN_NAME'))
+                    ->send(new SendToMega1000WarehouseNotFoundMail("Brak danych magazynu " . $supplier, $supplier));
             }
         }
-    }
-
-    private function sendEmail($warehouse, $email)
-    {
-        $sendFormWithProducts = env('FRONT_NUXT_URL') . "/magazyn/aktualizacja-cen/{$warehouse->id}/zaktualizuj";
-        \Mailer::create()
-            ->to($email)
-            ->send(
-                new SendTableWithProductPriceChangeMail("Prośba o aktualizację cen produktów " . $warehouse->symbol,
-                $sendFormWithProducts,
-                $warehouse->symbol
-            )
-        );
     }
 
     private function getEmail($warehouse)
@@ -101,5 +85,18 @@ class CheckPriceChangesInProductsJob
             }
         }
         return $warehouse->property->email ?: $warehouse->firm->email;
+    }
+
+    private function sendEmail($warehouse, $email)
+    {
+        $sendFormWithProducts = env('FRONT_NUXT_URL') . "/magazyn/aktualizacja-cen/{$warehouse->id}/zaktualizuj";
+        \Mailer::create()
+            ->to($email)
+            ->send(
+                new SendTableWithProductPriceChangeMail("Prośba o aktualizację cen produktów " . $warehouse->symbol,
+                    $sendFormWithProducts,
+                    $warehouse->symbol
+                )
+            );
     }
 }
