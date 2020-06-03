@@ -4,6 +4,7 @@ namespace App\Entities;
 
 use Exception;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 use Laravel\Passport\HasApiTokens;
@@ -80,7 +81,7 @@ class Customer extends Authenticatable implements Transformable
         if (strlen($pass) < 9) {
             throw new Exception('wrong_phone');
         }
-        return $pass;
+        return Hash::make($pass);
     }
 
     public function chats()
