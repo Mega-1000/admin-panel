@@ -253,4 +253,10 @@ class Product extends Model implements Transformable
     {
         return $this->producent_override ?? $this->product_name_supplier;
     }
+
+    public function getPositions()
+    {
+        error_log(print_r($this->id, 1));
+        return $this->stock->position;
+    }
 }

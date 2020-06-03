@@ -1849,10 +1849,12 @@ class OrdersController extends Controller
         $tagHelper->setOrder($order);
         $order->print_order = true;
         $order->update();
+        $showPosition = is_a(Auth::user(), User::class);
 
         return View::make('orders.print', [
             'order' => $order,
             'tagHelper' => $tagHelper,
+            'showPosition' => $showPosition
         ]);
     }
 
