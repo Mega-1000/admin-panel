@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Entities\Label;
 use App\Entities\Order;
 use App\Mail\OrderStatusChangedToDispatchMail;
 use App\Repositories\OrderRepository;
@@ -81,7 +82,7 @@ class OrderStatusChangedToDispatchNotificationJob extends Job
 
         $notification = $orderWarehouseNotificationRepository->findWhere($dataArray)->first();
 
-        if($order->isOrderHasLabel(53)) {
+        if($order->isOrderHasLabel(Label::NOTIFICATION_LABEL)) {
             $orderWarehouseNotificationRepository->update([
                 'order_id' => $this->orderId,
                 'warehouse_id' => $order->warehouse_id,
