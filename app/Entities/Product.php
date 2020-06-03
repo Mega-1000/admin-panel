@@ -256,7 +256,6 @@ class Product extends Model implements Transformable
 
     public function getPositions()
     {
-        error_log(print_r($this->id, 1));
         return $this->stock->position;
     }
 }
