@@ -8,6 +8,7 @@ use App\Entities\Order;
 use App\Entities\OrderInvoice;
 use App\Entities\OrderItem;
 use App\Entities\OrderPayment;
+use App\Entities\PackageTemplate;
 use App\Entities\Warehouse;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
@@ -325,10 +326,13 @@ class OrdersController extends Controller
             $visibilities[$key]->show = json_decode($row->show, true);
             $visibilities[$key]->hidden = json_decode($row->hidden, true);
         }
+        $templateData = PackageTemplate::all();
+
         return view('orders.index', compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses'))
             ->withOuts($out)
             ->withLabIds($labIds)
-            ->withLabels($labels);
+            ->withLabels($labels)
+            ->withTemplateData($templateData);
     }
 
     /**

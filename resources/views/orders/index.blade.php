@@ -330,6 +330,33 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" tabindex="-1" id="createSimilarPackage" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Wybierz szablon paczki</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="createSimilarPackForm" method="POST">
+                        @csrf
+                        <select required name="templateList" class="form-control text-uppercase" id='templates' form="createSimilarPackForm">
+                            <option value="" selected="selected"></option>
+                            @foreach($templateData as $template)
+                                <option value="{{ $template->id }}">{{ $template->name }}</option>
+                            @endforeach
+                        </select>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" form="createSimilarPackForm" class="btn btn-success pull-right">Utwórz</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" tabindex="-1" id="moveTask" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -762,6 +789,13 @@
 
         $.fn.dataTable.ext.errMode = 'throw';
 
+        function createSimilar(id, orderId) {
+            let action ="{{ route('order_packages.duplicate',['packageId' => '%id']) }}"
+            action = action.replace('%id', id)
+            $('#createSimilarPackForm').attr('action', action)
+            $('#createSimilarPackage').modal()
+        }
+
         function cancelPackage(id, orderId) {
             if (confirm('Potwierdź anulację paczki')) {
                 url = '{{route('order_packages.sendRequestForCancelled', ['id' => '%id'])}}';
@@ -1002,6 +1036,7 @@
                                         html += '<div style="display: flex;">'
                                         html += '<button class="btn btn-success" id="package-' + value.id + '" onclick="sendPackage(' + value.id + ',' + value.order_id + ')">Wyślij</button>';
                                         html += '<button class="btn btn-danger" onclick="deletePackage(' + value.id + ', ' + value.order_id + ')">Usuń</button>'
+                                        html += '<button class="btn btn-info" onclick="createSimilar(' + value.id + ', ' + value.order_id + ')">Podobna</button>'
                                         html += '</div>'
                                     }
                                 } else {
@@ -1020,8 +1055,12 @@
                                     } else if (value.delivery_courier_name === 'ODBIOR_OSOBISTY') {
                                         html += '<a target="_blank" href="/storage/odbior_osobisty/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                     }
+                                    html += '<div style="display: flex;">'
                                     html += '<button class="btn btn-danger" onclick="cancelPackage(' + value.id + ', ' + value.order_id + ')">Anuluj</button>'
+                                    html += '<button class="btn btn-info" onclick="createSimilar(' + value.id + ', ' + value.order_id + ')">Podobna</button>'
+                                    html += '</div>'
                                 }
+
                                 html += '</div>';
                             }
                         });
