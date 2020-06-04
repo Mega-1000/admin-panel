@@ -7,6 +7,7 @@ use App\Entities\ContentType;
 use App\Entities\Order;
 use App\Entities\OrderOtherPackage;
 use App\Entities\OrderPackage;
+use App\Entities\PackageTemplate;
 use App\Entities\PackingType;
 use App\Entities\SelAddress;
 use App\Entities\SelTransaction;
@@ -76,6 +77,9 @@ class OrdersPackagesController extends Controller
      */
     public function create(Request $request, $id, $multi = null)
     {
+        if ($request['package_id']) {
+            $cod = OrderPackage::find($request['package_id'])->cash_on_delivery;
+        }
         $contentTypes = ContentType::all();
         $packingTypes = PackingType::all();
         $containerTypes = ContainerType::all();
@@ -132,10 +136,11 @@ class OrdersPackagesController extends Controller
 
         }
 
+        error_log($cod);
         $orderData = [
             'shipment_date' => $shipmentDate,
             'delivery_date' => $this->orderPackagesDataHelper->calculateDeliveryDate($shipmentDate),
-            'cash_on_delivery_amount' => $order->cash_on_delivery_amount,
+            'cash_on_delivery_amount' => $cod ?? $order->cash_on_delivery_amount,
             'customer_notices' => $order->customer_notices,
             'shipment_price_for_client' => $order->shipment_price_for_client,
             'shipment_price_for_us' => $order->shipment_price_for_us,
@@ -254,6 +259,7 @@ class OrdersPackagesController extends Controller
             $orderPackage->chosen_data_template = $data['chosen_data_template'];
         }
         $orderPackage->save();
+        return $orderPackage;
     }
 
     public function store(OrderPackageCreateRequest $request)
@@ -285,7 +291,7 @@ class OrdersPackagesController extends Controller
         $data['notices'] = $data['order_id'] . '/' . $data['number'] . ' ' . $notices;
         if ($data['delivery_courier_name'] === 'GIELDA' || $data['delivery_courier_name'] === 'ODBIOR_OSOBISTY') {
             $data = $this->generateSticker($data);
-            $data['status'] = 'WAITING_FOR_SENDING';
+            $data['status'] = PackageTemplate::WAITING_FOR_SENDING;
         }
 
         $order = $this->orderRepository->find($order_id);
@@ -763,4 +769,66 @@ class OrdersPackagesController extends Controller
         return true;
     }
 
+    public function duplicate(Request $request, $packageId)
+    {
+        try {
+            $template = PackageTemplate::findOrFail($request->templateList);
+            $package = OrderPackage::findOrFail($packageId);
+        } catch (\Exception $e) {
+            return redirect()->back()->with([
+                'message' => __('order_packages.message.package_error'),
+                'alert-type' => 'error'
+            ]);
+        }
+
+        $data = $template->attributesToArray();
+        $data['size_a'] = $template->sizeA;
+        $data['size_b'] = $template->sizeB;
+        $data['size_c'] = $template->sizeC;
+        $data['order_id'] = $package->order_id;
+        $data['shipment_date'] = $package->shipment_date;
+        $data['sending_number'] = null;
+        $data['letter_number'] = null;
+        $data['delivery_date'] = $package->delivery_date;
+        $data['quantity'] = 1;
+        $data['chosen_data_template'] = $template->id;
+        $data['notices'] = $package->notices;
+        $data['cash_on_delivery'] = $package->cash_on_delivery;
+        $data['status'] = PackageTemplate::STATUS_NEW;
+        $data['cost_for_client'] = $package->cost_for_client;
+        $data['cost_for_company'] = $package->cost_for_company;
+        $data['real_cost_for_company'] = $package->real_cost_for_company;
+        $data['content'] = $package->content;
+        $data['packing_type'] = $package->packing_type;
+        $packageNumber = OrderPackage::where('order_id', $package->order_id)->max('number');
+        $data['number'] = $packageNumber + 1;
+        $newPackage = $this->saveOrderPackage($data);
+
+        $toCancel = [
+            PackageTemplate::WAITING_FOR_SENDING,
+            PackageTemplate::SENDING
+        ];
+
+        $prods = $package->packedProducts;
+        $products = $prods->reduce(function ($prev, $next) {
+            $prev[$next->pivot->product_id] = ['quantity' => $next->pivot->quantity];
+            return $prev;
+        }, []);
+
+        $newPackage->packedProducts()->sync($products);
+        $package->packedProducts()->sync([]);
+        $newPackage->save();
+
+        if (in_array($package->status, $toCancel)) {
+            dispatch_now(new SendRequestForCancelledPackageJob($packageId));
+            $package->status = PackageTemplate::WAITING_FOR_CANCELLED;
+            $package->save();
+        } else if ($package->status == PackageTemplate::STATUS_NEW) {
+            $package->delete();
+        }
+        return redirect()->back()->with([
+            'message' => __('order_packages.message.store'),
+            'alert-type' => 'success'
+        ]);
+    }
 }
