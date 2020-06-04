@@ -136,7 +136,6 @@ class OrdersPackagesController extends Controller
 
         }
 
-        error_log($cod);
         $orderData = [
             'shipment_date' => $shipmentDate,
             'delivery_date' => $this->orderPackagesDataHelper->calculateDeliveryDate($shipmentDate),

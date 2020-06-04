@@ -790,28 +790,10 @@
         $.fn.dataTable.ext.errMode = 'throw';
 
         function createSimilar(id, orderId) {
-            {{--let url = '{{route('order_packages.create', ['order_id' => '%id'])}}';--}}
-            {{--let query = '{{http_build_query(['package_id' => '%pack'])}}';--}}
-            // url = url.replace('%id', orderId)
-            // window.location.href = url + '?package_id=' + id
             let action ="{{ route('order_packages.duplicate',['packageId' => '%id']) }}"
             action = action.replace('%id', id)
             $('#createSimilarPackForm').attr('action', action)
             $('#createSimilarPackage').modal()
-
-
-
-            {{--if (confirm('Potwierdź anulację paczki')) {--}}
-            {{--    url = '{{route('order_packages.sendRequestForCancelled', ['id' => '%id'])}}';--}}
-            {{--    $.ajax({--}}
-            {{--        url: url.replace('%id', id),--}}
-            {{--    }).done(function (data) {--}}
-            {{--        urlRefresh = '{{route('orders.index', ['order_id' => 'replace'])}}'--}}
-            {{--        window.location.href = urlRefresh.replace('replace', orderId)--}}
-            {{--    }).fail(function () {--}}
-            {{--        alert('Coś poszło nie tak')--}}
-            {{--    });--}}
-            {{--}--}}
         }
 
         function cancelPackage(id, orderId) {
