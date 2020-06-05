@@ -342,7 +342,8 @@
                 <div class="modal-body">
                     <form id="createSimilarPackForm" method="POST">
                         @csrf
-                        <select required name="templateList" class="form-control text-uppercase" id='templates' form="createSimilarPackForm">
+                        <select required name="templateList" class="form-control text-uppercase" id='templates'
+                                form="createSimilarPackForm">
                             <option value="" selected="selected"></option>
                             @foreach($templateData as $template)
                                 <option value="{{ $template->id }}">{{ $template->name }}</option>
@@ -352,7 +353,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
-                    <button type="submit" form="createSimilarPackForm" class="btn btn-success pull-right">Utwórz</button>
+                    <button type="submit" form="createSimilarPackForm" class="btn btn-success pull-right">Utwórz
+                    </button>
                 </div>
             </div>
         </div>
@@ -502,6 +504,15 @@
     <div class="form-group">
         <label for="send_courier">Import z SELLO: </label>
         <a name="send_courier" class="btn btn-success" href="/admin/sello-import/">Importuj</a>
+    </div>
+    <div class="form-group">
+        <label for="send_courier">Drukuj naklejki: </label>
+        @foreach($couriers as $courier)
+            <a name="send_courier" class="btn btn-success"
+               href="{{route('order_packages.letters',['courier_name'=>$courier->delivery_courier_name])}}">
+                {{$courier->delivery_courier_name}}</a>
+        @endforeach
+
     </div>
     <div style="display: flex; align-items: center;" id="add-label-container">
         <button onclick="addLabel()" type="button" class="btn btn-primary">@lang('orders.table.save_label')</button>
@@ -790,7 +801,7 @@
         $.fn.dataTable.ext.errMode = 'throw';
 
         function createSimilar(id, orderId) {
-            let action ="{{ route('order_packages.duplicate',['packageId' => '%id']) }}"
+            let action = "{{ route('order_packages.duplicate',['packageId' => '%id']) }}"
             action = action.replace('%id', id)
             $('#createSimilarPackForm').attr('action', action)
             $('#createSimilarPackage').modal()
