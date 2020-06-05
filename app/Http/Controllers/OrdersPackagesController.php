@@ -23,8 +23,10 @@ use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderRepository;
 use Barryvdh\DomPDF\Facade as PDF;
 use Carbon\Carbon;
+use iio\libmergepdf\Merger;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
@@ -562,6 +564,38 @@ class OrdersPackagesController extends Controller
             ->to($email)
             ->send(new SendDailyProtocolToDeliveryFirmMail("Protokół odbioru z dnia: " . Carbon::today()->toDateString(),
                 $path));
+    }
+
+    public function letters($courier_name)
+    {
+        if (empty($courier_name)) {
+            return redirect()->back()->with([
+                'message' => __('order_packages.message.courier_error'),
+                'alert-type' => 'error'
+            ]);
+        }
+        $packages = OrderPackage::where('delivery_courier_name', 'like', $courier_name)
+            ->whereNotNull('letter_number')
+            ->whereNotIn('status', [PackageTemplate::WAITING_FOR_CANCELLED, PackageTemplate::SENDING, PackageTemplate::DELIVERED])
+            ->get();
+        if ($packages->count() == 0) {
+            return redirect()->back()->with([
+                'message' => __('order_packages.message.courier_error'),
+                'alert-type' => 'error'
+            ]);
+        }
+        $merger = new Merger;
+        $packages->map(function ($pack) use ($merger) {
+            $file = $pack->getPathToSticker();
+            if (File::exists(public_path($file))) {
+                $merger->addFile(public_path($file));
+            }
+        });
+
+        return response($merger->merge())->withHeaders([
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => "filename=listy-$courier_name.pdf"
+        ]);
     }
 
     public function prepareGroupPackageToSend($courierName)
