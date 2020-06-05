@@ -35,7 +35,7 @@ class ChangeShipmentDatePackagesJob
      */
     public function handle()
     {
-        $orders = Order::where('shipment_date', '<', Carbon::today())->get();
+        $orders = Order::whereDate('shipment_date', '<', Carbon::today())->get();
         foreach ($orders as $order) {
             $date = new Carbon($order->shipment_date);
             if ($order->hasLabel(66)) {
