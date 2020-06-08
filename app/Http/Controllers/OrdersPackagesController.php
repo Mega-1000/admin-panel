@@ -576,7 +576,11 @@ class OrdersPackagesController extends Controller
         }
         $packages = OrderPackage::where('delivery_courier_name', 'like', $courier_name)
             ->whereNotNull('letter_number')
-            ->whereNotIn('status', [PackageTemplate::WAITING_FOR_CANCELLED, PackageTemplate::SENDING, PackageTemplate::DELIVERED])
+            ->whereNotIn('status', [
+                PackageTemplate::WAITING_FOR_CANCELLED,
+                PackageTemplate::SENDING,
+                PackageTemplate::DELIVERED,
+                PackageTemplate::CANCELLED])
             ->get();
         if ($packages->count() == 0) {
             return redirect()->back()->with([

@@ -12,4 +12,5 @@ class PackageTemplate extends Model
     public const SENDING = 'SENDING';
     public const WAITING_FOR_SENDING = 'WAITING_FOR_SENDING';
     const DELIVERED = 'DELIVERED';
+    const CANCELLED = 'CANCELLED';
 }
