@@ -82,7 +82,7 @@ class OrderStatusChangedToDispatchNotificationJob extends Job
 
         $notification = $orderWarehouseNotificationRepository->findWhere($dataArray)->first();
 
-        if($order->isOrderHasLabel(Label::NOTIFICATION_LABEL)) {
+        if(!$order->isOrderHasLabel(Label::PACKAGE_NOTIFICATION_SENT_LABEL) || $order->isOrderHasLabel(Label::PACKAGE_NOTIFICATION_LABEL)) {
             $orderWarehouseNotificationRepository->update([
                 'order_id' => $this->orderId,
                 'warehouse_id' => $order->warehouse_id,
