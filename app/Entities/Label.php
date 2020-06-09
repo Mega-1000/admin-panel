@@ -26,7 +26,7 @@ class Label extends Model implements Transformable
 
 
     const ORDER_ITEMS_REDEEMED_LABEL = 66;
-    const NOTIFICATION_LABEL = 53;
+    const PACKAGE_NOTIFICATION_LABEL = 53;
 
     /**
      * The attributes that are mass assignable.
