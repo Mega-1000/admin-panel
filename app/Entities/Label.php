@@ -26,8 +26,9 @@ class Label extends Model implements Transformable
 
 
     const ORDER_ITEMS_REDEEMED_LABEL = 66;
-    public $customColumnsVisibilities = [
+    const PACKAGE_NOTIFICATION_LABEL = 53;
 
+    public $customColumnsVisibilities = [
         'name',
         'group',
         'color',
