@@ -2,7 +2,6 @@
 
 namespace App\Entities;
 
-use Exception;
 use Illuminate\Notifications\Notifiable;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
@@ -78,9 +77,9 @@ class Customer extends Authenticatable implements Transformable
     {
         $pass = preg_replace('/[^0-9]/', '', $pass);
         if (strlen($pass) < 9) {
-            throw new Exception('wrong_phone');
+            throw new \Exception('wrong_phone');
         }
-        return $pass;
+        return \Hash::make($pass);
     }
 
     public function chats()

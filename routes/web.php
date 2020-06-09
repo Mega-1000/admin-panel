@@ -312,6 +312,7 @@ Route::group(['prefix' => 'admin'], function () {
             'OrdersPackagesController@datatable')->name('order_packages.datatable');
         Route::get('orderPackages/create/{id}/{multi?}', 'OrdersPackagesController@create')->name('order_packages.create');
         Route::post('orderPackages/store', 'OrdersPackagesController@store')->name('order_packages.store');
+        Route::post('orderPackages/duplicate/{packageId}', 'OrdersPackagesController@duplicate')->name('order_packages.duplicate');
         Route::get('orderPackages/{id}/edit', 'OrdersPackagesController@edit')->name('order_packages.edit');
         Route::put('orderPackages/{id}/update', [
             'uses' => 'OrdersPackagesController@update',
@@ -323,6 +324,8 @@ Route::group(['prefix' => 'admin'], function () {
             'OrdersPackagesController@sendRequestForCancelled')->name('order_packages.sendRequestForCancelled');
         Route::get('orderPackages/{courier_name}/protocols',
             'OrdersPackagesController@getProtocols')->name('order_packages.getProtocols');
+        Route::get('orderPackages/{courier_name}/letters',
+            'OrdersPackagesController@letters')->name('order_packages.letters');
         Route::get('orderPackages/{package_id}/send',
             'OrdersPackagesController@prepareGroupPackageToSend')->name('orders.package.prepareToSend');
         Route::post('orderPackages/changeValue', 'OrdersPackagesController@changeValue')->name('order_packages.changeValue');

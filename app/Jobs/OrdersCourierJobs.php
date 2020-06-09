@@ -2,27 +2,21 @@
 
 namespace App\Jobs;
 
+use App\Integrations\Apaczka\ApaczkaGuzzleClient;
+use App\Integrations\Apaczka\ApaczkaOrder;
+use App\Integrations\DPD\DPDService;
 use App\Integrations\Inpost\Inpost;
 use App\Integrations\Jas\Jas;
 use App\Integrations\Pocztex\addShipment;
 use App\Integrations\Pocztex\adresType;
 use App\Integrations\Pocztex\clearEnvelope;
-use App\Integrations\Pocztex\paletaType;
-use App\Integrations\Pocztex\platnikType;
-use App\Integrations\Pocztex\pobranieType;
-use App\Integrations\Pocztex\przesylkaPaletowaType;
-use App\Integrations\Pocztex\rodzajPaletyType;
+use App\Integrations\Pocztex\ElektronicznyNadawca;
 use App\Integrations\Pocztex\sendEnvelope;
-use App\Integrations\Pocztex\sposobPobraniaType;
 use App\Mail\SendLPToTheWarehouseAfterOrderCourierMail;
 use App\Repositories\OrderPackageRepository;
-use Illuminate\Support\Facades\Log;
-use App\Integrations\DPD\DPDService;
-use App\Integrations\Apaczka\ApaczkaGuzzleClient;
-use App\Integrations\Apaczka\ApaczkaOrder;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
 use Mockery\Exception;
 
 /**
@@ -78,6 +72,42 @@ class OrdersCourierJobs extends Job
         $this->courierName = $this->data['courier_name'];
     }
 
+    public static function generateValidXmlFromObj($obj, $node_block = 'nodes', $node_name = 'node')
+    {
+        $arr = get_object_vars($obj);
+        return self::generateValidXmlFromArray($arr, $node_block, $node_name);
+    }
+
+    public static function generateValidXmlFromArray($array, $node_block = 'nodes', $node_name = 'node')
+    {
+        $xml = '<?xml version="1.0" encoding="UTF-8" ?>';
+
+        $xml .= '<' . $node_block . '>';
+        $xml .= self::generateXmlFromArray($array, $node_name);
+        $xml .= '</' . $node_block . '>';
+
+        return $xml;
+    }
+
+    private static function generateXmlFromArray($array, $node_name)
+    {
+        $xml = '';
+
+        if (is_array($array) || is_object($array)) {
+            foreach ($array as $key => $value) {
+                if (is_numeric($key)) {
+                    $key = $node_name;
+                }
+
+                $xml .= '<' . $key . '>' . self::generateXmlFromArray($value, $node_name) . '</' . $key . '>';
+            }
+        } else {
+            $xml = htmlspecialchars($array, ENT_QUOTES);
+        }
+
+        return $xml;
+    }
+
     /**
      * Execute the job.
      *
@@ -109,7 +139,7 @@ class OrdersCourierJobs extends Job
                 $result = $this->createPackageForJas();
                 break;
             default:
-                Log::notice(
+                \Log::notice(
                     'Wrong courier',
                     ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
                 );
@@ -134,10 +164,14 @@ class OrdersCourierJobs extends Job
             }
 
             if ($path !== null) {
-                \Mailer::create()
-                    ->to($package->order->warehouse->firm->email)
-                    ->send(new SendLPToTheWarehouseAfterOrderCourierMail("List przewozowy przesyłki nr: " . $package->order->id . '/' . $package->number,
-                        $path, $package->order->id . '/' . $package->number));
+                try {
+                    \Mailer::create()
+                        ->to($package->order->warehouse->firm->email)
+                        ->send(new SendLPToTheWarehouseAfterOrderCourierMail("List przewozowy przesyłki nr: " . $package->order->id . '/' . $package->number,
+                            $path, $package->order->id . '/' . $package->number));
+                } catch (\Exception $e) {
+                    \Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);
+                }
             }
         }
     }
@@ -192,11 +226,11 @@ class OrdersCourierJobs extends Job
                 'phone' => $this->data['delivery_address']['phone']
             ];
 
-            $result = $dpd->sendPackage($parcels, $receiver, 'SENDER');
+            $result = $dpd->sendPackage($parcels, $receiver, 'SENDER', [], $this->data['notices']);
 
             if ($result->success == false) {
                 Session::put('message', $result);
-                Log::info(
+                \Log::info(
                     'Problem with send package in DPD',
                     [
                         'courier' => $this->courierName,
@@ -250,7 +284,7 @@ class OrdersCourierJobs extends Job
                 'letter_number' => $result->parcels[0]->Waybill
             ];
         } catch (Exception $exception) {
-            Log::info(
+            \Log::info(
                 'Problem in DPD integration',
                 ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
             );
@@ -270,11 +304,11 @@ class OrdersCourierJobs extends Job
                 $integration = new Inpost($this->data);
             } else {
                 $integration = new Inpost($this->data, 1);
-            } 
+            }
             $this->callInpostForPackage($integration);
         } catch (Exception $exception) {
             Session::put('message', $exception->getMessage());
-            Log::info(
+            \Log::info(
                 'Problem in INPOST integration',
                 ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
             );
@@ -282,21 +316,21 @@ class OrdersCourierJobs extends Job
         }
 
     }
-    
+
     public function callInpostForPackage($integration)
-    {     
+    {
         $json = $integration->prepareJsonForInpost();
         $package = $integration->createSimplePackage($json);
         if ($package->status == '400') {
             Session::put('message', $package);
-            Log::info(
-                    'Problem in INPOST integration with validation', ['courier' => $package, 'class' => get_class($this), 'line' => __LINE__]
+            \Log::info(
+                'Problem in INPOST integration with validation', ['courier' => $package, 'class' => get_class($this), 'line' => __LINE__]
             );
             die();
         }
         $this->orderPackageRepository->update([
             'inpost_url' => $package->href,
-                ], $this->data['additional_data']['order_package_id']);
+        ], $this->data['additional_data']['order_package_id']);
         $href = $integration->hrefExecute($package->href);
         return [
             'status' => 200,
@@ -309,7 +343,8 @@ class OrdersCourierJobs extends Job
     /**
      * @return array
      */
-    public function createPackageForApaczka() {
+    public function createPackageForApaczka()
+    {
         try {
             $apaczka = new ApaczkaGuzzleClient($this->config['apaczka']['appId'], $this->config['apaczka']['appSecret']);
             $forwardingDelivery = $this->data['additional_data']['forwarding_delivery'];
@@ -363,8 +398,8 @@ class OrdersCourierJobs extends Job
                     $carrierID = ApaczkaGuzzleClient::POCZTEX_EXPRESS_24;
                     break;
                 default:
-                    Log::notice(
-                            'Wrong courier', ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
+                    \Log::notice(
+                        'Wrong courier', ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
                     );
                     return ['status' => '500', 'error_code' => self::ERRORS['INVALID_FORWARDING_DELIVERY']];
             }
@@ -380,7 +415,7 @@ class OrdersCourierJobs extends Job
             $order->contents = $this->data['content'];
             $order->comment = $this->data['notices'];
             $order->setReceiverAddress(
-            $this->data['delivery_address']['firstname'], $this->data['delivery_address']['lastname'], $this->data['delivery_address']['address'], $this->data['delivery_address']['flat_number'], $this->data['delivery_address']['city'], 0, $this->data['delivery_address']['postal_code'], '', $this->data['delivery_address']['email'], $this->data['delivery_address']['phone']
+                $this->data['delivery_address']['firstname'], $this->data['delivery_address']['lastname'], $this->data['delivery_address']['address'], $this->data['delivery_address']['flat_number'], $this->data['delivery_address']['city'], 0, $this->data['delivery_address']['postal_code'], '', $this->data['delivery_address']['email'], $this->data['delivery_address']['phone']
             );
             if ($this->data['cash_on_delivery'] === true) {
                 $order->setPobranie($this->data['number_account_for_cash_on_delivery'], $this->data['price_for_cash_on_delivery']);
@@ -398,7 +433,7 @@ class OrdersCourierJobs extends Job
 
             if (isset($this->data['pickup_address'])) {
                 $order->setSenderAddress(
-                $this->data['pickup_address']['firmname'], $this->data['pickup_address']['firstname'] . ' ' . $this->data['pickup_address']['lastname'], $this->data['pickup_address']['address'], $this->data['pickup_address']['flat_number'], $this->data['pickup_address']['city'], 0, $this->data['pickup_address']['postal_code'], '', $this->data['pickup_address']['email'], $this->data['pickup_address']['phone']
+                    $this->data['pickup_address']['firmname'], $this->data['pickup_address']['firstname'] . ' ' . $this->data['pickup_address']['lastname'], $this->data['pickup_address']['address'], $this->data['pickup_address']['flat_number'], $this->data['pickup_address']['city'], 0, $this->data['pickup_address']['postal_code'], '', $this->data['pickup_address']['email'], $this->data['pickup_address']['phone']
                 );
                 if ($this->data['courier_type'] === 'ODBIOR_OSOBISTY') {
                     $pickup = 'SELF';
@@ -406,7 +441,7 @@ class OrdersCourierJobs extends Job
                     $pickup = 'COURIER';
                 }
                 $order->setPickup(
-                        $pickup, '08:00', '17:00', $this->data['pickup_address']['parcel_date']
+                    $pickup, '08:00', '17:00', $this->data['pickup_address']['parcel_date']
                 );
             }
 
@@ -415,7 +450,7 @@ class OrdersCourierJobs extends Job
             if ($result->status !== 400 && $result->response->order) {
                 $orderId = $result->response->order->id;
             } else {
-                Log::notice( $result->message, ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]);
+                \Log::notice($result->message, ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]);
                 return ['status' => '500', 'error_code' => self::ERRORS['PROBLEM_IN_PLACE_ORDER']];
             }
             $waybilljson = $apaczka->getWaybillDocument($orderId)->getBody();
@@ -423,8 +458,8 @@ class OrdersCourierJobs extends Job
             if ($waybill->status == 200) {
                 Storage::disk('local')->put('public/apaczka/stickers/sticker' . $orderId . '.pdf', base64_decode($waybill->response->waybill));
             } else {
-                Log::notice(
-                        $waybill->message, ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
+                \Log::notice(
+                    $waybill->message, ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
                 );
                 return ['status' => '500', 'error_code' => self::ERRORS['PROBLEM_WITH_DOWNLOAD_WAYBILL']];
             }
@@ -439,7 +474,7 @@ class OrdersCourierJobs extends Job
                 'letter_number' => $result->response->order->waybill_number
             ];
         } catch (Exception $exception) {
-            Log::info('Problem in Apaczka integration', ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]);
+            \Log::info('Problem in Apaczka integration', ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]);
             return ['status' => '500', 'error_code' => self::ERRORS['PROBLEM_WITH_APACZKA_INTEGRATION']];
         }
     }
@@ -451,9 +486,8 @@ class OrdersCourierJobs extends Job
     {
 
         $xml = '<tns:addShipment xmlns:tns="http://e-nadawca.poczta-polska.pl">';
-        $integration = new \App\Integrations\Pocztex\ElektronicznyNadawca();
+        $integration = new ElektronicznyNadawca();
         $integration->clearEnvelope(new clearEnvelope());
-        $package = new przesylkaPaletowaType();
         $xml .= '<przesylki';
         $xml .= ' zawartosc = "' . $this->data['content'] . '"';
         $shipment = new addShipment();
@@ -479,7 +513,6 @@ class OrdersCourierJobs extends Job
         //   $integration->__call('addShipment', $soapXML);
         //     Log::debug($integration->__getLastRequest());
 
-        $package->adres = $address;
         //      $package->miejsceDoreczenia = $address;
         $pickupAddress = new adresType();
 
@@ -493,51 +526,6 @@ class OrdersCourierJobs extends Job
         $pickupAddress->email = $this->data['pickup_address']['email'];
         $pickupAddress->kraj = 'Polska';
         $pickupAddress->osobaKontaktowa = $this->data['pickup_address']['firstname'] . ' ' . $this->data['pickup_address']['lastname'];
-        $package->adres = $pickupAddress;
-        $package->miejsceOdbioru = $pickupAddress;
-
-        $package->opis = $this->data['notices'];
-        $package->zawartosc = $this->data['content'];
-        $package->masa = $this->data['weight'];
-        $package->dataZaladunku = $this->data['pickup_address']['parcel_date'];
-        $package->dataDostawy = "2019-02-06";
-
-        $package->wartosc = $this->data['amount'] * 1000;
-
-        $package->powiadomienieNadawcy = $this->data['pickup_address']['phone'];
-        $palette = new paletaType();
-
-        switch ($this->data['additional_data']['package_type']) {
-            case 'EUR':
-                $palette->rodzajPalety = rodzajPaletyType::EUR;
-                break;
-            case 'POLPALETA':
-                $palette->rodzajPalety = rodzajPaletyType::POLPALETA;
-                break;
-            case 'INNA':
-                $palette->rodzajPalety = rodzajPaletyType::INNA;
-                break;
-        }
-
-
-        $palette->szerokosc = $this->data['width'];
-        $palette->dlugosc = $this->data['length'];
-        $palette->wysokosc = $this->data['height'];
-        $package->paleta = $palette;
-
-
-        $package->platnik = new platnikType();
-        $package->platnik->uiszczaOplate = "NADAWCA";
-
-        if ($this->data['cash_on_delivery'] == true) {
-            $package->pobranie = new pobranieType();
-            $package->pobranie->kwotaPobrania = $this->data['price_for_cash_on_delivery'] * 100;
-            $package->pobranie->nrb = $this->data['number_account_for_cash_on_delivery'];
-            $package->pobranie->sposobPobrania = sposobPobraniaType::RACHUNEK_BANKOWY;
-            $package->pobranie->tytulem = 'Zamowienie nr: ' . $this->data['order_id'];
-        }
-
-        $package->guid = $this->getGuid();
 
         $tag['guid'] = $this->getGuid();
         $tag['_'] = '';
@@ -698,11 +686,9 @@ class OrdersCourierJobs extends Job
         $param->appendChild($platnik);
         $dom->appendChild($param);
         $shipment->przesylki[] = new \SoapVar($dom->saveXML($dom->documentElement), XSD_ANYXML);
-
-        //    $shipment->przesylki[] = new \SoapVar($tag, SOAP_ENC_OBJECT, '');
         $sendingNumber = $integration->addShipment($shipment);
 
-        $eSender = new \App\Integrations\Pocztex\ElektronicznyNadawca();
+        $eSender = new ElektronicznyNadawca();
         $send = new sendEnvelope();
         $idSend = $eSender->sendEnvelope($send);
         $param = new \App\Integrations\Pocztex\getAddresLabelCompact();
@@ -719,7 +705,7 @@ class OrdersCourierJobs extends Job
         } else {
             Session::put('message', $idSend);
             Session::put('message', $retval);
-            Log::info(
+            \Log::info(
                 'Problem in Pocztex integration',
                 ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
             );
@@ -731,43 +717,6 @@ class OrdersCourierJobs extends Job
             'sending_number' => $idSend->idEnvelope,
             'letter_number' => $letter_number,
         ];
-    }
-
-
-    public static function generateValidXmlFromObj($obj, $node_block = 'nodes', $node_name = 'node')
-    {
-        $arr = get_object_vars($obj);
-        return self::generateValidXmlFromArray($arr, $node_block, $node_name);
-    }
-
-    public static function generateValidXmlFromArray($array, $node_block = 'nodes', $node_name = 'node')
-    {
-        $xml = '<?xml version="1.0" encoding="UTF-8" ?>';
-
-        $xml .= '<' . $node_block . '>';
-        $xml .= self::generateXmlFromArray($array, $node_name);
-        $xml .= '</' . $node_block . '>';
-
-        return $xml;
-    }
-
-    private static function generateXmlFromArray($array, $node_name)
-    {
-        $xml = '';
-
-        if (is_array($array) || is_object($array)) {
-            foreach ($array as $key => $value) {
-                if (is_numeric($key)) {
-                    $key = $node_name;
-                }
-
-                $xml .= '<' . $key . '>' . self::generateXmlFromArray($value, $node_name) . '</' . $key . '>';
-            }
-        } else {
-            $xml = htmlspecialchars($array, ENT_QUOTES);
-        }
-
-        return $xml;
     }
 
     public function getGuid()

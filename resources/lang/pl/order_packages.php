@@ -64,7 +64,8 @@ return [
         'container_delete' => 'Rodzaj przesyłki usunięty pomyślnie!',
         'packing_update' => 'Typ opakowania przesyłki zaktualizowany pomyślnie!',
         'packing_store' => 'Typ opakowania przesyłki dodany pomyślnie!',
-        'packing_delete' => 'Typ opakowania przesyłki usunięty pomyślnie!'
+        'packing_delete' => 'Typ opakowania przesyłki usunięty pomyślnie!',
+        'package_error' => 'Podana paczka nie istnieje, lub szablon został usunięty'
     ],
     'form' => [
         'delivery' => 'Id dostawy z SELLO (tr_DeliveryId)',

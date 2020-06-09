@@ -2,19 +2,10 @@
 
 namespace App\Jobs;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Auth;
-
-use App\Repositories\OrderRepository;
-use App\Repositories\TagRepository;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Mail\WarehouseOrder;
-
+use App\Repositories\OrderRepository;
+use App\Repositories\TagRepository;
 
 /**
  * Class OrderStatusChangedNotificationJob
@@ -56,10 +47,7 @@ class SendWarehouseOrderEmailJob extends Job
      */
     public function handle(EmailTagHandlerHelper $emailTagHandler, OrderRepository $orderRepository, TagRepository $tagRepository)
     {
-
-
-
-        $subject = "Zamówienie Produktów. Zlecenie nr: ". $this->warehouseOrderId;
+        $subject = "Zamówienie Produktów. Zlecenie nr: " . $this->warehouseOrderId;
         \Mailer::create()
             ->to($this->email)
             ->send(new WarehouseOrder($subject, $this->message));

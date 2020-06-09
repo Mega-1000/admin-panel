@@ -231,6 +231,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $addressArray['postal_code'] = $address->adr_ZipCode;
         $addressArray['nip'] = $address->adr_NIP;
         $addressArray['firmname'] = $address->adr_Company ?: $customer->cs_Company ?: '';
+        $addressArray['phone'] = $address->adr_PhoneNumber ?: $customer->phone->cp_Phone ?: '';
         return $addressArray;
     }
 

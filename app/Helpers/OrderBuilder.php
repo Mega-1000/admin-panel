@@ -104,6 +104,7 @@ class OrderBuilder
             $order = new Order();
         }
 
+        $order->getToken();
         $customer = $this->userSelector->getCustomer($order, $data);
         $order->customer_id = $customer->id;
 
@@ -254,12 +255,11 @@ class OrderBuilder
         $order->save();
     }
 
-    public static function updateOrderAddress($order, $deliveryAddress, $type, $phone, $relation, $login = '', $forceUpdateEmail = false)
+    public static function updateOrderAddress($order, $adressArray, $type, $phone, $relation, $login = '', $forceUpdateEmail = false)
     {
-        $phone = preg_replace('/[^0-9]/', '', $phone);
-
-        if (!is_array($deliveryAddress)) {
-            $deliveryAddress = [];
+        $phone = preg_replace('/[^0-9]/', '', $adressArray['phone'] ?? $phone);
+        if (!is_array($adressArray)) {
+            $adressArray = [];
         }
 
         switch ($relation) {
@@ -303,8 +303,8 @@ class OrderBuilder
                      'city',
                      'postal_code'
                  ] as $column) {
-            if (!empty($deliveryAddress[$column])) {
-                $address->$column = $deliveryAddress[$column];
+            if (!empty($adressArray[$column])) {
+                $address->$column = $adressArray[$column];
             }
         }
 

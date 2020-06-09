@@ -43,12 +43,14 @@ class ProductPacking extends Model implements Transformable
         'recommended_courier',
         'packing_name',
         'max_pieces_in_one_package',
-        'number_of_items_per_25_kg',
         'number_of_volume_items_for_paczkomat',
-        'inpost_courier_type',
         'dimension_x',
         'dimension_y',
-        'dimension_z'
+        'dimension_z',
+        'allegro_courier',
+        'paczkomat_size_a',
+        'paczkomat_size_b',
+        'paczkomat_size_c'
     ];
 
     /**
