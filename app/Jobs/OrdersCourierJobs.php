@@ -190,7 +190,7 @@ class OrdersCourierJobs extends Job
                 'phone' => $this->data['delivery_address']['phone']
             ];
 
-            $result = $dpd->sendPackage($parcels, $receiver, 'SENDER');
+            $result = $dpd->sendPackage($parcels, $receiver, 'SENDER', [], $this->data['notices']);
 
             if ($result->success == false) {
                 Session::put('message', $result);
@@ -288,13 +288,13 @@ class OrdersCourierJobs extends Job
         if ($package->status == '400') {
             Session::put('message', $package);
             \Log::info(
-                    'Problem in INPOST integration with validation', ['courier' => $package, 'class' => get_class($this), 'line' => __LINE__]
+                'Problem in INPOST integration with validation', ['courier' => $package, 'class' => get_class($this), 'line' => __LINE__]
             );
             die();
         }
         $this->orderPackageRepository->update([
             'inpost_url' => $package->href,
-                ], $this->data['additional_data']['order_package_id']);
+        ], $this->data['additional_data']['order_package_id']);
         $href = $integration->hrefExecute($package->href);
         return [
             'status' => 200,
@@ -362,7 +362,7 @@ class OrdersCourierJobs extends Job
                     break;
                 default:
                     \Log::notice(
-                            'Wrong courier', ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
+                        'Wrong courier', ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
                     );
                     return ['status' => '500', 'error_code' => self::ERRORS['INVALID_FORWARDING_DELIVERY']];
             }
@@ -378,7 +378,7 @@ class OrdersCourierJobs extends Job
             $order->contents = $this->data['content'];
             $order->comment = $this->data['notices'];
             $order->setReceiverAddress(
-            $this->data['delivery_address']['firstname'], $this->data['delivery_address']['lastname'], $this->data['delivery_address']['address'], $this->data['delivery_address']['flat_number'], $this->data['delivery_address']['city'], 0, $this->data['delivery_address']['postal_code'], '', $this->data['delivery_address']['email'], $this->data['delivery_address']['phone']
+                $this->data['delivery_address']['firstname'], $this->data['delivery_address']['lastname'], $this->data['delivery_address']['address'], $this->data['delivery_address']['flat_number'], $this->data['delivery_address']['city'], 0, $this->data['delivery_address']['postal_code'], '', $this->data['delivery_address']['email'], $this->data['delivery_address']['phone']
             );
             if ($this->data['cash_on_delivery'] === true) {
                 $order->setPobranie($this->data['number_account_for_cash_on_delivery'], $this->data['price_for_cash_on_delivery']);
@@ -396,7 +396,7 @@ class OrdersCourierJobs extends Job
 
             if (isset($this->data['pickup_address'])) {
                 $order->setSenderAddress(
-                $this->data['pickup_address']['firmname'], $this->data['pickup_address']['firstname'] . ' ' . $this->data['pickup_address']['lastname'], $this->data['pickup_address']['address'], $this->data['pickup_address']['flat_number'], $this->data['pickup_address']['city'], 0, $this->data['pickup_address']['postal_code'], '', $this->data['pickup_address']['email'], $this->data['pickup_address']['phone']
+                    $this->data['pickup_address']['firmname'], $this->data['pickup_address']['firstname'] . ' ' . $this->data['pickup_address']['lastname'], $this->data['pickup_address']['address'], $this->data['pickup_address']['flat_number'], $this->data['pickup_address']['city'], 0, $this->data['pickup_address']['postal_code'], '', $this->data['pickup_address']['email'], $this->data['pickup_address']['phone']
                 );
                 if ($this->data['courier_type'] === 'ODBIOR_OSOBISTY') {
                     $pickup = 'SELF';
@@ -404,7 +404,7 @@ class OrdersCourierJobs extends Job
                     $pickup = 'COURIER';
                 }
                 $order->setPickup(
-                        $pickup, '08:00', '17:00', $this->data['pickup_address']['parcel_date']
+                    $pickup, '08:00', '17:00', $this->data['pickup_address']['parcel_date']
                 );
             }
 
@@ -422,7 +422,7 @@ class OrdersCourierJobs extends Job
                 Storage::disk('local')->put('public/apaczka/stickers/sticker' . $orderId . '.pdf', base64_decode($waybill->response->waybill));
             } else {
                 \Log::notice(
-                        $waybill->message, ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
+                    $waybill->message, ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
                 );
                 return ['status' => '500', 'error_code' => self::ERRORS['PROBLEM_WITH_DOWNLOAD_WAYBILL']];
             }
