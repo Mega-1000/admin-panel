@@ -2,6 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Integrations\Apaczka\ApaczkaGuzzleClient;
+use App\Integrations\Apaczka\ApaczkaOrder;
+use App\Integrations\DPD\DPDService;
 use App\Integrations\Inpost\Inpost;
 use App\Integrations\Jas\Jas;
 use App\Integrations\Pocztex\addShipment;
@@ -11,12 +14,9 @@ use App\Integrations\Pocztex\ElektronicznyNadawca;
 use App\Integrations\Pocztex\sendEnvelope;
 use App\Mail\SendLPToTheWarehouseAfterOrderCourierMail;
 use App\Repositories\OrderPackageRepository;
-use App\Integrations\DPD\DPDService;
-use App\Integrations\Apaczka\ApaczkaGuzzleClient;
-use App\Integrations\Apaczka\ApaczkaOrder;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
 use Mockery\Exception;
 
 /**
@@ -70,6 +70,42 @@ class OrdersCourierJobs extends Job
         $this->data = $data;
         $this->config = config('integrations');
         $this->courierName = $this->data['courier_name'];
+    }
+
+    public static function generateValidXmlFromObj($obj, $node_block = 'nodes', $node_name = 'node')
+    {
+        $arr = get_object_vars($obj);
+        return self::generateValidXmlFromArray($arr, $node_block, $node_name);
+    }
+
+    public static function generateValidXmlFromArray($array, $node_block = 'nodes', $node_name = 'node')
+    {
+        $xml = '<?xml version="1.0" encoding="UTF-8" ?>';
+
+        $xml .= '<' . $node_block . '>';
+        $xml .= self::generateXmlFromArray($array, $node_name);
+        $xml .= '</' . $node_block . '>';
+
+        return $xml;
+    }
+
+    private static function generateXmlFromArray($array, $node_name)
+    {
+        $xml = '';
+
+        if (is_array($array) || is_object($array)) {
+            foreach ($array as $key => $value) {
+                if (is_numeric($key)) {
+                    $key = $node_name;
+                }
+
+                $xml .= '<' . $key . '>' . self::generateXmlFromArray($value, $node_name) . '</' . $key . '>';
+            }
+        } else {
+            $xml = htmlspecialchars($array, ENT_QUOTES);
+        }
+
+        return $xml;
     }
 
     /**
@@ -307,7 +343,8 @@ class OrdersCourierJobs extends Job
     /**
      * @return array
      */
-    public function createPackageForApaczka() {
+    public function createPackageForApaczka()
+    {
         try {
             $apaczka = new ApaczkaGuzzleClient($this->config['apaczka']['appId'], $this->config['apaczka']['appSecret']);
             $forwardingDelivery = $this->data['additional_data']['forwarding_delivery'];
@@ -413,7 +450,7 @@ class OrdersCourierJobs extends Job
             if ($result->status !== 400 && $result->response->order) {
                 $orderId = $result->response->order->id;
             } else {
-                \Log::notice( $result->message, ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]);
+                \Log::notice($result->message, ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]);
                 return ['status' => '500', 'error_code' => self::ERRORS['PROBLEM_IN_PLACE_ORDER']];
             }
             $waybilljson = $apaczka->getWaybillDocument($orderId)->getBody();
@@ -680,43 +717,6 @@ class OrdersCourierJobs extends Job
             'sending_number' => $idSend->idEnvelope,
             'letter_number' => $letter_number,
         ];
-    }
-
-
-    public static function generateValidXmlFromObj($obj, $node_block = 'nodes', $node_name = 'node')
-    {
-        $arr = get_object_vars($obj);
-        return self::generateValidXmlFromArray($arr, $node_block, $node_name);
-    }
-
-    public static function generateValidXmlFromArray($array, $node_block = 'nodes', $node_name = 'node')
-    {
-        $xml = '<?xml version="1.0" encoding="UTF-8" ?>';
-
-        $xml .= '<' . $node_block . '>';
-        $xml .= self::generateXmlFromArray($array, $node_name);
-        $xml .= '</' . $node_block . '>';
-
-        return $xml;
-    }
-
-    private static function generateXmlFromArray($array, $node_name)
-    {
-        $xml = '';
-
-        if (is_array($array) || is_object($array)) {
-            foreach ($array as $key => $value) {
-                if (is_numeric($key)) {
-                    $key = $node_name;
-                }
-
-                $xml .= '<' . $key . '>' . self::generateXmlFromArray($value, $node_name) . '</' . $key . '>';
-            }
-        } else {
-            $xml = htmlspecialchars($array, ENT_QUOTES);
-        }
-
-        return $xml;
     }
 
     public function getGuid()
