@@ -22,11 +22,21 @@ class Label extends Model implements Transformable
     const ADDITIONAL_INFO_IDS_FOR_TABLE = [92, 89, 93, 45, 55, 57, 59, 61, 90];
     const INVOICE_IDS_FOR_TABLE = [63];
     const CUSTOMER_DATA_REMINDER_IDS = [53, 74];
-
+    const DIALOG_TYPE_LABELS_IDS = [55, 56, 57, 58, 78, 79, 80, 81, 82, 83, 84, 85];
 
 
     const ORDER_ITEMS_REDEEMED_LABEL = 66;
+    public $customColumnsVisibilities = [
 
+        'name',
+        'group',
+        'color',
+        'status',
+        'icon',
+        'created_at',
+        'active',
+        'pending'
+    ];
     /**
      * The attributes that are mass assignable.
      *
@@ -100,16 +110,4 @@ class Label extends Model implements Transformable
         return $this->belongsToMany(Label::class, 'labels_timed_after_addition', 'main_label_id', 'label_to_handle_id')
             ->withPivot(['id', 'to_add_type_a', 'to_remove_type_a', 'to_add_type_b', 'to_remove_type_b', 'to_add_type_c', 'to_remove_type_c']);
     }
-
-    public $customColumnsVisibilities = [
-
-        'name' ,
-        'group' ,
-        'color',
-        'status',
-        'icon' ,
-        'created_at' ,
-        'active',
-        'pending'
-    ];
 }

@@ -582,6 +582,11 @@ class OrdersController extends Controller
                     $package->save();
                 }
             });
+            $order->labels->map(function ($label) use ($order) {
+                if (!in_array($label->pivot->label_id, Label::DIALOG_TYPE_LABELS_IDS)) {
+                    $order->labels()->detach($label);
+                }
+            });
         }
         $orderItems = $order->items;
         $itemsArray = [];
