@@ -581,13 +581,10 @@ class OrdersPackagesController extends Controller
                 PackageTemplate::SENDING,
                 PackageTemplate::DELIVERED,
                 PackageTemplate::CANCELLED])
+            ->whereHas('order', function ($query) {
+                $query->where('status_id', '<>', Order::STATUS_WITHOUT_REALIZATION);
+            })
             ->get();
-        if ($packages->count() == 0) {
-            return redirect()->back()->with([
-                'message' => __('order_packages.message.courier_error'),
-                'alert-type' => 'error'
-            ]);
-        }
         $merger = new Merger;
         $packages->map(function ($pack) use ($merger) {
             $file = $pack->getPathToSticker();

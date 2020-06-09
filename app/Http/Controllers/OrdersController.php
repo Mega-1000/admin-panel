@@ -3,12 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Entities\Auth_code;
+use App\Entities\ColumnVisibility;
 use App\Entities\InvoiceRequest;
+use App\Entities\Label;
+use App\Entities\LabelGroup;
 use App\Entities\Order;
 use App\Entities\OrderInvoice;
 use App\Entities\OrderItem;
 use App\Entities\OrderPayment;
 use App\Entities\PackageTemplate;
+use App\Entities\Product;
+use App\Entities\Role;
 use App\Entities\Warehouse;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
@@ -17,16 +22,19 @@ use App\Helpers\OrderCalcHelper;
 use App\Http\Requests\OrderUpdateRequest;
 use App\Jobs\AddLabelJob;
 use App\Jobs\ImportOrdersFromSelloJob;
-use App\Jobs\UpdatePackageRealCostJob;
 use App\Jobs\Orders\MissingDeliveryAddressSendMailJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Jobs\RemoveLabelJob;
+use App\Jobs\SendRequestForCancelledPackageJob;
+use App\Jobs\UpdatePackageRealCostJob;
 use App\Mail\SendOfferToCustomerMail;
 use App\Repositories\CustomerAddressRepository;
 use App\Repositories\CustomerRepository;
 use App\Repositories\EmployeeRepository;
+use App\Repositories\FirmRepository;
 use App\Repositories\LabelGroupRepository;
 use App\Repositories\LabelRepository;
+use App\Repositories\OrderAddressRepository;
 use App\Repositories\OrderItemRepository;
 use App\Repositories\OrderMessageRepository;
 use App\Repositories\OrderPackageRepository;
@@ -40,27 +48,18 @@ use App\Repositories\ProductStockRepository;
 use App\Repositories\SpeditionExchangeRepository;
 use App\Repositories\StatusRepository;
 use App\Repositories\TaskRepository;
-use App\Repositories\WarehouseRepository;
-use App\Repositories\FirmRepository;
-use App\Repositories\OrderAddressRepository;
 use App\Repositories\UserRepository;
-use Barryvdh\DomPDF\Facade as PDF;
+use App\Repositories\WarehouseRepository;
+use App\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\View;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
-use App\Entities\Product;
-use Illuminate\Http\Request;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
-use App\Entities\ColumnVisibility;
-use Illuminate\Support\Facades\Log;
-use App\User;
-use App\Entities\Label;
-use App\Entities\LabelGroup;
-use App\Entities\Role;
 
 /**
  * Class OrderController.
@@ -563,6 +562,32 @@ class OrdersController extends Controller
             ]);
         }
 
+        if ($request->input('status') == Order::STATUS_WITHOUT_REALIZATION) {
+            $order->packages->map(function ($package) {
+                $cannotCancel = [
+                    PackageTemplate::WAITING_FOR_CANCELLED,
+                    PackageTemplate::SENDING,
+                    PackageTemplate::DELIVERED,
+                    PackageTemplate::CANCELLED];
+                if (in_array($package->status, $cannotCancel)) {
+                   return;
+                }
+                if ($package->status == PackageTemplate::STATUS_NEW
+                    && $package->delivery_courier_name != 'POCZTEX'
+                    && $package->service_courier_name != 'POCZTEX') {
+                    $package->delete();
+                } else {
+                    dispatch_now(new SendRequestForCancelledPackageJob($package->id));
+                    $package->status = PackageTemplate::WAITING_FOR_CANCELLED;
+                    $package->save();
+                }
+            });
+            $order->labels->map(function ($label) use ($order) {
+                if (!in_array($label->pivot->label_id, Label::DIALOG_TYPE_LABELS_IDS)) {
+                    $order->labels()->detach($label);
+                }
+            });
+        }
         $orderItems = $order->items;
         $itemsArray = [];
         $orderItemKMD = 0;
