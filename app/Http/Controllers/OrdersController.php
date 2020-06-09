@@ -3,12 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Entities\Auth_code;
+use App\Entities\ColumnVisibility;
 use App\Entities\InvoiceRequest;
+use App\Entities\Label;
+use App\Entities\LabelGroup;
 use App\Entities\Order;
 use App\Entities\OrderInvoice;
 use App\Entities\OrderItem;
 use App\Entities\OrderPayment;
 use App\Entities\PackageTemplate;
+use App\Entities\Product;
+use App\Entities\Role;
 use App\Entities\Warehouse;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
@@ -17,16 +22,19 @@ use App\Helpers\OrderCalcHelper;
 use App\Http\Requests\OrderUpdateRequest;
 use App\Jobs\AddLabelJob;
 use App\Jobs\ImportOrdersFromSelloJob;
-use App\Jobs\UpdatePackageRealCostJob;
 use App\Jobs\Orders\MissingDeliveryAddressSendMailJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Jobs\RemoveLabelJob;
+use App\Jobs\SendRequestForCancelledPackageJob;
+use App\Jobs\UpdatePackageRealCostJob;
 use App\Mail\SendOfferToCustomerMail;
 use App\Repositories\CustomerAddressRepository;
 use App\Repositories\CustomerRepository;
 use App\Repositories\EmployeeRepository;
+use App\Repositories\FirmRepository;
 use App\Repositories\LabelGroupRepository;
 use App\Repositories\LabelRepository;
+use App\Repositories\OrderAddressRepository;
 use App\Repositories\OrderItemRepository;
 use App\Repositories\OrderMessageRepository;
 use App\Repositories\OrderPackageRepository;
@@ -40,27 +48,18 @@ use App\Repositories\ProductStockRepository;
 use App\Repositories\SpeditionExchangeRepository;
 use App\Repositories\StatusRepository;
 use App\Repositories\TaskRepository;
-use App\Repositories\WarehouseRepository;
-use App\Repositories\FirmRepository;
-use App\Repositories\OrderAddressRepository;
 use App\Repositories\UserRepository;
-use Barryvdh\DomPDF\Facade as PDF;
+use App\Repositories\WarehouseRepository;
+use App\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\View;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
-use App\Entities\Product;
-use Illuminate\Http\Request;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
-use App\Entities\ColumnVisibility;
-use Illuminate\Support\Facades\Log;
-use App\User;
-use App\Entities\Label;
-use App\Entities\LabelGroup;
-use App\Entities\Role;
 
 /**
  * Class OrderController.
@@ -177,10 +176,20 @@ class OrdersController extends Controller
 
     /** @var TaskRepository */
     protected $taskRepository;
-
+    protected $dtColumns = [
+        'clientFirstname' => 'customer_addresses.firstname',
+        'clientLastname' => 'customer_addresses.lastname',
+        'clientEmail' => 'customer_addresses.email',
+        'clientPhone' => 'customer_addresses.phone',
+        'statusName' => 'statuses.name',
+        'name' => 'users.name',
+        'orderId' => 'orders.id',
+        'orderDate' => 'orders.created_at',
+    ];
     private $replaceSearch = [
         'sello_payment' => 'sel_tr__transaction.tr_CheckoutFormPaymentId'
     ];
+
     /**
      * OrdersController constructor.
      * @param FirmRepository $repository
@@ -294,7 +303,7 @@ class OrdersController extends Controller
             'invoice' => Label::INVOICE_IDS_FOR_TABLE,
         );
         $usersQuery = User::with(['orders' => function ($q) {
-            $q->where('created_at','>', Carbon::now()->subMonths(2));
+            $q->where('created_at', '>', Carbon::now()->subMonths(2));
             $q->select('id', 'employee_id', 'remainder_date');
             $q->with(['labels' => function ($q) {
                 $q->select('labels.id', 'order_id');
@@ -342,7 +351,6 @@ class OrdersController extends Controller
     {
         return view('orders.create');
     }
-
 
     /**
      * Show the form for editing the specified resource.
@@ -463,6 +471,98 @@ class OrdersController extends Controller
         }
     }
 
+    private function getVariations($order)
+    {
+        $productsVariation = [];
+
+        $orderDeliveryAddress = $this->orderAddressRepository->findWhere([
+            "order_id" => $order->id,
+            'type' => 'DELIVERY_ADDRESS',
+        ])->first();
+
+        foreach ($order->items as $product) {
+            if ($product->product->product_group == null) {
+                continue;
+            }
+            $productVar = $this->productRepository->findByField('product_group', $product->product->product_group);
+            foreach ($productVar as $prod) {
+                $firm = $this->firmRepository->findByField('symbol', $prod->product_name_supplier);
+                if ($firm->isEmpty() || $firm->first->id->warehouses->isEmpty()) {
+                    continue;
+                }
+                $radius = 0;
+                $warehousePostalCode = $firm->first->id->warehouses->first->id->address->postal_code;
+                $firmLatLon = DB::table('postal_code_lat_lon')->where('postal_code', $warehousePostalCode)->get()->first();
+                $deliveryAddressLatLon = DB::table('postal_code_lat_lon')->where('postal_code', $orderDeliveryAddress->postal_code)->get()->first();
+
+                if ($firmLatLon != null && $deliveryAddressLatLon != null) {
+                    $radius = 73 * sqrt(
+                            pow($firmLatLon->latitude - $deliveryAddressLatLon->latitude, 2) +
+                            pow($firmLatLon->longitude - $deliveryAddressLatLon->longitude, 2)
+                        );
+                }
+                switch ($prod->variation_unit) {
+                    case 'UB':
+                        $unitData = $prod->price->gross_selling_price_basic_unit * $product->quantity * $prod->packing->numbers_of_basic_commercial_units_in_pack;
+                        break;
+                    case 'UC':
+                        $unitData = $prod->price->gross_selling_price_basic_unit * $product->quantity;
+                        break;
+                    case 'UCA':
+                        $unitData = $prod->price->gross_selling_price_basic_unit * $product->quantity * $prod->packing->numbers_of_basic_commercial_units_in_pack / $prod->packing->unit_consumption;
+                        break;
+                    case 'UCO':
+                        $unitData = $prod->price->gross_selling_price_basic_unit * $product->quantity / $prod->packing->number_of_sale_units_in_the_pack;
+                        break;
+                    default:
+                        Log::info(
+                            'Invalid variation unit: ' . $prod->variation_unit,
+                            ['product_id' => $prod->id, 'class' => get_class($this), 'line' => __LINE__]
+                        );
+                }
+
+                if ($radius > $firm->first->id->warehouses->first->id->radius ||
+                    $prod->price->gross_selling_price_commercial_unit === null ||
+                    $prod->price->gross_selling_price_basic_unit === null ||
+                    $prod->price->gross_selling_price_calculated_unit === null
+                ) {
+                    continue;
+                }
+                if ($prod->id == $product->product->id) {
+                    $diff = 0.0;
+                } else {
+                    $diff = $product->price - number_format($unitData, 2, '.', '');
+                }
+                $array = [
+                    'id' => $prod->id,
+                    'name' => $prod->name,
+                    'gross_selling_price_commercial_unit' => $prod->price->gross_selling_price_commercial_unit,
+                    'gross_selling_price_basic_unit' => $prod->price->gross_selling_price_basic_unit,
+                    'gross_selling_price_calculated_unit' => $prod->price->gross_selling_price_calculated_unit,
+                    'sum' => number_format($unitData, 2, '.', ''),
+                    'different' => $diff,
+                    'radius' => $radius,
+                    'product_name_supplier' => $prod->product_name_supplier,
+                    'phone' => $firm->first->id->phone,
+                    'review' => $prod->review,
+                    'quality' => $prod->quality,
+                    'quality_to_price' => $prod->quality_to_price,
+                    'comments' => $prod->comments,
+                    'variation_group' => $prod->variation_group,
+                    'value_of_the_order_for_free_transport' => $prod->value_of_the_order_for_free_transport
+                ];
+                $productsVariation[$product->product->id][] = $array;
+            }
+            foreach ($productsVariation as $variation) {
+                if (isset($productsVariation[$product->product->id])) {
+                    $productsVariation[$product->product->id] = collect($variation)->sortBy('different', 1, true);
+                }
+            }
+        }
+
+        return $productsVariation;
+    }
+
     /**
      * @param OrderUpdateRequest $request
      * @param $id
@@ -563,6 +663,32 @@ class OrdersController extends Controller
             ]);
         }
 
+        if ($request->input('status') == Order::STATUS_WITHOUT_REALIZATION) {
+            $order->packages->map(function ($package) {
+                $cannotCancel = [
+                    PackageTemplate::WAITING_FOR_CANCELLED,
+                    PackageTemplate::SENDING,
+                    PackageTemplate::DELIVERED,
+                    PackageTemplate::CANCELLED];
+                if (in_array($package->status, $cannotCancel)) {
+                    return;
+                }
+                if ($package->status == PackageTemplate::STATUS_NEW
+                    && $package->delivery_courier_name != 'POCZTEX'
+                    && $package->service_courier_name != 'POCZTEX') {
+                    $package->delete();
+                } else {
+                    dispatch_now(new SendRequestForCancelledPackageJob($package->id));
+                    $package->status = PackageTemplate::WAITING_FOR_CANCELLED;
+                    $package->save();
+                }
+            });
+            $order->labels->map(function ($label) use ($order) {
+                if (!in_array($label->pivot->label_id, Label::DIALOG_TYPE_LABELS_IDS)) {
+                    $order->labels()->detach($label);
+                }
+            });
+        }
         $orderItems = $order->items;
         $itemsArray = [];
         $orderItemKMD = 0;
@@ -703,12 +829,12 @@ class OrdersController extends Controller
         $sumToCheck = $sumOfOrdersReturn[0];
         if ($order->status_id == 5 || $order->status_id == 6) {
             if ($sumToCheck > 5 || $sumToCheck < -5) {
-                foreach($sumOfOrdersReturn[1] as $ordId) {
+                foreach ($sumOfOrdersReturn[1] as $ordId) {
                     dispatch_now(new RemoveLabelJob($ordId, [133]));
                     dispatch_now(new AddLabelJob($ordId, [134]));
                 }
             } else {
-                foreach($sumOfOrdersReturn[1] as $ordId) {
+                foreach ($sumOfOrdersReturn[1] as $ordId) {
                     dispatch_now(new RemoveLabelJob($ordId, [134]));
                     dispatch_now(new AddLabelJob($ordId, [133]));
                 }
@@ -740,77 +866,6 @@ class OrdersController extends Controller
             'message' => __('orders.message.update'),
             'alert-type' => 'success',
         ]);
-    }
-    public function sumOfOrders($order)
-    {
-        if($order->master_order_id != null) {
-            $order = $this->orderRepository->find($order->master_order_id);
-        } else {
-            $order = $this->orderRepository->find($order->id);
-        }
-        $ids = [];
-        $orderItems = $order->items;
-        $sum = 0;
-        foreach ($orderItems as $item) {
-            $sum += $item->net_selling_price_commercial_unit * $item->quantity * 1.23;
-        }
-        $sum += $order->additional_service_cost + $order->additional_cash_on_delivery_cost + $order->shipment_price_for_client;
-        $sum = round($sum, 2);
-//        dd($sum, $order->additional_service_cost,$order->additional_cash_on_delivery_cost,$order->shipment_price_for_client);
-        if($order->bookedPaymentsSum() - $order->promisePaymentsSum() < -5 ) {
-            $sumOfPayments = $order->promisePaymentsSum() - $order->bookedPaymentsSum();
-        } else if($order->bookedPaymentsSum() - $order->promisePaymentsSum() > 5) {
-            $sumOfPayments = $order->bookedPaymentsSum() + $order->promisePaymentsSum();
-        } else {
-            $sumOfPayments = $order->bookedPaymentsSum();
-        }
-        if($sum - $sumOfPayments < 2 && $sum - $sumOfPayments > -2) {
-            $mainOrderSum = $sum - $sumOfPayments;
-        } else {
-            $sumOfPackages = $order->packagesCashOnDeliverySum();
-            $mainOrderSum = $sum - ($sumOfPayments + $sumOfPackages);
-        }
-
-        $connectedOrders = $this->orderRepository->findWhere(['master_order_id' => $order->id]);
-
-        $connectedSum = 0;
-        $ids[] = $order->id;
-        foreach($connectedOrders as $connectedOrder) {
-            $orderItems = $connectedOrder->items;
-            $sum = 0;
-            foreach ($orderItems as $item) {
-                $sum += $item->net_selling_price_commercial_unit * $item->quantity * 1.23;
-            }
-            $sum += $connectedOrder->additional_service_cost + $connectedOrder->additional_cash_on_delivery_cost + $connectedOrder->shipment_price_for_client;
-            $sum = round($sum, 2);
-
-            if($connectedOrder->bookedPaymentsSum() - $connectedOrder->promisePaymentsSum() < -5 ) {
-                $sumOfPayments = $connectedOrder->promisePaymentsSum();
-            } else if($connectedOrder->bookedPaymentsSum() - $connectedOrder->promisePaymentsSum() > 5) {
-                $sumOfPayments = $connectedOrder->bookedPaymentsSum() + $connectedOrder->promisePaymentsSum();
-            } else {
-                $sumOfPayments = $connectedOrder->bookedPaymentsSum();
-            }
-            if($sum - $sumOfPayments < 2 && $sum - $sumOfPayments > -2) {
-                $connOrderSum = $sum - $sumOfPayments;
-            } else {
-                $sumOfPackages = $connectedOrder->packagesCashOnDeliverySum();
-                $connOrderSum = $sum - ($sumOfPayments + $sumOfPackages);
-            }
-
-            $connectedSum += $connOrderSum;
-            $ids[]        = $connectedOrder->id;
-        }
-
-        if ($mainOrderSum < 0) {
-            $sumToCheck = $mainOrderSum + $connectedSum;
-        } else if ($connectedSum < 0) {
-            $sumToCheck = $mainOrderSum + $connectedSum;
-        } else {
-            $sumToCheck = $mainOrderSum - $connectedSum;
-        }
-
-        return [$sumToCheck, $ids];
     }
 
     /**
@@ -869,6 +924,77 @@ class OrdersController extends Controller
         ]);
     }
 
+    public function sumOfOrders($order)
+    {
+        if ($order->master_order_id != null) {
+            $order = $this->orderRepository->find($order->master_order_id);
+        } else {
+            $order = $this->orderRepository->find($order->id);
+        }
+        $ids = [];
+        $orderItems = $order->items;
+        $sum = 0;
+        foreach ($orderItems as $item) {
+            $sum += $item->net_selling_price_commercial_unit * $item->quantity * 1.23;
+        }
+        $sum += $order->additional_service_cost + $order->additional_cash_on_delivery_cost + $order->shipment_price_for_client;
+        $sum = round($sum, 2);
+//        dd($sum, $order->additional_service_cost,$order->additional_cash_on_delivery_cost,$order->shipment_price_for_client);
+        if ($order->bookedPaymentsSum() - $order->promisePaymentsSum() < -5) {
+            $sumOfPayments = $order->promisePaymentsSum() - $order->bookedPaymentsSum();
+        } else if ($order->bookedPaymentsSum() - $order->promisePaymentsSum() > 5) {
+            $sumOfPayments = $order->bookedPaymentsSum() + $order->promisePaymentsSum();
+        } else {
+            $sumOfPayments = $order->bookedPaymentsSum();
+        }
+        if ($sum - $sumOfPayments < 2 && $sum - $sumOfPayments > -2) {
+            $mainOrderSum = $sum - $sumOfPayments;
+        } else {
+            $sumOfPackages = $order->packagesCashOnDeliverySum();
+            $mainOrderSum = $sum - ($sumOfPayments + $sumOfPackages);
+        }
+
+        $connectedOrders = $this->orderRepository->findWhere(['master_order_id' => $order->id]);
+
+        $connectedSum = 0;
+        $ids[] = $order->id;
+        foreach ($connectedOrders as $connectedOrder) {
+            $orderItems = $connectedOrder->items;
+            $sum = 0;
+            foreach ($orderItems as $item) {
+                $sum += $item->net_selling_price_commercial_unit * $item->quantity * 1.23;
+            }
+            $sum += $connectedOrder->additional_service_cost + $connectedOrder->additional_cash_on_delivery_cost + $connectedOrder->shipment_price_for_client;
+            $sum = round($sum, 2);
+
+            if ($connectedOrder->bookedPaymentsSum() - $connectedOrder->promisePaymentsSum() < -5) {
+                $sumOfPayments = $connectedOrder->promisePaymentsSum();
+            } else if ($connectedOrder->bookedPaymentsSum() - $connectedOrder->promisePaymentsSum() > 5) {
+                $sumOfPayments = $connectedOrder->bookedPaymentsSum() + $connectedOrder->promisePaymentsSum();
+            } else {
+                $sumOfPayments = $connectedOrder->bookedPaymentsSum();
+            }
+            if ($sum - $sumOfPayments < 2 && $sum - $sumOfPayments > -2) {
+                $connOrderSum = $sum - $sumOfPayments;
+            } else {
+                $sumOfPackages = $connectedOrder->packagesCashOnDeliverySum();
+                $connOrderSum = $sum - ($sumOfPayments + $sumOfPackages);
+            }
+
+            $connectedSum += $connOrderSum;
+            $ids[] = $connectedOrder->id;
+        }
+
+        if ($mainOrderSum < 0) {
+            $sumToCheck = $mainOrderSum + $connectedSum;
+        } else if ($connectedSum < 0) {
+            $sumToCheck = $mainOrderSum + $connectedSum;
+        } else {
+            $sumToCheck = $mainOrderSum - $connectedSum;
+        }
+
+        return [$sumToCheck, $ids];
+    }
 
     public function setWarehouseAndLabels(Request $request)
     {
@@ -973,7 +1099,6 @@ class OrdersController extends Controller
         ]);
     }
 
-
     /**
      * Remove the specified resource from storage.
      *
@@ -1067,7 +1192,6 @@ class OrdersController extends Controller
         }
     }
 
-
     /**
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
@@ -1100,7 +1224,6 @@ class OrdersController extends Controller
             'alert-type' => 'success',
         ]);
     }
-
 
     /**
      * @param $request
@@ -1473,43 +1596,6 @@ class OrdersController extends Controller
         return DataTables::of($collection)->with(['recordsFiltered' => $countFiltred])->skipPaging()->setTotalRecords($count)->make(true);
     }
 
-    public function prepareAdditionalOrderData($collection)
-    {
-        foreach ($collection as $order) {
-            $additional_service = $order->additional_service_cost ?? 0;
-            $additional_cod_cost = $order->additional_cash_on_delivery_cost ?? 0;
-            $shipment_price_client = $order->shipment_price_for_client ?? 0;
-            $totalProductPrice = 0;
-            foreach ($order->items as $item) {
-                $price = $item->net_selling_price_commercial_unit ?? 0;
-                $quantity = $item->quantity ?? 0;
-                $totalProductPrice += $price * $quantity;
-            }
-            $vatFactor = (1 + env('VAT'));
-            $products_value_gross = round($totalProductPrice * $vatFactor, 2);
-            $sum_of_gross_values = round($totalProductPrice * $vatFactor + $additional_service + $additional_cod_cost + $shipment_price_client, 2);
-            $order->values_data = array(
-                'sum_of_gross_values' => $sum_of_gross_values,
-                'products_value_gross' => $products_value_gross,
-                'shipment_price_for_client' => $order->shipment_price_for_client ?? 0,
-                'additional_cash_on_delivery_cost' => $order->additional_cash_on_delivery_cost ?? 0,
-                'additional_service_cost' => $order->additional_service_cost ?? 0
-            );
-        }
-        return $collection;
-    }
-
-    protected $dtColumns = [
-        'clientFirstname' => 'customer_addresses.firstname',
-        'clientLastname' => 'customer_addresses.lastname',
-        'clientEmail' => 'customer_addresses.email',
-        'clientPhone' => 'customer_addresses.phone',
-        'statusName' => 'statuses.name',
-        'name' => 'users.name',
-        'orderId' => 'orders.id',
-        'orderDate' => 'orders.created_at',
-    ];
-
     /**
      * @return mixed
      */
@@ -1682,6 +1768,47 @@ class OrdersController extends Controller
     }
 
     /**
+     * @return mixed
+     */
+    private function getQueryForDataTables()
+    {
+        $query = \DB::table('orders')
+            ->distinct()
+            ->select('*', 'orders.created_at as orderDate', 'orders.id as orderId',
+                'customer_addresses.email as clientEmail', 'statuses.name as statusName',
+                'customer_addresses.firstname as clientFirstname', 'customer_addresses.lastname as clientLastname',
+                'customer_addresses.phone as clientPhone', 'sel_tr__transaction.tr_CheckoutFormPaymentId as sello_payment')
+            ->leftJoin('customers', 'orders.customer_id', '=', 'customers.id')
+            ->leftJoin('warehouses', 'orders.warehouse_id', '=', 'warehouses.id')
+            ->leftJoin('statuses', 'orders.status_id', '=', 'statuses.id')
+            ->leftJoin('sel_tr__transaction', 'orders.sello_id', '=', 'sel_tr__transaction.id')
+            ->leftJoin('users', 'orders.employee_id', '=', 'users.id')
+            ->leftJoin('customer_addresses', function ($join) {
+                $join->on('customers.id', '=', 'customer_addresses.customer_id')
+                    ->where('type', '=', 'STANDARD_ADDRESS');
+            })->where(function ($query) {
+                if (Auth::user()->role_id == 4) {
+                    $query->where('orders.employee_id', '=', Auth::user()->id);
+                }
+            });
+        return $query;
+    }
+
+    /**
+     * @return array
+     */
+    private function getLabelGroupsNames()
+    {
+        return [
+            'label_platnosci',
+            'label_produkcja',
+            'label_transport',
+            'label_info_dodatkowe',
+            'label_fakury_zakupu',
+        ];
+    }
+
+    /**
      * @param $orderId
      * @param $type
      * @param bool $allSources
@@ -1795,6 +1922,32 @@ class OrdersController extends Controller
 
         $collection = $query->count();
 
+        return $collection;
+    }
+
+    public function prepareAdditionalOrderData($collection)
+    {
+        foreach ($collection as $order) {
+            $additional_service = $order->additional_service_cost ?? 0;
+            $additional_cod_cost = $order->additional_cash_on_delivery_cost ?? 0;
+            $shipment_price_client = $order->shipment_price_for_client ?? 0;
+            $totalProductPrice = 0;
+            foreach ($order->items as $item) {
+                $price = $item->net_selling_price_commercial_unit ?? 0;
+                $quantity = $item->quantity ?? 0;
+                $totalProductPrice += $price * $quantity;
+            }
+            $vatFactor = (1 + env('VAT'));
+            $products_value_gross = round($totalProductPrice * $vatFactor, 2);
+            $sum_of_gross_values = round($totalProductPrice * $vatFactor + $additional_service + $additional_cod_cost + $shipment_price_client, 2);
+            $order->values_data = array(
+                'sum_of_gross_values' => $sum_of_gross_values,
+                'products_value_gross' => $products_value_gross,
+                'shipment_price_for_client' => $order->shipment_price_for_client ?? 0,
+                'additional_cash_on_delivery_cost' => $order->additional_cash_on_delivery_cost ?? 0,
+                'additional_service_cost' => $order->additional_service_cost ?? 0
+            );
+        }
         return $collection;
     }
 
@@ -1934,8 +2087,8 @@ class OrdersController extends Controller
         }
 
         $masterPaymentId = 0;
-        foreach($orderToGetData->payments()->where('promise', '=', '')->get() as $orderGetPayment) {
-            if($orderGetPayment->amount >= $paymentAmount) {
+        foreach ($orderToGetData->payments()->where('promise', '=', '')->get() as $orderGetPayment) {
+            if ($orderGetPayment->amount >= $paymentAmount) {
                 $orderGetPayment->update([
                     'amount' => $orderGetPayment->amount - $paymentAmount
                 ]);
@@ -2108,20 +2261,6 @@ class OrdersController extends Controller
         }
     }
 
-    /**
-     * @return array
-     */
-    private function getLabelGroupsNames()
-    {
-        return [
-            'label_platnosci',
-            'label_produkcja',
-            'label_transport',
-            'label_info_dodatkowe',
-            'label_fakury_zakupu',
-        ];
-    }
-
     public function sendOfferToCustomer($id)
     {
         $order = $this->orderRepository->with(['customer', 'items', 'labels'])->find($id);
@@ -2139,7 +2278,7 @@ class OrdersController extends Controller
         $tempVariationCounter = [];
         foreach ($productsVariation as $key => $variation) {
             $variations = current($variation);
-            if(isset($tempVariationCounter[current($variations)['variation_group']])) {
+            if (isset($tempVariationCounter[current($variations)['variation_group']])) {
                 $tempVariationCounter[current($variations)['variation_group']] += 1;
             } else {
                 $tempVariationCounter[current($variations)['variation_group']] = 1;
@@ -2196,98 +2335,6 @@ class OrdersController extends Controller
             'message' => 'Pomyślnie wysłano ofertę do klienta',
             'alert-type' => 'success',
         ]);
-    }
-
-    private function getVariations($order)
-    {
-        $productsVariation = [];
-
-        $orderDeliveryAddress = $this->orderAddressRepository->findWhere([
-            "order_id" => $order->id,
-            'type' => 'DELIVERY_ADDRESS',
-        ])->first();
-
-        foreach ($order->items as $product) {
-            if ($product->product->product_group == null) {
-                continue;
-            }
-            $productVar = $this->productRepository->findByField('product_group', $product->product->product_group);
-            foreach ($productVar as $prod) {
-                $firm = $this->firmRepository->findByField('symbol', $prod->product_name_supplier);
-                if ($firm->isEmpty() || $firm->first->id->warehouses->isEmpty()) {
-                    continue;
-                }
-                $radius = 0;
-                $warehousePostalCode = $firm->first->id->warehouses->first->id->address->postal_code;
-                $firmLatLon = DB::table('postal_code_lat_lon')->where('postal_code', $warehousePostalCode)->get()->first();
-                $deliveryAddressLatLon = DB::table('postal_code_lat_lon')->where('postal_code', $orderDeliveryAddress->postal_code)->get()->first();
-
-                if ($firmLatLon != null && $deliveryAddressLatLon != null) {
-                    $radius = 73 * sqrt(
-                        pow($firmLatLon->latitude - $deliveryAddressLatLon->latitude, 2) +
-                        pow($firmLatLon->longitude - $deliveryAddressLatLon->longitude, 2)
-                    );
-                }
-                switch ($prod->variation_unit) {
-                    case 'UB':
-                        $unitData = $prod->price->gross_selling_price_basic_unit * $product->quantity * $prod->packing->numbers_of_basic_commercial_units_in_pack;
-                        break;
-                    case 'UC':
-                        $unitData = $prod->price->gross_selling_price_basic_unit * $product->quantity;
-                        break;
-                    case 'UCA':
-                        $unitData = $prod->price->gross_selling_price_basic_unit * $product->quantity * $prod->packing->numbers_of_basic_commercial_units_in_pack / $prod->packing->unit_consumption;
-                        break;
-                    case 'UCO':
-                        $unitData = $prod->price->gross_selling_price_basic_unit * $product->quantity / $prod->packing->number_of_sale_units_in_the_pack;
-                        break;
-                    default:
-                        Log::info(
-                            'Invalid variation unit: ' . $prod->variation_unit,
-                            ['product_id' => $prod->id, 'class' => get_class($this), 'line' => __LINE__]
-                        );
-                }
-
-                if ($radius > $firm->first->id->warehouses->first->id->radius ||
-                    $prod->price->gross_selling_price_commercial_unit === null ||
-                    $prod->price->gross_selling_price_basic_unit === null ||
-                    $prod->price->gross_selling_price_calculated_unit === null
-                ) {
-                    continue;
-                }
-                if ($prod->id == $product->product->id) {
-                    $diff = 0.0;
-                } else {
-                    $diff = $product->price - number_format($unitData, 2, '.', '');
-                }
-                $array = [
-                    'id' => $prod->id,
-                    'name' => $prod->name,
-                    'gross_selling_price_commercial_unit' => $prod->price->gross_selling_price_commercial_unit,
-                    'gross_selling_price_basic_unit' => $prod->price->gross_selling_price_basic_unit,
-                    'gross_selling_price_calculated_unit' => $prod->price->gross_selling_price_calculated_unit,
-                    'sum' => number_format($unitData, 2, '.', ''),
-                    'different' => $diff,
-                    'radius' => $radius,
-                    'product_name_supplier' => $prod->product_name_supplier,
-                    'phone' => $firm->first->id->phone,
-                    'review' => $prod->review,
-                    'quality' => $prod->quality,
-                    'quality_to_price' => $prod->quality_to_price,
-                    'comments' => $prod->comments,
-                    'variation_group' => $prod->variation_group,
-                    'value_of_the_order_for_free_transport' => $prod->value_of_the_order_for_free_transport
-                ];
-                    $productsVariation[$product->product->id][] = $array;
-                }
-            foreach ($productsVariation as $variation) {
-                if (isset($productsVariation[$product->product->id])) {
-                    $productsVariation[$product->product->id] = collect($variation)->sortBy('different', 1, true);
-                }
-            }
-        }
-
-        return $productsVariation;
     }
 
     public function getCalendar(int $id)
@@ -2421,33 +2468,6 @@ class OrdersController extends Controller
         OrderInvoice::where('id', $id)->delete();
 
         return response()->json(['status' => 'success']);
-    }
-
-    /**
-     * @return mixed
-     */
-    private function getQueryForDataTables()
-    {
-        $query = \DB::table('orders')
-            ->distinct()
-            ->select('*', 'orders.created_at as orderDate', 'orders.id as orderId',
-                'customer_addresses.email as clientEmail', 'statuses.name as statusName',
-                'customer_addresses.firstname as clientFirstname', 'customer_addresses.lastname as clientLastname',
-                'customer_addresses.phone as clientPhone', 'sel_tr__transaction.tr_CheckoutFormPaymentId as sello_payment')
-            ->leftJoin('customers', 'orders.customer_id', '=', 'customers.id')
-            ->leftJoin('warehouses', 'orders.warehouse_id', '=', 'warehouses.id')
-            ->leftJoin('statuses', 'orders.status_id', '=', 'statuses.id')
-            ->leftJoin('sel_tr__transaction', 'orders.sello_id', '=', 'sel_tr__transaction.id')
-            ->leftJoin('users', 'orders.employee_id', '=', 'users.id')
-            ->leftJoin('customer_addresses', function ($join) {
-                $join->on('customers.id', '=', 'customer_addresses.customer_id')
-                    ->where('type', '=', 'STANDARD_ADDRESS');
-            })->where(function ($query) {
-                if (Auth::user()->role_id == 4) {
-                    $query->where('orders.employee_id', '=', Auth::user()->id);
-                }
-            });
-        return $query;
     }
 }
 
