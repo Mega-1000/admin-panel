@@ -1651,16 +1651,19 @@ class OrdersController extends Controller
 
                     switch ($column['search']['value']) {
                         case "yesterday":
-                            $query->where("orders.shipment_date", '=', $now->subDay(1)->toDateString());
+                            $query->where("orders.shipment_date", '<', $now->toDateString());
+                            $query->where("orders.shipment_date", '>=', $now->subDay(1)->toDateString());
                             break;
                         case "today":
-                            $query->where("orders.shipment_date", '=', $now->toDateString());
+                            $query->where("orders.shipment_date", '>=', $now->toDateString());
+                            $query->where("orders.shipment_date", '<', $now->addDay(1)->toDateString());
                             break;
                         case "tomorrow":
-                            $query->where("orders.shipment_date", '=', $now->addDay(1)->toDateString());
+                            $query->where("orders.shipment_date", '>=', $now->addDay(1)->toDateString());
+                            $query->where("orders.shipment_date", '<', $now->addDay(1)->toDateString());
                             break;
                         case "from_tomorrow":
-                            $query->where("orders.shipment_date", '>', $now->toDateString());
+                            $query->where("orders.shipment_date", '>=', $now->addDay(1)->toDateString());
                             break;
                         case "all":
                         default:
@@ -1861,27 +1864,7 @@ class OrdersController extends Controller
                 }
             } else {
                 if ($column['name'] == "shipment_date" && !empty($column['search']['value'])) {
-                    $now = new Carbon();
-
-                    switch ($column['search']['value']) {
-                        case "yesterday":
-                            $query->where("orders.shipment_date", '>=', $now->subDay(1)->toDateString());
-                            $query->where("orders.shipment_date", '<', $now->toDateString());
-                            break;
-                        case "today":
-                            $query->where("orders.shipment_date", '=>', $now->toDateString());
-                            break;
-                        case "tomorrow":
-                            $query->where("orders.shipment_date", '>=', $now->addDay(1)->toDateString());
-                            $query->where("orders.shipment_date", '<', $now->addDay(2)->toDateString());
-                            break;
-                        case "from_tomorrow":
-                            $query->where("orders.shipment_date", '>=', $now->addDay(1)->toDateString());
-                            break;
-                        case "all":
-                        default:
-                            break;
-                    }
+                    $this->filterByDate($column, $query);
                 } elseif ($column['name'] == "remainder_date" && isset($column['search']['value'])) {
                     $val = filter_var($column['search']['value'], FILTER_VALIDATE_BOOLEAN);
                     if ($val) {
@@ -2470,6 +2453,36 @@ class OrdersController extends Controller
         OrderInvoice::where('id', $id)->delete();
 
         return response()->json(['status' => 'success']);
+    }
+
+    /**
+     * @param $column
+     * @param $query
+     */
+    private function filterByDate($column, $query): void
+    {
+        $now = new Carbon();
+
+        switch ($column) {
+            case "yesterday":
+                $query->where("orders.shipment_date", '<', $now->toDateString());
+                $query->where("orders.shipment_date", '>=', $now->subDay(1)->toDateString());
+                break;
+            case "today":
+                $query->where("orders.shipment_date", '>=', $now->toDateString());
+                $query->where("orders.shipment_date", '<', $now->addDay(1)->toDateString());
+                break;
+            case "tomorrow":
+                $query->where("orders.shipment_date", '>=', $now->addDay(1)->toDateString());
+                $query->where("orders.shipment_date", '<', $now->addDay(1)->toDateString());
+                break;
+            case "from_tomorrow":
+                $query->where("orders.shipment_date", '>=', $now->addDay(1)->toDateString());
+                break;
+            case "all":
+            default:
+                break;
+        }
     }
 }
 
