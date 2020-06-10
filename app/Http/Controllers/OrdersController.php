@@ -1780,12 +1780,19 @@ class OrdersController extends Controller
             ->select('*', 'orders.created_at as orderDate', 'orders.id as orderId',
                 'customer_addresses.email as clientEmail', 'statuses.name as statusName',
                 'customer_addresses.firstname as clientFirstname', 'customer_addresses.lastname as clientLastname',
-                'customer_addresses.phone as clientPhone', 'sel_tr__transaction.tr_CheckoutFormPaymentId as sello_payment')
+                'customer_addresses.phone as clientPhone', 'sel_tr__transaction.tr_CheckoutFormPaymentId as sello_payment',
+                'task_times.date_start as production_date', 'taskUser.firstname as taskUser')
             ->leftJoin('customers', 'orders.customer_id', '=', 'customers.id')
             ->leftJoin('warehouses', 'orders.warehouse_id', '=', 'warehouses.id')
             ->leftJoin('statuses', 'orders.status_id', '=', 'statuses.id')
             ->leftJoin('sel_tr__transaction', 'orders.sello_id', '=', 'sel_tr__transaction.id')
             ->leftJoin('users', 'orders.employee_id', '=', 'users.id')
+            //poniższe left joiny mają na celu wyświetlenie czasów oraz wykonwaców zadań z tabeli tasks na "gridzie"
+            ->leftJoin('tasks', 'orders.id', '=', 'tasks.order_id')
+            ->leftJoin('tasks as parentTask', 'parentTask.id', '=', 'tasks.parent_id')
+            ->leftJoin('users as taskUser', \DB::raw('COALESCE(parentTask.user_id, tasks.user_id)'), '=', 'taskUser.id')
+            ->leftJoin('task_times', 'task_times.task_id', '=', \DB::raw('COALESCE(parentTask.id, tasks.id)'))
+            //tasks - koniec
             ->leftJoin('customer_addresses', function ($join) {
                 $join->on('customers.id', '=', 'customer_addresses.customer_id')
                     ->where('type', '=', 'STANDARD_ADDRESS');
