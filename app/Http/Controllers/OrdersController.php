@@ -1865,16 +1865,18 @@ class OrdersController extends Controller
 
                     switch ($column['search']['value']) {
                         case "yesterday":
-                            $query->where("orders.shipment_date", '=', $now->subDay(1)->toDateString());
+                            $query->where("orders.shipment_date", '>=', $now->subDay(1)->toDateString());
+                            $query->where("orders.shipment_date", '<', $now->toDateString());
                             break;
                         case "today":
-                            $query->where("orders.shipment_date", '=', $now->toDateString());
+                            $query->where("orders.shipment_date", '=>', $now->toDateString());
                             break;
                         case "tomorrow":
-                            $query->where("orders.shipment_date", '=', $now->addDay(1)->toDateString());
+                            $query->where("orders.shipment_date", '>=', $now->addDay(1)->toDateString());
+                            $query->where("orders.shipment_date", '<', $now->addDay(2)->toDateString());
                             break;
                         case "from_tomorrow":
-                            $query->where("orders.shipment_date", '>', $now->toDateString());
+                            $query->where("orders.shipment_date", '>=', $now->addDay(1)->toDateString());
                             break;
                         case "all":
                         default:
