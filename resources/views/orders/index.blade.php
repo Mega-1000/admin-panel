@@ -512,7 +512,10 @@
                href="{{route('order_packages.letters',['courier_name'=>$courier->delivery_courier_name])}}">
                 {{$courier->delivery_courier_name}}</a>
         @endforeach
-
+    </div>
+    <div class="form-group">
+        <label for="send_courier">Drukuj zamówienia widoczne na stronie: </label>
+        <a name="print_orders" class="btn btn-success" onclick="printAll()">Drukuj wszystkie</a>
     </div>
     <div style="display: flex; align-items: center;" id="add-label-container">
         <button onclick="addLabel()" type="button" class="btn btn-primary">@lang('orders.table.save_label')</button>
@@ -643,7 +646,6 @@
                     <input type="text" id="columnSearch-statusName"/>
                     <button class="btn btn-default" id="set_outdate" onclick="
                         let is_filter = !$(this).hasClass('btn-success');
-                        console.log(is_filter)
                         if (is_filter) {
                             $(this).addClass('btn-success')
                         } else {
@@ -2102,6 +2104,17 @@
             }
 
 
+        }
+
+        function printAll() {
+            $.post("{{route('orders.printAll')}}", table.ajax.params())
+            .done((data) => {
+                if (!data.error) {
+                    window.open(data);
+                } else {
+                    alert('Trwa przygotowywanie listy')
+                }
+            });
         }
 
         function addLabel() {
