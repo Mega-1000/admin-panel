@@ -448,7 +448,7 @@ class Order extends Model implements Transformable
 
     public function taskSchedule()
     {
-        return $this->hasOne(Task::class);
+        return $this->hasMany(Task::class);
     }
 
     public function getToken()
