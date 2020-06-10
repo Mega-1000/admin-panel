@@ -1704,7 +1704,7 @@ class OrdersController extends Controller
             }
         }
 
-        $count = $query->get()->count();
+        $count = $query->count();
         $collection = $query
             ->limit($data['length'])->offset($data['start'])
             ->get();
