@@ -48,6 +48,9 @@ class CustomerOrderDataReminder implements ShouldQueue
             }
 
             try {
+                if (strpos($order->customer->login, 'allegromail.pl')) {
+                    return;
+                }
                 \Mailer::create()
                     ->to($order->customer->login)
                     ->send($senderJob);

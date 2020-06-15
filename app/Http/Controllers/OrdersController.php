@@ -1591,8 +1591,7 @@ class OrdersController extends Controller
     public function datatable(Request $request)
     {
         $data = $request->all();
-        $collection = $this->prepareCollection($data);
-        $countFiltred = $this->countFiltered($data);
+        list($collection, $countFiltred) = $this->prepareCollection($data);
         $count = $this->orderRepository->all();
         $count = count($count);
         $collection = $this->prepareAdditionalOrderData($collection);
@@ -1655,16 +1654,19 @@ class OrdersController extends Controller
 
                     switch ($column['search']['value']) {
                         case "yesterday":
-                            $query->where("orders.shipment_date", '=', $now->subDay(1)->toDateString());
+                            $query->where("orders.shipment_date", '<', $now->toDateString());
+                            $query->where("orders.shipment_date", '>=', $now->subDay(1)->toDateString());
                             break;
                         case "today":
-                            $query->where("orders.shipment_date", '=', $now->toDateString());
+                            $query->where("orders.shipment_date", '>=', $now->toDateString());
+                            $query->where("orders.shipment_date", '<', $now->addDay(1)->toDateString());
                             break;
                         case "tomorrow":
-                            $query->where("orders.shipment_date", '=', $now->addDay(1)->toDateString());
+                            $query->where("orders.shipment_date", '>=', $now->addDay(1)->toDateString());
+                            $query->where("orders.shipment_date", '<', $now->addDay(1)->toDateString());
                             break;
                         case "from_tomorrow":
-                            $query->where("orders.shipment_date", '>', $now->toDateString());
+                            $query->where("orders.shipment_date", '>=', $now->addDay(1)->toDateString());
                             break;
                         case "all":
                         default:
@@ -1705,6 +1707,8 @@ class OrdersController extends Controller
                 }
             }
         }
+
+        $count = $query->count();
 
         if ($withoutPagination) {
             $collection = $query
@@ -1773,7 +1777,7 @@ class OrdersController extends Controller
                 ->all();
         }
 
-        return $collection;
+        return [$collection, $count];
     }
 
     /**
@@ -1786,7 +1790,14 @@ class OrdersController extends Controller
             ->select('*', 'orders.created_at as orderDate', 'orders.id as orderId',
                 'customer_addresses.email as clientEmail', 'statuses.name as statusName',
                 'customer_addresses.firstname as clientFirstname', 'customer_addresses.lastname as clientLastname',
-                'customer_addresses.phone as clientPhone', 'sel_tr__transaction.tr_CheckoutFormPaymentId as sello_payment')
+                'customer_addresses.phone as clientPhone', 'sel_tr__transaction.tr_CheckoutFormPaymentId as sello_payment',
+                'task_times.date_start as production_date', 'taskUser.firstname as taskUserFirstName')
+            //poniższe left joiny mają na celu wyświetlenie czasów oraz wykonwaców zadań z tabeli tasks na "gridzie"
+            ->leftJoin('tasks', 'orders.id', '=', 'tasks.order_id')
+            ->leftJoin('tasks as parentTask', 'parentTask.id', '=', 'tasks.parent_id')
+            ->leftJoin('users as taskUser', \DB::raw('COALESCE(parentTask.user_id, tasks.user_id)'), '=', 'taskUser.id')
+            ->leftJoin('task_times', 'task_times.task_id', '=', \DB::raw('COALESCE(parentTask.id, tasks.id)'))
+            //tasks - koniec
             ->leftJoin('customers', 'orders.customer_id', '=', 'customers.id')
             ->leftJoin('warehouses', 'orders.warehouse_id', '=', 'warehouses.id')
             ->leftJoin('statuses', 'orders.status_id', '=', 'statuses.id')
@@ -1840,98 +1851,6 @@ class OrdersController extends Controller
         }
 
         return implode(' ----------- ', $messages);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function countFiltered($data)
-    {
-        $query = $this->getQueryForDataTables()->orderBy('orders.id', 'desc');
-        $notSearchable = [
-
-        ];
-
-        foreach ($data['columns'] as $column) {
-            if ($column['searchable'] == 'true' && !empty($column['search']['value'])) {
-                if (array_key_exists($column['name'], $notSearchable)) {
-
-                } else {
-                    if (array_key_exists($column['name'], $this->dtColumns)) {
-                        if ($column['name'] == 'statusName' && $column['search']['regex'] == true) {
-                            $query->whereRaw($this->dtColumns[$column['name']] . ' REGEXP ' . "'{$column['search']['value']}'");
-                        } else {
-                            $query->where($this->dtColumns[$column['name']], 'LIKE', "%{$column['search']['value']}%");
-                        }
-                    } else {
-                        $columnName = $this->replaceSearch[$column['name']] ?? $column['name'];
-                        $query->where($columnName, 'LIKE', "%{$column['search']['value']}%");
-                    }
-                }
-            } else {
-                if ($column['name'] == "shipment_date" && !empty($column['search']['value'])) {
-                    $now = new Carbon();
-
-                    switch ($column['search']['value']) {
-                        case "yesterday":
-                            $query->where("orders.shipment_date", '=', $now->subDay(1)->toDateString());
-                            break;
-                        case "today":
-                            $query->where("orders.shipment_date", '=', $now->toDateString());
-                            break;
-                        case "tomorrow":
-                            $query->where("orders.shipment_date", '=', $now->addDay(1)->toDateString());
-                            break;
-                        case "from_tomorrow":
-                            $query->where("orders.shipment_date", '>', $now->toDateString());
-                            break;
-                        case "all":
-                        default:
-                            break;
-                    }
-                } elseif ($column['name'] == "remainder_date" && isset($column['search']['value'])) {
-                    $val = filter_var($column['search']['value'], FILTER_VALIDATE_BOOLEAN);
-                    if ($val) {
-                        $query->whereRaw('remainder_date < Now()');
-                    }
-                } else {
-                    if ($column['name'] == "search_on_lp" && !empty($column['search']['value'])) {
-                        $query->leftJoin('order_packages', 'orders.id', '=', 'order_packages.order_id');
-                        $query->whereRaw('order_packages.letter_number' . ' REGEXP ' . "'{$column['search']['value']}'");
-                    } elseif (in_array($column['name'],
-                            $this->getLabelGroupsNames()) && !empty($column['search']['value'])) {
-                        $query->whereExists(function ($innerQuery) use ($column) {
-                            $innerQuery->select("*")
-                                ->from('order_labels')
-                                ->whereRaw("order_labels.order_id = orders.id and order_labels.label_id = {$column['search']['value']}");
-                        });
-                    } elseif ($column['name'] == "packages_sent" && !empty($column['search']['value'])) {
-                        $query->whereExists(function ($innerQuery) use ($column) {
-                            $innerQuery->select("*")
-                                ->from('order_packages')
-                                ->whereRaw("order_packages.order_id = orders.id AND order_packages.delivery_courier_name LIKE '{$column['search']['value']}' AND order_packages.status IN ('SENDING', 'DELIVERED')");
-                        });
-                    } elseif ($column['name'] == "packages_not_sent" && !empty($column['search']['value'])) {
-                        $query->whereExists(function ($innerQuery) use ($column) {
-                            $innerQuery->select("*")
-                                ->from('order_packages')
-                                ->whereRaw("order_packages.order_id = orders.id AND order_packages.delivery_courier_name LIKE '{$column['search']['value']}' AND order_packages.status NOT IN ('SENDING', 'DELIVERED')");
-                        });
-                    } elseif ($column['name'] == 'sum_of_payments' && !empty($column['search']['value'])) {
-                        $query->whereRaw('(select sum(amount) from order_payments where order_payments.order_id = orders.id)' . ' LIKE ' . "'%{$column['search']['value']}%'");
-                    } elseif ($column['name'] == 'sum_of_gross_values' && !empty($column['search']['value'])) {
-                        $query->whereRaw('orders.total_price + IFNULL(orders.additional_service_cost, 0) + IFNULL(orders.additional_cash_on_delivery_cost, 0) + IFNULL(orders.shipment_price_for_client, 0)' . ' LIKE ' . "'%{$column['search']['value']}%'");
-                    } elseif ($column['name'] == 'left_to_pay' && !empty($column['search']['value'])) {
-                        $query->whereRaw('IFNULL((orders.total_price + IFNULL(orders.additional_service_cost, 0) + IFNULL(orders.additional_cash_on_delivery_cost, 0) + IFNULL(orders.shipment_price_for_client, 0)) - ifnull((select sum(amount) from order_payments where order_payments.order_id = orders.id), 0),0)' . ' LIKE ' . "'%{$column['search']['value']}%'");
-                    }
-                }
-
-            }
-        }
-
-        $collection = $query->count();
-
-        return $collection;
     }
 
     public function prepareAdditionalOrderData($collection)
@@ -2378,10 +2297,12 @@ class OrdersController extends Controller
         }
         $productPacking = $this->productPackingRepository->findWhereIn('product_id', $productsArray);
 
-        \Mailer::create()
-            ->to($order->customer->login)
-            ->send(new SendOfferToCustomerMail('Oferta nr: ' . $order->id, $order, $productsVariation,
-                $allProductsFromSupplier, $productPacking));
+        if (!strpos($order->customer->login, 'allegromail.pl')) {
+            \Mailer::create()
+                ->to($order->customer->login)
+                ->send(new SendOfferToCustomerMail('Oferta nr: ' . $order->id, $order, $productsVariation,
+                    $allProductsFromSupplier, $productPacking));
+        }
 
         return redirect()->route('orders.edit', ['order_id' => $order->id])->with([
             'message' => 'Pomyślnie wysłano ofertę do klienta',

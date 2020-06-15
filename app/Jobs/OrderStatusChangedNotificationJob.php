@@ -87,6 +87,9 @@ class OrderStatusChangedNotificationJob extends Job
             Storage::disk('local')->put('public/proforma/' . $order->proforma_filename, $pdf);
 
             try {
+                if (strpos($order->customer->login,'allegromail.pl')) {
+                    return;
+                }
                 \Mailer::create()
                     ->to($order->customer->login)
                     ->send(new OrderStatusChanged($subject, $message, $pdf));

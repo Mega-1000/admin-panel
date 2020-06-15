@@ -50,6 +50,9 @@ class OrderObserver
 
             if ((new Carbon($original))->diffInDays($newDate) !== 0) {
                 try {
+                    if (strpos($order->customer->login, 'allegromail.pl')) {
+                        return;
+                    }
                     \Mailer::create()
                         ->to($order->customer->login)
                         ->send(new ShipmentDateInOrderChangedMail([

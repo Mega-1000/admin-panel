@@ -10,6 +10,7 @@ use App\Entities\TaskSalaryDetails;
 use App\Entities\TaskTime;
 use App\Entities\Warehouse;
 use App\Helpers\GetCustomerForSello;
+use App\Helpers\Helper;
 use App\Helpers\LabelsHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceOverrider;
@@ -21,10 +22,10 @@ use App\Http\Controllers\OrdersPaymentsController;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -231,7 +232,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $addressArray['postal_code'] = $address->adr_ZipCode;
         $addressArray['nip'] = $address->adr_NIP;
         $addressArray['firmname'] = $address->adr_Company ?: $customer->cs_Company ?: '';
-        $addressArray['phone'] = $address->adr_PhoneNumber ?: $customer->phone->cp_Phone ?: '';
+        $addressArray['phone'] = Helper::preparePhone($address->adr_PhoneNumber ?: $customer->phone->cp_Phone ?: '');
         return $addressArray;
     }
 
@@ -277,12 +278,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
     private function createAddressArray($transaction): array
     {
         $transactionArray = [];
-        $transactionArray['customer_login'] = str_replace('allegromail.pl', 'mega1000.pl', $transaction->customer->email->ce_email);
-        $phone = preg_replace('/[^0-9]/', '', $transaction->customer->phone->cp_Phone);
-        $pos = strpos($phone, '48');
-        if ($pos === 0) {
-            $phone = substr($phone, 2);
-        }
+        $transactionArray['customer_login'] = $transaction->customer->email->ce_email;
+        $phone = Helper::preparePhone($transaction->customer->phone->cp_Phone);
         $transactionArray['phone'] = $phone;
         $transactionArray['update_email'] = true;
         $transactionArray['customer_notices'] = empty($transaction->note) ? '' : $transaction->note->ne_Content;
@@ -292,4 +289,5 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $transactionArray['nick_allegro'] = $transaction->customer->cs_Nick;
         return $transactionArray;
     }
+
 }

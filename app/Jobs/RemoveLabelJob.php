@@ -60,13 +60,13 @@ class RemoveLabelJob extends Job
                 continue;
             }
 
-            if ($labelId == 41) {
+            if ($labelId == 41 && !strpos($this->order->customer->login, 'allegromail.pl')) {
                 $noData = DB::table('gt_invoices')->where('order_id', $this->order->id)->where('gt_invoice_status_id', '13')->first();
                 if (!empty($noData)) {
                     try {
                         \Mailer::create()
                             ->to($this->order->customer->login)
-                            ->send(new DifferentCustomerData('Wybór danych do wystawienia faktury - zlecenie'.$this->order->id, $this->order->id, $noData->id));
+                            ->send(new DifferentCustomerData('Wybór danych do wystawienia faktury - zlecenie' . $this->order->id, $this->order->id, $noData->id));
                     } catch (\Swift_TransportException $e) {
 
                     }
@@ -74,7 +74,7 @@ class RemoveLabelJob extends Job
                     try {
                         \Mailer::create()
                             ->to($this->order->customer->login)
-                            ->send(new ConfirmData('Wybór danych do wystawienia faktury  - zlecenie'.$this->order->id, $this->order->id));
+                            ->send(new ConfirmData('Wybór danych do wystawienia faktury  - zlecenie' . $this->order->id, $this->order->id));
                     } catch (\Swift_TransportException $e) {
 
                     }

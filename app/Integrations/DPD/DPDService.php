@@ -280,7 +280,10 @@ class DPDService extends SoapClient
                 $obj->packageId = ($this->apiVersion > 1) ? $result->return->Packages->Package[0]->PackageId : $result->return->packages[0]->packageId;
                 $obj->parcels = ($this->apiVersion > 1) ? $result->return->Packages->Package[0]->Parcels->Parcel : $result->return->packages[0]->parcels;
 
-            } else $obj->success = false;
+            } else {
+                \Log::error('Failed pickup request: ', [$result]);
+                $obj->success = false;
+            }
 
             return $obj;
 
@@ -539,7 +542,10 @@ class DPDService extends SoapClient
                 $obj->fileformat = $fileFormat;
                 $obj->pageformat = $pageFormat;
 
-            } else $obj->success = false;
+            } else {
+                \Log::error('Failed Speed Label Generation: ', [$result]);
+                $obj->success = false;
+            }
 
             return $obj;
 
@@ -659,7 +665,10 @@ class DPDService extends SoapClient
                 $obj->fileformat = 'pdf';
                 $obj->pageformat = $pageFormat;
 
-            } else $obj->success = false;
+            } else {
+                \Log::error('Failed generateProtocol: ', [$result]);
+                $obj->success = false;
+            }
 
             return $obj;
 
@@ -779,7 +788,10 @@ class DPDService extends SoapClient
 
                 $obj->success = true;
 
-            } else $obj->success = false;
+            } else {
+                \Log::error('Failed Pickup Request', [$result]);
+                $obj->success = false;
+            }
 
 
 

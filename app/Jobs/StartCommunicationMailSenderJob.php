@@ -44,6 +44,9 @@ class StartCommunicationMailSenderJob implements ShouldQueue
             return;
         }
         try {
+            if (strpos($this->email,'allegromail.pl')) {
+                return;
+            }
             \Mailer::create()
                 ->to($this->email)
                 ->send(new StartCommunication($this->orderId));
