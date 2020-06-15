@@ -1082,7 +1082,7 @@
                     data: 'production_date',
                     name: 'production_date',
                     searchable: false,
-                    render: (production_date, option, row) => (production_date ?? '' + ' ' + row.taskUser ?? '')
+                    render: (production_date, option, row) => ((production_date ?? '')  + ' ' + (row.taskUserFirstName ?? ''))
                 },
                 {
                     data: 'shipment_date',
