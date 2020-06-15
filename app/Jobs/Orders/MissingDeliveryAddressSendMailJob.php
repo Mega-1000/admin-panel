@@ -38,6 +38,9 @@ class MissingDeliveryAddressSendMailJob extends Job
                     }
                 }
             }
+            if (strpos($this->order->customer->login, 'allegromail.pl')) {
+                return;
+            }
             \Mailer::create()
                 ->to($this->order->customer->login)
                 ->send(new MissingDeliveryAddressMail("Niekompletne dane - numer zamówienia: {$this->order->id}", $formLink));

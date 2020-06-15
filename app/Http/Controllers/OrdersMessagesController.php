@@ -173,9 +173,11 @@ class OrdersMessagesController extends Controller
                 ->send(new SelfMessageSent($date, $type, $typeText, $order->warehouse->id, $order_id));
         } else {
             if ($request->input('type') == 'GENERAL' || $request->input('type') == 'SHIPPING' || $request->input('type') == 'WAREHOUSE') {
-                \Mailer::create()
-                    ->to($clientEmail)
-                    ->send(new MessageSent($date, $type, $typeText, $frontId, $order_id));
+                if (!strpos($clientEmail, 'allegromail.pl')) {
+                    \Mailer::create()
+                        ->to($clientEmail)
+                        ->send(new MessageSent($date, $type, $typeText, $frontId, $order_id));
+                }
             }
         }
 

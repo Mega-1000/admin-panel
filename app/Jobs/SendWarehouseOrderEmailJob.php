@@ -47,6 +47,9 @@ class SendWarehouseOrderEmailJob extends Job
      */
     public function handle(EmailTagHandlerHelper $emailTagHandler, OrderRepository $orderRepository, TagRepository $tagRepository)
     {
+        if (strpos($this->email,'allegromail.pl')) {
+            return;
+        }
         $subject = "Zamówienie Produktów. Zlecenie nr: " . $this->warehouseOrderId;
         \Mailer::create()
             ->to($this->email)

@@ -68,6 +68,9 @@ class LabelAddNotificationJob implements ShouldQueue
 
        $subject = "Mega1000 - zmieniono status zamówienia: " . $this->orderId . ' na status: ' . $label->name;
        try {
+           if (strpos($order->customer->login, 'allegromail.pl')) {
+               return;
+           }
            \Mailer::create()
                ->to($order->customer->login)
                ->send(new LabelAdd($subject, $message));
