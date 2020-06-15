@@ -53,15 +53,22 @@ class Helper
 
     public static function sendEmail($email, $template, $subject, $additionalData = [])
     {
-        return \Mail::send(
-            "emails/$template",
-            array_merge(['email' => $email], $additionalData),
-            function ($m) use ($email, $subject) {
-                $to = env('MAIL_DEV_ADDRESS', $email);
-                $name = env('MAIL_DEV_NAME', $email);
-                $m->to($to, $name)->subject($subject);
-            }
-        );
+        if (strpos($email, 'allegromail.pl')) {
+            return;
+        }
+        try {
+            return \Mail::send(
+                "emails/$template",
+                array_merge(['email' => $email], $additionalData),
+                function ($m) use ($email, $subject) {
+                    $to = env('MAIL_DEV_ADDRESS', $email);
+                    $name = env('MAIL_DEV_NAME', $email);
+                    $m->to($to, $name)->subject($subject);
+                }
+            );
+        } catch (\Exception $e) {
+            \Log::error('Mail::send', ['message' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
+        }
     }
 
     /**

@@ -2244,10 +2244,12 @@ class OrdersController extends Controller
         }
         $productPacking = $this->productPackingRepository->findWhereIn('product_id', $productsArray);
 
-        \Mailer::create()
-            ->to($order->customer->login)
-            ->send(new SendOfferToCustomerMail('Oferta nr: ' . $order->id, $order, $productsVariation,
-                $allProductsFromSupplier, $productPacking));
+        if (!strpos($order->customer->login, 'allegromail.pl')) {
+            \Mailer::create()
+                ->to($order->customer->login)
+                ->send(new SendOfferToCustomerMail('Oferta nr: ' . $order->id, $order, $productsVariation,
+                    $allProductsFromSupplier, $productPacking));
+        }
 
         return redirect()->route('orders.edit', ['order_id' => $order->id])->with([
             'message' => 'Pomyślnie wysłano ofertę do klienta',
