@@ -63,4 +63,18 @@ class Helper
             }
         );
     }
+
+    /**
+     * @param $number
+     * @return false|string|string[]|null
+     */
+    public static function preparePhone($number)
+    {
+        $phone = preg_replace('/[^0-9]/', '', $number);
+        $pos = strpos($phone, '48');
+        if ($pos === 0) {
+            $phone = substr($phone, 2);
+        }
+        return $phone;
+    }
 }
