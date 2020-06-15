@@ -222,9 +222,9 @@
             </div>
             <div class="form-group" style="width: 20%; float: left; padding: 5px;">
                 <label for="production_date">@lang('orders.form.production_date')</label>
-                <input type="text" class="form-control default-date-time-picker-now" id="production_date"
+                <input disabled type="text" class="form-control default-date-time-picker-now" id="production_date"
                        name="production_date"
-                       value="{{ $order->production_date }}">
+                       value="{{ $order->taskSchedule->first()->taskTime->date_start }}">
             </div>
             <div class="form-group" style="width: 20%; float: left; padding: 5px;">
                 <label for="shipment_date">@lang('orders.form.shipment_date')</label>
