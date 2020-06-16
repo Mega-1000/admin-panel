@@ -2,7 +2,8 @@
 <html lang="pl">
 <head>
     <title>Zamówienie {{ $order->id }}</title>
-    <meta charset="UTF-8">
+{{--    <meta charset="UTF-8">--}}
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
     <style>
         body, html, .docc {
@@ -29,7 +30,7 @@
         <h2>Osoba odpowiedzialna:</h2> {!! $tagHelper->consultantOrStorekeeper() !!}<br/>
     @endif
     <div style="position:absolute; right:40px; top:0px;">
-        <h2>
+        <h2 style="display: inline-block">
             MEGA 1000 BIS SP Z O O<br/>
             ZEROMSKIEGO 52/18<br/>
             50-312 WROCLAW<br/>

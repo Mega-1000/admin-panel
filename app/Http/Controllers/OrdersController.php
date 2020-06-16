@@ -52,11 +52,15 @@ use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
 use App\User;
 use Carbon\Carbon;
+use Dompdf\Dompdf;
+use iio\libmergepdf\Merger;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
 use Yajra\DataTables\Facades\DataTables;
@@ -1598,7 +1602,7 @@ class OrdersController extends Controller
     /**
      * @return mixed
      */
-    public function prepareCollection($data)
+    public function prepareCollection($data, $withoutPagination = false)
     {
         $sortingColumnId = $data['order'][0]['column'];
         $sortingColumnDirection = $data['order'][0]['dir'];
@@ -1705,9 +1709,15 @@ class OrdersController extends Controller
         }
 
         $count = $query->count();
-        $collection = $query
-            ->limit($data['length'])->offset($data['start'])
-            ->get();
+
+        if ($withoutPagination) {
+            $collection = $query
+                ->get();
+        } else {
+            $collection = $query
+                ->limit($data['length'])->offset($data['start'])
+                ->get();
+        }
 
         foreach ($collection as $row) {
             $orderId = $row->orderId;
@@ -1867,6 +1877,49 @@ class OrdersController extends Controller
             );
         }
         return $collection;
+    }
+
+    public function printAll(Request $request)
+    {
+        $finalPdfFileName = 'allPrints.pdf';
+        $lockName = 'file.lock';
+        if (File::exists(public_path($lockName))) {
+            return response(['error' => 'file_exist']);
+        }
+        file_put_contents($lockName, '');
+        $data = $request->all();
+        $collection = $this->prepareCollection($data, true);
+        $tagHelper = new EmailTagHandlerHelper();
+        $merger = new Merger;
+        $i = 0;
+        foreach ($collection as $ord) {
+            $dompdf = new Dompdf();
+
+            $order = Order::find($ord->orderId);
+            $tagHelper->setOrder($order);
+            $view = View::make('orders.print', [
+                'order' => $order,
+                'tagHelper' => $tagHelper,
+                'showPosition' => true
+            ]);
+            if (empty($view)) {
+                continue;
+            }
+            $dompdf->loadHTML($view);
+            $dompdf->render();
+            $output = $dompdf->output();
+            file_put_contents("spec_$i.pdf", $output);
+            $merger->addFile(public_path("spec_$i.pdf"));
+            $i++;
+        }
+        $file = $merger->merge();
+        file_put_contents(public_path("storage/$finalPdfFileName"), $file);
+        while ($i >= 0) {
+            File::delete(public_path("spec_$i.pdf"));
+            $i--;
+        }
+        unlink(public_path($lockName));
+        return Storage::url($finalPdfFileName, now());
     }
 
     /**
