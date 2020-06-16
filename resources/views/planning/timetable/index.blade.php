@@ -527,11 +527,7 @@
           eventRender: function (event) {
 
             let id;
-            if (event.event.extendedProps.customOrderId !== null) {
-              id = event.event.extendedProps.customOrderId;
-            } else {
-              id = event.event.extendedProps.customTaskId;
-            }
+            id = event.event.extendedProps.customTaskId;
             $(event.el).attr('id', id);
 
           },
@@ -899,13 +895,13 @@
             }
           }
         };
-        var idFromUrl = getUrlParameter('id');
+        var idFromUrl = 'task-{{ $selectId }}'
         var viewTypeFromUrl = getUrlParameter('view_type');
         var activeStartFromUrl = getUrlParameter('active_start');
         var activeEndFromUrl = getUrlParameter('active_end');
         if (idFromUrl !== undefined) {
           setTimeout(function () {
-            $('#' + idFromUrl).css('border', '3px solid rgb(96,2,1)');
+            $('#' + idFromUrl).css('border', '4px solid rgb(96,2,1)');
             $(".fc-scroller").animate({
               scrollLeft: $('#' + idFromUrl).position().left - 600
             }, 500);

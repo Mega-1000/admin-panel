@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\Task;
 use App\Entities\Warehouse;
 use App\Repositories\TaskRepository;
 use App\Repositories\WarehouseRepository;
@@ -28,14 +29,20 @@ class TimetablesController extends Controller
             $string = explode('-', $request->id);
             if (isset($string[1])) {
                 if($string[0] == 'taskOrder') {
-                    $tasks = $this->taskRepository->findByField('order_id', (int)$string[1]);
-                    if ($tasks->isEmpty()) {
+                    $tasks = Task::where('order_id', (int)$string[1]);
+                    if ($tasks->count() == 0) {
                         return redirect()->back()->with([
                             'message' => 'Zadanie dla zamówienia o id: ' . $string[1] . ' nie istnieje.',
                             'alert-type' => 'error'
                         ]);
                     }
-                    $dateView = new Carbon($tasks->first->id->taskTime->date_start);
+                    $task = $tasks->first();
+                    $parent = $task->parent()->first();
+                    if ($parent) {
+                        $task = $parent;
+                    }
+                    $selectId = $task->id;
+                    $dateView = new Carbon($task->taskTime->date_start);
                     $activeDay = $dateView->toDateTimeString();
 
                     $viewType = 'resourceTimelineDay';
@@ -44,7 +51,7 @@ class TimetablesController extends Controller
         }
         $warehouses = $this->warehouseRepository->findByField('symbol', 'MEGA-OLAWA');
 
-        return view('planning.timetable.index', compact(['warehouses', 'viewType', 'activeDay']));
+        return view('planning.timetable.index', compact(['warehouses', 'viewType', 'activeDay', 'selectId']));
     }
 
     public function getStorekeepers($id)
