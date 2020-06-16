@@ -36,6 +36,16 @@ class Task extends Model implements Transformable
         'parent_id'
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function($model)
+        {
+            $model->childs()->update(['parent_id' => null]);
+        });
+    }
+
     public function warehouse()
     {
         return $this->belongsTo(Warehouse::class);

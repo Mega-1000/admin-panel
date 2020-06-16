@@ -15,6 +15,11 @@ class LabelGroup extends Model implements Transformable
 {
     use TransformableTrait;
 
+    const PRODUCTION_LABEL_GROUP_ID = 2;
+    public $customColumnsVisibilities = [
+        'name',
+        'created_at',
+    ];
     /**
      * The attributes that are mass assignable.
      *
@@ -31,9 +36,4 @@ class LabelGroup extends Model implements Transformable
     {
         return $this->hasMany(Label::class);
     }
-
-    public $customColumnsVisibilities =[
-        'name',
-        'created_at' ,
-    ];
 }

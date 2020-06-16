@@ -632,7 +632,19 @@
             if ($('#warehouseSelect').is(':selected')) {
               warehouse = $('#warehouseSelect').val();
             }
-            $.ajax({
+
+              function prepareOrderList(item) {
+                  let labels = ''
+                  let input = `<label>${item.name}<input name="new_group[]" type="checkbox" value="${item.id}"></label>`;
+                  if (item.order && item.order.labels) {
+                      labels = item.order.labels.map((label) => {
+                          return `<i class="${label.icon_name}" style="color: ${label.color}"/>`
+                      })
+                  }
+                  return input + labels
+              }
+
+              $.ajax({
               url: '/admin/planning/tasks/' + info.event.id + '/getTask',
               type: "GET"
             }).done(function (data) {
@@ -706,8 +718,10 @@
                 html += '</div>';
                 html += '<div>';
                 if (data.childs.length > 0) {
+                    html += '<label for="produceAll">Wyprodukuj wszystko <button id="produceAll" name="produceAll" type="checkbox"/>';
+                    html += '<br>';
                     html += '<p>Wyeksportuj paczki do nowej grupy</p>';
-                    let test = data.childs.map((item) =>`<label>${item.name}<input name="new_group[]" type="checkbox" value="${item.id}">` )
+                    let test = data.childs.map((item) => prepareOrderList(item) )
                     html += test.join('<br>')
                 }
 

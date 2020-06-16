@@ -2,26 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\LabelGroup;
 use App\Entities\Task;
 use App\Entities\TaskSalaryDetails;
 use App\Entities\TaskTime;
-use App\Entities\Warehouse;
 use App\Helpers\OrderCalcHelper;
 use App\Helpers\TaskTimeHelper;
+use App\Http\Requests\TaskCreateRequest;
+use App\Http\Requests\TaskUpdateRequest;
 use App\Jobs\AddLabelJob;
 use App\Jobs\RemoveLabelJob;
 use App\Repositories\OrderRepository;
+use App\Repositories\TaskRepository;
 use App\Repositories\TaskTimeRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
-use App\User;
-use Illuminate\Http\Request;
-use App\Http\Requests\TaskCreateRequest;
-use App\Http\Requests\TaskUpdateRequest;
-use App\Repositories\TaskRepository;
-use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\Facades\DataTables;
 
 /**
  * Class TasksController.
@@ -919,7 +918,13 @@ class TasksController extends Controller
 
     public function getTask($id)
     {
-        $task = Task::with(['user', 'taskTime', 'taskSalaryDetail', 'order', 'childs'])->find($id);
+        $task = Task::with(['user', 'taskTime', 'taskSalaryDetail', 'order', 'childs' => function ($q) {
+            $q->with(['order' => function ($q) {
+                $q->with(['labels' => function ($q) {
+                    $q->where('label_group_id', LabelGroup::PRODUCTION_LABEL_GROUP_ID);
+                }]);
+            }]);
+        }])->find($id);
 
         if (empty($task)) {
             abort(404);
