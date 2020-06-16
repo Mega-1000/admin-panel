@@ -16,6 +16,12 @@
             <th>ID</th>
             <th>@lang('order_packages.form.list_order')</th>
             <th>@lang('order_packages.form.template_symbol')</th>
+            <th>@lang('order_packages.form.deliverer')</th>
+            <th>@lang('order_packages.form.delivery')</th>
+            <th>@lang('order_packages.form.service_courier_name')</th>
+            <th>@lang('order_packages.form.delivery_courier_name')</th>
+            <th>@lang('order_packages.form.container_type')</th>
+            <th>@lang('order_packages.form.packing_type')</th>
             <th>Nazwa</th>
             <th>Data utworzenia</th>
             <th>@lang('voyager.generic.actions')</th>
@@ -24,11 +30,17 @@
         <tbody>
          @foreach ($packageTemplates as $packageTemplate)
         <tr>
-            <td width="10%">{{$packageTemplate->id}}</td>
-            <td width="10%">@if($packageTemplate->list_order!=1000){{$packageTemplate->list_order}}@endif</td>
-            <td width="10%">{{$packageTemplate->symbol}}</td>
-            <td width="30%">{{$packageTemplate->name}}</td>
-            <td width="20%">{{$packageTemplate->created_at}}</td>
+            <td>{{$packageTemplate->id}}</td>
+            <td>@if($packageTemplate->list_order!=1000){{$packageTemplate->list_order}}@endif</td>
+            <td>{{$packageTemplate->symbol}}</td>
+            <td>{{$packageTemplate->sello_deliverer_id}}</td>
+            <td>{{$packageTemplate->sello_delivery_id}}</td>
+            <td>{{$packageTemplate->service_courier_name}}</td>
+            <td>{{$packageTemplate->delivery_courier_name}}</td>
+            <td>{{$packageTemplate->container_type}}</td>
+            <td>{{$packageTemplate->packing_type}}</td>
+            <td>{{$packageTemplate->name}}</td>
+            <td>{{$packageTemplate->created_at}}</td>
             <td>
                 <div class="col-md-10">
                     <a href="{{ url()->current() }}/{{$packageTemplate->id}}/edit" class="btn btn-sm btn-primary edit">
@@ -54,5 +66,5 @@
 @endsection
 
 @section('datatable-scripts')
-    
+
 @endsection
