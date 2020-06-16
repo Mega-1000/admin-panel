@@ -501,9 +501,12 @@ class TasksController extends Controller
                 if ($request->new_resource !== null) {
                     $dataToSave = ['user_id' => $request->new_resource];
                     $dataToSave = array_merge($dataToSave);
-                    if ($request->old_resource == 37 && $task->order_id != null) {
-                        $prev = [];
-                        dispatch_now(new RemoveLabelJob($task->order_id, [47], $prev));
+                    if ($task->childs()->count() > 0) {
+                        $task->childs()->get()->map(function ($child) use ($request) {
+                            $this->removeLabel($request, $child);
+                        });
+                    } else {
+                        $this->removeLabel($request, $task);
                     }
                 }
                 $task->update($dataToSave != null ? $dataToSave : $dataToStore);
@@ -799,6 +802,12 @@ class TasksController extends Controller
                     $this->updateAbandonedTaskTime($newGroup->first(), $duration);
                 }
             }
+//            if ($request->produceAll) {
+//                $task->childs->map(function ($child) {
+//                    $prev = [];
+//                    dispatch_now(new RemoveLabelJob($child->order_id, [47], $prev));
+//                });
+//            }
             $dataToStore = [
                 'start' => $request->start,
                 'end' => $request->end,
@@ -968,5 +977,15 @@ class TasksController extends Controller
         $taskTime->save();
         $task->parent_id = null;
         $task->save();
+    }
+
+    private function removeLabel(Request $request, $task)
+    {
+        error_log($request->old_resource);
+        error_log($task->order_id);
+        if ($request->old_resource == 37 && $task->order_id != null) {
+            $prev = [];
+            dispatch_now(new RemoveLabelJob($task->order_id, [47], $prev));
+        }
     }
 }

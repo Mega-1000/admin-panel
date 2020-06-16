@@ -25,6 +25,7 @@ class TimetablesController extends Controller
     {
         $activeDay = null;
         $viewType = null;
+        $selectId = null;
         if (isset($request->id)) {
             $string = explode('-', $request->id);
             if (isset($string[1])) {
