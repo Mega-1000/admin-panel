@@ -1888,7 +1888,7 @@ class OrdersController extends Controller
         }
         file_put_contents($lockName, '');
         $data = $request->all();
-        $collection = $this->prepareCollection($data, true);
+        list($collection, $count) = $this->prepareCollection($data, true);
         $tagHelper = new EmailTagHandlerHelper();
         $merger = new Merger;
         $i = 0;
