@@ -432,6 +432,7 @@ Route::group(['prefix' => 'admin'], function () {
                     Route::get('/{id}/getTasksForUser/{user_id}', 'TasksController@getTasksForUser')->name('getTasksForUser');
                     Route::post('/acceptTask', 'TasksController@acceptTask')->name('acceptTask');
                     Route::post('/rejectTask', 'TasksController@rejectTask')->name('rejectTask');
+                    Route::post('/produce', 'TasksController@produceOrders')->name('produceOrders');
                 });
             Route::prefix('reports')->as('reports.')
                 ->group(function () {

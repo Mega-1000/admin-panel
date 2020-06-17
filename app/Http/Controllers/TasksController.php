@@ -2,26 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\Label;
+use App\Entities\LabelGroup;
 use App\Entities\Task;
 use App\Entities\TaskSalaryDetails;
 use App\Entities\TaskTime;
-use App\Entities\Warehouse;
 use App\Helpers\OrderCalcHelper;
 use App\Helpers\TaskTimeHelper;
+use App\Http\Requests\TaskCreateRequest;
+use App\Http\Requests\TaskUpdateRequest;
 use App\Jobs\AddLabelJob;
 use App\Jobs\RemoveLabelJob;
 use App\Repositories\OrderRepository;
+use App\Repositories\TaskRepository;
 use App\Repositories\TaskTimeRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
-use App\User;
-use Illuminate\Http\Request;
-use App\Http\Requests\TaskCreateRequest;
-use App\Http\Requests\TaskUpdateRequest;
-use App\Repositories\TaskRepository;
-use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\Facades\DataTables;
 
 /**
  * Class TasksController.
@@ -501,9 +501,12 @@ class TasksController extends Controller
                 if ($request->new_resource !== null) {
                     $dataToSave = ['user_id' => $request->new_resource];
                     $dataToSave = array_merge($dataToSave);
-                    if ($request->old_resource == 37 && $task->order_id != null) {
-                        $prev = [];
-                        dispatch_now(new RemoveLabelJob($task->order_id, [47], $prev));
+                    if ($task->childs()->count() > 0) {
+                        $task->childs()->get()->map(function ($child) use ($request) {
+                            $this->removeLabel($request, $child);
+                        });
+                    } else {
+                        $this->removeLabel($request, $task);
                     }
                 }
                 $task->update($dataToSave != null ? $dataToSave : $dataToStore);
@@ -603,6 +606,25 @@ class TasksController extends Controller
                 'message' => __('tasks.messages.update'),
                 'alert-type' => 'success'
             ]);
+        }
+    }
+
+    public function produceOrders(Request $request)
+    {
+        if ($request->id) {
+            try {
+                $task = Task::findOrFail($request->id);
+                $task->childs->map(function ($child) {
+                    dispatch_now(new RemoveLabelJob($child->order_id,
+                        [Label::ORDER_ITEMS_UNDER_CONSTRUCTION],
+                        $prev));
+                });
+            } catch (\Exception $e) {
+                return response(['error' => true, 'message' => 'Nie znaleziono zadania']);
+            }
+            return response(['success' => true]);
+        } else {
+            return response(['error' => true]);
         }
     }
 
@@ -799,6 +821,7 @@ class TasksController extends Controller
                     $this->updateAbandonedTaskTime($newGroup->first(), $duration);
                 }
             }
+
             $dataToStore = [
                 'start' => $request->start,
                 'end' => $request->end,
@@ -910,7 +933,13 @@ class TasksController extends Controller
 
     public function getTask($id)
     {
-        $task = Task::with(['user', 'taskTime', 'taskSalaryDetail', 'order', 'childs'])->find($id);
+        $task = Task::with(['user', 'taskTime', 'taskSalaryDetail', 'order', 'childs' => function ($q) {
+            $q->with(['order' => function ($q) {
+                $q->with(['labels' => function ($q) {
+                    $q->where('label_group_id', LabelGroup::PRODUCTION_LABEL_GROUP_ID);
+                }]);
+            }]);
+        }])->find($id);
 
         if (empty($task)) {
             abort(404);
@@ -968,5 +997,15 @@ class TasksController extends Controller
         $taskTime->save();
         $task->parent_id = null;
         $task->save();
+    }
+
+    private function removeLabel(Request $request, $task)
+    {
+        error_log($request->old_resource);
+        error_log($task->order_id);
+        if ($request->old_resource == 37 && $task->order_id != null) {
+            $prev = [];
+            dispatch_now(new RemoveLabelJob($task->order_id, [47], $prev));
+        }
     }
 }

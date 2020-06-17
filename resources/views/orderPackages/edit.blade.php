@@ -130,7 +130,7 @@
                         PACZKOMAT
                     </option>
                     @if ($isAllegro))
-                     <option {{ $orderPackage->service_courier_name === 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
+                     <option {{ $orderPackage->delivery_courier_name === 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
                         ALLEGRO-INPOST
                     </option>
                     @endif
