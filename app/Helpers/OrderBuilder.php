@@ -138,11 +138,12 @@ class OrderBuilder
             OrderBuilder::updateOrderAddress(
                 $order,
                 $data['delivery_address'] ?? [],
-                'STANDARD_ADDRESS',
+                CustomerAddress::ADDRESS_TYPE_STANDARD,
                 $data['phone'] ?? '',
                 'customer',
                 $data['customer_login'] ?? '',
-                $data['update_email']
+                $data['update_email'],
+                $data['update_customer'] ?? false
             );
             OrderBuilder::updateOrderAddress(
                 $order,
@@ -255,9 +256,14 @@ class OrderBuilder
         $order->save();
     }
 
-    public static function updateOrderAddress($order, $adressArray, $type, $phone, $relation, $login = '', $forceUpdateEmail = false)
+    public static function updateOrderAddress($order, $adressArray, $type, $phone, $relation, $login = '', $forceUpdateEmail = false, $forceUpdateCustomer = false)
     {
-        $phone = preg_replace('/[^0-9]/', '', $adressArray['phone'] ?? $phone);
+        if ($type == CustomerAddress::ADDRESS_TYPE_STANDARD) {
+            $phone = $phone ?? $adressArray['phone'];
+        } else {
+            $phone = $adressArray['phone'] ?? $phone;
+        }
+        $phone = preg_replace('/[^0-9]/', '', $phone);
         if (!is_array($adressArray)) {
             $adressArray = [];
         }
@@ -284,6 +290,12 @@ class OrderBuilder
                     $address = new CustomerAddress();
                     $address->phone = $phone;
                     $address->type = $type;
+                }
+                if ($forceUpdateCustomer) {
+                    $address->phone = $phone;
+                    $address->type = $type;
+                    $adressArray['firstname'] = $adressArray['cust_firstname'];
+                    $adressArray['lastname'] = $adressArray['cust_lastname'];
                 }
                 if (!empty($login) && (!$exists || $forceUpdateEmail)) {
                     $address->email = $login;

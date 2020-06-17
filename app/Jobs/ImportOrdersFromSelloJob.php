@@ -140,20 +140,20 @@ class ImportOrdersFromSelloJob implements ShouldQueue
     private function setAdressArray($transaction, array $transactionArray): array
     {
         if ($transaction->deliveryAddress) {
-            $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->deliveryAddress, $transaction->customer);
+            $transactionArray['delivery_address'] = $this->setAddressFromSelloAddr($transaction->deliveryAddress, $transaction->customer);
         } else if ($transaction->deliveryAddressBefore) {
-            $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->deliveryAddressBefore, $transaction->customer);
+            $transactionArray['delivery_address'] = $this->setAddressFromSelloAddr($transaction->deliveryAddressBefore, $transaction->customer);
         } else if ($transaction->defaultAdress) {
-            $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->defaultAdress, $transaction->customer);
+            $transactionArray['delivery_address'] = $this->setAddressFromSelloAddr($transaction->defaultAdress, $transaction->customer);
         } else if ($transaction->defaultAdressBefore) {
-            $transactionArray['delivery_address'] = $this->setDeliveryAddress($transaction->defaultAdressBefore, $transaction->customer);
+            $transactionArray['delivery_address'] = $this->setAddressFromSelloAddr($transaction->defaultAdressBefore, $transaction->customer);
         }
         $transactionArray['delivery_address']['email'] = $transactionArray['customer_login'];
 
         if ($transaction->invoiceAddress) {
-            $transactionArray['invoice_address'] = $this->setDeliveryAddress($transaction->invoiceAddress, $transaction->customer);
+            $transactionArray['invoice_address'] = $this->setAddressFromSelloAddr($transaction->invoiceAddress, $transaction->customer);
         } else if ($transaction->invoiceAddressBefore) {
-            $transactionArray['invoice_address'] = $this->setDeliveryAddress($transaction->invoiceAddressBefore, $transaction->customer);
+            $transactionArray['invoice_address'] = $this->setAddressFromSelloAddr($transaction->invoiceAddressBefore, $transaction->customer);
         } else if ($transactionArray['delivery_address']) {
             $transactionArray['invoice_address'] = $transactionArray['delivery_address'];
         }
@@ -208,9 +208,9 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         }
     }
 
-    private function setDeliveryAddress($address, $customer): array
+    private function setAddressFromSelloAddr($address, $customer): array
     {
-        list($name, $surname) = $this->getNameFromAdrres($address);
+        list($name, $surname) = $this->getNameFromAdrres($address->adr_Name);
         $street = $address->adr_Address1;
         $street = substr($street, 2);
 
@@ -233,12 +233,15 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $addressArray['nip'] = $address->adr_NIP;
         $addressArray['firmname'] = $address->adr_Company ?: $customer->cs_Company ?: '';
         $addressArray['phone'] = Helper::preparePhone($address->adr_PhoneNumber ?: $customer->phone->cp_Phone ?: '');
+        list($name, $surname) = $this->getNameFromAdrres($customer->cs_Name);
+        $addressArray['cust_firstname'] = $name;
+        $addressArray['cust_lastname'] = $surname;
         return $addressArray;
     }
 
-    private function getNameFromAdrres($deliveryAddress): array
+    private function getNameFromAdrres($fullname): array
     {
-        $adressName = explode(' ', $deliveryAddress->adr_Name);
+        $adressName = explode(' ', $fullname);
         if (sizeof($adressName) == 2) {
             $name = $adressName[0];
             $surname = $adressName[1];
@@ -281,7 +284,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $transactionArray['customer_login'] = $transaction->customer->email->ce_email;
         $phone = Helper::preparePhone($transaction->customer->phone->cp_Phone);
         $transactionArray['phone'] = $phone;
-        $transactionArray['update_email'] = true;
+        $transactionArray['`update`_email'] = true;
+        $transactionArray['update_customer'] = true;
         $transactionArray['customer_notices'] = empty($transaction->note) ? '' : $transaction->note->ne_Content;
         $transactionArray = $this->setAdressArray($transaction, $transactionArray);
         $transactionArray['is_standard'] = 1;
