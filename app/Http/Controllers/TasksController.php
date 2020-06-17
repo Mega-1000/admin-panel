@@ -821,12 +821,7 @@ class TasksController extends Controller
                     $this->updateAbandonedTaskTime($newGroup->first(), $duration);
                 }
             }
-//            if ($request->produceAll) {
-//                $task->childs->map(function ($child) {
-//                    $prev = [];
-//                    dispatch_now(new RemoveLabelJob($child->order_id, [47], $prev));
-//                });
-//            }
+
             $dataToStore = [
                 'start' => $request->start,
                 'end' => $request->end,
