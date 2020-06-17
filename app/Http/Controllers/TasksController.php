@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\Label;
 use App\Entities\LabelGroup;
 use App\Entities\Task;
 use App\Entities\TaskSalaryDetails;
@@ -605,6 +606,25 @@ class TasksController extends Controller
                 'message' => __('tasks.messages.update'),
                 'alert-type' => 'success'
             ]);
+        }
+    }
+
+    public function produceOrders(Request $request)
+    {
+        if ($request->id) {
+            try {
+                $task = Task::findOrFail($request->id);
+                $task->childs->map(function ($child) {
+                    dispatch_now(new RemoveLabelJob($child->order_id,
+                        [Label::ORDER_ITEMS_UNDER_CONSTRUCTION],
+                        $prev));
+                });
+            } catch (\Exception $e) {
+                return response(['error' => true, 'message' => 'Nie znaleziono zadania']);
+            }
+            return response(['success' => true]);
+        } else {
+            return response(['error' => true]);
         }
     }
 

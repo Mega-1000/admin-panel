@@ -718,7 +718,7 @@
                 html += '</div>';
                 html += '<div>';
                 if (data.childs.length > 0) {
-                    html += '<label for="produceAll">Wyprodukuj wszystko <button id="produceAll" name="produceAll" type="checkbox"/>';
+                    html += '<button type="button" data-dismiss="modal" onclick="produceAll(' +data.id + ')">Wyprodukuj wszystko</button>';
                     html += '<br>';
                     html += '<p>Wyeksportuj paczki do nowej grupy</p>';
                     let test = data.childs.map((item) => prepareOrderList(item) )
@@ -894,6 +894,21 @@
     </script>
     <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
     <script>
+      function produceAll(id) {
+          if (confirm('Wyprodukować wsystkie zamówienia?')) {
+              $.ajax({
+                  url: "{{ route('planning.tasks.produceOrders') }}",
+                  method: "POST",
+                  data: {
+                      id: id
+                  }
+              }).done(function (res) {
+                  if (res.error) {
+                      alert(res.message ?? 'Coś poszło nie tak');
+                  }
+              });
+          }
+      }
       $(document).ready(function () {
         var getUrlParameter = function getUrlParameter(sParam) {
           var sPageURL = window.location.search.substring(1),
