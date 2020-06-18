@@ -146,9 +146,6 @@
     {!! $tagHelper->shipmentData() !!}
 </div>
 
-<div style="page-break-before: always"></div>
-
-
 <script>
     window.print();
 </script>

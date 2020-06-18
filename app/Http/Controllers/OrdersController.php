@@ -1893,7 +1893,7 @@ class OrdersController extends Controller
         $merger = new Merger;
         $i = 0;
         foreach ($collection as $ord) {
-            $dompdf = new Dompdf();
+            $dompdf = new Dompdf(['enable_remote' => true]);
 
             $order = Order::find($ord->orderId);
             $tagHelper->setOrder($order);
