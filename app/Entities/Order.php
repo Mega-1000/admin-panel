@@ -3,13 +3,12 @@
 namespace App\Entities;
 
 use App\Helpers\TaskTimeHelper;
-use App\Jobs\ImportOrdersFromSelloJob;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
-use Illuminate\Support\Str;
 
 /**
  * Class Order.
@@ -23,56 +22,6 @@ class Order extends Model implements Transformable
 
     const STATUS_WITHOUT_REALIZATION = 8;
     const STATUS_ORDER_FINISHED = 6;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'id_from_front_db',
-        'customer_id',
-        'status_id',
-        'last_status_update_date',
-        'total_price',
-        'weight',
-        'shipment_price_for_client',
-        'shipment_price_for_us',
-        'customer_notices',
-        'cash_on_delivery_amount',
-        'allegro_transaction_id',
-        'employee_id',
-        'warehouse_id',
-        'additional_service_cost',
-        'invoice_warehouse_file',
-        'document_number',
-        'consultant_earning',
-        'consultant_earning',
-        'printed',
-        'correction_description',
-        'correction_amount',
-        'packing_warehouse_cost',
-        'rating',
-        'rating_message',
-        'shipping_abroad',
-        'proposed_payment',
-        'additional_cash_on_delivery_cost',
-        'consultant_notices',
-        'remainder_date',
-        'shipment_date',
-        'shipment_start_days_variation',
-        'invoice_id',
-        'additional_info',
-        'invoice_number',
-        'print_order',
-        'consultant_notice',
-        'consultant_value',
-        'warehouse_notice',
-        'warehouse_value',
-        'production_date',
-        'master_order_id',
-        'spedition_comment',
-    ];
     public $customColumnsVisibilities = [
         'mark',
         'spedition_exchange_invoiced_selector',
@@ -122,23 +71,55 @@ class Order extends Model implements Transformable
         'search_on_lp',
         'production_date',
     ];
-
     /**
-     * @return float
+     * The attributes that are mass assignable.
+     *
+     * @var array
      */
-    public function getSumOfGrossValues()
-    {
-        $totalOfProductsPrices = 0;
-        $vatFactor = (1 + env('VAT'));
-
-        if (count($this->items)) {
-            foreach ($this->items as $item) {
-                $totalOfProductsPrices += floatval($item->net_selling_price_commercial_unit) * intval($item->quantity);
-            }
-        }
-
-        return round(($totalOfProductsPrices * $vatFactor) + floatval($this->shipment_price_for_client) + floatval($this->additional_service_cost) + floatval($this->additional_cash_on_delivery_cost), 2);
-    }
+    protected $fillable = [
+        'id_from_front_db',
+        'customer_id',
+        'status_id',
+        'last_status_update_date',
+        'total_price',
+        'weight',
+        'shipment_price_for_client',
+        'shipment_price_for_us',
+        'customer_notices',
+        'cash_on_delivery_amount',
+        'allegro_transaction_id',
+        'employee_id',
+        'warehouse_id',
+        'additional_service_cost',
+        'invoice_warehouse_file',
+        'document_number',
+        'consultant_earning',
+        'consultant_earning',
+        'printed',
+        'correction_description',
+        'correction_amount',
+        'packing_warehouse_cost',
+        'rating',
+        'rating_message',
+        'shipping_abroad',
+        'proposed_payment',
+        'additional_cash_on_delivery_cost',
+        'consultant_notices',
+        'remainder_date',
+        'shipment_date',
+        'shipment_start_days_variation',
+        'invoice_id',
+        'additional_info',
+        'invoice_number',
+        'print_order',
+        'consultant_notice',
+        'consultant_value',
+        'warehouse_notice',
+        'warehouse_value',
+        'production_date',
+        'master_order_id',
+        'spedition_comment',
+    ];
 
     public function getPackagesCashOnSum()
     {
@@ -149,18 +130,6 @@ class Order extends Model implements Transformable
         }
 
         return $this->toPayPackages() - $sum;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isPaymentRegulated()
-    {
-        $valueRange = config('orders.plus-minus-regulation-amount');
-        $orderTotalPrice = $this->getSumOfGrossValues();
-        $totalPaymentAmount = floatval($this->payments()->where("promise", "")->sum("amount"));
-
-        return ($totalPaymentAmount > ($orderTotalPrice - $valueRange) && $totalPaymentAmount < ($orderTotalPrice + $valueRange));
     }
 
     /**
@@ -184,6 +153,51 @@ class Order extends Model implements Transformable
         } else {
             return $orderTotalPrice - $totalPaymentAmount - $sum;
         }
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function packages()
+    {
+        return $this->hasMany(OrderPackage::class);
+    }
+
+    /**
+     * @return float
+     */
+    public function getSumOfGrossValues()
+    {
+        $totalOfProductsPrices = 0;
+        $vatFactor = (1 + env('VAT'));
+
+        if (count($this->items)) {
+            foreach ($this->items as $item) {
+                $totalOfProductsPrices += floatval($item->net_selling_price_commercial_unit) * intval($item->quantity);
+            }
+        }
+
+        return round(($totalOfProductsPrices * $vatFactor) + floatval($this->shipment_price_for_client) + floatval($this->additional_service_cost) + floatval($this->additional_cash_on_delivery_cost), 2);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function payments()
+    {
+        return $this->hasMany(OrderPayment::class);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPaymentRegulated()
+    {
+        $valueRange = config('orders.plus-minus-regulation-amount');
+        $orderTotalPrice = $this->getSumOfGrossValues();
+        $totalPaymentAmount = floatval($this->payments()->where("promise", "")->sum("amount"));
+
+        return ($totalPaymentAmount > ($orderTotalPrice - $valueRange) && $totalPaymentAmount < ($orderTotalPrice + $valueRange));
     }
 
     /**
@@ -219,6 +233,14 @@ class Order extends Model implements Transformable
         ));
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function addresses()
+    {
+        return $this->hasMany(OrderAddress::class);
+    }
+
     public function isInvoiceDataComplete()
     {
         $invoiceAddress = $this->addresses()->where('type', '=', 'INVOICE_ADDRESS')->first();
@@ -250,6 +272,14 @@ class Order extends Model implements Transformable
     public function hasLabel($labelId)
     {
         return $this->labels()->where('label_id', $labelId)->count();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function labels()
+    {
+        return $this->belongsToMany(Label::class, 'order_labels')->withPivot('added_type');
     }
 
     public function promisePayments()
@@ -391,43 +421,11 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function packages()
-    {
-        return $this->hasMany(OrderPackage::class);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function payments()
-    {
-        return $this->hasMany(OrderPayment::class);
-    }
-
-    /**
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
     public function task()
     {
         return $this->hasOne(OrderTask::class);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function labels()
-    {
-        return $this->belongsToMany(Label::class, 'order_labels')->withPivot('added_type');
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function addresses()
-    {
-        return $this->hasMany(OrderAddress::class);
     }
 
     /**
@@ -513,17 +511,17 @@ class Order extends Model implements Transformable
 
     public function warehousePayments()
     {
-        return $this->hasMany(OrderPayment::class)->where('type','WAREHOUSE');
+        return $this->hasMany(OrderPayment::class)->where('type', 'WAREHOUSE');
     }
 
     public function speditionPayments()
     {
-        return $this->hasMany(OrderPayment::class)->where('type','SPEDITION');
+        return $this->hasMany(OrderPayment::class)->where('type', 'SPEDITION');
     }
 
     public function speditionPaymentsSum()
     {
-        return $this->hasMany(OrderPayment::class)->where('type','SPEDITION');
+        return $this->hasMany(OrderPayment::class)->where('type', 'SPEDITION');
     }
 
     public function isOrderHasLabel($labelId)
@@ -541,12 +539,17 @@ class Order extends Model implements Transformable
         return $this->hasMany(SubiektInvoices::class);
     }
 
+    public function selloTransaction()
+    {
+        return $this->hasOne(SelTransaction::class, 'id', 'sello_id');
+    }
+
     public function groupWarehousePayments()
     {
         $acceptedPaymentsValue = 0;
         $pendingPaymentsValue = 0;
-        foreach($this->warehousePayments as $payment) {
-            switch($payment->status) {
+        foreach ($this->warehousePayments as $payment) {
+            switch ($payment->status) {
                 case 'ACCEPTED':
                     $acceptedPaymentsValue += $payment->amount;
                     break;
