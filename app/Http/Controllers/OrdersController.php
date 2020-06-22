@@ -21,6 +21,7 @@ use App\Helpers\LabelsHelper;
 use App\Helpers\OrderCalcHelper;
 use App\Http\Requests\OrderUpdateRequest;
 use App\Jobs\AddLabelJob;
+use App\Jobs\AllegroTrackingNumberUpdater;
 use App\Jobs\ImportOrdersFromSelloJob;
 use App\Jobs\Orders\MissingDeliveryAddressSendMailJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
@@ -2382,6 +2383,15 @@ class OrdersController extends Controller
         dispatch_now(new ImportOrdersFromSelloJob());
         return redirect()->route('orders.index')->with([
             'message' => 'Rozpoczęto import z Sello',
+            'alert-type' => 'success',
+        ]);
+    }
+
+    public function sendTrackingNumbers()
+    {
+        dispatch_now(new AllegroTrackingNumberUpdater());
+        return redirect()->route('orders.index')->with([
+            'message' => 'Rozpoczęto wysyłanie numerów naklejek do allegro',
             'alert-type' => 'success',
         ]);
     }
