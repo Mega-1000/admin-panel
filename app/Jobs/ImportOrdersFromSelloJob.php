@@ -148,7 +148,6 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         } else if ($transaction->defaultAdressBefore) {
             $transactionArray['delivery_address'] = $this->setAddressFromSelloAddr($transaction->defaultAdressBefore, $transaction->customer);
         }
-        $transactionArray['delivery_address']['email'] = $transactionArray['customer_login'];
 
         if ($transaction->invoiceAddress) {
             $transactionArray['invoice_address'] = $this->setAddressFromSelloAddr($transaction->invoiceAddress, $transaction->customer);
@@ -157,7 +156,6 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         } else if ($transactionArray['delivery_address']) {
             $transactionArray['invoice_address'] = $transactionArray['delivery_address'];
         }
-        $transactionArray['invoice_address']['email'] = $transactionArray['customer_login'];
         return $transactionArray;
     }
 
@@ -228,6 +226,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $addressArray['lastname'] = $surname;
         $addressArray['flat_number'] = $flatNr;
         $addressArray['address'] = $streetName;
+        $addressArray['email'] = $address->adr_Email ?: $customer->email->ce_email;
         $addressArray['nip'] = $address->adr_NIP ?: $customer->cs_NIP ?: '';
         $addressArray['postal_code'] = $address->adr_ZipCode;
         $addressArray['nip'] = $address->adr_NIP;
@@ -284,7 +283,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $transactionArray['customer_login'] = $transaction->customer->email->ce_email;
         $phone = Helper::preparePhone($transaction->customer->phone->cp_Phone);
         $transactionArray['phone'] = $phone;
-        $transactionArray['`update`_email'] = true;
+        $transactionArray['update`_email'] = true;
         $transactionArray['update_customer'] = true;
         $transactionArray['customer_notices'] = empty($transaction->note) ? '' : $transaction->note->ne_Content;
         $transactionArray = $this->setAdressArray($transaction, $transactionArray);
