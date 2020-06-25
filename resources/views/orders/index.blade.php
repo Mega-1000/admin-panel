@@ -890,6 +890,7 @@
                     'targets': 21,
                     'createdCell': function (td, cellData, rowData, row, col) {
                         $(td).attr('id', 'consultant_notices-' + rowData.orderId);
+                        $(td).attr('class', 'hoverable');
                     }
                 }
             ],
