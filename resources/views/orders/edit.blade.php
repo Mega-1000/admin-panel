@@ -1108,7 +1108,7 @@
                         @endphp
                     @endforeach
                     <td>{{ $paymentsValue }}</td>
-                    <td id="left-amount-{{$itemOrder->id}}" data-value="{{ $orderValue - $paymentsValue }}">{{ $orderValue - $paymentsValue }}</td>
+                    <td id="left-amount-{{$itemOrder->id}}" data-value="{{ $orderValue - ($paymentsValue ?? 0) }}">{{ $orderValue - ($paymentsValue ?? 0) }}</td>
                     <td>
                         @foreach($itemOrder->promisePayments($itemOrder->id) as $payment)
                             {{ $payment->amount }}
@@ -1472,7 +1472,7 @@
                             <h5 class="payment__pending">Oczekujące: {{ $payments['PENDING'] }}</h5>
                             <h5 class="payment__accepted">Zaakceptowane: {{ $payments['ACCEPTED'] }}</h5>
                         </td>
-                        <td id="left-amount-{{$itemOrder->id}}" data-value="{{ $orderValue - $paymentsValue }}">{{ $orderValue - $paymentsValue }}</td>
+                        <td id="left-amount-{{$itemOrder->id}}" data-value="{{ $orderValue - ($paymentsValue ?? 0) }}">{{ $orderValue - ($paymentsValue ?? 0) }}</td>
                         <td>
                             <button id="moveButton-{{$itemOrder->id}}" class="btn btn-sm btn-warning edit move__payment--button" onclick="moveData({{$itemOrder->id}})">Przenieś wpłatę stąd</button>
                             <button id="moveButtonAjax-{{$itemOrder->id}}" class="btn btn-sm btn-success btn-move edit hidden" onclick="moveDataAjax({{$itemOrder->id}})">Przenieś dane tutaj</button>
@@ -1547,7 +1547,7 @@
                 <td>
                     <h5 class="payment__accepted">Do zapłaty: {{ $paymentsValue }}</h5>
                 </td>
-                <td id="left-amount-{{$order->id}}" data-value="{{ $orderValue - $paymentsValue }}">{{ $orderValue - $paymentsValue }}</td>
+                <td id="left-amount-{{$order->id}}" data-value="{{ $orderValue - ($paymentsValue ?? 0) }}">{{ $orderValue - ($paymentsValue ?? 0) }}</td>
             </tr>
             <tr>
                 <td><h2>Suma faktur: <b style="color: red;">{{ $sumOfOrders }} zł</b></h2></td>
