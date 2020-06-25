@@ -503,7 +503,11 @@
     <br>
     <div class="form-group">
         <label for="send_courier">Import z SELLO: </label>
-        <a name="send_courier" class="btn btn-success" href="/admin/sello-import/">Importuj</a>
+        <a name="send_courier" class="btn btn-success" href="{{ route('orders.sello_import') }}">Importuj</a>
+        <label for="send_courier">Wyślij numery naklejek do allegro: </label>
+        <a name="send_courier" class="btn btn-success" href="{{ route('orders.send_tracking_numbers') }}">Wyślij numery</a>
+
+
     </div>
     <div class="form-group">
         <label for="send_courier">Drukuj naklejki: </label>

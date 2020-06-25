@@ -28,6 +28,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\CheckStatusInpostPackagesJob::class)->everyMinute();
         $schedule->job(Jobs\CheckPackagesStatusJob::class)->everyMinute();
         $schedule->job(Jobs\ChangeShipmentDatePackagesJob::class)->dailyAt("00:30");
+        $schedule->job(Jobs\AllegroTrackingNumberUpdater::class)->dailyAt("02:00");
         $schedule->job(Jobs\SendLPWithReminderSendingToWarehouseJob::class)->dailyAt("05:00");
         $schedule->job(Jobs\CheckPriceChangesInProductsJob::class)->dailyAt("04:00");
         $schedule->job(Jobs\CheckDateOfProductNewPriceJob::class)->dailyAt("04:30");
@@ -42,7 +43,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\JpgGeneratorJob::class)->dailyAt("01:00");
         $schedule->job(Jobs\ImportCsvFileJob::class)->everyMinute();
         $schedule->job(Jobs\ImportOrdersFromSelloJob::class)->cron('0 6,11,17,22 * * *');
-        $schedule->job(UpdatePackageRealCostJob::class)->dailyAt("00:30");
+        $schedule->job(Jobs\UpdatePackageRealCostJob::class)->dailyAt("00:30");
         $schedule->job(Jobs\CheckIfInvoicesExistInOrders::class)->dailyAt("07:00");
         $schedule->job(Jobs\UrgentInvoiceRequest::class)->everyFifteenMinutes()->between('9:00', '17:00');
         $schedule->job(Jobs\CheckForHangedChats::class)->cron('0,15,30,45 7-17 * * 1-5');
