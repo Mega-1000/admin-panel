@@ -23,6 +23,16 @@
     }
 }
 
+.hoverable {
+    display: block;
+    max-height: 280px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: inherit;
+}
+.hoverable:hover {
+    max-height: 999999px;
+}
 .ck-editor__editable {
     min-height: 500px;
 }
