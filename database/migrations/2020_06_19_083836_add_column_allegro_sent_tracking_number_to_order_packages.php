@@ -1,5 +1,6 @@
 <?php
 
+use App\Entities\OrderPackage;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -16,8 +17,7 @@ class AddColumnAllegroSentTrackingNumberToOrderPackages extends Migration
         Schema::table('order_packages', function (Blueprint $table) {
             $table->boolean('tracking_number_sent_to_allegro')->default(0);
         });
-        \DB::table('order_packages')
-            ->update(['tracking_number_sent_to_allegro' => 1]);
+        OrderPackage::query()->update(['tracking_number_sent_to_allegro' => 1]);
     }
 
     /**
