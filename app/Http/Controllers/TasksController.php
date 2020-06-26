@@ -1001,8 +1001,6 @@ class TasksController extends Controller
 
     private function removeLabel(Request $request, $task)
     {
-        error_log($request->old_resource);
-        error_log($task->order_id);
         if ($request->old_resource == 37 && $task->order_id != null) {
             $prev = [];
             dispatch_now(new RemoveLabelJob($task->order_id, [47], $prev));
