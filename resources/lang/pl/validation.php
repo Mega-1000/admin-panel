@@ -144,6 +144,10 @@ return [
     */
 
     'attributes' => [
-        'id' => 'Produkty są wymagane'
+        'id' => 'Produkty są wymagane',
+        'net_payment_column_number' => 'numer kolumny płatności netto',
+        'gross_payment_column_number' => 'numer kolumny płatności brutto',
+        'letter_number_column_number' => 'numer kolumny z listem przewozowym',
+        'name' => 'nazwa',
     ],
 ];

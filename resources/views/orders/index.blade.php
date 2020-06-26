@@ -510,12 +510,19 @@
 
     </div>
     <div class="form-group">
-        <label for="send_courier">Drukuj naklejki: </label>
+        <label for="print_courier">Drukuj naklejki: </label>
         @foreach($couriers as $courier)
-            <a name="send_courier" class="btn btn-success"
+            <a name="print_courier" class="btn btn-success"
                href="{{route('order_packages.letters',['courier_name'=>$courier->delivery_courier_name])}}">
                 {{$courier->delivery_courier_name}}</a>
         @endforeach
+    </div>
+    <div class="form-group">
+        Import cen paczek.
+        <label for="deliverers">Lista dostawców: </label>
+        <a name="deliverers" class="btn btn-success" href="{{ route('transportPayment.list') }}">Dostawcy</a>
+        <label for="import_packages_payment">Wczytaj płatności dla paczek:</label>
+        <a name="import_packages_payment" class="btn btn-success" href="{{ route('orders.send_tracking_numbers') }}">Wyślij numery</a>
     </div>
     <div class="form-group">
         <label for="send_courier">Drukuj zamówienia widoczne na stronie: </label>
