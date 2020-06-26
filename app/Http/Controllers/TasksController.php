@@ -791,142 +791,9 @@ class TasksController extends Controller
     public function updateTask(Request $request, $id)
     {
         if ($request->update == 1) {
-            $task = $this->repository->find($id);
-            if ($task->order_id != null) {
-                $customId = 'taskOrder-' . $task->order_id;
-            } else {
-                $customId = 'task-' . $task->id;
-            }
-            if (empty($task)) {
-                abort(404);
-            }
-            if ($request->new_group) {
-                $newGroup = Task::whereIn('id', $request->new_group)->get();
-                $duration = $newGroup->reduce(function ($prev, $next) {
-                    $time = $next->taskTime;
-                    $finishTime = new Carbon($time->date_start);
-                    $startTime = new Carbon($time->date_end);
-                    $totalDuration = $finishTime->diffInMinutes($startTime);
-                    return $prev + $totalDuration;
-                }, 0);
-                $taskTime = $task->taskTime;
-                $endTime = new Carbon($taskTime->date_end);
-                $endTime->subMinutes($duration);
-                $taskTime->date_end = $endTime->toDateTimeString();
-                $taskTime->save();
-                $request->end = $taskTime->date_end;
-                if ($newGroup->count() > 1) {
-                    $this->createNewGroup($newGroup, $task, $duration);
-                } else {
-                    $this->updateAbandonedTaskTime($newGroup->first(), $duration);
-                }
-            }
-
-            $dataToStore = [
-                'start' => $request->start,
-                'end' => $request->end,
-                'id' => $id,
-                'user_id' => $task->user_id,
-                'color' => substr($request->color, 1),
-                'name' => $request->name,
-            ];
-            if (substr($request->color, 1) == '008000' || substr($request->color, 1) == '32CD32') {
-                $dataToStore['status'] = 'FINISHED';
-            }
-            $allow = TaskTimeHelper::allowTaskMove($dataToStore);
-            if ($allow === true) {
-                $dataToStore['date_start'] = $dataToStore['start'];
-                $dataToStore['date_end'] = $dataToStore['end'];
-                $task->update($dataToStore);
-                $task->taskTime->update($dataToStore);
-                if ($task->taskSalaryDetail == null) {
-                    $task->taskSalaryDetail()->create($request->all());
-                } else {
-                    $task->taskSalaryDetail->update($request->all());
-                }
-                if ($task->order_id !== null) {
-                    $task->taskSalaryDetail->update($request->all());
-                    $orderItemKMD = 0;
-                    $totalPrice = $task->order->total_price;
-                    $profit = 0;
-                    foreach ($task->order->items as $item) {
-                        if ($item->product->symbol == 'KMD') {
-                            $orderItemKMD = $item->quantity;
-                        }
-                        $itemsArray[] = $item->product_id;
-                        $profit += (((float)$item->net_selling_price_commercial_unit * (int)$item->quantity) - ((float)$item->net_purchase_price_commercial_unit * (int)$item->quantity)) * 1.23;
-                    }
-                    if ($task->order->status_id === 4) {
-                        $consultantVal = OrderCalcHelper::calcConsultantValue($orderItemKMD,
-                            number_format($profit, 2, '.', ''));
-                        $totalPrice += $consultantVal;
-                    } else {
-                        $consultantVal = $request->consultant_value;
-                        $totalPrice += $task->order->total_price + (float)$request->consultant_value;
-                    }
-                    $shipmentDate = $request->shipment_date;
-                    $task->order->update([
-                        'shipment_date' => $shipmentDate,
-                        'consultant_notice' => $request->consultant_notice,
-                        'consultant_value' => $consultantVal,
-                        'warehouse_notice' => $request->warehouse_notice,
-                        'warehouse_value' => $request->warehouse_value,
-                        'total_price' => $totalPrice
-                    ]);
-                    $prev = [];
-
-                    if ($task->color == '32CD32') {
-                        dispatch_now(new RemoveLabelJob($task->order_id, [49], $prev));
-                        dispatch_now(new AddLabelJob($task->order_id, [50], $prev));
-                    }
-                    if ($task->color == '008000') {
-                        dispatch_now(new RemoveLabelJob($task->order_id, [74], $prev));
-                        dispatch_now(new AddLabelJob($task->order_id, [41], $prev));
-                    }
-                    $dateTime = new Carbon($request->start);
-                    $title = $task->order_id . ' - ' . $dateTime->format('d-m') . ' - ' . $task->order->warehouse_value;
-                    $task->update([
-                        'name' => $title
-                    ]);
-                }
-                return redirect()->route('planning.timetable.index', [
-                    'id' => $customId,
-                    'view_type' => $request->view_type,
-                    'active_start' => $request->active_start,
-                ])->with([
-                    'message' => __('tasks.messages.update'),
-                    'alert-type' => 'success'
-                ]);
-            } else {
-                return redirect()->route('planning.timetable.index', [
-                    'id' => $customId,
-                    'view_type' => $request->view_type,
-                    'active_start' => $request->active_start,
-                ])->with([
-                    'message' => __('tasks.messages.update_error'),
-                    'alert-type' => 'error'
-                ]);
-            }
+            return $this->onlyUpdateTask($id, $request);
         } else {
-            $task = $this->repository->find($id);
-            if ($task->order_id != null) {
-                $customId = 'taskOrder-' . $task->order_id;
-            } else {
-                $customId = 'task-' . $task->id;
-            }
-            if (empty($task)) {
-                abort(404);
-            }
-
-            $task->delete();
-
-            return redirect()->route('planning.timetable.index', [
-                'view_type' => $request->view_type,
-                'active_start' => $request->active_start,
-            ])->with([
-                'message' => __('tasks.messages.delete'),
-                'alert-type' => 'success'
-            ]);
+            return $this->deleteTask($id, $request);
         }
 
     }
@@ -1007,5 +874,194 @@ class TasksController extends Controller
             $prev = [];
             dispatch_now(new RemoveLabelJob($task->order_id, [47], $prev));
         }
+    }
+
+    /**
+     * @param $id
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    private function onlyUpdateTask($id, Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $task = $this->repository->find($id);
+        if ($task->order_id != null) {
+            $customId = 'taskOrder-' . $task->order_id;
+        } else {
+            $customId = 'task-' . $task->id;
+        }
+        if (empty($task)) {
+            abort(404);
+        }
+        if ($request->new_group) {
+            $newGroup = Task::whereIn('id', $request->new_group)->get();
+            $duration = $newGroup->reduce(function ($prev, $next) {
+                $time = $next->taskTime;
+                $finishTime = new Carbon($time->date_start);
+                $startTime = new Carbon($time->date_end);
+                $totalDuration = $finishTime->diffInMinutes($startTime);
+                return $prev + $totalDuration;
+            }, 0);
+            $taskTime = $task->taskTime;
+            $endTime = new Carbon($taskTime->date_end);
+            $endTime->subMinutes($duration);
+            $taskTime->date_end = $endTime->toDateTimeString();
+            $taskTime->save();
+            $request->end = $taskTime->date_end;
+            if ($newGroup->count() > 1) {
+                $this->createNewGroup($newGroup, $task, $duration);
+            } else {
+                $this->updateAbandonedTaskTime($newGroup->first(), $duration);
+            }
+        }
+
+        $dataToStore = [
+            'start' => $request->start,
+            'end' => $request->end,
+            'id' => $id,
+            'user_id' => $task->user_id,
+            'color' => substr($request->color, 1),
+            'name' => $request->name,
+        ];
+        if (substr($request->color, 1) == '008000' || substr($request->color, 1) == '32CD32') {
+            $dataToStore['status'] = 'FINISHED';
+        }
+        $allow = TaskTimeHelper::allowTaskMove($dataToStore);
+        if ($allow === true) {
+            $dataToStore['date_start'] = $dataToStore['start'];
+            $dataToStore['date_end'] = $dataToStore['end'];
+            $task->update($dataToStore);
+            $task->taskTime->update($dataToStore);
+            if ($task->taskSalaryDetail == null) {
+                $task->taskSalaryDetail()->create($request->all());
+            } else {
+                $task->taskSalaryDetail->update($request->all());
+            }
+            if ($task->order_id !== null) {
+                $task->taskSalaryDetail->update($request->all());
+                $orderItemKMD = 0;
+                $totalPrice = $task->order->total_price;
+                $profit = 0;
+                foreach ($task->order->items as $item) {
+                    if ($item->product->symbol == 'KMD') {
+                        $orderItemKMD = $item->quantity;
+                    }
+                    $profit += (((float)$item->net_selling_price_commercial_unit * (int)$item->quantity) - ((float)$item->net_purchase_price_commercial_unit * (int)$item->quantity)) * 1.23;
+                }
+                if ($task->order->status_id === 4) {
+                    $consultantVal = OrderCalcHelper::calcConsultantValue($orderItemKMD,
+                        number_format($profit, 2, '.', ''));
+                    $totalPrice += $consultantVal;
+                } else {
+                    $consultantVal = $request->consultant_value;
+                    $totalPrice += $task->order->total_price + (float)$request->consultant_value;
+                }
+                $shipmentDate = $request->shipment_date;
+                $task->order->update([
+                    'shipment_date' => $shipmentDate,
+                    'consultant_notice' => $request->consultant_notice,
+                    'consultant_value' => $consultantVal,
+                    'warehouse_notice' => $request->warehouse_notice,
+                    'warehouse_value' => $request->warehouse_value,
+                    'total_price' => $totalPrice
+                ]);
+                $prev = [];
+
+                if ($task->color == '32CD32') {
+                    dispatch_now(new RemoveLabelJob($task->order_id, [49], $prev));
+                    dispatch_now(new AddLabelJob($task->order_id, [50], $prev));
+                }
+                if ($task->color == '008000') {
+                    dispatch_now(new RemoveLabelJob($task->order_id, [74], $prev));
+                    dispatch_now(new AddLabelJob($task->order_id, [41], $prev));
+                }
+                $dateTime = new Carbon($request->start);
+                $title = $task->order_id . ' - ' . $dateTime->format('d-m') . ' - ' . $task->order->warehouse_value;
+                $task->update([
+                    'name' => $title
+                ]);
+            }
+            return redirect()->route('planning.timetable.index', [
+                'id' => $customId,
+                'view_type' => $request->view_type,
+                'active_start' => $request->active_start,
+            ])->with([
+                'message' => __('tasks.messages.update'),
+                'alert-type' => 'success'
+            ]);
+        } else {
+            return redirect()->route('planning.timetable.index', [
+                'id' => $customId,
+                'view_type' => $request->view_type,
+                'active_start' => $request->active_start,
+            ])->with([
+                'message' => __('tasks.messages.update_error'),
+                'alert-type' => 'error'
+            ]);
+        }
+        return $prev;
+    }
+
+    /**
+     * @param $id
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    private function deleteTask($id, Request $request): \Illuminate\Http\RedirectResponse
+    {
+        $task = Task::find($id);
+        if ($task->order_id != null) {
+            $customId = 'taskOrder-' . $task->order_id;
+        } else {
+            $customId = 'task-' . $task->id;
+        }
+        if (empty($task)) {
+            abort(404);
+        }
+
+        if ($task->childs()->count()) {
+            $orders = $task->childs->map(function ($task) {
+                return $task->order;
+            });
+            $canDelete = $orders->filter(function ($order) {
+               return $order->labels()->where('label_id', Label::GREEN_HAMMER_ID)->count();
+            })->count() == 0;
+            if (!$canDelete) {
+                return redirect()->route('planning.timetable.index', [
+                    'view_type' => $request->view_type,
+                    'active_start' => $request->active_start,
+                ])->with([
+                    'message' => __('tasks.messages.cannot_delete_ask_warehouse'),
+                    'alert-type' => 'error'
+                ]);
+            }
+            $orders->map(function ($order) {
+                $order->labels()->detach(Label::BLUE_HAMMER_ID);
+            });
+            $task->childs()->delete();
+            $task->delete();
+        } else {
+            if (!empty($task->order)) {
+                $canDelete = $task->order->labels()->where('labels.id', Label::GREEN_HAMMER_ID)->count() == 0;
+                if (!$canDelete) {
+                    return redirect()->route('planning.timetable.index', [
+                        'view_type' => $request->view_type,
+                        'active_start' => $request->active_start,
+                    ])->with([
+                        'message' => __('tasks.messages.cannot_delete_ask_warehouse'),
+                        'alert-type' => 'error'
+                    ]);
+                }
+                $task->order->labels()->detach(Label::BLUE_HAMMER_ID);
+            }
+            $task->delete();
+        }
+
+        return redirect()->route('planning.timetable.index', [
+            'view_type' => $request->view_type,
+            'active_start' => $request->active_start,
+        ])->with([
+            'message' => __('tasks.messages.delete'),
+            'alert-type' => 'success'
+        ]);
     }
 }

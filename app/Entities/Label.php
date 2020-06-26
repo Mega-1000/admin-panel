@@ -28,6 +28,8 @@ class Label extends Model implements Transformable
     const ORDER_ITEMS_REDEEMED_LABEL = 66;
     const PACKAGE_NOTIFICATION_LABEL = 53;
     const PACKAGE_NOTIFICATION_SENT_LABEL = 52;
+    const BLUE_HAMMER_ID = 47;
+    const GREEN_HAMMER_ID = 48;
     const ORDER_ITEMS_UNDER_CONSTRUCTION = 49;
     const ORDER_ITEMS_CONSTRUCTED = 50;
 
