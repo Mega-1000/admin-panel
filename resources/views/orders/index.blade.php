@@ -1655,12 +1655,8 @@
                     data: 'packages',
                     name: 'real_cost_for_company',
                     render: function (packages) {
-                        let html = '';
-                        packages.forEach(function (package) {
-                            html += '<span style="margin-top: 5px;">' + package.real_cost_for_company;
-                            +'</span>';
-                        });
-                        return html;
+                        return '<span style="margin-top: 5px;">' +
+                            packages.reduce((prev, next) => (prev + parseFloat(next.real_cost_for_company)), 0) + '</span>';
                     }
                 },
                 {
