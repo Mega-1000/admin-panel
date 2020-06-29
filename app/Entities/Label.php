@@ -32,6 +32,7 @@ class Label extends Model implements Transformable
     const GREEN_HAMMER_ID = 48;
     const ORDER_ITEMS_UNDER_CONSTRUCTION = 49;
     const ORDER_ITEMS_CONSTRUCTED = 50;
+    const IS_NOT_PAID = 119;
 
     public $customColumnsVisibilities = [
         'name',

@@ -6,6 +6,7 @@ use App\Entities\ColumnVisibility;
 use App\Entities\Order;
 use App\Entities\OrderPayment;
 use App\Entities\Payment;
+use App\Helpers\AllegroPaymentImporter;
 use App\Http\Requests\OrderPaymentCreateRequest;
 use App\Http\Requests\OrderPaymentUpdateRequest;
 use App\Jobs\AddLabelJob;
@@ -22,6 +23,8 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use TCG\Voyager\Models\Role;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -101,6 +104,28 @@ class OrdersPaymentsController extends Controller
         $customerId = $id;
         $order = null;
         return view('orderPayments.master.create', compact('customerId', 'order'));
+    }
+
+    public function payAllegro(Request $request) {
+        $file = $request->file('file');
+        $maxFileSize = 20000000;
+        if ($file->getSize() > $maxFileSize) {
+            return redirect()->route('orders.index')->with([
+                'message' => __('transport.errors.too-big-file'),
+                'alert-type' => 'error'
+            ]);
+        }
+        $fixedCSV = str_replace(array("=\r\n", "=\r", "=\n"),"", $file->get());
+        do {
+            $fileName = Str::random(40) . '.csv';
+            $path = Storage::path('user-files/allegro-payments/') . $fileName;
+        } while (file_exists($path));
+        Storage::put('user-files/allegro-payments/' . $fileName, $fixedCSV);
+        $allegro = new AllegroPaymentImporter(Storage::path('user-files/allegro-payments/') . $fileName);
+        $errors = $allegro->import();
+        return redirect()->route('orders.index')->with(
+            'allegro_payments_errors', $errors
+        );
     }
 
     /**
@@ -1201,7 +1226,7 @@ class OrdersPaymentsController extends Controller
         return $collection;
     }
 
-    protected static function dispatchLabelsForPaymentAmount($payment): void
+    public static function dispatchLabelsForPaymentAmount($payment): void
     {
         if ($payment->order->isPaymentRegulated()) {
             dispatch_now(new DispatchLabelEventByNameJob($payment->order->id, "payment-equal-to-order-value"));
