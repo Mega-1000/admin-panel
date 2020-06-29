@@ -60,6 +60,9 @@ class TransportPaymentImporter
 
     private function processLine(?array $line)
     {
+        if (empty($line[$this->columnLetter])) {
+            return;
+        }
         $package = OrderPackage::where('letter_number', $line[$this->columnLetter])->first();
         if (empty($package)) {
             throw new \Exception('Nie znaleziono paczki o liście nr: ' . $line[$this->columnLetter], 1);
