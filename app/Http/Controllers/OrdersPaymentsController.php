@@ -123,6 +123,7 @@ class OrdersPaymentsController extends Controller
         Storage::put('user-files/allegro-payments/' . $fileName, $fixedCSV);
         $allegro = new AllegroPaymentImporter(Storage::path('user-files/allegro-payments/') . $fileName);
         $errors = $allegro->import();
+        Storage::delete('user-files/allegro-payments/' . $fileName);
         return redirect()->route('orders.index')->with(
             'allegro_payments_errors', $errors
         );

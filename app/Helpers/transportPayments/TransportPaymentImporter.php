@@ -67,9 +67,9 @@ class TransportPaymentImporter
 
         $cost = -1;
         if ($this->columnGrossPayment) {
-            $cost = $line[$this->columnGrossPayment];
+            $cost = floatval(str_replace(',', '.', $line[$this->columnGrossPayment]));
         } else if ($this->columnNetPayment) {
-            $cost = round($line[$this->columnNetPayment] * 1.23, 2);
+            $cost = round(floatval(str_replace(',', '.', $line[$this->columnNetPayment])) * 1.23, 2);
         }
 
         if ($cost === -1) {

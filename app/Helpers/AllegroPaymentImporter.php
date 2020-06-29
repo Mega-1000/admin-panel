@@ -39,6 +39,7 @@ class AllegroPaymentImporter
                 $errors[] = $e->getMessage();
             }
         }
+        fclose($handle);
         return $errors;
     }
 
