@@ -15,7 +15,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/test', function() {
+Route::get('/test', function () {
     return 'test';
 });
 
@@ -274,6 +274,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orders/getCosts', 'OrdersController@getCosts')->name('orders.getCosts');
         Route::post('orders/invoice/request', 'OrdersController@invoiceRequest')->name('orders.invoiceRequest');
         Route::get('orders/{id}/invoices', 'OrdersController@getInvoices')->name('orders.getInvoices');
+        Route::post('orders/allegro-payment', 'OrdersPaymentsController@payAllegro')->name('orders.allegroPayments');
 
         Route::get('orderPayments/datatable/{id}',
             'OrdersPaymentsController@datatable')->name('order_payments.datatable');
@@ -459,7 +460,7 @@ Route::group(['prefix' => 'admin'], function () {
             ->group(function () {
                 Route::get('/import/payments', 'ImportPaymentsController@importPayments')->name('importPayments');
                 Route::post('/import/payments', 'ImportPaymentsController@store')->name('storePaymentsPdf');
-        });
+            });
 
         Route::post('users/workHours/', 'UserWorksController@addWorkHours')->name('users.addWorkHours');
         Route::get('actualizationPrice', 'ActualizationController@sendActualization')->name('actualizationPrice');
