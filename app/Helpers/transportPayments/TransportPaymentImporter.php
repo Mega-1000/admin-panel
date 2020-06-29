@@ -46,7 +46,7 @@ class TransportPaymentImporter
             throw new \Exception('Nie można otworzyć pliku');
         }
         $errors = [];
-        while (($line = fgetcsv($handle, 100, ",")) !== FALSE) {
+        while (($line = fgetcsv($handle, 0, ";")) !== FALSE) {
             try {
                 $this->processLine($line);
             } catch (\Exception $e) {
