@@ -468,6 +468,12 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/dispatch-job/generate-jpgs', 'DispatchJobController@generateJpgs')->name('job.generateJpgs');
         Route::get('/chat/{all?}/{orderId?}', 'MessagesController@index')->name('chat.index');
 
+        Route::get('/transport', 'TransportPaymentsController@list')->name('transportPayment.list');
+        Route::get('/transport/create', 'TransportPaymentsController@createOrUpdate')->name('transportPayment.createOrUpdate');
+        Route::get('/transport/delete', 'TransportPaymentsController@delete')->name('transportPayment.delete');
+        Route::post('/transport/store', 'TransportPaymentsController@store')->name('transportPayment.post');
+        Route::get('/transport/edit/{id}', 'TransportPaymentsController@edit')->name('transportPayment.edit');
+        Route::post('/transport/update-pricing', 'TransportPaymentsController@updatePricing')->name('transportPayment.update_pricing');
     });
 });
 

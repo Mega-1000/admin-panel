@@ -137,6 +137,41 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" tabindex="-1" id="upload-payments" role="dialog">
+        <div class="modal-dialog" id="modalDialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="titleModal">Wybierz dostawcę i jego plik w formacie .csv: </h4>
+                </div>
+                <div class="modal-body">
+                    <form id="updateTransportPayment" action="{{ route('transportPayment.update_pricing') }}"
+                          method="POST" enctype="multipart/form-data">
+                        {{ csrf_field() }}
+                        Dostawca:
+                        <br/>
+                        <select required name="deliverersList" class="form-control text-uppercase">
+                            <option value="" selected="selected"></option>
+                            @foreach($deliverers as $deliver)
+                                <option value="{{ $deliver->id }}">{{ $deliver->name }}</option>
+                            @endforeach
+                        </select>
+                        <br/>
+                        Plik:
+                        <br/>
+                        <input type="file" name="file"/>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" form="updateTransportPayment" class="btn btn-success pull-right">Wyślij
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" tabindex="-1" id="addStorekeeperTimeError" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -510,12 +545,25 @@
 
     </div>
     <div class="form-group">
-        <label for="send_courier">Drukuj naklejki: </label>
+        <label for="print_courier">Drukuj naklejki: </label>
         @foreach($couriers as $courier)
-            <a name="send_courier" class="btn btn-success"
+            <a name="print_courier" class="btn btn-success"
                href="{{route('order_packages.letters',['courier_name'=>$courier->delivery_courier_name])}}">
                 {{$courier->delivery_courier_name}}</a>
         @endforeach
+    </div>
+    <div class="form-group">
+        Import cen paczek.
+        <label for="deliverers">Lista dostawców: </label>
+        <a name="deliverers" class="btn btn-success" href="{{ route('transportPayment.list') }}">Dostawcy</a>
+        <label for="import_packages_payment">Wczytaj płatności dla paczek:</label>
+        <a name="import_packages_payment" class="btn btn-success" onclick="$('#upload-payments').modal('show')">Wyślij
+            numery</a>
+        @if(!empty(session('update_errors')))
+            @foreach(session('update_errors') as $error)
+                <div class="alert alert-warning"> {{$error}} </div>
+            @endforeach
+        @endif
     </div>
     <div class="form-group">
         <label for="send_courier">Drukuj zamówienia widoczne na stronie: </label>
@@ -1089,7 +1137,7 @@
                     data: 'production_date',
                     name: 'production_date',
                     searchable: false,
-                    render: (production_date, option, row) => ((production_date ?? '')  + ' ' + (row.taskUserFirstName ?? ''))
+                    render: (production_date, option, row) => ((production_date ?? '') + ' ' + (row.taskUserFirstName ?? ''))
                 },
                 {
                     data: 'shipment_date',
@@ -1648,12 +1696,8 @@
                     data: 'packages',
                     name: 'real_cost_for_company',
                     render: function (packages) {
-                        let html = '';
-                        packages.forEach(function (package) {
-                            html += '<span style="margin-top: 5px;">' + package.real_cost_for_company;
-                            +'</span>';
-                        });
-                        return html;
+                        return '<span style="margin-top: 5px;">' +
+                            packages.reduce((prev, next) => (prev + parseFloat(next.real_cost_for_company)), 0) + '</span>';
                     }
                 },
                 {
@@ -2114,13 +2158,13 @@
 
         function printAll() {
             $.post("{{route('orders.printAll')}}", table.ajax.params())
-            .done((data) => {
-                if (!data.error) {
-                    window.open(data);
-                } else {
-                    alert('Trwa przygotowywanie listy')
-                }
-            });
+                .done((data) => {
+                    if (!data.error) {
+                        window.open(data);
+                    } else {
+                        alert('Trwa przygotowywanie listy')
+                    }
+                });
         }
 
         function addLabel() {
@@ -2283,7 +2327,8 @@
                 table.ajax.reload(null, false);
             });
         }
-        var renderCalendar = function(minTime = "07:00:00", maxTime = "20:00:00") {
+
+        var renderCalendar = function (minTime = "07:00:00", maxTime = "20:00:00") {
             let calendarEl = document.getElementById('calendar');
             let calendar = new FullCalendar.Calendar(calendarEl, {
                 plugins: ['interaction', 'dayGrid', 'timeGrid', 'resourceTimeline'],
