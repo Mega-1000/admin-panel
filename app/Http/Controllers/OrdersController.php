@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Entities\Auth_code;
 use App\Entities\ColumnVisibility;
+use App\Entities\Deliverer;
 use App\Entities\InvoiceRequest;
 use App\Entities\Label;
 use App\Entities\LabelGroup;
@@ -341,11 +342,13 @@ class OrdersController extends Controller
             $visibilities[$key]->hidden = json_decode($row->hidden, true);
         }
         $templateData = PackageTemplate::all();
+        $deliverers = Deliverer::all();
 
         return view('orders.index', compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses'))
             ->withOuts($out)
             ->withLabIds($labIds)
             ->withLabels($labels)
+            ->withDeliverers($deliverers)
             ->withTemplateData($templateData);
     }
 
