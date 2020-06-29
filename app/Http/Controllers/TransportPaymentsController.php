@@ -74,15 +74,11 @@ class TransportPaymentsController extends Controller
                 ->setColumnLetter($deliverer->letter_number_column_number);
             $errors = $importer->import($fileName);
         } catch (\Exception $e) {
-            error_log(print_r([$e->getMessage(), $e->getTraceAsString()], 1));
             return redirect()->route('orders.index')->with([
                 'message' => $e->getMessage(),
                 'alert-type' => 'error'
             ]);
         }
-
-        error_log(print_r($errors, 1));
-//        return back()->withInput();
         return redirect()->route('orders.index')->with(
             'update_errors', $errors
         );

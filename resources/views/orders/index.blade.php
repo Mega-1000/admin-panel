@@ -172,6 +172,31 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" tabindex="-1" id="upload-allegro-payments" role="dialog">
+        <div class="modal-dialog" id="modalDialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="titleModal">Dołącz plik płatności od allegro w formacie .csv: </h4>
+                </div>
+                <div class="modal-body">
+                    <form id="updateAllegroPayment" action="{{ route('orders.allegroPayments') }}"
+                          method="POST" enctype="multipart/form-data">
+                        {{ csrf_field() }}
+                        Plik:
+                        <br/>
+                        <input type="file" name="file"/>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" form="updateAllegroPayment" class="btn btn-success pull-right">Wyślij</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" tabindex="-1" id="addStorekeeperTimeError" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -561,6 +586,15 @@
             numery</a>
         @if(!empty(session('update_errors')))
             @foreach(session('update_errors') as $error)
+                <div class="alert alert-warning"> {{$error}} </div>
+            @endforeach
+        @endif
+    </div>
+    <div class="form-group">
+        <label for="upload-allegro-pays">Aktualizuj płatności allegro: </label>
+        <a name="print_orders" class="btn btn-success" onclick="$('#upload-allegro-payments').modal('show')">Aktualizuj</a>
+        @if(!empty(session('allegro_payments_errors')))
+            @foreach(session('allegro_payments_errors') as $error)
                 <div class="alert alert-warning"> {{$error}} </div>
             @endforeach
         @endif
