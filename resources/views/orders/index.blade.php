@@ -565,7 +565,8 @@
         <label for="send_courier">Import z SELLO: </label>
         <a name="send_courier" class="btn btn-success" href="{{ route('orders.sello_import') }}">Importuj</a>
         <label for="send_courier">Wyślij numery naklejek do allegro: </label>
-        <a name="send_courier" class="btn btn-success" href="{{ route('orders.send_tracking_numbers') }}">Wyślij numery</a>
+        <a name="send_courier" class="btn btn-success" href="{{ route('orders.send_tracking_numbers') }}">Wyślij
+            numery</a>
 
 
     </div>
@@ -592,7 +593,8 @@
     </div>
     <div class="form-group">
         <label for="upload-allegro-pays">Aktualizuj płatności allegro: </label>
-        <a name="print_orders" class="btn btn-success" onclick="$('#upload-allegro-payments').modal('show')">Aktualizuj</a>
+        <a name="print_orders" class="btn btn-success"
+           onclick="$('#upload-allegro-payments').modal('show')">Aktualizuj</a>
         @if(!empty(session('allegro_payments_errors')))
             @foreach(session('allegro_payments_errors') as $error)
                 <div class="alert alert-warning"> {{$error}} </div>
@@ -1062,10 +1064,11 @@
                     render: function (data, type, row) {
                         var html = '';
                         $.each(data, function (key, value) {
-                            if (Math.abs(value.real_cost_for_company - value.cost_for_company) > 2) {
-                                html = '<div style="border: solid red 4px" >'
+                            let isProblem = Math.abs((value.real_cost_for_company ?? 0) - (value.cost_for_company ?? 0)) > 2
+                            if (isProblem) {
+                                html += '<div style="border: solid red 4px" >'
                             }
-                            if ((value.status === 'SENDING' && value.status !== 'CANCELLED') || (value.status === 'DELIVERED' && value.status !== 'CANCELLED')) {
+                            if (value.status == 'SENDING' || value.status == 'DELIVERED') {
                                 html += '<div style="display: flex; align-items: center; flex-direction: column;" > ' +
                                     '<div style="display: flex; align-items: center;">' +
                                     '<p style="margin: 8px 0px 0px 0px;">' + row.orderId + '/' + value.number + '</p>'
@@ -1094,6 +1097,9 @@
                                     }
                                 }
                                 html += '</div>';
+                            }
+                            if (isProblem) {
+                                html += '</div>'
                             }
                         });
                         return html;
