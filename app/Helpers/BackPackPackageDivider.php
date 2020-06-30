@@ -50,7 +50,10 @@ class BackPackPackageDivider implements iDividable
         $pack->service_courier_name = $packTemplate->service_courier_name;
         $pack->weight = $packTemplate->weight;
         $pack->number = $packageNumber;
-        $pack->content = 'Materiały budowlane';
+        $pack->chosen_data_template = $packTemplate->name;
+        $pack->cost_for_client = $packTemplate->approx_cost_client;
+        $pack->cost_for_company = $packTemplate->approx_cost_firm;
+        $pack->content = $packTemplate->content ?? 'Materiały budowlane';
         $pack->notices = $orderId . '/' . $packageNumber;
         $pack->symbol = $packTemplate->symbol;
         $helper = new OrderPackagesDataHelper();
@@ -64,6 +67,7 @@ class BackPackPackageDivider implements iDividable
         $pack->quantity = 1;
         $pack->status = 'NEW';
         $pack->container_type = $packTemplate->container_type;
+        $pack->packing_type = $packTemplate->packing_type;
         $pack->shape = $packTemplate->shape;
         $pack->save();
         return $pack;
