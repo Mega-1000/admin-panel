@@ -459,9 +459,7 @@ class OrdersPackagesController extends Controller
 
     public function sendRequestForCancelled($id)
     {
-        dispatch_now(new SendRequestForCancelledPackageJob($id));
-
-        $this->repository->update(['status' => 'WAITING_FOR_CANCELLED'], $id);
+        $this->repository->update(['status' => 'CANCELLED'], $id);
 
         return redirect()->back()->with([
             'message' => __('order_packages.message.request_for_cancelled_package'),
