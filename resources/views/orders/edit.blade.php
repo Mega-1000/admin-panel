@@ -186,15 +186,15 @@
             </div>
             <div class="form-group" style="width: 15%; float: left; padding: 5px;">
                 <label for="shipment_price_for_client">@lang('orders.form.shipment_price_for_client')</label>
-                <input type="text" class="form-control sumChange" id="shipment_price_for_client"
+                <input disabled type="text" class="form-control sumChange" id="shipment_price_for_client"
                        name="shipment_price_for_client"
-                       value="{{ $order->shipment_price_for_client ?? '' }}">
+                       value="{{ $clientTotalCost ?? '' }}">
             </div>
             <div class="form-group" style="width: 15%; float: left; padding: 5px;">
                 <label for="shipment_price_for_us">@lang('orders.form.shipment_price_for_us')</label>
-                <input type="text" class="form-control priceChange sumChange" id="shipment_price_for_us"
+                <input disabled type="text" class="form-control priceChange sumChange" id="shipment_price_for_us"
                        name="shipment_price_for_us"
-                       value="{{ $order->shipment_price_for_us ?? '' }}">
+                       value="{{ $ourTotalCost ?? '' }}">
             </div>
             <div class="form-group" style="width: 15%; float: left; padding: 5px;">
                 <label for="proposed_payment">Proponowana zaliczka brutto</label>
@@ -1309,6 +1309,7 @@
                 <th>@lang('order_packages.table.delivery_date')</th>
                 <th>@lang('order_packages.table.cost_for_client')</th>
                 <th>@lang('order_packages.table.cost_for_company')</th>
+                <th>@lang('order_packages.table.cod_cost_for_us')</th>
                 <th>@lang('order_packages.table.real_cost_for_company')</th>
                 <th>@lang('order_packages.table.sending_number')</th>
                 <th>@lang('order_packages.table.quantity')</th>
@@ -3197,6 +3198,10 @@
                                 {
                                     data: 'cost_for_company',
                                     name: 'cost_for_company',
+                                },
+                                {
+                                    data: 'cod_cost_for_us',
+                                    name: 'cod_cost_for_us',
                                 },
                                 {
                                     data: 'real_cost_for_company',

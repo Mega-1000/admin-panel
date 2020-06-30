@@ -102,6 +102,9 @@
                     <option {{ old('delivery_courier_name') == 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
                         GIELDA
                     </option>
+
+                    <option {{ old('delivery_courier_name') == 'GLS' ? 'selected="selected"' : '' }} value="GLS">GLS</option>
+                    <option {{ old('delivery_courier_name') == 'UPS' ? 'selected="selected"' : '' }} value="UPS">UPS</option>
                     <option
                         {{ old('delivery_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         ODBIÓR OSOBISTY
@@ -133,6 +136,8 @@
                     <option {{ old('delivery_courier_name') == 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
                         GIELDA
                     </option>
+                    <option {{ old('delivery_courier_name') == 'GLS' ? 'selected="selected"' : '' }} value="GLS">GLS</option>
+                    <option {{ old('delivery_courier_name') == 'UPS' ? 'selected="selected"' : '' }} value="UPS">UPS</option>
                     <option
                         {{ old('delivery_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         ODBIÓR OSOBISTY
@@ -204,6 +209,11 @@
                 <label for="cost_for_client">@lang('order_packages.form.cod_cost')</label>
                 <input type="number" step=".01" class="form-control" id="cod_cost" name="cod_cost"
                        value="{{ old('cod_cost') }}">
+            </div>
+            <div class="form-group">
+                <label for="cost_for_client">@lang('order_packages.form.cod_cost_for_us')</label>
+                <input type="number" step=".01" class="form-control" id="cod_cost_for_us" name="cod_cost_for_us"
+                       value="{{ old('cod_cost_for_us') }}">
             </div>
             <div class="form-group">
                 <label for="cost_for_client">@lang('order_packages.form.cost_for_client')</label>

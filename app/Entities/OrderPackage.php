@@ -110,4 +110,14 @@ class OrderPackage extends Model implements Transformable
         }
         return $path;
     }
+
+    public function getClientCosts()
+    {
+        return $this->cost_for_client;
+    }
+
+    public function getOurCosts()
+    {
+        return $this->cost_for_company + $this->cod_cost_for_us;
+    }
 }
