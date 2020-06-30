@@ -53,6 +53,8 @@ class BackPackPackageDivider implements iDividable
         $pack->chosen_data_template = $packTemplate->name;
         $pack->cost_for_client = $packTemplate->approx_cost_client;
         $pack->cost_for_company = $packTemplate->approx_cost_firm;
+        $pack->cod_cost_for_us = $packTemplate->cod_cost_for_us;
+        $pack->cash_on_delivery = $packTemplate->cod_cost;
         $pack->content = $packTemplate->content ?? 'Materiały budowlane';
         $pack->notices = $orderId . '/' . $packageNumber;
         $pack->symbol = $packTemplate->symbol;

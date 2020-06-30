@@ -129,6 +129,7 @@ return [
         'maxWeight' => 'Maksymalna waga Paczki u wybranego kuriera',
         'weightVolume' => 'Objętość wagowa [cm3]',
         'cod_cost' => 'Koszt pobrania dla klienta',
+        'cod_cost_for_us' => 'Koszt pobrania dla nas',
         'maxStringLength' => 'Maksymalna ilość znaków w uwagach do spedycji'
     ]
 ];

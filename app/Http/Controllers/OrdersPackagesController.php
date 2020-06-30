@@ -250,6 +250,8 @@ class OrdersPackagesController extends Controller
         $orderPackage->status = $data['status'];
         $orderPackage->cost_for_client = $data['cost_for_client'];
         $orderPackage->cost_for_company = $data['cost_for_company'];
+        $orderPackage->cash_on_delivery = $data['cod_cost'];
+        $orderPackage->cod_cost_for_us = $data['cod_cost_for_us'];
         $orderPackage->real_cost_for_company = $data['real_cost_for_company'];
         $orderPackage->content = $data['content'];
         $orderPackage->packing_type = $data['packing_type'];
@@ -830,6 +832,7 @@ class OrdersPackagesController extends Controller
         $data['cash_on_delivery'] = $package->cash_on_delivery;
         $data['status'] = PackageTemplate::STATUS_NEW;
         $data['cost_for_client'] = $package->cost_for_client;
+        $data['cost_for_company'] = $package->cost_for_company;
         $data['cost_for_company'] = $package->cost_for_company;
         $data['real_cost_for_company'] = $package->real_cost_for_company;
         $data['content'] = $package->content;

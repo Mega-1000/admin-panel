@@ -76,7 +76,8 @@ class PackageTemplatesController extends Controller
             'notice_max_lenght'=>'integer|required',
             'symbol' => 'required',
             'max_weight' => 'numeric|required',
-            'volume' => 'integer|required'
+            'volume' => 'integer|required',
+            'list_order'=>'required'
         ));
         if (!empty($request->accept_time)) {
             $this->validate($request, array(
@@ -120,6 +121,7 @@ class PackageTemplatesController extends Controller
         $template->list_order = $request->list_order;
         $template->displayed_name = $request->displayed_name;
         $template->packing_type = $request->packing_type;
+        $template->cod_cost_for_us = $request->cod_cost_for_us;
 
         $template->save();
     }
