@@ -1062,7 +1062,7 @@
                     render: function (data, type, row) {
                         var html = '';
                         $.each(data, function (key, value) {
-                            if (value.real_cost_for_company > value.cost_for_company) {
+                            if (Math.abs(value.real_cost_for_company - value.cost_for_company) > 2) {
                                 html = '<div style="border: solid red 4px" >'
                             }
                             if ((value.status === 'SENDING' && value.status !== 'CANCELLED') || (value.status === 'DELIVERED' && value.status !== 'CANCELLED')) {

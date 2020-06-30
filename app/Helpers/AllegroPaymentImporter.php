@@ -53,7 +53,7 @@ class AllegroPaymentImporter
         $amount = explode(" ", $line[self::AMOUNT_COLUMN_NUMBER])[0];
         $id = $line[self::ID_COLUMN_NUMBER];
 
-        $transaction = SelTransaction::where('tr_CheckoutFormId', $id)->where('tr_Group', 1)->first();
+        $transaction = SelTransaction::where('tr_CheckoutFormPaymentId', $id)->where('tr_Group', 1)->first();
         if (empty($transaction)) {
             throw new \Exception('Nie znaleziono transakcji o id: ' . $id);
         }
