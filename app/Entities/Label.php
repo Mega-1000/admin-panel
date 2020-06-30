@@ -15,16 +15,6 @@ class Label extends Model implements Transformable
 {
     use TransformableTrait;
 
-    const CHAT_TYPE = 'chat';
-    const PAYMENTS_IDS_FOR_TABLE = [119, 134, 120, 101, 99, 102];
-    const PRODUCTION_IDS_FOR_TABLE = [96, 51, 54, 77, 118];
-    const TRANSPORT_IDS_FOR_TABLE = [68, 103, 104, 105, 106];
-    const ADDITIONAL_INFO_IDS_FOR_TABLE = [92, 89, 93, 45, 55, 57, 59, 61, 90];
-    const INVOICE_IDS_FOR_TABLE = [63];
-    const CUSTOMER_DATA_REMINDER_IDS = [53, 74];
-    const DIALOG_TYPE_LABELS_IDS = [55, 56, 57, 58, 78, 79, 80, 81, 82, 83, 84, 85];
-
-
     const ORDER_ITEMS_REDEEMED_LABEL = 66;
     const PACKAGE_NOTIFICATION_LABEL = 53;
     const PACKAGE_NOTIFICATION_SENT_LABEL = 52;
@@ -33,6 +23,17 @@ class Label extends Model implements Transformable
     const ORDER_ITEMS_UNDER_CONSTRUCTION = 49;
     const ORDER_ITEMS_CONSTRUCTED = 50;
     const IS_NOT_PAID = 119;
+
+    const CHAT_TYPE = 'chat';
+    const PAYMENTS_IDS_FOR_TABLE = [119, 134, 120, 101, 99, 102];
+    const PRODUCTION_IDS_FOR_TABLE = [96, 51, 54, 77, 118];
+    const TRANSPORT_IDS_FOR_TABLE = [68, 103, 104, 105, 106];
+    const ADDITIONAL_INFO_IDS_FOR_TABLE = [92, 89, 93, 45, 55, 57, 59, 61, 90];
+    const INVOICE_IDS_FOR_TABLE = [63];
+    const CUSTOMER_DATA_REMINDER_IDS = [53, 74];
+    const DIALOG_TYPE_LABELS_IDS = [55, 56, 57, 58, 78, 79, 80, 81, 82, 83, 84, 85];
+    const NOT_SENT_YET_LABELS_IDS = [self::BLUE_HAMMER_ID, self::GREEN_HAMMER_ID, self::ORDER_ITEMS_UNDER_CONSTRUCTION, self::ORDER_ITEMS_CONSTRUCTED];
+
 
     public $customColumnsVisibilities = [
         'name',

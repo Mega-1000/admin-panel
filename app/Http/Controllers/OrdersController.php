@@ -1740,6 +1740,7 @@ class OrdersController extends Controller
             $row->packages = \DB::table('order_packages')->where('order_id', $row->orderId)->get();
             $row->otherPackages = \DB::table('order_other_packages')->where('order_id', $row->orderId)->get();
             $row->addresses = \DB::table('order_addresses')->where('order_id', $row->orderId)->get();
+            $row->history = Order::where('customer_id', $row->customer_id)->with('labels')->get();
             $invoices = \DB::table('order_order_invoices')->where('order_id', $row->orderId)->get(['id']);
             $arrInvoice = [];
             foreach ($invoices as $invoice) {
