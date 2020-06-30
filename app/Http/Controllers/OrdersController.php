@@ -11,6 +11,7 @@ use App\Entities\LabelGroup;
 use App\Entities\Order;
 use App\Entities\OrderInvoice;
 use App\Entities\OrderItem;
+use App\Entities\OrderPackage;
 use App\Entities\OrderPayment;
 use App\Entities\PackageTemplate;
 use App\Entities\Product;
@@ -461,6 +462,14 @@ class OrdersController extends Controller
             'status_id' => 5,
         ]);
 
+        $clientTotalCost = $order->packages->reduce(function ($prev,OrderPackage $next) {
+            return $prev + $next->getClientCosts();
+        }, 0);
+
+        $ourTotalCost = $order->packages->reduce(function ($prev, OrderPackage $next) {
+            return $prev + $next->getOurCosts();
+        }, 0);
+
         $orderHasSentLP = $order->hasOrderSentLP();
         if ($order->customer_id == 4128) {
             return view('orders.edit_self',
@@ -468,14 +477,14 @@ class OrdersController extends Controller
                     'users', 'customerInfo', 'orderInvoiceAddress',
                     'orderDeliveryAddress', 'orderItems', 'warehouse', 'statuses', 'messages', 'productPacking',
                     'customerDeliveryAddress', 'firms', 'productsVariation', 'allProductsFromSupplier', 'orderId',
-                    'customerOrdersToPay'));
+                    'customerOrdersToPay', 'clientTotalCost', 'ourTotalCost'));
         } else {
             return view('orders.edit',
                 compact('visibilitiesTask', 'visibilitiesPackage', 'visibilitiesPayments', 'warehouses', 'order',
                     'users', 'customerInfo', 'orderInvoiceAddress',
                     'orderDeliveryAddress', 'orderItems', 'warehouse', 'statuses', 'messages', 'productPacking',
                     'customerDeliveryAddress', 'firms', 'productsVariation', 'allProductsFromSupplier', 'orderId',
-                    'customerOrdersToPay', 'orderHasSentLP', 'emails'));
+                    'customerOrdersToPay', 'orderHasSentLP', 'emails', 'clientTotalCost', 'ourTotalCost'));
         }
     }
 

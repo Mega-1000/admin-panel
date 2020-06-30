@@ -42,6 +42,7 @@ return [
         'letter_number' => 'Numer listu przewozowego',
         'cost_for_client' => 'Koszt dla klienta brutto',
         'cost_for_company' => 'Koszt dla firmy brutto',
+        'cod_cost_for_us' => 'Koszt pobrania dla nas',
         'real_cost_for_company' => 'Realny koszt firmy brutto',
         'created_at' => 'Utworzone w',
         'actions' => 'Akcje',
