@@ -92,6 +92,8 @@
                     <option {{ $orderPackage->service_courier_name === 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         ODBIÓR OSOBISTY
                     </option>
+                    <option {{ $orderPackage->service_courier_name == 'GLS' ? 'selected="selected"' : '' }} value="GLS">GLS</option>
+                    <option {{ $orderPackage->service_courier_name == 'UPS' ? 'selected="selected"' : '' }} value="UPS">UPS</option>
                     <option {{ old('delivery_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         PACZKOMAT
                     </option>
@@ -123,6 +125,8 @@
                     <option {{ $orderPackage->delivery_courier_name === 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
                         GIELDA
                     </option>
+                    <option {{ $orderPackage->service_courier_name == 'GLS' ? 'selected="selected"' : '' }} value="GLS">GLS</option>
+                    <option {{ $orderPackage->service_courier_name == 'UPS' ? 'selected="selected"' : '' }} value="UPS">UPS</option>
                     <option {{ $orderPackage->delivery_courier_name === 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         ODBIÓR OSOBISTY
                     </option>
