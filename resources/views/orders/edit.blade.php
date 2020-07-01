@@ -198,9 +198,13 @@
             </div>
             <div class="form-group" style="width: 15%; float: left; padding: 5px;">
                 <label for="shipment_price_for_us">@lang('orders.form.shipment_price_for_us')</label>
-                <input disabled type="text" class="form-control priceChange sumChange" id="shipment_price_for_us"
+                <input type="text" class="form-control priceChange sumChange" id="shipment_price_for_us"
                        name="shipment_price_for_us"
-                       value="{{ $ourTotalCost ?? '' }}">
+                       value="{{ $order->shipment_price_for_us ?? '' }}">
+                <label for="shipment_price_for_us_automatic">@lang('orders.form.shipment_price_for_us_automatic')</label>
+                <input disabled type="text" class="form-control priceChange sumChange" id="shipment_price_for_us_automatic"
+                   name="shipment_price_for_us_automatic"
+                   value="{{ $ourTotalCost ?? '' }}">
             </div>
             <div class="form-group" style="width: 15%; float: left; padding: 5px;">
                 <label for="proposed_payment">Proponowana zaliczka brutto</label>
