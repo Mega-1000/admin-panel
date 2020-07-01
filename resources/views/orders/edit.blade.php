@@ -186,8 +186,14 @@
             </div>
             <div class="form-group" style="width: 15%; float: left; padding: 5px;">
                 <label for="shipment_price_for_client">@lang('orders.form.shipment_price_for_client')</label>
-                <input disabled type="text" class="form-control sumChange" id="shipment_price_for_client"
+                <input type="text" class="form-control sumChange" id="shipment_price_for_client"
                        name="shipment_price_for_client"
+                       value="{{ $order->shipment_price_for_client ?? '' }}">
+            </div>
+            <div class="form-group" style="width: 15%; float: left; padding: 5px;">
+                <label for="shipment_price_for_client_automatic">@lang('orders.form.shipment_price_for_client_automatic')</label>
+                <input disabled type="text" class="form-control sumChange" id="shipment_price_for_client_automatic"
+                       name="shipment_price_for_client_automatic"
                        value="{{ $clientTotalCost ?? '' }}">
             </div>
             <div class="form-group" style="width: 15%; float: left; padding: 5px;">
