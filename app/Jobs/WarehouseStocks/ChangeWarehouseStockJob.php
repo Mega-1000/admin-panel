@@ -60,6 +60,11 @@ class ChangeWarehouseStockJob extends Job
             if($product === null) {
                 return response()->json(['error' => 'Product does not exist.']);
             }
+            $product->stock->logs()->where('order_id', $this->orderId)->where('action', 'DELETE')->first();
+
+            if(!empty($productStockLog)) {
+                return response()->json(['error' => 'exists']);
+            }
             $productStock = $product->stock;
             $productStockRepository->update([
                 'quantity' => $productStock->quantity - $item->quantity,
