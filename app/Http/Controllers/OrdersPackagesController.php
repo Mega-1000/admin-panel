@@ -251,7 +251,7 @@ class OrdersPackagesController extends Controller
         $orderPackage->cost_for_client = $data['cost_for_client'];
         $orderPackage->cost_for_company = $data['cost_for_company'];
         $orderPackage->cash_on_delivery = $data['cod_cost'] ?? '';
-        $orderPackage->cod_cost_for_us = $data['cod_cost_for_us'];
+        $orderPackage->cod_cost_for_us = $data['cod_cost_for_us'] ?? '';
         $orderPackage->real_cost_for_company = $data['real_cost_for_company'];
         $orderPackage->content = $data['content'];
         $orderPackage->packing_type = $data['packing_type'];
