@@ -1292,19 +1292,46 @@
                     data: 'orderId',
                     name: 'orderId',
                     render: function (orderId, row, data) {
+                        let html = '';
                         if (data.master_order_id == null) {
-                            let html = '';
                             if (data.sello_id) {
                                 html += ' (A)'
                             }
                             for (let i = 0; i < data.connected.length; i++) {
                                 html += '<span style="display: block;">(P)' + data.connected[i].id + '</span>';
                             }
-                            return '<a target="_blank" href="/admin/planning/timetable?id=taskOrder-' + orderId + '">(G)' + orderId + '</a>' + html;
+                            html = '<a target="_blank" href="/admin/planning/timetable?id=taskOrder-' + orderId + '">(G)' + orderId + '</a>' + html;
                         } else {
-                            return '<a target="_blank" href="/admin/planning/timetable?id=taskOrder-' + orderId + '">(P)' + orderId + '</a><span style="display: block;">(G)' + data.master_order_id + '</span>';
+                            html = '<a target="_blank" href="/admin/planning/timetable?id=taskOrder-' + orderId + '">(P)' + orderId + '</a><span style="display: block;">(G)' + data.master_order_id + '</span>';
                         }
+                        let array = {{ json_encode(\App\Entities\Label::NOT_SENT_YET_LABELS_IDS) }};
+                        let batteryId = {{ \App\Entities\Label::ORDER_ITEMS_REDEEMED_LABEL }};
+                        let hasHammerOrBagLabel = data.labels.filter(label => {
+                            return array.includes(parseInt(label[0].id));
+                        }).length > 0;
+                        let isNotProducedYet = data.labels.filter(label => {
+                            return parseInt(label[0].id) == batteryId ;
+                        }).length == 0;
+                        if (hasHammerOrBagLabel && isNotProducedYet) {
+                            html += data.history.reduce((acu, order) => {
+                                if (order.id == orderId) {
+                                    return acu;
+                                }
+                                let hasChildHammerOrBagLabel = order.labels.filter(label => {
+                                    return array.includes(parseInt(label.id));
+                                }).length > 0;
+                                let isChildNotProducedYet = order.labels.filter(label => {
+                                    return parseInt(label.id) == batteryId ;
+                                }).length == 0;
+                                if (hasChildHammerOrBagLabel && isChildNotProducedYet) {
+                                    let url = "{{ route('orders.edit', ['id' => ':id:']) }}"
+                                    return acu += '<a target="_blank" href="' + url.replace(":id:", order.id) + `"> (D)${order.id}</a>`
+                                }
+                                return acu;
+                            }, '');
 
+                        }
+                        return html;
                     }
                 },
                 {
