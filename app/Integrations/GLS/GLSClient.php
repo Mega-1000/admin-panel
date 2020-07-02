@@ -69,7 +69,7 @@ class GLSClient
                     'message' => $e->getMessage(),
                     'stack' => $e->getTraceAsString()]);
 
-            return['error' => true, 'content' => 'Code: ' . $e->faultcode ?? 'none' . ', FaultString: ' . $e->faultstring ?? 'none'];
+            return ['error' => true, 'content' => 'Code: ' . $e->faultcode ?? 'none' . ', FaultString: ' . $e->faultstring ?? 'none'];
         }
     }
 
@@ -125,5 +125,23 @@ class GLSClient
                     'stack' => $e->getTraceAsString()]);
         }
     }
+
+    public function deletePackage($id)
+    {
+        try {
+            $oInput = new stdClass();
+            $oInput->session = $this->session;
+            $oInput->id = $id;
+            $oClient = $this->client->adePreparingBox_DeleteConsign($oInput);
+            return true;
+        } catch (\Exception $e) {
+            \Log::error('Problem ze usunięciem przesyłki GLS ',
+                ['soapDebug' => 'Code: ' . $e->faultcode ?? 'none' . ', FaultString: ' . $e->faultstring ?? 'none',
+                    'message' => $e->getMessage(),
+                    'stack' => $e->getTraceAsString()]);
+            return false;
+        }
+    }
+
 
 }
