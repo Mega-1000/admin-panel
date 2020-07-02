@@ -589,6 +589,7 @@ class OrdersPackagesController extends Controller
             $gls = new GLSClient();
             $gls->auth();
             $gls->getLetterForPackage($package->sending_number);
+            $gls->logout();
             $number = $gls->getPackageNumer($package->sending_number);
             $package->letter_number = $number;
             $package->save();
