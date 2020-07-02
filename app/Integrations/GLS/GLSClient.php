@@ -6,6 +6,7 @@ namespace App\Integrations\GLS;
 
 use App\Entities\OrderPackage;
 use App\Integrations\GLS\soap\PackageObjectBuilder;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use SoapClient;
 use stdClass;
@@ -115,9 +116,8 @@ class GLSClient
             $oInput->session = $this->session;
             $oInput->consigns_ids = new stdClass();
             $oInput->consigns_ids->items = $ids;
-            $oInput->desc = 'Potwierdzenie nadania';
+            $oInput->desc = 'Potwierdzenie nadania z dn. ' . \Carbon\Carbon::now()->toDateString();
             $oClient = $this->client->adePickup_Create($oInput);
-            //todo aktualizacja numerow przesylek
             return $oClient->return->id;
         } catch (\Exception $e) {
             \Log::error('Problem ze potwierdzeniem przesyłek GLS ',

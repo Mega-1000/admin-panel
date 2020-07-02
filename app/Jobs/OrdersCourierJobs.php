@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Entities\ConfirmPackages;
 use App\Entities\OrderPackage;
 use App\Integrations\Apaczka\ApaczkaGuzzleClient;
 use App\Integrations\Apaczka\ApaczkaOrder;
@@ -785,6 +786,7 @@ class OrdersCourierJobs extends Job
             );
             return ['is_error' => true];
         }
+
 
         //todo dodać tworzenie potwiedzeń
         //status sending

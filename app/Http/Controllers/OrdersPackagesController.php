@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\ConfirmPackages;
 use App\Entities\ContainerType;
 use App\Entities\ContentType;
 use App\Entities\Order;
@@ -589,12 +590,12 @@ class OrdersPackagesController extends Controller
             $gls = new GLSClient();
             $gls->auth();
             $gls->getLetterForPackage($package->sending_number);
-            $gls->logout();
             $number = $gls->getPackageNumer($package->sending_number);
             $package->letter_number = $number;
             $package->save();
+            $gls->logout();
+            ConfirmPackages::create(['package_id' => $package->id]);
             $file = Storage::disk('private')->get('labels/gls/' . $package->sending_number . '.pdf');
-
         }
         return Storage::disk('private')->download('labels/gls/' . $package->sending_number . '.pdf');
     }
