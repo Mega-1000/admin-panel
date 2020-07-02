@@ -245,7 +245,7 @@ class CheckPackagesStatusJob
         $body = (string)$res->getBody();
         if (str_contains($body, 'Doreczona')) {
             $package->status = OrderPackage::DELIVERED;
-        } else if (str_contains($body, 'Skan kontrolny KK	')) {
+        } else if (str_contains($body, 'Skan kontrolny KK')) {
             $package->status = OrderPackage::SENDING;
         }
         if ($package->isDirty()) {
