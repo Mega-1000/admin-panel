@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Repositories\OrderPackageRepository;
+use GuzzleHttp\Client;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
@@ -70,6 +71,8 @@ class CheckPackagesStatusJob
                 case 'JAS':
                     $this->checkStatusInJasPackages($package);
                     break;
+                case 'GLS':
+                    $this->checkStatusInGlsPackages($package);
                 default:
                     break;
             }
@@ -232,6 +235,21 @@ class CheckPackagesStatusJob
                 $package->status = 'SENDING';
                 $package->save();
             }
+        }
+    }
+
+    private function checkStatusInGlsPackages($package)
+    {
+        $guzzle = new Client();
+        $res = $guzzle->get('http://statusy.gls-poland.com.pl/last.php?nr_paczki=' . $package->letter_number);
+        $body = (string)$res->getBody();
+        if (str_contains($body, 'Doreczona')) {
+            $package->status = OrderPackage::DELIVERED;
+        } else if (str_contains($body, 'Skan kontrolny KK	')) {
+            $package->status = OrderPackage::SENDING;
+        }
+        if ($package->isDirty()) {
+            $package->save();
         }
     }
 }
