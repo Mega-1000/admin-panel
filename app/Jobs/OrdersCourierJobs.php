@@ -2,9 +2,11 @@
 
 namespace App\Jobs;
 
+use App\Entities\OrderPackage;
 use App\Integrations\Apaczka\ApaczkaGuzzleClient;
 use App\Integrations\Apaczka\ApaczkaOrder;
 use App\Integrations\DPD\DPDService;
+use App\Integrations\GLS\GLSClient;
 use App\Integrations\Inpost\Inpost;
 use App\Integrations\Jas\Jas;
 use App\Integrations\Pocztex\addShipment;
@@ -138,6 +140,9 @@ class OrdersCourierJobs extends Job
             case 'JAS':
                 $result = $this->createPackageForJas();
                 break;
+            case 'GLS':
+                $result = $this->createPackageForGLS();
+                break;
             default:
                 \Log::notice(
                     'Wrong courier',
@@ -146,10 +151,13 @@ class OrdersCourierJobs extends Job
                 die;
         }
 
+        if (!empty($result['is_error'])) {
+            return;
+        }
         $this->orderPackageRepository->update([
             'sending_number' => $result['sending_number'],
             'letter_number' => $result['letter_number'],
-            'status' => 'WAITING_FOR_SENDING'
+            'status' => OrderPackage::WAITING_FOR_SENDING
         ], $this->data['additional_data']['order_package_id']);
         $package = $this->orderPackageRepository->find($this->data['additional_data']['order_package_id']);
         if ($package->service_courier_name !== 'INPOST' && $package->service_courier_name !== 'ALLEGRO-INPOST') {
@@ -163,7 +171,7 @@ class OrdersCourierJobs extends Job
                 }
             }
 
-            if ($path !== null) {
+            if (!empty($path)) {
                 try {
                     \Mailer::create()
                         ->to($package->order->warehouse->firm->email)
@@ -753,5 +761,44 @@ class OrdersCourierJobs extends Job
                 'letter_number' => $letterNumber,
             ];
         }
+    }
+
+    private function createPackageForGLS()
+    {
+        $pack = OrderPackage::find($this->data['additional_data']['order_package_id']);
+        if (empty($pack)) {
+            \Log::error('Nie istnieje paczka GLS o id: ' . $this->data['additional_data']['order_package_id']);
+        }
+        $client = new GLSClient();
+        $client->auth();
+        list('error' => $isError, 'content' => $id) = $client->createNewPackage($pack);
+
+        if ($isError) {
+            \App\Helpers\Helper::sendEmail(
+                auth()->user()->email,
+                'send-log',
+                'Błąd zamiawiania paczki ' . env('APP_NAME'),
+                [
+                    'date' => now(),
+                    'logMessage' => $id
+                ]
+            );
+            return ['is_error' => true];
+        }
+
+        //todo dodać tworzenie potwiedzeń
+        //status sending
+
+//        $pack->letter_number = $number;
+//
+////        $newId = $client->confirmSending([$id]);
+////        $pack->sending_number = $newId;
+//        $client->getConfirmedPickupDetails(327171);
+//
+////        $client->getPackageStatus($pack->letter_number);
+//        $pack->save();
+        $client->logout();
+
+        return ['sending_number' => $id, 'letter_number' => ''];
     }
 }

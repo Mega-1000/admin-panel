@@ -1160,6 +1160,11 @@
                                         html += '<a target="_blank" href="/storage/gielda/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                     } else if (value.delivery_courier_name === 'ODBIOR_OSOBISTY') {
                                         html += '<a target="_blank" href="/storage/odbior_osobisty/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
+                                    } else if (value.delivery_courier_name === 'GLS') {
+                                        let url = "{{ route('orders.package.getSticker', ['id' => '%%'])}}"
+                                        html += '<a target="_blank" href="' + url.replace('%%', value.id) + '"><p>';
+                                        html += value.letter_number ? value.letter_number : 'wygeneruj naklejkę';
+                                        html += '</p></a>';
                                     }
                                     html += '<div style="display: flex;">'
                                     html += '<button class="btn btn-danger" onclick="cancelPackage(' + value.id + ', ' + value.order_id + ')">Anuluj</button>'
