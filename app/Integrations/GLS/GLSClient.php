@@ -6,7 +6,6 @@ namespace App\Integrations\GLS;
 
 use App\Entities\OrderPackage;
 use App\Integrations\GLS\soap\PackageObjectBuilder;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use SoapClient;
 use stdClass;
@@ -127,36 +126,4 @@ class GLSClient
         }
     }
 
-    public function getConfirmedPickupDetails($id)
-    {
-        try {
-            $oInput = new stdClass();
-            $oInput->session = $this->session;
-            $oInput->id = $id;
-            $oInput->id_start = 0;
-            $oClient = $this->client->adePickup_GetConsign($oInput);
-//            $oClient = $this->client->adePickup_GetConsignIDs($oInput);
-            print_r($oClient);
-        } catch (\Exception $e) {
-            \Log::error('Problem ze pobraniem potwierdzonych przesyłek GLS ',
-                ['soapDebug' => 'Code: ' . $e->faultcode ?? 'none' . ', FaultString: ' . $e->faultstring ?? 'none',
-                    'message' => $e->getMessage(),
-                    'stack' => $e->getTraceAsString()]);
-        }
-    }
-
-    public function getPackageStatus($number)
-    {
-        try {
-            $oInput = new stdClass();
-            $oInput->session = $this->session;
-            $oInput->number = $number;
-            $oClient = $this->client->adePickup_ParcelNumberSearch($oInput);
-        } catch (\Exception $e) {
-            \Log::error('Problem ze sprawdzeniem statusu paczki GLS ',
-                ['soapDebug' => 'Code: ' . $e->faultcode ?? 'none' . ', FaultString: ' . $e->faultstring ?? 'none',
-                    'message' => $e->getMessage(),
-                    'stack' => $e->getTraceAsString()]);
-        }
-    }
 }

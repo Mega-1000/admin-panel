@@ -31,8 +31,8 @@ class ConfirmSentPackagesJob implements ShouldQueue
      */
     public function handle()
     {
-        $packages = ConfirmPackages::all();
-        $ids = $packages->reduce(function ($acu, $curr) {
+        $packagesIdsToConfirm = ConfirmPackages::all();
+        $ids = $packagesIdsToConfirm->reduce(function ($acu, $curr) {
             $acu[] = $curr->package->sending_number;
             $curr->delete();
             return $acu;

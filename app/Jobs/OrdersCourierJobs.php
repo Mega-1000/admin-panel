@@ -786,19 +786,6 @@ class OrdersCourierJobs extends Job
             );
             return ['is_error' => true];
         }
-
-
-        //todo dodać tworzenie potwiedzeń
-        //status sending
-
-//        $pack->letter_number = $number;
-//
-////        $newId = $client->confirmSending([$id]);
-////        $pack->sending_number = $newId;
-//        $client->getConfirmedPickupDetails(327171);
-//
-////        $client->getPackageStatus($pack->letter_number);
-//        $pack->save();
         $client->logout();
 
         return ['sending_number' => $id, 'letter_number' => ''];
