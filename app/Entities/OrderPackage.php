@@ -15,6 +15,7 @@ class OrderPackage extends Model implements Transformable
 {
     use TransformableTrait;
 
+    const WAITING_FOR_SENDING = 'WAITING_FOR_SENDING';
     public $customColumnsVisibilities = [
         'number',
         'size_a',

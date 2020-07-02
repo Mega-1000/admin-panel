@@ -362,6 +362,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orders/products/{symbol}', 'OrdersController@addProduct')->name('orders.products.add');
         Route::get('orders/{order_id}/package/{package_id}/send',
             'OrdersPackagesController@preparePackageToSend')->name('orders.package.prepareToSend');
+        Route::get('orders/package/{package_id}/sticker',
+            'OrdersPackagesController@getSticker')->name('orders.package.getSticker');
 
         Route::get('import', 'ImportController@index')->name('import.index');
         Route::post('import/store', 'ImportController@store')->name('import.store');

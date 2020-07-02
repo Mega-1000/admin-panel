@@ -257,16 +257,12 @@ class Order extends Model implements Transformable
 
     public function getDeliveryAddress()
     {
-        $deliveryAddress = $this->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first();
-
-        return $deliveryAddress;
+        return $this->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first();
     }
 
     public function getInvoiceAddress()
     {
-        $invoiceAddress = $this->addresses()->where('type', '=', 'INVOICE_ADDRESS')->first();
-
-        return $invoiceAddress;
+        return $this->addresses()->where('type', '=', 'INVOICE_ADDRESS')->first();
     }
 
     public function hasLabel($labelId)
