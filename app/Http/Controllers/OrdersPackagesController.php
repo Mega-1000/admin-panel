@@ -250,11 +250,9 @@ class OrdersPackagesController extends Controller
         $orderPackage->shape = $data['shape'];
         $orderPackage->sending_number = $data['sending_number'];
         $orderPackage->letter_number = $data['letter_number'];
-        $orderPackage->cash_on_delivery = $data['cash_on_delivery'];
         $orderPackage->status = $data['status'];
         $orderPackage->cost_for_client = $data['cost_for_client'];
         $orderPackage->cost_for_company = $data['cost_for_company'];
-        $orderPackage->cod_cost_for_us = $data['cod_cost_for_us'] ?? '';
         $orderPackage->real_cost_for_company = $data['real_cost_for_company'];
         $orderPackage->content = $data['content'];
         $orderPackage->packing_type = $data['packing_type'];
