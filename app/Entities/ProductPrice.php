@@ -65,6 +65,7 @@ class ProductPrice extends Model implements Transformable
         'gross_purchase_price_aggregate_unit_after_discounts',
         'gross_selling_price_the_largest_unit',
         'gross_purchase_price_the_largest_unit_after_discounts',
+        'allegro_selling_gross_commercial_price'
     ];
 
     /**
