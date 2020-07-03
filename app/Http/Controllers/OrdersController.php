@@ -462,7 +462,7 @@ class OrdersController extends Controller
             'status_id' => 5,
         ]);
 
-        $clientTotalCost = $order->packages->reduce(function ($prev,OrderPackage $next) {
+        $clientTotalCost = $order->packages->reduce(function ($prev, OrderPackage $next) {
             return $prev + $next->getClientCosts();
         }, 0);
 
@@ -1911,6 +1911,16 @@ class OrdersController extends Controller
 
             $order = Order::find($ord->orderId);
             $tagHelper->setOrder($order);
+            $lostFromPack = $order->items->map(function ($item) use ($order) {
+                $fromPack = $this->calculateTotalAmoutForPackages($order, $item);
+                $notAssigned = $this->calculateTotalAmoutForOtherPackages($order, $item);
+                $item->quantity -= ($fromPack + $notAssigned);
+                if ($item->quantity > 0) {
+                    return $item;
+                }
+                return null;
+            });
+            $order->lost = $lostFromPack;
             $view = View::make('orders.print', [
                 'order' => $order,
                 'tagHelper' => $tagHelper,
@@ -1993,11 +2003,46 @@ class OrdersController extends Controller
         $order->update();
         $showPosition = is_a(Auth::user(), User::class);
 
+        $lostFromPack = $order->items->map(function ($item) use ($order) {
+            $fromPack = $this->calculateTotalAmoutForPackages($order, $item);
+            $notAssigned = $this->calculateTotalAmoutForOtherPackages($order, $item);
+            $item->quantity -= ($fromPack + $notAssigned);
+            if ($item->quantity > 0) {
+                return $item;
+            }
+            return null;
+        });
+        $order->lost = $lostFromPack;
         return View::make('orders.print', [
             'order' => $order,
             'tagHelper' => $tagHelper,
             'showPosition' => $showPosition
         ]);
+    }
+
+    /**
+     * @param $order
+     * @param $item
+     * @return mixed
+     */
+    private function calculateTotalAmoutForPackages($order, $item)
+    {
+        return $order->packages->reduce(function ($acu, $curr) use ($item) {
+            $totalAmountForPack = $curr->packedProducts->reduce(function ($acumulator, $current) use ($item) {
+                return $acumulator + ($current->id == $item->product_id ? $current->pivot->quantity : 0);
+            }, 0);
+            return $acu + $totalAmountForPack;
+        }, 0);
+    }
+
+    private function calculateTotalAmoutForOtherPackages($order, $item)
+    {
+        return $order->otherPackages->reduce(function ($acu, $curr) use ($item) {
+            $totalAmountForPack = $curr->products->reduce(function ($accumulator, $current) use ($item) {
+                return $accumulator + ($current->id == $item->product_id ? $current->pivot->quantity : 0);
+            }, 0);
+            return $acu + $totalAmountForPack;
+        }, 0);
     }
 
     /**
