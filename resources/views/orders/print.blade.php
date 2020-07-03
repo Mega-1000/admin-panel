@@ -142,30 +142,7 @@
                 @continue
             @endif
             <table border="0" cellpadding="1" cellspacing="1" style="width: 100%;">
-                <tr>
-                    <td style="width:100px"><img
-                            src="{!!  $pack->product->getImageUrl() !!}"
-                            alt="{{ $pack->name }}"
-                            style="width:70px"/></td>
-                    <td><span
-                            style="font-size:14px; font-weight:bold;">{{ $pack->product->name }}</span><br/>symbol: {{ $pack->product->symbol }}
-                        <br/>Ilość: {{ $pack->quantity }} {{ $pack->product->packing->calciation_unit }}<br/></td>
-                    @if(isset($showPosition) && $showPosition)
-                        <td>
-                            ILOŚĆ NA STANIE: {{ $pack->product->stock->quantity }} <br/>
-                            @if(count($pack->product->getPositions()))
-                                LOKACJA PRODUKTÓW: <br/>
-                                @foreach($pack->product->getPositions() as $position)
-                                    Alejka: {{ $position->lane }} <br/>
-                                    Regał: {{ $position->bookstand }} </br>
-                                    Półka: {{ $position->shelf }} </br>
-                                    Pozycja: {{ $position->position }} </br>
-                                    Ilość: {{ $position->position_quantity }}
-                                @endforeach
-                            @endif
-                        </td>
-                    @endif
-                </tr>
+                @include('orders.single_item', ['item' => $pack->product, 'quantity' => $pack->quantity])
                 <tr>
                     <td colspan="3">
                         <hr/>
