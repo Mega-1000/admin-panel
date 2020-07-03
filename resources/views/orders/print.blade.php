@@ -152,6 +152,10 @@
         @endforeach
     @endif
 
+    @if($order->warehouse_notice)
+        <br><br/><b>UWAGI MAGAZYNU</b><br/>
+        {!! $order->warehouse_notice !!}
+    @endif
 
     <br/><b>DANE KUPUJĄCEGO</b><br/>
     {!! $tagHelper->buyerData() !!}
