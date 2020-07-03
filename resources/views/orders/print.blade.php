@@ -136,7 +136,26 @@
             @include('orders.items_table',['$package' => $package])
         @endforeach
     @endif
+    @if(count($order->lost) > 0)
+        @foreach($order->lost as $pack)
+            @if(empty($pack))
+                @continue
+            @endif
+            <table border="0" cellpadding="1" cellspacing="1" style="width: 100%;">
+                @include('orders.single_item', ['item' => $pack->product, 'quantity' => $pack->quantity])
+                <tr>
+                    <td colspan="3">
+                        <hr/>
+                    </td>
+                </tr>
+            </table>
+        @endforeach
+    @endif
 
+    @if($order->warehouse_notice)
+        <br><br/><b>UWAGI MAGAZYNU</b><br/>
+        {!! $order->warehouse_notice !!}
+    @endif
 
     <br/><b>DANE KUPUJĄCEGO</b><br/>
     {!! $tagHelper->buyerData() !!}
