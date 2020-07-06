@@ -45,8 +45,7 @@
 
     {{--<b>uwagi klienta:</b> <br/>--}}
     <b>uwagi spedycja:</b> {!! $tagHelper->commentsToShipping(" | ") !!}<br/>
-    <b>uwagi magazyn:</b> {!! $tagHelper->commentsToStorehouse(" | ") !!}
-
+    <b>uwagi magazyn:</b> {!! $order->warehouse_notice !!}
     <br/><br/>
 
     @if(count($order->packages) > 0)
@@ -150,11 +149,6 @@
                 </tr>
             </table>
         @endforeach
-    @endif
-
-    @if($order->warehouse_notice)
-        <br><br/><b>UWAGI MAGAZYNU</b><br/>
-        {!! $order->warehouse_notice !!}
     @endif
 
     <br/><b>DANE KUPUJĄCEGO</b><br/>
