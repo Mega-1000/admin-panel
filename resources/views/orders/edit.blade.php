@@ -482,6 +482,9 @@
                 </button>
             </div>
             <h3 style="clear: both;">Produkty</h3>
+            <button type="button" class="btn btn-success" onclick="loadAllegroPrices()">
+                Przelicz po cenach allegro
+            </button>
             <table id="productsTable" class="table table1 table-venice-blue productsTableEdit">
                 <tbody id="products-tbody">
                 @php
@@ -2814,6 +2817,19 @@
                             });
                         });
 
+                        function loadAllegroPrices() {
+                            $.ajax({
+                                'url': "{{ route('prices.allegroPrices', ['id' => $order->id]) }}"
+                            }).done(data => {
+                                if (data.error) {
+                                    alert(data.error)
+                                    return;
+                                }
+                                data.content.map(item => {
+                                    $(`.row-${item.id}`).find(".gross_selling_price_commercial_unit").val(item.price).change()
+                                });
+                            });
+                        }
                     </script>
                     <script>
                         const deleteRecordOrderPayments = (id) => {
