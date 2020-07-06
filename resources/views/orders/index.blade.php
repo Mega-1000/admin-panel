@@ -596,9 +596,47 @@
         <a name="print_orders" class="btn btn-success"
            onclick="$('#upload-allegro-payments').modal('show')">Aktualizuj</a>
         @if(!empty(session('allegro_payments_errors')))
-            @foreach(session('allegro_payments_errors') as $error)
-                <div class="alert alert-warning"> {{$error}} </div>
-            @endforeach
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>
+                        W tabeli importu sello nie istnieje transakcja o id:
+                    </th>
+                    <th>
+                        Nie zaimportowano zlecenia z systemu sello do mega1000:
+                    </th>
+                    <th>
+                        Transakcja została już wcześniej opłacona:
+                    </th>
+                    <th>
+                        Brak poprawnej kwoty obietnicy wpłaty. Proszę sprawdzić czy kwota obietnicy wpłaty się zgadza.
+                    </th>
+                    <th>
+                        Inne błędy:
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                @php
+                $type1 = session('allegro_payments_errors')[1] ?? [];
+                $type2 = session('allegro_payments_errors')[2] ?? [];
+                $type3 = session('allegro_payments_errors')[3] ?? [];
+                $type4 = session('allegro_payments_errors')[4] ?? [];
+                $typeOther = session('allegro_payments_errors')['other'] ?? [];
+
+                $length = max([count($type1), count($type2), count($type3), count($type4), count($typeOther)]);
+                @endphp
+                @for ($i = 0; $i < $length; $i++)
+                    <tr>
+                        <td>{!! isset($type1[$i]) ? $type1[$i] : '' !!}</td>
+                        <td>{!! isset($type2[$i]) ? $type2[$i] : '' !!}</td>
+                        <td>{!! isset($type3[$i]) ? $type3[$i] : '' !!}</td>
+                        <td>{!! isset($type4[$i]) ? $type4[$i] : '' !!}</td>
+                        <td>{!! isset($typeOther[$i]) ? $typeOther[$i] : '' !!}</td>
+                    </tr>
+                @endfor
+                </tbody>
+            </table>
         @endif
     </div>
     <div class="form-group">
