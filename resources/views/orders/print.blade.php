@@ -25,7 +25,7 @@
 
 
 <div class="docc">
-    <h1>WZ {{ $order->id }} {!! $similar ? '(D) ' . join(', (D) ',$similar) : '' !!}</h1>
+    <h1>WZ {{ $order->id }} {!! $similar && $showPosition ? '(D) ' . join(', (D) ',$similar) : '' !!}</h1>
     @if(!empty($order->employee))
         <h2>Osoba odpowiedzialna:</h2> {!! $tagHelper->consultantOrStorekeeper() !!}<br/>
     @endif
