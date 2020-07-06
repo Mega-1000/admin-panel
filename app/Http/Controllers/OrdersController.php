@@ -1921,7 +1921,9 @@ class OrdersController extends Controller
                 return null;
             });
             $order->lost = $lostFromPack;
+            $similar = $this->findSimilarOrders($order);
             $view = View::make('orders.print', [
+                'similar' => $similar,
                 'order' => $order,
                 'tagHelper' => $tagHelper,
                 'showPosition' => true
@@ -2013,8 +2015,10 @@ class OrdersController extends Controller
             return null;
         });
         $order->lost = $lostFromPack;
+        $similar = $this->findSimilarOrders($order);
         return View::make('orders.print', [
             'order' => $order,
+            'similar' => $similar ?? [],
             'tagHelper' => $tagHelper,
             'showPosition' => $showPosition
         ]);
@@ -2509,6 +2513,41 @@ class OrdersController extends Controller
         OrderInvoice::where('id', $id)->delete();
 
         return response()->json(['status' => 'success']);
+    }
+
+    /**
+     * @param $order
+     * @return mixed
+     */
+    private function findSimilarOrders($order)
+    {
+        $notSentYetLabel = Label::NOT_SENT_YET_LABELS_IDS;
+        $batteryId = Label::ORDER_ITEMS_REDEEMED_LABEL;
+        $hasHammerOrBagLabel = $order->labels->filter(function ($label) use ($notSentYetLabel) {
+            return in_array($label->id, $notSentYetLabel);
+        });
+        $isNotProducedYet = $order->labels->filter(function ($label) use ($batteryId) {
+                return $label->id === $batteryId;
+            })->count() == 0;
+        if ($hasHammerOrBagLabel && $isNotProducedYet) {
+            $history = $order->customer->orders;
+            $similar = $history->reduce(function ($acu, $orderh) use ($batteryId, $notSentYetLabel, $order) {
+                if ($orderh->id == $order->id) {
+                    return $acu;
+                }
+                $hasChildHammerOrBagLabel = $orderh->labels->filter(function ($label) use ($notSentYetLabel) {
+                        return in_array($label->id, $notSentYetLabel);
+                    })->count() > 0;
+                $isChildNotProducedYet = $orderh->labels->filter(function ($label) use ($batteryId) {
+                        return $label->id == $batteryId;
+                    })->count() == 0;
+                if ($hasChildHammerOrBagLabel && $isChildNotProducedYet) {
+                    $acu [] = $orderh->id;
+                }
+                return $acu;
+            }, []);
+        }
+        return $similar;
     }
 }
 
