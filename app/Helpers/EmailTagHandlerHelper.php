@@ -265,6 +265,23 @@ class EmailTagHandlerHelper
         return $content;
     }
 
+    //[UWAGI-DO-MAGAZYNU]
+    public function commentsToStorehouse($glue = "<br>")
+    {
+        $messages = $this->order->messages()->where('type', 'LIKE', 'WAREHOUSE')->orderBy('created_at')->get();
+        $content = "";
+
+        if (count($messages) > 0) {
+            $temp = [];
+            foreach ($messages as $item) {
+                $temp[] = $item->message;
+            }
+            $content = join($glue, $temp);
+        }
+
+        return $content;
+    }
+
     //[TELEFON-KUPUJACEGO]
     public function purchaserPhoneNumber()
     {
