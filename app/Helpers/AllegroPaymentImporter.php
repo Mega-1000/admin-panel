@@ -67,6 +67,10 @@ class AllegroPaymentImporter
         })->first();
 
         if (empty($found)) {
+            $isPaid = $order->bookedPayments()->where('amount', $amount)->count() > 0;
+            if ($isPaid) {
+                throw new \Exception('Transakcja o id: ' . $id . ' została już wcześniej opłacona');
+            }
             throw new \Exception('Nie znaleziono transakcji o id: ' . $id . ' na kwotę: ' . $amount);
         }
         $found->promise = 0;
