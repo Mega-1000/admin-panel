@@ -18,6 +18,7 @@
             @endforeach
         </select>
     </div>
+    <link rel="stylesheet" href="{{ URL::asset('css/views/timetable/timetable.css') }}">
 @endsection
 @section('content')
     @php
@@ -643,12 +644,15 @@
                             })
                         }
                         let url = route.replace('%%', item.id);
-                        return input + labels +  `<a href="${url}">Edycja zlecenia</a>`
+                        console.log(item)
+                        let tooltipText = item.order.warehouse_notice ?? ''
+                        let tooltipElement = item.order.warehouse_notice ? `<i title="${tooltipText}" data-toggle="tooltip" class="comment-icon fas fa-comment"></i>` : '';
+                        return input + labels + tooltipElement +`<a href="${url}">Edycja zlecenia</a>`
                     }
 
                     $.ajax({
                         url: '/admin/planning/tasks/' + info.event.id + '/getTask',
-                        type: "GET"
+                        type: "GET"o
                     }).done(function (data) {
                         $('#updateTaskModal').modal();
                         let form = $('#updateTaskDetail').length;
@@ -809,6 +813,12 @@
                         });
                         var checkboxes = $('.export_to_new_group');
                         var lastChecked = null;
+
+                        $(() => {
+                            $('[data-toggle="tooltip"]').tooltip();
+                        });
+
+
                     }).fail(function () {
                         $('#errorGetToUpdate').modal();
                     });
