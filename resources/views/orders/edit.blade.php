@@ -3796,15 +3796,24 @@
 
                             }
 
+                            function calculateNettoFromGross(netto, gross, id, fixed = 2) {
+                                let nettoPrice = $("input[name='" + netto + "[" + id + "]']");
+                                let grossPrice = $("input[name='" + gross + "[" + id + "]']").val();
+                                let vat = 1.23;
+                                let calc;
+                                calc = parseFloat(grossPrice) / parseFloat(vat);
+                                nettoPrice.val(parseFloat(calc).toFixed(fixed));
+                            }
+
                             @foreach ($order->items as $item)
                             update2('net_purchase_price_commercial_unit', 'gross_purchase_price_commercial_unit', '{{$item->id}}');
                             update('net_purchase_price_basic_unit', 'gross_purchase_price_basic_unit', '{{$item->id}}');
                             update('net_purchase_price_calculated_unit', 'gross_purchase_price_calculated_unit', '{{$item->id}}');
                             update('net_purchase_price_aggregate_unit', 'gross_purchase_price_aggregate_unit', '{{$item->id}}');
-                            update2('net_selling_price_commercial_unit', 'gross_selling_price_commercial_unit', '{{$item->id}}');
-                            update('net_selling_price_basic_unit', 'gross_selling_price_basic_unit', '{{$item->id}}');
-                            update('net_selling_price_calculated_unit', 'gross_selling_price_calculated_unit', '{{$item->id}}');
-                            update('net_selling_price_aggregate_unit', 'gross_selling_price_aggregate_unit', '{{$item->id}}');
+                            calculateNettoFromGross('net_selling_price_commercial_unit', 'gross_selling_price_commercial_unit', '{{$item->id}}');
+                            calculateNettoFromGross('net_selling_price_basic_unit', 'gross_selling_price_basic_unit', '{{$item->id}}', 4);
+                            calculateNettoFromGross('net_selling_price_calculated_unit', 'gross_selling_price_calculated_unit', '{{$item->id}}', 4);
+                            calculateNettoFromGross('net_selling_price_aggregate_unit', 'gross_selling_price_aggregate_unit', '{{$item->id}}', 4);
                             @endforeach
 
                             $(function () {
