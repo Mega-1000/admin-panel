@@ -1615,7 +1615,7 @@ class OrdersController extends Controller
     /**
      * @return mixed
      */
-    public function prepareCollection($data, $withoutPagination = false)
+    public function prepareCollection($data, $withoutPagination = false, $minId = false)
     {
         $sortingColumnId = $data['order'][0]['column'];
         $sortingColumnDirection = $data['order'][0]['dir'];
@@ -1719,6 +1719,9 @@ class OrdersController extends Controller
                     $query->whereRaw('IFNULL((CAST((select sum(net_selling_price_commercial_unit * quantity * 1.23) from order_items where order_id = orders.id) AS DECIMAL (12,2)) + IFNULL(orders.additional_service_cost, 0) + IFNULL(orders.additional_cash_on_delivery_cost, 0) + IFNULL(orders.shipment_price_for_client, 0)) - ifnull((select sum(amount) from order_payments where order_payments.order_id = orders.id), 0),0)' . ' LIKE ' . "'%{$column['search']['value']}%'");
                 }
             }
+        }
+        if ($minId) {
+            $query->where($sortingColumns[6], '>', $minId);
         }
 
         $count = $query->count();
@@ -2447,6 +2450,12 @@ class OrdersController extends Controller
             'message' => 'Rozpoczęto import z Sello',
             'alert-type' => 'success',
         ]);
+    }
+
+    public function findPage(Request $request, $id) {
+        list($collection, $count) = $this->prepareCollection($request->all(), false, $id);
+        return response($count / $request->all()['length']);
+        //todo implement
     }
 
     public function sendTrackingNumbers()

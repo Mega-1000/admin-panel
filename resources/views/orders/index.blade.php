@@ -690,6 +690,12 @@
                 <input type="search" class="form-control" name="searchLeft" id="searchLeft">
             </div>
         </div>
+
+        <div class="col-md-4 mb-4">
+                <label for="searchById">Zajdź po ID</label>
+                <input type="search" name="searchById" id="searchById">
+                <button onclick="findPage()" class="btn btn-success">Znajdź zlecenie</button>
+        </div>
     </div>
     <table id="dataTable" class="table table-hover spacious-container ordersTable">
         <thead>
@@ -2274,6 +2280,15 @@
                     } else {
                         alert('Trwa przygotowywanie listy')
                     }
+                });
+        }
+
+        function findPage() {
+            let id = $('#searchById').val()
+            let url = "{{route('orders.findPage', ['id' => '%%'])}}"
+            $.post(url.replace('%%', id), table.ajax.params())
+                .done((data) => {
+                    window.table.page(Math.floor(data)).draw('page')
                 });
         }
 
