@@ -63,7 +63,7 @@ class AllegroPaymentImporter
         }
         $payment = $order->promisePayments();
         $found = $payment->filter(function ($item) use ($amount) {
-            return $item->amount == $amount;
+            return abs($item->amount - $amount) < 2;
         })->first();
 
         if (empty($found)) {
