@@ -2547,7 +2547,7 @@ class OrdersController extends Controller
                 return $acu;
             }, []);
         }
-        return $similar;
+        return $similar ?? [];
     }
 }
 
