@@ -435,6 +435,7 @@ class ImportCsvFileJob implements ShouldQueue
             'coating' => $line[237],
             'allegro_selling_gross_commercial_price' => $line[250],
             'gross_price_of_packing' => $line[252],
+            'gross_selling_price_commercial_unit' => $line[252],
             'net_selling_price_commercial_unit' => $line[270],
             'net_selling_price_basic_unit' => $line[272],
             'net_selling_price_calculated_unit' => $line[271],

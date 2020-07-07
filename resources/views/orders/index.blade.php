@@ -1582,7 +1582,7 @@
                         var items = row['items'];
 
                         for (let index = 0; index < items.length; index++) {
-                            let priceSelling = items[index].net_selling_price_commercial_unit;
+                            let priceSelling = items[index].gross_selling_price_commercial_unit;
                             let pricePurchase = items[index].net_purchase_price_commercial_unit_after_discounts;
                             let quantity = items[index].quantity;
 
@@ -1599,7 +1599,7 @@
                             sumOfPurchase += parseFloat(pricePurchase) * parseInt(quantity);
                         }
 
-                        return ((sumOfSelling - sumOfPurchase) * 1.23).toFixed(2);
+                        return (sumOfSelling - (sumOfPurchase * 1.23)).toFixed(2);
 
                     }
                 },
@@ -1674,7 +1674,7 @@
                         var items = row['items'];
 
                         for (let index = 0; index < items.length; index++) {
-                            let price = items[index].net_selling_price_commercial_unit;
+                            let price = items[index].gross_selling_price_commercial_unit;
                             let quantity = items[index].quantity;
                             if (price == null) {
                                 price = 0;
@@ -1684,7 +1684,7 @@
                             }
                             totalOfProductsPrices += parseFloat(price) * parseInt(quantity);
                         }
-                        let orderSum = ((totalOfProductsPrices * 1.23) + parseFloat(shipmentPriceForClient) + parseFloat(additionalServiceCost) + parseFloat(additionalPackageCost)).toFixed(2);
+                        let orderSum = (totalOfProductsPrices + parseFloat(shipmentPriceForClient) + parseFloat(additionalServiceCost) + parseFloat(additionalPackageCost)).toFixed(2);
                         let totalOfPayments = 0;
                         var payments = row['payments'];
 

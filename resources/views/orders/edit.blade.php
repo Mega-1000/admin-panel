@@ -496,9 +496,9 @@
                 @endphp
                 @foreach($order->items as $item)
                     @php
-                        $gross_purchase_sum += ($item->net_purchase_price_commercial_unit_after_discounts * $item->quantity * 1.23);
+                        $gross_purchase_sum += ($item->gross_purchase_price_commercial_unit_after_discounts * $item->quantity);
                         $net_purchase_sum += $item->net_purchase_price_commercial_unit_after_discounts * $item->quantity ;
-                        $gross_selling_sum += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+                        $gross_selling_sum += ($item->gross_selling_price_commercial_unit * $item->quantity);
                         $net_selling_sum += $item->net_selling_price_commercial_unit * $item->quantity;
                         $weight += $item->product->weight_trade_unit_after_discounts * $item->quantity;
                     @endphp
@@ -826,7 +826,7 @@
                         <td>
                             <input type="text" class="form-control item-value priceChange" data-item-id="{{$item->id}}"
                                    disabled name="item-value"
-                                   value="{{ number_format(($item->net_selling_price_commercial_unit_after_discounts * $item->quantity * 1.23), 2) }} zł">
+                                   value="{{ number_format(($item->gross_selling_price_commercial_unit_after_discounts * $item->quantity), 2) }} zł">
                         </td>
                         <td colspan="3"></td>
                     </tr>
@@ -848,7 +848,7 @@
                         <td>
                             <input type="text" class="form-control item-profit priceChange" data-item-id="{{$item->id}}"
                                    disabled name="item-profit"
-                                   value="{{ number_format(($item->net_selling_price_commercial_unit_after_discounts * $item->quantity * 1.23) - ($item->net_purchase_price_commercial_unit_after_discounts * $item->quantity * 1.23), 2) }} zł">
+                                   value="{{ number_format(($item->gross_selling_price_commercial_unit_after_discounts * $item->quantity) - ($item->net_purchase_price_commercial_unit_after_discounts * $item->quantity * 1.23), 2) }} zł">
                         </td>
                         <td colspan="3"></td>
                     </tr>
@@ -1104,7 +1104,7 @@
                     @php
                         $sumOfItems = 0;
                         foreach ($itemOrder->items as $item) {
-                            $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+                            $sumOfItems += ($item->gross_selling_price_commercial_unit * $item->quantity);
                         }
                         $orderValue = str_replace(',', '', number_format($sumOfItems + $itemOrder->shipment_price_for_client + $itemOrder->additional_service_cost + $itemOrder->additional_cash_on_delivery_cost, 2));
                     @endphp
@@ -1161,7 +1161,7 @@
                                     @php
                                         $sumOfItems = 0;
                                         foreach ($itemCustomerOrder->items as $item) {
-                                            $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+                                            $sumOfItems += ($item->gross_selling_price_commercial_unit * $item->quantity);
                                         }
                                         $orderValue = str_replace(',', '', number_format($sumOfItems + $itemCustomerOrder->shipment_price_for_client + $itemCustomerOrder->additional_service_cost + $itemCustomerOrder->additional_cash_on_delivery_cost, 2));
                                     @endphp
@@ -1177,7 +1177,7 @@
                                         @php
                                             $sumOfItems = 0;
                                             foreach ($itemCustomerOrder->items as $item) {
-                                                $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+                                                $sumOfItems += ($item->gross_selling_price_commercial_unit * $item->quantity);
                                             }
                                             $orderValue = str_replace(',', '', number_format($sumOfItems + $itemCustomerOrder->shipment_price_for_client + $itemCustomerOrder->additional_service_cost + $itemCustomerOrder->additional_cash_on_delivery_cost, 2));
                                         @endphp
@@ -1190,7 +1190,7 @@
                                     @php
                                         $sumOfItems = 0;
                                         foreach ($itemCustomerOrder->items as $item) {
-                                            $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+                                            $sumOfItems += ($item->gross_selling_price_commercial_unit * $item->quantity);
                                         }
                                         $orderValue = str_replace(',', '', number_format($sumOfItems + $itemCustomerOrder->shipment_price_for_client + $itemCustomerOrder->additional_service_cost + $itemCustomerOrder->additional_cash_on_delivery_cost, 2));
                                     @endphp
@@ -1236,7 +1236,7 @@
                                         @php
                                             $sumOfItems = 0;
                                             foreach ($itemCustomerOrder->items as $item) {
-                                                $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+                                                $sumOfItems += ($item->gross_selling_price_commercial_unit * $item->quantity);
                                             }
                                             $orderValue = str_replace(',', '', number_format($sumOfItems + $itemCustomerOrder->shipment_price_for_client + $itemCustomerOrder->additional_service_cost + $itemCustomerOrder->additional_cash_on_delivery_cost, 2));
                                         @endphp
@@ -1471,7 +1471,7 @@
                         @php
                             $sumOfItems = 0;
                             foreach ($itemOrder->items as $item) {
-                                $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+                                $sumOfItems += ($item->gross_selling_price_commercial_unit * $item->quantity);
                             }
                             $orderValue = str_replace(',', '', number_format($sumOfItems + $itemOrder->shipment_price_for_client + $itemOrder->additional_service_cost + $itemOrder->additional_cash_on_delivery_cost, 2));
                         @endphp
@@ -1544,7 +1544,7 @@
                 @php
                     $sumOfItems = 0;
                     foreach ($order->items as $item) {
-                        $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+                        $sumOfItems += ($item->gross_selling_price_commercial_unit * $item->quantity);
                     }
                     $orderValue = str_replace(',', '', number_format($sumOfItems + $order->shipment_price_for_client + $order->additional_service_cost + $order->additional_cash_on_delivery_cost, 2));
                 @endphp
@@ -1688,7 +1688,7 @@
                                 @php
                                     $gross_purchase_sum += ($item->net_purchase_price_commercial_unit_after_discounts * $item->quantity * 1.23);
                                     $net_purchase_sum += $item->net_purchase_price_commercial_unit_after_discounts * $item->quantity ;
-                                    $gross_selling_sum += ($item->net_selling_price_commercial_unit_after_discounts * $item->quantity * 1.23);
+                                    $gross_selling_sum += ($item->gross_selling_price_commercial_unit_after_discounts * $item->quantity);
                                     $net_selling_sum += $item->net_selling_price_commercial_unit_after_discounts * $item->quantity;
                                     $weight += $item->product->weight_trade_unit * $item->quantity;
                                 @endphp
@@ -2104,7 +2104,7 @@
                                                class="form-control item-profit priceChange"
                                                data-item-id="{{$item->id}}" disabled
                                                name="item-profit"
-                                               value="{{ number_format(($item->net_selling_price_commercial_unit * $item->quantity * 1.23) - ($item->net_purchase_price_commercial_unit_after_discounts * $item->quantity * 1.23), 2) }}">
+                                               value="{{ number_format(($item->gross_selling_price_commercial_unit * $item->quantity) - ($item->net_purchase_price_commercial_unit_after_discounts * $item->quantity * 1.23), 2) }}">
                                     </td>
                                     <td colspan="3"></td>
                                 </tr>
