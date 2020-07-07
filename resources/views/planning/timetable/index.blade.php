@@ -635,13 +635,15 @@
 
                     function prepareOrderList(item) {
                         let labels = ''
-                        let input = `<label>${item.name}<input name="new_group[]" type="checkbox" value="${item.id}"></label>`;
+                        let input = `<label>${item.name}<input class="export_to_new_group" name="new_group[]" type="checkbox" value="${item.id}"></label>`;
+                        const route = "{{ route('orders.edit', ['id' => '%%']) }}";
                         if (item.order && item.order.labels) {
                             labels = item.order.labels.map((label) => {
                                 return `<i class="${label.icon_name}" style="color: ${label.color}"/>`
                             })
                         }
-                        return input + labels
+                        let url = route.replace('%%', item.id);
+                        return input + labels +  `<a href="${url}">Edycja zlecenia</a>`
                     }
 
                     $.ajax({
@@ -796,6 +798,17 @@
                                 $('#color-violet').attr('checked', true);
                             }
                         }
+                        $('.export_to_new_group').on('click', e => {
+                            if (e.shiftKey && lastChecked) {
+                                let start = checkboxes.index(e.target);
+                                let end = checkboxes.index(lastChecked);
+                                checkboxes.slice(Math.min(start,end), Math.max(start,end)+ 1).prop('checked', lastChecked.checked);
+
+                            }
+                            lastChecked = e.target
+                        });
+                        var checkboxes = $('.export_to_new_group');
+                        var lastChecked = null;
                     }).fail(function () {
                         $('#errorGetToUpdate').modal();
                     });
