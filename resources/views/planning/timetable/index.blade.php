@@ -652,7 +652,7 @@
 
                     $.ajax({
                         url: '/admin/planning/tasks/' + info.event.id + '/getTask',
-                        type: "GET"o
+                        type: "GET"
                     }).done(function (data) {
                         $('#updateTaskModal').modal();
                         let form = $('#updateTaskDetail').length;
