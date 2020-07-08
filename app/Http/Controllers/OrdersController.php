@@ -2455,7 +2455,6 @@ class OrdersController extends Controller
     public function findPage(Request $request, $id) {
         list($collection, $count) = $this->prepareCollection($request->all(), false, $id);
         return response($count / $request->all()['length']);
-        //todo implement
     }
 
     public function sendTrackingNumbers()
