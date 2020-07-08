@@ -26,6 +26,8 @@ class Customer extends Authenticatable implements Transformable
         'id_from_old_db', 'login', 'password', 'nick_allegro', 'status',
     ];
 
+    protected $hidden = ['password', 'remember_token'];
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
