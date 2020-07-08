@@ -853,6 +853,11 @@ class OrdersController extends Controller
 
         $sumOfOrdersReturn = $this->sumOfOrders($order);
         $sumToCheck = $sumOfOrdersReturn[0];
+
+        if ($order->status_id == 8) {
+            $order->labels()->detach();
+        }
+
         if ($order->status_id == 5 || $order->status_id == 6) {
             if ($sumToCheck > 5 || $sumToCheck < -5) {
                 foreach ($sumOfOrdersReturn[1] as $ordId) {
