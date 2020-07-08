@@ -8,6 +8,7 @@ use App\Entities\Task;
 use App\Entities\TaskSalaryDetails;
 use App\Entities\TaskTime;
 use App\Helpers\OrderCalcHelper;
+use App\Helpers\OrdersHelper;
 use App\Helpers\TaskTimeHelper;
 use App\Http\Requests\TaskCreateRequest;
 use App\Http\Requests\TaskUpdateRequest;
@@ -808,6 +809,9 @@ class TasksController extends Controller
             }]);
         }])->find($id);
 
+        foreach ($task->childs as $child) {
+            $child->order->similar = OrdersHelper::findSimilarOrders($child->order);
+        }
         if (empty($task)) {
             abort(404);
         }

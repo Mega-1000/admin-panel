@@ -636,7 +636,8 @@
 
                     function prepareOrderList(item) {
                         let labels = ''
-                        let input = `<label>${item.name}<input class="export_to_new_group" name="new_group[]" type="checkbox" value="${item.id}"></label>`;
+                        let duplicates = item.order.similar
+                        let input = `<label>${item.name}<input data-orderid="${item.order.id}" data-duplicates="${duplicates ? duplicates.join(',') : ''}" class="export_to_new_group" name="new_group[]" type="checkbox" value="${item.id}"></label>`;
                         const route = "{{ route('orders.edit', ['id' => '%%']) }}";
                         if (item.order && item.order.labels) {
                             labels = item.order.labels.map((label) => {
@@ -644,10 +645,10 @@
                             })
                         }
                         let url = route.replace('%%', item.id);
-                        console.log(item)
                         let tooltipText = item.order.warehouse_notice ?? ''
                         let tooltipElement = item.order.warehouse_notice ? `<i title="${tooltipText}" data-toggle="tooltip" class="comment-icon fas fa-comment"></i>` : '';
-                        return input + labels + tooltipElement +`<a href="${url}">Edycja zlecenia</a>`
+                        duplicates = duplicates.length > 0 ? ' (D):' + duplicates.join(', (D)') : '';
+                        return input + labels + tooltipElement +`<a href="${url}">Edycja zlecenia</a>` + duplicates
                     }
 
                     $.ajax({
@@ -806,10 +807,21 @@
                             if (e.shiftKey && lastChecked) {
                                 let start = checkboxes.index(e.target);
                                 let end = checkboxes.index(lastChecked);
-                                checkboxes.slice(Math.min(start,end), Math.max(start,end)+ 1).prop('checked', lastChecked.checked);
-
+                                checkboxes.slice(Math.min(start,end), Math.max(start,end)+ 1).each((index, item) => {
+                                    item.checked = lastChecked.checked;
+                                    let values = item.dataset.duplicates.split(',');
+                                    values.map(val => {
+                                        $(`[data-orderid="${val}"]`).prop('checked', item.checked)
+                                    })
+                                });
+                            } else {
+                                let values = e.target.dataset.duplicates.split(',');
+                                values.map(val => {
+                                    $(`[data-orderid="${val}"]`).prop('checked', e.target.checked)
+                                })
                             }
                             lastChecked = e.target
+
                         });
                         var checkboxes = $('.export_to_new_group');
                         var lastChecked = null;
