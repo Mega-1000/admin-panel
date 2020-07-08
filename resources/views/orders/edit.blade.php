@@ -3799,6 +3799,14 @@
                             function calculateNettoFromGross(netto, gross, id, fixed = 2) {
                                 let nettoPrice = $("input[name='" + netto + "[" + id + "]']");
                                 let grossPrice = $("input[name='" + gross + "[" + id + "]']").val();
+                                if (grossPrice) {
+                                    if (netto === 'net_selling_price_commercial_unit') {
+                                        update2(netto, gross, id);
+                                    } else {
+                                        update(netto, gross, id)
+                                    }
+                                    return;
+                                }
                                 let vat = 1.23;
                                 let calc;
                                 calc = parseFloat(grossPrice) / parseFloat(vat);
