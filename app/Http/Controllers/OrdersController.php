@@ -462,7 +462,7 @@ class OrdersController extends Controller
             'status_id' => 5,
         ]);
 
-        $clientTotalCost = $order->packages->reduce(function ($prev,OrderPackage $next) {
+        $clientTotalCost = $order->packages->reduce(function ($prev, OrderPackage $next) {
             return $prev + $next->getClientCosts();
         }, 0);
 
@@ -730,12 +730,16 @@ class OrdersController extends Controller
                     'net_purchase_price_basic_unit_after_discounts' => (float)$request->input('net_purchase_price_basic_unit')[$key],
                     'net_purchase_price_calculated_unit_after_discounts' => (float)$request->input('net_purchase_price_calculated_unit')[$key],
                     'net_purchase_price_aggregate_unit_after_discounts' => (float)$request->input('net_purchase_price_aggregate_unit')[$key],
+                    'gross_selling_price_commercial_unit' => (float)$request->input('gross_selling_price_commercial_unit')[$key],
+                    'gross_selling_price_basic_unit' => (float)$request->input('gross_selling_price_basic_unit')[$key],
+                    'gross_selling_price_calculated_unit' => (float)$request->input('gross_selling_price_calculated_unit')[$key],
+                    'gross_selling_price_aggregate_unit' => (float)$request->input('gross_selling_price_aggregate_unit')[$key],
                     'net_selling_price_commercial_unit' => (float)$request->input('net_selling_price_commercial_unit')[$key],
                     'net_selling_price_basic_unit' => (float)$request->input('net_selling_price_basic_unit')[$key],
                     'net_selling_price_calculated_unit' => (float)$request->input('net_selling_price_calculated_unit')[$key],
                     'net_selling_price_aggregate_unit' => (float)$request->input('net_selling_price_aggregate_unit')[$key],
                     'quantity' => (int)$request->input('quantity_commercial')[$key],
-                    'price' => (float)$request->input('net_selling_price_commercial_unit')[$key] * (int)$request->input('quantity_commercial')[$key] * 1.23,
+                    'price' => (float)$request->input('gross_selling_price_commercial_unit')[$key] * (int)$request->input('quantity_commercial')[$key],
                     'order_id' => $order->id,
                     'product_id' => $value,
                 ]);
@@ -750,12 +754,16 @@ class OrdersController extends Controller
                         'net_purchase_price_basic_unit_after_discounts' => (float)$request->input('net_purchase_price_basic_unit')[$id],
                         'net_purchase_price_calculated_unit_after_discounts' => (float)$request->input('net_purchase_price_calculated_unit')[$id],
                         'net_purchase_price_aggregate_unit_after_discounts' => (float)$request->input('net_purchase_price_aggregate_unit')[$id],
+                        'gross_selling_price_commercial_unit' => (float)$request->input('gross_selling_price_commercial_unit')[$id],
+                        'gross_selling_price_basic_unit' => (float)$request->input('gross_selling_price_basic_unit')[$id],
+                        'gross_selling_price_calculated_unit' => (float)$request->input('gross_selling_price_calculated_unit')[$id],
+                        'gross_selling_price_aggregate_unit' => (float)$request->input('gross_selling_price_aggregate_unit')[$id],
                         'net_selling_price_commercial_unit' => (float)$request->input('net_selling_price_commercial_unit')[$id],
                         'net_selling_price_basic_unit' => (float)$request->input('net_selling_price_basic_unit')[$id],
                         'net_selling_price_calculated_unit' => (float)$request->input('net_selling_price_calculated_unit')[$id],
                         'net_selling_price_aggregate_unit' => (float)$request->input('net_selling_price_aggregate_unit')[$id],
                         'quantity' => (int)$request->input('quantity_commercial')[$id],
-                        'price' => (float)$request->input('net_selling_price_commercial_unit')[$id] * (int)$request->input('quantity_commercial')[$id] * 1.23,
+                        'price' => (float)$request->input('gross_selling_price_commercial_unit')[$id] * (int)$request->input('quantity_commercial')[$id],
                     ], $id);
                 } else {
                     $orderItem = $this->orderItemRepository->find($id);
@@ -894,7 +902,7 @@ class OrdersController extends Controller
         unset($data['allegro_transaction_id']);
         $data['total_price'] = 0;
         foreach ($data['id'] as $productId) {
-            $data['total_price'] += (float)$data['net_selling_price_commercial_unit'][$productId] * (int)$data['quantity_commercial'][$productId] * 1.23;
+            $data['total_price'] += (float)$data['gross_selling_price_commercial_unit'][$productId] * (int)$data['quantity_commercial'][$productId];
         }
         $order = $this->orderRepository->create($data);
         if (!empty($data['id'])) {
@@ -911,7 +919,7 @@ class OrdersController extends Controller
                     'order_id' => $order->id,
                     'product_id' => $data['product_id'][$id],
                     'quantity' => $data['quantity_commercial'][$id],
-                    'price' => (float)$data['net_selling_price_commercial_unit'][$id] * (int)$data['quantity_commercial'][$id] * 1.23,
+                    'price' => (float)$data['gross_selling_price_commercial_unit'][$id] * (int)$data['quantity_commercial'][$id],
                 ]);
             }
         }
@@ -952,7 +960,7 @@ class OrdersController extends Controller
         $orderItems = $order->items;
         $sum = 0;
         foreach ($orderItems as $item) {
-            $sum += $item->net_selling_price_commercial_unit * $item->quantity * 1.23;
+            $sum += $item->gross_selling_price_commercial_unit * $item->quantity;
         }
         $sum += $order->additional_service_cost + $order->additional_cash_on_delivery_cost + $order->shipment_price_for_client;
         $sum = round($sum, 2);
@@ -979,7 +987,7 @@ class OrdersController extends Controller
             $orderItems = $connectedOrder->items;
             $sum = 0;
             foreach ($orderItems as $item) {
-                $sum += $item->net_selling_price_commercial_unit * $item->quantity * 1.23;
+                $sum += $item->gross_selling_price_commercial_unit * $item->quantity;
             }
             $sum += $connectedOrder->additional_service_cost + $connectedOrder->additional_cash_on_delivery_cost + $connectedOrder->shipment_price_for_client;
             $sum = round($sum, 2);
@@ -1054,7 +1062,7 @@ class OrdersController extends Controller
 
         $totalPrice = 0;
         foreach ($request->input('id') as $productId) {
-            $totalPrice += (float)$request->input('net_selling_price_commercial_unit')[$productId] * (int)$request->input('quantity_commercial')[$productId] * 1.23;
+            $totalPrice += (float)$request->input('gross_selling_price_commercial_unit')[$productId] * (int)$request->input('quantity_commercial')[$productId];
 
         }
         $warehouse = $this->warehouseRepository->findWhere(["symbol" => $request->input('delivery_warehouse')])->first();
@@ -1311,7 +1319,7 @@ class OrdersController extends Controller
 
                     $item->update([
                         'quantity' => $item->quantity - $quantity,
-                        'price' => (float)$data['net_selling_price_commercial_unit'][$id] * ($item->quantity - $quantity) * 1.23
+                        'price' => (float)$data['gross_selling_price_commercial_unit'][$id] * ($item->quantity - $quantity)
                     ]);
                     $this->orderRepository->update([
                         'weight' => $order->weight - ($item->product->weight_trade_unit * $quantity),
@@ -1329,10 +1337,10 @@ class OrdersController extends Controller
                 $item->order_id = $newOrder->id;
                 $item->product_id = $data['product_id'][$id];
                 $item->quantity = $quantity;
-                $item->price = (float)$data['net_selling_price_commercial_unit'][$id] * $quantity * 1.23;
+                $item->price = (float)$data['gross_selling_price_commercial_unit'][$id] * $quantity;
                 $item->save();
                 $productsWeightSum += (float)$data['modal_weight'][$id] * $quantity;
-                $productsSum += (float)$data['net_selling_price_commercial_unit'][$id] * $quantity * 1.23;
+                $productsSum += (float)$data['gross_selling_price_commercial_unit'][$id] * $quantity;
 
             }
         }
@@ -1615,7 +1623,7 @@ class OrdersController extends Controller
     /**
      * @return mixed
      */
-    public function prepareCollection($data, $withoutPagination = false)
+    public function prepareCollection($data, $withoutPagination = false, $minId = false)
     {
         $sortingColumnId = $data['order'][0]['column'];
         $sortingColumnDirection = $data['order'][0]['dir'];
@@ -1719,6 +1727,9 @@ class OrdersController extends Controller
                     $query->whereRaw('IFNULL((CAST((select sum(net_selling_price_commercial_unit * quantity * 1.23) from order_items where order_id = orders.id) AS DECIMAL (12,2)) + IFNULL(orders.additional_service_cost, 0) + IFNULL(orders.additional_cash_on_delivery_cost, 0) + IFNULL(orders.shipment_price_for_client, 0)) - ifnull((select sum(amount) from order_payments where order_payments.order_id = orders.id), 0),0)' . ' LIKE ' . "'%{$column['search']['value']}%'");
                 }
             }
+        }
+        if ($minId) {
+            $query->where($sortingColumns[6], '>', $minId);
         }
 
         $count = $query->count();
@@ -1911,7 +1922,19 @@ class OrdersController extends Controller
 
             $order = Order::find($ord->orderId);
             $tagHelper->setOrder($order);
+            $lostFromPack = $order->items->map(function ($item) use ($order) {
+                $fromPack = $this->calculateTotalAmoutForPackages($order, $item);
+                $notAssigned = $this->calculateTotalAmoutForOtherPackages($order, $item);
+                $item->quantity -= ($fromPack + $notAssigned);
+                if ($item->quantity > 0) {
+                    return $item;
+                }
+                return null;
+            });
+            $order->lost = $lostFromPack;
+            $similar = $this->findSimilarOrders($order);
             $view = View::make('orders.print', [
+                'similar' => $similar,
                 'order' => $order,
                 'tagHelper' => $tagHelper,
                 'showPosition' => true
@@ -1993,11 +2016,48 @@ class OrdersController extends Controller
         $order->update();
         $showPosition = is_a(Auth::user(), User::class);
 
+        $lostFromPack = $order->items->map(function ($item) use ($order) {
+            $fromPack = $this->calculateTotalAmoutForPackages($order, $item);
+            $notAssigned = $this->calculateTotalAmoutForOtherPackages($order, $item);
+            $item->quantity -= ($fromPack + $notAssigned);
+            if ($item->quantity > 0) {
+                return $item;
+            }
+            return null;
+        });
+        $order->lost = $lostFromPack;
+        $similar = $this->findSimilarOrders($order);
         return View::make('orders.print', [
             'order' => $order,
+            'similar' => $similar ?? [],
             'tagHelper' => $tagHelper,
             'showPosition' => $showPosition
         ]);
+    }
+
+    /**
+     * @param $order
+     * @param $item
+     * @return mixed
+     */
+    private function calculateTotalAmoutForPackages($order, $item)
+    {
+        return $order->packages->reduce(function ($acu, $curr) use ($item) {
+            $totalAmountForPack = $curr->packedProducts->reduce(function ($acumulator, $current) use ($item) {
+                return $acumulator + ($current->id == $item->product_id ? $current->pivot->quantity : 0);
+            }, 0);
+            return $acu + $totalAmountForPack;
+        }, 0);
+    }
+
+    private function calculateTotalAmoutForOtherPackages($order, $item)
+    {
+        return $order->otherPackages->reduce(function ($acu, $curr) use ($item) {
+            $totalAmountForPack = $curr->products->reduce(function ($accumulator, $current) use ($item) {
+                return $accumulator + ($current->id == $item->product_id ? $current->pivot->quantity : 0);
+            }, 0);
+            return $acu + $totalAmountForPack;
+        }, 0);
     }
 
     /**
@@ -2400,6 +2460,11 @@ class OrdersController extends Controller
         ]);
     }
 
+    public function findPage(Request $request, $id) {
+        list($collection, $count) = $this->prepareCollection($request->all(), false, $id);
+        return response($count / $request->all()['length']);
+    }
+
     public function sendTrackingNumbers()
     {
         dispatch_now(new AllegroTrackingNumberUpdater());
@@ -2464,6 +2529,41 @@ class OrdersController extends Controller
         OrderInvoice::where('id', $id)->delete();
 
         return response()->json(['status' => 'success']);
+    }
+
+    /**
+     * @param $order
+     * @return mixed
+     */
+    private function findSimilarOrders($order)
+    {
+        $notSentYetLabel = Label::NOT_SENT_YET_LABELS_IDS;
+        $batteryId = Label::ORDER_ITEMS_REDEEMED_LABEL;
+        $hasHammerOrBagLabel = $order->labels->filter(function ($label) use ($notSentYetLabel) {
+            return in_array($label->id, $notSentYetLabel);
+        });
+        $isNotProducedYet = $order->labels->filter(function ($label) use ($batteryId) {
+                return $label->id === $batteryId;
+            })->count() == 0;
+        if ($hasHammerOrBagLabel && $isNotProducedYet) {
+            $history = $order->customer->orders;
+            $similar = $history->reduce(function ($acu, $orderh) use ($batteryId, $notSentYetLabel, $order) {
+                if ($orderh->id == $order->id) {
+                    return $acu;
+                }
+                $hasChildHammerOrBagLabel = $orderh->labels->filter(function ($label) use ($notSentYetLabel) {
+                        return in_array($label->id, $notSentYetLabel);
+                    })->count() > 0;
+                $isChildNotProducedYet = $orderh->labels->filter(function ($label) use ($batteryId) {
+                        return $label->id == $batteryId;
+                    })->count() == 0;
+                if ($hasChildHammerOrBagLabel && $isChildNotProducedYet) {
+                    $acu [] = $orderh->id;
+                }
+                return $acu;
+            }, []);
+        }
+        return $similar ?? [];
     }
 }
 

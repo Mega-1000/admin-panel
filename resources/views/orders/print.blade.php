@@ -25,7 +25,7 @@
 
 
 <div class="docc">
-    <h1>WZ {{ $order->id }}</h1>
+    <h1>WZ {{ $order->id }} {!! $similar && $showPosition ? '(D) ' . join(', (D) ',$similar) : '' !!}</h1>
     @if(!empty($order->employee))
         <h2>Osoba odpowiedzialna:</h2> {!! $tagHelper->consultantOrStorekeeper() !!}<br/>
     @endif
@@ -45,8 +45,7 @@
 
     {{--<b>uwagi klienta:</b> <br/>--}}
     <b>uwagi spedycja:</b> {!! $tagHelper->commentsToShipping(" | ") !!}<br/>
-    <b>uwagi magazyn:</b> {!! $tagHelper->commentsToStorehouse(" | ") !!}
-
+    <b>uwagi magazyn:</b> {!! $order->warehouse_notice !!}
     <br/><br/>
 
     @if(count($order->packages) > 0)
@@ -136,7 +135,21 @@
             @include('orders.items_table',['$package' => $package])
         @endforeach
     @endif
-
+    @if(count($order->lost) > 0)
+        @foreach($order->lost as $pack)
+            @if(empty($pack))
+                @continue
+            @endif
+            <table border="0" cellpadding="1" cellspacing="1" style="width: 100%;">
+                @include('orders.single_item', ['item' => $pack->product, 'quantity' => $pack->quantity])
+                <tr>
+                    <td colspan="3">
+                        <hr/>
+                    </td>
+                </tr>
+            </table>
+        @endforeach
+    @endif
 
     <br/><b>DANE KUPUJĄCEGO</b><br/>
     {!! $tagHelper->buyerData() !!}

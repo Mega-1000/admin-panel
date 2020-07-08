@@ -156,6 +156,9 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         } else if ($transactionArray['delivery_address']) {
             $transactionArray['invoice_address'] = $transactionArray['delivery_address'];
         }
+        if (!empty($transaction->deliveryAddress->adr_Email)) {
+            $transactionArray['invoice_address']['email'] = $transaction->deliveryAddress->adr_Email;
+        }
         return $transactionArray;
     }
 

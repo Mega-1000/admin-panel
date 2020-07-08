@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\ConfirmPackages;
 use App\Entities\ContainerType;
 use App\Entities\ContentType;
 use App\Entities\Order;
@@ -14,6 +15,7 @@ use App\Entities\SelTransaction;
 use App\Helpers\OrderPackagesDataHelper;
 use App\Http\Requests\OrderPackageCreateRequest;
 use App\Http\Requests\OrderPackageUpdateRequest;
+use App\Integrations\GLS\GLSClient;
 use App\Jobs\AddLabelJob;
 use App\Jobs\OrdersCourierJobs;
 use App\Jobs\SendRequestForCancelledPackageJob;
@@ -24,10 +26,12 @@ use App\Repositories\OrderRepository;
 use Barryvdh\DomPDF\Facade as PDF;
 use Carbon\Carbon;
 use iio\libmergepdf\Merger;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -250,7 +254,6 @@ class OrdersPackagesController extends Controller
         $orderPackage->status = $data['status'];
         $orderPackage->cost_for_client = $data['cost_for_client'];
         $orderPackage->cost_for_company = $data['cost_for_company'];
-        $orderPackage->cod_cost_for_us = $data['cod_cost_for_us'] ?? '';
         $orderPackage->real_cost_for_company = $data['real_cost_for_company'];
         $orderPackage->content = $data['content'];
         $orderPackage->packing_type = $data['packing_type'];
@@ -565,6 +568,37 @@ class OrdersPackagesController extends Controller
                 $path));
     }
 
+    public function getSticker(Request $request, $id)
+    {
+        $package = OrderPackage::find($id);
+        if (empty($package)) {
+            return redirect()->back()->with([
+                'message' => __('order_packages.message.package_not_found_error'),
+                'alert-type' => 'error'
+            ]);
+        }
+        if (empty($package->sending_number)) {
+            return redirect()->back()->with([
+                'message' => __('order_packages.message.package_not_ordered_error'),
+                'alert-type' => 'error'
+            ]);
+        }
+        try {
+            $file = Storage::disk('private')->get('labels/gls/' . $package->sending_number . '.pdf');
+        } catch (FileNotFoundException $e) {
+            $gls = new GLSClient();
+            $gls->auth();
+            $gls->getLetterForPackage($package->sending_number);
+            $number = $gls->getPackageNumer($package->sending_number);
+            $package->letter_number = $number;
+            $package->save();
+            $gls->logout();
+            ConfirmPackages::create(['package_id' => $package->id]);
+            $file = Storage::disk('private')->get('labels/gls/' . $package->sending_number . '.pdf');
+        }
+        return Storage::disk('private')->download('labels/gls/' . $package->sending_number . '.pdf');
+    }
+
     public function letters($courier_name)
     {
         if (empty($courier_name)) {
@@ -757,7 +791,7 @@ class OrdersPackagesController extends Controller
     protected function validatePackage($data)
     {
         $validator = Validator::make($data, [
-            'courier_name' => 'required|min:3|in:INPOST,APACZKA,DPD,POCZTEX,JAS,ALLEGRO-INPOST',
+            'courier_name' => 'required|min:3|in:INPOST,APACZKA,DPD,POCZTEX,JAS,ALLEGRO-INPOST,GLS',
             'courier_type' => 'nullable',
             'weight' => 'required|numeric',
             'length' => 'required|numeric',

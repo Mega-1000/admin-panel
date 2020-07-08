@@ -66,7 +66,9 @@ return [
         'packing_update' => 'Typ opakowania przesyłki zaktualizowany pomyślnie!',
         'packing_store' => 'Typ opakowania przesyłki dodany pomyślnie!',
         'packing_delete' => 'Typ opakowania przesyłki usunięty pomyślnie!',
-        'package_error' => 'Podana paczka nie istnieje, lub szablon został usunięty'
+        'package_error' => 'Podana paczka nie istnieje, lub szablon został usunięty',
+        'package_not_found_error' => 'Podana paczka nie istnieje',
+        'package_not_ordered_error' => 'Podana paczka nie została jeszcze zamówiona'
     ],
     'form' => [
         'delivery' => 'Id dostawy z SELLO (tr_DeliveryId)',

@@ -36,7 +36,17 @@ class AllegroPaymentImporter
             try {
                 $this->payForOrder($line);
             } catch (\Exception $e) {
-                $errors[] = $e->getMessage();
+                switch ($e->getCode()) {
+                    case 1:
+                    case 2:
+                    case 3:
+                    case 4:
+                        $errors[$e->getCode()][] = $e->getMessage();
+                        break;
+                    default:
+                        $errors['other'][] = $e->getMessage();
+                        break;
+                }
             }
         }
         fclose($handle);
@@ -53,21 +63,25 @@ class AllegroPaymentImporter
         $amount = explode(" ", $line[self::AMOUNT_COLUMN_NUMBER])[0];
         $id = $line[self::ID_COLUMN_NUMBER];
 
-        $transaction = SelTransaction::where('tr_CheckoutFormPaymentId', $id)->first();
+        $transaction = SelTransaction::where('tr_CheckoutFormPaymentId', $id)->orderBy('tr_Group', 'desc')->first();
         if (empty($transaction)) {
-            throw new \Exception('Nie znaleziono transakcji o id: ' . $id);
+            throw new \Exception('id: ' . $id, 1);
         }
         $order = $transaction->order;
         if (empty($order)) {
-            throw new \Exception('Nie znaleziono zamówienia dla transakcji o id: ' . $id);
+            throw new \Exception('id: ' . $id, 2);
         }
         $payment = $order->promisePayments();
         $found = $payment->filter(function ($item) use ($amount) {
-            return $item->amount == $amount;
+            return abs($item->amount - $amount) < 2;
         })->first();
 
         if (empty($found)) {
-            throw new \Exception('Nie znaleziono transakcji o id: ' . $id . ' na kwotę: ' . $amount);
+            $isPaid = $order->bookedPayments()->where('amount', $amount)->count() > 0;
+            if ($isPaid) {
+                throw new \Exception('id: ' . $id, 3);
+            }
+            throw new \Exception('id: transakcji: ' . $id . ', kwota: ' . $amount, 4);
         }
         $found->promise = 0;
         $found->save();

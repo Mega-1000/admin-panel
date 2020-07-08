@@ -169,15 +169,14 @@ class Order extends Model implements Transformable
     public function getSumOfGrossValues()
     {
         $totalOfProductsPrices = 0;
-        $vatFactor = (1 + env('VAT'));
 
         if (count($this->items)) {
             foreach ($this->items as $item) {
-                $totalOfProductsPrices += floatval($item->net_selling_price_commercial_unit) * intval($item->quantity);
+                $totalOfProductsPrices += $item->gross_selling_price_commercial_unit * intval($item->quantity);
             }
         }
 
-        return round(($totalOfProductsPrices * $vatFactor) + floatval($this->shipment_price_for_client) + floatval($this->additional_service_cost) + floatval($this->additional_cash_on_delivery_cost), 2);
+        return round($totalOfProductsPrices + floatval($this->shipment_price_for_client) + floatval($this->additional_service_cost) + floatval($this->additional_cash_on_delivery_cost), 2);
     }
 
     /**
@@ -257,16 +256,12 @@ class Order extends Model implements Transformable
 
     public function getDeliveryAddress()
     {
-        $deliveryAddress = $this->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first();
-
-        return $deliveryAddress;
+        return $this->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first();
     }
 
     public function getInvoiceAddress()
     {
-        $invoiceAddress = $this->addresses()->where('type', '=', 'INVOICE_ADDRESS')->first();
-
-        return $invoiceAddress;
+        return $this->addresses()->where('type', '=', 'INVOICE_ADDRESS')->first();
     }
 
     public function hasLabel($labelId)

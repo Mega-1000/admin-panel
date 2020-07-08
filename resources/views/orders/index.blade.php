@@ -596,9 +596,47 @@
         <a name="print_orders" class="btn btn-success"
            onclick="$('#upload-allegro-payments').modal('show')">Aktualizuj</a>
         @if(!empty(session('allegro_payments_errors')))
-            @foreach(session('allegro_payments_errors') as $error)
-                <div class="alert alert-warning"> {{$error}} </div>
-            @endforeach
+            <table class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th>
+                        W tabeli importu sello nie istnieje transakcja o id:
+                    </th>
+                    <th>
+                        Nie zaimportowano zlecenia z systemu sello do mega1000:
+                    </th>
+                    <th>
+                        Transakcja została już wcześniej opłacona:
+                    </th>
+                    <th>
+                        Brak poprawnej kwoty obietnicy wpłaty. Proszę sprawdzić czy kwota obietnicy wpłaty się zgadza.
+                    </th>
+                    <th>
+                        Inne błędy:
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                @php
+                $type1 = session('allegro_payments_errors')[1] ?? [];
+                $type2 = session('allegro_payments_errors')[2] ?? [];
+                $type3 = session('allegro_payments_errors')[3] ?? [];
+                $type4 = session('allegro_payments_errors')[4] ?? [];
+                $typeOther = session('allegro_payments_errors')['other'] ?? [];
+
+                $length = max([count($type1), count($type2), count($type3), count($type4), count($typeOther)]);
+                @endphp
+                @for ($i = 0; $i < $length; $i++)
+                    <tr>
+                        <td>{!! isset($type1[$i]) ? $type1[$i] : '' !!}</td>
+                        <td>{!! isset($type2[$i]) ? $type2[$i] : '' !!}</td>
+                        <td>{!! isset($type3[$i]) ? $type3[$i] : '' !!}</td>
+                        <td>{!! isset($type4[$i]) ? $type4[$i] : '' !!}</td>
+                        <td>{!! isset($typeOther[$i]) ? $typeOther[$i] : '' !!}</td>
+                    </tr>
+                @endfor
+                </tbody>
+            </table>
         @endif
     </div>
     <div class="form-group">
@@ -651,6 +689,12 @@
                 <label for="searchLeft">Szukaj po Pozostały do zapłaty</label>
                 <input type="search" class="form-control" name="searchLeft" id="searchLeft">
             </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+                <label for="searchById">Zajdź po ID</label>
+                <input type="search" name="searchById" id="searchById">
+                <button onclick="findPage()" class="btn btn-success">Znajdź zlecenie</button>
         </div>
     </div>
     <table id="dataTable" class="table table-hover spacious-container ordersTable">
@@ -1160,6 +1204,11 @@
                                         html += '<a target="_blank" href="/storage/gielda/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                     } else if (value.delivery_courier_name === 'ODBIOR_OSOBISTY') {
                                         html += '<a target="_blank" href="/storage/odbior_osobisty/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
+                                    } else if (value.delivery_courier_name === 'GLS') {
+                                        let url = "{{ route('orders.package.getSticker', ['id' => '%%'])}}"
+                                        html += '<a target="_blank" href="' + url.replace('%%', value.id) + '"><p>';
+                                        html += value.letter_number ? value.letter_number : 'wygeneruj naklejkę';
+                                        html += '</p></a>';
                                     }
                                     html += '<div style="display: flex;">'
                                     html += '<button class="btn btn-danger" onclick="cancelPackage(' + value.id + ', ' + value.order_id + ')">Anuluj</button>'
@@ -1539,7 +1588,7 @@
                         var items = row['items'];
 
                         for (let index = 0; index < items.length; index++) {
-                            let priceSelling = items[index].net_selling_price_commercial_unit;
+                            let priceSelling = items[index].gross_selling_price_commercial_unit;
                             let pricePurchase = items[index].net_purchase_price_commercial_unit_after_discounts;
                             let quantity = items[index].quantity;
 
@@ -1556,7 +1605,7 @@
                             sumOfPurchase += parseFloat(pricePurchase) * parseInt(quantity);
                         }
 
-                        return ((sumOfSelling - sumOfPurchase) * 1.23).toFixed(2);
+                        return (sumOfSelling - (sumOfPurchase * 1.23)).toFixed(2);
 
                     }
                 },
@@ -1631,7 +1680,7 @@
                         var items = row['items'];
 
                         for (let index = 0; index < items.length; index++) {
-                            let price = items[index].net_selling_price_commercial_unit;
+                            let price = items[index].gross_selling_price_commercial_unit;
                             let quantity = items[index].quantity;
                             if (price == null) {
                                 price = 0;
@@ -1641,7 +1690,7 @@
                             }
                             totalOfProductsPrices += parseFloat(price) * parseInt(quantity);
                         }
-                        let orderSum = ((totalOfProductsPrices * 1.23) + parseFloat(shipmentPriceForClient) + parseFloat(additionalServiceCost) + parseFloat(additionalPackageCost)).toFixed(2);
+                        let orderSum = (totalOfProductsPrices + parseFloat(shipmentPriceForClient) + parseFloat(additionalServiceCost) + parseFloat(additionalPackageCost)).toFixed(2);
                         let totalOfPayments = 0;
                         var payments = row['payments'];
 
@@ -2231,6 +2280,15 @@
                     } else {
                         alert('Trwa przygotowywanie listy')
                     }
+                });
+        }
+
+        function findPage() {
+            let id = $('#searchById').val()
+            let url = "{{route('orders.findPage', ['id' => '%%'])}}"
+            $.post(url.replace('%%', id), table.ajax.params())
+                .done((data) => {
+                    window.table.page(Math.floor(data)).draw('page')
                 });
         }
 

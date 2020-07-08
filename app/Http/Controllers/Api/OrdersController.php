@@ -437,7 +437,7 @@ class OrdersController extends Controller
                 $item->product->$kGross = round($item->$kNet * $vat, 2);
             }
 
-            $item->product->gross_price_of_packing = round($item->net_selling_price_commercial_unit * $vat, 2);
+            $item->product->gross_price_of_packing = $item->gross_selling_price_commercial_unit;
             $item->product->amount = $item->quantity;
 
             $products[] = $item->product;

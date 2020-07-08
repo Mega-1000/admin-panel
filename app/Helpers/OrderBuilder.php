@@ -237,7 +237,11 @@ class OrderBuilder
                 if (!empty($item['old_price']) && isset($oldPrices[$product->id])) {
                     $orderItem->$column = $oldPrices[$product->id][$column];
                 } else {
-                    $orderItem->$column = $price->$column;
+                    if ($column === "gross_selling_price_commercial_unit") {
+                       $orderItem->$column = $price->gross_price_of_packing;
+                    } else {
+                       $orderItem->$column = $price->$column;
+                    }
                 }
             }
             if ($this->priceOverrider) {
@@ -345,6 +349,11 @@ class OrderBuilder
             'net_selling_price_calculated_unit',
             'net_selling_price_aggregate_unit',
             'net_selling_price_the_largest_unit',
+            'gross_selling_price_commercial_unit',
+            'gross_selling_price_basic_unit',
+            'gross_selling_price_calculated_unit',
+            'gross_selling_price_aggregate_unit',
+            'gross_selling_price_the_largest_unit',
             'net_purchase_price_commercial_unit_after_discounts',
             'net_purchase_price_basic_unit_after_discounts',
             'net_purchase_price_calculated_unit_after_discounts',

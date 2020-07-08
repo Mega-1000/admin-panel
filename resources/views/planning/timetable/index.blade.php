@@ -18,6 +18,7 @@
             @endforeach
         </select>
     </div>
+    <link rel="stylesheet" href="{{ URL::asset('css/views/timetable/timetable.css') }}">
 @endsection
 @section('content')
     @php
@@ -635,13 +636,18 @@
 
                     function prepareOrderList(item) {
                         let labels = ''
-                        let input = `<label>${item.name}<input name="new_group[]" type="checkbox" value="${item.id}"></label>`;
+                        let input = `<label>${item.name}<input class="export_to_new_group" name="new_group[]" type="checkbox" value="${item.id}"></label>`;
+                        const route = "{{ route('orders.edit', ['id' => '%%']) }}";
                         if (item.order && item.order.labels) {
                             labels = item.order.labels.map((label) => {
                                 return `<i class="${label.icon_name}" style="color: ${label.color}"/>`
                             })
                         }
-                        return input + labels
+                        let url = route.replace('%%', item.id);
+                        console.log(item)
+                        let tooltipText = item.order.warehouse_notice ?? ''
+                        let tooltipElement = item.order.warehouse_notice ? `<i title="${tooltipText}" data-toggle="tooltip" class="comment-icon fas fa-comment"></i>` : '';
+                        return input + labels + tooltipElement +`<a href="${url}">Edycja zlecenia</a>`
                     }
 
                     $.ajax({
@@ -796,6 +802,23 @@
                                 $('#color-violet').attr('checked', true);
                             }
                         }
+                        $('.export_to_new_group').on('click', e => {
+                            if (e.shiftKey && lastChecked) {
+                                let start = checkboxes.index(e.target);
+                                let end = checkboxes.index(lastChecked);
+                                checkboxes.slice(Math.min(start,end), Math.max(start,end)+ 1).prop('checked', lastChecked.checked);
+
+                            }
+                            lastChecked = e.target
+                        });
+                        var checkboxes = $('.export_to_new_group');
+                        var lastChecked = null;
+
+                        $(() => {
+                            $('[data-toggle="tooltip"]').tooltip();
+                        });
+
+
                     }).fail(function () {
                         $('#errorGetToUpdate').modal();
                     });

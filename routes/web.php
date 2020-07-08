@@ -23,6 +23,7 @@ Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
     Route::group(['middleware' => 'admin'], function () {
 
+        Route::get('prices/allegro-prices/{id}', 'ProductPricesController@getAllegroPrices')->name('prices.allegroPrices');
         Route::get('orders/{id}/get-basket', 'OrdersController@goToBasket')->name('orders.goToBasket');
         Route::get('/pages/content/delete', 'PagesGeneratorController@deleteContent')->name('pages.deleteContent');
         Route::get('/pages/{id}/content/edit', 'PagesGeneratorController@editContent')->name('pages.editContent');
@@ -250,6 +251,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('orders/printAll', 'OrdersController@printAll')->name('orders.printAll');
         Route::get('orders/create', 'OrdersController@create')->name('orders.create');
         Route::get('orders/{id}/edit', 'OrdersController@edit')->name('orders.edit');
+        Route::post('orders/find-page/{id}', 'OrdersController@findPage')->name('orders.findPage');
         Route::delete('orders/{id}/', 'OrdersController@destroy')->name('orders.destroy');
         Route::put('orders/{id}/update', [
             'uses' => 'OrdersController@update',
@@ -362,6 +364,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orders/products/{symbol}', 'OrdersController@addProduct')->name('orders.products.add');
         Route::get('orders/{order_id}/package/{package_id}/send',
             'OrdersPackagesController@preparePackageToSend')->name('orders.package.prepareToSend');
+        Route::get('orders/package/{package_id}/sticker',
+            'OrdersPackagesController@getSticker')->name('orders.package.getSticker');
 
         Route::get('import', 'ImportController@index')->name('import.index');
         Route::post('import/store', 'ImportController@store')->name('import.store');
