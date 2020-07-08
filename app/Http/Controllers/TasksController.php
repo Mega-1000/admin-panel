@@ -101,7 +101,7 @@ class TasksController extends Controller
                         $orderItemKMD = $item->quantity;
                     }
                     $itemsArray[] = $item->product_id;
-                    $profit += (((float)$item->net_selling_price_commercial_unit * (int)$item->quantity) - ((float)$item->net_purchase_price_commercial_unit * (int)$item->quantity)) * 1.23;
+                    $profit = $this->calculateProfit($item, $profit);
                 }
                 if ($task->order->status_id === 4) {
                     $consultantVal = OrderCalcHelper::calcConsultantValue($orderItemKMD,
@@ -192,7 +192,7 @@ class TasksController extends Controller
                         $orderItemKMD = $item->quantity;
                     }
                     $itemsArray[] = $item->product_id;
-                    $profit += (((float)$item->net_selling_price_commercial_unit * (int)$item->quantity) - ((float)$item->net_purchase_price_commercial_unit * (int)$item->quantity)) * 1.23;
+                    $profit = $this->calculateProfit($item, $profit);
                 }
                 if ($task->order->status_id === 4) {
                     $consultantVal = OrderCalcHelper::calcConsultantValue($orderItemKMD,
@@ -275,7 +275,7 @@ class TasksController extends Controller
                         $orderItemKMD = $item->quantity;
                     }
                     $itemsArray[] = $item->product_id;
-                    $profit += (((float)$item->net_selling_price_commercial_unit * (int)$item->quantity) - ((float)$item->net_purchase_price_commercial_unit * (int)$item->quantity)) * 1.23;
+                    $profit = $this->calculateProfit($item, $profit);
                 }
                 if ($task->order->status_id === 4) {
                     $consultantVal = OrderCalcHelper::calcConsultantValue($orderItemKMD,
@@ -744,7 +744,7 @@ class TasksController extends Controller
                         $orderItemKMD = $item->quantity;
                     }
                     $itemsArray[] = $item->product_id;
-                    $profit += (((float)$item->net_selling_price_commercial_unit * (int)$item->quantity) - ((float)$item->net_purchase_price_commercial_unit * (int)$item->quantity)) * 1.23;
+                    $profit = $this->calculateProfit($item, $profit);
                 }
                 if ($task->order->status_id === 4) {
                     $consultantVal = OrderCalcHelper::calcConsultantValue($orderItemKMD,
@@ -943,7 +943,7 @@ class TasksController extends Controller
                     if ($item->product->symbol == 'KMD') {
                         $orderItemKMD = $item->quantity;
                     }
-                    $profit += (((float)$item->net_selling_price_commercial_unit * (int)$item->quantity) - ((float)$item->net_purchase_price_commercial_unit * (int)$item->quantity)) * 1.23;
+                    $profit = $this->calculateProfit($item, $profit);
                 }
                 if ($task->order->status_id === 4) {
                     $consultantVal = OrderCalcHelper::calcConsultantValue($orderItemKMD,
@@ -1061,5 +1061,16 @@ class TasksController extends Controller
             'message' => __('tasks.messages.delete'),
             'alert-type' => 'success'
         ]);
+    }
+
+    /**
+     * @param $item
+     * @param float $profit
+     * @return float
+     */
+    private function calculateProfit($item, float $profit): float
+    {
+        $profit += (((float)$item->gross_selling_price_commercial_unit * (int)$item->quantity) - ((float)$item->gross_purchase_price_commercial_unit * (int)$item->quantity));
+        return $profit;
     }
 }

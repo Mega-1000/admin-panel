@@ -85,7 +85,7 @@
 @php
     $sumOfItems = 0;
     foreach ($order->items as $item) {
-        $sumOfItems += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+        $sumOfItems += ($item->gross_selling_price_commercial_unit * $item->quantity);
     }
     $orderValue = str_replace(',', '', number_format($sumOfItems + $order->shipment_price_for_client + $order->additional_service_cost + $order->additional_cash_on_delivery_cost, 2));
     $paymentsValue = 0;

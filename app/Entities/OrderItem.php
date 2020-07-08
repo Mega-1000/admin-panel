@@ -40,7 +40,12 @@ class OrderItem extends Model implements Transformable
         'net_selling_price_basic_unit',
         'net_selling_price_calculated_unit',
         'net_selling_price_aggregate_unit',
-        'net_selling_price_the_largest_unit'
+        'net_selling_price_the_largest_unit',
+        'gross_selling_price_commercial_unit',
+        'gross_selling_price_basic_unit',
+        'gross_selling_price_calculated_unit',
+        'gross_selling_price_aggregate_unit',
+        'gross_selling_price_the_largest_unit'
     ];
 
     /**

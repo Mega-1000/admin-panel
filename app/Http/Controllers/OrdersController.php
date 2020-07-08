@@ -730,12 +730,16 @@ class OrdersController extends Controller
                     'net_purchase_price_basic_unit_after_discounts' => (float)$request->input('net_purchase_price_basic_unit')[$key],
                     'net_purchase_price_calculated_unit_after_discounts' => (float)$request->input('net_purchase_price_calculated_unit')[$key],
                     'net_purchase_price_aggregate_unit_after_discounts' => (float)$request->input('net_purchase_price_aggregate_unit')[$key],
+                    'gross_selling_price_commercial_unit' => (float)$request->input('gross_selling_price_commercial_unit')[$key],
+                    'gross_selling_price_basic_unit' => (float)$request->input('gross_selling_price_basic_unit')[$key],
+                    'gross_selling_price_calculated_unit' => (float)$request->input('gross_selling_price_calculated_unit')[$key],
+                    'gross_selling_price_aggregate_unit' => (float)$request->input('gross_selling_price_aggregate_unit')[$key],
                     'net_selling_price_commercial_unit' => (float)$request->input('net_selling_price_commercial_unit')[$key],
                     'net_selling_price_basic_unit' => (float)$request->input('net_selling_price_basic_unit')[$key],
                     'net_selling_price_calculated_unit' => (float)$request->input('net_selling_price_calculated_unit')[$key],
                     'net_selling_price_aggregate_unit' => (float)$request->input('net_selling_price_aggregate_unit')[$key],
                     'quantity' => (int)$request->input('quantity_commercial')[$key],
-                    'price' => (float)$request->input('net_selling_price_commercial_unit')[$key] * (int)$request->input('quantity_commercial')[$key] * 1.23,
+                    'price' => (float)$request->input('gross_selling_price_commercial_unit')[$key] * (int)$request->input('quantity_commercial')[$key],
                     'order_id' => $order->id,
                     'product_id' => $value,
                 ]);
@@ -750,12 +754,16 @@ class OrdersController extends Controller
                         'net_purchase_price_basic_unit_after_discounts' => (float)$request->input('net_purchase_price_basic_unit')[$id],
                         'net_purchase_price_calculated_unit_after_discounts' => (float)$request->input('net_purchase_price_calculated_unit')[$id],
                         'net_purchase_price_aggregate_unit_after_discounts' => (float)$request->input('net_purchase_price_aggregate_unit')[$id],
+                        'gross_selling_price_commercial_unit' => (float)$request->input('gross_selling_price_commercial_unit')[$id],
+                        'gross_selling_price_basic_unit' => (float)$request->input('gross_selling_price_basic_unit')[$id],
+                        'gross_selling_price_calculated_unit' => (float)$request->input('gross_selling_price_calculated_unit')[$id],
+                        'gross_selling_price_aggregate_unit' => (float)$request->input('gross_selling_price_aggregate_unit')[$id],
                         'net_selling_price_commercial_unit' => (float)$request->input('net_selling_price_commercial_unit')[$id],
                         'net_selling_price_basic_unit' => (float)$request->input('net_selling_price_basic_unit')[$id],
                         'net_selling_price_calculated_unit' => (float)$request->input('net_selling_price_calculated_unit')[$id],
                         'net_selling_price_aggregate_unit' => (float)$request->input('net_selling_price_aggregate_unit')[$id],
                         'quantity' => (int)$request->input('quantity_commercial')[$id],
-                        'price' => (float)$request->input('net_selling_price_commercial_unit')[$id] * (int)$request->input('quantity_commercial')[$id] * 1.23,
+                        'price' => (float)$request->input('gross_selling_price_commercial_unit')[$id] * (int)$request->input('quantity_commercial')[$id],
                     ], $id);
                 } else {
                     $orderItem = $this->orderItemRepository->find($id);
@@ -894,7 +902,7 @@ class OrdersController extends Controller
         unset($data['allegro_transaction_id']);
         $data['total_price'] = 0;
         foreach ($data['id'] as $productId) {
-            $data['total_price'] += (float)$data['net_selling_price_commercial_unit'][$productId] * (int)$data['quantity_commercial'][$productId] * 1.23;
+            $data['total_price'] += (float)$data['gross_selling_price_commercial_unit'][$productId] * (int)$data['quantity_commercial'][$productId];
         }
         $order = $this->orderRepository->create($data);
         if (!empty($data['id'])) {
@@ -911,7 +919,7 @@ class OrdersController extends Controller
                     'order_id' => $order->id,
                     'product_id' => $data['product_id'][$id],
                     'quantity' => $data['quantity_commercial'][$id],
-                    'price' => (float)$data['net_selling_price_commercial_unit'][$id] * (int)$data['quantity_commercial'][$id] * 1.23,
+                    'price' => (float)$data['gross_selling_price_commercial_unit'][$id] * (int)$data['quantity_commercial'][$id],
                 ]);
             }
         }
@@ -952,7 +960,7 @@ class OrdersController extends Controller
         $orderItems = $order->items;
         $sum = 0;
         foreach ($orderItems as $item) {
-            $sum += $item->net_selling_price_commercial_unit * $item->quantity * 1.23;
+            $sum += $item->gross_selling_price_commercial_unit * $item->quantity;
         }
         $sum += $order->additional_service_cost + $order->additional_cash_on_delivery_cost + $order->shipment_price_for_client;
         $sum = round($sum, 2);
@@ -979,7 +987,7 @@ class OrdersController extends Controller
             $orderItems = $connectedOrder->items;
             $sum = 0;
             foreach ($orderItems as $item) {
-                $sum += $item->net_selling_price_commercial_unit * $item->quantity * 1.23;
+                $sum += $item->gross_selling_price_commercial_unit * $item->quantity;
             }
             $sum += $connectedOrder->additional_service_cost + $connectedOrder->additional_cash_on_delivery_cost + $connectedOrder->shipment_price_for_client;
             $sum = round($sum, 2);
@@ -1054,7 +1062,7 @@ class OrdersController extends Controller
 
         $totalPrice = 0;
         foreach ($request->input('id') as $productId) {
-            $totalPrice += (float)$request->input('net_selling_price_commercial_unit')[$productId] * (int)$request->input('quantity_commercial')[$productId] * 1.23;
+            $totalPrice += (float)$request->input('gross_selling_price_commercial_unit')[$productId] * (int)$request->input('quantity_commercial')[$productId];
 
         }
         $warehouse = $this->warehouseRepository->findWhere(["symbol" => $request->input('delivery_warehouse')])->first();
@@ -1311,7 +1319,7 @@ class OrdersController extends Controller
 
                     $item->update([
                         'quantity' => $item->quantity - $quantity,
-                        'price' => (float)$data['net_selling_price_commercial_unit'][$id] * ($item->quantity - $quantity) * 1.23
+                        'price' => (float)$data['gross_selling_price_commercial_unit'][$id] * ($item->quantity - $quantity)
                     ]);
                     $this->orderRepository->update([
                         'weight' => $order->weight - ($item->product->weight_trade_unit * $quantity),
@@ -1329,10 +1337,10 @@ class OrdersController extends Controller
                 $item->order_id = $newOrder->id;
                 $item->product_id = $data['product_id'][$id];
                 $item->quantity = $quantity;
-                $item->price = (float)$data['net_selling_price_commercial_unit'][$id] * $quantity * 1.23;
+                $item->price = (float)$data['gross_selling_price_commercial_unit'][$id] * $quantity;
                 $item->save();
                 $productsWeightSum += (float)$data['modal_weight'][$id] * $quantity;
-                $productsSum += (float)$data['net_selling_price_commercial_unit'][$id] * $quantity * 1.23;
+                $productsSum += (float)$data['gross_selling_price_commercial_unit'][$id] * $quantity;
 
             }
         }

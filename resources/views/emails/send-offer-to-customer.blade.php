@@ -15,9 +15,9 @@
     @endphp
     @foreach($order->items as $item)
         @php
-            $gross_purchase_sum += ($item->net_purchase_price_commercial_unit * $item->quantity * 1.23);
+            $gross_purchase_sum += ($item->gross_purchase_price_commercial_unit * $item->quantity);
             $net_purchase_sum += $item->net_purchase_price_commercial_unit * $item->quantity ;
-            $gross_selling_sum += ($item->net_selling_price_commercial_unit * $item->quantity * 1.23);
+            $gross_selling_sum += ($item->gross_selling_price_commercial_unit * $item->quantity);
             $net_selling_sum += $item->net_selling_price_commercial_unit * $item->quantity;
             $weight += $item->product->weight_trade_unit * $item->quantity;
         @endphp
@@ -75,7 +75,7 @@
                             <input type="text" class="form-control item-value priceChange" data-item-id="{{$item->id}}"
                                    disabled
                                    name="item-value"
-                                   value="{{ number_format(($item->net_selling_price_commercial_unit * $item->quantity * 1.23), 2) }} zł"/>
+                                   value="{{ number_format(($item->gross_selling_price_commercial_unit * $item->quantity), 2) }} zł"/>
                         </td>
                     </tr>
                 </table>

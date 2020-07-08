@@ -95,15 +95,15 @@
                     <td style="width: 4.6%">{{ $item->quantity }}</td>
                     <td style="width: 10.1%">{{ $item->net_selling_price_commercial_unit }} zł</td>
                     <td style="width: 7%;">23%</td>
-                    <td style="width: 8%">{{ number_format($item->net_selling_price_commercial_unit * 1.23, 2) }} zł</td>
+                    <td style="width: 8%">{{ $item->gross_selling_price_commercial_unit, 2 }} zł</td>
                     <td style="width: 13.1%">{{ $item->net_selling_price_commercial_unit * $item->quantity }} zł</td>
-                    <td style="width: 13%;">{{ number_format($item->net_selling_price_commercial_unit * 0.23 * $item->quantity, 2) }} zł</td>
-                    <td style="width: 13.1%">{{ number_format($item->net_selling_price_commercial_unit * 1.23 * $item->quantity, 2) }} zł</td>
+                    <td style="width: 13%;">{{ number_format(($item->gross_selling_price_commercial_unit - $item->net_selling_price_commercial_unit) * $item->quantity, 2) }} zł</td>
+                    <td style="width: 13.1%">{{ number_format($item->gross_selling_price_commercial_unit * $item->quantity, 2) }} zł</td>
                 </tr>
                 @php
                     $netSum += $item->net_selling_price_commercial_unit * $item->quantity;
-                    $grossSum += $item->net_selling_price_commercial_unit * $item->quantity * 1.23;
-                    $vatSum += $item->net_selling_price_commercial_unit * $item->quantity * 0.23;
+                    $grossSum += $item->gross_selling_price_commercial_unit * $item->quantity;
+                    $vatSum += ($item->gross_selling_price_commercial_unit - $item->net_selling_price_commercial_unit) * $item->quantity * 0.23;
                     $i++;
                 @endphp
             @endforeach
