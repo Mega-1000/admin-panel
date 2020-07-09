@@ -700,7 +700,7 @@
     <table id="dataTable" class="table table-hover spacious-container ordersTable">
         <thead>
         <tr>
-            <th></th>
+            <th><input id="selectAllOrders" type="checkbox"></th>
             <th>@lang('orders.table.spedition_exchange_invoiced_selector')</th>
             <th>
                 <div><span>@lang('orders.table.packages_sent')</span></div>
@@ -1003,6 +1003,24 @@
         // DataTable
         window.table = table = $('#dataTable').DataTable({
             language: {!! json_encode( __('voyager.datatable'), true) !!},
+            "initComplete": () => {
+                $('.order-id-checkbox').on('click', e => {
+                    if (e.shiftKey && lastChecked) {
+                        let start = checkboxes.index(e.target);
+                        let end = checkboxes.index(lastChecked);
+                        checkboxes.slice(Math.min(start, end), Math.max(start, end) + 1).each((index, item) => {
+                            item.checked = lastChecked.checked;
+                        });
+                    }
+                    lastChecked = e.target;
+
+                });
+                $('#selectAllOrders').on('click', e => {
+                    checkboxes.each((index, item) => { item.checked = e.target.checked });
+                })
+                var checkboxes = $('.order-id-checkbox');
+                var lastChecked = null;
+            },
             processing: true,
             serverSide: true,
             stateSave: true,
