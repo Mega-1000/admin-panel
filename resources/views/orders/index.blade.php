@@ -696,6 +696,10 @@
                 <input type="search" name="searchById" id="searchById">
                 <button onclick="findPage()" class="btn btn-success">Znajdź zlecenie</button>
         </div>
+        <div class="col-md-4 mb-4">
+            <label for="selectAllOrders">Zaznacz wszystkie zlecenia</label>
+            <input id="selectAllOrders" type="checkbox"/>
+        </div>
     </div>
     <table id="dataTable" class="table table-hover spacious-container ordersTable">
         <thead>
