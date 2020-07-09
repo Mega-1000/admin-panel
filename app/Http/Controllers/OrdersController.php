@@ -64,6 +64,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
@@ -360,6 +361,11 @@ class OrdersController extends Controller
     public function create()
     {
         return view('orders.create');
+    }
+
+    public function editPackages($id) {
+        Session::put('uri', 'orderPackages');
+        return $this->edit($id);
     }
 
     /**

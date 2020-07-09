@@ -1164,7 +1164,11 @@
                                 html = '<div style="border: solid green 4px" >'
                             }
                         }
+                        let cancelled = 0;
                         $.each(data, function (key, value) {
+                            if (value.status === 'CANCELLED') {
+                                cancelled++;
+                            }
                             if (value.status !== 'SENDING' && value.status !== 'DELIVERED' && value.status !== 'CANCELLED') {
                                 html += '<div style="display: flex; align-items: center; flex-direction: column;" > ' +
                                     '<div style="display: flex; align-items: stretch;">' +
@@ -1219,6 +1223,11 @@
                                 html += '</div>';
                             }
                         });
+                        if (cancelled > 0) {
+                            let url = "{{ route('orders.editPackages', ['id' => '%%']) }}";
+                            url = url.replace('%%', order.orderId)
+                            html += `<a target=+_blank href="${url}">Anulowano: ${cancelled}</a>`;
+                        }
                         return html;
                     }
                 },

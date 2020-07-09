@@ -251,6 +251,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('orders/printAll', 'OrdersController@printAll')->name('orders.printAll');
         Route::get('orders/create', 'OrdersController@create')->name('orders.create');
         Route::get('orders/{id}/edit', 'OrdersController@edit')->name('orders.edit');
+        Route::get('orders/{id}/edit/packages', 'OrdersController@editPackages')->name('orders.editPackages');
         Route::post('orders/find-page/{id}', 'OrdersController@findPage')->name('orders.findPage');
         Route::delete('orders/{id}/', 'OrdersController@destroy')->name('orders.destroy');
         Route::put('orders/{id}/update', [

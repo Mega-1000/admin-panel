@@ -78,6 +78,7 @@
         {{ method_field('put') }}
         <div class="orders-general" id="general">
             <input type="hidden" value="{{Session::get('uri')}}" id="uri">
+            {{ Session::forget('uri') }}
             <div class="form-group" style="width: 11%; float: left; padding: 5px;">
                 <label for="value_of_items_gross">@lang('orders.form.order_id')</label>
                 <input type="text" class="form-control" id="order_id" name="order_id"
