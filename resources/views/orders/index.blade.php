@@ -700,7 +700,7 @@
     <table id="dataTable" class="table table-hover spacious-container ordersTable">
         <thead>
         <tr>
-            <th><input id="selectAllOrders" type="checkbox"></th>
+            <th></th>
             <th>@lang('orders.table.spedition_exchange_invoiced_selector')</th>
             <th>
                 <div><span>@lang('orders.table.packages_sent')</span></div>
