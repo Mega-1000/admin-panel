@@ -3,6 +3,7 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
@@ -110,6 +111,8 @@ class OrderPackage extends Model implements Transformable
             $path = "/storage/gielda/stickers/sticker$this->letter_number.pdf";
         } else if ($this->delivery_courier_name === 'ODBIOR_OSOBISTY') {
             $path = "/storage/odbior_osobisty/stickers/sticker$this->letter_number.pdf";
+        } else if ($this->service_courier_name === 'GLS' || $this->delivery_courier_name === 'GLS') {
+            $path = Storage::disk('private')->path('labels/gls/');
         }
         return $path;
     }
