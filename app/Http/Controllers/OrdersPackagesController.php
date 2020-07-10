@@ -654,17 +654,10 @@ class OrdersPackagesController extends Controller
 
             if (!$packages->isEmpty()) {
                 foreach ($packages as $package) {
-                    $result = $this->preparePackageToSend($package->order->id, $package->id);
-                    $resArr = $result->getData();
-                    $itemMessage = 'ID Zamówienia ' . $package->order->id . ' | Numer paczki: ' . $package->id;
-                    if ($resArr->message != null) {
-                        foreach ($resArr->message as $msg) {
-                            $itemMessage .= ' ' . $msg;
-                        }
-                        $message = [
-                            'message' => $itemMessage
-                        ];
-                        array_push($messages, $message);
+                    try {
+                        list($message, $messages) = $this->sendPackage($package, $messages);
+                    } catch (\Exception $e) {
+                        \Log::error('błąd przy nadawaniu hurtowym paczki', ['error' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
                     }
                 }
             }
@@ -897,5 +890,27 @@ class OrdersPackagesController extends Controller
             'message' => __('order_packages.message.store'),
             'alert-type' => 'success'
         ]);
+    }
+
+    /**
+     * @param $package
+     * @param array $messages
+     * @return array
+     */
+    protected function sendPackage($package, array $messages): array
+    {
+        $result = $this->preparePackageToSend($package->order->id, $package->id);
+        $resArr = $result->getData();
+        $itemMessage = 'ID Zamówienia ' . $package->order->id . ' | Numer paczki: ' . $package->id;
+        if ($resArr->message != null) {
+            foreach ($resArr->message as $msg) {
+                $itemMessage .= ' ' . $msg;
+            }
+            $message = [
+                'message' => $itemMessage
+            ];
+            array_push($messages, $message);
+        }
+        return array($message, $messages);
     }
 }
