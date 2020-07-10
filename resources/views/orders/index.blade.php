@@ -540,6 +540,7 @@
         <a name="send_courier" class="btn btn-success" href="/admin/orderPackages/POCZTEX/send">Pocztex</a>
         <a name="send_courier" class="btn btn-success" href="/admin/orderPackages/APACZKA/send">Apaczka</a>
         <a name="send_courier" class="btn btn-success" href="/admin/orderPackages/JAS/send">Jas</a>
+        <a name="send_courier" class="btn btn-success" href="/admin/orderPackages/GLS/send">GLS</a>
         <a name="send_courier" class="btn btn-info" href="/admin/orderPackages/ALL/send">Wyślij wszystkie</a>
     </div>
     <div class="form-group">

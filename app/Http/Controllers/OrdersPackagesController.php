@@ -635,7 +635,7 @@ class OrdersPackagesController extends Controller
     public function prepareGroupPackageToSend($courierName)
     {
         ini_set('max_execution_time', 600);
-        if ($courierName == 'APACZKA' || $courierName == 'INPOST' || $courierName == 'DPD' || $courierName == 'POCZTEX' || $courierName == 'JAS' || $courierName == 'ALL') {
+        if ($courierName == 'APACZKA' || $courierName == 'INPOST' || $courierName == 'DPD' || $courierName == 'POCZTEX' || $courierName == 'JAS' ||  $courierName == 'GLS' || $courierName == 'ALL') {
             if ($courierName !== 'ALL') {
                 $packages = $this->repository->findWhere([
                     ['status', '=', 'NEW'],
