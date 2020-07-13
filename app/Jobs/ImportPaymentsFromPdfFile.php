@@ -72,7 +72,7 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
                 continue;
             }
             try {
-                $payments = $this->processNewTransaction($fn, $payments);
+                $payments = $this->processNewTransaction($fn);
             } catch (\Exception $e) {
                 \Log::error($e->getMessage(), ['line' => $e->getTraceAsString()]);
             }
