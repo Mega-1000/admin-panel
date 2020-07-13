@@ -588,7 +588,37 @@
             numery</a>
         @if(!empty(session('update_errors')))
             @foreach(session('update_errors') as $error)
-                <div class="alert alert-warning"> {{$error}} </div>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>
+                            Nie znaleziono paczki o liście nr:
+                        </th>
+                        <th>
+                            Brak kosztów dla paczki nr:
+                        </th>
+                        <th>
+                            Inny błąd:
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @php
+                        $type1 = session('update_errors')[1] ?? [];
+                        $type2 = session('update_errors')[2] ?? [];
+                        $typeOther = session('update_errors')['other'] ?? [];
+
+                        $length = max([count($type1), count($type2), count($typeOther)]);
+                    @endphp
+                    @for ($i = 0; $i < $length; $i++)
+                        <tr>
+                            <td>{!! isset($type1[$i]) ? $type1[$i] : '' !!}</td>
+                            <td>{!! isset($type2[$i]) ? $type2[$i] : '' !!}</td>
+                            <td>{!! isset($typeOther[$i]) ? $typeOther[$i] : '' !!}</td>
+                        </tr>
+                    @endfor
+                    </tbody>
+                </table>
             @endforeach
         @endif
     </div>
