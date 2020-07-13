@@ -157,16 +157,19 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
             if (!array_key_exists('orderId', $payment)) {
                 continue;
             }
-            foreach ($payment['orderId'] as &$id) {
-                $id = str_replace(' ', '', $id);
-                $id = preg_replace('/[qQ][qQ]/', '', $id);
+            error_log(print_r($payment, 1));
+            $newIds = [];
+            foreach ($payment['orderId'] as $id) {
+                $newId = str_replace(' ', '', $id);
+                $newId = preg_replace('/[qQ][qQ]/', '', $newId);
+                $newIds [] = $newId;
             }
 
-            $sum = OrderPayment::whereIn('order_id', $payment['orderId'])->where('promise', 1)->sum('amount');
+            $sum = OrderPayment::whereIn('order_id', $newIds)->where('promise', 1)->sum('amount');
             if (abs($sum - $payment['amount']) > 2) {
                 continue;
             }
-            foreach ($payment['orderId'] as $id) {
+            foreach ($newIds as $id) {
                 $payment = OrderPayment::where('order_id', $id)->where('promise', 1)->first();
                 $paymentsInfo[] = app()->call(OrdersPaymentsController::class . '@storeFromImport', [$id, $payment->amount, $this->date]);
             }
