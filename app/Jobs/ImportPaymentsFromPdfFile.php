@@ -104,14 +104,19 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
             if (empty($orderRegexMatches[0])) {
                 continue;
             }
+
             if ($this->verifyOrderId($orderRegexMatches[0])) {
                 $payment = [];
                 $payment['orderId'] = $orderRegexMatches[0];
-                $line = fgets($fn);
-                $newline = str_replace(' ', '', $line);
-                $newline = explode(',', $newline);
-                if (count($newline) < 3) {
-                    throw new \Exception('Problem z importem płatności');
+                $newline = [];
+                while (!$isNewTransaction && !feof($fn) && count($newline) < 3) {
+                    $line = fgets($fn);
+                    $newline = str_replace(' ', '', $line);
+                    $newline = explode(',', $newline);
+                    $isNewTransaction = $this->checkIfTransactionbegins($line);
+                }
+                if ($isNewTransaction) {
+                    continue;
                 }
                 $amount = $newline[0];
                 $penny = substr($newline[1], 0, 2);
@@ -129,7 +134,8 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
     private function checkIfGivenLineContainOrderNumber(string $fileLine)
     {
         $matches = [];
-        preg_match_all('/[qQ][qQ](\d{3,5})[qQ][qQ]/', $fileLine, $matches);
+        $transactions = str_replace(' ', '', $fileLine);
+        preg_match_all('/[qQ][qQ](\d{3,5})[qQ][qQ]/', $transactions, $matches);
         return $matches;
     }
 
@@ -151,6 +157,11 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
             if (!array_key_exists('orderId', $payment)) {
                 continue;
             }
+            foreach ($payment['orderId'] as &$id) {
+                $id = str_replace(' ', '', $id);
+                $id = preg_replace('/[qQ][qQ]/', '', $id);
+            }
+
             $sum = OrderPayment::whereIn('order_id', $payment['orderId'])->where('promise', 1)->sum('amount');
             if (abs($sum - $payment['amount']) > 2) {
                 continue;
