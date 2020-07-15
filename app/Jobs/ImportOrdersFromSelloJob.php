@@ -284,8 +284,6 @@ class ImportOrdersFromSelloJob implements ShouldQueue
     {
         $transactionArray = [];
         $transactionArray['customer_login'] = $transaction->customer->email->ce_email;
-        $phone = Helper::preparePhone($transaction->customer->phone->cp_Phone);
-        $transactionArray['phone'] = $phone;
         $transactionArray['update`_email'] = true;
         $transactionArray['update_customer'] = true;
         $transactionArray['customer_notices'] = empty($transaction->note) ? '' : $transaction->note->ne_Content;
@@ -293,6 +291,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $transactionArray['is_standard'] = 1;
         $transactionArray['rewrite'] = 0;
         $transactionArray['nick_allegro'] = $transaction->customer->cs_Nick;
+        $phone = Helper::preparePhone($transaction->customer->phone->cp_Phone ?? $transactionArray['delivery_address']['phone']);
+        $transactionArray['phone'] = $phone;
         return $transactionArray;
     }
 
