@@ -157,7 +157,6 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
             if (!array_key_exists('orderId', $payment)) {
                 continue;
             }
-            error_log(print_r($payment, 1));
             $newIds = [];
             foreach ($payment['orderId'] as $id) {
                 $newId = str_replace(' ', '', $id);
@@ -169,9 +168,13 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
             if (abs($sum - $payment['amount']) > 2) {
                 continue;
             }
-            foreach ($newIds as $id) {
-                $payment = OrderPayment::where('order_id', $id)->where('promise', 1)->first();
-                $paymentsInfo[] = app()->call(OrdersPaymentsController::class . '@storeFromImport', [$id, $payment->amount, $this->date]);
+            if (count($newIds) === 0) {
+                $paymentsInfo[] = app()->call(OrdersPaymentsController::class . '@storeFromImport', [$newIds[0], $payment['amount'], $this->date]);
+            } else {
+                foreach ($newIds as $id) {
+                    $payment = OrderPayment::where('order_id', $id)->where('promise', 1)->first();
+                    $paymentsInfo[] = app()->call(OrdersPaymentsController::class . '@storeFromImport', [$id, $payment->amount ?? $payment['amount'], $this->date]);
+                }
             }
         }
 

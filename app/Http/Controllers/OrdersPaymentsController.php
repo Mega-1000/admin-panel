@@ -236,8 +236,7 @@ class OrdersPaymentsController extends Controller
             } else {
                 return false;
             }
-        }
-        elseif (strlen($orderId) > 4 && strlen($orderId) < 10) {
+        } elseif (strlen($orderId) > 4 && strlen($orderId) < 10) {
             $order = $this->orderRepository->findWhere(['id_from_front_db' => $orderId])->first();
             $orderId = $order->id;
         } elseif (strlen($orderId) < 5) {
