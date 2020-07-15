@@ -2598,13 +2598,6 @@
                         }
 
                         let dateTime = firstDate.getFullYear() + '-' + ('0' + (firstDate.getMonth() + 1)).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getHours() + ':' + startMinutes;
-                        let newDate = new Date(info.dateStr);
-                        let endDate = new Date(newDate.setHours(newDate.getHours() + 1 - 2));
-                        let minutes = endDate.getMinutes();
-                        if (minutes < 10) {
-                            minutes = '0' + minutes;
-                        }
-                        let dateTimeEnd = endDate.getFullYear() + '-' + ('0' + (endDate.getMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getHours() + ':' + minutes;
                         let warehouse = null;
                         if ($('#warehouseSelect').is(':selected')) {
                             warehouse = $('#warehouseSelect').val();
@@ -2630,8 +2623,22 @@
                         html += '<input type="text" name="start" id="start_new" class="form-control default-date-time-picker-now" value="' + dateTime + '">';
                         html += '</div>';
                         html += '<div class="form-group">';
+                        html += '<p>Dodaj czas zakończenia:</p>'
+                        html += '<button class="add-end-time" value="5">+5</button>';
+                        html += '<button class="add-end-time" value="10">+10</button>';
+                        html += '<button class="add-end-time" value="15">+15</button>';
+                        html += '<button class="add-end-time" value="20">+20</button>';
+                        html += '<button class="add-end-time" value="25">+25</button>';
+                        html += '<button class="add-end-time" value="30">+30</button>';
+                        html += '<button class="add-end-time" value="40">+40</button>';
+                        html += '<button class="add-end-time" value="50">+50</button>';
+                        html += '<button class="add-end-time" value="60">+60</button>';
+                        html += '<button class="add-end-time" value="70">+70</button>';
+                        html += '<button class="add-end-time" value="80">+80</button>';
+                        html += '<button class="add-end-time" value="90">+90</button>';
+                        html += '<br />';
                         html += '<label for="end">Godzina zakończenia</label>';
-                        html += '<input type="text" name="end" id="end" class="form-control default-date-time-picker-now" value="' + dateTimeEnd + '">';
+                        html += '<input type="text" required name="end" id="end" class="time-to-finish-task form-control default-date-time-picker-now">';
                         html += '</div>';
                         html += '<div class="form-group">';
                         html += '<label for="color-green">';
@@ -2684,6 +2691,17 @@
                             format: "YYYY-MM-DD H:mm",
                             stepping: 5,
                         });
+                        $('.add-end-time').click(event => {
+                            event.preventDefault();
+                            let start = new Date($("#start_new").val());
+                            let end = new Date(start.getTime() + event.target.value * 60000);
+                            let startMinutes = end.getMinutes();
+                            if (startMinutes < 10) {
+                                startMinutes = '0' + startMinutes;
+                            }
+                            let dateTime = end.getFullYear() + '-' + ('0' + (end.getMonth() + 1)).slice(-2) + '-' + end.getUTCDate() + ' ' + end.getHours() + ':' + startMinutes;
+                            $(".time-to-finish-task").val(dateTime);
+                        })
                         $('#name_new').val($('input[name="order_id"]').val() + ' - ' + firstDate.getUTCDate() + '-' + ('0' + (firstDate.getMonth() + 1)).slice(-2) + ' - ' + $('#warehouse_value').val());
                         $('#name_new').change(function () {
                             var dateObj = new Date($('#start_new').val());
