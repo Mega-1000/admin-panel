@@ -82,6 +82,8 @@ class Helper
         if ($pos === 0) {
             $phone = substr($phone, 2);
         }
-        return $phone;
+        if (strlen($phone) > 4) {
+            return $phone;
+        }
     }
 }
