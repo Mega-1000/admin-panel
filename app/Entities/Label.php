@@ -16,6 +16,8 @@ class Label extends Model implements Transformable
     use TransformableTrait;
 
     const ORDER_ITEMS_REDEEMED_LABEL = 66;
+    const BLUE_BATTERY_LABEL_ID = 74;
+    const ORANGE_BATTERY_LABEL_ID = 67;
     const PACKAGE_NOTIFICATION_LABEL = 53;
     const PACKAGE_NOTIFICATION_SENT_LABEL = 52;
     const BLUE_HAMMER_ID = 47;
