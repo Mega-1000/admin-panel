@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Entities\ColumnVisibility;
-use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\OrderPayment;
 use App\Entities\Payment;
@@ -221,18 +220,6 @@ class OrdersPaymentsController extends Controller
             'message' => __('order_payments.message.store'),
             'alert-type' => 'success'
         ])->withInput(['tab' => 'orderPayments']);
-    }
-
-    public function markToRefund(Request $request) {
-        try {
-            $data = $request->all();
-            Order::findOrFail($data['id']);
-            dispatch_now(new AddLabelJob($data['id'], [Label::MARK_TO_RETURN]));
-            dispatch_now(new RemoveLabelJob($data['id'], [Label::PAYMENT_PROBLEM]));
-            return response('success', 200);
-        } catch (\Exception $e) {
-            return response(['error' => 'Błędne zlecenie'], 403);
-        }
     }
 
     public function storeFromImport($orderId, $amount, $date)

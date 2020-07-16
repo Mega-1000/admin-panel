@@ -1018,68 +1018,70 @@
                 </a>
             @endif
         </h1>
-        <div style="display:flex;">
-            <table style="margin: 8px" id="paymentsTable" class="table table-hover">
-                <thead>
-                <tr>
-                    <th>@lang('order_payments.table.payments')</th>
-                    <th>@lang('order_payments.table.booked_date')</th>
-                    <th>@lang('order_payments.table.title')</th>
-                    <th>@lang('order_payments.table.booked_orders')</th>
-                    <th>@lang('order_payments.table.payment_left')</th>
-                    <th>Zaliczka</th>
-                    <th>@lang('order_payments.table.add')</th>
-                </tr>
-                </thead>
-                <tbody>
+        <table style="width: 50%; float: left;" id="paymentsTable" class="table table-hover">
+            <thead>
+            <tr>
+                <th>@lang('order_payments.table.payments')</th>
+                <th>@lang('order_payments.table.booked_date')</th>
+                <th>@lang('order_payments.table.title')</th>
+                <th>@lang('order_payments.table.booked_orders')</th>
+                <th>@lang('order_payments.table.payment_left')</th>
+                <th>Zaliczka</th>
+                <th>@lang('order_payments.table.add')</th>
+            </tr>
+            </thead>
+            <tbody>
+            @php
+                $sumOfPayments = 0;
+            @endphp
+            @foreach($order->customer->payments as $payment)
                 @php
-                    $sumOfPayments = 0;
+                    $sumOfPayments = $sumOfPayments + $payment->amount;
                 @endphp
-                @foreach($order->customer->payments as $payment)
-                    @php
-                        $sumOfPayments = $sumOfPayments + $payment->amount;
-                    @endphp
-                    <tr>
-                        <td>{{ $payment->amount }}</td>
-                        <td>{{ $payment->created_at }}</td>
-                        <td>{{ $payment->title }}</td>
-                        <td>
-                            @foreach($payment->getOrdersUsingPayment() as $orderId => $paymentsValue)
-                                <b style="font-weight: 700;">{{ $orderId }}</b> - {{ $paymentsValue }} zł <br/>
-                            @endforeach
-                        </td>
-                        <td>{{ $payment->amount_left }}</td>
-                        <td>
-                            @if($payment->promise == '1')
-                                <b style="color: red;">Tak</b>
-                            @else
-                                <b style="color: red;">Nie</b>
-                            @endif
-                        </td>
-                        <td>
-                            @if($payment->promise == '1' && Auth::user()->role_id != 4)
-                                <button type="button" class="btn btn-success openPromiseModal" style="display: block;"
-                                        data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->amount }}">
-                                    Zaksięguj
-                                </button>
-                            @else
-                                <button type="button" class="btn" style="display: block;" disabled>
-                                    Zaksięgowano
-                                </button>
-                                <button type="button" class="btn btn-primary openPaymentModal" style="display: block;"
-                                        data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->amount }}">
-                                    Przydziel
-                                </button>
-                            @endif
-                            <a href="{{ route('payments.edit', ['id' => $payment->id]) }}" class="btn btn-info">Edytuj</a>
-                            <a href="{{ route('payments.destroy', ['id' => $payment->id]) }}"
-                               class="btn btn-danger">Usuń</a>
-                        </td>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
-            <table style="margin: 8px" id="ordersTable" class="table table-hover">
+                <tr>
+                    <td>{{ $payment->amount }}</td>
+                    <td>{{ $payment->created_at }}</td>
+                    <td>{{ $payment->title }}</td>
+                    <td>
+                        @foreach($payment->getOrdersUsingPayment() as $orderId => $paymentsValue)
+                            <b style="font-weight: 700;">{{ $orderId }}</b> - {{ $paymentsValue }} zł <br/>
+                        @endforeach
+                    </td>
+                    <td>{{ $payment->amount_left }}</td>
+                    <td>
+                        @if($payment->promise == '1')
+                            <b style="color: red;">Tak</b>
+                        @else
+                            <b style="color: red;">Nie</b>
+                        @endif
+                    </td>
+                    <td>
+                        @if($payment->promise == '1' && Auth::user()->role_id != 4)
+                            <button type="button" class="btn btn-success openPromiseModal" style="display: block;"
+                                    data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->amount }}">
+                                Zaksięguj
+                            </button>
+                        @else
+                            <button type="button" class="btn" style="display: block;" disabled>
+                                Zaksięgowano
+                            </button>
+                            <button type="button" class="btn btn-primary openPaymentModal" style="display: block;"
+                                    data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->amount }}">
+                                Przydziel
+                            </button>
+                        @endif
+                        <a href="{{ route('payments.edit', ['id' => $payment->id]) }}" class="btn btn-info">Edytuj</a>
+                        <a href="{{ route('payments.destroy', ['id' => $payment->id]) }}"
+                           class="btn btn-danger">Usuń</a>
+                    </td>
+                </tr>
+            @endforeach
+            <tr>
+                <td><h2>Suma wpłat: <b style="color: red;">{{ $sumOfPayments }} zł</b></h2></td>
+            </tr>
+            </tbody>
+        </table>
+        <table style="width: 49%; margin-left: 1%; display: inline-block;" id="ordersTable" class="table table-hover">
             <thead>
             <tr>
                 <th>@lang('order_payments.table.order_id')</th>
@@ -1132,21 +1134,17 @@
                     </td>
                 </tr>
             @endforeach
+            <tr>
+                <td><h2>Suma faktur: <b style="color: red;">{{ $sumOfOrders }} zł</b></h2></td>
+            </tr>
+
             </tbody>
         </table>
-        </div>
-
-            <div>
-            <h2>Suma wpłat: <b style="color: red;">{{ $sumOfPayments }} zł</b></h2>
-            <h2>Suma faktur: <b style="color: red;">{{ $sumOfOrders }} zł</b></h2>
-            <h2>Bilans: <b style="color: red;">{{ $sumOfPayments - $sumOfOrders }} zł</b></h2>
-            <button id="mark-order-to-refund" class="btn btn-sm btn-warning">Przygotuj wpłatę do zwrotu</button>
-        </div>
     </div>
     <!-- Modal -->
     <div class="modal fade" id="paymentModal" tabindex="-1" role="dialog" aria-labelledby="paymentModal"
          aria-hidden="true">
-        <div class="modal-dialog" role="document">btn btn-sm edit move__payment--button btn-warning<
+        <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">Przydziel wpłatę do zamówienia</h5>
@@ -4418,17 +4416,4 @@
                     </script>
 
                     <script src="{{ URL::asset('js/views/orders/edit.js') }}"></script>
-                    <script>
-                        $('#mark-order-to-refund').click(e => {
-                            $.post('{{route('orders.markToRefund')}}', {
-                                id: {{$order->id}}
-                            })
-                            .done(() => {
-                                alert('Poprawnie oznaczono do zwrotu należności')
-                            })
-                            .fail((data) => {
-                                alert('Wystąpił błąd')
-                            })
-                        })
-                    </script>
 @endsection

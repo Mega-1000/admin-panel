@@ -266,7 +266,6 @@ Route::group(['prefix' => 'admin'], function () {
             'OrdersController@moveData')->name('orders.moveData');
         Route::post('orders/{orderIdToGet}/data/{orderIdToSend}/payment/move',
             'OrdersController@movePaymentData')->name('orders.movePaymentData');
-        Route::post('orders/payments/mark-to-refund', 'OrdersPaymentsController@markToRefund')->name('orders.markToRefund');
         Route::get('orders/{id}/getDataFromLastOrder',
             'OrdersController@getDataFromLastOrder')->name('orders.getDataFromLastOrder');
         Route::get('orders/{id}/getDataFromCustomer',
