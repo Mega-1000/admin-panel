@@ -77,6 +77,7 @@ use Yajra\DataTables\Facades\DataTables;
  */
 class OrdersController extends Controller
 {
+    const PROB = 134;
     /**
      * @var FirmRepository
      */
@@ -867,17 +868,20 @@ class OrdersController extends Controller
         if ($order->status_id == 5 || $order->status_id == 6) {
             if ($sumToCheck > 5 || $sumToCheck < -5) {
                 foreach ($sumOfOrdersReturn[1] as $ordId) {
-                    dispatch_now(new RemoveLabelJob($ordId, [133]));
-                    dispatch_now(new AddLabelJob($ordId, [134]));
+                    $wouldntRefund = empty($order->labels->where('id', 150)->first());
+                    if ($wouldntRefund) {
+                        dispatch_now(new RemoveLabelJob($ordId, [133]));
+                        dispatch_now(new AddLabelJob($ordId, [Label::PAYMENT_PROBLEM]));
+                    }
                 }
             } else {
                 foreach ($sumOfOrdersReturn[1] as $ordId) {
-                    dispatch_now(new RemoveLabelJob($ordId, [134]));
+                    dispatch_now(new RemoveLabelJob($ordId, [Label::PAYMENT_PROBLEM]));
                     dispatch_now(new AddLabelJob($ordId, [133]));
                 }
             }
         } else {
-            dispatch_now(new RemoveLabelJob($order, [134]));
+            dispatch_now(new RemoveLabelJob($order, [Label::PAYMENT_PROBLEM]));
             dispatch_now(new RemoveLabelJob($order, [133]));
         }
 
