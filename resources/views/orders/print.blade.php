@@ -137,7 +137,7 @@
     @endif
     @if(count($order->lost) > 0)
         @foreach($order->lost as $pack)
-            @if(empty($pack))
+            @if(empty($pack) || $pack->quantity == 0)
                 @continue
             @endif
             <table border="0" cellpadding="1" cellspacing="1" style="width: 100%;">

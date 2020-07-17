@@ -1940,7 +1940,8 @@ class OrdersController extends Controller
                 $fromPack = $this->calculateTotalAmoutForPackages($order, $item);
                 $notAssigned = $this->calculateTotalAmoutForOtherPackages($order, $item);
                 $item->quantity -= ($fromPack + $notAssigned);
-                if ($item->quantity > 0) {
+                if ($item->quantity !== 0) {
+                    $this->recalculatePackages($order, $item);
                     return $item;
                 }
                 return null;
@@ -2034,11 +2035,14 @@ class OrdersController extends Controller
             $fromPack = $this->calculateTotalAmoutForPackages($order, $item);
             $notAssigned = $this->calculateTotalAmoutForOtherPackages($order, $item);
             $item->quantity -= ($fromPack + $notAssigned);
-            if ($item->quantity > 0) {
+
+            if ($item->quantity !== 0) {
+                $this->recalculatePackages($order, $item);
                 return $item;
             }
             return null;
         });
+        error_log(print_r($order, 1));
         $order->lost = $lostFromPack;
         $similar = OrdersHelper::findSimilarOrders($order);
         return View::make('orders.print', [
@@ -2543,6 +2547,39 @@ class OrdersController extends Controller
         OrderInvoice::where('id', $id)->delete();
 
         return response()->json(['status' => 'success']);
+    }
+
+    /**
+     * @param $order
+     * @param $item
+     */
+    protected function recalculatePackages($order, $item): void
+    {
+        foreach ($order->packages as $pack) {
+            foreach ($pack->packedProducts as $packedProduct) {
+                if ($item->quantity === 0 || $item->id !== $packedProduct->id) {
+                    continue;
+                }
+                $diff = min($item->quantity, $packedProduct->pivot->quantity);
+                $item->quantity += $diff;
+                $packedProduct->pivot->quantity -= $diff;
+            }
+        }
+
+        foreach ($order->otherPackages as $pack) {
+            foreach ($pack->products as $prod) {
+                if ($item->quantity === 0 || $item->product_id !== $prod->id) {
+                    continue;
+                }
+                error_log(print_r('st' . $item->quantity, 1));
+                error_log(print_r('sta' . $prod->pivot->quantity, 1));
+                $diff = min($item->quantity, $prod->pivot->quantity);
+                $item->quantity -= $diff;
+                $prod->pivot->quantity += $diff;
+                $prod->pivot->save();
+                error_log(print_r('end' . $prod->pivot->quantity, 1));
+            }
+        }
     }
 
 }
