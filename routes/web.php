@@ -266,6 +266,8 @@ Route::group(['prefix' => 'admin'], function () {
             'OrdersController@moveData')->name('orders.moveData');
         Route::post('orders/{orderIdToGet}/data/{orderIdToSend}/payment/move',
             'OrdersController@movePaymentData')->name('orders.movePaymentData');
+        Route::post('orders/{orderId}/surplus/move',
+            'OrdersController@moveSurplus')->name('orders.moveSurplus');
         Route::get('orders/{id}/getDataFromLastOrder',
             'OrdersController@getDataFromLastOrder')->name('orders.getDataFromLastOrder');
         Route::get('orders/{id}/getDataFromCustomer',
@@ -278,6 +280,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('orders/invoice/request', 'OrdersController@invoiceRequest')->name('orders.invoiceRequest');
         Route::get('orders/{id}/invoices', 'OrdersController@getInvoices')->name('orders.getInvoices');
         Route::post('orders/allegro-payment', 'OrdersPaymentsController@payAllegro')->name('orders.allegroPayments');
+        Route::post('orders/surplus/return', 'OrdersPaymentsController@returnSurplusPayment')->name('orders.returnSurplus');
 
         Route::get('orderPayments/datatable/{id}',
             'OrdersPaymentsController@datatable')->name('order_payments.datatable');

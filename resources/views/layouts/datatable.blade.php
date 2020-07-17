@@ -98,6 +98,26 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" tabindex="-1" id="payment_move_surplus" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Czy jesteś pewny że chcesz przenieść nadpłatę na konto klienta?</h4>
+                    <div class="form-group">
+                        <label for="new_date_for_timed_label_type_c">Kwota</label>
+                        <input type="number" id="surplus__amount" name="surplus__amount" class="form-control">
+                        <input type="hidden" name="surplus__order--id">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="button" class="btn btn-success pull-right" id="payment-move-surplus-ok" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" tabindex="-1" id="order_invoices_delete" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">

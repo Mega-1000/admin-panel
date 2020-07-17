@@ -28,7 +28,8 @@ return [
         'add' => 'Przydziel do zlecenia',
         'move' => 'Przenieś wpłatę',
         'invoice' => 'Faktura',
-        'status' => 'Status'
+        'status' => 'Status',
+        'return' => 'Zwrot nadpłaty'
     ],
     'message' => [
         'store' => 'Płatność została dodana pomyślnie!',
