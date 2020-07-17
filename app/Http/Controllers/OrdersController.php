@@ -28,6 +28,7 @@ use App\Jobs\AllegroTrackingNumberUpdater;
 use App\Jobs\ImportOrdersFromSelloJob;
 use App\Jobs\Orders\MissingDeliveryAddressSendMailJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
+use App\Jobs\RemoveFileLockJob;
 use App\Jobs\RemoveLabelJob;
 use App\Jobs\SendRequestForCancelledPackageJob;
 use App\Jobs\UpdatePackageRealCostJob;
@@ -1922,6 +1923,7 @@ class OrdersController extends Controller
     {
         $finalPdfFileName = 'allPrints.pdf';
         $lockName = 'file.lock';
+        dispatch((new RemoveFileLockJob($lockName))->delay(360));
         if (File::exists(public_path($lockName))) {
             return response(['error' => 'file_exist']);
         }
