@@ -107,11 +107,11 @@
                     <option {{ $old->delivery_courier_name == 'GLS' ? 'selected="selected"' : '' }} value="GLS">GLS</option>
                     <option {{ $old->delivery_courier_name == 'UPS' ? 'selected="selected"' : '' }} value="UPS">UPS</option>
                     <option
-                        {{ $old->ser_courier_name == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
+                        {{ $old->service_courier_name == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         ODBIÓR OSOBISTY
                     </option>
                     <option
-                        {{ $old->delivery_courier_name == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
+                        {{ $old->service_courier_name == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
                         ALLEGRO-INPOST
                     </option>
                 </select>
