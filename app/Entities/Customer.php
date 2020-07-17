@@ -53,6 +53,11 @@ class Customer extends Authenticatable implements Transformable
         return $this->hasMany(Payment::class);
     }
 
+    public function surplusPayments()
+    {
+        return $this->hasMany(UserSurplusPayment::class, 'user_id');
+    }
+
     public $customColumnsVisibilities = [
         "customer_adresses.firstname",
         "lastname",

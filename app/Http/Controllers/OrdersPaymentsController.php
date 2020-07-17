@@ -3,9 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Entities\ColumnVisibility;
+use App\Entities\Customer;
+use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\OrderPayment;
 use App\Entities\Payment;
+use App\Entities\UserSurplusPayment;
+use App\Entities\UserSurplusPaymentHistory;
 use App\Helpers\AllegroPaymentImporter;
 use App\Http\Requests\OrderPaymentCreateRequest;
 use App\Http\Requests\OrderPaymentUpdateRequest;
@@ -1319,6 +1323,41 @@ class OrdersPaymentsController extends Controller
         ]);
 
         return view('orderPayments.warehousePaymentConfirmed');
+    }
+
+    public function returnSurplusPayment(Request $request)
+    {
+        $userSurplusPayment = UserSurplusPayment::find($request->input('user_surplus_id'));
+        if(empty($userSurplusPayment)) {
+            abort(404);
+        }
+        $userSurplusPayment->update([
+            'surplus_amount' => $userSurplusPayment->surplus_amount - $request->input('surplus_amount')
+        ]);
+
+
+        $userSurplusPaymentHistory = UserSurplusPaymentHistory::create([
+            'user_id' => $request->input('surplus_customer_id'),
+            'surplus_amount' => $request->input('surplus_amount'),
+            'operation' => 'DECREASE',
+            'user_surplus_payment' => $userSurplusPayment->id
+        ]);
+
+        $customer = Customer::find($request->input('surplus_customer_id'));
+
+        $payments = $customer->surplusPayments;
+
+        if($payments->sum('surplus_amount') == 0) {
+            foreach($customer->orders as $order) {
+                dispatch_now(new RemoveLabelJob($order->id, [Label::ORDER_SURPLUS]));
+            }
+        } else {
+            foreach($customer->orders as $order) {
+                dispatch_now(new RemoveLabelJob($order->id, [Label::ORDER_SURPLUS]));
+            }
+        }
+
+        return redirect()->back();
     }
 }
 
