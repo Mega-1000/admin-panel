@@ -2,17 +2,16 @@
 
 namespace App\Jobs;
 
+use App\Entities\Order;
+use App\Entities\OrderPayment;
 use App\Http\Controllers\OrdersPaymentsController;
 use App\Repositories\OrderRepository;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Facades\Storage;
-use Smalot\PdfParser\Parser;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Spatie\PdfToText\Pdf;
-use Illuminate\Support\Facades\DB;
 
 class ImportPaymentsFromPdfFile implements ShouldQueue
 {
@@ -21,6 +20,7 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
         InteractsWithQueue,
         Queueable,
         SerializesModels;
+
     protected $orderRepository;
     protected $filename;
     protected $date;
@@ -33,8 +33,8 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
     public function __construct(OrderRepository $orderRepository, $filename, $date = null)
     {
         $this->orderRepository = $orderRepository;
-        $this->filename        = $filename;
-        $this->date            = $date;
+        $this->filename = $filename;
+        $this->date = $date;
     }
 
     /**
@@ -46,13 +46,10 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
     {
         $basePath = base_path();
         $this->convertPdfFileToTextFile(
-            $basePath . '/pdf/app.js', $basePath . '/storage/app/' . $this->filename, $basePath . '/storage/app/'. $this->filename
+            $basePath . '/pdf/app.js', $basePath . '/storage/app/' . $this->filename, $basePath . '/storage/app/' . $this->filename
         );
-
-        $ordersIds = $this->getOrdersIds();
-
-        $payments  = $this->getPaymentsFromTextFile($basePath . '/storage/app/' . str_replace('.pdf', '.txt', $this->filename), $ordersIds);
-        $infos     = $this->storePayments($payments);
+        $payments = $this->getPaymentsFromTextFile($basePath . '/storage/app/' . str_replace('.pdf', '.txt', $this->filename));
+        $infos = $this->storePayments($payments);
 
         return $infos;
     }
@@ -61,31 +58,23 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
     {
         $outputFilePath = str_replace('.pdf', '', $outputFilePath);
 
-        exec('node '.$pdfApplicationPath.' '.$pdfFilePath.' '. $outputFilePath);
+        exec('node ' . $pdfApplicationPath . ' ' . $pdfFilePath . ' ' . $outputFilePath);
     }
 
-    protected function getPaymentsFromTextFile($filePath, $ordersIds)
+    protected function getPaymentsFromTextFile($filePath)
     {
         $payments = [];
-        $fn       = fopen($filePath, "r");
-        $i        = 0;
+        $fn = fopen($filePath, "r");
         while (!feof($fn)) {
-            $result = fgets($fn);
-            $orderRegexMatches = $this->checkIfGivenLineContainOrderNumber($result);
-            if (count($orderRegexMatches) > 0) {
-                $text   = fgets($fn);
-                $letter = DB::table('order_packages')->where('letter_number', 'LIKE', trim($text))->first();
-                if (!empty($letter)) {
-                    $payments[$i]['orderId'] = $letter->order_id;
-                }
-                if($this->verifyOrderId($orderRegexMatches, $ordersIds)) {
-                    $payments[$i]['orderId'] = $orderRegexMatches[1];
-                }
+            $line = fgets($fn);
+            $isNewTransaction = $this->checkIfTransactionbegins($line);
+            if (!$isNewTransaction) {
+                continue;
             }
-            $amountRegexMatches = $this->checkIfGivenLineContainValidAmount($result);
-            if (count($amountRegexMatches) > 0) {
-                $payments[$i]['amount'] = (float) str_replace(',', '.', str_replace(' ', '', str_replace('PLN', '', $amountRegexMatches[0])));
-                $i++;
+            try {
+                $payments = $this->processNewTransaction($fn);
+            } catch (\Exception $e) {
+                \Log::error($e->getMessage(), ['line' => $e->getTraceAsString()]);
             }
         }
         fclose($fn);
@@ -93,23 +82,116 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
         return $payments;
     }
 
-    private function verifyOrderId($matchedResult, $ordersIds)
+    private function checkIfTransactionbegins(string $result)
     {
-        return count($matchedResult) > 1 && substr($matchedResult[1], 0, 1) !== '0' && in_array($matchedResult[1], $ordersIds);
+        return preg_match('/PRZELEW.*?PRZYCHODZĄCY/', $result);
     }
 
-    private function checkIfGivenLineContainAccoutNumber(string $fileLine) {
-        return strlen($fileLine) == 27 && ctype_digit(substr($fileLine, 0, 26)) || strlen($fileLine) == 29 && ctype_digit(substr($fileLine, 2, 26));
+    /**
+     * @param $fn
+     * @param array $payments
+     * @return array
+     * @throws \Exception
+     */
+    protected function processNewTransaction($fn)
+    {
+        $isNewTransaction = false;
+        $payments = [];
+        while (!$isNewTransaction && !feof($fn)) {
+            $line = fgets($fn);
+
+            $orderRegexMatches = $this->checkIfGivenLineContainOrderNumber($line);
+            if (empty($orderRegexMatches[0])) {
+                continue;
+            }
+
+            if ($this->verifyOrderId($orderRegexMatches[0])) {
+                $payment = [];
+                $payment['orderId'] = $orderRegexMatches[0];
+                $newline = [];
+                while (!$isNewTransaction && !feof($fn) && count($newline) < 3) {
+                    $line = fgets($fn);
+                    $newline = str_replace(' ', '', $line);
+                    $newline = explode(',', $newline);
+                    $isNewTransaction = $this->checkIfTransactionbegins($line);
+                }
+                if ($isNewTransaction) {
+                    continue;
+                }
+                $amount = $newline[0];
+                $penny = substr($newline[1], 0, 2);
+                $payment['amount'] = $amount . '.' . $penny;
+                $payments [] = $payment;
+            }
+            $isNewTransaction = $this->checkIfTransactionbegins($line);
+        };
+        if (!feof($fn)) {
+            $payments = array_merge($payments, $this->processNewTransaction($fn));
+        }
+        return $payments;
     }
 
-    private function checkIfGivenLineContainOrderNumber(string $fileLine) {
-        preg_match('/[qQ][qQ](\d{3,5})[qQ][qQ]/', $fileLine, $matches);
+    private function checkIfGivenLineContainOrderNumber(string $fileLine)
+    {
+        $matches = [];
+        $transactions = str_replace(' ', '', $fileLine);
+        preg_match_all('/[qQ][qQ](\d{3,5})[qQ][qQ]/', $transactions, $matches);
         return $matches;
     }
 
-    private function checkIfGivenLineContainValidAmount(string $fileLine) {
+    private function verifyOrderId($matchedResult)
+    {
+        foreach ($matchedResult as $result) {
+            $id = str_replace('QQ', '', $result);
+            if (empty(Order::find($id))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    protected function storePayments($payments)
+    {
+        $paymentsInfo = [];
+        foreach ($payments as $payment) {
+            if (!array_key_exists('orderId', $payment)) {
+                continue;
+            }
+            $newIds = [];
+            foreach ($payment['orderId'] as $id) {
+                $newId = str_replace(' ', '', $id);
+                $newId = preg_replace('/[qQ][qQ]/', '', $newId);
+                $newIds [] = $newId;
+            }
+            $sum = OrderPayment::whereIn('order_id', $newIds)->where('promise', 1)->sum('amount');
+
+
+            if ($sum > 0 && abs($sum - $payment['amount']) > 2) {
+                continue;
+            }
+            foreach ($newIds as $id) {
+                $promise = OrderPayment::where('order_id', $id)->where('promise', 1)->first();
+                if (empty($promise)) {
+                    $amount = $payment['amount'];
+                } else {
+                    $amount = $promise->amount;
+                }
+                $paymentsInfo[] = app()->call(OrdersPaymentsController::class . '@storeFromImport', [$id, $amount, $this->date]);
+            }
+        }
+
+        return $paymentsInfo;
+    }
+
+    private function checkIfGivenLineContainAccoutNumber(string $fileLine)
+    {
+        return strlen($fileLine) == 27 && ctype_digit(substr($fileLine, 0, 26)) || strlen($fileLine) == 29 && ctype_digit(substr($fileLine, 2, 26));
+    }
+
+    private function checkIfGivenLineContainValidAmount(string $fileLine)
+    {
         $fileLine = str_replace(' ', '', $fileLine);
-        if(strpos($fileLine, 'PLN') !== false) {
+        if (strpos($fileLine, 'PLN') !== false) {
             preg_match('/([1-9][0-9]*|0)(\,[0-9]{2})?/', $fileLine, $matches);
 
             return $matches;
@@ -117,30 +199,4 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
         return [];
     }
 
-    protected function storePayments($payments)
-    {
-        $paymentsInfo = [];
-        foreach ($payments as $payment) {
-            if (array_key_exists('orderId', $payment)) {
-                $paymentsInfo[] = app()->call(OrdersPaymentsController::class.'@storeFromImport', [$payment['orderId'], $payment['amount'], $this->date]);
-            }
-        }
-
-        return $paymentsInfo;
-    }
-
-    protected function getOrdersIds()
-    {
-        $ordersIds = [];
-        $orders    = $this->orderRepository->all();
-
-        foreach ($orders as $order) {
-            $ordersIds[] = $order->id;
-            if ($order->id_from_front_db != NULL) {
-                $ordersIds[] = $order->id_from_front_db;
-            }
-        }
-
-        return $ordersIds;
-    }
 }

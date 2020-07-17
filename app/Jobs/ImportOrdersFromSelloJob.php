@@ -234,7 +234,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $addressArray['postal_code'] = $address->adr_ZipCode;
         $addressArray['nip'] = $address->adr_NIP;
         $addressArray['firmname'] = $address->adr_Company ?: $customer->cs_Company ?: '';
-        $addressArray['phone'] = Helper::preparePhone($address->adr_PhoneNumber ?: $customer->phone->cp_Phone ?: '');
+        $addressArray['phone'] = Helper::preparePhone($address->adr_PhoneNumber ?: $customer->phone->cp_Phone ?? '');
         list($name, $surname) = $this->getNameFromAdrres($customer->cs_Name);
         $addressArray['cust_firstname'] = $name;
         $addressArray['cust_lastname'] = $surname;
@@ -284,8 +284,6 @@ class ImportOrdersFromSelloJob implements ShouldQueue
     {
         $transactionArray = [];
         $transactionArray['customer_login'] = $transaction->customer->email->ce_email;
-        $phone = Helper::preparePhone($transaction->customer->phone->cp_Phone);
-        $transactionArray['phone'] = $phone;
         $transactionArray['update`_email'] = true;
         $transactionArray['update_customer'] = true;
         $transactionArray['customer_notices'] = empty($transaction->note) ? '' : $transaction->note->ne_Content;
@@ -293,6 +291,14 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $transactionArray['is_standard'] = 1;
         $transactionArray['rewrite'] = 0;
         $transactionArray['nick_allegro'] = $transaction->customer->cs_Nick;
+        $phone = Helper::preparePhone($transaction->customer->phone->cp_Phone);
+        if (empty($phone)) {
+            $phone = Helper::preparePhone($transactionArray['delivery_address']['phone']);
+        }
+        if (empty($phone)) {
+            $phone = Helper::preparePhone($transactionArray['invoice_address']['phone']);
+        }
+        $transactionArray['phone'] = $phone;
         return $transactionArray;
     }
 

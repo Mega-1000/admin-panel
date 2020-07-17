@@ -50,7 +50,15 @@ class TransportPaymentImporter
             try {
                 $this->processLine($line);
             } catch (\Exception $e) {
-                $errors[] = $e->getMessage();
+                switch ($e->getCode()) {
+                    case 1:
+                    case 2:
+                        $errors[$e->getCode()][] = $e->getMessage();
+                        break;
+                    default:
+                        $errors['other'][] = $e->getMessage();
+                        break;
+                }
             }
         }
         fclose($handle);
@@ -65,7 +73,7 @@ class TransportPaymentImporter
         }
         $package = OrderPackage::where('letter_number', $line[$this->columnLetter])->first();
         if (empty($package)) {
-            throw new \Exception('Nie znaleziono paczki o liście nr: ' . $line[$this->columnLetter], 1);
+            throw new \Exception('list nr: ' . $line[$this->columnLetter], 1);
         }
 
         $cost = -1;
@@ -77,7 +85,7 @@ class TransportPaymentImporter
 
         if ($cost === -1) {
             if (empty($package)) {
-                throw new \Exception('Brak kosztów dla paczki nr: ' . $line[$this->columnLetter], 2);
+                throw new \Exception('list nr: ' . $line[$this->columnLetter], 2);
             }
         }
 

@@ -583,19 +583,7 @@ class OrdersPackagesController extends Controller
                 'alert-type' => 'error'
             ]);
         }
-        try {
-            $file = Storage::disk('private')->get('labels/gls/' . $package->sending_number . '.pdf');
-        } catch (FileNotFoundException $e) {
-            $gls = new GLSClient();
-            $gls->auth();
-            $gls->getLetterForPackage($package->sending_number);
-            $number = $gls->getPackageNumer($package->sending_number);
-            $package->letter_number = $number;
-            $package->save();
-            $gls->logout();
-            ConfirmPackages::create(['package_id' => $package->id]);
-            $file = Storage::disk('private')->get('labels/gls/' . $package->sending_number . '.pdf');
-        }
+        $this->getStickerForGls($package);
         return Storage::disk('private')->download('labels/gls/' . $package->sending_number . '.pdf');
     }
 
@@ -607,22 +595,17 @@ class OrdersPackagesController extends Controller
                 'alert-type' => 'error'
             ]);
         }
-        $packages = OrderPackage::where('delivery_courier_name', 'like', $courier_name)
-            ->whereNotNull('letter_number')
-            ->whereNotIn('status', [
-                PackageTemplate::WAITING_FOR_CANCELLED,
-                PackageTemplate::SENDING,
-                PackageTemplate::DELIVERED,
-                PackageTemplate::CANCELLED])
-            ->whereHas('order', function ($query) {
-                $query->where('status_id', '<>', Order::STATUS_WITHOUT_REALIZATION);
-            })
-            ->get();
+        $packages = $this->getPackagesToSent($courier_name);
         $merger = new Merger;
-        $packages->map(function ($pack) use ($merger) {
-            $file = $pack->getPathToSticker();
-            if (File::exists(public_path($file))) {
-                $merger->addFile(public_path($file));
+        $packages->map(function ($pack) use ($courier_name, $merger) {
+            if ($courier_name == 'GLS') {
+                $file = $this->getStickerForGls($pack);
+                $merger->addRaw($file);
+            } else {
+                $file = $pack->getPathToSticker();
+                if (File::exists(public_path($file))) {
+                    $merger->addFile(public_path($file));
+                }
             }
         });
 
@@ -635,7 +618,7 @@ class OrdersPackagesController extends Controller
     public function prepareGroupPackageToSend($courierName)
     {
         ini_set('max_execution_time', 600);
-        if ($courierName == 'APACZKA' || $courierName == 'INPOST' || $courierName == 'DPD' || $courierName == 'POCZTEX' || $courierName == 'JAS' || $courierName == 'ALL') {
+        if ($courierName == 'APACZKA' || $courierName == 'INPOST' || $courierName == 'DPD' || $courierName == 'POCZTEX' || $courierName == 'JAS' ||  $courierName == 'GLS' || $courierName == 'ALL') {
             if ($courierName !== 'ALL') {
                 $packages = $this->repository->findWhere([
                     ['status', '=', 'NEW'],
@@ -654,17 +637,10 @@ class OrdersPackagesController extends Controller
 
             if (!$packages->isEmpty()) {
                 foreach ($packages as $package) {
-                    $result = $this->preparePackageToSend($package->order->id, $package->id);
-                    $resArr = $result->getData();
-                    $itemMessage = 'ID Zamówienia ' . $package->order->id . ' | Numer paczki: ' . $package->id;
-                    if ($resArr->message != null) {
-                        foreach ($resArr->message as $msg) {
-                            $itemMessage .= ' ' . $msg;
-                        }
-                        $message = [
-                            'message' => $itemMessage
-                        ];
-                        array_push($messages, $message);
+                    try {
+                        list($message, $messages) = $this->sendPackage($package, $messages);
+                    } catch (\Exception $e) {
+                        \Log::error('błąd przy nadawaniu hurtowym paczki', ['error' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
                     }
                 }
             }
@@ -897,5 +873,68 @@ class OrdersPackagesController extends Controller
             'message' => __('order_packages.message.store'),
             'alert-type' => 'success'
         ]);
+    }
+
+    /**
+     * @param $package
+     * @param array $messages
+     * @return array
+     */
+    protected function sendPackage($package, array $messages): array
+    {
+        $result = $this->preparePackageToSend($package->order->id, $package->id);
+        $resArr = $result->getData();
+        $itemMessage = 'ID Zamówienia ' . $package->order->id . ' | Numer paczki: ' . $package->id;
+        if ($resArr->message != null) {
+            foreach ($resArr->message as $msg) {
+                $itemMessage .= ' ' . $msg;
+            }
+            $message = [
+                'message' => $itemMessage
+            ];
+            array_push($messages, $message);
+        }
+        return array($message, $messages);
+    }
+
+    /**
+     * @param $courier_name
+     * @return mixed
+     */
+    protected function getPackagesToSent($courier_name)
+    {
+        return OrderPackage::where('delivery_courier_name', 'like', $courier_name)
+            ->whereNotNull('letter_number')
+            ->whereNotIn('status', [
+                PackageTemplate::WAITING_FOR_CANCELLED,
+                PackageTemplate::SENDING,
+                PackageTemplate::DELIVERED,
+                PackageTemplate::CANCELLED])
+            ->whereHas('order', function ($query) {
+                $query->where('status_id', '<>', Order::STATUS_WITHOUT_REALIZATION);
+            })
+            ->get();
+    }
+
+    /**
+     * @param $package
+     * @throws FileNotFoundException
+     */
+    protected function getStickerForGls($package)
+    {
+        try {
+            $file = Storage::disk('private')->get('labels/gls/' . $package->sending_number . '.pdf');
+        } catch (FileNotFoundException $e) {
+            $gls = new GLSClient();
+            $gls->auth();
+            $gls->getLetterForPackage($package->sending_number);
+            $number = $gls->getPackageNumer($package->sending_number);
+            $package->letter_number = $number;
+            $package->save();
+            $gls->logout();
+            ConfirmPackages::create(['package_id' => $package->id]);
+            $file = Storage::disk('private')->get('labels/gls/' . $package->sending_number . '.pdf');
+        }
+        return $file;
     }
 }

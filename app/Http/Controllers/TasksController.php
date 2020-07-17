@@ -8,6 +8,7 @@ use App\Entities\Task;
 use App\Entities\TaskSalaryDetails;
 use App\Entities\TaskTime;
 use App\Helpers\OrderCalcHelper;
+use App\Helpers\OrdersHelper;
 use App\Helpers\TaskTimeHelper;
 use App\Http\Requests\TaskCreateRequest;
 use App\Http\Requests\TaskUpdateRequest;
@@ -501,12 +502,14 @@ class TasksController extends Controller
                 if ($request->new_resource !== null) {
                     $dataToSave = ['user_id' => $request->new_resource];
                     $dataToSave = array_merge($dataToSave);
-                    if ($task->childs()->count() > 0) {
-                        $task->childs()->get()->map(function ($child) use ($request) {
-                            $this->removeLabel($request, $child);
-                        });
-                    } else {
-                        $this->removeLabel($request, $task);
+                    if ($request->new_resource != 36) {
+                        if ($task->childs()->count() > 0) {
+                            $task->childs()->get()->map(function ($child) use ($request) {
+                                $this->removeLabel($request, $child);
+                            });
+                        } else {
+                            $this->removeLabel($request, $task);
+                        }
                     }
                 }
                 $task->update($dataToSave != null ? $dataToSave : $dataToStore);
@@ -803,11 +806,15 @@ class TasksController extends Controller
         $task = Task::with(['user', 'taskTime', 'taskSalaryDetail', 'order', 'childs' => function ($q) {
             $q->with(['order' => function ($q) {
                 $q->with(['labels' => function ($q) {
-                    $q->where('label_group_id', LabelGroup::PRODUCTION_LABEL_GROUP_ID);
+                    $q->where('label_group_id', LabelGroup::PRODUCTION_LABEL_GROUP_ID)->orWhereIn('labels.id',
+                        [Label::BLUE_BATTERY_LABEL_ID, Label::ORANGE_BATTERY_LABEL_ID, Label::ORDER_ITEMS_REDEEMED_LABEL]);
                 }]);
             }]);
         }])->find($id);
 
+        foreach ($task->childs as $child) {
+            $child->order->similar = OrdersHelper::findSimilarOrders($child->order);
+        }
         if (empty($task)) {
             abort(404);
         }

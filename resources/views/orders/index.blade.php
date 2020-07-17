@@ -540,6 +540,7 @@
         <a name="send_courier" class="btn btn-success" href="/admin/orderPackages/POCZTEX/send">Pocztex</a>
         <a name="send_courier" class="btn btn-success" href="/admin/orderPackages/APACZKA/send">Apaczka</a>
         <a name="send_courier" class="btn btn-success" href="/admin/orderPackages/JAS/send">Jas</a>
+        <a name="send_courier" class="btn btn-success" href="/admin/orderPackages/GLS/send">GLS</a>
         <a name="send_courier" class="btn btn-info" href="/admin/orderPackages/ALL/send">Wyślij wszystkie</a>
     </div>
     <div class="form-group">
@@ -587,7 +588,37 @@
             numery</a>
         @if(!empty(session('update_errors')))
             @foreach(session('update_errors') as $error)
-                <div class="alert alert-warning"> {{$error}} </div>
+                <table class="table table-bordered table-striped">
+                    <thead>
+                    <tr>
+                        <th>
+                            Nie znaleziono paczki o liście nr:
+                        </th>
+                        <th>
+                            Brak kosztów dla paczki nr:
+                        </th>
+                        <th>
+                            Inny błąd:
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @php
+                        $type1 = session('update_errors')[1] ?? [];
+                        $type2 = session('update_errors')[2] ?? [];
+                        $typeOther = session('update_errors')['other'] ?? [];
+
+                        $length = max([count($type1), count($type2), count($typeOther)]);
+                    @endphp
+                    @for ($i = 0; $i < $length; $i++)
+                        <tr>
+                            <td>{!! isset($type1[$i]) ? $type1[$i] : '' !!}</td>
+                            <td>{!! isset($type2[$i]) ? $type2[$i] : '' !!}</td>
+                            <td>{!! isset($typeOther[$i]) ? $typeOther[$i] : '' !!}</td>
+                        </tr>
+                    @endfor
+                    </tbody>
+                </table>
             @endforeach
         @endif
     </div>
@@ -695,6 +726,10 @@
                 <label for="searchById">Zajdź po ID</label>
                 <input type="search" name="searchById" id="searchById">
                 <button onclick="findPage()" class="btn btn-success">Znajdź zlecenie</button>
+        </div>
+        <div class="col-md-4 mb-4">
+            <label for="selectAllOrders">Zaznacz wszystkie zlecenia</label>
+            <input id="selectAllOrders" type="checkbox"/>
         </div>
     </div>
     <table id="dataTable" class="table table-hover spacious-container ordersTable">
@@ -1003,6 +1038,24 @@
         // DataTable
         window.table = table = $('#dataTable').DataTable({
             language: {!! json_encode( __('voyager.datatable'), true) !!},
+            "initComplete": () => {
+                $('.order-id-checkbox').on('click', e => {
+                    if (e.shiftKey && lastChecked) {
+                        let start = checkboxes.index(e.target);
+                        let end = checkboxes.index(lastChecked);
+                        checkboxes.slice(Math.min(start, end), Math.max(start, end) + 1).each((index, item) => {
+                            item.checked = lastChecked.checked;
+                        });
+                    }
+                    lastChecked = e.target;
+
+                });
+                $('#selectAllOrders').on('click', e => {
+                    checkboxes.each((index, item) => { item.checked = e.target.checked });
+                })
+                var checkboxes = $('.order-id-checkbox');
+                var lastChecked = null;
+            },
             processing: true,
             serverSide: true,
             stateSave: true,
@@ -1164,7 +1217,11 @@
                                 html = '<div style="border: solid green 4px" >'
                             }
                         }
+                        let cancelled = 0;
                         $.each(data, function (key, value) {
+                            if (value.status === 'CANCELLED') {
+                                cancelled++;
+                            }
                             if (value.status !== 'SENDING' && value.status !== 'DELIVERED' && value.status !== 'CANCELLED') {
                                 html += '<div style="display: flex; align-items: center; flex-direction: column;" > ' +
                                     '<div style="display: flex; align-items: stretch;">' +
@@ -1219,6 +1276,11 @@
                                 html += '</div>';
                             }
                         });
+                        if (cancelled > 0) {
+                            let url = "{{ route('orders.editPackages', ['id' => '%%']) }}";
+                            url = url.replace('%%', order.orderId)
+                            html += `<a target=+_blank href="${url}">Anulowano: ${cancelled}</a>`;
+                        }
                         return html;
                     }
                 },
@@ -2536,13 +2598,6 @@
                         }
 
                         let dateTime = firstDate.getFullYear() + '-' + ('0' + (firstDate.getMonth() + 1)).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getHours() + ':' + startMinutes;
-                        let newDate = new Date(info.dateStr);
-                        let endDate = new Date(newDate.setHours(newDate.getHours() + 1 - 2));
-                        let minutes = endDate.getMinutes();
-                        if (minutes < 10) {
-                            minutes = '0' + minutes;
-                        }
-                        let dateTimeEnd = endDate.getFullYear() + '-' + ('0' + (endDate.getMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getHours() + ':' + minutes;
                         let warehouse = null;
                         if ($('#warehouseSelect').is(':selected')) {
                             warehouse = $('#warehouseSelect').val();
@@ -2568,8 +2623,22 @@
                         html += '<input type="text" name="start" id="start_new" class="form-control default-date-time-picker-now" value="' + dateTime + '">';
                         html += '</div>';
                         html += '<div class="form-group">';
+                        html += '<p>Dodaj czas zakończenia:</p>'
+                        html += '<button class="add-end-time" value="5">+5</button>';
+                        html += '<button class="add-end-time" value="10">+10</button>';
+                        html += '<button class="add-end-time" value="15">+15</button>';
+                        html += '<button class="add-end-time" value="20">+20</button>';
+                        html += '<button class="add-end-time" value="25">+25</button>';
+                        html += '<button class="add-end-time" value="30">+30</button>';
+                        html += '<button class="add-end-time" value="40">+40</button>';
+                        html += '<button class="add-end-time" value="50">+50</button>';
+                        html += '<button class="add-end-time" value="60">+60</button>';
+                        html += '<button class="add-end-time" value="70">+70</button>';
+                        html += '<button class="add-end-time" value="80">+80</button>';
+                        html += '<button class="add-end-time" value="90">+90</button>';
+                        html += '<br />';
                         html += '<label for="end">Godzina zakończenia</label>';
-                        html += '<input type="text" name="end" id="end" class="form-control default-date-time-picker-now" value="' + dateTimeEnd + '">';
+                        html += '<input type="text" required name="end" id="end" class="time-to-finish-task form-control default-date-time-picker-now">';
                         html += '</div>';
                         html += '<div class="form-group">';
                         html += '<label for="color-green">';
@@ -2622,6 +2691,17 @@
                             format: "YYYY-MM-DD H:mm",
                             stepping: 5,
                         });
+                        $('.add-end-time').click(event => {
+                            event.preventDefault();
+                            let start = new Date($("#start_new").val());
+                            let end = new Date(start.getTime() + event.target.value * 60000);
+                            let startMinutes = end.getMinutes();
+                            if (startMinutes < 10) {
+                                startMinutes = '0' + startMinutes;
+                            }
+                            let dateTime = end.getFullYear() + '-' + ('0' + (end.getMonth() + 1)).slice(-2) + '-' + end.getUTCDate() + ' ' + end.getHours() + ':' + startMinutes;
+                            $(".time-to-finish-task").val(dateTime);
+                        })
                         $('#name_new').val($('input[name="order_id"]').val() + ' - ' + firstDate.getUTCDate() + '-' + ('0' + (firstDate.getMonth() + 1)).slice(-2) + ' - ' + $('#warehouse_value').val());
                         $('#name_new').change(function () {
                             var dateObj = new Date($('#start_new').val());

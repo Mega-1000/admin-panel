@@ -394,8 +394,22 @@
                         html += '<input type="text" name="start" id="start_new" class="form-control default-date-time-picker-now" value="' + dateTime + '">';
                         html += '</div>';
                         html += '<div class="form-group">';
+                        html += '<p>Dodaj czas zakończenia:</p>'
+                        html += '<button class="add-end-time" value="5">+5</button>';
+                        html += '<button class="add-end-time" value="10">+10</button>';
+                        html += '<button class="add-end-time" value="15">+15</button>';
+                        html += '<button class="add-end-time" value="20">+20</button>';
+                        html += '<button class="add-end-time" value="25">+25</button>';
+                        html += '<button class="add-end-time" value="30">+30</button>';
+                        html += '<button class="add-end-time" value="40">+40</button>';
+                        html += '<button class="add-end-time" value="50">+50</button>';
+                        html += '<button class="add-end-time" value="60">+60</button>';
+                        html += '<button class="add-end-time" value="70">+70</button>';
+                        html += '<button class="add-end-time" value="80">+80</button>';
+                        html += '<button class="add-end-time" value="90">+90</button>';
+                        html += '<br />';
                         html += '<label for="end">Godzina zakończenia</label>';
-                        html += '<input type="text" name="end" id="end" class="form-control default-date-time-picker-now" value="' + dateTimeEnd + '">';
+                        html += '<input type="text" name="end" id="end" class="time-to-finish-task form-control default-date-time-picker-now" value="' + dateTimeEnd + '">';
                         html += '</div>';
                         html += '<div class="form-group">';
                         html += '<label for="color-green">';
@@ -446,8 +460,19 @@
                         $('.default-date-time-picker-now').datetimepicker({
                             sideBySide: true,
                             format: "YYYY-MM-DD H:mm",
-                            stepping: 1
+                            stepping: 5
                         });
+                        $('.add-end-time').click(event => {
+                            event.preventDefault();
+                            let start = new Date($("#start_new").val());
+                            let end = new Date(start.getTime() + event.target.value * 60000);
+                            let startMinutes = end.getMinutes();
+                            if (startMinutes < 10) {
+                                startMinutes = '0' + startMinutes;
+                            }
+                            let dateTime = end.getFullYear() + '-' + ('0' + (end.getMonth() + 1)).slice(-2) + '-' + end.getUTCDate() + ' ' + end.getHours() + ':' + startMinutes;
+                            $(".time-to-finish-task").val(dateTime);
+                        })
                         $('#name').val((endDate.getUTCDate() + '-' + ('0' + (endDate.getMonth() + 1)).slice(-2)) + ' - ' + $('#warehouse_value').val());
                         $(document).on('focusout', '.default-date-time-picker-now', function () {
                             var dateObj = new Date($('#start_new').val());
@@ -625,8 +650,9 @@
                     $('.default-date-time-picker-now').datetimepicker({
                         sideBySide: true,
                         format: "YYYY-MM-DD H:mm",
-                        stepping: 1
+                        stepping: 5
                     });
+
                 },
                 eventClick: function (info) {
                     let warehouse = null;
@@ -636,7 +662,8 @@
 
                     function prepareOrderList(item) {
                         let labels = ''
-                        let input = `<label>${item.name}<input class="export_to_new_group" name="new_group[]" type="checkbox" value="${item.id}"></label>`;
+                        let duplicates = item.order.similar
+                        let input = `<label>${item.name}<input data-orderid="${item.order.id}" data-duplicates="${duplicates ? duplicates.join(',') : ''}" class="export_to_new_group" name="new_group[]" type="checkbox" value="${item.id}"></label>`;
                         const route = "{{ route('orders.edit', ['id' => '%%']) }}";
                         if (item.order && item.order.labels) {
                             labels = item.order.labels.map((label) => {
@@ -644,10 +671,10 @@
                             })
                         }
                         let url = route.replace('%%', item.id);
-                        console.log(item)
                         let tooltipText = item.order.warehouse_notice ?? ''
                         let tooltipElement = item.order.warehouse_notice ? `<i title="${tooltipText}" data-toggle="tooltip" class="comment-icon fas fa-comment"></i>` : '';
-                        return input + labels + tooltipElement +`<a href="${url}">Edycja zlecenia</a>`
+                        duplicates = duplicates.length > 0 ? ' (D):' + duplicates.join(', (D)') : '';
+                        return input + labels + tooltipElement +`<a href="${url}">Edycja zlecenia</a>` + duplicates
                     }
 
                     $.ajax({
@@ -780,7 +807,7 @@
                             $('.default-date-time-picker-now').datetimepicker({
                                 sideBySide: true,
                                 format: "YYYY-MM-DD H:mm",
-                                stepping: 1
+                                stepping: 5
                             });
                             $('.default-date-picker-now').datetimepicker({
                                 sideBySide: true,
@@ -806,10 +833,21 @@
                             if (e.shiftKey && lastChecked) {
                                 let start = checkboxes.index(e.target);
                                 let end = checkboxes.index(lastChecked);
-                                checkboxes.slice(Math.min(start,end), Math.max(start,end)+ 1).prop('checked', lastChecked.checked);
-
+                                checkboxes.slice(Math.min(start,end), Math.max(start,end)+ 1).each((index, item) => {
+                                    item.checked = lastChecked.checked;
+                                    let values = item.dataset.duplicates.split(',');
+                                    values.map(val => {
+                                        $(`[data-orderid="${val}"]`).prop('checked', item.checked)
+                                    })
+                                });
+                            } else {
+                                let values = e.target.dataset.duplicates.split(',');
+                                values.map(val => {
+                                    $(`[data-orderid="${val}"]`).prop('checked', e.target.checked)
+                                })
                             }
                             lastChecked = e.target
+
                         });
                         var checkboxes = $('.export_to_new_group');
                         var lastChecked = null;
