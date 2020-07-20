@@ -1287,7 +1287,7 @@ class OrdersController extends Controller
             'warehouse_id' => $order->warehouse_id,
             'master_order_id' => $order->id
         ]);
-
+        $newOrder->getToken();
         $deliveryAddress = $this->orderAddressRepository->findWhere([
             'order_id' => $order->id,
             'type' => 'DELIVERY_ADDRESS',
