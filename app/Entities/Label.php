@@ -25,6 +25,7 @@ class Label extends Model implements Transformable
     const ORDER_ITEMS_UNDER_CONSTRUCTION = 49;
     const ORDER_ITEMS_CONSTRUCTED = 50;
     const IS_NOT_PAID = 119;
+    const ORDER_SURPLUS = 151;
     const FROM_SELLO = 119;
 
     const CHAT_TYPE = 'chat';

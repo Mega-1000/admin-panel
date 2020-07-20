@@ -1081,6 +1081,32 @@
             </tr>
             </tbody>
         </table>
+            <table style="width: 100%; float: left;" id="paymentsTable" class="table table-hover">
+                <thead>
+                <h3>Nadpłaty / zwroty użytkownika {{ $order->customer->login }}</h3>
+                <tr>
+                    <th>@lang('order_payments.table.payments')</th>
+                    <th>@lang('order_payments.table.return')</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach($order->customer->surplusPayments as $payment)
+                    <tr>
+                        <td>{{ $payment->surplus_amount }}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary openSurplusModal" style="display: block;"
+                                    data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->surplus_amount }}" data-surplus-id="{{ $payment->id }}">
+                                Zwrot
+                            </button>
+                            <button type="button" class="btn btn-secondary openPaymentModal" style="display: block;"
+                                    data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->surplus_amount }}">
+                                Przydziel
+                            </button>
+                        </td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
         <table style="width: 49%; margin-left: 1%; display: inline-block;" id="ordersTable" class="table table-hover">
             <thead>
             <tr>
@@ -1131,6 +1157,7 @@
                     <td>
                         <button id="moveButton-{{$itemOrder->id}}" class="btn btn-sm btn-warning edit move__payment--button" onclick="moveData({{$itemOrder->id}})">Przenieś wpłatę stąd</button>
                         <button id="moveButtonAjax-{{$itemOrder->id}}" class="btn btn-sm btn-success btn-move edit hidden" onclick="moveDataAjax({{$itemOrder->id}})">Przenieś dane tutaj</button>
+                        <button id="moveSurplus-{{$itemOrder->id}}" class="btn btn-sm btn-success edit move__payment--button" onclick="moveSurplus({{$itemOrder->id}})">Przenieś nadpłatę na konto klienta</button>
                     </td>
                 </tr>
             @endforeach
@@ -1202,6 +1229,30 @@
                             <input type="hidden" value="0" name="masterPaymentId">
                             <input type="hidden" value="0" name="masterPaymentAmount">
                         </div>
+                        <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Surplus return modal -->
+    <div class="modal fade" id="surplusModal" tabindex="-1" role="dialog" aria-labelledby="paymentModal"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Potwierdź zwrot pieniędzy dla użytkownika</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ action('OrdersPaymentsController@returnSurplusPayment') }}" method="POST">
+                        {{ csrf_field() }}
+                        <input type="text" class="form-control" id="surplus_amount" name="surplus_amount"
+                               value="0">
+                        <input type="hidden" id="user_surplus_id" name="user_surplus_id">
+                        <input type="hidden" id="surplus_customer_id" name="surplus_customer_id" value="{{ $order->customer_id }}">
                         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
                     </form>
                 </div>
@@ -4165,6 +4216,24 @@
                             $('#paymentModal').modal();
                         });
 
+                        $('.openSurplusModal').on('click', function () {
+                            let masterPaymentId = $(this).data('payment');
+                            let masterPaymentAmount = $(this).data('payment-amount');
+                            let surplusId = $(this).data('surplus-id');
+                            $('#surplusModal input[name="user_surplus_id"]').val(surplusId);
+                            $('#surplusModal input[name="masterPaymentAmount"]').val(masterPaymentAmount);
+                            $('input[name="surplus_amount"]').val(masterPaymentAmount);
+                            $('#surplusModal').modal();
+                        });
+
+                        $('.openPaymentModal').on('click', function () {
+                            let masterPaymentId = $(this).data('payment');
+                            let masterPaymentAmount = $(this).data('payment-amount');
+                            $('#paymentModal input[name="masterPaymentAmount"]').val(masterPaymentAmount);
+                            $('input[name="masterPaymentId"]').val(masterPaymentId);
+                            $('#paymentModal').modal();
+                        });
+
                         $('.openWarehousePaymentModal').on('click', function () {
                             let masterPaymentId = $(this).data('payment');
                             let masterPaymentAmount = $(this).data('payment-amount');
@@ -4248,6 +4317,44 @@
                                 $('#payment_move_data_error_select').modal('show');
                             }
                         }
+                        function moveSurplus(id){
+                            let surplusValue = $('#left-amount-' + id).data('value');
+                            if(Math.sign(surplusValue) === -1) {
+                                let paymentMoveAmount;
+                                surplusValue = Math.abs(surplusValue)
+                                console.log(surplusValue, 'xxasdsa')
+                                $('#surplus__order--id').val(id);
+                                $('#surplus__amount').val(surplusValue)
+                                $('#payment_move_surplus').modal('show');
+                            } else {
+                                $('#payment_move_data_error_select').modal('show');
+                            }
+                        }
+                        $('#payment-move-surplus-ok').on('click', function(){
+                            let orderId = $('#order_id').val();
+                            console.log(orderId);
+                            let surplusAmount = $('#surplus__amount').val();
+                            $.ajax({
+                                method: 'POST',
+                                url: '/admin/orders/'+orderId+'/surplus/move',
+                                data: {
+                                    orderId: orderId,
+                                    surplusAmount: surplusAmount
+                                }
+                            }).done(function(data) {
+                                $('#order_move_data_success').modal('show');
+
+                                $('#order_move_data_ok').on('click', function(){
+                                    window.location.href='/admin/orders';
+                                });
+                            }).fail(function() {
+                                $('#order_move_data_error').modal('show');
+                                $('#order_move_data_ok_error').on('click', function() {
+                                    window.location.href = '/admin/orders';
+
+                                });
+                            });
+                        });
                         $('#payment-move-data-ok').on('click', function(){
                             var idToGet = $('#order_id_get').text();
                             var idToSend = $('#order_id_send').text();

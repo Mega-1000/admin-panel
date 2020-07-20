@@ -16,6 +16,8 @@ use App\Entities\OrderPayment;
 use App\Entities\PackageTemplate;
 use App\Entities\Product;
 use App\Entities\Role;
+use App\Entities\UserSurplusPayment;
+use App\Entities\UserSurplusPaymentHistory;
 use App\Entities\Warehouse;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
@@ -2168,6 +2170,40 @@ class OrdersController extends Controller
             'promise' => '',
             'promise_date' => null,
         ]);
+
+        return response()->json('done', 200);
+    }
+
+    public function moveSurplus(Request $request, $orderId)
+    {
+        $order = $this->orderRepository->find($orderId);
+        if (empty($order)) {
+            abort(404);
+        }
+        $surplusAmount = $request->input('surplusAmount');
+
+        $userSurplusPayment = UserSurplusPayment::create([
+            'user_id' => $order->customer_id,
+            'surplus_amount' => $surplusAmount
+        ]);
+
+        $orderPayment = $order->payments()->where('promise', '')->where('amount', '>=', $surplusAmount)->first();
+
+        $orderPayment->update([
+            'amount' => $orderPayment->amount - $surplusAmount
+        ]);
+
+        $userSurplusPaymentHistory = UserSurplusPaymentHistory::create([
+            'user_id' => $order->customer_id,
+            'surplus_amount' => $surplusAmount,
+            'operation' => 'INCREASE',
+            'order_id' => $order->id,
+            'user_surplus_payment' => $userSurplusPayment->id
+        ]);
+
+        foreach($order->customer->orders as $order) {
+            dispatch_now(new AddLabelJob($order->id, [Label::ORDER_SURPLUS]));
+        }
 
         return response()->json('done', 200);
     }
