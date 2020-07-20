@@ -1038,24 +1038,6 @@
         // DataTable
         window.table = table = $('#dataTable').DataTable({
             language: {!! json_encode( __('voyager.datatable'), true) !!},
-            "initComplete": () => {
-                $('.order-id-checkbox').on('click', e => {
-                    if (e.shiftKey && lastChecked) {
-                        let start = checkboxes.index(e.target);
-                        let end = checkboxes.index(lastChecked);
-                        checkboxes.slice(Math.min(start, end), Math.max(start, end) + 1).each((index, item) => {
-                            item.checked = lastChecked.checked;
-                        });
-                    }
-                    lastChecked = e.target;
-
-                });
-                $('#selectAllOrders').on('click', e => {
-                    checkboxes.each((index, item) => { item.checked = e.target.checked });
-                })
-                var checkboxes = $('.order-id-checkbox');
-                var lastChecked = null;
-            },
             processing: true,
             serverSide: true,
             stateSave: true,
@@ -1933,6 +1915,25 @@
                 },
             ],
         });
+
+        window.table.on( 'draw', function () {
+
+            $('.order-id-checkbox').on('click', e => {
+                if (e.shiftKey && lastChecked) {
+                    let start = checkboxes.index(e.target);
+                    let end = checkboxes.index(lastChecked);
+                    checkboxes.slice(Math.min(start, end), Math.max(start, end) + 1).each((index, item) => {
+                        item.checked = lastChecked.checked;
+                    });
+                }
+                lastChecked = e.target;
+
+            });
+            $('#selectAllOrders').on('click', e => {
+                checkboxes.each((index, item) => { item.checked = e.target.checked });
+            })
+            var checkboxes = $('.order-id-checkbox');
+            var lastChecked = null;        } );
             @foreach($visibilities as $key =>$row)
         var {{'show'.$row->name}}  = @json($row->show);
         {{'show'.$row->name}} = {{'show'.$row->name}}.map(function (x) {
