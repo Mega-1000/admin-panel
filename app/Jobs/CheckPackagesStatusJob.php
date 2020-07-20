@@ -2,6 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Integrations\Pocztex\ElektronicznyNadawca;
+use App\Integrations\Pocztex\envelopeStatusType;
+use App\Integrations\Pocztex\getEnvelopeStatus;
 use App\Repositories\OrderPackageRepository;
 use GuzzleHttp\Client;
 use Illuminate\Bus\Queueable;
@@ -176,29 +179,22 @@ class CheckPackagesStatusJob
      */
     protected function checkStatusInPocztexPackages($package)
     {
-        $url = $this->config['pocztex']['tracking_url'] . $package->letter_number;
-
-        $guzzle = new \GuzzleHttp\Client;
-
-        $response = $guzzle->get($url, [
-            'headers' => [
-                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; …) Gecko/20100101 Firefox/65.0'
-            ]
-        ]);
-        $result = json_decode((string)$response->getBody(), true);
-
-        if (isset($result[0]['zdarzenia'])) {
-            foreach ($result[0]['zdarzenia'] as $item) {
-                if ($item['nazwa'] == 'Wysłanie z ładunkiem' || $item['nazwa'] == 'Nadanie') {
-                    $package->status = 'SENDING';
-                    $package->save();
-                } else {
-                    if ($item['nazwa'] == 'Doręczenie') {
-                        $package->status = 'DELIVERED';
-                        $package->save();
-                    }
-                }
-            }
+        $integration = new ElektronicznyNadawca();
+        $request = new getEnvelopeStatus();
+        $request->idEnvelope = $package->sending_number;
+        $status = $integration->getEnvelopeStatus($request);
+        switch ($status->envelopeStatus) {
+            case envelopeStatusType::PRZYJETY:
+            case envelopeStatusType::DOSTARCZONY:
+                $package->status = OrderPackage::DELIVERED;
+                break;
+            case envelopeStatusType::WYSLANY:
+            case envelopeStatusType::WALIDOWANY:
+                $package->status = OrderPackage::SENDING;
+                break;
+        }
+        if ($package->isDirty()) {
+            $package->save();
         }
     }
 
