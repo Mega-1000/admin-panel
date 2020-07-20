@@ -691,6 +691,7 @@ class OrdersPackagesController extends Controller
         }
         $data = [
             'order_id' => $order->id,
+            'symbol' => $package->symbol,
             'courier_type' => $package->delivery_courier_name,
             'courier_name' => $package->service_courier_name,
             'weight' => $package->weight,

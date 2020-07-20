@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
  */
 class Inpost
 {
+    const PACZKOMAT = 'PACZKOMAT';
     /**
      * @var
      */
@@ -59,14 +60,14 @@ class Inpost
                 'post_code' => $this->data['pickup_address']['postal_code'],
                 'country_code' => 'PL'
             ];
-            if ($this->data['courier_type'] == 'PACZKOMAT' && $this->allegro) {
+            if ($this->data['courier_type'] == self::PACZKOMAT && $this->allegro) {
                 $sections = [
                     'receiver' => [
                         'email' => $this->data['additional_data']['allegro_mail'],
                         'phone' => $this->data['delivery_address']['phone']
                     ],
                 ];
-            } else if ($this->data['courier_type'] == 'PACZKOMAT') {
+            } else if ($this->data['courier_type'] == self::PACZKOMAT) {
                 $sections = [
                     'receiver' => [
                         'email' => $this->data['delivery_address']['email'],
@@ -106,7 +107,7 @@ class Inpost
                         'address' => $addressSender
                     ]
             ];
-            if ($this->data['courier_type'] == 'PACZKOMAT' && $this->allegro) {
+            if ($this->data['courier_type'] == self::PACZKOMAT && $this->allegro) {
                 $sections += [
                     'custom_attributes' => [
                         'target_point' => $this->data['delivery_address']['lastname'],
@@ -122,27 +123,16 @@ class Inpost
                         'allegro_transaction_id' => $this->data['additional_data']['allegro_transaction_id'],
                         'allegro_user_id' => $this->data['additional_data']['allegro_user_id']
                     ]
-                ]; 
+                ];
             }
 
             $sections += [
                 'comments' => $this->data['notices']
             ];
 
+            $parcels = $this->prepareParcelArray();
             $sections += [
-                'parcels' => [
-                    'dimensions' => [
-                        'length' => $this->data['length'],
-                        'width' => $this->data['width'],
-                        'height' => $this->data['height'],
-                        'unit' => 'mm',
-                    ],
-                    'weight' => [
-                        'amount' => $this->data['weight'],
-                        'unit' => 'kg'
-                    ]
-
-                ]
+                'parcels' => [$parcels]
             ];
 
             if ($this->data['cash_on_delivery'] == true) {
@@ -158,18 +148,18 @@ class Inpost
                 ];
             }
 
-            if ($this->data['courier_type'] == 'PACZKOMAT' && $this->allegro) {
+            if ($this->data['courier_type'] == self::PACZKOMAT && $this->allegro) {
                 $sections += [
                     'service' => 'inpost_locker_allegro'
                 ];
-            } else if ($this->data['courier_type'] == 'PACZKOMAT') {
+            } else if ($this->data['courier_type'] == self::PACZKOMAT) {
                 $sections += [
                     'service' => 'inpost_locker_standard'
                 ];
-            } else if ($this->allegro) {               
-            $sections += [
-                    'service' => 'inpost_courier_allegro'
-                ];
+            } else if ($this->allegro) {
+                $sections += [
+                        'service' => 'inpost_courier_allegro'
+                    ];
             } else {
                 $sections += [
                     'service' => 'inpost_courier_standard',
@@ -263,5 +253,54 @@ class Inpost
         $result = json_decode($output);
 
         return $result;
+    }
+
+    /**
+     * @return string
+     */
+    protected function prepareTemplateForLocker(): string
+    {
+        $symbol = explode('_', $this->data['symbol']);
+        switch (strtolower($symbol[1])) {
+            case 'pa':
+                $template = "small";
+                break;
+            case 'pb' :
+                $template = "medium";
+                break;
+            case 'pc':
+                $template = "large";
+                break;
+            default:
+                $template = false;
+        }
+        return $template;
+    }
+
+    /**
+     * @return array
+     */
+    protected function prepareParcelArray(): array
+    {
+        $parcels = [];
+        $template = false;
+        if ($this->data['courier_type'] == self::PACZKOMAT) {
+            $template = $this->prepareTemplateForLocker();
+        }
+        if ($template) {
+            $parcels['template'] = $template;
+        }
+        $parcels ['dimensions'] = [
+            'length' => $this->data['length'],
+            'width' => $this->data['width'],
+            'height' => $this->data['height'],
+            'unit' => 'mm',
+        ];
+
+        $parcels ['weight'] = [
+            'amount' => $this->data['weight'],
+            'unit' => 'kg'
+        ];
+        return $parcels;
     }
 }
