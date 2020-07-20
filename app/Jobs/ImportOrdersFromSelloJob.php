@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\Product;
 use App\Entities\SelTransaction;
@@ -265,6 +266,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
     private function setLabels($order, $taskPrimalId)
     {
         $preventionArray = [];
+        $order->labels()->attach(Label::FROM_SELLO);
         dispatch_now(new RemoveLabelJob($order, [LabelsHelper::FINISH_LOGISTIC_LABEL_ID], $preventionArray, LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID));
         dispatch_now(new RemoveLabelJob($order, [LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID], $preventionArray, []));
         dispatch_now(new RemoveLabelJob($order, [LabelsHelper::WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID], $preventionArray, []));

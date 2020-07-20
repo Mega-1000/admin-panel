@@ -830,7 +830,7 @@ class TasksController extends Controller
     private function createNewGroup(\Illuminate\Support\Collection $newGroup, $task, $duration): void
     {
         $name = $newGroup->map(function ($item) {
-            return $item->id;
+            return $item->order_id;
         })->toArray();
         $taskNew = Task::create([
             'warehouse_id' => $task->warehouse_id,
