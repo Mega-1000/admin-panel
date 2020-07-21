@@ -210,7 +210,7 @@ class OrderBuilder
     private function assignItemsToOrder($order, $items)
     {
         $weight = 0;
-        $orderItems = $order->items();
+        $orderItems = $order->items;
         $order->items()->delete();
         $oldPrices = [];
 
@@ -234,7 +234,7 @@ class OrderBuilder
             $orderItem->quantity = $item['amount'];
             $orderItem->product_id = $product->id;
             foreach (OrderBuilder::getPriceColumns() as $column) {
-                if (!empty($item['old_price']) && isset($oldPrices[$product->id])) {
+                if (empty($item['recalculate']) && isset($oldPrices[$product->id])) {
                     $orderItem->$column = $oldPrices[$product->id][$column];
                 } else {
                     if ($column === "gross_selling_price_commercial_unit") {
