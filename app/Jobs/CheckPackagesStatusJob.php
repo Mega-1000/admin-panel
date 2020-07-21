@@ -181,10 +181,9 @@ class CheckPackagesStatusJob
     {
         $integration = new ElektronicznyNadawca();
         $request = new getEnvelopeStatus();
-        $request->idEnvelope = $package->sending_number;
+        $request->idEnvelope = 133520957;
         $status = $integration->getEnvelopeStatus($request);
         switch ($status->envelopeStatus) {
-            case envelopeStatusType::PRZYJETY:
             case envelopeStatusType::DOSTARCZONY:
                 $package->status = OrderPackage::DELIVERED;
                 break;
