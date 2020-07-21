@@ -289,6 +289,7 @@ class OrdersController extends Controller
         $couriers = \DB::table('order_packages')->distinct()->select('delivery_courier_name')->get();
         $warehouses = $this->warehouseRepository->findByField('symbol', 'MEGA-OLAWA');
 
+        $allWarehouses = Warehouse::all();
         $customColumnLabels = [];
         foreach ($labelGroups as $labelGroup) {
             $customColumnLabels[$labelGroup->name] = [];
@@ -355,7 +356,8 @@ class OrdersController extends Controller
             ->withLabIds($labIds)
             ->withLabels($labels)
             ->withDeliverers($deliverers)
-            ->withTemplateData($templateData);
+            ->withTemplateData($templateData)
+            ->withWarehouses($allWarehouses);
     }
 
     /**

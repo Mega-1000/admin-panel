@@ -149,5 +149,7 @@ return [
         'gross_payment_column_number' => 'numer kolumny płatności brutto',
         'letter_number_column_number' => 'numer kolumny z listem przewozowym',
         'name' => 'nazwa',
+        'date_to' => 'data początkowa',
+        'date_from' => 'data końcowa',
     ],
 ];

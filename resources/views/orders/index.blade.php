@@ -520,19 +520,35 @@
         <a name="actualization-price" target="_blank" class="btn btn-success" href="/admin/actualizationPrice">Wyślij
             prośbę o aktualizację cen</a>
     </div>
-    <div class="form-group">
-        <label for="protocols">Protokoły z dnia dzisiejszego</label>
-        <a name="protocols" target="_blank" class="btn btn-success"
-           href="/admin/orderPackages/inpost/protocols">Inpost</a>
-        <a name="protocols" target="_blank" class="btn btn-success" href="/admin/orderPackages/dpd/protocols">DPD</a>
-        <a name="protocols" target="_blank" class="btn btn-success" href="/admin/orderPackages/pocztex/protocols">Pocztex</a>
-        <a name="protocols" target="_blank" class="btn btn-success" href="/admin/orderPackages/apaczka/protocols">Apaczka</a>
-        <a name="protocols" target="_blank" class="btn btn-success" href="/admin/orderPackages/jas/protocols">Jas</a>
-        <a name="protocols" target="_blank" class="btn btn-success"
-           href="/admin/orderPackages/gielda/protocols">Gielda</a>
-        <a name="protocols" target="_blank" class="btn btn-info" href="/admin/orderPackages/all/protocols">Wszystkie
-            protokoły</a>
-    </div>
+    <form method="POST" action="{{ route('order_packages.getProtocols') }}">
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        <div class="form-group">
+            {{csrf_field()}}
+            <label for="protocols">Protokoły z dnia</label>
+            <input name="date_from" class="protocol_datepicker" id="protocol_datepicker_from" value="{{ Carbon\Carbon::now()->format('d/m/yy') }}"/>
+            do dnia
+            <input name="date_to" class="protocol_datepicker" id="protocol_datepicker_to" value="{{ Carbon\Carbon::now()->format('d/m/yy') }}"/>
+            z magazynu:
+            <input type="text" id="delivery_warehouse" name="delivery_warehouse"
+                       value="MEGA-OLAWA"/>
+            <input type="submit" name="courier" value="Inpost" target="_blank" class="btn btn-success" />
+            <input type="submit" name="courier" value="Dpd" target="_blank" class="btn btn-success" />
+            <input type="submit" name="courier" value="Pocztex" target="_blank" class="btn btn-success" />
+            <input type="submit" name="courier" value="Apaczka" target="_blank" class="btn btn-success" />
+            <input type="submit" name="courier" value="Jas" target="_blank" class="btn btn-success" />
+            <input type="submit" name="courier" value="Gielda" target="_blank" class="btn btn-success" >
+            <input type="submit" name="courier" value="Gls" target="_blank" class="btn btn-success" />
+            <input type="submit" name="courier" value="Wszystkie" target="_blank" class="btn btn-info" />
+        </div>
+    </form>
     <div class="form-group">
         <label for="send_courier">Wyślij kurierów: </label>
         <a name="send_courier" class="btn btn-success" href="/admin/orderPackages/INPOST/send">Inpost</a>
@@ -946,7 +962,19 @@
 @section('datatable-scripts')
     <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
     <script>
-
+        $('.protocol_datepicker').datepicker({ dateFormat: "dd/mm/yy"});
+        $(() => {
+            var available = [
+                @php
+                    foreach($warehouses as $item){
+                         echo '"'.$item->symbol.'",';
+                         }
+                @endphp
+            ];
+            $("#delivery_warehouse").autocomplete({
+                source: available
+            });
+        });
         $(function () {
             if (localStorage.getItem("filter") != null) {
                 $("#orderFilter").val(localStorage.getItem('filter')).prop('selected', true);

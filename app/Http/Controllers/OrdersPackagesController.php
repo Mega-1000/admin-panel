@@ -13,6 +13,7 @@ use App\Entities\PackingType;
 use App\Entities\SelAddress;
 use App\Entities\SelTransaction;
 use App\Helpers\OrderPackagesDataHelper;
+use App\Http\Requests\GetProtocolRequest;
 use App\Http\Requests\OrderPackageCreateRequest;
 use App\Http\Requests\OrderPackageUpdateRequest;
 use App\Integrations\GLS\GLSClient;
@@ -469,12 +470,16 @@ class OrdersPackagesController extends Controller
         ]);
     }
 
-    public function getProtocols($courierName)
+    public function getProtocols(GetProtocolRequest $request)
     {
-        if ($courierName !== 'all') {
+        $request->validated();
+
+        $courierName = strtoupper($request->courier);
+        if ($courierName !== 'Wszystkie') {
             $packages = $this->repository->findWhere([
                 ['delivery_courier_name', '=', $courierName],
-                ['shipment_date', '=', Carbon::today()],
+                ['shipment_date', '<=', Carbon::createFromFormat('d/m/yy',$request->date_to)],
+                ['shipment_date', '>=', Carbon::createFromFormat('d/m/yy', $request->date_from)],
                 ['status', '!=', 'CANCELLED'],
                 ['status', '!=', 'WAITING_FOR_CANCELLED'],
                 ['status', '!=', 'REJECT_CANCELLED'],
@@ -493,7 +498,7 @@ class OrdersPackagesController extends Controller
             $packagesArray = [];
             foreach ($packages as $package) {
                 if ($package->order->warehouse !== null) {
-                    if ($package->order->warehouse->symbol !== 'MEGA-OLAWA') {
+                    if ($package->order->warehouse->symbol !== $request->delivery_warehouse) {
                         continue;
                     }
                 }
