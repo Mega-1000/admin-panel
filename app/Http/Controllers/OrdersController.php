@@ -357,7 +357,7 @@ class OrdersController extends Controller
             ->withLabels($labels)
             ->withDeliverers($deliverers)
             ->withTemplateData($templateData)
-            ->withWarehouses($allWarehouses);
+            ->withAllWarehouses($allWarehouses);
     }
 
     /**

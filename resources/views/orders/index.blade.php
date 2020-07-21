@@ -966,7 +966,7 @@
         $(() => {
             var available = [
                 @php
-                    foreach($warehouses as $item){
+                    foreach($allWarehouses as $item){
                          echo '"'.$item->symbol.'",';
                          }
                 @endphp
