@@ -187,8 +187,7 @@ class CheckPackagesStatusJob
             case envelopeStatusType::DOSTARCZONY:
                 $package->status = OrderPackage::DELIVERED;
                 break;
-            case envelopeStatusType::WYSLANY:
-            case envelopeStatusType::WALIDOWANY:
+            case envelopeStatusType::PRZYJETY:
                 $package->status = OrderPackage::SENDING;
                 break;
         }
