@@ -294,9 +294,9 @@
             </div>
             <div class="form-group" style="width: 20%; float: left; padding: 5px;">
                 <label for="confirmed_sending_date_con_mag">@lang('orders.form.confirmed_sending_date_con_mag')</label>
-doda                <input type="text" class="form-control default-date-picker-now" id="confirmed_sending_date_con_mag"
-                       name="confirmed_sending_date_con_mag"
-                       value="{{ $order->confirmed_sending_date_con_mag ?? ''}}">
+                doda <input type="text" class="form-control default-date-picker-now" id="confirmed_sending_date_con_mag"
+                            name="confirmed_sending_date_con_mag"
+                            value="{{ $order->confirmed_sending_date_con_mag ?? ''}}">
             </div>
             <div class="form-group" style="width: 20%; float: left; padding: 5px;">
                 <label for="initial_pickup_date_client">@lang('orders.form.initial_pickup_date_client')</label>
@@ -333,25 +333,51 @@ doda                <input type="text" class="form-control default-date-picker-n
                 <input type="number" class="form-control" id="consultant_value" name="consultant_value"
                        value="{{ $order->consultant_value ?? ''}}">
             </div>
-            <div class="form-group" style="width: 50%; float: left; padding: 5px;">
-                <label for="warehouse_notice">@lang('orders.form.warehouse_notice')</label>
-                <textarea rows="5" cols="40" class="form-control" id="warehouse_notice"
-                          name="warehouse_notice">{{ $order->warehouse_notice ?? ''}}</textarea>
+            <div class="form-group" style="width: 25%; float: left; padding: 5px;">
+                <div>
+                    <label for="warehouse_notice">@lang('orders.form.warehouse_notice')</label>
+                    <textarea rows="5" cols="40" class="form-control" id="warehouse_notice"
+                              name="warehouse_notice" disabled>{{ $order->warehouse_notice ?? ''}}</textarea>
+                </div>
+                    <div class="flex-input">
+                        <input type="text" class="form-control" placeholder="@lang('orders.form.warehouse_notice')"
+                               id="{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}" name="warehouse_notice"/>
+                        <div class="input-group-append">
+                            <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}')"
+                                    class="btn btn-success" type="button">wyślij
+                            </button>
+                        </div>
+                    </div>
             </div>
-            <div class="form-group" style="width: 50%; float: left; padding: 5px;">
-                <label for="warehouse_notice">Informacje dla spedycji</label>
-                <textarea rows="5" cols="40" class="form-control" id="spedition_comment"
-                          name="spedition_comment">{{ $order->spedition_comment ?? ''}}</textarea>
+            <div class="form-group" style="width: 25%; float: left; padding: 5px;">
+                <div>
+                    <label for="spedition_comment">Informacje dla spedycji</label>
+                    <textarea class="form-control" rows="5" disabled>{{ $order->spedition_comment ?? ''}}</textarea>
+                    <div class="flex-input">
+                        <input type="text" class="form-control" placeholder="Informacje dla spedycji"
+                               id="{{ \App\Entities\Order::COMMENT_SHIPPING_TYPE }}" name="spedition_comment"/>
+                        <div class="input-group-append">
+                            <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_SHIPPING_TYPE }}')"
+                                    class="btn btn-success" type="button">wyślij
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="form-group" style="width: 50%; float: left; padding: 5px;">
-                <label for="consultant_notice">@lang('orders.form.consultant_notice')</label>
-                <textarea rows="5" cols="40" type="text" class="form-control" id="consultant_notice"
-                          name="consultant_notice">{{ $order->consultant_notice ?? ''}}</textarea>
-            </div>
-            <div class="form-group" style="width: 60%; float: left; padding: 5px;">
+            <div class="form-group" style="width: 25%; float: left; padding: 5px;">
                 <label for="consultant_notices">@lang('orders.form.consultant_notices')</label>
-                <textarea class="form-control" name="consultant_notices" id="consultant_notices"
+                <textarea disabled class="form-control" name="consultant_notices" id="consultant_notices"
                           rows="5">{{ $order->consultant_notices ?? ''}}</textarea>
+                <div class="flex-input">
+                    <input type="text" class="form-control" placeholder="@lang('orders.form.consultant_notices')"
+                           id="{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}" name="consultant_notices"/>
+                    <div class="input-group-append">
+                        <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}')"
+                                class="btn btn-success" type="button">wyślij
+                        </button>
+                    </div>
+                </div>
+
             </div>
             <div class="form-group" style="width: 40%; float: left; padding: 5px;">
                 <label for="remainder_date">@lang('orders.form.remainder_date')</label>
@@ -2342,6 +2368,23 @@ doda                <input type="text" class="form-control default-date-picker-n
 @endsection
 @section('datatable-scripts')
     <script type="application/javascript">
+        function sendComment(type) {
+            $.post(
+                {
+                    url: "{{route('orders.updateNotice')}}",
+                    data: {
+                        order_id: {{ $order->id }},
+                        message: $(`#${type}`).val(),
+                        type: type
+                    }
+                })
+                .done(() => location.reload())
+                .fail((response) => {
+                    var json = JSON.parse(response.responseText);
+                    alert(Object.values(json.errors));
+                })
+        }
+
         function removeLabel(id) {
             $.post(
                 {
