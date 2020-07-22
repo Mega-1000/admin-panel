@@ -48,6 +48,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\UrgentInvoiceRequest::class)->everyFifteenMinutes()->between('9:00', '17:00');
         $schedule->job(Jobs\CheckForHangedChats::class)->cron('0,15,30,45 7-17 * * 1-5');
         $schedule->job(Jobs\ConfirmSentPackagesJob::class)->dailyAt("23:34");
+        $schedule->job(Jobs\AutomaticallyFinishOrdersJob::class)->dailyAt("18:00");
     }
 
     /**

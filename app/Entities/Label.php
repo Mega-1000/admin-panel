@@ -27,6 +27,7 @@ class Label extends Model implements Transformable
     const IS_NOT_PAID = 119;
     const ORDER_SURPLUS = 151;
     const FROM_SELLO = 136;
+    const ORANGE_BAG = 51;
 
     const CHAT_TYPE = 'chat';
     const PAYMENTS_IDS_FOR_TABLE = [119, 134, 120, 101, 99, 102];
