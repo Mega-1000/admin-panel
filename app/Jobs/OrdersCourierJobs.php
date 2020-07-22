@@ -234,8 +234,12 @@ class OrdersCourierJobs extends Job
                 'email' => $this->data['delivery_address']['email'],
                 'phone' => $this->data['delivery_address']['phone']
             ];
+            $services = [];
+            if ($this->data['cash_on_delivery']) {
+                $services = ['cod' => ['amount' => $this->data['price_for_cash_on_delivery'], 'currency' => 'PLN']];
+            }
 
-            $result = $dpd->sendPackage($parcels, $receiver, 'SENDER', [], $this->data['notices']);
+            $result = $dpd->sendPackage($parcels, $receiver, 'SENDER', $services, $this->data['notices']);
 
             if ($result->success == false) {
                 Session::put('message', $result);
