@@ -253,6 +253,15 @@ class TasksController extends Controller
             'user_id' => $request->user_id
         ];
 
+        if (!empty($request->order_id)) {
+            $count = Task::where('order_id', $request->order_id)->count();
+            if ($count) {
+                return redirect()->route('planning.timetable.index')->with([
+                    'message' => __('tasks.messages.task_with_order_exist'),
+                    'alert-type' => 'error'
+                ]);
+            }
+        }
         $allow = TaskTimeHelper::allowTaskMove($dataToStore);
         if ($allow === true) {
             $dataToStore = $request->all();

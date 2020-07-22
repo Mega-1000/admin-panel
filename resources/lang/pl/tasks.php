@@ -39,5 +39,6 @@ return [
         'update' => 'Zadanie zostało pomyślnie zaktualizowane',
         'update_error' => 'Zadanie nie zostało zaktualizowane',
         'cannot_delete_ask_warehouse' => 'Zadanie nie zostało zaktualizowane. Skontaktuj się z magazynem',
+        'task_with_order_exist' => 'Już istnieje zadanie dla danego zamówienia',
     ]
 ];
