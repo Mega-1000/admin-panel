@@ -192,7 +192,8 @@
                        value="{{ $order->shipment_price_for_client ?? '' }}">
             </div>
             <div class="form-group" style="width: 15%; float: left; padding: 5px;">
-                <label for="shipment_price_for_client_automatic">@lang('orders.form.shipment_price_for_client_automatic')</label>
+                <label
+                    for="shipment_price_for_client_automatic">@lang('orders.form.shipment_price_for_client_automatic')</label>
                 <input disabled type="text" class="form-control sumChange" id="shipment_price_for_client_automatic"
                        name="shipment_price_for_client_automatic"
                        value="{{ $clientTotalCost ?? '' }}">
@@ -202,10 +203,12 @@
                 <input type="text" class="form-control priceChange sumChange" id="shipment_price_for_us"
                        name="shipment_price_for_us"
                        value="{{ $order->shipment_price_for_us ?? '' }}">
-                <label for="shipment_price_for_us_automatic">@lang('orders.form.shipment_price_for_us_automatic')</label>
-                <input disabled type="text" class="form-control priceChange sumChange" id="shipment_price_for_us_automatic"
-                   name="shipment_price_for_us_automatic"
-                   value="{{ $ourTotalCost ?? '' }}">
+                <label
+                    for="shipment_price_for_us_automatic">@lang('orders.form.shipment_price_for_us_automatic')</label>
+                <input disabled type="text" class="form-control priceChange sumChange"
+                       id="shipment_price_for_us_automatic"
+                       name="shipment_price_for_us_automatic"
+                       value="{{ $ourTotalCost ?? '' }}">
             </div>
             <div class="form-group" style="width: 15%; float: left; padding: 5px;">
                 <label for="proposed_payment">Proponowana zaliczka brutto</label>
@@ -272,48 +275,58 @@
             </div>
             <div class="form-group" style="width: 20%; float: left; padding: 5px;">
                 <label for="initial_sending_date_client">@lang('orders.form.initial_sending_date_client')</label>
-                <input  type="text" class="form-control default-date-picker-now"  id="initial_sending_date_client" name="initial_sending_date_client"
-                       value="{{ $order->initial_sending_date_client ?? ''}}" >
+                <input type="text" class="form-control default-date-picker-now" id="initial_sending_date_client"
+                       name="initial_sending_date_client"
+                       value="{{ $order->initial_sending_date_client ?? ''}}">
             </div>
             <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                <label for="initial_sending_date_consultant">@lang('orders.form.initial_sending_date_consultant')</label>
-                <input  type="text" class="form-control default-date-picker-now"  id="initial_sending_date_consultant" name="initial_sending_date_consultant"
-                       value="{{ $order->initial_sending_date_consultant ?? ''}}" >
+                <label
+                    for="initial_sending_date_consultant">@lang('orders.form.initial_sending_date_consultant')</label>
+                <input type="text" class="form-control default-date-picker-now" id="initial_sending_date_consultant"
+                       name="initial_sending_date_consultant"
+                       value="{{ $order->initial_sending_date_consultant ?? ''}}">
             </div>
             <div class="form-group" style="width: 20%; float: left; padding: 5px;">
                 <label for="initial_sending_date_magazine">@lang('orders.form.initial_sending_date_magazine')</label>
-                <input  type="text" class="form-control default-date-picker-now"  id="initial_sending_date_magazine" name="initial_sending_date_magazine"
-                       value="{{ $order->initial_sending_date_magazine ?? ''}}" >
+                <input type="text" class="form-control default-date-picker-now" id="initial_sending_date_magazine"
+                       name="initial_sending_date_magazine"
+                       value="{{ $order->initial_sending_date_magazine ?? ''}}">
             </div>
             <div class="form-group" style="width: 20%; float: left; padding: 5px;">
                 <label for="confirmed_sending_date_con_mag">@lang('orders.form.confirmed_sending_date_con_mag')</label>
-                <input  type="text" class="form-control default-date-picker-now"  id="confirmed_sending_date_con_mag" name="confirmed_sending_date_con_mag"
-                       value="{{ $order->confirmed_sending_date_con_mag ?? ''}}" >
+doda                <input type="text" class="form-control default-date-picker-now" id="confirmed_sending_date_con_mag"
+                       name="confirmed_sending_date_con_mag"
+                       value="{{ $order->confirmed_sending_date_con_mag ?? ''}}">
             </div>
             <div class="form-group" style="width: 20%; float: left; padding: 5px;">
                 <label for="initial_pickup_date_client">@lang('orders.form.initial_pickup_date_client')</label>
-                <input  type="text" class="form-control default-date-time-picker-now"  id="initial_pickup_date_client" name="initial_pickup_date_client"
-                       value="{{ $order->initial_pickup_date_client ?? ''}}" >
+                <input type="text" class="form-control default-date-time-picker-now" id="initial_pickup_date_client"
+                       name="initial_pickup_date_client"
+                       value="{{ $order->initial_pickup_date_client ?? ''}}">
             </div>
             <div class="form-group" style="width: 20%; float: left; padding: 5px;">
                 <label for="confirmed_pickup_date_client">@lang('orders.form.confirmed_pickup_date_client')</label>
-                <input  type="text" class="form-control default-date-time-picker-now"  id="confirmed_pickup_date_client" name="confirmed_pickup_date_client"
-                       value="{{ $order->confirmed_pickup_date_client ?? ''}}" >
+                <input type="text" class="form-control default-date-time-picker-now" id="confirmed_pickup_date_client"
+                       name="confirmed_pickup_date_client"
+                       value="{{ $order->confirmed_pickup_date_client ?? ''}}">
             </div>
             <div class="form-group" style="width: 20%; float: left; padding: 5px;">
                 <label for="confirmed_pickup_date_con_mag">@lang('orders.form.confirmed_pickup_date_con_mag')</label>
-                <input  type="text" class="form-control default-date-time-picker-now"  id="confirmed_pickup_date_con_mag" name="confirmed_pickup_date_con_mag"
-                       value="{{ $order->confirmed_pickup_date_con_mag ?? ''}}" >
+                <input type="text" class="form-control default-date-time-picker-now" id="confirmed_pickup_date_con_mag"
+                       name="confirmed_pickup_date_con_mag"
+                       value="{{ $order->confirmed_pickup_date_con_mag ?? ''}}">
             </div>
             <div class="form-group" style="width: 20%; float: left; padding: 5px;">
                 <label for="initial_delivery_date_con_mag">@lang('orders.form.initial_delivery_date_con_mag')</label>
-                <input  type="text" class="form-control default-date-time-picker-now"  id="initial_delivery_date_con_mag" name="initial_delivery_date_con_mag"
-                       value="{{ $order->initial_delivery_date_con_mag ?? ''}}" >
+                <input type="text" class="form-control default-date-time-picker-now" id="initial_delivery_date_con_mag"
+                       name="initial_delivery_date_con_mag"
+                       value="{{ $order->initial_delivery_date_con_mag ?? ''}}">
             </div>
             <div class="form-group" style="width: 20%; float: left; padding: 5px;">
                 <label for="confirmed_delivery_date">@lang('orders.form.confirmed_delivery_date')</label><br><br>
-                <input  type="text" class="form-control default-date-time-picker-now"  id="confirmed_delivery_date" name="confirmed_delivery_date"
-                       value="{{ $order->confirmed_delivery_date ?? ''}}" >
+                <input type="text" class="form-control default-date-time-picker-now" id="confirmed_delivery_date"
+                       name="confirmed_delivery_date"
+                       value="{{ $order->confirmed_delivery_date ?? ''}}">
             </div>
             <div class="form-group" style="width: 25%; float: left; padding: 5px;">
                 <label for="consultant_value">@lang('orders.form.consultant_value')</label>
@@ -978,8 +991,13 @@
             </div>
             <h3>Etykiety</h3>
             @foreach($order->labels as $label)
-                <span style="color: {{ $label->font_color }}; margin-top: 5px; background-color:{{ $label->color }}"><i
-                        style="font-size: 1rem" class="{{ $label->icon_name }}"></i> {{ $label->name }}</span>
+                <div class="border" id="label_{{ $label->id }}">
+                    <i onclick="removeLabel({{ $label->id }})" style="cursor: pointer; color: red"
+                       class="fas fa-times-circle"></i>
+                    <span
+                        style="color: {{ $label->font_color }}; margin-top: 5px; background-color:{{ $label->color }}"><i
+                            style="font-size: 1rem" class="{{ $label->icon_name }}"></i> {{ $label->name }}</span>
+                </div>
             @endforeach
         </div>
 
@@ -1081,32 +1099,33 @@
             </tr>
             </tbody>
         </table>
-            <table style="width: 100%; float: left;" id="paymentsTable" class="table table-hover">
-                <thead>
-                <h3>Nadpłaty / zwroty użytkownika {{ $order->customer->login }}</h3>
+        <table style="width: 100%; float: left;" id="paymentsTable" class="table table-hover">
+            <thead>
+            <h3>Nadpłaty / zwroty użytkownika {{ $order->customer->login }}</h3>
+            <tr>
+                <th>@lang('order_payments.table.payments')</th>
+                <th>@lang('order_payments.table.return')</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach($order->customer->surplusPayments as $payment)
                 <tr>
-                    <th>@lang('order_payments.table.payments')</th>
-                    <th>@lang('order_payments.table.return')</th>
+                    <td>{{ $payment->surplus_amount }}</td>
+                    <td>
+                        <button type="button" class="btn btn-primary openSurplusModal" style="display: block;"
+                                data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->surplus_amount }}"
+                                data-surplus-id="{{ $payment->id }}">
+                            Zwrot
+                        </button>
+                        <button type="button" class="btn btn-secondary openPaymentModal" style="display: block;"
+                                data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->surplus_amount }}">
+                            Przydziel
+                        </button>
+                    </td>
                 </tr>
-                </thead>
-                <tbody>
-                @foreach($order->customer->surplusPayments as $payment)
-                    <tr>
-                        <td>{{ $payment->surplus_amount }}</td>
-                        <td>
-                            <button type="button" class="btn btn-primary openSurplusModal" style="display: block;"
-                                    data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->surplus_amount }}" data-surplus-id="{{ $payment->id }}">
-                                Zwrot
-                            </button>
-                            <button type="button" class="btn btn-secondary openPaymentModal" style="display: block;"
-                                    data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->surplus_amount }}">
-                                Przydziel
-                            </button>
-                        </td>
-                    </tr>
-                @endforeach
-                </tbody>
-            </table>
+            @endforeach
+            </tbody>
+        </table>
         <table style="width: 49%; margin-left: 1%; display: inline-block;" id="ordersTable" class="table table-hover">
             <thead>
             <tr>
@@ -1148,16 +1167,26 @@
                         @endphp
                     @endforeach
                     <td>{{ $paymentsValue }}</td>
-                    <td id="left-amount-{{$itemOrder->id}}" data-value="{{ $orderValue - ($paymentsValue ?? 0) }}">{{ $orderValue - ($paymentsValue ?? 0) }}</td>
+                    <td id="left-amount-{{$itemOrder->id}}"
+                        data-value="{{ $orderValue - ($paymentsValue ?? 0) }}">{{ $orderValue - ($paymentsValue ?? 0) }}</td>
                     <td>
                         @foreach($itemOrder->promisePayments($itemOrder->id) as $payment)
                             {{ $payment->amount }}
                         @endforeach
                     </td>
                     <td>
-                        <button id="moveButton-{{$itemOrder->id}}" class="btn btn-sm btn-warning edit move__payment--button" onclick="moveData({{$itemOrder->id}})">Przenieś wpłatę stąd</button>
-                        <button id="moveButtonAjax-{{$itemOrder->id}}" class="btn btn-sm btn-success btn-move edit hidden" onclick="moveDataAjax({{$itemOrder->id}})">Przenieś dane tutaj</button>
-                        <button id="moveSurplus-{{$itemOrder->id}}" class="btn btn-sm btn-success edit move__payment--button" onclick="moveSurplus({{$itemOrder->id}})">Przenieś nadpłatę na konto klienta</button>
+                        <button id="moveButton-{{$itemOrder->id}}"
+                                class="btn btn-sm btn-warning edit move__payment--button"
+                                onclick="moveData({{$itemOrder->id}})">Przenieś wpłatę stąd
+                        </button>
+                        <button id="moveButtonAjax-{{$itemOrder->id}}"
+                                class="btn btn-sm btn-success btn-move edit hidden"
+                                onclick="moveDataAjax({{$itemOrder->id}})">Przenieś dane tutaj
+                        </button>
+                        <button id="moveSurplus-{{$itemOrder->id}}"
+                                class="btn btn-sm btn-success edit move__payment--button"
+                                onclick="moveSurplus({{$itemOrder->id}})">Przenieś nadpłatę na konto klienta
+                        </button>
                     </td>
                 </tr>
             @endforeach
@@ -1252,7 +1281,8 @@
                         <input type="text" class="form-control" id="surplus_amount" name="surplus_amount"
                                value="0">
                         <input type="hidden" id="user_surplus_id" name="user_surplus_id">
-                        <input type="hidden" id="surplus_customer_id" name="surplus_customer_id" value="{{ $order->customer_id }}">
+                        <input type="hidden" id="surplus_customer_id" name="surplus_customer_id"
+                               value="{{ $order->customer_id }}">
                         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
                     </form>
                 </div>
@@ -1260,7 +1290,8 @@
         </div>
     </div>
     <!-- Warehouse payment modal -->
-    <div class="modal fade" id="warehousePaymentModal" tabindex="-1" role="dialog" aria-labelledby="warehousePaymentModal"
+    <div class="modal fade" id="warehousePaymentModal" tabindex="-1" role="dialog"
+         aria-labelledby="warehousePaymentModal"
          aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -1411,7 +1442,7 @@
                 czy zaktualizować telefon w adresie dostawy
                 <input type="checkbox" name="delivery_phone"/>
             </label>
-            <input value="Nadpisz dane" type="submit" />
+            <input value="Nadpisz dane" type="submit"/>
         </form>
     </div>
     <div class="spedition-payments" id="spedition-payments">
@@ -1445,12 +1476,15 @@
                 <td>
                     @if($order->invoices !== null || count($order->invoices) > 0)
                         @foreach($order->invoices as $invoice)
-                            <a target="_blank" href="/storage/invoices/{{ $invoice->invoice_name }}" style="margin-top: 5px;">Faktura</a>
+                            <a target="_blank" href="/storage/invoices/{{ $invoice->invoice_name }}"
+                               style="margin-top: 5px;">Faktura</a>
                         @endforeach
                     @elseif($order->invoiceRequests !== null || count($order->invoiceRequests) > 0)
                         <p class="invoice__request--sent">Prośba o fakturę została już wysłana.</p>
                     @else
-                        <button class="btn btn-sm btn-success" onclick="sendInvoiceRequest({{$itemOrder->id}})">Poproś o fakturę</button>
+                        <button class="btn btn-sm btn-success" onclick="sendInvoiceRequest({{$itemOrder->id}})">Poproś o
+                            fakturę
+                        </button>
                     @endif
                 </td>
                 <td>{{ $order->status->name }}</td>
@@ -1474,7 +1508,8 @@
                 <td>
                     <h5 class="payment__accepted">Do zapłaty: {{ $paymentsValue }}</h5>
                 </td>
-                <td id="left-amount-{{$order->id}}" data-value="{{ $orderValue - ($paymentsValue ?? 0) }}">{{ $orderValue - ($paymentsValue ?? 0) }}</td>
+                <td id="left-amount-{{$order->id}}"
+                    data-value="{{ $orderValue - ($paymentsValue ?? 0) }}">{{ $orderValue - ($paymentsValue ?? 0) }}</td>
             </tr>
             <tr>
                 <td><h2>Suma faktur: <b style="color: red;">{{ $sumOfOrders }} zł</b></h2></td>
@@ -2305,2083 +2340,2104 @@
         }
     </style>
 @endsection
-                @section('datatable-scripts')
-                    <script type="application/javascript">
-                        $(document).ready(function () {
-                            $(function () {
-                                var available = [
-                                    @php
-                                        foreach($warehouses as $item){
-                                             echo '"'.$item->symbol.'",';
-                                             }
-                                    @endphp
-                                ];
-                                $("#delivery_warehouse").autocomplete({
-                                    source: available
-                                });
-                            });
-                            $(function () {
-                                var available = [
-                                    @php
-                                        foreach($firms as $item){
-                                             echo '"'.$item->symbol.'",';
-                                             }
-                                    @endphp
-                                ];
-                                $("#firms_data").autocomplete({
-                                    source: available
-                                });
-                            });
+@section('datatable-scripts')
+    <script type="application/javascript">
+        function removeLabel(id) {
+            $.post(
+                {
+                    url: "{{route('orders.detachLabel')}}",
+                    data: {
+                        order_id: {{ $order->id }},
+                        label_id: id,
+                    }
+                })
+                .done(() => $(`#label_${id}`).remove())
+                .fail((response) => {
+                    var json = JSON.parse(response.responseText);
+                    alert(Object.values(json.errors));
+                })
+        }
 
-                            var general = $('#general').show();
-                            var payments = $('#order-payments').hide();
-                            var tasks = $('#order-tasks').hide();
-                            var packages = $('#order-packages').hide();
-                            var messages = $('#order-messages').hide();
-                            var warehousePayments = $('#warehouse-payments').hide();
-                            var speditionPayments = $('#spedition-payments').hide();
-                            var status = $('#order-status').hide();
-                            var customer = $('#order-customer').hide();
-                            var pageTitle = $('.page-title').children('i');
-                            var createButtonOrderPayments = $('#create-button-orderPayments').hide();
-                            var createButtonOrderTasks = $('#create-button-orderTasks').hide();
-                            var createButtonOrderPackages = $('#create-button-orderPackages').hide();
-                            var uri = $('#uri').val()
-                            var value;
-                            var referrer = document.referrer;
-                            var breadcrumb = $('.breadcrumb');
-                            var item = '{{old('tab')}}';
-                            var addOrder = $('#new-order');
-                            addOrder.hide();
-                            breadcrumb.children().remove();
-                            breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");
-                            breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit'>Zamówienia</a></li>");
-                            breadcrumb.append("<li class='disable'><a href='javascript:void()'>Edytuj</a></li>");
-                            if (referrer.search('orderPayments') != -1 || uri.search('orderPayments') != -1 || item === 'orderPayments') {
-                                $('#button-general').removeClass('active');
-                                $('#button-tasks').removeClass('active');
-                                $('#button-messages').removeClass('active');
-                                $('#button-payments').addClass('active');
-                                $('#button-packages').removeClass('active');
-                                $('#button-customer').removeClass('active');
-                                $('#submit').hide();
-                                $('#submitOrder').hide();
-                                general.hide();
-                                tasks.hide();
-                                payments.show();
-                                packages.hide();
-                                customer.hide();
-                                messages.hide();
-                                status.hide();
-                                warehousePayments.hide();
-                                speditionPayments.hide();
-                                createButtonOrderPayments.show();
-                                createButtonOrderPackages.hide();
-                                createButtonOrderTasks.hide();
-                                pageTitle.removeClass();
-                                pageTitle.addClass('voyager-wallet');
-                                breadcrumb.children().last().remove();
-                                breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#order-payments'>Płatności</a></li>");
-                                addOrder.hide();
+        $(document).ready(function () {
+            $(function () {
+                var available = [
+                    @php
+                        foreach($warehouses as $item){
+                             echo '"'.$item->symbol.'",';
+                             }
+                    @endphp
+                ];
+                $("#delivery_warehouse").autocomplete({
+                    source: available
+                });
+            });
+            $(function () {
+                var available = [
+                    @php
+                        foreach($firms as $item){
+                             echo '"'.$item->symbol.'",';
+                             }
+                    @endphp
+                ];
+                $("#firms_data").autocomplete({
+                    source: available
+                });
+            });
 
-                            } else if (referrer.search('orderTasks') != -1 || uri.search('orderTasks') != -1 || item === 'orderTasks') {
-                                $('#button-general').removeClass('active');
-                                $('#button-tasks').addClass('active');
-                                $('#button-messages').removeClass('active');
-                                $('#button-payments').removeClass('active');
-                                $('#button-packages').removeClass('active');
-                                $('#button-customer').removeClass('active');
-                                $('#submit').hide();
-                                $('#submitOrder').hide();
-                                general.hide();
-                                tasks.show();
-                                payments.hide();
-                                packages.hide();
-                                customer.hide();
-                                messages.hide();
-                                warehousePayments.hide();
-                                speditionPayments.hide();
-                                status.hide();
-                                createButtonOrderPayments.hide();
-                                createButtonOrderPackages.hide();
-                                createButtonOrderTasks.show();
-                                pageTitle.removeClass();
-                                pageTitle.addClass('voyager-calendar');
+            var general = $('#general').show();
+            var payments = $('#order-payments').hide();
+            var tasks = $('#order-tasks').hide();
+            var packages = $('#order-packages').hide();
+            var messages = $('#order-messages').hide();
+            var warehousePayments = $('#warehouse-payments').hide();
+            var speditionPayments = $('#spedition-payments').hide();
+            var status = $('#order-status').hide();
+            var customer = $('#order-customer').hide();
+            var pageTitle = $('.page-title').children('i');
+            var createButtonOrderPayments = $('#create-button-orderPayments').hide();
+            var createButtonOrderTasks = $('#create-button-orderTasks').hide();
+            var createButtonOrderPackages = $('#create-button-orderPackages').hide();
+            var uri = $('#uri').val()
+            var value;
+            var referrer = document.referrer;
+            var breadcrumb = $('.breadcrumb');
+            var item = '{{old('tab')}}';
+            var addOrder = $('#new-order');
+            addOrder.hide();
+            breadcrumb.children().remove();
+            breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");
+            breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit'>Zamówienia</a></li>");
+            breadcrumb.append("<li class='disable'><a href='javascript:void()'>Edytuj</a></li>");
+            if (referrer.search('orderPayments') != -1 || uri.search('orderPayments') != -1 || item === 'orderPayments') {
+                $('#button-general').removeClass('active');
+                $('#button-tasks').removeClass('active');
+                $('#button-messages').removeClass('active');
+                $('#button-payments').addClass('active');
+                $('#button-packages').removeClass('active');
+                $('#button-customer').removeClass('active');
+                $('#submit').hide();
+                $('#submitOrder').hide();
+                general.hide();
+                tasks.hide();
+                payments.show();
+                packages.hide();
+                customer.hide();
+                messages.hide();
+                status.hide();
+                warehousePayments.hide();
+                speditionPayments.hide();
+                createButtonOrderPayments.show();
+                createButtonOrderPackages.hide();
+                createButtonOrderTasks.hide();
+                pageTitle.removeClass();
+                pageTitle.addClass('voyager-wallet');
+                breadcrumb.children().last().remove();
+                breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#order-payments'>Płatności</a></li>");
+                addOrder.hide();
 
-                                breadcrumb.children().last().remove();
-                                breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#employees'>Zadania</a></li>");
-                                addOrder.hide();
+            } else if (referrer.search('orderTasks') != -1 || uri.search('orderTasks') != -1 || item === 'orderTasks') {
+                $('#button-general').removeClass('active');
+                $('#button-tasks').addClass('active');
+                $('#button-messages').removeClass('active');
+                $('#button-payments').removeClass('active');
+                $('#button-packages').removeClass('active');
+                $('#button-customer').removeClass('active');
+                $('#submit').hide();
+                $('#submitOrder').hide();
+                general.hide();
+                tasks.show();
+                payments.hide();
+                packages.hide();
+                customer.hide();
+                messages.hide();
+                warehousePayments.hide();
+                speditionPayments.hide();
+                status.hide();
+                createButtonOrderPayments.hide();
+                createButtonOrderPackages.hide();
+                createButtonOrderTasks.show();
+                pageTitle.removeClass();
+                pageTitle.addClass('voyager-calendar');
 
-                            } else if (referrer.search('orderPackages') != -1 || uri.search('orderPackages') != -1 || item === 'orderPackages') {
-                                $('#button-general').removeClass('active');
-                                $('#button-tasks').removeClass('active');
-                                $('#button-messages').removeClass('active');
-                                $('#button-payments').removeClass('active');
-                                $('#button-packages').addClass('active');
-                                $('#button-customer').removeClass('active');
-                                $('#submit').hide();
-                                $('#submitOrder').hide();
-                                general.hide();
-                                tasks.hide();
-                                payments.hide();
-                                packages.show();
-                                customer.hide();
-                                messages.hide();
-                                warehousePayments.hide();
-                                speditionPayments.hide();
-                                createButtonOrderPayments.hide();
-                                createButtonOrderPackages.show();
-                                createButtonOrderTasks.hide();
-                                pageTitle.removeClass();
-                                pageTitle.addClass('voyager-archive');
+                breadcrumb.children().last().remove();
+                breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#employees'>Zadania</a></li>");
+                addOrder.hide();
 
-                                breadcrumb.children().last().remove();
-                                breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit'>Paczki</a></li>");
-                                addOrder.hide();
-                            } else if (referrer.search('orderMessages') != -1 || uri.search('orderMessages') != -1 || item === 'orderMessages') {
-                                $('#button-general').removeClass('active');
-                                $('#button-tasks').removeClass('active');
-                                $('#button-messages').addClass('active');
-                                $('#button-payments').removeClass('active');
-                                $('#button-packages').removeClass('active');
-                                $('#button-customer').removeClass('active');
-                                $('#submit').hide();
-                                $('#submitOrder').hide();
-                                general.hide();
-                                tasks.hide();
-                                payments.hide();
-                                packages.hide();
-                                customer.hide();
-                                messages.show();
-                                warehousePayments.hide();
-                                speditionPayments.hide();
-                                createButtonOrderPayments.hide();
-                                createButtonOrderPackages.hide();
-                                createButtonOrderTasks.hide();
-                                pageTitle.removeClass();
-                                pageTitle.addClass('voyager-chat');
+            } else if (referrer.search('orderPackages') != -1 || uri.search('orderPackages') != -1 || item === 'orderPackages') {
+                $('#button-general').removeClass('active');
+                $('#button-tasks').removeClass('active');
+                $('#button-messages').removeClass('active');
+                $('#button-payments').removeClass('active');
+                $('#button-packages').addClass('active');
+                $('#button-customer').removeClass('active');
+                $('#submit').hide();
+                $('#submitOrder').hide();
+                general.hide();
+                tasks.hide();
+                payments.hide();
+                packages.show();
+                customer.hide();
+                messages.hide();
+                warehousePayments.hide();
+                speditionPayments.hide();
+                createButtonOrderPayments.hide();
+                createButtonOrderPackages.show();
+                createButtonOrderTasks.hide();
+                pageTitle.removeClass();
+                pageTitle.addClass('voyager-archive');
 
-                                breadcrumb.children().last().remove();
-                                breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#employees'>Zadania</a></li>");
-                                addOrder.hide();
-                            }
-                            $('[name="change-button-form"]').on('click', function () {
-                                value = this.value;
-                                $('#' + value).show();
-                                if (value === 'general') {
-                                    $('#button-general').addClass('active');
-                                    $('#button-tasks').removeClass('active');
-                                    $('#button-messages').removeClass('active');
-                                    $('#button-payments').removeClass('active');
-                                    $('#button-packages').removeClass('active');
-                                    $('#button-customer').removeClass('active');
-                                    $('#button-warehouse-payments').removeClass('active');
-                                    $('#button-spedition-payments').removeClass('active');
-                                    speditionPayments.hide();
-                                    warehousePayments.hide();
-                                    general.show();
-                                    tasks.hide();
-                                    payments.hide();
-                                    packages.hide();
-                                    customer.hide();
-                                    messages.hide();
-                                    status.hide();
-                                    $('#submit').show();
-                                    $('#submitOrder').show();
-                                    pageTitle.removeClass();
-                                    pageTitle.addClass('voyager-file-text');
-                                    createButtonOrderPayments.hide();
-                                    createButtonOrderPackages.hide();
-                                    createButtonOrderTasks.hide();
-                                    breadcrumb.children().remove();
-                                    breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");
-                                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit'>Zamówienia</a></li>");
-                                    breadcrumb.append("<li class='disable'><a href='javascript:void()'>Edytuj</a></li>");
-                                    addOrder.hide();
-                                } else if (value === 'tasks') {
-                                    $('#button-general').removeClass('active');
-                                    $('#button-tasks').addClass('active');
-                                    $('#button-messages').removeClass('active');
-                                    $('#button-payments').removeClass('active');
-                                    $('#button-packages').removeClass('active');
-                                    $('#button-customer').removeClass('active');
-                                    $('#submit').hide();
-                                    $('#submitOrder').hide();
-                                    $('#button-warehouse-payments').removeClass('active');
-                                    $('#button-spedition-payments').removeClass('active');
-                                    speditionPayments.hide();
-                                    warehousePayments.hide();
-                                    general.hide();
-                                    tasks.show();
-                                    payments.hide();
-                                    packages.hide();
-                                    messages.hide();
-                                    customer.hide();
-                                    status.hide();
-                                    pageTitle.removeClass();
-                                    pageTitle.addClass('voyager-calendar');
-                                    createButtonOrderPayments.hide();
-                                    createButtonOrderPackages.hide();
-                                    createButtonOrderTasks.show();
-                                    breadcrumb.children().last().remove();
-                                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#order-tasks'>Zadania</a></li>");
-                                    addOrder.hide();
-                                } else if (value === 'payments') {
-                                    $('#button-general').removeClass('active');
-                                    $('#button-tasks').removeClass('active');
-                                    $('#button-messages').removeClass('active');
-                                    $('#button-payments').addClass('active');
-                                    $('#button-customer').removeClass('active');
-                                    $('#button-packages').removeClass('active');
-                                    $('#submit').hide();
-                                    $('#submitOrder').hide();
-                                    $('#button-warehouse-payments').removeClass('active');
-                                    $('#button-spedition-payments').removeClass('active');
-                                    speditionPayments.hide();
-                                    warehousePayments.hide();
-                                    general.hide();
-                                    tasks.hide();
-                                    payments.show();
-                                    packages.hide();
-                                    messages.hide();
-                                    customer.hide();
-                                    status.hide();
-                                    pageTitle.removeClass();
-                                    pageTitle.addClass('voyager-wallet');
-                                    createButtonOrderPayments.show();
-                                    createButtonOrderPackages.hide();
-                                    createButtonOrderTasks.hide();
+                breadcrumb.children().last().remove();
+                breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit'>Paczki</a></li>");
+                addOrder.hide();
+            } else if (referrer.search('orderMessages') != -1 || uri.search('orderMessages') != -1 || item === 'orderMessages') {
+                $('#button-general').removeClass('active');
+                $('#button-tasks').removeClass('active');
+                $('#button-messages').addClass('active');
+                $('#button-payments').removeClass('active');
+                $('#button-packages').removeClass('active');
+                $('#button-customer').removeClass('active');
+                $('#submit').hide();
+                $('#submitOrder').hide();
+                general.hide();
+                tasks.hide();
+                payments.hide();
+                packages.hide();
+                customer.hide();
+                messages.show();
+                warehousePayments.hide();
+                speditionPayments.hide();
+                createButtonOrderPayments.hide();
+                createButtonOrderPackages.hide();
+                createButtonOrderTasks.hide();
+                pageTitle.removeClass();
+                pageTitle.addClass('voyager-chat');
 
-                                    breadcrumb.children().last().remove();
-                                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#order-payments'>Płatności</a></li>");
-                                    addOrder.hide();
+                breadcrumb.children().last().remove();
+                breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#employees'>Zadania</a></li>");
+                addOrder.hide();
+            }
+            $('[name="change-button-form"]').on('click', function () {
+                value = this.value;
+                $('#' + value).show();
+                if (value === 'general') {
+                    $('#button-general').addClass('active');
+                    $('#button-tasks').removeClass('active');
+                    $('#button-messages').removeClass('active');
+                    $('#button-payments').removeClass('active');
+                    $('#button-packages').removeClass('active');
+                    $('#button-customer').removeClass('active');
+                    $('#button-warehouse-payments').removeClass('active');
+                    $('#button-spedition-payments').removeClass('active');
+                    speditionPayments.hide();
+                    warehousePayments.hide();
+                    general.show();
+                    tasks.hide();
+                    payments.hide();
+                    packages.hide();
+                    customer.hide();
+                    messages.hide();
+                    status.hide();
+                    $('#submit').show();
+                    $('#submitOrder').show();
+                    pageTitle.removeClass();
+                    pageTitle.addClass('voyager-file-text');
+                    createButtonOrderPayments.hide();
+                    createButtonOrderPackages.hide();
+                    createButtonOrderTasks.hide();
+                    breadcrumb.children().remove();
+                    breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");
+                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit'>Zamówienia</a></li>");
+                    breadcrumb.append("<li class='disable'><a href='javascript:void()'>Edytuj</a></li>");
+                    addOrder.hide();
+                } else if (value === 'tasks') {
+                    $('#button-general').removeClass('active');
+                    $('#button-tasks').addClass('active');
+                    $('#button-messages').removeClass('active');
+                    $('#button-payments').removeClass('active');
+                    $('#button-packages').removeClass('active');
+                    $('#button-customer').removeClass('active');
+                    $('#submit').hide();
+                    $('#submitOrder').hide();
+                    $('#button-warehouse-payments').removeClass('active');
+                    $('#button-spedition-payments').removeClass('active');
+                    speditionPayments.hide();
+                    warehousePayments.hide();
+                    general.hide();
+                    tasks.show();
+                    payments.hide();
+                    packages.hide();
+                    messages.hide();
+                    customer.hide();
+                    status.hide();
+                    pageTitle.removeClass();
+                    pageTitle.addClass('voyager-calendar');
+                    createButtonOrderPayments.hide();
+                    createButtonOrderPackages.hide();
+                    createButtonOrderTasks.show();
+                    breadcrumb.children().last().remove();
+                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#order-tasks'>Zadania</a></li>");
+                    addOrder.hide();
+                } else if (value === 'payments') {
+                    $('#button-general').removeClass('active');
+                    $('#button-tasks').removeClass('active');
+                    $('#button-messages').removeClass('active');
+                    $('#button-payments').addClass('active');
+                    $('#button-customer').removeClass('active');
+                    $('#button-packages').removeClass('active');
+                    $('#submit').hide();
+                    $('#submitOrder').hide();
+                    $('#button-warehouse-payments').removeClass('active');
+                    $('#button-spedition-payments').removeClass('active');
+                    speditionPayments.hide();
+                    warehousePayments.hide();
+                    general.hide();
+                    tasks.hide();
+                    payments.show();
+                    packages.hide();
+                    messages.hide();
+                    customer.hide();
+                    status.hide();
+                    pageTitle.removeClass();
+                    pageTitle.addClass('voyager-wallet');
+                    createButtonOrderPayments.show();
+                    createButtonOrderPackages.hide();
+                    createButtonOrderTasks.hide();
 
-                                } else if (value === 'messages') {
-                                    $('#button-general').removeClass('active');
-                                    $('#button-tasks').removeClass('active');
-                                    $('#button-messages').addClass('active');
-                                    $('#button-payments').removeClass('active');
-                                    $('#button-customer').removeClass('active');
-                                    $('#button-packages').removeClass('active');
-                                    $('#submit').hide();
-                                    $('#submitOrder').hide();
-                                    $('#button-warehouse-payments').removeClass('active');
-                                    $('#button-spedition-payments').removeClass('active');
-                                    speditionPayments.hide();
-                                    warehousePayments.hide();
-                                    general.hide();
-                                    tasks.hide();
-                                    payments.hide();
-                                    packages.hide();
-                                    messages.show();
-                                    customer.hide();
-                                    status.hide();
-                                    pageTitle.removeClass();
-                                    pageTitle.addClass('voyager-chat');
-                                    createButtonOrderPayments.hide();
-                                    createButtonOrderPackages.hide();
-                                    createButtonOrderTasks.hide();
+                    breadcrumb.children().last().remove();
+                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#order-payments'>Płatności</a></li>");
+                    addOrder.hide();
 
-                                    breadcrumb.children().last().remove();
-                                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#order-messages'>Wiadomości</a></li>");
-                                    addOrder.hide();
-                                } else if (value === 'packages') {
-                                    $('#button-general').removeClass('active');
-                                    $('#button-tasks').removeClass('active');
-                                    $('#button-messages').removeClass('active');
-                                    $('#button-payments').removeClass('active');
-                                    $('#button-customer').removeClass('active');
-                                    $('#button-packages').addClass('active');
-                                    $('#submit').hide();
-                                    $('#submitOrder').hide();
-                                    $('#button-warehouse-payments').removeClass('active');
-                                    $('#button-spedition-payments').removeClass('active');
-                                    speditionPayments.hide();
-                                    warehousePayments.hide();
-                                    general.hide();
-                                    tasks.hide();
-                                    payments.hide();
-                                    customer.hide();
-                                    packages.show();
-                                    messages.hide();
-                                    status.hide();
-                                    pageTitle.removeClass();
-                                    pageTitle.addClass('voyager-archive');
-                                    createButtonOrderPayments.hide();
-                                    createButtonOrderPackages.show();
-                                    createButtonOrderTasks.hide();
-                                    breadcrumb.children().last().remove();
-                                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#order-packages'>Paczki</a></li>");
-                                    addOrder.hide();
-                                } else if (value === 'status') {
-                                    $('#button-general').removeClass('active');
-                                    $('#button-tasks').removeClass('active');
-                                    $('#button-messages').removeClass('active');
-                                    $('#button-payments').removeClass('active');
-                                    $('#button-packages').removeClass('active');
-                                    $('#button-customer').removeClass('active');
-                                    $('#submit').show();
-                                    $('#submitOrder').hide();
-                                    $('#button-warehouse-payments').removeClass('active');
-                                    $('#button-spedition-payments').removeClass('active');
-                                    speditionPayments.hide();
-                                    warehousePayments.hide();
-                                    general.hide();
-                                    tasks.hide();
-                                    payments.hide();
-                                    packages.hide();
-                                    messages.hide();
-                                    customer.hide();
-                                    status.show();
-                                    pageTitle.removeClass();
-                                    pageTitle.addClass('voyager-tag');
-                                    createButtonOrderPayments.hide();
-                                    createButtonOrderPackages.hide();
-                                    createButtonOrderTasks.hide();
-                                    breadcrumb.children().last().remove();
-                                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#status'>Status zamówienia</a></li>");
-                                    addOrder.hide();
-                                } else if (value === 'customer') {
-                                    $('#button-general').removeClass('active');
-                                    $('#button-tasks').removeClass('active');
-                                    $('#button-messages').removeClass('active');
-                                    $('#button-payments').removeClass('active');
-                                    $('#button-packages').removeClass('active');
-                                    $('#button-customer').addClass('active');
-                                    $('#submit').hide();
-                                    $('#submitOrder').hide();
-                                    $('#button-warehouse-payments').removeClass('active');
-                                    $('#button-spedition-payments').removeClass('active');
-                                    speditionPayments.hide();
-                                    warehousePayments.hide();
-                                    general.hide();
-                                    tasks.hide();
-                                    payments.hide();
-                                    packages.hide();
-                                    messages.hide();
-                                    customer.show();
-                                    status.hide();
-                                    pageTitle.removeClass();
-                                    pageTitle.addClass('voyager-tag');
-                                    createButtonOrderPayments.hide();
-                                    createButtonOrderPackages.hide();
-                                    createButtonOrderTasks.hide();
-                                    breadcrumb.children().last().remove();
-                                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#status'>Status zamówienia</a></li>");
-                                    addOrder.hide();
-                                } else if (value === 'warehouse-payments') {
-                                    $('#button-general').removeClass('active');
-                                    $('#button-tasks').removeClass('active');
-                                    $('#button-messages').removeClass('active');
-                                    $('#button-payments').removeClass('active');
-                                    $('#button-packages').removeClass('active');
-                                    $('#button-customer').removeClass('active');
-                                    $('#submit').hide();
-                                    $('#submitOrder').hide();
-                                    $('#button-warehouse-payments').addClass('active');
-                                    $('#button-spedition-payments').removeClass('active');
-                                    speditionPayments.hide();
-                                    warehousePayments.show();
-                                    general.hide();
-                                    tasks.hide();
-                                    payments.hide();
-                                    packages.hide();
-                                    messages.hide();
-                                    customer.hide();
-                                    status.hide();
-                                    pageTitle.removeClass();
-                                    pageTitle.addClass('voyager-tag');
-                                    createButtonOrderPayments.hide();
-                                    createButtonOrderPackages.hide();
-                                    createButtonOrderTasks.hide();
-                                    breadcrumb.children().last().remove();
-                                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#status'>Status zamówienia</a></li>");
-                                    addOrder.hide();
-                                } else if (value === 'spedition-payments') {
-                                    $('#button-general').removeClass('active');
-                                    $('#button-tasks').removeClass('active');
-                                    $('#button-messages').removeClass('active');
-                                    $('#button-payments').removeClass('active');
-                                    $('#button-packages').removeClass('active');
-                                    $('#button-customer').removeClass('active');
-                                    $('#submit').hide();
-                                    $('#submitOrder').hide();
-                                    $('#button-warehouse-payments').removeClass('active');
-                                    $('#button-spedition-payments').addClass('active');
-                                    speditionPayments.show();
-                                    warehousePayments.hide();
-                                    general.hide();
-                                    tasks.hide();
-                                    payments.hide();
-                                    packages.hide();
-                                    messages.hide();
-                                    customer.hide();
-                                    status.hide();
-                                    pageTitle.removeClass();
-                                    pageTitle.addClass('voyager-tag');
-                                    createButtonOrderPayments.show();
-                                    createButtonOrderPackages.hide();
-                                    createButtonOrderTasks.hide();
-                                    breadcrumb.children().last().remove();
-                                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#status'>Status zamówienia</a></li>");
-                                    addOrder.hide();
-                                    $('#create-button-orderPayments-spedition').hide();
-                                }
-                            });
-                        });
+                } else if (value === 'messages') {
+                    $('#button-general').removeClass('active');
+                    $('#button-tasks').removeClass('active');
+                    $('#button-messages').addClass('active');
+                    $('#button-payments').removeClass('active');
+                    $('#button-customer').removeClass('active');
+                    $('#button-packages').removeClass('active');
+                    $('#submit').hide();
+                    $('#submitOrder').hide();
+                    $('#button-warehouse-payments').removeClass('active');
+                    $('#button-spedition-payments').removeClass('active');
+                    speditionPayments.hide();
+                    warehousePayments.hide();
+                    general.hide();
+                    tasks.hide();
+                    payments.hide();
+                    packages.hide();
+                    messages.show();
+                    customer.hide();
+                    status.hide();
+                    pageTitle.removeClass();
+                    pageTitle.addClass('voyager-chat');
+                    createButtonOrderPayments.hide();
+                    createButtonOrderPackages.hide();
+                    createButtonOrderTasks.hide();
 
-                        function loadAllegroPrices() {
-                            $.ajax({
-                                'url': "{{ route('prices.allegroPrices', ['id' => $order->id]) }}"
-                            }).done(data => {
-                                if (data.error) {
-                                    alert(data.error)
-                                    return;
-                                }
-                                data.content.map(item => {
-                                    $(`.row-${item.id}`).find(".gross_selling_price_commercial_unit").val(item.price).change()
-                                });
-                            });
+                    breadcrumb.children().last().remove();
+                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#order-messages'>Wiadomości</a></li>");
+                    addOrder.hide();
+                } else if (value === 'packages') {
+                    $('#button-general').removeClass('active');
+                    $('#button-tasks').removeClass('active');
+                    $('#button-messages').removeClass('active');
+                    $('#button-payments').removeClass('active');
+                    $('#button-customer').removeClass('active');
+                    $('#button-packages').addClass('active');
+                    $('#submit').hide();
+                    $('#submitOrder').hide();
+                    $('#button-warehouse-payments').removeClass('active');
+                    $('#button-spedition-payments').removeClass('active');
+                    speditionPayments.hide();
+                    warehousePayments.hide();
+                    general.hide();
+                    tasks.hide();
+                    payments.hide();
+                    customer.hide();
+                    packages.show();
+                    messages.hide();
+                    status.hide();
+                    pageTitle.removeClass();
+                    pageTitle.addClass('voyager-archive');
+                    createButtonOrderPayments.hide();
+                    createButtonOrderPackages.show();
+                    createButtonOrderTasks.hide();
+                    breadcrumb.children().last().remove();
+                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#order-packages'>Paczki</a></li>");
+                    addOrder.hide();
+                } else if (value === 'status') {
+                    $('#button-general').removeClass('active');
+                    $('#button-tasks').removeClass('active');
+                    $('#button-messages').removeClass('active');
+                    $('#button-payments').removeClass('active');
+                    $('#button-packages').removeClass('active');
+                    $('#button-customer').removeClass('active');
+                    $('#submit').show();
+                    $('#submitOrder').hide();
+                    $('#button-warehouse-payments').removeClass('active');
+                    $('#button-spedition-payments').removeClass('active');
+                    speditionPayments.hide();
+                    warehousePayments.hide();
+                    general.hide();
+                    tasks.hide();
+                    payments.hide();
+                    packages.hide();
+                    messages.hide();
+                    customer.hide();
+                    status.show();
+                    pageTitle.removeClass();
+                    pageTitle.addClass('voyager-tag');
+                    createButtonOrderPayments.hide();
+                    createButtonOrderPackages.hide();
+                    createButtonOrderTasks.hide();
+                    breadcrumb.children().last().remove();
+                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#status'>Status zamówienia</a></li>");
+                    addOrder.hide();
+                } else if (value === 'customer') {
+                    $('#button-general').removeClass('active');
+                    $('#button-tasks').removeClass('active');
+                    $('#button-messages').removeClass('active');
+                    $('#button-payments').removeClass('active');
+                    $('#button-packages').removeClass('active');
+                    $('#button-customer').addClass('active');
+                    $('#submit').hide();
+                    $('#submitOrder').hide();
+                    $('#button-warehouse-payments').removeClass('active');
+                    $('#button-spedition-payments').removeClass('active');
+                    speditionPayments.hide();
+                    warehousePayments.hide();
+                    general.hide();
+                    tasks.hide();
+                    payments.hide();
+                    packages.hide();
+                    messages.hide();
+                    customer.show();
+                    status.hide();
+                    pageTitle.removeClass();
+                    pageTitle.addClass('voyager-tag');
+                    createButtonOrderPayments.hide();
+                    createButtonOrderPackages.hide();
+                    createButtonOrderTasks.hide();
+                    breadcrumb.children().last().remove();
+                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#status'>Status zamówienia</a></li>");
+                    addOrder.hide();
+                } else if (value === 'warehouse-payments') {
+                    $('#button-general').removeClass('active');
+                    $('#button-tasks').removeClass('active');
+                    $('#button-messages').removeClass('active');
+                    $('#button-payments').removeClass('active');
+                    $('#button-packages').removeClass('active');
+                    $('#button-customer').removeClass('active');
+                    $('#submit').hide();
+                    $('#submitOrder').hide();
+                    $('#button-warehouse-payments').addClass('active');
+                    $('#button-spedition-payments').removeClass('active');
+                    speditionPayments.hide();
+                    warehousePayments.show();
+                    general.hide();
+                    tasks.hide();
+                    payments.hide();
+                    packages.hide();
+                    messages.hide();
+                    customer.hide();
+                    status.hide();
+                    pageTitle.removeClass();
+                    pageTitle.addClass('voyager-tag');
+                    createButtonOrderPayments.hide();
+                    createButtonOrderPackages.hide();
+                    createButtonOrderTasks.hide();
+                    breadcrumb.children().last().remove();
+                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#status'>Status zamówienia</a></li>");
+                    addOrder.hide();
+                } else if (value === 'spedition-payments') {
+                    $('#button-general').removeClass('active');
+                    $('#button-tasks').removeClass('active');
+                    $('#button-messages').removeClass('active');
+                    $('#button-payments').removeClass('active');
+                    $('#button-packages').removeClass('active');
+                    $('#button-customer').removeClass('active');
+                    $('#submit').hide();
+                    $('#submitOrder').hide();
+                    $('#button-warehouse-payments').removeClass('active');
+                    $('#button-spedition-payments').addClass('active');
+                    speditionPayments.show();
+                    warehousePayments.hide();
+                    general.hide();
+                    tasks.hide();
+                    payments.hide();
+                    packages.hide();
+                    messages.hide();
+                    customer.hide();
+                    status.hide();
+                    pageTitle.removeClass();
+                    pageTitle.addClass('voyager-tag');
+                    createButtonOrderPayments.show();
+                    createButtonOrderPackages.hide();
+                    createButtonOrderTasks.hide();
+                    breadcrumb.children().last().remove();
+                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#status'>Status zamówienia</a></li>");
+                    addOrder.hide();
+                    $('#create-button-orderPayments-spedition').hide();
+                }
+            });
+        });
+
+        function loadAllegroPrices() {
+            $.ajax({
+                'url': "{{ route('prices.allegroPrices', ['id' => $order->id]) }}"
+            }).done(data => {
+                if (data.error) {
+                    alert(data.error)
+                    return;
+                }
+                data.content.map(item => {
+                    $(`.row-${item.id}`).find(".gross_selling_price_commercial_unit").val(item.price).change()
+                });
+            });
+        }
+    </script>
+    <script>
+        const deleteRecordOrderPayments = (id) => {
+            $('#delete_form')[0].action = "/admin/orderPayments/" + id;
+            $('#delete_modal').modal('show');
+        };
+        $.fn.dataTable.ext.errMode = 'throw';
+        // DataTable
+        let tableOrderPayments = $('#dataTableOrderPayments').DataTable({
+            language: {!! json_encode( __('voyager.datatable'), true) !!},
+            processing: true,
+            serverSide: true,
+            columnDefs: [
+                {className: "dt-center", targets: "_all"}
+            ],
+            order: [[0, "asc"]],
+            ajax: '{!! route('order_payments.datatable', ['id' => $order->id ]) !!}',
+            dom: 'Bfrtip',
+            buttons: [
+                {extend: 'colvis', text: 'Widzialność kolumn'}
+            ],
+            columns: [
+                {
+                    data: 'id',
+                    name: 'id',
+                    render: function (id, type, row) {
+                        return '<input type="checkbox">';
+                    }
+                },
+                {
+                    data: 'id',
+                    name: 'id'
+                },
+                {
+                    data: 'order_id',
+                    name: 'order_id'
+                },
+                {
+                    data: 'amount',
+                    name: 'amount'
+                },
+                {
+                    data: 'notices',
+                    name: 'notices'
+                },
+                {
+                    data: 'promise',
+                    name: 'promise',
+                    render: function (promise) {
+                        if (promise == '1') {
+                            return '<span>Tak</span>';
+                        } else {
+                            return '<span>Nie</span>';
                         }
-                    </script>
-                    <script>
-                        const deleteRecordOrderPayments = (id) => {
-                            $('#delete_form')[0].action = "/admin/orderPayments/" + id;
-                            $('#delete_modal').modal('show');
-                        };
-                        $.fn.dataTable.ext.errMode = 'throw';
-                        // DataTable
-                        let tableOrderPayments = $('#dataTableOrderPayments').DataTable({
-                            language: {!! json_encode( __('voyager.datatable'), true) !!},
-                            processing: true,
-                            serverSide: true,
-                            columnDefs: [
-                                {className: "dt-center", targets: "_all"}
-                            ],
-                            order: [[0, "asc"]],
-                            ajax: '{!! route('order_payments.datatable', ['id' => $order->id ]) !!}',
-                            dom: 'Bfrtip',
-                            buttons: [
-                                {extend: 'colvis', text: 'Widzialność kolumn'}
-                            ],
-                            columns: [
-                                {
-                                    data: 'id',
-                                    name: 'id',
-                                    render: function (id, type, row) {
-                                        return '<input type="checkbox">';
-                                    }
-                                },
-                                {
-                                    data: 'id',
-                                    name: 'id'
-                                },
-                                {
-                                    data: 'order_id',
-                                    name: 'order_id'
-                                },
-                                {
-                                    data: 'amount',
-                                    name: 'amount'
-                                },
-                                {
-                                    data: 'notices',
-                                    name: 'notices'
-                                },
-                                {
-                                    data: 'promise',
-                                    name: 'promise',
-                                    render: function (promise) {
-                                        if (promise == '1') {
-                                            return '<span>Tak</span>';
-                                        } else {
-                                            return '<span>Nie</span>';
-                                        }
-                                    }
+                    }
 
-                                },
-                                {
-                                    data: 'promise_date',
-                                    name: 'promise_date'
-                                },
-                                {
-                                    data: 'created_at',
-                                    name: 'created_at'
-                                },
-                                {
-                                    data: 'id',
-                                    name: 'id',
-                                    render: function (id) {
-                                        let html = '<a href="/admin/orderPayments/' + id + '/edit" class="btn btn-sm btn-primary edit">';
-                                        html += '<i class="voyager-edit"></i>';
-                                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
-                                        html += '</a>';
+                },
+                {
+                    data: 'promise_date',
+                    name: 'promise_date'
+                },
+                {
+                    data: 'created_at',
+                    name: 'created_at'
+                },
+                {
+                    data: 'id',
+                    name: 'id',
+                    render: function (id) {
+                        let html = '<a href="/admin/orderPayments/' + id + '/edit" class="btn btn-sm btn-primary edit">';
+                        html += '<i class="voyager-edit"></i>';
+                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
+                        html += '</a>';
 
-                                        html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecordOrderPayments(' + id + ')">';
-                                        html += '<i class="voyager-trash"></i>';
-                                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
-                                        html += '</button>';
-                                        return html;
-                                    }
-                                }
-                            ]
-                        });
-                            @foreach($visibilitiesPayments as $key =>$row)
+                        html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecordOrderPayments(' + id + ')">';
+                        html += '<i class="voyager-trash"></i>';
+                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
+                        html += '</button>';
+                        return html;
+                    }
+                }
+            ]
+        });
+            @foreach($visibilitiesPayments as $key =>$row)
 
-                        var {{'show'.$row->name}}  = @json($row->show);
-                        {{'show'.$row->name}} = {{'show'.$row->name}}.map(function (x) {
-                            if (typeof tableOrderPayments.column(x + ':name').index() === "number")
-                                return tableOrderPayments.column(x + ':name').index();
-                        });
-                        {{'show'.$row->name}} = {{'show'.$row->name}}.filter(function (el) {
-                            return el != null;
-                        });
+        var {{'show'.$row->name}}  = @json($row->show);
+        {{'show'.$row->name}} = {{'show'.$row->name}}.map(function (x) {
+            if (typeof tableOrderPayments.column(x + ':name').index() === "number")
+                return tableOrderPayments.column(x + ':name').index();
+        });
+        {{'show'.$row->name}} = {{'show'.$row->name}}.filter(function (el) {
+            return el != null;
+        });
 
-                        var {{'hidden'.$row->name}} = @json($row->hidden);
-                        {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.map(function (x) {
-                            if (typeof tableOrderPayments.column(x + ':name').index() === "number")
-                                return tableOrderPayments.column(x + ':name').index();
-                        });
-                        {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.filter(function (el) {
-                            return el != null;
-                        });
+        var {{'hidden'.$row->name}} = @json($row->hidden);
+        {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.map(function (x) {
+            if (typeof tableOrderPayments.column(x + ':name').index() === "number")
+                return tableOrderPayments.column(x + ':name').index();
+        });
+        {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.filter(function (el) {
+            return el != null;
+        });
 
-                        tableOrderPayments.button().add({{1+$key}}, {
-                            extend: 'colvisGroup',
-                            text: '{{$row->display_name}}',
-                            show: {{'show'.$row->name}},
-                            hide: {{'hidden'.$row->name}}
-                        });
-                        @endforeach
+        tableOrderPayments.button().add({{1+$key}}, {
+            extend: 'colvisGroup',
+            text: '{{$row->display_name}}',
+            show: {{'show'.$row->name}},
+            hide: {{'hidden'.$row->name}}
+        });
+        @endforeach
 
 
 
 
-                        $('#dataTableOrderPayments thead tr th').each(function (i) {
-                            var title = $(this).text();
-                            if (title !== '' && title !== 'Akcje') {
-                                $(this).html('<div><span>' + title + '</span></div><div><input type="text" placeholder="Szukaj ' + title + '" id="columnSearch' + i + '"/></div>');
-                            } else if (title == 'Akcje') {
-                                $(this).html('<span id="columnSearch' + i + '">Akcje</span>');
-                            }
-                            $('input', this).on('keyup change', function () {
-                                if (table.column(i).search() !== this.value) {
-                                    table
-                                        .column(i)
-                                        .search(this.value)
-                                        .draw();
-                                }
-                            });
-                        });
+        $('#dataTableOrderPayments thead tr th').each(function (i) {
+            var title = $(this).text();
+            if (title !== '' && title !== 'Akcje') {
+                $(this).html('<div><span>' + title + '</span></div><div><input type="text" placeholder="Szukaj ' + title + '" id="columnSearch' + i + '"/></div>');
+            } else if (title == 'Akcje') {
+                $(this).html('<span id="columnSearch' + i + '">Akcje</span>');
+            }
+            $('input', this).on('keyup change', function () {
+                if (table.column(i).search() !== this.value) {
+                    table
+                        .column(i)
+                        .search(this.value)
+                        .draw();
+                }
+            });
+        });
 
 
-                        const deleteRecordOrderTasks = (id) => {
-                            $('#delete_form')[0].action = "/admin/orderTasks/" + id;
-                            $('#delete_modal').modal('show');
-                        };
-                        $.fn.dataTable.ext.errMode = 'throw';
-                        // DataTable
+        const deleteRecordOrderTasks = (id) => {
+            $('#delete_form')[0].action = "/admin/orderTasks/" + id;
+            $('#delete_modal').modal('show');
+        };
+        $.fn.dataTable.ext.errMode = 'throw';
+        // DataTable
 
-                        let tableOrderTasks = $('#dataTableOrderTasks').DataTable({
-                            language: {!! json_encode( __('voyager.datatable'), true) !!},
-                            processing: true,
-                            serverSide: true,
-                            columnDefs: [
-                                {className: "dt-center", targets: "_all"}
-                            ],
-                            order: [[0, "asc"]],
-                            ajax: '{!! route('order_tasks.datatable', ['id' => $order->id]) !!}',
-                            dom: 'Bfrtip',
-                            buttons: [
-                                {extend: 'colvis', text: 'Widzialność kolumn'}
-                            ],
-                            columns: [
-                                {
-                                    data: 'id',
-                                    name: 'id',
-                                    render: function (id) {
-                                        return '<input type="checkbox">';
-                                    }
-                                },
-                                {
-                                    data: 'id',
-                                    name: 'id'
-                                },
-                                {
-                                    data: 'description',
-                                    name: 'description'
-                                },
-                                {
-                                    data: 'title',
-                                    name: 'title'
-                                },
-                                {
-                                    data: 'show_label_at',
-                                    name: 'show_label_at'
-                                },
-                                {
-                                    data: 'status',
-                                    name: 'status',
-                                    render: function (status) {
-                                        if (status === 'OPEN') {
-                                            return '<span>' + {!! json_encode(__('order_tasks.table.open'), true) !!} +'</span>';
-                                        } else {
-                                            return '<span>' + {!! json_encode(__('order_tasks.table.closed'), true) !!} +'</span>';
-                                        }
-                                    }
-                                },
-                                {
-                                    data: 'created_at',
-                                    name: 'created_at'
-                                },
-                                {
-                                    data: 'id',
-                                    name: 'id',
-                                    render: function (id) {
-                                        let html = '<a href="/admin/orderTasks/' + id + '/edit" class="btn btn-sm btn-primary edit">';
-                                        html += '<i class="voyager-edit"></i>';
-                                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
-                                        html += '</a>';
-
-                                        html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecordOrderTasks(' + id + ')">';
-                                        html += '<i class="voyager-trash"></i>';
-                                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
-                                        html += '</button>';
-                                        return html;
-                                    }
-                                }
-                            ]
-                        });
-                            @foreach($visibilitiesTask as $key =>$row)
-
-                        var {{'show'.$row->name}}  = @json($row->show);
-                        {{'show'.$row->name}} = {{'show'.$row->name}}.map(function (x) {
-                            if (typeof tableOrderTasks.column(x + ':name').index() === "number")
-                                return tableOrderTasks.column(x + ':name').index();
-                        });
-                        {{'show'.$row->name}} = {{'show'.$row->name}}.filter(function (el) {
-                            return el != null;
-                        });
-
-                        var {{'hidden'.$row->name}} = @json($row->hidden);
-                        {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.map(function (x) {
-                            if (typeof tableOrderTasks.column(x + ':name').index() === "number")
-                                return tableOrderTasks.column(x + ':name').index();
-                        });
-                        {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.filter(function (el) {
-                            return el != null;
-                        });
-
-                        tableOrderTasks.button().add({{1+$key}}, {
-                            extend: 'colvisGroup',
-                            text: '{{$row->display_name}}',
-                            show: {{'show'.$row->name}},
-                            hide: {{'hidden'.$row->name}}
-                        });
-                        @endforeach
-
-                        $('#dataTableOrderTasks thead tr th').each(function (i) {
-                            var title = $(this).text();
-                            if (title !== '' && title !== 'Akcje') {
-                                $(this).html('<div><span>' + title + '</span></div><div><input type="text" placeholder="Szukaj ' + title + '" id="columnSearch' + i + '"/></div>');
-                            } else if (title == 'Akcje') {
-                                $(this).html('<span id="columnSearch' + i + '">Akcje</span>');
-                            }
-                            $('input', this).on('keyup change', function () {
-                                if (table.column(i).search() !== this.value) {
-                                    table
-                                        .column(i)
-                                        .search(this.value)
-                                        .draw();
-                                }
-                            });
-                        });
-
-                        const deleteRecordOrderPackages = (id) => {
-                            $('#delete_form')[0].action = "/admin/orderPackages/" + id;
-                            $('#delete_modal').modal('show');
-                        };
-                        $.fn.dataTable.ext.errMode = 'throw';
-                        // DataTable
-                        let tableOrderPackages = $('#dataTableOrderPackages').DataTable({
-                            language: {!! json_encode( __('voyager.datatable'), true) !!},
-                            processing: true,
-                            serverSide: true,
-                            columnDefs: [
-                                {className: "dt-center", targets: "_all"}
-                            ],
-                            order: [[0, "asc"]],
-                            ajax: '{!! route('order_packages.datatable', ['id' => $order->id]) !!}',
-                            dom: 'Bfrtip',
-                            buttons: [
-                                {extend: 'colvis', text: 'Widzialność kolumn'}
-                            ],
-                            columns: [
-                                {
-                                    data: 'id',
-                                    name: 'id',
-                                    render: function (id) {
-                                        return '<input type="checkbox">';
-                                    }
-                                },
-                                {
-                                    data: 'id',
-                                    name: 'id',
-                                    render: function (id, data, row) {
-                                        let html = '';
-                                        if (row.status !== 'SENDING' && row.status !== 'WAITING_FOR_SENDING' && row.status !== 'CANCELLED' && row.status !== 'WAITING_FOR_CANCELLED' && row.status !== 'DELIVERED' && row.service_courier_name !== 'GIELDA' && row.service_courier_name !== 'ODBIOR_OSOBISTY' && row.delivery_courier_name !== 'GIELDA' && row.delivery_courier_name !== 'ODBIOR_OSOBISTY') {
-                                            html += '<button class="btn btn-sm btn-success edit" onclick="sendPackage(' + id + ',' + row.order_id + ')">';
-                                            html += '<i class="voyager-mail"></i>';
-                                            html += '<span class="hidden-xs hidden-sm"> Wyślij</span>';
-                                            html += '</button>';
-                                        }
-                                        html += '<a href="/admin/orderPackages/' + id + '/edit" class="btn btn-sm btn-primary edit">';
-                                        html += '<i class="voyager-edit"></i>';
-                                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
-                                        html += '</a>';
-                                        html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecordOrderPackages(' + id + ')">';
-                                        html += '<i class="voyager-trash"></i>';
-                                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
-                                        html += '</button>';
-
-                                        return html;
-                                    }
-                                },
-                                {
-                                    data: 'id',
-                                    name: 'id'
-                                },
-                                {
-                                    data: 'number',
-                                    name: 'number'
-                                },
-                                {
-                                    data: 'status',
-                                    name: 'status',
-                                    render: function (status) {
-                                        if (status === 'DELIVERED') {
-                                            return '<span style="color: green;">' + {!! json_encode(__('order_packages.table.delivered'), true) !!} +'</span>';
-                                        } else if (status === 'CANCELLED') {
-                                            return '<span style="color: red;">' + {!! json_encode(__('order_packages.table.cancelled'), true) !!} +'</span>';
-                                        } else if (status === 'NEW') {
-                                            return '<span style="color: blue;">' + {!! json_encode(__('order_packages.table.new'), true) !!} +'</span>';
-                                        } else if (status === 'SENDING') {
-                                            return '<span style="color: orange;">' + {!! json_encode(__('order_packages.table.sending'), true) !!} +'</span>';
-                                        } else if (status === 'WAITING_FOR_SENDING') {
-                                            return '<span style="color: orange;">' + {!! json_encode(__('order_packages.table.waiting_for_sending'), true) !!} +'</span>';
-                                        } else if (status === 'WAITING_FOR_CANCELLED') {
-
-                                            return '<span style="color: orange;">' + {!! json_encode(__('order_packages.table.waiting_for_cancelled'), true) !!} +'</span>';
-                                        } else if (status === 'REJECT_CANCELLED') {
-
-                                            return '<span style="color: red;">Anulacja odrzucona</span>';
-                                        }
-                                    }
-                                },
-                                {
-                                    data: 'letter_number',
-                                    name: 'letter_number',
-                                },
-                                {
-                                    data: 'size_a',
-                                    name: 'size_a'
-                                },
-                                {
-                                    data: 'size_b',
-                                    name: 'size_b'
-                                },
-                                {
-                                    data: 'size_c',
-                                    name: 'size_c'
-                                },
-                                {
-                                    data: 'weight',
-                                    name: 'weight'
-                                },
-                                {
-                                    data: 'container_type',
-                                    name: 'container_type'
-                                },
-                                {
-                                    data: 'shape',
-                                    name: 'shape'
-                                },
-                                {
-                                    data: 'cash_on_delivery',
-                                    name: 'cash_on_delivery',
-                                },
-                                {
-                                    data: 'notices',
-                                    name: 'notices'
-                                },
-                                {
-                                    data: 'delivery_courier_name',
-                                    name: 'delivery_courier_name'
-                                },
-                                {
-                                    data: 'service_courier_name',
-                                    name: 'service_courier_name'
-                                },
-                                {
-                                    data: 'shipment_date',
-                                    name: 'shipment_date'
-                                },
-                                {
-                                    data: 'delivery_date',
-                                    name: 'delivery_date'
-                                },
-                                {
-                                    data: 'cost_for_client',
-                                    name: 'cost_for_client',
-                                },
-                                {
-                                    data: 'cost_for_company',
-                                    name: 'cost_for_company',
-                                },
-                                {
-                                    data: 'cod_cost_for_us',
-                                    name: 'cod_cost_for_us',
-                                },
-                                {
-                                    data: 'real_cost_for_company',
-                                    name: 'real_cost_for_company'
-                                },
-
-                                {
-                                    data: 'sending_number',
-                                    name: 'sending_number'
-                                },
-                                {
-                                    data: 'quantity',
-                                    name: 'quantity'
-                                },
-                                {
-                                    data: 'created_at',
-                                    name: 'created_at',
-                                },
-                            ]
-                        });
-                            @foreach($visibilitiesPackage as $key =>$row)
-
-                        var {{'show'.$row->name}}  = @json($row->show);
-                        {{'show'.$row->name}} = {{'show'.$row->name}}.map(function (x) {
-                            if (typeof tableOrderPackages.column(x + ':name').index() === "number")
-                                return tableOrderPackages.column(x + ':name').index();
-                        });
-                        {{'show'.$row->name}} = {{'show'.$row->name}}.filter(function (el) {
-                            return el != null;
-                        });
-
-                        var {{'hidden'.$row->name}} = @json($row->hidden);
-                        {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.map(function (x) {
-                            if (typeof tableOrderPackages.column(x + ':name').index() === "number")
-                                return tableOrderPackages.column(x + ':name').index();
-                        });
-                        {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.filter(function (el) {
-                            return el != null;
-                        });
-
-                        tableOrderPackages.button().add({{1+$key}}, {
-                            extend: 'colvisGroup',
-                            text: '{{$row->display_name}}',
-                            show: {{'show'.$row->name}},
-                            hide: {{'hidden'.$row->name}}
-                        });
-                        @endforeach
-
-                        $('#dataTableOrderPackages thead tr th').each(function (i) {
-                            var title = $(this).text();
-                            if (title !== '' && title !== 'Akcje') {
-                                $(this).html('<div><span>' + title + '</span></div><div><input type="text" placeholder="Szukaj ' + title + '" id="columnSearch' + i + '"/></div>');
-                            } else if (title == 'Akcje') {
-                                $(this).html('<span id="columnSearch' + i + '">Akcje</span>');
-                            }
-                            $('input', this).on('keyup change', function () {
-                                if (table.column(i).search() !== this.value) {
-                                    table
-                                        .column(i)
-                                        .search(this.value)
-                                        .draw();
-                                }
-                            });
-                        });
-
-                        function sendPackage(id, orderId) {
-                            $('#order_courier > div > div > div.modal-header > h4 > span').remove();
-                            $('#order_courier > div > div > div.modal-header > span').remove();
-                            $.ajax({
-                                url: '/admin/orders/' + orderId + '/package/' + id + '/send',
-                            }).done(function (data) {
-                                $('#order_courier').modal('show');
-                                if (data.message == 'Kurier zostanie zamówiony w przeciągu kilku minut' || data.message === null) {
-                                    $('#order_courier > div > div > div.modal-header > h4').append('<span>Kurier zostanie zamówiony w przeciągu kilku minut</span>');
-                                } else {
-                                    $('#order_courier > div > div > div.modal-header > h4').append('<span>Jedno z wymaganych pól nie zostało zdefiniowane:</span>');
-                                    $('#order_courier > div > div > div.modal-header').append('<span style="color:red;">' + data.message + '</span><br>');
-                                }
-                                $('#success-ok').on('click', function () {
-                                    window.location.href = '/admin/orders/' + orderId + '/edit';
-                                });
-                            }).fail(function () {
-                                $('#order_courier_problem').modal('show');
-                                $('#problem-ok').on('click', function () {
-                                    window.location.href = '/admin/orders/' + orderId + '/edit';
-                                });
-                            });
+        let tableOrderTasks = $('#dataTableOrderTasks').DataTable({
+            language: {!! json_encode( __('voyager.datatable'), true) !!},
+            processing: true,
+            serverSide: true,
+            columnDefs: [
+                {className: "dt-center", targets: "_all"}
+            ],
+            order: [[0, "asc"]],
+            ajax: '{!! route('order_tasks.datatable', ['id' => $order->id]) !!}',
+            dom: 'Bfrtip',
+            buttons: [
+                {extend: 'colvis', text: 'Widzialność kolumn'}
+            ],
+            columns: [
+                {
+                    data: 'id',
+                    name: 'id',
+                    render: function (id) {
+                        return '<input type="checkbox">';
+                    }
+                },
+                {
+                    data: 'id',
+                    name: 'id'
+                },
+                {
+                    data: 'description',
+                    name: 'description'
+                },
+                {
+                    data: 'title',
+                    name: 'title'
+                },
+                {
+                    data: 'show_label_at',
+                    name: 'show_label_at'
+                },
+                {
+                    data: 'status',
+                    name: 'status',
+                    render: function (status) {
+                        if (status === 'OPEN') {
+                            return '<span>' + {!! json_encode(__('order_tasks.table.open'), true) !!} +'</span>';
+                        } else {
+                            return '<span>' + {!! json_encode(__('order_tasks.table.closed'), true) !!} +'</span>';
                         }
+                    }
+                },
+                {
+                    data: 'created_at',
+                    name: 'created_at'
+                },
+                {
+                    data: 'id',
+                    name: 'id',
+                    render: function (id) {
+                        let html = '<a href="/admin/orderTasks/' + id + '/edit" class="btn btn-sm btn-primary edit">';
+                        html += '<i class="voyager-edit"></i>';
+                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
+                        html += '</a>';
 
-                        $(document).on("change", "select", function () {
-                            $("option[value=" + this.value + "]", this)
-                                .attr("selected", true).siblings()
-                                .removeAttr("selected")
-                        });
-                        $(document).ready(function () {
+                        html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecordOrderTasks(' + id + ')">';
+                        html += '<i class="voyager-trash"></i>';
+                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
+                        html += '</button>';
+                        return html;
+                    }
+                }
+            ]
+        });
+            @foreach($visibilitiesTask as $key =>$row)
 
-                            var editor;
-                            ClassicEditor
-                                .create(document.querySelector('.editor'))
-                                .then(editor => {
-                                    console.log(editor);
-                                    $('#status').on('change', function () {
-                                        $('#status option').each(function () {
-                                            if ($(this).is(':selected')) {
-                                                $.ajax({
-                                                    url: '/admin/orders/status/' + this.value + '/message',
-                                                    success: function (result) {
-                                                        editor.data.set(result);
-                                                    }
-                                                });
-                                            }
-                                        });
-                                    });
-                                    $('#status option').each(function () {
-                                        if ($(this).is(':selected')) {
-                                            $.ajax({
-                                                url: '/admin/orders/status/' + this.value + '/message',
-                                                success: function (result) {
-                                                    editor.data.set(result);
-                                                }
-                                            });
-                                        }
-                                    });
-                                })
-                                .catch(error => {
-                                        console.error(error);
-                                    }
-                                );
+        var {{'show'.$row->name}}  = @json($row->show);
+        {{'show'.$row->name}} = {{'show'.$row->name}}.map(function (x) {
+            if (typeof tableOrderTasks.column(x + ':name').index() === "number")
+                return tableOrderTasks.column(x + ':name').index();
+        });
+        {{'show'.$row->name}} = {{'show'.$row->name}}.filter(function (el) {
+            return el != null;
+        });
 
-                            function updateProfit() {
-                                commaReplace('.priceChange');
-                                var gross_purchase_price_sum = 0;
-                                var net_purchase_price_sum = 0;
-                                var gross_selling_price_sum = 0;
-                                var net_selling_price_sum = 0;
-                                console.log('ppp');
-                                $('.productsTableEdit .gross_purchase_price_commercial_unit').each(function () {
-                                    var quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
-                                    var gross_selling_price = $('.gross_selling_price_commercial_unit[data-item-id="' + $(this).data('item-id') + '"]').val();
-                                    gross_purchase_price_sum += $(this).val() * quantity;
-                                    var gross_purchase_price = $(this).val() * quantity;
-                                    var sellingSum = gross_selling_price * quantity;
-                                    var weightSum = parseFloat($('[name="weight_trade_unit[' + $(this).data('item-id') + ']').val()) * quantity;
-                                    var profitItem = ((gross_selling_price * quantity) - gross_purchase_price).toFixed(2);
+        var {{'hidden'.$row->name}} = @json($row->hidden);
+        {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.map(function (x) {
+            if (typeof tableOrderTasks.column(x + ':name').index() === "number")
+                return tableOrderTasks.column(x + ':name').index();
+        });
+        {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.filter(function (el) {
+            return el != null;
+        });
 
-                                    var unitCommercialName = $('[name="unit_commercial_name[' + $(this).data('item-id') + ']"]').val();
+        tableOrderTasks.button().add({{1+$key}}, {
+            extend: 'colvisGroup',
+            text: '{{$row->display_name}}',
+            show: {{'show'.$row->name}},
+            hide: {{'hidden'.$row->name}}
+        });
+        @endforeach
 
-                                    var unitBasicUnits = $('[name="unit_basic_units[' + $(this).data('item-id') + ']"]').val();
-                                    var unitBasicName = $('[name="unit_basic_name[' + $(this).data('item-id') + ']"]').val();
+        $('#dataTableOrderTasks thead tr th').each(function (i) {
+            var title = $(this).text();
+            if (title !== '' && title !== 'Akcje') {
+                $(this).html('<div><span>' + title + '</span></div><div><input type="text" placeholder="Szukaj ' + title + '" id="columnSearch' + i + '"/></div>');
+            } else if (title == 'Akcje') {
+                $(this).html('<span id="columnSearch' + i + '">Akcje</span>');
+            }
+            $('input', this).on('keyup change', function () {
+                if (table.column(i).search() !== this.value) {
+                    table
+                        .column(i)
+                        .search(this.value)
+                        .draw();
+                }
+            });
+        });
 
-                                    var unitCalculationUnits = $('[name="calculation_unit_units[' + $(this).data('item-id') + ']"]').val();
-                                    var unitCalculationConsumption = $('[name="calculation_unit_consumption[' + $(this).data('item-id') + ']"]').val();
-                                    var unitCalculationName = $('[name="calculation_unit_name[' + $(this).data('item-id') + ']"]').val();
+        const deleteRecordOrderPackages = (id) => {
+            $('#delete_form')[0].action = "/admin/orderPackages/" + id;
+            $('#delete_modal').modal('show');
+        };
+        $.fn.dataTable.ext.errMode = 'throw';
+        // DataTable
+        let tableOrderPackages = $('#dataTableOrderPackages').DataTable({
+            language: {!! json_encode( __('voyager.datatable'), true) !!},
+            processing: true,
+            serverSide: true,
+            columnDefs: [
+                {className: "dt-center", targets: "_all"}
+            ],
+            order: [[0, "asc"]],
+            ajax: '{!! route('order_packages.datatable', ['id' => $order->id]) !!}',
+            dom: 'Bfrtip',
+            buttons: [
+                {extend: 'colvis', text: 'Widzialność kolumn'}
+            ],
+            columns: [
+                {
+                    data: 'id',
+                    name: 'id',
+                    render: function (id) {
+                        return '<input type="checkbox">';
+                    }
+                },
+                {
+                    data: 'id',
+                    name: 'id',
+                    render: function (id, data, row) {
+                        let html = '';
+                        if (row.status !== 'SENDING' && row.status !== 'WAITING_FOR_SENDING' && row.status !== 'CANCELLED' && row.status !== 'WAITING_FOR_CANCELLED' && row.status !== 'DELIVERED' && row.service_courier_name !== 'GIELDA' && row.service_courier_name !== 'ODBIOR_OSOBISTY' && row.delivery_courier_name !== 'GIELDA' && row.delivery_courier_name !== 'ODBIOR_OSOBISTY') {
+                            html += '<button class="btn btn-sm btn-success edit" onclick="sendPackage(' + id + ',' + row.order_id + ')">';
+                            html += '<i class="voyager-mail"></i>';
+                            html += '<span class="hidden-xs hidden-sm"> Wyślij</span>';
+                            html += '</button>';
+                        }
+                        html += '<a href="/admin/orderPackages/' + id + '/edit" class="btn btn-sm btn-primary edit">';
+                        html += '<i class="voyager-edit"></i>';
+                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
+                        html += '</a>';
+                        html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecordOrderPackages(' + id + ')">';
+                        html += '<i class="voyager-trash"></i>';
+                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
+                        html += '</button>';
 
-                                    var unitCollectiveUnits = $('[name="unit_of_collective_units[' + $(this).data('item-id') + ']"]').val();
-                                    var unitCollectiveName = $('[name="unit_of_collective_name[' + $(this).data('item-id') + ']"]').val();
+                        return html;
+                    }
+                },
+                {
+                    data: 'id',
+                    name: 'id'
+                },
+                {
+                    data: 'number',
+                    name: 'number'
+                },
+                {
+                    data: 'status',
+                    name: 'status',
+                    render: function (status) {
+                        if (status === 'DELIVERED') {
+                            return '<span style="color: green;">' + {!! json_encode(__('order_packages.table.delivered'), true) !!} +'</span>';
+                        } else if (status === 'CANCELLED') {
+                            return '<span style="color: red;">' + {!! json_encode(__('order_packages.table.cancelled'), true) !!} +'</span>';
+                        } else if (status === 'NEW') {
+                            return '<span style="color: blue;">' + {!! json_encode(__('order_packages.table.new'), true) !!} +'</span>';
+                        } else if (status === 'SENDING') {
+                            return '<span style="color: orange;">' + {!! json_encode(__('order_packages.table.sending'), true) !!} +'</span>';
+                        } else if (status === 'WAITING_FOR_SENDING') {
+                            return '<span style="color: orange;">' + {!! json_encode(__('order_packages.table.waiting_for_sending'), true) !!} +'</span>';
+                        } else if (status === 'WAITING_FOR_CANCELLED') {
 
-                                    $('[name="unit_commercial[' + $(this).data('item-id') + ']"]').val(quantity + ' ' + unitCommercialName);
-                                    $('[name="unit_basic[' + $(this).data('item-id') + ']"]').val(quantity * unitBasicUnits + ' ' + unitBasicName);
-                                    $('[name="calculation_unit[' + $(this).data('item-id') + ']"]').val((quantity * unitCalculationUnits) / unitCalculationConsumption + ' ' + unitCalculationName);
-                                    $('[name="unit_of_collective[' + $(this).data('item-id') + ']"]').val((quantity * unitCollectiveUnits).toFixed(4) + ' ' + unitCollectiveName);
-                                    $('input.item-weight[data-item-id="' + $(this).data('item-id') + '"]').val(weightSum + ' kg');
-                                    $('input.item-profit[data-item-id="' + $(this).data('item-id') + '"]').val(profitItem + ' zł');
-                                    $('input.item-value[data-item-id="' + $(this).data('item-id') + '"]').val(parseFloat(sellingSum).toFixed(2) + ' zł');
-                                });
-                                $('.productsTableEdit .net_purchase_price_commercial_unit').each(function () {
-                                    var quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
-                                    net_purchase_price_sum += $(this).val() * quantity;
-                                });
-                                $('.productsTableEdit .gross_selling_price_commercial_unit').each(function () {
-                                    var quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
-                                    gross_selling_price_sum += $(this).val() * quantity;
-                                });
-                                $('.productsTableEdit .net_selling_price_commercial_unit').each(function () {
-                                    var quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
-                                    net_selling_price_sum += $(this).val() * quantity;
-                                });
-                                if ($('#additional_service_cost').val() == '') {
-                                    additionalServiceCost = 0;
-                                } else {
-                                    additionalServiceCost = parseFloat($('#additional_service_cost').val());
-                                }
-                                var profit = ((gross_selling_price_sum - gross_purchase_price_sum)).toFixed(2);
-                                var total_price = gross_selling_price_sum.toFixed(2);
-                                console.log('Total ' + total_price);
-                                $('input#profit').val(profit);
-                                $('input#total_price').val(total_price);
-                                $("#profitInfo").val($('#profit').val());
-                                $("#totalPriceInfo").val($("#total_price").val());
-                                $("#orderItemsSum").val(total_price);
-                                updateOrderSum();
-                                $("#weight").val(
-                                    parseFloat(
-                                        $('.item-weight').toArray().reduce(
-                                            (prev, curr) => prev + parseFloat(curr.value), 0)
-                                    ).toFixed(2))
-                                $("#weightInfo").val($("#weight").val());
-                            }
+                            return '<span style="color: orange;">' + {!! json_encode(__('order_packages.table.waiting_for_cancelled'), true) !!} +'</span>';
+                        } else if (status === 'REJECT_CANCELLED') {
 
-                            $('.quantityChange').on('change', function () {
-                                updateOrderSum();
-                            });
-                            $('#additional_service_cost').on('change', function () {
-                                updateOrderSum(1);
-                                commaReplace('.priceChange');
-                            });
+                            return '<span style="color: red;">Anulacja odrzucona</span>';
+                        }
+                    }
+                },
+                {
+                    data: 'letter_number',
+                    name: 'letter_number',
+                },
+                {
+                    data: 'size_a',
+                    name: 'size_a'
+                },
+                {
+                    data: 'size_b',
+                    name: 'size_b'
+                },
+                {
+                    data: 'size_c',
+                    name: 'size_c'
+                },
+                {
+                    data: 'weight',
+                    name: 'weight'
+                },
+                {
+                    data: 'container_type',
+                    name: 'container_type'
+                },
+                {
+                    data: 'shape',
+                    name: 'shape'
+                },
+                {
+                    data: 'cash_on_delivery',
+                    name: 'cash_on_delivery',
+                },
+                {
+                    data: 'notices',
+                    name: 'notices'
+                },
+                {
+                    data: 'delivery_courier_name',
+                    name: 'delivery_courier_name'
+                },
+                {
+                    data: 'service_courier_name',
+                    name: 'service_courier_name'
+                },
+                {
+                    data: 'shipment_date',
+                    name: 'shipment_date'
+                },
+                {
+                    data: 'delivery_date',
+                    name: 'delivery_date'
+                },
+                {
+                    data: 'cost_for_client',
+                    name: 'cost_for_client',
+                },
+                {
+                    data: 'cost_for_company',
+                    name: 'cost_for_company',
+                },
+                {
+                    data: 'cod_cost_for_us',
+                    name: 'cod_cost_for_us',
+                },
+                {
+                    data: 'real_cost_for_company',
+                    name: 'real_cost_for_company'
+                },
 
-                            $(document).on('change', 'input.price', function () {
-                                    console.log('x');
-                                    commaReplace('.priceChange');
+                {
+                    data: 'sending_number',
+                    name: 'sending_number'
+                },
+                {
+                    data: 'quantity',
+                    name: 'quantity'
+                },
+                {
+                    data: 'created_at',
+                    name: 'created_at',
+                },
+            ]
+        });
+            @foreach($visibilitiesPackage as $key =>$row)
 
-                                    var itemId = $(this).data('item-id');
+        var {{'show'.$row->name}}  = @json($row->show);
+        {{'show'.$row->name}} = {{'show'.$row->name}}.map(function (x) {
+            if (typeof tableOrderPackages.column(x + ':name').index() === "number")
+                return tableOrderPackages.column(x + ':name').index();
+        });
+        {{'show'.$row->name}} = {{'show'.$row->name}}.filter(function (el) {
+            return el != null;
+        });
 
-                                    var net_purchase_price_commercial_unit = $('.net_purchase_price_commercial_unit[data-item-id="' + itemId + '"');
-                                    var net_purchase_price_basic_unit = $('.net_purchase_price_basic_unit[data-item-id="' + itemId + '"');
-                                    var net_purchase_price_calculated_unit = $('.net_purchase_price_calculated_unit[data-item-id="' + itemId + '"');
-                                    var net_purchase_price_aggregate_unit = $('.net_purchase_price_aggregate_unit[data-item-id="' + itemId + '"');
-                                    var net_selling_price_commercial_unit = $('.net_selling_price_commercial_unit[data-item-id="' + itemId + '"');
-                                    var net_selling_price_basic_unit = $('.net_selling_price_basic_unit[data-item-id="' + itemId + '"');
-                                    var net_selling_price_calculated_unit = $('.net_selling_price_calculated_unit[data-item-id="' + itemId + '"');
-                                    var net_selling_price_aggregate_unit = $('.net_selling_price_aggregate_unit[data-item-id="' + itemId + '"');
+        var {{'hidden'.$row->name}} = @json($row->hidden);
+        {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.map(function (x) {
+            if (typeof tableOrderPackages.column(x + ':name').index() === "number")
+                return tableOrderPackages.column(x + ':name').index();
+        });
+        {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.filter(function (el) {
+            return el != null;
+        });
 
-                                    var gross_purchase_price_commercial_unit = $('.gross_purchase_price_commercial_unit[data-item-id="' + itemId + '"');
-                                    var gross_purchase_price_basic_unit = $('.gross_purchase_price_basic_unit[data-item-id="' + itemId + '"');
-                                    var gross_purchase_price_calculated_unit = $('.gross_purchase_price_calculated_unit[data-item-id="' + itemId + '"');
-                                    var gross_purchase_price_aggregate_unit = $('.gross_purchase_price_aggregate_unit[data-item-id="' + itemId + '"');
-                                    var gross_selling_price_commercial_unit = $('.gross_selling_price_commercial_unit[data-item-id="' + itemId + '"');
-                                    var gross_selling_price_basic_unit = $('.gross_selling_price_basic_unit[data-item-id="' + itemId + '"');
-                                    var gross_selling_price_calculated_unit = $('.gross_selling_price_calculated_unit[data-item-id="' + itemId + '"');
-                                    var gross_selling_price_aggregate_unit = $('.gross_selling_price_aggregate_unit[data-item-id="' + itemId + '"');
+        tableOrderPackages.button().add({{1+$key}}, {
+            extend: 'colvisGroup',
+            text: '{{$row->display_name}}',
+            show: {{'show'.$row->name}},
+            hide: {{'hidden'.$row->name}}
+        });
+        @endforeach
 
-                                    var numbers_of_basic_commercial_units_in_pack = $('.numbers_of_basic_commercial_units_in_pack[data-item-id="' + itemId + '"');
-                                    var number_of_sale_units_in_the_pack = $('.number_of_sale_units_in_the_pack[data-item-id="' + itemId + '"');
-                                    var number_of_trade_items_in_the_largest_unit = $('.number_of_trade_items_in_the_largest_unit[data-item-id="' + itemId + '"');
-                                    var unit_consumption = $('.unit_consumption[data-item-id="' + itemId + '"');
+        $('#dataTableOrderPackages thead tr th').each(function (i) {
+            var title = $(this).text();
+            if (title !== '' && title !== 'Akcje') {
+                $(this).html('<div><span>' + title + '</span></div><div><input type="text" placeholder="Szukaj ' + title + '" id="columnSearch' + i + '"/></div>');
+            } else if (title == 'Akcje') {
+                $(this).html('<span id="columnSearch' + i + '">Akcje</span>');
+            }
+            $('input', this).on('keyup change', function () {
+                if (table.column(i).search() !== this.value) {
+                    table
+                        .column(i)
+                        .search(this.value)
+                        .draw();
+                }
+            });
+        });
 
-                                    var net_purchase_price_commercial_unit_value = 0;
-                                    if (!$(this).hasClass('gross_purchase_price_commercial_unit')) {
-                                        net_purchase_price_commercial_unit_value = parseFloat(net_purchase_price_commercial_unit.val());
-                                    } else {
-                                        net_purchase_price_commercial_unit_value = parseFloat(gross_purchase_price_commercial_unit.val() / 1.23);
-                                    }
-                                    var net_purchase_price_basic_unit_value = 0;
-                                    if (!$(this).hasClass('gross_purchase_price_basic_unit')) {
-                                        net_purchase_price_basic_unit_value = parseFloat(net_purchase_price_basic_unit.val());
-                                    } else {
-                                        net_purchase_price_basic_unit_value = parseFloat(gross_purchase_price_basic_unit.val() / 1.23);
-                                    }
-                                    var net_purchase_price_aggregate_unit_value = 0;
-                                    if (!$(this).hasClass('gross_purchase_price_aggregate_unit')) {
-                                        net_purchase_price_aggregate_unit_value = parseFloat(net_purchase_price_aggregate_unit.val());
-                                    } else {
-                                        net_purchase_price_aggregate_unit_value = parseFloat(gross_purchase_price_aggregate_unit.val() / 1.23);
-                                    }
-                                    var net_purchase_price_calculated_unit_value = 0;
-                                    if (!$(this).hasClass('gross_purchase_price_calculated_unit')) {
-                                        net_purchase_price_calculated_unit_value = parseFloat(net_purchase_price_calculated_unit.val());
-                                    } else {
-                                        net_purchase_price_calculated_unit_value = parseFloat(gross_purchase_price_calculated_unit.val() / 1.23);
-                                    }
+        function sendPackage(id, orderId) {
+            $('#order_courier > div > div > div.modal-header > h4 > span').remove();
+            $('#order_courier > div > div > div.modal-header > span').remove();
+            $.ajax({
+                url: '/admin/orders/' + orderId + '/package/' + id + '/send',
+            }).done(function (data) {
+                $('#order_courier').modal('show');
+                if (data.message == 'Kurier zostanie zamówiony w przeciągu kilku minut' || data.message === null) {
+                    $('#order_courier > div > div > div.modal-header > h4').append('<span>Kurier zostanie zamówiony w przeciągu kilku minut</span>');
+                } else {
+                    $('#order_courier > div > div > div.modal-header > h4').append('<span>Jedno z wymaganych pól nie zostało zdefiniowane:</span>');
+                    $('#order_courier > div > div > div.modal-header').append('<span style="color:red;">' + data.message + '</span><br>');
+                }
+                $('#success-ok').on('click', function () {
+                    window.location.href = '/admin/orders/' + orderId + '/edit';
+                });
+            }).fail(function () {
+                $('#order_courier_problem').modal('show');
+                $('#problem-ok').on('click', function () {
+                    window.location.href = '/admin/orders/' + orderId + '/edit';
+                });
+            });
+        }
 
-                                    var net_selling_price_commercial_unit_value = 0;
-                                    if (!$(this).hasClass('gross_selling_price_commercial_unit')) {
-                                        net_selling_price_commercial_unit_value = parseFloat(net_selling_price_commercial_unit.val());
-                                    } else {
-                                        net_selling_price_commercial_unit_value = parseFloat(gross_selling_price_commercial_unit.val() / 1.23);
-                                    }
-                                    var net_selling_price_basic_unit_value = 0;
-                                    if (!$(this).hasClass('gross_selling_price_basic_unit')) {
-                                        net_selling_price_basic_unit_value = parseFloat(net_selling_price_basic_unit.val());
-                                    } else {
-                                        net_selling_price_basic_unit_value = parseFloat(gross_selling_price_basic_unit.val() / 1.23);
-                                    }
-                                    var net_selling_price_aggregate_unit_value = 0;
-                                    if (!$(this).hasClass('gross_selling_price_aggregate_unit')) {
-                                        net_selling_price_aggregate_unit_value = parseFloat(net_selling_price_aggregate_unit.val());
-                                    } else {
-                                        net_selling_price_aggregate_unit_value = parseFloat(gross_selling_price_aggregate_unit.val() / 1.23);
-                                    }
-                                    var net_selling_price_calculated_unit_value = 0;
-                                    if (!$(this).hasClass('gross_selling_price_calculated_unit')) {
-                                        net_selling_price_calculated_unit_value = parseFloat(net_selling_price_calculated_unit.val());
-                                    } else {
-                                        net_selling_price_calculated_unit_value = parseFloat(gross_selling_price_calculated_unit.val() / 1.23);
-                                    }
+        $(document).on("change", "select", function () {
+            $("option[value=" + this.value + "]", this)
+                .attr("selected", true).siblings()
+                .removeAttr("selected")
+        });
+        $(document).ready(function () {
 
-
-                                    var numbers_of_basic_commercial_units_in_pack_value = parseFloat(numbers_of_basic_commercial_units_in_pack.val());
-                                    var number_of_sale_units_in_the_pack_value = parseFloat(number_of_sale_units_in_the_pack.val());
-                                    var unit_consumption_value = parseFloat(unit_consumption.val());
-                                    var values = {
-                                        'net_purchase_price_commercial_unit':
-                                            {
-                                                'net_purchase_price_aggregate_unit': (net_purchase_price_commercial_unit_value * number_of_sale_units_in_the_pack_value).toFixed(4),
-                                                'net_purchase_price_basic_unit': (net_purchase_price_commercial_unit_value / numbers_of_basic_commercial_units_in_pack_value).toFixed(4),
-                                                'net_purchase_price_calculated_unit': ((net_purchase_price_commercial_unit_value / numbers_of_basic_commercial_units_in_pack_value) * unit_consumption_value).toFixed(4),
-                                                'gross_purchase_price_aggregate_unit': ((net_purchase_price_commercial_unit_value * number_of_sale_units_in_the_pack_value) * 1.23).toFixed(4),
-                                                'gross_purchase_price_basic_unit': ((net_purchase_price_commercial_unit_value / numbers_of_basic_commercial_units_in_pack_value) * 1.23).toFixed(4),
-                                                'gross_purchase_price_calculated_unit': (((net_purchase_price_commercial_unit_value / numbers_of_basic_commercial_units_in_pack_value) * unit_consumption_value) * 1.23).toFixed(4),
-                                            },
-                                        'net_purchase_price_basic_unit':
-                                            {
-                                                'net_purchase_price_aggregate_unit': (net_purchase_price_basic_unit_value * number_of_sale_units_in_the_pack_value * numbers_of_basic_commercial_units_in_pack_value).toFixed(4),
-                                                'net_purchase_price_commercial_unit': (net_purchase_price_basic_unit_value * numbers_of_basic_commercial_units_in_pack_value).toFixed(2),
-                                                'net_purchase_price_calculated_unit': ((net_purchase_price_basic_unit_value * unit_consumption_value)).toFixed(4),
-                                                'gross_purchase_price_aggregate_unit': ((net_purchase_price_basic_unit_value * number_of_sale_units_in_the_pack_value * numbers_of_basic_commercial_units_in_pack_value * 1.23)).toFixed(4),
-                                                'gross_purchase_price_commercial_unit': ((net_purchase_price_basic_unit_value * numbers_of_basic_commercial_units_in_pack_value) * 1.23).toFixed(2),
-                                                'gross_purchase_price_calculated_unit': (((net_purchase_price_basic_unit_value * unit_consumption_value) * 1.23)).toFixed(4)
-                                            },
-                                        'net_purchase_price_aggregate_unit':
-                                            {
-                                                'net_purchase_price_basic_unit': (net_purchase_price_aggregate_unit_value / (number_of_sale_units_in_the_pack_value * numbers_of_basic_commercial_units_in_pack_value)).toFixed(4),
-                                                'net_purchase_price_commercial_unit': (net_purchase_price_aggregate_unit_value / (number_of_sale_units_in_the_pack_value)).toFixed(2),
-                                                'net_purchase_price_calculated_unit': (net_purchase_price_aggregate_unit_value * (number_of_sale_units_in_the_pack_value)).toFixed(4),
-                                                'gross_purchase_price_basic_unit': ((net_purchase_price_aggregate_unit_value / (number_of_sale_units_in_the_pack_value * numbers_of_basic_commercial_units_in_pack_value)) * 1.23).toFixed(4),
-                                                'gross_purchase_price_commercial_unit': ((net_purchase_price_aggregate_unit_value / (number_of_sale_units_in_the_pack_value)) * 1.23).toFixed(2),
-                                                'gross_purchase_price_calculated_unit': ((net_purchase_price_aggregate_unit_value * (number_of_sale_units_in_the_pack_value)) * 1.23).toFixed(4),
-                                            },
-                                        'net_purchase_price_calculated_unit':
-                                            {
-                                                'net_purchase_price_basic_unit': ((net_purchase_price_calculated_unit_value / unit_consumption_value)).toFixed(4),
-                                                'net_purchase_price_commercial_unit': ((net_purchase_price_calculated_unit_value / unit_consumption_value) * numbers_of_basic_commercial_units_in_pack_value).toFixed(2),
-                                                'net_purchase_price_aggregate_unit': (((net_purchase_price_calculated_unit_value * (number_of_sale_units_in_the_pack_value / unit_consumption_value)))).toFixed(4),
-                                                'gross_purchase_price_basic_unit': (((net_purchase_price_calculated_unit_value / unit_consumption_value)) * 1.23).toFixed(4),
-                                                'gross_purchase_price_commercial_unit': (((net_purchase_price_calculated_unit_value / unit_consumption_value) * numbers_of_basic_commercial_units_in_pack_value) * 1.23).toFixed(2),
-                                                'gross_purchase_price_aggregate_unit': (((net_purchase_price_calculated_unit_value * (number_of_sale_units_in_the_pack_value / unit_consumption_value))) * 1.23).toFixed(4),
-
-                                            },
-                                        'net_selling_price_commercial_unit':
-                                            {
-                                                'net_selling_price_aggregate_unit': (net_selling_price_commercial_unit_value * number_of_sale_units_in_the_pack_value).toFixed(4),
-                                                'net_selling_price_basic_unit': (net_selling_price_commercial_unit_value / numbers_of_basic_commercial_units_in_pack_value).toFixed(4),
-                                                'net_selling_price_calculated_unit': ((net_selling_price_commercial_unit_value / numbers_of_basic_commercial_units_in_pack_value) * unit_consumption_value).toFixed(4),
-                                                'gross_selling_price_aggregate_unit': ((net_selling_price_commercial_unit_value * number_of_sale_units_in_the_pack_value) * 1.23).toFixed(4),
-                                                'gross_selling_price_basic_unit': ((net_selling_price_commercial_unit_value / numbers_of_basic_commercial_units_in_pack_value) * 1.23).toFixed(4),
-                                                'gross_selling_price_calculated_unit': (((net_selling_price_commercial_unit_value / numbers_of_basic_commercial_units_in_pack_value) * unit_consumption_value) * 1.23).toFixed(4),
-                                            },
-                                        'net_selling_price_basic_unit':
-                                            {
-                                                'net_selling_price_aggregate_unit': (net_selling_price_basic_unit_value * number_of_sale_units_in_the_pack_value * numbers_of_basic_commercial_units_in_pack_value).toFixed(2),
-                                                'net_selling_price_commercial_unit': (net_selling_price_basic_unit_value * numbers_of_basic_commercial_units_in_pack_value).toFixed(2),
-                                                'net_selling_price_calculated_unit': ((net_selling_price_basic_unit_value * unit_consumption_value)).toFixed(2),
-                                                'gross_selling_price_aggregate_unit': ((net_selling_price_basic_unit_value * number_of_sale_units_in_the_pack_value * numbers_of_basic_commercial_units_in_pack_value * 1.23)).toFixed(2),
-                                                'gross_selling_price_commercial_unit': ((net_selling_price_basic_unit_value * numbers_of_basic_commercial_units_in_pack_value) * 1.23).toFixed(2),
-                                                'gross_selling_price_calculated_unit': (((net_selling_price_basic_unit_value * unit_consumption_value) * 1.23)).toFixed(2)
-                                            },
-                                        'net_selling_price_aggregate_unit':
-                                            {
-                                                'net_selling_price_basic_unit': (net_selling_price_aggregate_unit_value / (number_of_sale_units_in_the_pack_value * numbers_of_basic_commercial_units_in_pack_value)).toFixed(2),
-                                                'net_selling_price_commercial_unit': (net_selling_price_aggregate_unit_value / (number_of_sale_units_in_the_pack_value)).toFixed(2),
-                                                'net_selling_price_calculated_unit': (net_selling_price_aggregate_unit_value * (number_of_sale_units_in_the_pack_value)).toFixed(2),
-                                                'gross_selling_price_basic_unit': ((net_selling_price_aggregate_unit_value / (number_of_sale_units_in_the_pack_value * numbers_of_basic_commercial_units_in_pack_value)) * 1.23).toFixed(2),
-                                                'gross_selling_price_commercial_unit': ((net_selling_price_aggregate_unit_value / (number_of_sale_units_in_the_pack_value)) * 1.23).toFixed(2),
-                                                'gross_selling_price_calculated_unit': ((net_selling_price_aggregate_unit_value * (number_of_sale_units_in_the_pack_value)) * 1.23).toFixed(2),
-                                            },
-                                        'net_selling_price_calculated_unit':
-                                            {
-                                                'net_selling_price_basic_unit': ((net_selling_price_calculated_unit_value / unit_consumption_value)).toFixed(2),
-                                                'net_selling_price_commercial_unit': ((net_selling_price_calculated_unit_value / unit_consumption_value) * numbers_of_basic_commercial_units_in_pack_value).toFixed(2),
-                                                'net_selling_price_aggregate_unit': ((net_selling_price_calculated_unit_value * (number_of_sale_units_in_the_pack_value / unit_consumption_value))).toFixed(2),
-                                                'gross_selling_price_basic_unit': (((net_selling_price_calculated_unit_value / unit_consumption_value)) * 1.23).toFixed(2),
-                                                'gross_selling_price_commercial_unit': (((net_selling_price_calculated_unit_value / unit_consumption_value) * numbers_of_basic_commercial_units_in_pack_value) * 1.23).toFixed(2),
-                                                'gross_selling_price_aggregate_unit': ((net_selling_price_calculated_unit_value * (number_of_sale_units_in_the_pack_value / unit_consumption_value)) * 1.23).toFixed(2),
-                                            }
-                                    }
-
-
-                                    if ($(this).hasClass('net_purchase_price_commercial_unit')) {
-                                        net_purchase_price_aggregate_unit.val(values['net_purchase_price_commercial_unit']['net_purchase_price_aggregate_unit']);
-                                        net_purchase_price_basic_unit.val(values['net_purchase_price_commercial_unit']['net_purchase_price_basic_unit']);
-                                        net_purchase_price_calculated_unit.val(values['net_purchase_price_commercial_unit']['net_purchase_price_calculated_unit']);
-                                        gross_purchase_price_commercial_unit.val(($(this).val() * 1.23).toFixed(2));
-                                        gross_purchase_price_aggregate_unit.val(values['net_purchase_price_commercial_unit']['gross_purchase_price_aggregate_unit']);
-                                        gross_purchase_price_basic_unit.val(values['net_purchase_price_commercial_unit']['gross_purchase_price_basic_unit']);
-                                        gross_purchase_price_calculated_unit.val(values['net_purchase_price_commercial_unit']['gross_purchase_price_calculated_unit']);
-                                    }
-
-                                    if ($(this).hasClass('net_purchase_price_basic_unit')) {
-                                        net_purchase_price_aggregate_unit.val(values['net_purchase_price_basic_unit']['net_purchase_price_aggregate_unit']);
-                                        net_purchase_price_commercial_unit.val(values['net_purchase_price_basic_unit']['net_purchase_price_commercial_unit']);
-                                        net_purchase_price_calculated_unit.val(values['net_purchase_price_basic_unit']['net_purchase_price_calculated_unit']);
-                                        gross_purchase_price_basic_unit.val(($(this).val() * 1.23).toFixed(4));
-                                        gross_purchase_price_aggregate_unit.val(values['net_purchase_price_basic_unit']['gross_purchase_price_aggregate_unit']);
-                                        gross_purchase_price_commercial_unit.val(values['net_purchase_price_basic_unit']['gross_purchase_price_commercial_unit']);
-                                        gross_purchase_price_calculated_unit.val(values['net_purchase_price_basic_unit']['gross_purchase_price_calculated_unit']);
-                                        $('.net_purchase_price_commercial_unit').change()
-                                    }
-
-                                    if ($(this).hasClass('net_purchase_price_aggregate_unit')) {
-                                        net_purchase_price_basic_unit.val(values['net_purchase_price_aggregate_unit']['net_purchase_price_basic_unit']);
-                                        net_purchase_price_commercial_unit.val(values['net_purchase_price_aggregate_unit']['net_purchase_price_commercial_unit']);
-                                        net_purchase_price_calculated_unit.val(values['net_purchase_price_aggregate_unit']['net_purchase_price_calculated_unit']);
-                                        gross_purchase_price_aggregate_unit.val(($(this).val() * 1.23).toFixed(4));
-                                        gross_purchase_price_basic_unit.val(values['net_purchase_price_aggregate_unit']['gross_purchase_price_basic_unit']);
-                                        gross_purchase_price_commercial_unit.val(values['net_purchase_price_aggregate_unit']['gross_purchase_price_commercial_unit']);
-                                        gross_purchase_price_calculated_unit.val(values['net_purchase_price_aggregate_unit']['gross_purchase_price_calculated_unit']);
-                                        $('.net_purchase_price_commercial_unit').change()
-                                    }
-
-                                    if ($(this).hasClass('net_purchase_price_calculated_unit')) {
-                                        net_purchase_price_basic_unit.val(values['net_purchase_price_calculated_unit']['net_purchase_price_basic_unit']);
-                                        net_purchase_price_commercial_unit.val(values['net_purchase_price_calculated_unit']['net_purchase_price_commercial_unit']);
-                                        net_purchase_price_aggregate_unit.val(values['net_purchase_price_calculated_unit']['net_purchase_price_aggregate_unit']);
-                                        gross_purchase_price_calculated_unit.val(($(this).val() * 1.23).toFixed(4));
-                                        gross_purchase_price_basic_unit.val(values['net_purchase_price_calculated_unit']['gross_purchase_price_basic_unit']);
-                                        gross_purchase_price_commercial_unit.val(values['net_purchase_price_calculated_unit']['gross_purchase_price_commercial_unit']);
-                                        gross_purchase_price_aggregate_unit.val(values['net_purchase_price_calculated_unit']['gross_purchase_price_aggregate_unit']);
-                                        $('.net_purchase_price_commercial_unit').change()
-                                    }
-
-                                    if ($(this).hasClass('gross_purchase_price_commercial_unit')) {
-                                        net_purchase_price_aggregate_unit.val(values['net_purchase_price_commercial_unit']['net_purchase_price_aggregate_unit']);
-                                        net_purchase_price_basic_unit.val(values['net_purchase_price_commercial_unit']['net_purchase_price_basic_unit']);
-                                        net_purchase_price_calculated_unit.val(values['net_purchase_price_commercial_unit']['net_purchase_price_calculated_unit']);
-                                        net_purchase_price_commercial_unit.val(($(this).val() / 1.23).toFixed(2));
-                                        gross_purchase_price_aggregate_unit.val(values['net_purchase_price_commercial_unit']['gross_purchase_price_aggregate_unit']);
-                                        gross_purchase_price_basic_unit.val(values['net_purchase_price_commercial_unit']['gross_purchase_price_basic_unit']);
-                                        gross_purchase_price_calculated_unit.val(values['net_purchase_price_commercial_unit']['gross_purchase_price_calculated_unit']);
-                                    }
-
-                                    if ($(this).hasClass('gross_purchase_price_basic_unit')) {
-                                        net_purchase_price_aggregate_unit.val(values['net_purchase_price_basic_unit']['net_purchase_price_aggregate_unit']);
-                                        net_purchase_price_commercial_unit.val(values['net_purchase_price_basic_unit']['net_purchase_price_commercial_unit']);
-                                        net_purchase_price_calculated_unit.val(values['net_purchase_price_basic_unit']['net_purchase_price_calculated_unit']);
-                                        net_purchase_price_basic_unit.val(($(this).val() / 1.23).toFixed(4));
-                                        gross_purchase_price_aggregate_unit.val(values['net_purchase_price_basic_unit']['gross_purchase_price_aggregate_unit']);
-                                        gross_purchase_price_commercial_unit.val(values['net_purchase_price_basic_unit']['gross_purchase_price_commercial_unit']);
-                                        gross_purchase_price_calculated_unit.val(values['net_purchase_price_basic_unit']['gross_purchase_price_calculated_unit']);
-                                        $('.gross_purchase_price_commercial_unit').change()
-                                    }
-
-                                    if ($(this).hasClass('gross_purchase_price_aggregate_unit')) {
-                                        net_purchase_price_basic_unit.val(values['net_purchase_price_aggregate_unit']['net_purchase_price_basic_unit']);
-                                        net_purchase_price_commercial_unit.val(values['net_purchase_price_aggregate_unit']['net_purchase_price_commercial_unit']);
-                                        net_purchase_price_calculated_unit.val(values['net_purchase_price_aggregate_unit']['net_purchase_price_calculated_unit']);
-                                        net_purchase_price_aggregate_unit.val(($(this).val() / 1.23).toFixed(4));
-                                        gross_purchase_price_basic_unit.val(values['net_purchase_price_aggregate_unit']['gross_purchase_price_basic_unit']);
-                                        gross_purchase_price_commercial_unit.val(values['net_purchase_price_aggregate_unit']['gross_purchase_price_commercial_unit']);
-                                        gross_purchase_price_calculated_unit.val(values['net_purchase_price_aggregate_unit']['gross_purchase_price_calculated_unit']);
-                                        $('.gross_purchase_price_commercial_unit').change()
-                                    }
-
-                                    if ($(this).hasClass('gross_purchase_price_calculated_unit')) {
-                                        net_purchase_price_basic_unit.val(values['net_purchase_price_calculated_unit']['net_purchase_price_basic_unit']);
-                                        net_purchase_price_commercial_unit.val(values['net_purchase_price_calculated_unit']['net_purchase_price_commercial_unit']);
-                                        net_purchase_price_aggregate_unit.val(values['net_purchase_price_calculated_unit']['net_purchase_price_aggregate_unit']);
-                                        net_purchase_price_calculated_unit.val(($(this).val() / 1.23).toFixed(4));
-                                        gross_purchase_price_basic_unit.val(values['net_purchase_price_calculated_unit']['gross_purchase_price_basic_unit']);
-                                        gross_purchase_price_commercial_unit.val(values['net_purchase_price_calculated_unit']['gross_purchase_price_commercial_unit']);
-                                        gross_purchase_price_aggregate_unit.val(values['net_purchase_price_calculated_unit']['gross_purchase_price_aggregate_unit']);
-                                        $('.gross_purchase_price_commercial_unit').change()
-                                    }
-
-                                    if ($(this).hasClass('net_selling_price_commercial_unit')) {
-                                        net_selling_price_aggregate_unit.val(values['net_selling_price_commercial_unit']['net_selling_price_aggregate_unit']);
-                                        net_selling_price_basic_unit.val(values['net_selling_price_commercial_unit']['net_selling_price_basic_unit']);
-                                        net_selling_price_calculated_unit.val(values['net_selling_price_commercial_unit']['net_selling_price_calculated_unit']);
-                                        gross_selling_price_commercial_unit.val(($(this).val() * 1.23).toFixed(2));
-                                        gross_selling_price_aggregate_unit.val(values['net_selling_price_commercial_unit']['gross_selling_price_aggregate_unit']);
-                                        gross_selling_price_basic_unit.val(values['net_selling_price_commercial_unit']['gross_selling_price_basic_unit']);
-                                        gross_selling_price_calculated_unit.val(values['net_selling_price_commercial_unit']['gross_selling_price_calculated_unit']);
-                                    }
-
-                                    if ($(this).hasClass('net_selling_price_basic_unit')) {
-                                        net_selling_price_aggregate_unit.val(values['net_selling_price_basic_unit']['net_selling_price_aggregate_unit']);
-                                        net_selling_price_commercial_unit.val(values['net_selling_price_basic_unit']['net_selling_price_commercial_unit']);
-                                        net_selling_price_calculated_unit.val(values['net_selling_price_basic_unit']['net_selling_price_calculated_unit']);
-                                        gross_selling_price_basic_unit.val(($(this).val() * 1.23).toFixed(4));
-                                        gross_selling_price_aggregate_unit.val(values['net_selling_price_basic_unit']['gross_selling_price_aggregate_unit']);
-                                        gross_selling_price_commercial_unit.val(values['net_selling_price_basic_unit']['gross_selling_price_commercial_unit']);
-                                        gross_selling_price_calculated_unit.val(values['net_selling_price_basic_unit']['gross_selling_price_calculated_unit']);
-                                        $('.net_selling_price_commercial_unit').change()
-                                    }
-
-                                    if ($(this).hasClass('net_selling_price_aggregate_unit')) {
-                                        net_selling_price_basic_unit.val(values['net_selling_price_aggregate_unit']['net_selling_price_basic_unit']);
-                                        net_selling_price_commercial_unit.val(values['net_selling_price_aggregate_unit']['net_selling_price_commercial_unit']);
-                                        net_selling_price_calculated_unit.val(values['net_selling_price_aggregate_unit']['net_selling_price_calculated_unit']);
-                                        gross_selling_price_aggregate_unit.val(($(this).val() * 1.23).toFixed(4));
-                                        gross_selling_price_basic_unit.val(values['net_selling_price_aggregate_unit']['gross_selling_price_basic_unit']);
-                                        gross_selling_price_commercial_unit.val(values['net_selling_price_aggregate_unit']['gross_selling_price_commercial_unit']);
-                                        gross_selling_price_calculated_unit.val(values['net_selling_price_aggregate_unit']['gross_selling_price_calculated_unit']);
-                                        $('.net_selling_price_commercial_unit').change()
-                                    }
-
-                                    if ($(this).hasClass('net_selling_price_calculated_unit')) {
-                                        net_selling_price_basic_unit.val(values['net_selling_price_calculated_unit']['net_selling_price_basic_unit']);
-                                        net_selling_price_commercial_unit.val(values['net_selling_price_calculated_unit']['net_selling_price_commercial_unit']);
-                                        net_selling_price_aggregate_unit.val(values['net_selling_price_calculated_unit']['net_selling_price_aggregate_unit']);
-                                        gross_selling_price_calculated_unit.val(($(this).val() * 1.23).toFixed(4));
-                                        gross_selling_price_basic_unit.val(values['net_selling_price_calculated_unit']['gross_selling_price_basic_unit']);
-                                        gross_selling_price_commercial_unit.val(values['net_selling_price_calculated_unit']['gross_selling_price_commercial_unit']);
-                                        gross_selling_price_aggregate_unit.val(values['net_selling_price_calculated_unit']['gross_selling_price_aggregate_unit']);
-                                        $('.net_selling_price_commercial_unit').change()
-                                    }
-
-                                    if ($(this).hasClass('gross_selling_price_commercial_unit')) {
-                                        net_selling_price_aggregate_unit.val(values['net_selling_price_commercial_unit']['net_selling_price_aggregate_unit']);
-                                        net_selling_price_basic_unit.val(values['net_selling_price_commercial_unit']['net_selling_price_basic_unit']);
-                                        net_selling_price_calculated_unit.val(values['net_selling_price_commercial_unit']['net_selling_price_calculated_unit']);
-                                        net_selling_price_commercial_unit.val(($(this).val() / 1.23).toFixed(2));
-                                        gross_selling_price_aggregate_unit.val(values['net_selling_price_commercial_unit']['gross_selling_price_aggregate_unit']);
-                                        gross_selling_price_basic_unit.val(values['net_selling_price_commercial_unit']['gross_selling_price_basic_unit']);
-                                        gross_selling_price_calculated_unit.val(values['net_selling_price_commercial_unit']['gross_selling_price_calculated_unit']);
-                                    }
-
-                                    if ($(this).hasClass('gross_selling_price_basic_unit')) {
-                                        net_selling_price_aggregate_unit.val(values['net_selling_price_basic_unit']['net_selling_price_aggregate_unit']);
-                                        net_selling_price_commercial_unit.val(values['net_selling_price_basic_unit']['net_selling_price_commercial_unit']);
-                                        net_selling_price_calculated_unit.val(values['net_selling_price_basic_unit']['net_selling_price_calculated_unit']);
-                                        net_selling_price_basic_unit.val(($(this).val() / 1.23).toFixed(4));
-                                        gross_selling_price_aggregate_unit.val(values['net_selling_price_basic_unit']['gross_selling_price_aggregate_unit']);
-                                        gross_selling_price_commercial_unit.val(values['net_selling_price_basic_unit']['gross_selling_price_commercial_unit']);
-                                        gross_selling_price_calculated_unit.val(values['net_selling_price_basic_unit']['gross_selling_price_calculated_unit']);
-                                        $('.gross_selling_price_commercial_unit').change()
-                                    }
-
-                                    if ($(this).hasClass('gross_selling_price_aggregate_unit')) {
-                                        net_selling_price_basic_unit.val(values['net_selling_price_aggregate_unit']['net_selling_price_basic_unit']);
-                                        net_selling_price_commercial_unit.val(values['net_selling_price_aggregate_unit']['net_selling_price_commercial_unit']);
-                                        net_selling_price_calculated_unit.val(values['net_selling_price_aggregate_unit']['net_selling_price_calculated_unit']);
-                                        net_selling_price_aggregate_unit.val(($(this).val() / 1.23).toFixed(4));
-                                        gross_selling_price_basic_unit.val(values['net_selling_price_aggregate_unit']['gross_selling_price_basic_unit']);
-                                        gross_selling_price_commercial_unit.val(values['net_selling_price_aggregate_unit']['gross_selling_price_commercial_unit']);
-                                        gross_selling_price_calculated_unit.val(values['net_selling_price_aggregate_unit']['gross_selling_price_calculated_unit']);
-                                        $('.gross_selling_price_commercial_unit').change()
-                                    }
-
-                                    if ($(this).hasClass('gross_selling_price_calculated_unit')) {
-                                        net_selling_price_basic_unit.val(values['net_selling_price_calculated_unit']['net_selling_price_basic_unit']);
-                                        net_selling_price_commercial_unit.val(values['net_selling_price_calculated_unit']['net_selling_price_commercial_unit']);
-                                        net_selling_price_aggregate_unit.val(values['net_selling_price_calculated_unit']['net_selling_price_aggregate_unit']);
-                                        net_selling_price_calculated_unit.val(($(this).val() / 1.23).toFixed(4));
-                                        gross_selling_price_basic_unit.val(values['net_selling_price_calculated_unit']['gross_selling_price_basic_unit']);
-                                        gross_selling_price_commercial_unit.val(values['net_selling_price_calculated_unit']['gross_selling_price_commercial_unit']);
-                                        gross_selling_price_aggregate_unit.val(values['net_selling_price_calculated_unit']['gross_selling_price_aggregate_unit']);
-                                        $('.gross_selling_price_commercial_unit').change()
-                                    }
-
-                                    updateProfit();
-                                }
-                            );
-
-
-                            function update(purchase, selling, id) {
-                                var purchasePrice = $("input[name='" + purchase + "[" + id + "]']").val();
-                                var sellingPrice = $("input[name='" + selling + "[" + id + "]']");
-                                var vat = 1.23;
-                                var calc;
-
-                                calc = parseFloat(purchasePrice) * parseFloat(vat);
-
-                                sellingPrice.val(parseFloat(calc).toFixed(4));
-
-                            }
-
-                            function update2(purchase, selling, id) {
-                                var purchasePrice = $("input[name='" + purchase + "[" + id + "]']").val();
-                                var sellingPrice = $("input[name='" + selling + "[" + id + "]']");
-                                var vat = 1.23;
-                                var calc;
-
-                                calc = parseFloat(purchasePrice) * parseFloat(vat);
-
-                                sellingPrice.val(parseFloat(calc).toFixed(2));
-
-                            }
-
-                            function calculateNettoFromGross(netto, gross, id, fixed = 2) {
-                                let nettoPrice = $("input[name='" + netto + "[" + id + "]']");
-                                let grossPrice = $("input[name='" + gross + "[" + id + "]']").val();
-                                if (grossPrice) {
-                                    if (netto === 'net_selling_price_commercial_unit') {
-                                        update2(netto, gross, id);
-                                    } else {
-                                        update(netto, gross, id)
-                                    }
-                                    return;
-                                }
-                                let vat = 1.23;
-                                let calc;
-                                calc = parseFloat(grossPrice) / parseFloat(vat);
-                                nettoPrice.val(parseFloat(calc).toFixed(fixed));
-                            }
-
-                            @foreach ($order->items as $item)
-                            update2('net_purchase_price_commercial_unit', 'gross_purchase_price_commercial_unit', '{{$item->id}}');
-                            update('net_purchase_price_basic_unit', 'gross_purchase_price_basic_unit', '{{$item->id}}');
-                            update('net_purchase_price_calculated_unit', 'gross_purchase_price_calculated_unit', '{{$item->id}}');
-                            update('net_purchase_price_aggregate_unit', 'gross_purchase_price_aggregate_unit', '{{$item->id}}');
-                            calculateNettoFromGross('net_selling_price_commercial_unit', 'gross_selling_price_commercial_unit', '{{$item->id}}');
-                            calculateNettoFromGross('net_selling_price_basic_unit', 'gross_selling_price_basic_unit', '{{$item->id}}', 4);
-                            calculateNettoFromGross('net_selling_price_calculated_unit', 'gross_selling_price_calculated_unit', '{{$item->id}}', 4);
-                            calculateNettoFromGross('net_selling_price_aggregate_unit', 'gross_selling_price_aggregate_unit', '{{$item->id}}', 4);
-                            @endforeach
-
-                            $(function () {
-                                $("#add-item").autocomplete({
-                                    source: "{{ route('orders.products.autocomplete') }}",
-                                    minLength: 1,
-                                    select: function (event, ui) {
-                                        $('#add-item').val(ui.item.value);
-                                    }
-                                });
-                            });
-                            $('#add-item').on('change', function () {
+            var editor;
+            ClassicEditor
+                .create(document.querySelector('.editor'))
+                .then(editor => {
+                    console.log(editor);
+                    $('#status').on('change', function () {
+                        $('#status option').each(function () {
+                            if ($(this).is(':selected')) {
                                 $.ajax({
-                                    type: 'GET',
-                                    url: '/admin/orders/products/' + this.value,
-                                    headers: {
-                                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                                    },
-                                    success: function (data) {
-                                        var currentId = $('.id').length;
-                                        var id = parseInt(currentId) + 1;
-
-                                        $('#products-tbody:last-child').append(
-                                            '<tr class="id" id="id[' + id + ']">\n' +
-                                            '<td><img src="' + data.imageUrl + '" class="product-image">' + '<h4><strong>' + id + '. </strong> ' + data.product.name + ' </h4></td>\n' +
-                                            '<input name="id[' + id + ']"\n' +
-                                            'value="' + id + '" type="hidden"\n' +
-                                            'class="form-control" id="id[' + id + ']">' +
-                                            '<input name="product_id[' + id + ']"\n' +
-                                            'value="' + data.product.id + '" type="hidden"\n' +
-                                            'class="form-control" id="product_id[' + id + ']">' +
-                                            '<input value="1" type="hidden"\n' +
-                                            'class="form-control item_quantity"  name="item_quantity[' + id + ']" data-item-id="' + id + '">\n' +
-                                            '<input name="numbers_of_basic_commercial_units_in_pack[' + id + ']"\n' +
-                                            'data-item-id="' + id + '" value="' + data.packing.numbers_of_basic_commercial_units_in_pack + '" type="hidden"\n' +
-                                            'class="form-control numbers_of_basic_commercial_units_in_pack" id="numbers_of_basic_commercial_units_in_pack[' + id + ']">\n' +
-                                            '<input name="number_of_sale_units_in_the_pack[' + id + ']"\n' +
-                                            'data-item-id="' + id + '" value="' + data.packing.number_of_sale_units_in_the_pack + '" type="hidden"\n' +
-                                            'class="form-control number_of_sale_units_in_the_pack" id="number_of_sale_units_in_the_pack[' + id + ']">\n' +
-                                            '<input name="number_of_trade_items_in_the_largest_unit[' + id + ']"\n' +
-                                            'data-item-id="' + id + '" value="' + data.packing.number_of_trade_items_in_the_largest_unit + '" type="hidden"\n' +
-                                            'class="form-control number_of_trade_items_in_the_largest_unit" id="number_of_trade_items_in_the_largest_unit[' + id + ']">\n' +
-                                            '<input name="unit_consumption[' + id + ']"\n' +
-                                            'data-item-id="' + id + '" value="' + data.packing.unit_consumption + '" type="hidden"\n' +
-                                            'class="form-control unit_consumption" id="unit_consumption[' + id + ']">' +
-                                            '</tr>' +
-                                            '<tr>\n' +
-                                            '<th>Cena zakupu</th>\n' +
-                                            '</tr><tr class="purchase-row">\n' +
-                                            '<td>\n' +
-                                            '<input name="net_purchase_price_commercial_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_purchase_price_commercial_unit).toFixed(2) + '" type="text" class="form-control price net_purchase_price_commercial_unit" id="net_purchase_price_commercial_unit[' + id + ']">\n' +
-                                            '\n' +
-                                            '<input name="net_purchase_price_basic_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_purchase_price_basic_unit).toFixed(2) + '" type="text" class="form-control price net_purchase_price_basic_unit" id="net_purchase_price_basic_unit[' + id + ']">\n' +
-                                            '\n' +
-                                            '<input name="net_purchase_price_calculated_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_purchase_price_calculated_unit).toFixed(2) + '" type="text" class="form-control price net_purchase_price_calculated_unit" id="net_purchase_price_calculated_unit[' + id + ']">\n' +
-                                            '\n' +
-                                            '<input name="net_purchase_price_aggregate_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_purchase_price_aggregate_unit).toFixed(2) + '" type="text" class="form-control price net_purchase_price_aggregate_unit" id="net_purchase_price_aggregate_unit[' + id + ']">\n' +
-                                            '</td>\n' +
-                                            '</tr><tr class="purchase-row">\n' +
-                                            '<td>\n' +
-                                            '<input name="gross_purchase_price_commercial_unit[' + id + ']" value="' + parseFloat(data.price.net_purchase_price_commercial_unit * 1.23).toFixed(2) + '" type="text" data-item-id="' + id + '" class="form-control price gross_purchase_price_commercial_unit" id="gross_purchase_price_commercial_unit[' + id + ']">\n' +
-                                            '\n' +
-                                            '<input name="gross_purchase_price_basic_unit[' + id + ']" value="' + parseFloat(data.price.net_purchase_price_basic_unit * 1.23).toFixed(2) + '" type="text" data-item-id="' + id + '" class="form-control price gross_purchase_price_basic_unit" id="gross_purchase_price_basic_unit[' + id + ']">\n' +
-                                            '\n' +
-                                            '<input name="gross_purchase_price_calculated_unit[' + id + ']" value="' + parseFloat(data.price.net_purchase_price_calculated_unit * 1.23).toFixed(2) + '" type="text" data-item-id="' + id + '" class="form-control price gross_purchase_price_calculated_unit" id="gross_purchase_price_calculated_unit[' + id + ']">\n' +
-                                            '\n' +
-                                            '<input name="gross_purchase_price_aggregate_unit[' + id + ']" value="' + parseFloat(data.price.net_purchase_price_aggregate_unit * 1.23).toFixed(2) + '" type="text" data-item-id="' + id + '" class="form-control price gross_purchase_price_aggregate_unit" id="gross_purchase_price_aggregate_unit[' + id + ']">\n' +
-                                            '</td>\n' +
-                                            '</tr><tr class="purchase-row">\n' +
-                                            '<td>\n' +
-                                            '<input name="unit_commercial" value="1 ' + data.packing.unit_commercial + '" type="text" class="form-control" id="unit_commercial" disabled="">\n' +
-                                            '\n' +
-                                            '<input name="unit_basic" value="' + parseFloat(data.packing.numbers_of_basic_commercial_units_in_pack) + ' ' + data.packing.unit_basic + '" type="text" class="form-control" id="unit_basic" disabled="">\n' +
-                                            '\n' +
-                                            '<input name="calculation_unit" value="' + parseFloat(data.packing.numbers_of_basic_commercial_units_in_pack / data.packing.unit_consumption).toFixed(2) + ' ' + data.packing.calculation_unit + '" type="text" class="form-control" id="calculation_unit" disabled="">\n' +
-                                            '\n' +
-                                            '<input name="unit_of_collective" value="' + data.packing.number_of_sale_units_in_the_pack + ' ' + data.packing.unit_of_collective + '" type="text" class="form-control" id="unit_of_collective" disabled="">\n' +
-                                            '</td>\n' +
-                                            '</tr><tr>\n' +
-                                            '<th>Cena sprzedaży</th>\n' +
-                                            '</tr><tr class="selling-row">\n' +
-                                            '<td>\n' +
-                                            '<input name="net_selling_price_commercial_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_selling_price_commercial_unit).toFixed(2) + '" type="text" class="form-control price net_selling_price_commercial_unit change-order" id="net_selling_price_commercial_unit[' + id + ']">\n' +
-                                            '\n' +
-                                            '<input name="net_selling_price_basic_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_selling_price_basic_unit).toFixed(2) + '" type="text" class="form-control price net_selling_price_basic_unit change-order" id="net_selling_price_basic_unit[' + id + ']">\n' +
-                                            '\n' +
-                                            '<input name="net_selling_price_calculated_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_selling_price_calculated_unit).toFixed(2) + '" type="text" class="form-control price net_selling_price_calculated_unit change-order" id="net_selling_price_calculated_unit[' + id + ']">\n' +
-                                            '\n' +
-                                            '<input name="net_selling_price_aggregate_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_selling_price_aggregate_unit).toFixed(2) + '" type="text" class="form-control price net_selling_price_aggregate_unit change-order" id="net_selling_price_aggregate_unit[' + id + ']">\n' +
-                                            '</td>\n' +
-                                            '</tr><tr class="selling-row">\n' +
-                                            '<td>\n' +
-                                            '<input name="gross_selling_price_commercial_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_selling_price_commercial_unit * 1.23).toFixed(2) + '" type="text" class="form-control price gross_selling_price_commercial_unit change-order" id="gross_selling_price_commercial_unit[' + id + ']">\n' +
-                                            '\n' +
-                                            '<input name="gross_selling_price_basic_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_selling_price_basic_unit * 1.23).toFixed(2) + '" type="text" class="form-control price gross_selling_price_basic_unit change-order" id="gross_selling_price_basic_unit[' + id + ']">\n' +
-                                            '\n' +
-                                            '<input name="gross_selling_price_calculated_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_selling_price_calculated_unit * 1.23).toFixed(2) + '" type="text" class="form-control price gross_selling_price_calculated_unit change-order" id="gross_selling_price_calculated_unit[' + id + ']">\n' +
-                                            '\n' +
-                                            '<input name="gross_selling_price_aggregate_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_selling_price_calculated_unit * 1.23).toFixed(2) + '" type="text" class="form-control price gross_selling_price_aggregate_unit change-order" id="gross_selling_price_aggregate_unit[' + id + ']">\n' +
-                                            '</td>\n' +
-                                            '</tr>' +
-                                            '<tr class="purchase-row">\n' +
-                                            '<td>\n' +
-                                            '<input name="unit_commercial" value="1 ' + data.packing.unit_commercial + '" type="text" class="form-control" id="unit_commercial" disabled="">\n' +
-                                            '\n' +
-                                            '<input name="unit_basic" value="' + parseFloat(data.packing.numbers_of_basic_commercial_units_in_pack) + ' ' + data.packing.unit_basic + '" type="text" class="form-control" id="unit_basic" disabled="">\n' +
-                                            '<input name="calculation_unit" value="' + parseFloat(data.packing.numbers_of_basic_commercial_units_in_pack / data.packing.unit_consumption).toFixed(2) + ' ' + data.packing.calculation_unit + '" type="text" class="form-control" id="calculation_unit" disabled="">\n' +
-                                            '<input name="unit_of_collective" value="' + data.packing.number_of_sale_units_in_the_pack + ' ' + data.packing.unit_of_collective + '" type="text" class="form-control" id="unit_of_collective" disabled="">\n' +
-                                            '</td>\n' +
-                                            '</tr><tr>\n' +
-                                            '<th>Ilość</th>\n' +
-                                            '</tr><tr class="selling-row">\n' +
-                                            '<td>\n' +
-                                            '<input name="quantity_commercial[' + id + ']" value="1" data-item-id="' + id + '" type="text" class="form-control price" id="quantity_commercial[' + id + ']">\n' +
-                                            '</td>\n' +
-                                            '</tr><tr>\n' +
-                                            '<th>Zysk</th>\n' +
-                                            '</tr><tr class="selling-row">\n' +
-                                            '<td>\n' +
-                                            '<input type="text" class="form-control item-profit" data-item-id="' + id + '" disabled="" name="item-profit" value="0.00">\n' +
-                                            '</td>\n' +
-                                            '</tr>'
-                                        );
-                                        $('#add-item').val(' ');
-
+                                    url: '/admin/orders/status/' + this.value + '/message',
+                                    success: function (result) {
+                                        editor.data.set(result);
                                     }
                                 });
-                            });
-                            var sh = 0;
-                            $('input.change-order').on('change', function () {
-                                //   $('#new-order').show();
-                                sh = 1;
-                            });
-
-                            $('[name="change-button-form"]').on('click', function () {
-                                value = this.value;
-                                $('#' + value).show();
-                                if (value === 'general' && sh === 1) {
-                                    $('#new-order').show();
-                                }
-                            });
-
-                            //  $('#new-order').hide();
+                            }
                         });
-
-                        function commaReplace(cssClass) {
-                            document.querySelectorAll(cssClass).forEach(function (input) {
-                                input.value = input.value.replace(/,/g, '.');
-                            });
-                        }
-
-                        $(document).ready(function () {
-                            commaReplace('.priceChange');
-                            let valueOfItemsGross;
-                            let packingWarehouseCost;
-                            let shipmentPriceForClient;
-                            let additionalServiceCost;
-
-                            if ($('#additional_service_cost').val() == '') {
-                                additionalServiceCost = 0;
-                            } else {
-                                additionalServiceCost = parseFloat($('#additional_service_cost').val());
-                            }
-
-
-                            let profit = parseFloat($('#profit').val().replace(',', ''));
-                            $("#profitInfo").val(profit);
-                            $("#totalPriceInfo").val($("#orderItemsSum").val());
-                            $("#weightInfo").val($("#weight").val());
-                            updateOrderSum();
-
-                            $('.sumChange').on('change', function () {
-                                updateOrderSum();
-                            });
-
-
-                        });
-
-                        function updateOrderSum(profit = null) {
-                            if ($('#totalPriceInfo').val() == '') {
-                                valueOfItemsGross = 0;
-                            } else {
-                                valueOfItemsGross = parseFloat($('#orderItemsSum').val().replace(',', ''));
-                            }
-                            if ($('#additional_cash_on_delivery_cost').val() == '') {
-                                packingWarehouseCost = 0;
-                            } else {
-                                packingWarehouseCost = parseFloat($('#additional_cash_on_delivery_cost').val());
-                            }
-
-                            if ($('#shipment_price_for_client').val() == '') {
-                                shipmentPriceForClient = 0;
-                            } else {
-                                shipmentPriceForClient = parseFloat($('#shipment_price_for_client').val());
-                            }
-
-                            if ($('#additional_service_cost').val() == '') {
-                                additionalServieCost = 0;
-                            } else {
-                                additionalServieCost = parseFloat($('#additional_service_cost').val());
-                            }
-
-                            if (profit == 1) {
-                                $('#profitInfo').val((parseFloat($('#profit').val()) + additionalServieCost).toFixed(2));
-                            }
-                            let sum = valueOfItemsGross + packingWarehouseCost + shipmentPriceForClient + additionalServieCost;
-                            $('#orderValueSum').val(sum.toFixed(2));
-                            $('#left_to_pay_on_delivery').val((sum - parseFloat($('#payments').val())).toFixed(2));
-                        }
-
-                        $('#status').on('change', function () {
-                            $('#shouldBeSent').attr('checked', true);
-                        });
-                        $(document).ready(function () {
-                            let newOrder = 1;
-
-                            $('#newSplitOrder').on('click', function () {
-                                showSplitButtons('.btn-split');
-                                switch (newOrder) {
-                                    case 1:
-                                        showSubsplitOrder('.firstOrder');
-                                        $('[name="firstOrderExist"]').val(1);
-                                        break;
-                                    case 2:
-                                        showSubsplitOrder('.secondOrder');
-                                        $('[name="secondOrderExist"]').val(1);
-                                        break;
-                                    case 3:
-                                        showSubsplitOrder('.thirdOrder');
-                                        $('[name="thirdOrderExist"]').val(1);
-                                        break;
-                                    case 4:
-                                        showSubsplitOrder('.fourthOrder');
-                                        $('[name="fourthOrderExist"]').val(1);
-                                        break;
-                                    case 5:
-                                        showSubsplitOrder('.fifthOrder');
-                                        $('[name="fifthOrderExist"]').val(1);
-                                        break;
-                                    default:
-
-                                }
-                                newOrder++;
-                            });
-
-                            $('.splitQuantity').on('change', function () {
-                                let itemId = $(this).data('item-id');
-                                let name = '[name="modal_quantity_commercial[' + itemId + ']"]';
-                                let base = $(this).next().find('[name="base[' + itemId + ']"]');
-                                let productQuantity = $(name);
-                                let productQuantityValue = productQuantity.val();
-                                productQuantity.val(productQuantity.val() - $(this).val());
-                                let leftClass = '[name="left[' + $(this).data('item-id') + ']"]';
-                                let quantityLeft = base.text() - sumSplitOrdersQuantity(itemId);
-                                let type = $(this).data('order-type');
-                                changeWeight(type, itemId, $(this).val());
-                                changeLeft(leftClass, quantityLeft);
-                            });
-
-
-                            $('.dkoInput').on('change', function () {
-                                changeDko();
-                            });
-
-                            $('.dkpInput').on('change', function () {
-                                changeDkp();
-                            });
-
-                            $('.shipmentClient').on('change', function () {
-                                changeShipmentClient();
-                            });
-
-                            $('.shipmentUs').on('change', function () {
-                                changeShipmentUs();
-                            });
-
-                            $('.splitDko').on('click', function () {
-                                let orderDko = {{ $order->additional_service_cost ?? 0 }};
-                                splitCosts('additional_service_cost', orderDko, 'DKO');
-                            });
-
-                            $('.splitDkp').on('click', function () {
-                                let orderDkp = {{ $order->additional_cash_on_delivery_cost ?? 0 }};
-                                splitCosts('additional_cash_on_delivery_cost', orderDkp, 'DKP');
-                            });
-
-                            $('.splitClient').on('click', function () {
-                                let shipmentClient = {{ $order->shipment_price_for_client ?? 0 }};
-                                splitCosts('shipment_price_for_client', shipmentClient, 'SHIP_CLIENT');
-                            });
-
-                            $('.splitUs').on('click', function () {
-                                let shipmentUs = {{ $order->shipment_price_for_us ?? 0 }};
-                                splitCosts('shipment_price_for_us', shipmentUs, 'SHIP_US');
-                            });
-                            $('.net_purchase_price_commercial_unit').first().change()
-                        });
-
-                        function changeDko(split = null) {
-                            let dkoDifference;
-                            let orderDko = {{ $order->additional_service_cost ?? 0 }};
-                            if (split != null) {
-                                dkoDifference = parseFloat(orderDko - split);
-                            } else {
-                                dkoDifference = parseFloat(orderDko - sumSplitOrdersDko());
-                            }
-
-                            changeLeft('.dkoLeft', dkoDifference);
-                        }
-
-                        function changeDkp(split = null) {
-                            let dkpDifference;
-                            let orderDkp = {{ $order->additional_cash_on_delivery_cost ?? 0 }};
-                            if (split != null) {
-                                dkpDifference = parseFloat(orderDkp - split);
-                            } else {
-                                dkpDifference = parseFloat(orderDkp - sumSplitOrdersDkp());
-                            }
-                            changeLeft('.dkpLeft', dkpDifference);
-                        }
-
-                        function changeShipmentClient(split = null) {
-                            let orderClientShipment = {{ $order->shipment_price_for_client ?? 0 }};
-                            let orderClientShipmentDifference;
-                            if (split != null) {
-                                orderClientShipmentDifference = parseFloat(orderClientShipment - split);
-                            } else {
-                                orderClientShipmentDifference = parseFloat(orderClientShipment - sumSplitOrdersShipmentClient());
-                            }
-                            changeLeft('.shipmentClientLeft', orderClientShipmentDifference);
-                        }
-
-                        function changeShipmentUs(split = null) {
-                            let orderShipmentUs = {{ $order->shipment_price_for_us ?? 0 }};
-                            let orderShipmentUsDifference;
-                            if (split != null) {
-                                orderShipmentUsDifference = parseFloat(orderShipmentUs - split);
-                            } else {
-                                orderShipmentUsDifference = parseFloat(orderShipmentUs - sumSplitOrdersShipmentUs());
-                            }
-                            changeLeft('.shipmentUsLeft', orderShipmentUsDifference);
-                        }
-
-                        function sumSplitOrdersQuantity(id) {
-                            let sumSplitOrdersQuantity = ~~parseInt($('[name="firstOrderQuantity[' + id + ']"]').val()) + ~~parseInt($('[name="secondOrderQuantity[' + id + ']"]').val()) + ~~parseInt($('[name="thirdOrderQuantity[' + id + ']"]').val()) + ~~parseInt($('[name="fourthOrderQuantity[' + id + ']"]').val()) + ~~parseInt($('[name="fifthOrderQuantity[' + id + ']"]').val());
-
-                            return sumSplitOrdersQuantity;
-                        }
-
-                        function sumSplitOrdersDko(id) {
-                            let sumSplitOrdersDko = ~~parseFloat($('[name="additional_service_cost_firstOrder"]').val()) + ~~parseFloat($('[name="additional_service_cost_secondOrder"]').val()) + ~~parseFloat($('[name="additional_service_cost_thirdOrder"]').val()) + ~~parseFloat($('[name="additional_service_cost_fourthOrder"]').val()) + ~~parseFloat($('[name="additional_service_cost_fifthOrder"]').val());
-                            return sumSplitOrdersDko;
-                        }
-
-                        function sumSplitOrdersDkp(id) {
-                            let sumSplitOrdersDkp = ~~parseFloat($('[name="additional_cash_on_delivery_cost_firstOrder"]').val()) + ~~parseFloat($('[name="additional_cash_on_delivery_cost_secondOrder"]').val()) + ~~parseFloat($('[name="additional_cash_on_delivery_cost_thirdOrder"]').val()) + ~~parseFloat($('[name="additional_cash_on_delivery_cost_fourthOrder"]').val()) + ~~parseFloat($('[name="additional_cash_on_delivery_cost_fifthOrder"]').val());
-
-                            return sumSplitOrdersDkp;
-                        }
-
-                        function sumSplitOrdersShipmentClient(id) {
-                            let sumSplitOrdersShipmentClient = ~~parseFloat($('[name="shipment_price_for_client_firstOrder"]').val()) + ~~parseFloat($('[name="shipment_price_for_client_secondOrder"]').val()) + ~~parseFloat($('[name="shipment_price_for_client_thirdOrder"]').val()) + ~~parseFloat($('[name="shipment_price_for_client_fourthOrder"]').val()) + ~~parseFloat($('[name="shipment_price_for_client_fifthOrder"]').val());
-
-                            return sumSplitOrdersShipmentClient;
-                        }
-
-                        function sumSplitOrdersShipmentUs(id) {
-                            let sumSplitOrdersShipmentUs = ~~parseFloat($('[name="shipment_price_for_us_firstOrder"]').val()) + ~~parseFloat($('[name="shipment_price_for_us_secondOrder"]').val()) + ~~parseFloat($('[name="shipment_price_for_us_thirdOrder"]').val()) + ~~parseFloat($('[name="shipment_price_for_us_fourthOrder"]').val()) + ~~parseFloat($('[name="shipment_price_for_us_fifthOrder"]').val());
-
-                            return sumSplitOrdersShipmentUs;
-                        }
-
-                        function splitCosts(elementsName, value, type) {
-                            let func;
-                            switch (type) {
-                                case 'DKO':
-                                    func = changeDko(value);
-                                    break;
-                                case 'DKP':
-                                    func = changeDkp(value);
-                                    break;
-                                case 'SHIP_CLIENT':
-                                    func = changeShipmentClient(value);
-                                    break;
-                                case 'SHIP_US':
-                                    func = changeShipmentUs(value);
-                                    break;
-                                default:
-                            }
-                            if ($('[name="firstOrderExist"]').val() == 1 && $('[name="secondOrderExist"]').val() == 0) {
-                                $('[name="' + elementsName + '_firstOrder"]').val(value);
-                                func;
-                            } else if ($('[name="secondOrderExist"]').val() == 1 && $('[name="secondOrderExist"]').val() == 1 && $('[name="thirdOrderExist"]').val() == 0) {
-                                value = (value / 2).toFixed(2);
-                                $('[name="' + elementsName + '_firstOrder"]').val(value);
-                                $('[name="' + elementsName + '_secondOrder"]').val(value);
-                                func;
-                            } else if ($('[name="secondOrderExist"]').val() == 1 && $('[name="secondOrderExist"]').val() == 1 && $('[name="thirdOrderExist"]').val() == 1 && $('[name="fourthOrderExist"]').val() == 0) {
-                                value = (value / 3).toFixed(2);
-                                $('[name="' + elementsName + '_firstOrder"]').val(value);
-                                $('[name="' + elementsName + '_secondOrder"]').val(value);
-                                $('[name="' + elementsName + '_thirdOrder"]').val(value);
-                                func;
-                            } else if ($('[name="secondOrderExist"]').val() == 1 && $('[name="secondOrderExist"]').val() == 1 && $('[name="thirdOrderExist"]').val() == 1 && $('[name="fourthOrderExist"]').val() == 1 && $('[name="fourthOrderExist"]').val() == 0) {
-                                value = (value / 4).toFixed(2);
-                                $('[name="' + elementsName + '_firstOrder"]').val(value);
-                                $('[name="' + elementsName + '_secondOrder"]').val(value);
-                                $('[name="' + elementsName + '_thirdOrder"]').val(value);
-                                $('[name="' + elementsName + '_fourthOrder"]').val(value);
-                                func;
-                            } else {
-                                value = (value / 5).toFixed(2);
-                                $('[name="' + elementsName + '_firstOrder"]').val(value);
-                                $('[name="' + elementsName + '_secondOrder"]').val(value);
-                                $('[name="' + elementsName + '_thirdOrder"]').val(value);
-                                $('[name="' + elementsName + '_fourthOrder"]').val(value);
-                                $('[name="' + elementsName + '_fifthOrder"]').val(value);
-                                func;
-                            }
-                        }
-
-                        function changeLeft(elementsClass, value) {
-                            $(elementsClass).each(function () {
-                                $(this).text(value);
-                            });
-                        }
-
-                        function showSubsplitOrder(elementsClass) {
-                            $(elementsClass).each(function () {
-                                $(this).css('display', 'table-cell');
-                            });
-                        }
-
-                        function showSplitButtons(elementsClass) {
-                            $(elementsClass).each(function () {
-                                $(this).css('display', 'block');
-                            });
-                        }
-
-                        function getFirmData(id) {
-                            var symbol = $('#firms_data').val();
-                            window.location.href = '/admin/orders/' + id + '/getDataFromFirm/' + symbol;
-                        }
-
-                        function changeWeight(type, id, quantity) {
-                            let weightSelector = 'input[name="' + type + 'OrderWeightValue[' + id + ']"]';
-                            let weightValue = $(weightSelector).val();
-                            let weight = parseInt(weightValue * quantity);
-                            let weightValueSelector = '[name="' + type + 'OrderWeight[' + id + ']"]';
-                            if (weight == 0) {
-                                $(weightValueSelector).text(weightValue + ' kg');
-                            } else {
-                                $(weightValueSelector).text(weight + ' kg');
-                            }
-
-                            let weightBase = '[name="' + type + 'OrderWeightValueBase[' + id + ']"]';
-                            $(weightBase).val(weight);
-
-                            let weightSum = 0;
-                            $('.' + type + 'WeightValueBase').each(function (item) {
-                                weightSum += parseFloat($('.' + type + 'WeightValueBase')[item].value);
-                            });
-
-                            let globalWeightTextSelector = '.' + type + 'OrderWeightSum';
-                            $(globalWeightTextSelector).text('Waga: ' + weightSum + ' kg');
-                        }
-
-                        function fillQuantity(id, quantity, type) {
-                            let selector = '[name="' + type + 'OrderQuantity[' + id + ']"]';
-                            $(selector).val(quantity);
-                            $(selector).trigger('change');
-                        }
-
-                        $('.openPaymentModal').on('click', function () {
-                            let masterPaymentId = $(this).data('payment');
-                            let masterPaymentAmount = $(this).data('payment-amount');
-                            $('#paymentModal input[name="masterPaymentAmount"]').val(masterPaymentAmount);
-                            $('input[name="masterPaymentId"]').val(masterPaymentId);
-                            $('#paymentModal').modal();
-                        });
-
-                        $('.openSurplusModal').on('click', function () {
-                            let masterPaymentId = $(this).data('payment');
-                            let masterPaymentAmount = $(this).data('payment-amount');
-                            let surplusId = $(this).data('surplus-id');
-                            $('#surplusModal input[name="user_surplus_id"]').val(surplusId);
-                            $('#surplusModal input[name="masterPaymentAmount"]').val(masterPaymentAmount);
-                            $('input[name="surplus_amount"]').val(masterPaymentAmount);
-                            $('#surplusModal').modal();
-                        });
-
-                        $('.openPaymentModal').on('click', function () {
-                            let masterPaymentId = $(this).data('payment');
-                            let masterPaymentAmount = $(this).data('payment-amount');
-                            $('#paymentModal input[name="masterPaymentAmount"]').val(masterPaymentAmount);
-                            $('input[name="masterPaymentId"]').val(masterPaymentId);
-                            $('#paymentModal').modal();
-                        });
-
-                        $('.openWarehousePaymentModal').on('click', function () {
-                            let masterPaymentId = $(this).data('payment');
-                            let masterPaymentAmount = $(this).data('payment-amount');
-                            $('#warehousePaymentModal input[name="masterPaymentAmount"]').val(masterPaymentAmount);
-                            $('input[name="masterPaymentId"]').val(masterPaymentId);
-                            $('#warehousePaymentModal').modal();
-                        });
-
-                        $('.openPromiseModal').on('click', function () {
-                            let masterPaymentId = $(this).data('payment');
-                            let masterPaymentAmount = $(this).data('payment-amount');
-                            $('input[name="masterPaymentId"]').val(masterPaymentId);
-                            $('input[name="amount"]').val(masterPaymentAmount);
-                            $('#promiseModal').modal();
-                        });
-
-                        $('#chooseOrder').on('change', function () {
-                            let orderId = $(this).val();
-                            let orderValue = parseFloat($('input[name="order-payment-' + orderId + '"]').val());
-                            let masterPaymentAmount = parseFloat($('#paymentModal input[name="masterPaymentAmount"]').val());
-                            if (masterPaymentAmount > orderValue) {
-                                $('#orderPayment #amount').val(orderValue);
-                            } else if (masterPaymentAmount < orderValue) {
-                                $('#orderPayment #amount').val(masterPaymentAmount);
-                            }
-
-                        });
-                        $('#chooseOrder').on('change', function () {
-                            let orderId = $(this).val();
-                            let orderValue = parseFloat($('input[name="order-payment-' + orderId + '"]').val());
-                            let masterPaymentAmount = parseFloat($('#warehousePaymentModal input[name="masterPaymentAmount"]').val());
-                            if (masterPaymentAmount > orderValue) {
-                                $('#orderPayment #amount').val(orderValue);
-                            } else if (masterPaymentAmount < orderValue) {
-                                $('#orderPayment #amount').val(masterPaymentAmount);
-                            }
-
-                        });
-                        function moveData(id){
-                            if($('#moveButton-'+id).hasClass('btn-warning')) {
-                                $('#moveButton-' + id).removeClass('btn-warning').addClass('btn-dark');
-                                $('.btn-warning').attr('disabled', true);
-                                $('.btn-move').removeClass('hidden');
-                            } else if ($('#moveButton-'+id).hasClass('btn-dark')) {
-                                $('#moveButton-' + id).removeClass('btn-dark').addClass('btn-warning');
-                                $('.btn-warning').attr('disabled', false);
-                                $('.btn-move').addClass('hidden');
-                            }
-                        }
-                        function sendInvoiceRequest(id){
-                            let url = '{{ route('orders.invoiceRequest') }}'
+                    });
+                    $('#status option').each(function () {
+                        if ($(this).is(':selected')) {
                             $.ajax({
-                                method: 'POST',
-                                url: url,
-                                data: {
-                                    id: id
+                                url: '/admin/orders/status/' + this.value + '/message',
+                                success: function (result) {
+                                    editor.data.set(result);
                                 }
-                            }).done(data => alert('Pomyślnie wywołano prośbę o fakturę.')).fail(data => alert('Prośba o fakturę nie została wysłana. Wystąpił błąd.'));
-                        }
-                        function moveDataAjax(id){
-                            var idToSend = id;
-                            var buttonId = $('.btn-dark').attr('id');
-                            var idToGet;
-                            var res = buttonId.split("-");
-                            idToGet = res[1];
-                            var amountToGet = $('#left-amount-' + idToGet).data('value');
-                            var amountToSend = $('#left-amount-' + idToSend).data('value');
-                            if(idToGet != idToSend && Math.sign(amountToGet) == -1) {
-                                let paymentMoveAmount;
-                                amountToGet = Math.abs(amountToGet)
-                                if(amountToGet > amountToSend) {
-                                    paymentMoveAmount = amountToSend
-                                } else {
-                                    paymentMoveAmount = amountToGet
-                                }
-                                $('#order_id_get').text(idToGet);
-                                $('#order_id_send').text(idToSend);
-                                $('#payment__amount').val(paymentMoveAmount)
-                                $('#payment_move_data').modal('show');
-                            } else {
-                                $('#payment_move_data_error_select').modal('show');
-                            }
-                        }
-                        function moveSurplus(id){
-                            let surplusValue = $('#left-amount-' + id).data('value');
-                            if(Math.sign(surplusValue) === -1) {
-                                let paymentMoveAmount;
-                                surplusValue = Math.abs(surplusValue)
-                                console.log(surplusValue, 'xxasdsa')
-                                $('#surplus__order--id').val(id);
-                                $('#surplus__amount').val(surplusValue)
-                                $('#payment_move_surplus').modal('show');
-                            } else {
-                                $('#payment_move_data_error_select').modal('show');
-                            }
-                        }
-                        $('#payment-move-surplus-ok').on('click', function(){
-                            let orderId = $('#order_id').val();
-                            console.log(orderId);
-                            let surplusAmount = $('#surplus__amount').val();
-                            $.ajax({
-                                method: 'POST',
-                                url: '/admin/orders/'+orderId+'/surplus/move',
-                                data: {
-                                    orderId: orderId,
-                                    surplusAmount: surplusAmount
-                                }
-                            }).done(function(data) {
-                                $('#order_move_data_success').modal('show');
-
-                                $('#order_move_data_ok').on('click', function(){
-                                    window.location.href='/admin/orders';
-                                });
-                            }).fail(function() {
-                                $('#order_move_data_error').modal('show');
-                                $('#order_move_data_ok_error').on('click', function() {
-                                    window.location.href = '/admin/orders';
-
-                                });
                             });
-                        });
-                        $('#payment-move-data-ok').on('click', function(){
-                            var idToGet = $('#order_id_get').text();
-                            var idToSend = $('#order_id_send').text();
-                            var paymentAmount = $('#payment__amount').val();
-                            $.ajax({
-                                method: 'POST',
-                                url: '/admin/orders/'+idToGet+'/data/'+idToSend+'/payment/move',
-                                data: {
-                                    idToGet: idToGet,
-                                    idToSend: idToSend,
-                                    paymentAmount: paymentAmount
-                                }
-                            }).done(function(data) {
-                                $('#order_move_data_success').modal('show');
+                        }
+                    });
+                })
+                .catch(error => {
+                        console.error(error);
+                    }
+                );
 
-                                $('#order_move_data_ok').on('click', function(){
-                                    window.location.href='/admin/orders';
-                                });
-                            }).fail(function() {
-                                $('#order_move_data_error').modal('show');
-                                $('#order_move_data_ok_error').on('click', function() {
-                                    window.location.href = '/admin/orders';
+            function updateProfit() {
+                commaReplace('.priceChange');
+                var gross_purchase_price_sum = 0;
+                var net_purchase_price_sum = 0;
+                var gross_selling_price_sum = 0;
+                var net_selling_price_sum = 0;
+                console.log('ppp');
+                $('.productsTableEdit .gross_purchase_price_commercial_unit').each(function () {
+                    var quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
+                    var gross_selling_price = $('.gross_selling_price_commercial_unit[data-item-id="' + $(this).data('item-id') + '"]').val();
+                    gross_purchase_price_sum += $(this).val() * quantity;
+                    var gross_purchase_price = $(this).val() * quantity;
+                    var sellingSum = gross_selling_price * quantity;
+                    var weightSum = parseFloat($('[name="weight_trade_unit[' + $(this).data('item-id') + ']').val()) * quantity;
+                    var profitItem = ((gross_selling_price * quantity) - gross_purchase_price).toFixed(2);
 
-                                });
-                            });
-                        });
-                    </script>
+                    var unitCommercialName = $('[name="unit_commercial_name[' + $(this).data('item-id') + ']"]').val();
 
-                    <script src="{{ URL::asset('js/views/orders/edit.js') }}"></script>
+                    var unitBasicUnits = $('[name="unit_basic_units[' + $(this).data('item-id') + ']"]').val();
+                    var unitBasicName = $('[name="unit_basic_name[' + $(this).data('item-id') + ']"]').val();
+
+                    var unitCalculationUnits = $('[name="calculation_unit_units[' + $(this).data('item-id') + ']"]').val();
+                    var unitCalculationConsumption = $('[name="calculation_unit_consumption[' + $(this).data('item-id') + ']"]').val();
+                    var unitCalculationName = $('[name="calculation_unit_name[' + $(this).data('item-id') + ']"]').val();
+
+                    var unitCollectiveUnits = $('[name="unit_of_collective_units[' + $(this).data('item-id') + ']"]').val();
+                    var unitCollectiveName = $('[name="unit_of_collective_name[' + $(this).data('item-id') + ']"]').val();
+
+                    $('[name="unit_commercial[' + $(this).data('item-id') + ']"]').val(quantity + ' ' + unitCommercialName);
+                    $('[name="unit_basic[' + $(this).data('item-id') + ']"]').val(quantity * unitBasicUnits + ' ' + unitBasicName);
+                    $('[name="calculation_unit[' + $(this).data('item-id') + ']"]').val((quantity * unitCalculationUnits) / unitCalculationConsumption + ' ' + unitCalculationName);
+                    $('[name="unit_of_collective[' + $(this).data('item-id') + ']"]').val((quantity * unitCollectiveUnits).toFixed(4) + ' ' + unitCollectiveName);
+                    $('input.item-weight[data-item-id="' + $(this).data('item-id') + '"]').val(weightSum + ' kg');
+                    $('input.item-profit[data-item-id="' + $(this).data('item-id') + '"]').val(profitItem + ' zł');
+                    $('input.item-value[data-item-id="' + $(this).data('item-id') + '"]').val(parseFloat(sellingSum).toFixed(2) + ' zł');
+                });
+                $('.productsTableEdit .net_purchase_price_commercial_unit').each(function () {
+                    var quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
+                    net_purchase_price_sum += $(this).val() * quantity;
+                });
+                $('.productsTableEdit .gross_selling_price_commercial_unit').each(function () {
+                    var quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
+                    gross_selling_price_sum += $(this).val() * quantity;
+                });
+                $('.productsTableEdit .net_selling_price_commercial_unit').each(function () {
+                    var quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
+                    net_selling_price_sum += $(this).val() * quantity;
+                });
+                if ($('#additional_service_cost').val() == '') {
+                    additionalServiceCost = 0;
+                } else {
+                    additionalServiceCost = parseFloat($('#additional_service_cost').val());
+                }
+                var profit = ((gross_selling_price_sum - gross_purchase_price_sum)).toFixed(2);
+                var total_price = gross_selling_price_sum.toFixed(2);
+                console.log('Total ' + total_price);
+                $('input#profit').val(profit);
+                $('input#total_price').val(total_price);
+                $("#profitInfo").val($('#profit').val());
+                $("#totalPriceInfo").val($("#total_price").val());
+                $("#orderItemsSum").val(total_price);
+                updateOrderSum();
+                $("#weight").val(
+                    parseFloat(
+                        $('.item-weight').toArray().reduce(
+                            (prev, curr) => prev + parseFloat(curr.value), 0)
+                    ).toFixed(2))
+                $("#weightInfo").val($("#weight").val());
+            }
+
+            $('.quantityChange').on('change', function () {
+                updateOrderSum();
+            });
+            $('#additional_service_cost').on('change', function () {
+                updateOrderSum(1);
+                commaReplace('.priceChange');
+            });
+
+            $(document).on('change', 'input.price', function () {
+                    console.log('x');
+                    commaReplace('.priceChange');
+
+                    var itemId = $(this).data('item-id');
+
+                    var net_purchase_price_commercial_unit = $('.net_purchase_price_commercial_unit[data-item-id="' + itemId + '"');
+                    var net_purchase_price_basic_unit = $('.net_purchase_price_basic_unit[data-item-id="' + itemId + '"');
+                    var net_purchase_price_calculated_unit = $('.net_purchase_price_calculated_unit[data-item-id="' + itemId + '"');
+                    var net_purchase_price_aggregate_unit = $('.net_purchase_price_aggregate_unit[data-item-id="' + itemId + '"');
+                    var net_selling_price_commercial_unit = $('.net_selling_price_commercial_unit[data-item-id="' + itemId + '"');
+                    var net_selling_price_basic_unit = $('.net_selling_price_basic_unit[data-item-id="' + itemId + '"');
+                    var net_selling_price_calculated_unit = $('.net_selling_price_calculated_unit[data-item-id="' + itemId + '"');
+                    var net_selling_price_aggregate_unit = $('.net_selling_price_aggregate_unit[data-item-id="' + itemId + '"');
+
+                    var gross_purchase_price_commercial_unit = $('.gross_purchase_price_commercial_unit[data-item-id="' + itemId + '"');
+                    var gross_purchase_price_basic_unit = $('.gross_purchase_price_basic_unit[data-item-id="' + itemId + '"');
+                    var gross_purchase_price_calculated_unit = $('.gross_purchase_price_calculated_unit[data-item-id="' + itemId + '"');
+                    var gross_purchase_price_aggregate_unit = $('.gross_purchase_price_aggregate_unit[data-item-id="' + itemId + '"');
+                    var gross_selling_price_commercial_unit = $('.gross_selling_price_commercial_unit[data-item-id="' + itemId + '"');
+                    var gross_selling_price_basic_unit = $('.gross_selling_price_basic_unit[data-item-id="' + itemId + '"');
+                    var gross_selling_price_calculated_unit = $('.gross_selling_price_calculated_unit[data-item-id="' + itemId + '"');
+                    var gross_selling_price_aggregate_unit = $('.gross_selling_price_aggregate_unit[data-item-id="' + itemId + '"');
+
+                    var numbers_of_basic_commercial_units_in_pack = $('.numbers_of_basic_commercial_units_in_pack[data-item-id="' + itemId + '"');
+                    var number_of_sale_units_in_the_pack = $('.number_of_sale_units_in_the_pack[data-item-id="' + itemId + '"');
+                    var number_of_trade_items_in_the_largest_unit = $('.number_of_trade_items_in_the_largest_unit[data-item-id="' + itemId + '"');
+                    var unit_consumption = $('.unit_consumption[data-item-id="' + itemId + '"');
+
+                    var net_purchase_price_commercial_unit_value = 0;
+                    if (!$(this).hasClass('gross_purchase_price_commercial_unit')) {
+                        net_purchase_price_commercial_unit_value = parseFloat(net_purchase_price_commercial_unit.val());
+                    } else {
+                        net_purchase_price_commercial_unit_value = parseFloat(gross_purchase_price_commercial_unit.val() / 1.23);
+                    }
+                    var net_purchase_price_basic_unit_value = 0;
+                    if (!$(this).hasClass('gross_purchase_price_basic_unit')) {
+                        net_purchase_price_basic_unit_value = parseFloat(net_purchase_price_basic_unit.val());
+                    } else {
+                        net_purchase_price_basic_unit_value = parseFloat(gross_purchase_price_basic_unit.val() / 1.23);
+                    }
+                    var net_purchase_price_aggregate_unit_value = 0;
+                    if (!$(this).hasClass('gross_purchase_price_aggregate_unit')) {
+                        net_purchase_price_aggregate_unit_value = parseFloat(net_purchase_price_aggregate_unit.val());
+                    } else {
+                        net_purchase_price_aggregate_unit_value = parseFloat(gross_purchase_price_aggregate_unit.val() / 1.23);
+                    }
+                    var net_purchase_price_calculated_unit_value = 0;
+                    if (!$(this).hasClass('gross_purchase_price_calculated_unit')) {
+                        net_purchase_price_calculated_unit_value = parseFloat(net_purchase_price_calculated_unit.val());
+                    } else {
+                        net_purchase_price_calculated_unit_value = parseFloat(gross_purchase_price_calculated_unit.val() / 1.23);
+                    }
+
+                    var net_selling_price_commercial_unit_value = 0;
+                    if (!$(this).hasClass('gross_selling_price_commercial_unit')) {
+                        net_selling_price_commercial_unit_value = parseFloat(net_selling_price_commercial_unit.val());
+                    } else {
+                        net_selling_price_commercial_unit_value = parseFloat(gross_selling_price_commercial_unit.val() / 1.23);
+                    }
+                    var net_selling_price_basic_unit_value = 0;
+                    if (!$(this).hasClass('gross_selling_price_basic_unit')) {
+                        net_selling_price_basic_unit_value = parseFloat(net_selling_price_basic_unit.val());
+                    } else {
+                        net_selling_price_basic_unit_value = parseFloat(gross_selling_price_basic_unit.val() / 1.23);
+                    }
+                    var net_selling_price_aggregate_unit_value = 0;
+                    if (!$(this).hasClass('gross_selling_price_aggregate_unit')) {
+                        net_selling_price_aggregate_unit_value = parseFloat(net_selling_price_aggregate_unit.val());
+                    } else {
+                        net_selling_price_aggregate_unit_value = parseFloat(gross_selling_price_aggregate_unit.val() / 1.23);
+                    }
+                    var net_selling_price_calculated_unit_value = 0;
+                    if (!$(this).hasClass('gross_selling_price_calculated_unit')) {
+                        net_selling_price_calculated_unit_value = parseFloat(net_selling_price_calculated_unit.val());
+                    } else {
+                        net_selling_price_calculated_unit_value = parseFloat(gross_selling_price_calculated_unit.val() / 1.23);
+                    }
+
+
+                    var numbers_of_basic_commercial_units_in_pack_value = parseFloat(numbers_of_basic_commercial_units_in_pack.val());
+                    var number_of_sale_units_in_the_pack_value = parseFloat(number_of_sale_units_in_the_pack.val());
+                    var unit_consumption_value = parseFloat(unit_consumption.val());
+                    var values = {
+                        'net_purchase_price_commercial_unit':
+                            {
+                                'net_purchase_price_aggregate_unit': (net_purchase_price_commercial_unit_value * number_of_sale_units_in_the_pack_value).toFixed(4),
+                                'net_purchase_price_basic_unit': (net_purchase_price_commercial_unit_value / numbers_of_basic_commercial_units_in_pack_value).toFixed(4),
+                                'net_purchase_price_calculated_unit': ((net_purchase_price_commercial_unit_value / numbers_of_basic_commercial_units_in_pack_value) * unit_consumption_value).toFixed(4),
+                                'gross_purchase_price_aggregate_unit': ((net_purchase_price_commercial_unit_value * number_of_sale_units_in_the_pack_value) * 1.23).toFixed(4),
+                                'gross_purchase_price_basic_unit': ((net_purchase_price_commercial_unit_value / numbers_of_basic_commercial_units_in_pack_value) * 1.23).toFixed(4),
+                                'gross_purchase_price_calculated_unit': (((net_purchase_price_commercial_unit_value / numbers_of_basic_commercial_units_in_pack_value) * unit_consumption_value) * 1.23).toFixed(4),
+                            },
+                        'net_purchase_price_basic_unit':
+                            {
+                                'net_purchase_price_aggregate_unit': (net_purchase_price_basic_unit_value * number_of_sale_units_in_the_pack_value * numbers_of_basic_commercial_units_in_pack_value).toFixed(4),
+                                'net_purchase_price_commercial_unit': (net_purchase_price_basic_unit_value * numbers_of_basic_commercial_units_in_pack_value).toFixed(2),
+                                'net_purchase_price_calculated_unit': ((net_purchase_price_basic_unit_value * unit_consumption_value)).toFixed(4),
+                                'gross_purchase_price_aggregate_unit': ((net_purchase_price_basic_unit_value * number_of_sale_units_in_the_pack_value * numbers_of_basic_commercial_units_in_pack_value * 1.23)).toFixed(4),
+                                'gross_purchase_price_commercial_unit': ((net_purchase_price_basic_unit_value * numbers_of_basic_commercial_units_in_pack_value) * 1.23).toFixed(2),
+                                'gross_purchase_price_calculated_unit': (((net_purchase_price_basic_unit_value * unit_consumption_value) * 1.23)).toFixed(4)
+                            },
+                        'net_purchase_price_aggregate_unit':
+                            {
+                                'net_purchase_price_basic_unit': (net_purchase_price_aggregate_unit_value / (number_of_sale_units_in_the_pack_value * numbers_of_basic_commercial_units_in_pack_value)).toFixed(4),
+                                'net_purchase_price_commercial_unit': (net_purchase_price_aggregate_unit_value / (number_of_sale_units_in_the_pack_value)).toFixed(2),
+                                'net_purchase_price_calculated_unit': (net_purchase_price_aggregate_unit_value * (number_of_sale_units_in_the_pack_value)).toFixed(4),
+                                'gross_purchase_price_basic_unit': ((net_purchase_price_aggregate_unit_value / (number_of_sale_units_in_the_pack_value * numbers_of_basic_commercial_units_in_pack_value)) * 1.23).toFixed(4),
+                                'gross_purchase_price_commercial_unit': ((net_purchase_price_aggregate_unit_value / (number_of_sale_units_in_the_pack_value)) * 1.23).toFixed(2),
+                                'gross_purchase_price_calculated_unit': ((net_purchase_price_aggregate_unit_value * (number_of_sale_units_in_the_pack_value)) * 1.23).toFixed(4),
+                            },
+                        'net_purchase_price_calculated_unit':
+                            {
+                                'net_purchase_price_basic_unit': ((net_purchase_price_calculated_unit_value / unit_consumption_value)).toFixed(4),
+                                'net_purchase_price_commercial_unit': ((net_purchase_price_calculated_unit_value / unit_consumption_value) * numbers_of_basic_commercial_units_in_pack_value).toFixed(2),
+                                'net_purchase_price_aggregate_unit': (((net_purchase_price_calculated_unit_value * (number_of_sale_units_in_the_pack_value / unit_consumption_value)))).toFixed(4),
+                                'gross_purchase_price_basic_unit': (((net_purchase_price_calculated_unit_value / unit_consumption_value)) * 1.23).toFixed(4),
+                                'gross_purchase_price_commercial_unit': (((net_purchase_price_calculated_unit_value / unit_consumption_value) * numbers_of_basic_commercial_units_in_pack_value) * 1.23).toFixed(2),
+                                'gross_purchase_price_aggregate_unit': (((net_purchase_price_calculated_unit_value * (number_of_sale_units_in_the_pack_value / unit_consumption_value))) * 1.23).toFixed(4),
+
+                            },
+                        'net_selling_price_commercial_unit':
+                            {
+                                'net_selling_price_aggregate_unit': (net_selling_price_commercial_unit_value * number_of_sale_units_in_the_pack_value).toFixed(4),
+                                'net_selling_price_basic_unit': (net_selling_price_commercial_unit_value / numbers_of_basic_commercial_units_in_pack_value).toFixed(4),
+                                'net_selling_price_calculated_unit': ((net_selling_price_commercial_unit_value / numbers_of_basic_commercial_units_in_pack_value) * unit_consumption_value).toFixed(4),
+                                'gross_selling_price_aggregate_unit': ((net_selling_price_commercial_unit_value * number_of_sale_units_in_the_pack_value) * 1.23).toFixed(4),
+                                'gross_selling_price_basic_unit': ((net_selling_price_commercial_unit_value / numbers_of_basic_commercial_units_in_pack_value) * 1.23).toFixed(4),
+                                'gross_selling_price_calculated_unit': (((net_selling_price_commercial_unit_value / numbers_of_basic_commercial_units_in_pack_value) * unit_consumption_value) * 1.23).toFixed(4),
+                            },
+                        'net_selling_price_basic_unit':
+                            {
+                                'net_selling_price_aggregate_unit': (net_selling_price_basic_unit_value * number_of_sale_units_in_the_pack_value * numbers_of_basic_commercial_units_in_pack_value).toFixed(2),
+                                'net_selling_price_commercial_unit': (net_selling_price_basic_unit_value * numbers_of_basic_commercial_units_in_pack_value).toFixed(2),
+                                'net_selling_price_calculated_unit': ((net_selling_price_basic_unit_value * unit_consumption_value)).toFixed(2),
+                                'gross_selling_price_aggregate_unit': ((net_selling_price_basic_unit_value * number_of_sale_units_in_the_pack_value * numbers_of_basic_commercial_units_in_pack_value * 1.23)).toFixed(2),
+                                'gross_selling_price_commercial_unit': ((net_selling_price_basic_unit_value * numbers_of_basic_commercial_units_in_pack_value) * 1.23).toFixed(2),
+                                'gross_selling_price_calculated_unit': (((net_selling_price_basic_unit_value * unit_consumption_value) * 1.23)).toFixed(2)
+                            },
+                        'net_selling_price_aggregate_unit':
+                            {
+                                'net_selling_price_basic_unit': (net_selling_price_aggregate_unit_value / (number_of_sale_units_in_the_pack_value * numbers_of_basic_commercial_units_in_pack_value)).toFixed(2),
+                                'net_selling_price_commercial_unit': (net_selling_price_aggregate_unit_value / (number_of_sale_units_in_the_pack_value)).toFixed(2),
+                                'net_selling_price_calculated_unit': (net_selling_price_aggregate_unit_value * (number_of_sale_units_in_the_pack_value)).toFixed(2),
+                                'gross_selling_price_basic_unit': ((net_selling_price_aggregate_unit_value / (number_of_sale_units_in_the_pack_value * numbers_of_basic_commercial_units_in_pack_value)) * 1.23).toFixed(2),
+                                'gross_selling_price_commercial_unit': ((net_selling_price_aggregate_unit_value / (number_of_sale_units_in_the_pack_value)) * 1.23).toFixed(2),
+                                'gross_selling_price_calculated_unit': ((net_selling_price_aggregate_unit_value * (number_of_sale_units_in_the_pack_value)) * 1.23).toFixed(2),
+                            },
+                        'net_selling_price_calculated_unit':
+                            {
+                                'net_selling_price_basic_unit': ((net_selling_price_calculated_unit_value / unit_consumption_value)).toFixed(2),
+                                'net_selling_price_commercial_unit': ((net_selling_price_calculated_unit_value / unit_consumption_value) * numbers_of_basic_commercial_units_in_pack_value).toFixed(2),
+                                'net_selling_price_aggregate_unit': ((net_selling_price_calculated_unit_value * (number_of_sale_units_in_the_pack_value / unit_consumption_value))).toFixed(2),
+                                'gross_selling_price_basic_unit': (((net_selling_price_calculated_unit_value / unit_consumption_value)) * 1.23).toFixed(2),
+                                'gross_selling_price_commercial_unit': (((net_selling_price_calculated_unit_value / unit_consumption_value) * numbers_of_basic_commercial_units_in_pack_value) * 1.23).toFixed(2),
+                                'gross_selling_price_aggregate_unit': ((net_selling_price_calculated_unit_value * (number_of_sale_units_in_the_pack_value / unit_consumption_value)) * 1.23).toFixed(2),
+                            }
+                    }
+
+
+                    if ($(this).hasClass('net_purchase_price_commercial_unit')) {
+                        net_purchase_price_aggregate_unit.val(values['net_purchase_price_commercial_unit']['net_purchase_price_aggregate_unit']);
+                        net_purchase_price_basic_unit.val(values['net_purchase_price_commercial_unit']['net_purchase_price_basic_unit']);
+                        net_purchase_price_calculated_unit.val(values['net_purchase_price_commercial_unit']['net_purchase_price_calculated_unit']);
+                        gross_purchase_price_commercial_unit.val(($(this).val() * 1.23).toFixed(2));
+                        gross_purchase_price_aggregate_unit.val(values['net_purchase_price_commercial_unit']['gross_purchase_price_aggregate_unit']);
+                        gross_purchase_price_basic_unit.val(values['net_purchase_price_commercial_unit']['gross_purchase_price_basic_unit']);
+                        gross_purchase_price_calculated_unit.val(values['net_purchase_price_commercial_unit']['gross_purchase_price_calculated_unit']);
+                    }
+
+                    if ($(this).hasClass('net_purchase_price_basic_unit')) {
+                        net_purchase_price_aggregate_unit.val(values['net_purchase_price_basic_unit']['net_purchase_price_aggregate_unit']);
+                        net_purchase_price_commercial_unit.val(values['net_purchase_price_basic_unit']['net_purchase_price_commercial_unit']);
+                        net_purchase_price_calculated_unit.val(values['net_purchase_price_basic_unit']['net_purchase_price_calculated_unit']);
+                        gross_purchase_price_basic_unit.val(($(this).val() * 1.23).toFixed(4));
+                        gross_purchase_price_aggregate_unit.val(values['net_purchase_price_basic_unit']['gross_purchase_price_aggregate_unit']);
+                        gross_purchase_price_commercial_unit.val(values['net_purchase_price_basic_unit']['gross_purchase_price_commercial_unit']);
+                        gross_purchase_price_calculated_unit.val(values['net_purchase_price_basic_unit']['gross_purchase_price_calculated_unit']);
+                        $('.net_purchase_price_commercial_unit').change()
+                    }
+
+                    if ($(this).hasClass('net_purchase_price_aggregate_unit')) {
+                        net_purchase_price_basic_unit.val(values['net_purchase_price_aggregate_unit']['net_purchase_price_basic_unit']);
+                        net_purchase_price_commercial_unit.val(values['net_purchase_price_aggregate_unit']['net_purchase_price_commercial_unit']);
+                        net_purchase_price_calculated_unit.val(values['net_purchase_price_aggregate_unit']['net_purchase_price_calculated_unit']);
+                        gross_purchase_price_aggregate_unit.val(($(this).val() * 1.23).toFixed(4));
+                        gross_purchase_price_basic_unit.val(values['net_purchase_price_aggregate_unit']['gross_purchase_price_basic_unit']);
+                        gross_purchase_price_commercial_unit.val(values['net_purchase_price_aggregate_unit']['gross_purchase_price_commercial_unit']);
+                        gross_purchase_price_calculated_unit.val(values['net_purchase_price_aggregate_unit']['gross_purchase_price_calculated_unit']);
+                        $('.net_purchase_price_commercial_unit').change()
+                    }
+
+                    if ($(this).hasClass('net_purchase_price_calculated_unit')) {
+                        net_purchase_price_basic_unit.val(values['net_purchase_price_calculated_unit']['net_purchase_price_basic_unit']);
+                        net_purchase_price_commercial_unit.val(values['net_purchase_price_calculated_unit']['net_purchase_price_commercial_unit']);
+                        net_purchase_price_aggregate_unit.val(values['net_purchase_price_calculated_unit']['net_purchase_price_aggregate_unit']);
+                        gross_purchase_price_calculated_unit.val(($(this).val() * 1.23).toFixed(4));
+                        gross_purchase_price_basic_unit.val(values['net_purchase_price_calculated_unit']['gross_purchase_price_basic_unit']);
+                        gross_purchase_price_commercial_unit.val(values['net_purchase_price_calculated_unit']['gross_purchase_price_commercial_unit']);
+                        gross_purchase_price_aggregate_unit.val(values['net_purchase_price_calculated_unit']['gross_purchase_price_aggregate_unit']);
+                        $('.net_purchase_price_commercial_unit').change()
+                    }
+
+                    if ($(this).hasClass('gross_purchase_price_commercial_unit')) {
+                        net_purchase_price_aggregate_unit.val(values['net_purchase_price_commercial_unit']['net_purchase_price_aggregate_unit']);
+                        net_purchase_price_basic_unit.val(values['net_purchase_price_commercial_unit']['net_purchase_price_basic_unit']);
+                        net_purchase_price_calculated_unit.val(values['net_purchase_price_commercial_unit']['net_purchase_price_calculated_unit']);
+                        net_purchase_price_commercial_unit.val(($(this).val() / 1.23).toFixed(2));
+                        gross_purchase_price_aggregate_unit.val(values['net_purchase_price_commercial_unit']['gross_purchase_price_aggregate_unit']);
+                        gross_purchase_price_basic_unit.val(values['net_purchase_price_commercial_unit']['gross_purchase_price_basic_unit']);
+                        gross_purchase_price_calculated_unit.val(values['net_purchase_price_commercial_unit']['gross_purchase_price_calculated_unit']);
+                    }
+
+                    if ($(this).hasClass('gross_purchase_price_basic_unit')) {
+                        net_purchase_price_aggregate_unit.val(values['net_purchase_price_basic_unit']['net_purchase_price_aggregate_unit']);
+                        net_purchase_price_commercial_unit.val(values['net_purchase_price_basic_unit']['net_purchase_price_commercial_unit']);
+                        net_purchase_price_calculated_unit.val(values['net_purchase_price_basic_unit']['net_purchase_price_calculated_unit']);
+                        net_purchase_price_basic_unit.val(($(this).val() / 1.23).toFixed(4));
+                        gross_purchase_price_aggregate_unit.val(values['net_purchase_price_basic_unit']['gross_purchase_price_aggregate_unit']);
+                        gross_purchase_price_commercial_unit.val(values['net_purchase_price_basic_unit']['gross_purchase_price_commercial_unit']);
+                        gross_purchase_price_calculated_unit.val(values['net_purchase_price_basic_unit']['gross_purchase_price_calculated_unit']);
+                        $('.gross_purchase_price_commercial_unit').change()
+                    }
+
+                    if ($(this).hasClass('gross_purchase_price_aggregate_unit')) {
+                        net_purchase_price_basic_unit.val(values['net_purchase_price_aggregate_unit']['net_purchase_price_basic_unit']);
+                        net_purchase_price_commercial_unit.val(values['net_purchase_price_aggregate_unit']['net_purchase_price_commercial_unit']);
+                        net_purchase_price_calculated_unit.val(values['net_purchase_price_aggregate_unit']['net_purchase_price_calculated_unit']);
+                        net_purchase_price_aggregate_unit.val(($(this).val() / 1.23).toFixed(4));
+                        gross_purchase_price_basic_unit.val(values['net_purchase_price_aggregate_unit']['gross_purchase_price_basic_unit']);
+                        gross_purchase_price_commercial_unit.val(values['net_purchase_price_aggregate_unit']['gross_purchase_price_commercial_unit']);
+                        gross_purchase_price_calculated_unit.val(values['net_purchase_price_aggregate_unit']['gross_purchase_price_calculated_unit']);
+                        $('.gross_purchase_price_commercial_unit').change()
+                    }
+
+                    if ($(this).hasClass('gross_purchase_price_calculated_unit')) {
+                        net_purchase_price_basic_unit.val(values['net_purchase_price_calculated_unit']['net_purchase_price_basic_unit']);
+                        net_purchase_price_commercial_unit.val(values['net_purchase_price_calculated_unit']['net_purchase_price_commercial_unit']);
+                        net_purchase_price_aggregate_unit.val(values['net_purchase_price_calculated_unit']['net_purchase_price_aggregate_unit']);
+                        net_purchase_price_calculated_unit.val(($(this).val() / 1.23).toFixed(4));
+                        gross_purchase_price_basic_unit.val(values['net_purchase_price_calculated_unit']['gross_purchase_price_basic_unit']);
+                        gross_purchase_price_commercial_unit.val(values['net_purchase_price_calculated_unit']['gross_purchase_price_commercial_unit']);
+                        gross_purchase_price_aggregate_unit.val(values['net_purchase_price_calculated_unit']['gross_purchase_price_aggregate_unit']);
+                        $('.gross_purchase_price_commercial_unit').change()
+                    }
+
+                    if ($(this).hasClass('net_selling_price_commercial_unit')) {
+                        net_selling_price_aggregate_unit.val(values['net_selling_price_commercial_unit']['net_selling_price_aggregate_unit']);
+                        net_selling_price_basic_unit.val(values['net_selling_price_commercial_unit']['net_selling_price_basic_unit']);
+                        net_selling_price_calculated_unit.val(values['net_selling_price_commercial_unit']['net_selling_price_calculated_unit']);
+                        gross_selling_price_commercial_unit.val(($(this).val() * 1.23).toFixed(2));
+                        gross_selling_price_aggregate_unit.val(values['net_selling_price_commercial_unit']['gross_selling_price_aggregate_unit']);
+                        gross_selling_price_basic_unit.val(values['net_selling_price_commercial_unit']['gross_selling_price_basic_unit']);
+                        gross_selling_price_calculated_unit.val(values['net_selling_price_commercial_unit']['gross_selling_price_calculated_unit']);
+                    }
+
+                    if ($(this).hasClass('net_selling_price_basic_unit')) {
+                        net_selling_price_aggregate_unit.val(values['net_selling_price_basic_unit']['net_selling_price_aggregate_unit']);
+                        net_selling_price_commercial_unit.val(values['net_selling_price_basic_unit']['net_selling_price_commercial_unit']);
+                        net_selling_price_calculated_unit.val(values['net_selling_price_basic_unit']['net_selling_price_calculated_unit']);
+                        gross_selling_price_basic_unit.val(($(this).val() * 1.23).toFixed(4));
+                        gross_selling_price_aggregate_unit.val(values['net_selling_price_basic_unit']['gross_selling_price_aggregate_unit']);
+                        gross_selling_price_commercial_unit.val(values['net_selling_price_basic_unit']['gross_selling_price_commercial_unit']);
+                        gross_selling_price_calculated_unit.val(values['net_selling_price_basic_unit']['gross_selling_price_calculated_unit']);
+                        $('.net_selling_price_commercial_unit').change()
+                    }
+
+                    if ($(this).hasClass('net_selling_price_aggregate_unit')) {
+                        net_selling_price_basic_unit.val(values['net_selling_price_aggregate_unit']['net_selling_price_basic_unit']);
+                        net_selling_price_commercial_unit.val(values['net_selling_price_aggregate_unit']['net_selling_price_commercial_unit']);
+                        net_selling_price_calculated_unit.val(values['net_selling_price_aggregate_unit']['net_selling_price_calculated_unit']);
+                        gross_selling_price_aggregate_unit.val(($(this).val() * 1.23).toFixed(4));
+                        gross_selling_price_basic_unit.val(values['net_selling_price_aggregate_unit']['gross_selling_price_basic_unit']);
+                        gross_selling_price_commercial_unit.val(values['net_selling_price_aggregate_unit']['gross_selling_price_commercial_unit']);
+                        gross_selling_price_calculated_unit.val(values['net_selling_price_aggregate_unit']['gross_selling_price_calculated_unit']);
+                        $('.net_selling_price_commercial_unit').change()
+                    }
+
+                    if ($(this).hasClass('net_selling_price_calculated_unit')) {
+                        net_selling_price_basic_unit.val(values['net_selling_price_calculated_unit']['net_selling_price_basic_unit']);
+                        net_selling_price_commercial_unit.val(values['net_selling_price_calculated_unit']['net_selling_price_commercial_unit']);
+                        net_selling_price_aggregate_unit.val(values['net_selling_price_calculated_unit']['net_selling_price_aggregate_unit']);
+                        gross_selling_price_calculated_unit.val(($(this).val() * 1.23).toFixed(4));
+                        gross_selling_price_basic_unit.val(values['net_selling_price_calculated_unit']['gross_selling_price_basic_unit']);
+                        gross_selling_price_commercial_unit.val(values['net_selling_price_calculated_unit']['gross_selling_price_commercial_unit']);
+                        gross_selling_price_aggregate_unit.val(values['net_selling_price_calculated_unit']['gross_selling_price_aggregate_unit']);
+                        $('.net_selling_price_commercial_unit').change()
+                    }
+
+                    if ($(this).hasClass('gross_selling_price_commercial_unit')) {
+                        net_selling_price_aggregate_unit.val(values['net_selling_price_commercial_unit']['net_selling_price_aggregate_unit']);
+                        net_selling_price_basic_unit.val(values['net_selling_price_commercial_unit']['net_selling_price_basic_unit']);
+                        net_selling_price_calculated_unit.val(values['net_selling_price_commercial_unit']['net_selling_price_calculated_unit']);
+                        net_selling_price_commercial_unit.val(($(this).val() / 1.23).toFixed(2));
+                        gross_selling_price_aggregate_unit.val(values['net_selling_price_commercial_unit']['gross_selling_price_aggregate_unit']);
+                        gross_selling_price_basic_unit.val(values['net_selling_price_commercial_unit']['gross_selling_price_basic_unit']);
+                        gross_selling_price_calculated_unit.val(values['net_selling_price_commercial_unit']['gross_selling_price_calculated_unit']);
+                    }
+
+                    if ($(this).hasClass('gross_selling_price_basic_unit')) {
+                        net_selling_price_aggregate_unit.val(values['net_selling_price_basic_unit']['net_selling_price_aggregate_unit']);
+                        net_selling_price_commercial_unit.val(values['net_selling_price_basic_unit']['net_selling_price_commercial_unit']);
+                        net_selling_price_calculated_unit.val(values['net_selling_price_basic_unit']['net_selling_price_calculated_unit']);
+                        net_selling_price_basic_unit.val(($(this).val() / 1.23).toFixed(4));
+                        gross_selling_price_aggregate_unit.val(values['net_selling_price_basic_unit']['gross_selling_price_aggregate_unit']);
+                        gross_selling_price_commercial_unit.val(values['net_selling_price_basic_unit']['gross_selling_price_commercial_unit']);
+                        gross_selling_price_calculated_unit.val(values['net_selling_price_basic_unit']['gross_selling_price_calculated_unit']);
+                        $('.gross_selling_price_commercial_unit').change()
+                    }
+
+                    if ($(this).hasClass('gross_selling_price_aggregate_unit')) {
+                        net_selling_price_basic_unit.val(values['net_selling_price_aggregate_unit']['net_selling_price_basic_unit']);
+                        net_selling_price_commercial_unit.val(values['net_selling_price_aggregate_unit']['net_selling_price_commercial_unit']);
+                        net_selling_price_calculated_unit.val(values['net_selling_price_aggregate_unit']['net_selling_price_calculated_unit']);
+                        net_selling_price_aggregate_unit.val(($(this).val() / 1.23).toFixed(4));
+                        gross_selling_price_basic_unit.val(values['net_selling_price_aggregate_unit']['gross_selling_price_basic_unit']);
+                        gross_selling_price_commercial_unit.val(values['net_selling_price_aggregate_unit']['gross_selling_price_commercial_unit']);
+                        gross_selling_price_calculated_unit.val(values['net_selling_price_aggregate_unit']['gross_selling_price_calculated_unit']);
+                        $('.gross_selling_price_commercial_unit').change()
+                    }
+
+                    if ($(this).hasClass('gross_selling_price_calculated_unit')) {
+                        net_selling_price_basic_unit.val(values['net_selling_price_calculated_unit']['net_selling_price_basic_unit']);
+                        net_selling_price_commercial_unit.val(values['net_selling_price_calculated_unit']['net_selling_price_commercial_unit']);
+                        net_selling_price_aggregate_unit.val(values['net_selling_price_calculated_unit']['net_selling_price_aggregate_unit']);
+                        net_selling_price_calculated_unit.val(($(this).val() / 1.23).toFixed(4));
+                        gross_selling_price_basic_unit.val(values['net_selling_price_calculated_unit']['gross_selling_price_basic_unit']);
+                        gross_selling_price_commercial_unit.val(values['net_selling_price_calculated_unit']['gross_selling_price_commercial_unit']);
+                        gross_selling_price_aggregate_unit.val(values['net_selling_price_calculated_unit']['gross_selling_price_aggregate_unit']);
+                        $('.gross_selling_price_commercial_unit').change()
+                    }
+
+                    updateProfit();
+                }
+            );
+
+
+            function update(purchase, selling, id) {
+                var purchasePrice = $("input[name='" + purchase + "[" + id + "]']").val();
+                var sellingPrice = $("input[name='" + selling + "[" + id + "]']");
+                var vat = 1.23;
+                var calc;
+
+                calc = parseFloat(purchasePrice) * parseFloat(vat);
+
+                sellingPrice.val(parseFloat(calc).toFixed(4));
+
+            }
+
+            function update2(purchase, selling, id) {
+                var purchasePrice = $("input[name='" + purchase + "[" + id + "]']").val();
+                var sellingPrice = $("input[name='" + selling + "[" + id + "]']");
+                var vat = 1.23;
+                var calc;
+
+                calc = parseFloat(purchasePrice) * parseFloat(vat);
+
+                sellingPrice.val(parseFloat(calc).toFixed(2));
+
+            }
+
+            function calculateNettoFromGross(netto, gross, id, fixed = 2) {
+                let nettoPrice = $("input[name='" + netto + "[" + id + "]']");
+                let grossPrice = $("input[name='" + gross + "[" + id + "]']").val();
+                if (grossPrice) {
+                    if (netto === 'net_selling_price_commercial_unit') {
+                        update2(netto, gross, id);
+                    } else {
+                        update(netto, gross, id)
+                    }
+                    return;
+                }
+                let vat = 1.23;
+                let calc;
+                calc = parseFloat(grossPrice) / parseFloat(vat);
+                nettoPrice.val(parseFloat(calc).toFixed(fixed));
+            }
+
+            @foreach ($order->items as $item)
+            update2('net_purchase_price_commercial_unit', 'gross_purchase_price_commercial_unit', '{{$item->id}}');
+            update('net_purchase_price_basic_unit', 'gross_purchase_price_basic_unit', '{{$item->id}}');
+            update('net_purchase_price_calculated_unit', 'gross_purchase_price_calculated_unit', '{{$item->id}}');
+            update('net_purchase_price_aggregate_unit', 'gross_purchase_price_aggregate_unit', '{{$item->id}}');
+            calculateNettoFromGross('net_selling_price_commercial_unit', 'gross_selling_price_commercial_unit', '{{$item->id}}');
+            calculateNettoFromGross('net_selling_price_basic_unit', 'gross_selling_price_basic_unit', '{{$item->id}}', 4);
+            calculateNettoFromGross('net_selling_price_calculated_unit', 'gross_selling_price_calculated_unit', '{{$item->id}}', 4);
+            calculateNettoFromGross('net_selling_price_aggregate_unit', 'gross_selling_price_aggregate_unit', '{{$item->id}}', 4);
+            @endforeach
+
+            $(function () {
+                $("#add-item").autocomplete({
+                    source: "{{ route('orders.products.autocomplete') }}",
+                    minLength: 1,
+                    select: function (event, ui) {
+                        $('#add-item').val(ui.item.value);
+                    }
+                });
+            });
+            $('#add-item').on('change', function () {
+                $.ajax({
+                    type: 'GET',
+                    url: '/admin/orders/products/' + this.value,
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    success: function (data) {
+                        var currentId = $('.id').length;
+                        var id = parseInt(currentId) + 1;
+
+                        $('#products-tbody:last-child').append(
+                            '<tr class="id" id="id[' + id + ']">\n' +
+                            '<td><img src="' + data.imageUrl + '" class="product-image">' + '<h4><strong>' + id + '. </strong> ' + data.product.name + ' </h4></td>\n' +
+                            '<input name="id[' + id + ']"\n' +
+                            'value="' + id + '" type="hidden"\n' +
+                            'class="form-control" id="id[' + id + ']">' +
+                            '<input name="product_id[' + id + ']"\n' +
+                            'value="' + data.product.id + '" type="hidden"\n' +
+                            'class="form-control" id="product_id[' + id + ']">' +
+                            '<input value="1" type="hidden"\n' +
+                            'class="form-control item_quantity"  name="item_quantity[' + id + ']" data-item-id="' + id + '">\n' +
+                            '<input name="numbers_of_basic_commercial_units_in_pack[' + id + ']"\n' +
+                            'data-item-id="' + id + '" value="' + data.packing.numbers_of_basic_commercial_units_in_pack + '" type="hidden"\n' +
+                            'class="form-control numbers_of_basic_commercial_units_in_pack" id="numbers_of_basic_commercial_units_in_pack[' + id + ']">\n' +
+                            '<input name="number_of_sale_units_in_the_pack[' + id + ']"\n' +
+                            'data-item-id="' + id + '" value="' + data.packing.number_of_sale_units_in_the_pack + '" type="hidden"\n' +
+                            'class="form-control number_of_sale_units_in_the_pack" id="number_of_sale_units_in_the_pack[' + id + ']">\n' +
+                            '<input name="number_of_trade_items_in_the_largest_unit[' + id + ']"\n' +
+                            'data-item-id="' + id + '" value="' + data.packing.number_of_trade_items_in_the_largest_unit + '" type="hidden"\n' +
+                            'class="form-control number_of_trade_items_in_the_largest_unit" id="number_of_trade_items_in_the_largest_unit[' + id + ']">\n' +
+                            '<input name="unit_consumption[' + id + ']"\n' +
+                            'data-item-id="' + id + '" value="' + data.packing.unit_consumption + '" type="hidden"\n' +
+                            'class="form-control unit_consumption" id="unit_consumption[' + id + ']">' +
+                            '</tr>' +
+                            '<tr>\n' +
+                            '<th>Cena zakupu</th>\n' +
+                            '</tr><tr class="purchase-row">\n' +
+                            '<td>\n' +
+                            '<input name="net_purchase_price_commercial_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_purchase_price_commercial_unit).toFixed(2) + '" type="text" class="form-control price net_purchase_price_commercial_unit" id="net_purchase_price_commercial_unit[' + id + ']">\n' +
+                            '\n' +
+                            '<input name="net_purchase_price_basic_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_purchase_price_basic_unit).toFixed(2) + '" type="text" class="form-control price net_purchase_price_basic_unit" id="net_purchase_price_basic_unit[' + id + ']">\n' +
+                            '\n' +
+                            '<input name="net_purchase_price_calculated_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_purchase_price_calculated_unit).toFixed(2) + '" type="text" class="form-control price net_purchase_price_calculated_unit" id="net_purchase_price_calculated_unit[' + id + ']">\n' +
+                            '\n' +
+                            '<input name="net_purchase_price_aggregate_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_purchase_price_aggregate_unit).toFixed(2) + '" type="text" class="form-control price net_purchase_price_aggregate_unit" id="net_purchase_price_aggregate_unit[' + id + ']">\n' +
+                            '</td>\n' +
+                            '</tr><tr class="purchase-row">\n' +
+                            '<td>\n' +
+                            '<input name="gross_purchase_price_commercial_unit[' + id + ']" value="' + parseFloat(data.price.net_purchase_price_commercial_unit * 1.23).toFixed(2) + '" type="text" data-item-id="' + id + '" class="form-control price gross_purchase_price_commercial_unit" id="gross_purchase_price_commercial_unit[' + id + ']">\n' +
+                            '\n' +
+                            '<input name="gross_purchase_price_basic_unit[' + id + ']" value="' + parseFloat(data.price.net_purchase_price_basic_unit * 1.23).toFixed(2) + '" type="text" data-item-id="' + id + '" class="form-control price gross_purchase_price_basic_unit" id="gross_purchase_price_basic_unit[' + id + ']">\n' +
+                            '\n' +
+                            '<input name="gross_purchase_price_calculated_unit[' + id + ']" value="' + parseFloat(data.price.net_purchase_price_calculated_unit * 1.23).toFixed(2) + '" type="text" data-item-id="' + id + '" class="form-control price gross_purchase_price_calculated_unit" id="gross_purchase_price_calculated_unit[' + id + ']">\n' +
+                            '\n' +
+                            '<input name="gross_purchase_price_aggregate_unit[' + id + ']" value="' + parseFloat(data.price.net_purchase_price_aggregate_unit * 1.23).toFixed(2) + '" type="text" data-item-id="' + id + '" class="form-control price gross_purchase_price_aggregate_unit" id="gross_purchase_price_aggregate_unit[' + id + ']">\n' +
+                            '</td>\n' +
+                            '</tr><tr class="purchase-row">\n' +
+                            '<td>\n' +
+                            '<input name="unit_commercial" value="1 ' + data.packing.unit_commercial + '" type="text" class="form-control" id="unit_commercial" disabled="">\n' +
+                            '\n' +
+                            '<input name="unit_basic" value="' + parseFloat(data.packing.numbers_of_basic_commercial_units_in_pack) + ' ' + data.packing.unit_basic + '" type="text" class="form-control" id="unit_basic" disabled="">\n' +
+                            '\n' +
+                            '<input name="calculation_unit" value="' + parseFloat(data.packing.numbers_of_basic_commercial_units_in_pack / data.packing.unit_consumption).toFixed(2) + ' ' + data.packing.calculation_unit + '" type="text" class="form-control" id="calculation_unit" disabled="">\n' +
+                            '\n' +
+                            '<input name="unit_of_collective" value="' + data.packing.number_of_sale_units_in_the_pack + ' ' + data.packing.unit_of_collective + '" type="text" class="form-control" id="unit_of_collective" disabled="">\n' +
+                            '</td>\n' +
+                            '</tr><tr>\n' +
+                            '<th>Cena sprzedaży</th>\n' +
+                            '</tr><tr class="selling-row">\n' +
+                            '<td>\n' +
+                            '<input name="net_selling_price_commercial_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_selling_price_commercial_unit).toFixed(2) + '" type="text" class="form-control price net_selling_price_commercial_unit change-order" id="net_selling_price_commercial_unit[' + id + ']">\n' +
+                            '\n' +
+                            '<input name="net_selling_price_basic_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_selling_price_basic_unit).toFixed(2) + '" type="text" class="form-control price net_selling_price_basic_unit change-order" id="net_selling_price_basic_unit[' + id + ']">\n' +
+                            '\n' +
+                            '<input name="net_selling_price_calculated_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_selling_price_calculated_unit).toFixed(2) + '" type="text" class="form-control price net_selling_price_calculated_unit change-order" id="net_selling_price_calculated_unit[' + id + ']">\n' +
+                            '\n' +
+                            '<input name="net_selling_price_aggregate_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_selling_price_aggregate_unit).toFixed(2) + '" type="text" class="form-control price net_selling_price_aggregate_unit change-order" id="net_selling_price_aggregate_unit[' + id + ']">\n' +
+                            '</td>\n' +
+                            '</tr><tr class="selling-row">\n' +
+                            '<td>\n' +
+                            '<input name="gross_selling_price_commercial_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_selling_price_commercial_unit * 1.23).toFixed(2) + '" type="text" class="form-control price gross_selling_price_commercial_unit change-order" id="gross_selling_price_commercial_unit[' + id + ']">\n' +
+                            '\n' +
+                            '<input name="gross_selling_price_basic_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_selling_price_basic_unit * 1.23).toFixed(2) + '" type="text" class="form-control price gross_selling_price_basic_unit change-order" id="gross_selling_price_basic_unit[' + id + ']">\n' +
+                            '\n' +
+                            '<input name="gross_selling_price_calculated_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_selling_price_calculated_unit * 1.23).toFixed(2) + '" type="text" class="form-control price gross_selling_price_calculated_unit change-order" id="gross_selling_price_calculated_unit[' + id + ']">\n' +
+                            '\n' +
+                            '<input name="gross_selling_price_aggregate_unit[' + id + ']" data-item-id="' + id + '" value="' + parseFloat(data.price.net_selling_price_calculated_unit * 1.23).toFixed(2) + '" type="text" class="form-control price gross_selling_price_aggregate_unit change-order" id="gross_selling_price_aggregate_unit[' + id + ']">\n' +
+                            '</td>\n' +
+                            '</tr>' +
+                            '<tr class="purchase-row">\n' +
+                            '<td>\n' +
+                            '<input name="unit_commercial" value="1 ' + data.packing.unit_commercial + '" type="text" class="form-control" id="unit_commercial" disabled="">\n' +
+                            '\n' +
+                            '<input name="unit_basic" value="' + parseFloat(data.packing.numbers_of_basic_commercial_units_in_pack) + ' ' + data.packing.unit_basic + '" type="text" class="form-control" id="unit_basic" disabled="">\n' +
+                            '<input name="calculation_unit" value="' + parseFloat(data.packing.numbers_of_basic_commercial_units_in_pack / data.packing.unit_consumption).toFixed(2) + ' ' + data.packing.calculation_unit + '" type="text" class="form-control" id="calculation_unit" disabled="">\n' +
+                            '<input name="unit_of_collective" value="' + data.packing.number_of_sale_units_in_the_pack + ' ' + data.packing.unit_of_collective + '" type="text" class="form-control" id="unit_of_collective" disabled="">\n' +
+                            '</td>\n' +
+                            '</tr><tr>\n' +
+                            '<th>Ilość</th>\n' +
+                            '</tr><tr class="selling-row">\n' +
+                            '<td>\n' +
+                            '<input name="quantity_commercial[' + id + ']" value="1" data-item-id="' + id + '" type="text" class="form-control price" id="quantity_commercial[' + id + ']">\n' +
+                            '</td>\n' +
+                            '</tr><tr>\n' +
+                            '<th>Zysk</th>\n' +
+                            '</tr><tr class="selling-row">\n' +
+                            '<td>\n' +
+                            '<input type="text" class="form-control item-profit" data-item-id="' + id + '" disabled="" name="item-profit" value="0.00">\n' +
+                            '</td>\n' +
+                            '</tr>'
+                        );
+                        $('#add-item').val(' ');
+
+                    }
+                });
+            });
+            var sh = 0;
+            $('input.change-order').on('change', function () {
+                //   $('#new-order').show();
+                sh = 1;
+            });
+
+            $('[name="change-button-form"]').on('click', function () {
+                value = this.value;
+                $('#' + value).show();
+                if (value === 'general' && sh === 1) {
+                    $('#new-order').show();
+                }
+            });
+
+            //  $('#new-order').hide();
+        });
+
+        function commaReplace(cssClass) {
+            document.querySelectorAll(cssClass).forEach(function (input) {
+                input.value = input.value.replace(/,/g, '.');
+            });
+        }
+
+        $(document).ready(function () {
+            commaReplace('.priceChange');
+            let valueOfItemsGross;
+            let packingWarehouseCost;
+            let shipmentPriceForClient;
+            let additionalServiceCost;
+
+            if ($('#additional_service_cost').val() == '') {
+                additionalServiceCost = 0;
+            } else {
+                additionalServiceCost = parseFloat($('#additional_service_cost').val());
+            }
+
+
+            let profit = parseFloat($('#profit').val().replace(',', ''));
+            $("#profitInfo").val(profit);
+            $("#totalPriceInfo").val($("#orderItemsSum").val());
+            $("#weightInfo").val($("#weight").val());
+            updateOrderSum();
+
+            $('.sumChange').on('change', function () {
+                updateOrderSum();
+            });
+
+
+        });
+
+        function updateOrderSum(profit = null) {
+            if ($('#totalPriceInfo').val() == '') {
+                valueOfItemsGross = 0;
+            } else {
+                valueOfItemsGross = parseFloat($('#orderItemsSum').val().replace(',', ''));
+            }
+            if ($('#additional_cash_on_delivery_cost').val() == '') {
+                packingWarehouseCost = 0;
+            } else {
+                packingWarehouseCost = parseFloat($('#additional_cash_on_delivery_cost').val());
+            }
+
+            if ($('#shipment_price_for_client').val() == '') {
+                shipmentPriceForClient = 0;
+            } else {
+                shipmentPriceForClient = parseFloat($('#shipment_price_for_client').val());
+            }
+
+            if ($('#additional_service_cost').val() == '') {
+                additionalServieCost = 0;
+            } else {
+                additionalServieCost = parseFloat($('#additional_service_cost').val());
+            }
+
+            if (profit == 1) {
+                $('#profitInfo').val((parseFloat($('#profit').val()) + additionalServieCost).toFixed(2));
+            }
+            let sum = valueOfItemsGross + packingWarehouseCost + shipmentPriceForClient + additionalServieCost;
+            $('#orderValueSum').val(sum.toFixed(2));
+            $('#left_to_pay_on_delivery').val((sum - parseFloat($('#payments').val())).toFixed(2));
+        }
+
+        $('#status').on('change', function () {
+            $('#shouldBeSent').attr('checked', true);
+        });
+        $(document).ready(function () {
+            let newOrder = 1;
+
+            $('#newSplitOrder').on('click', function () {
+                showSplitButtons('.btn-split');
+                switch (newOrder) {
+                    case 1:
+                        showSubsplitOrder('.firstOrder');
+                        $('[name="firstOrderExist"]').val(1);
+                        break;
+                    case 2:
+                        showSubsplitOrder('.secondOrder');
+                        $('[name="secondOrderExist"]').val(1);
+                        break;
+                    case 3:
+                        showSubsplitOrder('.thirdOrder');
+                        $('[name="thirdOrderExist"]').val(1);
+                        break;
+                    case 4:
+                        showSubsplitOrder('.fourthOrder');
+                        $('[name="fourthOrderExist"]').val(1);
+                        break;
+                    case 5:
+                        showSubsplitOrder('.fifthOrder');
+                        $('[name="fifthOrderExist"]').val(1);
+                        break;
+                    default:
+
+                }
+                newOrder++;
+            });
+
+            $('.splitQuantity').on('change', function () {
+                let itemId = $(this).data('item-id');
+                let name = '[name="modal_quantity_commercial[' + itemId + ']"]';
+                let base = $(this).next().find('[name="base[' + itemId + ']"]');
+                let productQuantity = $(name);
+                let productQuantityValue = productQuantity.val();
+                productQuantity.val(productQuantity.val() - $(this).val());
+                let leftClass = '[name="left[' + $(this).data('item-id') + ']"]';
+                let quantityLeft = base.text() - sumSplitOrdersQuantity(itemId);
+                let type = $(this).data('order-type');
+                changeWeight(type, itemId, $(this).val());
+                changeLeft(leftClass, quantityLeft);
+            });
+
+
+            $('.dkoInput').on('change', function () {
+                changeDko();
+            });
+
+            $('.dkpInput').on('change', function () {
+                changeDkp();
+            });
+
+            $('.shipmentClient').on('change', function () {
+                changeShipmentClient();
+            });
+
+            $('.shipmentUs').on('change', function () {
+                changeShipmentUs();
+            });
+
+            $('.splitDko').on('click', function () {
+                let orderDko = {{ $order->additional_service_cost ?? 0 }};
+                splitCosts('additional_service_cost', orderDko, 'DKO');
+            });
+
+            $('.splitDkp').on('click', function () {
+                let orderDkp = {{ $order->additional_cash_on_delivery_cost ?? 0 }};
+                splitCosts('additional_cash_on_delivery_cost', orderDkp, 'DKP');
+            });
+
+            $('.splitClient').on('click', function () {
+                let shipmentClient = {{ $order->shipment_price_for_client ?? 0 }};
+                splitCosts('shipment_price_for_client', shipmentClient, 'SHIP_CLIENT');
+            });
+
+            $('.splitUs').on('click', function () {
+                let shipmentUs = {{ $order->shipment_price_for_us ?? 0 }};
+                splitCosts('shipment_price_for_us', shipmentUs, 'SHIP_US');
+            });
+            $('.net_purchase_price_commercial_unit').first().change()
+        });
+
+        function changeDko(split = null) {
+            let dkoDifference;
+            let orderDko = {{ $order->additional_service_cost ?? 0 }};
+            if (split != null) {
+                dkoDifference = parseFloat(orderDko - split);
+            } else {
+                dkoDifference = parseFloat(orderDko - sumSplitOrdersDko());
+            }
+
+            changeLeft('.dkoLeft', dkoDifference);
+        }
+
+        function changeDkp(split = null) {
+            let dkpDifference;
+            let orderDkp = {{ $order->additional_cash_on_delivery_cost ?? 0 }};
+            if (split != null) {
+                dkpDifference = parseFloat(orderDkp - split);
+            } else {
+                dkpDifference = parseFloat(orderDkp - sumSplitOrdersDkp());
+            }
+            changeLeft('.dkpLeft', dkpDifference);
+        }
+
+        function changeShipmentClient(split = null) {
+            let orderClientShipment = {{ $order->shipment_price_for_client ?? 0 }};
+            let orderClientShipmentDifference;
+            if (split != null) {
+                orderClientShipmentDifference = parseFloat(orderClientShipment - split);
+            } else {
+                orderClientShipmentDifference = parseFloat(orderClientShipment - sumSplitOrdersShipmentClient());
+            }
+            changeLeft('.shipmentClientLeft', orderClientShipmentDifference);
+        }
+
+        function changeShipmentUs(split = null) {
+            let orderShipmentUs = {{ $order->shipment_price_for_us ?? 0 }};
+            let orderShipmentUsDifference;
+            if (split != null) {
+                orderShipmentUsDifference = parseFloat(orderShipmentUs - split);
+            } else {
+                orderShipmentUsDifference = parseFloat(orderShipmentUs - sumSplitOrdersShipmentUs());
+            }
+            changeLeft('.shipmentUsLeft', orderShipmentUsDifference);
+        }
+
+        function sumSplitOrdersQuantity(id) {
+            let sumSplitOrdersQuantity = ~~parseInt($('[name="firstOrderQuantity[' + id + ']"]').val()) + ~~parseInt($('[name="secondOrderQuantity[' + id + ']"]').val()) + ~~parseInt($('[name="thirdOrderQuantity[' + id + ']"]').val()) + ~~parseInt($('[name="fourthOrderQuantity[' + id + ']"]').val()) + ~~parseInt($('[name="fifthOrderQuantity[' + id + ']"]').val());
+
+            return sumSplitOrdersQuantity;
+        }
+
+        function sumSplitOrdersDko(id) {
+            let sumSplitOrdersDko = ~~parseFloat($('[name="additional_service_cost_firstOrder"]').val()) + ~~parseFloat($('[name="additional_service_cost_secondOrder"]').val()) + ~~parseFloat($('[name="additional_service_cost_thirdOrder"]').val()) + ~~parseFloat($('[name="additional_service_cost_fourthOrder"]').val()) + ~~parseFloat($('[name="additional_service_cost_fifthOrder"]').val());
+            return sumSplitOrdersDko;
+        }
+
+        function sumSplitOrdersDkp(id) {
+            let sumSplitOrdersDkp = ~~parseFloat($('[name="additional_cash_on_delivery_cost_firstOrder"]').val()) + ~~parseFloat($('[name="additional_cash_on_delivery_cost_secondOrder"]').val()) + ~~parseFloat($('[name="additional_cash_on_delivery_cost_thirdOrder"]').val()) + ~~parseFloat($('[name="additional_cash_on_delivery_cost_fourthOrder"]').val()) + ~~parseFloat($('[name="additional_cash_on_delivery_cost_fifthOrder"]').val());
+
+            return sumSplitOrdersDkp;
+        }
+
+        function sumSplitOrdersShipmentClient(id) {
+            let sumSplitOrdersShipmentClient = ~~parseFloat($('[name="shipment_price_for_client_firstOrder"]').val()) + ~~parseFloat($('[name="shipment_price_for_client_secondOrder"]').val()) + ~~parseFloat($('[name="shipment_price_for_client_thirdOrder"]').val()) + ~~parseFloat($('[name="shipment_price_for_client_fourthOrder"]').val()) + ~~parseFloat($('[name="shipment_price_for_client_fifthOrder"]').val());
+
+            return sumSplitOrdersShipmentClient;
+        }
+
+        function sumSplitOrdersShipmentUs(id) {
+            let sumSplitOrdersShipmentUs = ~~parseFloat($('[name="shipment_price_for_us_firstOrder"]').val()) + ~~parseFloat($('[name="shipment_price_for_us_secondOrder"]').val()) + ~~parseFloat($('[name="shipment_price_for_us_thirdOrder"]').val()) + ~~parseFloat($('[name="shipment_price_for_us_fourthOrder"]').val()) + ~~parseFloat($('[name="shipment_price_for_us_fifthOrder"]').val());
+
+            return sumSplitOrdersShipmentUs;
+        }
+
+        function splitCosts(elementsName, value, type) {
+            let func;
+            switch (type) {
+                case 'DKO':
+                    func = changeDko(value);
+                    break;
+                case 'DKP':
+                    func = changeDkp(value);
+                    break;
+                case 'SHIP_CLIENT':
+                    func = changeShipmentClient(value);
+                    break;
+                case 'SHIP_US':
+                    func = changeShipmentUs(value);
+                    break;
+                default:
+            }
+            if ($('[name="firstOrderExist"]').val() == 1 && $('[name="secondOrderExist"]').val() == 0) {
+                $('[name="' + elementsName + '_firstOrder"]').val(value);
+                func;
+            } else if ($('[name="secondOrderExist"]').val() == 1 && $('[name="secondOrderExist"]').val() == 1 && $('[name="thirdOrderExist"]').val() == 0) {
+                value = (value / 2).toFixed(2);
+                $('[name="' + elementsName + '_firstOrder"]').val(value);
+                $('[name="' + elementsName + '_secondOrder"]').val(value);
+                func;
+            } else if ($('[name="secondOrderExist"]').val() == 1 && $('[name="secondOrderExist"]').val() == 1 && $('[name="thirdOrderExist"]').val() == 1 && $('[name="fourthOrderExist"]').val() == 0) {
+                value = (value / 3).toFixed(2);
+                $('[name="' + elementsName + '_firstOrder"]').val(value);
+                $('[name="' + elementsName + '_secondOrder"]').val(value);
+                $('[name="' + elementsName + '_thirdOrder"]').val(value);
+                func;
+            } else if ($('[name="secondOrderExist"]').val() == 1 && $('[name="secondOrderExist"]').val() == 1 && $('[name="thirdOrderExist"]').val() == 1 && $('[name="fourthOrderExist"]').val() == 1 && $('[name="fourthOrderExist"]').val() == 0) {
+                value = (value / 4).toFixed(2);
+                $('[name="' + elementsName + '_firstOrder"]').val(value);
+                $('[name="' + elementsName + '_secondOrder"]').val(value);
+                $('[name="' + elementsName + '_thirdOrder"]').val(value);
+                $('[name="' + elementsName + '_fourthOrder"]').val(value);
+                func;
+            } else {
+                value = (value / 5).toFixed(2);
+                $('[name="' + elementsName + '_firstOrder"]').val(value);
+                $('[name="' + elementsName + '_secondOrder"]').val(value);
+                $('[name="' + elementsName + '_thirdOrder"]').val(value);
+                $('[name="' + elementsName + '_fourthOrder"]').val(value);
+                $('[name="' + elementsName + '_fifthOrder"]').val(value);
+                func;
+            }
+        }
+
+        function changeLeft(elementsClass, value) {
+            $(elementsClass).each(function () {
+                $(this).text(value);
+            });
+        }
+
+        function showSubsplitOrder(elementsClass) {
+            $(elementsClass).each(function () {
+                $(this).css('display', 'table-cell');
+            });
+        }
+
+        function showSplitButtons(elementsClass) {
+            $(elementsClass).each(function () {
+                $(this).css('display', 'block');
+            });
+        }
+
+        function getFirmData(id) {
+            var symbol = $('#firms_data').val();
+            window.location.href = '/admin/orders/' + id + '/getDataFromFirm/' + symbol;
+        }
+
+        function changeWeight(type, id, quantity) {
+            let weightSelector = 'input[name="' + type + 'OrderWeightValue[' + id + ']"]';
+            let weightValue = $(weightSelector).val();
+            let weight = parseInt(weightValue * quantity);
+            let weightValueSelector = '[name="' + type + 'OrderWeight[' + id + ']"]';
+            if (weight == 0) {
+                $(weightValueSelector).text(weightValue + ' kg');
+            } else {
+                $(weightValueSelector).text(weight + ' kg');
+            }
+
+            let weightBase = '[name="' + type + 'OrderWeightValueBase[' + id + ']"]';
+            $(weightBase).val(weight);
+
+            let weightSum = 0;
+            $('.' + type + 'WeightValueBase').each(function (item) {
+                weightSum += parseFloat($('.' + type + 'WeightValueBase')[item].value);
+            });
+
+            let globalWeightTextSelector = '.' + type + 'OrderWeightSum';
+            $(globalWeightTextSelector).text('Waga: ' + weightSum + ' kg');
+        }
+
+        function fillQuantity(id, quantity, type) {
+            let selector = '[name="' + type + 'OrderQuantity[' + id + ']"]';
+            $(selector).val(quantity);
+            $(selector).trigger('change');
+        }
+
+        $('.openPaymentModal').on('click', function () {
+            let masterPaymentId = $(this).data('payment');
+            let masterPaymentAmount = $(this).data('payment-amount');
+            $('#paymentModal input[name="masterPaymentAmount"]').val(masterPaymentAmount);
+            $('input[name="masterPaymentId"]').val(masterPaymentId);
+            $('#paymentModal').modal();
+        });
+
+        $('.openSurplusModal').on('click', function () {
+            let masterPaymentId = $(this).data('payment');
+            let masterPaymentAmount = $(this).data('payment-amount');
+            let surplusId = $(this).data('surplus-id');
+            $('#surplusModal input[name="user_surplus_id"]').val(surplusId);
+            $('#surplusModal input[name="masterPaymentAmount"]').val(masterPaymentAmount);
+            $('input[name="surplus_amount"]').val(masterPaymentAmount);
+            $('#surplusModal').modal();
+        });
+
+        $('.openPaymentModal').on('click', function () {
+            let masterPaymentId = $(this).data('payment');
+            let masterPaymentAmount = $(this).data('payment-amount');
+            $('#paymentModal input[name="masterPaymentAmount"]').val(masterPaymentAmount);
+            $('input[name="masterPaymentId"]').val(masterPaymentId);
+            $('#paymentModal').modal();
+        });
+
+        $('.openWarehousePaymentModal').on('click', function () {
+            let masterPaymentId = $(this).data('payment');
+            let masterPaymentAmount = $(this).data('payment-amount');
+            $('#warehousePaymentModal input[name="masterPaymentAmount"]').val(masterPaymentAmount);
+            $('input[name="masterPaymentId"]').val(masterPaymentId);
+            $('#warehousePaymentModal').modal();
+        });
+
+        $('.openPromiseModal').on('click', function () {
+            let masterPaymentId = $(this).data('payment');
+            let masterPaymentAmount = $(this).data('payment-amount');
+            $('input[name="masterPaymentId"]').val(masterPaymentId);
+            $('input[name="amount"]').val(masterPaymentAmount);
+            $('#promiseModal').modal();
+        });
+
+        $('#chooseOrder').on('change', function () {
+            let orderId = $(this).val();
+            let orderValue = parseFloat($('input[name="order-payment-' + orderId + '"]').val());
+            let masterPaymentAmount = parseFloat($('#paymentModal input[name="masterPaymentAmount"]').val());
+            if (masterPaymentAmount > orderValue) {
+                $('#orderPayment #amount').val(orderValue);
+            } else if (masterPaymentAmount < orderValue) {
+                $('#orderPayment #amount').val(masterPaymentAmount);
+            }
+
+        });
+        $('#chooseOrder').on('change', function () {
+            let orderId = $(this).val();
+            let orderValue = parseFloat($('input[name="order-payment-' + orderId + '"]').val());
+            let masterPaymentAmount = parseFloat($('#warehousePaymentModal input[name="masterPaymentAmount"]').val());
+            if (masterPaymentAmount > orderValue) {
+                $('#orderPayment #amount').val(orderValue);
+            } else if (masterPaymentAmount < orderValue) {
+                $('#orderPayment #amount').val(masterPaymentAmount);
+            }
+
+        });
+
+        function moveData(id) {
+            if ($('#moveButton-' + id).hasClass('btn-warning')) {
+                $('#moveButton-' + id).removeClass('btn-warning').addClass('btn-dark');
+                $('.btn-warning').attr('disabled', true);
+                $('.btn-move').removeClass('hidden');
+            } else if ($('#moveButton-' + id).hasClass('btn-dark')) {
+                $('#moveButton-' + id).removeClass('btn-dark').addClass('btn-warning');
+                $('.btn-warning').attr('disabled', false);
+                $('.btn-move').addClass('hidden');
+            }
+        }
+
+        function sendInvoiceRequest(id) {
+            let url = '{{ route('orders.invoiceRequest') }}'
+            $.ajax({
+                method: 'POST',
+                url: url,
+                data: {
+                    id: id
+                }
+            }).done(data => alert('Pomyślnie wywołano prośbę o fakturę.')).fail(data => alert('Prośba o fakturę nie została wysłana. Wystąpił błąd.'));
+        }
+
+        function moveDataAjax(id) {
+            var idToSend = id;
+            var buttonId = $('.btn-dark').attr('id');
+            var idToGet;
+            var res = buttonId.split("-");
+            idToGet = res[1];
+            var amountToGet = $('#left-amount-' + idToGet).data('value');
+            var amountToSend = $('#left-amount-' + idToSend).data('value');
+            if (idToGet != idToSend && Math.sign(amountToGet) == -1) {
+                let paymentMoveAmount;
+                amountToGet = Math.abs(amountToGet)
+                if (amountToGet > amountToSend) {
+                    paymentMoveAmount = amountToSend
+                } else {
+                    paymentMoveAmount = amountToGet
+                }
+                $('#order_id_get').text(idToGet);
+                $('#order_id_send').text(idToSend);
+                $('#payment__amount').val(paymentMoveAmount)
+                $('#payment_move_data').modal('show');
+            } else {
+                $('#payment_move_data_error_select').modal('show');
+            }
+        }
+
+        function moveSurplus(id) {
+            let surplusValue = $('#left-amount-' + id).data('value');
+            if (Math.sign(surplusValue) === -1) {
+                let paymentMoveAmount;
+                surplusValue = Math.abs(surplusValue)
+                console.log(surplusValue, 'xxasdsa')
+                $('#surplus__order--id').val(id);
+                $('#surplus__amount').val(surplusValue)
+                $('#payment_move_surplus').modal('show');
+            } else {
+                $('#payment_move_data_error_select').modal('show');
+            }
+        }
+
+        $('#payment-move-surplus-ok').on('click', function () {
+            let orderId = $('#order_id').val();
+            console.log(orderId);
+            let surplusAmount = $('#surplus__amount').val();
+            $.ajax({
+                method: 'POST',
+                url: '/admin/orders/' + orderId + '/surplus/move',
+                data: {
+                    orderId: orderId,
+                    surplusAmount: surplusAmount
+                }
+            }).done(function (data) {
+                $('#order_move_data_success').modal('show');
+
+                $('#order_move_data_ok').on('click', function () {
+                    window.location.href = '/admin/orders';
+                });
+            }).fail(function () {
+                $('#order_move_data_error').modal('show');
+                $('#order_move_data_ok_error').on('click', function () {
+                    window.location.href = '/admin/orders';
+
+                });
+            });
+        });
+        $('#payment-move-data-ok').on('click', function () {
+            var idToGet = $('#order_id_get').text();
+            var idToSend = $('#order_id_send').text();
+            var paymentAmount = $('#payment__amount').val();
+            $.ajax({
+                method: 'POST',
+                url: '/admin/orders/' + idToGet + '/data/' + idToSend + '/payment/move',
+                data: {
+                    idToGet: idToGet,
+                    idToSend: idToSend,
+                    paymentAmount: paymentAmount
+                }
+            }).done(function (data) {
+                $('#order_move_data_success').modal('show');
+
+                $('#order_move_data_ok').on('click', function () {
+                    window.location.href = '/admin/orders';
+                });
+            }).fail(function () {
+                $('#order_move_data_error').modal('show');
+                $('#order_move_data_ok_error').on('click', function () {
+                    window.location.href = '/admin/orders';
+
+                });
+            });
+        });
+    </script>
+
+    <script src="{{ URL::asset('js/views/orders/edit.js') }}"></script>
 @endsection

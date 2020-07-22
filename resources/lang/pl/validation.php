@@ -39,7 +39,7 @@ return [
     'dimensions'           => ':attribute ma niepoprawne wymiary.',
     'distinct'             => ':attribute ma zduplikowane wartości.',
     'email'                => 'Format :attribute jest nieprawidłowy.',
-    'exists'               => 'Zaznaczony :attribute jest nieprawidłowy.',
+    'exists'               => 'Wybrany :attribute jest nieprawidłowy.',
     'file'                 => ':attribute musi być plikiem.',
     'filled'               => 'Pole :attribute jest wymagane.',
     'gt'                   => [
@@ -151,5 +151,6 @@ return [
         'name' => 'nazwa',
         'date_to' => 'data początkowa',
         'date_from' => 'data końcowa',
+        'order_id' => 'identyfikator zamówienia',
     ],
 ];

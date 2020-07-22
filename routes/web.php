@@ -358,6 +358,9 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get('invoice/{id}/delete', 'OrdersController@deleteInvoice')->name('order.deleteInvoice');
 
+        Route::post('orders/detach-label',
+            'LabelsController@detachLabelFromOrder')->name('orders.detachLabel');
+
         Route::post('orders/label-removal/{orderId}/{labelId}',
             'OrdersController@swapLabelsAfterLabelRemoval')->name('orders.label-removal');
         Route::post('orders/payment-deadline', 'OrdersController@setPaymentDeadline')->name('orders.payment-deadline');

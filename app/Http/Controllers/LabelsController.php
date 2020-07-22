@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Entities\ColumnVisibility;
+use App\Entities\Order;
 use App\Http\Requests\LabelCreateRequest;
 use App\Http\Requests\LabelUpdateRequest;
+use App\Http\Requests\OrderEditLabel;
 use App\Repositories\LabelGroupRepository;
 use App\Repositories\LabelRepository;
+use http\Env\Request;
 use Yajra\DataTables\Facades\DataTables;
 
 /**
@@ -92,6 +95,18 @@ class LabelsController extends Controller
             'message' => __('labels.message.store'),
             'alert-type' => 'success'
         ]);
+    }
+
+    public function detachLabelFromOrder(OrderEditLabel $request)
+    {
+        try {
+            $request->validated();
+            $order = Order::find($request->order_id);
+            $order->labels()->detach($request->label_id);
+            return response('success');
+        } catch (\Exception $e) {
+            return response(['errors' => ['message'=> "Niespodziewany błąd prosimy spróbować później"]], 400);
+        }
     }
 
     /**
