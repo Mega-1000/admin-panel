@@ -348,7 +348,7 @@ class OrdersController extends Controller
             $visibilities[$key]->show = json_decode($row->show, true);
             $visibilities[$key]->hidden = json_decode($row->hidden, true);
         }
-        $templateData = PackageTemplate::all();
+        $templateData = PackageTemplate::orderBy('list_order', 'asc')->get();
         $deliverers = Deliverer::all();
 
         return view('orders.index', compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses'))
