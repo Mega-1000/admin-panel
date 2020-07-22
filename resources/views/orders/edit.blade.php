@@ -294,9 +294,9 @@
             </div>
             <div class="form-group" style="width: 20%; float: left; padding: 5px;">
                 <label for="confirmed_sending_date_con_mag">@lang('orders.form.confirmed_sending_date_con_mag')</label>
-doda                <input type="text" class="form-control default-date-picker-now" id="confirmed_sending_date_con_mag"
-                       name="confirmed_sending_date_con_mag"
-                       value="{{ $order->confirmed_sending_date_con_mag ?? ''}}">
+                doda <input type="text" class="form-control default-date-picker-now" id="confirmed_sending_date_con_mag"
+                            name="confirmed_sending_date_con_mag"
+                            value="{{ $order->confirmed_sending_date_con_mag ?? ''}}">
             </div>
             <div class="form-group" style="width: 20%; float: left; padding: 5px;">
                 <label for="initial_pickup_date_client">@lang('orders.form.initial_pickup_date_client')</label>
@@ -1104,13 +1104,44 @@ doda                <input type="text" class="form-control default-date-picker-n
             <h3>Nadpłaty / zwroty użytkownika {{ $order->customer->login }}</h3>
             <tr>
                 <th>@lang('order_payments.table.payments')</th>
+                <th>@lang('order_payments.table.order-return')</th>
                 <th>@lang('order_payments.table.return')</th>
             </tr>
             </thead>
             <tbody>
             @foreach($order->customer->surplusPayments as $payment)
                 <tr>
-                    <td>{{ $payment->surplus_amount }}</td>
+                    <td>Nadpłata w kwocie: {{ $payment->surplus_amount }}</td>
+                    <td><a href="/admin/orders/{{ $payment->order_id }}/edit">{{ $payment->order_id }}</a></td>
+                    <td>
+                        <button type="button" class="btn btn-primary openSurplusModal" style="display: block;"
+                                data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->surplus_amount }}"
+                                data-surplus-id="{{ $payment->id }}">
+                            Zwrot
+                        </button>
+                        <button type="button" class="btn btn-secondary openPaymentModal" style="display: block;"
+                                data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->surplus_amount }}">
+                            Przydziel
+                        </button>
+                    </td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+        <table style="width: 100%; float: left;" id="paymentsTable" class="table table-hover">
+            <thead>
+            <h3>Nadpłaty / zwroty użytkownika {{ $order->customer->login }}</h3>
+            <tr>
+                <th>@lang('order_payments.table.payments')</th>
+                <th>@lang('order_payments.table.order-return')</th>
+                <th>@lang('order_payments.table.return')</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach($order->customer->surplusPayments as $payment)
+                <tr>
+                    <td>Nadpłata w kwocie: {{ $payment->surplus_amount }}</td>
+                    <td><a href="/admin/orders/{{ $payment->order_id }}/edit">{{ $payment->order_id }}</a></td>
                     <td>
                         <button type="button" class="btn btn-primary openSurplusModal" style="display: block;"
                                 data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->surplus_amount }}"
