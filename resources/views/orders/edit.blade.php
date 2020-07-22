@@ -1086,13 +1086,15 @@
                 <h3>Nadpłaty / zwroty użytkownika {{ $order->customer->login }}</h3>
                 <tr>
                     <th>@lang('order_payments.table.payments')</th>
+                    <th>@lang('order_payments.table.order-return')</th>
                     <th>@lang('order_payments.table.return')</th>
                 </tr>
                 </thead>
                 <tbody>
                 @foreach($order->customer->surplusPayments as $payment)
                     <tr>
-                        <td>{{ $payment->surplus_amount }}</td>
+                        <td>Nadpłata w kwocie: {{ $payment->surplus_amount }}</td>
+                        <td><a href="/admin/orders/{{ $payment->order_id }}/edit">{{ $payment->order_id }}</a></td>
                         <td>
                             <button type="button" class="btn btn-primary openSurplusModal" style="display: block;"
                                     data-payment="{{ $payment->id }}" data-payment-amount="{{ $payment->surplus_amount }}" data-surplus-id="{{ $payment->id }}">

@@ -8,6 +8,6 @@ class UserSurplusPayment extends Model
 {
     public $table = 'users_surplus_payments';
 
-    public $fillable = ['surplus_amount', 'user_id'];
+    public $fillable = ['surplus_amount', 'user_id', 'order_id'];
 
 }
