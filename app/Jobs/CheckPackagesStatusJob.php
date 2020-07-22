@@ -4,7 +4,9 @@ namespace App\Jobs;
 
 use App\Integrations\Pocztex\ElektronicznyNadawca;
 use App\Integrations\Pocztex\envelopeStatusType;
+use App\Integrations\Pocztex\getEnvelopeContentShort;
 use App\Integrations\Pocztex\getEnvelopeStatus;
+use App\Integrations\Pocztex\statusType;
 use App\Repositories\OrderPackageRepository;
 use GuzzleHttp\Client;
 use Illuminate\Bus\Queueable;
@@ -180,6 +182,13 @@ class CheckPackagesStatusJob
     protected function checkStatusInPocztexPackages($package)
     {
         $integration = new ElektronicznyNadawca();
+        $request = new getEnvelopeContentShort();
+        $request->idEnvelope = $package->sending_number;
+        $status = $integration->getEnvelopeContentShort($request);
+        if ($status->przesylka->status !== statusType::POTWIERDZONA) {
+            return;
+        }
+
         $request = new getEnvelopeStatus();
         $request->idEnvelope = $package->sending_number;
         $status = $integration->getEnvelopeStatus($request);
