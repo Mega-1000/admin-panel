@@ -2705,17 +2705,7 @@
                         html += '</div>';
                         html += '<div class="form-group">';
                         html += '<label for="consultant_notice">Opis obsługi konsultanta</label>';
-                        html += '<textarea rows="5" cols="40" type="text" name="consultant_notice" id="consultant_notice" class="form-control"></textarea>';
-                        html += `
-                                    <div class="flex-input">
-                                        <input type="text" class="form-control" placeholder="@lang('orders.form.consultant_notices')"
-                                               id="{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}" name="spedition_comment"/>
-                                        <div class="input-group-append">
-                                            <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}', ${data.order.id})"
-                                                    class="btn btn-success" type="button">wyślij
-                                            </button>
-                                        </div>
-                                    </div>`
+                        html += '<textarea disabled rows="5" cols="40" type="text" name="consultant_notice" id="consultant_notice" class="form-control"></textarea>';
                         html += '</div>';
                         html += '<div class="form-group">';
                         html += '<label for="warehouse_value">Koszt obsługi magazynu</label>';
@@ -2724,16 +2714,6 @@
                         html += '<div class="form-group">';
                         html += '<label for="warehouse_notice">Opis obsługi magazynu</label>';
                         html += '<textarea disabled rows="5" cols="40" type="text" name="warehouse_notice" id="warehouse_notice" class="form-control"></textarea>';
-                        html += `
-                            <div class="flex-input">
-                                <input type="text" class="form-control" placeholder="@lang('orders.form.warehouse_notice')"
-                                       id="{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}" name="warehouse_notice"/>
-                                <div class="input-group-append">
-                                    <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}', ${data.order.id})"
-                                            class="btn btn-success" type="button">wyślij
-                                    </button>
-                                </div>
-                            </div>`
                         html += '</div>';
                         html += '</div>';
                         if (taskGroup.length !== 0) {
@@ -3031,9 +3011,9 @@
                                 warehouse_notice = '';
                             } else {
                                 consultant_value = data.task_salary_detail.consultant_value;
-                                consultant_notice = data.order ? data.order.consultant_notices : data.task_salary_detail.consultant_notice;
+                                consultant_notice = data.task_salary_detail.consultant_notice;
                                 warehouse_value = data.task_salary_detail.warehouse_value;
-                                warehouse_notice = data.order ? data.order.warehouse_notice : data.task_salary_detail.warehouse_notice;
+                                warehouse_notice = data.task_salary_detail.warehouse_notice;
                                 if (consultant_notice == null) {
                                     consultant_notice = '';
                                 }
@@ -3047,40 +3027,16 @@
                             html += '</div>';
                             html += '<div class="form-group">';
                             html += '<label for="consultant_notice">Opis obsługi konsultanta</label>';
-                            html += '<textarea ';
-                            html += data.order ? 'disabled' : '';
-                            html += ' rows="5" cols="40" type="text" name="consultant_notice" id="consultant_notice" class="form-control">' + consultant_notice + '</textarea>';
+                            html += '<textarea disabled rows="5" cols="40" type="text" name="consultant_notice" id="consultant_notice" class="form-control">' + consultant_notice + '</textarea>';
                             html += '</div>';
-                            html += data.order ? `
-                                    <div class="flex-input">
-                                        <input type="text" class="form-control" placeholder="@lang('orders.form.consultant_notices')"
-                                               id="{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}" name="spedition_comment"/>
-                                        <div class="input-group-append">
-                                            <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}', ${data.order.id})"
-                                                    class="btn btn-success" type="button">wyślij
-                                            </button>
-                                        </div>
-                                    </div>` : '';
                             html += '<div class="form-group">';
                             html += '<label for="warehouse_value">Koszt obsługi magazynu</label>';
                             html += '<input type="number" name="warehouse_value" id="warehouse_value" class="form-control" value="' + warehouse_value + '">';
                             html += '</div>';
                             html += '<div class="form-group">';
                             html += '<label for="warehouse_notice">Opis obsługi magazynu</label>';
-                            html += '<textarea ';
-                            html += data.order ? 'disabled' : ''
-                            html += ' rows="5" cols="40" type="text" name="warehouse_notice" id="warehouse_notice" class="form-control">' + warehouse_notice + '</textarea>';
+                            html += '<textarea disabled rows="5" cols="40" type="text" name="warehouse_notice" id="warehouse_notice" class="form-control">' + warehouse_notice + '</textarea>';
                             html += '</div>';
-                            html += data.order ? `
-                            <div class="flex-input">
-                                <input type="text" class="form-control" placeholder="@lang('orders.form.warehouse_notice')"
-                                       id="{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}" name="warehouse_notice"/>
-                                <div class="input-group-append">
-                                    <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}', ${data.order.id})"
-                                            class="btn btn-success" type="button">wyślij
-                                    </button>
-                                </div>
-                            </div>` : '';
                             html += '<div class="form-group">';
                             html += '<a class="btn btn-success" target="_blank" href="/admin/orders/' + data.order_id + '/edit">Przenieś mnie do edycji zlecenia</a>';
                             html += '<br><a class="btn btn-success" target="_blank" href="/admin/orders?order_id=' + data.order_id + '">Przenieś mnie do zlecenia na liście zleceń</a>';
@@ -3146,23 +3102,6 @@
     </script>
     <script type="text/javascript" src="{{ URL::asset('js/helpers/render-calendar.js') }}"></script>
     <script>
-        function sendComment(type, order_id) {
-            $.post(
-                {
-                    url: "{{route('orders.updateNotice')}}",
-                    data: {
-                        order_id: order_id,
-                        message: $(`#${type}`).val(),
-                        type: type
-                    }
-                })
-                .done(() => location.reload())
-                .fail((response) => {
-                    var json = JSON.parse(response.responseText);
-                    alert(Object.values(json.errors));
-                })
-        }
-
         $(document).ready(function () {
             var getUrlParameter = function getUrlParameter(sParam) {
                 var sPageURL = window.location.search.substring(1),
