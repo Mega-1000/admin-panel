@@ -19,13 +19,8 @@ class SelloPackageDivider implements iDividable
 
     public function divide($data, Order $order)
     {
-        $realPackageNumber = 1;
-        foreach ($this->transactionList as $transaction) {
-            if ($transaction->tr_Group) {
-                continue;
-            }
-            $this->divideForTransaction($data, $order, $transaction, $realPackageNumber);
-        }
+        $this->divideForTransaction($data, $order, $this->transactionList[0]);
+
         return false;
     }
 
@@ -33,32 +28,17 @@ class SelloPackageDivider implements iDividable
      * @param $items
      * @param Order $order
      * @param $transaction
-     * @param $realPackageNumber
      */
-    private function divideForTransaction($items, Order $order, $transaction, &$realPackageNumber)
+    private function divideForTransaction($items, Order $order, $transaction)
     {
         $data = $this->findProductInData($items, $transaction);
-        $packing = ProductPacking::where('product_id', $data['id'])->first();
         $template = $this->prepareTemplate($transaction);
-        $isPaczkomat = in_array($template->id, self::TEMPLATE_IDS_FOR_PACZKOMAT);
-        $amountLeft = $data['amount'];
-        while ($amountLeft > 0) {
-            if ($isPaczkomat) {
-                list($quantity, $newTemplate) = $this->getPaczkomatQuantity($amountLeft, $packing);
-                if ($newTemplate) {
-                    $template = $newTemplate;
-                }
-            } else {
-                $quantity = min($packing->allegro_courier ?: 1, $amountLeft);
-            }
-            $pack = BackPackPackageDivider::createPackage($template, $order->id, $realPackageNumber);
+        for($i = 0; $i < $transaction->tr_CheckoutFormCalculatedNumberOfPackages; $i++) {
+            $pack = BackPackPackageDivider::createPackage($template, $order->id, $i+1);
             $pack->packedProducts()->attach($data['id'],
-                ['quantity' => $quantity]);
-            $amountLeft -= $quantity;
-            $realPackageNumber++;
+                ['quantity' => 1]);
             $shipment_date = $pack->shipment_date;
         }
-
         $order->shipment_date = $shipment_date;
         $order->save();
     }

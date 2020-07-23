@@ -29,7 +29,8 @@ return [
         'move' => 'Przenieś wpłatę',
         'invoice' => 'Faktura',
         'status' => 'Status',
-        'return' => 'Zwrot nadpłaty'
+        'return' => 'Zwrot nadpłaty',
+        'order-return' => 'Nadpłata pochodzi z zamówienia:'
     ],
     'message' => [
         'store' => 'Płatność została dodana pomyślnie!',

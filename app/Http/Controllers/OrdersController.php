@@ -2216,10 +2216,12 @@ class OrdersController extends Controller
 
         $userSurplusPayment = UserSurplusPayment::create([
             'user_id' => $order->customer_id,
-            'surplus_amount' => $surplusAmount
+            'surplus_amount' => $surplusAmount,
+            'order_id' => $order->id
         ]);
 
-        $orderPayment = $order->payments()->where('promise', '')->where('amount', '>=', $surplusAmount)->first();
+        $orderPayment = $order->payments()->where('promise', '')->first();
+
 
         $orderPayment->update([
             'amount' => $orderPayment->amount - $surplusAmount
