@@ -692,15 +692,12 @@ class OrdersController extends Controller
             'status_id' => $request->input('status'),
             'proposed_payment' => $request->input('proposed_payment'),
             'last_status_update_date' => $statusUpdateDate,
-//            'consultant_notices' => $request->input('consultant_notices'),
             'remainder_date' => $request->input('remainder_date'),
             'shipment_date' => $request->input('shipment_date'),
             'consultant_notice' => $request->input('consultant_notice'),
             'consultant_value' => $request->input('consultant_value'),
-//            'warehouse_notice' => $request->input('warehouse_notice'),
             'warehouse_value' => $request->input('warehouse_value'),
             'production_date' => $request->input('production_date'),
-//            'spedition_comment' => $request->input('spedition_comment'),
         ], $id);
 
         $orderObj = Order::find($id);

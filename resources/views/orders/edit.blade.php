@@ -294,7 +294,7 @@
             </div>
             <div class="form-group" style="width: 20%; float: left; padding: 5px;">
                 <label for="confirmed_sending_date_con_mag">@lang('orders.form.confirmed_sending_date_con_mag')</label>
-                doda <input type="text" class="form-control default-date-picker-now" id="confirmed_sending_date_con_mag"
+                <input type="text" class="form-control default-date-picker-now" id="confirmed_sending_date_con_mag"
                             name="confirmed_sending_date_con_mag"
                             value="{{ $order->confirmed_sending_date_con_mag ?? ''}}">
             </div>

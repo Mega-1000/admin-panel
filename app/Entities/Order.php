@@ -273,7 +273,7 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Re'la'tions\BelongsToMany
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
     public function labels()
     {
