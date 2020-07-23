@@ -24,6 +24,7 @@ use App\Helpers\EmailTagHandlerHelper;
 use App\Helpers\LabelsHelper;
 use App\Helpers\OrderCalcHelper;
 use App\Helpers\OrdersHelper;
+use App\Http\Requests\NoticesRequest;
 use App\Http\Requests\OrderUpdateRequest;
 use App\Jobs\AddLabelJob;
 use App\Jobs\AllegroTrackingNumberUpdater;
@@ -60,9 +61,15 @@ use App\Repositories\WarehouseRepository;
 use App\User;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
+use Exception;
 use iio\libmergepdf\Merger;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -71,6 +78,7 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
+use Mailer;
 use Yajra\DataTables\Facades\DataTables;
 
 /**
@@ -280,7 +288,7 @@ class OrdersController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|\Illuminate\View\View
      */
     public function index(Request $request)
     {
@@ -361,7 +369,7 @@ class OrdersController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|\Illuminate\View\View
      */
     public function create()
     {
@@ -378,7 +386,7 @@ class OrdersController extends Controller
      *
      * @param int $id
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit($id)
     {
@@ -592,10 +600,35 @@ class OrdersController extends Controller
         return $productsVariation;
     }
 
+    public function updateNotices(NoticesRequest $request)
+    {
+        $request->validated();
+        $user = Auth::user();
+        if (empty($user)) {
+            return response(['errors' => ['message'=> "Użytkownik nie jest zalogowany"]], 400);
+        }
+        $order = Order::find($request->order_id);
+        switch($request->type) {
+            case Order::COMMENT_SHIPPING_TYPE:
+                $order->spedition_comment .= $this->formatMessage($user, $request);
+                break;
+            case Order::COMMENT_WAREHOUSE_TYPE:
+                $order->warehouse_notice .= $this->formatMessage($user, $request);
+                break;
+            case Order::COMMENT_CONSULTANT_TYPE:
+                $order->consultant_notices .= $this->formatMessage($user, $request);
+                break;
+            default:
+                return response(['errors' => ['message'=> "Zły typ komentarza"]], 400);
+        }
+        $order->save();
+        return \response('success');
+    }
+
     /**
      * @param OrderUpdateRequest $request
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function update(OrderUpdateRequest $request, $id)
     {
@@ -659,15 +692,12 @@ class OrdersController extends Controller
             'status_id' => $request->input('status'),
             'proposed_payment' => $request->input('proposed_payment'),
             'last_status_update_date' => $statusUpdateDate,
-            'consultant_notices' => $request->input('consultant_notices'),
             'remainder_date' => $request->input('remainder_date'),
             'shipment_date' => $request->input('shipment_date'),
             'consultant_notice' => $request->input('consultant_notice'),
             'consultant_value' => $request->input('consultant_value'),
-            'warehouse_notice' => $request->input('warehouse_notice'),
             'warehouse_value' => $request->input('warehouse_value'),
             'production_date' => $request->input('production_date'),
-            'spedition_comment' => $request->input('spedition_comment'),
         ], $id);
 
         $orderObj = Order::find($id);
@@ -914,7 +944,7 @@ class OrdersController extends Controller
 
     /**
      * @param $data
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function store($data)
     {
@@ -1068,7 +1098,7 @@ class OrdersController extends Controller
     /**
      * @param Request $request
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function updateSelf(Request $request, $id)
     {
@@ -1148,7 +1178,7 @@ class OrdersController extends Controller
      *
      * @param int $id
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy($id)
     {
@@ -1205,7 +1235,7 @@ class OrdersController extends Controller
             $order = Order::findOrFail($data['order_id']);
             $date = $data['date'];
             $d = Carbon::createFromDate($date['year'], $date['month'], $date['day']);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             if ($ex instanceof ModelNotFoundException) {
                 return response('Dane zamówienie nie istnieje', 400);
             }
@@ -1238,7 +1268,7 @@ class OrdersController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function splitOrders(Request $request)
     {
@@ -1373,7 +1403,7 @@ class OrdersController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function acceptItemsToStock(Request $request)
     {
@@ -1563,7 +1593,7 @@ class OrdersController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function returnItemsFromStock(Request $request)
     {
@@ -1611,7 +1641,7 @@ class OrdersController extends Controller
 
     /**
      * @param $orderId
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function sendSelfOrderToWarehouse($orderId)
     {
@@ -1626,7 +1656,7 @@ class OrdersController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function datatable(Request $request)
     {
@@ -1981,7 +2011,7 @@ class OrdersController extends Controller
 
     /**
      * @param $id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function getStatusMessage($id)
     {
@@ -1993,7 +2023,7 @@ class OrdersController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function autocomplete(Request $request)
     {
@@ -2004,7 +2034,7 @@ class OrdersController extends Controller
 
     /**
      * @param $symbol
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function addProduct($symbol)
     {
@@ -2086,7 +2116,7 @@ class OrdersController extends Controller
     /**
      * @param $orderIdToGet
      * @param $orderIdToSend
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function moveData($orderIdToGet, $orderIdToSend)
     {
@@ -2143,7 +2173,7 @@ class OrdersController extends Controller
     /**
      * @param $orderIdToGet
      * @param $orderIdToSend
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function movePaymentData(Request $request, $orderIdToGet, $orderIdToSend)
     {
@@ -2214,7 +2244,7 @@ class OrdersController extends Controller
 
     /**
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function getDataFromLastOrder($id)
     {
@@ -2287,7 +2317,7 @@ class OrdersController extends Controller
 
     /**
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function getDataFromCustomer($id)
     {
@@ -2336,7 +2366,7 @@ class OrdersController extends Controller
     /**
      * @param $id
      * @param $symbol
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function getDataFromFirm($id, $symbol)
     {
@@ -2431,7 +2461,7 @@ class OrdersController extends Controller
         $productPacking = $this->productPackingRepository->findWhereIn('product_id', $productsArray);
 
         if (!strpos($order->customer->login, 'allegromail.pl')) {
-            \Mailer::create()
+            Mailer::create()
                 ->to($order->customer->login)
                 ->send(new SendOfferToCustomerMail('Oferta nr: ' . $order->id, $order, $productsVariation,
                     $allProductsFromSupplier, $productPacking));
@@ -2539,7 +2569,7 @@ class OrdersController extends Controller
         try {
             $user = Auth::user();
             if (empty($user)) {
-                throw new \Exception('Wrong User');
+                throw new Exception('Wrong User');
             }
             $order = Order::findOrFail($request->id);
 
@@ -2557,7 +2587,7 @@ class OrdersController extends Controller
 
             $frontUrl = env('FRONT_URL') . '/koszyk.html?' . $query;
             return redirect($frontUrl);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             Log::notice('Can not edit basket', ['message' => $exception->getMessage(), 'stack' => $exception->getTraceAsString()]);
         }
         return redirect()->back()->with([
@@ -2612,15 +2642,22 @@ class OrdersController extends Controller
                 if ($item->quantity === 0 || $item->product_id !== $prod->id) {
                     continue;
                 }
-                error_log(print_r('st' . $item->quantity, 1));
-                error_log(print_r('sta' . $prod->pivot->quantity, 1));
                 $diff = min($item->quantity, $prod->pivot->quantity);
                 $item->quantity -= $diff;
                 $prod->pivot->quantity += $diff;
                 $prod->pivot->save();
-                error_log(print_r('end' . $prod->pivot->quantity, 1));
             }
         }
+    }
+
+    /**
+     * @param Authenticatable|null $user
+     * @param NoticesRequest $request
+     * @param $order
+     */
+    protected function formatMessage(?Authenticatable $user, NoticesRequest $request): string
+    {
+        return PHP_EOL . Carbon::now()->toDateTimeString() . ' ' . $user->name . ' ' . $user->firstname . ' ' . $user->lastname . ': ' . $request->message;
     }
 
 }

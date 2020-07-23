@@ -117,10 +117,13 @@ class TasksController extends Controller
                     'total_price' => $totalPrice
                 ]);
                 $dataToSave = $request->all();
-                $arr = [
-                    'consultant_notice' => $task->order->consultant_notice,
-                    'warehouse_notice' => $task->order->warehouse_notice,
-                ];
+                $arr = [];
+                if (empty($request->order_id)) {
+                    $arr = [
+                        'consultant_notice' => $task->order->consultant_notice,
+                        'warehouse_notice' => $task->order->warehouse_notice,
+                    ];
+                }
                 $task->taskSalaryDetail()->create(array_merge($dataToStore, $arr));
                 $prev = [];
                 dispatch_now(new AddLabelJob($request->order_id, [47], $prev));
@@ -142,6 +145,17 @@ class TasksController extends Controller
                 'alert-type' => 'error'
             ]);
         }
+    }
+
+    /**
+     * @param $item
+     * @param float $profit
+     * @return float
+     */
+    private function calculateProfit($item, float $profit): float
+    {
+        $profit += (((float)$item->gross_selling_price_commercial_unit * (int)$item->quantity) - ((float)$item->gross_purchase_price_commercial_unit * (int)$item->quantity));
+        return $profit;
     }
 
     /**
@@ -205,9 +219,7 @@ class TasksController extends Controller
                 }
                 $task->order->update([
                     'shipment_date' => $request->date_start,
-                    'consultant_notice' => $request->consultant_notice,
                     'consultant_value' => $consultantVal,
-                    'warehouse_notice' => $request->warehouse_notice,
                     'warehouse_value' => $request->warehouse_value,
                     'total_price' => $totalPrice
                 ]);
@@ -226,7 +238,6 @@ class TasksController extends Controller
             ]);
         }
     }
-
 
     public function destroy($id)
     {
@@ -297,9 +308,7 @@ class TasksController extends Controller
                 }
                 $task->order->update([
                     'production_date' => $request->start,
-                    'consultant_notice' => $request->consultant_notice,
                     'consultant_value' => $consultantVal,
-                    'warehouse_notice' => $request->warehouse_notice,
                     'warehouse_value' => $request->warehouse_value,
                     'total_price' => $totalPrice,
                     'warehouse_id' => $task->warehouse_id
@@ -370,7 +379,9 @@ class TasksController extends Controller
             $start = new Carbon($task->taskTime->date_start);
             $end = new Carbon($task->taskTime->date_end);
             if ($task->taskSalaryDetail != null) {
-                $text = 'ID Zadania: ' . $task->id . ', Nazwa zadania: ' . $task->name . ', Wykonuje: ' . $task->user->name . ', Rozpoczęcie: ' . $start->toDateTimeString() . ', Zakończenie: ' . $end->toDateTimeString() . ', Koszt obsługi konsultanta: ' . $task->taskSalaryDetail->consultant_value . ', Uwagi konsultanta: ' . $task->taskSalaryDetail->consultant_notice . ', Koszt obsługi magazynu: ' . $task->taskSalaryDetail->warehouse_value . ', Uwagi magazynu: ' . $task->taskSalaryDetail->warehouse_notice;
+                $consultantNotice = $task->order ? $task->order->consultant_notices : $task->taskSalaryDetail->consultant_notice;
+                $warehouseNotice = $task->order ? $task->order->warehouse_notice : $task->taskSalaryDetail->warehouse_notice;
+                $text = 'ID Zadania: ' . $task->id . ', Nazwa zadania: ' . $task->name . ', Wykonuje: ' . $task->user->name . ', Rozpoczęcie: ' . $start->toDateTimeString() . ', Zakończenie: ' . $end->toDateTimeString() . ', Koszt obsługi konsultanta: ' . $task->taskSalaryDetail->consultant_value . ', Uwagi konsultanta: ' . $consultantNotice . ', Koszt obsługi magazynu: ' . $task->taskSalaryDetail->warehouse_value . ', Uwagi magazynu: ' . $warehouseNotice;
                 if ($task->order != null) {
                     $drnp = new Carbon($task->order->shipment_date);
                     $text .= ', Data rozpoczęcia nadawania przesyłki: ' . $drnp->toDateString();
@@ -621,6 +632,14 @@ class TasksController extends Controller
         }
     }
 
+    private function removeLabel(Request $request, $task)
+    {
+        if ($request->old_resource == 37 && $task->order_id != null) {
+            $prev = [];
+            dispatch_now(new RemoveLabelJob($task->order_id, [47], $prev));
+        }
+    }
+
     public function produceOrders(Request $request)
     {
         if ($request->id) {
@@ -768,9 +787,7 @@ class TasksController extends Controller
                 }
                 $task->order->update([
                     'production_date' => $request->date_start,
-                    'consultant_notice' => $request->consultant_notice,
                     'consultant_value' => $consultantVal,
-                    'warehouse_notice' => $request->warehouse_notice,
                     'warehouse_value' => $request->warehouse_value,
                     'total_price' => $totalPrice
                 ]);
@@ -808,86 +825,6 @@ class TasksController extends Controller
             return $this->deleteTask($id, $request);
         }
 
-    }
-
-    public function getTask($id)
-    {
-        $task = Task::with(['user', 'taskTime', 'taskSalaryDetail', 'order', 'childs' => function ($q) {
-            $q->with(['order' => function ($q) {
-                $q->with(['labels' => function ($q) {
-                    $q->where('label_group_id', LabelGroup::PRODUCTION_LABEL_GROUP_ID)->orWhereIn('labels.id',
-                        [Label::BLUE_BATTERY_LABEL_ID, Label::ORANGE_BATTERY_LABEL_ID, Label::ORDER_ITEMS_REDEEMED_LABEL]);
-                }]);
-            }]);
-        }])->find($id);
-
-        foreach ($task->childs as $child) {
-            $child->order->similar = OrdersHelper::findSimilarOrders($child->order);
-        }
-        if (empty($task)) {
-            abort(404);
-        }
-
-        return response()->json($task);
-    }
-
-    /**
-     * @param \Illuminate\Support\Collection $newGroup
-     * @param $task
-     * @param $duration
-     */
-    private function createNewGroup(\Illuminate\Support\Collection $newGroup, $task, $duration): void
-    {
-        $name = $newGroup->map(function ($item) {
-            return $item->order_id;
-        })->toArray();
-        $taskNew = Task::create([
-            'warehouse_id' => $task->warehouse_id,
-            'user_id' => $task->user_id,
-            'order_id' => $task->order_id,
-            'created_by' => $task->created_by,
-            'name' => implode(', ', $name),
-            'color' => $task->color,
-            'status' => $task->status
-        ]);
-        $time = TaskTimeHelper::getFirstAvailableTime($duration);
-        TaskTime::create([
-            'task_id' => $taskNew->id,
-            'date_start' => $time['start'],
-            'date_end' => $time['end']
-        ]);
-        TaskSalaryDetails::create([
-            'task_id' => $taskNew->id,
-            'consultant_value' => 0,
-            'warehouse_value' => 0
-        ]);
-        $newGroup->map(function ($item) use ($taskNew) {
-            $item->parent_id = $taskNew->id;
-            $item->save();
-        });
-    }
-
-    /**
-     * @param $task
-     * @param $duration
-     */
-    private function updateAbandonedTaskTime($task, $duration): void
-    {
-        $taskTime = $task->taskTime;
-        $time = TaskTimeHelper::getFirstAvailableTime($duration);
-        $taskTime->date_start = $time['start'];
-        $taskTime->date_end = $time['end'];
-        $taskTime->save();
-        $task->parent_id = null;
-        $task->save();
-    }
-
-    private function removeLabel(Request $request, $task)
-    {
-        if ($request->old_resource == 37 && $task->order_id != null) {
-            $prev = [];
-            dispatch_now(new RemoveLabelJob($task->order_id, [47], $prev));
-        }
     }
 
     /**
@@ -972,9 +909,7 @@ class TasksController extends Controller
                 $shipmentDate = $request->shipment_date;
                 $task->order->update([
                     'shipment_date' => $shipmentDate,
-                    'consultant_notice' => $request->consultant_notice,
                     'consultant_value' => $consultantVal,
-                    'warehouse_notice' => $request->warehouse_notice,
                     'warehouse_value' => $request->warehouse_value,
                     'total_price' => $totalPrice
                 ]);
@@ -1016,6 +951,57 @@ class TasksController extends Controller
     }
 
     /**
+     * @param \Illuminate\Support\Collection $newGroup
+     * @param $task
+     * @param $duration
+     */
+    private function createNewGroup(\Illuminate\Support\Collection $newGroup, $task, $duration): void
+    {
+        $name = $newGroup->map(function ($item) {
+            return $item->order_id;
+        })->toArray();
+        $taskNew = Task::create([
+            'warehouse_id' => $task->warehouse_id,
+            'user_id' => $task->user_id,
+            'order_id' => $task->order_id,
+            'created_by' => $task->created_by,
+            'name' => implode(', ', $name),
+            'color' => $task->color,
+            'status' => $task->status
+        ]);
+        $time = TaskTimeHelper::getFirstAvailableTime($duration);
+        TaskTime::create([
+            'task_id' => $taskNew->id,
+            'date_start' => $time['start'],
+            'date_end' => $time['end']
+        ]);
+        TaskSalaryDetails::create([
+            'task_id' => $taskNew->id,
+            'consultant_value' => 0,
+            'warehouse_value' => 0
+        ]);
+        $newGroup->map(function ($item) use ($taskNew) {
+            $item->parent_id = $taskNew->id;
+            $item->save();
+        });
+    }
+
+    /**
+     * @param $task
+     * @param $duration
+     */
+    private function updateAbandonedTaskTime($task, $duration): void
+    {
+        $taskTime = $task->taskTime;
+        $time = TaskTimeHelper::getFirstAvailableTime($duration);
+        $taskTime->date_start = $time['start'];
+        $taskTime->date_end = $time['end'];
+        $taskTime->save();
+        $task->parent_id = null;
+        $task->save();
+    }
+
+    /**
      * @param $id
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
@@ -1037,8 +1023,8 @@ class TasksController extends Controller
                 return $task->order;
             });
             $canDelete = $orders->filter(function ($order) {
-               return $order->labels()->where('label_id', Label::GREEN_HAMMER_ID)->count();
-            })->count() == 0;
+                    return $order->labels()->where('label_id', Label::GREEN_HAMMER_ID)->count();
+                })->count() == 0;
             if (!$canDelete) {
                 return redirect()->route('planning.timetable.index', [
                     'view_type' => $request->view_type,
@@ -1079,14 +1065,24 @@ class TasksController extends Controller
         ]);
     }
 
-    /**
-     * @param $item
-     * @param float $profit
-     * @return float
-     */
-    private function calculateProfit($item, float $profit): float
+    public function getTask($id)
     {
-        $profit += (((float)$item->gross_selling_price_commercial_unit * (int)$item->quantity) - ((float)$item->gross_purchase_price_commercial_unit * (int)$item->quantity));
-        return $profit;
+        $task = Task::with(['user', 'taskTime', 'taskSalaryDetail', 'order', 'childs' => function ($q) {
+            $q->with(['order' => function ($q) {
+                $q->with(['labels' => function ($q) {
+                    $q->where('label_group_id', LabelGroup::PRODUCTION_LABEL_GROUP_ID)->orWhereIn('labels.id',
+                        [Label::BLUE_BATTERY_LABEL_ID, Label::ORANGE_BATTERY_LABEL_ID, Label::ORDER_ITEMS_REDEEMED_LABEL]);
+                }]);
+            }]);
+        }])->find($id);
+
+        foreach ($task->childs as $child) {
+            $child->order->similar = OrdersHelper::findSimilarOrders($child->order);
+        }
+        if (empty($task)) {
+            abort(404);
+        }
+
+        return response()->json($task);
     }
 }

@@ -22,6 +22,9 @@ class Order extends Model implements Transformable
 
     const STATUS_WITHOUT_REALIZATION = 8;
     const STATUS_ORDER_FINISHED = 6;
+    const COMMENT_SHIPPING_TYPE = 'shipping_comment';
+    const COMMENT_WAREHOUSE_TYPE = 'warehouse_comment';
+    const COMMENT_CONSULTANT_TYPE = 'consultant_comment';
     public $customColumnsVisibilities = [
         'mark',
         'spedition_exchange_invoiced_selector',

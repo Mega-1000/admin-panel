@@ -6,3 +6,8 @@
 .ui-tooltip {
     z-index: 999999 !important;
  }
+
+.flex-input {
+    display: flex;
+    align-items: center;
+}
