@@ -103,7 +103,7 @@
                 @php
                     $netSum += $item->net_selling_price_commercial_unit * $item->quantity;
                     $grossSum += $item->gross_selling_price_commercial_unit * $item->quantity;
-                    $vatSum += ($item->gross_selling_price_commercial_unit - $item->net_selling_price_commercial_unit) * $item->quantity * 0.23;
+                    $vatSum += ($item->gross_selling_price_commercial_unit - $item->net_selling_price_commercial_unit) * $item->quantity;
                     $i++;
                 @endphp
             @endforeach
