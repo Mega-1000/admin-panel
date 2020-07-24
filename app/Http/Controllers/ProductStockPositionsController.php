@@ -97,7 +97,7 @@ class ProductStockPositionsController extends Controller
         if (empty($productStockPosition)) {
             abort(404);
         }
-        $productStock = $this->productStockRepository->find($id);
+        $productStock = $this->productStockRepository->findByField('product_id', $id);
 
         if ($request->different !== null) {
             if (strstr($request->different, '+') == true) {

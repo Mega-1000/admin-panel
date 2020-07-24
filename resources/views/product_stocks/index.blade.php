@@ -162,17 +162,19 @@
                 {
                     data: 'id',
                     name: 'quantity',
-		    render: function(data, type, row) {
-			let html = 0;
-                        if (row.positions) {
-                            row.positions.forEach(function (position) {
-                                html += parseInt(position.position_quantity);
-                            });
+                    render: function(data, type, row) {
+                                let html = 0;
+                                if (row.positions) {
+                                    console.log(row)
+                                    row.positions.forEach(function (position) {
+                                        html += parseInt(position.position_quantity);
+                                    });
 
-                        }
+                                }
 
-                        return html;
-		    },
+                                return html;
+
+                    },
                     searchable: false,
                 },
                 {

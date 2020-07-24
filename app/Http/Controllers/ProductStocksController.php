@@ -84,7 +84,7 @@ class ProductStocksController extends Controller
             $visibilitiesPosition[$key]->hidden = json_decode($row->hidden,true);
         }
         error_log(print_r($productStocks, 1));
-        return view('product_stocks.edit', compact('visibilitiesLogs','visibilitiesPosition','productStocks'));
+        return view('product_stocks.edit', compact('visibilitiesLogs','visibilitiesPosition','productStocks', 'id'));
     }
 
     /**
@@ -187,7 +187,7 @@ class ProductStocksController extends Controller
     {
         $query = \DB::table('product_stocks')
             ->distinct()
-            ->select('*')
+            ->select('*', 'product_stocks.id as stock_id')
             ->join('products', 'product_stocks.product_id', '=', 'products.id')
             ->leftJoin('product_prices', 'product_stocks.product_id', '=', 'product_prices.product_id')
             ->whereNull('deleted_at');
@@ -231,7 +231,7 @@ class ProductStocksController extends Controller
             ->get();
 
         foreach ($collection as $row) {
-            $row->positions = \DB::table('product_stock_positions')->where('product_stock_id', $row->id)->get();
+            $row->positions = \DB::table('product_stock_positions')->where('product_stock_id', $row->stock_id)->get();
         }
 
 
