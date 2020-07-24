@@ -1971,17 +1971,6 @@ class OrdersController extends Controller
 
             $order = Order::find($ord->orderId);
             $tagHelper->setOrder($order);
-            $lostFromPack = $order->items->map(function ($item) use ($order) {
-                $fromPack = $this->calculateTotalAmoutForPackages($order, $item);
-                $notAssigned = $this->calculateTotalAmoutForOtherPackages($order, $item);
-                $item->quantity -= ($fromPack + $notAssigned);
-                if ($item->quantity !== 0) {
-                    $this->recalculatePackages($order, $item);
-                    return $item;
-                }
-                return null;
-            });
-            $order->lost = $lostFromPack;
             $similar = OrdersHelper::findSimilarOrders($order);
             $view = View::make('orders.print', [
                 'similar' => $similar,
@@ -2066,19 +2055,6 @@ class OrdersController extends Controller
         $order->update();
         $showPosition = is_a(Auth::user(), User::class);
 
-        $lostFromPack = $order->items->map(function ($item) use ($order) {
-            $fromPack = $this->calculateTotalAmoutForPackages($order, $item);
-            $notAssigned = $this->calculateTotalAmoutForOtherPackages($order, $item);
-            $item->quantity -= ($fromPack + $notAssigned);
-
-            if ($item->quantity !== 0) {
-                $this->recalculatePackages($order, $item);
-                return $item;
-            }
-            return null;
-        });
-        error_log(print_r($order, 1));
-        $order->lost = $lostFromPack;
         $similar = OrdersHelper::findSimilarOrders($order);
         return View::make('orders.print', [
             'order' => $order,
