@@ -522,7 +522,7 @@ class TasksController extends Controller
                 if ($request->new_resource !== null) {
                     $dataToSave = ['user_id' => $request->new_resource];
                     $dataToSave = array_merge($dataToSave);
-                    if ($request->new_resource != 36) {
+                    if ($request->new_resource != Task::TO_CONFIRM_USER_ID) {
                         if ($task->childs()->count() > 0) {
                             $task->childs()->get()->map(function ($child) use ($request) {
                                 $this->removeLabel($request, $child);
