@@ -49,7 +49,7 @@
                 <textarea class="form-control" id="notices" name="notices"
                           value="{{old('notices')}}" rows="5"></textarea>
             </div>
-            @if(Auth::user()->role_id == 3 || Auth::user()->role_id == 2)
+            @if(Auth::user()->role_id == 3 || Auth::user()->role_id == 2 || Auth::user()->role_id == 1)
             <div class="form-group">
                 <label for="tags">@lang('order_payments.form.promise')</label>
                 <input type="checkbox" id="promise" name="promise">
@@ -57,7 +57,7 @@
             @else
                 <div class="form-group">
                     <label for="tags">@lang('order_payments.form.promise')</label>
-                    <input type="checkbox" id="promise" name="promise" checked>
+                    <input type="checkbox" id="promise" name="promise" checked readonly>
                 </div>
             @endif
             <div class="form-group">
