@@ -79,29 +79,19 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             if (Order::where('sello_id', $transaction->id)->count() > 0) {
                 return $count;
             }
-            $transactionArray = $this->createAddressArray($transaction);
+            try {
+                $transactionArray = $this->createAddressArray($transaction);
+            } catch (\Exception $e) {
+                \Log::error('sello adress creation', ['message' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
+                return $count;
+            }
             $tax = 1 + env('VAT');
-            $products = $transactionGroup
-                ->filter(function ($transaction) { return $transaction->tr_Group != 1; })
-                ->map(function ($singleTransaction) use ($tax) {
-                    if ($singleTransaction->transactionItem->itemExist()) {
-                        $symbol = explode('-', $singleTransaction->transactionItem->item->it_Symbol);
-                        $newSymbol = [$symbol[0], $symbol[1], '0'];
-                        $newSymbol = join('-', $newSymbol);
-                        $product = Product::where('symbol', $newSymbol)->first();
-                    }
-                    if (empty($product)) {
-                        $product = Product::getDefaultProduct();
-                    }
-                    $product->transaction_id = $singleTransaction->id;
-                    $product->tt_quantity = $singleTransaction->transactionItem->tt_Quantity;
-                    $product->total_price = $singleTransaction->tr_Payment - $singleTransaction->tr_DeliveryCost;
-                    $product->price_override = [
-                        'gross_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price,
-                        'net_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price / $tax
-                    ];
-                    return $product;
-                });
+            try {
+                $products = $this->prepareProducts($transactionGroup, $tax);
+            } catch (\Exception $e) {
+                \Log::error('sello product preparation', ['message' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
+                return $count;
+            }
 
             $orderItems = $products->map(function ($product) {
                 return [
@@ -302,6 +292,39 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         }
         $transactionArray['phone'] = $phone;
         return $transactionArray;
+    }
+
+    /**
+     * @param $transactionGroup
+     * @param $tax
+     * @return mixed
+     */
+    protected function prepareProducts($transactionGroup, $tax)
+    {
+        $products = $transactionGroup
+            ->filter(function ($transaction) {
+                return $transaction->tr_Group != 1;
+            })
+            ->map(function ($singleTransaction) use ($tax) {
+                if ($singleTransaction->transactionItem->itemExist()) {
+                    $symbol = explode('-', $singleTransaction->transactionItem->item->it_Symbol);
+                    $newSymbol = [$symbol[0], $symbol[1], '0'];
+                    $newSymbol = join('-', $newSymbol);
+                    $product = Product::where('symbol', $newSymbol)->first();
+                }
+                if (empty($product)) {
+                    $product = Product::getDefaultProduct();
+                }
+                $product->transaction_id = $singleTransaction->id;
+                $product->tt_quantity = $singleTransaction->transactionItem->tt_Quantity;
+                $product->total_price = $singleTransaction->tr_Payment - $singleTransaction->tr_DeliveryCost;
+                $product->price_override = [
+                    'gross_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price,
+                    'net_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price / $tax
+                ];
+                return $product;
+            });
+        return $products;
     }
 
 }
