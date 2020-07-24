@@ -83,7 +83,6 @@ class ProductStocksController extends Controller
             $visibilitiesPosition[$key]->show = json_decode($row->show,true);
             $visibilitiesPosition[$key]->hidden = json_decode($row->hidden,true);
         }
-        error_log(print_r($productStocks, 1));
         return view('product_stocks.edit', compact('visibilitiesLogs','visibilitiesPosition','productStocks', 'id'));
     }
 
