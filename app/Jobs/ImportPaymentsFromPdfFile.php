@@ -157,10 +157,17 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
             if (!array_key_exists('orderId', $payment)) {
                 continue;
             }
+
             $newIds = [];
+            $previousId = 0;
+
             foreach ($payment['orderId'] as $id) {
                 $newId = str_replace(' ', '', $id);
                 $newId = preg_replace('/[qQ][qQ]/', '', $newId);
+                if($previousId == $newId) {
+                    continue;
+                }
+                $previousId = $newId;
                 $newIds [] = $newId;
             }
             $sum = OrderPayment::whereIn('order_id', $newIds)->where('promise', 1)->sum('amount');
