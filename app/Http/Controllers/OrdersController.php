@@ -376,7 +376,8 @@ class OrdersController extends Controller
         return view('orders.create');
     }
 
-    public function editPackages($id) {
+    public function editPackages($id)
+    {
         Session::put('uri', 'orderPackages');
         return $this->edit($id);
     }
@@ -421,6 +422,11 @@ class OrdersController extends Controller
             $productsArray[] = $item->product_id;
         }
 
+        $labelsButtons = Label::whereIn('id', [91, 151, 152])->get();
+        $labelsButtons = $labelsButtons->reduce(function ($reduced, $current) {
+            $reduced[$current->id] = $current;
+            return $reduced;
+        }, []);
         $allProductsFromSupplier = [];
         $productsVariation = $this->getVariations($order);
         foreach ($productsVariation as $variation) {
@@ -497,14 +503,14 @@ class OrdersController extends Controller
                     'users', 'customerInfo', 'orderInvoiceAddress',
                     'orderDeliveryAddress', 'orderItems', 'warehouse', 'statuses', 'messages', 'productPacking',
                     'customerDeliveryAddress', 'firms', 'productsVariation', 'allProductsFromSupplier', 'orderId',
-                    'customerOrdersToPay', 'clientTotalCost', 'ourTotalCost'));
+                    'customerOrdersToPay', 'clientTotalCost', 'ourTotalCost', 'labelsButtons'));
         } else {
             return view('orders.edit',
                 compact('visibilitiesTask', 'visibilitiesPackage', 'visibilitiesPayments', 'warehouses', 'order',
                     'users', 'customerInfo', 'orderInvoiceAddress',
                     'orderDeliveryAddress', 'orderItems', 'warehouse', 'statuses', 'messages', 'productPacking',
                     'customerDeliveryAddress', 'firms', 'productsVariation', 'allProductsFromSupplier', 'orderId',
-                    'customerOrdersToPay', 'orderHasSentLP', 'emails', 'clientTotalCost', 'ourTotalCost'));
+                    'customerOrdersToPay', 'orderHasSentLP', 'emails', 'clientTotalCost', 'ourTotalCost', 'labelsButtons'));
         }
     }
 
@@ -605,10 +611,10 @@ class OrdersController extends Controller
         $request->validated();
         $user = Auth::user();
         if (empty($user)) {
-            return response(['errors' => ['message'=> "Użytkownik nie jest zalogowany"]], 400);
+            return response(['errors' => ['message' => "Użytkownik nie jest zalogowany"]], 400);
         }
         $order = Order::find($request->order_id);
-        switch($request->type) {
+        switch ($request->type) {
             case Order::COMMENT_SHIPPING_TYPE:
                 $order->spedition_comment .= $this->formatMessage($user, $request);
                 break;
@@ -619,10 +625,20 @@ class OrdersController extends Controller
                 $order->consultant_notices .= $this->formatMessage($user, $request);
                 break;
             default:
-                return response(['errors' => ['message'=> "Zły typ komentarza"]], 400);
+                return response(['errors' => ['message' => "Zły typ komentarza"]], 400);
         }
         $order->save();
         return \response('success');
+    }
+
+    /**
+     * @param Authenticatable|null $user
+     * @param NoticesRequest $request
+     * @param $order
+     */
+    protected function formatMessage(?Authenticatable $user, NoticesRequest $request): string
+    {
+        return PHP_EOL . Carbon::now()->toDateTimeString() . ' ' . $user->name . ' ' . $user->firstname . ' ' . $user->lastname . ': ' . $request->message;
     }
 
     /**
@@ -2065,31 +2081,6 @@ class OrdersController extends Controller
     }
 
     /**
-     * @param $order
-     * @param $item
-     * @return mixed
-     */
-    private function calculateTotalAmoutForPackages($order, $item)
-    {
-        return $order->packages->reduce(function ($acu, $curr) use ($item) {
-            $totalAmountForPack = $curr->packedProducts->reduce(function ($acumulator, $current) use ($item) {
-                return $acumulator + ($current->id == $item->product_id ? $current->pivot->quantity : 0);
-            }, 0);
-            return $acu + $totalAmountForPack;
-        }, 0);
-    }
-
-    private function calculateTotalAmoutForOtherPackages($order, $item)
-    {
-        return $order->otherPackages->reduce(function ($acu, $curr) use ($item) {
-            $totalAmountForPack = $curr->products->reduce(function ($accumulator, $current) use ($item) {
-                return $accumulator + ($current->id == $item->product_id ? $current->pivot->quantity : 0);
-            }, 0);
-            return $acu + $totalAmountForPack;
-        }, 0);
-    }
-
-    /**
      * @param $orderIdToGet
      * @param $orderIdToSend
      * @return JsonResponse
@@ -2211,7 +2202,7 @@ class OrdersController extends Controller
             'user_surplus_payment' => $userSurplusPayment->id
         ]);
 
-        foreach($order->customer->orders as $order) {
+        foreach ($order->customer->orders as $order) {
             dispatch_now(new AddLabelJob($order->id, [Label::ORDER_SURPLUS]));
         }
 
@@ -2525,7 +2516,8 @@ class OrdersController extends Controller
         ]);
     }
 
-    public function findPage(Request $request, $id) {
+    public function findPage(Request $request, $id)
+    {
         list($collection, $count) = $this->prepareCollection($request->all(), false, $id);
         return response($count / $request->all()['length']);
     }
@@ -2627,13 +2619,28 @@ class OrdersController extends Controller
     }
 
     /**
-     * @param Authenticatable|null $user
-     * @param NoticesRequest $request
      * @param $order
+     * @param $item
+     * @return mixed
      */
-    protected function formatMessage(?Authenticatable $user, NoticesRequest $request): string
+    private function calculateTotalAmoutForPackages($order, $item)
     {
-        return PHP_EOL . Carbon::now()->toDateTimeString() . ' ' . $user->name . ' ' . $user->firstname . ' ' . $user->lastname . ': ' . $request->message;
+        return $order->packages->reduce(function ($acu, $curr) use ($item) {
+            $totalAmountForPack = $curr->packedProducts->reduce(function ($acumulator, $current) use ($item) {
+                return $acumulator + ($current->id == $item->product_id ? $current->pivot->quantity : 0);
+            }, 0);
+            return $acu + $totalAmountForPack;
+        }, 0);
+    }
+
+    private function calculateTotalAmoutForOtherPackages($order, $item)
+    {
+        return $order->otherPackages->reduce(function ($acu, $curr) use ($item) {
+            $totalAmountForPack = $curr->products->reduce(function ($accumulator, $current) use ($item) {
+                return $accumulator + ($current->id == $item->product_id ? $current->pivot->quantity : 0);
+            }, 0);
+            return $acu + $totalAmountForPack;
+        }, 0);
     }
 
 }

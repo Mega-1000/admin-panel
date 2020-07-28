@@ -295,8 +295,8 @@
             <div class="form-group" style="width: 20%; float: left; padding: 5px;">
                 <label for="confirmed_sending_date_con_mag">@lang('orders.form.confirmed_sending_date_con_mag')</label>
                 <input type="text" class="form-control default-date-picker-now" id="confirmed_sending_date_con_mag"
-                            name="confirmed_sending_date_con_mag"
-                            value="{{ $order->confirmed_sending_date_con_mag ?? ''}}">
+                       name="confirmed_sending_date_con_mag"
+                       value="{{ $order->confirmed_sending_date_con_mag ?? ''}}">
             </div>
             <div class="form-group" style="width: 20%; float: left; padding: 5px;">
                 <label for="initial_pickup_date_client">@lang('orders.form.initial_pickup_date_client')</label>
@@ -335,22 +335,35 @@
             </div>
             <div class="form-group" style="width: 25%; float: left; padding: 5px;">
                 <div>
+                    <button data-label-id="{{\App\Entities\Label::WAREHOUSE_MARK}}" class="add-label"><i
+                            style="color: {{ ($labelsButtons[\App\Entities\Label::WAREHOUSE_MARK])->color }};
+                                margin-top: 5px;"
+                            class="{{ $labelsButtons[\App\Entities\Label::WAREHOUSE_MARK]->icon_name }}"></i></button>
+                    <button data-label-id="{{\App\Entities\Label::SHIPPING_MARK}}" class="add-label"><i
+                            style="color: {{ ($labelsButtons[\App\Entities\Label::SHIPPING_MARK])->color }};
+                                margin-top: 5px;"
+                            class="{{ $labelsButtons[\App\Entities\Label::SHIPPING_MARK]->icon_name }}"></i></button>
+
                     <label for="warehouse_notice">@lang('orders.form.warehouse_notice')</label>
                     <textarea rows="5" cols="40" class="form-control" id="warehouse_notice"
                               name="warehouse_notice" disabled>{{ $order->warehouse_notice ?? ''}}</textarea>
                 </div>
-                    <div class="flex-input">
-                        <input type="text" class="form-control" placeholder="@lang('orders.form.warehouse_notice')"
-                               id="{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}" name="warehouse_notice"/>
-                        <div class="input-group-append">
-                            <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}')"
-                                    class="btn btn-success" type="button">wyślij
-                            </button>
-                        </div>
+                <div class="flex-input">
+                    <input type="text" class="form-control" placeholder="@lang('orders.form.warehouse_notice')"
+                           id="{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}" name="warehouse_notice"/>
+                    <div class="input-group-append">
+                        <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}')"
+                                class="btn btn-success" type="button">wyślij
+                        </button>
                     </div>
+                </div>
             </div>
             <div class="form-group" style="width: 25%; float: left; padding: 5px;">
                 <div>
+                    <button data-label-id="{{\App\Entities\Label::SHIPPING_MARK}}" class="add-label"><i
+                            style="color: {{ ($labelsButtons[\App\Entities\Label::SHIPPING_MARK])->color }};
+                                margin-top: 5px;"
+                            class="{{ $labelsButtons[\App\Entities\Label::SHIPPING_MARK]->icon_name }}"></i></button>
                     <label for="spedition_comment">Informacje dla spedycji</label>
                     <textarea class="form-control" rows="5" disabled>{{ $order->spedition_comment ?? ''}}</textarea>
                     <div class="flex-input">
@@ -365,6 +378,14 @@
                 </div>
             </div>
             <div class="form-group" style="width: 25%; float: left; padding: 5px;">
+                <button data-label-id="{{\App\Entities\Label::CONSULTANT_MARK}}" class="add-label"><i
+                        style="color: {{ ($labelsButtons[\App\Entities\Label::CONSULTANT_MARK])->color }};
+                            margin-top: 5px;"
+                        class="{{ $labelsButtons[\App\Entities\Label::CONSULTANT_MARK]->icon_name }}"></i></button>
+                <button data-label-id="{{\App\Entities\Label::SHIPPING_MARK}}" class="add-label"><i
+                        style="color: {{ ($labelsButtons[\App\Entities\Label::SHIPPING_MARK])->color }};
+                            margin-top: 5px;"
+                        class="{{ $labelsButtons[\App\Entities\Label::SHIPPING_MARK]->icon_name }}"></i></button>
                 <label for="consultant_notices">@lang('orders.form.consultant_notices')</label>
                 <textarea disabled class="form-control" name="consultant_notices" id="consultant_notices"
                           rows="5">{{ $order->consultant_notices ?? ''}}</textarea>
@@ -2399,6 +2420,16 @@
 @endsection
 @section('datatable-scripts')
     <script type="application/javascript">
+        $(".add-label").click(event => {
+            event.preventDefault();
+            const url = "{{route('orders.label-addition', ['labelId' => "%%"])}}";
+            $.post(url.replace("%%", event.currentTarget .getAttribute("data-label-id")), {
+                orderIds: [{{ $order->id }}]
+            })
+                .done(() => alert("dodano etykietę"))
+                .fail(() => alert("Nie udało się dodać etykiety"))
+        });
+
         function sendComment(type) {
             $.post(
                 {
