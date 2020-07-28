@@ -239,6 +239,8 @@ Route::group(['prefix' => 'admin'], function () {
             'ProductStockLogsController@datatable')->name('product_stocks.logs.datatable');
         Route::get('products/stocks/{id}/logs/{log_id}/show',
             'ProductStockLogsController@show')->name('product_stocks.logs.show');
+        Route::post('positions/{from}/{to}/quantity/move',
+            'ProductStockPositionsController@quantityMove')->name('product_stocks.quantity_move');
 
         Route::get('orders', 'OrdersController@index')->name('orders.index');
         Route::post('orders/returnItemsFromStock',

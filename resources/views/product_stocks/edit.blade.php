@@ -343,7 +343,7 @@
                 {
                     data: 'id',
                     name: 'id',
-                    render: function (id) {
+                    render: function (id, type, row) {
                         let html = '<a href="/admin/products/stocks/{{$productStocks->id}}/positions/' + id + '/edit" class="btn btn-sm btn-primary edit">';
                         html += '<i class="voyager-edit"></i>';
                         html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
@@ -352,11 +352,64 @@
                         html += '<i class="voyager-trash"></i>';
                         html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
                         html += '</a>';
+                        html += '<button type="button" data-quantity="' + row.position_quantity + '" id="moveButton-' + row.id + '" class="btn btn-sm btn-warning edit" onclick="moveData(' + row.id + ')">Przenieś towar stąd</button>';
+                        html += '<button type="button" id="moveButtonAjax-' + row.id + '" class="btn btn-sm btn-success btn-move edit hidden" onclick="moveDataAjax(' + row.id + ')">Przenieś towar tutaj</button>';
                         return html;
                     }
                 }
             ]
         });
+        function moveData(id) {
+            if ($('#moveButton-' + id).hasClass('btn-warning')) {
+                $('#moveButton-' + id).removeClass('btn-warning').addClass('btn-dark');
+                $('.btn-warning').attr('disabled', true);
+                $('.btn-move').removeClass('hidden');
+            } else if ($('#moveButton-' + id).hasClass('btn-dark')) {
+                $('#moveButton-' + id).removeClass('btn-dark').addClass('btn-warning');
+                $('.btn-warning').attr('disabled', false);
+                $('.btn-move').addClass('hidden');
+            }
+        }
+
+        function moveDataAjax(id) {
+            let idToSend = id;
+            let buttonId = $('.btn-dark').attr('id');
+            let idToGet;
+            let res = buttonId.split("-")
+            idToGet = res[1];
+            let quantity = $('#moveButton-' + idToGet).data('quantity');
+            if (idToGet != idToSend) {
+                $('#quantity__move').val(quantity);
+                $('#order_id_get').text(idToGet);
+                $('#order_id_send').text(idToSend);
+                $('#move_position_quantity').modal('show');
+            } else {
+                $('#move_position_quantity_error').modal('show');
+            }
+        }
+
+        $('#move_position_quantity_ok').on('click', function () {
+            var idToGet = $('#order_id_get').text();
+            var idToSend = $('#order_id_send').text();
+            $.ajax({
+                type: 'POST',
+                data: {'quantity__move' : $('#quantity__move').val()},
+                url: '/admin/positions/' + idToGet + '/' + idToSend + '/quantity' + '/move'
+            }).done(function (data) {
+                $('#order_move_data_success').modal('show');
+
+                $('#payment-move-data-ok').on('click', function () {
+                    window.location.reload();
+                });
+            }).fail(function () {
+                $('#order_move_data_error').modal('show');
+                $('#order_move_data_ok_error').on('click', function () {
+                    window.location.href = '/admin/orders';
+
+                });
+            });
+        });
+
         @foreach($visibilitiesPosition as $key =>$row)
 
         var {{'show'.$row->name}}  = @json($row->show);

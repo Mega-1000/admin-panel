@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\ProductStockPosition;
 use App\Http\Requests\ProductStockPositionCreate;
 use App\Http\Requests\ProductStockPositionUpdate;
 use App\Repositories\ProductStockPositionRepository;
 use App\Repositories\ProductStockRepository;
+use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
 /**
@@ -173,6 +175,20 @@ class ProductStockPositionsController extends Controller
         $collection = $this->repository->findByField('product_stock_id', $id)->all();
 
         return $collection;
+    }
+
+    public function quantityMove(Request $request, $from, $to)
+    {
+        $fromPosition = ProductStockPosition::find($from);
+        $toPosition = ProductStockPosition::find($to);
+
+        $fromPosition->update([
+            'position_quantity' => $fromPosition->position_quantity - $request->input('quantity__move')
+        ]);
+
+        $toPosition->update([
+            'position_quantity' => $toPosition->position_quantity + $request->input('quantity__move')
+        ]);
     }
 
 }
