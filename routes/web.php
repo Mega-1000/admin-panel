@@ -243,6 +243,7 @@ Route::group(['prefix' => 'admin'], function () {
             'ProductStockPositionsController@quantityMove')->name('product_stocks.quantity_move');
 
         Route::get('orders', 'OrdersController@index')->name('orders.index');
+        Route::post('orders/update-notices', 'OrdersController@updateNotices')->name('orders.updateNotice');
         Route::post('orders/returnItemsFromStock',
             'OrdersController@returnItemsFromStock')->name('orders.returnItemsFromStock');
         Route::post('orders/acceptItemsToStock',

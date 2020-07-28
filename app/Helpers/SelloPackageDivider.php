@@ -19,12 +19,8 @@ class SelloPackageDivider implements iDividable
 
     public function divide($data, Order $order)
     {
-        foreach ($this->transactionList as $transaction) {
-            if (!$transaction->tr_Group) {
-                continue;
-            }
-            $this->divideForTransaction($data, $order, $transaction);
-        }
+        $this->divideForTransaction($data, $order, $this->transactionList[0]);
+
         return false;
     }
 

@@ -2720,7 +2720,7 @@
                         html += '</div>';
                         html += '<div class="form-group">';
                         html += '<label for="consultant_notice">Opis obsługi konsultanta</label>';
-                        html += '<textarea rows="5" cols="40" type="text" name="consultant_notice" id="consultant_notice" class="form-control"></textarea>';
+                        html += '<textarea disabled rows="5" cols="40" type="text" name="consultant_notice" id="consultant_notice" class="form-control"></textarea>';
                         html += '</div>';
                         html += '<div class="form-group">';
                         html += '<label for="warehouse_value">Koszt obsługi magazynu</label>';
@@ -2728,7 +2728,7 @@
                         html += '</div>';
                         html += '<div class="form-group">';
                         html += '<label for="warehouse_notice">Opis obsługi magazynu</label>';
-                        html += '<textarea rows="5" cols="40" type="text" name="warehouse_notice" id="warehouse_notice" class="form-control"></textarea>';
+                        html += '<textarea disabled rows="5" cols="40" type="text" name="warehouse_notice" id="warehouse_notice" class="form-control"></textarea>';
                         html += '</div>';
                         html += '</div>';
                         if (taskGroup.length !== 0) {
@@ -3042,7 +3042,7 @@
                             html += '</div>';
                             html += '<div class="form-group">';
                             html += '<label for="consultant_notice">Opis obsługi konsultanta</label>';
-                            html += '<textarea rows="5" cols="40" type="text" name="consultant_notice" id="consultant_notice" class="form-control">' + consultant_notice + '</textarea>';
+                            html += '<textarea disabled rows="5" cols="40" type="text" name="consultant_notice" id="consultant_notice" class="form-control">' + consultant_notice + '</textarea>';
                             html += '</div>';
                             html += '<div class="form-group">';
                             html += '<label for="warehouse_value">Koszt obsługi magazynu</label>';
@@ -3050,7 +3050,7 @@
                             html += '</div>';
                             html += '<div class="form-group">';
                             html += '<label for="warehouse_notice">Opis obsługi magazynu</label>';
-                            html += '<textarea rows="5" cols="40" type="text" name="warehouse_notice" id="warehouse_notice" class="form-control">' + warehouse_notice + '</textarea>';
+                            html += '<textarea disabled rows="5" cols="40" type="text" name="warehouse_notice" id="warehouse_notice" class="form-control">' + warehouse_notice + '</textarea>';
                             html += '</div>';
                             html += '<div class="form-group">';
                             html += '<a class="btn btn-success" target="_blank" href="/admin/orders/' + data.order_id + '/edit">Przenieś mnie do edycji zlecenia</a>';

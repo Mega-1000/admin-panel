@@ -71,41 +71,6 @@
                 </tr>
             </table>
             <br/><br/>
-            @if(count($package->packedProducts) > 0)
-                @foreach($package->packedProducts as $item)
-                    <table border="0" cellpadding="1" cellspacing="1" style="width: 100%;">
-                        <tr>
-                            <td style="width:100px"><img
-                                    src="{!! $item->getImageUrl() !!}"
-                                    alt="{{ $item->name }}"
-                                    style="width:70px"/></td>
-                            <td><span
-                                    style="font-size:14px; font-weight:bold;">{{ $item->name }}</span><br/>symbol: {{ $item->symbol }}
-                                <br/>Ilość: {{ $item->pivot->quantity }} {{ $item->packing->calciation_unit }}<br/></td>
-                            @if($showPosition)
-                                <td>
-                                    ILOŚĆ NA STANIE: {{ $item->stock->quantity }} <br/>
-                                    @if(count($item->getPositions()))
-                                        LOKACJA PRODUKTÓW: <br/>
-                                        @foreach($item->getPositions() as $position)
-                                            Alejka: {{ $position->lane }} <br/>
-                                            Regał: {{ $position->bookstand }} </br>
-                                            Półka: {{ $position->shelf }} </br>
-                                            Pozycja: {{ $position->position }} </br>
-                                            Ilość: {{ $position->position_quantity }}
-                                        @endforeach
-                                    @endif
-                                </td>
-                            @endif
-                        </tr>
-                        <tr>
-                            <td colspan="3">
-                                <hr/>
-                            </td>
-                        </tr>
-                    </table>
-                @endforeach
-            @endif
         @endforeach
     @endif
     @if(count($order->factoryDelivery) > 0)
@@ -121,35 +86,15 @@
                 </tr>
             </table>
             <br/><br/>
-            @include('orders.items_table',['$package' => $package])
         @endforeach
     @endif
-    @if(count($order->notCalculable) > 0)
-        @foreach($order->notCalculable as $package)
-            <table border="1" cellpadding="2" cellspacing="0" style="width: 100%;">
-                <tr style="background: red">
-                    <th>Produkty niepoliczalne</th>
-                </tr>
-            </table>
-            <br/><br/>
-            @include('orders.items_table',['$package' => $package])
-        @endforeach
-    @endif
-    @if(count($order->lost) > 0)
-        @foreach($order->lost as $pack)
-            @if(empty($pack) || $pack->quantity == 0)
-                @continue
-            @endif
-            <table border="0" cellpadding="1" cellspacing="1" style="width: 100%;">
-                @include('orders.single_item', ['item' => $pack->product, 'quantity' => $pack->quantity])
-                <tr>
-                    <td colspan="3">
-                        <hr/>
-                    </td>
-                </tr>
-            </table>
-        @endforeach
-    @endif
+    <table border="1" cellpadding="2" cellspacing="0" style="width: 100%;">
+        <tr style="background: red">
+            <th>Produkty niepoliczalne</th>
+        </tr>
+    </table>
+    <br/><br/>
+    @include('orders.items_table',['items' => $order->items])
 
     <br/><b>DANE KUPUJĄCEGO</b><br/>
     {!! $tagHelper->buyerData() !!}

@@ -343,8 +343,8 @@
                 {
                     data: 'id',
                     name: 'id',
-                    render: function (id, type, row) {
-                        let html = '<a href="/admin/products/stocks/{{$productStocks->id}}/positions/' + id + '/edit" class="btn btn-sm btn-primary edit">';
+                    render: function (id) {
+                        let html = '<a href="/admin/products/stocks/{{$id}}/positions/' + id + '/edit" class="btn btn-sm btn-primary edit">';
                         html += '<i class="voyager-edit"></i>';
                         html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
                         html += '</a>';

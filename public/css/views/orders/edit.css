@@ -7,3 +7,8 @@
     border-color: #c40804;
     border-width: 3px;
 }
+
+.flex-input {
+    display: flex;
+    align-items: center;
+}
