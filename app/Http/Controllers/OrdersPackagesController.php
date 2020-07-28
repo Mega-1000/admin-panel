@@ -841,7 +841,7 @@ class OrdersPackagesController extends Controller
         $data['delivery_date'] = $package->delivery_date;
         $data['quantity'] = 1;
         $data['chosen_data_template'] = $template->id;
-        $data['notices'] = $package->notices;
+        $data['notices'] = $data['order_id'] . '/' . $data['number'];
         $data['cash_on_delivery'] = $package->cash_on_delivery;
         $data['status'] = PackageTemplate::STATUS_NEW;
         $data['cost_for_client'] = $package->cost_for_client;
