@@ -39,20 +39,32 @@ class ChangeWarehouseStockJob extends Job
 
         $order = $orderRepository->find($this->orderId);
 
+        $errors = [];
+
         foreach($order->items as $item) {
             $product = $item->product;
             if($product !== null) {
                 $productStockPosition = $product->stock->position->first();
                 if(empty($productStockPosition)) {
-                    return response()->json(['error' => 'position', 'product' => $product->id, 'productName' => $product->symbol]);
+                    $errors[] = ['error' => 'position', 'product' => $product->id, 'productName' => $product->symbol, 'productStock' => $product->stock];
+                    continue;
+                }
+
+                if($productStockPosition->position_quantity <= $item->quantity) {
+                    $errors[] = ['error' => 'quantity', 'product' => $product->id, 'productName' => $product->symbol, 'productStock' => $product->stock, 'position' => $productStockPosition];
+                    continue;
                 }
 
                 $product->stock->logs()->where('order_id', $this->orderId)->where('action', 'DELETE')->first();
 
                 if(!empty($productStockLog)) {
-                    return response()->json(['error' => 'exists']);
+                    $errors[] = ['error' => 'exists', 'product' => $product->id, 'productName' => $product->symbol, 'order_id' => $order->id];
+                    continue;
                 }
             }
+        }
+        if(count($errors) > 0) {
+            return response()->json($errors);
         }
 
         foreach($order->items as $item) {

@@ -35,6 +35,26 @@
         </div>
     </div>
 
+    <div class="modal fade" tabindex="-1" id="position_change" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title"><i class="voyager-trash"></i> {{ __('voyager.generic.delete_question_2') }}?</h4>
+                </div>
+                <div class="modal-footer">
+                    <form action="#" id="delete_form" method="POST">
+                        {{ csrf_field() }}
+                        <div></div>
+                        <input type="submit" class="btn btn-danger pull-right delete-confirm" value="{{ __('voyager::generic.delete_confirm') }}">
+                    </form>
+                    <button type="button" class="btn btn-default pull-right" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" tabindex="-1" id="order_courier" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -273,6 +293,67 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-info" data-dismiss="modal">Anuluj</button>
                     <button data-index="4" type="button" class="btn btn-danger" id="remove-label-and-set-date">Usuń etykietę</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" tabindex="-1" id="stock_modal" role="dialog">
+        <div class="modal-dialog" id="stock_modal_dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Ustaw termin płatnośći</h4>
+                </div>
+                <div class="modal-body">
+                    <h3>Błędy - ilość</h3>
+                    <div id="quantity__errors">
+
+                    </div>
+                    <h3>Błędy - pozycje</h3>
+                    <div id="position__errors">
+
+                    </div>
+                    <h3>Błędy - stan magazynowy</h3>
+                    <div id="exists__errors">
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" data-dismiss="modal">Anuluj</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" tabindex="-1" id="move_position_quantity_error" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Nie możesz wybrać tego samego zamówienia do przeniesienia danych.</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger pull-right" id="move_position_quantity_ok_error"  data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" tabindex="-1" id="move_position_quantity" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+
+                    <h4 class="modal-title">Czy jesteś pewny że chcesz przenieść okresloną ilość towaru z pozycji <span id="order_id_get"></span> na pozycję <span id="order_id_send"></span>?</h4>
+                    <div class="form-group">
+                        <label for="quantity__move">Ilość towaru do przeniesienia</label><input id="quantity__move" name="quantity__move" type="number" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="button" class="btn btn-success pull-right" id="move_position_quantity_ok" data-dismiss="modal">Ok</button>
                 </div>
             </div>
         </div>
