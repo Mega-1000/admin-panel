@@ -4,9 +4,8 @@ namespace App\Jobs;
 
 use App\Entities\Label;
 use App\Entities\Order;
+use App\Entities\OrderWarehouseNotification;
 use App\Mail\OrderStatusChangedToDispatchMail;
-use App\Repositories\OrderRepository;
-use App\Repositories\OrderWarehouseNotificationRepository;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -53,10 +52,9 @@ class OrderStatusChangedToDispatchNotificationJob extends Job
     /**
      * Execute the job.
      *
-     * @param OrderWarehouseNotificationRepository $orderWarehouseNotificationRepository
      * @return void
      */
-    public function handle(OrderWarehouseNotificationRepository $orderWarehouseNotificationRepository) {
+    public function handle() {
         try {
             $order = Order::findOrFail($this->orderId);
         } catch (\Exception $exception) {
@@ -80,23 +78,21 @@ class OrderStatusChangedToDispatchNotificationJob extends Job
             'waiting_for_response' => true,
         ];
 
-        $notification = $orderWarehouseNotificationRepository->findWhere($dataArray)->first();
+        $notification = OrderWarehouseNotification::where($dataArray)->first();
 
-        if(!empty($notification)) {
-            if(!$order->isOrderHasLabel(Label::PACKAGE_NOTIFICATION_SENT_LABEL) || $order->isOrderHasLabel(Label::PACKAGE_NOTIFICATION_LABEL)) {
-                $orderWarehouseNotificationRepository->update([
-                    'order_id' => $this->orderId,
-                    'warehouse_id' => $order->warehouse_id,
-                    'waiting_for_response' => false,
-                ], $notification->id);
-                Log::notice('Znaleziono etykietę Awizacja przyjęta w zamówieniu. Status wysyłania notyfikacji został zmieniony na przyjęty.', ['line' => __LINE__, 'file' => __FILE__, 'order' => $order->id]);
-                return;
-            }
+        if(!empty($notification) && (!$order->isOrderHasLabel(Label::PACKAGE_NOTIFICATION_SENT_LABEL) || $order->isOrderHasLabel(Label::PACKAGE_NOTIFICATION_LABEL))) {
+            $notification->update([
+                'order_id' => $this->orderId,
+                'warehouse_id' => $order->warehouse_id,
+                'waiting_for_response' => false,
+            ]);
+            Log::notice('Znaleziono etykietę Awizacja przyjęta w zamówieniu. Status wysyłania notyfikacji został zmieniony na przyjęty.', ['line' => __LINE__, 'file' => __FILE__, 'order' => $order->id]);
+            return;
         }
 
         if (!$notification) {
             $subject = "Prośba o potwierdzenie awizacji dla zamówienia nr. " . $this->orderId;
-            $notification = $orderWarehouseNotificationRepository->create($dataArray);
+            $notification = OrderWarehouseNotification::create($dataArray);
         }
 
         $acceptanceFormLink = env('FRONT_NUXT_URL') . "/magazyn/awizacja/{$notification->id}/{$order->warehouse_id}/{$this->orderId}";
