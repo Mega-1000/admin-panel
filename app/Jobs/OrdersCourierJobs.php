@@ -344,7 +344,24 @@ class OrdersCourierJobs extends Job
         $this->orderPackageRepository->update([
             'inpost_url' => $package->href,
         ], $this->data['additional_data']['order_package_id']);
+
         $href = $integration->hrefExecute($package->href);
+        $package = OrderPackage::find($this->data['additional_data']['order_package_id']);
+        $package->letter_number = $href->tracking_number;
+        $package->save();
+        if ($href->status !== 'confirmed') {
+            die();
+        }
+        $integration->getLabel($href->id, $href->tracking_number);
+        $package->status = 'WAITING_FOR_SENDING';
+        $package->save();
+        if ($package->send_protocol == true) {
+            die();
+        }
+        $path = storage_path('app/public/inpost/stickers/sticker' . $package->letter_number . '.pdf');
+        if (is_null($path)) {
+            die();
+        }
         return [
             'status' => 200,
             'error_code' => 0,

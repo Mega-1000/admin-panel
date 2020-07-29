@@ -100,12 +100,12 @@ class Inpost
             }
             $sections += [
                 'sender' => [
-                        'first_name' => $this->data['pickup_address']['firstname'],
-                        'last_name' => $this->data['pickup_address']['lastname'],
-                        'email' => $this->data['pickup_address']['email'],
-                        'phone' => $this->data['pickup_address']['phone'],
-                        'address' => $addressSender
-                    ]
+                    'first_name' => $this->data['pickup_address']['firstname'],
+                    'last_name' => $this->data['pickup_address']['lastname'],
+                    'email' => $this->data['pickup_address']['email'],
+                    'phone' => $this->data['pickup_address']['phone'],
+                    'address' => $addressSender
+                ]
             ];
             if ($this->data['courier_type'] == self::PACZKOMAT && $this->allegro) {
                 $sections += [
@@ -117,7 +117,7 @@ class Inpost
                     ]
                 ];
             } else if ($this->allegro) {
-               $sections += [
+                $sections += [
                     'custom_attributes' => [
                         'sending_method' => 'dispatch_order',
                         'allegro_transaction_id' => $this->data['additional_data']['allegro_transaction_id'],
@@ -158,8 +158,8 @@ class Inpost
                 ];
             } else if ($this->allegro) {
                 $sections += [
-                        'service' => 'inpost_courier_allegro'
-                    ];
+                    'service' => 'inpost_courier_allegro'
+                ];
             } else {
                 $sections += [
                     'service' => 'inpost_courier_standard',
@@ -245,7 +245,7 @@ class Inpost
         if ($curl_error) {
             Log::notice(
                 'Error in INPOST integration - method hrefExecute',
-                ['courier' => 'INPOST', 'class' => get_class($this), 'line' => __LINE__]
+                ['error' => $curl_error, 'courier' => 'INPOST', 'class' => get_class($this), 'line' => __LINE__]
             );
         }
         curl_close($ch);
