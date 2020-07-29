@@ -76,7 +76,7 @@ class ProductStockPositionsController extends Controller
         if (empty($productStockPosition)) {
             abort(404);
         }
-        $productStock = ProductStock::findWhere(['product_id' => $id])->first();
+        $productStock = ProductStock::where(['product_id' => $id])->first();
 
 
         if ($request->different !== null) {
@@ -150,7 +150,7 @@ class ProductStockPositionsController extends Controller
      */
     public function prepareCollection($id)
     {
-        $collection = ProductStockPosition::findWhere(['product_stock_id', $id])->all();
+        $collection = ProductStockPosition::where(['product_stock_id' => $id])->get();
 
         return $collection;
     }
