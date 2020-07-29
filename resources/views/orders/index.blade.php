@@ -533,36 +533,52 @@
         <div class="form-group">
             {{csrf_field()}}
             <label for="protocols">Protokoły z dnia</label>
-            <input name="date_from" class="protocol_datepicker" id="protocol_datepicker_from" value="{{ Carbon\Carbon::now()->format('d/m/yy') }}"/>
+            <input name="date_from" class="protocol_datepicker" id="protocol_datepicker_from"
+                   value="{{ Carbon\Carbon::now()->format('d/m/yy') }}"/>
             do dnia
-            <input name="date_to" class="protocol_datepicker" id="protocol_datepicker_to" value="{{ Carbon\Carbon::now()->format('d/m/yy') }}"/>
+            <input name="date_to" class="protocol_datepicker" id="protocol_datepicker_to"
+                   value="{{ Carbon\Carbon::now()->format('d/m/yy') }}"/>
             z magazynu:
             <input type="text" id="delivery_warehouse" name="delivery_warehouse"
-                       value="MEGA-OLAWA"/>
-            <input type="submit" name="courier" value="Inpost" target="_blank" class="btn btn-success" />
-            <input type="submit" name="courier" value="Dpd" target="_blank" class="btn btn-success" />
-            <input type="submit" name="courier" value="Pocztex" target="_blank" class="btn btn-success" />
-            <input type="submit" name="courier" value="Apaczka" target="_blank" class="btn btn-success" />
-            <input type="submit" name="courier" value="Jas" target="_blank" class="btn btn-success" />
-            <input type="submit" name="courier" value="Gielda" target="_blank" class="btn btn-success" >
-            <input type="submit" name="courier" value="Gls" target="_blank" class="btn btn-success" />
-            <input type="submit" name="courier" value="Wszystkie" target="_blank" class="btn btn-info" />
+                   value="MEGA-OLAWA"/>
+            <input type="submit" name="courier" value="Inpost" target="_blank" class="btn btn-success"/>
+            <input type="submit" name="courier" value="Dpd" target="_blank" class="btn btn-success"/>
+            <input type="submit" name="courier" value="Pocztex" target="_blank" class="btn btn-success"/>
+            <input type="submit" name="courier" value="Apaczka" target="_blank" class="btn btn-success"/>
+            <input type="submit" name="courier" value="Jas" target="_blank" class="btn btn-success"/>
+            <input type="submit" name="courier" value="Gielda" target="_blank" class="btn btn-success">
+            <input type="submit" name="courier" value="Gls" target="_blank" class="btn btn-success"/>
+            <input type="submit" name="courier" value="Wszystkie" target="_blank" class="btn btn-info"/>
         </div>
     </form>
     <div class="form-group">
         <label for="send_courier">Wyślij kurierów: </label>
-        <a name="send_courier" class="btn btn-success" href="/admin/orderPackages/INPOST/send">Inpost</a>
-        <a name="send_courier" class="btn btn-success" href="/admin/orderPackages/DPD/send">DPD</a>
-        <a name="send_courier" class="btn btn-success" href="/admin/orderPackages/POCZTEX/send">Pocztex</a>
-        <a name="send_courier" class="btn btn-success" href="/admin/orderPackages/APACZKA/send">Apaczka</a>
-        <a name="send_courier" class="btn btn-success" href="/admin/orderPackages/JAS/send">Jas</a>
-        <a name="send_courier" class="btn btn-success" href="/admin/orderPackages/GLS/send">GLS</a>
-        <a name="send_courier" class="btn btn-info" href="/admin/orderPackages/ALL/send">Wyślij wszystkie</a>
+        <button name="send_courier" class="send_courier_class btn btn-success"
+                href="/admin/orderPackages/INPOST/send">Inpost
+        </button>
+        <button name="send_courier" class="send_courier_class btn btn-success"
+                href="/admin/orderPackages/DPD/send">DPD
+        </button>
+        <button name="send_courier" class="send_courier_class btn btn-success"
+                href="/admin/orderPackages/POCZTEX/send">Pocztex
+        </button>
+        <button name="send_courier" class="send_courier_class btn btn-success"
+                href="/admin/orderPackages/APACZKA/send">Apaczka
+        </button>
+        <button name="send_courier" class="send_courier_class btn btn-success"
+                href="/admin/orderPackages/JAS/send">Jas
+        </button>
+        <button name="send_courier" class="send_courier_class btn btn-success"
+                href="/admin/orderPackages/GLS/send">GLS
+        </button>
+        <button name="send_courier" class="send_courier_class btn btn-info"
+                href="/admin/orderPackages/ALL/send">Wyślij wszystkie
+        </button>
     </div>
     <div class="form-group">
-        <label for="send_courier">Szablony paczek:</label>
-        <a name="send_courier" class="btn btn-success" href="/admin/packageTemplates/">Lista Szablonów</a>
-        <a name="send_courier" class="btn btn-info" href="/admin/packageTemplates/create">Dodaj szablon</a>
+        <label for="package_template">Szablony paczek:</label>
+        <a name="package_template" class="btn btn-success" href="/admin/packageTemplates/">Lista Szablonów</a>
+        <a name="package_template" class="btn btn-info" href="/admin/packageTemplates/create">Dodaj szablon</a>
         <label style="margin-left: 20px" for="container_type">Rodzaje przesyłek:</label>
         <a style="margin-left: 5px" name="container_type" class="btn btn-success" href="/admin/containerTypes/">Lista
             rodzajów przesyłek</a>
@@ -579,10 +595,10 @@
     </div>
     <br>
     <div class="form-group">
-        <label for="send_courier">Import z SELLO: </label>
-        <a name="send_courier" class="btn btn-success" href="{{ route('orders.sello_import') }}">Importuj</a>
-        <label for="send_courier">Wyślij numery naklejek do allegro: </label>
-        <a name="send_courier" class="btn btn-success" href="{{ route('orders.send_tracking_numbers') }}">Wyślij
+        <label for="import_sello">Import z SELLO: </label>
+        <a name="import_sello" class="btn btn-success" href="{{ route('orders.sello_import') }}">Importuj</a>
+        <label for="send_labels_allegro">Wyślij numery naklejek do allegro: </label>
+        <a name="send_labels_allegro" class="btn btn-success" href="{{ route('orders.send_tracking_numbers') }}">Wyślij
             numery</a>
 
 
@@ -665,13 +681,13 @@
                 </thead>
                 <tbody>
                 @php
-                $type1 = session('allegro_payments_errors')[1] ?? [];
-                $type2 = session('allegro_payments_errors')[2] ?? [];
-                $type3 = session('allegro_payments_errors')[3] ?? [];
-                $type4 = session('allegro_payments_errors')[4] ?? [];
-                $typeOther = session('allegro_payments_errors')['other'] ?? [];
+                    $type1 = session('allegro_payments_errors')[1] ?? [];
+                    $type2 = session('allegro_payments_errors')[2] ?? [];
+                    $type3 = session('allegro_payments_errors')[3] ?? [];
+                    $type4 = session('allegro_payments_errors')[4] ?? [];
+                    $typeOther = session('allegro_payments_errors')['other'] ?? [];
 
-                $length = max([count($type1), count($type2), count($type3), count($type4), count($typeOther)]);
+                    $length = max([count($type1), count($type2), count($type3), count($type4), count($typeOther)]);
                 @endphp
                 @for ($i = 0; $i < $length; $i++)
                     <tr>
@@ -687,7 +703,7 @@
         @endif
     </div>
     <div class="form-group">
-        <label for="send_courier">Drukuj zamówienia widoczne na stronie: </label>
+        <label for="print_orders">Drukuj zamówienia widoczne na stronie: </label>
         <a name="print_orders" class="btn btn-success" onclick="printAll()">Drukuj wszystkie</a>
     </div>
     <div style="display: flex; align-items: center;" id="add-label-container">
@@ -739,9 +755,9 @@
         </div>
 
         <div class="col-md-4 mb-4">
-                <label for="searchById">Zajdź po ID</label>
-                <input type="search" name="searchById" id="searchById">
-                <button onclick="findPage()" class="btn btn-success">Znajdź zlecenie</button>
+            <label for="searchById">Zajdź po ID</label>
+            <input type="search" name="searchById" id="searchById">
+            <button onclick="findPage()" class="btn btn-success">Znajdź zlecenie</button>
         </div>
         <div class="col-md-4 mb-4">
             <label for="selectAllOrders">Zaznacz wszystkie zlecenia</label>
@@ -962,7 +978,12 @@
 @section('datatable-scripts')
     <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
     <script>
-        $('.protocol_datepicker').datepicker({ dateFormat: "dd/mm/yy"});
+        $(".send_courier_class").click(event => {
+            $(".send_courier_class").each((id, item) =>
+                item.setAttribute("disabled", true));
+            window.location.href = event.currentTarget.getAttribute("href");
+        })
+        $('.protocol_datepicker').datepicker({dateFormat: "dd/mm/yy"});
         $(() => {
             var available = [
                 @php
@@ -1436,7 +1457,7 @@
                             return array.includes(parseInt(label[0].id));
                         }).length > 0;
                         let isNotProducedYet = data.labels.filter(label => {
-                            return parseInt(label[0].id) == batteryId ;
+                            return parseInt(label[0].id) == batteryId;
                         }).length == 0;
                         if (hasHammerOrBagLabel && isNotProducedYet) {
                             html += data.history.reduce((acu, order) => {
@@ -1447,7 +1468,7 @@
                                     return array.includes(parseInt(label.id));
                                 }).length > 0;
                                 let isChildNotProducedYet = order.labels.filter(label => {
-                                    return parseInt(label.id) == batteryId ;
+                                    return parseInt(label.id) == batteryId;
                                 }).length == 0;
                                 if (hasChildHammerOrBagLabel && isChildNotProducedYet) {
                                     let url = "{{ route('orders.edit', ['id' => ':id:']) }}"
@@ -1944,7 +1965,7 @@
             ],
         });
 
-        window.table.on( 'draw', function () {
+        window.table.on('draw', function () {
 
             $('.order-id-checkbox').on('click', e => {
                 if (e.shiftKey && lastChecked) {
@@ -1958,10 +1979,13 @@
 
             });
             $('#selectAllOrders').on('click', e => {
-                checkboxes.each((index, item) => { item.checked = e.target.checked });
+                checkboxes.each((index, item) => {
+                    item.checked = e.target.checked
+                });
             })
             var checkboxes = $('.order-id-checkbox');
-            var lastChecked = null;        } );
+            var lastChecked = null;
+        });
             @foreach($visibilities as $key =>$row)
         var {{'show'.$row->name}}  = @json($row->show);
         {{'show'.$row->name}} = {{'show'.$row->name}}.map(function (x) {
