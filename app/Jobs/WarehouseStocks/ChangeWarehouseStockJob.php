@@ -55,7 +55,7 @@ class ChangeWarehouseStockJob extends Job
                     continue;
                 }
 
-                $product->stock->logs()->where('order_id', $this->orderId)->where('action', 'DELETE')->first();
+                $productStockLog = $product->stock->logs()->where('order_id', $this->orderId)->where('action', 'DELETE')->first();
 
                 if(!empty($productStockLog)) {
                     $errors[] = ['error' => 'exists', 'product' => $product->id, 'productName' => $product->symbol, 'order_id' => $order->id];
@@ -63,6 +63,7 @@ class ChangeWarehouseStockJob extends Job
                 }
             }
         }
+
         if(count($errors) > 0) {
             return response()->json($errors);
         }
@@ -72,7 +73,7 @@ class ChangeWarehouseStockJob extends Job
             if($product === null) {
                 return response()->json(['error' => 'Product does not exist.']);
             }
-            $product->stock->logs()->where('order_id', $this->orderId)->where('action', 'DELETE')->first();
+            $productStockLog = $product->stock->logs()->where('order_id', $this->orderId)->where('action', 'DELETE')->first();
 
             if(!empty($productStockLog)) {
                 return response()->json(['error' => 'exists']);
