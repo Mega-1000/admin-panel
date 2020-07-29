@@ -397,15 +397,12 @@
                 url: '/admin/positions/' + idToGet + '/' + idToSend + '/quantity' + '/move'
             }).done(function (data) {
                 $('#order_move_data_success').modal('show');
-
-                $('#payment-move-data-ok').on('click', function () {
-                    window.location.reload();
-                });
+                let currentUrl = window.location.href;
+                window.location.href = currentUrl + '?tab=positions';
             }).fail(function () {
                 $('#order_move_data_error').modal('show');
                 $('#order_move_data_ok_error').on('click', function () {
                     window.location.href = '/admin/orders';
-
                 });
             });
         });
