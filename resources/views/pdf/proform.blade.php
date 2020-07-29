@@ -67,6 +67,9 @@
             </tr>
         </tbody>
     </table>
+    <p>
+        UWAGA przy dokonwyaniu przelewu bankowego tej oferty trzeba koniecznie wpisać ciąg znaków QQ{{ $order->id }}QQ
+    </p>
     <table class="table table-striped" style="table-layout:fixed; width: 100%;">
         <thead>
         <tr style="height:20px;">
