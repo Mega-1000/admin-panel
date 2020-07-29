@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Mail\WarehouseDispatchPendingReminderMail;
 use App\Repositories\OrderWarehouseNotificationRepository;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class WarehouseDispatchPendingReminderJob extends Job
@@ -24,6 +25,7 @@ class WarehouseDispatchPendingReminderJob extends Job
             if (!empty($warehousesToRemind)) {
                 foreach ($warehousesToRemind as $warehouseNotification) {
                     if ($this->shouldNotifyWithEmail($warehouseNotification, $now)) {
+                        Log::notice('Wysyłka powiadomienie dla zamówienia: ' . $warehouseNotification->order_id , ['line' => __LINE__, 'file' => __FILE__]);
                         dispatch_now(new OrderStatusChangedToDispatchNotificationJob($warehouseNotification->order_id));
                     }
                 }

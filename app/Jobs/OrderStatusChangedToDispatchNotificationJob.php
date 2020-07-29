@@ -60,7 +60,7 @@ class OrderStatusChangedToDispatchNotificationJob extends Job
         try {
             $order = Order::findOrFail($this->orderId);
         } catch (\Exception $exception) {
-            Log::error($exception->getMessage(), ['line' => $exception->getLine(), 'file' => $exception->getFile()]);
+            Log::error($exception->getMessage(), ['line' => $exception->getLine(), 'file' => $exception->getFile(), 'comment' => 'Nie znaleziono zamówienia o numerze: ' . $this->orderId . ' podczas wysyłania awizacji.']);
             return;
         }
 
@@ -69,7 +69,7 @@ class OrderStatusChangedToDispatchNotificationJob extends Job
             $warehouseMail = $warehouse->firm->email;
         }
         if (empty($warehouseMail)) {
-            Log::notice('Brak adresu mailowego w firmie, lub magazyn nie istnieje', ['line' => __LINE__, 'file' => __FILE__]);
+            Log::notice('Brak adresu mailowego w firmie, lub magazyn nie istnieje', ['line' => __LINE__, 'file' => __FILE__, 'order' => $order->id]);
             return;
         }
         $subject = "Przypomnienie o potwierdzenie awizacji dla zamówienia nr. " . $this->orderId;
@@ -82,14 +82,16 @@ class OrderStatusChangedToDispatchNotificationJob extends Job
 
         $notification = $orderWarehouseNotificationRepository->findWhere($dataArray)->first();
 
-        if(!$order->isOrderHasLabel(Label::PACKAGE_NOTIFICATION_SENT_LABEL) || $order->isOrderHasLabel(Label::PACKAGE_NOTIFICATION_LABEL)) {
-            $orderWarehouseNotificationRepository->update([
-                'order_id' => $this->orderId,
-                'warehouse_id' => $order->warehouse_id,
-                'waiting_for_response' => false,
-            ], $notification->id);
-            Log::notice('Znaleziono etykietę Awizacja przyjęta w zamówieniu. Status wysyłania notyfikacji został zmieniony na przyjęty.', ['line' => __LINE__, 'file' => __FILE__]);
-            return;
+        if(!empty($notification)) {
+            if(!$order->isOrderHasLabel(Label::PACKAGE_NOTIFICATION_SENT_LABEL) || $order->isOrderHasLabel(Label::PACKAGE_NOTIFICATION_LABEL)) {
+                $orderWarehouseNotificationRepository->update([
+                    'order_id' => $this->orderId,
+                    'warehouse_id' => $order->warehouse_id,
+                    'waiting_for_response' => false,
+                ], $notification->id);
+                Log::notice('Znaleziono etykietę Awizacja przyjęta w zamówieniu. Status wysyłania notyfikacji został zmieniony na przyjęty.', ['line' => __LINE__, 'file' => __FILE__, 'order' => $order->id]);
+                return;
+            }
         }
 
         if (!$notification) {
@@ -105,6 +107,7 @@ class OrderStatusChangedToDispatchNotificationJob extends Job
                     ->to($warehouseMail)
                     ->send(new OrderStatusChangedToDispatchMail($subject, $acceptanceFormLink,
                         $sendFormInvoice, $order, $this->self));
+                Log::notice('Wysłano email awizacyjny na mail: ' . $warehouseMail . ' dla zamówienia: ' . $order->id, ['line' => __LINE__, 'file' => __FILE__]);
             } else {
                 \Mailer::create()
                     ->to($warehouseMail)
