@@ -686,7 +686,7 @@
                                 return `<i class="${label.icon_name}" style="color: ${label.color}"/>`
                             })
                         }
-                        let url = route.replace('%%', item.id);
+                        let url = route.replace('%%', item.order.id);
                         let tooltipText = item.order.warehouse_notice ?? ''
                         let tooltipElement = item.order.warehouse_notice ? `<i title="${tooltipText}" data-toggle="tooltip" class="comment-icon fas fa-comment"></i>` : '';
                         duplicates = duplicates.length > 0 ? ' (D):' + duplicates.join(', (D)') : '';
