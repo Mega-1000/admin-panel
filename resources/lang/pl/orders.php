@@ -126,6 +126,7 @@ return [
         'remainder_date' => 'Data przypomnienia',
         'invoice_number' => 'Numer faktury',
         'additional_info' => 'Dodatkowe informacje',
+        'financial_notices' => 'Uwagi księgowości',
         'warehouse_notice' => 'Dialog Magazyn',
         'consultant_value' => 'Koszt obsługi konsultanta',
         'warehouse_notice' => 'Opis obsługi magazynu',

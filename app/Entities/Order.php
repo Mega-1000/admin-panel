@@ -41,6 +41,7 @@ class Order extends Model implements Transformable
         'symbol',
         'customer_notices',
         'consultant_notices',
+        'financial_comment',
         'clientPhone',
         'clientEmail',
         'clientFirstname',

@@ -379,6 +379,20 @@
                     </div>
                 </div>
             </div>
+            <div class="form-group" style="width: 25%; float: left; padding: 5px;">
+                @include('orders.labels', ['title' =>  __('orders.form.financial_notices')])
+                <textarea disabled class="form-control" name="financial_comment" id="financial_comment"
+                          rows="5">{{ $order->financial_comment ?? ''}}</textarea>
+                <div class="flex-input">
+                    <input type="text" class="form-control" placeholder="@lang('orders.form.financial_notices')"
+                           id="{{ \App\Entities\Order::COMMENT_FINANCIAL_TYPE }}" name="consultant_notices"/>
+                    <div class="input-group-append">
+                        <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_FINANCIAL_TYPE }}')"
+                                class="btn btn-success" type="button">wyślij
+                        </button>
+                    </div>
+                </div>
+            </div>
             <div class="form-group" style="width: 40%; float: left; padding: 5px;">
                 <label for="remainder_date">@lang('orders.form.remainder_date')</label>
                 <input type="text" class="form-control default-date-time-picker-now" id="remainder_date"

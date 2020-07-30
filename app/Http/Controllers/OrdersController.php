@@ -624,6 +624,9 @@ class OrdersController extends Controller
             case Order::COMMENT_CONSULTANT_TYPE:
                 $order->consultant_notices .= $this->formatMessage($user, $request);
                 break;
+            case Order::COMMENT_FINANCIAL_TYPE:
+                $order->financial_comment .= $this->formatMessage($user, $request);
+                break;
             default:
                 return response(['errors' => ['message' => "Zły typ komentarza"]], 400);
         }
