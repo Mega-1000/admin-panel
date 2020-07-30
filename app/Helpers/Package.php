@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Collection;
 class Package
 {
     const CAN_NOT_ADD_MORE = 'Nie można dodać produktu do koszyka';
+    const DPD_COURIER = 'DPD';
     public $productList;
     public $packageName;
     public $displayed_name;
