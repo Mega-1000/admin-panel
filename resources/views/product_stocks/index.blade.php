@@ -165,11 +165,14 @@
                     render: function(data, type, row) {
                                 let html = 0;
                                 if (row.positions) {
-                                    console.log(row)
                                     row.positions.forEach(function (position) {
                                         html += parseInt(position.position_quantity);
                                     });
 
+                                }
+
+                                if(html < row.min_quantity) {
+                                    html = '<span style="color: red; font-weight: bold;">' + html + '</span>';
                                 }
 
                                 return html;
