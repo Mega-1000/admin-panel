@@ -252,6 +252,7 @@ Route::group(['prefix' => 'admin'], function () {
             'OrdersController@sendSelfOrderToWarehouse')->name('orders.sendSelfOrderToWarehouse');
         Route::post('orders/datatable', 'OrdersController@datatable')->name('orders.datatable');
         Route::post('orders/printAll', 'OrdersController@printAll')->name('orders.printAll');
+        Route::post('orders/sendVisibleCouriers', 'OrdersController@sendVisibleCouriers')->name('orders.sendVisibleCouriers');
         Route::get('orders/create', 'OrdersController@create')->name('orders.create');
         Route::get('orders/{id}/edit', 'OrdersController@edit')->name('orders.edit');
         Route::get('orders/{id}/edit/packages', 'OrdersController@editPackages')->name('orders.editPackages');

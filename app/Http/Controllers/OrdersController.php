@@ -1968,6 +1968,39 @@ class OrdersController extends Controller
         return $collection;
     }
 
+    public function sendVisibleCouriers(Request $request)
+    {
+        $data = $request->all();
+        list($collection, $countFiltred) = $this->prepareCollection($data);
+        if (!$countFiltred) {
+            return \response("Brak zamówień");
+        }
+        $messages = [];
+        foreach ($collection as $ord) {
+            $message = $this->sendPackagesForOrder($ord);
+            if (!empty($message)) {
+                $messages = array_merge($messages, $message);
+            }
+        }
+        return \response(['errors' => $messages], 200);
+    }
+
+    private function sendPackagesForOrder($ord)
+    {
+        $order = Order::find($ord->orderId);
+        $messages = [];
+        $packages = $order->packages->where('status', 'NEW');
+        foreach ($packages as $package) {
+            try {
+                list($message, $messages) = app(OrdersPackagesController::class)->sendPackage($package, $messages);
+            } catch (\Exception $e) {
+                \Log::error('błąd przy nadawaniu hurtowym paczki', ['error' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
+                $messages [] = $e->getMessage();
+            }
+        }
+        return $messages;
+    }
+
     public function printAll(Request $request)
     {
         $finalPdfFileName = 'allPrints.pdf';

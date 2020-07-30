@@ -887,7 +887,7 @@ class OrdersPackagesController extends Controller
      * @param array $messages
      * @return array
      */
-    protected function sendPackage($package, array $messages): array
+    public function sendPackage($package, array $messages): array
     {
         $result = $this->preparePackageToSend($package->order->id, $package->id);
         $resArr = $result->getData();

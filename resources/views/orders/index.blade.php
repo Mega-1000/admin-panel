@@ -88,6 +88,10 @@
         .modal-content {
             border: 1px solid #000;
         }
+
+        #packages_errors {
+            color: red;
+        }
     </style>
 @endsection
 
@@ -580,6 +584,11 @@
         <button name="send_courier" class="send_courier_class btn btn-info"
                 href="/admin/orderPackages/ALL/send">Wyślij wszystkie
         </button>
+        <button name="send_courier" class="send_courier_class btn btn-danger"
+                id="filtered-packages">Wyślij przefiltrowane
+        </button>
+    </div>
+    <div id="packages_errors" class="form-group">
     </div>
     <div class="form-group">
         <label for="package_template">Szablony paczek:</label>
@@ -985,10 +994,35 @@
     <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
     <script>
         $(".send_courier_class").click(event => {
-            $(".send_courier_class").each((id, item) =>
-                item.setAttribute("disabled", true));
-            window.location.href = event.currentTarget.getAttribute("href");
+            if (event.currentTarget.id == "filtered-packages") {
+                return;
+            }
+            if (confirm("Na pewno zamówić kurierów?")) {
+                $(".send_courier_class").each((id, item) => item.setAttribute("disabled", true));
+                window.location.href = event.currentTarget.getAttribute("href");
+            }
         })
+
+        $("#filtered-packages").click(event => {
+            if (!confirm("Na pewno zamówić kurierów?")) {
+                return;
+            }
+            $(".send_courier_class").each((id, item) => item.setAttribute("disabled", true));
+            $.post("{{route('orders.sendVisibleCouriers')}}", table.ajax.params())
+                .done((data) => {
+                    if (!data.errors) {
+                        alert('Wysłano wszystkie paczki')
+                    } else {
+                        console.log(data.errors);
+
+                        data.errors.forEach(error =>{
+                            console.log(error);
+                            $('#packages_errors').append(`<p>${error}</p>`);
+                        })
+                    }
+                });
+        });
+
         $('.protocol_datepicker').datepicker({dateFormat: "dd/mm/yy"});
         $(() => {
             var available = [
