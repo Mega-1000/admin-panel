@@ -25,6 +25,7 @@ class Order extends Model implements Transformable
     const COMMENT_SHIPPING_TYPE = 'shipping_comment';
     const COMMENT_WAREHOUSE_TYPE = 'warehouse_comment';
     const COMMENT_CONSULTANT_TYPE = 'consultant_comment';
+    const COMMENT_FINANCIAL_TYPE = 'financial_comment';
     public $customColumnsVisibilities = [
         'mark',
         'spedition_exchange_invoiced_selector',

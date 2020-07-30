@@ -422,7 +422,7 @@ class OrdersController extends Controller
             $productsArray[] = $item->product_id;
         }
 
-        $labelsButtons = Label::whereIn('id', [91, 151, 152])->get();
+        $labelsButtons = Label::whereIn('id', [Label::MASTER_MARK, Label::WAREHOUSE_MARK, Label::CONSULTANT_MARK, Label::SHIPPING_MARK])->get();
         $labelsButtons = $labelsButtons->reduce(function ($reduced, $current) {
             $reduced[$current->id] = $current;
             return $reduced;
