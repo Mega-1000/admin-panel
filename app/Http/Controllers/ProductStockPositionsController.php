@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\ProductStock;
 use App\Entities\ProductStockPosition;
 use App\Http\Requests\ProductStockPositionCreate;
 use App\Http\Requests\ProductStockPositionUpdate;
-use App\Repositories\ProductStockPositionRepository;
-use App\Repositories\ProductStockRepository;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -16,28 +15,6 @@ use Yajra\DataTables\Facades\DataTables;
  */
 class ProductStockPositionsController extends Controller
 {
-    /**
-     * @var ProductStockPositionRepository
-     */
-    protected $repository;
-
-    /**
-     * @var ProductStockRepository
-     */
-    protected $productStockRepository;
-
-    /**
-     * ProductStockPositionsController constructor.
-     * @param ProductStockPositionRepository $repository
-     * @param ProductStockRepository $productStockRepository
-     */
-    public function __construct(
-        ProductStockPositionRepository $repository,
-        ProductStockRepository $productStockRepository
-    ) {
-        $this->repository = $repository;
-        $this->productStockRepository = $productStockRepository;
-    }
 
     /**
      * Show the form for creating a new resource.
@@ -55,16 +32,16 @@ class ProductStockPositionsController extends Controller
      */
     public function store(ProductStockPositionCreate $request)
     {
-        $productStockPosition = $this->repository->create(
+        $productStockPosition = ProductStockPosition::create(
             array_merge(['product_stock_id' => $request->id], $request->all())
         );
         $positionQuantity = $request->position_quantity;
-        $productStock = $this->productStockRepository->find($productStockPosition->product_stock_id);
+        $productStock = ProductStock::find($productStockPosition->product_stock_id);
         if (empty($productStock)) {
             abort(404);
         }
         $quantity = $productStock->quantity + $positionQuantity;
-        $this->productStockRepository->update(['quantity' => $quantity], $productStock->id);
+        $productStock->update(['quantity' => $quantity]);
         $this->createLog('+' . $request->position_quantity, $productStock->id, $productStockPosition->id);
 
         return redirect()->route('product_stocks.edit', ['id' => $request->id, 'tab' => 'positions'])->with([
@@ -81,7 +58,7 @@ class ProductStockPositionsController extends Controller
      */
     public function edit($id, $position_id)
     {
-        $productStockPosition = $this->repository->find($position_id);
+        $productStockPosition = ProductStockPosition::find($position_id);
 
         return view('product_stocks.positions.edit', compact('id', 'productStockPosition'));
     }
@@ -94,12 +71,12 @@ class ProductStockPositionsController extends Controller
      */
     public function update(ProductStockPositionUpdate $request, $id, $position_id)
     {
-        $productStockPosition = $this->repository->find($position_id);
+        $productStockPosition = ProductStockPosition::find($position_id);
 
         if (empty($productStockPosition)) {
             abort(404);
         }
-        $productStock = $this->productStockRepository->findByField('product_id', $id)->first();
+        $productStock = ProductStock::where(['product_id' => $id])->first();
 
 
         if ($request->different !== null) {
@@ -119,10 +96,10 @@ class ProductStockPositionsController extends Controller
                     }
                 }
             }
-            $this->productStockRepository->update(['quantity' => $calc], $productStock->id);
+            $productStock->update(['quantity' => $calc]);
             $this->createLog($request->different, $productStock->id, $productStockPosition->id);
         }
-        $this->repository->update($request->all(), $productStockPosition->id);
+        $productStockPosition->update($request->all());
 
 
         return redirect()->route('product_stocks.edit', ['id' => $request->id, 'tab' => 'positions'])->with([
@@ -138,18 +115,18 @@ class ProductStockPositionsController extends Controller
      */
     public function destroy($id, $position_id)
     {
-        $productStockPosition = $this->repository->find($position_id);
+        $productStockPosition = ProductStockPosition::find($position_id);
 
         if (empty($productStockPosition)) {
             abort(404);
         }
         $positionQuantity = $productStockPosition->position_quantity;
-        $productStock = $this->productStockRepository->find($productStockPosition->product_stock_id);
+        $productStock = ProductStock::find($productStockPosition->product_stock_id);
         if (empty($productStock)) {
             abort(404);
         }
         $quantity = $productStock->quantity - $positionQuantity;
-        $this->productStockRepository->update(['quantity' => $quantity], $productStock->id);
+        $productStock->update(['quantity' => $quantity]);
         $productStockPosition->delete($productStockPosition->id);
         $this->createLog('-' . $positionQuantity, $productStock->id, $productStockPosition->id);
         return redirect()->route('product_stocks.edit', ['id' => $id, 'tab' => 'positions'])->with([
@@ -173,7 +150,7 @@ class ProductStockPositionsController extends Controller
      */
     public function prepareCollection($id)
     {
-        $collection = $this->repository->findByField('product_stock_id', $id)->all();
+        $collection = ProductStockPosition::where(['product_stock_id' => $id])->get();
 
         return $collection;
     }
