@@ -728,7 +728,7 @@
             @foreach($groupedLabels as $groupName => $group)
                 <optgroup label="{{ $groupName }}">
                     @foreach($group as $label)
-                        <option value="{{ $label->id }}">{{ $label->name }}</option>
+                        <option value="{{ $label->id }}" data-timed="{{ $label->timed }}">{{ $label->name }}</option>
                     @endforeach
                 </optgroup>
             @endforeach
@@ -2463,6 +2463,8 @@
 
         function addLabel() {
             let chosenLabel = $("#choosen-label");
+            let timed = chosenLabel[0].selectedOptions[0].dataset.timed;
+
             if (chosenLabel.val() == "") {
                 alert("Nie wybrano etykiety");
                 return;
@@ -2479,21 +2481,42 @@
                 orderIds.push($(order).val());
             });
 
-            $.ajax({
-                url: "/admin/orders/label-addition/" + chosenLabel.val(),
-                method: "POST",
-                data: {orderIds: orderIds}
-            }).done(function () {
+            if(timed == 1) {
+                $('#timed_label').modal('show');
+                $('#time_label_ok').on('click', () => {
+                    $.ajax({
+                        url: "/admin/orders/label-addition/" + chosenLabel.val(),
+                        method: "POST",
+                        data: {orderIds: orderIds, time: $('#time_label').val()}
+                    }).done(function () {
+                        $.ajax({
+                            url: '/api/get-labels-scheduler-await/{{ Auth::id() }}'
+                        }).done(function (res) {
+                            if (res.length) {
+                                location.reload();
+                            } else {
+                                table.ajax.reload(null, false);
+                            }
+                        });
+                    });
+                })
+            } else {
                 $.ajax({
-                    url: '/api/get-labels-scheduler-await/{{ Auth::id() }}'
-                }).done(function (res) {
-                    if (res.length) {
-                        location.reload();
-                    } else {
-                        table.ajax.reload(null, false);
-                    }
+                    url: "/admin/orders/label-addition/" + chosenLabel.val(),
+                    method: "POST",
+                    data: {orderIds: orderIds}
+                }).done(function () {
+                    $.ajax({
+                        url: '/api/get-labels-scheduler-await/{{ Auth::id() }}'
+                    }).done(function (res) {
+                        if (res.length) {
+                            location.reload();
+                        } else {
+                            table.ajax.reload(null, false);
+                        }
+                    });
                 });
-            });
+            }
         }
 
         function moveData(id) {

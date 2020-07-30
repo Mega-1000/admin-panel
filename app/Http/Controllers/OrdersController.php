@@ -1276,9 +1276,15 @@ class OrdersController extends Controller
             return;
         }
 
+        if($request->input('time') !== null) {
+            $time = $request->input('time');
+        } else {
+            $time = false;
+        }
+
         $orders = $this->orderRepository->findWhereIn('id', $orderIds);
         foreach ($orders as $order) {
-            dispatch_now(new AddLabelJob($order, [$labelId], $preventionArray));
+            dispatch_now(new AddLabelJob($order, [$labelId], $preventionArray, [], null, $time));
         }
     }
 

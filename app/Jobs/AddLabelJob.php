@@ -10,6 +10,7 @@ use App\Repositories\OrderLabelSchedulerRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\TaskRepository;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class AddLabelJob extends Job
@@ -19,6 +20,7 @@ class AddLabelJob extends Job
     protected $loopPreventionArray;
     protected $options;
     protected $self;
+    protected $time;
 
     protected $awaitRepository;
 
@@ -29,8 +31,9 @@ class AddLabelJob extends Job
      * @param $loopPreventionArray
      * @param $options
      * @param $self
+     * @param $time
      */
-    public function __construct($order, $labelIdsToAdd, &$loopPreventionArray = [], $options = [], $self = null)
+    public function __construct($order, $labelIdsToAdd, &$loopPreventionArray = [], $options = [], $self = null, $time = false)
     {
         $this->order = $order;
         $this->labelIdsToAdd = $labelIdsToAdd;
@@ -39,6 +42,7 @@ class AddLabelJob extends Job
             'added_type' => null,
         ], $options);
         $this->self = $self;
+        $this->time = $time;
     }
 
     /**
@@ -76,6 +80,15 @@ class AddLabelJob extends Job
             //attaching current label
             $label = $labelRepository->find($labelId);
             $alreadyHasLabel = $this->order->labels()->where('label_id', $labelId)->get();
+
+            if($this->time !== false) {
+                DB::table('timed_labels')->insert([
+                    'execution_time' => $this->time,
+                    'order_id' => $this->order->id,
+                    'label_id' => $labelId,
+                    'is_executed' => false
+                ]);
+            }
 
             if (count($alreadyHasLabel) == 0) {
 

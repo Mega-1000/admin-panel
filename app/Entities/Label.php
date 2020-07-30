@@ -31,6 +31,7 @@ class Label extends Model implements Transformable
     const WAREHOUSE_MARK = 91;
     const CONSULTANT_MARK = 151;
     const SHIPPING_MARK = 152;
+    const URGENT_INTERVENTION = 90;
 
     const CHAT_TYPE = 'chat';
     const PAYMENTS_IDS_FOR_TABLE = [119, 134, 120, 101, 99, 102];
@@ -67,7 +68,8 @@ class Label extends Model implements Transformable
         'status',
         'icon_name',
         'message',
-        'manual_label_selection_to_add_after_removal'
+        'manual_label_selection_to_add_after_removal',
+        'timed'
     ];
 
     /**

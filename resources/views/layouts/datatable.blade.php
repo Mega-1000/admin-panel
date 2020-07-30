@@ -358,6 +358,22 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" tabindex="-1" id="timed_label" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <label for="time_label">Wybierz datę oraz godzinę o której ma wywołać się etykieta Intwerwencja</label>
+                    <input type="text" name="time_label" id="time_label" class="form-control default-date-time-picker-now">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="button" class="btn btn-success pull-right" id="time_label_ok" data-dismiss="modal">Ok</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 @section('scripts')
     <script src="{{ URL::asset('js/customSearchDataTable.js') }}"></script>
