@@ -50,6 +50,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\ConfirmSentPackagesJob::class)->dailyAt("23:34");
         $schedule->job(Jobs\AutomaticallyFinishOrdersJob::class)->dailyAt("18:00");
         $schedule->job(Jobs\ExecuteTimedLabels::class)->everyFiveMinutes();
+        $schedule->job(Jobs\ChangeDdpShipmentDatePackagesJob::class)->dailyAt("12:01");
     }
 
     /**

@@ -50,7 +50,10 @@ class ChangeWarehouseStockJob extends Job
                     continue;
                 }
 
-                if($productStockPosition->position_quantity <= $item->quantity) {
+                $isMoreThanOnePosition = $product->stock->position->count() > 1;
+                $hasPositionLessQuantityThanOrderQuantity = $productStockPosition < $item->quantity;
+
+                if($isMoreThanOnePosition && $hasPositionLessQuantityThanOrderQuantity) {
                     $errors[] = ['error' => 'quantity', 'product' => $product->id, 'productName' => $product->symbol, 'productStock' => $product->stock, 'position' => $productStockPosition];
                     continue;
                 }

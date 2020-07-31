@@ -32,6 +32,7 @@ class Label extends Model implements Transformable
     const CONSULTANT_MARK = 151;
     const SHIPPING_MARK = 152;
     const URGENT_INTERVENTION = 90;
+    const MASTER_MARK = 153;
 
     const CHAT_TYPE = 'chat';
     const PAYMENTS_IDS_FOR_TABLE = [119, 134, 120, 101, 99, 102];
