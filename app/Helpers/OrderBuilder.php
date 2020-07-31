@@ -242,7 +242,7 @@ class OrderBuilder
         Storage::disk('private')->put('files/' . $order->id . '/' . $random . '.' . $extension, $fileDecoded);
         $order->files()->create([
             'file_name' => $file['name'],
-            'hash' => $random
+            'hash' => $random . '.' . $extension
         ]);
     }
 

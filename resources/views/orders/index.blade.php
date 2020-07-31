@@ -1385,15 +1385,30 @@
                 },
                     @foreach($customColumnLabels as $labelGroupName => $label)
                 {
-                    data: 'labels',
+                    data: null,
                     name: 'label_{{str_replace(" ", "_", $labelGroupName)}}',
                     searchable: false,
                     orderable: false,
-                    render: function (labels, option, row) {
+                    render: function (order, option, row) {
+                        let labels = order.labels;
                         let html = '';
                         let currentLabelGroup = "{{ $labelGroupName }}";
                         if (row.closest_label_schedule_type_c && currentLabelGroup == "info dodatkowe") {
                             html += row.closest_label_schedule_type_c.trigger_time;
+                        }
+                        if (currentLabelGroup == "info dodatkowe") {
+                            let url = "{{ route('orders.getFile', ['id' => '%%', 'file_id' => 'QQ']) }}";
+                            let files = order.files;
+                            if (files.length > 0) {
+                                let orderUrl = url.replace('%%', order.orderId);
+                                files.forEach(function (file) {
+                                    let href = orderUrl.replace('QQ', file.hash);
+
+                                    html += `<a target="_blank" href="${href}" style="margin-top: 5px;">${file.file_name}</a>`;
+                                });
+                                html += '<br />'
+                                html += '<a href="#" class="remove__file"' + 'onclick="getFilesList(' + order.orderId + ')">Usuń</a>'
+                            }
                         }
                         labels.forEach(function (label) {
                             if (label.length > 0) {
@@ -2530,6 +2545,29 @@
             })
         }
 
+        function getFilesList(id) {
+            let url = "{{ route('orders.getFiles', ['id' => '%%']) }}"
+            $.ajax({
+                url: url.replace('%%', id)
+            }).done(function (data) {
+                $('#order_files_delete').modal('show');
+                if (data === null) {
+                    return;
+                }
+                $('#files__list').remove();
+                let parent = document.getElementById("files__container");
+                let filesSelect = document.createElement("SELECT");
+                filesSelect.id = "files__list";
+                parent.appendChild(filesSelect);
+                data.forEach((file) => {
+                    let option = document.createElement("option");
+                    option.value = file.id;
+                    option.text = file.file_name;
+                    filesSelect.appendChild(option);
+                })
+            })
+        }
+
         function moveDataAjax(id) {
             var idToSend = id;
             var buttonId = $('.btn-dark').attr('id');
@@ -2549,6 +2587,20 @@
             let invoiceId = $('#invoice__list option:selected').val();
             $.ajax({
                 url: '/admin/invoice/' + invoiceId + '/delete'
+            }).done(function (data) {
+                $('#invoice_delete_success').modal('show');
+
+                $('#invoice-delete-ok').on('click', function () {
+                    location.reload();
+                });
+            })
+        })
+
+        $('#remove-selected-file').on('click', () => {
+            let fileId = $('#files__list option:selected').val();
+            let url = "{{ route('orders.fileDelete', ['id' => '%%']) }}"
+            $.ajax({
+                url: url.replace('%%', fileId)
             }).done(function (data) {
                 $('#invoice_delete_success').modal('show');
 

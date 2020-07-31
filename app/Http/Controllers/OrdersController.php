@@ -9,6 +9,7 @@ use App\Entities\InvoiceRequest;
 use App\Entities\Label;
 use App\Entities\LabelGroup;
 use App\Entities\Order;
+use App\Entities\OrderFiles;
 use App\Entities\OrderInvoice;
 use App\Entities\OrderItem;
 use App\Entities\OrderPackage;
@@ -1868,6 +1869,7 @@ class OrdersController extends Controller
                     $q->where('order_id', '=', $orderId);
                 })
                 ->all();
+            $row->files = OrderFiles::where('order_id', $row->orderId)->get();
         }
 
         return [$collection, $count];
@@ -2485,6 +2487,24 @@ class OrdersController extends Controller
         }
 
         return response()->json($warehouse->users, 200);
+    }
+
+    public function getFile(int $id, string $file_id)
+    {
+        return Storage::disk('private')->download('files/' . $id . '/' . $file_id);
+    }
+
+    public function deleteFile(int $id)
+    {
+        $file = OrderFiles::find($id);
+        Storage::disk('private')->delete('files/' . $file->order_id . '/' . $file->hash);
+        $file->delete();
+        return \response('success');
+    }
+
+    public function getFiles(int $id)
+    {
+        return OrderFiles::where('order_id', $id)->get();
     }
 
     public function getUserInfo(int $id)
