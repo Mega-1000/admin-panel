@@ -339,7 +339,7 @@ class OrdersCourierJobs extends Job
             \Log::info(
                 'Problem in INPOST integration with validation', ['courier' => $package, 'class' => get_class($this), 'line' => __LINE__]
             );
-            die();
+            return;
         }
         $this->orderPackageRepository->update([
             'inpost_url' => $package->href,
@@ -350,17 +350,17 @@ class OrdersCourierJobs extends Job
         $package->letter_number = $href->tracking_number;
         $package->save();
         if ($href->status !== 'confirmed') {
-            die();
+            return;
         }
         $integration->getLabel($href->id, $href->tracking_number);
         $package->status = 'WAITING_FOR_SENDING';
         $package->save();
         if ($package->send_protocol == true) {
-            die();
+            return;
         }
         $path = storage_path('app/public/inpost/stickers/sticker' . $package->letter_number . '.pdf');
         if (is_null($path)) {
-            die();
+            return;
         }
         return [
             'status' => 200,
