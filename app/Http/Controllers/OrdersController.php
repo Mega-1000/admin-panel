@@ -2004,12 +2004,15 @@ class OrdersController extends Controller
         foreach ($packages as $package) {
             try {
                 list($message, $messages) = app(OrdersPackagesController::class)->sendPackage($package, $messages);
+                if(!empty($message)) {
+                    $messages [] =$message;
+                }
             } catch (\Exception $e) {
                 \Log::error('błąd przy nadawaniu hurtowym paczki', ['error' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
                 $messages [] = $e->getMessage();
             }
         }
-        return $message;
+        return $messages;
     }
 
     public function printAll(Request $request)
