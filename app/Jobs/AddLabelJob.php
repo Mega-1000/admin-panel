@@ -82,12 +82,15 @@ class AddLabelJob extends Job
             $alreadyHasLabel = $this->order->labels()->where('label_id', $labelId)->get();
 
             if($this->time !== false) {
-                DB::table('timed_labels')->insert([
+                $timedLabel = DB::table('timed_labels')->insert([
                     'execution_time' => $this->time,
                     'order_id' => $this->order->id,
                     'label_id' => $labelId,
                     'is_executed' => false
                 ]);
+
+                $removeLabelJob = (new RemoveLabelJob($this->order->id, [$labelId]))->delay($this->time);
+                $addLabelJob = (new AddLabelJob($this->order->id, [Label::URGENT_INTERVENTION]))->delay($this->time);
             }
 
             if (count($alreadyHasLabel) == 0) {
