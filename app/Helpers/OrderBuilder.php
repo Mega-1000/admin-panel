@@ -15,9 +15,13 @@ use App\Helpers\interfaces\iPostOrderAction;
 use App\Helpers\interfaces\iSumable;
 use Exception;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class OrderBuilder
 {
+
+    const VALID_EXTENSIONS = ['png', 'jpg', 'jpeg', 'pdf', 'tif', 'gif'];
 
     /**
      * @var iDividable
@@ -119,6 +123,10 @@ class OrderBuilder
 
         $order->save();
 
+        foreach ($data['files'] as $file) {
+            $this->attachFileToOrder($file, $order);
+        }
+
         if (!empty($data['customer_notices'])) {
             $helper = new MessagesHelper();
             $helper->orderId = $order->id;
@@ -195,6 +203,16 @@ class OrderBuilder
         }
     }
 
+    private static function getDefaultProduct()
+    {
+        $product = Product::getDefaultProduct();
+        if (!$product) {
+            throw new Exception('wrong_product_id');
+        }
+
+        return [['id' => $product->id, 'amount' => 1]];
+    }
+
     private static function assignEmployeeToOrder($order, $customer)
     {
         $orderCustomerOpenExists = Order::where('customer_id', $customer->id)
@@ -205,6 +223,27 @@ class OrderBuilder
         if (!empty($orderCustomerOpenExists)) {
             $order->employee_id = $orderCustomerOpenExists->employee_id;
         }
+    }
+
+    /**
+     * @param $file
+     * @param Order $order
+     */
+    protected function attachFileToOrder($file, Order $order)
+    {
+        $data = explode(',', $file['base64'])[1];
+        $fileDecoded = base64_decode($data);
+        $extension = explode('.', $file['name']);
+        $extension = end($extension);
+        if (!in_array($extension, self::VALID_EXTENSIONS)) {
+            return;
+        }
+        $random = Str::random(40);
+        Storage::disk('private')->put('files/' . $order->id . '/' . $random . '.' . $extension, $fileDecoded);
+        $order->files()->create([
+            'file_name' => $file['name'],
+            'hash' => $random
+        ]);
     }
 
     private function assignItemsToOrder($order, $items)
@@ -238,9 +277,9 @@ class OrderBuilder
                     $orderItem->$column = $oldPrices[$product->id][$column];
                 } else {
                     if ($column === "gross_selling_price_commercial_unit") {
-                       $orderItem->$column = $price->gross_price_of_packing;
+                        $orderItem->$column = $price->gross_price_of_packing;
                     } else {
-                       $orderItem->$column = $price->$column;
+                        $orderItem->$column = $price->$column;
                     }
                 }
             }
@@ -258,6 +297,32 @@ class OrderBuilder
         $order->total_price = $this->priceCalculator->getTotal();
         $order->weight = round($weight, 2);
         $order->save();
+    }
+
+    public static function getPriceColumns()
+    {
+        return [
+            'net_purchase_price_commercial_unit',
+            'net_purchase_price_basic_unit',
+            'net_purchase_price_calculated_unit',
+            'net_purchase_price_aggregate_unit',
+            'net_purchase_price_the_largest_unit',
+            'net_selling_price_commercial_unit',
+            'net_selling_price_basic_unit',
+            'net_selling_price_calculated_unit',
+            'net_selling_price_aggregate_unit',
+            'net_selling_price_the_largest_unit',
+            'gross_selling_price_commercial_unit',
+            'gross_selling_price_basic_unit',
+            'gross_selling_price_calculated_unit',
+            'gross_selling_price_aggregate_unit',
+            'gross_selling_price_the_largest_unit',
+            'net_purchase_price_commercial_unit_after_discounts',
+            'net_purchase_price_basic_unit_after_discounts',
+            'net_purchase_price_calculated_unit_after_discounts',
+            'net_purchase_price_aggregate_unit_after_discounts',
+            'net_purchase_price_the_largest_unit_after_discounts'
+        ];
     }
 
     public static function updateOrderAddress($order, $adressArray, $type, $phone, $relation, $login = '', $forceUpdateEmail = false, $forceUpdateCustomer = false)
@@ -325,41 +390,6 @@ class OrderBuilder
         }
 
         $obj->addresses()->save($address);
-    }
-
-    private static function getDefaultProduct()
-    {
-        $product = Product::getDefaultProduct();
-        if (!$product) {
-            throw new Exception('wrong_product_id');
-        }
-
-        return [['id' => $product->id, 'amount' => 1]];
-    }
-    public static function getPriceColumns()
-    {
-        return [
-            'net_purchase_price_commercial_unit',
-            'net_purchase_price_basic_unit',
-            'net_purchase_price_calculated_unit',
-            'net_purchase_price_aggregate_unit',
-            'net_purchase_price_the_largest_unit',
-            'net_selling_price_commercial_unit',
-            'net_selling_price_basic_unit',
-            'net_selling_price_calculated_unit',
-            'net_selling_price_aggregate_unit',
-            'net_selling_price_the_largest_unit',
-            'gross_selling_price_commercial_unit',
-            'gross_selling_price_basic_unit',
-            'gross_selling_price_calculated_unit',
-            'gross_selling_price_aggregate_unit',
-            'gross_selling_price_the_largest_unit',
-            'net_purchase_price_commercial_unit_after_discounts',
-            'net_purchase_price_basic_unit_after_discounts',
-            'net_purchase_price_calculated_unit_after_discounts',
-            'net_purchase_price_aggregate_unit_after_discounts',
-            'net_purchase_price_the_largest_unit_after_discounts'
-        ];
     }
 
 }

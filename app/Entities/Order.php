@@ -444,6 +444,14 @@ class Order extends Model implements Transformable
         return $this->belongsToMany(OrderInvoice::class, 'order_order_invoices', 'order_id', 'invoice_id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function files()
+    {
+        return $this->hasMany(OrderFiles::class);
+    }
+
     public function taskSchedule()
     {
         return $this->hasMany(Task::class);
