@@ -123,8 +123,10 @@ class OrderBuilder
 
         $order->save();
 
-        foreach ($data['files'] as $file) {
-            $this->attachFileToOrder($file, $order);
+        if (!empty($data['files'])) {
+            foreach ($data['files'] as $file) {
+                $this->attachFileToOrder($file, $order);
+            }
         }
 
         if (!empty($data['customer_notices'])) {
@@ -254,10 +256,10 @@ class OrderBuilder
         $oldPrices = [];
 
         foreach ($orderItems as $item) {
-            foreach (OrderBuilder::getPriceColumns() as $column) {
-                $oldPrices[$item->product_id][$column] = $item->$column;
-            }
+        foreach (OrderBuilder::getPriceColumns() as $column) {
+            $oldPrices[$item->product_id][$column] = $item->$column;
         }
+    }
 
         foreach ($items as $item) {
             $product = Product::find($item['id']);
