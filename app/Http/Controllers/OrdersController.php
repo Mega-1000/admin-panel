@@ -2003,7 +2003,7 @@ class OrdersController extends Controller
                 $messages [] = $e->getMessage();
             }
         }
-        return $messages;
+        return $message;
     }
 
     public function printAll(Request $request)
