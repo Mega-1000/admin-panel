@@ -80,6 +80,7 @@ class LabelsController extends Controller
             'status' => $request->input('status'),
             'icon_name' => $request->input('icon_name'),
             'message' => $request->input('message'),
+            'timed' => $request->has('isTimed'),
             'manual_label_selection_to_add_after_removal' => $request->input('manual_label_selection_to_add_after_removal') ?? 0,
         ]);
 
@@ -123,11 +124,13 @@ class LabelsController extends Controller
         $labelsToRemoveAfterAddition = $label->labelsToRemoveAfterAddition()->get();
         $labelsToRemoveAfterRemoval = $label->labelsToRemoveAfterRemoval()->get();
         $timedLabelsAfterAddition = $this->prepareTimedLabelsForFront($label->timedLabelsAfterAddition()->get());
+        $timedLabel = $label->timed;
 
         $labelsToAddAfterAdditionIds = $this->getArrayOfIds($labelsToAddAfterAddition);
         $labelsToAddAfterRemovalIds = $this->getArrayOfIds($labelsToAddAfterRemoval);
         $labelsToRemoveAfterAdditionIds = $this->getArrayOfIds($labelsToRemoveAfterAddition);
         $labelsToRemoveAfterRemovalIds = $this->getArrayOfIds($labelsToRemoveAfterRemoval);
+
         return view('labels.edit', compact(
             'label',
             'labelGroups',
@@ -136,7 +139,8 @@ class LabelsController extends Controller
             'labelsToAddAfterRemovalIds',
             'labelsToRemoveAfterAdditionIds',
             'labelsToRemoveAfterRemovalIds',
-            'timedLabelsAfterAddition'
+            'timedLabelsAfterAddition',
+            'timedLabel'
         ));
     }
 
@@ -162,6 +166,7 @@ class LabelsController extends Controller
             'status' => $request->input('status'),
             'icon_name' => $request->input('icon_name'),
             'message' => $request->input('message'),
+            'timed' => $request->has('isTimed'),
             'manual_label_selection_to_add_after_removal' => $request->input('manual_label_selection_to_add_after_removal') ?? 0,
         ],$id);
 

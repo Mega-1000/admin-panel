@@ -119,6 +119,12 @@
                     @endforeach
                 </select>
             </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="isTimed"
+                       {{ $timedLabel ? "checked" : "" }}
+                       name="isTimed">
+                <label for="isTimed" class="form-check-label">@lang('labels.form.timed')</label>
+            </div>
             <timed-labels-config :name="'timed_labels'"
                                  :labels="{{ json_encode($labels) }}"
                                  :existing-timed-labels="{{ json_encode($timedLabelsAfterAddition) }}"/>
