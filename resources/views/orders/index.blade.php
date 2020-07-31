@@ -728,7 +728,7 @@
             @foreach($groupedLabels as $groupName => $group)
                 <optgroup label="{{ $groupName }}">
                     @foreach($group as $label)
-                        <option value="{{ $label->id }}">{{ $label->name }}</option>
+                        <option value="{{ $label->id }}" data-timed="{{ $label->timed }}">{{ $label->name }}</option>
                     @endforeach
                 </optgroup>
             @endforeach
@@ -2478,6 +2478,8 @@
 
         function addLabel() {
             let chosenLabel = $("#choosen-label");
+            let timed = chosenLabel[0].selectedOptions[0].dataset.timed;
+
             if (chosenLabel.val() == "") {
                 alert("Nie wybrano etykiety");
                 return;
@@ -2494,13 +2496,34 @@
                 orderIds.push($(order).val());
             });
 
+            if(timed == 1) {
+                $('#timed_label').modal('show');
+                $('#time_label_ok').on('click', () => {
+                    addLabel(orderIds, chosenLabel, true)
+                })
+            } else {
+               addLabelAjax(orderIds, chosenLabel, false)
+            }
+        }
+
+        function addLabelAjax(orderIds, chosenLabel, timed = false) {
+            let data = '';
+            let url = "{{ route('orders.label-addition', ['labelId' => ':id'])}}"
+            url = url.replace(':id', chosenLabel.val());
+            let schedulerUrl = "{{ route('api.labels.get-labels-scheduler-await', ['userId' => ':id']) }}"
+            schedulerUrl = schedulerUrl.replace(':id', {{ Auth::id() }});
+            if(timed == false) {
+                data = {orderIds: orderIds, time: $('#time_label').val()};
+            } else {
+                data = {orderIds: orderIds}
+            }
             $.ajax({
-                url: "/admin/orders/label-addition/" + chosenLabel.val(),
+                url: url,
                 method: "POST",
-                data: {orderIds: orderIds}
+                data: data
             }).done(function () {
                 $.ajax({
-                    url: '/api/get-labels-scheduler-await/{{ Auth::id() }}'
+                    url: schedulerUrl
                 }).done(function (res) {
                     if (res.length) {
                         location.reload();
