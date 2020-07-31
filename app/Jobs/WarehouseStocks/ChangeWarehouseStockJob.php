@@ -50,9 +50,11 @@ class ChangeWarehouseStockJob extends Job
                     continue;
                 }
 
-                if($productStockPosition->position_quantity <= $item->quantity) {
-                    $errors[] = ['error' => 'quantity', 'product' => $product->id, 'productName' => $product->symbol, 'productStock' => $product->stock, 'position' => $productStockPosition];
-                    continue;
+                if(count($product->stock->position) > 1 && $productStockPosition < $item->quantity) {
+                    if($productStockPosition->position_quantity <= $item->quantity) {
+                        $errors[] = ['error' => 'quantity', 'product' => $product->id, 'productName' => $product->symbol, 'productStock' => $product->stock, 'position' => $productStockPosition];
+                        continue;
+                    }
                 }
 
                 $productStockLog = $product->stock->logs()->where('order_id', $this->orderId)->where('action', 'DELETE')->first();
