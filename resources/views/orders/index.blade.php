@@ -2484,39 +2484,39 @@
             if(timed == 1) {
                 $('#timed_label').modal('show');
                 $('#time_label_ok').on('click', () => {
-                    $.ajax({
-                        url: "/admin/orders/label-addition/" + chosenLabel.val(),
-                        method: "POST",
-                        data: {orderIds: orderIds, time: $('#time_label').val()}
-                    }).done(function () {
-                        $.ajax({
-                            url: '/api/get-labels-scheduler-await/{{ Auth::id() }}'
-                        }).done(function (res) {
-                            if (res.length) {
-                                location.reload();
-                            } else {
-                                table.ajax.reload(null, false);
-                            }
-                        });
-                    });
+                    addLabel(orderIds, chosenLabel, true)
                 })
             } else {
-                $.ajax({
-                    url: "/admin/orders/label-addition/" + chosenLabel.val(),
-                    method: "POST",
-                    data: {orderIds: orderIds}
-                }).done(function () {
-                    $.ajax({
-                        url: '/api/get-labels-scheduler-await/{{ Auth::id() }}'
-                    }).done(function (res) {
-                        if (res.length) {
-                            location.reload();
-                        } else {
-                            table.ajax.reload(null, false);
-                        }
-                    });
-                });
+               addLabelAjax(orderIds, chosenLabel, false)
             }
+        }
+
+        function addLabelAjax(orderIds, chosenLabel, timed = false) {
+            let data = '';
+            let url = "{{ route('orders.label-addition', ['labelId' => ':id'])}}"
+            url = url.replace(':id', chosenLabel.val());
+            let schedulerUrl = "{{ route('api.labels.get-labels-scheduler-await', ['userId' => ':id']) }}"
+            schedulerUrl = schedulerUrl.replace(':id', {{ Auth::id() }});
+            if(timed == false) {
+                data = {orderIds: orderIds, time: $('#time_label').val()};
+            } else {
+                data = {orderIds: orderIds}
+            }
+            $.ajax({
+                url: url,
+                method: "POST",
+                data: data
+            }).done(function () {
+                $.ajax({
+                    url: schedulerUrl
+                }).done(function (res) {
+                    if (res.length) {
+                        location.reload();
+                    } else {
+                        table.ajax.reload(null, false);
+                    }
+                });
+            });
         }
 
         function moveData(id) {
