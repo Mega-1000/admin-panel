@@ -140,14 +140,7 @@ class ProductStocksController extends Controller
         $data = $request->all();
         $collection = $this->prepareCollection($data);
 
-        $countFiltred = $this->countFiltered($data);
-
-        $count = $this->repository->all();
-
-        $count = count($count);
-
-
-        return DataTables::of($collection)->with(['recordsFiltered' => $countFiltred])->skipPaging()->setTotalRecords($count)->make(true);
+        return DataTables::of($collection[0])->with(['recordsFiltered' => $collection[1]])->skipPaging()->setTotalRecords($collection[1])->make(true);
 
     }
 
@@ -217,13 +210,8 @@ class ProductStocksController extends Controller
             }
         }
 
-
-
-//        if ($data['search']['value']) {
-//            foreach ($data['columns'] as $column) {
-//                $query->where($column['name'], 'LIKE', "%{$column['search']['value']}%");
-//            }
-//        }
+        $collectionCount = $query
+            ->count();
 
         $collection = $query
             ->limit($data['length'])->offset($data['start'])
@@ -234,57 +222,7 @@ class ProductStocksController extends Controller
         }
 
 
-        return $collection;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function countFiltered($data)
-    {
-        $query = \DB::table('product_stocks')
-            ->distinct()
-            ->select('*')
-            ->join('products', 'product_stocks.product_id', '=', 'products.id')
-            ->leftJoin('product_prices', 'product_stocks.product_id', '=', 'product_prices.product_id');
-
-
-        $notSearchable = [17, 19];
-
-        foreach ($data['columns'] as $column) {
-            if ($column['searchable'] == 'true' && !empty($column['search']['value'])) {
-                if (array_key_exists($column['name'], $notSearchable)) {
-
-                }  else {
-                    $query->where($column['name'], 'LIKE', "%{$column['search']['value']}%");
-                }
-            } else if ($column['name'] == 'quantity' && !empty($column['search']['value'])) {
-                switch ($column['search']['value']) {
-                    case "all":
-                        break;
-                    case "on_stock":
-                        $query->whereRaw('product_stocks.quantity <> ?', [0]);
-                        break;
-                    case "without-dash":
-                        $query->whereRaw('INSTR(`symbol`, "-") = 0');
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        if ($data['search']['value']) {
-            foreach ($data['columns'] as $column) {
-                $query->where($column['name'], 'LIKE', "%{$column['search']['value']}%");
-            }
-        }
-        $collection = $query
-            ->get();
-
-        $collection = $collection->count();
-
-        return $collection;
+        return [$collection, $collectionCount];
     }
 
     /**

@@ -256,6 +256,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orders/create', 'OrdersController@create')->name('orders.create');
         Route::get('orders/{id}/edit', 'OrdersController@edit')->name('orders.edit');
         Route::get('orders/{id}/edit/packages', 'OrdersController@editPackages')->name('orders.editPackages');
+        Route::get('orders/{id}/files/{file_id}', 'OrdersController@getFile')->name('orders.getFile');
+        Route::get('orders/files/delete/{file_id}', 'OrdersController@deleteFile')->name('orders.fileDelete');
         Route::post('orders/find-page/{id}', 'OrdersController@findPage')->name('orders.findPage');
         Route::delete('orders/{id}/', 'OrdersController@destroy')->name('orders.destroy');
         Route::put('orders/{id}/update', [
@@ -283,6 +285,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orders/getCosts', 'OrdersController@getCosts')->name('orders.getCosts');
         Route::post('orders/invoice/request', 'OrdersController@invoiceRequest')->name('orders.invoiceRequest');
         Route::get('orders/{id}/invoices', 'OrdersController@getInvoices')->name('orders.getInvoices');
+        Route::get('orders/{id}/files', 'OrdersController@getFiles')->name('orders.getFiles');
         Route::post('orders/allegro-payment', 'OrdersPaymentsController@payAllegro')->name('orders.allegroPayments');
         Route::post('orders/surplus/return', 'OrdersPaymentsController@returnSurplusPayment')->name('orders.returnSurplus');
 

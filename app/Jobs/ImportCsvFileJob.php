@@ -406,6 +406,7 @@ class ImportCsvFileJob implements ShouldQueue
             'numbers_of_basic_commercial_units_in_pack' => $line[73],
             'number_of_sale_units_in_the_pack' => $line[74],
             'number_of_trade_items_in_the_largest_unit' => $line[75],
+            'min_quantity' => $line[87],
             'weight_collective_unit' => floatval(str_replace(',', '.', $line[103])),
             'weight_trade_unit' => floatval(str_replace(',', '.', $line[100])),
             'weight_biggest_unit' => floatval(str_replace(',', '.', $line[104])),

@@ -25,6 +25,7 @@ class Order extends Model implements Transformable
     const COMMENT_SHIPPING_TYPE = 'shipping_comment';
     const COMMENT_WAREHOUSE_TYPE = 'warehouse_comment';
     const COMMENT_CONSULTANT_TYPE = 'consultant_comment';
+    const COMMENT_FINANCIAL_TYPE = 'financial_comment';
     public $customColumnsVisibilities = [
         'mark',
         'spedition_exchange_invoiced_selector',
@@ -40,6 +41,7 @@ class Order extends Model implements Transformable
         'symbol',
         'customer_notices',
         'consultant_notices',
+        'financial_comment',
         'clientPhone',
         'clientEmail',
         'clientFirstname',
@@ -440,6 +442,14 @@ class Order extends Model implements Transformable
     public function invoices()
     {
         return $this->belongsToMany(OrderInvoice::class, 'order_order_invoices', 'order_id', 'invoice_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function files()
+    {
+        return $this->hasMany(OrderFiles::class);
     }
 
     public function taskSchedule()
