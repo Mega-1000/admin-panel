@@ -109,6 +109,14 @@
                 <input type="checkbox" class="form-check-input" id="isTimed" name="isTimed">
                 <label for="isTimed" class="form-check-label">@lang('labels.form.timed')</label>
             </div>
+            <div class="form-group">
+                <label for="labels_after_time">@lang('labels.form.labels_after_time')</label>
+                <select multiple class="form-control text-uppercase" name="labels_after_time[]">
+                    @foreach($labels as $label)
+                        <option value="{{ $label->id }}">{{ $label->name }}</option>
+                    @endforeach
+                </select>
+            </div>
             <timed-labels-config :name="'timed_labels'" :labels="{{ json_encode($labels) }}"/>
         </div>
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>

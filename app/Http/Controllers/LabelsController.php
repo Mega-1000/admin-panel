@@ -85,6 +85,7 @@ class LabelsController extends Controller
         ]);
 
         $label->labelsToAddAfterAddition()->sync($request->input('labels_to_add_after_addition'));
+        $label->labelsToAddAfterTimedLabel()->sync($request->input('labels_after_time'));
         $label->labelsToAddAfterRemoval()->sync($request->input('labels_to_add_after_removal'));
         $label->labelsToRemoveAfterAddition()->sync($request->input('labels_to_remove_after_addition'));
         $label->labelsToRemoveAfterRemoval()->sync($request->input('labels_to_remove_after_removal'));
@@ -171,6 +172,7 @@ class LabelsController extends Controller
         ],$id);
 
         $label->labelsToAddAfterAddition()->sync($request->input('labels_to_add_after_addition'));
+        $label->labelsToAddAfterTimedLabel()->sync($request->input('labels_after_time'));
         $label->labelsToAddAfterRemoval()->sync($request->input('labels_to_add_after_removal'));
         $label->labelsToRemoveAfterAddition()->sync($request->input('labels_to_remove_after_addition'));
         $label->labelsToRemoveAfterRemoval()->sync($request->input('labels_to_remove_after_removal'));

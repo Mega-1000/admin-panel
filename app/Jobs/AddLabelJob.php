@@ -88,9 +88,16 @@ class AddLabelJob extends Job
                     'label_id' => $labelId,
                     'is_executed' => false
                 ]);
-
-                $removeLabelJob = (new RemoveLabelJob($this->order->id, [$labelId]))->delay($this->time);
-                $addLabelJob = (new AddLabelJob($this->order->id, [Label::URGENT_INTERVENTION]))->delay($this->time);
+                $labelsAfterTime = DB::table('label_labels_to_add_after_timed_label')->where('main_label_id', $labelId)->get();
+                if($labelsAfterTime->count() > 0) {
+                    $removeLabelJob = (new RemoveLabelJob($this->order->id, [$labelId]))->delay($this->time);
+                    foreach($labelsAfterTime as $labelAfterTime) {
+                        $addLabelJob = (new AddLabelJob($this->order->id, [$labelAfterTime->label_to_add_id]))->delay($this->time);
+                    }
+                } else {
+                    $removeLabelJob = (new RemoveLabelJob($this->order->id, [$labelId]))->delay($this->time);
+                    $addLabelJob = (new AddLabelJob($this->order->id, [Label::URGENT_INTERVENTION]))->delay($this->time);
+                }
             }
 
             if (count($alreadyHasLabel) == 0) {
