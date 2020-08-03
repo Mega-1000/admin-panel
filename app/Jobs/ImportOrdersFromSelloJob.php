@@ -128,6 +128,35 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         }
     }
 
+    /**
+     * @param $transaction
+     * @return array
+     */
+    private function createAddressArray($transaction): array
+    {
+        $transactionArray = [];
+        $transactionArray['customer_login'] = $transaction->customer->email->ce_email;
+        $transactionArray['update`_email'] = true;
+        $transactionArray['update_customer'] = true;
+        $transactionArray['customer_notices'] = empty($transaction->note) ? '' : $transaction->note->ne_Content;
+        $transactionArray = $this->setAdressArray($transaction, $transactionArray);
+        $transactionArray['is_standard'] = 1;
+        $transactionArray['rewrite'] = 0;
+        $transactionArray['nick_allegro'] = $transaction->customer->cs_Nick;
+        $phone = Helper::preparePhone($transaction->customer->phone->cp_Phone);
+        if (strpos($transactionArray['invoice_address']['email'], '+') === false) {
+            $transactionArray['invoice_address']['email'] = $transactionArray['delivery_address']['email'];
+        }
+        if (empty($phone)) {
+            $phone = Helper::preparePhone($transactionArray['delivery_address']['phone']);
+        }
+        if (empty($phone)) {
+            $phone = Helper::preparePhone($transactionArray['invoice_address']['phone']);
+        }
+        $transactionArray['phone'] = $phone;
+        return $transactionArray;
+    }
+
     private function setAdressArray($transaction, array $transactionArray): array
     {
         if ($transaction->deliveryAddress) {
@@ -151,53 +180,6 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $transactionArray['invoice_address']['email'] = $transaction->deliveryAddress->adr_Email;
         }
         return $transactionArray;
-    }
-
-    private function buildOrder($transaction, array $transactionArray, $products, $group, $taskPrimalId)
-    {
-        $calculator = new SelloPriceCalculator();
-
-        $calculator->setProductList($products);
-
-        $packageBuilder = new SelloPackageDivider();
-        $packageBuilder->setTransactionList($group);
-
-        $prices = [];
-        foreach ($products as $product) {
-            $prices[$product->id] = $product->price_override;
-        }
-
-        $priceOverrider = new OrderPriceOverrider($prices);
-
-        $transportPrice = new SelloTransportSumCalculator();
-        $transportPrice->setTransportPrice($transaction->tr_DeliveryCost);
-
-        $orderBuilder = new OrderBuilder();
-        $orderBuilder
-            ->setPackageGenerator($packageBuilder)
-            ->setPriceCalculator($calculator)
-            ->setPriceOverrider($priceOverrider)
-            ->setTotalTransportSumCalculator($transportPrice)
-            ->setUserSelector(new GetCustomerForSello());
-
-        ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($transactionArray);
-
-        $order = Order::find($id);
-        $order->sello_id = $transaction->id;
-        $user = User::where('name', '001')->first();
-        $order->employee()->associate($user);
-        $withWarehouse = $products->filter(function ($prod) {
-           return !empty($prod->packing->warehouse_physical);
-        });
-        $warehouseSymbol = $withWarehouse->first()->packing->warehouse_physical ?? self::DEFAULT_WAREHOUSE;
-        $warehouse = Warehouse::where('symbol', $warehouseSymbol)->first();
-        $order->warehouse()->associate($warehouse);
-
-        $order->save();
-        if ($transaction->tr_Paid) {
-            $this->createPaymentPromise($order, $transaction);
-            $this->setLabels($order, $taskPrimalId);
-        }
     }
 
     private function setAddressFromSelloAddr($address, $customer): array
@@ -245,55 +227,6 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         return array($name, $surname);
     }
 
-    private function createPaymentPromise(Order $order, $transaction)
-    {
-        $amount = $transaction->tr_Payment;
-        OrdersPaymentsController::payOrder($order->id, $amount,
-            null, 1,
-            null, Carbon::today()->addDay(7)->toDateTimeString());
-    }
-
-    private function setLabels($order, $taskPrimalId)
-    {
-        $preventionArray = [];
-        $order->labels()->attach(Label::FROM_SELLO);
-        dispatch_now(new RemoveLabelJob($order, [LabelsHelper::FINISH_LOGISTIC_LABEL_ID], $preventionArray, LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID));
-        dispatch_now(new RemoveLabelJob($order, [LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID], $preventionArray, []));
-        dispatch_now(new RemoveLabelJob($order, [LabelsHelper::WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID], $preventionArray, []));
-        if ($order->warehouse->id == Warehouse::OLAWA_WAREHOUSE_ID) {
-            dispatch_now(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::WAIT_FOR_WAREHOUSE_TO_ACCEPT]));
-            $order->createNewTask(5, $taskPrimalId);
-        } else {
-            dispatch_now(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::SEND_TO_WAREHOUSE_FOR_VALIDATION]));
-        }
-    }
-
-    /**
-     * @param $transaction
-     * @return array
-     */
-    private function createAddressArray($transaction): array
-    {
-        $transactionArray = [];
-        $transactionArray['customer_login'] = $transaction->customer->email->ce_email;
-        $transactionArray['update`_email'] = true;
-        $transactionArray['update_customer'] = true;
-        $transactionArray['customer_notices'] = empty($transaction->note) ? '' : $transaction->note->ne_Content;
-        $transactionArray = $this->setAdressArray($transaction, $transactionArray);
-        $transactionArray['is_standard'] = 1;
-        $transactionArray['rewrite'] = 0;
-        $transactionArray['nick_allegro'] = $transaction->customer->cs_Nick;
-        $phone = Helper::preparePhone($transaction->customer->phone->cp_Phone);
-        if (empty($phone)) {
-            $phone = Helper::preparePhone($transactionArray['delivery_address']['phone']);
-        }
-        if (empty($phone)) {
-            $phone = Helper::preparePhone($transactionArray['invoice_address']['phone']);
-        }
-        $transactionArray['phone'] = $phone;
-        return $transactionArray;
-    }
-
     /**
      * @param $transactionGroup
      * @param $tax
@@ -325,6 +258,76 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                 return $product;
             });
         return $products;
+    }
+
+    private function buildOrder($transaction, array $transactionArray, $products, $group, $taskPrimalId)
+    {
+        $calculator = new SelloPriceCalculator();
+
+        $calculator->setProductList($products);
+
+        $packageBuilder = new SelloPackageDivider();
+        $packageBuilder->setTransactionList($group);
+
+        $prices = [];
+        foreach ($products as $product) {
+            $prices[$product->id] = $product->price_override;
+        }
+
+        $priceOverrider = new OrderPriceOverrider($prices);
+
+        $transportPrice = new SelloTransportSumCalculator();
+        $transportPrice->setTransportPrice($transaction->tr_DeliveryCost);
+
+        $orderBuilder = new OrderBuilder();
+        $orderBuilder
+            ->setPackageGenerator($packageBuilder)
+            ->setPriceCalculator($calculator)
+            ->setPriceOverrider($priceOverrider)
+            ->setTotalTransportSumCalculator($transportPrice)
+            ->setUserSelector(new GetCustomerForSello());
+
+        ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($transactionArray);
+
+        $order = Order::find($id);
+        $order->sello_id = $transaction->id;
+        $user = User::where('name', '001')->first();
+        $order->employee()->associate($user);
+        $withWarehouse = $products->filter(function ($prod) {
+            return !empty($prod->packing->warehouse_physical);
+        });
+        $warehouseSymbol = $withWarehouse->first()->packing->warehouse_physical ?? self::DEFAULT_WAREHOUSE;
+        $warehouse = Warehouse::where('symbol', $warehouseSymbol)->first();
+        $order->warehouse()->associate($warehouse);
+
+        $order->save();
+        if ($transaction->tr_Paid) {
+            $this->createPaymentPromise($order, $transaction);
+            $this->setLabels($order, $taskPrimalId);
+        }
+    }
+
+    private function createPaymentPromise(Order $order, $transaction)
+    {
+        $amount = $transaction->tr_Payment;
+        OrdersPaymentsController::payOrder($order->id, $amount,
+            null, 1,
+            null, Carbon::today()->addDay(7)->toDateTimeString());
+    }
+
+    private function setLabels($order, $taskPrimalId)
+    {
+        $preventionArray = [];
+        $order->labels()->attach(Label::FROM_SELLO);
+        dispatch_now(new RemoveLabelJob($order, [LabelsHelper::FINISH_LOGISTIC_LABEL_ID], $preventionArray, LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID));
+        dispatch_now(new RemoveLabelJob($order, [LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID], $preventionArray, []));
+        dispatch_now(new RemoveLabelJob($order, [LabelsHelper::WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID], $preventionArray, []));
+        if ($order->warehouse->id == Warehouse::OLAWA_WAREHOUSE_ID) {
+            dispatch_now(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::WAIT_FOR_WAREHOUSE_TO_ACCEPT]));
+            $order->createNewTask(5, $taskPrimalId);
+        } else {
+            dispatch_now(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::SEND_TO_WAREHOUSE_FOR_VALIDATION]));
+        }
     }
 
 }
