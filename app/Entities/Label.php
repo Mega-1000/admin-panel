@@ -100,6 +100,14 @@ class Label extends Model implements Transformable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
+    public function labelsToAddAfterTimedLabel()
+    {
+        return $this->belongsToMany(Label::class, 'label_labels_to_add_after_timed_label', 'main_label_id', 'label_to_add_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
     public function labelsToAddAfterRemoval()
     {
         return $this->belongsToMany(Label::class, 'label_labels_to_add_after_removal', 'main_label_id', 'label_to_add_id');
