@@ -15,7 +15,7 @@
 
 .label-with-desc-pair {
     width: min-content;
-    margin: 5px;
+    padding: 5px;
 }
 
 .flex-container-labels {

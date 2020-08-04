@@ -2423,6 +2423,11 @@
                 .done(() => alert("dodano etykietę"))
                 .fail(() => alert("Nie udało się dodać etykiety"))
         });
+        $(".remove-label").click(event => {
+            event.preventDefault();
+            const labelId = event.currentTarget.getAttribute("data-label-id");
+            removeLabel(labelId);
+        });
 
         function sendComment(type) {
             $.post(

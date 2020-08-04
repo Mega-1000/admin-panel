@@ -1,47 +1,114 @@
 <div class="flex-container-labels">
-    <div class="label-with-desc-pair">
-        <label>
-            mas
-            <button title="{{ $labelsButtons[\App\Entities\Label::WAREHOUSE_MARK]->name}}"
-                    data-label-id="{{\App\Entities\Label::WAREHOUSE_MARK}}" class="add-label"><i
-                    style="color: {{ ($labelsButtons[\App\Entities\Label::WAREHOUSE_MARK])->color }};
-                        margin-top: 5px;"
-                    class="{{ $labelsButtons[\App\Entities\Label::WAREHOUSE_MARK]->icon_name }}"></i>
-            </button>
-        </label>
-    </div>
-    <div class="label-with-desc-pair">
-        <label>
-            kon
-            <button title="{{ $labelsButtons[\App\Entities\Label::SHIPPING_MARK]->name}}"
-                    data-label-id="{{\App\Entities\Label::SHIPPING_MARK}}" class="add-label"><i
-                    style="color: {{ ($labelsButtons[\App\Entities\Label::SHIPPING_MARK])->color }};
-                        margin-top: 5px;"
-                    class="{{ $labelsButtons[\App\Entities\Label::SHIPPING_MARK]->icon_name }}"></i>
-            </button>
-        </label>
-    </div>
-    <div class="label-with-desc-pair">
-        <label>
-            mag
-            <button title="{{ $labelsButtons[\App\Entities\Label::CONSULTANT_MARK]->name}}"
-                    data-label-id="{{\App\Entities\Label::CONSULTANT_MARK}}" class="add-label"><i
-                    style="color: {{ ($labelsButtons[\App\Entities\Label::CONSULTANT_MARK])->color }};
-                        margin-top: 5px;"
-                    class="{{ $labelsButtons[\App\Entities\Label::CONSULTANT_MARK]->icon_name }}"></i>
-            </button>
-        </label>
-    </div>
-    <div class="label-with-desc-pair">
-        <label>
-            fin
-            <button title="{{ $labelsButtons[\App\Entities\Label::MASTER_MARK]->name}}"
-                    data-label-id="{{\App\Entities\Label::MASTER_MARK}}" class="add-label"><i
-                    style="color: {{ ($labelsButtons[\App\Entities\Label::MASTER_MARK])->color }};
-                        margin-top: 5px;"
-                    class="{{ $labelsButtons[\App\Entities\Label::MASTER_MARK]->icon_name }}"></i>
-            </button>
-        </label>
+    <div class="col-md-4">
+        <p class="text-center">Dodaj etykiety</p>
+        <div class="row">
+
+            <div class="col-md-1 label-with-desc-pair">
+                <label>
+                    mas
+                </label>
+                <button title="{{ $labelsButtons[\App\Entities\Label::WAREHOUSE_MARK]->name}}"
+                        data-label-id="{{\App\Entities\Label::WAREHOUSE_MARK}}" class="add-label"><i
+                        style="color: {{ ($labelsButtons[\App\Entities\Label::WAREHOUSE_MARK])->color }};
+                            margin-top: 5px;"
+                        class="{{ $labelsButtons[\App\Entities\Label::WAREHOUSE_MARK]->icon_name }}"></i>
+                </button>
+            </div>
+            <div class="col-md-1 label-with-desc-pair">
+                <label>
+                    kon
+                </label>
+                <button title="{{ $labelsButtons[\App\Entities\Label::SHIPPING_MARK]->name}}"
+                        data-label-id="{{\App\Entities\Label::SHIPPING_MARK}}" class="add-label"><i
+                        style="color: {{ ($labelsButtons[\App\Entities\Label::SHIPPING_MARK])->color }};
+                            margin-top: 5px;"
+                        class="{{ $labelsButtons[\App\Entities\Label::SHIPPING_MARK]->icon_name }}"></i>
+                </button>
+            </div>
+            <div class="col-md-1 label-with-desc-pair">
+                <label>
+                    mag
+                </label>
+                <button title="{{ $labelsButtons[\App\Entities\Label::CONSULTANT_MARK]->name}}"
+                        data-label-id="{{\App\Entities\Label::CONSULTANT_MARK}}" class="add-label"><i
+                        style="color: {{ ($labelsButtons[\App\Entities\Label::CONSULTANT_MARK])->color }};
+                            margin-top: 5px;"
+                        class="{{ $labelsButtons[\App\Entities\Label::CONSULTANT_MARK]->icon_name }}"></i>
+                </button>
+            </div>
+            <div class="col-md-1 label-with-desc-pair">
+                <label>
+                    fin
+                </label>
+                <button title="{{ $labelsButtons[\App\Entities\Label::MASTER_MARK]->name}}"
+                        data-label-id="{{\App\Entities\Label::MASTER_MARK}}" class="add-label"><i
+                        style="color: {{ ($labelsButtons[\App\Entities\Label::MASTER_MARK])->color }};
+                            margin-top: 5px;"
+                        class="{{ $labelsButtons[\App\Entities\Label::MASTER_MARK]->icon_name }}"></i>
+                </button>
+            </div>
+        </div>
     </div>
     <label for="warehouse_notice">{{ $title }}</label>
+    <div class="col-md-4">
+        <p class="text-center">Usuń etykiety</p>
+        <div class="row">
+
+            @if($order->labels->firstWhere('id', \App\Entities\Label::WAREHOUSE_MARK))
+                <div class="col-md-1 label-with-desc-pair">
+                    <label>
+                        mas
+                    </label>
+                    <button title="{{ $labelsButtons[\App\Entities\Label::WAREHOUSE_MARK]->name}}"
+                            data-label-id="{{\App\Entities\Label::WAREHOUSE_MARK}}" class="remove-label"><i
+                            style="color: {{ ($labelsButtons[\App\Entities\Label::WAREHOUSE_MARK])->color }};
+                                margin-top: 5px;"
+                            class="{{ $labelsButtons[\App\Entities\Label::WAREHOUSE_MARK]->icon_name }}"></i>
+                    </button>
+                </div>
+            @endif
+            @if($order->labels->firstWhere('id', \App\Entities\Label::SHIPPING_MARK))
+
+                <div class="col-md-1 label-with-desc-pair">
+                    <label>
+                        kon
+                    </label>
+                    <button title="{{ $labelsButtons[\App\Entities\Label::SHIPPING_MARK]->name}}"
+                            data-label-id="{{\App\Entities\Label::SHIPPING_MARK}}" class="remove-label"><i
+                            style="color: {{ ($labelsButtons[\App\Entities\Label::SHIPPING_MARK])->color }};
+                                margin-top: 5px;"
+                            class="{{ $labelsButtons[\App\Entities\Label::SHIPPING_MARK]->icon_name }}"></i>
+                    </button>
+                </div>
+            @endif
+            @if($order->labels->firstWhere('id', \App\Entities\Label::CONSULTANT_MARK))
+
+                <div class="col-md-1 label-with-desc-pair">
+                    <label>
+                        mag
+                    </label>
+                    <button title="{{ $labelsButtons[\App\Entities\Label::CONSULTANT_MARK]->name}}"
+                            data-label-id="{{\App\Entities\Label::CONSULTANT_MARK}}" class="remove-label"><i
+                            style="color: {{ ($labelsButtons[\App\Entities\Label::CONSULTANT_MARK])->color }};
+                                margin-top: 5px;"
+                            class="{{ $labelsButtons[\App\Entities\Label::CONSULTANT_MARK]->icon_name }}"></i>
+                    </button>
+                </div>
+            @endif
+            @if($order->labels->firstWhere('id', \App\Entities\Label::MASTER_MARK))
+
+                <div class="col-md-1 label-with-desc-pair">
+                    <label>
+                        fin
+                    </label>
+                    <button title="{{ $labelsButtons[\App\Entities\Label::MASTER_MARK]->name}}"
+                            data-label-id="{{\App\Entities\Label::MASTER_MARK}}" class="remove-label"><i
+                            style="color: {{ ($labelsButtons[\App\Entities\Label::MASTER_MARK])->color }};
+                                margin-top: 5px;"
+                            class="{{ $labelsButtons[\App\Entities\Label::MASTER_MARK]->icon_name }}"></i>
+                    </button>
+                </div>
+            @endif
+        </div>
+    </div>
 </div>
