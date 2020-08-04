@@ -23,6 +23,7 @@ use App\Entities\Warehouse;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Helpers\LabelsHelper;
+use App\Helpers\OrderBuilder;
 use App\Helpers\OrderCalcHelper;
 use App\Helpers\OrdersHelper;
 use App\Http\Requests\NoticesRequest;
@@ -2496,6 +2497,36 @@ class OrdersController extends Controller
         }
 
         return response()->json($warehouse->users, 200);
+    }
+
+    public function addFile(Request $request, $id)
+    {
+        $order = Order::find($id);
+        if (empty($order)) {
+            return redirect()->back()->with([
+                'message' => __('orders.order_not_found'),
+                'alert-type' => 'error'
+            ]);
+        }
+        $file = $request->file('file');
+        $extension = explode('.', $file->getClientOriginalName());
+        $extension = end($extension);
+        if (!in_array($extension, OrderBuilder::VALID_EXTENSIONS)) {
+            return redirect()->back()->with([
+                'message' => __('orders.files.wrong_type_error'),
+                'alert-type' => 'error'
+            ]);
+        }
+        $random = Str::random(40);
+        Storage::disk('private')->put('files/' . $order->id . '/' . $random . '.' . $extension, $file->get());
+        $order->files()->create([
+            'file_name' => $file->getClientOriginalName(),
+            'hash' => $random . '.' . $extension
+        ]);
+        return redirect()->back()->with([
+            'message' => __('voyager.media.success_uploaded_file'),
+            'alert-type' => 'success'
+        ]);
     }
 
     public function getFile(int $id, string $file_id)

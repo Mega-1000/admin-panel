@@ -182,6 +182,33 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" tabindex="-1" id="add-new-file" role="dialog">
+        <div class="modal-dialog" id="modalDialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="titleModal">Dodaj nowy plik:</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="addNewFileToOrder"
+                          method="POST" enctype="multipart/form-data">
+                        {{ csrf_field() }}
+                        Plik:
+                        <br/>
+                        <input accept=".pdf,image/*" type="file" name="file"/>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" form="addNewFileToOrder" class="btn btn-success pull-right">Wyślij
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" tabindex="-1" id="upload-allegro-payments" role="dialog">
         <div class="modal-dialog" id="modalDialog">
             <div class="modal-content">
@@ -1397,6 +1424,21 @@
                             html += row.closest_label_schedule_type_c.trigger_time;
                         }
                         if (currentLabelGroup == "info dodatkowe") {
+                            html += '<a href="#" class="add__file"' + 'onclick="addNewFile(' + order.orderId + ')">Dodaj</a>'
+                            let url = "{{ route('orders.getFile', ['id' => '%%', 'file_id' => 'QQ']) }}";
+                            let files = order.files;
+                            if (files.length > 0) {
+                                let orderUrl = url.replace('%%', order.orderId);
+                                files.forEach(function (file) {
+                                    let href = orderUrl.replace('QQ', file.hash);
+
+                                    html += `<a target="_blank" href="${href}" style="margin-top: 5px;">${file.file_name}</a>`;
+                                });
+                                html += '<br />'
+                                html += '<a href="#" class="remove__file"' + 'onclick="getFilesList(' + order.orderId + ')">Usuń</a>'
+                            }
+                        }
+                        if (currentLabelGroup == "info dodatkowe") {
                             let url = "{{ route('orders.getFile', ['id' => '%%', 'file_id' => 'QQ']) }}";
                             let files = order.files;
                             if (files.length > 0) {
@@ -2566,6 +2608,11 @@
                     invoiceSelect.appendChild(option);
                 })
             })
+        }
+        function addNewFile(id) {
+            let url = "{{ route('orders.fileAdd', ['id' => '%%']) }}"
+            $('#addNewFileToOrder').attr('action', url.replace('%%', id));
+            $('#add-new-file').modal('show');
         }
 
         function getFilesList(id) {

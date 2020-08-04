@@ -142,5 +142,8 @@ return [
         'initial_delivery_date_con_mag' => 'Wstępna data i przybliżona godzina dostawy towaru wskazana przez magazyn bądź konsultanta',
         'confirmed_delivery_date' => 'Potwierdzona data i przybliżona godzina dostawy',
     ],
-
+    'files'=> [
+        'wrong_type_error' => 'Zły format pliku',
+    ],
+    'order_not_found' => 'Nie znaleziono zamówienia',
 ];
