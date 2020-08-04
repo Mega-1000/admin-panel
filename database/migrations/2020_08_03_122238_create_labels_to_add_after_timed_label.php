@@ -30,6 +30,6 @@ class CreateLabelsToAddAfterTimedLabel extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('labels_to_add_after_timed_label');
+        Schema::dropIfExists('label_labels_to_add_after_timed_label');
     }
 }
