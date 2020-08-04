@@ -145,5 +145,6 @@ return [
     'files'=> [
         'wrong_type_error' => 'Zły format pliku',
     ],
+    'wrong_template_error' => 'Zły szablon paczki',
     'order_not_found' => 'Nie znaleziono zamówienia',
 ];

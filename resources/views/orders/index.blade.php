@@ -4,98 +4,40 @@
     <h1 class="page-title">
         <i class="voyager-window-list"></i> @lang('orders.title')
     </h1>
-    <style>
-        #stock_modal_dialog {
-            width: 800px;
-        }
-        .modal__product {
-            color: red;
-        }
-        #dateTask {
-            -webkit-border-radius: 0px !important;
-            -moz-border-radius: 0px !important;
-            border-radius: 0px !important;
-        }
-
-        .pointer {
-            cursor: pointer;
-        }
-
-        .ui-tooltip {
-            width: 700px !important;
-            max-width: 700px !important;
-        }
-
-        .order-label {
-            padding-top: 5px;
-            padding-bottom: 5px;
-        }
-
-        .order-label i {
-            font-size: 1.5rem
-        }
-
-        #filterByWarehouseMegaOlawa {
-            position: absolute;
-            top: 33px;
-            right: 5px;
-        }
-
-        #btn-print:hover {
-            background-color: #2ecc71;
-            color: #FFF;
-        }
-
-        .input_div__label-search {
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-        }
-
-        .spedition-exchange-generated-link {
-            margin-left: 10px;
-            display: inline-block;
-        }
-
-        .transport-exchange {
-            border: 1px solid #d0d0d0;
-            padding: 5px;
-        }
-
-        .transport-exchange-offer {
-            cursor: pointer;
-        }
-
-        .transport-exchange-offer:not(:last-child) {
-            border-bottom: 1px solid #8f8f8f;
-        }
-
-        .transport-exchange__spedition-chosen {
-            background-color: rgba(0, 192, 22, 0.65);
-        }
-
-        .btn.btn-xs {
-            padding: 2px 10px;
-            font-size: 12px;
-            display: inline-block;
-            margin-right: 2px;
-        }
-
-        .btn.btn-xs:last-child {
-            margin-right: 0;
-        }
-
-        .modal-content {
-            border: 1px solid #000;
-        }
-
-        #packages_errors {
-            color: red;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ URL::asset('css/views/orders/index.css') }}">
 @endsection
 
 @section('table')
+    <div class="modal fade" tabindex="-1" id="print-package-group" role="dialog">
+        <div class="modal-dialog" id="modalDialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="titleModal"></h4>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" id="print-package-form" action="{{ route('orders.findPackage') }}">
+                        @csrf()
+                        <select name="user_id" required class="form-control">
+                            <option value="" selected="selected">wybierz użytkownika</option>
+                            @foreach($users as $user)
+                                <option
+                                    value="{{$user->id}}">{{$user->name}} {{$user->firstname}} {{$user->lastname}}</option>
+                            @endforeach
+                        </select>
+                        <input name="package_type" id="print-package-type" type="hidden">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" form="print-package-form" class="btn btn-success pull-right">Wyślij
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" tabindex="-1" id="magazine" role="dialog">
         <div class="modal-dialog" id="modalDialog">
             <div class="modal-content">
@@ -492,320 +434,7 @@
             </div>
         </div>
     </div>
-    <div style="display: flex; align-items: center;" id="add-label-container">
-        <button class="btn btn-warning" onclick="clearFilters()">Wyszczyść filtry</button>
-        <button id="showTable" class="btn btn-warning" style="margin-left: 5px">Pokaż Tabelkę z Etykietami Pracownika
-        </button>
-        <div class="col-md-12 hidden" style="float: right" id="labelTable">
-            <table width="50%" style="float:right;" border="1">
-                <tr>
-                    <th colspan="1" width="10%"></th>
-                    <th colspan="1" width="10%">Pracownik</th>
-                    <th colspan="1" width="5%">Przedawnienia</th>
-                    <th colspan="{{count($labIds['payments'])}}" width="17,5%" style="text-align: center">Płatności</th>
-                    <th colspan="{{count($labIds['production'])}}" width="15%" style="text-align: center">Produkcja</th>
-                    <th colspan="{{count($labIds['transport'])}}" width="17,5%" style="text-align: center">Transport
-                    </th>
-                    <th colspan="{{count($labIds['info'])}}" width="20%" style="text-align: center">Info Dodatkowe</th>
-                    <th colspan="{{count($labIds['invoice'])}}" width="5%" style="text-align: center">Faktury Zakupu
-                    </th>
-                </tr>
-                <tr>
-                    <th>Ikona Etykiety</th>
-                    <th></th>
-                    <th></th>
-                    @foreach ($labIds as $labIdGroup)
-                        @foreach ($labIdGroup as $labId)
-                            @foreach ($labels as $label)
-                                @if ($labId == $label->id)
-                                    <th scope="col">
-                                        <div style="width:40px;" align="center">
-                                            <span title="{{$label->name}}">
-                                            <i style="font-size: 2.5rem; color: {{$label->color}}"
-                                               class="{{$label->icon_name}}"></i>
-                                        </div>
-                                    </th>
-                                @endif
-                            @endforeach
-                        @endforeach
-                    @endforeach
-                </tr>
-                @foreach ($outs as $out)
-                    @if (!empty($out['user']->orders[0]))
-                        <tr>
-                            <th style="text-align: center">{{$out['user']->id}}</th>
-                            <th>{{$out['user']->firstname}} {{$out['user']->lastname}}</th>
-                            <th>{{$out['outdated']}}</th>
-                            @foreach ($labIds as $labIdGroup)
-                                @foreach ($labIdGroup as $labId)
-                                    <td style="text-align: center">{{$out[$labId] ?? 0}}</td>
-                                @endforeach
-                            @endforeach
-                        </tr>
-                    @endif
-                @endforeach
-            </table>
-        </div>
-    </div>
-    <div style="display: flex; align-items: center;" id="add-label-container">
-        <input type="hidden" id="spedition-exchange-selected-items" value="[]">
-        <button class="btn btn-secondary" onclick="gerateSpeditionExchangeLink()">Giełda spedycyjna (generuj link)
-        </button>
-        <div class="spedition-exchange-generated-link"></div>
-    </div>
-    <div style="display: flex; align-items: center;" id="add-label-container">
-        <a name="actualization-price" target="_blank" class="btn btn-success" href="/admin/actualizationPrice">Wyślij
-            prośbę o aktualizację cen</a>
-    </div>
-    <form method="POST" action="{{ route('order_packages.getProtocols') }}">
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-        <div class="form-group">
-            {{csrf_field()}}
-            <label for="protocols">Protokoły z dnia</label>
-            <input name="date_from" class="protocol_datepicker" id="protocol_datepicker_from"
-                   value="{{ Carbon\Carbon::now()->format('d/m/yy') }}"/>
-            do dnia
-            <input name="date_to" class="protocol_datepicker" id="protocol_datepicker_to"
-                   value="{{ Carbon\Carbon::now()->format('d/m/yy') }}"/>
-            z magazynu:
-            <input type="text" id="delivery_warehouse" name="delivery_warehouse"
-                   value="MEGA-OLAWA"/>
-            <input type="submit" name="courier" value="Inpost" target="_blank" class="btn btn-success"/>
-            <input type="submit" name="courier" value="Dpd" target="_blank" class="btn btn-success"/>
-            <input type="submit" name="courier" value="Pocztex" target="_blank" class="btn btn-success"/>
-            <input type="submit" name="courier" value="Apaczka" target="_blank" class="btn btn-success"/>
-            <input type="submit" name="courier" value="Jas" target="_blank" class="btn btn-success"/>
-            <input type="submit" name="courier" value="Gielda" target="_blank" class="btn btn-success">
-            <input type="submit" name="courier" value="Gls" target="_blank" class="btn btn-success"/>
-            <input type="submit" name="courier" value="Wszystkie" target="_blank" class="btn btn-info"/>
-        </div>
-    </form>
-    <div class="form-group">
-        <label for="send_courier">Wyślij kurierów: </label>
-        <button name="send_courier" class="send_courier_class btn btn-success"
-                href="/admin/orderPackages/INPOST/send">Inpost
-        </button>
-        <button name="send_courier" class="send_courier_class btn btn-success"
-                href="/admin/orderPackages/DPD/send">DPD
-        </button>
-        <button name="send_courier" class="send_courier_class btn btn-success"
-                href="/admin/orderPackages/POCZTEX/send">Pocztex
-        </button>
-        <button name="send_courier" class="send_courier_class btn btn-success"
-                href="/admin/orderPackages/APACZKA/send">Apaczka
-        </button>
-        <button name="send_courier" class="send_courier_class btn btn-success"
-                href="/admin/orderPackages/JAS/send">Jas
-        </button>
-        <button name="send_courier" class="send_courier_class btn btn-success"
-                href="/admin/orderPackages/GLS/send">GLS
-        </button>
-        <button name="send_courier" class="send_courier_class btn btn-info"
-                href="/admin/orderPackages/ALL/send">Wyślij wszystkie
-        </button>
-        <button name="send_courier" class="send_courier_class btn btn-danger"
-                id="filtered-packages">Wyślij przefiltrowane
-        </button>
-    </div>
-    <div id="packages_errors" class="form-group">
-    </div>
-    <div class="form-group">
-        <label for="package_template">Szablony paczek:</label>
-        <a name="package_template" class="btn btn-success" href="/admin/packageTemplates/">Lista Szablonów</a>
-        <a name="package_template" class="btn btn-info" href="/admin/packageTemplates/create">Dodaj szablon</a>
-        <label style="margin-left: 20px" for="container_type">Rodzaje przesyłek:</label>
-        <a style="margin-left: 5px" name="container_type" class="btn btn-success" href="/admin/containerTypes/">Lista
-            rodzajów przesyłek</a>
-        <a name="container_type" class="btn btn-info" href="/admin/containerTypes/create">Dodaj rodzaj przesyłki</a>
-    </div>
-    <div>
-        <label for="content_type">Typy zawartości przesyłek:</label>
-        <a name="content_type" class="btn btn-success" href="/admin/contentTypes/">Lista Typów zawartości przesyłek</a>
-        <a name="content_type" class="btn btn-info" href="/admin/contentTypes/create">Dodaj typ zawartości przesyłki</a>
-        <label style="margin-left: 20px" for="packing_type">Typy opakowań przesyłek:</label>
-        <a style="margin-left: 5px" name="packing_type" class="btn btn-success" href="/admin/packingTypes/">Lista Typów
-            opakowań przesyłek</a>
-        <a name="packing_type" class="btn btn-info" href="/admin/packingTypes/create">Dodaj typ opakowania przesyłki</a>
-    </div>
-    <br>
-    <div class="form-group">
-        <label for="import_sello">Import z SELLO: </label>
-        <a name="import_sello" class="btn btn-success" href="{{ route('orders.sello_import') }}">Importuj</a>
-        <label for="send_labels_allegro">Wyślij numery naklejek do allegro: </label>
-        <a name="send_labels_allegro" class="btn btn-success" href="{{ route('orders.send_tracking_numbers') }}">Wyślij
-            numery</a>
-
-
-    </div>
-    <div class="form-group">
-        <label for="print_courier">Drukuj naklejki: </label>
-        @foreach($couriers as $courier)
-            <a name="print_courier" class="btn btn-success"
-               href="{{route('order_packages.letters',['courier_name'=>$courier->delivery_courier_name])}}">
-                {{$courier->delivery_courier_name}}</a>
-        @endforeach
-    </div>
-    <div class="form-group">
-        Import cen paczek.
-        <label for="deliverers">Lista dostawców: </label>
-        <a name="deliverers" class="btn btn-success" href="{{ route('transportPayment.list') }}">Dostawcy</a>
-        <label for="import_packages_payment">Wczytaj płatności dla paczek:</label>
-        <a name="import_packages_payment" class="btn btn-success" onclick="$('#upload-payments').modal('show')">Wyślij
-            numery</a>
-        @if(!empty(session('update_errors')))
-            @foreach(session('update_errors') as $error)
-                <table class="table table-bordered table-striped">
-                    <thead>
-                    <tr>
-                        <th>
-                            Nie znaleziono paczki o liście nr:
-                        </th>
-                        <th>
-                            Brak kosztów dla paczki nr:
-                        </th>
-                        <th>
-                            Inny błąd:
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @php
-                        $type1 = session('update_errors')[1] ?? [];
-                        $type2 = session('update_errors')[2] ?? [];
-                        $typeOther = session('update_errors')['other'] ?? [];
-
-                        $length = max([count($type1), count($type2), count($typeOther)]);
-                    @endphp
-                    @for ($i = 0; $i < $length; $i++)
-                        <tr>
-                            <td>{!! isset($type1[$i]) ? $type1[$i] : '' !!}</td>
-                            <td>{!! isset($type2[$i]) ? $type2[$i] : '' !!}</td>
-                            <td>{!! isset($typeOther[$i]) ? $typeOther[$i] : '' !!}</td>
-                        </tr>
-                    @endfor
-                    </tbody>
-                </table>
-            @endforeach
-        @endif
-    </div>
-    <div class="form-group">
-        <label for="upload-allegro-pays">Aktualizuj płatności allegro: </label>
-        <a name="print_orders" class="btn btn-success"
-           onclick="$('#upload-allegro-payments').modal('show')">Aktualizuj</a>
-        @if(!empty(session('allegro_payments_errors')))
-            <table class="table table-bordered table-striped">
-                <thead>
-                <tr>
-                    <th>
-                        W tabeli importu sello nie istnieje transakcja o id:
-                    </th>
-                    <th>
-                        Nie zaimportowano zlecenia z systemu sello do mega1000:
-                    </th>
-                    <th>
-                        Transakcja została już wcześniej opłacona:
-                    </th>
-                    <th>
-                        Brak poprawnej kwoty obietnicy wpłaty. Proszę sprawdzić czy kwota obietnicy wpłaty się zgadza.
-                    </th>
-                    <th>
-                        Inne błędy:
-                    </th>
-                </tr>
-                </thead>
-                <tbody>
-                @php
-                    $type1 = session('allegro_payments_errors')[1] ?? [];
-                    $type2 = session('allegro_payments_errors')[2] ?? [];
-                    $type3 = session('allegro_payments_errors')[3] ?? [];
-                    $type4 = session('allegro_payments_errors')[4] ?? [];
-                    $typeOther = session('allegro_payments_errors')['other'] ?? [];
-
-                    $length = max([count($type1), count($type2), count($type3), count($type4), count($typeOther)]);
-                @endphp
-                @for ($i = 0; $i < $length; $i++)
-                    <tr>
-                        <td>{!! isset($type1[$i]) ? $type1[$i] : '' !!}</td>
-                        <td>{!! isset($type2[$i]) ? $type2[$i] : '' !!}</td>
-                        <td>{!! isset($type3[$i]) ? $type3[$i] : '' !!}</td>
-                        <td>{!! isset($type4[$i]) ? $type4[$i] : '' !!}</td>
-                        <td>{!! isset($typeOther[$i]) ? $typeOther[$i] : '' !!}</td>
-                    </tr>
-                @endfor
-                </tbody>
-            </table>
-        @endif
-    </div>
-    <div class="form-group">
-        <label for="print_orders">Drukuj zamówienia widoczne na stronie: </label>
-        <a name="print_orders" class="btn btn-success" onclick="printAll()">Drukuj wszystkie</a>
-    </div>
-    <div style="display: flex; align-items: center;" id="add-label-container">
-        <button onclick="addLabel()" type="button" class="btn btn-primary">@lang('orders.table.save_label')</button>
-        <select style="margin-left: 10px;" class="form-control text-uppercase" id="choosen-label">
-            <option value="" selected="selected">@lang('orders.table.choose_label')</option>
-            @foreach($groupedLabels as $groupName => $group)
-                <optgroup label="{{ $groupName }}">
-                    @foreach($group as $label)
-                        <option value="{{ $label->id }}" data-timed="{{ $label->timed }}">{{ $label->name }}</option>
-                    @endforeach
-                </optgroup>
-            @endforeach
-        </select>
-    </div>
-    <div style="display: flex; align-items: center;" id="add-label-container">
-        <button class="btn btn-text">Filtr zamówień</button>
-        <select style="margin-left: 10px;" class="form-control text-uppercase orderFilter" id="orderFilter">
-            <option value="ALL">Wszystkie</option>
-            <option value="PENDING">Wszystkie zlecenia wyłączając bez realizacji oraz zakończone</option>
-            <option value="WITHOUT_REALIZATION">Bez realizacji</option>
-            <option value="COMPLETED">Oferta zakończona</option>
-        </select>
-    </div>
-    <div class="form-row">
-        <div class="col-md-3 mb-3">
-            <div class="form-group">
-                <label for="searchLP">Szukaj po LP</label>
-                <input type="search" class="form-control" name="searchLP" id="searchLP">
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="form-group">
-                <label for="searchOrderValue">Szukaj po Wartości zamówienia</label>
-                <input type="search" class="form-control" name="searchOrderValue" id="searchOrderValue">
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="form-group">
-                <label for="searchPayment">Szukaj po Zaliczce</label>
-                <input type="search" class="form-control" name="searchPayment" id="searchPayment">
-            </div>
-        </div>
-        <div class="col-md-3 mb-3">
-            <div class="form-group">
-                <label for="searchLeft">Szukaj po Pozostały do zapłaty</label>
-                <input type="search" class="form-control" name="searchLeft" id="searchLeft">
-            </div>
-        </div>
-
-        <div class="col-md-4 mb-4">
-            <label for="searchById">Zajdź po ID</label>
-            <input type="search" name="searchById" id="searchById">
-            <button onclick="findPage()" class="btn btn-success">Znajdź zlecenie</button>
-        </div>
-        <div class="col-md-4 mb-4">
-            <label for="selectAllOrders">Zaznacz wszystkie zlecenia</label>
-            <input id="selectAllOrders" type="checkbox"/>
-        </div>
-    </div>
+    @include('orders.buttons')
     <table id="dataTable" class="table table-hover spacious-container ordersTable">
         <thead>
         <tr>
@@ -1020,6 +649,10 @@
 @section('datatable-scripts')
     <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
     <script>
+        $('.print-group').click(event => {
+            $('#print-package-type').val(event.currentTarget.name);
+            $('#print-package-group').modal('show');
+        })
         $(".send_courier_class").click(event => {
             if (event.currentTarget.id == "filtered-packages") {
                 return;
@@ -1042,7 +675,7 @@
                     } else {
                         console.log(data.errors);
 
-                        data.errors.forEach(error =>{
+                        data.errors.forEach(error => {
                             console.log(error);
                             $('#packages_errors').append(`<p>${error}</p>`);
                         })
@@ -2083,7 +1716,7 @@
             var checkboxes = $('.order-id-checkbox');
             var lastChecked = null;
         });
-            @foreach($visibilities as $key =>$row)
+        @foreach($visibilities as $key =>$row)
         var {{'show'.$row->name}}  = @json($row->show);
         {{'show'.$row->name}} = {{'show'.$row->name}}.map(function (x) {
             // if (typeof table.column(x+':name').index() === "number")
@@ -2107,7 +1740,7 @@
             show: {{'show'.$row->name}},
             hide: {{'hidden'.$row->name}}
         });
-            @endforeach
+        @endforeach
         let localDatatables = localStorage.getItem('DataTables_dataTable_/admin/orders');
         if (localDatatables != null) {
             let objDatatables = JSON.parse(localDatatables);
@@ -2327,13 +1960,13 @@
                     $('#quantity__errors').empty();
                     $('#exists__errors').empty();
                     res.forEach((error) => {
-                        if(error.error == 'position') {
+                        if (error.error == 'position') {
                             $('#position__errors').append(`<h5>Brak pozycji dla produktu: <span class="modal__product">${error.productName}</span>. Przejdź do tworzenia pozycji: <a href="/admin/products/stocks/${error.product}/positions/create" target="_blank">Kliknij tutaj</a>`)
                         }
-                        if(error.error == 'quantity') {
+                        if (error.error == 'quantity') {
                             $('#quantity__errors').append(`<h5>Brak wystarczającej ilości produktu na pozycji głównej - ilość: <span class="modal__position">${error.position.position_quantity}</span>. Przejdź do przenoszenia pomiędzy pozycjami: <a href="/admin/products/stocks/${error.product}/edit?tab=positions" target="_blank">Kliknij tutaj</a>`)
                         }
-                        if(error.error == 'exists') {
+                        if (error.error == 'exists') {
                             $('#exists__errors').append(`<h5>Dla produktu: <span class="modal__product">${error.productName}</span> został już wykonany stan magazynowy. Jeśli chcesz usunąć daną etykietę - przejdź do edycji zamówienia i usuń etykietę na samym dole: <a href="/admin/orders/${error.order_id}/edit" target="_blank">Kliknij tutaj</a>`)
                         }
                     })
@@ -2538,13 +2171,13 @@
                 orderIds.push($(order).val());
             });
 
-            if(timed == 1) {
+            if (timed == 1) {
                 $('#timed_label').modal('show');
                 $('#time_label_ok').on('click', () => {
                     addLabel(orderIds, chosenLabel, true)
                 })
             } else {
-               addLabelAjax(orderIds, chosenLabel, false)
+                addLabelAjax(orderIds, chosenLabel, false)
             }
         }
 
@@ -2554,7 +2187,7 @@
             url = url.replace(':id', chosenLabel.val());
             let schedulerUrl = "{{ route('api.labels.get-labels-scheduler-await', ['userId' => ':id']) }}"
             schedulerUrl = schedulerUrl.replace(':id', {{ Auth::id() }});
-            if(timed == false) {
+            if (timed == false) {
                 data = {orderIds: orderIds, time: $('#time_label').val()};
             } else {
                 data = {orderIds: orderIds}
@@ -2609,6 +2242,7 @@
                 })
             })
         }
+
         function addNewFile(id) {
             let url = "{{ route('orders.fileAdd', ['id' => '%%']) }}"
             $('#addNewFileToOrder').attr('action', url.replace('%%', id));

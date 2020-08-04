@@ -17,6 +17,7 @@ use App\Entities\OrderPayment;
 use App\Entities\PackageTemplate;
 use App\Entities\Product;
 use App\Entities\Role;
+use App\Entities\Task;
 use App\Entities\UserSurplusPayment;
 use App\Entities\UserSurplusPaymentHistory;
 use App\Entities\Warehouse;
@@ -27,6 +28,7 @@ use App\Helpers\OrderBuilder;
 use App\Helpers\OrderCalcHelper;
 use App\Helpers\OrdersHelper;
 use App\Http\Requests\NoticesRequest;
+use App\Http\Requests\OrdersFindPackageRequest;
 use App\Http\Requests\OrderUpdateRequest;
 use App\Jobs\AddLabelJob;
 use App\Jobs\AllegroTrackingNumberUpdater;
@@ -298,6 +300,7 @@ class OrdersController extends Controller
         $labels = Label::all();
         $couriers = \DB::table('order_packages')->distinct()->select('delivery_courier_name')->get();
         $warehouses = $this->warehouseRepository->findByField('symbol', 'MEGA-OLAWA');
+        $users = User::all();
 
         $allWarehouses = Warehouse::all();
         $customColumnLabels = [];
@@ -367,6 +370,7 @@ class OrdersController extends Controller
             ->withLabels($labels)
             ->withDeliverers($deliverers)
             ->withTemplateData($templateData)
+            ->withUsers($users)
             ->withAllWarehouses($allWarehouses);
     }
 
@@ -606,6 +610,55 @@ class OrdersController extends Controller
         }
 
         return $productsVariation;
+    }
+
+    public function findPackage(OrdersFindPackageRequest $request)
+    {
+        $data = $request->validated();
+        $courierArray = [];
+        switch ($data['package_type']) {
+            case 'paczkomat':
+                $courierArray = ['INPOST', 'ALLEGRO-INPOST'];
+                break;
+            case 'gls':
+                $courierArray = ['GLS'];
+                break;
+            case 'pocztex':
+                $courierArray = ['POCZTEX'];
+                break;
+            default:
+                return redirect()->back()->with([
+                    'message' => __('order_packages.message.package_error'),
+                    'alert-type' => 'error',
+                ]);
+        }
+        $task = Task::where('user_id', Task::WAREHOUSE_USER_ID)
+            ->with(['taskTime' => function ($query) {
+                $query->orderBy('date_start', 'asc');
+            }])
+            ->whereHas('order', function ($query) use ($courierArray) {
+                $query->whereHas('packages', function ($query) use ($courierArray) {
+                    $query->whereIn('delivery_courier_name', $courierArray);
+                });
+            })->first();
+        if (empty($task)) {
+            return redirect()->back()->with([
+                'message' => 'Brak nieprzydzielonych paczek dla: ' . $data['package_type'] . ' spróbuj wygenerować paczki dla innego kuriera',
+                'alert-type' => 'error',
+            ]);
+        }
+
+        //todo: wydziel zamowienie + powiazane z grupy
+        //todo: przenies task do usera na godzinę obecną
+        $tagHelper = new EmailTagHandlerHelper();
+        $tagHelper->setOrder($task->order);
+        $similar = OrdersHelper::findSimilarOrders($task->order);
+        return View::make('orders.print', [
+            'similar' => $similar,
+            'order' => $task->order,
+            'tagHelper' => $tagHelper,
+            'showPosition' => true
+        ]);
     }
 
     public function updateNotices(NoticesRequest $request)
@@ -1281,7 +1334,7 @@ class OrdersController extends Controller
             return;
         }
 
-        if($request->input('time') !== null) {
+        if ($request->input('time') !== null) {
             $time = $request->input('time');
         } else {
             $time = false;
@@ -2005,8 +2058,8 @@ class OrdersController extends Controller
         foreach ($packages as $package) {
             try {
                 list($message, $messages) = app(OrdersPackagesController::class)->sendPackage($package, $messages);
-                if(!empty($message)) {
-                    $messages [] =$message;
+                if (!empty($message)) {
+                    $messages [] = $message;
                 }
             } catch (\Exception $e) {
                 \Log::error('błąd przy nadawaniu hurtowym paczki', ['error' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
@@ -2118,7 +2171,6 @@ class OrdersController extends Controller
         $order->print_order = true;
         $order->update();
         $showPosition = is_a(Auth::user(), User::class);
-
         $similar = OrdersHelper::findSimilarOrders($order);
         return View::make('orders.print', [
             'order' => $order,
