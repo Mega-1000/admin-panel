@@ -660,7 +660,6 @@ class OrdersController extends Controller
             return $prev + $totalDuration;
         }, 0);
         $dt = Carbon::now();
-        $dt->minute = round($dt->minute, -1);
         $dt->second = 0;
         $data = [
             'start' => $dt->toDateTimeString(),
@@ -683,7 +682,6 @@ class OrdersController extends Controller
         $tagHelper = new EmailTagHandlerHelper();
         $tagHelper->setOrder($task->order);
         $similar = OrdersHelper::findSimilarOrders($task->order);
-        //todo przypisać, zadanie do usera w specjlanej tabeli
         return View::make('orders.print', [
             'similar' => $similar,
             'order' => $task->order,
