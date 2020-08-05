@@ -89,14 +89,18 @@ class AddLabelJob extends Job
                     'is_executed' => false
                 ]);
                 $labelsAfterTime = DB::table('label_labels_to_add_after_timed_label')->where('main_label_id', $labelId)->get();
+                $now = Carbon::now();
+                $targetDatetime = Carbon::parse($this->time);
+                $delay = $now->diffInSeconds($targetDatetime);
+
                 if($labelsAfterTime->count() > 0) {
-                    $removeLabelJob = (new RemoveLabelJob($this->order->id, [$labelId]))->delay($this->time);
+                    $removeLabelJob = (new RemoveLabelJob($this->order->id, [$labelId]))->delay($delay);
                     foreach($labelsAfterTime as $labelAfterTime) {
-                        $addLabelJob = (new AddLabelJob($this->order->id, [$labelAfterTime->label_to_add_id]))->delay($this->time);
+                        $addLabelJob = (new AddLabelJob($this->order->id, [$labelAfterTime->label_to_add_id]))->delay($delay);
                     }
                 } else {
-                    $removeLabelJob = (new RemoveLabelJob($this->order->id, [$labelId]))->delay($this->time);
-                    $addLabelJob = (new AddLabelJob($this->order->id, [Label::URGENT_INTERVENTION]))->delay($this->time);
+                    $removeLabelJob = (new RemoveLabelJob($this->order->id, [$labelId]))->delay($delay);
+                    $addLabelJob = (new AddLabelJob($this->order->id, [Label::URGENT_INTERVENTION]))->delay($delay);
                 }
             }
 

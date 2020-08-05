@@ -8,6 +8,7 @@ use App\Mail\ConfirmData;
 use App\Mail\DifferentCustomerData;
 use App\Repositories\LabelRepository;
 use App\Repositories\OrderRepository;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -17,6 +18,7 @@ class RemoveLabelJob extends Job
     protected $labelIdsToRemove;
     protected $loopPreventionArray;
     protected $customLabelIdsToAddAfterRemoval = [];
+    protected $time;
 
     /**
      * RemoveLabelJob constructor.
@@ -24,8 +26,9 @@ class RemoveLabelJob extends Job
      * @param $labelIdsToRemove
      * @param $loopPreventionArray
      * @param $customLabelIdsToAddAfterRemoval
+     * @param $time
      */
-    public function __construct($order, $labelIdsToRemove, &$loopPreventionArray = [], $customLabelIdsToAddAfterRemoval = [])
+    public function __construct($order, $labelIdsToRemove, &$loopPreventionArray = [], $customLabelIdsToAddAfterRemoval = [], $time = null)
     {
         $this->order                           = $order;
         $this->labelIdsToRemove                = $labelIdsToRemove;
@@ -35,6 +38,7 @@ class RemoveLabelJob extends Job
         } else {
             array_push($this->customLabelIdsToAddAfterRemoval, $customLabelIdsToAddAfterRemoval);
         }
+        $this->time = $time;
     }
 
     /**
@@ -82,6 +86,18 @@ class RemoveLabelJob extends Job
             }
 
             $label = $labelRepository->find($labelId);
+
+            if($this->time !== null) {
+                $labelsToChange = DB::table('label_labels_to_add_after_timed_label')->where(['main_label_id' => $labelId])->get();
+                $now = Carbon::now();
+                $targetDatetime = Carbon::parse($this->time);
+                $delay = $now->diffInSeconds($targetDatetime);
+                foreach($labelsToChange as $labelToChange) {
+                    $addSideLabelJob = (new AddLabelJob($this->order->id, [$labelToChange->main_label_id]));
+                    $removeSideLabelAfterTimeJob = (new RemoveLabelJob($this->order->id, [$labelToChange->main_label_id]))->delay($delay);
+                    $addMainLabelAfterTimeJob = (new AddLabelJob($this->order->id, [$labelToChange->main_label_id]))->delay($delay);
+                }
+            }
 
             if ($label->manual_label_selection_to_add_after_removal) {
                 $labelIdsToAttach = $this->customLabelIdsToAddAfterRemoval;

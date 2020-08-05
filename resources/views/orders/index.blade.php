@@ -1453,6 +1453,7 @@
                             }
                         }
                         labels.forEach(function (label) {
+                            console.log(labels, 'dsadsadsa')
                             if (label.length > 0) {
                                 if (label[0].label_group_id != null) {
                                     if (label[0].label_group[0].name == currentLabelGroup) {
@@ -1495,9 +1496,9 @@
                                             comparasion = d1 >= d2
                                         }
                                         if (label[0].id == '{{ env('MIX_LABEL_WAITING_FOR_PAYMENT_ID') }}' && comparasion) {
-                                            html += '<div data-toggle="label-tooltip" style="border: solid red 4px" data-html="true" title="' + tooltipContent + '" class="pointer" onclick="removeLabel(' + row.orderId + ', ' + label[0].id + ', ' + label[0].manual_label_selection_to_add_after_removal + ', \'' + label[0].added_type + '\');"><span class="order-label" style="color: ' + label[0].font_color + '; display: block; margin-top: 5px; background-color: ' + label[0].color + '"><i class="' + label[0].icon_name + '"></i></span></div>';
+                                            html += '<div data-toggle="label-tooltip" style="border: solid red 4px" data-html="true" title="' + tooltipContent + '" class="pointer" onclick="removeLabel(' + row.orderId + ', ' + label[0].id + ', ' + label[0].manual_label_selection_to_add_after_removal + ', \'' + label[0].added_type + ', \'' + label[0].timed + '\');"><span class="order-label" style="color: ' + label[0].font_color + '; display: block; margin-top: 5px; background-color: ' + label[0].color + '"><i class="' + label[0].icon_name + '"></i></span></div>';
                                         } else {
-                                            html += '<div data-toggle="label-tooltip" data-html="true" title="' + tooltipContent + '" class="pointer" onclick="removeLabel(' + row.orderId + ', ' + label[0].id + ', ' + label[0].manual_label_selection_to_add_after_removal + ', \'' + label[0].added_type + '\');"><span class="order-label" style="color: ' + label[0].font_color + '; display: block; margin-top: 5px; background-color: ' + label[0].color + '"><i class="' + label[0].icon_name + '"></i></span></div>';
+                                            html += '<div data-toggle="label-tooltip" data-html="true" title="' + tooltipContent + '" class="pointer" onclick="removeLabel(' + row.orderId + ', ' + label[0].id + ', ' + label[0].manual_label_selection_to_add_after_removal + ', \'' + label[0].added_type + '\', \'' + label[0].timed +  '\');"><span class="order-label" style="color: ' + label[0].font_color + '; display: block; margin-top: 5px; background-color: ' + label[0].color + '"><i class="' + label[0].icon_name + '"></i></span></div>';
                                         }
                                     }
                                 }
@@ -2317,7 +2318,27 @@
             }
         });
 
-        function removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType) {
+        function removeTimedLabel(orderId, labelId) {
+            $.ajax({
+                url: "/admin/orders/label-removal/" + orderId + "/" + labelId,
+                method: "POST",
+                data: {time: $('#time_label_removal').val()}
+            }).done(function (res) {
+
+            });
+        }
+
+        function removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType, timed, skipTimed = true) {
+            if(timed == '1' && skipTimed) {
+                $('#timed_label_removal').modal('show');
+                $('#time_label_removal_ok').on('click', () => {
+                    removeTimedLabel(orderId, labelId)
+                })
+                $('#time_label_removal_cancel').on('click', () => {
+                    removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType, timed, false)
+                })
+                return;
+            }
             let removeLabelRequest = function () {
                 $.ajax({
                     url: "/admin/orders/label-removal/" + orderId + "/" + labelId,
@@ -2541,7 +2562,8 @@
             if(timed == 1) {
                 $('#timed_label').modal('show');
                 $('#time_label_ok').on('click', () => {
-                    addLabel(orderIds, chosenLabel, true)
+                    console.log()
+                    addLabelAjax(orderIds, chosenLabel, true)
                 })
             } else {
                addLabelAjax(orderIds, chosenLabel, false)
