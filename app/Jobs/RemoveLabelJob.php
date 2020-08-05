@@ -88,15 +88,7 @@ class RemoveLabelJob extends Job
             $label = $labelRepository->find($labelId);
 
             if($this->time !== null) {
-                $labelsToChange = DB::table('label_labels_to_add_after_timed_label')->where(['main_label_id' => $labelId])->get();
-                $now = Carbon::now();
-                $targetDatetime = Carbon::parse($this->time);
-                $delay = $now->diffInSeconds($targetDatetime);
-                foreach($labelsToChange as $labelToChange) {
-                    $addSideLabelJob = (new AddLabelJob($this->order->id, [$labelToChange->main_label_id]));
-                    $removeSideLabelAfterTimeJob = (new RemoveLabelJob($this->order->id, [$labelToChange->main_label_id]))->delay($delay);
-                    $addMainLabelAfterTimeJob = (new AddLabelJob($this->order->id, [$labelToChange->main_label_id]))->delay($delay);
-                }
+                $this->timedLabelChange($label);
             }
 
             if ($label->manual_label_selection_to_add_after_removal) {
@@ -147,6 +139,19 @@ class RemoveLabelJob extends Job
                 }
                 dispatch_now(new RemoveLabelJob($this->order, $labelIdsToDetach, $this->loopPreventionArray));
             }
+        }
+    }
+
+    private function timedLabelChange($label)
+    {
+        $labelsToChange = $label->labelsToAddAfterTimedLabel()->get();
+        $now = Carbon::now();
+        $targetDatetime = Carbon::parse($this->time);
+        $delay = $now->diffInSeconds($targetDatetime);
+        foreach($labelsToChange as $labelToChange) {
+            $addSideLabelJob = (new AddLabelJob($this->order->id, [$labelToChange->main_label_id]));
+            $removeSideLabelAfterTimeJob = (new RemoveLabelJob($this->order->id, [$labelToChange->main_label_id]))->delay($delay);
+            $addMainLabelAfterTimeJob = (new AddLabelJob($this->order->id, [$labelToChange->main_label_id]))->delay($delay);
         }
     }
 }
