@@ -28,7 +28,7 @@ return [
         'pending' => 'Oczekujący',
         'message' => 'Wiadomość email',
         'manual_label_selection_to_add_after_removal' => 'Ręczny wybór Etykiet do dodania po skasowaniu obecnej',
-        'timed' => 'Etykieta ma wymuszać na użytkowniku podanie daty i godziny, po której zmieni się w interwencję',
+        'timed' => 'Etykieta ma wymuszać na użytkowniku podanie daty i godziny, po której zmieni się w etykietę zastępczą',
         'labels_to_add_after_addition' => 'Etykiety do dodania po dodaniu obecnej',
         'labels_to_add_after_removal' => 'Etykiety do dodania po skasowaniu obecnej',
         'labels_to_remove_after_addition' => 'Etykiety do skasowania po dodaniu obecnej',
