@@ -27,6 +27,7 @@ use App\Helpers\LabelsHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderCalcHelper;
 use App\Helpers\OrdersHelper;
+use App\Helpers\TaskHelper;
 use App\Http\Requests\NoticesRequest;
 use App\Http\Requests\OrdersFindPackageRequest;
 use App\Http\Requests\OrderUpdateRequest;
@@ -648,11 +649,41 @@ class OrdersController extends Controller
             ]);
         }
 
-        //todo: wydziel zamowienie + powiazane z grupy
-        //todo: przenies task do usera na godzinę obecną
+        $similar = OrdersHelper::findSimilarOrders($task->order);
+        $newGroup = Task::whereIn('order_id', $similar)->get();
+        $newGroup = $newGroup->concat([$task]);
+        $duration = $newGroup->reduce(function ($prev, $next) {
+            $time = $next->taskTime;
+            $finishTime = new Carbon($time->date_start);
+            $startTime = new Carbon($time->date_end);
+            $totalDuration = $finishTime->diffInMinutes($startTime);
+            return $prev + $totalDuration;
+        }, 0);
+        $dt = Carbon::now();
+        $dt->minute = round($dt->minute, -1);
+        $dt->second = 0;
+        $data = [
+            'start' => $dt->toDateTimeString(),
+            'end' => $dt->addMinutes($duration)->toDateTimeString(),
+            'id' => $data['user_id'],
+            'user_id' => $data['user_id']
+        ];
+        if ($newGroup->count() > 1) {
+            TaskHelper::createNewGroup($newGroup, $task, $duration, $data);
+        } else {
+            TaskHelper::updateAbandonedTaskTime($newGroup->first(), $duration, $data);
+        }
+
+        $tsk = Task::find($task->id);
+        if ($tsk->parent->count()) {
+            $tsk = $tsk->parent;
+        }
+        $tsk->user_id = $data['user_id'];
+        $tsk->save();
         $tagHelper = new EmailTagHandlerHelper();
         $tagHelper->setOrder($task->order);
         $similar = OrdersHelper::findSimilarOrders($task->order);
+        //todo przypisać, zadanie do usera w specjlanej tabeli
         return View::make('orders.print', [
             'similar' => $similar,
             'order' => $task->order,

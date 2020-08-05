@@ -9,18 +9,20 @@ use Carbon\Carbon;
 class TaskTimeHelper
 {
 
-    public static function getFirstAvailableTime($duration) {
+    public static function getFirstAvailableTime($duration, $data = false)
+    {
+        if (!$data) {
+            $date = Carbon::now();
+            $date->setTime(8, 0);
+            $data = [
+                'start' => $date->toDateTimeString(),
+                'end' => $date->addMinutes($duration)->toDateTimeString(),
+                'id' => User::OLAWA_USER_ID,
+                'user_id' => User::OLAWA_USER_ID
+            ];
+        }
 
-        $date = Carbon::now();
-        $date->setTime(8, 0);
         $allow = false;
-        $data = [
-            'start' => $date->toDateTimeString(),
-            'end' => $date->addMinutes($duration)->toDateTimeString(),
-            'id' => User::OLAWA_USER_ID,
-            'user_id' => User::OLAWA_USER_ID
-        ];
-
         while (!$allow) {
             $allow = self::allowTaskMove($data);
             if ($allow) {

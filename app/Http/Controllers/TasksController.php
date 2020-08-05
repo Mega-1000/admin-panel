@@ -5,10 +5,9 @@ namespace App\Http\Controllers;
 use App\Entities\Label;
 use App\Entities\LabelGroup;
 use App\Entities\Task;
-use App\Entities\TaskSalaryDetails;
-use App\Entities\TaskTime;
 use App\Helpers\OrderCalcHelper;
 use App\Helpers\OrdersHelper;
+use App\Helpers\TaskHelper;
 use App\Helpers\TaskTimeHelper;
 use App\Http\Requests\TaskCreateRequest;
 use App\Http\Requests\TaskUpdateRequest;
@@ -845,24 +844,7 @@ class TasksController extends Controller
         }
         if ($request->new_group) {
             $newGroup = Task::whereIn('id', $request->new_group)->get();
-            $duration = $newGroup->reduce(function ($prev, $next) {
-                $time = $next->taskTime;
-                $finishTime = new Carbon($time->date_start);
-                $startTime = new Carbon($time->date_end);
-                $totalDuration = $finishTime->diffInMinutes($startTime);
-                return $prev + $totalDuration;
-            }, 0);
-            $taskTime = $task->taskTime;
-            $endTime = new Carbon($taskTime->date_end);
-            $endTime->subMinutes($duration);
-            $taskTime->date_end = $endTime->toDateTimeString();
-            $taskTime->save();
-            $request->end = $taskTime->date_end;
-            if ($newGroup->count() > 1) {
-                $this->createNewGroup($newGroup, $task, $duration);
-            } else {
-                $this->updateAbandonedTaskTime($newGroup->first(), $duration);
-            }
+            $this->updateOldAndCreateNewGroup($newGroup, $request, $task);
         }
 
         $dataToStore = [
@@ -951,57 +933,6 @@ class TasksController extends Controller
     }
 
     /**
-     * @param \Illuminate\Support\Collection $newGroup
-     * @param $task
-     * @param $duration
-     */
-    private function createNewGroup(\Illuminate\Support\Collection $newGroup, $task, $duration): void
-    {
-        $name = $newGroup->map(function ($item) {
-            return $item->order_id;
-        })->toArray();
-        $taskNew = Task::create([
-            'warehouse_id' => $task->warehouse_id,
-            'user_id' => $task->user_id,
-            'order_id' => $task->order_id,
-            'created_by' => $task->created_by,
-            'name' => implode(', ', $name),
-            'color' => $task->color,
-            'status' => $task->status
-        ]);
-        $time = TaskTimeHelper::getFirstAvailableTime($duration);
-        TaskTime::create([
-            'task_id' => $taskNew->id,
-            'date_start' => $time['start'],
-            'date_end' => $time['end']
-        ]);
-        TaskSalaryDetails::create([
-            'task_id' => $taskNew->id,
-            'consultant_value' => 0,
-            'warehouse_value' => 0
-        ]);
-        $newGroup->map(function ($item) use ($taskNew) {
-            $item->parent_id = $taskNew->id;
-            $item->save();
-        });
-    }
-
-    /**
-     * @param $task
-     * @param $duration
-     */
-    private function updateAbandonedTaskTime($task, $duration): void
-    {
-        $taskTime = $task->taskTime;
-        $time = TaskTimeHelper::getFirstAvailableTime($duration);
-        $taskTime->date_start = $time['start'];
-        $taskTime->date_end = $time['end'];
-        $taskTime->save();
-        $task->parent_id = null;
-        $task->save();
-    }
-
-    /**
      * @param $id
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
@@ -1084,5 +1015,32 @@ class TasksController extends Controller
         }
 
         return response()->json($task);
+    }
+
+    /**
+     * @param $newGroup
+     * @param $request
+     * @param $task
+     */
+    private function updateOldAndCreateNewGroup($newGroup, $request, $task): void
+    {
+        $duration = $newGroup->reduce(function ($prev, $next) {
+            $time = $next->taskTime;
+            $finishTime = new Carbon($time->date_start);
+            $startTime = new Carbon($time->date_end);
+            $totalDuration = $finishTime->diffInMinutes($startTime);
+            return $prev + $totalDuration;
+        }, 0);
+        $taskTime = $task->taskTime;
+        $endTime = new Carbon($taskTime->date_end);
+        $endTime->subMinutes($duration);
+        $taskTime->date_end = $endTime->toDateTimeString();
+        $taskTime->save();
+        $request->end = $taskTime->date_end;
+        if ($newGroup->count() > 1) {
+            TaskHelper::createNewGroup($newGroup, $task, $duration);
+        } else {
+            TaskHelper::updateAbandonedTaskTime($newGroup->first(), $duration);
+        }
     }
 }
