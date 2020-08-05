@@ -38,6 +38,39 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" tabindex="-1" id="mark-as-created" role="dialog">
+        <div class="modal-dialog" id="modalDialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="titleModal"></h4>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" id="finish-task-form" action="{{ route('planning.tasks.produceOrdersRedirect') }}">
+                        @csrf()
+                        <select onchange="fetchUsersTasks()" id="select-user-for-finish-task" name="user_id" required
+                                class="form-control">
+                            <option value="" selected="selected">wybierz użytkownika</option>
+                            @foreach($users as $user)
+                                <option
+                                    value="{{$user->id}}">{{$user->name}} {{$user->firstname}} {{$user->lastname}}</option>
+                            @endforeach
+                        </select>
+                        <select name="id" id="select-task-for-finish" required class="form-control">
+                            <option value="" selected="selected">wybierz zadanie</option>
+                        </select>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" form="finish-task-form" class="btn btn-success pull-right">Zakończ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" tabindex="-1" id="magazine" role="dialog">
         <div class="modal-dialog" id="modalDialog">
             <div class="modal-content">
@@ -649,6 +682,23 @@
 @section('datatable-scripts')
     <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
     <script>
+        function fetchUsersTasks() {
+            let id = $('#select-user-for-finish-task').val()
+            let url = "{{route('planning.tasks.getForUser', ['id' => '%%'])}}"
+            $.ajax(url.replace('%%', id))
+                .done(response => {
+                    if (response.errors) {
+                        alert('Wystąpił błąd pobierania danych')
+                        return;
+                    }
+                    console.log(response);
+                    response.forEach(task => $('#select-task-for-finish').append(`<option class="temporary-option" value="${task.id}">${task.name}</option>`))
+                })
+        }
+
+        $('#accept-pack').click(event => {
+            $("#mark-as-created").modal('show');
+        })
         $('.print-group').click(event => {
             $('#print-package-type').val(event.currentTarget.name);
             $('#print-package-group').modal('show');

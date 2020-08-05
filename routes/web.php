@@ -438,6 +438,7 @@ Route::group(['prefix' => 'admin'], function () {
             Route::prefix('tasks')->as('tasks.')
                 ->group(function () {
                     Route::get('/', 'TasksController@index')->name('index');
+                    Route::get('/user/{id}', 'TasksController@getForUser')->name('getForUser');
                     Route::get('/datatable', 'TasksController@datatable')->name('datatable');
                     Route::post('/store', 'TasksController@store')->name('store');
                     Route::get('/create', 'TasksController@create')->name('create');
@@ -455,6 +456,7 @@ Route::group(['prefix' => 'admin'], function () {
                     Route::post('/acceptTask', 'TasksController@acceptTask')->name('acceptTask');
                     Route::post('/rejectTask', 'TasksController@rejectTask')->name('rejectTask');
                     Route::post('/produce', 'TasksController@produceOrders')->name('produceOrders');
+                    Route::post('/produce-redirect', 'TasksController@produceOrdersRedirect')->name('produceOrdersRedirect');
                 });
             Route::prefix('reports')->as('reports.')
                 ->group(function () {

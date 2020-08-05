@@ -18,6 +18,7 @@ use App\Repositories\TaskRepository;
 use App\Repositories\TaskTimeRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -639,16 +640,66 @@ class TasksController extends Controller
         }
     }
 
+    public function getForUser($id)
+    {
+        if (empty(User::find($id))) {
+            return response(['error' => 'Brak danego użytkownika'], 400);
+        }
+        $tasks = Task::where('tasks.user_id', 9)->whereHas('order', function ($query) {
+            $query->whereHas('labels', function ($query) {
+                $query->where('labels.id', Label::ORDER_ITEMS_UNDER_CONSTRUCTION);
+            });
+        })->orWhereHas('childs', function ($query) {
+            $query->whereHas('order', function ($query) {
+                $query->whereHas('labels', function ($query) {
+                    $query->where('labels.id', Label::ORDER_ITEMS_UNDER_CONSTRUCTION);
+                });
+            });
+        })->get();
+        return response($tasks);
+    }
+
+    public function produceOrdersRedirect(Request $request)
+    {
+        try {
+            $task = Task::findOrFail($request->id);
+            $this->markTaskAsProduced($task);
+        } catch (\Exception $e) {
+            return redirect()->back()->with([
+                'message' => __('tasks.messages.update_error'),
+                'alert-type' => 'error'
+            ]);
+        }
+        return redirect()->back()->with([
+            'message' => __('tasks.messages.update'),
+            'alert-type' => 'success'
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     */
+    private function markTaskAsProduced($task): void
+    {
+        if ($task->childs->count()) {
+            $task->childs->map(function ($child) {
+                dispatch_now(new RemoveLabelJob($child->order_id,
+                    [Label::ORDER_ITEMS_UNDER_CONSTRUCTION],
+                    $prev));
+            });
+        } else {
+            dispatch_now(new RemoveLabelJob($task->order_id,
+                [Label::ORDER_ITEMS_UNDER_CONSTRUCTION],
+                $prev));
+        }
+    }
+
     public function produceOrders(Request $request)
     {
         if ($request->id) {
             try {
                 $task = Task::findOrFail($request->id);
-                $task->childs->map(function ($child) {
-                    dispatch_now(new RemoveLabelJob($child->order_id,
-                        [Label::ORDER_ITEMS_UNDER_CONSTRUCTION],
-                        $prev));
-                });
+                $this->markTaskAsProduced($task);
             } catch (\Exception $e) {
                 return response(['error' => true, 'message' => 'Nie znaleziono zadania']);
             }
@@ -933,6 +984,33 @@ class TasksController extends Controller
     }
 
     /**
+     * @param $newGroup
+     * @param $request
+     * @param $task
+     */
+    private function updateOldAndCreateNewGroup($newGroup, $request, $task): void
+    {
+        $duration = $newGroup->reduce(function ($prev, $next) {
+            $time = $next->taskTime;
+            $finishTime = new Carbon($time->date_start);
+            $startTime = new Carbon($time->date_end);
+            $totalDuration = $finishTime->diffInMinutes($startTime);
+            return $prev + $totalDuration;
+        }, 0);
+        $taskTime = $task->taskTime;
+        $endTime = new Carbon($taskTime->date_end);
+        $endTime->subMinutes($duration);
+        $taskTime->date_end = $endTime->toDateTimeString();
+        $taskTime->save();
+        $request->end = $taskTime->date_end;
+        if ($newGroup->count() > 1) {
+            TaskHelper::createNewGroup($newGroup, $task, $duration);
+        } else {
+            TaskHelper::updateAbandonedTaskTime($newGroup->first(), $duration);
+        }
+    }
+
+    /**
      * @param $id
      * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
@@ -1015,32 +1093,5 @@ class TasksController extends Controller
         }
 
         return response()->json($task);
-    }
-
-    /**
-     * @param $newGroup
-     * @param $request
-     * @param $task
-     */
-    private function updateOldAndCreateNewGroup($newGroup, $request, $task): void
-    {
-        $duration = $newGroup->reduce(function ($prev, $next) {
-            $time = $next->taskTime;
-            $finishTime = new Carbon($time->date_start);
-            $startTime = new Carbon($time->date_end);
-            $totalDuration = $finishTime->diffInMinutes($startTime);
-            return $prev + $totalDuration;
-        }, 0);
-        $taskTime = $task->taskTime;
-        $endTime = new Carbon($taskTime->date_end);
-        $endTime->subMinutes($duration);
-        $taskTime->date_end = $endTime->toDateTimeString();
-        $taskTime->save();
-        $request->end = $taskTime->date_end;
-        if ($newGroup->count() > 1) {
-            TaskHelper::createNewGroup($newGroup, $task, $duration);
-        } else {
-            TaskHelper::updateAbandonedTaskTime($newGroup->first(), $duration);
-        }
     }
 }

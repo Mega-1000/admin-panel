@@ -615,78 +615,66 @@ class OrdersController extends Controller
 
     public function findPackage(OrdersFindPackageRequest $request)
     {
-        $data = $request->validated();
-        $courierArray = [];
-        switch ($data['package_type']) {
-            case 'paczkomat':
-                $courierArray = ['INPOST', 'ALLEGRO-INPOST'];
-                break;
-            case 'gls':
-                $courierArray = ['GLS'];
-                break;
-            case 'pocztex':
-                $courierArray = ['POCZTEX'];
-                break;
-            default:
-                return redirect()->back()->with([
-                    'message' => __('order_packages.message.package_error'),
-                    'alert-type' => 'error',
-                ]);
+        $finalPdfFileName = 'allsmallprints.pdf';
+        $lockName = 'file.lock.small';
+        dispatch((new RemoveFileLockJob($lockName))->delay(360));
+        if (File::exists(public_path($lockName))) {
+            return response(['error' => 'file_exist']);
         }
-        $task = Task::where('user_id', Task::WAREHOUSE_USER_ID)
-            ->with(['taskTime' => function ($query) {
-                $query->orderBy('date_start', 'asc');
-            }])
-            ->whereHas('order', function ($query) use ($courierArray) {
-                $query->whereHas('packages', function ($query) use ($courierArray) {
-                    $query->whereIn('delivery_courier_name', $courierArray);
-                });
-            })->first();
+        file_put_contents($lockName, '');
+        $data = $request->validated();
+        try {
+            $task = $this->prepareTask($data['package_type']);
+        } catch (Exception $e) {
+            return redirect()->back()->with([
+                'message' => $e->getMessage(),
+                'alert-type' => 'error',
+            ]);
+        }
         if (empty($task)) {
             return redirect()->back()->with([
                 'message' => 'Brak nieprzydzielonych paczek dla: ' . $data['package_type'] . ' spróbuj wygenerować paczki dla innego kuriera',
                 'alert-type' => 'error',
             ]);
         }
-
         $similar = OrdersHelper::findSimilarOrders($task->order);
-        $newGroup = Task::whereIn('order_id', $similar)->get();
-        $newGroup = $newGroup->concat([$task]);
-        $duration = $newGroup->reduce(function ($prev, $next) {
-            $time = $next->taskTime;
-            $finishTime = new Carbon($time->date_start);
-            $startTime = new Carbon($time->date_end);
-            $totalDuration = $finishTime->diffInMinutes($startTime);
-            return $prev + $totalDuration;
-        }, 0);
-        $dt = Carbon::now();
-        $dt->second = 0;
-        $data = [
-            'start' => $dt->toDateTimeString(),
-            'end' => $dt->addMinutes($duration)->toDateTimeString(),
-            'id' => $data['user_id'],
-            'user_id' => $data['user_id']
-        ];
-        if ($newGroup->count() > 1) {
-            TaskHelper::createNewGroup($newGroup, $task, $duration, $data);
-        } else {
-            TaskHelper::updateAbandonedTaskTime($newGroup->first(), $duration, $data);
-        }
-
-        $tsk = Task::find($task->id);
-        if ($tsk->parent->count()) {
-            $tsk = $tsk->parent;
-        }
-        $tsk->user_id = $data['user_id'];
-        $tsk->save();
+        $this->attachTaskForUser($task, $data, $similar);
+        $allOrders = array_merge($similar, [$task->order->id]);
         $tagHelper = new EmailTagHandlerHelper();
-        $tagHelper->setOrder($task->order);
-        $similar = OrdersHelper::findSimilarOrders($task->order);
-        return View::make('orders.print', [
-            'similar' => $similar,
-            'order' => $task->order,
-            'tagHelper' => $tagHelper,
-            'showPosition' => true
+        $merger = new Merger;
+        $i = 0;
+        foreach ($allOrders as $ord) {
+            $dompdf = new Dompdf(['enable_remote' => true]);
+            $order = Order::find($ord);
+            $tagHelper->setOrder($order);
+            $similar = OrdersHelper::findSimilarOrders($order);
+
+            $view = View::make('orders.print', [
+                'similar' => $similar,
+                'order' => $order,
+                'tagHelper' => $tagHelper,
+                'showPosition' => true
+            ]);
+            if (empty($view)) {
+                continue;
+            }
+            $dompdf->loadHTML($view);
+            $dompdf->render();
+            $output = $dompdf->output();
+            file_put_contents("spec_usr_$i.pdf", $output);
+            $merger->addFile(public_path("spec_usr_$i.pdf"));
+            $i++;
+        }
+        $file = $merger->merge();
+        file_put_contents(public_path("storage/$finalPdfFileName"), $file);
+        while ($i >= 0) {
+            File::delete(public_path("spec_usr_$i.pdf"));
+            $i--;
+        }
+        unlink(public_path($lockName));
+        return response(Storage::disk('public')->get($finalPdfFileName), 200,[
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline'
         ]);
     }
 
@@ -2135,13 +2123,13 @@ class OrdersController extends Controller
             $i++;
         }
         $file = $merger->merge();
-        file_put_contents(public_path("storage/$finalPdfFileName"), $file);
+        file_put_contents(public_path("storage/"), $file);
         while ($i >= 0) {
             File::delete(public_path("spec_$i.pdf"));
             $i--;
         }
         unlink(public_path($lockName));
-        return Storage::url($finalPdfFileName, now());
+        return Storage::file($finalPdfFileName, now());
     }
 
     /**
@@ -2820,5 +2808,80 @@ class OrdersController extends Controller
         }, 0);
     }
 
+    /**
+     * @param $package_type
+     * @return mixed
+     * @throws Exception
+     */
+    private function prepareTask($package_type)
+    {
+        $courierArray = [];
+        switch ($package_type) {
+            case 'paczkomat':
+                $courierArray = ['INPOST', 'ALLEGRO-INPOST'];
+                break;
+            case 'gls':
+                $courierArray = ['GLS'];
+                break;
+            case 'dpd':
+                $courierArray = ['DPD'];
+                break;
+            case 'pocztex':
+                $courierArray = ['POCZTEX'];
+                break;
+            default:
+                throw new \Exception(__('order_packages.message.package_error'));
+        }
+        $task = Task::where('user_id', Task::WAREHOUSE_USER_ID)
+            ->with(['taskTime' => function ($query) {
+                $query->orderBy('date_start', 'asc');
+            }])
+            ->whereHas('order', function ($query) use ($courierArray) {
+                $query->whereHas('packages', function ($query) use ($courierArray) {
+                    $query->whereIn('delivery_courier_name', $courierArray);
+                })->whereHas('labels', function ($query) {
+                    $query->where('labels.id', Label::ORDER_ITEMS_UNDER_CONSTRUCTION);
+                });
+            })->first();
+        return $task;
+    }
+
+    /**
+     * @param $task
+     * @param array $data
+     * @param array $similar
+     */
+    private function attachTaskForUser($task, array $data, array $similar): void
+    {
+        $newGroup = Task::whereIn('order_id', $similar)->get();
+        $newGroup = $newGroup->concat([$task]);
+        $duration = $newGroup->reduce(function ($prev, $next) {
+            $time = $next->taskTime;
+            $finishTime = new Carbon($time->date_start);
+            $startTime = new Carbon($time->date_end);
+            $totalDuration = $finishTime->diffInMinutes($startTime);
+            return $prev + $totalDuration;
+        }, 0);
+        $dt = Carbon::now();
+        $dt->second = 0;
+        $data = [
+            'start' => $dt->toDateTimeString(),
+            'end' => $dt->addMinutes($duration)->toDateTimeString(),
+            'id' => $data['user_id'],
+            'user_id' => $data['user_id']
+        ];
+        if ($newGroup->count() > 1) {
+            TaskHelper::createNewGroup($newGroup, $task, $duration, $data);
+        } else {
+            TaskHelper::updateAbandonedTaskTime($newGroup->first(), $duration, $data);
+        }
+
+        $tsk = Task::find($task->id);
+        if ($tsk->parent->count()) {
+            $tsk = $tsk->parent->first();
+        }
+        $tsk->user_id = $data['user_id'];
+        $tsk->save();
+    }
 }
 

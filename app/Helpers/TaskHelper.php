@@ -22,7 +22,6 @@ class TaskHelper
         $taskNew = Task::create([
             'warehouse_id' => $task->warehouse_id,
             'user_id' => $task->user_id,
-            'order_id' => $task->order_id,
             'created_by' => $task->created_by,
             'name' => implode(', ', $name),
             'color' => $task->color,
