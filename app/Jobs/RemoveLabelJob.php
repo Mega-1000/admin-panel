@@ -144,7 +144,7 @@ class RemoveLabelJob extends Job
 
     private function timedLabelChange($label)
     {
-        $labelsToChange = $label->labelsToAddAfterTimedLabel()->get();
+        $labelsToChange = $label->labelsToAddAfterTimedLabel;
         $now = Carbon::now();
         $targetDatetime = Carbon::parse($this->time);
         $delay = $now->diffInSeconds($targetDatetime);
