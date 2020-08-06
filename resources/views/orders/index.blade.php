@@ -1425,33 +1425,20 @@
                         }
                         if (currentLabelGroup == "info dodatkowe") {
                             html += '<a href="#" class="add__file"' + 'onclick="addNewFile(' + order.orderId + ')">Dodaj</a>'
+                            html += '<br />'
                             let url = "{{ route('orders.getFile', ['id' => '%%', 'file_id' => 'QQ']) }}";
                             let files = order.files;
                             if (files.length > 0) {
                                 let orderUrl = url.replace('%%', order.orderId);
                                 files.forEach(function (file) {
                                     let href = orderUrl.replace('QQ', file.hash);
-
                                     html += `<a target="_blank" href="${href}" style="margin-top: 5px;">${file.file_name}</a>`;
+                                    html += '<br />'
                                 });
-                                html += '<br />'
                                 html += '<a href="#" class="remove__file"' + 'onclick="getFilesList(' + order.orderId + ')">Usuń</a>'
                             }
                         }
-                        if (currentLabelGroup == "info dodatkowe") {
-                            let url = "{{ route('orders.getFile', ['id' => '%%', 'file_id' => 'QQ']) }}";
-                            let files = order.files;
-                            if (files.length > 0) {
-                                let orderUrl = url.replace('%%', order.orderId);
-                                files.forEach(function (file) {
-                                    let href = orderUrl.replace('QQ', file.hash);
 
-                                    html += `<a target="_blank" href="${href}" style="margin-top: 5px;">${file.file_name}</a>`;
-                                });
-                                html += '<br />'
-                                html += '<a href="#" class="remove__file"' + 'onclick="getFilesList(' + order.orderId + ')">Usuń</a>'
-                            }
-                        }
                         labels.forEach(function (label) {
                             if (label.length > 0) {
                                 if (label[0].label_group_id != null) {
