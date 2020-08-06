@@ -1246,7 +1246,9 @@ class OrdersController extends Controller
             return response('warehouse not found', 400);
         }
 
-        return dispatch_now(new RemoveLabelJob($order, [$labelId], $preventionArray, $labelsToAddAfterRemoval));
+        $time = $request->input('time');
+
+        return dispatch_now(new RemoveLabelJob($order, [$labelId], $preventionArray, $labelsToAddAfterRemoval, $time));
     }
 
     public function setPaymentDeadline(Request $request)
