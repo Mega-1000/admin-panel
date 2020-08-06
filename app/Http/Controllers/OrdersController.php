@@ -2531,7 +2531,9 @@ class OrdersController extends Controller
 
     public function getFile(int $id, string $file_id)
     {
-        return Storage::disk('private')->download('files/' . $id . '/' . $file_id);
+        $type = ["Content-Type" => Storage::disk('private')->mimeType('files/' . $id . '/' . $file_id)];
+        $file = Storage::disk('private')->get('files/' . $id . '/' . $file_id);
+        return response($file, 200, $type);
     }
 
     public function deleteFile(int $id)
