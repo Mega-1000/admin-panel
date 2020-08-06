@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Entities\Label;
 use App\Entities\LabelGroup;
+use App\Entities\Order;
 use App\Entities\Task;
 use App\Helpers\OrderCalcHelper;
 use App\Helpers\OrdersHelper;
 use App\Helpers\TaskHelper;
 use App\Helpers\TaskTimeHelper;
+use App\Http\Requests\DenyTaskRequest;
 use App\Http\Requests\TaskCreateRequest;
 use App\Http\Requests\TaskUpdateRequest;
 use App\Jobs\AddLabelJob;
@@ -692,6 +694,28 @@ class TasksController extends Controller
                 [Label::ORDER_ITEMS_UNDER_CONSTRUCTION],
                 $prev));
         }
+    }
+
+    public function deny(DenyTaskRequest $request)
+    {
+        $data = $request->validated();
+        $task = Task::find($data['task_id']);
+        $user = $task->user;
+        if ($task->childs->count()) {
+            $task->childs->map(function ($item) use ($data, $user) {
+                $item->order->warehouse_notice .= Order::formatMessage($user, $data['description']);
+                $item->order->save();
+                dispatch_now(new AddLabelJob($item->order->id, [Label::RED_HAMMER_ID], $prev));
+            });
+        } else {
+            $task->order->warehouse_notice .= Order::formatMessage($user, $data['description']);
+            $task->order->save();
+            dispatch_now(new AddLabelJob($task->order->id, [Label::RED_HAMMER_ID], $prev));
+        }
+        return redirect()->back()->with([
+            'message' => __('tasks.messages.update'),
+            'alert-type' => 'success'
+        ]);
     }
 
     public function produceOrders(Request $request)

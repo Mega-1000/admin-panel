@@ -457,6 +457,7 @@ Route::group(['prefix' => 'admin'], function () {
                     Route::post('/rejectTask', 'TasksController@rejectTask')->name('rejectTask');
                     Route::post('/produce', 'TasksController@produceOrders')->name('produceOrders');
                     Route::post('/produce-redirect', 'TasksController@produceOrdersRedirect')->name('produceOrdersRedirect');
+                    Route::post('/mark-denied/', 'TasksController@deny')->name('deny');
                 });
             Route::prefix('reports')->as('reports.')
                 ->group(function () {

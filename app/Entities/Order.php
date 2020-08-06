@@ -5,6 +5,7 @@ namespace App\Entities;
 use App\Helpers\TaskTimeHelper;
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 use Prettus\Repository\Contracts\Transformable;
@@ -125,6 +126,16 @@ class Order extends Model implements Transformable
         'master_order_id',
         'spedition_comment',
     ];
+
+    /**
+     * @param Authenticatable|null $user
+     * @param String $message
+     * @return string
+     */
+    public static function formatMessage(?Authenticatable $user, string $message): string
+    {
+        return PHP_EOL . Carbon::now()->toDateTimeString() . ' ' . $user->name . ' ' . $user->firstname . ' ' . $user->lastname . ': ' . $message;
+    }
 
     public function getPackagesCashOnSum()
     {
