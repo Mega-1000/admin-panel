@@ -1453,7 +1453,6 @@
                             }
                         }
                         labels.forEach(function (label) {
-                            console.log(labels, 'dsadsadsa')
                             if (label.length > 0) {
                                 if (label[0].label_group_id != null) {
                                     if (label[0].label_group[0].name == currentLabelGroup) {
