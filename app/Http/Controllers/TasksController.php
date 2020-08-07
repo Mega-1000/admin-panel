@@ -647,7 +647,7 @@ class TasksController extends Controller
         if (empty(User::find($id))) {
             return response(['error' => 'Brak danego użytkownika'], 400);
         }
-        $tasks = Task::where('tasks.user_id', 9)->whereHas('order', function ($query) {
+        $tasks = Task::where('tasks.user_id', $id)->whereHas('order', function ($query) {
             $query->whereHas('labels', function ($query) {
                 $query->where('labels.id', Label::ORDER_ITEMS_UNDER_CONSTRUCTION);
             });
