@@ -125,12 +125,14 @@ class LabelsController extends Controller
         $labelsToRemoveAfterAddition = $label->labelsToRemoveAfterAddition()->get();
         $labelsToRemoveAfterRemoval = $label->labelsToRemoveAfterRemoval()->get();
         $timedLabelsAfterAddition = $this->prepareTimedLabelsForFront($label->timedLabelsAfterAddition()->get());
+        $labelsToAddAfterTime = $label->labelsToAddAfterRemoval;
         $timedLabel = $label->timed;
 
         $labelsToAddAfterAdditionIds = $this->getArrayOfIds($labelsToAddAfterAddition);
         $labelsToAddAfterRemovalIds = $this->getArrayOfIds($labelsToAddAfterRemoval);
         $labelsToRemoveAfterAdditionIds = $this->getArrayOfIds($labelsToRemoveAfterAddition);
         $labelsToRemoveAfterRemovalIds = $this->getArrayOfIds($labelsToRemoveAfterRemoval);
+        $labelsToAddAfterTimeIds = $this->getArrayOfIds($labelsToAddAfterTime);
 
         return view('labels.edit', compact(
             'label',
@@ -140,6 +142,7 @@ class LabelsController extends Controller
             'labelsToAddAfterRemovalIds',
             'labelsToRemoveAfterAdditionIds',
             'labelsToRemoveAfterRemovalIds',
+            'labelsToAddAfterTimeIds',
             'timedLabelsAfterAddition',
             'timedLabel'
         ));
