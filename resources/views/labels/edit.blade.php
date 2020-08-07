@@ -129,7 +129,8 @@
                 <label for="labels_after_time">@lang('labels.form.labels_after_time')</label>
                 <select multiple class="form-control text-uppercase" name="labels_after_time[]">
                     @foreach($labels as $label)
-                        <option value="{{ $label->id }}">{{ $label->name }}</option>
+                        <option
+                            {{ in_array($label->id, $labelsToAddAfterTimeIds) ? 'selected="selected"' : '' }} value="{{ $label->id }}">{{ $label->name }}</option>
                     @endforeach
                 </select>
             </div>

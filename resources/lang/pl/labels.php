@@ -33,7 +33,7 @@ return [
         'labels_to_add_after_removal' => 'Etykiety do dodania po skasowaniu obecnej',
         'labels_to_remove_after_addition' => 'Etykiety do skasowania po dodaniu obecnej',
         'labels_to_remove_after_removal' => 'Etykiety do skasowania po skasowaniu obecnej',
-        'labels_after_time' => 'Etykiety do dodania po upłynięciu czasu obecnej etykiety'
+        'labels_after_time' => 'Etykiety do dodania po skasowaniu i upłynięciu wybranego czasu'
     ],
     'message' => [
         'store' => 'Etykieta została dodana pomyślnie!',

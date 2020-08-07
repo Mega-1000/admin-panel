@@ -2055,6 +2055,7 @@
                 data: {time: $('#time_label_removal').val()}
             }).done(function (res) {
                 $('#timed_label_success').modal('show');
+                table.ajax.reload(null, false);
             });
         }
 
