@@ -149,9 +149,9 @@ class RemoveLabelJob extends Job
         $targetDatetime = Carbon::parse($this->time);
         $delay = $now->diffInSeconds($targetDatetime);
         foreach($labelsToChange as $labelToChange) {
-            $addSideLabelJob = (new AddLabelJob($this->order->id, [$labelToChange->main_label_id]));
-            $removeSideLabelAfterTimeJob = (new RemoveLabelJob($this->order->id, [$labelToChange->main_label_id]))->delay($delay);
-            $addMainLabelAfterTimeJob = (new AddLabelJob($this->order->id, [$labelToChange->main_label_id]))->delay($delay);
+            dispatch_now(new AddLabelJob($this->order->id, [$labelToChange->pivot->label_to_add_id]));
+            dispatch(new RemoveLabelJob($this->order->id, [$labelToChange->pivot->label_to_add_id]))->delay($delay);
+            dispatch(new AddLabelJob($this->order->id, [$labelToChange->pivot->main_label_id]))->delay($delay);
         }
     }
 }
