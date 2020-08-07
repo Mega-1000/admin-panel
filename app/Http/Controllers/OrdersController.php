@@ -1435,7 +1435,9 @@ class OrdersController extends Controller
             return response('warehouse not found', 400);
         }
 
-        return dispatch_now(new RemoveLabelJob($order, [$labelId], $preventionArray, $labelsToAddAfterRemoval));
+        $time = $request->input('time');
+
+        return dispatch_now(new RemoveLabelJob($order, [$labelId], $preventionArray, $labelsToAddAfterRemoval, $time));
     }
 
     public function setPaymentDeadline(Request $request)
@@ -2719,7 +2721,9 @@ class OrdersController extends Controller
 
     public function getFile(int $id, string $file_id)
     {
-        return Storage::disk('private')->download('files/' . $id . '/' . $file_id);
+        $type = ["Content-Type" => Storage::disk('private')->mimeType('files/' . $id . '/' . $file_id)];
+        $file = Storage::disk('private')->get('files/' . $id . '/' . $file_id);
+        return response($file, 200, $type);
     }
 
     public function deleteFile(int $id)
