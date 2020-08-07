@@ -620,19 +620,21 @@ class OrdersController extends Controller
         $data = $request->validated();
         $skip = $data['skip'] ?? 0;
         dispatch((new RemoveFileLockJob($lockName))->delay(360));
-        if (File::exists(public_path($lockName))) {
+        if (File::exists(public_path($lockName)) == true) {
             return response(['error' => 'file_exist']);
         }
         file_put_contents($lockName, '');
         try {
             $task = $this->prepareTask($data['package_type'], $skip);
         } catch (Exception $e) {
+            unlink(public_path($lockName));
             return redirect()->back()->with([
                 'message' => $e->getMessage(),
                 'alert-type' => 'error',
             ]);
         }
         if (empty($task)) {
+            unlink(public_path($lockName));
             return redirect()->back()->with([
                 'message' => 'Brak nieprzydzielonych paczek dla: ' . $data['package_type'] . ' spróbuj wygenerować paczki dla innego kuriera',
                 'alert-type' => 'error',
@@ -713,7 +715,7 @@ class OrdersController extends Controller
             }])
             ->whereHas('order', function ($query) use ($courierArray) {
                 $query->whereHas('packages', function ($query) use ($courierArray) {
-                    $query->whereIn('delivery_courier_name', $courierArray);
+                    $query->whereIn('service_courier_name', $courierArray);
                 })->whereHas('labels', function ($query) {
                     $query->where('labels.id', Label::ORDER_ITEMS_UNDER_CONSTRUCTION)
                         ->where('labels.id', '!=', Label::RED_HAMMER_ID);
