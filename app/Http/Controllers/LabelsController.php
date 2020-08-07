@@ -125,7 +125,7 @@ class LabelsController extends Controller
         $labelsToRemoveAfterAddition = $label->labelsToRemoveAfterAddition()->get();
         $labelsToRemoveAfterRemoval = $label->labelsToRemoveAfterRemoval()->get();
         $timedLabelsAfterAddition = $this->prepareTimedLabelsForFront($label->timedLabelsAfterAddition()->get());
-        $labelsToAddAfterTime = $label->labelsToAddAfterRemoval;
+        $labelsToAddAfterTime = $label->labelsToAddAfterTimedLabel;
         $timedLabel = $label->timed;
 
         $labelsToAddAfterAdditionIds = $this->getArrayOfIds($labelsToAddAfterAddition);
