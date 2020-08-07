@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
     <title>Zamówienie {{ $order->id }}</title>
-{{--    <meta charset="UTF-8">--}}
+    {{--    <meta charset="UTF-8">--}}
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 
     <style>
@@ -104,9 +104,11 @@
     {!! $tagHelper->shipmentData() !!}
 </div>
 
-<script>
-    window.print();
-</script>
+@if(empty($notPrint))
+    <script>
+        window.print();
+    </script>
+@endif
 
 </body>
 </html>

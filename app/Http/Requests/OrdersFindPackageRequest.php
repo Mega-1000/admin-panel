@@ -25,7 +25,9 @@ class OrdersFindPackageRequest extends FormRequest
     {
         return [
             'user_id' => 'exists:users,id',
-            'package_type' => 'required'
+            'package_type' => 'required',
+            'skip' => 'integer',
+            'action' => '',
         ];
     }
 }

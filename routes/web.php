@@ -251,6 +251,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('orders/sendSelfOrderToWarehouse/{id}',
             'OrdersController@sendSelfOrderToWarehouse')->name('orders.sendSelfOrderToWarehouse');
         Route::post('orders/findPackage', 'OrdersController@findPackage')->name('orders.findPackage');
+        Route::post('orders/accept-deny', 'OrdersController@acceptDeny')->name('accept-deny');
         Route::post('orders/datatable', 'OrdersController@datatable')->name('orders.datatable');
         Route::post('orders/printAll', 'OrdersController@printAll')->name('orders.printAll');
         Route::post('orders/sendVisibleCouriers', 'OrdersController@sendVisibleCouriers')->name('orders.sendVisibleCouriers');

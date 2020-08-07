@@ -92,6 +92,7 @@ use Yajra\DataTables\Facades\DataTables;
  */
 class OrdersController extends Controller
 {
+    const ALLSMALLPRINTS_PDF = 'allsmallprints.pdf';
     /**
      * @var FirmRepository
      */
@@ -614,16 +615,17 @@ class OrdersController extends Controller
 
     public function findPackage(OrdersFindPackageRequest $request)
     {
-        $finalPdfFileName = 'allsmallprints.pdf';
+        $finalPdfFileName = self::ALLSMALLPRINTS_PDF;
         $lockName = 'file.lock.small';
+        $data = $request->validated();
+        $skip = $data['skip'] ?? 0;
         dispatch((new RemoveFileLockJob($lockName))->delay(360));
         if (File::exists(public_path($lockName))) {
             return response(['error' => 'file_exist']);
         }
         file_put_contents($lockName, '');
-        $data = $request->validated();
         try {
-            $task = $this->prepareTask($data['package_type']);
+            $task = $this->prepareTask($data['package_type'], $skip);
         } catch (Exception $e) {
             return redirect()->back()->with([
                 'message' => $e->getMessage(),
@@ -636,21 +638,57 @@ class OrdersController extends Controller
                 'alert-type' => 'error',
             ]);
         }
+        $user = User::find($data['user_id']);
         $similar = OrdersHelper::findSimilarOrders($task->order);
-        $this->attachTaskForUser($task, $data, $similar);
-        $this->createListOfWz($similar, $task, $finalPdfFileName, $lockName);
-        return response(Storage::disk('public')->get($finalPdfFileName), 200, [
-            'Content-Type' => 'application/pdf',
-            'Content-Disposition' => 'inline'
-        ]);
+        if (!$user->can_decline) {
+            $this->attachTaskForUser($task, $data['user_id'], $similar);
+        }
+        $views = $this->createListOfWz($similar, $task, $finalPdfFileName, $lockName);
+        $pdf = Storage::disk('public')->get($finalPdfFileName);
+        if (!$user->can_decline) {
+            return response($pdf, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline'
+            ]);
+        }
+        $view = View::make('orders.confirm', ['user_id' => $user->id, 'skip' => $skip + 1, 'package_type' => $data['package_type']]);
+        return response($views . $view, 200);
+    }
+
+    public function acceptDeny(OrdersFindPackageRequest $request)
+    {
+        $finalPdfFileName = self::ALLSMALLPRINTS_PDF;
+        $data = $request->validated();
+        $skip = $data['skip'] ?? 1;
+        if ($data['action'] == 'accept') {
+            $skip = $skip - 1;
+            try {
+                $task = $this->prepareTask($data['package_type'], $skip);
+                $similar = OrdersHelper::findSimilarOrders($task->order);
+                $this->attachTaskForUser($task, $data['user_id'], $similar);
+            } catch (Exception $e) {
+                return redirect()->back()->with([
+                    'message' => $e->getMessage(),
+                    'alert-type' => 'error',
+                ]);
+            }
+            $pdf = Storage::disk('public')->get($finalPdfFileName);
+            return response($pdf, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline'
+            ]);
+        } else {
+            return $this->findPackage($request);
+        }
     }
 
     /**
      * @param $package_type
+     * @param $skip
      * @return mixed
      * @throws Exception
      */
-    private function prepareTask($package_type)
+    private function prepareTask($package_type, $skip)
     {
         $courierArray = [];
         switch ($package_type) {
@@ -678,18 +716,18 @@ class OrdersController extends Controller
                     $query->whereIn('delivery_courier_name', $courierArray);
                 })->whereHas('labels', function ($query) {
                     $query->where('labels.id', Label::ORDER_ITEMS_UNDER_CONSTRUCTION)
-                        ->whereNot('labels.id', Label::RED_HAMMER_ID);
+                        ->where('labels.id', '!=', Label::RED_HAMMER_ID);
                 });
-            })->first();
+            })->offset($skip)->first();
         return $task;
     }
 
     /**
      * @param $task
-     * @param array $data
+     * @param int $user_id
      * @param array $similar
      */
-    private function attachTaskForUser($task, array $data, array $similar): void
+    private function attachTaskForUser($task, int $user_id, array $similar): void
     {
         $newGroup = Task::whereIn('order_id', $similar)->get();
         $newGroup = $newGroup->concat([$task]);
@@ -705,8 +743,8 @@ class OrdersController extends Controller
         $data = [
             'start' => $dt->toDateTimeString(),
             'end' => $dt->addMinutes($duration)->toDateTimeString(),
-            'id' => $data['user_id'],
-            'user_id' => $data['user_id']
+            'id' => $user_id,
+            'user_id' => $user_id
         ];
         if ($newGroup->count() > 1) {
             TaskHelper::createNewGroup($newGroup, $task, $duration, $data);
@@ -718,8 +756,55 @@ class OrdersController extends Controller
         if ($tsk->parent->count()) {
             $tsk = $tsk->parent->first();
         }
-        $tsk->user_id = $data['user_id'];
+        $tsk->user_id = $user_id;
         $tsk->save();
+    }
+
+    /**
+     * @param array $similar
+     * @param $task
+     * @param string $finalPdfFileName
+     * @param string $lockName
+     */
+    private function createListOfWz(array $similar, $task, string $finalPdfFileName, string $lockName)
+    {
+        $allOrders = array_merge($similar, [$task->order->id]);
+        $tagHelper = new EmailTagHandlerHelper();
+        $merger = new Merger;
+        $i = 0;
+        $views = '';
+        foreach ($allOrders as $ord) {
+            $dompdf = new Dompdf(['enable_remote' => true]);
+            $order = Order::find($ord);
+            $tagHelper->setOrder($order);
+            $similar = OrdersHelper::findSimilarOrders($order);
+
+            $view = View::make('orders.print', [
+                'similar' => $similar,
+                'order' => $order,
+                'tagHelper' => $tagHelper,
+                'showPosition' => true,
+                'notPrint' => true
+            ]);
+            $views .= $view;
+            if (empty($view)) {
+                continue;
+            }
+            $dompdf->loadHTML($view);
+            $dompdf->render();
+            $output = $dompdf->output();
+            file_put_contents("spec_usr_$i.pdf", $output);
+            $merger->addFile(public_path("spec_usr_$i.pdf"));
+            $i++;
+        }
+        $file = $merger->merge();
+        file_put_contents(public_path("storage/$finalPdfFileName"), $file);
+        while ($i >= 0) {
+            File::delete(public_path("spec_usr_$i.pdf"));
+            $i--;
+        }
+        unlink(public_path($lockName));
+        return $views;
     }
 
     public function updateNotices(NoticesRequest $request)
@@ -2840,49 +2925,6 @@ class OrdersController extends Controller
             }, 0);
             return $acu + $totalAmountForPack;
         }, 0);
-    }
-
-    /**
-     * @param array $similar
-     * @param $task
-     * @param string $finalPdfFileName
-     * @param string $lockName
-     */
-    private function createListOfWz(array $similar, $task, string $finalPdfFileName, string $lockName): void
-    {
-        $allOrders = array_merge($similar, [$task->order->id]);
-        $tagHelper = new EmailTagHandlerHelper();
-        $merger = new Merger;
-        $i = 0;
-        foreach ($allOrders as $ord) {
-            $dompdf = new Dompdf(['enable_remote' => true]);
-            $order = Order::find($ord);
-            $tagHelper->setOrder($order);
-            $similar = OrdersHelper::findSimilarOrders($order);
-
-            $view = View::make('orders.print', [
-                'similar' => $similar,
-                'order' => $order,
-                'tagHelper' => $tagHelper,
-                'showPosition' => true
-            ]);
-            if (empty($view)) {
-                continue;
-            }
-            $dompdf->loadHTML($view);
-            $dompdf->render();
-            $output = $dompdf->output();
-            file_put_contents("spec_usr_$i.pdf", $output);
-            $merger->addFile(public_path("spec_usr_$i.pdf"));
-            $i++;
-        }
-        $file = $merger->merge();
-        file_put_contents(public_path("storage/$finalPdfFileName"), $file);
-        while ($i >= 0) {
-            File::delete(public_path("spec_usr_$i.pdf"));
-            $i--;
-        }
-        unlink(public_path($lockName));
     }
 }
 
