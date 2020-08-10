@@ -241,6 +241,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             ->map(function ($singleTransaction) use ($tax) {
                 if ($singleTransaction->transactionItem->itemExist()) {
                     $symbol = explode('-', $singleTransaction->transactionItem->item->it_Symbol);
+                    $quantity = explode('Q', $singleTransaction->transactionItem->item->it_Symbol)[1];
                     $newSymbol = [$symbol[0], $symbol[1], '0'];
                     $newSymbol = join('-', $newSymbol);
                     $product = Product::where('symbol', $newSymbol)->first();
@@ -248,13 +249,21 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                 if (empty($product)) {
                     $product = Product::getDefaultProduct();
                 }
+                if (!empty($quantity)) {
+                    $product->tt_quantity = $quantity;
+                    $product->price_override = [
+                        'gross_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price / $quantity,
+                        'net_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price / $quantity / $tax
+                    ];
+                } else {
+                    $product->tt_quantity = $singleTransaction->transactionItem->tt_Quantity;
+                    $product->price_override = [
+                        'gross_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price,
+                        'net_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price / $tax
+                    ];
+                }
                 $product->transaction_id = $singleTransaction->id;
-                $product->tt_quantity = $singleTransaction->transactionItem->tt_Quantity;
                 $product->total_price = $singleTransaction->tr_Payment - $singleTransaction->tr_DeliveryCost;
-                $product->price_override = [
-                    'gross_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price,
-                    'net_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price / $tax
-                ];
                 return $product;
             });
         return $products;
