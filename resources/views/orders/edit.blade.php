@@ -381,7 +381,7 @@
             </div>
             <div class="form-group" style="width: 25%; float: left; padding: 5px;">
                 @include('orders.labels', ['title' =>  __('orders.form.financial_notices')])
-                <textarea disabled class="form-control" name="financial_comment" id="financial_comment"
+                <textarea disabled class="form-control" name="financial_comment" id="financial_notices"
                           rows="5">{{ $order->financial_comment ?? ''}}</textarea>
                 <div class="flex-input">
                     <input type="text" class="form-control" placeholder="@lang('orders.form.financial_notices')"
