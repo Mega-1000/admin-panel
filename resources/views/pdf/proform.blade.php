@@ -50,26 +50,23 @@
                 </td>
                 <td>
                     <h4>Nabywca</h4>
-                    @if($order->isInvoiceDataComplete())
-                    <p> {{ $order->getInvoiceAddress()->firstname }} {{ $order->getInvoiceAddress()->lastname }} {{ $order->getInvoiceAddress()->firmname }} <br/>
-                        {{ $order->getInvoiceAddress()->address }} {{ $order->getInvoiceAddress()->flat_number }}    <br/>
-                        {{ $order->getInvoiceAddress()->postal_code }} {{ $order->getInvoiceAddress()->city }}<br/>
-                        @if($order->getInvoiceAddress()->nip != null)
-                        NIP: {{ $order->getInvoiceAddress()->nip }} <br/>
+                    <p> {{ $order->getInvoiceAddress()->firstname ?? ''}} {{ $order->getInvoiceAddress()->lastname ?? '' }} {{ $order->getInvoiceAddress()->firmname ?? ''}} <br/>
+                        {{ $order->getInvoiceAddress()->address ?? ''}} {{ $order->getInvoiceAddress()->flat_number ?? ''}}    <br/>
+                        {{ $order->getInvoiceAddress()->postal_code ?? ''}} {{ $order->getInvoiceAddress()->city ?? ''}}<br/>
+                        @if(!empty($order->getInvoiceAddress()->nip))
+                            NIP: {{ $order->getInvoiceAddress()->nip }} <br/>
                         @endif
                     </p>
-                    @else
-                        <p> {{ $order->customer->standardAddress()->email }}<br/>
-                            {{ $order->customer->standardAddress()->phone }}
+                        <p> {{ $order->customer->standardAddress()->email ?? '' }}<br/>
+                            {{ $order->customer->standardAddress()->phone ?? '' }}
                         </p>
-                    @endif
                 </td>
             </tr>
         </tbody>
     </table>
-    <p>
+    <h4>
         UWAGA przy dokonwyaniu przelewu bankowego tej oferty trzeba koniecznie wpisać ciąg znaków QQ{{ $order->id }}QQ
-    </p>
+    </h4>
     <table class="table table-striped" style="table-layout:fixed; width: 100%;">
         <thead>
         <tr style="height:20px;">
