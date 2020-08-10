@@ -65,11 +65,11 @@ class AllegroPaymentImporter
 
         $transaction = SelTransaction::where('tr_CheckoutFormPaymentId', $id)->orderBy('tr_Group', 'desc')->first();
         if (empty($transaction)) {
-            throw new \Exception('id: ' . $id, 1);
+            throw new \Exception($id, 1);
         }
         $order = $transaction->order;
         if (empty($order)) {
-            throw new \Exception('id: ' . $id, 2);
+            throw new \Exception($id, 2);
         }
         $payment = $order->promisePayments();
         $found = $payment->filter(function ($item) use ($amount) {
@@ -79,9 +79,9 @@ class AllegroPaymentImporter
         if (empty($found)) {
             $isPaid = $order->bookedPayments()->where('amount', $amount)->count() > 0;
             if ($isPaid) {
-                throw new \Exception('id: ' . $id, 3);
+                throw new \Exception($id, 3);
             }
-            throw new \Exception('id: transakcji: ' . $id . ', kwota: ' . $amount, 4);
+            throw new \Exception('id transakcji: ' . $id . ', kwota: ' . $amount, 4);
         }
         $found->promise = 0;
         $found->save();
