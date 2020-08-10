@@ -1029,7 +1029,7 @@
                 <input type="email" class="form-control" id="customer_address.email" name="customer_address.email"
                        value="{{ $orderDeliveryAddress->email ?? '' }}" disabled>
             </div>
-            <h3>Etykiety</h3>
+            <h3>Etykiety (kasowanie etykiet nie wywołuje dodatkowych konsekwencji)</h3>
             @foreach($order->labels as $label)
                 <div class="border" id="label_{{ $label->id }}">
                     <i onclick="removeLabel({{ $label->id }})" style="cursor: pointer; color: red"
