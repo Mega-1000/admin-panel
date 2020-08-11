@@ -476,7 +476,7 @@
                         $('.default-date-time-picker-now').datetimepicker({
                             sideBySide: true,
                             format: "YYYY-MM-DD H:mm",
-                            stepping: 5
+                            stepping: 1
                         });
                         $('.add-end-time').click(event => {
                             event.preventDefault();
@@ -666,7 +666,7 @@
                     $('.default-date-time-picker-now').datetimepicker({
                         sideBySide: true,
                         format: "YYYY-MM-DD H:mm",
-                        stepping: 5
+                        stepping: 1
                     });
 
                 },
@@ -847,7 +847,7 @@
                             $('.default-date-time-picker-now').datetimepicker({
                                 sideBySide: true,
                                 format: "YYYY-MM-DD H:mm",
-                                stepping: 5
+                                stepping: 1
                             });
                             $('.default-date-picker-now').datetimepicker({
                                 sideBySide: true,
