@@ -160,8 +160,6 @@
             <label for="send_labels_allegro">Wyślij numery naklejek do allegro: </label>
             <a name="send_labels_allegro" class="btn btn-success" href="{{ route('orders.send_tracking_numbers') }}">Wyślij
                 numery</a>
-
-
         </div>
         <div class="form-group">
             <label for="print_courier">Drukuj naklejki: </label>
@@ -261,6 +259,11 @@
                     @endfor
                     </tbody>
                 </table>
+                <form method="POST" action="{{ route('orders.create-payments')}}">
+                    @csrf
+                    <input type="hidden" name="payments_ids" value="{{ json_encode($type1)}}">
+                    <button class="btn btn-success">Utwórz transakcje</button>
+                </form>
             @endif
         </div>
         <div class="form-group">

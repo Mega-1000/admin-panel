@@ -23,11 +23,14 @@ use App\Entities\UserSurplusPaymentHistory;
 use App\Entities\Warehouse;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
+use App\Helpers\GetCustomerForNewOrder;
 use App\Helpers\LabelsHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderCalcHelper;
+use App\Helpers\OrderPriceCalculator;
 use App\Helpers\OrdersHelper;
 use App\Helpers\TaskHelper;
+use App\Helpers\TransportSumCalculator;
 use App\Http\Requests\CreatePaymentsRequest;
 use App\Http\Requests\NoticesRequest;
 use App\Http\Requests\OrdersFindPackageRequest;
@@ -2880,6 +2883,25 @@ class OrdersController extends Controller
         OrderInvoice::where('id', $id)->delete();
 
         return response()->json(['status' => 'success']);
+    }
+
+    public function createPayments(CreatePaymentsRequest $request)
+    {
+        $data = $request->validated();
+        foreach ($data['payments_ids'] as $payments_id) {
+            $orderParams = [
+                'want_contact' => true,
+            ];
+            $orderBuilder = new OrderBuilder();
+            $orderBuilder
+                ->setPackageGenerator(new BackPackPackageDivider())
+                ->setPriceCalculator(new OrderPriceCalculator())
+                ->setTotalTransportSumCalculator(new TransportSumCalculator)
+                ->setUserSelector(new GetCustomerForNewOrder());
+            ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($orderParams);
+
+        }
+        return \response('success');
     }
 
     /**
