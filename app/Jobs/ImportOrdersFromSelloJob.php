@@ -241,7 +241,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             ->map(function ($singleTransaction) use ($tax) {
                 if ($singleTransaction->transactionItem->itemExist()) {
                     $symbol = explode('-', $singleTransaction->transactionItem->item->it_Symbol);
-                    $quantity = explode('Q', $singleTransaction->transactionItem->item->it_Symbol)[1];
+                    $quantity = explode('Q', $singleTransaction->transactionItem->item->it_Symbol)[1] ?? '';
                     $newSymbol = [$symbol[0], $symbol[1], '0'];
                     $newSymbol = join('-', $newSymbol);
                     $product = Product::where('symbol', $newSymbol)->first();
