@@ -2888,9 +2888,16 @@ class OrdersController extends Controller
     public function createPayments(CreatePaymentsRequest $request)
     {
         $data = $request->validated();
-        foreach ($data['payments_ids'] as $payments_id) {
+        $arr = json_decode($data['payments_ids']);
+        foreach ($arr as $payment) {
+            $pay = json_decode($payment);
+            $order = Order::where('return_payment_id', $pay->id)->count();
+            if ($order) {
+                continue;
+            }
             $orderParams = [
                 'want_contact' => true,
+                'phone' => User::CONTACT_PHONE
             ];
             $orderBuilder = new OrderBuilder();
             $orderBuilder
@@ -2899,9 +2906,18 @@ class OrdersController extends Controller
                 ->setTotalTransportSumCalculator(new TransportSumCalculator)
                 ->setUserSelector(new GetCustomerForNewOrder());
             ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($orderParams);
-
+            OrdersPaymentsController::payOrder($id, $pay->amount,
+                null, 1,
+                null, Carbon::today()->addDay(7)->toDateTimeString());
+            $order = Order::find($id);
+            $order->return_payment_id = $pay->id;
+            $order->labels()->attach(Label::SHIPPING_MARK);
+            $order->save();
         }
-        return \response('success');
+        return back()->with([
+            'message' => __('voyager.generic.successfully_added_new'),
+            'alert-type' => 'success',
+        ]);
     }
 
     /**

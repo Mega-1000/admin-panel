@@ -250,11 +250,11 @@
                     @endphp
                     @for ($i = 0; $i < $length; $i++)
                         <tr>
-                            <td>{!! isset($type1[$i]) ? $type1[$i] : '' !!}</td>
-                            <td>{!! isset($type2[$i]) ? $type2[$i] : '' !!}</td>
-                            <td>{!! isset($type3[$i]) ? $type3[$i] : '' !!}</td>
-                            <td>{!! isset($type4[$i]) ? $type4[$i] : '' !!}</td>
-                            <td>{!! isset($typeOther[$i]) ? $typeOther[$i] : '' !!}</td>
+                            <td>{!! !empty($type1[$i]) ? json_decode($type1[$i])->id : '' !!}</td>
+                            <td>{!! !empty($type2[$i]) ? json_decode($type2[$i])->id : '' !!}</td>
+                            <td>{!! !empty($type3[$i]) ? json_decode($type3[$i])->id : '' !!}</td>
+                            <td>{!! !empty($type4[$i]) ? json_decode($type4[$i])->id : '' !!}</td>
+                            <td>{!! !empty($typeOther[$i]) ? 'transakcja: ' . json_decode($typeOther[$i])->id. ', kwota: ' . json_decode($typeOther[$i])->amount : '' !!}</td>
                         </tr>
                     @endfor
                     </tbody>

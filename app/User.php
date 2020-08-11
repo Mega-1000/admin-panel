@@ -29,6 +29,7 @@ class User extends \TCG\Voyager\Models\User
     const ROLE_ACCOUNTANT = 3;
     const ROLE_CONSULTANT = 4;
     public const OLAWA_USER_ID = 37;
+    const CONTACT_PHONE = 691801594;
 
     /**
      * The attributes that are mass assignable.
@@ -128,7 +129,7 @@ class User extends \TCG\Voyager\Models\User
     {
         return $this->belongsToMany(Chat::class, 'chat_user')->withTimestamps();
     }
-    
+
     public function orders()
     {
         return $this->hasMany(Order::class, 'employee_id');
