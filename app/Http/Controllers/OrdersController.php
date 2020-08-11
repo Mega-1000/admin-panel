@@ -28,6 +28,7 @@ use App\Helpers\OrderBuilder;
 use App\Helpers\OrderCalcHelper;
 use App\Helpers\OrdersHelper;
 use App\Helpers\TaskHelper;
+use App\Http\Requests\CreatePaymentsRequest;
 use App\Http\Requests\NoticesRequest;
 use App\Http\Requests\OrdersFindPackageRequest;
 use App\Http\Requests\OrderUpdateRequest;
@@ -613,50 +614,6 @@ class OrdersController extends Controller
         return $productsVariation;
     }
 
-    public function findPackage(OrdersFindPackageRequest $request)
-    {
-        $finalPdfFileName = self::ALLSMALLPRINTS_PDF;
-        $lockName = 'file.lock.small';
-        $data = $request->validated();
-        $skip = $data['skip'] ?? 0;
-        dispatch((new RemoveFileLockJob($lockName))->delay(360));
-        if (File::exists(public_path($lockName)) == true) {
-            return response(['error' => 'file_exist']);
-        }
-        file_put_contents($lockName, '');
-        try {
-            $task = $this->prepareTask($data['package_type'], $skip);
-        } catch (Exception $e) {
-            unlink(public_path($lockName));
-            return redirect()->back()->with([
-                'message' => $e->getMessage(),
-                'alert-type' => 'error',
-            ]);
-        }
-        if (empty($task)) {
-            unlink(public_path($lockName));
-            return redirect()->back()->with([
-                'message' => 'Brak nieprzydzielonych paczek dla: ' . $data['package_type'] . ' spróbuj wygenerować paczki dla innego kuriera',
-                'alert-type' => 'error',
-            ]);
-        }
-        $user = User::find($data['user_id']);
-        $similar = OrdersHelper::findSimilarOrders($task->order);
-        if (!$user->can_decline) {
-            $this->attachTaskForUser($task, $data['user_id'], $similar);
-        }
-        $views = $this->createListOfWz($similar, $task, $finalPdfFileName, $lockName);
-        $pdf = Storage::disk('public')->get($finalPdfFileName);
-        if (!$user->can_decline) {
-            return response($pdf, 200, [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'inline'
-            ]);
-        }
-        $view = View::make('orders.confirm', ['user_id' => $user->id, 'skip' => $skip + 1, 'package_type' => $data['package_type']]);
-        return response($views . $view, 200);
-    }
-
     public function acceptDeny(OrdersFindPackageRequest $request)
     {
         $finalPdfFileName = self::ALLSMALLPRINTS_PDF;
@@ -717,8 +674,11 @@ class OrdersController extends Controller
                 $query->whereHas('packages', function ($query) use ($courierArray) {
                     $query->whereIn('service_courier_name', $courierArray);
                 })->whereHas('labels', function ($query) {
-                    $query->where('labels.id', Label::ORDER_ITEMS_UNDER_CONSTRUCTION)
-                        ->where('labels.id', '!=', Label::RED_HAMMER_ID);
+                    $query
+                        ->where('labels.id', Label::BLUE_HAMMER_ID)
+                        ->where('labels.id', '!=', Label::RED_HAMMER_ID)
+                        ->where('labels.id', '!=', Label::GRAY_HAMMER_ID)
+                        ->where('labels.id', '!=', Label::PRODUCTION_STOP_ID);
                 });
             })->offset($skip)->first();
         return $task;
@@ -760,6 +720,50 @@ class OrdersController extends Controller
         }
         $tsk->user_id = $user_id;
         $tsk->save();
+    }
+
+    public function findPackage(OrdersFindPackageRequest $request)
+    {
+        $finalPdfFileName = self::ALLSMALLPRINTS_PDF;
+        $lockName = 'file.lock.small';
+        $data = $request->validated();
+        $skip = $data['skip'] ?? 0;
+        dispatch((new RemoveFileLockJob($lockName))->delay(360));
+        if (File::exists(public_path($lockName)) == true) {
+            return response(['error' => 'file_exist']);
+        }
+        file_put_contents($lockName, '');
+        try {
+            $task = $this->prepareTask($data['package_type'], $skip);
+        } catch (Exception $e) {
+            unlink(public_path($lockName));
+            return redirect()->back()->with([
+                'message' => $e->getMessage(),
+                'alert-type' => 'error',
+            ]);
+        }
+        if (empty($task)) {
+            unlink(public_path($lockName));
+            return redirect()->back()->with([
+                'message' => 'Brak nieprzydzielonych paczek dla: ' . $data['package_type'] . ' spróbuj wygenerować paczki dla innego kuriera',
+                'alert-type' => 'error',
+            ]);
+        }
+        $user = User::find($data['user_id']);
+        $similar = OrdersHelper::findSimilarOrders($task->order);
+        if (!$user->can_decline) {
+            $this->attachTaskForUser($task, $data['user_id'], $similar);
+        }
+        $views = $this->createListOfWz($similar, $task, $finalPdfFileName, $lockName);
+        $pdf = Storage::disk('public')->get($finalPdfFileName);
+        if (!$user->can_decline) {
+            return response($pdf, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline'
+            ]);
+        }
+        $view = View::make('orders.confirm', ['user_id' => $user->id, 'skip' => $skip + 1, 'package_type' => $data['package_type']]);
+        return response($views . $view, 200);
     }
 
     /**

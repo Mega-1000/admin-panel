@@ -23,6 +23,8 @@ class Label extends Model implements Transformable
     const BLUE_HAMMER_ID = 47;
     const GREEN_HAMMER_ID = 48;
     const RED_HAMMER_ID = 96;
+    const GRAY_HAMMER_ID = 149;
+    const PRODUCTION_STOP_ID = 145;
     const ORDER_ITEMS_UNDER_CONSTRUCTION = 49;
     const ORDER_ITEMS_CONSTRUCTED = 50;
     const IS_NOT_PAID = 119;
