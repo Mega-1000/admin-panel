@@ -18,7 +18,7 @@
                     <h4 class="modal-title" id="titleModal"></h4>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" id="print-package-form" action="{{ route('orders.findPackage') }}">
+                    <form method="POST" target="_blank" id="print-package-form" action="{{ route('orders.findPackage') }}">
                         @csrf()
                         <select name="user_id" required class="form-control">
                             <option value="" selected="selected">wybierz użytkownika</option>

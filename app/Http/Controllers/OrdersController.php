@@ -302,7 +302,7 @@ class OrdersController extends Controller
         $labels = Label::all();
         $couriers = \DB::table('order_packages')->distinct()->select('delivery_courier_name')->get();
         $warehouses = $this->warehouseRepository->findByField('symbol', 'MEGA-OLAWA');
-        $users = User::all();
+        $storekeepers = User::where('role_id', User::ROLE_STOREKEEPER)->get();
 
         $allWarehouses = Warehouse::all();
         $customColumnLabels = [];
@@ -372,7 +372,7 @@ class OrdersController extends Controller
             ->withLabels($labels)
             ->withDeliverers($deliverers)
             ->withTemplateData($templateData)
-            ->withUsers($users)
+            ->withUsers($storekeepers)
             ->withAllWarehouses($allWarehouses);
     }
 
@@ -708,6 +708,11 @@ class OrdersController extends Controller
             'id' => $user_id,
             'user_id' => $user_id
         ];
+        foreach ($similar as $order_id) {
+            dispatch_now(new RemoveLabelJob($order_id, [Label::BLUE_HAMMER_ID]));
+        }
+        dispatch_now(new RemoveLabelJob($task->order->id, [Label::BLUE_HAMMER_ID]));
+
         if ($newGroup->count() > 1) {
             TaskHelper::createNewGroup($newGroup, $task, $duration, $data);
         } else {

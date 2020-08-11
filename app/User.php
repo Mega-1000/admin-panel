@@ -28,6 +28,7 @@ class User extends \TCG\Voyager\Models\User
     const ROLE_ADMIN = 2;
     const ROLE_ACCOUNTANT = 3;
     const ROLE_CONSULTANT = 4;
+    const ROLE_STOREKEEPER = 5;
     public const OLAWA_USER_ID = 37;
 
     /**
@@ -128,7 +129,7 @@ class User extends \TCG\Voyager\Models\User
     {
         return $this->belongsToMany(Chat::class, 'chat_user')->withTimestamps();
     }
-    
+
     public function orders()
     {
         return $this->hasMany(Order::class, 'employee_id');
