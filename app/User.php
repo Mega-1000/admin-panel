@@ -30,6 +30,7 @@ class User extends \TCG\Voyager\Models\User
     const ROLE_CONSULTANT = 4;
     const ROLE_STOREKEEPER = 5;
     public const OLAWA_USER_ID = 37;
+    const CONTACT_PHONE = 691801594;
 
     /**
      * The attributes that are mass assignable.

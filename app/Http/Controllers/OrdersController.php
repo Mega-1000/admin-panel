@@ -23,11 +23,14 @@ use App\Entities\UserSurplusPaymentHistory;
 use App\Entities\Warehouse;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
+use App\Helpers\GetCustomerForNewOrder;
 use App\Helpers\LabelsHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderCalcHelper;
+use App\Helpers\OrderPriceCalculator;
 use App\Helpers\OrdersHelper;
 use App\Helpers\TaskHelper;
+use App\Helpers\TransportSumCalculator;
 use App\Http\Requests\CreatePaymentsRequest;
 use App\Http\Requests\NoticesRequest;
 use App\Http\Requests\OrdersFindPackageRequest;
@@ -2885,6 +2888,41 @@ class OrdersController extends Controller
         OrderInvoice::where('id', $id)->delete();
 
         return response()->json(['status' => 'success']);
+    }
+
+    public function createPayments(CreatePaymentsRequest $request)
+    {
+        $data = $request->validated();
+        $arr = json_decode($data['payments_ids']);
+        foreach ($arr as $payment) {
+            $pay = json_decode($payment);
+            $order = Order::where('return_payment_id', $pay->id)->count();
+            if ($order) {
+                continue;
+            }
+            $orderParams = [
+                'want_contact' => true,
+                'phone' => User::CONTACT_PHONE
+            ];
+            $orderBuilder = new OrderBuilder();
+            $orderBuilder
+                ->setPackageGenerator(new BackPackPackageDivider())
+                ->setPriceCalculator(new OrderPriceCalculator())
+                ->setTotalTransportSumCalculator(new TransportSumCalculator)
+                ->setUserSelector(new GetCustomerForNewOrder());
+            ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($orderParams);
+            OrdersPaymentsController::payOrder($id, $pay->amount,
+                null, 1,
+                null, Carbon::today()->addDay(7)->toDateTimeString());
+            $order = Order::find($id);
+            $order->return_payment_id = $pay->id;
+            $order->labels()->attach(Label::SHIPPING_MARK);
+            $order->save();
+        }
+        return back()->with([
+            'message' => __('voyager.generic.successfully_added_new'),
+            'alert-type' => 'success',
+        ]);
     }
 
     /**

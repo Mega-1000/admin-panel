@@ -160,8 +160,6 @@
             <label for="send_labels_allegro">Wyślij numery naklejek do allegro: </label>
             <a name="send_labels_allegro" class="btn btn-success" href="{{ route('orders.send_tracking_numbers') }}">Wyślij
                 numery</a>
-
-
         </div>
         <div class="form-group">
             <label for="print_courier">Drukuj naklejki: </label>
@@ -252,15 +250,20 @@
                     @endphp
                     @for ($i = 0; $i < $length; $i++)
                         <tr>
-                            <td>{!! isset($type1[$i]) ? $type1[$i] : '' !!}</td>
-                            <td>{!! isset($type2[$i]) ? $type2[$i] : '' !!}</td>
-                            <td>{!! isset($type3[$i]) ? $type3[$i] : '' !!}</td>
-                            <td>{!! isset($type4[$i]) ? $type4[$i] : '' !!}</td>
-                            <td>{!! isset($typeOther[$i]) ? $typeOther[$i] : '' !!}</td>
+                            <td>{!! !empty($type1[$i]) ? json_decode($type1[$i])->id : '' !!}</td>
+                            <td>{!! !empty($type2[$i]) ? json_decode($type2[$i])->id : '' !!}</td>
+                            <td>{!! !empty($type3[$i]) ? json_decode($type3[$i])->id : '' !!}</td>
+                            <td>{!! !empty($type4[$i]) ? json_decode($type4[$i])->id : '' !!}</td>
+                            <td>{!! !empty($typeOther[$i]) ? 'transakcja: ' . json_decode($typeOther[$i])->id. ', kwota: ' . json_decode($typeOther[$i])->amount : '' !!}</td>
                         </tr>
                     @endfor
                     </tbody>
                 </table>
+                <form method="POST" action="{{ route('orders.create-payments')}}">
+                    @csrf
+                    <input type="hidden" name="payments_ids" value="{{ json_encode($type1)}}">
+                    <button class="btn btn-success">Utwórz transakcje</button>
+                </form>
             @endif
         </div>
         <div class="form-group">

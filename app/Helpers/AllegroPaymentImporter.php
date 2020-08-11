@@ -5,6 +5,7 @@ namespace App\Helpers;
 
 
 use App\Entities\Label;
+use App\Entities\Order;
 use App\Entities\SelTransaction;
 use App\Http\Controllers\OrdersPaymentsController;
 use App\Jobs\RemoveLabelJob;
@@ -65,11 +66,15 @@ class AllegroPaymentImporter
 
         $transaction = SelTransaction::where('tr_CheckoutFormPaymentId', $id)->orderBy('tr_Group', 'desc')->first();
         if (empty($transaction)) {
-            throw new \Exception($id, 1);
+            $order = Order::where('return_payment_id', $id)->count();
+            if ($order) {
+                return;
+            }
+            throw new \Exception(json_encode(['id' => $id, 'amount' => $amount]), 1);
         }
         $order = $transaction->order;
         if (empty($order)) {
-            throw new \Exception($id, 2);
+            throw new \Exception(json_encode(['id' => $id, 'amount' => $amount]), 2);
         }
         $payment = $order->promisePayments();
         $found = $payment->filter(function ($item) use ($amount) {
@@ -79,9 +84,9 @@ class AllegroPaymentImporter
         if (empty($found)) {
             $isPaid = $order->bookedPayments()->where('amount', $amount)->count() > 0;
             if ($isPaid) {
-                throw new \Exception($id, 3);
+                throw new \Exception(json_encode(['id' => $id, 'amount' => $amount]), 3);
             }
-            throw new \Exception('id transakcji: ' . $id . ', kwota: ' . $amount, 4);
+            throw new \Exception(json_encode(['id' => $id, 'amount' => $amount]), 4);
         }
         $found->promise = 0;
         $found->save();
