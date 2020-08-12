@@ -665,6 +665,10 @@ class TasksController extends Controller
     {
         try {
             $task = Task::findOrFail($request->id);
+            $end = Carbon::now();
+            $end->second = 0;
+            $task->TaskTime->date_end = $end;
+            $task->TaskTime->save();
             $this->markTaskAsProduced($task);
         } catch (\Exception $e) {
             return redirect()->back()->with([
