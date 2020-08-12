@@ -1775,8 +1775,9 @@
                     name: 'document_number'
                 },
                 {
-                    data: 'sello_payment',
-                    name: 'sello_payment'
+                    data: null,
+                    name: 'sello_payment',
+                    render: (data, type, row) => (data.sello_payment ?? data.return_payment_id)
                 },
                 {
                     data: 'remainder_date',
