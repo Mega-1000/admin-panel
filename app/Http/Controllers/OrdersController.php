@@ -920,6 +920,8 @@ class OrdersController extends Controller
             'shipment_date' => $request->input('shipment_date'),
             'consultant_notice' => $request->input('consultant_notice'),
             'consultant_value' => $request->input('consultant_value'),
+            'refund_id' => $request->input('refund_id'),
+            'refunded' => $request->input('refunded'),
             'warehouse_value' => $request->input('warehouse_value'),
             'production_date' => $request->input('production_date'),
         ], $id);
@@ -2920,12 +2922,10 @@ class OrdersController extends Controller
                 ->setTotalTransportSumCalculator(new TransportSumCalculator)
                 ->setUserSelector(new GetCustomerForNewOrder());
             ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($orderParams);
-            OrdersPaymentsController::payOrder($id, $pay->amount,
-                null, 1,
-                null, Carbon::today()->addDay(7)->toDateTimeString());
             $order = Order::find($id);
             $order->return_payment_id = $pay->id;
-            $order->labels()->attach(Label::SHIPPING_MARK);
+            $order->to_refund = $pay->amount;
+            $order->labels()->sync([Label::SHIPPING_MARK]);
             $order->save();
         }
         return back()->with([

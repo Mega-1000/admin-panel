@@ -334,6 +334,21 @@
                        value="{{ $order->consultant_value ?? ''}}">
             </div>
             <div class="form-group" style="width: 25%; float: left; padding: 5px;">
+                <label for="refund_id">@lang('orders.form.refund_number')</label>
+                <input type="text" class="form-control" id="refund_id" name="refund_id"
+                       value="{{ $order->refund_id ?? ''}}">
+            </div>
+            <div class="form-group" style="width: 25%; float: left; padding: 5px;">
+                <label for="to_refund">@lang('orders.form.to_refund')</label>
+                <input disabled type="number" class="form-control" id="to_refund" name="to_refund"
+                       value="{{ $order->to_refund ?? ''}}">
+            </div>
+            <div class="form-group" style="width: 25%; float: left; padding: 5px;">
+                <label for="refunded">@lang('orders.form.refunded')</label>
+                <input type="number" class="form-control" id="refunded" name="refunded"
+                       value="{{ $order->refunded ?? ''}}">
+            </div>
+            <div class="form-group" style="width: 25%; float: left; padding: 5px;">
                 <div>
 
                     @include('orders.labels', ['title' => __('orders.form.warehouse_notice')])

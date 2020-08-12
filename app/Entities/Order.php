@@ -120,6 +120,8 @@ class Order extends Model implements Transformable
         'print_order',
         'consultant_notice',
         'consultant_value',
+        'refund_id',
+        'refunded',
         'warehouse_notice',
         'warehouse_value',
         'production_date',
