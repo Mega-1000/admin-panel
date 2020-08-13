@@ -6,6 +6,9 @@ use App\Entities\Label;
 use App\Entities\LabelGroup;
 use App\Entities\Order;
 use App\Entities\Task;
+use App\Entities\TaskSalaryDetails;
+use App\Entities\TaskTime;
+use App\Entities\Warehouse;
 use App\Helpers\OrderCalcHelper;
 use App\Helpers\OrdersHelper;
 use App\Helpers\TaskHelper;
@@ -211,7 +214,7 @@ class TasksController extends Controller
         if ($allow === true) {
             $dataToStore = $request->all();
             if ($request->color == '008000' || $request->color == '32CD32') {
-                $dataToStore['status'] = 'FINISHED';
+                $dataToStore['status'] = Task::FINISHED;
             }
             $task->update($dataToStore);
             $task->taskTime->update($request->all());
@@ -694,7 +697,7 @@ class TasksController extends Controller
             $end = Carbon::now();
             $end->second = 0;
             $task->TaskTime->date_end = $end;
-            $task->status = "FINISHED";
+            $task->status = Task::FINISHED;
             $task->TaskTime->save();
             $task->save();
             $this->markTaskAsProduced($task);
@@ -738,24 +741,66 @@ class TasksController extends Controller
     {
         $data = $request->validated();
         $task = Task::find($data['task_id']);
+        $time = $task->taskTime()->first();
+        $newTask = Task::create([
+            'warehouse_id' => Warehouse::OLAWA_WAREHOUSE_ID,
+            'user_id' => $task->user_id,
+            'created_by' => $task->user_id,
+            'name' => 'odrzucone zadanie',
+            'color' => Task::DISABLED_COLOR,
+            'status' => Task::FINISHED
+        ]);
+
+        $end = Carbon::now();
+        $end->second = 0;
+        TaskTime::create([
+            'task_id' => $newTask->id,
+            'date_start' => $time->date_start,
+            'date_end' => $end
+        ]);
+        TaskSalaryDetails::create([
+            'task_id' => $newTask->id,
+            'consultant_value' => 0,
+            'warehouse_value' => 0
+        ]);
+        $task->status = Task::FINISHED;
+        $task->save();
         $user = $task->user;
         if ($task->childs->count()) {
             $task->childs->map(function ($item) use ($data, $user) {
-                $item->order->warehouse_notice .= Order::formatMessage($user, $data['description']);
-                $item->order->save();
-                $item->order->labels()->attach(Label::SHIPPING_MARK);
-                dispatch_now(new AddLabelJob($item->order->id, [Label::RED_HAMMER_ID], $prev));
+                $this->addNotification($user, $data['description'], $item);
+                if ($item->order) {
+                    $item->order->labels()->attach(Label::SHIPPING_MARK);
+                    dispatch_now(new AddLabelJob($item->order->id, [Label::RED_HAMMER_ID], $prev));
+                }
             });
         } else {
-            $task->order->warehouse_notice .= Order::formatMessage($user, $data['description']);
-            $task->order->save();
-            $task->order->labels()->attach(Label::SHIPPING_MARK);
-            dispatch_now(new AddLabelJob($task->order->id, [Label::RED_HAMMER_ID], $prev));
+            $this->addNotification($user, $data['description'], $task);
+            if ($task->order) {
+                $task->order->labels()->attach(Label::SHIPPING_MARK);
+                dispatch_now(new AddLabelJob($task->order->id, [Label::RED_HAMMER_ID], $prev));
+            }
         }
         return redirect()->back()->with([
             'message' => __('tasks.messages.update'),
             'alert-type' => 'success'
         ]);
+    }
+
+    /**
+     * @param $user
+     * @param $description
+     * @param $item
+     */
+    private function addNotification($user, $description, $item): void
+    {
+        $message = Order::formatMessage($user, $description);
+        if ($item->order) {
+            $item->order->warehouse_notice .= $message;
+            $item->order->save();
+        } else {
+            $item->taskSalaryDetail->warehouse_notice .= $message;
+        }
     }
 
     public function produceOrders(Request $request)
@@ -853,7 +898,7 @@ class TasksController extends Controller
             return response()->json($array);
         } else {
             $array = [
-                'status' => 'WAITING_FOR_ACCEPT',
+                'status' => Task::WAITING_FOR_ACCEPT,
                 'id' => $task->id,
             ];
             return response()->json($array);
@@ -971,7 +1016,7 @@ class TasksController extends Controller
             'name' => $request->name,
         ];
         if (substr($request->color, 1) == '008000' || substr($request->color, 1) == '32CD32') {
-            $dataToStore['status'] = 'FINISHED';
+            $dataToStore['status'] = Task::FINISHED;
         }
         $allow = TaskTimeHelper::allowTaskMove($dataToStore);
         if ($allow === true) {

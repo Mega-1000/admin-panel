@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\Task;
 use App\Repositories\TaskRepository;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -80,7 +81,7 @@ class UserWorksController extends Controller
                             'date_start' => $start,
                             'date_end' => $end,
                             'rendering' => 'background',
-                            'color' => 'd7d7d7',
+                            'color' => Task::DISABLED_COLOR,
                             'created_by' => 1,
                             'status' => 'TO_DO'
                         ];
@@ -92,7 +93,7 @@ class UserWorksController extends Controller
                             'date_start' => $dateEnd->subMinutes(10)->toDateTimeString(),
                             'date_end' => $dateEnd->addMinutes(10)->toDateTimeString(),
                             'rendering' => 'background',
-                            'color' => 'd7d7d7',
+                            'color' => Task::DISABLED_COLOR,
                             'created_by' => 1,
                             'status' => 'TO_DO'
                         ];
