@@ -90,3 +90,12 @@
     font-weight: bold;
     display: block;
 }
+
+#columnSearch-left_to_pay {
+    margin-top: 0px !important;
+}
+
+#difference-button {
+    padding: 0 15px;
+    margin-top: 0px;
+}

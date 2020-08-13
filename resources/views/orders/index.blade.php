@@ -701,6 +701,7 @@
             <th>
                 <div><span>@lang('orders.table.left_to_pay')</span></div>
                 <div class="input_div">
+                    <button class="btn btn-success" id="difference-button">Pokaż +/- 2 zł</button>
                     <input type="text" id="columnSearch-left_to_pay"/>
                 </div>
             </th>
@@ -943,6 +944,9 @@
             ajax: {
                 url: '{!! route('orders.datatable') !!}',
                 type: 'POST',
+                "data": function ( d ) {
+                    d.differenceMode = localStorage.getItem('differenceMode');
+                },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
@@ -3051,6 +3055,7 @@
     <script type="text/javascript" src="{{ URL::asset('js/helpers/render-calendar.js') }}"></script>
     <script>
         $(document).ready(function () {
+            localStorage.removeItem('differenceMode');
             var getUrlParameter = function getUrlParameter(sParam) {
                 var sPageURL = window.location.search.substring(1),
                     sURLVariables = sPageURL.split('&'),
@@ -3185,6 +3190,11 @@
 
             $('.fc-license-message').remove();
         });
+
+        $('#difference-button').click(() => {
+            localStorage.setItem('differenceMode', true);
+            alert('Włączono pokazywanie +/- 2 zł');
+        })
 
     </script>
 @endsection
