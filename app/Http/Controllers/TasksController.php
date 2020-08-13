@@ -743,11 +743,13 @@ class TasksController extends Controller
             $task->childs->map(function ($item) use ($data, $user) {
                 $item->order->warehouse_notice .= Order::formatMessage($user, $data['description']);
                 $item->order->save();
+                $item->order->labels()->attach(Label::SHIPPING_MARK);
                 dispatch_now(new AddLabelJob($item->order->id, [Label::RED_HAMMER_ID], $prev));
             });
         } else {
             $task->order->warehouse_notice .= Order::formatMessage($user, $data['description']);
             $task->order->save();
+            $task->order->labels()->attach(Label::SHIPPING_MARK);
             dispatch_now(new AddLabelJob($task->order->id, [Label::RED_HAMMER_ID], $prev));
         }
         return redirect()->back()->with([
