@@ -2015,10 +2015,18 @@ class OrdersController extends Controller
                 } elseif ($column['name'] == 'sum_of_gross_values' && !empty($column['search']['value'])) {
                     $query->whereRaw('CAST((select sum(net_selling_price_commercial_unit * quantity * 1.23) from order_items where order_id = orders.id) AS DECIMAL (12,2)) + IFNULL(orders.additional_service_cost, 0) + IFNULL(orders.additional_cash_on_delivery_cost, 0) + IFNULL(orders.shipment_price_for_client, 0)' . ' LIKE ' . "'%{$column['search']['value']}%'");
                 } elseif ($column['name'] == 'left_to_pay' && !empty($column['search']['value'])) {
-                    $query->whereRaw('IFNULL((CAST((select sum(net_selling_price_commercial_unit * quantity * 1.23) from order_items where order_id = orders.id) AS DECIMAL (12,2)) + IFNULL(orders.additional_service_cost, 0) + IFNULL(orders.additional_cash_on_delivery_cost, 0) + IFNULL(orders.shipment_price_for_client, 0)) - ifnull((select sum(amount) from order_payments where order_payments.order_id = orders.id), 0),0)' . ' LIKE ' . "'%{$column['search']['value']}%'");
+                    $sumQuery = 'IFNULL((CAST((select sum(gross_selling_price_commercial_unit * quantity) from order_items where order_id = orders.id) AS DECIMAL (12,2)) + IFNULL(orders.additional_service_cost, 0) + IFNULL(orders.additional_cash_on_delivery_cost, 0) + IFNULL(orders.shipment_price_for_client, 0)) - ifnull((select sum(amount) from order_payments where order_payments.order_id = orders.id), 0),0)';
+                    if($data['differenceMode'] == true) {
+                        $differenceUp = $column['search']['value'] + 2;
+                        $differenceDown = $column['search']['value'] - 2;
+                        $query->whereRaw($sumQuery . ' < ' . "'{$differenceUp}'" . ' OR ' . $sumQuery . ' > ' . $differenceDown);
+                    } else {
+                        $query->whereRaw($sumQuery . ' LIKE ' . "'%{$column['search']['value']}%'");
+                    }
                 }
             }
         }
+
         if ($minId) {
             $query->where($sortingColumns[6], '>', $minId);
         }
