@@ -273,7 +273,7 @@
 @endsection
 
 @section('javascript')
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"/>
     <script>
         function sendComment(type, order_id) {
             $.post(
@@ -295,8 +295,21 @@
     <script>
         console.log('test-b')
 
-        function renderCalendar(minTime = "07:00:00", maxTime = "18:00:00") {
-            console.log('test')
+        function renderCalendarMins(number) {
+            renderCalendar(document.calendarMinTime, document.calendarMaxTime, number);
+        }
+
+        function renderCalendarExtendTime() {
+            let from = document.calendarMinTime === "06:00:00" ? "07:00:00" : "06:00:00";
+            let to = document.calendarMaxTime === "23:00:00" ? "18:00:00" : "23:00:00";
+            renderCalendar(from, to, document.calendarSlot);
+        }
+
+        function renderCalendar(minTime = "07:00:00", maxTime = "18:00:00", slot = "0:05") {
+            document.calendarMaxTime = maxTime;
+            document.calendarMinTime = minTime;
+            document.calendarSlot = slot;
+            $('#calendar').empty();
             let calendarEl = document.getElementById('calendar');
             let calendar = new FullCalendar.Calendar(calendarEl, {
                 plugins: ['interaction', 'dayGrid', 'timeGrid', 'resourceTimeline'],
@@ -304,7 +317,7 @@
                 editable: true,
                 aspectRatio: 1.8,
                 scrollTime: '7:00',
-                slotDuration: '0:05',
+                slotDuration: slot,
                 timeZone: 'UTC',
                 minTime: minTime,
                 maxTime: maxTime,
@@ -325,7 +338,7 @@
                 ],
                 header: {
                     left: 'promptResource today prev,next',
-                    center: 'title changeTimeLine',
+                    center: 'title changeTimeLine twoMins fiveMins fifteenMins',
                     right: 'resourceTimelineDay,resourceTimelineThreeDays,timeGridWeek,dayGridMonth'
                 },
                 slotWidth: 15,
@@ -365,8 +378,11 @@
                     },
                     changeTimeLine: {
                         text: 'Zmień zakres czasu',
-                        click: () => renderCalendar("06:00:00", "23:00:00")
-                    }
+                        click: () => renderCalendarExtendTime()
+                    },
+                    twoMins: {text: '2 minuty', click: () => renderCalendarMins("00:02")},
+                    fifteenMins: {text: '15 minut', click: () => renderCalendarMins("00:15")},
+                    fiveMins: {text: '5 minut', click: () => renderCalendarMins("00:05")},
                 },
                 dateClick: function (info) {
                     if (info.view.type !== 'timeGridWeek' && info.view.type !== 'dayGridMonth') {
@@ -1043,11 +1059,11 @@
                     }
                 }
             };
-            var idFromUrl = 'task-{{ $selectId }}'
+            var idFromUrl = 'task-{{ $selectId }}';
             var viewTypeFromUrl = getUrlParameter('view_type');
             var activeStartFromUrl = getUrlParameter('active_start');
             var activeEndFromUrl = getUrlParameter('active_end');
-            if (idFromUrl !== undefined) {
+            if (idFromUrl !== 'undefined' && idFromUrl !== 'task-') {
                 setTimeout(function () {
                     $('#' + idFromUrl).css('border', '4px solid rgb(96,2,1)');
                     $(".fc-scroller").animate({
