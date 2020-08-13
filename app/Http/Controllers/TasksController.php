@@ -78,6 +78,12 @@ class TasksController extends Controller
 
     public function store(TaskCreateRequest $request)
     {
+        if ($request->quickTask) {
+            $time = Carbon::now();
+            $time->second = 0;
+            $request->date_start = $time;
+            $request->date_end = Carbon::now()->addMinutes(5);
+        }
         $dataToStore = [
             'start' => $request->date_start,
             'end' => $request->date_end,
@@ -137,11 +143,21 @@ class TasksController extends Controller
             ]);
             $task->taskSalaryDetail()->create($request->all());
 
+            if ($request->quickTask) {
+                return back()->with(['message' => __('tasks.messages.store'),
+                    'alert-type' => 'success'
+                ]);
+            }
             return redirect()->route('planning.tasks.index')->with([
                 'message' => __('tasks.messages.store'),
                 'alert-type' => 'success'
             ]);
         } else {
+            if ($request->quickTask) {
+                return back()->with(['message' => __('tasks.messages.store_error'),
+                    'alert-type' => 'error'
+                ]);
+            }
             return redirect()->route('planning.tasks.index')->with([
                 'message' => __('tasks.messages.store_error'),
                 'alert-type' => 'error'
@@ -647,17 +663,27 @@ class TasksController extends Controller
         if (empty(User::find($id))) {
             return response(['error' => 'Brak danego użytkownika'], 400);
         }
-        $tasks = Task::where('tasks.user_id', $id)->whereHas('order', function ($query) {
-            $query->whereHas('labels', function ($query) {
-                $query->where('labels.id', Label::ORDER_ITEMS_UNDER_CONSTRUCTION);
-            });
-        })->orWhereHas('childs', function ($query) {
-            $query->whereHas('order', function ($query) {
-                $query->whereHas('labels', function ($query) {
-                    $query->where('labels.id', Label::ORDER_ITEMS_UNDER_CONSTRUCTION);
+        $tasks = Task::where('tasks.user_id', $id)
+            ->where(function ($query) {
+                $query->whereHas('order', function ($query) {
+                    $query->whereHas('labels', function ($query) {
+                        $query->where('labels.id', Label::ORDER_ITEMS_UNDER_CONSTRUCTION);
+                    });
+                })->orWhereHas('childs', function ($query) {
+                    $query->whereHas('order', function ($query) {
+                        $query->whereHas('labels', function ($query) {
+                            $query->where('labels.id', Label::ORDER_ITEMS_UNDER_CONSTRUCTION);
+                        });
+                    });
                 });
-            });
-        })->get();
+            })->orWhere(function ($query) use ($id) {
+                $query->where('status', 'WAITING_FOR_ACCEPT')
+                    ->where('tasks.user_id', $id)
+                    ->where(function ($query) {
+                        $query->whereDoesntHave('order')
+                            ->orWhereDoesntHave('childs');
+                    });
+            })->get();
         return response($tasks);
     }
 
@@ -668,8 +694,14 @@ class TasksController extends Controller
             $end = Carbon::now();
             $end->second = 0;
             $task->TaskTime->date_end = $end;
+            $task->status = "FINISHED";
             $task->TaskTime->save();
+            $task->save();
             $this->markTaskAsProduced($task);
+            if ($request->warehouse_notice) {
+                $task->taskSalaryDetail->warehouse_notice .= Order::formatMessage($task->user, $request->warehouse_notice);
+                $task->taskSalaryDetail->save();
+            }
         } catch (\Exception $e) {
             return redirect()->back()->with([
                 'message' => __('tasks.messages.update_error'),
@@ -689,11 +721,13 @@ class TasksController extends Controller
     {
         if ($task->childs->count()) {
             $task->childs->map(function ($child) {
-                dispatch_now(new RemoveLabelJob($child->order_id,
-                    [Label::ORDER_ITEMS_UNDER_CONSTRUCTION],
-                    $prev));
+                if ($child->order_id) {
+                    dispatch_now(new RemoveLabelJob($child->order_id,
+                        [Label::ORDER_ITEMS_UNDER_CONSTRUCTION],
+                        $prev));
+                }
             });
-        } else {
+        } else if ($task->order_id) {
             dispatch_now(new RemoveLabelJob($task->order_id,
                 [Label::ORDER_ITEMS_UNDER_CONSTRUCTION],
                 $prev));

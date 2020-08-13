@@ -8,6 +8,43 @@
 @endsection
 
 @section('table')
+    <div class="modal fade" tabindex="-1" id="add-custom-task" role="dialog">
+        <div class="modal-dialog" id="modalDialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="titleModal"></h4>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" target="_blank" id="create-new-task"
+                          action="{{ route('planning.tasks.store') }}">
+                        @csrf()
+                        <select name="user_id" required class="form-control">
+                            <option value="" selected="selected">wybierz użytkownika</option>
+                            @foreach($users as $user)
+                                <option
+                                    value="{{$user->id}}">{{$user->name}} {{$user->firstname}} {{$user->lastname}}</option>
+                            @endforeach
+                        </select>
+                        <div class="form-group">
+                            <label for="task-name">Podaj nazwę zadania</label>
+                            <input class="form-control" required name="name" id="task-name" type="text">
+                        </div>
+                        <input type="hidden" name="warehouse_id" value="{{ \App\Entities\Warehouse::OLAWA_WAREHOUSE_ID }}">
+                        <input type="hidden" name="quickTask" value="1">
+                        <input type="hidden" name="color" value="008000">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" form="create-new-task" class="btn btn-success pull-right">Wyślij
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" tabindex="-1" id="print-package-group" role="dialog">
         <div class="modal-dialog" id="modalDialog">
             <div class="modal-content">
@@ -18,7 +55,8 @@
                     <h4 class="modal-title" id="titleModal"></h4>
                 </div>
                 <div class="modal-body">
-                    <form method="POST" target="_blank" id="print-package-form" action="{{ route('orders.findPackage') }}">
+                    <form method="POST" target="_blank" id="print-package-form"
+                          action="{{ route('orders.findPackage') }}">
                         @csrf()
                         <select name="user_id" required class="form-control">
                             <option value="" selected="selected">wybierz użytkownika</option>
@@ -65,9 +103,13 @@
                         </div>
                         <div class="form-group">
                             <label for="select-task-for-finish">Wybierz zadanie</label>
-                            <select name="id" id="select-task-for-finish" required class="form-control">
+                            <select onchange="taskSelected(this, '#warehouse-done-notice', '#warehouse-done-notice-input')" name="id" id="select-task-for-finish" required class="form-control">
                                 <option value="" selected="selected">brak</option>
                             </select>
+                        </div>
+                        <div class="form-group" id="warehouse-done-notice">
+                            <label for="warehouse_notice">Podaj nazwę zadania</label>
+                            <input id="warehouse-done-notice-input" class="form-control" name="warehouse_notice" type="text">
                         </div>
                     </form>
                 </div>
@@ -735,7 +777,18 @@
 @section('datatable-scripts')
     <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
     <script>
+        function taskSelected(select, input, control) {
+            let selectedOption = select.options[select.selectedIndex];
+            if (selectedOption.dataset.order === '') {
+                $(input).show();
+            } else {
+                $(input).hide();
+                $(control).val('');
+            }
+        }
         function fetchUsersTasks(user, select) {
+            $(select).empty();
+            $(select).append('<option value="" selected="selected">brak</option>');
             let id = user.value
             let url = "{{route('planning.tasks.getForUser', ['id' => '%%'])}}"
             $.ajax(url.replace('%%', id))
@@ -744,7 +797,7 @@
                         alert('Wystąpił błąd pobierania danych')
                         return;
                     }
-                    response.forEach(task => $(select).append(`<option class="temporary-option" value="${task.id}">${task.name}</option>`))
+                    response.forEach(task => $(select).append(`<option data-order="${task.order_id ?? ''}" class="temporary-option" value="${task.id}">${task.name}</option>`))
                 })
         }
 
@@ -752,6 +805,9 @@
             $("#mark-as-created").modal('show');
         });
         $('#deny-pack').click(event => $('#mark-as-denied').modal('show'));
+        $('#create-new-task-button').click(event => {
+            $('#add-custom-task').modal('show');
+        })
         $('.print-group').click(event => {
             $('#print-package-type').val(event.currentTarget.name);
             $('#print-package-group').modal('show');
@@ -2060,7 +2116,7 @@
         }
 
         function removeLabel(orderId, labelId, manualLabelSelectionToAdd, addedType, timed = null, skipTimed = true) {
-            if(timed == '1' && skipTimed) {
+            if (timed == '1' && skipTimed) {
                 $('#timed_label_removal').modal('show');
                 $('#time_label_removal_ok').on('click', () => {
                     removeTimedLabel(orderId, labelId)
