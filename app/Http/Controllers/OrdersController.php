@@ -2019,7 +2019,7 @@ class OrdersController extends Controller
                     if($data['differenceMode'] == true) {
                         $differenceUp = $column['search']['value'] + 2;
                         $differenceDown = $column['search']['value'] - 2;
-                        $query->whereRaw($sumQuery . ' < ' . "'{$differenceUp}'" . ' OR ' . $sumQuery . ' > ' . $differenceDown);
+                        $query->whereRaw($sumQuery . ' < ' . "{$differenceUp}" . ' AND ' . $sumQuery . ' > ' . $differenceDown);
                     } else {
                         $query->whereRaw($sumQuery . ' LIKE ' . "'%{$column['search']['value']}%'");
                     }
