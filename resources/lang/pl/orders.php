@@ -99,6 +99,7 @@ return [
         'additional_service_cost' => 'Dodaktowy koszt obsługi',
         'document_number' => 'Nr dokumentu',
         'document_number_sell' => 'Nr dokumentu sprzedaży',
+        'document_number_sell_subiekt' => 'Nr dokumentu sprzedaży (subiekt)',
         'consultant_earning' => 'Wynagrodzenie konsultanta',
         'warehouse_cost' => 'Koszt magazynu',
         'delivery_warehouse' => 'Magazyn',

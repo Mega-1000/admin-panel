@@ -119,6 +119,24 @@
                 <input type="text" class="form-control" id="customer_address.phone" name="customer_address.phone"
                        value="{{ $customerInfo->phone ?? '' }}" disabled>
             </div>
+            @foreach($selInvoices as $selInvoice)
+                <div class="form-group" style="width: 11%; float: left; padding: 5px;">
+                    <label for="document_number">@lang('orders.form.document_number_sell')
+                        <a target="_blank" href="{{ route('invoices.getInvoice', ['id' => $selInvoice->id]) }}">plik</a>
+                    </label>
+                    <input disabled class="form-control" id="document_number_sell"
+                           value="{{$selInvoice->invoice_name}}">
+                </div>
+            @endforeach
+            @foreach($subiektInvoices as $subInvoice)
+                <div class="form-group" style="width: 11%; float: left; padding: 5px;">
+                    <label for="document_number">@lang('orders.form.document_number_sell_subiekt')
+                        <a target="_blank" href="{{ route('invoices.subiektInvoices', ['id' => $subInvoice->id]) }}">plik</a>
+                    </label>
+                    <input disabled class="form-control" id="document_number_sell"
+                           value="{{$subInvoice->gt_invoice_number}}">
+                </div>
+            @endforeach
             <div class="form-group" style="width: 11%; float: left; padding: 5px;">
                 <label for="document_number">@lang('orders.form.document_number')</label>
                 <input class="form-control" id="document_number"
@@ -1560,8 +1578,8 @@
             <tr>
                 <td>{{ $order->id }}</td>
                 <td>
-                    @if($order->invoices !== null || count($order->invoices) > 0)
-                        @foreach($order->invoices as $invoice)
+                    @if($order->buyInvoices !== null || count($order->buyInvoices) > 0)
+                        @foreach($order->buyInvoices as $invoice)
                             <a target="_blank" href="/storage/invoices/{{ $invoice->invoice_name }}"
                                style="margin-top: 5px;">Faktura</a>
                         @endforeach
@@ -2428,21 +2446,28 @@
 @endsection
 @section('datatable-scripts')
     <script type="application/javascript">
-        $(() => $(document).tooltip());
-        $(".add-label").click(event => {
+        $(() = > $(document).tooltip()
+        )
+        ;
+        $(".add-label").click(event = > {
             event.preventDefault();
             const url = "{{route('orders.label-addition', ['labelId' => "%%"])}}";
             $.post(url.replace("%%", event.currentTarget.getAttribute("data-label-id")), {
                 orderIds: [{{ $order->id }}]
             })
-                .done(() => alert("dodano etykietę"))
-                .fail(() => alert("Nie udało się dodać etykiety"))
-        });
-        $(".remove-label").click(event => {
+                .done(() = > alert("dodano etykietę")
+        )
+        .fail(() = > alert("Nie udało się dodać etykiety")
+        )
+        })
+        ;
+        $(".remove-label").click(event = > {
             event.preventDefault();
             const labelId = event.currentTarget.getAttribute("data-label-id");
             removeLabel(labelId);
-        });
+        }
+        )
+        ;
 
         function sendComment(type) {
             $.post(
@@ -2996,7 +3021,7 @@
                 }
             ]
         });
-            @foreach($visibilitiesPayments as $key =>$row)
+        @foreach($visibilitiesPayments as $key =>$row)
 
         var {{'show'.$row->name}}  = @json($row->show);
         {{'show'.$row->name}} = {{'show'.$row->name}}.map(function (x) {
@@ -3122,7 +3147,7 @@
                 }
             ]
         });
-            @foreach($visibilitiesTask as $key =>$row)
+        @foreach($visibilitiesTask as $key =>$row)
 
         var {{'show'.$row->name}}  = @json($row->show);
         {{'show'.$row->name}} = {{'show'.$row->name}}.map(function (x) {
@@ -3331,7 +3356,7 @@
                 },
             ]
         });
-            @foreach($visibilitiesPackage as $key =>$row)
+        @foreach($visibilitiesPackage as $key =>$row)
 
         var {{'show'.$row->name}}  = @json($row->show);
         {{'show'.$row->name}} = {{'show'.$row->name}}.map(function (x) {

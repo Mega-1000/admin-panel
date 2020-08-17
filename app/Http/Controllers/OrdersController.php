@@ -407,7 +407,7 @@ class OrdersController extends Controller
      */
     public function edit($id)
     {
-        $order = $this->orderRepository->with(['customer', 'items', 'labels'])->find($id);
+        $order = $this->orderRepository->with(['customer', 'items', 'labels', 'subiektInvoices', 'sellInvoices'])->find($id);
         $orderId = $id;
 
         $customerInfo = $this->customerAddressRepository->findWhere([
@@ -512,18 +512,20 @@ class OrdersController extends Controller
             return $prev + $next->getOurCosts();
         }, 0);
 
+        $selInvoices = $order->sellInvoices ?? [];
+        $subiektInvoices = $order->subiektInvoices ?? [];
         $orderHasSentLP = $order->hasOrderSentLP();
         if ($order->customer_id == 4128) {
             return view('orders.edit_self',
                 compact('visibilitiesTask', 'visibilitiesPackage', 'visibilitiesPayments', 'warehouses', 'order',
-                    'users', 'customerInfo', 'orderInvoiceAddress',
+                    'users', 'customerInfo', 'orderInvoiceAddress', 'selInvoices', 'subiektInvoices',
                     'orderDeliveryAddress', 'orderItems', 'warehouse', 'statuses', 'messages', 'productPacking',
                     'customerDeliveryAddress', 'firms', 'productsVariation', 'allProductsFromSupplier', 'orderId',
                     'customerOrdersToPay', 'clientTotalCost', 'ourTotalCost', 'labelsButtons'));
         } else {
             return view('orders.edit',
                 compact('visibilitiesTask', 'visibilitiesPackage', 'visibilitiesPayments', 'warehouses', 'order',
-                    'users', 'customerInfo', 'orderInvoiceAddress',
+                    'users', 'customerInfo', 'orderInvoiceAddress', 'selInvoices', 'subiektInvoices',
                     'orderDeliveryAddress', 'orderItems', 'warehouse', 'statuses', 'messages', 'productPacking',
                     'customerDeliveryAddress', 'firms', 'productsVariation', 'allProductsFromSupplier', 'orderId',
                     'customerOrdersToPay', 'orderHasSentLP', 'emails', 'clientTotalCost', 'ourTotalCost', 'labelsButtons'));
