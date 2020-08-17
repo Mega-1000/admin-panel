@@ -460,6 +460,22 @@ class Order extends Model implements Transformable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
+    public function buyInvoices()
+    {
+        return $this->belongsToMany(OrderInvoice::class, 'order_order_invoices', 'order_id', 'invoice_id')->where('invoice_type', 'buy');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function sellInvoices()
+    {
+        return $this->belongsToMany(OrderInvoice::class, 'order_order_invoices', 'order_id', 'invoice_id')->where('invoice_type', 'sell');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
     public function files()
     {
         return $this->hasMany(OrderFiles::class);

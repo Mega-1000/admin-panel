@@ -1261,11 +1261,11 @@ class OrdersPaymentsController extends Controller
         if($isWarehousePayment) {
             $token = md5(uniqid());
             $url = route('ordersPayment.warehousePaymentConfirmation', ['token' => $token]);
-            if($order->invoices()->first() !== null) {
+            if($order->buyInvoices()->first() !== null) {
                 try {
                     \Mailer::create()
                         ->to($order->warehouse->warehouse_email)
-                        ->send(new WarehousePaymentAccept($orderId, $amount, $order->invoices()->first()->invoice_name, $url));
+                        ->send(new WarehousePaymentAccept($orderId, $amount, $order->buyInvoices()->first()->invoice_name, $url));
                 } catch (\Swift_TransportException $e) {
                     Log::error('Warehouse payment accept email was not sent due to. Error: ' . $e->getMessage());
                 }

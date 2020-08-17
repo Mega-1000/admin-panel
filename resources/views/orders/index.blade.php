@@ -279,6 +279,33 @@
         </div>
     </div>
 
+    <div class="modal fade" tabindex="-1" id="add-new-file" role="dialog">
+        <div class="modal-dialog" id="modalDialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="titleModal">Dodaj nową fakturę sprzedaży:</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="addNewFileToOrder"
+                          method="POST" enctype="multipart/form-data">
+                        {{ csrf_field() }}
+                        Plik:
+                        <br/>
+                        <input accept=".pdf,image/*" type="file" name="file"/>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" form="addNewFileToOrder" class="btn btn-success pull-right">Wyślij
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" tabindex="-1" id="upload-allegro-payments" role="dialog">
         <div class="modal-dialog" id="modalDialog">
             <div class="modal-content">

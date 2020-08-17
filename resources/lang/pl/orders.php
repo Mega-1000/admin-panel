@@ -98,6 +98,7 @@ return [
         'cash_on_delivery_amount' => 'Kwota pobrania',
         'additional_service_cost' => 'Dodaktowy koszt obsługi',
         'document_number' => 'Nr dokumentu',
+        'document_number_sell' => 'Nr dokumentu sprzedaży',
         'consultant_earning' => 'Wynagrodzenie konsultanta',
         'warehouse_cost' => 'Koszt magazynu',
         'delivery_warehouse' => 'Magazyn',

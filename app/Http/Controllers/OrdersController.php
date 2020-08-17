@@ -2048,7 +2048,7 @@ class OrdersController extends Controller
                 array_push($arrInvoice, $invoice->id);
             }
             if (count($arrInvoice) > 0) {
-                $row->invoices = \DB::table('order_invoices')->whereIn('id', $arrInvoice)->get();
+                $row->invoices = \DB::table('order_invoices')->whereIn('id', $arrInvoice)->where('invoice_type', 'buy')->get();
             }
 
             $labels = [];
@@ -2890,7 +2890,7 @@ class OrdersController extends Controller
     {
         $order = Order::find($id);
 
-        return response()->json($order->invoices);
+        return response()->json($order->buyInvoices);
     }
 
     public function deleteInvoice($id)

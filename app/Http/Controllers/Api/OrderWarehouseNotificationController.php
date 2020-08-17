@@ -111,7 +111,7 @@ class OrderWarehouseNotificationController extends Controller
 
             Storage::disk('local')->put('public/invoices/' . $filename, file_get_contents($file));
             $invoice = $order->invoices()->create([
-                'invoice_type' => 'invoice',
+                'invoice_type' => 'buy',
                 'invoice_name' => $filename
             ]);
             $invoiceRequest = $order->invoiceRequests()->first();
