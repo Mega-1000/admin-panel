@@ -252,7 +252,7 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" tabindex="-1" id="add-new-file" role="dialog">
+    <div class="modal fade" tabindex="-1" id="add-new-sell-invoice" role="dialog">
         <div class="modal-dialog" id="modalDialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -262,17 +262,20 @@
                     <h4 class="modal-title" id="titleModal">Dodaj nowy plik:</h4>
                 </div>
                 <div class="modal-body">
-                    <form id="addNewFileToOrder"
+                    <form id="addNewSellInvoiceToOrder"
+                          action="{{ route('invoices.addInvoice') }}"
                           method="POST" enctype="multipart/form-data">
                         {{ csrf_field() }}
                         Plik:
                         <br/>
                         <input accept=".pdf,image/*" type="file" name="file"/>
+                        <input type="hidden" value="sell" name="type"/>
+                        <input type="hidden" id="new-sell-invoice-order-id" name="order_id"/>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
-                    <button type="submit" form="addNewFileToOrder" class="btn btn-success pull-right">Wyślij
+                    <button type="submit" form="addNewSellInvoiceToOrder" class="btn btn-success pull-right">Wyślij
                     </button>
                 </div>
             </div>
@@ -796,6 +799,7 @@
                     <input hidden type="text" id="columnSearch-remainder_date" value="false"/>
                 </div>
             </th>
+            <th>@lang('orders.form.sell_invoices')</th>
             <th></th>
         </tr>
         </thead>
@@ -1765,6 +1769,9 @@
                         let html = ''
                         if (invoices !== undefined) {
                             invoices.forEach(function (invoice) {
+                                if (invoice.invoice_type !== 'buy') {
+                                    return;
+                                }
                                 html += '<a target="_blank" href="/storage/invoices/' + invoice.invoice_name + '" style="margin-top: 5px;">Faktura</a>';
                             });
                             let jsonInvoices = JSON.stringify(invoices);
@@ -1870,6 +1877,28 @@
                     data: 'remainder_date',
                     name: 'remainder_date',
                     searchable: false
+                },
+                {
+                    data: null,
+                    name: 'invoices',
+                    render: function (data) {
+                        let invoices = data.invoices
+                        let html = ''
+                        if (invoices !== undefined) {
+                            invoices.forEach(function (invoice) {
+                                if (invoice.invoice_type !== 'sell') {
+                                    return;
+                                }
+                                html += '<a target="_blank" href="/storage/invoices/' + invoice.invoice_name + '" style="margin-top: 5px;">Faktura</a>';
+                            });
+                            let jsonInvoices = JSON.stringify(invoices);
+                            html += '<br />'
+                            html += '<a href="#" class="remove__invoices"' + 'onclick="getInvoicesList(' + data.orderId + ')">Usuń</a>'
+                        }
+                        html += '<a href="#" onclick="addNewSellInvoice(' + data.orderId + ')" style="margin-top: 5px;">Dodaj</a>';
+
+                        return html;
+                    }
                 },
                 {
                     data: 'id',
@@ -2453,6 +2482,11 @@
             let url = "{{ route('orders.fileAdd', ['id' => '%%']) }}"
             $('#addNewFileToOrder').attr('action', url.replace('%%', id));
             $('#add-new-file').modal('show');
+        }
+
+        function addNewSellInvoice(id) {
+            $('#new-sell-invoice-order-id').val(id);
+            $('#add-new-sell-invoice').modal('show');
         }
 
         function getFilesList(id) {

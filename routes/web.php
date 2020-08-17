@@ -483,8 +483,9 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::prefix('invoices')->as('invoices.')
             ->group(function () {
+                Route::post('/addInvoice', 'InvoicesController@addInvoice')->name('addInvoice');
                 Route::get('/getSubiekt/{id}', 'InvoicesController@getSubiektInvoice')->name('subiektInvoices');
-                Route::get('/get/{id}', 'InvoicesController@getInvoice')->name('subiektInvoices');
+                Route::get('/get/{id}', 'InvoicesController@getInvoice')->name('getInvoice');
                 Route::get('/import/payments', 'ImportPaymentsController@importPayments')->name('importPayments');
                 Route::post('/import/payments', 'ImportPaymentsController@store')->name('storePaymentsPdf');
             });
