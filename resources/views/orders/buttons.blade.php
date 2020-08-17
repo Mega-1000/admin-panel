@@ -333,16 +333,16 @@
     <div class="col-md-2">
         <h4>Drukuj paczki z grupy:</h4>
         <div class="row">
-            <button class="btn btn-info print-group" name="paczkomat">Paczkomat</button>
+            <button class="btn btn-info print-group" name="paczkomat">Paczkomat</button> ({{ $couriersCount['inpost'] }})
         </div>
         <div class="row">
-            <button class="btn btn-info print-group" name="gls">Gls</button>
+            <button class="btn btn-info print-group" name="gls">Gls</button> ({{ $couriersCount['gls'] }})
         </div>
         <div class="row">
-            <button class="btn btn-info print-group" name="dpd">Dpd</button>
+            <button class="btn btn-info print-group" name="dpd">Dpd</button> ({{ $couriersCount['dpd'] }})
         </div>
         <div class="row">
-            <button class="btn btn-info print-group" name="pocztex">Pocztex</button>
+            <button class="btn btn-info print-group" name="pocztex">Pocztex</button> ({{ $couriersCount['pocztex'] }})
         </div>
         <div class="row">
             <button class="btn btn-info" id="create-new-task-button" name="custom">Dodatkowe Zadanie</button>

@@ -368,7 +368,11 @@ class OrdersController extends Controller
         }
         $templateData = PackageTemplate::orderBy('list_order', 'asc')->get();
         $deliverers = Deliverer::all();
-
+        $glsCount = $this->getTaskQuery(['GLS'])->count();
+        $dpdCount = $this->getTaskQuery(['DPD'])->count();
+        $pocztexCount = $this->getTaskQuery(['POCZTEX'])->count();
+        $inpostCount = $this->getTaskQuery(['INPOST', 'ALLEGRO-INPOST'])->count();
+        $couriersCount = ['gls' => $glsCount, 'dpd' => $dpdCount, 'pocztex' => $pocztexCount, 'inpost' => $inpostCount];
         return view('orders.index', compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses'))
             ->withOuts($out)
             ->withLabIds($labIds)
@@ -376,6 +380,7 @@ class OrdersController extends Controller
             ->withDeliverers($deliverers)
             ->withTemplateData($templateData)
             ->withUsers($storekeepers)
+            ->withCouriersCount($couriersCount)
             ->withAllWarehouses($allWarehouses);
     }
 
@@ -669,22 +674,7 @@ class OrdersController extends Controller
             default:
                 throw new \Exception(__('order_packages.message.package_error'));
         }
-        $task = Task::where('user_id', Task::WAREHOUSE_USER_ID)
-            ->with(['taskTime' => function ($query) {
-                $query->orderBy('date_start', 'asc');
-            }])
-            ->whereHas('order', function ($query) use ($courierArray) {
-                $query->whereHas('packages', function ($query) use ($courierArray) {
-                    $query->whereIn('service_courier_name', $courierArray);
-                })->whereHas('labels', function ($query) {
-                    $query
-                        ->where('labels.id', Label::BLUE_HAMMER_ID);
-                })->whereDoesntHave('labels', function ($query) {
-                    $query->where('labels.id', Label::RED_HAMMER_ID)
-                        ->orWhere('labels.id', Label::GRAY_HAMMER_ID)
-                        ->orWhere('labels.id', Label::PRODUCTION_STOP_ID);
-                });
-            })->offset($skip)->first();
+        $task = $this->getTaskQuery($courierArray)->offset($skip)->first();
         return $task;
     }
 
@@ -2996,6 +2986,30 @@ class OrdersController extends Controller
             }, 0);
             return $acu + $totalAmountForPack;
         }, 0);
+    }
+
+    /**
+     * @param array $courierArray
+     * @return mixed
+     */
+    private function getTaskQuery(array $courierArray)
+    {
+        return Task::where('user_id', Task::WAREHOUSE_USER_ID)
+            ->with(['taskTime' => function ($query) {
+                $query->orderBy('date_start', 'asc');
+            }])
+            ->whereHas('order', function ($query) use ($courierArray) {
+                $query->whereHas('packages', function ($query) use ($courierArray) {
+                    $query->whereIn('service_courier_name', $courierArray);
+                })->whereHas('labels', function ($query) {
+                    $query
+                        ->where('labels.id', Label::BLUE_HAMMER_ID);
+                })->whereDoesntHave('labels', function ($query) {
+                    $query->where('labels.id', Label::RED_HAMMER_ID)
+                        ->orWhere('labels.id', Label::GRAY_HAMMER_ID)
+                        ->orWhere('labels.id', Label::PRODUCTION_STOP_ID);
+                });
+            });
     }
 }
 
