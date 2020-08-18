@@ -2446,28 +2446,21 @@
 @endsection
 @section('datatable-scripts')
     <script type="application/javascript">
-        $(() = > $(document).tooltip()
-        )
-        ;
-        $(".add-label").click(event = > {
+        $(() => $(document).tooltip());
+        $(".add-label").click(event => {
             event.preventDefault();
             const url = "{{route('orders.label-addition', ['labelId' => "%%"])}}";
             $.post(url.replace("%%", event.currentTarget.getAttribute("data-label-id")), {
                 orderIds: [{{ $order->id }}]
             })
-                .done(() = > alert("dodano etykietę")
-        )
-        .fail(() = > alert("Nie udało się dodać etykiety")
-        )
-        })
-        ;
-        $(".remove-label").click(event = > {
+                .done(() => alert("dodano etykietę"))
+                .fail(() => alert("Nie udało się dodać etykiety"))
+        });
+        $(".remove-label").click(event => {
             event.preventDefault();
             const labelId = event.currentTarget.getAttribute("data-label-id");
             removeLabel(labelId);
-        }
-        )
-        ;
+        });
 
         function sendComment(type) {
             $.post(
