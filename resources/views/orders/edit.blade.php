@@ -363,7 +363,7 @@
             </div>
             <div class="form-group" style="width: 25%; float: left; padding: 5px;">
                 <label for="refunded">@lang('orders.form.refunded')</label>
-                <input type="number" class="form-control" id="refunded" name="refunded"
+                <input step="0.01" type="number" class="form-control" id="refunded" name="refunded"
                        value="{{ $order->refunded ?? ''}}">
             </div>
             <div class="form-group" style="width: 25%; float: left; padding: 5px;">
