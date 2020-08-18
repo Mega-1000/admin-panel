@@ -101,6 +101,8 @@ return [
         'document_number_sell' => 'Nr dokumentu sprzedaży',
         'document_number_sell_subiekt' => 'Nr dokumentu sprzedaży (subiekt)',
         'sell_invoices' => 'Faktury sprzedaży',
+        'allegro_form_id' => 'Id zamówienia allegro',
+        'allegro_commission' => 'Wartość brutto prowizji allegro',
         'consultant_earning' => 'Wynagrodzenie konsultanta',
         'warehouse_cost' => 'Koszt magazynu',
         'delivery_warehouse' => 'Magazyn',

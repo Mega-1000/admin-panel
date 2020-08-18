@@ -2037,6 +2037,7 @@ class OrdersController extends Controller
 
         foreach ($collection as $row) {
             $orderId = $row->orderId;
+            $row->allegro_commission = abs(\DB::table('order_allegro_commissions')->where('order_id', $row->orderId)->sum('amount'));
             $row->items = \DB::table('order_items')->where('order_id', $row->orderId)->get();
             $row->connected = \DB::table('orders')->where('master_order_id', $row->orderId)->get();
             $row->payments = \DB::table('order_payments')->where('order_id', $row->orderId)->get();
@@ -2109,6 +2110,7 @@ class OrdersController extends Controller
                 'customer_addresses.email as clientEmail', 'statuses.name as statusName',
                 'customer_addresses.firstname as clientFirstname', 'customer_addresses.lastname as clientLastname',
                 'customer_addresses.phone as clientPhone', 'sel_tr__transaction.tr_CheckoutFormPaymentId as sello_payment',
+                'sel_tr__transaction.tr_CheckoutFormId as sello_form',
                 'task_times.date_start as production_date', 'taskUser.firstname as taskUserFirstName')
             //poniższe left joiny mają na celu wyświetlenie czasów oraz wykonwaców zadań z tabeli tasks na "gridzie"
             ->leftJoin('tasks', 'orders.id', '=', 'tasks.order_id')

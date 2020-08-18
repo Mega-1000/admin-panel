@@ -334,6 +334,32 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" tabindex="-1" id="upload-allegro-commission-modal" role="dialog">
+        <div class="modal-dialog" id="modalDialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="titleModal">Dołącz plik prowizji od allegro w formacie .csv: </h4>
+                </div>
+                <div class="modal-body">
+                    <form id="uploadAllegroComission" action="{{ route('orders.allegroCommission') }}"
+                          method="POST" enctype="multipart/form-data">
+                        {{ csrf_field() }}
+                        Plik:
+                        <br/>
+                        <input type="file" name="file"/>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" form="uploadAllegroComission" class="btn btn-success pull-right">Wyślij</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" tabindex="-1" id="addStorekeeperTimeError" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -800,6 +826,8 @@
                 </div>
             </th>
             <th>@lang('orders.form.sell_invoices')</th>
+            <th>@lang('orders.form.allegro_form_id')</th>
+            <th>@lang('orders.form.allegro_commission')</th>
             <th></th>
         </tr>
         </thead>
@@ -1899,6 +1927,16 @@
 
                         return html;
                     }
+                },
+                {
+                    data: 'sello_form',
+                    name: 'sello_form',
+                    searchable: false,
+                },
+                {
+                    data: 'allegro_commission',
+                    name: 'allegro_commission',
+                    searchable: false,
                 },
                 {
                     data: 'id',

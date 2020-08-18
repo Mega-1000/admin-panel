@@ -629,4 +629,14 @@ class Order extends Model implements Transformable
             'warehouse_value' => 0
         ]);
     }
+
+    public function detailedCommissions()
+    {
+        return $this->hasMany(OrderAllegroCommission::class);
+    }
+
+    public function commission()
+    {
+        return $this->detailedCommissions()->sum('amount');
+    }
 }

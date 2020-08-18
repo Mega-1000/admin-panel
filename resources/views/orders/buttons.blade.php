@@ -214,9 +214,18 @@
         </div>
         <div class="form-group">
             <label for="upload-allegro-pays">Aktualizuj płatności allegro: </label>
-            <a name="print_orders" class="btn btn-success"
+            <a id="upload-allegro-pays" name="print_orders" class="btn btn-success"
                onclick="$('#upload-allegro-payments').modal('show')">Aktualizuj</a>
-            @if(!empty(session('allegro_payments_errors')))
+            <button id="upload-allegro-commission-button" name="print_orders" class="btn btn-success"
+               onclick="$('#upload-allegro-commission-modal').modal('show')">Aktualizuj prowizje Allegro</button>
+            @if(!empty(session('allegro_commission_errors')))
+                @foreach(session('allegro_commission_errors') as $error)
+                    <div class="alert-danger">
+                        {{ $error }}
+                    </div>
+                @endforeach
+            @endif
+                @if(!empty(session('allegro_payments_errors')))
                 <table class="table table-bordered table-striped">
                     <thead>
                     <tr>
