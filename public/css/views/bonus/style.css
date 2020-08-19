@@ -1,0 +1,3 @@
+#dataTable thead tr:first-child #first-bonus-column {
+    width: auto !important;
+}

@@ -23,6 +23,10 @@ Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
     Route::group(['middleware' => 'admin'], function () {
 
+        Route::get('/bonus', 'BonusController@index')->name('bonus.index');
+        Route::post('/bonus', 'BonusController@create')->name('bonus.create');
+        Route::post('/bonus/delete', 'BonusController@destroy')->name('bonus.destroy');
+
         Route::get('prices/allegro-prices/{id}', 'ProductPricesController@getAllegroPrices')->name('prices.allegroPrices');
         Route::get('orders/{id}/get-basket', 'OrdersController@goToBasket')->name('orders.goToBasket');
         Route::get('/pages/content/delete', 'PagesGeneratorController@deleteContent')->name('pages.deleteContent');
