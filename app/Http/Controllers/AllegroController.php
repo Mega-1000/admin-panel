@@ -52,7 +52,6 @@ class AllegroController extends Controller
             return redirect()->route('orders.index')->with(['message' => __('voyager.generic.successfully_updated'),
                 'alert-type' => 'success']);
         } catch (\Exception $e) {
-            error_log(print_r($e->getMessage(), 1));
             return redirect()->route('orders.index')->with(['message' => __('voyager.generic.update_failed'),
                 'alert-type' => 'error']);
         }
