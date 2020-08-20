@@ -373,7 +373,7 @@
                     <textarea rows="5" cols="40" class="form-control" id="warehouse_notice"
                               name="warehouse_notice" disabled>{{ $order->warehouse_notice ?? ''}}</textarea>
                     <div class="flex-input">
-                        <input type="text" class="form-control" placeholder="@lang('orders.form.warehouse_notice')"
+                        <input type="text" class="form-control scrollable-notice" placeholder="@lang('orders.form.warehouse_notice')"
                                id="{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}" name="warehouse_notice"/>
                         <div class="input-group-append">
                             <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}')"
@@ -386,9 +386,9 @@
             <div class="form-group" style="width: 25%; float: left; padding: 5px;">
                 <div>
                     @include('orders.labels', ['title' => 'Informacje dla spedycji'])
-                    <textarea class="form-control" rows="5" disabled>{{ $order->spedition_comment ?? ''}}</textarea>
+                    <textarea id="shipping_notice" class="form-control" rows="5" disabled>{{ $order->spedition_comment ?? ''}}</textarea>
                     <div class="flex-input">
-                        <input type="text" class="form-control" placeholder="Informacje dla spedycji"
+                        <input type="text" class="form-control scrollable-notice" placeholder="Informacje dla spedycji"
                                id="{{ \App\Entities\Order::COMMENT_SHIPPING_TYPE }}" name="spedition_comment"/>
                         <div class="input-group-append">
                             <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_SHIPPING_TYPE }}')"
@@ -400,10 +400,10 @@
             </div>
             <div class="form-group" style="width: 25%; float: left; padding: 5px;">
                 @include('orders.labels', ['title' =>  __('orders.form.consultant_notices')])
-                <textarea disabled class="form-control" name="consultant_notices" id="consultant_notices"
+                <textarea id="consultant_notice" disabled class="form-control" name="consultant_notices" id="consultant_notices"
                           rows="5">{{ $order->consultant_notices ?? ''}}</textarea>
                 <div class="flex-input">
-                    <input type="text" class="form-control" placeholder="@lang('orders.form.consultant_notices')"
+                    <input type="text" class="form-control scrollable-notice" placeholder="@lang('orders.form.consultant_notices')"
                            id="{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}" name="consultant_notices"/>
                     <div class="input-group-append">
                         <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}')"
@@ -414,7 +414,7 @@
             </div>
             <div class="form-group" style="width: 25%; float: left; padding: 5px;">
                 @include('orders.labels', ['title' =>  __('orders.form.financial_notices')])
-                <textarea disabled class="form-control" name="financial_comment" id="financial_notices"
+                <textarea id="financial_notice" disabled class="form-control scrollable-notice" name="financial_comment" id="financial_notices"
                           rows="5">{{ $order->financial_comment ?? ''}}</textarea>
                 <div class="flex-input">
                     <input type="text" class="form-control" placeholder="@lang('orders.form.financial_notices')"
@@ -2446,6 +2446,22 @@
 @endsection
 @section('datatable-scripts')
     <script type="application/javascript">
+        // var element = document.getElementById("warehouse_comment");
+        // element.scrollTop = element.scrollHeight;
+
+        $(document).ready(function(){
+            // console.log('scroll');
+            // $('.scrollable-notice').each((index, element) => $(element).scrollTop(1E10));
+            $('#warehouse_notice').scrollTop(1E10);
+            $('#shipping_notice').scrollTop(1E10);
+            $('#consultant_notice').scrollTop(1E10);
+            $('#financial_notice').scrollTop(1E10);
+
+            // var element = document.getElementById("warehouse_comment");
+            // element.scrollTop = element.scrollHeight;
+
+            // $('.scrollable-notice').each((index, element) => element.scrollTop = element.scrollHeight);
+        });
         $(() => $(document).tooltip());
         $(".add-label").click(event => {
             event.preventDefault();

@@ -49,7 +49,7 @@
             </div>
         </div>
     </div>
-    <label for="warehouse_notice">{{ $title }}</label>
+    <label for="">{{ $title }}</label>
     <div class="col-md-4">
         <p class="text-center">Usuń etykiety</p>
         <div class="row">
