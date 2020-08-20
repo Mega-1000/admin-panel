@@ -1135,6 +1135,7 @@ class OrdersController extends Controller
             $order->labels()->detach();
             $order->taskSchedule()->delete();
             $order->shipment_date = null;
+            $order->save();
         }
 
         if ($request->input('status') != $order->status_id && $request->input('shouldBeSent') == 'on') {
