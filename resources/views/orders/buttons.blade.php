@@ -218,6 +218,18 @@
                onclick="$('#upload-allegro-payments').modal('show')">Aktualizuj</a>
             <button id="upload-allegro-commission-button" name="print_orders" class="btn btn-success"
                onclick="$('#upload-allegro-commission-modal').modal('show')">Aktualizuj prowizje Allegro</button>
+            @if(!empty(session('allegro_new_letters')))
+                @foreach(session('allegro_new_letters') as $letter)
+                    <div class="alert-info">
+                        {{ $letter['letter_number'] }}
+                    </div>
+                @endforeach
+                    <form method="POST" action="{{ route('orders.newLettersFromAllegro') }}">
+                        @csrf
+                        <input type="hidden" name="letters" value="{{ json_encode(session('allegro_new_letters'))}}">
+                        <button class="btn btn-success">Utwórz nowe listy</button>
+                    </form>
+            @endif
             @if(!empty(session('allegro_commission_errors')))
                 @foreach(session('allegro_commission_errors') as $error)
                     <div class="alert-danger">

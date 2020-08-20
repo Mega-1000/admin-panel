@@ -295,6 +295,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orders/{id}/files', 'OrdersController@getFiles')->name('orders.getFiles');
         Route::post('orders/allegro-payment', 'OrdersPaymentsController@payAllegro')->name('orders.allegroPayments');
         Route::post('orders/allegro-commission', 'AllegroController@setCommission')->name('orders.allegroCommission');
+        Route::post('orders/allegro-new-letter', 'AllegroController@createNewLetter')->name('orders.newLettersFromAllegro');
         Route::post('orders/create-payments', 'OrdersController@createPayments')->name('orders.create-payments');
         Route::post('orders/surplus/return', 'OrdersPaymentsController@returnSurplusPayment')->name('orders.returnSurplus');
 
