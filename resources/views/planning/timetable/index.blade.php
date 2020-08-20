@@ -296,12 +296,15 @@
         console.log('test-b')
 
         function renderCalendarMins(number) {
+            window.localStorage.setItem('mins', number);
             renderCalendar(document.calendarMinTime, document.calendarMaxTime, number);
         }
 
         function renderCalendarExtendTime() {
             let from = document.calendarMinTime === "06:00:00" ? "07:00:00" : "06:00:00";
             let to = document.calendarMaxTime === "23:00:00" ? "18:00:00" : "23:00:00";
+            window.localStorage.setItem('from-time', from);
+            window.localStorage.setItem('to-time', to);
             renderCalendar(from, to, document.calendarSlot);
         }
 
@@ -956,7 +959,10 @@
         breadcrumb.append("<li class='disable'><a href='javascript:void()'>Terminarz</a></li>");
         window.addEventListener('DOMContentLoaded', function () {
             console.log('test2')
-            renderCalendar();
+            let mins = window.localStorage.getItem('mins') ?? '00:05';
+            let from = window.localStorage.getItem('from-time') ?? '07:00:00';
+            let to = window.localStorage.getItem('to-time') ?? '18:00:00';
+            renderCalendar(from, to, mins);
             console.log('test3')
             $('.fc-license-message').remove();
 
