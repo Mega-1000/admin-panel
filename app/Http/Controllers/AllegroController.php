@@ -84,7 +84,12 @@ class AllegroController extends Controller
         }
 
         $formId = substr($line[7], $start, $end - $start);
-        $transaction = SelTransaction::where('tr_CheckoutFormId', $formId)->where('tr_Group', 1)->first();
+        $isGroup = SelTransaction::where('tr_CheckoutFormId', $formId)->count() > 1;
+        if ($isGroup) {
+            $transaction = SelTransaction::where('tr_CheckoutFormId', $formId)->where('tr_Group', 1)->first();
+        } else {
+            $transaction = SelTransaction::where('tr_CheckoutFormId', $formId)->first();
+        }
         if (empty($transaction)) {
             throw new \Exception('Brak zlecenia sello o id zamówienia: ' . $formId);
         }
