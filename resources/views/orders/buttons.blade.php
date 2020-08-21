@@ -239,7 +239,7 @@
                     <form method="POST" action="{{ route('orders.newOrdersFromAllegroComissions') }}">
                         @csrf
                         <input type="hidden" name="ids" value="{{ json_encode(session('allegro_new_orders_from_comission'))}}">
-                        <button id="create-new-lists-from-allegro" class="btn btn-success">Utwórz nowe listy</button>
+                        <button id="create-new-lists-from-allegro" class="btn btn-success">Utwórz nowe zlecenia</button>
                     </form>
             @endif
             @if(!empty(session('allegro_commission_errors')))
