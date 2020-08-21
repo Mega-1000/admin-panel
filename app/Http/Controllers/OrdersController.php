@@ -2196,6 +2196,7 @@ class OrdersController extends Controller
                 'additional_service_cost' => $order->additional_service_cost ?? 0
             );
             $order->sello_payment = $order->sello_payment ?? $order->return_payment_id;
+            $order->sello_form = $order->sello_form ?? $order->allegro_form_id;
         }
         return $collection;
     }

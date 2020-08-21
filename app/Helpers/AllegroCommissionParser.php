@@ -2,8 +2,10 @@
 
 namespace App\Helpers;
 
+use App\Entities\Order;
 use App\Entities\OrderAllegroCommission;
 use App\Entities\OrderPackage;
+use App\Entities\Product;
 use App\Entities\SelTransaction;
 use App\User;
 
@@ -11,18 +13,24 @@ class AllegroCommissionParser
 {
     public const START_STRING = 'Numer zamówienia: ';
     public const SEND_STRING = 'Numer nadania: ';
+    private $twsuId;
 
-    public static function CreatePack(string $letterNumber, float $cost)
+    public function __construct()
+    {
+        $this->twsuId = Product::getDefaultProduct()->id;
+    }
+
+    public static function CreatePack(string $letterNumber, float $cost, string $courierName)
     {
         return [
             'real_cost_for_company' => $cost,
             'letter_number' => $letterNumber,
             'sending_number' => '',
             'status' => OrderPackage::SENDING,
-            'symbol' => 'DPD(?)',
+            'symbol' => $courierName . '(?)',
             'quantity' => 1,
-            'delivery_courier_name' => 'DPD',
-            'service_courier_name' => 'DPD'
+            'delivery_courier_name' => $courierName,
+            'service_courier_name' => $courierName
         ];
     }
 
@@ -44,6 +52,10 @@ class AllegroCommissionParser
             try {
                 $this->parseCsvForProvision($line, $updatingOrders);
                 $pack = $this->parseCsvForTransport('DPD', $line);
+                if (!empty($pack)) {
+                    $newLetters = array_merge($newLetters, [$pack]);
+                }
+                $pack = $this->parseCsvForTransport('InPost', $line);
                 if (!empty($pack)) {
                     $newLetters = array_merge($newLetters, [$pack]);
                 }
@@ -74,7 +86,7 @@ class AllegroCommissionParser
         }
         $transaction = $this->getTransaction($formId);
         $order = $transaction->order;
-        $amount = floatval(str_replace(',', '.', $line[5]));
+        $amount = abs(floatval(str_replace(',', '.', $line[5])));
         if (empty($order)) {
             throw new \Exception('Brak zamówienia dla zlecenie sello o id zamówienia: ' . $formId);
         }
@@ -135,13 +147,13 @@ class AllegroCommissionParser
         return $transaction;
     }
 
-    public function parseCsvForTransport(string $string, array $line): array
+    public function parseCsvForTransport(string $courierName, array $line): array
     {
         if ($line[7] == '' || $line[3] == '') {
             return [];
         }
 
-        if (strpos($line[3], $string) === false) {
+        if (strpos($line[3], $courierName) === false) {
             return [];
         }
         $formId = $this->getNumberForParam($line[7], self::START_STRING);
@@ -154,23 +166,23 @@ class AllegroCommissionParser
             return [];
         }
 
-        $transaction = $this->getTransaction($formId);
-        $order = $transaction->order;
-        $package = $order->packages->where('letter_number', $letterNumber)->first();
+        $package = OrderPackage::where('letter_number', $letterNumber)->first();
         $amount = floatval(str_replace(',', '.', $line[5]));
         if (empty($package)) {
-            return self::setPackageDetails($letterNumber, $amount);
+            return self::setPackageDetails($letterNumber, $amount, $courierName, $formId);
         }
         $package->real_cost_for_company = $amount;
         $package->save();
         return [];
     }
 
-    private static function setPackageDetails(string $letterNumber, float $cost)
+    private static function setPackageDetails(string $letterNumber, float $cost, string $courierName, $formId)
     {
         return [
             'real_cost_for_company' => $cost,
-            'letter_number' => $letterNumber
+            'letter_number' => $letterNumber,
+            'courier_name' => $courierName,
+            'form_id' => $formId
         ];
     }
 
@@ -178,19 +190,30 @@ class AllegroCommissionParser
      * @param array $pack
      * @throws \Exception
      */
-    public static function createNewPackage($pack): void
+    public function createNewPackage($pack, $formId): void
     {
         $orderParams = [
             'want_contact' => true,
             'phone' => User::CONTACT_PHONE
         ];
+        $prices = [
+            'gross_selling_price_commercial_unit' => 0,
+            'net_selling_price_commercial_unit' => 0
+        ];
+        $override[$this->twsuId] = $prices;
+        $priceOverrider = new OrderPriceOverrider($override);
+
         $orderBuilder = new OrderBuilder();
         $orderBuilder
+            ->setPriceOverrider($priceOverrider)
             ->setPackageGenerator(new BackPackPackageDivider())
             ->setPriceCalculator(new OrderPriceCalculator())
             ->setTotalTransportSumCalculator(new TransportSumCalculator)
             ->setUserSelector(new GetCustomerForNewOrder());
         ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($orderParams);
+        $order = Order::find($id);
+        $order->allegro_form_id = $formId;
+        $order->save();
         $pack['order_id'] = $id;
         OrderPackage::create($pack);
     }

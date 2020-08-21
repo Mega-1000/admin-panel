@@ -56,8 +56,10 @@ class AllegroController extends Controller
         foreach ($letters as $letter) {
             $nr = $letter->letter_number;
             $amount = $letter->real_cost_for_company;
-            $pack = AllegroCommissionParser::CreatePack($nr, $amount);
-            AllegroCommissionParser::createNewPackage($pack);
+            $courierName = $letter->courier_name;
+            $parser = new AllegroCommissionParser();
+            $pack = AllegroCommissionParser::CreatePack($nr, $amount, $courierName);
+            $parser->createNewPackage($pack, $letter->form_id);
         }
         return redirect()->route('orders.index')->with(['message' => __('voyager.generic.successfully_updated'),
             'alert-type' => 'success']);

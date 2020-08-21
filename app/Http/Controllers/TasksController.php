@@ -764,6 +764,7 @@ class TasksController extends Controller
             'warehouse_value' => 0
         ]);
         $task->status = Task::FINISHED;
+        $task->user_id = Task::TO_CONFIRM_USER_ID;
         $task->save();
         $user = $task->user;
         if ($task->childs->count()) {

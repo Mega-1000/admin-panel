@@ -227,7 +227,7 @@
                     <form method="POST" action="{{ route('orders.newLettersFromAllegro') }}">
                         @csrf
                         <input type="hidden" name="letters" value="{{ json_encode(session('allegro_new_letters'))}}">
-                        <button class="btn btn-success">Utwórz nowe listy</button>
+                        <button id="create-new-lists-from-allegro" class="btn btn-success">Utwórz nowe listy</button>
                     </form>
             @endif
             @if(!empty(session('allegro_commission_errors')))
@@ -374,3 +374,8 @@
         </div>
     </div>
 </div>
+<script>
+    $('create-new-lists-from-allegro').click(function(){
+        $(this).attr("disabled", true);
+    });
+</script>
