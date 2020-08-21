@@ -103,7 +103,6 @@ class AllegroCommissionParser
             $updatingOrders[$order->id] = true;
             if ($order->detailedCommissions()->count() > 0) {
                 \DB::table('order_allegro_commissions')->where('order_id', $order->id)->delete();
-                $order->detailedCommissions->each->delete();
             }
         }
 

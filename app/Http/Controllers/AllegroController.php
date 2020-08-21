@@ -43,7 +43,6 @@ class AllegroController extends Controller
                 $route->with('allegro_new_letters', $newLetters);
             }
             if ($newOrders) {
-                error_log(print_r($newOrders, 1));
                 $route->with('allegro_new_orders_from_comission', $newOrders);
             }
             return $route->with(['message' => __('voyager.generic.successfully_updated'),
