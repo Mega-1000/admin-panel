@@ -946,8 +946,6 @@
             calendar.render();
         }
 
-        console.log('test-e')
-
         $(function () {
             $(document).tooltip();
         });
@@ -958,12 +956,10 @@
         breadcrumb.append("<li class='active'><a href='/admin/planning/timetable'>Planowanie pracy</a></li>");
         breadcrumb.append("<li class='disable'><a href='javascript:void()'>Terminarz</a></li>");
         window.addEventListener('DOMContentLoaded', function () {
-            console.log('test2')
             let mins = window.localStorage.getItem('mins') ?? '00:05';
             let from = window.localStorage.getItem('from-time') ?? '07:00:00';
             let to = window.localStorage.getItem('to-time') ?? '18:00:00';
             renderCalendar(from, to, mins);
-            console.log('test3')
             $('.fc-license-message').remove();
 
             $('#start').change(function () {

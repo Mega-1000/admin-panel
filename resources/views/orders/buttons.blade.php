@@ -386,8 +386,3 @@
         </div>
     </div>
 </div>
-<script>
-    $('create-new-lists-from-allegro').click(function(){
-        $(this).attr("disabled", true);
-    });
-</script>

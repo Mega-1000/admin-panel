@@ -87,3 +87,7 @@
 #packages_errors {
     color: red;
 }
+
+.modal-dialog-timesheet {
+    width: auto;
+}

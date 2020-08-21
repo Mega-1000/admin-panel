@@ -167,7 +167,7 @@
         </div>
     </div>
     <div class="modal fade" tabindex="-1" id="magazine" role="dialog">
-        <div class="modal-dialog" id="modalDialog">
+        <div class="modal-dialog modal-dialog-timesheet" id="modalDialog">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal"
@@ -2658,6 +2658,7 @@
         }
 
         var renderCalendar = function (minTime = "07:00:00", maxTime = "20:00:00") {
+            $('#calendar').empty();
             let calendarEl = document.getElementById('calendar');
             let calendar = new FullCalendar.Calendar(calendarEl, {
                 plugins: ['interaction', 'dayGrid', 'timeGrid', 'resourceTimeline'],
