@@ -2054,6 +2054,11 @@ class OrdersController extends Controller
             $row->otherPackages = \DB::table('order_other_packages')->where('order_id', $row->orderId)->get();
             $row->addresses = \DB::table('order_addresses')->where('order_id', $row->orderId)->get();
             $row->history = Order::where('customer_id', $row->customer_id)->with('labels')->get();
+            $row->history = $row->history->reduce(function ($acu, $current) {
+                $insert = ['id' => $current->id, 'labels' => $current->labels];
+                $acu []= $insert;
+                return $acu;
+            },[]);
             $invoices = \DB::table('order_order_invoices')->where('order_id', $row->orderId)->get(['invoice_id']);
             $arrInvoice = [];
             foreach ($invoices as $invoice) {
