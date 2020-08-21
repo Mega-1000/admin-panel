@@ -85,6 +85,7 @@ return [
             'warehouse-payments' => 'Płatności magazynów',
             'spedition-payments' => 'Płatności spedycji'
         ],
+        'labels_log' => 'Dziennik etykiet',
         'last_status_update_date' => 'Ostatnia data zmiany statusu',
         'total_price' => 'Suma zamówienia',
         'weight' => 'Waga',

@@ -426,6 +426,11 @@
                     </div>
                 </div>
             </div>
+            <div class="form-group" style="width: 25%; float: left; padding: 5px;">
+                <label>@lang('orders.form.labels_log')</label>
+                <textarea id="labels_log" disabled class="form-control scrollable-notice" name="financial_comment" id="labels_log"
+                          rows="5">{{ $order->labels_log ?? ''}}</textarea>
+            </div>
             <div class="form-group" style="width: 40%; float: left; padding: 5px;">
                 <label for="remainder_date">@lang('orders.form.remainder_date')</label>
                 <input type="text" class="form-control default-date-time-picker-now" id="remainder_date"
@@ -2446,21 +2451,11 @@
 @endsection
 @section('datatable-scripts')
     <script type="application/javascript">
-        // var element = document.getElementById("warehouse_comment");
-        // element.scrollTop = element.scrollHeight;
-
         $(document).ready(function(){
-            // console.log('scroll');
-            // $('.scrollable-notice').each((index, element) => $(element).scrollTop(1E10));
             $('#warehouse_notice').scrollTop(1E10);
             $('#shipping_notice').scrollTop(1E10);
             $('#consultant_notice').scrollTop(1E10);
             $('#financial_notice').scrollTop(1E10);
-
-            // var element = document.getElementById("warehouse_comment");
-            // element.scrollTop = element.scrollHeight;
-
-            // $('.scrollable-notice').each((index, element) => element.scrollTop = element.scrollHeight);
         });
         $(() => $(document).tooltip());
         $(".add-label").click(event => {

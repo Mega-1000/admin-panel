@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Entities\ColumnVisibility;
+use App\Entities\Label;
 use App\Entities\Order;
 use App\Http\Requests\LabelCreateRequest;
 use App\Http\Requests\LabelUpdateRequest;
 use App\Http\Requests\OrderEditLabel;
 use App\Repositories\LabelGroupRepository;
 use App\Repositories\LabelRepository;
+use Carbon\Carbon;
 use http\Env\Request;
+use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
 
 /**
@@ -105,8 +108,13 @@ class LabelsController extends Controller
             $request->validated();
             $order = Order::find($request->order_id);
             $order->labels()->detach($request->label_id);
+            $user = Auth::user();
+            $label = Label::find($request->label_id);
+            $order->labels_log .= Order::formatMessage($user, "usunął etykietę: $label->name");
+            $order->save();
             return response('success');
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
+            \Log::error('Nie udało się usunąć etykiety', ['message' => $exception->getMessage(), 'trace' => $exception->getTraceAsString()]);
             return response(['errors' => ['message'=> "Niespodziewany błąd prosimy spróbować później"]], 400);
         }
     }

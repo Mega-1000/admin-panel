@@ -1487,9 +1487,17 @@ class OrdersController extends Controller
         } else {
             $time = false;
         }
+        $user = Auth::user();
+        $label = Label::find($labelId);
 
         $orders = $this->orderRepository->findWhereIn('id', $orderIds);
         foreach ($orders as $order) {
+            try {
+                $order->labels_log .= Order::formatMessage($user, "dodał etykietę: $label->name");
+                $order->save();
+            } catch (Exception $exception) {
+                \Log::error('Nie udało się zapisać logu', ['message' => $exception->getMessage(), 'trace' => $exception->getTraceAsString()]);
+            }
             dispatch_now(new AddLabelJob($order, [$labelId], $preventionArray, [], null, $time));
         }
     }
