@@ -30,6 +30,7 @@ class AllegroController extends Controller
             $parsedData = $parser->parseFile($handle);
             $errors = $parsedData['errors'];
             $newLetters = $parsedData['new_letters'];
+            $newOrders = $parsedData['new_orders'];
             fclose($handle);
             Storage::delete($path);
             $route = redirect()->route('orders.index');
@@ -40,6 +41,10 @@ class AllegroController extends Controller
             }
             if ($newLetters) {
                 $route->with('allegro_new_letters', $newLetters);
+            }
+            if ($newOrders) {
+                error_log(print_r($newOrders, 1));
+                $route->with('allegro_new_orders_from_comission', $newOrders);
             }
             return $route->with(['message' => __('voyager.generic.successfully_updated'),
                 'alert-type' => 'success']);
@@ -60,6 +65,18 @@ class AllegroController extends Controller
             $parser = new AllegroCommissionParser();
             $pack = AllegroCommissionParser::CreatePack($nr, $amount, $courierName);
             $parser->createNewPackage($pack, $letter->form_id);
+        }
+        return redirect()->route('orders.index')->with(['message' => __('voyager.generic.successfully_updated'),
+            'alert-type' => 'success']);
+    }
+
+    public function createNewOrder(Request $request)
+    {
+        $data = $request->all();
+        $orders = json_decode($data['ids']);
+        $parser = new AllegroCommissionParser();
+        foreach ($orders as $id) {
+            $parser->createNewOrder($id);
         }
         return redirect()->route('orders.index')->with(['message' => __('voyager.generic.successfully_updated'),
             'alert-type' => 'success']);

@@ -43,6 +43,7 @@ class AllegroCommissionParser
         $firstline = true;
         $errors = [];
         $newLetters = [];
+        $newOrders = [];
         $updatingOrders = [];
         while (($line = fgetcsv($handle, 0, ";")) !== FALSE) {
             if ($firstline) {
@@ -50,7 +51,10 @@ class AllegroCommissionParser
                 continue;
             }
             try {
-                $this->parseCsvForProvision($line, $updatingOrders);
+                $new = $this->parseCsvForProvision($line, $updatingOrders);
+                if (!empty($new)) {
+                    $newOrders []= $new;
+                }
                 $pack = $this->parseCsvForTransport('DPD', $line);
                 if (!empty($pack)) {
                     $newLetters = array_merge($newLetters, [$pack]);
@@ -63,7 +67,7 @@ class AllegroCommissionParser
                 $errors[] = $e->getMessage();
             }
         }
-        return ['new_letters' => $newLetters, 'errors' => $errors];
+        return ['new_letters' => $newLetters, 'new_orders' => $newOrders, 'errors' => $errors];
     }
 
     /**
@@ -71,25 +75,29 @@ class AllegroCommissionParser
      * @param array $updatingOrders
      * @throws \Exception
      */
-    public function parseCsvForProvision(array $line, array &$updatingOrders): void
+    public function parseCsvForProvision(array $line, array &$updatingOrders): string
     {
         if ($line[7] == '') {
-            return;
+            return '';
         }
         if (strpos($line[3], 'Prowizja') === false) {
-            return;
+            return '';
         }
 
         $formId = $this->getNumberForParam($line[7], self::START_STRING);
         if (!$formId) {
-            return;
+            return '';
         }
         $transaction = $this->getTransaction($formId);
-        $order = $transaction->order;
-        $amount = abs(floatval(str_replace(',', '.', $line[5])));
-        if (empty($order)) {
-            throw new \Exception('Brak zamówienia dla zlecenie sello o id zamówienia: ' . $formId);
+        if (empty($transaction)) {
+            $order = Order::where('allegro_form_id', $formId)->first();
+        } else {
+            $order = $transaction->order;
         }
+        if (empty($order)) {
+            return $formId;
+        }
+        $amount = abs(floatval(str_replace(',', '.', $line[5])));
 
         if (empty($updatingOrders[$order->id])) {
             $updatingOrders[$order->id] = true;
@@ -103,6 +111,7 @@ class AllegroCommissionParser
         $commission->order_id = $order->id;
         $commission->amount = $amount;
         $commission->save();
+        return '';
     }
 
     /**
@@ -142,7 +151,7 @@ class AllegroCommissionParser
             $transaction = SelTransaction::where('tr_CheckoutFormId', $formId)->first();
         }
         if (empty($transaction)) {
-            throw new \Exception('Brak zlecenia sello o id zamówienia: ' . $formId);
+            return false;
         }
         return $transaction;
     }
@@ -192,6 +201,18 @@ class AllegroCommissionParser
      */
     public function createNewPackage($pack, $formId): void
     {
+        $id = $this->createNewOrder($formId);
+        $pack['order_id'] = $id;
+        OrderPackage::create($pack);
+    }
+
+    /**
+     * @param $formId
+     * @return mixed
+     * @throws \Exception
+     */
+    public function createNewOrder($formId)
+    {
         $orderParams = [
             'want_contact' => true,
             'phone' => User::CONTACT_PHONE
@@ -200,6 +221,7 @@ class AllegroCommissionParser
             'gross_selling_price_commercial_unit' => 0,
             'net_selling_price_commercial_unit' => 0
         ];
+        $override = [];
         $override[$this->twsuId] = $prices;
         $priceOverrider = new OrderPriceOverrider($override);
 
@@ -214,7 +236,6 @@ class AllegroCommissionParser
         $order = Order::find($id);
         $order->allegro_form_id = $formId;
         $order->save();
-        $pack['order_id'] = $id;
-        OrderPackage::create($pack);
+        return $id;
     }
 }
