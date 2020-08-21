@@ -1862,7 +1862,7 @@
                     name: 'real_cost_for_company',
                     render: function (packages) {
                         return '<span style="margin-top: 5px;">' +
-                            packages.reduce((prev, next) => (prev + parseFloat(next.real_cost_for_company)), 0) + '</span>';
+                            packages.reduce((prev, next) => (prev + parseFloat(next.real_cost_for_company ?? 0)), 0) + '</span>';
                     }
                 },
                 {
