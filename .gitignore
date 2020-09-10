@@ -18,5 +18,6 @@ yarn-error.log
 .phpunit.result.cache
 .rnd
 /public/css/app.css
+/public/*pdf
 /public/js/app.js
 /storage/logs
