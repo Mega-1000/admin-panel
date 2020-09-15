@@ -2019,11 +2019,11 @@ class OrdersController extends Controller
                 } elseif ($column['name'] == 'left_to_pay' && !empty($column['search']['value'])) {
                     $sumQuery = 'IFNULL((CAST((select sum(gross_selling_price_commercial_unit * quantity) from order_items where order_id = orders.id) AS DECIMAL (12,2)) + IFNULL(orders.additional_service_cost, 0) + IFNULL(orders.additional_cash_on_delivery_cost, 0) + IFNULL(orders.shipment_price_for_client, 0)) - ifnull((select sum(amount) from order_payments where order_payments.order_id = orders.id), 0),0)';
                     if ($data['differenceMode'] == true) {
-                        $differenceUp = $column['search']['value'] + 2;
-                        $differenceDown = $column['search']['value'] - 2;
+                        $differenceUp = (float)($column['search']['value'] + 2);
+                        $differenceDown = (float)($column['search']['value'] - 2);
                         $query->whereRaw($sumQuery . ' < ' . "{$differenceUp}" . ' AND ' . $sumQuery . ' > ' . $differenceDown);
                     } else {
-                        $query->whereRaw($sumQuery . ' LIKE ' . "'%{$column['search']['value']}%'");
+                        $query->whereRaw($sumQuery . ' = ' . "'{$column['search']['value']}'");
                     }
                 }
             }
@@ -2054,6 +2054,7 @@ class OrdersController extends Controller
             $row->otherPackages = \DB::table('order_other_packages')->where('order_id', $row->orderId)->get();
             $row->addresses = \DB::table('order_addresses')->where('order_id', $row->orderId)->get();
             $row->history = Order::where('customer_id', $row->customer_id)->with('labels')->get();
+            $row->left_to_pay = 0;
             $row->history = $row->history->reduce(function ($acu, $current) {
                 $insert = ['id' => $current->id, 'labels' => $current->labels];
                 $acu []= $insert;
