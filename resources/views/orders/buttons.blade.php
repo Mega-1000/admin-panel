@@ -303,6 +303,10 @@
             <label for="print_orders">Drukuj zamówienia widoczne na stronie: </label>
             <a name="print_orders" class="btn btn-success" onclick="printAll()">Drukuj wszystkie</a>
         </div>
+        <div class="form-group">
+            <label for="products-stocks-changes">Pokaż zmiany w stanach magazynowych</label>
+            <button class="btn btn-success" onclick="showProductsStockChangesModal()">Wyświetl</button>
+        </div>
         <div style="display: flex; align-items: center;" id="add-label-container">
             <button onclick="addLabel()" type="button" class="btn btn-primary">@lang('orders.table.save_label')</button>
             <select style="margin-left: 10px;" class="form-control text-uppercase" id="choosen-label">

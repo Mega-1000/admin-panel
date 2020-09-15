@@ -35,7 +35,7 @@ class ProductStockLog extends Model implements Transformable
      */
     public function stock()
     {
-        return $this->belongsTo(ProductStock::class);
+        return $this->belongsTo(ProductStock::class, 'product_stock_id');
     }
 
     /**

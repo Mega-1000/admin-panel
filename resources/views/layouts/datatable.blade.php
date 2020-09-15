@@ -70,6 +70,30 @@
         </div>
     </div>
 
+    <div class="modal fade" tabindex="-1" id="products-stocks-changes-modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Wybierz zakres dat</h4>
+                    <form action="{{ route('productsStocks.changes') }}" id="products-stocks-changes-form" method="POST">
+                        {{ csrf_field() }}
+                        <div class="form-group">
+                            <label for="products-stocks-changes-start-date">Data rozpoczęcia</label>
+                            <input type="text" id="products-stocks-changes-start-date" name="products-stocks-changes-start-date" class="form-control default-date-time-picker-now">
+                        </div>
+                        <div class="form-group">
+                            <label for="products-stocks-changes-end-date">Data zakończenia</label>
+                            <input type="text" id="products-stocks-changes-end-date" name="products-stocks-changes-end-date" class="form-control default-date-time-picker-now">
+                        </div>
+                        <input type="submit" class="btn btn-success pull-right" value="Wyświetl wyniki">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" tabindex="-1" id="order_courier_problem" role="dialog">
         <div class="modal-dialog">
             <div class="modal-content">

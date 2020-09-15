@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Entities\ColumnVisibility;
 use App\Entities\ProductStock;
+use App\Entities\ProductStockLog;
 use App\Http\Requests\ProductStockUpdateRequest;
 use App\Repositories\ProductRepository;
+use App\Repositories\ProductStockLogRepository;
 use App\Repositories\ProductStockPositionRepository;
 use App\Repositories\ProductStockRepository;
 use Illuminate\Http\Request;
@@ -35,19 +37,28 @@ class ProductStocksController extends Controller
     protected $productStockPositionRepository;
 
     /**
+     * @var ProductStockLogRepository
+     */
+    protected $productStockLogRepository;
+
+
+    /**
      * ProductStocksController constructor.
      * @param ProductStockRepository $repository
      * @param ProductRepository $productRepository
      * @param ProductStockPositionRepository $productStockPositionRepository
+     * @param ProductStockLogRepository $productStockLogRepository
      */
     public function __construct(
         ProductStockRepository $repository,
         ProductRepository $productRepository,
-        ProductStockPositionRepository $productStockPositionRepository
+        ProductStockPositionRepository $productStockPositionRepository,
+        ProductStockLogRepository $productStockLogRepository
     ) {
         $this->repository = $repository;
         $this->productRepository = $productRepository;
         $this->productStockPositionRepository = $productStockPositionRepository;
+        $this->productStockLogRepository = $productStockLogRepository;
     }
 
     /**
@@ -245,5 +256,15 @@ class ProductStocksController extends Controller
             'message' => __('product_stocks.message.change_status'),
             'alert-type' => 'success'
         ]);
+    }
+
+    public function productsStocksChanges(Request $request)
+    {
+        $startDate = $request->input('products-stocks-changes-start-date');
+        $endDate = $request->input('products-stocks-changes-end-date');
+
+        $productsStocksChanges = ProductStockLog::where([['created_at', '>=', $startDate], ['created_at', '<=', $endDate]])->get();
+
+        return view('product_stocks.changes', compact('productsStocksChanges', 'startDate', 'endDate'));
     }
 }

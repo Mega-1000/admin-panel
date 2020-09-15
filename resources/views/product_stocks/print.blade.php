@@ -33,7 +33,9 @@
                 <td>
                     Ilość wszystkich: {{ $product->quantity }} <br/>
                     @foreach($product->positions as $position)
-                        <p>Pozycja: <b>{{ $position->lane }}</b> <b>{{ $position->bookstand }}</b> <b>{{ $position->shelf }}</b> <b>{{ $position->position }}</b> <br/> Ilość na pozycji: <b style="color: red;">{{ $position->position_quantity }}</b> </p>
+                        <p>
+                            Pozycja: <b>{{ $position->lane }}</b> <b>{{ $position->bookstand }}</b> <b>{{ $position->shelf }}</b> <b>{{ $position->position }}</b> <br/>
+                            Ilość na pozycji: <b style="color: red;">{{ $position->position_quantity }}</b> </p>
                     @endforeach
                 </td>
             </tr>
