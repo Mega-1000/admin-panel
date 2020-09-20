@@ -19,6 +19,10 @@ class AppServiceProvider extends ServiceProvider
                 error_log($sql->sql);
             });
         }
+        
+        if ($this->app->environment('production')) {
+            \URL::forceScheme('https');
+        }
     }
 
     /**
