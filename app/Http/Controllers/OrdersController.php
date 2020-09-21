@@ -2017,7 +2017,20 @@ class OrdersController extends Controller
                 } elseif ($column['name'] == 'sum_of_gross_values' && !empty($column['search']['value'])) {
                     $query->whereRaw('CAST((select sum(net_selling_price_commercial_unit * quantity * 1.23) from order_items where order_id = orders.id) AS DECIMAL (12,2)) + IFNULL(orders.additional_service_cost, 0) + IFNULL(orders.additional_cash_on_delivery_cost, 0) + IFNULL(orders.shipment_price_for_client, 0)' . ' LIKE ' . "'%{$column['search']['value']}%'");
                 } elseif ($column['name'] == 'left_to_pay' && !empty($column['search']['value'])) {
-                    $sumQuery = 'IFNULL((CAST((select sum(gross_selling_price_commercial_unit * quantity) from order_items where order_id = orders.id) AS DECIMAL (12,2)) + IFNULL(orders.additional_service_cost, 0) + IFNULL(orders.additional_cash_on_delivery_cost, 0) + IFNULL(orders.shipment_price_for_client, 0)) - ifnull((select sum(amount) from order_payments where order_payments.order_id = orders.id and order_payments.promise != "1"), 0),0)';
+                    $sumQuery = '
+                    IFNULL((
+                            CAST(
+                                (SELECT sum(gross_selling_price_commercial_unit * quantity) FROM order_items where order_id = orders.id)
+                            AS DECIMAL (12,2))
+                            + IFNULL(orders.additional_service_cost, 0)
+                            + IFNULL(orders.additional_cash_on_delivery_cost, 0)
+                            + IFNULL(orders.shipment_price_for_client, 0)
+                        )
+                        - IFNULL(
+                            (SELECT sum(amount) FROM order_payments WHERE order_payments.order_id = orders.id AND order_payments.promise != "1")
+                        , 0)
+                    , 0)
+                    ';
                     if ($data['differenceMode'] == true) {
                         $differenceUp = (float)($column['search']['value'] + 2);
                         $differenceDown = (float)($column['search']['value'] - 2);
