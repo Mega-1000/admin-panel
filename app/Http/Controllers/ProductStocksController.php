@@ -265,6 +265,13 @@ class ProductStocksController extends Controller
 
         $productsStocksChanges = ProductStockLog::where([['created_at', '>=', $startDate], ['created_at', '<=', $endDate]])->get();
 
-        return view('product_stocks.changes', compact('productsStocksChanges', 'startDate', 'endDate'));
+        $groupedProductsStocksChanges = [];
+
+        foreach($productsStocksChanges as $productsStocksChange) {
+            $groupedProductsStocksChanges[$productsStocksChange->product_stock_id][] = $productsStocksChange;
+        }
+
+
+        return view('product_stocks.changes', compact('groupedProductsStocksChanges', 'startDate', 'endDate'));
     }
 }
