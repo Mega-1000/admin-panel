@@ -1706,7 +1706,7 @@
                     }
                 },
                 {
-                    data: 'orderId',
+                    data: 'id',
                     name: 'left_to_pay',
                     searchable: false,
                     render: function (date, type, row) {
