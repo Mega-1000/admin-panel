@@ -22,15 +22,24 @@
             <th>Nazwa produktu</th>
             <th>Symbol produktu</th>
             <th>Ilość na stanie</th>
+            <th>Zlecenia</th>
         </thead>
-        @foreach($productsStocksChanges as $productsStocksChange)
+        @foreach($groupedProductsStocksChanges as $groupedProductsStocksChange)
             <tr>
-                <td>{{ $productsStocksChange->stock->product->name }}</td>
+                <td>{{ $groupedProductsStocksChange[0]->stock->product->name }}</td>
                 <td>
-                    {{ $productsStocksChange->stock->product->symbol }}
+                    {{ $groupedProductsStocksChange[0]->stock->product->symbol }}
                 </td>
                 <td>
-                    <span class="product__quantity">{{ $productsStocksChange->stock->quantity }}</span>
+                    <span class="product__quantity">{{ $groupedProductsStocksChange[0]->stock->quantity }}</span>
+                </td>
+                <td>
+                    @foreach($groupedProductsStocksChange as $stockChangeOrder)
+                        @if($stockChangeOrder->order_id !== null)
+                            <br/>
+                            <span>Zlecenie: <a href="{{ route('orders.edit', ['id' => $stockChangeOrder->order_id]) }}">{{ $stockChangeOrder->order_id }}</a></span>
+                        @endif
+                    @endforeach
                 </td>
             </tr>
             <tr>
