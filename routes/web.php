@@ -393,6 +393,7 @@ Route::group(['prefix' => 'admin'], function () {
             'OrdersPackagesController@getSticker')->name('orders.package.getSticker');
 
         Route::get('import', 'ImportController@index')->name('import.index');
+        Route::post('products/stocks/changes', 'ProductStocksController@productsStocksChanges')->name('productsStocks.changes');
         Route::post('import/store', 'ImportController@store')->name('import.store');
         Route::get('store/import/{id}/{amount}', 'OrdersPaymentsController@storeFromImport');
 

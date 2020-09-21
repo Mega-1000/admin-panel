@@ -2416,6 +2416,10 @@
                 });
         }
 
+        function showProductsStockChangesModal() {
+            $('#products-stocks-changes-modal').modal('show');
+        }
+
         function findPage() {
             let id = $('#searchById').val()
             let url = "{{route('orders.findPage', ['id' => '%%'])}}"
