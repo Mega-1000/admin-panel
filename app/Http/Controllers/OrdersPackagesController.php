@@ -473,28 +473,26 @@ class OrdersPackagesController extends Controller
     public function getProtocols(GetProtocolRequest $request)
     {
         $request->validated();
-
         $courierName = strtoupper($request->courier);
         if ($courierName !== 'Wszystkie') {
+            $packages = OrderPackage::where('delivery_courier_name', '=', $courierName)
+                ->whereDate('shipment_date', '<=', Carbon::createFromFormat('d/m/yy',$request->date_to)->format('yy-m-d'))
+                ->whereDate('shipment_date', '>=', Carbon::createFromFormat('d/m/yy',$request->date_from)->format('yy-m-d'))
+                ->where('status', '!=', 'CANCELLED')
+                ->where('status', '!=', 'WAITING_FOR_CANCELLED')
+                ->where('status', '!=', 'REJECT_CANCELLED')
+                ->get();
+        } else {
+            $courierName = 'wszystkie';
             $packages = $this->repository->findWhere([
-                ['delivery_courier_name', '=', $courierName],
                 ['shipment_date', '<=', Carbon::createFromFormat('d/m/yy',$request->date_to)],
                 ['shipment_date', '>=', Carbon::createFromFormat('d/m/yy', $request->date_from)],
                 ['status', '!=', 'CANCELLED'],
                 ['status', '!=', 'WAITING_FOR_CANCELLED'],
                 ['status', '!=', 'REJECT_CANCELLED'],
             ]);
-        } else {
-            $courierName = 'wszystkie';
-            $packages = $this->repository->findWhere([
-                ['shipment_date', '=', Carbon::today()],
-                ['status', '!=', 'CANCELLED'],
-                ['status', '!=', 'WAITING_FOR_CANCELLED'],
-                ['status', '!=', 'REJECT_CANCELLED'],
-            ]);
         }
-
-        if (!$packages->isEmpty()) {
+        if ($packages->count() > 0 ){
             $packagesArray = [];
             foreach ($packages as $package) {
                 if ($package->order->warehouse !== null) {
@@ -530,7 +528,11 @@ class OrdersPackagesController extends Controller
             }
             $path = storage_path('app/public/protocols/protocol-' . $courierName . '-' . Carbon::today()->toDateString() . '.pdf');
             $pdf->save($path);
-            $this->sendProtocolToDeliveryFirm(strtoupper($courierName), $path);
+            try {
+                $this->sendProtocolToDeliveryFirm(strtoupper($courierName), $path);
+            } catch (\Exception $e) {
+                \Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);
+            }
             return $pdf->download('protocol-' . $courierName . '-' . Carbon::today()->toDateString() . '.pdf');
         } else {
             return redirect()->back()->with([

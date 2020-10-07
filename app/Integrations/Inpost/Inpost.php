@@ -226,9 +226,13 @@ class Inpost
         }
         curl_close($ch);
 
-        Storage::disk('local')->put('public/inpost/stickers/sticker' . $trackingNumber . '.pdf', $output);
+        $isStored = Storage::disk('local')->put('public/inpost/stickers/sticker' . $trackingNumber . '.pdf', $output);
 
-        return $output;
+        if($isStored === true){
+            return true;
+        } else {
+            $this->getLabel($id, $trackingNumber);
+        }
     }
 
     public function hrefExecute($href)
