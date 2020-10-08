@@ -246,11 +246,8 @@ class CheckPackagesStatusJob
         $guzzle = new Client();
         $res = $guzzle->get('http://statusy.gls-poland.com.pl/last.php?nr_paczki=' . $package->letter_number);
         $body = (string)$res->getBody();
-        if($package->id == 16082) {
-            var_dump($body);
-        }
+
         if (str_contains($body, 'Doreczona')) {
-            var_dump($package->id, 'xxx');
             $package->status = OrderPackage::DELIVERED;
         } else if (str_contains($body, 'Paczka w magazynie')) {
             $package->status = OrderPackage::SENDING;

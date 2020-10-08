@@ -155,14 +155,14 @@ class OrdersCourierJobs extends Job
         if (!empty($result['is_error'])) {
             return;
         }
-        \Log::info('ppp' . $result['letter_number']);
+
         $this->orderPackageRepository->update([
             'sending_number' => $result['sending_number'],
             'letter_number' => $result['letter_number'],
             'status' => OrderPackage::WAITING_FOR_SENDING
         ], $this->data['additional_data']['order_package_id']);
         $package = $this->orderPackageRepository->find($this->data['additional_data']['order_package_id']);
-        \Log::info('zzz' . $package->letter_number);
+
         if ($package->service_courier_name !== 'INPOST' && $package->service_courier_name !== 'ALLEGRO-INPOST') {
             if ($package->delivery_courier_name === 'DPD') {
                 $path = storage_path('app/public/dpd/stickers/sticker' . $package->letter_number . '.pdf');
@@ -354,7 +354,7 @@ class OrdersCourierJobs extends Job
         if ($href->status !== 'confirmed') {
             return;
         }
-        $status = $integration->getLabel($href->id, $href->tracking_number);
+        $integration->getLabel($href->id, $href->tracking_number);
         if ($package->send_protocol == true) {
             return;
         }
@@ -362,7 +362,7 @@ class OrdersCourierJobs extends Job
         if (is_null($path)) {
             return;
         }
-        \Log::info('xxx' . $package->letter_number);
+
         return [
             'status' => 200,
             'error_code' => 0,
