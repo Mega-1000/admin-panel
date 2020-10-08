@@ -228,11 +228,7 @@ class Inpost
 
         $isStored = Storage::disk('local')->put('public/inpost/stickers/sticker' . $trackingNumber . '.pdf', $output);
 
-        if($isStored === true){
-            return true;
-        } else {
-            $this->getLabel($id, $trackingNumber);
-        }
+        return $isStored;
     }
 
     public function hrefExecute($href)
