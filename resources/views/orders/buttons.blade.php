@@ -85,14 +85,16 @@
                 {{csrf_field()}}
                 <label for="protocols">Protokoły z dnia</label>
                 <input name="date_from" class="protocol_datepicker" id="protocol_datepicker_from"
-                       value="{{ Carbon\Carbon::now()->format('d/m/yy') }}"/>
+                       value="{{ Carbon\Carbon::now()->format('d/m/yy') }}" style="width: 100px;"/>
                 do dnia
                 <input name="date_to" class="protocol_datepicker" id="protocol_datepicker_to"
-                       value="{{ Carbon\Carbon::now()->format('d/m/yy') }}"/>
+                       value="{{ Carbon\Carbon::now()->format('d/m/yy') }}"/ style="width: 100px;">
                 z magazynu:
                 <input type="text" id="delivery_warehouse" name="delivery_warehouse"
                        value="MEGA-OLAWA"/>
                 <input type="submit" name="courier" value="Inpost" target="_blank" class="btn btn-success"/>
+                <input type="submit" name="courier" value="Allegro-Inpost" target="_blank" class="btn btn-success"/>
+                <input type="submit" name="courier" value="Paczkomat" target="_blank" class="btn btn-success"/>
                 <input type="submit" name="courier" value="Dpd" target="_blank" class="btn btn-success"/>
                 <input type="submit" name="courier" value="Pocztex" target="_blank" class="btn btn-success"/>
                 <input type="submit" name="courier" value="Apaczka" target="_blank" class="btn btn-success"/>
@@ -217,18 +219,18 @@
             <a id="upload-allegro-pays" name="print_orders" class="btn btn-success"
                onclick="$('#upload-allegro-payments').modal('show')">Aktualizuj</a>
             <button id="upload-allegro-commission-button" name="print_orders" class="btn btn-success"
-               onclick="$('#upload-allegro-commission-modal').modal('show')">Aktualizuj prowizje Allegro</button>
+                    onclick="$('#upload-allegro-commission-modal').modal('show')">Aktualizuj prowizje Allegro</button>
             @if(!empty(session('allegro_new_letters')))
                 @foreach(session('allegro_new_letters') as $letter)
                     <div class="alert-info">
                         {{ $letter['letter_number'] }}
                     </div>
                 @endforeach
-                    <form method="POST" action="{{ route('orders.newLettersFromAllegro') }}">
-                        @csrf
-                        <input type="hidden" name="letters" value="{{ json_encode(session('allegro_new_letters'))}}">
-                        <button id="create-new-lists-from-allegro" class="btn btn-success">Utwórz nowe listy</button>
-                    </form>
+                <form method="POST" action="{{ route('orders.newLettersFromAllegro') }}">
+                    @csrf
+                    <input type="hidden" name="letters" value="{{ json_encode(session('allegro_new_letters'))}}">
+                    <button id="create-new-lists-from-allegro" class="btn btn-success">Utwórz nowe listy</button>
+                </form>
             @endif
             @if(!empty(session('allegro_new_orders_from_comission')))
                 @foreach(session('allegro_new_orders_from_comission') as $order)
@@ -236,11 +238,11 @@
                         {{ $order }}
                     </div>
                 @endforeach
-                    <form method="POST" action="{{ route('orders.newOrdersFromAllegroComissions') }}">
-                        @csrf
-                        <input type="hidden" name="ids" value="{{ json_encode(session('allegro_new_orders_from_comission'))}}">
-                        <button id="create-new-lists-from-allegro" class="btn btn-success">Utwórz nowe zlecenia</button>
-                    </form>
+                <form method="POST" action="{{ route('orders.newOrdersFromAllegroComissions') }}">
+                    @csrf
+                    <input type="hidden" name="ids" value="{{ json_encode(session('allegro_new_orders_from_comission'))}}">
+                    <button id="create-new-lists-from-allegro" class="btn btn-success">Utwórz nowe zlecenia</button>
+                </form>
             @endif
             @if(!empty(session('allegro_commission_errors')))
                 @foreach(session('allegro_commission_errors') as $error)
@@ -249,7 +251,7 @@
                     </div>
                 @endforeach
             @endif
-                @if(!empty(session('allegro_payments_errors')))
+            @if(!empty(session('allegro_payments_errors')))
                 <table class="table table-bordered table-striped">
                     <thead>
                     <tr>

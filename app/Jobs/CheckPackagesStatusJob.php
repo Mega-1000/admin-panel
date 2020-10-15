@@ -246,11 +246,22 @@ class CheckPackagesStatusJob
         $guzzle = new Client();
         $res = $guzzle->get('http://statusy.gls-poland.com.pl/last.php?nr_paczki=' . $package->letter_number);
         $body = (string)$res->getBody();
-        if (str_contains($body, 'Doreczona')) {
-            $package->status = OrderPackage::DELIVERED;
-        } else if (str_contains($body, 'Skan kontrolny KK')) {
-            $package->status = OrderPackage::SENDING;
+
+
+        switch(true) {
+            case str_contains($body, 'Doreczona'):
+                $package->status = OrderPackage::DELIVERED;
+                break;
+            case str_contains($body, 'Paczka w magazynie') ||
+                 str_contains($body, 'W doreczeniu') ||
+                 str_contains($body, 'Skan kontrolny KK'):
+                $package->status = OrderPackage::SENDING;
+                break;
+            case str_contains($body, 'Dane od KK otrzymane'):
+                $package->status = OrderPackage::WAITING_FOR_SENDING;
+                break;
         }
+
         if ($package->isDirty()) {
             $package->save();
         }

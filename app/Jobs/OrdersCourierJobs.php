@@ -155,12 +155,14 @@ class OrdersCourierJobs extends Job
         if (!empty($result['is_error'])) {
             return;
         }
+
         $this->orderPackageRepository->update([
             'sending_number' => $result['sending_number'],
             'letter_number' => $result['letter_number'],
             'status' => OrderPackage::WAITING_FOR_SENDING
         ], $this->data['additional_data']['order_package_id']);
         $package = $this->orderPackageRepository->find($this->data['additional_data']['order_package_id']);
+
         if ($package->service_courier_name !== 'INPOST' && $package->service_courier_name !== 'ALLEGRO-INPOST') {
             if ($package->delivery_courier_name === 'DPD') {
                 $path = storage_path('app/public/dpd/stickers/sticker' . $package->letter_number . '.pdf');
@@ -318,7 +320,7 @@ class OrdersCourierJobs extends Job
             } else {
                 $integration = new Inpost($this->data, 1);
             }
-            $this->callInpostForPackage($integration);
+            return $this->callInpostForPackage($integration);
         } catch (Exception $exception) {
             Session::put('message', $exception->getMessage());
             \Log::info(
@@ -333,28 +335,28 @@ class OrdersCourierJobs extends Job
     public function callInpostForPackage($integration)
     {
         $json = $integration->prepareJsonForInpost();
-        $package = $integration->createSimplePackage($json);
-        if ($package->status == '400') {
-            Session::put('message', $package);
+        $simplePackage = $integration->createSimplePackage($json);
+        if ($simplePackage->status == '400') {
+            Session::put('message', $simplePackage);
             \Log::info(
-                'Problem in INPOST integration with validation', ['courier' => $package, 'class' => get_class($this), 'line' => __LINE__]
+                'Problem in INPOST integration with validation', ['courier' => $simplePackage, 'class' => get_class($this), 'line' => __LINE__]
             );
             return;
         }
-        $this->orderPackageRepository->update([
+        $package = OrderPackage::where('id', '=', $this->data['additional_data']['order_package_id'])->first();
+        $package->update([
             'inpost_url' => $package->href,
-        ], $this->data['additional_data']['order_package_id']);
-
-        $href = $integration->hrefExecute($package->href);
-        $package = OrderPackage::find($this->data['additional_data']['order_package_id']);
+        ]);
+        // Operacje poprzedzające sleepa po stronie Inpostu trwają poniżej 3 sekund,
+        // po natychmiastowym wywołaniu kolejnych metod nie ma jeszcze odpowiedniego wpisu w zwrotce ich API (numer przewozowy)
+        sleep(3);
+        $href = $integration->hrefExecute($simplePackage->href);
         $package->letter_number = $href->tracking_number;
         $package->save();
         if ($href->status !== 'confirmed') {
             return;
         }
         $integration->getLabel($href->id, $href->tracking_number);
-        $package->status = 'WAITING_FOR_SENDING';
-        $package->save();
         if ($package->send_protocol == true) {
             return;
         }
@@ -362,11 +364,12 @@ class OrdersCourierJobs extends Job
         if (is_null($path)) {
             return;
         }
+
         return [
             'status' => 200,
             'error_code' => 0,
             'sending_number' => $href->id,
-            'letter_number' => null,
+            'letter_number' => $package->letter_number,
         ];
     }
 
