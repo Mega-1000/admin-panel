@@ -1222,7 +1222,6 @@
                         }
                         let cancelled = 0;
                         $.each(data, function (key, value) {
-				console.log(key, value);
                             if (value.status === 'CANCELLED') {
                                 cancelled++;
                             }
