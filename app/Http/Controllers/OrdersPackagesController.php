@@ -518,6 +518,7 @@ class OrdersPackagesController extends Controller
                 ];
                 array_push($packagesArray, $packagesArr);
             }
+            $pdfFilename = 'protocol-' . $courierName . '-' . Carbon::today()->toDateString() . '.pdf';
             $pdf = PDF::loadView('pdf.protocol', [
                 'packages' => $packagesArray,
                 'date' => Carbon::today()->toDateString(),
@@ -526,14 +527,14 @@ class OrdersPackagesController extends Controller
             if (!file_exists(storage_path('app/public/protocols'))) {
                 mkdir(storage_path('app/public/protocols'));
             }
-            $path = storage_path('app/public/protocols/protocol-' . $courierName . '-' . Carbon::today()->toDateString() . '.pdf');
+            $path = storage_path('app/public/protocols/' . $pdfFilename);
             $pdf->save($path);
             try {
                 $this->sendProtocolToDeliveryFirm(strtoupper($courierName), $path);
             } catch (\Exception $e) {
                 \Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);
             }
-            return $pdf->download('protocol-' . $courierName . '-' . Carbon::today()->toDateString() . '.pdf');
+            return $pdf->download($pdfFilename);
         } else {
             return redirect()->back()->with([
                 'message' => __('order_packages.message.protocol_error'),

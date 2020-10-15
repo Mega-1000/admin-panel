@@ -992,7 +992,10 @@
                 }
                 $('#package-' + id).attr("disabled", false);
                 $('#success-ok').on('click', function () {
-                    window.location.href = '/admin/orders?order_id=' + orderId;
+		    setTimeout(() => {
+			table.ajax.reload(null, false);
+                        window.location.href = '/admin/orders?order_id=' + orderId;
+		    }, 500);
                 });
             }).fail(function () {
                 $('#package-' + id).attr("disabled", false);
@@ -1131,15 +1134,49 @@
                                 if (value.letter_number === null) {
                                     html += '<a href="javascript:void()"><p>Brak listu przewozowego</p></a>';
                                 } else {
+				    let color = '';
+				    switch(value.status) {
+					case 'DELIVERED':
+						color = '#87D11B';
+						break;
+					case 'SENDING':
+						color = '#4DCFFF';
+                                                break;
+					case 'WAITING_FOR_SENDING':
+						color = '#5537f0';
+                                                break;
+				    }
                                     if (value.service_courier_name === 'INPOST' || value.service_courier_name === 'ALLEGRO-INPOST') {
-                                        html += '<a target="_blank" href="/storage/inpost/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
+                                        html += '<a target="_blank" href="/storage/inpost/stickers/sticker' + value.letter_number + '.pdf"><p style="margin-bottom: 0px;">' + value.letter_number + '</p></a>';
+					html += '<div>';
+					 if(value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
+                                                html += '<span>' + value.cash_on_delivery + ' zł</span>';
+                                        }
+					html += '<a target="_blank" style="color: green; font-weight: bold; color: #FFFFFF; display: inline-block; margin-top: 5px; margin-left: 5px; padding: 5px; background-color:' + color + '" href="https://inpost.pl/sledzenie-przesylek?number=' + value.letter_number + '"<i class="fas fa-shipping-fast"></i></a>';
+					html += '</div>';
                                     } else if (value.delivery_courier_name === 'DPD') {
-                                        html += '<p>' + value.sending_number + '</p>';
-                                        html += '<a target="_blank" href="/storage/dpd/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
+                                        html += '<p style="margin-bottom: 0px;">' + value.sending_number + '</p>';
+                                        html += '<a target="_blank" href="/storage/dpd/stickers/sticker' + value.letter_number + '.pdf"><p style="margin-bottom: 0px;">' + value.letter_number + '</p></a>';
+					html += '<div>';
+					if(value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
+						html += '<span>' + value.cash_on_delivery + ' zł</span>';
+					}
+					html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; margin-top: 5px;padding: 5px;margin-left: 5px; background-color:' + color + '" href="https://tracktrace.dpd.com.pl/parcelDetails?typ=1&p1=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
+					 html += '</div>';
                                     } else if (value.delivery_courier_name === 'POCZTEX') {
-                                        html += '<a target="_blank" href="/storage/pocztex/protocols/protocol' + value.sending_number + '.pdf"><p>' + value.letter_number + '</p></a>';
+                                        html += '<a target="_blank" href="/storage/pocztex/protocols/protocol' + value.sending_number + '.pdf"><p style="margin-bottom: 0px;">' + value.letter_number + '</p></a>';
+					html += '<div>';
+					 if(value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
+                                                html += '<span>' + value.cash_on_delivery + ' zł</span>';
+                                        }
+					html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; margin-top: 5px;padding: 5px;margin-left: 5px; background-color:' + color + '" href="http://www.pocztex.pl/sledzenie-przesylek/?numer=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
+					html += '</div>';
                                     } else if (value.delivery_courier_name === 'JAS') {
                                         html += '<a target="_blank" href="/storage/jas/protocols/protocol' + value.sending_number + '.pdf"><p>' + value.letter_number + '</p></a>';
+					 if(value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
+                                                html += '<span>' + value.cash_on_delivery + ' zł</span>';
+                                        }
+
                                         html += '<a target="_blank" href="/storage/jas/labels/label' + value.sending_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                     } else if (value.delivery_courier_name === 'GIELDA') {
                                         html += '<a target="_blank" href="/storage/gielda/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
@@ -1147,9 +1184,15 @@
                                         html += '<a target="_blank" href="/storage/odbior_osobisty/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                     } else if (value.delivery_courier_name === 'GLS') {
                                         let url = "{{ route('orders.package.getSticker', ['id' => '%%'])}}"
-                                        html += '<a target="_blank" href="' + url.replace('%%', value.id) + '"><p>';
+                                        html += '<a target="_blank" href="' + url.replace('%%', value.id) + '"><p style="margin-bottom: 0px;">';
                                         html += value.letter_number ? value.letter_number : 'wygeneruj naklejkę';
+					html += '<div>';
+					 if(value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
+                                                html += '<span>' + value.cash_on_delivery + ' zł</span>';
+                                        }
+					html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; padding: 5px; margin-top: 5px;margin-left: 5px; background-color:' + color + '" href="https://gls-group.eu/PL/pl/sledzenie-paczek?match=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
                                         html += '</p></a>';
+					html += '</div>';
                                     }
                                 }
                                 html += '</div>';
@@ -1169,6 +1212,7 @@
                     render: function (order, type, row) {
                         let data = order.packages
                         var html = ''
+                        let color = '#87D11B';
                         if (data.length != 0) {
                             if (order.otherPackages && order.otherPackages.find(el => el.type == 'not_calculable')) {
                                 html = '<div style="border: solid blue 4px" >'
@@ -1178,6 +1222,7 @@
                         }
                         let cancelled = 0;
                         $.each(data, function (key, value) {
+				console.log(key, value);
                             if (value.status === 'CANCELLED') {
                                 cancelled++;
                             }
@@ -1208,11 +1253,29 @@
                                 } else {
                                     if (value.service_courier_name === 'INPOST' || value.service_courier_name === 'ALLEGRO-INPOST') {
                                         html += '<a target="_blank" href="/storage/inpost/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
+                                        html += '<div>';
+                                        if(value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
+                                            html += '<span>' + value.cash_on_delivery + ' zł</span>';
+                                        }
+                                        html += '<a target="_blank" style="color: green; font-weight: bold; color: #FFFFFF; display: inline-block; margin-top: 5px; margin-left: 5px; padding: 5px; background-color:' + color + '" href="https://inpost.pl/sledzenie-przesylek?number=' + value.letter_number + '"<i class="fas fa-shipping-fast"></i></a>';
+                                        html += '</div>';
                                     } else if (value.delivery_courier_name === 'DPD') {
                                         html += '<a target="_blank" href="/storage/dpd/protocols/protocol' + value.letter_number + '.pdf"><p>' + value.sending_number + '</p></a>';
                                         html += '<a target="_blank" href="/storage/dpd/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
+                                        html += '<div>';
+                                        if(value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
+                                            html += '<span>' + value.cash_on_delivery + ' zł</span>';
+                                        }
+                                        html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; margin-top: 5px;padding: 5px;margin-left: 5px; background-color:' + color + '" href="https://tracktrace.dpd.com.pl/parcelDetails?typ=1&p1=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
+                                        html += '</div>';
                                     } else if (value.delivery_courier_name === 'POCZTEX') {
                                         html += '<a target="_blank" href="/storage/pocztex/protocols/protocol' + value.sending_number + '.pdf"><p>' + value.letter_number + '</p></a>';
+                                        html += '<div>';
+                                        if(value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
+                                            html += '<span>' + value.cash_on_delivery + ' zł</span>';
+                                        }
+                                        html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; margin-top: 5px;padding: 5px;margin-left: 5px; background-color:' + color + '" href="http://www.pocztex.pl/sledzenie-przesylek/?numer=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
+                                        html += '</div>';
                                     } else if (value.delivery_courier_name === 'JAS') {
                                         html += '<a target="_blank" href="/storage/jas/protocols/protocol' + value.sending_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                         html += '<a target="_blank" href="/storage/jas/labels/label' + value.sending_number + '.pdf"><p>' + value.letter_number + '</p></a>';
@@ -1225,6 +1288,13 @@
                                         html += '<a target="_blank" href="' + url.replace('%%', value.id) + '"><p>';
                                         html += value.letter_number ? value.letter_number : 'wygeneruj naklejkę';
                                         html += '</p></a>';
+                                        html += '<div>';
+                                        if(value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
+                                            html += '<span>' + value.cash_on_delivery + ' zł</span>';
+                                        }
+                                        html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; padding: 5px; margin-top: 5px;margin-left: 5px; background-color:' + color + '" href="https://gls-group.eu/PL/pl/sledzenie-paczek?match=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
+                                        html += '</p></a>';
+                                        html += '</div>';
                                     }
                                     html += '<div style="display: flex;">'
                                     html += '<button class="btn btn-danger" onclick="cancelPackage(' + value.id + ', ' + value.order_id + ')">Anuluj</button>'
