@@ -28,6 +28,7 @@ class AllegroController extends Controller
             }
             $parser = new AllegroCommissionParser();
             $parsedData = $parser->parseFile($handle);
+            dd($parsedData);
             $errors = $parsedData['errors'];
             $newLetters = $parsedData['new_letters'];
             $newOrders = $parsedData['new_orders'];
