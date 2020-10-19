@@ -21,3 +21,4 @@ yarn-error.log
 /public/*pdf
 /public/js/app.js
 /storage/logs
+docker

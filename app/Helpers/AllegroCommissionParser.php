@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Entities\AllegroPackage;
 use App\Entities\Order;
 use App\Entities\OrderAllegroCommission;
 use App\Entities\OrderPackage;
@@ -15,14 +16,14 @@ class AllegroCommissionParser
 {
     public const START_STRING = 'Numer zamówienia: ';
     public const SEND_STRING = 'Numer nadania: ';
-    private $twsuId;
+    private $productId;
 
     public function __construct()
     {
-        $this->twsuId = Product::getDefaultProduct()->id;
+        $this->productId = Product::getDefaultProduct()->id;
     }
 
-    public static function CreatePack(string $letterNumber, float $cost, string $courierName)
+    public static function CreatePack(string $letterNumber, float $cost, string $courierName): array
     {
         return [
             'real_cost_for_company' => $cost,
@@ -244,7 +245,7 @@ class AllegroCommissionParser
             'net_selling_price_commercial_unit' => 0
         ];
         $override = [];
-        $override[$this->twsuId] = $prices;
+        $override[$this->productId] = $prices;
         $priceOverrider = new OrderPriceOverrider($override);
 
         $orderBuilder = new OrderBuilder();
