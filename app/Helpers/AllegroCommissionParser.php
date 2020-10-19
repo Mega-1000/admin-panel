@@ -2,25 +2,28 @@
 
 namespace App\Helpers;
 
+use App\Entities\AllegroPackage;
 use App\Entities\Order;
 use App\Entities\OrderAllegroCommission;
 use App\Entities\OrderPackage;
 use App\Entities\Product;
 use App\Entities\SelTransaction;
 use App\User;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class AllegroCommissionParser
 {
     public const START_STRING = 'Numer zamówienia: ';
     public const SEND_STRING = 'Numer nadania: ';
-    private $twsuId;
+    private $productId;
 
     public function __construct()
     {
-        $this->twsuId = Product::getDefaultProduct()->id;
+        $this->productId = Product::getDefaultProduct()->id;
     }
 
-    public static function CreatePack(string $letterNumber, float $cost, string $courierName)
+    public static function CreatePack(string $letterNumber, float $cost, string $courierName): array
     {
         return [
             'real_cost_for_company' => $cost,
@@ -67,6 +70,7 @@ class AllegroCommissionParser
                 $errors[] = $e->getMessage();
             }
         }
+
         return ['new_letters' => $newLetters, 'new_orders' => $newOrders, 'errors' => $errors];
     }
 
@@ -173,24 +177,44 @@ class AllegroCommissionParser
         if (!$letterNumber) {
             return [];
         }
+        switch($line[3]) {
+            case 'Przesyłka DPD':
+                $deliveryCourier = 'DPD';
+                break;
+            case 'DPD - Kurier opłaty dodatkowe':
+                $deliveryCourier = 'DPD';
+                break;
+            case 'InPost - opłaty dodatkowe':
+                $deliveryCourier = 'INPOST';
+                break;
+        }
+
+        $allegroDate = Carbon::parse($line[0]);
 
         $package = OrderPackage::where('letter_number', $letterNumber)->first();
         $amount = floatval(str_replace(',', '.', $line[5]));
         if (empty($package)) {
-            return self::setPackageDetails($letterNumber, $amount, $courierName, $formId);
+            return self::setPackageDetails($letterNumber, $amount, $courierName, $formId, $deliveryCourier);
         }
+        DB::table('allegro_package')->insert([
+            'package_id' => $package->id,
+            'allegro_operation_date' => $allegroDate,
+            'package_spedition_company_name' => $deliveryCourier,
+            'package_delivery_company_name' => $deliveryCourier,
+        ]);
         $package->real_cost_for_company = $amount;
         $package->save();
         return [];
     }
 
-    private static function setPackageDetails(string $letterNumber, float $cost, string $courierName, $formId)
+    private static function setPackageDetails(string $letterNumber, float $cost, string $courierName, $formId, string $deliveryCourier)
     {
         return [
             'real_cost_for_company' => $cost,
             'letter_number' => $letterNumber,
             'courier_name' => $courierName,
-            'form_id' => $formId
+            'form_id' => $formId,
+            'delivery_courier_name' => $deliveryCourier
         ];
     }
 
@@ -221,7 +245,7 @@ class AllegroCommissionParser
             'net_selling_price_commercial_unit' => 0
         ];
         $override = [];
-        $override[$this->twsuId] = $prices;
+        $override[$this->productId] = $prices;
         $priceOverrider = new OrderPriceOverrider($override);
 
         $orderBuilder = new OrderBuilder();
