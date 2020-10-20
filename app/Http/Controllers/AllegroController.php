@@ -3,19 +3,23 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\AllegroCommissionParser;
-use App\Http\Requests\AllegroSetCommission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class AllegroController extends Controller
 {
 
-    public function setCommission(AllegroSetCommission $request)
+    public function setCommission(Request $request)
     {
-        $this->validate($request, $request->rules());
-
         try {
             $file = $request->file('file');
+            $maxFileSize = 20000000;
+            if ($file->getSize() > $maxFileSize) {
+                return redirect()->route('orders.index')->with([
+                    'message' => __('transport.errors.too-big-file'),
+                    'alert-type' => 'error'
+                ]);
+            }
             $path = Storage::put('user-files/', $file);
             $path = Storage::path($path);
 
