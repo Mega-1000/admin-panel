@@ -35,6 +35,8 @@ files.forEach(file => {
 
 Vue.use(Vuelidate);
 Vue.component('datetime', Datetime);
+Vue.component("draggable-packages", () => import("./components/global/DraggablePackages"));
+
 Vue.prototype.$luxon = DateTime;
 /**
  * Next, we will create a fresh Vue application instance and attach it to

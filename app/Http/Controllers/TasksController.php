@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Entities\Label;
 use App\Entities\LabelGroup;
 use App\Entities\Order;
+use App\Entities\PackageTemplate;
 use App\Entities\Task;
 use App\Entities\TaskSalaryDetails;
 use App\Entities\TaskTime;
@@ -1203,5 +1204,18 @@ class TasksController extends Controller
         }
 
         return response()->json($task);
+    }
+
+    public function manageProduceProccess($id)
+    {
+        $task = Task::find($id);
+        $templateData = PackageTemplate::orderBy('list_order', 'asc')->get();
+
+        return view('orderTasks.manage', compact('task', 'templateData'));
+    }
+
+    public function attachProductsToPackages(Request $request)
+    {
+
     }
 }
