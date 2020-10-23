@@ -420,6 +420,24 @@
     <link href='/fullcalendar/timegrid/main.css' rel='stylesheet' />
     <link href='/fullcalendar/timeline/main.css' rel='stylesheet' />
     <link href='/fullcalendar/resource-timeline/main.css' rel='stylesheet' />
+@endsection
+
+@section('page_header')
+    @yield('app-header')
+@endsection
+
+@section('content')
+    <div class="page-content" id="vue">
+        @include('voyager::alerts')
+        @include('voyager::dimmers')
+        @yield('app-content')
+        <label-scheduler-await-user
+                :user-id="{{ Auth::id() }}"
+        />
+    </div>
+@endsection
+
+@section('javascript')
     {{-- Rollbar script --}}
     <script>
         var _rollbarConfig = {
@@ -442,24 +460,6 @@
     <script src='/fullcalendar/timeline/main.js'></script>
     <script src='/fullcalendar/resource-common/main.js'></script>
     <script src='/fullcalendar/resource-timeline/main.js'></script>
-@endsection
-
-@section('page_header')
-    @yield('app-header')
-@endsection
-
-@section('content')
-    <div class="page-content" id="vue">
-        @include('voyager::alerts')
-        @include('voyager::dimmers')
-        @yield('app-content')
-        <label-scheduler-await-user
-                :user-id="{{ Auth::id() }}"
-        />
-    </div>
-@endsection
-
-@section('javascript')
 
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
