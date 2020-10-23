@@ -177,6 +177,7 @@ return [
         App\Providers\RepositoryServiceProvider::class,
         Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class,
         Barryvdh\Debugbar\ServiceProvider::class,
+        Rollbar\Laravel\RollbarServiceProvider::class,
 
         /*
          * Model Observers Service Providers....

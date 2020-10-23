@@ -25,6 +25,7 @@
         "predis/predis": "~1.0",
         "prettus/l5-repository": "^2.6",
         "rap2hpoutre/laravel-log-viewer": "^1.0",
+        "rollbar/rollbar-laravel": "4.*",
         "sentry/sentry-laravel": "1.0.0",
         "smalot/pdfparser": "*",
         "spatie/browsershot": "^3.34",
@@ -50,7 +51,9 @@
     },
     "extra": {
         "laravel": {
-            "dont-discover": []
+            "dont-discover": [
+                "rollbar/rollbar-laravel"
+            ]
         }
     },
     "autoload": {
