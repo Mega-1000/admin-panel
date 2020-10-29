@@ -1213,9 +1213,4 @@ class TasksController extends Controller
 
         return view('orderTasks.manage', compact('task', 'templateData'));
     }
-
-    public function attachProductsToPackages(Request $request)
-    {
-
-    }
 }

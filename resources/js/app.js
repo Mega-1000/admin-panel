@@ -15,6 +15,7 @@ import Vue from 'vue'
 import { Datetime } from 'vue-datetime';
 import 'vue-datetime/dist/vue-datetime.css'
 import { Settings, DateTime } from 'luxon'
+import DraggablePackages from "./components/global/DraggablePackages";
 
 Settings.defaultLocale = 'pl'
 
@@ -35,7 +36,7 @@ files.forEach(file => {
 
 Vue.use(Vuelidate);
 Vue.component('datetime', Datetime);
-Vue.component("draggable-packages", () => import("./components/global/DraggablePackages"));
+Vue.component("draggable-packages", DraggablePackages);
 
 Vue.prototype.$luxon = DateTime;
 /**

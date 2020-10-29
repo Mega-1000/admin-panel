@@ -53,12 +53,12 @@
                 break;
             }
         @endphp
-    <div style="border: solid green 4px; width: 30%; padding: 10px;" >
-        <div style="display: flex; flex-direction: column; align-items: center;" >
-            <div style="display: flex; align-items: stretch;">
-                <p style="margin: 8px 0px 0px 0px;">{{ $task->order->id }} / {{ $package->id }}</p>
+    <div class="manage__packages">
+        <div class="main__container">
+            <div>
+                <p class="package__container">{{ $task->order->id }} / {{ $package->id }}</p>
                 @if($package->symbol)
-                    <p style="margin: 8px 8px 0px 8px;">{{ $package->symbol }}</p> </div>
+                    <p class="package__container">{{ $package->symbol }}</p> </div>
                 @endif
                 @switch($package->status)
                     @case('WAITING_FOR_CANCELLED')
@@ -66,7 +66,7 @@
                     @break
 
                     @case('REJECT_CANCELLED')
-                        <p style="color:red;">ANULACJA ODRZUCONA</p>
+                        <p class="cancelled">ANULACJA ODRZUCONA</p>
                     @break
                 @endswitch
                 @if($package->letter_number === null &&
@@ -77,7 +77,7 @@
                     $package->delivery_courier_name !== 'ODBIOR_OSOBISTY' &&
                     $package->service_courier_name !== 'ODBIOR_OSOBISTY'
                 )
-                    <div style="display: flex;">
+                    <div class="display__flex">
                         <button class="btn btn-success" id="package-{{$package->id}}" onclick="sendPackage('{{$package->id}}','{{ $package->order_id }}')">Wyślij</button>
                         <button class="btn btn-danger" onclick="deletePackage('{{$package->id}}', '{{$package->order_id}}')">Usuń</button>
                         <button class="btn btn-info" onclick="createSimilar('{{$package->id}}', '{{$package->order_id}}')">Podobna</button>
@@ -94,7 +94,7 @@
                             @if(isset($cashOnDelivery))
                                 {{ $cashOnDelivery }}
                             @endif
-                            <a target="_blank" style="color: green; font-weight: bold; color: #FFFFFF; display: inline-block; margin-top: 5px; margin-left: 5px; padding: 5px;  background-color: {{ $color }}" href="https://inpost.pl/sledzenie-przesylek?number={{$package->letter_number}}"><i class="fas fa-shipping-fast"></i></a>
+                            <a target="_blank" class="courier__link" href="https://inpost.pl/sledzenie-przesylek?number={{$package->letter_number}}"><i class="fas fa-shipping-fast"></i></a>
                         </div>
                     @endif
                     @switch($package->delivery_courier_name)
@@ -105,7 +105,7 @@
                             @if(isset($cashOnDelivery))
                                 {{ $cashOnDelivery }}
                             @endif
-                            <a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; margin-top: 5px;padding: 5px;margin-left: 5px;  background-color: {{ $color }}" href="https://tracktrace.dpd.com.pl/parcelDetails?typ=1&p1={{$package->letter_number}}"><i class="fas fa-shipping-fast"></i></a>
+                            <a target="_blank" class="courier__link" href="https://tracktrace.dpd.com.pl/parcelDetails?typ=1&p1={{$package->letter_number}}"><i class="fas fa-shipping-fast"></i></a>
                         </div>
                         @break
                         @case('POCZTEX')
@@ -114,7 +114,7 @@
                             @if(isset($cashOnDelivery))
                                 {{ $cashOnDelivery }}
                             @endif
-                            <a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; margin-top: 5px;padding: 5px;margin-left: 5px;  background-color: {{ $color }}" href="http://www.pocztex.pl/sledzenie-przesylek/?numer={{$package->letter_number}}"><i class="fas fa-shipping-fast"></i></a>
+                            <a target="_blank" class="courier__link" href="http://www.pocztex.pl/sledzenie-przesylek/?numer={{$package->letter_number}}"><i class="fas fa-shipping-fast"></i></a>
                         </div>
                         @break
                         @case('JAS')
@@ -144,11 +144,11 @@
                             @if(isset($cashOnDelivery))
                                 {{ $cashOnDelivery }}
                             @endif
-                            <a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; padding: 5px; margin-top: 5px;margin-left: 5px; background-color: {{ $color }}" href="https://gls-group.eu/PL/pl/sledzenie-paczek?match={{$package->letter_number}}"><i class="fas fa-shipping-fast"></i></a>
+                            <a target="_blank" class="courier__link" href="https://gls-group.eu/PL/pl/sledzenie-paczek?match={{$package->letter_number}}"><i class="fas fa-shipping-fast"></i></a>
                         </div>
                         @break
                     @endswitch
-                    <div style="display: flex;">
+                    <div class="display__flex">
                     <button class="btn btn-danger" onclick="cancelPackage('{{$package->id}}', '{{$package->order_id}}')">Anuluj</button>
                     <button class="btn btn-info" onclick="createSimilar('{{$package->id}}', '{{$package->order_id}}')">Podobna</button>
                     </div>
@@ -162,16 +162,16 @@
             $isProblem = abs(($package->real_cost_for_company ?? 0) - ($package->cost_for_company ?? 0)) > 2;
         @endphp
         @if($isProblem)
-            <div style="border: solid red 4px">
+            <div class="error__class">
         @endif
         @if($package->status == 'SENDING' || $package->status == 'DELIVERED')
-            <div style="display: flex; align-items: center; flex-direction: column;" >
-                <div style="display: flex; align-items: center;">
-                    <p style="margin: 8px 0px 0px 0px;">{{ $package->order_id }} / {{ $package->number }}</p>
+            <div class="manage__packages" >
+                <div class="main__container">
+                    <p class="package__container">{{ $package->order_id }} / {{ $package->number }}</p>
                     @if($package->symbol)
-                        <p style="margin: 8px 8px 0px 8px;">{{ $package->symbol }}</p> </div>
+                        <p class="package__container">{{ $package->symbol }}</p> </div>
                     @else
-                        <p style="margin: 8px 8px 0px 8px;">{{ $package->container_type }}</p> </div>
+                        <p class="package__container">{{ $package->container_type }}</p> </div>
                     @endif
                 @if($package->letter_number === null)
                     <a href="javascript:void()">Brak listu przewozowego</a>
@@ -187,7 +187,7 @@
                             @if(isset($cashOnDelivery))
                                 {{ $cashOnDelivery }}
                             @endif
-                            <a target="_blank" style="color: green; font-weight: bold; color: #FFFFFF; display: inline-block; margin-top: 5px; margin-left: 5px; padding: 5px;" href="https://inpost.pl/sledzenie-przesylek?number={{$package->letter_number}}"><i class="fas fa-shipping-fast"></i></a>
+                            <a target="_blank" class="courier__link" href="https://inpost.pl/sledzenie-przesylek?number={{$package->letter_number}}"><i class="fas fa-shipping-fast"></i></a>
                         </div>
                     @endif
                     @switch($package->delivery_courier_name)
@@ -198,7 +198,7 @@
                             @if(isset($cashOnDelivery))
                                 {{ $cashOnDelivery }}
                             @endif
-                            <a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; margin-top: 5px;padding: 5px;margin-left: 5px;" href="https://tracktrace.dpd.com.pl/parcelDetails?typ=1&p1={{$package->letter_number}}"><i class="fas fa-shipping-fast"></i></a>
+                            <a target="_blank" class="courier__link" href="https://tracktrace.dpd.com.pl/parcelDetails?typ=1&p1={{$package->letter_number}}"><i class="fas fa-shipping-fast"></i></a>
                         </div>
                         @break
                         @case('POCZTEX')
@@ -207,7 +207,7 @@
                             @if(isset($cashOnDelivery))
                                 {{ $cashOnDelivery }}
                             @endif
-                            <a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; margin-top: 5px;padding: 5px;margin-left: 5px;" href="http://www.pocztex.pl/sledzenie-przesylek/?numer={{$package->letter_number}}"><i class="fas fa-shipping-fast"></i></a>
+                            <a target="_blank" class="courier__link" href="http://www.pocztex.pl/sledzenie-przesylek/?numer={{$package->letter_number}}"><i class="fas fa-shipping-fast"></i></a>
                         </div>
                         @break
                         @case('JAS')
@@ -237,7 +237,7 @@
                             @if(isset($cashOnDelivery))
                                 {{ $cashOnDelivery }}
                             @endif
-                            <a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; padding: 5px; margin-top: 5px;margin-left: 5px;" href="https://gls-group.eu/PL/pl/sledzenie-paczek?match={{$package->letter_number}}"><i class="fas fa-shipping-fast"></i></a>
+                            <a target="_blank" class="courier__link" href="https://gls-group.eu/PL/pl/sledzenie-paczek?match={{$package->letter_number}}"><i class="fas fa-shipping-fast"></i></a>
                         </div>
                         @break
                     @endswitch
@@ -249,6 +249,42 @@
     <draggable-packages></draggable-packages>
     @component('orderTasks.modals.modals', ['templateData' => $templateData])
     @endcomponent
+    <style>
+        .cancelled {
+            color: red;
+        }
+        .display__flex {
+            display: flex;
+        }
+        .courier__link {
+            font-weight: bold;
+            color: #FFFFFF;
+            display: inline-block;
+            padding: 5px;
+            margin-top: 5px;
+            margin-left: 5px;
+        }
+        .package__container {
+            margin: 8px 8px 0px 8px;
+        }
+        .manage__packages {
+            border: solid green 4px;
+            width: 30%;
+            padding: 10px;
+        }
+        .main__container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .main__container div:first-child {
+            display: flex;
+            align-items: stretch;
+        }
+        .error__class {
+            border: solid red 4px;
+        }
+    </style>
 @endsection
 @section('scripts')
     <script>

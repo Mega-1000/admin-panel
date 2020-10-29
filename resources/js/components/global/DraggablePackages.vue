@@ -57,11 +57,8 @@
     </div>
 </template>
 <script>
-    import draggable from "vuedraggable";
-    import rawDisplayer from "vuedraggable";
-    let id = 1;
+    import { draggable, rawDisplayer } from "vuedraggable";
     export default {
-        order: 14,
         components: {
             draggable,
             rawDisplayer
@@ -69,7 +66,10 @@
         data() {
             return {
                 packages: [],
-                products: []
+                products: [],
+                order: [],
+                sendStatus: false,
+                error: []
             };
         },
         methods: {
@@ -78,9 +78,17 @@
                     .then(response => {
                         this.packages = response.data.packages;
                         this.products = response.data.orderProducts;
+                        this.order = response.data.order;
                     });
             },
-            async savePackagesItems() {}
+            async savePackagesItems() {
+                window.axios.post('/saveSpecificOrderWithPackages', { packages: this.packages, products: this.products, orderId: this.order.id })
+                    .then(response => {
+                        this.sendStatus = true;
+                    }).catch(error => {
+                        this.error = error;
+                    });
+            }
         },
         async mounted() {
             await this.fetchOrderWithPackages();
