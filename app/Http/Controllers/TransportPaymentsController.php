@@ -1,35 +1,107 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Entities\Deliverer;
 use App\Helpers\transportPayments\TransportPaymentImporter;
+use App\Http\Requests\DelivererCreateRequest;
+use App\Http\Requests\DelivererEditRequest;
+use App\Services\TransportService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class TransportPaymentsController extends Controller
 {
+    private $transportService;
+
+    public function __construct(TransportService $transportService)
+    {
+        $this->transportService = $transportService;
+    }
+
     public function list()
     {
         return view('transport.list', ['deliverers' => Deliverer::all()]);
     }
 
-    public function createOrUpdate(Request $request)
+    public function create(): View
     {
-        try {
-            $deliverer = false;
-            if ($request->id) {
-                $deliverer = Deliverer::findOrFail($request->id);
-            }
-            return view('transport.single', ['deliverer' => $deliverer]);
-        } catch (\Exception $e) {
+        return view('transport.create');
+    }
+
+    public function store(DelivererCreateRequest $request): RedirectResponse
+    {
+        if ($this->transportService->getDelivererByName($request->getName())) {
             return redirect()->route('transportPayment.list')->with([
-                'message' => __('transport.errors.not-found'),
-                'alert-type' => 'error'
+                'message' => __('transport.errors.exists'),
+                'alert-type' => 'error',
+            ]);
+        }
+
+        try {
+            $this->transportService->createDeliverer($request->getName());
+
+            return redirect()->route('transportPayment.list')->with([
+                'message' => __('voyager.generic.successfully_added_new'),
+                'alert-type' => 'success',
+            ]);
+        } catch (\Exception $exception) {
+            return redirect()->route('transportPayment.list')->with([
+                'message' => $exception->getMessage(),
+                'alert-type' => 'error',
             ]);
         }
     }
+
+    /**
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Foundation\Application|RedirectResponse|View
+     */
+    public function edit(int $delivererId)
+    {
+        $deliverer = $this->transportService->getDeliverer($delivererId);
+        if ($deliverer) {
+            return view('transport.edit', ['deliverer' => $deliverer]);
+        }
+
+        return redirect()->route('transportPayment.list')->with([
+            'message' => __('transport.errors.not-found'),
+            'alert-type' => 'error',
+        ]);
+    }
+
+    public function update(DelivererEditRequest $request, int $delivererId): RedirectResponse
+    {
+        $deliverer = $this->transportService->getDeliverer($delivererId);
+        if (!$deliverer) {
+            return redirect()->route('transportPayment.list')->with([
+                'message' => __('transport.errors.not-found'),
+                'alert-type' => 'error',
+            ]);
+        }
+
+        if ($this->transportService->updateDeliverer($deliverer, $request->getName())) {
+            return redirect()->route('transportPayment.list')->with([
+                'message' => __('voyager.generic.successfully_updated'),
+                'alert-type' => 'success',
+            ]);
+        }
+
+        return redirect()->route('transportPayment.list')->with([
+            'message' => __('voyager.generic.update_failed'),
+            'alert-type' => 'error',
+        ]);
+    }
+
+
+
+
+
+
 
     public function delete(Request $request)
     {
@@ -84,7 +156,7 @@ class TransportPaymentsController extends Controller
         );
     }
 
-    public function store(Request $request)
+    public function store2(Request $request)
     {
         if ($request->gross_payment_column_number_gross) {
             $request->validate([
