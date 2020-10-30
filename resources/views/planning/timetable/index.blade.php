@@ -390,20 +390,19 @@
                 dateClick: function (info) {
                     if (info.view.type !== 'timeGridWeek' && info.view.type !== 'dayGridMonth') {
                         $('#addNewTask').modal();
-                        let startDate = new Date(info.dateStr);
-                        let firstDate = new Date(startDate.setHours(startDate.getHours() - 2));
-                        let startMinutes = firstDate.getMinutes();
+                        const startDate = new Date(info.dateStr);
+                        let startMinutes = startDate.getMinutes();
                         if (startMinutes < 10) {
                             startMinutes = '0' + startMinutes;
                         }
-                        let dateTime = firstDate.getFullYear() + '-' + ('0' + (firstDate.getMonth() + 1)).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getHours() + ':' + startMinutes;
-                        let newDate = new Date(info.dateStr);
-                        let endDate = new Date(newDate.setHours(newDate.getHours() + 1 - 2));
+                        let dateTime = startDate.getFullYear() + '-' + ('0' + (startDate.getMonth() + 1)).slice(-2) + '-' + startDate.getUTCDate() + ' ' + startDate.getUTCHours() + ':' + startMinutes;
+                        const newDate = new Date(info.dateStr);
+                        let endDate = new Date(newDate.setHours(newDate.getHours() + 1));
                         let minutes = endDate.getMinutes();
                         if (minutes < 10) {
                             minutes = '0' + minutes;
                         }
-                        let dateTimeEnd = endDate.getFullYear() + '-' + ('0' + (endDate.getMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getHours() + ':' + minutes;
+                        let dateTimeEnd = endDate.getFullYear() + '-' + ('0' + (endDate.getMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getUTCHours() + ':' + minutes;
                         let warehouse = null;
                         if ($('#warehouseSelect').is(':selected')) {
                             warehouse = $('#warehouseSelect').val();
