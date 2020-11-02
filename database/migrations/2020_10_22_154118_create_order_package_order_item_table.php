@@ -11,7 +11,7 @@ class CreateOrderPackageOrderItemTable extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up() : void
     {
         Schema::create('order_package_order_item', function (Blueprint $table) {
             $table->increments('id');
@@ -28,7 +28,7 @@ class CreateOrderPackageOrderItemTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down() : void
     {
         Schema::dropIfExists('order_package_order_item');
     }

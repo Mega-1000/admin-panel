@@ -20,6 +20,7 @@ use App\Http\Requests\TaskUpdateRequest;
 use App\Jobs\AddLabelJob;
 use App\Jobs\RemoveLabelJob;
 use App\Repositories\OrderRepository;
+use App\Repositories\PackageTemplateRepository;
 use App\Repositories\TaskRepository;
 use App\Repositories\TaskTimeRepository;
 use App\Repositories\UserRepository;
@@ -28,6 +29,7 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
 
 /**
@@ -50,12 +52,15 @@ class TasksController extends Controller
 
     protected $taskTimeRepository;
 
+    protected $packageTemplateRepository;
+
     public function __construct(
         TaskRepository $repository,
         UserRepository $userRepository,
         OrderRepository $orderRepository,
         WarehouseRepository $warehouseRepository,
-        TaskTimeRepository $taskTimeRepository
+        TaskTimeRepository $taskTimeRepository,
+        PackageTemplateRepository $packageTemplateRepository
     )
     {
         $this->repository = $repository;
@@ -63,6 +68,7 @@ class TasksController extends Controller
         $this->orderRepository = $orderRepository;
         $this->warehouseRepository = $warehouseRepository;
         $this->taskTimeRepository = $taskTimeRepository;
+        $this->packageTemplateRepository = $packageTemplateRepository;
     }
 
 
@@ -1206,10 +1212,10 @@ class TasksController extends Controller
         return response()->json($task);
     }
 
-    public function manageProduceProccess($id)
+    public function manageProduceProccess(int $id) : View
     {
-        $task = Task::find($id);
-        $templateData = PackageTemplate::orderBy('list_order', 'asc')->get();
+        $task = $this->repository->find($id);
+        $templateData = $this->packageTemplateRepository->orderBy('list_order', 'asc')->get();
 
         return view('orderTasks.manage', compact('task', 'templateData'));
     }
