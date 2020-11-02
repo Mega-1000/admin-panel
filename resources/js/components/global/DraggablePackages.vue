@@ -69,7 +69,7 @@
                 products: [],
                 order: [],
                 sendStatus: false,
-                error: []
+                error: [],
             };
         },
         methods: {
