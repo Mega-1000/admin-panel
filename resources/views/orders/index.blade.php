@@ -2334,6 +2334,8 @@
                         $('#selectWarehouse').click();
                     }
                     refreshDtOrReload();
+
+                    renderCalendar();
                 })
                     .fail((error) => {
                         if (error.responseText === 'warehouse not found') {
