@@ -33,5 +33,5 @@ return [
             'packages' => 'Przesyłki'
         ]
     ],
-    'manage' => 'Zarządzaj zleceniem przydzielonym do zadania'
+    'manage' => 'Zarządzaj zleceniem przydzielonym do zadania',
 ];

@@ -61,7 +61,7 @@
     export default {
         components: {
             draggable,
-            rawDisplayer
+            rawDisplayer,
         },
         data() {
             return {
@@ -69,7 +69,7 @@
                 products: [],
                 order: [],
                 sendStatus: false,
-                error: []
+                error: [],
             };
         },
         methods: {
