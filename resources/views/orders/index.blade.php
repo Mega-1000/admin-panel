@@ -2806,14 +2806,13 @@
                 dateClick: function (info) {
                     if (info.view.type !== 'timeGridWeek' && info.view.type !== 'dayGridMonth') {
                         $('#addNewTask').modal();
-                        let startDate = new Date(info.dateStr);
-                        let firstDate = new Date(startDate.setHours(startDate.getHours() - 2));
-                        let startMinutes = firstDate.getMinutes();
+                        const startDate = new Date(info.dateStr);
+                        let startMinutes = startDate.getMinutes();
                         if (startMinutes < 10) {
                             startMinutes = '0' + startMinutes;
                         }
 
-                        let dateTime = firstDate.getFullYear() + '-' + ('0' + (firstDate.getMonth() + 1)).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getHours() + ':' + startMinutes;
+                        let dateTime = startDate.getFullYear() + '-' + ('0' + (startDate.getUTCMonth() + 1)).slice(-2) + '-' + startDate.getUTCDate() + ' ' + startDate.getUTCHours() + ':' + startMinutes;
                         let warehouse = null;
                         if ($('#warehouseSelect').is(':selected')) {
                             warehouse = $('#warehouseSelect').val();
@@ -2918,7 +2917,7 @@
                             let dateTime = end.getFullYear() + '-' + ('0' + (end.getMonth() + 1)).slice(-2) + '-' + end.getUTCDate() + ' ' + end.getHours() + ':' + startMinutes;
                             $(".time-to-finish-task").val(dateTime);
                         })
-                        $('#name_new').val($('input[name="order_id"]').val() + ' - ' + firstDate.getUTCDate() + '-' + ('0' + (firstDate.getMonth() + 1)).slice(-2) + ' - ' + $('#warehouse_value').val());
+                        $('#name_new').val($('input[name="order_id"]').val() + ' - ' + startDate.getUTCDate() + '-' + ('0' + (startDate.getUTCMonth() + 1)).slice(-2) + ' - ' + $('#warehouse_value').val());
                         $('#name_new').change(function () {
                             var dateObj = new Date($('#start_new').val());
                             var month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
