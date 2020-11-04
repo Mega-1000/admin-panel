@@ -311,13 +311,21 @@
         </div>
         <div style="display: flex; align-items: center;" id="add-label-container">
             <button onclick="addLabel()" type="button" class="btn btn-primary">@lang('orders.table.save_label')</button>
-            <select style="margin-left: 10px;" class="form-control text-uppercase" id="choosen-label">
+            <select style="margin-left: 10px;" class="form-control text-uppercase selectpicker" data-live-search="true" id="choosen-label">
                 <option value="" selected="selected">@lang('orders.table.choose_label')</option>
                 @foreach($groupedLabels as $groupName => $group)
                     <optgroup label="{{ $groupName }}">
                         @foreach($group as $label)
                             <option value="{{ $label->id }}"
-                                    data-timed="{{ $label->timed }}">{{ $label->name }}</option>
+                                    data-content="
+                                    <span class='order-label' style='color: {{$label->font_color}}; background-color: {{$label->color}}'>
+                                        <i class='{{$label->icon_name}}'></i>
+                                    </span>
+                                    {{ $label->name }}
+                                    "
+                                    data-timed="{{ $label->timed }}">
+                                {{ $label->name }}
+                            </option>
                         @endforeach
                     </optgroup>
                 @endforeach
