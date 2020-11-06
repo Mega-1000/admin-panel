@@ -37,7 +37,7 @@
                     @foreach($groupedProductsStocksChange as $stockChangeOrder)
                         @if($stockChangeOrder->order_id !== null)
                             <br/>
-                            <span>Zlecenie: <a href="{{ route('orders.edit', ['id' => $stockChangeOrder->order_id]) }}">{{ $stockChangeOrder->order_id }}</a></span>
+                            <span>Zlecenie: <a href="{{ route('orders.edit', ['id' => $stockChangeOrder->order_id]) }}">{{ $stockChangeOrder->order_id }}</a> - {{ $stockChangeOrder->quantity }} sztuk</span>
                         @endif
                     @endforeach
                 </td>

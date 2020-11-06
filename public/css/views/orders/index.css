@@ -22,8 +22,10 @@
 }
 
 .order-label {
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding: 5px;
+    display: inline-block;
+    width: 30px;
+    margin-top: 5px;
 }
 
 .order-label i {
@@ -90,4 +92,16 @@
 
 .modal-dialog-timesheet {
     width: auto;
+}
+
+.dropdown-menu>li>a {
+    padding: 0px;
+}
+
+.bootstrap-select>.dropdown-toggle {
+    background-color: white;
+}
+.bootstrap-select>.dropdown-toggle {
+    padding: 0px;
+    margin-left: 10px;
 }

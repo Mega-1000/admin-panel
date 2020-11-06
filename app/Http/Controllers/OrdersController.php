@@ -302,7 +302,7 @@ class OrdersController extends Controller
     public function index(Request $request)
     {
         $labelGroups = LabelGroup::all();
-        $labels = Label::all();
+        $labels = $this->labelRepository->where('status', 'ACTIVE')->orderBy('order')->get();
         $couriers = \DB::table('order_packages')->distinct()->select('delivery_courier_name')->get();
         $warehouses = $this->warehouseRepository->findByField('symbol', 'MEGA-OLAWA');
         $storekeepers = User::where('role_id', User::ROLE_STOREKEEPER)->get();
