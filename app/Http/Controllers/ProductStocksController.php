@@ -271,7 +271,6 @@ class ProductStocksController extends Controller
             $groupedProductsStocksChanges[$productsStocksChange->product_stock_id][] = $productsStocksChange;
         }
 
-
         return view('product_stocks.changes', compact('groupedProductsStocksChanges', 'startDate', 'endDate'));
     }
 }
