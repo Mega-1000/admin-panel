@@ -7,6 +7,7 @@ use App\Entities\Customer;
 use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\OrderPayment;
+use App\Entities\OrderPaymentLog;
 use App\Entities\Payment;
 use App\Entities\UserSurplusPayment;
 use App\Entities\UserSurplusPaymentHistory;
@@ -214,11 +215,27 @@ class OrdersPaymentsController extends Controller
 
         $type = $request->input('payment-type');
 
-        OrdersPaymentsController::payOrder($orderId, $request->input('amount'),
+        $orderPayment = OrdersPaymentsController::payOrder($orderId, $request->input('amount'),
             $masterPaymentId, $promise,
             $chooseOrder, $request->input('promise_date'),
             $type, $isWarehousePayment
             );
+
+
+        $orderPaymentAmount = str_replace(",", ".", $request->input('amount'));
+        $clientPaymentAmount = Customer::find($orderPayment->order->customer_id)->payments->sum('amount_left');
+
+        $paymentLog = OrderPaymentLog::create([
+            'booked_date' => $request->input('created_at'),
+            'payment_type' => 'ORDER_PAYMENT',
+            'order_payment_id' => $orderPayment->id,
+            'user_id' => $orderPayment->order->customer_id,
+            'order_id' => $orderId,
+            'description' => $request->input('notices'),
+            'payment_amount' => str_replace(",", ".", $request->input('amount')),
+            'payment_sum_before_payment' => $clientPaymentAmount,
+            'payment_sum_after_payment' => $clientPaymentAmount - $orderPaymentAmount,
+        ]);
 
         return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
             'message' => __('order_payments.message.store'),
@@ -1056,12 +1073,14 @@ class OrdersPaymentsController extends Controller
     {
         $orderId = $request->input('order_id');
         $promise = $request->input('promise');
+        $amount = str_replace(",", ".", $request->input('amount'));
+        $clientPaymentAmount = Customer::find($request->input('customer_id'))->payments->sum('amount_left');
         if (!empty($orderId)) {
             if($request->input('payment-type') == 'WAREHOUSE') {
                 $order = Order::find($orderId);
                 $payment = Payment::create([
-                    'amount' => str_replace(",", ".", $request->input('amount')),
-                    'amount_left' => str_replace(",", ".", $request->input('amount')),
+                    'amount' => $amount,
+                    'amount_left' => $amount,
                     'customer_id' => $request->input('customer_id'),
                     'warehouse_id' => $order->warehouse->id,
                     'notices' => $request->input('notices'),
@@ -1070,14 +1089,26 @@ class OrdersPaymentsController extends Controller
                 ]);
             } else {
                 $payment = Payment::create([
-                    'amount' => str_replace(",", ".", $request->input('amount')),
-                    'amount_left' => str_replace(",", ".", $request->input('amount')),
+                    'amount' => $amount,
+                    'amount_left' => $amount,
                     'customer_id' => $request->input('customer_id'),
                     'notices' => $request->input('notices'),
                     'type' => $request->input('payment-type'),
                     'promise' => $promise
                 ]);
             }
+
+            $paymentLog = OrderPaymentLog::create([
+                'booked_date' => $request->input('created_at'),
+                'payment_type' => 'CLIENT_PAYMENT',
+                'order_payment_id' => $payment->id,
+                'user_id' => $request->input('customer_id'),
+                'order_id' => $orderId,
+                'description' => $request->input('notices'),
+                'payment_amount' => $amount,
+                'payment_sum_before_payment' => $clientPaymentAmount,
+                'payment_sum_after_payment' => $clientPaymentAmount + $amount,
+            ]);
 
             return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
                 'message' => __('order_payments.message.store'),
@@ -1239,7 +1270,7 @@ class OrdersPaymentsController extends Controller
         }
     }
 
-    public static function payOrder($orderId, $amount, $masterPaymentId, string $promise, $chooseOrder, $promiseDate, $type = null, $isWarehousePayment = null): void
+    public static function payOrder($orderId, $amount, $masterPaymentId, string $promise, $chooseOrder, $promiseDate, $type = null, $isWarehousePayment = null): OrderPayment
     {
         $order = Order::find($orderId);
 
@@ -1306,6 +1337,8 @@ class OrdersPaymentsController extends Controller
             $order->status_id = 5;
             $order->save();
         }
+
+        return $payment;
     }
 
     public function warehousePaymentConfirmation($token)
