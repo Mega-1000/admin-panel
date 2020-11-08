@@ -1105,7 +1105,7 @@
             </tr>
             </thead>
         </table>
-        <button class="btn btn-success">Wyświetl historię transakcji</button>
+        <button class="btn btn-success" id="show-transaction-history">Wyświetl historię transakcji</button>
         <h1>Rozrachunki z kontrahentem: {{ $order->customer->login }}
             @if(Auth::user()->role_id == 3 || Auth::user()->role_id == 2 || Auth::user()->role_id == 1)
                 <a id="create-button-orderPayments" style="float:right;margin-right: 15px;"
@@ -2440,6 +2440,53 @@
                             </tbody>
                         </table>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" tabindex="-1" id="transaction-history-modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                </div>
+                <div class="modal-body">
+                    <table id="paymentsTable" class="table table-hover" style="width: 50%; float: left;">
+                        <thead>
+                            <tr>
+                                <th>Numer transakcji</th>
+                                <th>Data utworzenia</th>
+                                <th>Data zaksięgowania</th>
+                                <th>Opis</th>
+                                <th>Klient</th>
+                                <th>Zlecenie</th>
+                                <th>Typ</th>
+                                <th>Kwota</th>
+                                <th>Wartość przed wpłatą</th>
+                                <th>Wartość po wpłatą</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($orderPaymentsTransactions as $orderPaymentsTransaction)
+                            <tr>
+                                <td>{{ $orderPaymentsTransaction->id }}</td>
+                                <td>{{ $orderPaymentsTransaction->created_at }}</td>
+                                <td>{{ $orderPaymentsTransaction->booked_date }}</td>
+                                <td>{{ $orderPaymentsTransaction->description }}</td>
+                                <td>{{ $orderPaymentsTransaction->user_id }}</td>
+                                <td>{{ $orderPaymentsTransaction->order_id }}</td>
+                                <td>{{ $orderPaymentsTransaction->payment_type }}</td>
+                                <td>{{ $orderPaymentsTransaction->payment_amount }}</td>
+                                <td>{{ $orderPaymentsTransaction->payment_sum_before_payment }}</td>
+                                <td>{{ $orderPaymentsTransaction->payment_sum_after_payment }}</td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-right" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
                 </div>
             </div>
         </div>
@@ -4150,6 +4197,10 @@
         });
         $(document).ready(function () {
             let newOrder = 1;
+
+            $('#show-transaction-history').on('click', () => {
+                $('#transaction-history-modal').modal('show');
+            });
 
             $('#newSplitOrder').on('click', function () {
                 showSplitButtons('.btn-split');
