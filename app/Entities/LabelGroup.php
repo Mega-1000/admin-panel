@@ -39,6 +39,6 @@ class LabelGroup extends Model implements Transformable
 
     public function activeLabels(): HasMany
     {
-        return $this->hasMany(Label::class)->where('status', LabelStatus::Active);
+        return $this->hasMany(Label::class)->where('status', LabelStatusEnum::Active);
     }
 }
