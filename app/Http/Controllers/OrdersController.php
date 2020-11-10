@@ -319,7 +319,7 @@ class OrdersController extends Controller
                 $groupedLabels[$labelGroup->name] = $labelGroup->activeLabels;
         }
 
-        $groupedLabels['bez grupy'] = $this->labelRepository->where('label_group_id', null)->where('status', LabelStatus::Active)->get();
+        $groupedLabels['bez grupy'] = $this->labelRepository->where('label_group_id', null)->where('status', LabelStatusEnum::Active)->get();
 
         $loggedUser = $request->user();
         if ($loggedUser->role_id == Role::ADMIN || $loggedUser->role_id == Role::SUPER_ADMIN) {
@@ -3044,4 +3044,3 @@ class OrdersController extends Controller
             });
     }
 }
-
