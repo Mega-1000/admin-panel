@@ -11,7 +11,7 @@ class UpdateLabelGroupsTableAddOrderColumn extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
         Schema::table('label_groups', function (Blueprint $table) {
             $table->unsignedInteger('order')->nullable();
