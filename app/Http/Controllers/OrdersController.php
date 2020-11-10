@@ -301,7 +301,7 @@ class OrdersController extends Controller
      */
     public function index(Request $request)
     {
-        $labelGroups = LabelGroup::all()->sortBy('order');
+        $labelGroups = $this->labelGroupRepository->get()->sortBy('order');
         $labels = $this->labelRepository->where('status', 'ACTIVE')->orderBy('order')->get();
         $couriers = \DB::table('order_packages')->distinct()->select('delivery_courier_name')->get();
         $warehouses = $this->warehouseRepository->findByField('symbol', 'MEGA-OLAWA');
@@ -318,8 +318,7 @@ class OrdersController extends Controller
                 $groupedLabels[$labelGroup->name] = $labelGroup->activeLabels;
         }
 
-        $groupedLabels['bez grupy'] = Label::whereNull('label_group_id')->where('status', 'ACTIVE')->get();
-
+        $groupedLabels['bez grupy'] = $this->labelRepository->where('label_group_id', null)->where('status', Label::ACTIVE_STATUS)->get();
 
         $loggedUser = $request->user();
         if ($loggedUser->role_id == Role::ADMIN || $loggedUser->role_id == Role::SUPER_ADMIN) {
