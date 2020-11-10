@@ -21,6 +21,7 @@ use App\Entities\Task;
 use App\Entities\UserSurplusPayment;
 use App\Entities\UserSurplusPaymentHistory;
 use App\Entities\Warehouse;
+use App\Enums\LabelStatus;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Helpers\GetCustomerForNewOrder;
@@ -318,7 +319,7 @@ class OrdersController extends Controller
                 $groupedLabels[$labelGroup->name] = $labelGroup->activeLabels;
         }
 
-        $groupedLabels['bez grupy'] = $this->labelRepository->where('label_group_id', null)->where('status', Label::ACTIVE_STATUS)->get();
+        $groupedLabels['bez grupy'] = $this->labelRepository->where('label_group_id', null)->where('status', LabelStatus::Active)->get();
 
         $loggedUser = $request->user();
         if ($loggedUser->role_id == Role::ADMIN || $loggedUser->role_id == Role::SUPER_ADMIN) {

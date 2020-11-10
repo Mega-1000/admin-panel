@@ -2,6 +2,7 @@
 
 namespace App\Entities;
 
+use App\Enums\LabelStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Prettus\Repository\Contracts\Transformable;
@@ -38,6 +39,6 @@ class LabelGroup extends Model implements Transformable
 
     public function activeLabels(): HasMany
     {
-        return $this->hasMany(Label::class)->where('status', Label::ACTIVE_STATUS);
+        return $this->hasMany(Label::class)->where('status', LabelStatus::Active);
     }
 }
