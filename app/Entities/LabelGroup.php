@@ -2,7 +2,7 @@
 
 namespace App\Entities;
 
-use App\Enums\LabelStatus;
+use App\Enums\LabelStatusEnum;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Prettus\Repository\Contracts\Transformable;
