@@ -23,7 +23,7 @@ class UpdateLabelGroupsTableAddOrderColumn extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('label_groups', function (Blueprint $table) {
             $table->dropColumn('order');
