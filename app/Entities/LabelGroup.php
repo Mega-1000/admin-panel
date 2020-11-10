@@ -26,7 +26,8 @@ class LabelGroup extends Model implements Transformable
      * @var array
      */
     protected $fillable = [
-        'name', 'order'
+        'name', 
+        'order',
     ];
 
     /**
