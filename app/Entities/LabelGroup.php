@@ -26,7 +26,7 @@ class LabelGroup extends Model implements Transformable
      * @var array
      */
     protected $fillable = [
-        'name'
+        'name', 'order'
     ];
 
     /**
@@ -35,5 +35,13 @@ class LabelGroup extends Model implements Transformable
     public function labels()
     {
         return $this->hasMany(Label::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function activeLabels()
+    {
+        return $this->hasMany(Label::class)->where('status', 'ACTIVE');
     }
 }
