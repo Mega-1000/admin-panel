@@ -41,7 +41,7 @@ class LabelGroup extends Model implements Transformable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function activeLabels()
+    public function activeLabels(): HasMany
     {
         return $this->hasMany(Label::class)->where('status', 'ACTIVE');
     }
