@@ -6,11 +6,6 @@ use Illuminate\Database\Migrations\Migration;
 
 class UpdateLabelGroupsTableAddOrderColumn extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
     public function up()
     {
         Schema::table('label_groups', function (Blueprint $table) {
@@ -18,11 +13,6 @@ class UpdateLabelGroupsTableAddOrderColumn extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
     public function down()
     {
         Schema::table('label_groups', function (Blueprint $table) {
