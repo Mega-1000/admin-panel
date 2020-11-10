@@ -7,5 +7,5 @@ use BenSampo\Enum\Enum;
 final class LabelStatus extends Enum
 {
     const Active = 'ACTIVE';
-    const Pending =   'PENDING';
+    const Pending = 'PENDING';
 }
