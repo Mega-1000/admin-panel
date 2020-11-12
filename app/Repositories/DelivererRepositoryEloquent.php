@@ -24,5 +24,4 @@ class DelivererRepositoryEloquent extends BaseRepository implements DelivererRep
     {
         $this->pushCriteria(app(RequestCriteria::class));
     }
-
 }

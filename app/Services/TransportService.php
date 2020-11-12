@@ -1,9 +1,8 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Domains\DelivererPackageImport\Repositories\DelivererImportRuleRepositoryEloquent;
 use App\Entities\Deliverer;
 use App\Repositories\DelivererRepositoryEloquent;
 
@@ -11,9 +10,14 @@ class TransportService
 {
     private $delivererRepository;
 
-    public function __construct(DelivererRepositoryEloquent $delivererRepository)
-    {
+    private $delivererImportRuleRepository;
+
+    public function __construct(
+        DelivererRepositoryEloquent $delivererRepository,
+        DelivererImportRuleRepositoryEloquent $delivererImportRuleRepository
+    ) {
         $this->delivererRepository = $delivererRepository;
+        $this->delivererImportRuleRepository = $delivererImportRuleRepository;
     }
 
     public function getDeliverer(int $delivererId): ?Deliverer
@@ -32,7 +36,6 @@ class TransportService
     }
 
     /**
-     * @param string $name
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Support\Collection|mixed
      * @throws \Prettus\Validator\Exceptions\ValidatorException
      */
@@ -41,5 +44,15 @@ class TransportService
         return $this->delivererRepository->create([
             'name' => $name
         ]);
+    }
+
+    public function saveDelivererImportRules(Deliverer $deliverer, array $delivererImportRules): void
+    {
+        if (empty($delivererImportRules)) {
+            return;
+        }
+
+        $this->delivererImportRuleRepository->removeAllDelivererImportRules($deliverer);
+        $this->delivererImportRuleRepository->saveImportRules($delivererImportRules);
     }
 }

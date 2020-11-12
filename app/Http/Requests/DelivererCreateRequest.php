@@ -17,11 +17,27 @@ class DelivererCreateRequest extends FormRequest
     {
         return [
             'name' => 'required',
+            'action' => 'array',
+            'value' => 'array',
+            'columnName' => 'array',
+            'columnNumber' => 'array',
+            'changeTo' => 'array',
         ];
     }
 
     public function getName(): string
     {
         return $this->validated()['name'];
+    }
+
+    public function getImportRules(): array
+    {
+        return [
+            'actions' => $this->validated()['action'],
+            'values' => $this->validated()['value'],
+            'columnNames' => $this->validated()['columnName'],
+            'columnNumbers' => $this->validated()['columnNumber'],
+            'changeTo' => $this->validated()['changeTo'],
+        ];
     }
 }

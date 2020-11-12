@@ -1,11 +1,13 @@
-<?php
-
-declare(strict_types=1);
+<?php declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Builders\DelivererImportRulesBuilder;
+use App\Domains\DelivererPackageImport\Enums\DelivererRulesActionEnum;
+use App\Domains\DelivererPackageImport\Enums\DelivererRulesColumnNameEnum;
 use App\Entities\Deliverer;
 use App\Helpers\transportPayments\TransportPaymentImporter;
+use App\Http\DTOs\DelivererCreateImportRulesDTO;
 use App\Http\Requests\DelivererCreateRequest;
 use App\Http\Requests\DelivererEditRequest;
 use App\Services\TransportService;
@@ -24,27 +26,50 @@ class TransportPaymentsController extends Controller
         $this->transportService = $transportService;
     }
 
-    public function list()
+    public function list(): View
     {
         return view('transport.list', ['deliverers' => Deliverer::all()]);
     }
 
     public function create(): View
     {
-        return view('transport.create');
+        return view('transport.create', [
+            'columns' => DelivererRulesColumnNameEnum::getValues(),
+            'csvColumnsNumbers' => range(1,20),
+            'actions' => DelivererRulesActionEnum::getInstances(),
+        ]);
     }
 
-    public function store(DelivererCreateRequest $request): RedirectResponse
-    {
-        if ($this->transportService->getDelivererByName($request->getName())) {
+    public function store(
+        DelivererCreateRequest $request,
+        DelivererImportRulesBuilder $delivererImportRulesBuilder
+    ): RedirectResponse {
+        /*if ($this->transportService->getDelivererByName($request->getName())) {
             return redirect()->route('transportPayment.list')->with([
                 'message' => __('transport.errors.exists'),
                 'alert-type' => 'error',
             ]);
+        }*/
+
+        if (!$deliverer = $this->transportService->getDelivererByName($request->getName())) {
+            $deliverer = $this->transportService->createDeliverer($request->getName());
         }
 
-        try {
+        $importRules = $delivererImportRulesBuilder->buildFromRequest(
+            $deliverer,
+            new DelivererCreateImportRulesDTO($request->getImportRules())
+        );
+
+        $this->transportService->saveDelivererImportRules(
+            $deliverer,
+            $importRules
+        );
+
+        dd('OK');
+
+        /*try {
             $this->transportService->createDeliverer($request->getName());
+            $this->transportService->createDelivererImportRules();
 
             return redirect()->route('transportPayment.list')->with([
                 'message' => __('voyager.generic.successfully_added_new'),
@@ -55,7 +80,7 @@ class TransportPaymentsController extends Controller
                 'message' => $exception->getMessage(),
                 'alert-type' => 'error',
             ]);
-        }
+        }*/
     }
 
     /**
