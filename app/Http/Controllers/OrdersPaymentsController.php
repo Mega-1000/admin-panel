@@ -11,6 +11,7 @@ use App\Entities\OrderPaymentLog;
 use App\Entities\Payment;
 use App\Entities\UserSurplusPayment;
 use App\Entities\UserSurplusPaymentHistory;
+use App\Enums\OrderPaymentLogType;
 use App\Helpers\AllegroPaymentImporter;
 use App\Http\Requests\OrderPaymentCreateRequest;
 use App\Http\Requests\OrderPaymentUpdateRequest;
@@ -24,6 +25,7 @@ use App\Repositories\OrderPaymentRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentRepository;
 use App\Repositories\OrderPackageRepository;
+use App\Services\OrderPaymentLogService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -67,6 +69,11 @@ class OrdersPaymentsController extends Controller
     protected $orderPackageRepository;
 
     /**
+     * @var OrderPaymentLogService
+     */
+    protected $orderPaymentLogService;
+
+    /**
      * OrderPaymentController constructor.
      *
      * @param OrderPaymentRepository $repository
@@ -74,14 +81,16 @@ class OrdersPaymentsController extends Controller
      * @param PaymentRepository $paymentRepository
      * @param CustomerRepository $customerRepository
      * @param OrderPackageRepository $orderPackageRepository
+     * @param OrderPaymentLogService $orderPaymentLogService
      */
-    public function __construct(OrderPaymentRepository $repository, OrderRepository $orderRepository, PaymentRepository $paymentRepository, CustomerRepository $customerRepository, OrderPackageRepository $orderPackageRepository)
+    public function __construct(OrderPaymentRepository $repository, OrderRepository $orderRepository, PaymentRepository $paymentRepository, CustomerRepository $customerRepository, OrderPackageRepository $orderPackageRepository, OrderPaymentLogService $orderPaymentLogService)
     {
         $this->repository = $repository;
         $this->orderRepository = $orderRepository;
         $this->paymentRepository = $paymentRepository;
         $this->customerRepository = $customerRepository;
         $this->orderPackageRepository = $orderPackageRepository;
+        $this->orderPaymentLogService = $orderPaymentLogService;
     }
 
 
@@ -223,19 +232,13 @@ class OrdersPaymentsController extends Controller
 
 
         $orderPaymentAmount = str_replace(",", ".", $request->input('amount'));
-        $clientPaymentAmount = Customer::find($orderPayment->order->customer_id)->payments->sum('amount_left');
+        $clientPaymentAmount = $this->customerRepository->find($orderPayment->order->customer_id)->payments->sum('amount_left');
 
-        $paymentLog = OrderPaymentLog::create([
-            'booked_date' => $request->input('created_at'),
-            'payment_type' => 'ORDER_PAYMENT',
-            'order_payment_id' => $orderPayment->id,
-            'user_id' => $orderPayment->order->customer_id,
-            'order_id' => $orderId,
-            'description' => $request->input('notices'),
-            'payment_amount' => str_replace(",", ".", $request->input('amount')),
-            'payment_sum_before_payment' => $clientPaymentAmount,
-            'payment_sum_after_payment' => $clientPaymentAmount - $orderPaymentAmount,
-        ]);
+        $this->orderPaymentLogService->create(
+            $orderId, $orderPayment->id, $orderPayment->order->customer_id,
+            $clientPaymentAmount, $orderPaymentAmount,
+            $request, OrderPaymentLogType::OrderPayment
+        );
 
         return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
             'message' => __('order_payments.message.store'),
@@ -1098,17 +1101,11 @@ class OrdersPaymentsController extends Controller
                 ]);
             }
 
-            $paymentLog = OrderPaymentLog::create([
-                'booked_date' => $request->input('created_at'),
-                'payment_type' => 'CLIENT_PAYMENT',
-                'order_payment_id' => $payment->id,
-                'user_id' => $request->input('customer_id'),
-                'order_id' => $orderId,
-                'description' => $request->input('notices'),
-                'payment_amount' => $amount,
-                'payment_sum_before_payment' => $clientPaymentAmount,
-                'payment_sum_after_payment' => $clientPaymentAmount + $amount,
-            ]);
+            $this->orderPaymentLogService->create(
+                $orderId, $payment->id, $request->input('customer_id'),
+                $clientPaymentAmount, $amount,
+                $request, OrderPaymentLogType::ClientPayment
+            );
 
             return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
                 'message' => __('order_payments.message.store'),
