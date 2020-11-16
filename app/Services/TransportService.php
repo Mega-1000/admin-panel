@@ -5,6 +5,10 @@ namespace App\Services;
 use App\Domains\DelivererPackageImport\Repositories\DelivererImportRuleRepositoryEloquent;
 use App\Entities\Deliverer;
 use App\Repositories\DelivererRepositoryEloquent;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use \Symfony\Component\HttpFoundation\File\File;
 
 class TransportService
 {
@@ -54,5 +58,17 @@ class TransportService
 
         $this->delivererImportRuleRepository->removeAllDelivererImportRules($deliverer);
         $this->delivererImportRuleRepository->saveImportRules($delivererImportRules);
+    }
+
+    public function getDelivererImportRules()
+    {
+
+    }
+
+    public function saveFileToImport(UploadedFile $file): File
+    {
+        $fileName = Str::random(40) . '.csv';
+
+        return $file->move(Storage::path('user-files/transport/'), $fileName);
     }
 }

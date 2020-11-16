@@ -5,17 +5,19 @@ namespace App\Http\Controllers;
 use App\Builders\DelivererImportRulesBuilder;
 use App\Domains\DelivererPackageImport\Enums\DelivererRulesActionEnum;
 use App\Domains\DelivererPackageImport\Enums\DelivererRulesColumnNameEnum;
+use App\Domains\DelivererPackageImport\ImportRules\DelivererImportRulesManager;
+use App\Domains\DelivererPackageImport\Repositories\DelivererImportRuleRepositoryEloquent;
+use App\Domains\DelivererPackageImport\TransportPaymentImporter;
 use App\Entities\Deliverer;
-use App\Helpers\transportPayments\TransportPaymentImporter;
 use App\Http\DTOs\DelivererCreateImportRulesDTO;
 use App\Http\Requests\DelivererCreateRequest;
 use App\Http\Requests\DelivererEditRequest;
+use App\Http\Requests\TransportPaymentsImportRequest;
 use App\Services\TransportService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Nexmo\Client\Exception\Transport;
 
 class TransportPaymentsController extends Controller
 {
@@ -145,37 +147,35 @@ class TransportPaymentsController extends Controller
         }
     }
 
-    public function updatePricing(Request $request)
-    {
-        $file = $request->file('file');
-        $maxFileSize = 20000000;
-        if ($file->getSize() > $maxFileSize) {
+    public function updatePricing(
+        TransportPaymentsImportRequest $request,
+        TransportPaymentImporter $transportPaymentImporter
+    ): RedirectResponse {
+        $deliverer = $this->transportService->getDeliverer((int) $request->input('delivererId'));
+
+        if (!$deliverer) {
             return redirect()->route('orders.index')->with([
-                'message' => __('transport.errors.too-big-file'),
-                'alert-type' => 'error'
+                'message' => __('transport.errors.not-found'),
+                'alert-type' => 'error',
             ]);
         }
 
-        do {
-            $fileName = Str::random(40) . '.csv';
-            $path = Storage::path('user-files/transport/') . $fileName;
-        } while (file_exists($path));
-
-        $file->move(Storage::path('user-files/transport/'), $fileName);
-
         try {
-            $deliverer = Deliverer::findOrFail($request)->first();
-            $importer = new TransportPaymentImporter();
-            $importer->setColumnNetPayment($deliverer->net_payment_column_number)
-                ->setColumnGrossPayment($deliverer->gross_payment_column_number_gross)
-                ->setColumnLetter($deliverer->letter_number_column_number);
-            $errors = $importer->import($fileName);
+            $transportPaymentImporter->import(
+                $deliverer,
+                $this->transportService->saveFileToImport($request->file('file'))
+            );
+
+            dd('importuj');
+
         } catch (\Exception $e) {
             return redirect()->route('orders.index')->with([
                 'message' => $e->getMessage(),
                 'alert-type' => 'error'
             ]);
         }
+
+        dd('ok');
         return redirect()->route('orders.index')->with(
             'update_errors', $errors
         );

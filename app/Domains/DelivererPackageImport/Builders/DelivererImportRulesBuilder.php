@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Builders;
+namespace App\Domains\DelivererPackageImport\Builders;
 
 use App\Domains\DelivererPackageImport\Factories\DelivererImportRuleFromRequestFactory;
 use App\Entities\Deliverer;

@@ -232,7 +232,7 @@
                         {{ csrf_field() }}
                         Dostawca:
                         <br/>
-                        <select required name="deliverersList" class="form-control text-uppercase">
+                        <select required name="delivererId" class="form-control text-uppercase">
                             <option value="" selected="selected"></option>
                             @foreach($deliverers as $deliver)
                                 <option value="{{ $deliver->id }}">{{ $deliver->name }}</option>

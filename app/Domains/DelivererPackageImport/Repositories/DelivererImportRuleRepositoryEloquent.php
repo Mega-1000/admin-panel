@@ -1,10 +1,13 @@
-<?php declare(strict_types=1);
+<?php /** @noinspection PhpUndefinedFieldInspection */
+declare(strict_types=1);
 
 namespace App\Domains\DelivererPackageImport\Repositories;
 
 use App\Entities\Deliverer;
 use App\Entities\DelivererImportRule;
 use Illuminate\Container\Container as Application;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
 
@@ -40,5 +43,15 @@ class DelivererImportRuleRepositoryEloquent extends BaseRepository implements De
     public function removeAllDelivererImportRules(Deliverer $deliverer): int
     {
         return $this->deleteWhere(['deliverer_id' => $deliverer->id]);
+    }
+
+    /**
+     * @return LengthAwarePaginator|Collection|mixed
+     */
+    public function getDelivererImportRules(Deliverer $deliverer)
+    {
+        return $this->findWhere([
+            'deliverer_id' => $deliverer->id,
+        ]);
     }
 }
