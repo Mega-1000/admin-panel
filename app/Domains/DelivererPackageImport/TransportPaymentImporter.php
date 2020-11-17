@@ -61,6 +61,8 @@ class TransportPaymentImporter
 
     private function processLine($line)
     {
-        //$order = $this->delivererImportRulesManager->findOrder($line);
+        $this->delivererImportRulesManager->runRules($line);
+
+        dd('process line');
     }
 }

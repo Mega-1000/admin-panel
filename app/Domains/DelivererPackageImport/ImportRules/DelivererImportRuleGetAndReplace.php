@@ -6,5 +6,8 @@ namespace App\Domains\DelivererPackageImport\ImportRules;
 
 class DelivererImportRuleGetAndReplace extends DelivererImportRuleAbstract
 {
-
+    public function run(array $line)
+    {
+        // TODO: Implement run() method.
+    }
 }

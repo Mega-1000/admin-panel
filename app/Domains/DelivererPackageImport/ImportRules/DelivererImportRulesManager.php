@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace App\Domains\DelivererPackageImport\ImportRules;
 
+use App\Domains\DelivererPackageImport\Enums\DelivererRulesActionEnum;
 use App\Domains\DelivererPackageImport\Factories\DelivererImportRuleFromEntityFactory;
 use App\Domains\DelivererPackageImport\Repositories\DelivererImportRuleRepositoryEloquent;
 use App\Entities\Deliverer;
+use App\Entities\Order;
 use Illuminate\Support\Collection;
 
 class DelivererImportRulesManager
@@ -19,6 +21,15 @@ class DelivererImportRulesManager
 
     /* @var $importRules Collection */
     private $importRules;
+
+    /* @var $searchRules Collection */
+    private $searchRules;
+
+    private $setRules;
+
+    private $getRules;
+
+    private $getAndReplaceRules;
 
     public function __construct(
         DelivererImportRuleRepositoryEloquent $delivererImportRuleRepositoryEloquent,
@@ -43,26 +54,60 @@ class DelivererImportRulesManager
             $this->importRules = $rules->map(function ($item) {
                 return $this->delivererImportRuleFromEntityFactory->create($item);
             });
+
+            $this->setSearchRules();
+            $this->setSetRules();
+            $this->setGetRules();
+            $this->setGetAndReplaceRules();
         }
 
         return !empty($this->importRules);
     }
 
-    public function findOrder(array $line)
+    public function runRules(array $line)
     {
-        /*$searchCompareRule = $this->importRules->where(
-            'action', '=', DelivererRulesActionEnum::SEARCH_COMPARE
-        )->first();*/
+        $order = $this->findOrderByRule($line);
+
+        dd($order);
     }
 
-    private function findRulesForActions(array $actions): ?Collection
+    private function findOrderByRule(array $line): ?Order
     {
-        if (empty($actions)) {
-            return null;
+        if ($this->searchRules->isNotEmpty()) {
+            /* @var $ruleToRun DelivererImportRuleInterface */
+            $ruleToRun = $this->searchRules->shift();
+
+            $order = $ruleToRun->run($line);
+
+            return empty($order) ? $this->findOrderByRule($line) : $order;
         }
 
-        return $this->importRules->whereInStrict('action', $actions);
+        return null;
     }
 
-    private function setSearchRules
+    private function setSearchRules(): void
+    {
+        $this->searchRules = $this->importRules->whereInStrict('action', [
+            DelivererRulesActionEnum::SEARCH_COMPARE,
+            DelivererRulesActionEnum::SEARCH_REGEX,
+        ]);
+    }
+
+    private function setSetRules(): void
+    {
+        $this->setRules = $this->importRules->whereStrict('action', DelivererRulesActionEnum::SET);
+    }
+
+    private function setGetRules(): void
+    {
+        $this->getRules = $this->importRules->whereStrict('action', DelivererRulesActionEnum::GET);
+    }
+
+    private function setGetAndReplaceRules(): void
+    {
+        $this->getAndReplaceRules = $this->importRules->whereStrict(
+            'action',
+            DelivererRulesActionEnum::GET_AND_REPLACE
+        );
+    }
 }

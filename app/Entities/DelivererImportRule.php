@@ -2,6 +2,7 @@
 
 namespace App\Entities;
 
+use App\Domains\DelivererPackageImport\Enums\DelivererRulesActionEnum;
 use Illuminate\Database\Eloquent\Model;
 
 class DelivererImportRule extends Model
@@ -15,4 +16,9 @@ class DelivererImportRule extends Model
         'changeTo',
         'order',
     ];
+
+    public function getAction(): DelivererRulesActionEnum
+    {
+        return new DelivererRulesActionEnum($this->action);
+    }
 }
