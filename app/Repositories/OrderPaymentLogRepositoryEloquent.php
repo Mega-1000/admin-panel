@@ -13,17 +13,10 @@ use Prettus\Repository\Criteria\RequestCriteria;
  */
 class OrderPaymentLogRepositoryEloquent extends BaseRepository implements OrderPaymentLogRepository
 {
-    /**
-     * Specify Model class name
-     *
-     * @return string
-     */
     public function model()
     {
         return OrderPaymentLog::class;
     }
-
-
 
     /**
      * Boot up the repository, pushing criteria
