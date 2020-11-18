@@ -243,9 +243,13 @@ class OrdersPaymentsController extends Controller
         $clientPaymentAmount = $this->customerRepository->find($orderPayment->order->customer_id)->payments->sum('amount_left');
 
         $this->orderPaymentLogService->create(
-            $orderId, $orderPayment->id, $orderPayment->order->customer_id,
-            $clientPaymentAmount, $orderPaymentAmount,
-            $request, OrderPaymentLogType::OrderPayment
+            $orderId, 
+            $orderPayment->id, 
+            $orderPayment->order->customer_id,
+            $clientPaymentAmount, 
+            $orderPaymentAmount,
+            $request, 
+            OrderPaymentLogType::OrderPayment
         );
 
         return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
