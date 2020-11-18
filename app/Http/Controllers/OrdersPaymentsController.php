@@ -84,7 +84,14 @@ class OrdersPaymentsController extends Controller
      * @param OrderPackageRepository $orderPackageRepository
      * @param OrderPaymentLogService $orderPaymentLogService
      */
-    public function __construct(OrderPaymentRepository $repository, OrderRepository $orderRepository, PaymentRepository $paymentRepository, CustomerRepository $customerRepository, OrderPackageRepository $orderPackageRepository, OrderPaymentLogService $orderPaymentLogService)
+    public function __construct(
+        OrderPaymentRepository $repository, 
+        OrderRepository $orderRepository, 
+        PaymentRepository $paymentRepository, 
+        CustomerRepository $customerRepository, 
+        OrderPackageRepository $orderPackageRepository, 
+        OrderPaymentLogService $orderPaymentLogService
+    )
     {
         $this->repository = $repository;
         $this->orderRepository = $orderRepository;
@@ -1391,4 +1398,3 @@ class OrdersPaymentsController extends Controller
         return redirect()->back();
     }
 }
-
