@@ -18,7 +18,7 @@ class OrderPaymentLogRepositoryEloquent extends BaseRepository implements OrderP
      *
      * @return string
      */
-    public function model()
+    public function model(): string
     {
         return OrderPaymentLog::class;
     }
