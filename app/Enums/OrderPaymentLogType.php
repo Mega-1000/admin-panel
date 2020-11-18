@@ -8,4 +8,5 @@ final class OrderPaymentLogType extends Enum
 {
     const OrderPayment = 'ORDER_PAYMENT';
     const ClientPayment = 'CLIENT_PAYMENT';
+    const ReturnPayment = 'RETURN_PAYMENT';
 }

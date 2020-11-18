@@ -11,7 +11,7 @@ class CreateOrderPaymentsLogsTable extends Migration
         Schema::create('order_payments_logs', function (Blueprint $table) {
             $table->increments('id');
             $table->dateTime('booked_date')->nullable();
-            $table->enum('payment_type', ['CLIENT_PAYMENT', 'ORDER_PAYMENT', 'RETURN_PAYMENT']);
+            $table->enum('payment_type', [\App\Enums\OrderPaymentLogType::ClientPayment, \App\Enums\OrderPaymentLogType::OrderPayment, \App\Enums\OrderPaymentLogType::ReturnPayment]);
             $table->unsignedInteger('order_payment_id');
             $table->foreign('order_payment_id')
                 ->references('id')

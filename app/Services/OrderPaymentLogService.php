@@ -5,29 +5,19 @@ namespace App\Services;
 use App\Entities\OrderPaymentLog;
 use App\Helpers\PriceHelper;
 use App\Repositories\OrderPaymentLogRepository;
+use Illuminate\Http\Request;
 
-/**
- * Class OrderPaymentLogService.
- *
- * @package namespace App\Services;
- */
 class OrderPaymentLogService
 {
     protected $repository;
 
-    /**
-     * OrderPaymentController constructor.
-     *
-     * @param OrderPaymentLogRepository $repository
-     */
     public function __construct(OrderPaymentLogRepository $repository)
     {
         $this->repository = $repository;
     }
 
-    public function create($orderId, $orderPaymentId, $customerId, $clientPaymentAmount, $orderPaymentAmount, $request, $type)
+    public function create(int $orderId, int $orderPaymentId, int $customerId, string $clientPaymentAmount, string $orderPaymentAmount, Request $request, string $type) : void
     {
-
         $this->repository->create([
             'booked_date' => $request->input('created_at'),
             'payment_type' => $type,
@@ -40,6 +30,5 @@ class OrderPaymentLogService
             'payment_sum_after_payment' => $clientPaymentAmount - $orderPaymentAmount,
         ]);
     }
-
 }
 

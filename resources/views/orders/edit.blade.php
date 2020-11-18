@@ -1115,7 +1115,7 @@
                 </a>
             @endif
         </h1>
-        <table style="width: 50%; float: left;" id="paymentsTable" class="table table-hover">
+        <table id="paymentsTable" class="table table-hover">
             <thead>
             <tr>
                 <th>@lang('order_payments.table.payments')</th>

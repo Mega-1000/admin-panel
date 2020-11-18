@@ -27,6 +27,7 @@ use App\Repositories\OrderRepository;
 use App\Repositories\PaymentRepository;
 use App\Repositories\OrderPackageRepository;
 use App\Services\OrderPaymentLogService;
+use App\Services\OrderPaymentService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -75,6 +76,11 @@ class OrdersPaymentsController extends Controller
     protected $orderPaymentLogService;
 
     /**
+     * @var OrderPaymentService
+     */
+    protected $orderPaymentService;
+
+    /**
      * OrderPaymentController constructor.
      *
      * @param OrderPaymentRepository $repository
@@ -83,14 +89,16 @@ class OrdersPaymentsController extends Controller
      * @param CustomerRepository $customerRepository
      * @param OrderPackageRepository $orderPackageRepository
      * @param OrderPaymentLogService $orderPaymentLogService
+     * @param OrderPaymentService $orderPaymentService
      */
     public function __construct(
-        OrderPaymentRepository $repository, 
-        OrderRepository $orderRepository, 
-        PaymentRepository $paymentRepository, 
-        CustomerRepository $customerRepository, 
-        OrderPackageRepository $orderPackageRepository, 
-        OrderPaymentLogService $orderPaymentLogService
+        OrderPaymentRepository $repository,
+        OrderRepository $orderRepository,
+        PaymentRepository $paymentRepository,
+        CustomerRepository $customerRepository,
+        OrderPackageRepository $orderPackageRepository,
+        OrderPaymentLogService $orderPaymentLogService,
+        OrderPaymentService $orderPaymentService
     )
     {
         $this->repository = $repository;
@@ -99,6 +107,7 @@ class OrdersPaymentsController extends Controller
         $this->customerRepository = $customerRepository;
         $this->orderPackageRepository = $orderPackageRepository;
         $this->orderPaymentLogService = $orderPaymentLogService;
+        $this->orderPaymentService = $orderPaymentService;
     }
 
 
@@ -232,7 +241,7 @@ class OrdersPaymentsController extends Controller
 
         $type = $request->input('payment-type');
 
-        $orderPayment = OrdersPaymentsController::payOrder($orderId, $request->input('amount'),
+        $orderPayment = $this->orderPaymentService->payOrder($orderId, $request->input('amount'),
             $masterPaymentId, $promise,
             $chooseOrder, $request->input('promise_date'),
             $type, $isWarehousePayment
@@ -243,12 +252,12 @@ class OrdersPaymentsController extends Controller
         $clientPaymentAmount = $this->customerRepository->find($orderPayment->order->customer_id)->payments->sum('amount_left');
 
         $this->orderPaymentLogService->create(
-            $orderId, 
-            $orderPayment->id, 
+            $orderId,
+            $orderPayment->id,
             $orderPayment->order->customer_id,
-            $clientPaymentAmount, 
+            $clientPaymentAmount,
             $orderPaymentAmount,
-            $request, 
+            $request,
             OrderPaymentLogType::OrderPayment
         );
 
@@ -1277,77 +1286,6 @@ class OrdersPaymentsController extends Controller
         } else {
             dispatch_now(new DispatchLabelEventByNameJob($payment->order->id, "required-payment-before-unloading"));
         }
-    }
-
-    public static function payOrder(int $orderId, float $amount, int $masterPaymentId, string $promise, string $chooseOrder, string $promiseDate, string $type = null, bool $isWarehousePayment = null): OrderPayment
-    {
-        $order = Order::find($orderId);
-
-        if ($order->payments->count() == 0) {
-            dispatch_now(new DispatchLabelEventByNameJob($orderId, "payment-received"));
-            dispatch_now(new RemoveLabelJob($orderId, [44]));
-        }
-
-        if($type == null) {
-            $type = 'WAREHOUSE';
-        }
-
-        if($isWarehousePayment == null) {
-            $type = 'CLIENT';
-        }
-
-        $token = null;
-
-        if($isWarehousePayment) {
-            $token = md5(uniqid());
-            $url = route('ordersPayment.warehousePaymentConfirmation', ['token' => $token]);
-            if($order->buyInvoices()->first() !== null) {
-                try {
-                    \Mailer::create()
-                        ->to($order->warehouse->warehouse_email)
-                        ->send(new WarehousePaymentAccept($orderId, $amount, $order->buyInvoices()->first()->invoice_name, $url));
-                } catch (\Swift_TransportException $e) {
-                    Log::error('Warehouse payment accept email was not sent due to. Error: ' . $e->getMessage());
-                }
-            }
-        }
-
-        $payment = OrderPayment::create([
-            'amount' => str_replace(",", ".", $amount),
-            'master_payment_id' => $masterPaymentId ? $masterPaymentId : null,
-            'order_id' => $orderId,
-            'promise' => $promise,
-            'promise_date' => $promiseDate ?: null,
-            'type' => $type,
-            'status' => $isWarehousePayment ? 'PENDING' : null,
-            'token' => $token ? $token : null
-        ]);
-
-        if ($promise == '') {
-            dispatch_now(new RemoveLabelJob($orderId, [119]));
-        }
-
-        OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
-
-        if (!empty($chooseOrder)) {
-            $masterPayment = Payment::find($masterPaymentId);
-            $masterPayment->amount_left = $masterPayment->amount_left - str_replace(",", ".", $amount);
-            $masterPayment->save();
-            $deleted = OrderPayment::where('order_id', $orderId)
-                ->where('amount', $amount)
-                ->where('promise', '1')->first();
-
-            if (!empty($deleted)) {
-                $deleted->delete();
-            }
-        }
-
-        if ($payment != null && $order->status_id != 5) {
-            $order->status_id = 5;
-            $order->save();
-        }
-
-        return $payment;
     }
 
     public function warehousePaymentConfirmation($token)
