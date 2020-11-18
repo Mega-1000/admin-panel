@@ -13,6 +13,7 @@ use App\Entities\UserSurplusPayment;
 use App\Entities\UserSurplusPaymentHistory;
 use App\Enums\OrderPaymentLogType;
 use App\Helpers\AllegroPaymentImporter;
+use App\Helpers\PriceHelper;
 use App\Http\Requests\OrderPaymentCreateRequest;
 use App\Http\Requests\OrderPaymentUpdateRequest;
 use App\Jobs\AddLabelJob;
@@ -231,7 +232,7 @@ class OrdersPaymentsController extends Controller
             );
 
 
-        $orderPaymentAmount = str_replace(",", ".", $request->input('amount'));
+        $orderPaymentAmount = PriceHelper::modifyPriceToValidFormat($request->input('amount'));
         $clientPaymentAmount = $this->customerRepository->find($orderPayment->order->customer_id)->payments->sum('amount_left');
 
         $this->orderPaymentLogService->create(
@@ -1076,7 +1077,7 @@ class OrdersPaymentsController extends Controller
     {
         $orderId = $request->input('order_id');
         $promise = $request->input('promise');
-        $amount = str_replace(",", ".", $request->input('amount'));
+        $amount = PriceHelper::modifyPriceToValidFormat($request->input('amount'));
         $clientPaymentAmount = Customer::find($request->input('customer_id'))->payments->sum('amount_left');
         if (!empty($orderId)) {
             if($request->input('payment-type') == 'WAREHOUSE') {
@@ -1267,7 +1268,7 @@ class OrdersPaymentsController extends Controller
         }
     }
 
-    public static function payOrder($orderId, $amount, $masterPaymentId, string $promise, $chooseOrder, $promiseDate, $type = null, $isWarehousePayment = null): OrderPayment
+    public static function payOrder(int $orderId, float $amount, int $masterPaymentId, string $promise, string $chooseOrder, string $promiseDate, string $type = null, bool $isWarehousePayment = null): OrderPayment
     {
         $order = Order::find($orderId);
 

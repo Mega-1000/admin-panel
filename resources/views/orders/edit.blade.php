@@ -2452,7 +2452,7 @@
                             aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
-                    <table id="paymentsTable" class="table table-hover" style="width: 50%; float: left;">
+                    <table id="paymentsTable" class="table table-hover">
                         <thead>
                             <tr>
                                 <th>Numer transakcji</th>
