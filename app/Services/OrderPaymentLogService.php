@@ -16,16 +16,16 @@ class OrderPaymentLogService
         $this->repository = $repository;
     }
 
-    public function create(int $orderId, int $orderPaymentId, int $customerId, string $clientPaymentAmount, string $orderPaymentAmount, Request $request, string $type) : void
+    public function create(int $orderId, int $orderPaymentId, int $customerId, string $clientPaymentAmount, string $orderPaymentAmount, string $createdAt, string $notices, string $amount, string $type) : void
     {
         $this->repository->create([
-            'booked_date' => $request->input('created_at'),
+            'booked_date' => $createdAt,
             'payment_type' => $type,
             'order_payment_id' => $orderPaymentId,
             'user_id' => $customerId,
             'order_id' => $orderId,
-            'description' => $request->input('notices'),
-            'payment_amount' => PriceHelper::modifyPriceToValidFormat($request->input('amount')),
+            'description' => $notices,
+            'payment_amount' => PriceHelper::modifyPriceToValidFormat($amount),
             'payment_sum_before_payment' => $clientPaymentAmount,
             'payment_sum_after_payment' => $clientPaymentAmount - $orderPaymentAmount,
         ]);

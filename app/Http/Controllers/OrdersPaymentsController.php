@@ -257,7 +257,9 @@ class OrdersPaymentsController extends Controller
             $orderPayment->order->customer_id,
             $clientPaymentAmount,
             $orderPaymentAmount,
-            $request,
+            $request->input('created_at'),
+            $request->input('notices'),
+            $request->input('amount'),
             OrderPaymentLogType::OrderPayment
         );
 
@@ -1123,9 +1125,15 @@ class OrdersPaymentsController extends Controller
             }
 
             $this->orderPaymentLogService->create(
-                $orderId, $payment->id, $request->input('customer_id'),
-                $clientPaymentAmount, $amount,
-                $request, OrderPaymentLogType::ClientPayment
+                $orderId,
+                $payment->id,
+                $request->input('customer_id'),
+                $clientPaymentAmount,
+                $amount,
+                $request->input('created_at'),
+                $request->input('notices'),
+                $request->input('amount'),
+                OrderPaymentLogType::ClientPayment
             );
 
             return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
