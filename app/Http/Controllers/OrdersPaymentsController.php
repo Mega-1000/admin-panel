@@ -84,7 +84,14 @@ class OrdersPaymentsController extends Controller
      * @param OrderPackageRepository $orderPackageRepository
      * @param OrderPaymentLogService $orderPaymentLogService
      */
-    public function __construct(OrderPaymentRepository $repository, OrderRepository $orderRepository, PaymentRepository $paymentRepository, CustomerRepository $customerRepository, OrderPackageRepository $orderPackageRepository, OrderPaymentLogService $orderPaymentLogService)
+    public function __construct(
+        OrderPaymentRepository $repository, 
+        OrderRepository $orderRepository, 
+        PaymentRepository $paymentRepository, 
+        CustomerRepository $customerRepository, 
+        OrderPackageRepository $orderPackageRepository, 
+        OrderPaymentLogService $orderPaymentLogService
+    )
     {
         $this->repository = $repository;
         $this->orderRepository = $orderRepository;
@@ -236,9 +243,13 @@ class OrdersPaymentsController extends Controller
         $clientPaymentAmount = $this->customerRepository->find($orderPayment->order->customer_id)->payments->sum('amount_left');
 
         $this->orderPaymentLogService->create(
-            $orderId, $orderPayment->id, $orderPayment->order->customer_id,
-            $clientPaymentAmount, $orderPaymentAmount,
-            $request, OrderPaymentLogType::OrderPayment
+            $orderId, 
+            $orderPayment->id, 
+            $orderPayment->order->customer_id,
+            $clientPaymentAmount, 
+            $orderPaymentAmount,
+            $request, 
+            OrderPaymentLogType::OrderPayment
         );
 
         return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
@@ -1391,4 +1402,3 @@ class OrdersPaymentsController extends Controller
         return redirect()->back();
     }
 }
-

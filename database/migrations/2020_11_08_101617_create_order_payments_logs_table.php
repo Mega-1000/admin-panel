@@ -6,7 +6,7 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateOrderPaymentsLogsTable extends Migration
 {
-    public function up(): void
+    public function up() : void
     {
         Schema::create('order_payments_logs', function (Blueprint $table) {
             $table->increments('id');
@@ -36,7 +36,7 @@ class CreateOrderPaymentsLogsTable extends Migration
         });
     }
 
-    public function down()
+    public function down() : void
     {
         Schema::dropIfExists('order_payments_logs');
     }

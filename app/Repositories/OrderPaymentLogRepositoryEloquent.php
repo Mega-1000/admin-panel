@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Repositories;
 
@@ -13,7 +13,7 @@ use Prettus\Repository\Criteria\RequestCriteria;
  */
 class OrderPaymentLogRepositoryEloquent extends BaseRepository implements OrderPaymentLogRepository
 {
-    public function model()
+    public function model(): string
     {
         return OrderPaymentLog::class;
     }
