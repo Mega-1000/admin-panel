@@ -10,18 +10,16 @@ class DelivererImportRuleSearchCompare extends DelivererImportRuleAbstract
 {
     public function run(array $line): ?Order
     {
+        $this->line = $line;
+
         $order = $this->orderRepository->findWhere([
-            $this->getDbColumnName()->value => $this->getImportColumnNumber()->get()
+            $this->getDbColumnName()->value => $this->getDataToImport()
         ]);
 
         if ($order->count() > 1) {
             throw new \Exception('Too many orders were found for rule');
         }
 
-        if ($order->count() === 1) {
-            return $order->first();
-        }
-
-        return null;
+        return $order->first();
     }
 }

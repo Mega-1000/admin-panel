@@ -127,6 +127,7 @@ class Order extends Model implements Transformable
         'production_date',
         'master_order_id',
         'spedition_comment',
+        'financial_comment',
     ];
 
     /**

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Builders\DelivererImportRulesBuilder;
+use App\Domains\DelivererPackageImport\Builders\DelivererImportRulesBuilder;
 use App\Domains\DelivererPackageImport\Enums\DelivererRulesActionEnum;
 use App\Domains\DelivererPackageImport\Enums\DelivererRulesColumnNameEnum;
 use App\Domains\DelivererPackageImport\ImportRules\DelivererImportRulesManager;
@@ -67,7 +67,12 @@ class TransportPaymentsController extends Controller
             $importRules
         );
 
-        dd('OK');
+        return redirect()->route('transportPayment.list')->with([
+            'message' => __('voyager.generic.successfully_added_new'),
+            'alert-type' => 'success',
+        ]);
+
+        //dd('OK');
 
         /*try {
             $this->transportService->createDeliverer($request->getName());
@@ -166,19 +171,19 @@ class TransportPaymentsController extends Controller
                 $this->transportService->saveFileToImport($request->file('file'))
             );
 
-            dd('importuj');
-
+            return redirect()->route('transportPayment.list')->with([
+                'message' => __('transport.messages.import-finished'),
+                'alert-type' => 'success',
+            ]);
         } catch (\Exception $e) {
             return redirect()->route('orders.index')->with([
                 'message' => $e->getMessage(),
                 'alert-type' => 'error'
             ]);
         }
-
-        dd('ok');
-        return redirect()->route('orders.index')->with(
+        /*return redirect()->route('orders.index')->with(
             'update_errors', $errors
-        );
+        );*/
     }
 
     public function store2(Request $request)

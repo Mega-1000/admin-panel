@@ -29,6 +29,7 @@ class DelivererImportRulesManager
 
     private $getRules;
 
+    /* @var $getAndReplaceRules Collection */
     private $getAndReplaceRules;
 
     public function __construct(
@@ -64,14 +65,54 @@ class DelivererImportRulesManager
         return !empty($this->importRules);
     }
 
-    public function runRules(array $line)
+    public function runRules(array $line): void
     {
-        $order = $this->findOrderByRule($line);
+        $order = $this->findOrderByRules($line);
 
-        dd($order);
+        $this->runSetRules($order, $line);
+        $this->runGetRules($order, $line);
+        $this->runGetAndReplaceRules($order, $line);
     }
 
-    private function findOrderByRule(array $line): ?Order
+    private function runGetAndReplaceRules($order, $line): void
+    {
+        if ($this->getAndReplaceRules->isNotEmpty()) {
+            $this->getAndReplaceRules->each(function ($rulesGroup, $key) use ($order, $line) {
+                foreach ($rulesGroup as $rule) {
+                    /* @var $rule DelivererImportRuleInterface */
+                    $rule->setOrder($order);
+
+                    if ($rule->run($line)) {
+                        break;
+                    }
+                }
+            });
+        }
+    }
+
+    private function runGetRules(Order $order, array $line): void
+    {
+        if ($this->getRules->isNotEmpty()) {
+            $this->getRules->each(function ($rule) use ($order, $line) {
+                /* @var $rule DelivererImportRuleInterface */
+                $rule->setOrder($order);
+                $rule->run($line);
+            });
+        }
+    }
+
+    private function runSetRules(Order $order, array $line): void
+    {
+        if ($this->setRules->isNotEmpty()) {
+            $this->setRules->each(function ($rule) use ($order, $line) {
+                /* @var $rule DelivererImportRuleInterface */
+                $rule->setOrder($order);
+                $rule->run($line);
+            });
+        }
+    }
+
+    private function findOrderByRules(array $line): ?Order
     {
         if ($this->searchRules->isNotEmpty()) {
             /* @var $ruleToRun DelivererImportRuleInterface */
@@ -79,7 +120,7 @@ class DelivererImportRulesManager
 
             $order = $ruleToRun->run($line);
 
-            return empty($order) ? $this->findOrderByRule($line) : $order;
+            return empty($order) ? $this->findOrderByRules($line) : $order;
         }
 
         return null;
@@ -108,6 +149,9 @@ class DelivererImportRulesManager
         $this->getAndReplaceRules = $this->importRules->whereStrict(
             'action',
             DelivererRulesActionEnum::GET_AND_REPLACE
-        );
+        )->mapToGroups(function ($rule) {
+            /* @var $rule DelivererImportRuleInterface */
+            return [$rule->getImportRuleEntity()->db_column_name => $rule];
+        });
     }
 }

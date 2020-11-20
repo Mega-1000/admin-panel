@@ -18,7 +18,7 @@ class CreateDelivererImportRulesTable extends Migration
             $table->string('db_column_name')->nullable(false);
             $table->unsignedTinyInteger('import_column_number')->nullable(false);
             $table->string('value')->nullable(false);
-            $table->string('changeTo')->nullable(false);
+            $table->string('change_to')->nullable(false);
             $table->unsignedTinyInteger('sort')->nullable(false);
             $table->timestamps();
 

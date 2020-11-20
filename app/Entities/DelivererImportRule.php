@@ -13,7 +13,7 @@ class DelivererImportRule extends Model
         'db_column_name',
         'import_column_number',
         'value',
-        'changeTo',
+        'change_to',
         'order',
     ];
 

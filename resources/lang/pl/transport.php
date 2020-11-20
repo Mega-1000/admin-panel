@@ -7,4 +7,7 @@ return [
         'exists' => 'Istnieje już dostawca o takiej nazwie',
         'mimes' => 'Plik musi mieć format CSV',
     ],
+    'messages' => [
+        'import-finished' => 'Import został wykonany',
+    ],
 ];
