@@ -18,7 +18,7 @@ class OrderPaymentLogRepositoryEloquent extends BaseRepository implements OrderP
         return OrderPaymentLog::class;
     }
 
-    public function boot() : void
+    public function boot(): void
     {
         $this->pushCriteria(app(RequestCriteria::class));
     }
