@@ -8,9 +8,6 @@ use Illuminate\Database\Migrations\Migration;
 
 class CreateDelivererImportRulesTable extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('deliverer_import_rules', function (Blueprint $table) {
@@ -28,9 +25,6 @@ class CreateDelivererImportRulesTable extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('deliverer_import_rules', function (Blueprint $table) {

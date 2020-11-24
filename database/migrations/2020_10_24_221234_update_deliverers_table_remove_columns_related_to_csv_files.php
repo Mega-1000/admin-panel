@@ -8,9 +8,6 @@ use Illuminate\Database\Migrations\Migration;
 
 class UpdateDeliverersTableRemoveColumnsRelatedToCsvFiles extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::table('deliverers', function (Blueprint $table) {
@@ -20,9 +17,6 @@ class UpdateDeliverersTableRemoveColumnsRelatedToCsvFiles extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::table('deliverers', function (Blueprint $table) {

@@ -1978,22 +1978,22 @@
                 {
                     data: 'allegro_deposit_value',
                     name: 'allegro_deposit_value',
-                    searchable: false
+                    searchable: false,
                 },
                 {
                     data: 'allegro_operation_date',
                     name: 'allegro_operation_date',
-                    searchable: false
+                    searchable: false,
                 },
                 {
                     data: 'allegro_additional_service',
                     name: 'allegro_additional_service',
-                    searchable: false
+                    searchable: false,
                 },
                 {
                     data: 'payment_channel',
                     name: 'payment_channel',
-                    searchable: false
+                    searchable: false,
                 },
                 {
                     data: 'remainder_date',

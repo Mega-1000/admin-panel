@@ -8,7 +8,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class Deliverer extends Model
 {
-    protected $fillable = [
-        'name',
-    ];
+    protected $fillable = ['name'];
 }

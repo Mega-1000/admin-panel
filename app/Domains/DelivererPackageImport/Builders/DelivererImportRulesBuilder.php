@@ -29,15 +29,8 @@ class DelivererImportRulesBuilder
         }
 
         $rulesCollection = [];
-
         foreach ($rulesFromRequest as $rule) {
-            try {
-                $rule = $this->delivererImportRuleFromRequestFactory->create($deliverer, $rule);
-            } catch (\Exception $exception) {
-                dd($exception->getMessage()); //todo log
-            }
-
-            $rulesCollection[] = $rule;
+            $rulesCollection[] = $this->delivererImportRuleFromRequestFactory->create($deliverer, $rule);
         }
 
         return $rulesCollection;

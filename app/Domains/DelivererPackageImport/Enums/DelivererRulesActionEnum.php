@@ -9,9 +9,13 @@ use BenSampo\Enum\Enum;
 final class DelivererRulesActionEnum extends Enum
 {
     public const SEARCH_COMPARE = 'searchCompare';
+
     public const SEARCH_REGEX = 'searchRegex';
+
     public const SET = 'set';
+
     public const GET = 'get';
+
     public const GET_AND_REPLACE = 'getAndReplace';
 
     public static function getDescription($value): string

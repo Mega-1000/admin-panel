@@ -62,11 +62,6 @@ class TransportService
         $this->delivererImportRuleRepository->saveImportRules($delivererImportRules);
     }
 
-    public function getDelivererImportRules()
-    {
-
-    }
-
     public function saveFileToImport(UploadedFile $file): File
     {
         $fileName = Str::random(40) . '.csv';
