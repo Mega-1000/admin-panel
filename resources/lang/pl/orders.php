@@ -52,7 +52,7 @@ return [
         'correction_amount' => 'Kwota korekty',
         'correction_description' => 'Treść korekty',
         'document_number' => 'Nr dokumentu',
-        'payment_id' => 'Id płatności',
+        'payment_id' => 'ALLEGRO Id płatności',
         'search_on_lp' => 'do-ukrycia-domyslnie',
 
         'warehouse_cost' => 'Koszt magazynu',
@@ -65,6 +65,10 @@ return [
         'save_label' => 'Przypisz etykietę',
         'choose_label' => '--WYBIERZ ETYKIETĘ--',
         'production_date' => 'Data produkcji',
+        'allegro_deposit_value' => 'ALLEGRO wartość wpłaty',
+        'allegro_operation_date' => 'ALLEGRO data operacji',
+        'allegro_additional_service' => 'ALLEGRO nazwa usługi dodatkowej',
+        'payment_channel' => 'Kanał wpłaty',
     ],
     'message' => [
         'store' => 'Zamówienie zostało dodane pomyślnie!',
@@ -102,7 +106,7 @@ return [
         'document_number_sell' => 'Nr dokumentu sprzedaży',
         'document_number_sell_subiekt' => 'Nr dokumentu sprzedaży (subiekt)',
         'sell_invoices' => 'Faktury sprzedaży',
-        'allegro_form_id' => 'Id zamówienia allegro',
+        'allegro_form_id' => 'ALLEGRO numer zamówienia',
         'allegro_commission' => 'Wartość brutto prowizji allegro',
         'consultant_earning' => 'Wynagrodzenie konsultanta',
         'warehouse_cost' => 'Koszt magazynu',
