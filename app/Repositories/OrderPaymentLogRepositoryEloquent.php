@@ -22,5 +22,4 @@ class OrderPaymentLogRepositoryEloquent extends BaseRepository implements OrderP
     {
         $this->pushCriteria(app(RequestCriteria::class));
     }
-
 }

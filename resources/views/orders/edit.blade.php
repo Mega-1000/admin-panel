@@ -1105,7 +1105,7 @@
             </tr>
             </thead>
         </table>
-        <button class="btn btn-success" id="show-transaction-history">Wyświetl historię transakcji</button>
+        <button class="btn btn-success" id="show-transaction-history">@lang('order_payments.show_transaction_history')</button>
         <h1>Rozrachunki z kontrahentem: {{ $order->customer->login }}
             @if(Auth::user()->role_id == 3 || Auth::user()->role_id == 2 || Auth::user()->role_id == 1)
                 <a id="create-button-orderPayments" style="float:right;margin-right: 15px;"

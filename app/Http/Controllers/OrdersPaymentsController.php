@@ -80,17 +80,6 @@ class OrdersPaymentsController extends Controller
      */
     protected $orderPaymentService;
 
-    /**
-     * OrderPaymentController constructor.
-     *
-     * @param OrderPaymentRepository $repository
-     * @param OrderRepository $orderRepository
-     * @param PaymentRepository $paymentRepository
-     * @param CustomerRepository $customerRepository
-     * @param OrderPackageRepository $orderPackageRepository
-     * @param OrderPaymentLogService $orderPaymentLogService
-     * @param OrderPaymentService $orderPaymentService
-     */
     public function __construct(
         OrderPaymentRepository $repository,
         OrderRepository $orderRepository,
@@ -1100,8 +1089,16 @@ class OrdersPaymentsController extends Controller
         $orderId = $request->input('order_id');
         $promise = $request->input('promise');
         $amount = PriceHelper::modifyPriceToValidFormat($request->input('amount'));
-        $clientPaymentAmount = Customer::find($request->input('customer_id'))->payments->sum('amount_left');
+        $clientPaymentAmount = $this->customerRepository->find($request->input('customer_id'))->payments->sum('amount_left');
         if (!empty($orderId)) {
+            $request->validate([
+                'amount' => 'required|unique:posts|max:255',
+                'notices' => 'required|max:255',
+                'promise_date' => 'required|date',
+                'created_at' => 'required|date',
+                'payment-type' => 'required',
+                'customer_id' => 'required'
+            ]);
             if($request->input('payment-type') == 'WAREHOUSE') {
                 $order = Order::find($orderId);
                 $payment = Payment::create([
@@ -1123,6 +1120,8 @@ class OrdersPaymentsController extends Controller
                     'promise' => $promise
                 ]);
             }
+
+
 
             $this->orderPaymentLogService->create(
                 $orderId,
