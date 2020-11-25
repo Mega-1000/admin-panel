@@ -38,7 +38,7 @@ class CreateOrderPaymentsLogsTable extends Migration
         });
     }
 
-    public function down() : void
+    public function down(): void
     {
         Schema::dropIfExists('order_payments_logs');
     }
