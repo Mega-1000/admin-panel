@@ -13,7 +13,7 @@
                             margin-top: 5px;"
                         class="{{ $labelsButtons[\App\Entities\Label::WAREHOUSE_MARK]->icon_name }}"></i>
                 </button>
-                @if($user_type === 4)
+                @if($user_type === \App\Enums\UserRole::Consultant)
                 <h6 title="{{ $labelsButtons[\App\Entities\Label::WAREHOUSE_MARK]->name}}"
                         data-label-id="{{\App\Entities\Label::WAREHOUSE_MARK}}" class="add-label">
                     informacja dla mastera - dialog
@@ -30,7 +30,7 @@
                             margin-top: 5px;"
                         class="{{ $labelsButtons[\App\Entities\Label::SHIPPING_MARK]->icon_name }}"></i>
                 </button>
-                @if($user_type === 4)
+                @if($user_type === \App\Enums\UserRole::Consultant)
                 <h6 title="{{ $labelsButtons[\App\Entities\Label::SHIPPING_MARK]->name}}"
                     data-label-id="{{\App\Entities\Label::SHIPPING_MARK}}" class="add-label">
                     informacja dla konsultanta - dialog
@@ -47,7 +47,7 @@
                             margin-top: 5px;"
                         class="{{ $labelsButtons[\App\Entities\Label::CONSULTANT_MARK]->icon_name }}"></i>
                 </button>
-                @if($user_type === 4)
+                @if($user_type === \App\Enums\UserRole::Consultant)
                 <h6 title="{{ $labelsButtons[\App\Entities\Label::CONSULTANT_MARK]->name}}"
                     data-label-id="{{\App\Entities\Label::CONSULTANT_MARK}}" class="add-label">
                     informacja dla magazynu / dialog
@@ -64,7 +64,7 @@
                             margin-top: 5px;"
                         class="{{ $labelsButtons[\App\Entities\Label::MASTER_MARK]->icon_name }}"></i>
                 </button>
-                @if($user_type === 4)
+                @if($user_type === \App\Enums\UserRole::Consultant)
                 <h6 title="{{ $labelsButtons[\App\Entities\Label::MASTER_MARK]->name}}"
                     data-label-id="{{\App\Entities\Label::MASTER_MARK}}" class="add-label">
                     informacja dla ksiegowosci / dialog
