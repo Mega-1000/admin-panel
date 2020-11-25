@@ -67,7 +67,7 @@
                 @if($user_type === \App\Enums\UserRole::Consultant)
                 <h6 title="{{ $labelsButtons[\App\Entities\Label::MASTER_MARK]->name}}"
                     data-label-id="{{\App\Entities\Label::MASTER_MARK}}" class="add-label">
-                    informacja dla ksiegowosci / dialog
+                    informacja dla księgowości / dialog
                 </h6>
                 @endif
             </div>
