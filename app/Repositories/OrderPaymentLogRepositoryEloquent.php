@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php 
+
+declare(strict_types=1);
 
 namespace App\Repositories;
 
@@ -18,7 +20,7 @@ class OrderPaymentLogRepositoryEloquent extends BaseRepository implements OrderP
         return OrderPaymentLog::class;
     }
 
-    public function boot() : void
+    public function boot(): void
     {
         $this->pushCriteria(app(RequestCriteria::class));
     }

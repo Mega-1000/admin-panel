@@ -88,8 +88,7 @@ class OrdersPaymentsController extends Controller
         OrderPackageRepository $orderPackageRepository,
         OrderPaymentLogService $orderPaymentLogService,
         OrderPaymentService $orderPaymentService
-    )
-    {
+    ) {
         $this->repository = $repository;
         $this->orderRepository = $orderRepository;
         $this->paymentRepository = $paymentRepository;

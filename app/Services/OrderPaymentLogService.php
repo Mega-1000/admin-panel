@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php 
+
+declare(strict_types=1);
 
 namespace App\Services;
 
@@ -16,8 +18,17 @@ class OrderPaymentLogService
         $this->repository = $repository;
     }
 
-    public function create(int $orderId, int $orderPaymentId, int $customerId, string $clientPaymentAmount, string $orderPaymentAmount, string $createdAt, string $notices, string $amount, string $type) : void
-    {
+    public function create(
+        int $orderId, 
+        int $orderPaymentId, 
+        int $customerId, 
+        string $clientPaymentAmount, 
+        string $orderPaymentAmount, 
+        string $createdAt, 
+        string $notices, 
+        string $amount, 
+        string $type
+    ) : void {
         $this->repository->create([
             'booked_date' => $createdAt,
             'payment_type' => $type,

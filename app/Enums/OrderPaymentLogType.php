@@ -4,9 +4,9 @@ namespace App\Enums;
 
 use BenSampo\Enum\Enum;
 
-final class OrderPaymentLogType extends Enum
+final class OrderPaymentLogTypeEnum extends Enum
 {
-    const OrderPayment = 'ORDER_PAYMENT';
-    const ClientPayment = 'CLIENT_PAYMENT';
-    const ReturnPayment = 'RETURN_PAYMENT';
+    const OORDER_PAYMENT = 'ORDER_PAYMENT';
+    const CLIENT_PAYMENT = 'CLIENT_PAYMENT';
+    const RETURN_PAYMENT = 'RETURN_PAYMENT';
 }
