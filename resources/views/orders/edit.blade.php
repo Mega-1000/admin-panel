@@ -369,7 +369,7 @@
             <div class="form-group" style="width: 25%; float: left; padding: 5px;">
                 <div>
 
-                    @include('orders.labels', ['title' => __('orders.form.warehouse_notice')])
+                    @include('orders.labels', ['title' => __('orders.form.warehouse_notice'), 'user_type' => \App\Enums\UserRole::Storekeeper])
                     <textarea rows="5" cols="40" class="form-control" id="warehouse_notice"
                               name="warehouse_notice" disabled>{{ $order->warehouse_notice ?? ''}}</textarea>
                     <div class="flex-input">
@@ -385,7 +385,7 @@
             </div>
             <div class="form-group" style="width: 25%; float: left; padding: 5px;">
                 <div>
-                    @include('orders.labels', ['title' => 'Informacje dla spedycji'])
+                    @include('orders.labels', ['title' => 'Informacje dla spedycji', 'user_type' => \App\Enums\UserRole::SuperAdministrator])
                     <textarea id="shipping_notice" class="form-control" rows="5" disabled>{{ $order->spedition_comment ?? ''}}</textarea>
                     <div class="flex-input">
                         <input type="text" class="form-control scrollable-notice" placeholder="Informacje dla spedycji"
@@ -399,7 +399,7 @@
                 </div>
             </div>
             <div class="form-group" style="width: 25%; float: left; padding: 5px;">
-                @include('orders.labels', ['title' =>  __('orders.form.consultant_notices')])
+                @include('orders.labels', ['title' =>  __('orders.form.consultant_notices'), 'user_type' => \App\Enums\UserRole::Consultant])
                 <textarea id="consultant_notice" disabled class="form-control" name="consultant_notices" id="consultant_notices"
                           rows="5">{{ $order->consultant_notices ?? ''}}</textarea>
                 <div class="flex-input">
@@ -413,7 +413,7 @@
                 </div>
             </div>
             <div class="form-group" style="width: 25%; float: left; padding: 5px;">
-                @include('orders.labels', ['title' =>  __('orders.form.financial_notices')])
+                @include('orders.labels', ['title' =>  __('orders.form.financial_notices'), 'user_type' => \App\Enums\UserRole::Accountant])
                 <textarea id="financial_notice" disabled class="form-control scrollable-notice" name="financial_comment" id="financial_notices"
                           rows="5">{{ $order->financial_comment ?? ''}}</textarea>
                 <div class="flex-input">
@@ -2452,6 +2452,7 @@
 @section('datatable-scripts')
     <script type="application/javascript">
         $(document).ready(function(){
+            document.getElementById("consultant_comment").focus();
             $('#warehouse_notice').scrollTop(1E10);
             $('#shipping_notice').scrollTop(1E10);
             $('#consultant_notice').scrollTop(1E10);

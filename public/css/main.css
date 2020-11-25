@@ -99,3 +99,7 @@
     padding: 0 15px;
     margin-top: 0px;
 }
+
+.add-label {
+    cursor: pointer;
+}
