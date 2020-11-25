@@ -3,6 +3,7 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
@@ -51,6 +52,11 @@ class ProductStock extends Model implements Transformable
     public function logs()
     {
         return $this->hasMany(ProductStockLog::class);
+    }
+
+    public function packets(): HasMany
+    {
+        return $this->hasMany(ProductStockPacket::class);
     }
 
     public $customColumnsVisibilities = [

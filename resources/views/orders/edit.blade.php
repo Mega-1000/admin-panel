@@ -896,7 +896,7 @@
                                    class="form-control price change-order quantityChange"
                                    id="quantity_commercial[{{$item->id}}]">
                         </td>
-                        <td colspan="3">
+                        <td>
                             @php
                                 $quantityAll = 0;
                             @endphp
@@ -909,6 +909,18 @@
                                 @endphp
                             @endforeach
                             Ilość wszystkich: {{ $quantityAll }} <br/>
+                        </td>
+                        <td>
+                            <form action="{{ route('product_stock_packets.assign', ['orderItemId' => $item->id]) }}"></form>
+                            <div class="form-group">
+                                <label for="packets">@lang('product_stock_packets.form.choose_packet')</label>
+                                <select class="form-control" id="packets" name="packet">
+                                    @foreach($item->product->stock->packets as $packet)
+                                        <option value="{{ $packet->id }}">{{ $packet->packet_name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <button class="btn btn-success">Użyj wybranego pakietu</button>
                         </td>
                     </tr>
                     <tr class="row-{{$item->id}}">

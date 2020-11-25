@@ -124,6 +124,18 @@
                         html += '<i class="voyager-edit"></i>';
                         html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
                         html += '</a>';
+                        let listUrl = '{{ route('product_stock_packets.index', ':id') }}';
+                        listUrl = listUrl.replace(':id', id);
+                        html += '<a href="' + listUrl + '" class="btn btn-sm btn-warning edit">';
+                        html += '<i class="voyager-edit"></i>';
+                        html += '<span class="hidden-xs hidden-sm"> @lang('product_stock_packets.table.packet_list')</span>';
+                        html += '</a>';
+                        let createUrl = '{{ route('product_stock_packets.create', ':id') }}';
+                        createUrl = createUrl.replace(':id', id);
+                        html += '<a href="' + createUrl + '" class="btn btn-sm btn-success edit">';
+                        html += '<i class="voyager-edit"></i>';
+                        html += '<span class="hidden-xs hidden-sm"> @lang('product_stock_packets.table.packet_create')</span>';
+                        html += '</a>';
                         return html;
                     }
                 },

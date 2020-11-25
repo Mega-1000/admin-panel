@@ -3,6 +3,7 @@ return [
     'title' => 'Stany magazynowe',
     'list' => 'Lista stanów magazynowych',
     'edit' => 'Edytuj stan magazynowy',
+    'packet_create' => 'Stwórz pakiet produktu',
     'table' => [
         'name' => 'Nazwa',
         'symbol' => 'Symbol',
@@ -47,6 +48,7 @@ return [
         'additional_payment_for_milling' => 'Dopłata za frezowanie',
         'coating' => 'Narzut',
         'positions' => 'Pozycje produktu',
+        'packet_create' => 'Stwórz pakiet',
     ],
     'form' => [
         'name' => 'Nazwa',
@@ -67,6 +69,9 @@ return [
         'active' => 'Aktywny',
         'pending' => 'Oczekujący',
         'select_position' => 'Wybierz pozycję na magazynie',
+        'packet_quantity' => 'Ilość pakietów do utworzenia',
+        'packet_product_quantity' => 'Ilość produktu w pakiecie',
+        'packet_name' => 'Nazwa pakietu',
         'buttons' => [
             'general' => 'Główne',
             'stocks' => 'Stan magazynowy',
@@ -76,6 +81,7 @@ return [
         ],
     ],
     'message' => [
+        'packet_store' => 'Pakiet produktu został pomyślnie utworzony.',
         'change_status' => 'Status produktu został pomyślnie zaktualizowany',
         'update' => 'Stan magazynowy produktu został pomyślnie zaktualizowany',
         'error_quantity' => 'Stan magazynowy danej pozycji nie może być niższy niż 0'
