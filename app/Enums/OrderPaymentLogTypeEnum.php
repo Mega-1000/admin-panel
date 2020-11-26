@@ -6,7 +6,7 @@ use BenSampo\Enum\Enum;
 
 final class OrderPaymentLogTypeEnum extends Enum
 {
-    const OORDER_PAYMENT = 'ORDER_PAYMENT';
+    const ORDER_PAYMENT = 'ORDER_PAYMENT';
     const CLIENT_PAYMENT = 'CLIENT_PAYMENT';
     const RETURN_PAYMENT = 'RETURN_PAYMENT';
 }

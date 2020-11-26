@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 declare(strict_types=1);
 
@@ -40,6 +40,14 @@ class CreateOrderPaymentsLogsTable extends Migration
 
     public function down(): void
     {
+        Schema::table('order_payments_logs', function (Blueprint $table) {
+            $table->dropForeign('order_payment_id');
+            $table->dropColumn('order_payment_id');
+            $table->dropForeign('user_id');
+            $table->dropColumn('user_id');
+            $table->dropForeign('order_id');
+            $table->dropColumn('order_id');
+        });
         Schema::dropIfExists('order_payments_logs');
     }
 }

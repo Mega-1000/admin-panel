@@ -7,20 +7,18 @@ use App\Entities\Customer;
 use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\OrderPayment;
-use App\Entities\OrderPaymentLog;
 use App\Entities\Payment;
 use App\Entities\UserSurplusPayment;
 use App\Entities\UserSurplusPaymentHistory;
-use App\Enums\OrderPaymentLogType;
+use App\Enums\OrderPaymentLogTypeEnum;
 use App\Helpers\AllegroPaymentImporter;
 use App\Helpers\PriceHelper;
+use App\Http\Requests\MasterPaymentCreateRequest;
 use App\Http\Requests\OrderPaymentCreateRequest;
 use App\Http\Requests\OrderPaymentUpdateRequest;
 use App\Jobs\AddLabelJob;
 use App\Jobs\DispatchLabelEventByNameJob;
 use App\Jobs\RemoveLabelJob;
-use App\Mail\ConfirmData;
-use App\Mail\WarehousePaymentAccept;
 use App\Repositories\CustomerRepository;
 use App\Repositories\OrderPaymentRepository;
 use App\Repositories\OrderRepository;
@@ -28,10 +26,8 @@ use App\Repositories\PaymentRepository;
 use App\Repositories\OrderPackageRepository;
 use App\Services\OrderPaymentLogService;
 use App\Services\OrderPaymentService;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use TCG\Voyager\Models\Role;
@@ -248,7 +244,7 @@ class OrdersPaymentsController extends Controller
             $request->input('created_at'),
             $request->input('notices'),
             $request->input('amount'),
-            OrderPaymentLogType::OrderPayment
+            OrderPaymentLogTypeEnum::ORDER_PAYMENT
         );
 
         return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
@@ -1083,39 +1079,32 @@ class OrdersPaymentsController extends Controller
         }
     }
 
-    public function storeMaster(Request $request)
+    public function storeMaster(MasterPaymentCreateRequest $request)
     {
         $orderId = $request->input('order_id');
         $promise = $request->input('promise');
         $amount = PriceHelper::modifyPriceToValidFormat($request->input('amount'));
         $clientPaymentAmount = $this->customerRepository->find($request->input('customer_id'))->payments->sum('amount_left');
         if (!empty($orderId)) {
-            $request->validate([
-                'amount' => 'required|unique:posts|max:255',
-                'notices' => 'required|max:255',
-                'promise_date' => 'required|date',
-                'created_at' => 'required|date',
-                'payment-type' => 'required',
-                'customer_id' => 'required'
-            ]);
+            $validated = $request->validated();
             if($request->input('payment-type') == 'WAREHOUSE') {
                 $order = Order::find($orderId);
                 $payment = Payment::create([
                     'amount' => $amount,
                     'amount_left' => $amount,
-                    'customer_id' => $request->input('customer_id'),
+                    'customer_id' => $validated['customer_id'],
                     'warehouse_id' => $order->warehouse->id,
-                    'notices' => $request->input('notices'),
-                    'type' => $request->input('payment-type'),
+                    'notices' => $validated['notices'],
+                    'type' => $validated['payment-type'],
                     'promise' => $promise
                 ]);
             } else {
                 $payment = Payment::create([
                     'amount' => $amount,
                     'amount_left' => $amount,
-                    'customer_id' => $request->input('customer_id'),
-                    'notices' => $request->input('notices'),
-                    'type' => $request->input('payment-type'),
+                    'customer_id' => $validated['customer_id'],
+                    'notices' => $validated['notices'],
+                    'type' => $validated['payment-type'],
                     'promise' => $promise
                 ]);
             }
@@ -1125,13 +1114,13 @@ class OrdersPaymentsController extends Controller
             $this->orderPaymentLogService->create(
                 $orderId,
                 $payment->id,
-                $request->input('customer_id'),
+                $validated['customer_id'],
                 $clientPaymentAmount,
                 $amount,
-                $request->input('created_at'),
-                $request->input('notices'),
-                $request->input('amount'),
-                OrderPaymentLogType::ClientPayment
+                $validated['created_at'],
+                $validated['notices'],
+                $validated['amount'],
+                OrderPaymentLogTypeEnum::CLIENT_PAYMENT
             );
 
             return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
