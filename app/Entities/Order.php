@@ -635,11 +635,6 @@ class Order extends Model implements Transformable
         return $this->hasMany(OrderAllegroCommission::class);
     }
 
-    public function commission()
-    {
-        return $this->detailedCommissions()->sum('amount');
-    }
-
     public static function getLastOrder()
     {
         return Order::orderBy('id', 'desc')->first()->id;
