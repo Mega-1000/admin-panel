@@ -911,16 +911,26 @@
                             Ilość wszystkich: {{ $quantityAll }} <br/>
                         </td>
                         <td>
-                            <form action="{{ route('product_stock_packets.assign', ['orderItemId' => $item->id]) }}"></form>
-                            <div class="form-group">
-                                <label for="packets">@lang('product_stock_packets.form.choose_packet')</label>
-                                <select class="form-control" id="packets" name="packet">
-                                    @foreach($item->product->stock->packets as $packet)
-                                        <option value="{{ $packet->id }}">{{ $packet->packet_name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <button class="btn btn-success">Użyj wybranego pakietu</button>
+                            @if(!$item->packet)
+                                <div class="form-group">
+                                    <label for="packets">@lang('product_stock_packets.form.choose_packet')</label>
+                                    @if($item->product->stock->packets->count() > 0)
+                                        <select class="form-control" id="packets" name="packet">
+                                            @foreach($item->product->stock->packets as $packet)
+                                                <option value="{{ $packet->id }}">{{ $packet->packet_name }}</option>
+                                            @endforeach
+                                        </select>
+                                    @else
+                                        <h4>@lang('product_stock_packets.no_packets')</h4>
+                                    @endif
+                                </div>
+                                <button class="btn btn-success" data-orderItemId="{{ $item->id }}" id="assignPacketSubmit">Użyj wybranego pakietu</button>
+                            @else
+                                <div class="form-group">
+                                    @lang('product_stock_packets.currentPacket'): <b>{{ $item->packet->packet_name }}</b>
+                                </div>
+                                <button class="btn btn-danger" data-orderItemId="{{ $item->id }}" id="retainPacketSubmit">Usuń wybrany pakiet</button>
+                            @endif
                         </td>
                     </tr>
                     <tr class="row-{{$item->id}}">
@@ -4596,6 +4606,26 @@
 
                 });
             });
+        });
+
+        $('#assignPacketSubmit').on('click', () => {
+            let url = '{{ route('product_stock_packets.assign', ['orderItemId' => ':id']) }}';
+            url = url.replace(':id', $('#assignPacketSubmit').attr('data-orderItemId'));
+            $.ajax({
+                method: 'POST',
+                url: url,
+                data: {
+                    packet: $('#packets').val(),
+                }
+            })
+        });
+        $('#retainPacketSubmit').on('click', () => {
+            let url = '{{ route('product_stock_packets.retain', ['orderItemId' => ':id']) }}';
+            url = url.replace(':id', $('#retainPacketSubmit').attr('data-orderItemId'));
+            $.ajax({
+                method: 'POST',
+                url: url
+            })
         });
     </script>
 

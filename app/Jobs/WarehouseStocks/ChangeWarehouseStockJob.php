@@ -81,29 +81,28 @@ class ChangeWarehouseStockJob extends Job
             if(!empty($productStockLog)) {
                 return response()->json(['error' => 'exists']);
             }
-            $productStock = $product->stock;
-            $productStockRepository->update([
-                'quantity' => $productStock->quantity - $item->quantity,
-            ], $productStock->id);
+            if(!$item->packet) {
+                $productStock = $product->stock;
+                $productStockRepository->update([
+                    'quantity' => $productStock->quantity - $item->quantity,
+                ], $productStock->id);
 
+                $productStockPosition = $product->stock->position->first();
+                $productStockPositionRepository->update([
+                    'position_quantity' => $productStockPosition->position_quantity - $item->quantity
+                ], $productStockPosition->id);
 
-            $productStockPosition = $product->stock->position->first();
-            $productStockPositionRepository->update([
-                'position_quantity' => $productStockPosition->position_quantity - $item->quantity
-            ], $productStockPosition->id);
-
-            $productStockLogRepository->create([
-                'product_stock_id' => $productStock->id,
-                'product_stock_position_id' => $productStockPosition->id,
-                'action' => 'DELETE',
-                'quantity' => $item->quantity,
-                'order_id' => $this->orderId,
-                'user_id' => Auth::id(),
-                'created_at' => Carbon::now(),
-                'updated_at' => Carbon::now()
-            ]);
+                $productStockLogRepository->create([
+                    'product_stock_id' => $productStock->id,
+                    'product_stock_position_id' => $productStockPosition->id,
+                    'action' => 'DELETE',
+                    'quantity' => $item->quantity,
+                    'order_id' => $this->orderId,
+                    'user_id' => Auth::id(),
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ]);
+            }
         }
-
-
     }
 }

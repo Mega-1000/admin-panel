@@ -5,7 +5,13 @@
                 style="width:70px"/></td>
     <td style="width: 70%;"><span
                 style="font-size:14px; font-weight:bold;">{{ $item->name }}</span><br/>symbol: {{ $item->symbol }}
-        <br/>Ilość: <span style="font-size: 1.5em; font-weight: bold;">{{ $quantity }} {{ $item->packing->calciation_unit }}</span><br/></td>
+        <br/>Ilość: <span class="quantity">{{ $quantity }} {{ $item->packing->calciation_unit }}</span><br/>
+        @if($orderItem->packet)
+            Pobrane z pakietu {{ $orderItem->packet->packet_name }}: <span class="quantity">{{ $orderItem->packet->packet_product_quantity }}</span>
+            <br>
+            Pozostało do wydania poza pakietem: <span class="quantity">{{ $quantity - $orderItem->packet->packet_product_quantity }}</span>
+        @endif
+    </td>
     @if(isset($showPosition) && $showPosition)
         <td style="width: 20%;">
             ILOŚĆ NA STANIE: {{ $item->stock->quantity }} <br/>

@@ -56,7 +56,7 @@ class ProductStock extends Model implements Transformable
 
     public function packets(): HasMany
     {
-        return $this->hasMany(ProductStockPacket::class);
+        return $this->hasMany(ProductStockPacket::class)->where('packet_quantity', '>', 0);
     }
 
     public $customColumnsVisibilities = [

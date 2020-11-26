@@ -2,6 +2,9 @@
 return [
     'packet_list' => 'Lista pakietów',
     'edit' => 'Edycja pakietu',
+    'packet_assign' > 'Pakiet przypisany do przedmiotu',
+    'currentPacket' => 'Obecnie używany pakiet',
+    'no_packets' => 'Brak pakietów dla produktu',
     'table' => [
         'id' => 'ID',
         'name' => 'Nazwa pakietu',
@@ -9,7 +12,7 @@ return [
         'product_packet_quantity' => 'Ilość produktu w pakiecie',
         'actions' => 'Akcje',
         'packet_list' => 'Lista pakietów',
-        'packet_create' => 'Stwórz pakiet'
+        'packet_create' => 'Stwórz pakiet',
     ],
     'form' => [
         'choose_packet' => 'Wybierz pakiet',
@@ -39,7 +42,7 @@ return [
             'stocks' => 'Stan magazynowy',
             'positions' => 'Pozycje w magazynie',
             'logs' => 'Historia zmian',
-            'position_create' => 'Dodaj pozycję w magazynie'
+            'position_create' => 'Dodaj pozycję w magazynie',
         ],
     ]
 ];

@@ -19,6 +19,11 @@
             font: 10px Arial, Helvetica, sans-serif;
         }
 
+        .quantity {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
     </style>
 </head>
 <body>

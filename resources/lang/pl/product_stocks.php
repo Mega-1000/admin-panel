@@ -77,13 +77,13 @@ return [
             'stocks' => 'Stan magazynowy',
             'positions' => 'Pozycje w magazynie',
             'logs' => 'Historia zmian',
-            'position_create' => 'Dodaj pozycję w magazynie'
+            'position_create' => 'Dodaj pozycję w magazynie',
         ],
     ],
     'message' => [
         'packet_store' => 'Pakiet produktu został pomyślnie utworzony.',
         'change_status' => 'Status produktu został pomyślnie zaktualizowany',
         'update' => 'Stan magazynowy produktu został pomyślnie zaktualizowany',
-        'error_quantity' => 'Stan magazynowy danej pozycji nie może być niższy niż 0'
+        'error_quantity' => 'Stan magazynowy danej pozycji nie może być niższy niż 0',
     ]
 ];

@@ -15,10 +15,6 @@ use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-/**
- * Class ProductStocksController
- * @package App\Http\Controllers
- */
 class ProductStocksController extends Controller
 {
     /**
@@ -42,13 +38,6 @@ class ProductStocksController extends Controller
     protected $productStockLogRepository;
 
 
-    /**
-     * ProductStocksController constructor.
-     * @param ProductStockRepository $repository
-     * @param ProductRepository $productRepository
-     * @param ProductStockPositionRepository $productStockPositionRepository
-     * @param ProductStockLogRepository $productStockLogRepository
-     */
     public function __construct(
         ProductStockRepository $repository,
         ProductRepository $productRepository,

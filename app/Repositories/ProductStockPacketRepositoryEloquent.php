@@ -1,4 +1,4 @@
-<?php
+<?php declare(string_types=1);
 
 namespace App\Repositories;
 
@@ -6,11 +6,6 @@ use App\Entities\ProductStockPacket;
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
 
-/**
- * Class CategoryRepositoryEloquent.
- *
- * @package namespace App\Repositories;
- */
 class ProductStockPacketRepositoryEloquent extends BaseRepository implements ProductStockPacketRepository
 {
     public function model(): string
