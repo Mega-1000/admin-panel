@@ -2809,12 +2809,12 @@
                     if (info.view.type !== 'timeGridWeek' && info.view.type !== 'dayGridMonth') {
                         $('#addNewTask').modal();
                         const startDate = new Date(info.dateStr);
-                        let startMinutes = startDate.getMinutes();
+                        let startMinutes = startDate.getUTCMinutes();
                         if (startMinutes < 10) {
                             startMinutes = '0' + startMinutes;
                         }
 
-                        let dateTime = startDate.getFullYear() + '-' + ('0' + (startDate.getUTCMonth() + 1)).slice(-2) + '-' + startDate.getUTCDate() + ' ' + startDate.getUTCHours() + ':' + startMinutes;
+                        let dateTime = startDate.getUTCFullYear() + '-' + ('0' + (startDate.getUTCMonth() + 1)).slice(-2) + '-' + startDate.getUTCDate() + ' ' + startDate.getUTCHours() + ':' + startMinutes;
                         let warehouse = null;
                         if ($('#warehouseSelect').is(':selected')) {
                             warehouse = $('#warehouseSelect').val();
@@ -2912,29 +2912,29 @@
                             event.preventDefault();
                             let start = new Date($("#start_new").val());
                             let end = new Date(start.getTime() + event.target.value * 60000);
-                            let startMinutes = end.getMinutes();
+                            let startMinutes = end.getUTCMinutes();
                             if (startMinutes < 10) {
                                 startMinutes = '0' + startMinutes;
                             }
-                            let dateTime = end.getFullYear() + '-' + ('0' + (end.getMonth() + 1)).slice(-2) + '-' + end.getUTCDate() + ' ' + end.getHours() + ':' + startMinutes;
+                            let dateTime = end.getUTCFullYear() + '-' + ('0' + (end.getUTCMonth() + 1)).slice(-2) + '-' + end.getUTCDate() + ' ' + end.getUTCHours() + ':' + startMinutes;
                             $(".time-to-finish-task").val(dateTime);
                         })
                         $('#name_new').val($('input[name="order_id"]').val() + ' - ' + startDate.getUTCDate() + '-' + ('0' + (startDate.getUTCMonth() + 1)).slice(-2) + ' - ' + $('#warehouse_value').val());
                         $('#name_new').change(function () {
                             var dateObj = new Date($('#start_new').val());
-                            var month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
+                            var month = ('0' + (dateObj.getUTCMonth() + 1)).slice(-2);
                             var day = dateObj.getUTCDate();
                             $('#name_new').val($('input[name="order_id"]').val() + ' - ' + day + '-' + month + ' - ' + $('#warehouse_value').val());
                         });
                         $(document).on('focusout', '.default-date-time-picker-now', function () {
                             var dateObj = new Date($('#start_new').val());
-                            var month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
+                            var month = ('0' + (dateObj.getUTCMonth() + 1)).slice(-2);
                             var day = dateObj.getUTCDate();
                             $('#name_new').val($('input[name="order_id"]').val() + ' - ' + day + '-' + month + ' - ' + $('#warehouse_value').val());
                         });
                         $('#warehouse_value').change(function () {
                             var dateObj = new Date($('#start_new').val());
-                            var month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
+                            var month = ('0' + (dateObj.getUTCMonth() + 1)).slice(-2);
                             var day = dateObj.getUTCDate();
                             $('#name_new').val($('input[name="order_id"]').val() + ' - ' + day + '-' + month + ' - ' + $('#warehouse_value').val());
                         });
@@ -2960,20 +2960,19 @@
                             $('#acceptTask').modal();
                             $.each(data, function (index, value) {
                                 if (value.status === 'WAITING_FOR_ACCEPT') {
-                                    let startDate = new Date(value.start);
-                                    let firstDate = new Date(startDate.setHours(startDate.getHours() - 1));
-                                    let startMinutes = firstDate.getMinutes();
+                                    let firstDate = new Date(value.start);
+                                    let startMinutes = firstDate.getUTCMinutes();
                                     if (startMinutes < 10) {
                                         startMinutes = '0' + startMinutes;
                                     }
-                                    let dateTime = firstDate.getFullYear() + '-' + ('0' + (firstDate.getMonth() + 1)).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getHours() + ':' + startMinutes;
+                                    let dateTime = firstDate.getUTCFullYear() + '-' + ('0' + (firstDate.getUTCMonth() + 1)).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getUTCHours() + ':' + startMinutes;
                                     let newDate = new Date(value.end);
-                                    let endDate = new Date(newDate.setHours(newDate.getHours() - 1));
-                                    let minutes = endDate.getMinutes();
+                                    let endDate = new Date(newDate.setUTCHours(newDate.getUTCHours() - 1));
+                                    let minutes = endDate.getUTCMinutes();
                                     if (minutes < 10) {
                                         minutes = '0' + minutes;
                                     }
-                                    let dateTimeEnd = endDate.getFullYear() + '-' + ('0' + (endDate.getMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getHours() + ':' + minutes;
+                                    let dateTimeEnd = endDate.getUTCFullYear() + '-' + ('0' + (endDate.getUTCMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getUTCHours() + ':' + minutes;
                                     let html = '<tr class="appendRow">';
                                     html += '<td>' + value.id + '</td>';
                                     html += '<td>' + value.title + '</td>';
@@ -3014,36 +3013,22 @@
 
                 },
                 eventMouseEnter: function (info) {
-                    let startDate = new Date(info.event.start);
-                    let firstDate = new Date(startDate.setHours(startDate.getHours() - 1));
-                    let startMinutes = firstDate.getMinutes();
-                    if (startMinutes < 10) {
-                        startMinutes = '0' + startMinutes;
-                    }
-                    let newDate = new Date(info.event.end);
-                    let endDate = new Date(newDate.setHours(newDate.getHours() - 1));
-                    let minutes = endDate.getMinutes();
-                    if (minutes < 10) {
-                        minutes = '0' + minutes;
-                    }
-
                     $(info.el).attr('title', info.event.extendedProps.text);
                 },
                 eventDrop: function (info) {
-                    let startDate = new Date(info.event.start);
-                    let firstDate = new Date(startDate.setHours(startDate.getHours() - 1));
-                    let startMinutes = firstDate.getMinutes();
+                    let firstDate = new Date(info.event.start);
+                    let startMinutes = firstDate.getUTCMinutes();
                     if (startMinutes < 10) {
                         startMinutes = '0' + startMinutes;
                     }
-                    let dateTime = firstDate.getFullYear() + '-' + ('0' + (firstDate.getMonth() + 1)).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getHours() + ':' + startMinutes;
+                    let dateTime = firstDate.getUTCFullYear() + '-' + ('0' + (firstDate.getUTCMonth() + 1)).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getUTCHours() + ':' + startMinutes;
                     let newDate = new Date(info.event.end);
-                    let endDate = new Date(newDate.setHours(newDate.getHours() - 1));
-                    let minutes = endDate.getMinutes();
+                    let endDate = new Date(newDate.setUTCHours(newDate.getUTCHours() - 1));
+                    let minutes = endDate.getUTCMinutes();
                     if (minutes < 10) {
                         minutes = '0' + minutes;
                     }
-                    let dateTimeEnd = endDate.getFullYear() + '-' + ('0' + (endDate.getMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getHours() + ':' + minutes;
+                    let dateTimeEnd = endDate.getUTCFullYear() + '-' + ('0' + (endDate.getUTCMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getUTCHours() + ':' + minutes;
                     $('input[name="view_type"]').val(info.view.type);
                     $('input[name="active_start"]').val(info.view.activeStart);
                     $('#moveTaskForm').attr('action', '/admin/planning/tasks/' + info.event.id + '/moveTask');
@@ -3060,20 +3045,19 @@
                 },
                 eventResize: function (info) {
                     $('#editTask').modal();
-                    let startDate = new Date(info.event.start);
-                    let firstDate = new Date(startDate.setHours(startDate.getHours() - 1));
-                    let startMinutes = firstDate.getMinutes();
+                    let firstDate = new Date(info.event.start);
+                    let startMinutes = firstDate.getUTCMinutes();
                     if (startMinutes < 10) {
                         startMinutes = '0' + startMinutes;
                     }
-                    let dateTime = firstDate.getFullYear() + '-' + ('0' + (firstDate.getMonth() + 1)).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getHours() + ':' + startMinutes;
+                    let dateTime = firstDate.getUTCFullYear() + '-' + ('0' + (firstDate.getUTCMonth() + 1)).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getUTCHours() + ':' + startMinutes;
                     let newDate = new Date(info.event.end);
-                    let endDate = new Date(newDate.setHours(newDate.getHours() - 1));
-                    let minutes = endDate.getMinutes();
+                    let endDate = new Date(newDate.setUTCHours(newDate.getUTCHours() - 1));
+                    let minutes = endDate.getUTCMinutes();
                     if (minutes < 10) {
                         minutes = '0' + minutes;
                     }
-                    let dateTimeEnd = endDate.getFullYear() + '-' + ('0' + (endDate.getMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getHours() + ':' + minutes;
+                    let dateTimeEnd = endDate.getUTCFullYear() + '-' + ('0' + (endDate.getUTCMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getUTCHours() + ':' + minutes;
                     let warehouse = null;
                     if ($('#warehouseSelect').is(':selected')) {
                         warehouse = $('#warehouseSelect').val();

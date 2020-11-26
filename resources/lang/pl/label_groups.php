@@ -9,7 +9,8 @@ return [
         'created_at' => 'Utworzone w'
     ],
     'form' => [
-        'name' => 'Nazwa'
+        'name' => 'Nazwa',
+        'order' => 'Kolejność',
     ],
     'message' => [
         'store' => 'Grupa etykiet została dodana pomyślnie!',

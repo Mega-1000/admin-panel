@@ -318,7 +318,7 @@
                         @foreach($group as $label)
                             <option value="{{ $label->id }}"
                                     data-content="
-                                    <span class='order-label' style='color: {{$label->font_color}}; background-color: {{$label->color}}'>
+                                    <span class='order-label label__list' style='color: {{$label->font_color}}; background-color: {{$label->color}}'>
                                         <i class='{{$label->icon_name}}'></i>
                                     </span>
                                     {{ $label->name }}

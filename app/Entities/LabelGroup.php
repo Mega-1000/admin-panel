@@ -2,7 +2,9 @@
 
 namespace App\Entities;
 
+use App\Enums\LabelStatusEnum;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
@@ -26,14 +28,17 @@ class LabelGroup extends Model implements Transformable
      * @var array
      */
     protected $fillable = [
-        'name'
+        'name',
+        'order',
     ];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function labels()
+    public function labels() : HasMany
     {
         return $this->hasMany(Label::class);
+    }
+
+    public function activeLabels(): HasMany
+    {
+        return $this->hasMany(Label::class)->where('status', LabelStatusEnum::Active);
     }
 }
