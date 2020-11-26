@@ -21,10 +21,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
-/**
- * Class ProductStocksController
- * @package App\Http\Controllers
- */
 class ProductStockPacketsController extends Controller
 {
     /**
