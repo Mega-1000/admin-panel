@@ -639,4 +639,9 @@ class Order extends Model implements Transformable
     {
         return $this->detailedCommissions()->sum('amount');
     }
+
+    public static function getLastOrder()
+    {
+        return Order::orderBy('id', 'desc')->first()->id;
+    }
 }

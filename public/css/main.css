@@ -103,3 +103,11 @@
 .add-label {
     cursor: pointer;
 }
+
+#consultant_comment {
+    width: 70%;
+}
+
+.consultant__button--send {
+    display: inline-block;
+}

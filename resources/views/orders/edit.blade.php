@@ -79,350 +79,367 @@
         <div class="orders-general" id="general">
             <input type="hidden" value="{{Session::get('uri')}}" id="uri">
             {{ Session::forget('uri') }}
-            <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                <label for="value_of_items_gross">@lang('orders.form.order_id')</label>
-                <input type="text" class="form-control" id="order_id" name="order_id"
-                       value="{{ $order->id }}" disabled>
-            </div>
-            <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                <label for="employee">@lang('orders.form.employees')</label>
-                <select name="employee" id="employee" class="form-control">
-                    @if($order->employee_id == null)
-                        <option value="none" selected>Brak pracownika</option>
-                    @else
-                        <option value="none">Brak pracownika</option>
-                    @endif
-                    @foreach($users as $user)
-                        @if($user->id == $order->employee_id)
-                            <option value="{{ $user->id }}" selected>{{ $user->name }}
-                                - {{ $user->firstname }} {{ $user->lastname }}</option>
+            <div class="row">
+                <div class="form-group" style="width: 11%; float: left; padding: 5px;">
+                    <label for="value_of_items_gross">@lang('orders.form.order_id')</label>
+                    <input type="text" class="form-control" id="order_id" name="order_id"
+                           value="{{ $order->id }}" disabled>
+                </div>
+                <div class="form-group" style="width: 11%; float: left; padding: 5px;">
+                    <label for="employee">@lang('orders.form.employees')</label>
+                    <select name="employee" id="employee" class="form-control">
+                        @if($order->employee_id == null)
+                            <option value="none" selected>Brak pracownika</option>
                         @else
-                            <option value="{{ $user->id }}">{{ $user->name }}
-                                - {{ $user->firstname }} {{ $user->lastname }}</option>
+                            <option value="none">Brak pracownika</option>
                         @endif
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                <label for="customer_address.firstname">@lang('customers.table.firstname')</label>
-                <input type="text" class="form-control" id="customer_address.firstname"
-                       name="customer_address.firstname"
-                       value="{{ $customerInfo->firstname ?? '' }}" disabled>
-            </div>
-            <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                <label for="customer_address.lastname">@lang('customers.table.lastname')</label>
-                <input type="text" class="form-control" id="customer_address.firstname" name="customer_address.lastname"
-                       value="{{ $customerInfo->lastname ?? '' }}" disabled>
-            </div>
-            <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                <label for="customer_address.phone">@lang('customers.table.phone')</label>
-                <input type="text" class="form-control" id="customer_address.phone" name="customer_address.phone"
-                       value="{{ $customerInfo->phone ?? '' }}" disabled>
-            </div>
-            @foreach($selInvoices as $selInvoice)
+                        @foreach($users as $user)
+                            @if($user->id == $order->employee_id)
+                                <option value="{{ $user->id }}" selected>{{ $user->name }}
+                                    - {{ $user->firstname }} {{ $user->lastname }}</option>
+                            @else
+                                <option value="{{ $user->id }}">{{ $user->name }}
+                                    - {{ $user->firstname }} {{ $user->lastname }}</option>
+                            @endif
+                        @endforeach
+                    </select>
+                </div>
                 <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                    <label for="document_number">@lang('orders.form.document_number_sell')
-                        <a target="_blank" href="{{ route('invoices.getInvoice', ['id' => $selInvoice->id]) }}">plik</a>
-                    </label>
-                    <input disabled class="form-control" id="document_number_sell"
-                           value="{{$selInvoice->invoice_name}}">
+                    <label for="customer_address.firstname">@lang('customers.table.firstname')</label>
+                    <input type="text" class="form-control" id="customer_address.firstname"
+                           name="customer_address.firstname"
+                           value="{{ $customerInfo->firstname ?? '' }}" disabled>
                 </div>
-            @endforeach
-            @foreach($subiektInvoices as $subInvoice)
                 <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                    <label for="document_number">@lang('orders.form.document_number_sell_subiekt')
-                        <a target="_blank" href="{{ route('invoices.subiektInvoices', ['id' => $subInvoice->id]) }}">plik</a>
-                    </label>
-                    <input disabled class="form-control" id="document_number_sell"
-                           value="{{$subInvoice->gt_invoice_number}}">
+                    <label for="customer_address.lastname">@lang('customers.table.lastname')</label>
+                    <input type="text" class="form-control" id="customer_address.firstname" name="customer_address.lastname"
+                           value="{{ $customerInfo->lastname ?? '' }}" disabled>
                 </div>
-            @endforeach
-            <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                <label for="document_number">@lang('orders.form.document_number')</label>
-                <input class="form-control" id="document_number"
-                       name="document_number"
-                       value="{{ $order->document_number }}">
-            </div>
-            <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                <label for="warehouse_cost">@lang('orders.form.warehouse_cost')</label>
-                <input type="text" class="form-control priceChange" id="warehouse_cost" name="warehouse_cost"
-                       value="{{ $order->warehouse_cost }}">
-            </div>
-            <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                <label for="correction_amount">@lang('orders.form.correction_amount')</label>
-                <input type="text" class="form-control priceChange" id="correction_amount" name="correction_amount"
-                       value="{{ $order->correction_amount }}">
-            </div>
-            <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                <label for="correction_description">@lang('orders.form.correction_description')</label>
-                <input type="text" class="form-control" id="correction_description" name="correction_description"
-                       value="{{ $order->correction_description }}">
-            </div>
-            <div class="form-group" style="width: 30%; float: left; padding: 5px;">
-                <label for="status">@lang('orders.form.status')</label>
-                <select name="status" id="status" class="form-control">
-                    @foreach($statuses as $status)
-                        <option
-                            {{$order->status_id === $status->id ? 'selected="selected"' : ''}} value="{{ $status->id }}">{{ $status->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-check" style="width: 10%; margin-top: 10px; float: left; padding: 5px;">
-                <input type="checkbox" class="form-check-input" id="shouldBeSent" name="shouldBeSent">
-                <label class="form-check-label" for="shouldBeSent">Wysyłka maila</label>
-            </div>
-            <div class="form-group" style="width: 65%; float: left; padding: 5px;">
-                <label for="status">@lang('orders.form.last_status_update_date')</label> <br/>
-                {{$order->last_status_update_date}}
-            </div>
-            <div class="form-group" style="width: 10%; float: left; padding: 5px;">
-                <label for="profitInfo">@lang('orders.form.profit')</label>
-                <input type="text" class="form-control priceChange" id="profitInfo" disabled
-                       value="">
-            </div>
-            <div class="form-group" style="width: 15%; float: left; padding: 5px;">
-                <label for="totalPriceInfo">Suma zamówienia</label>
-                <input type="text" class="form-control" id="orderValueSum" name="orderValueSum"
-                       value="" disabled>
-            </div>
-            <div class="form-group" style="width: 15%; float: left; padding: 5px;">
-                <label for="value_of_items_gross">@lang('orders.form.value_of_items_gross')</label>
-                <input type="text" class="form-control priceChange sumChange" id="totalPriceInfo" disabled=""
-                       name="totalPriceInfo">
-
-            </div>
-            <div class="form-group" style="width: 15%; float: left; padding: 5px;">
-                <label for="additional_service_cost">@lang('orders.form.additional_service_cost')</label>
-                <input type="text" class="form-control priceChange sumChange" id="additional_service_cost"
-                       name="additional_service_cost"
-                       value="{{ $order->additional_service_cost }}">
-            </div>
-            <div class="form-group" style="width: 15%; float: left; padding: 5px;">
-                <label for="packing_warehouse_cost">@lang('orders.form.packing_warehouse_cost')</label>
-                <input class="form-control priceChange sumChange" id="additional_cash_on_delivery_cost"
-                       name="additional_cash_on_delivery_cost"
-                       value="{{ $order->additional_cash_on_delivery_cost }}">
-            </div>
-            <div class="form-group" style="width: 15%; float: left; padding: 5px;">
-                <label for="shipment_price_for_client">@lang('orders.form.shipment_price_for_client')</label>
-                <input type="text" class="form-control sumChange" id="shipment_price_for_client"
-                       name="shipment_price_for_client"
-                       value="{{ $order->shipment_price_for_client ?? '' }}">
-            </div>
-            <div class="form-group" style="width: 15%; float: left; padding: 5px;">
-                <label
-                    for="shipment_price_for_client_automatic">@lang('orders.form.shipment_price_for_client_automatic')</label>
-                <input disabled type="text" class="form-control sumChange" id="shipment_price_for_client_automatic"
-                       name="shipment_price_for_client_automatic"
-                       value="{{ $clientTotalCost ?? '' }}">
-            </div>
-            <div class="form-group" style="width: 15%; float: left; padding: 5px;">
-                <label for="shipment_price_for_us">@lang('orders.form.shipment_price_for_us')</label>
-                <input type="text" class="form-control priceChange sumChange" id="shipment_price_for_us"
-                       name="shipment_price_for_us"
-                       value="{{ $order->shipment_price_for_us ?? '' }}">
-                <label
-                    for="shipment_price_for_us_automatic">@lang('orders.form.shipment_price_for_us_automatic')</label>
-                <input disabled type="text" class="form-control priceChange sumChange"
-                       id="shipment_price_for_us_automatic"
-                       name="shipment_price_for_us_automatic"
-                       value="{{ $ourTotalCost ?? '' }}">
-            </div>
-            <div class="form-group" style="width: 15%; float: left; padding: 5px;">
-                <label for="proposed_payment">Proponowana zaliczka brutto</label>
-                <input type="text" class="form-control priceChange" id="proposed_payment"
-                       value="{{ $order->proposed_payment ?? 500 }}" name="proposed_payment">
-            </div>
-            <div class="form-group" style="width: 15%; float: left; padding: 5px;">
-                <label for="payments">Zaliczka zaksięgowana brutto</label>
-                <input type="text" class="form-control priceChange" id="payments"
-                       value="{{ $order->bookedPayments()->sum('amount') }}" name="payments" disabled>
-            </div>
-            <div class="form-group" style="width: 15%; float: left; padding: 5px;">
-                <label for="left_to_pay_on_delivery">Pozostało do zapłaty przed rozład.</label>
-                <input type="text" class="form-control priceChange" id="left_to_pay_on_delivery" value=""
-                       name="left_to_pay_on_delivery" disabled>
-            </div>
-            <div class="form-group" style="width: 15%; float: left; padding: 5px;">
-                <label for="delivery_warehouse">@lang('orders.form.delivery_warehouse')</label>
-                <input type="text" class="form-control" id="delivery_warehouse" name="delivery_warehouse"
-                       value="{{ $warehouse->symbol ?? '' }}">
-            </div>
-            <div class="form-group" style="width: 15%; float: left; padding: 5px;">
-                <label for="weightInfo">Waga</label>
-                <input type="text" class="form-control" id="weightInfo" disabled="" name="weightInfo">
-            </div>
-            <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                <label for="production_date">@lang('orders.form.production_date')</label>
-                <input disabled type="text" class="form-control default-date-time-picker-now" id="production_date"
-                       name="production_date"
-                       value="{{ $order->taskSchedule->first()->taskTime->date_start ?? '' }}">
-            </div>
-            <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                <label for="shipment_date">@lang('orders.form.shipment_date')</label>
-                <input type="text" class="form-control default-date-picker-now" id="shipment_date" name="shipment_date"
-                       value="{{ $order->shipment_date }}">
-            </div>
-            <div class="form-group" style="width: 15%; float: left; padding: 5px;">
-                <label for="allegro_transaction_id">@lang('orders.form.allegro_transaction_id')</label>
-                <input type="text" class="form-control" id="allegro_transaction_id" name="allegro_transaction_id"
-                       value="{{ $order->allegro_transaction_id ?? '' }}">
-            </div>
-            @if($order->cash_on_dalivery_amount > 0)
+                <div class="form-group" style="width: 11%; float: left; padding: 5px;">
+                    <label for="customer_address.phone">@lang('customers.table.phone')</label>
+                    <input type="text" class="form-control" id="customer_address.phone" name="customer_address.phone"
+                           value="{{ $customerInfo->phone ?? '' }}" disabled>
+                </div>
+                @foreach($selInvoices as $selInvoice)
+                    <div class="form-group" style="width: 11%; float: left; padding: 5px;">
+                        <label for="document_number">@lang('orders.form.document_number_sell')
+                            <a target="_blank" href="{{ route('invoices.getInvoice', ['id' => $selInvoice->id]) }}">plik</a>
+                        </label>
+                        <input disabled class="form-control" id="document_number_sell"
+                               value="{{$selInvoice->invoice_name}}">
+                    </div>
+                @endforeach
+                @foreach($subiektInvoices as $subInvoice)
+                    <div class="form-group" style="width: 11%; float: left; padding: 5px;">
+                        <label for="document_number">@lang('orders.form.document_number_sell_subiekt')
+                            <a target="_blank" href="{{ route('invoices.subiektInvoices', ['id' => $subInvoice->id]) }}">plik</a>
+                        </label>
+                        <input disabled class="form-control" id="document_number_sell"
+                               value="{{$subInvoice->gt_invoice_number}}">
+                    </div>
+                @endforeach
+                <div class="form-group" style="width: 11%; float: left; padding: 5px;">
+                    <label for="document_number">@lang('orders.form.document_number')</label>
+                    <input class="form-control" id="document_number"
+                           name="document_number"
+                           value="{{ $order->document_number }}">
+                </div>
+                <div class="form-group" style="width: 11%; float: left; padding: 5px;">
+                    <label for="warehouse_cost">@lang('orders.form.warehouse_cost')</label>
+                    <input type="text" class="form-control priceChange" id="warehouse_cost" name="warehouse_cost"
+                           value="{{ $order->warehouse_cost }}">
+                </div>
+                <div class="form-group" style="width: 11%; float: left; padding: 5px;">
+                    <label for="correction_amount">@lang('orders.form.correction_amount')</label>
+                    <input type="text" class="form-control priceChange" id="correction_amount" name="correction_amount"
+                           value="{{ $order->correction_amount }}">
+                </div>
+                <div class="form-group" style="width: 11%; float: left; padding: 5px;">
+                    <label for="correction_description">@lang('orders.form.correction_description')</label>
+                    <input type="text" class="form-control" id="correction_description" name="correction_description"
+                           value="{{ $order->correction_description }}">
+                </div>
+                <div class="form-group" style="width: 30%; float: left; padding: 5px;">
+                    <label for="status">@lang('orders.form.status')</label>
+                    <select name="status" id="status" class="form-control">
+                        @foreach($statuses as $status)
+                            <option
+                                {{$order->status_id === $status->id ? 'selected="selected"' : ''}} value="{{ $status->id }}">{{ $status->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-check" style="width: 10%; margin-top: 10px; float: left; padding: 5px;">
+                    <input type="checkbox" class="form-check-input" id="shouldBeSent" name="shouldBeSent">
+                    <label class="form-check-label" for="shouldBeSent">Wysyłka maila</label>
+                </div>
+                <div class="form-group" style="width: 65%; float: left; padding: 5px;">
+                    <label for="status">@lang('orders.form.last_status_update_date')</label> <br/>
+                    {{$order->last_status_update_date}}
+                </div>
+                <div class="form-group" style="width: 10%; float: left; padding: 5px;">
+                    <label for="profitInfo">@lang('orders.form.profit')</label>
+                    <input type="text" class="form-control priceChange" id="profitInfo" disabled
+                           value="">
+                </div>
                 <div class="form-group" style="width: 15%; float: left; padding: 5px;">
-                    <label for="packing_warehouse_cost">@lang('orders.form.cash_on_delivery')</label>
-                    <input type="text" class="form-control" id="cash_on_delivery" name="cash_on_delivery"
-                           value="@lang('orders.form.true')" disabled>
+                    <label for="totalPriceInfo">Suma zamówienia</label>
+                    <input type="text" class="form-control" id="orderValueSum" name="orderValueSum"
+                           value="" disabled>
                 </div>
-            @else
                 <div class="form-group" style="width: 15%; float: left; padding: 5px;">
-                    <label for="packing_warehouse_cost">@lang('orders.form.cash_on_delivery')</label>
-                    <input type="text" class="form-control" id="cash_on_delivery" name="cash_on_delivery"
-                           value="@lang('orders.form.false')" disabled>
-                </div>
-            @endif
-            <div class="form-group" style="width: 15%; float: left; padding: 5px;">
-                <label for="customer.nick_allegro">@lang('orders.form.nick_allegro')</label>
-                <input type="text" class="form-control" id="customer.nick_allegro" name="customer.nick_allegro"
-                       value="{{ $order->customer->nick_allegro ?? ''}}" disabled>
-            </div>
-            <div class="form-group" style="width: 25%; float: left; padding: 5px;">
-                <label for="warehouse_value">@lang('orders.form.warehouse_value')</label>
-                <input type="number" class="form-control" id="warehouse_value" name="warehouse_value"
-                       value="{{ $order->warehouse_value ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                <label for="initial_sending_date_client">@lang('orders.form.initial_sending_date_client')</label>
-                <input type="text" class="form-control default-date-picker-now" id="initial_sending_date_client"
-                       name="initial_sending_date_client"
-                       value="{{ $order->initial_sending_date_client ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                <label
-                    for="initial_sending_date_consultant">@lang('orders.form.initial_sending_date_consultant')</label>
-                <input type="text" class="form-control default-date-picker-now" id="initial_sending_date_consultant"
-                       name="initial_sending_date_consultant"
-                       value="{{ $order->initial_sending_date_consultant ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                <label for="initial_sending_date_magazine">@lang('orders.form.initial_sending_date_magazine')</label>
-                <input type="text" class="form-control default-date-picker-now" id="initial_sending_date_magazine"
-                       name="initial_sending_date_magazine"
-                       value="{{ $order->initial_sending_date_magazine ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                <label for="confirmed_sending_date_con_mag">@lang('orders.form.confirmed_sending_date_con_mag')</label>
-                <input type="text" class="form-control default-date-picker-now" id="confirmed_sending_date_con_mag"
-                       name="confirmed_sending_date_con_mag"
-                       value="{{ $order->confirmed_sending_date_con_mag ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                <label for="initial_pickup_date_client">@lang('orders.form.initial_pickup_date_client')</label>
-                <input type="text" class="form-control default-date-time-picker-now" id="initial_pickup_date_client"
-                       name="initial_pickup_date_client"
-                       value="{{ $order->initial_pickup_date_client ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                <label for="confirmed_pickup_date_client">@lang('orders.form.confirmed_pickup_date_client')</label>
-                <input type="text" class="form-control default-date-time-picker-now" id="confirmed_pickup_date_client"
-                       name="confirmed_pickup_date_client"
-                       value="{{ $order->confirmed_pickup_date_client ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                <label for="confirmed_pickup_date_con_mag">@lang('orders.form.confirmed_pickup_date_con_mag')</label>
-                <input type="text" class="form-control default-date-time-picker-now" id="confirmed_pickup_date_con_mag"
-                       name="confirmed_pickup_date_con_mag"
-                       value="{{ $order->confirmed_pickup_date_con_mag ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                <label for="initial_delivery_date_con_mag">@lang('orders.form.initial_delivery_date_con_mag')</label>
-                <input type="text" class="form-control default-date-time-picker-now" id="initial_delivery_date_con_mag"
-                       name="initial_delivery_date_con_mag"
-                       value="{{ $order->initial_delivery_date_con_mag ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                <label for="confirmed_delivery_date">@lang('orders.form.confirmed_delivery_date')</label><br><br>
-                <input type="text" class="form-control default-date-time-picker-now" id="confirmed_delivery_date"
-                       name="confirmed_delivery_date"
-                       value="{{ $order->confirmed_delivery_date ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 25%; float: left; padding: 5px;">
-                <label for="consultant_value">@lang('orders.form.consultant_value')</label>
-                <input type="number" class="form-control" id="consultant_value" name="consultant_value"
-                       value="{{ $order->consultant_value ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 25%; float: left; padding: 5px;">
-                <label for="refund_id">@lang('orders.form.refund_number')</label>
-                <input type="text" class="form-control" id="refund_id" name="refund_id"
-                       value="{{ $order->refund_id ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 25%; float: left; padding: 5px;">
-                <label for="to_refund">@lang('orders.form.to_refund')</label>
-                <input disabled type="number" class="form-control" id="to_refund" name="to_refund"
-                       value="{{ $order->to_refund ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 25%; float: left; padding: 5px;">
-                <label for="refunded">@lang('orders.form.refunded')</label>
-                <input step="0.01" type="number" class="form-control" id="refunded" name="refunded"
-                       value="{{ $order->refunded ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 25%; float: left; padding: 5px;">
-                <div>
+                    <label for="value_of_items_gross">@lang('orders.form.value_of_items_gross')</label>
+                    <input type="text" class="form-control priceChange sumChange" id="totalPriceInfo" disabled=""
+                           name="totalPriceInfo">
 
-                    @include('orders.labels', ['title' => __('orders.form.warehouse_notice'), 'user_type' => \App\Enums\UserRole::Storekeeper])
-                    <textarea rows="5" cols="40" class="form-control" id="warehouse_notice"
-                              name="warehouse_notice" disabled>{{ $order->warehouse_notice ?? ''}}</textarea>
-                    <div class="flex-input">
-                        <input type="text" class="form-control scrollable-notice" placeholder="@lang('orders.form.warehouse_notice')"
-                               id="{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}" name="warehouse_notice"/>
-                        <div class="input-group-append">
-                            <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}')"
-                                    class="btn btn-success" type="button">wyślij
-                            </button>
+                </div>
+                <div class="form-group" style="width: 15%; float: left; padding: 5px;">
+                    <label for="additional_service_cost">@lang('orders.form.additional_service_cost')</label>
+                    <input type="text" class="form-control priceChange sumChange" id="additional_service_cost"
+                           name="additional_service_cost"
+                           value="{{ $order->additional_service_cost }}">
+                </div>
+                <div class="form-group" style="width: 15%; float: left; padding: 5px;">
+                    <label for="packing_warehouse_cost">@lang('orders.form.packing_warehouse_cost')</label>
+                    <input class="form-control priceChange sumChange" id="additional_cash_on_delivery_cost"
+                           name="additional_cash_on_delivery_cost"
+                           value="{{ $order->additional_cash_on_delivery_cost }}">
+                </div>
+                <div class="form-group" style="width: 15%; float: left; padding: 5px;">
+                    <label for="shipment_price_for_client">@lang('orders.form.shipment_price_for_client')</label>
+                    <input type="text" class="form-control sumChange" id="shipment_price_for_client"
+                           name="shipment_price_for_client"
+                           value="{{ $order->shipment_price_for_client ?? '' }}">
+                </div>
+                <div class="form-group" style="width: 15%; float: left; padding: 5px;">
+                    <label
+                        for="shipment_price_for_client_automatic">@lang('orders.form.shipment_price_for_client_automatic')</label>
+                    <input disabled type="text" class="form-control sumChange" id="shipment_price_for_client_automatic"
+                           name="shipment_price_for_client_automatic"
+                           value="{{ $clientTotalCost ?? '' }}">
+                </div>
+                <div class="form-group" style="width: 15%; float: left; padding: 5px;">
+                    <label for="shipment_price_for_us">@lang('orders.form.shipment_price_for_us')</label>
+                    <input type="text" class="form-control priceChange sumChange" id="shipment_price_for_us"
+                           name="shipment_price_for_us"
+                           value="{{ $order->shipment_price_for_us ?? '' }}">
+                    <label
+                        for="shipment_price_for_us_automatic">@lang('orders.form.shipment_price_for_us_automatic')</label>
+                    <input disabled type="text" class="form-control priceChange sumChange"
+                           id="shipment_price_for_us_automatic"
+                           name="shipment_price_for_us_automatic"
+                           value="{{ $ourTotalCost ?? '' }}">
+                </div>
+                <div class="form-group" style="width: 15%; float: left; padding: 5px;">
+                    <label for="proposed_payment">Proponowana zaliczka brutto</label>
+                    <input type="text" class="form-control priceChange" id="proposed_payment"
+                           value="{{ $order->proposed_payment ?? 500 }}" name="proposed_payment">
+                </div>
+                <div class="form-group" style="width: 15%; float: left; padding: 5px;">
+                    <label for="payments">Zaliczka zaksięgowana brutto</label>
+                    <input type="text" class="form-control priceChange" id="payments"
+                           value="{{ $order->bookedPayments()->sum('amount') }}" name="payments" disabled>
+                </div>
+                <div class="form-group" style="width: 15%; float: left; padding: 5px;">
+                    <label for="left_to_pay_on_delivery">Pozostało do zapłaty przed rozład.</label>
+                    <input type="text" class="form-control priceChange" id="left_to_pay_on_delivery" value=""
+                           name="left_to_pay_on_delivery" disabled>
+                </div>
+                <div class="form-group" style="width: 15%; float: left; padding: 5px;">
+                    <label for="delivery_warehouse">@lang('orders.form.delivery_warehouse')</label>
+                    <input type="text" class="form-control" id="delivery_warehouse" name="delivery_warehouse"
+                           value="{{ $warehouse->symbol ?? '' }}">
+                </div>
+                <div class="form-group" style="width: 15%; float: left; padding: 5px;">
+                    <label for="weightInfo">Waga</label>
+                    <input type="text" class="form-control" id="weightInfo" disabled="" name="weightInfo">
+                </div>
+                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
+                    <label for="production_date">@lang('orders.form.production_date')</label>
+                    <input disabled type="text" class="form-control default-date-time-picker-now" id="production_date"
+                           name="production_date"
+                           value="{{ $order->taskSchedule->first()->taskTime->date_start ?? '' }}">
+                </div>
+                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
+                    <label for="shipment_date">@lang('orders.form.shipment_date')</label>
+                    <input type="text" class="form-control default-date-picker-now" id="shipment_date" name="shipment_date"
+                           value="{{ $order->shipment_date }}">
+                </div>
+                <div class="form-group" style="width: 15%; float: left; padding: 5px;">
+                    <label for="allegro_transaction_id">@lang('orders.form.allegro_transaction_id')</label>
+                    <input type="text" class="form-control" id="allegro_transaction_id" name="allegro_transaction_id"
+                           value="{{ $order->allegro_transaction_id ?? '' }}">
+                </div>
+                @if($order->cash_on_dalivery_amount > 0)
+                    <div class="form-group" style="width: 15%; float: left; padding: 5px;">
+                        <label for="packing_warehouse_cost">@lang('orders.form.cash_on_delivery')</label>
+                        <input type="text" class="form-control" id="cash_on_delivery" name="cash_on_delivery"
+                               value="@lang('orders.form.true')" disabled>
+                    </div>
+                @else
+                    <div class="form-group" style="width: 15%; float: left; padding: 5px;">
+                        <label for="packing_warehouse_cost">@lang('orders.form.cash_on_delivery')</label>
+                        <input type="text" class="form-control" id="cash_on_delivery" name="cash_on_delivery"
+                               value="@lang('orders.form.false')" disabled>
+                    </div>
+                @endif
+                <div class="form-group" style="width: 15%; float: left; padding: 5px;">
+                    <label for="customer.nick_allegro">@lang('orders.form.nick_allegro')</label>
+                    <input type="text" class="form-control" id="customer.nick_allegro" name="customer.nick_allegro"
+                           value="{{ $order->customer->nick_allegro ?? ''}}" disabled>
+                </div>
+                <div class="form-group" style="width: 25%; float: left; padding: 5px;">
+                    <label for="warehouse_value">@lang('orders.form.warehouse_value')</label>
+                    <input type="number" class="form-control" id="warehouse_value" name="warehouse_value"
+                           value="{{ $order->warehouse_value ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
+                    <label for="initial_sending_date_client">@lang('orders.form.initial_sending_date_client')</label>
+                    <input type="text" class="form-control default-date-picker-now" id="initial_sending_date_client"
+                           name="initial_sending_date_client"
+                           value="{{ $order->initial_sending_date_client ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
+                    <label
+                        for="initial_sending_date_consultant">@lang('orders.form.initial_sending_date_consultant')</label>
+                    <input type="text" class="form-control default-date-picker-now" id="initial_sending_date_consultant"
+                           name="initial_sending_date_consultant"
+                           value="{{ $order->initial_sending_date_consultant ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
+                    <label for="initial_sending_date_magazine">@lang('orders.form.initial_sending_date_magazine')</label>
+                    <input type="text" class="form-control default-date-picker-now" id="initial_sending_date_magazine"
+                           name="initial_sending_date_magazine"
+                           value="{{ $order->initial_sending_date_magazine ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
+                    <label for="confirmed_sending_date_con_mag">@lang('orders.form.confirmed_sending_date_con_mag')</label>
+                    <input type="text" class="form-control default-date-picker-now" id="confirmed_sending_date_con_mag"
+                           name="confirmed_sending_date_con_mag"
+                           value="{{ $order->confirmed_sending_date_con_mag ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
+                    <label for="initial_pickup_date_client">@lang('orders.form.initial_pickup_date_client')</label>
+                    <input type="text" class="form-control default-date-time-picker-now" id="initial_pickup_date_client"
+                           name="initial_pickup_date_client"
+                           value="{{ $order->initial_pickup_date_client ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
+                    <label for="confirmed_pickup_date_client">@lang('orders.form.confirmed_pickup_date_client')</label>
+                    <input type="text" class="form-control default-date-time-picker-now" id="confirmed_pickup_date_client"
+                           name="confirmed_pickup_date_client"
+                           value="{{ $order->confirmed_pickup_date_client ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
+                    <label for="confirmed_pickup_date_con_mag">@lang('orders.form.confirmed_pickup_date_con_mag')</label>
+                    <input type="text" class="form-control default-date-time-picker-now" id="confirmed_pickup_date_con_mag"
+                           name="confirmed_pickup_date_con_mag"
+                           value="{{ $order->confirmed_pickup_date_con_mag ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
+                    <label for="initial_delivery_date_con_mag">@lang('orders.form.initial_delivery_date_con_mag')</label>
+                    <input type="text" class="form-control default-date-time-picker-now" id="initial_delivery_date_con_mag"
+                           name="initial_delivery_date_con_mag"
+                           value="{{ $order->initial_delivery_date_con_mag ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
+                    <label for="confirmed_delivery_date">@lang('orders.form.confirmed_delivery_date')</label><br><br>
+                    <input type="text" class="form-control default-date-time-picker-now" id="confirmed_delivery_date"
+                           name="confirmed_delivery_date"
+                           value="{{ $order->confirmed_delivery_date ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 25%; float: left; padding: 5px;">
+                    <label for="consultant_value">@lang('orders.form.consultant_value')</label>
+                    <input type="number" class="form-control" id="consultant_value" name="consultant_value"
+                           value="{{ $order->consultant_value ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 25%; float: left; padding: 5px;">
+                    <label for="refund_id">@lang('orders.form.refund_number')</label>
+                    <input type="text" class="form-control" id="refund_id" name="refund_id"
+                           value="{{ $order->refund_id ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 25%; float: left; padding: 5px;">
+                    <label for="to_refund">@lang('orders.form.to_refund')</label>
+                    <input disabled type="number" class="form-control" id="to_refund" name="to_refund"
+                           value="{{ $order->to_refund ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 25%; float: left; padding: 5px;">
+                    <label for="refunded">@lang('orders.form.refunded')</label>
+                    <input step="0.01" type="number" class="form-control" id="refunded" name="refunded"
+                           value="{{ $order->refunded ?? ''}}">
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <div>
+                                @include('orders.labels', ['title' => __('orders.form.warehouse_notice'), 'user_type' => \App\Enums\UserRole::Storekeeper])
+                                <textarea rows="5" cols="40" class="form-control" id="warehouse_notice"
+                                          name="warehouse_notice" disabled>{{ $order->warehouse_notice ?? ''}}</textarea>
+                                <div class="flex-input">
+                                    <input type="text" class="form-control scrollable-notice" placeholder="@lang('orders.form.warehouse_notice')"
+                                           id="{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}" name="warehouse_notice"/>
+                                    <div class="input-group-append">
+                                        <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}')"
+                                                class="btn btn-success" type="button">wyślij
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="form-group" style="width: 25%; float: left; padding: 5px;">
-                <div>
-                    @include('orders.labels', ['title' => 'Informacje dla spedycji', 'user_type' => \App\Enums\UserRole::SuperAdministrator])
-                    <textarea id="shipping_notice" class="form-control" rows="5" disabled>{{ $order->spedition_comment ?? ''}}</textarea>
-                    <div class="flex-input">
-                        <input type="text" class="form-control scrollable-notice" placeholder="Informacje dla spedycji"
-                               id="{{ \App\Entities\Order::COMMENT_SHIPPING_TYPE }}" name="spedition_comment"/>
-                        <div class="input-group-append">
-                            <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_SHIPPING_TYPE }}')"
-                                    class="btn btn-success" type="button">wyślij
-                            </button>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <div>
+                                @include('orders.labels', ['title' => 'Informacje dla spedycji', 'user_type' => \App\Enums\UserRole::SuperAdministrator])
+                                <textarea id="shipping_notice" class="form-control" rows="5" disabled>{{ $order->spedition_comment ?? ''}}</textarea>
+                                <div class="flex-input">
+                                    <input type="text" class="form-control scrollable-notice" placeholder="Informacje dla spedycji"
+                                           id="{{ \App\Entities\Order::COMMENT_SHIPPING_TYPE }}" name="spedition_comment"/>
+                                    <div class="input-group-append">
+                                        <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_SHIPPING_TYPE }}')"
+                                                class="btn btn-success" type="button">wyślij
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            <div class="form-group" style="width: 25%; float: left; padding: 5px;">
-                @include('orders.labels', ['title' =>  __('orders.form.consultant_notices'), 'user_type' => \App\Enums\UserRole::Consultant])
-                <textarea id="consultant_notice" disabled class="form-control" name="consultant_notices" id="consultant_notices"
-                          rows="5">{{ $order->consultant_notices ?? ''}}</textarea>
-                <div class="flex-input">
-                    <input type="text" class="form-control scrollable-notice" placeholder="@lang('orders.form.consultant_notices')"
-                           id="{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}" name="consultant_notices"/>
-                    <div class="input-group-append">
-                        <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}')"
-                                class="btn btn-success" type="button">wyślij
-                        </button>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            @include('orders.labels', ['title' =>  __('orders.form.consultant_notices'), 'user_type' => \App\Enums\UserRole::Consultant])
+                            <textarea id="consultant_notice" disabled class="form-control" name="consultant_notices" id="consultant_notices"
+                                      rows="5">{{ $order->consultant_notices ?? ''}}</textarea>
+                            <div class="flex-input">
+                                <input type="text" class="form-control scrollable-notice" placeholder="@lang('orders.form.consultant_notices')"
+                                       id="{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}" name="consultant_notices"/>
+                                <div class="input-group-append">
+                                    <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}')"
+                                            class="btn btn-success consultant__button--send" type="button">wyślij
+                                    </button>
+                                    <h5 onclick="sendComment('{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}')"
+                                            class="consultant__button--send" type="button">wyślij
+                                    </h5>
+                                </div>
+                            </div>
+                            <h5 onclick="goToNextOrder()">@lang('orders.next_order')</h5>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="form-group" style="width: 25%; float: left; padding: 5px;">
-                @include('orders.labels', ['title' =>  __('orders.form.financial_notices'), 'user_type' => \App\Enums\UserRole::Accountant])
-                <textarea id="financial_notice" disabled class="form-control scrollable-notice" name="financial_comment" id="financial_notices"
-                          rows="5">{{ $order->financial_comment ?? ''}}</textarea>
-                <div class="flex-input">
-                    <input type="text" class="form-control" placeholder="@lang('orders.form.financial_notices')"
-                           id="{{ \App\Entities\Order::COMMENT_FINANCIAL_TYPE }}" name="consultant_notices"/>
-                    <div class="input-group-append">
-                        <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_FINANCIAL_TYPE }}')"
-                                class="btn btn-success" type="button">wyślij
-                        </button>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            @include('orders.labels', ['title' =>  __('orders.form.financial_notices'), 'user_type' => \App\Enums\UserRole::Accountant])
+                            <textarea id="financial_notice" disabled class="form-control scrollable-notice" name="financial_comment" id="financial_notices"
+                                      rows="5">{{ $order->financial_comment ?? ''}}</textarea>
+                            <div class="flex-input">
+                                <input type="text" class="form-control" placeholder="@lang('orders.form.financial_notices')"
+                                       id="{{ \App\Entities\Order::COMMENT_FINANCIAL_TYPE }}" name="consultant_notices"/>
+                                <div class="input-group-append">
+                                    <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_FINANCIAL_TYPE }}')"
+                                            class="btn btn-success" type="button">wyślij
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -4586,6 +4603,17 @@
                 });
             });
         });
+        function goToNextOrder() {
+            let lastOrderId = {{ Order::getLastOrder() }};
+            let currentOrderId = {{ $order->id }};
+            if(lastOrderId > currentOrderId) {
+                let nextOrderUrl = '{{ route('orders.edit', ['id' => $order->id + 1]) }}';
+                window.location.href = nextOrderUrl;
+            } else {
+                alert('To jest ostatnie zamówienie');
+            }
+        }
+
     </script>
 
     <script src="{{ URL::asset('js/views/orders/edit.js') }}"></script>
