@@ -727,7 +727,7 @@ class TasksController extends Controller
     /**
      * @param Request $request
      */
-    private function markTaskAsProduced($task): array
+    private function markTaskAsProduced($task)
     {
         $response = [];
         if ($task->childs->count()) {
