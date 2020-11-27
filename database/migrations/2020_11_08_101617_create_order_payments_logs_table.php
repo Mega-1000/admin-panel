@@ -17,16 +17,20 @@ class CreateOrderPaymentsLogsTable extends Migration
             $table->unsignedInteger('order_payment_id');
             $table->foreign('order_payment_id')
                 ->references('id')
-                ->on('order_payments')->nullable();
+                ->on('order_payments')->onDelete('cascade')->nullable();
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')
                 ->references('id')
-                ->on('users')->nullable();
+                ->on('customers')->onDelete('cascade')->nullable();
+            $table->unsignedInteger('employee_id');
+            $table->foreign('employee_id')
+                ->references('id')
+                ->on('users')->onDelete('cascade')->nullable();
             $table->string('payment_service_operator')->nullable();
             $table->unsignedInteger('order_id');
             $table->foreign('order_id')
                 ->references('id')
-                ->on('orders');
+                ->on('orders')->onDelete('cascade');
             $table->text('description')->nullable();
             $table->decimal('payment_amount')->nullable();
             $table->decimal('transfer_payment_amount')->nullable();
@@ -47,6 +51,8 @@ class CreateOrderPaymentsLogsTable extends Migration
             $table->dropColumn('user_id');
             $table->dropForeign('order_id');
             $table->dropColumn('order_id');
+            $table->dropForeign('employee_id');
+            $table->dropColumn('employee_id');
         });
         Schema::dropIfExists('order_payments_logs');
     }

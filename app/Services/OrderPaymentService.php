@@ -31,7 +31,7 @@ class OrderPaymentService
         $this->repository = $repository;
     }
 
-    public function payOrder(int $orderId, float $amount, int $masterPaymentId, string $promise, string $chooseOrder, string $promiseDate, string $type = null, bool $isWarehousePayment = null): OrderPayment
+    public function payOrder(int $orderId, float $amount, $masterPaymentId, string $promise, $chooseOrder, string $promiseDate, string $type = null, bool $isWarehousePayment = null): OrderPayment
     {
         $order = Order::find($orderId);
 

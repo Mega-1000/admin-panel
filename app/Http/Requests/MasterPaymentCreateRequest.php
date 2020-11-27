@@ -14,9 +14,9 @@ class MasterPaymentCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount' => 'required|unique:posts|max:255',
+            'amount' => 'required|',
             'notices' => 'required|max:255',
-            'promise_date' => 'required|date',
+            'promise_date' => 'date',
             'created_at' => 'required|date',
             'payment-type' => 'required',
             'customer_id' => 'required'

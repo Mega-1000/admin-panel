@@ -639,4 +639,9 @@ class Order extends Model implements Transformable
     {
         return $this->detailedCommissions()->sum('amount');
     }
+
+    public function paymentsTransactions()
+    {
+        return $this->hasMany(OrderPaymentLog::class);
+    }
 }

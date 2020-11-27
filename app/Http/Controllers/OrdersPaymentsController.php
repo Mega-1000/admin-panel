@@ -26,6 +26,7 @@ use App\Repositories\PaymentRepository;
 use App\Repositories\OrderPackageRepository;
 use App\Services\OrderPaymentLogService;
 use App\Services\OrderPaymentService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -225,9 +226,15 @@ class OrdersPaymentsController extends Controller
 
         $type = $request->input('payment-type');
 
+        if($request->input('promise_date') === null) {
+            $promiseDate = '';
+        } else {
+            $promiseDate = $request->input('promise_date');
+        }
+
         $orderPayment = $this->orderPaymentService->payOrder($orderId, $request->input('amount'),
             $masterPaymentId, $promise,
-            $chooseOrder, $request->input('promise_date'),
+            $chooseOrder, $promiseDate,
             $type, $isWarehousePayment
             );
 
@@ -235,16 +242,29 @@ class OrdersPaymentsController extends Controller
         $orderPaymentAmount = PriceHelper::modifyPriceToValidFormat($request->input('amount'));
         $clientPaymentAmount = $this->customerRepository->find($orderPayment->order->customer_id)->payments->sum('amount_left');
 
+        if($request->input('created_at') === null) {
+            $createdAt = Carbon::now();
+        } else {
+            $createdAt = $request->input('created_at');
+        }
+
+        if($request->input('notices') === null) {
+            $notices = '';
+        } else {
+            $notices = $request->input('notices');
+        }
+
         $this->orderPaymentLogService->create(
             $orderId,
             $orderPayment->id,
             $orderPayment->order->customer_id,
             $clientPaymentAmount,
             $orderPaymentAmount,
-            $request->input('created_at'),
-            $request->input('notices'),
+            $createdAt,
+            $notices,
             $request->input('amount'),
-            OrderPaymentLogTypeEnum::ORDER_PAYMENT
+            OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+            false
         );
 
         return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
@@ -274,6 +294,7 @@ class OrdersPaymentsController extends Controller
             $order = $this->orderRepository->find($orderId);
         }
         /////// połączone
+        $clientPaymentAmount = $this->customerRepository->find($order->customer_id)->payments->sum('amount_left');
         $connectedOrders = $this->orderRepository->findWhere(['master_order_id' => $order->id]);
         if($connectedOrders->count() > 0) {
             $hasGroupPromisePayment = false;
@@ -319,6 +340,18 @@ class OrdersPaymentsController extends Controller
                                             'customer_id' => $order->customer_id,
                                             'created_at' => $date
                                         ]);
+                                        $this->orderPaymentLogService->create(
+                                            $orderId,
+                                            $globalPayment->id,
+                                            $order->customer_id,
+                                            $clientPaymentAmount,
+                                            $amount,
+                                            $date,
+                                            '',
+                                            $amount,
+                                            OrderPaymentLogTypeEnum::CLIENT_PAYMENT,
+                                            true
+                                        );
                                         $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
 
                                         $payment = $this->repository->create([
@@ -327,6 +360,19 @@ class OrdersPaymentsController extends Controller
                                             'master_payment_id' => $globalPayment->id,
                                             'promise' => '',
                                         ]);
+
+                                        $this->orderPaymentLogService->create(
+                                            $connectedOrder->id,
+                                            $payment->id,
+                                            $order->customer_id,
+                                            $clientPaymentAmount,
+                                            $connectedOrder->getSumOfGrossValues(),
+                                            $date,
+                                            '',
+                                            $connectedOrder->getSumOfGrossValues(),
+                                            OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                            false
+                                        );
                                     } else {
                                         $globalPayment = $this->paymentRepository->findWhere([
                                             'amount' => $amount,
@@ -339,6 +385,18 @@ class OrdersPaymentsController extends Controller
                                             'master_payment_id' => $globalPayment->id,
                                             'promise' => '',
                                         ]);
+                                        $this->orderPaymentLogService->create(
+                                            $connectedOrder->id,
+                                            $payment->id,
+                                            $order->customer_id,
+                                            $clientPaymentAmount,
+                                            $connectedOrder->getSumOfGrossValues(),
+                                            $date,
+                                            '',
+                                            $connectedOrder->getSumOfGrossValues(),
+                                            OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                            false
+                                        );
                                     }
 
                                     OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
@@ -367,6 +425,18 @@ class OrdersPaymentsController extends Controller
                                             'customer_id' => $order->customer_id,
                                             'created_at' => $date
                                         ]);
+                                        $this->orderPaymentLogService->create(
+                                            $orderId,
+                                            $globalPayment->id,
+                                            $order->customer_id,
+                                            $clientPaymentAmount,
+                                            $amount,
+                                            $date,
+                                            '',
+                                            $amount,
+                                            OrderPaymentLogTypeEnum::CLIENT_PAYMENT,
+                                            true
+                                        );
 					if($amount > $order->getSumOfGrossValues()) {
                                             $globalPayment->update(['amount_left' => $globalPayment->amount - $order->getSumOfGrossValues()]);
 
@@ -376,6 +446,18 @@ class OrdersPaymentsController extends Controller
                                                 'master_payment_id' => $globalPayment->id,
                                                 'promise' => '',
                                             ]);
+                                            $this->orderPaymentLogService->create(
+                                                $connectedOrder->id,
+                                                $payment->id,
+                                                $order->customer_id,
+                                                $clientPaymentAmount,
+                                                $connectedOrder->getSumOfGrossValues(),
+                                                $date,
+                                                '',
+                                                $connectedOrder->getSumOfGrossValues(),
+                                                OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                                false
+                                            );
 					if($globalPayment->amount_left > 0) {
                                             foreach ($connectedOrders as $connectedOrder) {
                                                     if($globalPayment->amount_left > $connectedOrder->getSumOfGrossValues()) {
@@ -385,6 +467,18 @@ class OrdersPaymentsController extends Controller
                                                             'master_payment_id' => $globalPayment->id,
                                                             'promise' => '',
                                                         ]);
+                                                        $this->orderPaymentLogService->create(
+                                                            $connectedOrder->id,
+                                                            $payment->id,
+                                                            $order->customer_id,
+                                                            $clientPaymentAmount,
+                                                            $connectedOrder->getSumOfGrossValues(),
+                                                            $date,
+                                                            '',
+                                                            $connectedOrder->getSumOfGrossValues(),
+                                                            OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                                            false
+                                                        );
                                                         $globalPayment->update(['amount_left' => $globalPayment->amount_left - $connectedOrder->getSumOfGrossValues()]);
                                                     }
                                                 }
@@ -402,6 +496,18 @@ class OrdersPaymentsController extends Controller
                                             'master_payment_id' => $globalPayment->id,
                                             'promise' => '',
                                         ]);
+                                        $this->orderPaymentLogService->create(
+                                            $connectedOrder->id,
+                                            $payment->id,
+                                            $order->customer_id,
+                                            $clientPaymentAmount,
+                                            $connectedOrder->getSumOfGrossValues(),
+                                            $date,
+                                            '',
+                                            $connectedOrder->getSumOfGrossValues(),
+                                            OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                            false
+                                        );
                                     }
 
                                     OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
@@ -461,13 +567,36 @@ class OrdersPaymentsController extends Controller
                                             'created_at' => $date
                                         ]);
                                         $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
-
+                                        $this->orderPaymentLogService->create(
+                                            $orderId,
+                                            $globalPayment->id,
+                                            $order->customer_id,
+                                            $clientPaymentAmount,
+                                            $amount,
+                                            $date,
+                                            '',
+                                            $amount,
+                                            OrderPaymentLogTypeEnum::CLIENT_PAYMENT,
+                                            true
+                                        );
                                         $payment = $this->repository->create([
                                             'amount' => $connectedOrder->getSumOfGrossValues(),
                                             'order_id' => $connectedOrder->id,
                                             'master_payment_id' => $globalPayment->id,
                                             'promise' => '',
                                         ]);
+                                        $this->orderPaymentLogService->create(
+                                            $connectedOrder->id,
+                                            $payment->id,
+                                            $order->customer_id,
+                                            $clientPaymentAmount,
+                                            $connectedOrder->getSumOfGrossValues(),
+                                            $date,
+                                            '',
+                                            $connectedOrder->getSumOfGrossValues(),
+                                            OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                            false
+                                        );
                                     } else {
                                         $globalPayment = $this->paymentRepository->findWhere([
                                             'amount' => $amount,
@@ -480,6 +609,18 @@ class OrdersPaymentsController extends Controller
                                             'master_payment_id' => $globalPayment->id,
                                             'promise' => '',
                                         ]);
+                                        $this->orderPaymentLogService->create(
+                                            $connectedOrder->id,
+                                            $payment->id,
+                                            $order->customer_id,
+                                            $clientPaymentAmount,
+                                            $connectedOrder->getSumOfGrossValues(),
+                                            $date,
+                                            '',
+                                            $connectedOrder->getSumOfGrossValues(),
+                                            OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                            false
+                                        );
                                     }
 
                                     OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
@@ -503,6 +644,18 @@ class OrdersPaymentsController extends Controller
                             'customer_id' => $order->customer_id,
                             'created_at' => $date
                         ]);
+                        $this->orderPaymentLogService->create(
+                            $orderId,
+                            $globalPayment->id,
+                            $order->customer_id,
+                            $clientPaymentAmount,
+                            $amount,
+                            $date,
+                            '',
+                            $amount,
+                            OrderPaymentLogTypeEnum::CLIENT_PAYMENT,
+                            true
+                        );
                         $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
 
                         $payment = $this->repository->create([
@@ -511,6 +664,18 @@ class OrdersPaymentsController extends Controller
                             'master_payment_id' => $globalPayment->id,
                             'promise' => '',
                         ]);
+                        $this->orderPaymentLogService->create(
+                            $connectedOrder->id,
+                            $payment->id,
+                            $order->customer_id,
+                            $clientPaymentAmount,
+                            $connectedOrder->getSumOfGrossValues(),
+                            $date,
+                            '',
+                            $connectedOrder->getSumOfGrossValues(),
+                            OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                            false
+                        );
                     } else {
                         $globalPayment = $this->paymentRepository->findWhere([
                             'amount' => $amount,
@@ -523,6 +688,18 @@ class OrdersPaymentsController extends Controller
                             'master_payment_id' => $globalPayment->id,
                             'promise' => '',
                         ]);
+                        $this->orderPaymentLogService->create(
+                            $orderId,
+                            $globalPayment->id,
+                            $order->customer_id,
+                            $clientPaymentAmount,
+                            $amount,
+                            $date,
+                            '',
+                            $amount,
+                            OrderPaymentLogTypeEnum::CLIENT_PAYMENT,
+                            true
+                        );
                     }
                 }
                 return ['orderId' => $orderId, 'amount' => $amount,  'info' => 'Zlecenie zostało pomyślnie utworzone.'];
@@ -551,6 +728,18 @@ class OrdersPaymentsController extends Controller
                                     'customer_id' => $order->customer_id,
                                     'created_at' => $date
                                 ]);
+                                $this->orderPaymentLogService->create(
+                                    $orderId,
+                                    $globalPayment->id,
+                                    $order->customer_id,
+                                    $clientPaymentAmount,
+                                    $amount,
+                                    $date,
+                                    '',
+                                    $amount,
+                                    OrderPaymentLogTypeEnum::CLIENT_PAYMENT,
+                                    true
+                                );
                                 $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
 
                                 $payment = $this->repository->create([
@@ -559,6 +748,18 @@ class OrdersPaymentsController extends Controller
                                     'master_payment_id' => $globalPayment->id,
                                     'promise' => '',
                                 ]);
+                                $this->orderPaymentLogService->create(
+                                    $orderId,
+                                    $globalPayment->id,
+                                    $order->customer_id,
+                                    $clientPaymentAmount,
+                                    $amount,
+                                    $date,
+                                    '',
+                                    $amount,
+                                    OrderPaymentLogTypeEnum::CLIENT_PAYMENT,
+                                    true
+                                );
                             } else {
                                 $globalPayment = $this->paymentRepository->findWhere([
                                     'amount' => $amount,
@@ -571,6 +772,18 @@ class OrdersPaymentsController extends Controller
                                     'master_payment_id' => $globalPayment->id,
                                     'promise' => '',
                                 ]);
+                                $this->orderPaymentLogService->create(
+                                    $connectedOrder->id,
+                                    $payment->id,
+                                    $order->customer_id,
+                                    $clientPaymentAmount,
+                                    $connectedOrder->getSumOfGrossValues(),
+                                    $date,
+                                    '',
+                                    $connectedOrder->getSumOfGrossValues(),
+                                    OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                    false
+                                );
                             }
 
                             dispatch_now(new AddLabelJob($connectedOrder->id, [40]));
@@ -592,6 +805,18 @@ class OrdersPaymentsController extends Controller
                                 'customer_id' => $order->customer_id,
                                 'created_at' => $date
                             ]);
+                            $this->orderPaymentLogService->create(
+                                $orderId,
+                                $globalPayment->id,
+                                $order->customer_id,
+                                $clientPaymentAmount,
+                                $amount,
+                                $date,
+                                '',
+                                $amount,
+                                OrderPaymentLogTypeEnum::CLIENT_PAYMENT,
+                                true
+                            );
                             $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
 
                             $payment = $this->repository->create([
@@ -600,6 +825,18 @@ class OrdersPaymentsController extends Controller
                                 'master_payment_id' => $globalPayment->id,
                                 'promise' => '',
                             ]);
+                            $this->orderPaymentLogService->create(
+                                $connectedOrder->id,
+                                $payment->id,
+                                $order->customer_id,
+                                $clientPaymentAmount,
+                                $amount,
+                                $date,
+                                '',
+                                $amount,
+                                OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                false
+                            );
                         } else {
                             $globalPayment = $this->paymentRepository->findWhere([
                                 'amount' => $amount,
@@ -612,6 +849,18 @@ class OrdersPaymentsController extends Controller
                                 'master_payment_id' => $globalPayment->id,
                                 'promise' => '',
                             ]);
+                            $this->orderPaymentLogService->create(
+                                $connectedOrder->id,
+                                $payment->id,
+                                $order->customer_id,
+                                $clientPaymentAmount,
+                                $amount,
+                                $date,
+                                '',
+                                $amount,
+                                OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                false
+                            );
                         }
 
                         dispatch_now(new RemoveLabelJob($order->id, [40]));
@@ -636,6 +885,18 @@ class OrdersPaymentsController extends Controller
                                 'customer_id' => $order->customer_id,
                                 'created_at' => $date
                             ]);
+                            $this->orderPaymentLogService->create(
+                                $orderId,
+                                $globalPayment->id,
+                                $order->customer_id,
+                                $clientPaymentAmount,
+                                $globalAmount,
+                                $date,
+                                '',
+                                $globalAmount,
+                                OrderPaymentLogTypeEnum::CLIENT_PAYMENT,
+                                true
+                            );
                             $globalPayment->update(['amount_left' => $globalPayment->amount - $order->toPay()]);
                             if($order->toPay() < $amount) {
                                 $amount = $amount - $order->toPay();
@@ -645,6 +906,18 @@ class OrdersPaymentsController extends Controller
                                     'promise' => '',
                                     'master_payment_id' => $globalPayment->id
                                 ]);
+                                $this->orderPaymentLogService->create(
+                                    $connectedOrder->id,
+                                    $payment->id,
+                                    $order->customer_id,
+                                    $clientPaymentAmount,
+                                    $order->toPay(),
+                                    $date,
+                                    '',
+                                    $order->toPay(),
+                                    OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                    false
+                                );
                             } else {
                                 $payment = $this->repository->create([
                                     'amount' => $amount,
@@ -652,6 +925,18 @@ class OrdersPaymentsController extends Controller
                                     'promise' => '',
                                     'master_payment_id' => $globalPayment->id
                                 ]);
+                                $this->orderPaymentLogService->create(
+                                    $connectedOrder->id,
+                                    $payment->id,
+                                    $order->customer_id,
+                                    $clientPaymentAmount,
+                                    $amount,
+                                    $date,
+                                    '',
+                                    $amount,
+                                    OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                    false
+                                );
                                 $amount = 0;
                             }
                         }
@@ -676,6 +961,18 @@ class OrdersPaymentsController extends Controller
                                         'customer_id' => $order->customer_id,
                                         'created_at' => $date
                                     ]);
+                                    $this->orderPaymentLogService->create(
+                                        $orderId,
+                                        $globalPayment->id,
+                                        $order->customer_id,
+                                        $clientPaymentAmount,
+                                        $amount,
+                                        $date,
+                                        '',
+                                        $amount,
+                                        OrderPaymentLogTypeEnum::CLIENT_PAYMENT,
+                                        true
+                                    );
                                     $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
 
                                     $payment = $this->repository->create([
@@ -684,6 +981,18 @@ class OrdersPaymentsController extends Controller
                                         'master_payment_id' => $globalPayment->id,
                                         'promise' => '',
                                     ]);
+                                    $this->orderPaymentLogService->create(
+                                        $connectedOrder->id,
+                                        $payment->id,
+                                        $order->customer_id,
+                                        $clientPaymentAmount,
+                                        $connectedOrder->getSumOfGrossValues(),
+                                        $date,
+                                        '',
+                                        $connectedOrder->getSumOfGrossValues(),
+                                        OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                        false
+                                    );
                                 } else {
                                     $globalPayment = $this->paymentRepository->findWhere([
                                         'amount' => $amount,
@@ -696,6 +1005,18 @@ class OrdersPaymentsController extends Controller
                                         'master_payment_id' => $globalPayment->id,
                                         'promise' => '',
                                     ]);
+                                    $this->orderPaymentLogService->create(
+                                        $connectedOrder->id,
+                                        $payment->id,
+                                        $order->customer_id,
+                                        $clientPaymentAmount,
+                                        $connectedOrder->getSumOfGrossValues(),
+                                        $date,
+                                        '',
+                                        $connectedOrder->getSumOfGrossValues(),
+                                        OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                        false
+                                    );
                                 }
 
                                 dispatch_now(new AddLabelJob($connectedOrder->id, [40]));
@@ -716,6 +1037,18 @@ class OrdersPaymentsController extends Controller
                                         'customer_id' => $order->customer_id,
                                         'created_at' => $date
                                     ]);
+                                    $this->orderPaymentLogService->create(
+                                        $orderId,
+                                        $globalPayment->id,
+                                        $order->customer_id,
+                                        $clientPaymentAmount,
+                                        $amount,
+                                        $date,
+                                        '',
+                                        $amount,
+                                        OrderPaymentLogTypeEnum::CLIENT_PAYMENT,
+                                        true
+                                    );
                                     $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
 
                                     $payment = $this->repository->create([
@@ -724,6 +1057,18 @@ class OrdersPaymentsController extends Controller
                                         'promise' => '',
                                         'master_payment_id' => $globalPayment->id,
                                     ]);
+                                    $this->orderPaymentLogService->create(
+                                        $connectedOrder->id,
+                                        $payment->id,
+                                        $order->customer_id,
+                                        $clientPaymentAmount,
+                                        $amount,
+                                        $date,
+                                        '',
+                                        $amount,
+                                        OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                        false
+                                    );
                                 } else {
                                     $globalPayment = $this->paymentRepository->findWhere([
                                         'amount' => $globalAmount,
@@ -736,6 +1081,18 @@ class OrdersPaymentsController extends Controller
                                         'master_payment_id' => $globalPayment->id,
                                         'promise' => '',
                                     ]);
+                                    $this->orderPaymentLogService->create(
+                                        $connectedOrder->id,
+                                        $payment->id,
+                                        $order->customer_id,
+                                        $clientPaymentAmount,
+                                        $amount,
+                                        $date,
+                                        '',
+                                        $amount,
+                                        OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                        false
+                                    );
                                 }
 
                                 dispatch_now(new AddLabelJob($connectedOrder->id, [40]));
@@ -762,6 +1119,18 @@ class OrdersPaymentsController extends Controller
                                     'customer_id' => $order->customer_id,
                                     'created_at' => $date
                                 ]);
+                                $this->orderPaymentLogService->create(
+                                    $orderId,
+                                    $globalPayment->id,
+                                    $order->customer_id,
+                                    $clientPaymentAmount,
+                                    $amount,
+                                    $date,
+                                    '',
+                                    $amount,
+                                    OrderPaymentLogTypeEnum::CLIENT_PAYMENT,
+                                    true
+                                );
                                 $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
 
                                 $payment = $this->repository->create([
@@ -770,6 +1139,19 @@ class OrdersPaymentsController extends Controller
                                     'promise' => '',
                                     'master_payment_id' => $globalPayment->id,
                                 ]);
+
+                                $this->orderPaymentLogService->create(
+                                    $connectedOrder->id,
+                                    $payment->id,
+                                    $order->customer_id,
+                                    $clientPaymentAmount,
+                                    $connectedOrder->getSumOfGrossValues(),
+                                    $date,
+                                    '',
+                                    $connectedOrder->getSumOfGrossValues(),
+                                    OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                    false
+                                );
                             } else {
                                 $globalPayment = $this->paymentRepository->findWhere([
                                     'amount' => $amount,
@@ -782,6 +1164,19 @@ class OrdersPaymentsController extends Controller
                                     'promise' => '',
                                     'master_payment_id' => $globalPayment->id,
                                 ]);
+
+                                $this->orderPaymentLogService->create(
+                                    $connectedOrder->id,
+                                    $payment->id,
+                                    $order->customer_id,
+                                    $clientPaymentAmount,
+                                    $connectedOrder->getSumOfGrossValues(),
+                                    $date,
+                                    '',
+                                    $connectedOrder->getSumOfGrossValues(),
+                                    OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                    false
+                                );
                             }
 
                             dispatch_now(new RemoveLabelJob($connectedOrder->id, [40]));
@@ -805,6 +1200,18 @@ class OrdersPaymentsController extends Controller
                                 'created_at' => $date
 
                             ]);
+                            $this->orderPaymentLogService->create(
+                                $orderId,
+                                $globalPayment->id,
+                                $order->customer_id,
+                                $clientPaymentAmount,
+                                $amount,
+                                $date,
+                                '',
+                                $amount,
+                                OrderPaymentLogTypeEnum::CLIENT_PAYMENT,
+                                true
+                            );
                             $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
 
                             $payment = $this->repository->create([
@@ -813,6 +1220,18 @@ class OrdersPaymentsController extends Controller
                                 'promise' => '',
                                 'master_payment_id' => $globalPayment->id,
                             ]);
+                            $this->orderPaymentLogService->create(
+                                $connectedOrder->id,
+                                $payment->id,
+                                $order->customer_id,
+                                $clientPaymentAmount,
+                                $amount,
+                                $date,
+                                '',
+                                $amount,
+                                OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                false
+                            );
                         } else {
                             $globalPayment = $this->paymentRepository->findWhere([
                                 'amount' => $amount,
@@ -825,6 +1244,18 @@ class OrdersPaymentsController extends Controller
                                 'promise' => '',
                                 'master_payment_id' => $globalPayment->id,
                             ]);
+                            $this->orderPaymentLogService->create(
+                                $connectedOrder->id,
+                                $payment->id,
+                                $order->customer_id,
+                                $clientPaymentAmount,
+                                $amount,
+                                $date,
+                                '',
+                                $amount,
+                                OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                false
+                            );
                         }
                         dispatch_now(new RemoveLabelJob($order->id, [40]));
                     }
@@ -856,8 +1287,19 @@ class OrdersPaymentsController extends Controller
                                     'amount_left' => $amount,
                                     'customer_id' => $order->customer_id,
                                     'created_at' => $date
-
                                 ]);
+                                $this->orderPaymentLogService->create(
+                                    $orderId,
+                                    $globalPayment->id,
+                                    $order->customer_id,
+                                    $clientPaymentAmount,
+                                    $amount,
+                                    $date,
+                                    '',
+                                    $amount,
+                                    OrderPaymentLogTypeEnum::CLIENT_PAYMENT,
+                                    true
+                                );
                                 $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
 
                                 $payment = $this->repository->create([
@@ -866,6 +1308,18 @@ class OrdersPaymentsController extends Controller
                                     'promise' => '',
                                     'master_payment_id' => $globalPayment->id,
                                 ]);
+                                $this->orderPaymentLogService->create(
+                                    $connectedOrder->id,
+                                    $payment->id,
+                                    $order->customer_id,
+                                    $clientPaymentAmount,
+                                    $connectedOrder->getSumOfGrossValues(),
+                                    $date,
+                                    '',
+                                    $connectedOrder->getSumOfGrossValues(),
+                                    OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                    false
+                                );
                             } else {
                                 $globalPayment = $this->paymentRepository->findWhere([
                                     'amount' => $amount,
@@ -878,6 +1332,18 @@ class OrdersPaymentsController extends Controller
                                     'promise' => '',
                                     'master_payment_id' => $globalPayment->id,
                                 ]);
+                                $this->orderPaymentLogService->create(
+                                    $connectedOrder->id,
+                                    $payment->id,
+                                    $order->customer_id,
+                                    $clientPaymentAmount,
+                                    $connectedOrder->getSumOfGrossValues(),
+                                    $date,
+                                    '',
+                                    $connectedOrder->getSumOfGrossValues(),
+                                    OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                    false
+                                );
                             }
 
                             dispatch_now(new RemoveLabelJob($connectedOrder->id, [40]));
@@ -898,16 +1364,38 @@ class OrdersPaymentsController extends Controller
                                 'amount_left' => $amount,
                                 'customer_id' => $order->customer_id,
                                 'created_at' => $date
-
                             ]);
                             $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
-
+                            $this->orderPaymentLogService->create(
+                                $orderId,
+                                $globalPayment->id,
+                                $order->customer_id,
+                                $clientPaymentAmount,
+                                $amount,
+                                $date,
+                                '',
+                                $amount,
+                                OrderPaymentLogTypeEnum::CLIENT_PAYMENT,
+                                true
+                            );
                             $payment = $this->repository->create([
                                 'amount' => $amount,
                                 'order_id' => $orderId,
                                 'promise' => '',
                                 'master_payment_id' => $globalPayment->id,
                             ]);
+                            $this->orderPaymentLogService->create(
+                                $connectedOrder->id,
+                                $payment->id,
+                                $order->customer_id,
+                                $clientPaymentAmount,
+                                $amount,
+                                $date,
+                                '',
+                                $amount,
+                                OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                false
+                            );
                         } else {
                             $globalPayment = $this->paymentRepository->findWhere([
                                 'amount' => $amount,
@@ -920,6 +1408,18 @@ class OrdersPaymentsController extends Controller
                                 'promise' => '',
                                 'master_payment_id' => $globalPayment->id,
                             ]);
+                            $this->orderPaymentLogService->create(
+                                $connectedOrder->id,
+                                $payment->id,
+                                $order->customer_id,
+                                $clientPaymentAmount,
+                                $amount,
+                                $date,
+                                '',
+                                $amount,
+                                OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                false
+                            );
                         }
 
                         dispatch_now(new RemoveLabelJob($order->id, [40]));
@@ -946,9 +1446,21 @@ class OrdersPaymentsController extends Controller
                                     'amount_left' => $amount,
                                     'customer_id' => $order->customer_id,
                                     'created_at' => $date
-
                                 ]);
                                 $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
+
+                                $this->orderPaymentLogService->create(
+                                    $orderId,
+                                    $globalPayment->id,
+                                    $order->customer_id,
+                                    $clientPaymentAmount,
+                                    $amount,
+                                    $date,
+                                    '',
+                                    $amount,
+                                    OrderPaymentLogTypeEnum::CLIENT_PAYMENT,
+                                    true
+                                );
 
                                 $payment = $this->repository->create([
                                     'amount' => $connectedOrder->getSumOfGrossValues(),
@@ -956,6 +1468,18 @@ class OrdersPaymentsController extends Controller
                                     'promise' => '',
                                     'master_payment_id' => $globalPayment->id,
                                 ]);
+                                $this->orderPaymentLogService->create(
+                                    $connectedOrder->id,
+                                    $payment->id,
+                                    $order->customer_id,
+                                    $clientPaymentAmount,
+                                    $connectedOrder->getSumOfGrossValues(),
+                                    $date,
+                                    '',
+                                    $connectedOrder->getSumOfGrossValues(),
+                                    OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                    false
+                                );
                             } else {
                                 $globalPayment = $this->paymentRepository->findWhere([
                                     'amount' => $amount,
@@ -968,6 +1492,18 @@ class OrdersPaymentsController extends Controller
                                     'promise' => '',
                                     'master_payment_id' => $globalPayment->id,
                                 ]);
+                                $this->orderPaymentLogService->create(
+                                    $connectedOrder->id,
+                                    $payment->id,
+                                    $order->customer_id,
+                                    $clientPaymentAmount,
+                                    $connectedOrder->getSumOfGrossValues(),
+                                    $date,
+                                    '',
+                                    $connectedOrder->getSumOfGrossValues(),
+                                    OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                    false
+                                );
                             }
 
                             dispatch_now(new RemoveLabelJob($connectedOrder->id, [40]));
@@ -993,12 +1529,37 @@ class OrdersPaymentsController extends Controller
                             ]);
                             $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
 
+                            $this->orderPaymentLogService->create(
+                                $orderId,
+                                $globalPayment->id,
+                                $order->customer_id,
+                                $clientPaymentAmount,
+                                $amount,
+                                $date,
+                                '',
+                                $amount,
+                                OrderPaymentLogTypeEnum::CLIENT_PAYMENT,
+                                true
+                            );
+
                             $payment = $this->repository->create([
                                 'amount' => $amount,
                                 'order_id' => $orderId,
                                 'promise' => '',
                                 'master_payment_id' => $globalPayment->id,
                             ]);
+                            $this->orderPaymentLogService->create(
+                                $connectedOrder->id,
+                                $payment->id,
+                                $order->customer_id,
+                                $clientPaymentAmount,
+                                $amount,
+                                $date,
+                                '',
+                                $amount,
+                                OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                false
+                            );
                         } else {
                             $globalPayment = $this->paymentRepository->findWhere([
                                 'amount' => $amount,
@@ -1011,6 +1572,18 @@ class OrdersPaymentsController extends Controller
                                 'promise' => '',
                                 'master_payment_id' => $globalPayment->id,
                             ]);
+                            $this->orderPaymentLogService->create(
+                                $connectedOrder->id,
+                                $payment->id,
+                                $order->customer_id,
+                                $clientPaymentAmount,
+                                $amount,
+                                $date,
+                                '',
+                                $amount,
+                                OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                                false
+                            );
                         }
                         dispatch_now(new RemoveLabelJob($order->id, [40]));
                     }
@@ -1041,12 +1614,37 @@ class OrdersPaymentsController extends Controller
                     ]);
                     $globalPayment->update(['amount_left' => $globalPayment->amount - $amount]);
 
+                    $this->orderPaymentLogService->create(
+                        $orderId,
+                        $globalPayment->id,
+                        $order->customer_id,
+                        $clientPaymentAmount,
+                        $amount,
+                        $date,
+                        '',
+                        $amount,
+                        OrderPaymentLogTypeEnum::CLIENT_PAYMENT,
+                        true
+                    );
+
                     $payment = $this->repository->create([
                         'amount' => $amount,
                         'order_id' => $orderId,
                         'promise' => '',
                         'master_payment_id' => $globalPayment->id,
                     ]);
+                    $this->orderPaymentLogService->create(
+                        $orderId,
+                        $payment->id,
+                        $order->customer_id,
+                        $clientPaymentAmount,
+                        $amount,
+                        $date,
+                        '',
+                        $amount,
+                        OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                        false
+                    );
                 } else {
                     $globalPayment = $this->paymentRepository->findWhere([
                         'amount' => $amount,
@@ -1059,6 +1657,18 @@ class OrdersPaymentsController extends Controller
                         'promise' => '',
                         'master_payment_id' => $globalPayment->id,
                     ]);
+                    $this->orderPaymentLogService->create(
+                        $orderId,
+                        $payment->id,
+                        $order->customer_id,
+                        $clientPaymentAmount,
+                        $amount,
+                        $date,
+                        '',
+                        $amount,
+                        OrderPaymentLogTypeEnum::ORDER_PAYMENT,
+                        false
+                    );
                 }
 
 
@@ -1120,7 +1730,8 @@ class OrdersPaymentsController extends Controller
                 $validated['created_at'],
                 $validated['notices'],
                 $validated['amount'],
-                OrderPaymentLogTypeEnum::CLIENT_PAYMENT
+                OrderPaymentLogTypeEnum::CLIENT_PAYMENT,
+                true
             );
 
             return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
@@ -1202,6 +1813,19 @@ class OrdersPaymentsController extends Controller
             $payment->update([
                 'amount_left' => $payment->amount_left + $orderPayment->amount,
             ]);
+            $clientPaymentAmount = $this->customerRepository->find($orderPayment->order->customer_id)->payments->sum('amount_left');
+            $this->orderPaymentLogService->create(
+                $orderPayment->order_id,
+                $orderPayment->master_payment_id,
+                $orderPayment->order->customer_id,
+                $clientPaymentAmount,
+                $orderPayment->amount,
+                Carbon::now(),
+                '',
+                $orderPayment->amount,
+                OrderPaymentLogTypeEnum::CLIENT_PAYMENT,
+                true
+            );
         }
 
         $deleted = $this->repository->delete($id);

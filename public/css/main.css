@@ -101,6 +101,10 @@
 }
 
 #paymentsTable {
-    width: 50%;
+    width: 100%;
     float: left;
+}
+
+#transaction-history-modal .modal-dialog {
+    width: 70%;
 }

@@ -2459,21 +2459,23 @@
                                 <th>Data utworzenia</th>
                                 <th>Data zaksięgowania</th>
                                 <th>Opis</th>
+                                <th>Pracownik</th>
                                 <th>Klient</th>
                                 <th>Zlecenie</th>
                                 <th>Typ</th>
                                 <th>Kwota</th>
                                 <th>Wartość przed wpłatą</th>
-                                <th>Wartość po wpłatą</th>
+                                <th>Wartość po wpłacie</th>
                             </tr>
                         </thead>
                         <tbody>
-                        @foreach($orderPaymentsTransactions as $orderPaymentsTransaction)
+                        @foreach($order->paymentsTransactions as $orderPaymentsTransaction)
                             <tr>
                                 <td>{{ $orderPaymentsTransaction->id }}</td>
                                 <td>{{ $orderPaymentsTransaction->created_at }}</td>
                                 <td>{{ $orderPaymentsTransaction->booked_date }}</td>
                                 <td>{{ $orderPaymentsTransaction->description }}</td>
+                                <td>{{ $orderPaymentsTransaction->employee_id }}</td>
                                 <td>{{ $orderPaymentsTransaction->user_id }}</td>
                                 <td>{{ $orderPaymentsTransaction->order_id }}</td>
                                 <td>{{ $orderPaymentsTransaction->payment_type }}</td>
