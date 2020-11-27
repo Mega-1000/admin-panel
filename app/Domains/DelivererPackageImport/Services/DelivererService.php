@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Services;
+namespace App\Domains\DelivererPackageImport\Services;
 
 use App\Domains\DelivererPackageImport\Repositories\DelivererImportRuleRepositoryEloquent;
 use App\Entities\Deliverer;
@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use \Symfony\Component\HttpFoundation\File\File;
 
-class TransportService
+class DelivererService
 {
     private $delivererRepository;
 
@@ -26,7 +26,7 @@ class TransportService
         $this->delivererImportRuleRepository = $delivererImportRuleRepository;
     }
 
-    public function getDeliverer(int $delivererId): ?Deliverer
+    public function findDeliverer(int $delivererId): ?Deliverer
     {
         return $this->delivererRepository->find($delivererId);
     }
@@ -34,11 +34,6 @@ class TransportService
     public function getDelivererByName(string $name): ?Deliverer
     {
         return $this->delivererRepository->findByField('name', $name)->first();
-    }
-
-    public function updateDeliverer(Deliverer $deliverer, string $name): bool
-    {
-        return $deliverer->update(['name' => $name]);
     }
 
     /**
@@ -67,5 +62,26 @@ class TransportService
         $fileName = Str::random(40) . '.csv';
 
         return $file->move(Storage::path('user-files/transport/'), $fileName);
+    }
+
+    public function updateDeliverer(
+        Deliverer $deliverer,
+        string $name,
+        array $importRules
+    ): bool {
+        $this->delivererImportRuleRepository->removeAllDelivererImportRules($deliverer);
+
+        $this->saveDelivererImportRules(
+            $deliverer,
+            $importRules
+        );
+
+        return $deliverer->update(['name' => $name]);
+    }
+
+    public function deleteDeliverer(Deliverer $deliverer): void
+    {
+        $this->delivererImportRuleRepository->removeDeliverersImportRules($deliverer);
+        $this->delivererRepository->removeDeliverer($deliverer);
     }
 }

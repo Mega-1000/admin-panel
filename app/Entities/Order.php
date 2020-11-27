@@ -128,6 +128,10 @@ class Order extends Model implements Transformable
         'master_order_id',
         'spedition_comment',
         'financial_comment',
+        'allegro_form_id',
+        'allegro_deposit_value',
+        'allegro_operation_date',
+        'allegro_additional_service',
     ];
 
     /**

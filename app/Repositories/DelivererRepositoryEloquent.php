@@ -24,4 +24,14 @@ class DelivererRepositoryEloquent extends BaseRepository implements DelivererRep
     {
         $this->pushCriteria(app(RequestCriteria::class));
     }
+
+    public function findById(int $delivererId): ?Deliverer
+    {
+        return $this->find($delivererId);
+    }
+
+    public function removeDeliverer(Deliverer $deliverer): bool
+    {
+        return (bool) $this->delete($deliverer->id);
+    }
 }

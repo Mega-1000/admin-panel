@@ -6,6 +6,7 @@ namespace App\Domains\DelivererPackageImport\Repositories;
 
 use App\Entities\Deliverer;
 use App\Entities\DelivererImportRule;
+use App\Repositories\DelivererRepositoryEloquent;
 use Illuminate\Container\Container as Application;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -14,9 +15,15 @@ use Prettus\Repository\Criteria\RequestCriteria;
 
 class DelivererImportRuleRepositoryEloquent extends BaseRepository implements DelivererImportRuleRepositoryInterface
 {
-    public function __construct(Application $app)
-    {
+    private $delivererRepository;
+
+    public function __construct(
+        Application $app,
+        DelivererRepositoryEloquent $delivererRepository
+    ) {
         parent::__construct($app);
+
+        $this->delivererRepository = $delivererRepository;
     }
 
     public function model(): string
@@ -52,6 +59,13 @@ class DelivererImportRuleRepositoryEloquent extends BaseRepository implements De
     public function getDelivererImportRules(Deliverer $deliverer)
     {
         return $this->findWhere([
+            'deliverer_id' => $deliverer->id,
+        ]);
+    }
+
+    public function removeDeliverersImportRules(Deliverer $deliverer): bool
+    {
+        return (bool) $this->deleteWhere([
             'deliverer_id' => $deliverer->id,
         ]);
     }

@@ -8,13 +8,13 @@ use BenSampo\Enum\Enum;
 
 final class DelivererRulesColumnNameEnum extends Enum
 {
-    public const ALLEGRO_TRANSACTION_ID = 'allegro_transaction_id';
-
     public const SELLO_ID = 'sello_id';
 
-    public const CUSTOMER_NOTICES = 'customer_notices';
+    public const ALLEGRO_FORM_ID = 'allegro_form_id';
 
-    public const RATING_MESSAGE = 'rating_message';
+    public const ALLEGRO_DEPOSIT_VALUE = 'allegro_deposit_value';
 
-    public const FINANCIAL_COMMENT = 'financial_comment';
+    public const ALLEGRO_OPERATION_DATE = 'allegro_operation_date';
+
+    public const ALLEGRO_ADDITIONAL_SERVICE = 'allegro_additional_service';
 }

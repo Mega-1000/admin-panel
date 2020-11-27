@@ -7,27 +7,25 @@ namespace App\Http\Controllers;
 use App\Domains\DelivererPackageImport\Builders\DelivererImportRulesBuilder;
 use App\Domains\DelivererPackageImport\Enums\DelivererRulesActionEnum;
 use App\Domains\DelivererPackageImport\Enums\DelivererRulesColumnNameEnum;
-use App\Domains\DelivererPackageImport\ImportRules\DelivererImportRulesManager;
-use App\Domains\DelivererPackageImport\Repositories\DelivererImportRuleRepositoryEloquent;
 use App\Domains\DelivererPackageImport\TransportPaymentImporter;
 use App\Entities\Deliverer;
 use App\Http\DTOs\DelivererCreateImportRulesDTO;
 use App\Http\Requests\DelivererCreateRequest;
 use App\Http\Requests\DelivererEditRequest;
 use App\Http\Requests\TransportPaymentsImportRequest;
-use App\Services\TransportService;
+use App\Domains\DelivererPackageImport\Services\DelivererService;
+use App\Repositories\DelivererRepositoryEloquent;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use Nexmo\Client\Exception\Transport;
 
-class TransportPaymentsController extends Controller
+class DelivererController extends Controller
 {
-    private $transportService;
+    private $delivererService;
 
-    public function __construct(TransportService $transportService)
+    public function __construct(DelivererService $delivererService)
     {
-        $this->transportService = $transportService;
+        $this->delivererService = $delivererService;
     }
 
     public function list(): View
@@ -48,37 +46,25 @@ class TransportPaymentsController extends Controller
         DelivererCreateRequest $request,
         DelivererImportRulesBuilder $delivererImportRulesBuilder
     ): RedirectResponse {
-        /*if ($this->transportService->getDelivererByName($request->getName())) {
+        if ($this->delivererService->getDelivererByName($request->getName())) {
             return redirect()->route('transportPayment.list')->with([
                 'message' => __('transport.errors.exists'),
                 'alert-type' => 'error',
             ]);
-        }*/
-
-        if (!$deliverer = $this->transportService->getDelivererByName($request->getName())) {
-            $deliverer = $this->transportService->createDeliverer($request->getName());
         }
 
-        $importRules = $delivererImportRulesBuilder->buildFromRequest(
-            $deliverer,
-            new DelivererCreateImportRulesDTO($request->getImportRules())
-        );
+        try {
+            $deliverer = $this->delivererService->createDeliverer($request->getName());
 
-        $this->transportService->saveDelivererImportRules(
-            $deliverer,
-            $importRules
-        );
+            $importRules = $delivererImportRulesBuilder->buildFromRequest(
+                $deliverer,
+                new DelivererCreateImportRulesDTO($request->getImportRules())
+            );
 
-        return redirect()->route('transportPayment.list')->with([
-            'message' => __('voyager.generic.successfully_added_new'),
-            'alert-type' => 'success',
-        ]);
-
-        //dd('OK');
-
-        /*try {
-            $this->transportService->createDeliverer($request->getName());
-            $this->transportService->createDelivererImportRules();
+            $this->delivererService->saveDelivererImportRules(
+                $deliverer,
+                $importRules
+            );
 
             return redirect()->route('transportPayment.list')->with([
                 'message' => __('voyager.generic.successfully_added_new'),
@@ -89,7 +75,7 @@ class TransportPaymentsController extends Controller
                 'message' => $exception->getMessage(),
                 'alert-type' => 'error',
             ]);
-        }*/
+        }
     }
 
     /**
@@ -97,9 +83,13 @@ class TransportPaymentsController extends Controller
      */
     public function edit(int $delivererId)
     {
-        $deliverer = $this->transportService->getDeliverer($delivererId);
-        if ($deliverer) {
-            return view('transport.edit', ['deliverer' => $deliverer]);
+        if ($deliverer = $this->delivererService->findDeliverer($delivererId)) {
+            return view('transport.edit', [
+                'deliverer' => $deliverer,
+                'columns' => DelivererRulesColumnNameEnum::getValues(),
+                'csvColumnsNumbers' => range(1,20),
+                'actions' => DelivererRulesActionEnum::getInstances(),
+            ]);
         }
 
         return redirect()->route('transportPayment.list')->with([
@@ -108,9 +98,12 @@ class TransportPaymentsController extends Controller
         ]);
     }
 
-    public function update(DelivererEditRequest $request, int $delivererId): RedirectResponse
-    {
-        $deliverer = $this->transportService->getDeliverer($delivererId);
+    public function update(
+        DelivererEditRequest $request,
+        DelivererImportRulesBuilder $delivererImportRulesBuilder,
+        int $delivererId
+    ): RedirectResponse {
+        $deliverer = $this->delivererService->findDeliverer($delivererId);
         if (!$deliverer) {
             return redirect()->route('transportPayment.list')->with([
                 'message' => __('transport.errors.not-found'),
@@ -118,7 +111,14 @@ class TransportPaymentsController extends Controller
             ]);
         }
 
-        if ($this->transportService->updateDeliverer($deliverer, $request->getName())) {
+        if ($this->delivererService->updateDeliverer(
+            $deliverer,
+            $request->getName(),
+            $delivererImportRulesBuilder->buildFromRequest(
+                $deliverer,
+                new DelivererCreateImportRulesDTO($request->getImportRules())
+            )
+        )) {
             return redirect()->route('transportPayment.list')->with([
                 'message' => __('voyager.generic.successfully_updated'),
                 'alert-type' => 'success',
@@ -131,17 +131,15 @@ class TransportPaymentsController extends Controller
         ]);
     }
 
-
-
-
-
-
-
-    public function delete(Request $request)
-    {
+    public function delete(
+        Request $request,
+        DelivererRepositoryEloquent $delivererRepository
+    ): RedirectResponse {
         try {
-            $deliverer = Deliverer::findOrFail($request->id);
-            $deliverer->delete();
+            $deliverer = $delivererRepository->findById((int) $request->id);
+
+            $this->delivererService->deleteDeliverer($deliverer);
+
             return redirect()->route('transportPayment.list')->with([
                 'message' => __('voyager.generic.successfully_deleted'),
                 'alert-type' => 'success'
@@ -158,7 +156,7 @@ class TransportPaymentsController extends Controller
         TransportPaymentsImportRequest $request,
         TransportPaymentImporter $transportPaymentImporter
     ): RedirectResponse {
-        $deliverer = $this->transportService->getDeliverer((int) $request->input('delivererId'));
+        $deliverer = $this->transportService->findDeliverer((int) $request->input('delivererId'));
 
         if (!$deliverer) {
             return redirect()->route('orders.index')->with([
@@ -170,7 +168,7 @@ class TransportPaymentsController extends Controller
         try {
             $transportPaymentImporter->import(
                 $deliverer,
-                $this->transportService->saveFileToImport($request->file('file'))
+                $this->delivererService->saveFileToImport($request->file('file'))
             );
 
             return redirect()->route('transportPayment.list')->with([
@@ -183,9 +181,6 @@ class TransportPaymentsController extends Controller
                 'alert-type' => 'error'
             ]);
         }
-        /*return redirect()->route('orders.index')->with(
-            'update_errors', $errors
-        );*/
     }
 
     public function store2(Request $request)

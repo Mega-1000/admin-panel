@@ -72,7 +72,6 @@
         });
 
         $('.removeRule').click((event) => {
-            console.log('remove');
             event.preventDefault();
 
             $(this).closest('.rule').remove();
@@ -85,8 +84,8 @@
             const id = Math.random().toString(36).substring(7);
 
             if (countRules >= 2) {
-                newRule.find('.action option[value="search"]').remove();
-                newRule.find('.action option[value="searchByParse"]').remove();
+                newRule.find('.action option[value="searchCompare"]').remove();
+                newRule.find('.action option[value="searchRegex"]').remove();
             }
 
             newRule.attr('id', id);

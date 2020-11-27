@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Entities\Deliverer;
 use Prettus\Repository\Contracts\RepositoryInterface;
 
 /**
@@ -11,5 +12,6 @@ use Prettus\Repository\Contracts\RepositoryInterface;
  */
 interface DelivererRepository extends RepositoryInterface
 {
-    //
+    function findById(int $delivererId): ?Deliverer;
+    function removeDeliverer(Deliverer $deliverer): bool;
 }
