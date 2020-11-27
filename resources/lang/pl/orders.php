@@ -156,4 +156,6 @@ return [
     ],
     'wrong_template_error' => 'Zły szablon paczki',
     'order_not_found' => 'Nie znaleziono zamówienia',
+    'next_order' => 'Przejdź do kolejnego zlecenia',
+    'previous_order' => 'Przejdź do poprzedniego zlecenia',
 ];
