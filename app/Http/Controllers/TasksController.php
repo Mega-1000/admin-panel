@@ -699,8 +699,15 @@ class TasksController extends Controller
             $task->TaskTime->date_end = $end;
             $task->status = Task::FINISHED;
             $task->TaskTime->save();
+
+            $response = $this->markTaskAsProduced($task);
+            if($response !== null) {
+                return redirect()->back()->with([
+                    'message' => __('tasks.messages.stocks_invalid'),
+                    'alert-type' => 'error'
+                ]);
+            }
             $task->save();
-            $this->markTaskAsProduced($task);
             if ($request->warehouse_notice) {
                 $task->taskSalaryDetail->warehouse_notice .= Order::formatMessage($task->user, $request->warehouse_notice);
                 $task->taskSalaryDetail->save();
@@ -720,21 +727,24 @@ class TasksController extends Controller
     /**
      * @param Request $request
      */
-    private function markTaskAsProduced($task): void
+    private function markTaskAsProduced($task): array
     {
+        $response = null;
         if ($task->childs->count()) {
             $task->childs->map(function ($child) {
                 if ($child->order_id) {
-                    dispatch_now(new RemoveLabelJob($child->order_id,
+                    $response = dispatch_now(new RemoveLabelJob($child->order_id,
                         [Label::ORDER_ITEMS_UNDER_CONSTRUCTION],
                         $prev));
                 }
             });
         } else if ($task->order_id) {
-            dispatch_now(new RemoveLabelJob($task->order_id,
+            $response = dispatch_now(new RemoveLabelJob($task->order_id,
                 [Label::ORDER_ITEMS_UNDER_CONSTRUCTION],
                 $prev));
         }
+
+        return $response;
     }
 
     public function deny(DenyTaskRequest $request)
