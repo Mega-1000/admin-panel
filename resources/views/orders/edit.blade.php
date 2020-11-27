@@ -4606,7 +4606,7 @@
             });
         });
         function goToNextOrder() {
-            let lastOrderId = {{ Order::getLastOrder() }};
+            let lastOrderId = {{ $order->getLastOrder() }};
             let currentOrderId = {{ $order->id }};
             if(lastOrderId > currentOrderId) {
                 let nextOrderUrl = '{{ route('orders.edit', ['id' => $order->id + 1]) }}';
@@ -4617,7 +4617,7 @@
         }
 
         function goToPreviousOrder() {
-            let previousOrderUrl = '{{ route('orders.edit', ['id' => Order::getPreviousOrderId($order->id)]) }}';
+            let previousOrderUrl = '{{ route('orders.edit', ['id' => $order->getPreviousOrderId($order->id)]) }}';
             window.location.href = previousOrderUrl;
         }
 

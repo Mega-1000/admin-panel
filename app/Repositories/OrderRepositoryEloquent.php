@@ -32,9 +32,4 @@ class OrderRepositoryEloquent extends BaseRepository implements OrderRepository
     {
         $this->pushCriteria(app(RequestCriteria::class));
     }
-
-    public function commission(): float
-    {
-        return $this->model->detailedCommissions()->sum('amount');
-    }
 }
