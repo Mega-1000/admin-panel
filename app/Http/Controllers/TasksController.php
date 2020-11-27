@@ -729,7 +729,6 @@ class TasksController extends Controller
      */
     private function markTaskAsProduced($task)
     {
-        $response = [];
         if ($task->childs->count()) {
             $task->childs->map(function ($child) {
                 if ($child->order_id) {
