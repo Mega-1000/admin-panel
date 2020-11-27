@@ -519,9 +519,15 @@ class OrdersPackagesController extends Controller
                 array_push($packagesArray, $packagesArr);
             }
             $pdfFilename = 'protocol-' . $courierName . '-' . Carbon::today()->toDateString() . '.pdf';
+            if($request->date_to === $request->date_from) {
+                $date = ' z dnia ' . $request->date_to;
+            } else {
+                $date = ' od dnia ' . $request->date_from . ' do dnia ' . $request->date_to;
+            }
+
             $pdf = PDF::loadView('pdf.protocol', [
                 'packages' => $packagesArray,
-                'date' => Carbon::today()->toDateString(),
+                'date' => $date,
                 'courierName' => strtoupper($courierName)
             ])->setPaper('a4', 'landscape');
             if (!file_exists(storage_path('app/public/protocols'))) {
