@@ -53,7 +53,7 @@ class DelivererService
             return;
         }
 
-        $this->delivererImportRuleRepository->removeAllDelivererImportRules($deliverer);
+        $this->delivererImportRuleRepository->removeDelivererImportRules($deliverer);
         $this->delivererImportRuleRepository->saveImportRules($delivererImportRules);
     }
 
@@ -69,7 +69,7 @@ class DelivererService
         string $name,
         array $importRules
     ): bool {
-        $this->delivererImportRuleRepository->removeAllDelivererImportRules($deliverer);
+        $this->delivererImportRuleRepository->removeDelivererImportRules($deliverer);
 
         $this->saveDelivererImportRules(
             $deliverer,
@@ -81,7 +81,7 @@ class DelivererService
 
     public function deleteDeliverer(Deliverer $deliverer): void
     {
-        $this->delivererImportRuleRepository->removeDeliverersImportRules($deliverer);
+        $this->delivererImportRuleRepository->removeDelivererImportRules($deliverer);
         $this->delivererRepository->removeDeliverer($deliverer);
     }
 }

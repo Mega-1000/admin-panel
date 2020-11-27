@@ -79,7 +79,6 @@
 
         function copyRuleSchema() {
             const countRules = $('.rule').length;
-
             const newRule = $('.rule:first').clone(true);
             const id = Math.random().toString(36).substring(7);
 

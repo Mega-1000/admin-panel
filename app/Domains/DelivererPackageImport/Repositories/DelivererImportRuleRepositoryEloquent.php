@@ -48,11 +48,6 @@ class DelivererImportRuleRepositoryEloquent extends BaseRepository implements De
         }
     }
 
-    public function removeAllDelivererImportRules(Deliverer $deliverer): int
-    {
-        return $this->deleteWhere(['deliverer_id' => $deliverer->id]);
-    }
-
     /**
      * @return LengthAwarePaginator|Collection|mixed
      */
@@ -63,10 +58,8 @@ class DelivererImportRuleRepositoryEloquent extends BaseRepository implements De
         ]);
     }
 
-    public function removeDeliverersImportRules(Deliverer $deliverer): bool
+    public function removeDelivererImportRules(Deliverer $deliverer): bool
     {
-        return (bool) $this->deleteWhere([
-            'deliverer_id' => $deliverer->id,
-        ]);
+        return (bool) $deliverer->importRules()->delete();
     }
 }

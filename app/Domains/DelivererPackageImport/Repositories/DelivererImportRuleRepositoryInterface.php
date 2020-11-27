@@ -8,7 +8,6 @@ use Prettus\Repository\Contracts\RepositoryInterface;
 interface DelivererImportRuleRepositoryInterface extends RepositoryInterface
 {
     function saveImportRules(array $delivererImportRules);
-    function removeAllDelivererImportRules(Deliverer $deliverer): int;
     function getDelivererImportRules(Deliverer $deliverer);
-    function removeDeliverersImportRules(Deliverer $deliverer): bool;
+    function removeDelivererImportRules(Deliverer $deliverer): bool;
 }
