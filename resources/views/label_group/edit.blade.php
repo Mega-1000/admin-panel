@@ -27,6 +27,9 @@
                 <label for="name">@lang('label_groups.form.name')</label>
                 <input type="text" class="form-control" id="name" name="name"
                        value="{{ $labelGroup->name }}">
+                <label for="name">@lang('label_groups.form.order')</label>
+                <input type="number" class="form-control" id="order" name="order"
+                       value="{{ $labelGroup->order }}">
             </div>
         </div>
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
