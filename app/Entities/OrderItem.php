@@ -47,7 +47,7 @@ class OrderItem extends Model implements Transformable
         'gross_selling_price_calculated_unit',
         'gross_selling_price_aggregate_unit',
         'gross_selling_price_the_largest_unit',
-        'product_stock_packet_id'
+        'product_stock_packet_id',
     ];
 
     /**
