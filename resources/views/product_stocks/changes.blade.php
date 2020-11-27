@@ -10,6 +10,9 @@
             position: relative;
             font: 9px Arial, Helvetica, sans-serif;
         }
+        table {
+            width: 70%;
+        }
     </style>
 </head>
 <body>
@@ -17,7 +20,7 @@
 
 <div class="docc">
     <h2>Wydruk produktów ze zmienionymi stanami dla przedziału dni: {{ $startDate }} - {{ $endDate }}</h2>
-    <table border="0" cellpadding="1" cellspacing="1" style="width: 70%;">
+    <table border="0" cellpadding="1" cellspacing="1">
         <thead>
         <th>Nazwa produktu</th>
         <th>Pozycje</th>
