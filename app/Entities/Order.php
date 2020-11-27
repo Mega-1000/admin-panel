@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types=1);
 
 namespace App\Entities;
 
@@ -635,8 +635,13 @@ class Order extends Model implements Transformable
         return $this->hasMany(OrderAllegroCommission::class);
     }
 
-    public static function getLastOrder()
+    public static function getLastOrder(): int
     {
         return Order::orderBy('id', 'desc')->first()->id;
+    }
+
+    public static function getPreviousOrderId($orderId): int
+    {
+        return Order::where('id', '<', $orderId)->orderBy('id', 'desc')->first()->id;
     }
 }

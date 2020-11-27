@@ -410,6 +410,7 @@
                             @include('orders.labels', ['title' =>  __('orders.form.consultant_notices'), 'user_type' => \App\Enums\UserRole::Consultant])
                             <textarea id="consultant_notice" disabled class="form-control" name="consultant_notices" id="consultant_notices"
                                       rows="5">{{ $order->consultant_notices ?? ''}}</textarea>
+                            <h5>Zlecenie numer {{ $order->id }} - {{ $orderInvoiceAddress->nip ? 'Klient firmowy' : 'Klient prywatny' }}</h5>
                             <div class="flex-input">
                                 <input type="text" class="form-control scrollable-notice" placeholder="@lang('orders.form.consultant_notices')"
                                        id="{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}" name="consultant_notices"/>
@@ -423,6 +424,7 @@
                                 </div>
                             </div>
                             <h5 onclick="goToNextOrder()">@lang('orders.next_order')</h5>
+                            <h5 onclick="goToPreviousOrder()">@lang('orders.previous_order')</h5>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -4612,6 +4614,11 @@
             } else {
                 alert('To jest ostatnie zamówienie');
             }
+        }
+
+        function goToPreviousOrder() {
+            let previousOrderUrl = '{{ route('orders.edit', ['id' => Order::getPreviousOrderId($order->id)]) }}';
+            window.location.href = previousOrderUrl;
         }
 
     </script>
