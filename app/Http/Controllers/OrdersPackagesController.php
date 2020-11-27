@@ -522,11 +522,9 @@ class OrdersPackagesController extends Controller
             }
             $pdfFilename = 'protocol-' . $courierName . '-' . Carbon::today()->toDateString() . '.pdf';
 
-            $date = DateHelper::dateRangeOrDate($request->date_from, $request->date_to);
-
             $pdf = PDF::loadView('pdf.protocol', [
                 'packages' => $packagesArray,
-                'date' => $date,
+                'date' => DateHelper::dateRangeOrDate($request->date_from, $request->date_to),
                 'courierName' => strtoupper($courierName)
             ])->setPaper('a4', 'landscape');
             if (!file_exists(storage_path('app/public/protocols'))) {
