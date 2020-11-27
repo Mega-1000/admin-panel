@@ -114,16 +114,16 @@ class DelivererImportRulesManager
 
     private function findOrderByRules(array $line): ?Order
     {
-        if ($this->searchRules->isNotEmpty()) {
-            /* @var $ruleToRun DelivererImportRuleInterface */
-            $ruleToRun = $this->searchRules->shift();
-
-            $order = $ruleToRun->run($line);
-
-            return empty($order) ? $this->findOrderByRules($line) : $order;
+        if($this->searchRules->isEmpty()) {
+            return null;
         }
 
-        return null;
+        /* @var $ruleToRun DelivererImportRuleInterface */
+        $ruleToRun = $this->searchRules->shift();
+
+        $order = $ruleToRun->run($line);
+
+        return empty($order) ? $this->findOrderByRules($line) : $order;
     }
 
     private function setSearchRules(): void

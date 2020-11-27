@@ -23,6 +23,8 @@ abstract class DelivererImportRuleAbstract implements DelivererImportRuleInterfa
 
     protected $order;
 
+    protected $dataToImport;
+
     public function __construct(
         OrderRepositoryEloquent $orderRepository,
         DelivererImportRule $delivererImportRule

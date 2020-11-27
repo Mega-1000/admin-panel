@@ -12,12 +12,17 @@ class DelivererImportRuleGetAndReplace extends DelivererImportRuleAbstract
     {
         $this->line = $line;
 
-        if ($this->getValue() === $this->getDataToImport()) {
-            return $this->orderRepository->update([
-                $this->getDbColumnName()->value => $this->getChangeTo(),
-            ], $this->order->id);
+        if (!$this->validate()) {
+            return null;
         }
 
-        return null;
+        return $this->orderRepository->update([
+            $this->getDbColumnName()->value => $this->getChangeTo(),
+        ], $this->order->id);
+    }
+
+    private function validate(): bool
+    {
+        return $this->getValue() === $this->getDataToImport();
     }
 }
