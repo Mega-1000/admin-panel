@@ -478,8 +478,8 @@ class OrdersPackagesController extends Controller
 
         if ($courierName !== 'WSZYSTKIE') {
             $packages = OrderPackage::where('delivery_courier_name', '=', $courierName)
-                ->whereDate('shipment_date', '<=', Carbon::createFromFormat('d/m/yy',$request->date_to)->format('yy-m-d'))
-                ->whereDate('shipment_date', '>=', Carbon::createFromFormat('d/m/yy',$request->date_from)->format('yy-m-d'))
+                ->where('shipment_date', '<=', Carbon::createFromFormat('d/m/yy',$request->date_to)->format('yy-m-d'))
+                ->where('shipment_date', '>=', Carbon::createFromFormat('d/m/yy',$request->date_from)->format('yy-m-d'))
                 ->where('status', '!=', 'CANCELLED')
                 ->where('status', '!=', 'WAITING_FOR_CANCELLED')
                 ->where('status', '!=', 'REJECT_CANCELLED')
@@ -487,12 +487,13 @@ class OrdersPackagesController extends Controller
         } else {
             $courierName = 'wszystkie';
             $packages = OrderPackage::whereDate('shipment_date', '<=', Carbon::createFromFormat('d/m/yy',$request->date_to)->format('yy-m-d'))
-                ->whereDate('shipment_date', '>=', Carbon::createFromFormat('d/m/yy',$request->date_from)->format('yy-m-d'))
+                ->where('shipment_date', '>=', Carbon::createFromFormat('d/m/yy',$request->date_from)->format('yy-m-d'))
                 ->where('status', '!=', 'CANCELLED')
                 ->where('status', '!=', 'WAITING_FOR_CANCELLED')
                 ->where('status', '!=', 'REJECT_CANCELLED')
                 ->get();
         }
+
         if ($packages->count() > 0 ){
             $packagesArray = [];
             foreach ($packages as $package) {
