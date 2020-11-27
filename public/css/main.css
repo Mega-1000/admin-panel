@@ -103,3 +103,26 @@
 .add-label {
     cursor: pointer;
 }
+
+.wz__font {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.wz__description {
+    font-size:14px;
+    font-weight:bold;
+}
+
+.wz__position {
+    width: 100px;
+    display:inline-block;
+}
+
+.wz__container {
+    width: 300px;
+    display:inline-block;
+}
+.wz__image {
+    width: 70px;
+}

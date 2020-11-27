@@ -701,7 +701,7 @@ class TasksController extends Controller
             $task->TaskTime->save();
 
             $response = $this->markTaskAsProduced($task);
-            if($response !== null) {
+            if(!empty($response)) {
                 return redirect()->back()->with([
                     'message' => __('tasks.messages.stocks_invalid'),
                     'alert-type' => 'error'
@@ -729,7 +729,7 @@ class TasksController extends Controller
      */
     private function markTaskAsProduced($task): array
     {
-        $response = null;
+        $response = [];
         if ($task->childs->count()) {
             $task->childs->map(function ($child) {
                 if ($child->order_id) {
