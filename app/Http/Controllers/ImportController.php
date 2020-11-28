@@ -32,7 +32,7 @@ class ImportController extends Controller
             Storage::disk()->put('/user-files/baza/baza.csv', fopen($file, 'r+'));
             \Session::flash('flash-message', ['type' => 'success', 'message' => 'Plik został zapisany, import zostanie wykonany w ciągu kilku minut']);
         }
-        
+
         return redirect(route('import.index'));
     }
 }

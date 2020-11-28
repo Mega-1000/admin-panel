@@ -12,6 +12,7 @@ use App\Entities\PackageTemplate;
 use App\Entities\PackingType;
 use App\Entities\SelAddress;
 use App\Entities\SelTransaction;
+use App\Helpers\DateHelper;
 use App\Helpers\OrderPackagesDataHelper;
 use App\Http\Requests\GetProtocolRequest;
 use App\Http\Requests\OrderPackageCreateRequest;
@@ -477,8 +478,8 @@ class OrdersPackagesController extends Controller
 
         if ($courierName !== 'WSZYSTKIE') {
             $packages = OrderPackage::where('delivery_courier_name', '=', $courierName)
-                ->whereDate('shipment_date', '<=', Carbon::createFromFormat('d/m/yy',$request->date_to)->format('yy-m-d'))
-                ->whereDate('shipment_date', '>=', Carbon::createFromFormat('d/m/yy',$request->date_from)->format('yy-m-d'))
+                ->where('shipment_date', '<=', Carbon::createFromFormat('d/m/yy',$request->date_to)->format('yy-m-d'))
+                ->where('shipment_date', '>=', Carbon::createFromFormat('d/m/yy',$request->date_from)->format('yy-m-d'))
                 ->where('status', '!=', 'CANCELLED')
                 ->where('status', '!=', 'WAITING_FOR_CANCELLED')
                 ->where('status', '!=', 'REJECT_CANCELLED')
@@ -486,12 +487,13 @@ class OrdersPackagesController extends Controller
         } else {
             $courierName = 'wszystkie';
             $packages = OrderPackage::whereDate('shipment_date', '<=', Carbon::createFromFormat('d/m/yy',$request->date_to)->format('yy-m-d'))
-                ->whereDate('shipment_date', '>=', Carbon::createFromFormat('d/m/yy',$request->date_from)->format('yy-m-d'))
+                ->where('shipment_date', '>=', Carbon::createFromFormat('d/m/yy',$request->date_from)->format('yy-m-d'))
                 ->where('status', '!=', 'CANCELLED')
                 ->where('status', '!=', 'WAITING_FOR_CANCELLED')
                 ->where('status', '!=', 'REJECT_CANCELLED')
                 ->get();
         }
+
         if ($packages->count() > 0 ){
             $packagesArray = [];
             foreach ($packages as $package) {
@@ -519,9 +521,10 @@ class OrdersPackagesController extends Controller
                 array_push($packagesArray, $packagesArr);
             }
             $pdfFilename = 'protocol-' . $courierName . '-' . Carbon::today()->toDateString() . '.pdf';
+
             $pdf = PDF::loadView('pdf.protocol', [
                 'packages' => $packagesArray,
-                'date' => Carbon::today()->toDateString(),
+                'date' => DateHelper::dateRangeOrDate($request->date_from, $request->date_to),
                 'courierName' => strtoupper($courierName)
             ])->setPaper('a4', 'landscape');
             if (!file_exists(storage_path('app/public/protocols'))) {

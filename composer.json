@@ -31,7 +31,8 @@
         "spatie/browsershot": "^3.34",
         "tcg/voyager": "^1.1",
         "vaibhavpandeyvpz/phemail": "^1.0",
-        "yajra/laravel-datatables-oracle": "~8.0"
+        "yajra/laravel-datatables-oracle": "~8.0",
+        "bensampo/laravel-enum": "^v1.38.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.2",

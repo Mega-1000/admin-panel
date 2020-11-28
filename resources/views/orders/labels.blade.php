@@ -1,6 +1,6 @@
 <div class="flex-container-labels">
-    <div class="col-md-4">
-        <p class="text-center">Dodaj etykiety</p>
+    <div class="col-md-8">
+        <p class="text-left">Dodaj etykiety</p>
         <div class="row">
 
             <div class="col-md-1 label-with-desc-pair">
@@ -13,6 +13,12 @@
                             margin-top: 5px;"
                         class="{{ $labelsButtons[\App\Entities\Label::WAREHOUSE_MARK]->icon_name }}"></i>
                 </button>
+                @if($user_type === \App\Enums\UserRole::Consultant)
+                <h6 title="{{ $labelsButtons[\App\Entities\Label::WAREHOUSE_MARK]->name}}"
+                        data-label-id="{{\App\Entities\Label::WAREHOUSE_MARK}}" class="add-label">
+                    informacja dla mastera - dialog
+                </h6>
+                @endif
             </div>
             <div class="col-md-1 label-with-desc-pair">
                 <label>
@@ -24,6 +30,12 @@
                             margin-top: 5px;"
                         class="{{ $labelsButtons[\App\Entities\Label::SHIPPING_MARK]->icon_name }}"></i>
                 </button>
+                @if($user_type === \App\Enums\UserRole::Consultant)
+                <h6 title="{{ $labelsButtons[\App\Entities\Label::SHIPPING_MARK]->name}}"
+                    data-label-id="{{\App\Entities\Label::SHIPPING_MARK}}" class="add-label">
+                    informacja dla konsultanta - dialog
+                </h6>
+                @endif
             </div>
             <div class="col-md-1 label-with-desc-pair">
                 <label>
@@ -35,6 +47,12 @@
                             margin-top: 5px;"
                         class="{{ $labelsButtons[\App\Entities\Label::CONSULTANT_MARK]->icon_name }}"></i>
                 </button>
+                @if($user_type === \App\Enums\UserRole::Consultant)
+                <h6 title="{{ $labelsButtons[\App\Entities\Label::CONSULTANT_MARK]->name}}"
+                    data-label-id="{{\App\Entities\Label::CONSULTANT_MARK}}" class="add-label">
+                    informacja dla magazynu / dialog
+                </h6>
+                @endif
             </div>
             <div class="col-md-1 label-with-desc-pair">
                 <label>
@@ -46,11 +64,17 @@
                             margin-top: 5px;"
                         class="{{ $labelsButtons[\App\Entities\Label::MASTER_MARK]->icon_name }}"></i>
                 </button>
+                @if($user_type === \App\Enums\UserRole::Consultant)
+                <h6 title="{{ $labelsButtons[\App\Entities\Label::MASTER_MARK]->name}}"
+                    data-label-id="{{\App\Entities\Label::MASTER_MARK}}" class="add-label">
+                    informacja dla księgowości / dialog
+                </h6>
+                @endif
             </div>
         </div>
     </div>
     <label for="">{{ $title }}</label>
-    <div class="col-md-4">
+    <div class="col-md-2">
         <p class="text-center">Usuń etykiety</p>
         <div class="row">
 

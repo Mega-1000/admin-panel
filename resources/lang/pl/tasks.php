@@ -40,5 +40,6 @@ return [
         'update_error' => 'Zadanie nie zostało zaktualizowane',
         'cannot_delete_ask_warehouse' => 'Zadanie nie zostało zaktualizowane. Skontaktuj się z magazynem',
         'task_with_order_exist' => 'Już istnieje zadanie dla danego zamówienia',
+        'stocks_invalid' => 'Brak pozycji lub stanu magazynowego dla produktu w zamówieniu.',
     ]
 ];
