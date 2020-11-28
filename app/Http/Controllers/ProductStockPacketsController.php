@@ -15,10 +15,7 @@ use App\Services\ProductStockLogService;
 use App\Services\ProductStockPacketService;
 use App\Services\ProductStockPositionService;
 use App\Services\ProductStockService;
-use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class ProductStockPacketsController extends Controller
@@ -63,17 +60,6 @@ class ProductStockPacketsController extends Controller
      */
     protected $productStockPositionService;
 
-    /**
-     * ProductStocksController constructor.
-     * @param ProductStockPacketRepository $repository
-     * @param ProductStockRepository $productStockRepository
-     * @param ProductStockLogRepository $productStockLogRepository
-     * @param OrderItemRepository $orderItemRepository
-     * @param ProductStockPacketService $productStockPacketService
-     * @param ProductStockService $productStockService
-     * @param ProductStockLogService $productStockLogService
-     * @param ProductStockPositionService $productStockPositionService
-     */
     public function __construct(
         ProductStockPacketRepository $repository,
         ProductStockRepository $productStockRepository,
@@ -120,7 +106,6 @@ class ProductStockPacketsController extends Controller
     {
         $validated = $request->validated();
 
-
         $packetQuantity = $request->input('packet_quantity') * $request->input('packet_product_quantity');
 
         $productStock = $this->productStockRepository->find($productStockId);
@@ -131,7 +116,6 @@ class ProductStockPacketsController extends Controller
             $validated['packet_product_quantity'],
             $productStockId
         );
-
 
         $productStockFirstPosition = $productStock->position->first();
 
