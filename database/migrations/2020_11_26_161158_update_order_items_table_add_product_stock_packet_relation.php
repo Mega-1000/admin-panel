@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 declare(strict_types=1);
 
@@ -21,6 +21,7 @@ class UpdateOrderItemsTableAddProductStockPacketRelation extends Migration
     public function down(): void
     {
         Schema::table('order_items', function (Blueprint $table) {
+            $table->dropForeign('product_stock_packet_id');
             $table->dropColumn('product_stock_packet_id');
         });
     }
