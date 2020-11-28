@@ -232,7 +232,7 @@
                         {{ csrf_field() }}
                         Dostawca:
                         <br/>
-                        <select required name="deliverersList" class="form-control text-uppercase">
+                        <select required name="delivererId" class="form-control text-uppercase">
                             <option value="" selected="selected"></option>
                             @foreach($deliverers as $deliver)
                                 <option value="{{ $deliver->id }}">{{ $deliver->name }}</option>
@@ -819,6 +819,10 @@
                     <input type="text" id="columnSearch-sello_payment"/>
                 </div>
             </th>
+            <th>@lang('orders.table.allegro_deposit_value')</th>
+            <th>@lang('orders.table.allegro_operation_date')</th>
+            <th>@lang('orders.table.allegro_additional_service')</th>
+            <th>@lang('orders.table.payment_channel')</th>
             <th>
                 <div><span>@lang('orders.form.remainder_date')</span></div>
                 <div class="input_div">
@@ -1970,6 +1974,26 @@
                     data: null,
                     name: 'sello_payment',
                     render: (data, type, row) => (data.sello_payment ?? data.return_payment_id)
+                },
+                {
+                    data: 'allegro_deposit_value',
+                    name: 'allegro_deposit_value',
+                    searchable: false,
+                },
+                {
+                    data: 'allegro_operation_date',
+                    name: 'allegro_operation_date',
+                    searchable: false,
+                },
+                {
+                    data: 'allegro_additional_service',
+                    name: 'allegro_additional_service',
+                    searchable: false,
+                },
+                {
+                    data: 'payment_channel',
+                    name: 'payment_channel',
+                    searchable: false,
                 },
                 {
                     data: 'remainder_date',

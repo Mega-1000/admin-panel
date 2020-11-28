@@ -499,12 +499,13 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/dispatch-job/generate-jpgs', 'DispatchJobController@generateJpgs')->name('job.generateJpgs');
         Route::get('/chat/{all?}/{orderId?}', 'MessagesController@index')->name('chat.index');
 
-        Route::get('/transport', 'TransportPaymentsController@list')->name('transportPayment.list');
-        Route::get('/transport/create', 'TransportPaymentsController@createOrUpdate')->name('transportPayment.createOrUpdate');
-        Route::get('/transport/delete', 'TransportPaymentsController@delete')->name('transportPayment.delete');
-        Route::post('/transport/store', 'TransportPaymentsController@store')->name('transportPayment.post');
-        Route::get('/transport/edit/{id}', 'TransportPaymentsController@edit')->name('transportPayment.edit');
-        Route::post('/transport/update-pricing', 'TransportPaymentsController@updatePricing')->name('transportPayment.update_pricing');
+        Route::get('/transport', 'DelivererController@list')->name('transportPayment.list');
+        Route::get('/transport/create', 'DelivererController@create')->name('transportPayment.create');
+        Route::post('/transport/store', 'DelivererController@store')->name('transportPayment.store');
+        Route::get('/transport/edit/{delivererId}', 'DelivererController@edit')->name('transportPayment.edit');
+        Route::post('/transport/update/{delivererId}', 'DelivererController@update')->name('transportPayment.update');
+        Route::get('/transport/delete', 'DelivererController@delete')->name('transportPayment.delete');
+        Route::post('/transport/update-pricing', 'DelivererController@updatePricing')->name('transportPayment.update_pricing');
     });
 });
 
