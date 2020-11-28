@@ -8,7 +8,7 @@ use App\Repositories\ProductStockRepository;
 
 class ProductStockService
 {
-    protected $repository;
+    protected $productStockRepository;
 
     public function __construct(ProductStockRepository $repository)
     {
