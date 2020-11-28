@@ -15,7 +15,12 @@ class ProductStockPacketService
         $this->repository = $repository;
     }
 
-    public function create(int $packetQuantity, string $packetName, int $packetProductQuantity, int $productStockId): void {
+    public function create(
+        int $packetQuantity, 
+        string $packetName, 
+        int $packetProductQuantity, 
+        int $productStockId
+    ): void {
         $this->repository->create([
             'packet_quantity' => $packetQuantity,
             'packet_name' => $packetName,
