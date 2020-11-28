@@ -17,11 +17,7 @@ class ProductStockPositionService
     }
 
     public function update($positionQuantity, $packetQuantity, $productStockPositionId, int $sign): void {
-        if($sign === 0) {
-            $positionQuantity = $positionQuantity - $packetQuantity;
-        } else {
-            $positionQuantity = $positionQuantity + $packetQuantity;
-        }
+        $positionQuantity = $sign ? $positionQuantity - $packetQuantity : $positionQuantity + $packetQuantity;
 
         $this->repository->update([
             'position_quantity' => $positionQuantity
