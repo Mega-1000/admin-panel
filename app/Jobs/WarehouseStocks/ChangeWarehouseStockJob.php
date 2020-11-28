@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Jobs\Orders;
+namespace App\Jobs\WarehouseStocks;
 
-use App\Entities\Product;
-use App\Jobs\DispatchLabelEventByNameJob;
+use App\Enums\ProductStockLogActionEnum;
 use App\Jobs\Job;
 use App\Repositories\OrderRepository;
 use App\Repositories\ProductStockLogRepository;
@@ -12,7 +11,6 @@ use App\Repositories\ProductStockRepository;
 use App\Repositories\ProductRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use mysql_xdevapi\Exception;
 
 class ChangeWarehouseStockJob extends Job
 {
@@ -95,7 +93,7 @@ class ChangeWarehouseStockJob extends Job
                 $productStockLogRepository->create([
                     'product_stock_id' => $productStock->id,
                     'product_stock_position_id' => $productStockPosition->id,
-                    'action' => 'DELETE',
+                    'action' => ProductStockLogActionEnum::DELETE,
                     'quantity' => $item->quantity,
                     'order_id' => $this->orderId,
                     'user_id' => Auth::id(),

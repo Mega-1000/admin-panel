@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 declare(string_types=1);
 
@@ -27,7 +27,6 @@ class CreateProductStockPacketsTable extends Migration
     {
         Schema::table('product_stock_packets', function (Blueprint $table) {
             $table->dropForeign('product_stock_id');
-            $table->dropColumn('product_stock_id');
         });
         Schema::dropIfExists('product_stock_packets');
     }
