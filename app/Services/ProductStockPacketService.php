@@ -29,7 +29,13 @@ class ProductStockPacketService
         ]);
     }
 
-    public function update(int $packetQuantity, string $packetName, int $packetProductQuantity, int $productStockId, int $packetId): void {
+    public function update(
+        int $packetQuantity, 
+        string $packetName, 
+        int $packetProductQuantity, 
+        int $productStockId, 
+        int $packetId
+    ): void {
         $this->repository->update([
             'packet_quantity' => $packetQuantity,
             'packet_name' => $packetName,
