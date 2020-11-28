@@ -9,7 +9,7 @@ use App\Repositories\ProductStockPositionRepository;
 
 class ProductStockPositionService
 {
-    protected $repository;
+    protected $productStockPositionRepository;
 
     public function __construct(ProductStockPositionRepository $repository)
     {
