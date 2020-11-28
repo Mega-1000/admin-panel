@@ -23,7 +23,7 @@ class DelivererImportRuleSearchCompare extends DelivererImportRuleAbstract
         return $order->first();
     }
 
-    private function findOrder(): ?Order
+    private function findOrder(): Collection
     {
         return $this->orderRepository->findWhere([
             $this->getDbColumnName()->value => $this->getDataToImport(),

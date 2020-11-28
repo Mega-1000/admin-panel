@@ -38,7 +38,7 @@ class DelivererImportRuleSearchRegex extends DelivererImportRuleAbstract
         return substr($this->dataToImport, strlen($this->getValue()));
     }
 
-    private function findOrder(): ?Order
+    private function findOrder(): Collection
     {
         return $this->orderRepository->findWhere([
             $this->getDbColumnName()->value => $this->parseData(),

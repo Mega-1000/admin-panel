@@ -156,7 +156,7 @@ class DelivererController extends Controller
         TransportPaymentsImportRequest $request,
         TransportPaymentImporter $transportPaymentImporter
     ): RedirectResponse {
-        $deliverer = $this->transportService->findDeliverer((int) $request->input('delivererId'));
+        $deliverer = $this->delivererService->findDeliverer((int) $request->input('delivererId'));
 
         if (!$deliverer) {
             return redirect()->route('orders.index')->with([
