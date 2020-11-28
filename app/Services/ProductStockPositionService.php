@@ -19,7 +19,7 @@ class ProductStockPositionService
     public function update($positionQuantity, $packetQuantity, $productStockPositionId, int $sign): void {
         $positionQuantity = $sign ? $positionQuantity - $packetQuantity : $positionQuantity + $packetQuantity;
 
-        $this->repository->update([
+        $this->productStockPositionRepository->update([
             'position_quantity' => $positionQuantity
         ], $productStockPositionId);
     }
