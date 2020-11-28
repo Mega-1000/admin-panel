@@ -13,7 +13,7 @@ class ProductStockPositionService
 
     public function __construct(ProductStockPositionRepository $productStockPositionRepository)
     {
-        $this->repository = $repository;
+        $this->productStockPositionRepository = $productStockPositionRepository;
     }
 
     public function update($positionQuantity, $packetQuantity, $productStockPositionId, int $sign): void {
