@@ -68,4 +68,15 @@ class DateHelper
 
         return $date->hour >= $a && $date->hour < $b;
     }
+
+    public static function dateRangeOrDate(string $from, string $to): string
+    {
+        if($from === $to) {
+            $date = ' z dnia ' . $from;
+        } else {
+            $date = ' od dnia ' . $from . ' do dnia ' . $to;
+        }
+
+        return $date;
+    }
 }

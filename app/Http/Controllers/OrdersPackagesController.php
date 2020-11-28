@@ -12,6 +12,7 @@ use App\Entities\PackageTemplate;
 use App\Entities\PackingType;
 use App\Entities\SelAddress;
 use App\Entities\SelTransaction;
+use App\Helpers\DateHelper;
 use App\Helpers\OrderPackagesDataHelper;
 use App\Http\Requests\GetProtocolRequest;
 use App\Http\Requests\OrderPackageCreateRequest;
@@ -520,9 +521,10 @@ class OrdersPackagesController extends Controller
                 array_push($packagesArray, $packagesArr);
             }
             $pdfFilename = 'protocol-' . $courierName . '-' . Carbon::today()->toDateString() . '.pdf';
+
             $pdf = PDF::loadView('pdf.protocol', [
                 'packages' => $packagesArray,
-                'date' => Carbon::today()->toDateString(),
+                'date' => DateHelper::dateRangeOrDate($request->date_from, $request->date_to),
                 'courierName' => strtoupper($courierName)
             ])->setPaper('a4', 'landscape');
             if (!file_exists(storage_path('app/public/protocols'))) {
