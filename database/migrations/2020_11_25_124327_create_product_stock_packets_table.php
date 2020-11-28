@@ -1,4 +1,6 @@
-<?php declare(string_types=1);
+<?php 
+
+declare(string_types=1);
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
