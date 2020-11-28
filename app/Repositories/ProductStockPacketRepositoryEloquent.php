@@ -1,4 +1,6 @@
-<?php declare(string_types=1);
+<?php 
+
+declare(string_types=1);
 
 namespace App\Repositories;
 
