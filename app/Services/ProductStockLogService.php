@@ -17,7 +17,12 @@ class ProductStockLogService
         $this->repository = $repository;
     }
 
-    public function create(int $productStockId, int $productStockFirstPositionId, int $packetQuantity, string $action): void {
+    public function create(
+        int $productStockId, 
+        int $productStockFirstPositionId, 
+        int $packetQuantity, 
+        string $action
+    ): void {
         $this->repository->create([
             'product_stock_id' => $productStockId,
             'product_stock_position_id' => $productStockFirstPositionId,
