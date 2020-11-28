@@ -17,7 +17,7 @@ class ProductStockService
 
     public function update(int $productStockQuantity, int $currentPacketQuantityDifference, int $productStockId): void {
         $this->productStockRepository->update([
-            'quantity' => $productStockQuantity + $currentPacketQuantityDifference
+            'quantity' => $productStockQuantity + $currentPacketQuantityDifference,
         ], $productStockId);
     }
 
