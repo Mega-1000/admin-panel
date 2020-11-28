@@ -10,7 +10,7 @@ class ProductStockService
 {
     protected $productStockRepository;
 
-    public function __construct(ProductStockRepository $repository)
+    public function __construct(ProductStockRepository $productStockRepository)
     {
         $this->repository = $repository;
     }
