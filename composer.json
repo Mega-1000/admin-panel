@@ -12,6 +12,7 @@
         "ext-json": "*",
         "barryvdh/laravel-cors": "^0.11.2",
         "barryvdh/laravel-dompdf": "^0.8.4",
+        "bensampo/laravel-enum": "^v1.38.0",
         "doctrine/dbal": "^2.10",
         "fideloper/proxy": "^4.0",
         "gusapi/gusapi": "^4.0",

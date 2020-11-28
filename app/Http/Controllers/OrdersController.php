@@ -21,6 +21,7 @@ use App\Entities\Task;
 use App\Entities\UserSurplusPayment;
 use App\Entities\UserSurplusPaymentHistory;
 use App\Entities\Warehouse;
+use App\Enums\LabelStatusEnum;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Helpers\GetCustomerForNewOrder;
@@ -301,27 +302,25 @@ class OrdersController extends Controller
      */
     public function index(Request $request)
     {
-        $labelGroups = LabelGroup::all();
-        $labels = Label::all();
+        $labelGroups = $this->labelGroupRepository->get()->sortBy('order');
+        $labels = $this->labelRepository->where('status', 'ACTIVE')->orderBy('order')->get();
         $couriers = \DB::table('order_packages')->distinct()->select('delivery_courier_name')->get();
         $warehouses = $this->warehouseRepository->findByField('symbol', 'MEGA-OLAWA');
         $storekeepers = User::where('role_id', User::ROLE_STOREKEEPER)->get();
-
         $allWarehouses = Warehouse::all();
+
         $customColumnLabels = [];
         foreach ($labelGroups as $labelGroup) {
             $customColumnLabels[$labelGroup->name] = [];
         }
 
         $groupedLabels = [];
-        foreach ($labels as $label) {
-            if ($label->label_group_id) {
-                $labelGroup = $labelGroups->where('id', $label->label_group_id)->first();
-                $groupedLabels[$labelGroup->name][] = $label;
-            } else {
-                $groupedLabels["bez grupy"][] = $label;
-            }
+        foreach ($labelGroups as $labelGroup) {
+                $groupedLabels[$labelGroup->name] = $labelGroup->activeLabels;
         }
+
+        $groupedLabels['bez grupy'] = $this->labelRepository->where('label_group_id', null)->where('status', LabelStatusEnum::Active)->get();
+
         $loggedUser = $request->user();
         if ($loggedUser->role_id == Role::ADMIN || $loggedUser->role_id == Role::SUPER_ADMIN) {
             $admin = true;
@@ -3045,4 +3044,3 @@ class OrdersController extends Controller
             });
     }
 }
-

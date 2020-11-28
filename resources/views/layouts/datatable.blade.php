@@ -81,11 +81,11 @@
                         {{ csrf_field() }}
                         <div class="form-group">
                             <label for="products-stocks-changes-start-date">Data rozpoczęcia</label>
-                            <input type="text" id="products-stocks-changes-start-date" name="products-stocks-changes-start-date" class="form-control default-date-time-picker-now">
+                            <input type="text" id="products-stocks-changes-start-date" name="products-stocks-changes-start-date" value="{{ Carbon\Carbon::today() }}" class="form-control default-date-time-picker-now">
                         </div>
                         <div class="form-group">
                             <label for="products-stocks-changes-end-date">Data zakończenia</label>
-                            <input type="text" id="products-stocks-changes-end-date" name="products-stocks-changes-end-date" class="form-control default-date-time-picker-now">
+                            <input type="text" id="products-stocks-changes-end-date" name="products-stocks-changes-end-date" value="{{ Carbon\Carbon::today()->endOfDay() }}" class="form-control default-date-time-picker-now">
                         </div>
                         <input type="submit" class="btn btn-success pull-right" value="Wyświetl wyniki">
                     </form>

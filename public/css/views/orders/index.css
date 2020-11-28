@@ -22,8 +22,9 @@
 }
 
 .order-label {
-    padding-top: 5px;
-    padding-bottom: 5px;
+    padding: 5px;
+    display: inline-block;
+    margin-top: 5px;
 }
 
 .order-label i {
@@ -90,4 +91,35 @@
 
 .modal-dialog-timesheet {
     width: auto;
+}
+
+.dropdown-menu>li>a {
+    padding: 0px;
+}
+
+.bootstrap-select>.dropdown-toggle {
+    background-color: white;
+}
+.bootstrap-select>.dropdown-toggle {
+    padding: 0px;
+    margin-left: 10px;
+}
+
+.label__list {
+    padding: 0px;
+    margin-top: 0px;
+    width: 20px;
+    text-align: center;
+}
+
+.label__list i {
+    font-size: 1rem;
+}
+
+.dropdown-menu .divider {
+    margin-top: 0px;
+}
+
+.dropdown-menu {
+    width: 100%;
 }
