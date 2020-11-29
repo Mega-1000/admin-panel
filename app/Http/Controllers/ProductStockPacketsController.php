@@ -16,6 +16,7 @@ use App\Services\ProductStockPacketService;
 use App\Services\ProductStockPositionService;
 use App\Services\ProductStockService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class ProductStockPacketsController extends Controller
@@ -106,11 +107,11 @@ class ProductStockPacketsController extends Controller
     {
         $validated = $request->validated();
 
-        $packetQuantity = $request->input('packet_quantity') * $request->input('packet_product_quantity');
+        $packetQuantity = $this->productStockPacketService->getProductsQuantityInCreatedPackets($validated['packet_quantity'], $validated['packet_product_quantity']);
 
         $productStock = $this->productStockRepository->find($productStockId);
 
-        $this->productStockPacketService->create(
+        $this->productStockPacketService->createProductPacket(
             $validated['packet_quantity'],
             $validated['packet_name'],
             $validated['packet_product_quantity'],
@@ -119,9 +120,9 @@ class ProductStockPacketsController extends Controller
 
         $productStockFirstPosition = $productStock->position->first();
 
-        $this->productStockPositionService->update($productStockFirstPosition->position_quantity, $packetQuantity, $productStockFirstPosition->id, 0);
+        $this->productStockPositionService->updateProductPositionQuantity($productStockFirstPosition->position_quantity, $packetQuantity, $productStockFirstPosition->id, 0);
 
-        $this->productStockLogService->create($productStock->id, $productStockFirstPosition->id, $packetQuantity, 'DELETE');
+        $this->productStockLogService->storeProductQuantityChangeLog($productStock->id, $productStockFirstPosition->id, $packetQuantity, 'DELETE', Auth::user()->id);
 
         return redirect()->back()->with([
             'message' => __('product_stocks.message.packet_store'),
@@ -133,14 +134,16 @@ class ProductStockPacketsController extends Controller
     {
         $validated = $request->validated();
 
-        $productStockPacket = $this->repository->find($packetId);
+        $productStockPacket = $this->productStockPacketService->findPacket($packetId);
 
-        $previousPacketQuantity = $productStockPacket->packet_quantity * $productStockPacket->packet_product_quantity;
-        $packetQuantity = $validated['packet_quantity'] * $validated['packet_product_quantity'];
+        $currentPacketQuantityDifference = $this->productStockPacketService->getPacketQuantityDifferenceAfterUpdate(
+            $productStockPacket->packet_quantity,
+            $productStockPacket->packet_product_quantity,
+            $validated['packet_quantity'],
+            $validated['packet_product_quantity']
+        );
 
-        $currentPacketQuantityDifference = $previousPacketQuantity - $packetQuantity;
-
-        $this->productStockPacketService->update(
+        $this->productStockPacketService->updatePacketQuantity(
             $validated['packet_quantity'],
             $validated['packet_name'],
             $validated['packet_product_quantity'],
@@ -148,20 +151,20 @@ class ProductStockPacketsController extends Controller
             $packetId
         );
 
-
-        $productStock = $this->productStockRepository->find($productStockId);
+        $productStock = $this->productStockService->findProductStock($productStockId);
 
         $productStockFirstPosition = $productStock->position->first();
+        $currentPacketQuantity = $this->productStockPacketService->getProductsQuantityInCreatedPackets($validated['packet_quantity'], $validated['packet_product_quantity']);
 
-        $this->productStockService->update($productStockFirstPosition->position_quantity, $packetQuantity, $productStockFirstPosition->id);
+        $this->productStockService->updateProductStockQuantity($productStockFirstPosition->position_quantity, $currentPacketQuantity, $productStockFirstPosition->id);
 
-        $this->productStockPositionService->update($productStockFirstPosition->position_quantity, $currentPacketQuantityDifference, $productStockFirstPosition->id, 1);
+        $this->productStockPositionService->updateProductPositionQuantity($productStockFirstPosition->position_quantity, $currentPacketQuantityDifference, $productStockFirstPosition->id, 1);
 
-        $this->productStockService->update($productStock->quantity, $currentPacketQuantityDifference, $productStock->id);
+        $this->productStockService->updateProductStockQuantity($productStock->quantity, $currentPacketQuantityDifference, $productStock->id);
 
         $action = ($currentPacketQuantityDifference < 0) ? 'DELETE' : 'ADD';
 
-        $this->productStockLogService->create($productStock->id, $productStockFirstPosition->id, $packetQuantity, $action);
+        $this->productStockLogService->storeProductQuantityChangeLog($productStock->id, $productStockFirstPosition->id, $currentPacketQuantity, $action, Auth::user()->id);
 
         return redirect()->back()->with([
             'message' => __('product_stocks.message.packet_store'),
@@ -173,15 +176,9 @@ class ProductStockPacketsController extends Controller
     {
         $validated = $request->validated();
 
-        $productStockPacket = $this->repository->find($validated['packet']);
+        $this->productStockPacketService->reducePacketQuantityAfterAssignToOrderItem($validated['packet']);
 
-        $productStockPacket->update([
-            'packet_quantity' => $productStockPacket->packet_quantity - 1,
-        ]);
-
-        $this->orderItemRepository->find($orderItemId)->update([
-            'product_stock_packet_id' => $validated['packet']
-        ]);
+        $this->productStockPacketService->assignPacketToOrderItem($orderItemId, $validated['packet']);
 
         return redirect()->back()->with([
             'message' => __('product_stock_packets.packet_assign'),
@@ -191,16 +188,7 @@ class ProductStockPacketsController extends Controller
 
     public function retain(int $orderItemId): RedirectResponse
     {
-        $orderItem = $this->orderItemRepository->find($orderItemId);
-        $productStockPacket = $this->repository->find($orderItem->product_stock_packet_id);
-
-        $productStockPacket->update([
-            'packet_quantity' => $productStockPacket->packet_quantity + 1
-        ]);
-
-        $orderItem->update([
-            'product_stock_packet_id' => null
-        ]);
+        $this->productStockPacketService->unassignPacketFromOrderItem($orderItemId);
 
         return redirect()->back()->with([
             'message' => __('product_stock_packets.packet_assign'),

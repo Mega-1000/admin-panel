@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 declare(strict_types=1);
 
@@ -16,7 +16,7 @@ class ProductStockPositionService
         $this->productStockPositionRepository = $productStockPositionRepository;
     }
 
-    public function update($positionQuantity, $packetQuantity, $productStockPositionId, int $sign): void {
+    public function updateProductPositionQuantity(int $positionQuantity, int $packetQuantity, int $productStockPositionId, int $sign): void {
         $positionQuantity = $sign ? $positionQuantity - $packetQuantity : $positionQuantity + $packetQuantity;
 
         $this->productStockPositionRepository->update([
