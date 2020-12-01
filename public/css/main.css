@@ -125,7 +125,8 @@
     display:inline-block;
 }
 .wz__image {
-    width: 70px;
+    width: 100px;
+}
 #consultant_comment {
     width: 70%;
 }
