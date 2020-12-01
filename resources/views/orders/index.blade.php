@@ -1874,7 +1874,16 @@
                                 if (invoice.invoice_type !== 'buy') {
                                     return;
                                 }
+
                                 html += '<a target="_blank" href="/storage/invoices/' + invoice.invoice_name + '" style="margin-top: 5px;">Faktura</a>';
+
+                                if(invoice.is_visible_for_client == true || invoice.is_visible_for_client == null) {
+                                    html += '<p class="invoice__visible">Widoczna</p>';
+                                } else {
+                                    html += '<p class="invoice__invisible">Niewidoczna</p>';
+                                }
+
+                                html += '<a href="#" class="change__invoice--visibility"' + 'onclick="changeInvoiceVisibility(' + invoice.id + ')">Zmień widoczność</a>';
                             });
                             let jsonInvoices = JSON.stringify(invoices);
                             html += '<br />'
@@ -2016,6 +2025,7 @@
                             let jsonInvoices = JSON.stringify(invoices);
                             html += '<br />'
                             html += '<a href="#" class="remove__invoices"' + 'onclick="getInvoicesList(' + data.orderId + ')">Usuń</a>'
+
                         }
                         html += '<a href="#" onclick="addNewSellInvoice(' + data.orderId + ')" style="margin-top: 5px;">Dodaj</a>';
 
@@ -2613,6 +2623,14 @@
                     option.text = invoice.invoice_name;
                     invoiceSelect.appendChild(option);
                 })
+            })
+        }
+
+        function changeInvoiceVisibility(invoiceId) {
+            $.ajax({
+                url: '/admin/orders/invoice/' + invoiceId + '/visibility',
+            }).done(() => {
+                $('#order_invoices_change_visibility').modal('show');
             })
         }
 
