@@ -10,12 +10,12 @@ use App\Entities\Firm;
 
 class PdfCharactersHelper
 {
-    public static function changePolishCharactersToNonAccented($stringToReplace)
+    public static function changePolishCharactersToNonAccented(string $stringToReplace): string
     {
         $replaceCharactersArray = [
         'ę' => 'e',
         'ć' => 'c',
-        'ą' => 'a'
+        'ą' => 'a',
         'ń' => 'n',
         'ł' => 'l',
         'ś' => 's',
