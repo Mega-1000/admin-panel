@@ -14,6 +14,7 @@ use App\Entities\SelAddress;
 use App\Entities\SelTransaction;
 use App\Helpers\DateHelper;
 use App\Helpers\OrderPackagesDataHelper;
+use App\Helpers\PdfCharactersHelper;
 use App\Http\Requests\GetProtocolRequest;
 use App\Http\Requests\OrderPackageCreateRequest;
 use App\Http\Requests\OrderPackageUpdateRequest;
@@ -516,7 +517,7 @@ class OrdersPackagesController extends Controller
                     'letter_number' => $package->letter_number,
                     'phone' => $package->order->addresses->first->id->phone,
                     'postal_code' => $package->order->addresses->first->id->postal_code,
-                    'city' => $package->order->addresses->first->id->city,
+                    'city' => PdfCharactersHelper::changePolishCharactersToNonAccented($package->order->addresses->first->id->city),
                 ];
                 array_push($packagesArray, $packagesArr);
             }
