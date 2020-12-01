@@ -12,7 +12,16 @@ class PdfCharactersHelper
 {
     public static function changePolishCharactersToNonAccented($stringToReplace)
     {
-        $replaceCharactersArray = array('ę' => 'e', 'ć' => 'c', 'ą' => 'a', 'ń' => 'n', 'ł' => 'l', 'ś' => 's', 'Ł' => 'L', 'Ż' => 'Z');
+        $replaceCharactersArray = [
+        'ę' => 'e',
+        'ć' => 'c',
+        'ą' => 'a'
+        'ń' => 'n',
+        'ł' => 'l',
+        'ś' => 's',
+        'Ł' => 'L',
+        'Ż' => 'Z',
+    ];
 
         return strtr($stringToReplace, $replaceCharactersArray);
     }
