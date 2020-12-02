@@ -18,12 +18,15 @@
             padding-top: 20px;
             font: 10px Arial, Helvetica, sans-serif;
         }
-
+        
         .quantity {
             font-size: 1.5em;
             font-weight: bold;
         }
-
+        
+        .wz__image {
+            width: 100px;
+        }
     </style>
 </head>
 <body>
