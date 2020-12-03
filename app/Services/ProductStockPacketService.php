@@ -103,7 +103,7 @@ class ProductStockPacketService
         $productStockPacket = $this->findPacket($orderItem->product_stock_packet_id);
 
         $productStockPacket->update([
-            'packet_quantity' => $productStockPacket->packet_quantity + 1
+            'packet_quantity' => $productStockPacket->packet_quantity + 1,
         ]);
 
         $orderItem->update([
