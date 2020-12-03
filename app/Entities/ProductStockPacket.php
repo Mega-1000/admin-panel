@@ -1,6 +1,4 @@
-<?php 
-
-declare(strict_types=1);
+<?php
 
 declare(strict_types=1);
 
@@ -11,9 +9,9 @@ use Illuminate\Database\Eloquent\Model;
 class ProductStockPacket extends Model
 {
     protected $fillable = [
-        'packet_quantity', 
-        'packet_name', 
-        'packet_product_quantity', 
+        'packet_quantity',
+        'packet_name',
+        'packet_product_quantity',
         'product_stock_id',
     ];
 }

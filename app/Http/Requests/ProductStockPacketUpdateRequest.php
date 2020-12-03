@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 declare(strict_types=1);
 
@@ -18,7 +18,7 @@ class ProductStockPacketUpdateRequest extends FormRequest
         return [
             'packet_quantity' => 'required|integer',
             'packet_product_quantity' => 'required|integer',
-            'packet_name' => 'required|max:255',
+            'packet_name' => 'required|max:255|string',
         ];
     }
 }

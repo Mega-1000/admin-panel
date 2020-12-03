@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Enums\ProductStockLogActionEnum;
 use App\Http\Requests\ProductStockPacketAssignRequest;
 use App\Http\Requests\ProductStockPacketCreateRequest;
 use App\Http\Requests\ProductStockPacketUpdateRequest;
@@ -108,7 +109,7 @@ class ProductStockPacketsController extends Controller
         $validated = $request->validated();
 
         $packetQuantity = $this->productStockPacketService->getProductsQuantityInCreatedPackets(
-            $validated['packet_quantity'], 
+            $validated['packet_quantity'],
             $validated['packet_product_quantity']
         );
 
@@ -124,16 +125,16 @@ class ProductStockPacketsController extends Controller
         $productStockFirstPosition = $productStock->position->first();
 
         $this->productStockPositionService->updateProductPositionQuantity(
-            $productStockFirstPosition->position_quantity, 
-            $packetQuantity, $productStockFirstPosition->id, 
+            $productStockFirstPosition->position_quantity,
+            $packetQuantity, $productStockFirstPosition->id,
             0
         );
 
         $this->productStockLogService->storeProductQuantityChangeLog(
-            $productStock->id, 
-            $productStockFirstPosition->id, 
-            $packetQuantity, 
-            'DELETE', 
+            $productStock->id,
+            $productStockFirstPosition->id,
+            $packetQuantity,
+            ProductStockLogActionEnum::DELETE,
             Auth::user()->id
         );
 
@@ -168,36 +169,36 @@ class ProductStockPacketsController extends Controller
 
         $productStockFirstPosition = $productStock->position->first();
         $currentPacketQuantity = $this->productStockPacketService->getProductsQuantityInCreatedPackets(
-            $validated['packet_quantity'], 
+            $validated['packet_quantity'],
             $validated['packet_product_quantity']
         );
 
         $this->productStockService->updateProductStockQuantity(
-            $productStockFirstPosition->position_quantity, 
-            $currentPacketQuantity, 
+            $productStockFirstPosition->position_quantity,
+            $currentPacketQuantity,
             $productStockFirstPosition->id
         );
 
         $this->productStockPositionService->updateProductPositionQuantity(
-            $productStockFirstPosition->position_quantity, 
-            $currentPacketQuantityDifference, 
-            $productStockFirstPosition->id, 
+            $productStockFirstPosition->position_quantity,
+            $currentPacketQuantityDifference,
+            $productStockFirstPosition->id,
             1
         );
 
         $this->productStockService->updateProductStockQuantity(
-            $productStock->quantity, 
-            $currentPacketQuantityDifference, 
+            $productStock->quantity,
+            $currentPacketQuantityDifference,
             $productStock->id
         );
 
-        $action = ($currentPacketQuantityDifference < 0) ? 'DELETE' : 'ADD';
+        $action = ($currentPacketQuantityDifference < 0) ? ProductStockLogActionEnum::DELETE : ProductStockLogActionEnum::ADD;
 
         $this->productStockLogService->storeProductQuantityChangeLog(
-            $productStock->id, 
-            $productStockFirstPosition->id, 
-            $currentPacketQuantity, 
-            $action, 
+            $productStock->id,
+            $productStockFirstPosition->id,
+            $currentPacketQuantity,
+            $action,
             Auth::user()->id
         );
 

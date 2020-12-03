@@ -15,7 +15,7 @@ class ProductStockPacketService
     protected $orderItemRepository;
 
     public function __construct(
-        ProductStockPacketRepository $productStockPacketRepository, 
+        ProductStockPacketRepository $productStockPacketRepository,
         OrderItemRepository $orderItemRepository
     )
     {
@@ -23,7 +23,7 @@ class ProductStockPacketService
         $this->orderItemRepository = $orderItemRepository;
     }
 
-    public function findPacket($packetId)
+    public function findPacket(int $packetId)
     {
         return $this->productStockPacketRepository->find($packetId);
     }
@@ -42,7 +42,7 @@ class ProductStockPacketService
         ]);
     }
 
-    public function reducePacketQuantityAfterAssignToOrderItem($packetId): void
+    public function reducePacketQuantityAfterAssignToOrderItem(int $packetId): void
     {
         $productStockPacket = $this->findPacket($packetId);
         if(empty($productStockPacket)) {
