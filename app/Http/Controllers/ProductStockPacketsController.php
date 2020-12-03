@@ -193,7 +193,13 @@ class ProductStockPacketsController extends Controller
 
         $action = ($currentPacketQuantityDifference < 0) ? 'DELETE' : 'ADD';
 
-        $this->productStockLogService->storeProductQuantityChangeLog($productStock->id, $productStockFirstPosition->id, $currentPacketQuantity, $action, Auth::user()->id);
+        $this->productStockLogService->storeProductQuantityChangeLog(
+            $productStock->id, 
+            $productStockFirstPosition->id, 
+            $currentPacketQuantity, 
+            $action, 
+            Auth::user()->id
+        );
 
         return redirect()->back()->with([
             'message' => __('product_stocks.message.packet_store'),
