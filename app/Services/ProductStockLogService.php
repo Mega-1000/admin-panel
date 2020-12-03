@@ -30,7 +30,7 @@ class ProductStockLogService
             'quantity' => $packetQuantity,
             'user_id' => $userId,
             'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now()
+            'updated_at' => Carbon::now(),
         ]);
     }
 }
