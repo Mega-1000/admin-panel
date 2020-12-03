@@ -14,7 +14,10 @@ class ProductStockPacketService
 
     protected $orderItemRepository;
 
-    public function __construct(ProductStockPacketRepository $productStockPacketRepository, OrderItemRepository $orderItemRepository)
+    public function __construct(
+        ProductStockPacketRepository $productStockPacketRepository, 
+        OrderItemRepository $orderItemRepository
+    )
     {
         $this->productStockPacketRepository = $productStockPacketRepository;
         $this->orderItemRepository = $orderItemRepository;
