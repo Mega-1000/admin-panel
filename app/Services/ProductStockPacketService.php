@@ -87,7 +87,7 @@ class ProductStockPacketService
     public function assignPacketToOrderItem($orderItemId, $packetId): void
     {
         $this->orderItemRepository->find($orderItemId)->update([
-            'product_stock_packet_id' => $packetId
+            'product_stock_packet_id' => $packetId,
         ]);
     }
 
