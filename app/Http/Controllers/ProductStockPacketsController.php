@@ -123,7 +123,11 @@ class ProductStockPacketsController extends Controller
 
         $productStockFirstPosition = $productStock->position->first();
 
-        $this->productStockPositionService->updateProductPositionQuantity($productStockFirstPosition->position_quantity, $packetQuantity, $productStockFirstPosition->id, 0);
+        $this->productStockPositionService->updateProductPositionQuantity(
+            $productStockFirstPosition->position_quantity, 
+            $packetQuantity, $productStockFirstPosition->id, 
+            0
+        );
 
         $this->productStockLogService->storeProductQuantityChangeLog($productStock->id, $productStockFirstPosition->id, $packetQuantity, 'DELETE', Auth::user()->id);
 
