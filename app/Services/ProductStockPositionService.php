@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entities\ProductStockPosition;
 use App\Repositories\ProductStockPositionRepository;
 
 class ProductStockPositionService
@@ -17,9 +16,9 @@ class ProductStockPositionService
     }
 
     public function updateProductPositionQuantity(
-        int $positionQuantity, 
-        int $packetQuantity, 
-        int $productStockPositionId, 
+        int $positionQuantity,
+        int $packetQuantity,
+        int $productStockPositionId,
         int $sign
     ): void {
         $positionQuantity = $sign ? $positionQuantity - $packetQuantity : $positionQuantity + $packetQuantity;

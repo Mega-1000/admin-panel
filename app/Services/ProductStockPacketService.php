@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\ProductStockPacketQuantityEnum;
 use App\Repositories\OrderItemRepository;
 use App\Repositories\ProductStockPacketRepository;
 use Illuminate\Support\Facades\Log;
@@ -50,7 +51,7 @@ class ProductStockPacketService
             abort(404);
         }
         $productStockPacket->update([
-            'packet_quantity' => $productStockPacket->packet_quantity - 1,
+            'packet_quantity' => $productStockPacket->packet_quantity - ProductStockPacketQuantityEnum::DEFAULT_PRODUCT_STOCK_PACKET_QUANTITY,
         ]);
     }
 
@@ -84,14 +85,14 @@ class ProductStockPacketService
         return $this->getProductsQuantityInCreatedPackets($packetQuantityBeforeUpdate, $productQuantityInPacketBeforeUpdate) - $this->getProductsQuantityInCreatedPackets($currentPacketQuantity, $currentProductQuantityInPacket);
     }
 
-    public function assignPacketToOrderItem($orderItemId, $packetId): void
+    public function assignPacketToOrderItem(int $orderItemId, int $packetId): void
     {
         $this->orderItemRepository->find($orderItemId)->update([
             'product_stock_packet_id' => $packetId,
         ]);
     }
 
-    public function unassignPacketFromOrderItem($orderItemId): void
+    public function unassignPacketFromOrderItem(int $orderItemId): void
     {
         $orderItem = $this->orderItemRepository->find($orderItemId);
 
