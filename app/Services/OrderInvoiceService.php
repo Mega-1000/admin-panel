@@ -24,7 +24,7 @@ class OrderInvoiceService
             $visibility = true;
         }
 
-        $this->orderInvoiceRepository->update([
+        return $this->orderInvoiceRepository->update([
             'is_visible_for_client' => $visibility,
         ], $invoiceId);
     }
