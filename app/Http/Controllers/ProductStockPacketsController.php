@@ -167,7 +167,10 @@ class ProductStockPacketsController extends Controller
         $productStock = $this->productStockService->findProductStock($productStockId);
 
         $productStockFirstPosition = $productStock->position->first();
-        $currentPacketQuantity = $this->productStockPacketService->getProductsQuantityInCreatedPackets($validated['packet_quantity'], $validated['packet_product_quantity']);
+        $currentPacketQuantity = $this->productStockPacketService->getProductsQuantityInCreatedPackets(
+            $validated['packet_quantity'], 
+            $validated['packet_product_quantity']
+        );
 
         $this->productStockService->updateProductStockQuantity($productStockFirstPosition->position_quantity, $currentPacketQuantity, $productStockFirstPosition->id);
 
