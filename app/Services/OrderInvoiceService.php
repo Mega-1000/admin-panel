@@ -15,17 +15,11 @@ class OrderInvoiceService
         $this->orderInvoiceRepository = $orderInvoiceRepository;
     }
 
-    public function changeOrderInvoiceVisibility(int $invoiceId): void {
+    public function changeOrderInvoiceVisibility(int $invoiceId) {
         $orderInvoice = $this->orderInvoiceRepository->find($invoiceId);
 
-        if($orderInvoice->is_visible_for_client === null || $orderInvoice->is_visible_for_client === true) {
-            $visibility = false;
-        } else {
-            $visibility = true;
-        }
-
-        $this->orderInvoiceRepository->update([
-            'is_visible_for_client' => $visibility,
+        return $this->orderInvoiceRepository->update([
+            'is_visible_for_client' => !$orderInvoice->is_visible_for_client,
         ], $invoiceId);
     }
 }

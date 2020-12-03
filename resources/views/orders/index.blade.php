@@ -1877,7 +1877,7 @@
 
                                 html += '<a target="_blank" href="/storage/invoices/' + invoice.invoice_name + '" style="margin-top: 5px;">Faktura</a>';
 
-                                if(invoice.is_visible_for_client == true || invoice.is_visible_for_client == null) {
+                                if(invoice.is_visible_for_client) {
                                     html += '<p class="invoice__visible">Widoczna</p>';
                                 } else {
                                     html += '<p class="invoice__invisible">Niewidoczna</p>';
@@ -2627,8 +2627,10 @@
         }
 
         function changeInvoiceVisibility(invoiceId) {
+            let url = '{{ route('orders.changeInvoiceVisibility', ['id' => ':id']) }}';
+            url = url.replace(':id', invoiceId);
             $.ajax({
-                url: '/admin/orders/invoice/' + invoiceId + '/visibility',
+                url: url
             }).done(() => {
                 $('#order_invoices_change_visibility').modal('show');
             })
