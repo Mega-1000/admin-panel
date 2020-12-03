@@ -129,7 +129,13 @@ class ProductStockPacketsController extends Controller
             0
         );
 
-        $this->productStockLogService->storeProductQuantityChangeLog($productStock->id, $productStockFirstPosition->id, $packetQuantity, 'DELETE', Auth::user()->id);
+        $this->productStockLogService->storeProductQuantityChangeLog(
+            $productStock->id, 
+            $productStockFirstPosition->id, 
+            $packetQuantity, 
+            'DELETE', 
+            Auth::user()->id
+        );
 
         return redirect()->back()->with([
             'message' => __('product_stocks.message.packet_store'),
