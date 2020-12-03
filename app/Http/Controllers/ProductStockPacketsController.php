@@ -172,7 +172,11 @@ class ProductStockPacketsController extends Controller
             $validated['packet_product_quantity']
         );
 
-        $this->productStockService->updateProductStockQuantity($productStockFirstPosition->position_quantity, $currentPacketQuantity, $productStockFirstPosition->id);
+        $this->productStockService->updateProductStockQuantity(
+            $productStockFirstPosition->position_quantity, 
+            $currentPacketQuantity, 
+            $productStockFirstPosition->id
+        );
 
         $this->productStockPositionService->updateProductPositionQuantity($productStockFirstPosition->position_quantity, $currentPacketQuantityDifference, $productStockFirstPosition->id, 1);
 
