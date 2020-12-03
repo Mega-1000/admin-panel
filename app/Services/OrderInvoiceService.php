@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Repositories\OrderInvoiceRepository;
+use Illuminate\Http\Response;
 
 class OrderInvoiceService
 {
@@ -15,11 +16,13 @@ class OrderInvoiceService
         $this->orderInvoiceRepository = $orderInvoiceRepository;
     }
 
-    public function changeOrderInvoiceVisibility(int $invoiceId) {
+    public function changeOrderInvoiceVisibility(int $invoiceId): Response {
         $orderInvoice = $this->orderInvoiceRepository->find($invoiceId);
 
-        return $this->orderInvoiceRepository->update([
+        $orderInvoice = $this->orderInvoiceRepository->update([
             'is_visible_for_client' => !$orderInvoice->is_visible_for_client,
         ], $invoiceId);
+
+        return response(['invoice_name' => $orderInvoice->invoice_name]);
     }
 }

@@ -2629,9 +2629,11 @@
         function changeInvoiceVisibility(invoiceId) {
             let url = '{{ route('orders.changeInvoiceVisibility', ['id' => ':id']) }}';
             url = url.replace(':id', invoiceId);
+
             $.ajax({
                 url: url
-            }).done(() => {
+            }).done((data) => {
+                document.getElementById('invoice_name').innerText = data.invoice_name;
                 $('#order_invoices_change_visibility').modal('show');
             })
         }
