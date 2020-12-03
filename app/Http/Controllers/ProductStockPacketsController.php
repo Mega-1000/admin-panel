@@ -107,7 +107,10 @@ class ProductStockPacketsController extends Controller
     {
         $validated = $request->validated();
 
-        $packetQuantity = $this->productStockPacketService->getProductsQuantityInCreatedPackets($validated['packet_quantity'], $validated['packet_product_quantity']);
+        $packetQuantity = $this->productStockPacketService->getProductsQuantityInCreatedPackets(
+            $validated['packet_quantity'], 
+            $validated['packet_product_quantity']
+        );
 
         $productStock = $this->productStockRepository->find($productStockId);
 
