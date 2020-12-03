@@ -185,7 +185,11 @@ class ProductStockPacketsController extends Controller
             1
         );
 
-        $this->productStockService->updateProductStockQuantity($productStock->quantity, $currentPacketQuantityDifference, $productStock->id);
+        $this->productStockService->updateProductStockQuantity(
+            $productStock->quantity, 
+            $currentPacketQuantityDifference, 
+            $productStock->id
+        );
 
         $action = ($currentPacketQuantityDifference < 0) ? 'DELETE' : 'ADD';
 
