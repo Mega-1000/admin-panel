@@ -178,7 +178,12 @@ class ProductStockPacketsController extends Controller
             $productStockFirstPosition->id
         );
 
-        $this->productStockPositionService->updateProductPositionQuantity($productStockFirstPosition->position_quantity, $currentPacketQuantityDifference, $productStockFirstPosition->id, 1);
+        $this->productStockPositionService->updateProductPositionQuantity(
+            $productStockFirstPosition->position_quantity, 
+            $currentPacketQuantityDifference, 
+            $productStockFirstPosition->id, 
+            1
+        );
 
         $this->productStockService->updateProductStockQuantity($productStock->quantity, $currentPacketQuantityDifference, $productStock->id);
 
