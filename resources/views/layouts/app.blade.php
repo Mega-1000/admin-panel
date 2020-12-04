@@ -428,6 +428,7 @@
     <script src='/fullcalendar/timeline/main.js'></script>
     <script src='/fullcalendar/resource-common/main.js'></script>
     <script src='/fullcalendar/resource-timeline/main.js'></script>
+    <script src="/js/laroute.js"></script>
 @endsection
 
 @section('page_header')

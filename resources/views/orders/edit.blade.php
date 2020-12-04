@@ -4629,24 +4629,25 @@
         });
 
         $('#assignPacketSubmit').on('click', () => {
-            let url = '{{ route('product_stock_packets.assign', ['orderItemId' => ':id']) }}';
-            url = url.replace(':id', $('#assignPacketSubmit').attr('data-orderItemId'));
+            let url = laroute.route('product_stock_packets.assign', { packetId: $('#packets').val(), orderItemId: $('#assignPacketSubmit').attr('data-orderItemId') })
             $.ajax({
-                method: 'POST',
+                method: 'GET',
                 url: url,
-                data: {
-                    packet: $('#packets').val(),
-                }
+            }).done((data) => {
+                document.getElementById('packet__modal--title').innerText = 'Pomyślnie przypisano pakiet ' + data.packet_name + ' do produktu ' + data.order_item_name;
+                $('#packet__modal').modal('show');
             })
         });
-        
+
         $('#retainPacketSubmit').on('click', () => {
-            let url = '{{ route('product_stock_packets.retain', ['orderItemId' => ':id']) }}';
-            url = url.replace(':id', $('#retainPacketSubmit').attr('data-orderItemId'));
+            let url = laroute.route('product_stock_packets.retain', { orderItemId: $('#retainPacketSubmit').attr('data-orderItemId') });
             $.ajax({
-                method: 'POST',
+                method: 'GET',
                 url: url
-            })
+            }).done((data) => {
+                document.getElementById('packet__modal--title').innerText = 'Pomyślnie odłączono pakiet ' + data.packet_name + ' do produktu ' + data.order_item_name;
+                $('#packet__modal').modal('show');
+            });
         });
 
         function goToNextOrder() {

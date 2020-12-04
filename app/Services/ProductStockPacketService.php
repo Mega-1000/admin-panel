@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Enums\ProductStockLogActionEnum;
 use App\Enums\ProductStockPacketQuantityEnum;
 use App\Repositories\OrderItemRepository;
 use App\Repositories\ProductStockPacketRepository;
+use App\Repositories\ProductStockRepository;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class ProductStockPacketService
@@ -15,13 +20,29 @@ class ProductStockPacketService
 
     protected $orderItemRepository;
 
+    protected $productStockRepository;
+
+    protected $productStockPositionService;
+
+    protected $productStockLogService;
+
+    protected $productStockService;
+
     public function __construct(
         ProductStockPacketRepository $productStockPacketRepository,
-        OrderItemRepository $orderItemRepository
+        OrderItemRepository $orderItemRepository,
+        ProductStockRepository $productStockRepository,
+        ProductStockPositionService $productStockPositionService,
+        ProductStockLogService $productStockLogService,
+        ProductStockService $productStockService
     )
     {
         $this->productStockPacketRepository = $productStockPacketRepository;
         $this->orderItemRepository = $orderItemRepository;
+        $this->productStockRepository = $productStockRepository;
+        $this->productStockPositionService = $productStockPositionService;
+        $this->productStockLogService = $productStockLogService;
+        $this->productStockService = $productStockService;
     }
 
     public function findPacket(int $packetId)
@@ -30,38 +51,115 @@ class ProductStockPacketService
     }
 
     public function createProductPacket(
-        int $packetQuantity,
+        string $packetQuantity,
         string $packetName,
-        int $packetProductQuantity,
+        string $packetProductQuantity,
         int $productStockId
     ): void {
+
+        $packetQuantitySummary = $this->getProductsQuantityInCreatedPackets(
+            intval($packetQuantity),
+            intval($packetProductQuantity)
+        );
+
+        $productStock = $this->productStockRepository->find($productStockId);
+
         $this->productStockPacketRepository->create([
             'packet_quantity' => $packetQuantity,
             'packet_name' => $packetName,
             'packet_product_quantity' => $packetProductQuantity,
             'product_stock_id' => $productStockId,
         ]);
+
+        $productStockFirstPosition = $productStock->position->first();
+
+        $this->productStockPositionService->updateProductPositionQuantity(
+            $productStockFirstPosition->position_quantity,
+            $packetQuantitySummary, $productStockFirstPosition->id,
+            0
+        );
+
+        $this->productStockLogService->storeProductQuantityChangeLog(
+            $productStock->id,
+            $productStockFirstPosition->id,
+            $packetQuantitySummary,
+            ProductStockLogActionEnum::DELETE,
+            Auth::user()->id
+        );
     }
 
-    public function reducePacketQuantityAfterAssignToOrderItem(int $packetId): void
+    public function reducePacketQuantityAfterAssignToOrderItem(int $packetId): string
     {
         $productStockPacket = $this->findPacket($packetId);
+
         if(empty($productStockPacket)) {
-            Log::error('Cannot find ProductStockPacket using id: ' . $packetId);
-            abort(404);
+            throw new ModelNotFoundException();
         }
+
         $productStockPacket->update([
             'packet_quantity' => $productStockPacket->packet_quantity - ProductStockPacketQuantityEnum::DEFAULT_PRODUCT_STOCK_PACKET_QUANTITY,
         ]);
+
+        return $productStockPacket->packet_name;
     }
 
     public function updatePacketQuantity(
-        int $packetQuantity,
+        string $packetQuantity,
         string $packetName,
-        int $packetProductQuantity,
+        string $packetProductQuantity,
         int $productStockId,
         int $packetId
     ): void {
+
+        $packetQuantity = intval($packetQuantity);
+        $packetProductQuantity = intval($packetProductQuantity);
+
+        $productStockPacket = $this->findPacket($packetId);
+
+        $currentPacketQuantityDifference = $this->getPacketQuantityDifferenceAfterUpdate(
+            $productStockPacket->packet_quantity,
+            $productStockPacket->packet_product_quantity,
+            $packetQuantity,
+            $packetProductQuantity
+        );
+
+        $productStock = $this->productStockService->findProductStock($productStockId);
+
+        $productStockFirstPosition = $productStock->position->first();
+        $currentPacketQuantity = $this->getProductsQuantityInCreatedPackets(
+            $packetQuantity,
+            $packetProductQuantity
+        );
+
+        $this->productStockService->updateProductStockQuantity(
+            $productStockFirstPosition->position_quantity,
+            $currentPacketQuantity,
+            $productStockFirstPosition->id
+        );
+
+        $this->productStockPositionService->updateProductPositionQuantity(
+            $productStockFirstPosition->position_quantity,
+            $currentPacketQuantityDifference,
+            $productStockFirstPosition->id,
+            1
+        );
+
+        $this->productStockService->updateProductStockQuantity(
+            $productStock->quantity,
+            $currentPacketQuantityDifference,
+            $productStock->id
+        );
+
+        $action = ($currentPacketQuantityDifference < 0) ? ProductStockLogActionEnum::DELETE : ProductStockLogActionEnum::ADD;
+
+        $this->productStockLogService->storeProductQuantityChangeLog(
+            $productStock->id,
+            $productStockFirstPosition->id,
+            $currentPacketQuantity,
+            $action,
+            Auth::user()->id
+        );
+
         $this->productStockPacketRepository->update([
             'packet_quantity' => $packetQuantity,
             'packet_name' => $packetName,
@@ -85,30 +183,39 @@ class ProductStockPacketService
         return $this->getProductsQuantityInCreatedPackets($packetQuantityBeforeUpdate, $productQuantityInPacketBeforeUpdate) - $this->getProductsQuantityInCreatedPackets($currentPacketQuantity, $currentProductQuantityInPacket);
     }
 
-    public function assignPacketToOrderItem(int $orderItemId, int $packetId): void
-    {
-        $this->orderItemRepository->find($orderItemId)->update([
-            'product_stock_packet_id' => $packetId,
-        ]);
-    }
-
-    public function unassignPacketFromOrderItem(int $orderItemId): void
+    public function assignPacketToOrderItem(int $orderItemId, int $packetId): string
     {
         $orderItem = $this->orderItemRepository->find($orderItemId);
 
         if(empty($orderItem)) {
-            Log::error('Cannot find order item using id: ' . $orderItemId);
-            abort(404);
+            throw new ModelNotFoundException();
+        }
+
+        $orderItem->update([
+            'product_stock_packet_id' => $packetId,
+        ]);
+
+        return $orderItem->product->name;
+    }
+
+    public function unassignPacketFromOrderItem(int $orderItemId): Response
+    {
+        $orderItem = $this->orderItemRepository->find($orderItemId);
+
+        if(empty($orderItem)) {
+           throw new ModelNotFoundException();
         }
 
         $productStockPacket = $this->findPacket($orderItem->product_stock_packet_id);
 
         $productStockPacket->update([
-            'packet_quantity' => $productStockPacket->packet_quantity + 1,
+            'packet_quantity' => $productStockPacket->packet_quantity + ProductStockPacketQuantityEnum::DEFAULT_PRODUCT_STOCK_PACKET_QUANTITY
         ]);
 
         $orderItem->update([
             'product_stock_packet_id' => null
         ]);
+
+        return response(['order_item_name' => $orderItem->product->name, 'packet_name' => $productStockPacket->packet_name]);
     }
 }

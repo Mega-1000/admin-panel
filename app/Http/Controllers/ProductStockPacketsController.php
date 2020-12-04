@@ -16,8 +16,11 @@ use App\Services\ProductStockLogService;
 use App\Services\ProductStockPacketService;
 use App\Services\ProductStockPositionService;
 use App\Services\ProductStockService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class ProductStockPacketsController extends Controller
@@ -108,34 +111,11 @@ class ProductStockPacketsController extends Controller
     {
         $validated = $request->validated();
 
-        $packetQuantity = $this->productStockPacketService->getProductsQuantityInCreatedPackets(
-            $validated['packet_quantity'],
-            $validated['packet_product_quantity']
-        );
-
-        $productStock = $this->productStockRepository->find($productStockId);
-
         $this->productStockPacketService->createProductPacket(
             $validated['packet_quantity'],
             $validated['packet_name'],
             $validated['packet_product_quantity'],
             $productStockId
-        );
-
-        $productStockFirstPosition = $productStock->position->first();
-
-        $this->productStockPositionService->updateProductPositionQuantity(
-            $productStockFirstPosition->position_quantity,
-            $packetQuantity, $productStockFirstPosition->id,
-            0
-        );
-
-        $this->productStockLogService->storeProductQuantityChangeLog(
-            $productStock->id,
-            $productStockFirstPosition->id,
-            $packetQuantity,
-            ProductStockLogActionEnum::DELETE,
-            Auth::user()->id
         );
 
         return redirect()->back()->with([
@@ -148,15 +128,6 @@ class ProductStockPacketsController extends Controller
     {
         $validated = $request->validated();
 
-        $productStockPacket = $this->productStockPacketService->findPacket($packetId);
-
-        $currentPacketQuantityDifference = $this->productStockPacketService->getPacketQuantityDifferenceAfterUpdate(
-            $productStockPacket->packet_quantity,
-            $productStockPacket->packet_product_quantity,
-            $validated['packet_quantity'],
-            $validated['packet_product_quantity']
-        );
-
         $this->productStockPacketService->updatePacketQuantity(
             $validated['packet_quantity'],
             $validated['packet_name'],
@@ -165,70 +136,29 @@ class ProductStockPacketsController extends Controller
             $packetId
         );
 
-        $productStock = $this->productStockService->findProductStock($productStockId);
-
-        $productStockFirstPosition = $productStock->position->first();
-        $currentPacketQuantity = $this->productStockPacketService->getProductsQuantityInCreatedPackets(
-            $validated['packet_quantity'],
-            $validated['packet_product_quantity']
-        );
-
-        $this->productStockService->updateProductStockQuantity(
-            $productStockFirstPosition->position_quantity,
-            $currentPacketQuantity,
-            $productStockFirstPosition->id
-        );
-
-        $this->productStockPositionService->updateProductPositionQuantity(
-            $productStockFirstPosition->position_quantity,
-            $currentPacketQuantityDifference,
-            $productStockFirstPosition->id,
-            1
-        );
-
-        $this->productStockService->updateProductStockQuantity(
-            $productStock->quantity,
-            $currentPacketQuantityDifference,
-            $productStock->id
-        );
-
-        $action = ($currentPacketQuantityDifference < 0) ? ProductStockLogActionEnum::DELETE : ProductStockLogActionEnum::ADD;
-
-        $this->productStockLogService->storeProductQuantityChangeLog(
-            $productStock->id,
-            $productStockFirstPosition->id,
-            $currentPacketQuantity,
-            $action,
-            Auth::user()->id
-        );
-
         return redirect()->back()->with([
             'message' => __('product_stocks.message.packet_store'),
             'alert-type' => 'success',
         ]);
     }
 
-    public function assign(ProductStockPacketAssignRequest $request, int $orderItemId): RedirectResponse
+    public function assign(int $packetId, int $orderItemId): Response
     {
-        $validated = $request->validated();
+        try {
+            $packetName = $this->productStockPacketService->reducePacketQuantityAfterAssignToOrderItem($packetId);
+            $orderItemName = $this->productStockPacketService->assignPacketToOrderItem($orderItemId, $packetId);
+        } catch (ModelNotFoundException $e) {
+            Log::error('Cannot find model');
+            abort(404);
+        }
 
-        $this->productStockPacketService->reducePacketQuantityAfterAssignToOrderItem($validated['packet']);
-
-        $this->productStockPacketService->assignPacketToOrderItem($orderItemId, $validated['packet']);
-
-        return redirect()->back()->with([
-            'message' => __('product_stock_packets.packet_assign'),
-            'alert-type' => 'success',
-        ]);
+        return response(['order_item_name' => $orderItemName, 'packet_name' => $packetName]);
     }
 
-    public function retain(int $orderItemId): RedirectResponse
+    public function retain(int $orderItemId): Response
     {
-        $this->productStockPacketService->unassignPacketFromOrderItem($orderItemId);
+        $data = $this->productStockPacketService->unassignPacketFromOrderItem($orderItemId);
 
-        return redirect()->back()->with([
-            'message' => __('product_stock_packets.packet_assign'),
-            'alert-type' => 'success',
-        ]);
+        return response($data);
     }
 }
