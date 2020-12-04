@@ -1,6 +1,6 @@
 <div class="flex-container-labels">
-    <div class="col-md-4">
-        <p class="text-center">Dodaj etykiety</p>
+    <div class="col-md-8">
+        <p class="text-left">Dodaj etykiety</p>
         <div class="row">
 
             <div class="col-md-1 label-with-desc-pair">
@@ -74,7 +74,7 @@
         </div>
     </div>
     <label for="">{{ $title }}</label>
-    <div class="col-md-4">
+    <div class="col-md-2">
         <p class="text-center">Usuń etykiety</p>
         <div class="row">
 

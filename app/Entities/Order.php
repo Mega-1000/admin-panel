@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+declare(strict_types=1);
 
 namespace App\Entities;
 
@@ -127,6 +129,11 @@ class Order extends Model implements Transformable
         'production_date',
         'master_order_id',
         'spedition_comment',
+        'financial_comment',
+        'allegro_form_id',
+        'allegro_deposit_value',
+        'allegro_operation_date',
+        'allegro_additional_service',
     ];
 
     /**
@@ -635,7 +642,7 @@ class Order extends Model implements Transformable
         return $this->hasMany(OrderAllegroCommission::class);
     }
 
-    public function commission()
+    public function commission(): float
     {
         return $this->detailedCommissions()->sum('amount');
     }
@@ -643,5 +650,15 @@ class Order extends Model implements Transformable
     public function paymentsTransactions()
     {
         return $this->hasMany(OrderPaymentLog::class);
+    }
+  
+    public function getLastOrder(): int
+    {
+        return Order::orderBy('id', 'desc')->first()->id;
+    }
+
+    public function getPreviousOrderId($orderId): int
+    {
+        return Order::where('id', '<', $orderId)->orderBy('id', 'desc')->first()->id;
     }
 }

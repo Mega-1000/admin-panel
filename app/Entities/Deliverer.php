@@ -1,10 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Deliverer extends Model
 {
-    protected $fillable = ['name', 'net_payment_column_number', 'gross_payment_column_number_gross', 'letter_number_column_number'];
+    protected $fillable = ['name'];
+
+    public function importRules(): HasMany
+    {
+        return $this->hasMany(DelivererImportRule::class);
+    }
 }
