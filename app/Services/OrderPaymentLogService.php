@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entities\OrderPaymentLog;
 use App\Helpers\PriceHelper;
 use App\Repositories\OrderPaymentLogRepository;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class OrderPaymentLogService
