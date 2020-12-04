@@ -11,7 +11,7 @@ class UpdateOrderInvoicesTableAddIsVisibleColumn extends Migration
     public function up(): void
     {
         Schema::table('order_invoices', function (Blueprint $table) {
-            $table->boolean('is_visible_for_client')->nullable();
+            $table->boolean('is_visible_for_client')->default(1);
         });
     }
 
