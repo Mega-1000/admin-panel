@@ -2905,9 +2905,9 @@ class OrdersController extends Controller
         return response()->json($order->buyInvoices);
     }
 
-    public function changeInvoiceVisibility(int $invoiceId): void
+    public function changeInvoiceVisibility(int $invoiceId): Response
     {
-        $this->orderInvoiceService->changeOrderInvoiceVisibility($invoiceId);
+        return $this->orderInvoiceService->changeOrderInvoiceVisibility($invoiceId);
     }
 
     public function deleteInvoice($id)
