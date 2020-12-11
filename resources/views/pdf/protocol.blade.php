@@ -2,7 +2,7 @@
 <head>
     <style>
         body {
-            font-family: DejaVu Sans !important;
+            font-family:  Times-Roman, sans-serif !important;
             font-size: 9px !important;
         }
         tbody {

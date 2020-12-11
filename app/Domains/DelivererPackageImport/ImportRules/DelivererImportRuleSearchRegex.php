@@ -9,6 +9,8 @@ use Illuminate\Support\Collection;
 
 class DelivererImportRuleSearchRegex extends DelivererImportRuleAbstract
 {
+    private $parsedData;
+
     public function run(array $line): ?Order
     {
         $this->line = $line;
@@ -18,7 +20,6 @@ class DelivererImportRuleSearchRegex extends DelivererImportRuleAbstract
             return null;
         }
 
-        /* @var $order Collection */
         $order = $this->findOrder();
 
         if ($order->count() > 1) {
@@ -30,18 +31,19 @@ class DelivererImportRuleSearchRegex extends DelivererImportRuleAbstract
 
     private function validate(): bool
     {
-        return strpos($this->dataToImport, $this->getValue()) === 0;
-    }
+        if (preg_match("/{$this->getValue()}(.*),/iU", $this->dataToImport, $match)) {
+            $this->parsedData = $match[1];
 
-    private function parseData(): string
-    {
-        return substr($this->dataToImport, strlen($this->getValue()));
+            return true;
+        }
+
+        return false;
     }
 
     private function findOrder(): Collection
     {
         return $this->orderRepository->findWhere([
-            $this->getDbColumnName()->value => $this->parseData(),
+            $this->getDbColumnName()->value => $this->parsedData,
         ]);
     }
 }
