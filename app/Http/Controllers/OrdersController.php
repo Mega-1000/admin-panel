@@ -2905,11 +2905,6 @@ class OrdersController extends Controller
         return response()->json($order->buyInvoices);
     }
 
-    public function changeInvoiceVisibility(int $invoiceId): Response
-    {
-        return $this->orderInvoiceService->changeOrderInvoiceVisibility($invoiceId);
-    }
-
     public function deleteInvoice($id)
     {
         OrderInvoice::where('id', $id)->delete();
