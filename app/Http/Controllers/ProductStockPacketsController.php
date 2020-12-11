@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\Enums\ProductStockLogActionEnum;
-use App\Http\Requests\ProductStockPacketAssignRequest;
 use App\Http\Requests\ProductStockPacketCreateRequest;
 use App\Http\Requests\ProductStockPacketUpdateRequest;
 use App\Repositories\OrderItemRepository;
@@ -17,10 +15,8 @@ use App\Services\ProductStockPacketService;
 use App\Services\ProductStockPositionService;
 use App\Services\ProductStockService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 
 class ProductStockPacketsController extends Controller
@@ -142,23 +138,22 @@ class ProductStockPacketsController extends Controller
         ]);
     }
 
-    public function assign(int $packetId, int $orderItemId): Response
+    public function assign(int $packetId, int $orderItemId): JsonResponse
     {
         try {
-            $packetName = $this->productStockPacketService->reducePacketQuantityAfterAssignToOrderItem($packetId);
+            $packet = $this->productStockPacketService->reducePacketQuantityAfterAssignToOrderItem($packetId);
             $orderItemName = $this->productStockPacketService->assignPacketToOrderItem($orderItemId, $packetId);
+
+            return response()->json(['order_item_name' => $orderItemName, 'packet_name' => $packet->packet_name]);
         } catch (ModelNotFoundException $e) {
-            Log::error('Cannot find model');
             abort(404);
         }
-
-        return response(['order_item_name' => $orderItemName, 'packet_name' => $packetName]);
     }
 
-    public function retain(int $orderItemId): Response
+    public function retain(int $orderItemId): JsonResponse
     {
         $data = $this->productStockPacketService->unassignPacketFromOrderItem($orderItemId);
 
-        return response($data);
+        return response()->json($data);
     }
 }

@@ -9,11 +9,11 @@ use Carbon\Carbon;
 
 class ProductStockLogService
 {
-    protected $repository;
+    protected $productStockLogRepository;
 
-    public function __construct(ProductStockLogRepository $repository)
+    public function __construct(ProductStockLogRepository $productStockLogRepository)
     {
-        $this->repository = $repository;
+        $this->productStockLogRepository = $productStockLogRepository;
     }
 
     public function storeProductQuantityChangeLog(
@@ -22,8 +22,8 @@ class ProductStockLogService
         int $packetQuantity,
         string $action,
         int $userId
-    ): void {
-        $this->repository->create([
+    ) {
+        return $this->productStockLogRepository->create([
             'product_stock_id' => $productStockId,
             'product_stock_position_id' => $productStockFirstPositionId,
             'action' => $action,

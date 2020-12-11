@@ -5,17 +5,18 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Enums\ProductStockLogActionEnum;
-use App\Enums\ProductStockPacketQuantityEnum;
 use App\Repositories\OrderItemRepository;
 use App\Repositories\ProductStockPacketRepository;
 use App\Repositories\ProductStockRepository;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 
 class ProductStockPacketService
 {
+    const DEFAULT_PRODUCT_STOCK_PACKET_QUANTITY = 1;
+    const SUBTRACTION_SIGN = 0;
+    const ADDITION_SIGN = 1;
+
     protected $productStockPacketRepository;
 
     protected $orderItemRepository;
@@ -56,7 +57,6 @@ class ProductStockPacketService
         string $packetProductQuantity,
         int $productStockId
     ): void {
-
         $packetQuantitySummary = $this->getProductsQuantityInCreatedPackets(
             intval($packetQuantity),
             intval($packetProductQuantity)
@@ -76,7 +76,7 @@ class ProductStockPacketService
         $this->productStockPositionService->updateProductPositionQuantity(
             $productStockFirstPosition->position_quantity,
             $packetQuantitySummary, $productStockFirstPosition->id,
-            0
+            self::SUBTRACTION_SIGN
         );
 
         $this->productStockLogService->storeProductQuantityChangeLog(
@@ -88,7 +88,7 @@ class ProductStockPacketService
         );
     }
 
-    public function reducePacketQuantityAfterAssignToOrderItem(int $packetId): string
+    public function reducePacketQuantityAfterAssignToOrderItem(int $packetId)
     {
         $productStockPacket = $this->findPacket($packetId);
 
@@ -96,11 +96,9 @@ class ProductStockPacketService
             throw new ModelNotFoundException();
         }
 
-        $productStockPacket->update([
-            'packet_quantity' => $productStockPacket->packet_quantity - ProductStockPacketQuantityEnum::DEFAULT_PRODUCT_STOCK_PACKET_QUANTITY,
+        return $productStockPacket->update([
+            'packet_quantity' => $productStockPacket->packet_quantity - self::DEFAULT_PRODUCT_STOCK_PACKET_QUANTITY,
         ]);
-
-        return $productStockPacket->packet_name;
     }
 
     public function updatePacketQuantity(
@@ -141,7 +139,7 @@ class ProductStockPacketService
             $productStockFirstPosition->position_quantity,
             $currentPacketQuantityDifference,
             $productStockFirstPosition->id,
-            1
+            self::ADDITION_SIGN
         );
 
         $this->productStockService->updateProductStockQuantity(
@@ -198,7 +196,7 @@ class ProductStockPacketService
         return $orderItem->product->name;
     }
 
-    public function unassignPacketFromOrderItem(int $orderItemId): Response
+    public function unassignPacketFromOrderItem(int $orderItemId): array
     {
         $orderItem = $this->orderItemRepository->find($orderItemId);
 
@@ -209,13 +207,13 @@ class ProductStockPacketService
         $productStockPacket = $this->findPacket($orderItem->product_stock_packet_id);
 
         $productStockPacket->update([
-            'packet_quantity' => $productStockPacket->packet_quantity + ProductStockPacketQuantityEnum::DEFAULT_PRODUCT_STOCK_PACKET_QUANTITY
+            'packet_quantity' => $productStockPacket->packet_quantity + self::DEFAULT_PRODUCT_STOCK_PACKET_QUANTITY
         ]);
 
         $orderItem->update([
             'product_stock_packet_id' => null
         ]);
 
-        return response(['order_item_name' => $orderItem->product->name, 'packet_name' => $productStockPacket->packet_name]);
+        return ['order_item_name' => $orderItem->product->name, 'packet_name' => $productStockPacket->packet_name];
     }
 }

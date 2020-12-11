@@ -16,7 +16,7 @@ class ProductStockPacketAssignRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'packet' => 'required|numeric',
+            'packet' => 'required|integer',
         ];
     }
 }
