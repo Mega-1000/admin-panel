@@ -12,8 +12,6 @@ class DelivererImportRuleGet extends DelivererImportRuleAbstract
     {
         $this->line = $line;
 
-        return $this->orderRepository->update([
-            $this->getDbColumnName()->value => $this->getDataToImport(),
-        ], $this->order->id);
+        return $this->columnRepository->updateColumn($this->order, $this->getData());
     }
 }

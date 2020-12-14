@@ -4,9 +4,7 @@ namespace App\Repositories;
 
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
-use App\Repositories\OrderPackageRepository;
 use App\Entities\OrderPackage;
-use App\Validators\OrderPackageValidator;
 
 /**
  * Class OrderPackageRepositoryEloquent.
@@ -15,24 +13,14 @@ use App\Validators\OrderPackageValidator;
  */
 class OrderPackageRepositoryEloquent extends BaseRepository implements OrderPackageRepository
 {
-    /**
-     * Specify Model class name
-     *
-     * @return string
-     */
-    public function model()
+    public function model(): string
     {
         return OrderPackage::class;
     }
 
-    
-
-    /**
-     * Boot up the repository, pushing criteria
-     */
-    public function boot()
+    public function boot(): void
     {
         $this->pushCriteria(app(RequestCriteria::class));
     }
-    
+
 }

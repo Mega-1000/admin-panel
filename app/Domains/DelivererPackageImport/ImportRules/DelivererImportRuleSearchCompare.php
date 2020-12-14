@@ -1,11 +1,10 @@
-<?php
+<?php /** @noinspection PhpPossiblePolymorphicInvocationInspection */
 
 declare(strict_types=1);
 
 namespace App\Domains\DelivererPackageImport\ImportRules;
 
 use App\Entities\Order;
-use Illuminate\Support\Collection;
 
 class DelivererImportRuleSearchCompare extends DelivererImportRuleAbstract
 {
@@ -13,20 +12,12 @@ class DelivererImportRuleSearchCompare extends DelivererImportRuleAbstract
     {
         $this->line = $line;
 
-        /* @var $order Collection */
-        $order = $this->findOrder();
+        $order = $this->columnRepository->findOrder($this->getData());
 
         if ($order->count() > 1) {
             throw new \Exception('Too many orders were found for rule');
         }
 
         return $order->first();
-    }
-
-    private function findOrder(): Collection
-    {
-        return $this->orderRepository->findWhere([
-            $this->getDbColumnName()->value => $this->getDataToImport(),
-        ]);
     }
 }

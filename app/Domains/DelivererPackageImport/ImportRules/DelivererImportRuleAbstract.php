@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace App\Domains\DelivererPackageImport\ImportRules;
 
-use App\Domains\DelivererPackageImport\Enums\DelivererRulesColumnNameEnum;
+use App\Domains\DelivererPackageImport\Repositories\DelivererImportRuleColumnRepositoryInterface;
 use App\Domains\DelivererPackageImport\ValueObjects\DelivererImportRulesColumnNumberVO;
 use App\Entities\DelivererImportRule;
 use App\Entities\Order;
-use App\Repositories\OrderRepositoryEloquent;
+use Exception;
 
-abstract class DelivererImportRuleAbstract implements DelivererImportRuleInterface
+abstract class DelivererImportRuleAbstract
 {
     public $action;
 
     protected $importRuleEntity;
 
-    protected $orderRepository;
+    protected $columnRepository;
 
     /* @var array */
     protected $line;
@@ -25,65 +25,55 @@ abstract class DelivererImportRuleAbstract implements DelivererImportRuleInterfa
 
     protected $dataToImport;
 
-    public function __construct(
-        OrderRepositoryEloquent $orderRepository,
-        DelivererImportRule $delivererImportRule
-    ) {
-        $this->orderRepository = $orderRepository;
-        $this->importRuleEntity = $delivererImportRule;
+    private $column;
 
-        $this->action = $delivererImportRule->getAction()->value;
+    public function __construct(
+        DelivererImportRule $delivererImportRuleEntity,
+        DelivererImportRuleColumnRepositoryInterface $columnRepository
+    ) {
+        $this->columnRepository = $columnRepository;
+        $this->importRuleEntity = $delivererImportRuleEntity;
+
+        $this->action = $delivererImportRuleEntity->getAction()->value;
+        $this->column = $delivererImportRuleEntity->getColumnName()->value;
     }
+
+    abstract public function run(array $line): ?Order;
 
     public function setOrder(Order $order): void
     {
         $this->order = $order;
     }
 
-    public function getImportRuleEntity(): DelivererImportRule
-    {
-        return $this->importRuleEntity;
-    }
-
-    abstract public function run(array $line): ?Order;
-
-    protected function getDbColumnName(): ?DelivererRulesColumnNameEnum
-    {
-        return new DelivererRulesColumnNameEnum($this->importRuleEntity->db_column_name);
-    }
-
     /**
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
-    protected function getDataToImport()
+    protected function getData()
     {
-        $columnNumber = $this->getImportColumnNumber()->get();
+        $columnNumber = $this->getColumnNumber()->get();
 
         if (isset($this->line[$columnNumber-1])) {
             return $this->line[$columnNumber-1];
         }
 
-        throw new \Exception('No correct column number for ' . $this->getDbColumnName() . ' column');
+        throw new Exception(sprintf(
+            'No correct column number for %s column',
+            $this->importRuleEntity->getColumnName()->value
+        ));
     }
 
-    /**
-     * @return mixed
-     */
     protected function getValue()
     {
         return $this->importRuleEntity->value;
     }
 
-    /**
-     * @return mixed
-     */
     protected function getChangeTo()
     {
         return $this->importRuleEntity->change_to;
     }
 
-    private function getImportColumnNumber(): ?DelivererImportRulesColumnNumberVO
+    private function getColumnNumber(): ?DelivererImportRulesColumnNumberVO
     {
         return new DelivererImportRulesColumnNumberVO($this->importRuleEntity->import_column_number);
     }

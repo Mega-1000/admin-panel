@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\DelivererPackageImport;
 
+use App\Domains\DelivererPackageImport\Factories\DelivererImportRulesManagerFactory;
 use App\Domains\DelivererPackageImport\ImportRules\DelivererImportRulesManager;
 use App\Domains\DelivererPackageImport\Repositories\DelivererImportRuleRepositoryEloquent;
 use App\Entities\Deliverer;
@@ -17,27 +18,32 @@ class TransportPaymentImporter
 
     private $delivererImportRuleRepository;
 
+    private $delivererImportRulesManagerFactory;
+
+    /* @var $delivererImportRulesManager DelivererImportRulesManager */
     private $delivererImportRulesManager;
 
     public function __construct(
         DelivererImportRuleRepositoryEloquent $delivererImportRuleRepository,
-        DelivererImportRulesManager $delivererImportRulesManager
+        DelivererImportRulesManagerFactory $delivererImportRulesManagerFactory
     ) {
-        $this->delivererImportRulesManager = $delivererImportRulesManager;
         $this->delivererImportRuleRepository = $delivererImportRuleRepository;
+        $this->delivererImportRulesManagerFactory = $delivererImportRulesManagerFactory;
     }
 
     public function import(Deliverer $deliverer, File $file): void
     {
         $this->file = $file;
 
-        $this->delivererImportRulesManager->setDeliverer($deliverer);
+        $this->delivererImportRulesManager = $this->delivererImportRulesManagerFactory->create(
+            $deliverer
+        );
 
-        if (!$this->delivererImportRulesManager->prepareRules()) {
-            throw new \Exception('No import rules for the ' . $deliverer->name . ' deliverer');
-        }
+        //todo odwracamy zalenznosc i tworzymy oddzielne obiekty selloIdColumn
 
         $this->run();
+
+        dd('OK');
     }
 
     private function run(): void
