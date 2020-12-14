@@ -19,6 +19,9 @@
             font: 10px Arial, Helvetica, sans-serif;
         }
 
+        .wz__image {
+            width: 100px;
+        }
     </style>
 </head>
 <body>
