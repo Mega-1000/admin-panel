@@ -15,7 +15,8 @@ class OrderInvoiceService
         $this->orderInvoiceRepository = $orderInvoiceRepository;
     }
 
-    public function changeOrderInvoiceVisibility(int $invoiceId) {
+    public function changeOrderInvoiceVisibility(int $invoiceId) 
+    {
         $orderInvoice = $this->orderInvoiceRepository->find($invoiceId);
 
         return $this->orderInvoiceRepository->update([
