@@ -38,12 +38,8 @@ class TransportPaymentImporter
         $this->delivererImportRulesManager = $this->delivererImportRulesManagerFactory->create(
             $deliverer
         );
-
-        //todo odwracamy zalenznosc i tworzymy oddzielne obiekty selloIdColumn
-
+        
         $this->run();
-
-        dd('OK');
     }
 
     private function run(): void

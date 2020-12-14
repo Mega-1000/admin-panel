@@ -82,12 +82,12 @@ class DelivererImportRulesManager
     private function runGetAndReplaceRules($order, $line): void
     {
         if ($this->getAndReplaceRules->isNotEmpty()) {
-            $this->getAndReplaceRules->each(function ($rulesGroup, $key) use ($order, $line) {
+            $this->getAndReplaceRules->each(function ($rulesGroup) use ($order, $line) {
                 foreach ($rulesGroup as $rule) {
                     $rule->setOrder($order);
-                    // todo setData($line)
+                    $rule->setData($line);
 
-                    if ($rule->run($line)) {
+                    if ($rule->run()) {
                         break;
                     }
                 }

@@ -8,10 +8,8 @@ use App\Entities\Order;
 
 class DelivererImportRuleSet extends DelivererImportRuleAbstract
 {
-    public function run(array $line): Order
+    public function run(): Order
     {
-        $this->line = $line;
-
         return $this->columnRepository->updateColumn($this->order, $this->getValue());
     }
 }

@@ -38,11 +38,16 @@ abstract class DelivererImportRuleAbstract
         $this->column = $delivererImportRuleEntity->getColumnName()->value;
     }
 
-    abstract public function run(array $line): ?Order;
+    abstract public function run(): ?Order;
 
     public function setOrder(Order $order): void
     {
         $this->order = $order;
+    }
+
+    public function setData(array $line): void
+    {
+        $this->line = $line;
     }
 
     /**
@@ -63,11 +68,17 @@ abstract class DelivererImportRuleAbstract
         ));
     }
 
+    /**
+     * @return mixed
+     */
     protected function getValue()
     {
         return $this->importRuleEntity->value;
     }
 
+    /**
+     * @return mixed
+     */
     protected function getChangeTo()
     {
         return $this->importRuleEntity->change_to;

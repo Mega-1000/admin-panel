@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpPossiblePolymorphicInvocationInspection */
+<?php
 
 declare(strict_types=1);
 
@@ -10,9 +10,8 @@ class DelivererImportRuleSearchRegex extends DelivererImportRuleAbstract
 {
     private $parsedData;
 
-    public function run(array $line): ?Order
+    public function run(): ?Order
     {
-        $this->line = $line;
         $this->dataToImport = $this->getData();
 
         if (!$this->validate()) {

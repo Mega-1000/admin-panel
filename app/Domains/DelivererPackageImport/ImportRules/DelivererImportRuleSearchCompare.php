@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpPossiblePolymorphicInvocationInspection */
+<?php
 
 declare(strict_types=1);
 
@@ -8,10 +8,8 @@ use App\Entities\Order;
 
 class DelivererImportRuleSearchCompare extends DelivererImportRuleAbstract
 {
-    public function run(array $line): ?Order
+    public function run(): ?Order
     {
-        $this->line = $line;
-
         $order = $this->columnRepository->findOrder($this->getData());
 
         if ($order->count() > 1) {

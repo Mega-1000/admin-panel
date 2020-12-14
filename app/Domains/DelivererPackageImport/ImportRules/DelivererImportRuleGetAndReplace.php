@@ -8,10 +8,8 @@ use App\Entities\Order;
 
 class DelivererImportRuleGetAndReplace extends DelivererImportRuleAbstract
 {
-    public function run(array $line): ?Order
+    public function run(): ?Order
     {
-        $this->line = $line;
-
         if (!$this->validate()) {
             return null;
         }
