@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Auth;
 class ProductStockPacketService
 {
     private const DEFAULT_PRODUCT_STOCK_PACKET_QUANTITY = 1;
-    const SUBTRACTION_SIGN = 0;
+    private const SUBTRACTION_SIGN = 0;
     const ADDITION_SIGN = 1;
 
     protected $productStockPacketRepository;
