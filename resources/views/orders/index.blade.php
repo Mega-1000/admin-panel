@@ -2627,13 +2627,10 @@
         }
 
         function changeInvoiceVisibility(invoiceId) {
-            let url = laroute.route('orders.changeInvoiceVisibility', { id : invoiceId });
-
             $.ajax({
-                method: 'POST',
-                url: url
+                type: 'PATCH',
+                url: laroute.route('orders.changeInvoiceVisibility', { id : invoiceId })
             }).done((data) => {
-                console.log(data);
                 document.getElementById('invoice_name').innerText = data.invoice_name;
                 $('#order_invoices_change_visibility').modal('show');
             })

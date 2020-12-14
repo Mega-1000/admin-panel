@@ -286,7 +286,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orders/getCosts', 'OrdersController@getCosts')->name('orders.getCosts');
         Route::post('orders/invoice/request', 'OrdersController@invoiceRequest')->name('orders.invoiceRequest');
         Route::get('orders/{id}/invoices', 'OrdersController@getInvoices')->name('orders.getInvoices');
-        Route::post('orders/invoice/{id}/visibility', 'Api\InvoicesController@changeInvoiceVisibility')->name('orders.changeInvoiceVisibility');
+        Route::patch('orders/invoice/{id}/visibility', 'Api\InvoicesController@changeInvoiceVisibility')->name('orders.changeInvoiceVisibility');
         Route::get('orders/{id}/files', 'OrdersController@getFiles')->name('orders.getFiles');
         Route::post('orders/allegro-payment', 'OrdersPaymentsController@payAllegro')->name('orders.allegroPayments');
         Route::post('orders/allegro-commission', 'AllegroController@setCommission')->name('orders.allegroCommission');
