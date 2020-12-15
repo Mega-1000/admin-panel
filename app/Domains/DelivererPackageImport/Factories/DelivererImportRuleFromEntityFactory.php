@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Domains\DelivererPackageImport\Factories;
 
 use App\Domains\DelivererPackageImport\Enums\DelivererRulesActionEnum;
-use App\Domains\DelivererPackageImport\Enums\DelivererRulesColumnNameEnum;
 use App\Domains\DelivererPackageImport\ImportRules\DelivererImportRuleGet;
 use App\Domains\DelivererPackageImport\ImportRules\DelivererImportRuleGetAndReplace;
 use App\Domains\DelivererPackageImport\ImportRules\DelivererImportRuleSearchCompare;
@@ -15,20 +14,6 @@ use App\Entities\DelivererImportRule;
 
 class DelivererImportRuleFromEntityFactory
 {
-    private const ALLOWED_COLUMN_ACTIONS = [
-        DelivererRulesColumnNameEnum::ORDER_PACKAGES_LETTER_NUMBER => [
-            DelivererRulesActionEnum::SEARCH_COMPARE,
-            DelivererRulesActionEnum::SEARCH_REGEX,
-        ],
-        DelivererRulesColumnNameEnum::ORDER_SELLO_ID => [],
-        DelivererRulesColumnNameEnum::ORDER_ALLEGRO_FORM_ID => [],
-        DelivererRulesColumnNameEnum::ORDER_ALLEGRO_DEPOSIT_VALUE => [],
-        DelivererRulesColumnNameEnum::ORDER_ALLEGRO_OPERATION_DATE => [],
-        DelivererRulesColumnNameEnum::ORDER_ALLEGRO_ADDITIONAL_SERVICE => [],
-        DelivererRulesColumnNameEnum::ORDER_PACKAGES_SERVICE_COURIER_NAME => [],
-        DelivererRulesColumnNameEnum::ORDER_PACKAGES_REAL_COST_FOR_COMPANY => [],
-    ];
-
     private $columnRepositoryFactory;
 
     public function __construct(DelivererImportRuleColumnRepositoryFactory $columnRepositoryFactory)
@@ -38,18 +23,7 @@ class DelivererImportRuleFromEntityFactory
 
     public function create(DelivererImportRule $delivererImportRuleEntity)
     {
-        if (!$this->canActionBePerformedOnColumn(
-            $delivererImportRuleEntity->getColumnName(),
-            $delivererImportRuleEntity->getAction()
-        )) {
-            throw new \Exception(
-                sprintf(
-                    'Action %s is not performed for column %s',
-                    $delivererImportRuleEntity->getAction()->value,
-                    $delivererImportRuleEntity->getColumnName()->value
-                )
-            );
-        }
+        $this->validate($delivererImportRuleEntity);
 
         switch ($delivererImportRuleEntity->getAction()->value) {
             case DelivererRulesActionEnum::SEARCH_COMPARE:
@@ -95,13 +69,19 @@ class DelivererImportRuleFromEntityFactory
         }
     }
 
-    private function canActionBePerformedOnColumn(
-        DelivererRulesColumnNameEnum $columnNameEnum,
-        DelivererRulesActionEnum $actionEnum
-    ): bool {
-        return in_array(
-            $actionEnum->value,
-            self::ALLOWED_COLUMN_ACTIONS[$columnNameEnum->value]
-        );
+    private function validate(DelivererImportRule $delivererImportRuleEntity): void
+    {
+        if (!DelivererImportRule::canActionBePerformedOnColumn(
+            $delivererImportRuleEntity->getColumnName(),
+            $delivererImportRuleEntity->getAction()
+        )) {
+            throw new \Exception(
+                sprintf(
+                    'Action %s is not performed for column %s',
+                    $delivererImportRuleEntity->getAction()->value,
+                    $delivererImportRuleEntity->getColumnName()->value
+                )
+            );
+        }
     }
 }

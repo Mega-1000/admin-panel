@@ -16,6 +16,8 @@ final class DelivererRulesColumnNameEnum extends Enum
 
     public const ORDER_ALLEGRO_OPERATION_DATE = 'allegro_operation_date';
 
+    public const ORDER_REFUND_ID = 'refund_id';
+
     public const ORDER_SELLO_ID = 'sello_id';
 
     public const ORDER_PACKAGES_LETTER_NUMBER = 'letter_number';
