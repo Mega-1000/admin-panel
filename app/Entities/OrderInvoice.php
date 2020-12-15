@@ -22,7 +22,8 @@ class OrderInvoice extends Model implements Transformable
      */
     protected $fillable = [
         'invoice_type',
-        'invoice_name'
+        'invoice_name',
+        'is_visible_for_client',
     ];
 
 

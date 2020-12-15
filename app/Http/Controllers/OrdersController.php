@@ -68,6 +68,7 @@ use App\Repositories\StatusRepository;
 use App\Repositories\TaskRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
+use App\Services\OrderInvoiceService;
 use App\User;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
@@ -206,6 +207,9 @@ class OrdersController extends Controller
 
     /** @var TaskRepository */
     protected $taskRepository;
+
+    protected $orderInvoiceService;
+
     protected $dtColumns = [
         'clientFirstname' => 'customer_addresses.firstname',
         'clientLastname' => 'customer_addresses.lastname',
@@ -220,32 +224,6 @@ class OrdersController extends Controller
         'sello_payment' => 'sel_tr__transaction.tr_CheckoutFormPaymentId'
     ];
 
-    /**
-     * OrdersController constructor.
-     * @param FirmRepository $repository
-     * @param WarehouseRepository $warehouseRepository
-     * @param OrderRepository $orderRepository
-     * @param CustomerRepository $customerRepository
-     * @param EmployeeRepository $employeeRepository
-     * @param OrderPaymentRepository $orderPaymentRepository
-     * @param CustomerAddressRepository $customerAddressRepository
-     * @param OrderItemRepository $orderItemRepository
-     * @param StatusRepository $statusRepository
-     * @param OrderMessageRepository $orderMessageRepository
-     * @param OrderAddressRepository $orderAddressRepository
-     * @param UserRepository $userRepository
-     * @param ProductPackingRepository $productPackingRepository
-     * @param LabelGroupRepository $labelGroupRepository
-     * @param LabelRepository $labelRepository
-     * @param ProductStockRepository $productStockRepository
-     * @param ProductStockPositionRepository $productStockPositionRepository
-     * @param ProductStockLogRepository $productStockLogRepository
-     * @param FirmRepository $firmRepository
-     * @param ProductRepository $productRepository
-     * @param SpeditionExchangeRepository $speditionExchangeRepository
-     * @param OrderPackageRepository $orderPackageRepository
-     * @param TaskRepository $taskRepository
-     */
     public function __construct(
         FirmRepository $repository,
         WarehouseRepository $warehouseRepository,
@@ -269,7 +247,8 @@ class OrdersController extends Controller
         ProductRepository $productRepository,
         SpeditionExchangeRepository $speditionExchangeRepository,
         OrderPackageRepository $orderPackageRepository,
-        TaskRepository $taskRepository
+        TaskRepository $taskRepository,
+        OrderInvoiceService $orderInvoiceService
     )
     {
         $this->repository = $repository;
@@ -295,6 +274,7 @@ class OrdersController extends Controller
         $this->speditionExchangeRepository = $speditionExchangeRepository;
         $this->orderPackageRepository = $orderPackageRepository;
         $this->taskRepository = $taskRepository;
+        $this->orderInvoiceService = $orderInvoiceService;
     }
 
     /**
