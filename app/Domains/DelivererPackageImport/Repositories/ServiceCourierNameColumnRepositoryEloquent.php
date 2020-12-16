@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\DelivererPackageImport\Repositories;
 
+use App\Domains\DelivererPackageImport\Enums\DelivererRulesColumnNameEnum;
 use App\Entities\Order;
 use App\Repositories\OrderPackageRepositoryEloquent;
 
@@ -16,6 +17,8 @@ class ServiceCourierNameColumnRepositoryEloquent extends OrderPackageRepositoryE
 
     public function updateColumn(Order $order, $valueToUpdate)
     {
-        return null;
+        return $this->update([
+            DelivererRulesColumnNameEnum::ORDER_PACKAGES_SERVICE_COURIER_NAME => $valueToUpdate,
+        ], $order->id);
     }
 }

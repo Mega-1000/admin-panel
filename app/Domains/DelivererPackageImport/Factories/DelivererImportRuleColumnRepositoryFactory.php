@@ -12,6 +12,7 @@ use App\Domains\DelivererPackageImport\Repositories\AllegroOperationDateColumnRe
 use App\Domains\DelivererPackageImport\Repositories\DelivererImportRuleColumnRepositoryInterface;
 use App\Domains\DelivererPackageImport\Repositories\LetterNumberColumnRepositoryEloquent;
 use App\Domains\DelivererPackageImport\Repositories\RealCostForCompanyColumnRepositoryEloquent;
+use App\Domains\DelivererPackageImport\Repositories\RefundIdColumnRepositoryEloquent;
 use App\Domains\DelivererPackageImport\Repositories\SelloIdColumnRepositoryEloquent;
 use App\Domains\DelivererPackageImport\Repositories\ServiceCourierNameColumnRepositoryEloquent;
 
@@ -28,6 +29,8 @@ class DelivererImportRuleColumnRepositoryFactory
                 return app(AllegroFormIdColumnRepositoryEloquent::class);
             case DelivererRulesColumnNameEnum::ORDER_ALLEGRO_OPERATION_DATE:
                 return app(AllegroOperationDateColumnRepositoryEloquent::class);
+            case DelivererRulesColumnNameEnum::ORDER_REFUND_ID:
+                return app(RefundIdColumnRepositoryEloquent::class);
             case DelivererRulesColumnNameEnum::ORDER_SELLO_ID:
                 return app(SelloIdColumnRepositoryEloquent::class);
             case DelivererRulesColumnNameEnum::ORDER_PACKAGES_LETTER_NUMBER:

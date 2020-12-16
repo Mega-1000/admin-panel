@@ -8,17 +8,17 @@ use App\Domains\DelivererPackageImport\Enums\DelivererRulesColumnNameEnum;
 use App\Entities\Order;
 use App\Repositories\OrderRepositoryEloquent;
 
-class AllegroDepositValueColumnRepositoryEloquent extends OrderRepositoryEloquent implements DelivererImportRuleColumnRepositoryInterface
+class RefundIdColumnRepositoryEloquent extends OrderRepositoryEloquent implements DelivererImportRuleColumnRepositoryInterface
 {
     public function findOrder($valueToSearch)
     {
-        return null;
+        return $this->findWhere([
+            DelivererRulesColumnNameEnum::ORDER_REFUND_ID => $valueToSearch,
+        ]);
     }
 
     public function updateColumn(Order $order, $valueToUpdate)
     {
-        return $this->update([
-            DelivererRulesColumnNameEnum::ORDER_ALLEGRO_DEPOSIT_VALUE => $valueToUpdate,
-        ], $order->id);
+        return null;
     }
 }

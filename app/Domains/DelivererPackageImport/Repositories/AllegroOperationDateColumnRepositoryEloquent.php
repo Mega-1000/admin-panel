@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\DelivererPackageImport\Repositories;
 
+use App\Domains\DelivererPackageImport\Enums\DelivererRulesColumnNameEnum;
 use App\Entities\Order;
 use App\Repositories\OrderRepositoryEloquent;
 
@@ -16,6 +17,8 @@ class AllegroOperationDateColumnRepositoryEloquent extends OrderRepositoryEloque
 
     public function updateColumn(Order $order, $valueToUpdate)
     {
-        return null;
+        return $this->update([
+            DelivererRulesColumnNameEnum::ORDER_ALLEGRO_OPERATION_DATE => $valueToUpdate,
+        ], $order->id);
     }
 }
