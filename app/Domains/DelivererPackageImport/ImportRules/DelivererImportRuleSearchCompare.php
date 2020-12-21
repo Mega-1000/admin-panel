@@ -12,6 +12,10 @@ class DelivererImportRuleSearchCompare extends DelivererImportRuleAbstract
     {
         $order = $this->columnRepository->findOrder($this->getData());
 
+        if (is_null($order)) {
+            return null;
+        }
+
         if ($order->count() > 1) {
             throw new \Exception('Too many orders were found for rule');
         }

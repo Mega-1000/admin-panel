@@ -29,35 +29,35 @@ class DelivererImportRuleFromEntityFactory
             case DelivererRulesActionEnum::SEARCH_COMPARE:
                 return new DelivererImportRuleSearchCompare(
                     $delivererImportRuleEntity,
-                    $this->delivererImportRuleColumnRepositoryFactory->create(
+                    $this->columnRepositoryFactory->create(
                         $delivererImportRuleEntity->getColumnName()
                     )
                 );
             case DelivererRulesActionEnum::SEARCH_REGEX:
                 return new DelivererImportRuleSearchRegex(
                     $delivererImportRuleEntity,
-                    $this->delivererImportRuleColumnRepositoryFactory->create(
+                    $this->columnRepositoryFactory->create(
                         $delivererImportRuleEntity->getColumnName()
                     )
                 );
             case DelivererRulesActionEnum::SET:
                 return new DelivererImportRuleSet(
                     $delivererImportRuleEntity,
-                    $this->delivererImportRuleColumnRepositoryFactory->create(
+                    $this->columnRepositoryFactory->create(
                         $delivererImportRuleEntity->getColumnName()
                     )
                 );
             case DelivererRulesActionEnum::GET:
                 return new DelivererImportRuleGet(
                     $delivererImportRuleEntity,
-                    $this->delivererImportRuleColumnRepositoryFactory->create(
+                    $this->columnRepositoryFactory->create(
                         $delivererImportRuleEntity->getColumnName()
                     )
                 );
             case DelivererRulesActionEnum::GET_AND_REPLACE:
                 return new DelivererImportRuleGetAndReplace(
                     $delivererImportRuleEntity,
-                    $this->delivererImportRuleColumnRepositoryFactory->create(
+                    $this->columnRepositoryFactory->create(
                         $delivererImportRuleEntity->getColumnName()
                     )
                 );

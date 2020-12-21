@@ -84,6 +84,7 @@ class DelivererImportRulesManager
         if ($this->getAndReplaceRules->isNotEmpty()) {
             $this->getAndReplaceRules->each(function ($rulesGroup) use ($order, $line) {
                 foreach ($rulesGroup as $rule) {
+                    /* @var $rule DelivererImportRuleAbstract */
                     $rule->setOrder($order);
                     $rule->setData($line);
 
@@ -99,8 +100,10 @@ class DelivererImportRulesManager
     {
         if ($this->getRules->isNotEmpty()) {
             $this->getRules->each(function ($rule) use ($order, $line) {
+                /* @var $rule DelivererImportRuleAbstract */
                 $rule->setOrder($order);
-                $rule->run($line);
+                $rule->setData($line);
+                $rule->run();
             });
         }
     }
@@ -109,8 +112,10 @@ class DelivererImportRulesManager
     {
         if ($this->setRules->isNotEmpty()) {
             $this->setRules->each(function ($rule) use ($order, $line) {
+                /* @var $rule DelivererImportRuleAbstract */
                 $rule->setOrder($order);
-                $rule->run($line);
+                $rule->setData($line);
+                $rule->run();
             });
         }
     }
@@ -121,9 +126,11 @@ class DelivererImportRulesManager
             return null;
         }
 
+        /* @var $ruleToRun DelivererImportRuleAbstract */
         $ruleToRun = $this->searchRules->shift();
 
-        $order = $ruleToRun->run($line);
+        $ruleToRun->setData($line);
+        $order = $ruleToRun->run();
 
         return empty($order) ? $this->findOrderByRules($line) : $order;
     }

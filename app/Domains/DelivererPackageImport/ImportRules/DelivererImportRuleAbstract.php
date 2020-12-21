@@ -38,7 +38,7 @@ abstract class DelivererImportRuleAbstract
         $this->column = $delivererImportRuleEntity->getColumnName()->value;
     }
 
-    abstract public function run(): ?Order;
+    abstract public function run();
 
     public function setOrder(Order $order): void
     {
@@ -48,6 +48,11 @@ abstract class DelivererImportRuleAbstract
     public function setData(array $line): void
     {
         $this->line = $line;
+    }
+
+    public function getImportRuleEntity(): DelivererImportRule
+    {
+        return $this->importRuleEntity;
     }
 
     /**

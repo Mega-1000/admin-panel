@@ -21,6 +21,11 @@ class DelivererImportRuleFromRequestFactory
     {
         $this->validate($rule);
 
+        $this->actionEnum = new DelivererRulesActionEnum($rule['action']);
+        $this->columnNameEnum = new DelivererRulesColumnNameEnum($rule['columnName']);
+
+        $this->checkIfActionIsPerformed();
+
         switch ($rule['action']) {
             case DelivererRulesActionEnum::SEARCH_COMPARE:
                 return DelivererImportRuleEntityFactory::createSearch(
@@ -78,10 +83,10 @@ class DelivererImportRuleFromRequestFactory
         if (empty($rule['columnName'])) {
             throw new \Exception('Empty column name of import rule');
         }
+    }
 
-        $this->actionEnum = new DelivererRulesActionEnum($rule['action']);
-        $this->columnNameEnum = new DelivererRulesColumnNameEnum($rule['columnName']);
-
+    private function checkIfActionIsPerformed(): void
+    {
         if (!DelivererImportRule::canActionBePerformedOnColumn(
             $this->columnNameEnum,
             $this->actionEnum
