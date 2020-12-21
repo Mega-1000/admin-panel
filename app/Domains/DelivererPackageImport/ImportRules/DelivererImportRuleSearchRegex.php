@@ -5,22 +5,20 @@ declare(strict_types=1);
 namespace App\Domains\DelivererPackageImport\ImportRules;
 
 use App\Entities\Order;
-use Illuminate\Support\Collection;
 
 class DelivererImportRuleSearchRegex extends DelivererImportRuleAbstract
 {
     private $parsedData;
 
-    public function run(array $line): ?Order
+    public function run(): ?Order
     {
-        $this->line = $line;
-        $this->dataToImport = $this->getDataToImport();
+        $this->dataToImport = $this->getData();
 
         if (!$this->validate()) {
             return null;
         }
 
-        $order = $this->findOrder();
+        $order = $this->columnRepository->findOrder($this->parsedData);
 
         if ($order->count() > 1) {
             throw new \Exception('Too many orders were found for rule');
@@ -38,12 +36,5 @@ class DelivererImportRuleSearchRegex extends DelivererImportRuleAbstract
         }
 
         return false;
-    }
-
-    private function findOrder(): Collection
-    {
-        return $this->orderRepository->findWhere([
-            $this->getDbColumnName()->value => $this->parsedData,
-        ]);
     }
 }
