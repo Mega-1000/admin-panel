@@ -38,7 +38,7 @@ class TransportPaymentImporter
         $this->delivererImportRulesManager = $this->delivererImportRulesManagerFactory->create(
             $deliverer
         );
-        
+
         $this->run();
     }
 

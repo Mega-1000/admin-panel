@@ -8,12 +8,12 @@ use App\Entities\Order;
 
 class DelivererImportRuleSearchCompare extends DelivererImportRuleAbstract
 {
-    public function run(): ?Order
+    public function run(): Order
     {
         $order = $this->columnRepository->findOrder($this->getData());
 
         if (is_null($order)) {
-            return null;
+            throw new \Exception('Order for ' . $this->getData() . ' was not found');
         }
 
         if ($order->count() > 1) {

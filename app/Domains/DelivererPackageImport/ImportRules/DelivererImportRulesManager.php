@@ -50,7 +50,7 @@ class DelivererImportRulesManager
             throw new \Exception('No import rules for the ' . $this->deliverer->name . ' deliverer');
         }
 
-        $order = $this->findOrderByRules($line);
+        $order = $this->findOrderByRules($line, clone $this->searchRules);
 
         $this->runSetRules($order, $line);
         $this->runGetRules($order, $line);
@@ -79,7 +79,7 @@ class DelivererImportRulesManager
         return true;
     }
 
-    private function runGetAndReplaceRules($order, $line): void
+    private function runGetAndReplaceRules(Order $order, $line): void
     {
         if ($this->getAndReplaceRules->isNotEmpty()) {
             $this->getAndReplaceRules->each(function ($rulesGroup) use ($order, $line) {
@@ -120,19 +120,19 @@ class DelivererImportRulesManager
         }
     }
 
-    private function findOrderByRules(array $line): ?Order
+    private function findOrderByRules(array $line, Collection $searchRules): ?Order
     {
-        if ($this->searchRules->isEmpty()) {
+        if ($searchRules->isEmpty()) {
             return null;
         }
 
         /* @var $ruleToRun DelivererImportRuleAbstract */
-        $ruleToRun = $this->searchRules->shift();
+        $ruleToRun = $searchRules->shift();
 
         $ruleToRun->setData($line);
         $order = $ruleToRun->run();
 
-        return empty($order) ? $this->findOrderByRules($line) : $order;
+        return empty($order) ? $this->findOrderByRules($line, $searchRules) : $order;
     }
 
     private function setSearchRules(): void
