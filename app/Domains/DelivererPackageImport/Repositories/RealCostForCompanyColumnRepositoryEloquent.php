@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Domains\DelivererPackageImport\Repositories;
 
 use App\Domains\DelivererPackageImport\Enums\DelivererRulesColumnNameEnum;
+use App\Domains\DelivererPackageImport\PriceFormatter;
 use App\Entities\Order;
 use App\Repositories\OrderPackageRepositoryEloquent;
 use Illuminate\Support\Collection;
@@ -23,7 +24,9 @@ class RealCostForCompanyColumnRepositoryEloquent extends OrderPackageRepositoryE
         ])->first();
 
         if ($orderPackage) {
-            $orderPackage->{DelivererRulesColumnNameEnum::ORDER_PACKAGES_REAL_COST_FOR_COMPANY} = $valueToUpdate;
+            $orderPackage->{DelivererRulesColumnNameEnum::ORDER_PACKAGES_REAL_COST_FOR_COMPANY} = PriceFormatter::asAbsolute(
+                PriceFormatter::fromString($valueToUpdate)
+            );
 
             return $orderPackage->save();
         }
