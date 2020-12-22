@@ -79,7 +79,7 @@ class DelivererImportRulesManager
         return true;
     }
 
-    private function runGetAndReplaceRules($order, $line): void
+    private function runGetAndReplaceRules(Order $order, $line): void
     {
         if ($this->getAndReplaceRules->isNotEmpty()) {
             $this->getAndReplaceRules->each(function ($rulesGroup) use ($order, $line) {
@@ -96,7 +96,7 @@ class DelivererImportRulesManager
         }
     }
 
-    private function runGetRules($order, array $line): void
+    private function runGetRules(Order $order, array $line): void
     {
         if ($this->getRules->isNotEmpty()) {
             $this->getRules->each(function ($rule) use ($order, $line) {
@@ -108,7 +108,7 @@ class DelivererImportRulesManager
         }
     }
 
-    private function runSetRules($order, array $line): void
+    private function runSetRules(Order $order, array $line): void
     {
         if ($this->setRules->isNotEmpty()) {
             $this->setRules->each(function ($rule) use ($order, $line) {
