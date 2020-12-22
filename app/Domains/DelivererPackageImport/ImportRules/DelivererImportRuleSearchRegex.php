@@ -10,15 +10,19 @@ class DelivererImportRuleSearchRegex extends DelivererImportRuleAbstract
 {
     private $parsedData;
 
-    public function run(): ?Order
+    public function run(): Order
     {
         $this->dataToImport = $this->getData();
 
         if (!$this->validate()) {
-            return null;
+            throw new \Exception('Data could not be parsed');
         }
 
         $order = $this->columnRepository->findOrder($this->parsedData);
+
+        if (is_null($order)) {
+            throw new \Exception('Order for ' . $this->parsedData . ' was not found');
+        }
 
         if ($order->count() > 1) {
             throw new \Exception('Too many orders were found for rule');
