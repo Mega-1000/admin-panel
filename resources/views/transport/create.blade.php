@@ -37,7 +37,7 @@
                 <select name="columnName[]" id="columnName" class="form-control">
                     <option value="">--wybierz--</option>
                     @foreach ($columns as $column)
-                        <option value="{{ $column }}">{{ $column }}</option>
+                        <option value="{{ $column->value }}">{{ $column->description }}</option>
                     @endforeach
                 </select>
             </div>

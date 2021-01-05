@@ -43,11 +43,11 @@
                         <select name="columnName[]" id="columnName" class="form-control">
                             <option value="">--wybierz--</option>
                             @foreach ($columns as $column)
-                                <option value="{{ $column }}"
-                                    @if ($column === $rule->db_column_name)
+                                <option value="{{ $column->value }}"
+                                    @if ($column->value === $rule->db_column_name)
                                         selected="selected"
                                     @endif
-                                >{{ $column }}</option>
+                                >{{ $column->description }}</option>
                             @endforeach
                         </select>
                     </div>
