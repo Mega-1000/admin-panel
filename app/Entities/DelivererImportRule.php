@@ -15,10 +15,6 @@ class DelivererImportRule extends Model
             DelivererRulesActionEnum::SEARCH_COMPARE,
             DelivererRulesActionEnum::SEARCH_REGEX,
         ],
-        DelivererRulesColumnNameEnum::ORDER_SELLO_ID => [
-            DelivererRulesActionEnum::SEARCH_COMPARE,
-            DelivererRulesActionEnum::SEARCH_REGEX,
-        ],
         DelivererRulesColumnNameEnum::ORDER_ALLEGRO_FORM_ID => [
             DelivererRulesActionEnum::SEARCH_COMPARE,
             DelivererRulesActionEnum::SEARCH_REGEX,

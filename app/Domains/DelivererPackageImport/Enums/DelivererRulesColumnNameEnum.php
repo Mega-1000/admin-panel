@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\Domains\DelivererPackageImport\Enums;
 
+use BenSampo\Enum\Contracts\LocalizedEnum;
 use BenSampo\Enum\Enum;
 
-final class DelivererRulesColumnNameEnum extends Enum
+final class DelivererRulesColumnNameEnum extends Enum implements LocalizedEnum
 {
     public const ORDER_ALLEGRO_ADDITIONAL_SERVICE = 'allegro_additional_service';
 
@@ -17,8 +18,6 @@ final class DelivererRulesColumnNameEnum extends Enum
     public const ORDER_ALLEGRO_OPERATION_DATE = 'allegro_operation_date';
 
     public const ORDER_REFUND_ID = 'refund_id';
-
-    public const ORDER_SELLO_ID = 'sello_id';
 
     public const ORDER_PACKAGES_LETTER_NUMBER = 'letter_number';
 

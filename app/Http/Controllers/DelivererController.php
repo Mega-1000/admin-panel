@@ -36,7 +36,7 @@ class DelivererController extends Controller
     public function create(): View
     {
         return view('transport.create', [
-            'columns' => DelivererRulesColumnNameEnum::getValues(),
+            'columns' => DelivererRulesColumnNameEnum::getInstances(),
             'csvColumnsNumbers' => range(1,20),
             'actions' => DelivererRulesActionEnum::getInstances(),
         ]);
@@ -86,7 +86,7 @@ class DelivererController extends Controller
         if ($deliverer = $this->delivererService->findDeliverer($delivererId)) {
             return view('transport.edit', [
                 'deliverer' => $deliverer,
-                'columns' => DelivererRulesColumnNameEnum::getValues(),
+                'columns' => DelivererRulesColumnNameEnum::getInstances(),
                 'csvColumnsNumbers' => range(1,20),
                 'actions' => DelivererRulesActionEnum::getInstances(),
             ]);
