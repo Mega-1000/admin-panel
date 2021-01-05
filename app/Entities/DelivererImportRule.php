@@ -38,6 +38,9 @@ class DelivererImportRule extends Model
             DelivererRulesActionEnum::GET,
             DelivererRulesActionEnum::GET_AND_REPLACE,
         ],
+        DelivererRulesColumnNameEnum::ORDER_ALLEGRO_COMMISSION => [
+            DelivererRulesActionEnum::GET,
+        ],
         DelivererRulesColumnNameEnum::ORDER_PACKAGES_SERVICE_COURIER_NAME => [
             DelivererRulesActionEnum::SET,
             DelivererRulesActionEnum::GET,

@@ -107,7 +107,7 @@ return [
         'document_number_sell_subiekt' => 'Nr dokumentu sprzedaży (subiekt)',
         'sell_invoices' => 'Faktury sprzedaży',
         'allegro_form_id' => 'ALLEGRO numer zamówienia',
-        'allegro_commission' => 'Wartość brutto prowizji allegro',
+        'allegro_commission' => 'ALLEGRO wartość prowizji od sprzedaży towaru',
         'consultant_earning' => 'Wynagrodzenie konsultanta',
         'warehouse_cost' => 'Koszt magazynu',
         'delivery_warehouse' => 'Magazyn',

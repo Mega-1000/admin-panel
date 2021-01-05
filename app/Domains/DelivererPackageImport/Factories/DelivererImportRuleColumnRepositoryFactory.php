@@ -6,6 +6,7 @@ namespace App\Domains\DelivererPackageImport\Factories;
 
 use App\Domains\DelivererPackageImport\Enums\DelivererRulesColumnNameEnum;
 use App\Domains\DelivererPackageImport\Repositories\AllegroAdditionalServiceColumnRepositoryEloquent;
+use App\Domains\DelivererPackageImport\Repositories\AllegroCommissionColumnRepositoryEloquent;
 use App\Domains\DelivererPackageImport\Repositories\AllegroDepositValueColumnRepositoryEloquent;
 use App\Domains\DelivererPackageImport\Repositories\AllegroFormIdColumnRepositoryEloquent;
 use App\Domains\DelivererPackageImport\Repositories\AllegroOperationDateColumnRepositoryEloquent;
@@ -28,6 +29,8 @@ class DelivererImportRuleColumnRepositoryFactory
                 return app(AllegroFormIdColumnRepositoryEloquent::class);
             case DelivererRulesColumnNameEnum::ORDER_ALLEGRO_OPERATION_DATE:
                 return app(AllegroOperationDateColumnRepositoryEloquent::class);
+            case DelivererRulesColumnNameEnum::ORDER_ALLEGRO_COMMISSION:
+                return app(AllegroCommissionColumnRepositoryEloquent::class);
             case DelivererRulesColumnNameEnum::ORDER_REFUND_ID:
                 return app(RefundIdColumnRepositoryEloquent::class);
             case DelivererRulesColumnNameEnum::ORDER_PACKAGES_LETTER_NUMBER:

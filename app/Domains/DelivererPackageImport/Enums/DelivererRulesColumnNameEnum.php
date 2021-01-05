@@ -17,6 +17,8 @@ final class DelivererRulesColumnNameEnum extends Enum implements LocalizedEnum
 
     public const ORDER_ALLEGRO_OPERATION_DATE = 'allegro_operation_date';
 
+    public const ORDER_ALLEGRO_COMMISSION = 'allegro_commission';
+
     public const ORDER_REFUND_ID = 'refund_id';
 
     public const ORDER_PACKAGES_LETTER_NUMBER = 'letter_number';
