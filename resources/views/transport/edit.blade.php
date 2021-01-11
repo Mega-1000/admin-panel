@@ -21,7 +21,7 @@
         @if ($importRules = $deliverer->importRules()->get())
             @foreach ($importRules as $rule)
                 <div class="row rule">
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <label for="action">Rodzaj akcji</label>
                         <select name="action[]" id="action" class="form-control action">
                             <option value="">--wybierz--</option>
@@ -39,7 +39,7 @@
                         <input type="text" class="form-control" id="value" name="value[]" value="{{ $rule->value }}" />
                     </div>
                     <div class="col-md-2">
-                        <label for="columnName">Nazwa kolumny w bazie</label>
+                        <label for="columnName">Kolumna w bazie</label>
                         <select name="columnName[]" id="columnName" class="form-control">
                             <option value="">--wybierz--</option>
                             @foreach ($columns as $column)
@@ -51,8 +51,8 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <label for="columnNumber">Nr kolumny w pliku CSV</label>
+                    <div class="col-md-1">
+                        <label for="columnNumber">Nr kolumny w CSV</label>
                         <select name="columnNumber[]" id="columnNumber" class="form-control">
                             <option value="">--wybierz--</option>
                             @foreach ($csvColumnsNumbers as $number)
@@ -64,9 +64,26 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <label for="value">Zamień na</label>
                         <input type="text" class="form-control" id="value" name="changeTo[]" value="{{ $rule->change_to }}" />
+                    </div>
+                    <div class="col-md-2">
+                        <label for="conditionColumnNumber">Warunek: nr kolumny CSV</label>
+                        <select name="conditionColumnNumber[]" id="conditionColumnNumber" class="form-control">
+                            <option value="">--wybierz--</option>
+                            @foreach ($csvColumnsNumbers as $number)
+                                <option value="{{ $number }}"
+                                        @if ($number === $rule->condition_column_number)
+                                        selected="selected"
+                                    @endif
+                                >{{ $number }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="conditionValue">Warunek: wartość</label>
+                        <input type="text" class="form-control" id="conditionValue" name="conditionValue[]" value="{{ $rule->conditionValue }}" />
                     </div>
                     <div class="col-md-1 manage-rule">
                         <a href="#" class="addNewRule inline-block">Dodaj +</a>

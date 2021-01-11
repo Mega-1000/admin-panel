@@ -7,6 +7,7 @@ namespace App\Domains\DelivererPackageImport\Factories;
 use App\Domains\DelivererPackageImport\Enums\DelivererRulesActionEnum;
 use App\Domains\DelivererPackageImport\ImportRules\DelivererImportRuleGet;
 use App\Domains\DelivererPackageImport\ImportRules\DelivererImportRuleGetAndReplace;
+use App\Domains\DelivererPackageImport\ImportRules\DelivererImportRuleGetWithCondition;
 use App\Domains\DelivererPackageImport\ImportRules\DelivererImportRuleSearchCompare;
 use App\Domains\DelivererPackageImport\ImportRules\DelivererImportRuleSearchRegex;
 use App\Domains\DelivererPackageImport\ImportRules\DelivererImportRuleSet;
@@ -56,6 +57,13 @@ class DelivererImportRuleFromEntityFactory
                 );
             case DelivererRulesActionEnum::GET_AND_REPLACE:
                 return new DelivererImportRuleGetAndReplace(
+                    $delivererImportRuleEntity,
+                    $this->columnRepositoryFactory->create(
+                        $delivererImportRuleEntity->getColumnName()
+                    )
+                );
+            case DelivererRulesActionEnum::GET_WITH_CONDITION:
+                return new DelivererImportRuleGetWithCondition(
                     $delivererImportRuleEntity,
                     $this->columnRepositoryFactory->create(
                         $delivererImportRuleEntity->getColumnName()

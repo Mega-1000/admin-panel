@@ -75,10 +75,36 @@ abstract class DelivererImportRuleAbstract
 
     /**
      * @return mixed
+     * @throws Exception
+     */
+    protected function getConditionData()
+    {
+        $columnNumber = $this->getCOnditionColumnNumber()->get();
+
+        if (isset($this->line[$columnNumber-1])) {
+            return $this->line[$columnNumber-1];
+        }
+
+        throw new Exception(sprintf(
+            'No correct condition column number for %s column',
+            $this->importRuleEntity->getColumnName()->value
+        ));
+    }
+
+    /**
+     * @return mixed
      */
     protected function getValue()
     {
         return $this->importRuleEntity->value;
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getConditionValue()
+    {
+        return $this->importRuleEntity->condition_value;
     }
 
     /**
@@ -92,5 +118,10 @@ abstract class DelivererImportRuleAbstract
     private function getColumnNumber(): ?DelivererImportRulesColumnNumberVO
     {
         return new DelivererImportRulesColumnNumberVO($this->importRuleEntity->import_column_number);
+    }
+
+    private function getConditionColumnNumber(): ?DelivererImportRulesColumnNumberVO
+    {
+        return new DelivererImportRulesColumnNumberVO($this->importRuleEntity->condition_column_number);
     }
 }
