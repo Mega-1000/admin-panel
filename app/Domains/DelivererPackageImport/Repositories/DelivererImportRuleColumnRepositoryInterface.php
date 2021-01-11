@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Domains\DelivererPackageImport\Repositories;
 
+use App\Domains\DelivererPackageImport\ImportRules\DelivererImportRuleInterface;
+use App\Entities\DelivererImportRule;
 use App\Entities\Order;
 use Illuminate\Support\Collection;
 
@@ -23,8 +25,13 @@ interface DelivererImportRuleColumnRepositoryInterface
      * otherwise a body can be implemented and method should update a column we want.
      *
      * @param Order $order
+     * @param DelivererImportRuleInterface $delivererImportRule
      * @param $valueToUpdate
      * @return mixed
      */
-    public function updateColumn(Order $order, $valueToUpdate);
+    public function updateColumn(
+        Order $order,
+        DelivererImportRule $delivererImportRule,
+        $valueToUpdate
+    );
 }

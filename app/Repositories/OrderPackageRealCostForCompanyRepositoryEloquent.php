@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
+use App\Entities\OrderPackageRealCostForCompany;
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
-use App\Entities\OrderPackage;
 
-class OrderPackageRepositoryEloquent extends BaseRepository implements OrderPackageRepository
+class OrderPackageRealCostForCompanyRepositoryEloquent extends BaseRepository implements OrderPackageRepository
 {
     public function model(): string
     {
-        return OrderPackage::class;
+        return OrderPackageRealCostForCompany::class;
     }
 
     public function boot(): void

@@ -7,6 +7,7 @@ namespace App\Entities;
 use App\Domains\DelivererPackageImport\Enums\DelivererRulesActionEnum;
 use App\Domains\DelivererPackageImport\Enums\DelivererRulesColumnNameEnum;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class DelivererImportRule extends Model
 {
@@ -46,7 +47,7 @@ class DelivererImportRule extends Model
             DelivererRulesActionEnum::GET,
             DelivererRulesActionEnum::GET_AND_REPLACE,
         ],
-        DelivererRulesColumnNameEnum::ORDER_PACKAGES_REAL_COST_FOR_COMPANY => [
+        DelivererRulesColumnNameEnum::ORDER_PACKAGES_REAL_COST_FOR_COMPANY_COST => [
             DelivererRulesActionEnum::SET,
             DelivererRulesActionEnum::GET,
             DelivererRulesActionEnum::GET_AND_REPLACE,
@@ -72,6 +73,11 @@ class DelivererImportRule extends Model
     public function getColumnName(): DelivererRulesColumnNameEnum
     {
         return new DelivererRulesColumnNameEnum($this->db_column_name);
+    }
+
+    public function deliverer(): HasOne
+    {
+        return $this->hasOne(Deliverer::class, 'id', 'deliverer_id');
     }
 
     public static function canActionBePerformedOnColumn(

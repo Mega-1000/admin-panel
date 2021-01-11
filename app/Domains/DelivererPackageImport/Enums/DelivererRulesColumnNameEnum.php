@@ -23,7 +23,7 @@ final class DelivererRulesColumnNameEnum extends Enum implements LocalizedEnum
 
     public const ORDER_PACKAGES_LETTER_NUMBER = 'letter_number';
 
-    public const ORDER_PACKAGES_REAL_COST_FOR_COMPANY = 'real_cost_for_company';
-
     public const ORDER_PACKAGES_SERVICE_COURIER_NAME = 'service_courier_name';
+
+    public const ORDER_PACKAGES_REAL_COST_FOR_COMPANY_COST = 'real_cost_for_company';
 }

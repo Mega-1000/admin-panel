@@ -6,7 +6,7 @@ namespace App\Domains\DelivererPackageImport\ImportRules;
 
 use App\Entities\Order;
 
-class DelivererImportRuleSearchCompare extends DelivererImportRuleAbstract
+class DelivererImportRuleSearchCompare extends DelivererImportRuleAbstract implements DelivererImportRuleInterface
 {
     public function run(): Order
     {

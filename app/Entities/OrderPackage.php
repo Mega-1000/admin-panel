@@ -3,6 +3,7 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
@@ -89,6 +90,11 @@ class OrderPackage extends Model implements Transformable
     public function order()
     {
         return $this->belongsTo(Order::class);
+    }
+
+    public function realCostsForCompany(): HasMany
+    {
+        return $this->hasMany('App\Entities\OrderPackageRealCostForCompany');
     }
 
     public function packedProducts()
