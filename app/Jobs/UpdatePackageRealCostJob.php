@@ -2,8 +2,10 @@
 
 namespace App\Jobs;
 
+use App\Domains\DelivererPackageImport\PriceFormatter;
 use App\Repositories\OrderPackageRepository;
 use Illuminate\Bus\Queueable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -33,9 +35,10 @@ class UpdatePackageRealCostJob implements ShouldQueue {
             while (($csvLine = fgetcsv($spec, 1000, ",")) !== FALSE) {
                 foreach ($inpostPackages as $inpostPackage) {
                     if ($inpostPackage->letter_number == $csvLine[2]) {
-                        $inpostPackage->real_cost_for_company = $csvLine[7];
                         $inpostPackage->status = "DELIVERED";
                         $inpostPackage->save();
+
+                        $this->saveOrderPackageRealCostForCompany($inpostPackage, $csvLine[7]);
                     }
                 }
             }
@@ -46,9 +49,10 @@ class UpdatePackageRealCostJob implements ShouldQueue {
             while (($csvLine = fgetcsv($spec, 1000, ",")) !== FALSE) {
                 foreach ($pocztexPackages as $pocztexPackage) {
                     if ($pocztexPackage->letter_number == $csvLine[0]) {
-                        $pocztexPackage->real_cost_for_company = $csvLine[17];
                         $pocztexPackage->status = "DELIVERED";
                         $pocztexPackage->save();
+
+                        $this->saveOrderPackageRealCostForCompany($pocztexPackage, $csvLine[17]);
                     }
                 }
             }
@@ -59,9 +63,10 @@ class UpdatePackageRealCostJob implements ShouldQueue {
             while (($csvLine = fgetcsv($spec, 1000, ",")) !== FALSE) {
                 foreach ($dpdPackages as $dpdPackage) {
                     if ($dpdPackage->letter_number == $csvLine[11]) {
-                        $dpdPackage->real_cost_for_company = $csvLine[14]*1.23;
                         $dpdPackage->status = "DELIVERED";
                         $dpdPackage->save();
+
+                        $this->saveOrderPackageRealCostForCompany($dpdPackage, $csvLine[14]*1.23);
                     }
                 }
             }
@@ -94,4 +99,13 @@ class UpdatePackageRealCostJob implements ShouldQueue {
         return $sortedPackages;
     }
 
+    private function saveOrderPackageRealCostForCompany(OrderPackage $orderPackage, string $cost): Model
+    {
+        return $orderPackage->realCostsForCompany()->create([
+            'order_package_id' => $orderPackage->id,
+            'cost' => PriceFormatter::asAbsolute(
+                PriceFormatter::fromString($cost)
+            ),
+        ]);
+    }
 }

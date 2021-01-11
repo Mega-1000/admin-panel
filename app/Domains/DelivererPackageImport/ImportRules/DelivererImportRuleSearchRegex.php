@@ -6,7 +6,7 @@ namespace App\Domains\DelivererPackageImport\ImportRules;
 
 use App\Entities\Order;
 
-class DelivererImportRuleSearchRegex extends DelivererImportRuleAbstract
+class DelivererImportRuleSearchRegex extends DelivererImportRuleAbstract implements DelivererImportRuleInterface
 {
     private $parsedData;
 

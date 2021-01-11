@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\DelivererPackageImport\ImportRules;
 
-class DelivererImportRuleGetAndReplace extends DelivererImportRuleAbstract
+class DelivererImportRuleGetAndReplace extends DelivererImportRuleAbstract implements DelivererImportRuleInterface
 {
     /**
      * @return mixed
@@ -15,7 +15,11 @@ class DelivererImportRuleGetAndReplace extends DelivererImportRuleAbstract
             return null;
         }
 
-        return $this->columnRepository->updateColumn($this->order, $this->getChangeTo());
+        return $this->columnRepository->updateColumn(
+            $this->order,
+            $this->importRuleEntity,
+            $this->getChangeTo()
+        );
     }
 
     private function validate(): bool

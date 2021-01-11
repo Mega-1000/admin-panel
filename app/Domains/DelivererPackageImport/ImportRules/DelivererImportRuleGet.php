@@ -6,7 +6,7 @@ namespace App\Domains\DelivererPackageImport\ImportRules;
 
 use Exception;
 
-class DelivererImportRuleGet extends DelivererImportRuleAbstract
+class DelivererImportRuleGet extends DelivererImportRuleAbstract implements DelivererImportRuleInterface
 {
     /**
      * @return mixed
@@ -14,6 +14,10 @@ class DelivererImportRuleGet extends DelivererImportRuleAbstract
      */
     public function run()
     {
-        return $this->columnRepository->updateColumn($this->order, $this->getData());
+        return $this->columnRepository->updateColumn(
+            $this->order,
+            $this->importRuleEntity,
+            $this->getData()
+        );
     }
 }

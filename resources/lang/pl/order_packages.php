@@ -43,7 +43,7 @@ return [
         'cost_for_client' => 'Koszt dla klienta brutto',
         'cost_for_company' => 'Koszt dla firmy brutto',
         'cod_cost_for_us' => 'Koszt pobrania dla nas',
-        'real_cost_for_company' => 'Rzeczywisty koszt transportu przesyłki',
+        'real_cost_for_company' => 'Rzeczywiste koszty brutto transportu przesyłki',
         'created_at' => 'Utworzone w',
         'actions' => 'Akcje',
         'waiting_for_cancelled' => 'Oczekuje na anulację',

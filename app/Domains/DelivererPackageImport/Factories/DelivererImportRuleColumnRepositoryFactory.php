@@ -35,7 +35,7 @@ class DelivererImportRuleColumnRepositoryFactory
                 return app(RefundIdColumnRepositoryEloquent::class);
             case DelivererRulesColumnNameEnum::ORDER_PACKAGES_LETTER_NUMBER:
                 return app(LetterNumberColumnRepositoryEloquent::class);
-            case DelivererRulesColumnNameEnum::ORDER_PACKAGES_REAL_COST_FOR_COMPANY:
+            case DelivererRulesColumnNameEnum::ORDER_PACKAGES_REAL_COST_FOR_COMPANY_COST:
                 return app(RealCostForCompanyColumnRepositoryEloquent::class);
             case DelivererRulesColumnNameEnum::ORDER_PACKAGES_SERVICE_COURIER_NAME:
                 return app(ServiceCourierNameColumnRepositoryEloquent::class);
