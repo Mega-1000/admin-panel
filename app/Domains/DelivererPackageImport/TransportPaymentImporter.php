@@ -39,11 +39,7 @@ class TransportPaymentImporter
             $deliverer
         );
 
-        try {
-            $this->run();
-        } catch (\Exception $e) {
-            dd($e->getMessage());
-        }
+        $this->run();
     }
 
     private function run(): void
