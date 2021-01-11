@@ -16,6 +16,10 @@ class DelivererCreateImportRulesDTO
 
     private $changeTo;
 
+    private $conditionColumnNumber;
+
+    private $conditionValue;
+
     public function __construct(array $importRules)
     {
         $this->actions = $importRules['actions'];
@@ -23,6 +27,8 @@ class DelivererCreateImportRulesDTO
         $this->columnNames = $importRules['columnNames'];
         $this->columnNumbers = $importRules['columnNumbers'];
         $this->changeTo = $importRules['changeTo'];
+        $this->conditionColumnNumber = $importRules['conditionColumnNumber'];
+        $this->conditionValue = $importRules['conditionValue'];
     }
 
     public function getRules(): array
@@ -33,6 +39,8 @@ class DelivererCreateImportRulesDTO
             'columnName' => $this->columnNames,
             'columnNumber' => $this->columnNumbers,
             'changeTo' => $this->changeTo,
+            'conditionColumnNumber' => $this->conditionColumnNumber,
+            'conditionValue' => $this->conditionValue,
         ];
     }
 }

@@ -32,6 +32,8 @@ class DelivererImportRulesManager
     /* @var $getAndReplaceRules Collection */
     private $getAndReplaceRules;
 
+    private $getWithConditionRules;
+
     public function __construct(
         DelivererImportRuleRepositoryEloquent $delivererImportRuleRepositoryEloquent,
         DelivererImportRuleFromEntityFactory $delivererImportRuleFromEntityFactory,
@@ -55,6 +57,7 @@ class DelivererImportRulesManager
         $this->runSetRules($order, $line);
         $this->runGetRules($order, $line);
         $this->runGetAndReplaceRules($order, $line);
+        $this->runGetWithConditionRules($order, $line);
     }
 
     private function prepareRules(): bool
@@ -75,6 +78,7 @@ class DelivererImportRulesManager
         $this->setSetRules();
         $this->setGetRules();
         $this->setGetAndReplaceRules();
+        $this->setGetWithConditionRules();
 
         return true;
     }
@@ -83,6 +87,23 @@ class DelivererImportRulesManager
     {
         if ($this->getAndReplaceRules->isNotEmpty()) {
             $this->getAndReplaceRules->each(function ($rulesGroup) use ($order, $line) {
+                foreach ($rulesGroup as $rule) {
+                    /* @var $rule DelivererImportRuleAbstract */
+                    $rule->setOrder($order);
+                    $rule->setData($line);
+
+                    if ($rule->run()) {
+                        break;
+                    }
+                }
+            });
+        }
+    }
+
+    private function runGetWithConditionRules(Order $order, $line): void
+    {
+        if ($this->getWithConditionRules->isNotEmpty()) {
+            $this->getWithConditionRules->each(function ($rulesGroup) use ($order, $line) {
                 foreach ($rulesGroup as $rule) {
                     /* @var $rule DelivererImportRuleAbstract */
                     $rule->setOrder($order);
@@ -158,6 +179,16 @@ class DelivererImportRulesManager
         $this->getAndReplaceRules = $this->importRules->whereStrict(
             'action',
             DelivererRulesActionEnum::GET_AND_REPLACE
+        )->mapToGroups(function ($rule) {
+            return [$rule->getImportRuleEntity()->db_column_name => $rule];
+        });
+    }
+
+    private function setGetWithConditionRules(): void
+    {
+        $this->getWithConditionRules = $this->importRules->whereStrict(
+            'action',
+            DelivererRulesActionEnum::GET_WITH_CONDITION
         )->mapToGroups(function ($rule) {
             return [$rule->getImportRuleEntity()->db_column_name => $rule];
         });

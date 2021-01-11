@@ -28,16 +28,19 @@ class DelivererImportRule extends Model
             DelivererRulesActionEnum::SET,
             DelivererRulesActionEnum::GET,
             DelivererRulesActionEnum::GET_AND_REPLACE,
+            DelivererRulesActionEnum::GET_WITH_CONDITION,
         ],
         DelivererRulesColumnNameEnum::ORDER_ALLEGRO_OPERATION_DATE => [
             DelivererRulesActionEnum::SET,
             DelivererRulesActionEnum::GET,
             DelivererRulesActionEnum::GET_AND_REPLACE,
+            DelivererRulesActionEnum::GET_WITH_CONDITION,
         ],
         DelivererRulesColumnNameEnum::ORDER_ALLEGRO_ADDITIONAL_SERVICE => [
             DelivererRulesActionEnum::SET,
             DelivererRulesActionEnum::GET,
             DelivererRulesActionEnum::GET_AND_REPLACE,
+            DelivererRulesActionEnum::GET_WITH_CONDITION,
         ],
         DelivererRulesColumnNameEnum::ORDER_ALLEGRO_COMMISSION => [
             DelivererRulesActionEnum::GET,
@@ -46,11 +49,13 @@ class DelivererImportRule extends Model
             DelivererRulesActionEnum::SET,
             DelivererRulesActionEnum::GET,
             DelivererRulesActionEnum::GET_AND_REPLACE,
+            DelivererRulesActionEnum::GET_WITH_CONDITION,
         ],
         DelivererRulesColumnNameEnum::ORDER_PACKAGES_REAL_COST_FOR_COMPANY_COST => [
             DelivererRulesActionEnum::SET,
             DelivererRulesActionEnum::GET,
             DelivererRulesActionEnum::GET_AND_REPLACE,
+            DelivererRulesActionEnum::GET_WITH_CONDITION,
         ],
     ];
 
@@ -63,6 +68,8 @@ class DelivererImportRule extends Model
         'change_to',
         'order',
         'refund_id',
+        'condition_column_number',
+        'condition_value',
     ];
 
     public function getAction(): DelivererRulesActionEnum

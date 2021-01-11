@@ -65,6 +65,15 @@ class DelivererImportRuleFromRequestFactory
                     new DelivererImportRulesValueVO($rule['value']),
                     new DelivererImportRulesValueVO($rule['changeTo'])
                 );
+            case DelivererRulesActionEnum::GET_WITH_CONDITION:
+                return DelivererImportRuleEntityFactory::createGetWithCondition(
+                    $deliverer,
+                    $this->actionEnum,
+                    $this->columnNameEnum,
+                    new DelivererImportRulesColumnNumberVO((int) $rule['columnNumber']),
+                    new DelivererImportRulesColumnNumberVO((int) $rule['conditionColumnNumber']),
+                    new DelivererImportRulesValueVO($rule['conditionValue'])
+                );
             default:
                 throw new \Exception('Wrong action name for deliverer import rule: ' . $rule['action']);
         }
