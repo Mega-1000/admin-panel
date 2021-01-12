@@ -39,7 +39,7 @@ class RealCostForCompanyColumnRepositoryEloquent implements DelivererImportRuleC
         ])->first();
 
         if ($orderPackage) {
-            $orderPackage->realCostsForCompany()->create([
+            $orderPackage->realCostForCompany()->create([
                 'order_package_id' => $orderPackage->id,
                 'deliverer_id' => $delivererImportRule->deliverer->id,
                 'cost' => PriceFormatter::asAbsolute(PriceFormatter::fromString($valueToUpdate))

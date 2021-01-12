@@ -72,7 +72,6 @@ class Order extends Model implements Transformable
         'invoice_gross_sum',
         'icons',
         'consultant_earning',
-        'real_cost_for_company',
         'difference',
         'correction_amount',
         'correction_description',

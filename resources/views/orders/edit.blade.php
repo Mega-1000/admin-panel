@@ -3363,7 +3363,20 @@
                 },
                 {
                     data: 'real_cost_for_company',
-                    name: 'real_cost_for_company'
+                    name: 'real_cost_for_company',
+                    render: function(real_cost_for_company) {
+                        if (real_cost_for_company) {
+                            let value = [];
+
+                            real_cost_for_company.map(function (item) {
+                                value.push('<span>' + item.cost + '</span>');
+                            })
+
+                            return value.join('<br />');
+                        }
+
+                        return '';
+                    },
                 },
 
                 {

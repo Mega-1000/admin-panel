@@ -101,7 +101,7 @@ class UpdatePackageRealCostJob implements ShouldQueue {
 
     private function saveOrderPackageRealCostForCompany(OrderPackage $orderPackage, string $cost): Model
     {
-        return $orderPackage->realCostsForCompany()->create([
+        return $orderPackage->realCostForCompany()->create([
             'order_package_id' => $orderPackage->id,
             'cost' => PriceFormatter::asAbsolute(
                 PriceFormatter::fromString($cost)
