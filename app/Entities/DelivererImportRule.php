@@ -57,6 +57,9 @@ class DelivererImportRule extends Model
             DelivererRulesActionEnum::GET_AND_REPLACE,
             DelivererRulesActionEnum::GET_WITH_CONDITION,
         ],
+        DelivererRulesColumnNameEnum::SEL_TR__TRANSACTION_SELLO_PAYMENT => [
+            DelivererRulesActionEnum::SEARCH_COMPARE,
+        ],
     ];
 
     protected $fillable = [

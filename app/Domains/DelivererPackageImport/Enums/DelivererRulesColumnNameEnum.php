@@ -26,4 +26,6 @@ final class DelivererRulesColumnNameEnum extends Enum implements LocalizedEnum
     public const ORDER_PACKAGES_SERVICE_COURIER_NAME = 'service_courier_name';
 
     public const ORDER_PACKAGES_REAL_COST_FOR_COMPANY_COST = 'real_cost_for_company';
+
+    public const SEL_TR__TRANSACTION_SELLO_PAYMENT = 'tr_CheckoutFormPaymentId';
 }
