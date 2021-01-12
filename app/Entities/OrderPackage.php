@@ -4,6 +4,7 @@ namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
@@ -77,7 +78,6 @@ class OrderPackage extends Model implements Transformable
         'letter_number',
         'cost_for_client',
         'cost_for_company',
-        'real_cost_for_company',
         'inpost_url',
         'chosen_data_template',
         'content',

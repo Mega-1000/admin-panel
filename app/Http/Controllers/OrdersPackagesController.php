@@ -34,6 +34,7 @@ use iio\libmergepdf\Merger;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -269,7 +270,7 @@ class OrdersPackagesController extends Controller
         }
         $orderPackage->save();
 
-        $orderPackage->realCostsForCompany()->create([
+        $orderPackage->realCostForCompany()->create([
             'order_package_id' => $orderPackage->id,
             'cost' => PriceFormatter::asAbsolute(
                 PriceFormatter::fromString($data['real_cost_for_company'])
@@ -461,14 +462,9 @@ class OrdersPackagesController extends Controller
         return DataTables::collection($collection)->make(true);
     }
 
-    /**
-     * @return mixed
-     */
-    public function prepareCollection($id)
+    public function prepareCollection(int $id): Collection
     {
-        $collection = $this->repository->findByField('order_id', $id);
-
-        return $collection;
+        return $this->repository->with(['realCostsForCompany'])->findByField('order_id', $id);
     }
 
     public function sendRequestForCancelled($id)
