@@ -14,9 +14,9 @@ use App\Domains\DelivererPackageImport\Repositories\DelivererImportRuleColumnRep
 use App\Domains\DelivererPackageImport\Repositories\LetterNumberColumnRepositoryEloquent;
 use App\Domains\DelivererPackageImport\Repositories\RealCostForCompanyColumnRepositoryEloquent;
 use App\Domains\DelivererPackageImport\Repositories\RefundIdColumnRepositoryEloquent;
+use App\Domains\DelivererPackageImport\Repositories\SelloFormColumnRepositoryEloquent;
 use App\Domains\DelivererPackageImport\Repositories\SelloPaymentColumnRepositoryEloquent;
 use App\Domains\DelivererPackageImport\Repositories\ServiceCourierNameColumnRepositoryEloquent;
-use App\Repositories\SelTransactionRepositoryEloquent;
 
 class DelivererImportRuleColumnRepositoryFactory
 {
@@ -41,8 +41,10 @@ class DelivererImportRuleColumnRepositoryFactory
                 return app(RealCostForCompanyColumnRepositoryEloquent::class);
             case DelivererRulesColumnNameEnum::ORDER_PACKAGES_SERVICE_COURIER_NAME:
                 return app(ServiceCourierNameColumnRepositoryEloquent::class);
-            case DelivererRulesColumnNameEnum::SEL_TR__TRANSACTION_SELLO_PAYMENT:
+            case DelivererRulesColumnNameEnum::SEL_TR_TRANSACTION_SELLO_PAYMENT:
                 return app(SelloPaymentColumnRepositoryEloquent::class);
+            case DelivererRulesColumnNameEnum::SEL_TR_TRANSACTION_SELLO_FORM:
+                return app(SelloFormColumnRepositoryEloquent::class);
             default:
                 throw new \Exception(sprintf(
                     'No column repository for column %s',
