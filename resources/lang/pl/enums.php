@@ -13,6 +13,7 @@ return [
         DelivererRulesColumnNameEnum::ORDER_PACKAGES_REAL_COST_FOR_COMPANY_COST => 'Rzeczywiste koszty brutto transportu przesyłki',
         DelivererRulesColumnNameEnum::ORDER_PACKAGES_SERVICE_COURIER_NAME => 'Symbol firmy obsługującej przesyłkę',
         DelivererRulesColumnNameEnum::ORDER_ALLEGRO_COMMISSION => 'ALLEGRO wartość prowizji od sprzedaży towaru',
-        DelivererRulesColumnNameEnum::SEL_TR__TRANSACTION_SELLO_PAYMENT => 'ALLEGRO Id płatności',
+        DelivererRulesColumnNameEnum::SEL_TR_TRANSACTION_SELLO_PAYMENT => 'ALLEGRO Id płatności',
+        DelivererRulesColumnNameEnum::SEL_TR_TRANSACTION_SELLO_FORM => 'ALLEGRO numer zamówienia',
     ],
 ];
