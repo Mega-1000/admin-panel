@@ -3362,13 +3362,13 @@
                     name: 'cod_cost_for_us',
                 },
                 {
-                    data: 'real_cost_for_company',
-                    name: 'real_cost_for_company',
-                    render: function(real_cost_for_company) {
-                        if (real_cost_for_company) {
+                    data: 'real_costs_for_company',
+                    name: 'real_costs_for_company',
+                    render: function(real_costs_for_company) {
+                        if (real_costs_for_company) {
                             let value = [];
 
-                            real_cost_for_company.map(function (item) {
+                            real_costs_for_company.map(function (item) {
                                 value.push('<span>' + item.cost + '</span>');
                             })
 

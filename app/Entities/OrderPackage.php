@@ -92,7 +92,7 @@ class OrderPackage extends Model implements Transformable
         return $this->belongsTo(Order::class);
     }
 
-    public function realCostForCompany(): HasMany
+    public function realCostsForCompany(): HasMany
     {
         return $this->hasMany('App\Entities\OrderPackageRealCostForCompany');
     }

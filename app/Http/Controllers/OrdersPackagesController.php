@@ -464,7 +464,7 @@ class OrdersPackagesController extends Controller
 
     public function prepareCollection(int $id): Collection
     {
-        return $this->repository->with(['realCostForCompany'])->findByField('order_id', $id);
+        return $this->repository->with(['realCostsForCompany'])->findByField('order_id', $id);
     }
 
     public function sendRequestForCancelled($id)
