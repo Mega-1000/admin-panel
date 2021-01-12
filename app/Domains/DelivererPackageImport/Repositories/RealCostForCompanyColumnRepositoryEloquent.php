@@ -46,9 +46,9 @@ class RealCostForCompanyColumnRepositoryEloquent implements DelivererImportRuleC
             ]);
 
             return $orderPackage;
-        } else {
-            //todo log if order package does not exist
         }
+
+        //todo log if order package does not exist
 
         return null;
     }

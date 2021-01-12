@@ -79,7 +79,7 @@ abstract class DelivererImportRuleAbstract
      */
     protected function getConditionData()
     {
-        $columnNumber = $this->getCOnditionColumnNumber()->get();
+        $columnNumber = $this->getConditionColumnNumber()->get();
 
         if (isset($this->line[$columnNumber-1])) {
             return $this->line[$columnNumber-1];
