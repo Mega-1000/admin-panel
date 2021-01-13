@@ -24,7 +24,7 @@ class ProductStockPositionService
         int $productStockPositionId,
         int $sign
     ) {
-        $positionQuantity = $sign ? $positionQuantity + $packetQuantity : $positionQuantity - $packetQuantity;
+        $positionQuantity = $sign ? $positionQuantity + $packetQuantity : $positionQuantity - abs($packetQuantity);
 
         return $this->productStockPositionRepository->update([
             'position_quantity' => $positionQuantity,

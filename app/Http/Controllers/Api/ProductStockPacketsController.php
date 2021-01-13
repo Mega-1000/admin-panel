@@ -37,7 +37,7 @@ class ProductStockPacketsController extends Controller
 
     public function retain(int $orderItemId): JsonResponse
     {
-        $data = $this->productStockPacketService->unassignPacketFromOrderItem($orderItemId);
+        $data = $this->productStockPacketService->unassignPacket($orderItemId);
 
         return response()->json($data);
     }

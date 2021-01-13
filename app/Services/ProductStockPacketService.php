@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
-use App\Entities\OrderItem;
 use App\Enums\ProductStockLogActionEnum;
 use App\Repositories\OrderItemRepository;
 use App\Repositories\ProductStockPacketRepository;
 use App\Repositories\ProductStockRepository;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 
 class ProductStockPacketService
@@ -74,28 +72,17 @@ class ProductStockPacketService
 
         $productStockFirstPosition = $productStock->position->first();
 
-        $this->productStockPositionService->updateProductPositionQuantity(
-            $productStockFirstPosition->position_quantity,
-            $packetQuantitySummary, $productStockFirstPosition->id,
-            self::SUBTRACTION_SIGN
-        );
+        $packetDifference = -abs($packetQuantitySummary);
 
-        $this->productStockLogService->storeProductQuantityChangeLog(
-            $productStock->id,
-            $productStockFirstPosition->id,
-            $packetQuantitySummary,
-            ProductStockLogActionEnum::DELETE,
-            Auth::user()->id
-        );
+        $this->updateGlobalAndPositionStockQuantity($productStockFirstPosition, $packetDifference, self::SUBTRACTION_SIGN, $packetQuantitySummary, $productStock);
     }
 
+    /**
+     * @return mixed
+     */
     public function reducePacketQuantityAfterAssignToOrderItem(int $packetId)
     {
         $productStockPacket = $this->findPacket($packetId);
-
-        if(empty($productStockPacket)) {
-            throw new ModelNotFoundException();
-        }
 
         return $productStockPacket->update([
             'packet_quantity' => $productStockPacket->packet_quantity - self::DEFAULT_PRODUCT_STOCK_PACKET_QUANTITY,
@@ -109,7 +96,6 @@ class ProductStockPacketService
         int $productStockId,
         int $packetId
     ): void {
-
         $packetQuantity = intval($packetQuantity);
         $packetProductQuantity = intval($packetProductQuantity);
 
@@ -125,28 +111,37 @@ class ProductStockPacketService
         $productStock = $this->productStockService->findProductStock($productStockId);
 
         $productStockFirstPosition = $productStock->position->first();
-        $currentPacketQuantity = $this->getProductsQuantityInCreatedPackets(
-            $packetQuantity,
-            $packetProductQuantity
-        );
+        $currentPacketQuantity = $this->getProductsQuantityInCreatedPackets($packetQuantity, $packetProductQuantity);
 
-        $this->productStockService->updateProductStockQuantity(
-            $productStockFirstPosition->position_quantity,
-            $currentPacketQuantity,
-            $productStockFirstPosition->id
-        );
+        $this->updateGlobalAndPositionStockQuantity($productStockFirstPosition, $currentPacketQuantityDifference, self::SUBTRACTION_SIGN, $currentPacketQuantity, $productStock);
 
+        $this->updateProductStockPacket($packetQuantity, $packetName, $packetProductQuantity, $productStockId, $packetId);
+    }
+
+    private function updateProductStockPacket(int $packetQuantity, string $packetName, int $packetProductQuantity, int $productStockId, int $packetId)
+    {
+        $this->productStockPacketRepository->update([
+            'packet_quantity' => $packetQuantity,
+            'packet_name' => $packetName,
+            'packet_product_quantity' => $packetProductQuantity,
+            'product_stock_id' => $productStockId,
+        ], $packetId);
+    }
+
+    private function updateGlobalAndPositionStockQuantity($productStockFirstPosition, int $currentPacketQuantityDifference, int $sign, int $currentPacketQuantity, $productStock)
+    {
         $this->productStockPositionService->updateProductPositionQuantity(
             $productStockFirstPosition->position_quantity,
             $currentPacketQuantityDifference,
             $productStockFirstPosition->id,
-            self::ADDITION_SIGN
+            $sign
         );
 
         $this->productStockService->updateProductStockQuantity(
             $productStock->quantity,
             $currentPacketQuantityDifference,
-            $productStock->id
+            $productStock->id,
+            $sign
         );
 
         $action = ($currentPacketQuantityDifference < 0) ? ProductStockLogActionEnum::DELETE : ProductStockLogActionEnum::ADD;
@@ -158,13 +153,6 @@ class ProductStockPacketService
             $action,
             Auth::user()->id
         );
-
-        $this->productStockPacketRepository->update([
-            'packet_quantity' => $packetQuantity,
-            'packet_name' => $packetName,
-            'packet_product_quantity' => $packetProductQuantity,
-            'product_stock_id' => $productStockId,
-        ], $packetId);
     }
 
     private function getProductsQuantityInCreatedPackets(int $packetQuantity, int $productQuantityInPacket): int
@@ -182,11 +170,17 @@ class ProductStockPacketService
         return $this->getProductsQuantityInCreatedPackets($packetQuantityBeforeUpdate, $productQuantityInPacketBeforeUpdate) - $this->getProductsQuantityInCreatedPackets($currentPacketQuantity, $currentProductQuantityInPacket);
     }
 
+    /**
+     * @return mixed
+     */
     public function assignPacket(int $orderItemId, int $packetId)
     {
         return $this->assignPacketToOrderItem($orderItemId, $packetId);
     }
 
+    /**
+     * @return mixed
+     */
     private function assignPacketToOrderItem(int $orderItemId, int $packetId)
     {
         $orderItem = $this->orderItemRepository->find($orderItemId);
@@ -219,13 +213,23 @@ class ProductStockPacketService
         ]);
     }
 
-
     /**
      * @return mixed
      */
     public function deletePacket(int $packetId)
     {
         $packet = $this->findPacket($packetId);
+
+        $currentPacketQuantity = $this->getProductsQuantityInCreatedPackets(
+            $packet->packet_quantity,
+            $packet->packet_product_quantity
+        );
+
+        $productStock = $this->productStockService->findProductStock($packet->product_stock_id);
+
+        $productStockFirstPosition = $productStock->position->first();
+
+        $this->updateGlobalAndPositionStockQuantity($productStockFirstPosition, $currentPacketQuantity, self::ADDITION_SIGN, $currentPacketQuantity, $productStock);
 
         return $packet->delete();
     }

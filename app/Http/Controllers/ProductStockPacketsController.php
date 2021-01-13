@@ -14,11 +14,8 @@ use App\Services\ProductStockLogService;
 use App\Services\ProductStockPacketService;
 use App\Services\ProductStockPositionService;
 use App\Services\ProductStockService;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
-use Illuminate\Support\Facades\Log;
 
 class ProductStockPacketsController extends Controller
 {
@@ -139,11 +136,12 @@ class ProductStockPacketsController extends Controller
         ]);
     }
 
-    public function delete(int $id, int $packetId)
+    public function delete(int $id, int $packetId): RedirectResponse
     {
         $this->productStockPacketService->deletePacket($packetId);
 
         return redirect()->back()->with([
+            'id' => $id,
             'message' => __('product_stock_packets.messages.delete'),
             'alert-type' => 'info'
         ]);
