@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
 
 class ProductStockPacketsController extends Controller
 {
@@ -136,25 +137,6 @@ class ProductStockPacketsController extends Controller
             'message' => __('product_stocks.message.packet_store'),
             'alert-type' => 'success',
         ]);
-    }
-
-    public function assign(int $packetId, int $orderItemId): JsonResponse
-    {
-        try {
-            $packet = $this->productStockPacketService->reducePacketQuantityAfterAssignToOrderItem($packetId);
-            $orderItemName = $this->productStockPacketService->assignPacket($orderItemId, $packetId);
-
-            return response()->json(['order_item_name' => $orderItemName->product->name, 'packet_name' => $packet->packet_name]);
-        } catch (ModelNotFoundException $e) {
-            abort(404);
-        }
-    }
-
-    public function retain(int $orderItemId): JsonResponse
-    {
-        $data = $this->productStockPacketService->unassignPacketFromOrderItem($orderItemId);
-
-        return response()->json($data);
     }
 
     public function delete(int $id, int $packetId)

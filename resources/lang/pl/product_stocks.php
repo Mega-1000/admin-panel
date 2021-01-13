@@ -81,7 +81,7 @@ return [
         ],
     ],
     'message' => [
-        'packet_store' => 'Pakiet produktu został pomyślnie utworzony.',
+        'packet_store' => 'Pakiet produktu został pomyślnie utworzony',
         'change_status' => 'Status produktu został pomyślnie zaktualizowany',
         'update' => 'Stan magazynowy produktu został pomyślnie zaktualizowany',
         'error_quantity' => 'Stan magazynowy danej pozycji nie może być niższy niż 0',

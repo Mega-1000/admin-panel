@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Entities\OrderItem;
 use App\Enums\ProductStockLogActionEnum;
 use App\Repositories\OrderItemRepository;
 use App\Repositories\ProductStockPacketRepository;
@@ -181,21 +182,23 @@ class ProductStockPacketService
         return $this->getProductsQuantityInCreatedPackets($packetQuantityBeforeUpdate, $productQuantityInPacketBeforeUpdate) - $this->getProductsQuantityInCreatedPackets($currentPacketQuantity, $currentProductQuantityInPacket);
     }
 
-    public function assignPacket(int $orderItemId, int $packetId): string
+    public function assignPacket(int $orderItemId, int $packetId)
+    {
+        return $this->assignPacketToOrderItem($orderItemId, $packetId);
+    }
+
+    private function assignPacketToOrderItem(int $orderItemId, int $packetId)
     {
         $orderItem = $this->orderItemRepository->find($orderItemId);
 
-        return $this->assignPacketToOrderItem($orderItem, $packetId);
-    }
-
-    private function assignPacketToOrderItem($orderItem, int $packetId)
-    {
-        return $orderItem->update([
+        $orderItem->update([
             'product_stock_packet_id' => $packetId,
         ]);
+
+        return $orderItem;
     }
 
-    public function unassignPacketFromOrderItem(int $orderItemId): array
+    public function unassignPacket(int $orderItemId): array
     {
         $orderItem = $this->orderItemRepository->find($orderItemId);
 
@@ -205,11 +208,15 @@ class ProductStockPacketService
             'packet_quantity' => $productStockPacket->packet_quantity + self::DEFAULT_PRODUCT_STOCK_PACKET_QUANTITY
         ]);
 
+        $this->unassignPacketFromOrderItem($orderItem);
+
+        return ['order_item_name' => $orderItem->product->name, 'packet_name' => $productStockPacket->packet_name];
+    }
+
+    public function unassignPacketFromOrderItem($orderItem): void {
         $orderItem->update([
             'product_stock_packet_id' => null
         ]);
-
-        return ['order_item_name' => $orderItem->product->name, 'packet_name' => $productStockPacket->packet_name];
     }
 
 

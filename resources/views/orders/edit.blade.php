@@ -1,6 +1,7 @@
 @extends('layouts.datatable')
 @section('app-header')
     <link rel="stylesheet" href="{{ URL::asset('css/views/orders/edit.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <h1 class="page-title" style="margin-right: 0px;">
         <i class="voyager-window-list"></i> @lang('orders.edit')
         <a style="margin-left: 15px;" href="{{ action('OrdersController@index') }}"
@@ -4629,10 +4630,12 @@
         });
 
         $('#assignPacketSubmit').on('click', () => {
-            let url = laroute.route('product_stock_packets.assign', { packetId: $('#packets').val(), orderItemId: $('#assignPacketSubmit').attr('data-orderItemId') })
             $.ajax({
-                method: 'GET',
-                url: url,
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                method: 'POST',
+                url: laroute.route('product_stock_packets.assign', { packetId: $('#packets').val(), orderItemId: $('#assignPacketSubmit').attr('data-orderItemId') }),
             }).done((data) => {
                 document.getElementById('packet__modal--title').innerText = 'Pomyślnie przypisano pakiet ' + data.packet_name + ' do produktu ' + data.order_item_name;
                 $('#packet__modal').modal('show');
@@ -4640,10 +4643,12 @@
         });
 
         $('#retainPacketSubmit').on('click', () => {
-            let url = laroute.route('product_stock_packets.retain', { orderItemId: $('#retainPacketSubmit').attr('data-orderItemId') });
             $.ajax({
-                method: 'GET',
-                url: url
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                method: 'POST',
+                url: laroute.route('product_stock_packets.retain', { orderItemId: $('#retainPacketSubmit').attr('data-orderItemId') })
             }).done((data) => {
                 document.getElementById('packet__modal--title').innerText = 'Pomyślnie odłączono pakiet ' + data.packet_name + ' do produktu ' + data.order_item_name;
                 $('#packet__modal').modal('show');

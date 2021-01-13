@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 declare(string_types=1);
 
@@ -19,5 +19,4 @@ class ProductStockPacketRepositoryEloquent extends BaseRepository implements Pro
     {
         $this->pushCriteria(app(RequestCriteria::class));
     }
-
 }
