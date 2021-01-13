@@ -15,15 +15,18 @@ class ProductStockPositionService
         $this->productStockPositionRepository = $productStockPositionRepository;
     }
 
+    /**
+     * @return mixed
+     */
     public function updateProductPositionQuantity(
         int $positionQuantity,
         int $packetQuantity,
         int $productStockPositionId,
         int $sign
-    ): void {
+    ) {
         $positionQuantity = $sign ? $positionQuantity + $packetQuantity : $positionQuantity - $packetQuantity;
 
-        $this->productStockPositionRepository->update([
+        return $this->productStockPositionRepository->update([
             'position_quantity' => $positionQuantity,
         ], $productStockPositionId);
     }

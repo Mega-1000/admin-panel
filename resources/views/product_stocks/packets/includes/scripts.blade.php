@@ -15,7 +15,7 @@
             $('#stockQuantityLow').modal('show');
             return false;
         }
-        if(productStockFirstPositionQuantity < productStockQuantity) {
+        if(productStockQuantity < packetQuantityResult) {
             $('#stockPositionQuantityLow').modal('show');
             return false;
         }

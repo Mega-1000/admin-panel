@@ -166,7 +166,7 @@ class ProductStockPacketService
         ], $packetId);
     }
 
-    public function getProductsQuantityInCreatedPackets(int $packetQuantity, int $productQuantityInPacket): int
+    private function getProductsQuantityInCreatedPackets(int $packetQuantity, int $productQuantityInPacket): int
     {
         return $packetQuantity * $productQuantityInPacket;
     }
@@ -181,28 +181,23 @@ class ProductStockPacketService
         return $this->getProductsQuantityInCreatedPackets($packetQuantityBeforeUpdate, $productQuantityInPacketBeforeUpdate) - $this->getProductsQuantityInCreatedPackets($currentPacketQuantity, $currentProductQuantityInPacket);
     }
 
-    public function assignPacketToOrderItem(int $orderItemId, int $packetId): string
+    public function assignPacket(int $orderItemId, int $packetId): string
     {
         $orderItem = $this->orderItemRepository->find($orderItemId);
 
-        if(empty($orderItem)) {
-            throw new ModelNotFoundException();
-        }
+        return $this->assignPacketToOrderItem($orderItem, $packetId);
+    }
 
-        $orderItem->update([
+    private function assignPacketToOrderItem($orderItem, int $packetId)
+    {
+        return $orderItem->update([
             'product_stock_packet_id' => $packetId,
         ]);
-
-        return $orderItem->product->name;
     }
 
     public function unassignPacketFromOrderItem(int $orderItemId): array
     {
         $orderItem = $this->orderItemRepository->find($orderItemId);
-
-        if(empty($orderItem)) {
-           throw new ModelNotFoundException();
-        }
 
         $productStockPacket = $this->findPacket($orderItem->product_stock_packet_id);
 
@@ -215,5 +210,16 @@ class ProductStockPacketService
         ]);
 
         return ['order_item_name' => $orderItem->product->name, 'packet_name' => $productStockPacket->packet_name];
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function deletePacket(int $packetId)
+    {
+        $packet = $this->findPacket($packetId);
+
+        return $packet->delete();
     }
 }

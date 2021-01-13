@@ -142,9 +142,9 @@ class ProductStockPacketsController extends Controller
     {
         try {
             $packet = $this->productStockPacketService->reducePacketQuantityAfterAssignToOrderItem($packetId);
-            $orderItemName = $this->productStockPacketService->assignPacketToOrderItem($orderItemId, $packetId);
+            $orderItemName = $this->productStockPacketService->assignPacket($orderItemId, $packetId);
 
-            return response()->json(['order_item_name' => $orderItemName, 'packet_name' => $packet->packet_name]);
+            return response()->json(['order_item_name' => $orderItemName->product->name, 'packet_name' => $packet->packet_name]);
         } catch (ModelNotFoundException $e) {
             abort(404);
         }
@@ -155,5 +155,15 @@ class ProductStockPacketsController extends Controller
         $data = $this->productStockPacketService->unassignPacketFromOrderItem($orderItemId);
 
         return response()->json($data);
+    }
+
+    public function delete(int $id, int $packetId)
+    {
+        $this->productStockPacketService->deletePacket($packetId);
+
+        return redirect()->back()->with([
+            'message' => __('product_stock_packets.messages.delete'),
+            'alert-type' => 'info'
+        ]);
     }
 }

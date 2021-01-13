@@ -19,14 +19,16 @@ class ProductStockService
         return $this->productStockRepository->find($productStockId);
     }
 
+    /**
+     * @return mixed
+     */
     public function updateProductStockQuantity(
-        int $productStockQuantity, 
-        int $currentPacketQuantityDifference, 
+        int $productStockQuantity,
+        int $currentPacketQuantityDifference,
         int $productStockId
-    ): void {
-        $this->productStockRepository->update([
+    ) {
+        return $this->productStockRepository->update([
             'quantity' => $productStockQuantity + $currentPacketQuantityDifference,
         ], $productStockId);
     }
-
 }

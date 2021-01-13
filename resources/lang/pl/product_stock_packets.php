@@ -14,6 +14,9 @@ return [
         'packet_list' => 'Lista pakietów',
         'packet_create' => 'Stwórz pakiet',
     ],
+    'messages' => [
+      'delete' => 'Pakiet został pomyślnie usunięty',
+    ],
     'form' => [
         'choose_packet' => 'Wybierz pakiet',
         'name' => 'Nazwa',
