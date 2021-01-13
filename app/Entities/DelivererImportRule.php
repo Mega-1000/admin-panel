@@ -20,6 +20,12 @@ class DelivererImportRule extends Model
             DelivererRulesActionEnum::SEARCH_COMPARE,
             DelivererRulesActionEnum::SEARCH_REGEX,
         ],
+        DelivererRulesColumnNameEnum::ORDER_PAYMENT_CHANNEL => [
+            DelivererRulesActionEnum::SET,
+            DelivererRulesActionEnum::GET,
+            DelivererRulesActionEnum::GET_AND_REPLACE,
+            DelivererRulesActionEnum::GET_WITH_CONDITION,
+        ],
         DelivererRulesColumnNameEnum::ORDER_REFUND_ID => [
             DelivererRulesActionEnum::SEARCH_COMPARE,
             DelivererRulesActionEnum::SEARCH_REGEX,
