@@ -16,6 +16,9 @@ class ProductStockLogService
         $this->productStockLogRepository = $productStockLogRepository;
     }
 
+    /**
+     * @return mixed
+     */
     public function storeProductQuantityChangeLog(
         int $productStockId,
         int $productStockFirstPositionId,
