@@ -12,9 +12,6 @@ use Illuminate\Support\Facades\Log;
 
 class ProductStockPacketsController extends Controller
 {
-    /**
-     * @var ProductStockPacketService
-     */
     protected $productStockPacketService;
 
     public function __construct(ProductStockPacketService $productStockPacketService) {

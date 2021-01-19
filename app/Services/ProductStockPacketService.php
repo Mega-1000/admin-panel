@@ -45,6 +45,9 @@ class ProductStockPacketService
         $this->productStockService = $productStockService;
     }
 
+    /**
+     * @return mixed
+     */
     public function findPacket(int $packetId)
     {
         return $this->productStockPacketRepository->find($packetId);
@@ -118,7 +121,7 @@ class ProductStockPacketService
         $this->updateProductStockPacket($packetQuantity, $packetName, $packetProductQuantity, $productStockId, $packetId);
     }
 
-    private function updateProductStockPacket(int $packetQuantity, string $packetName, int $packetProductQuantity, int $productStockId, int $packetId)
+    private function updateProductStockPacket(int $packetQuantity, string $packetName, int $packetProductQuantity, int $productStockId, int $packetId): void
     {
         $this->productStockPacketRepository->update([
             'packet_quantity' => $packetQuantity,
@@ -128,7 +131,13 @@ class ProductStockPacketService
         ], $packetId);
     }
 
-    private function updateGlobalAndPositionStockQuantity($productStockFirstPosition, int $currentPacketQuantityDifference, int $sign, int $currentPacketQuantity, $productStock)
+    private function updateGlobalAndPositionStockQuantity(
+        $productStockFirstPosition,
+        int $currentPacketQuantityDifference,
+        int $sign,
+        int $currentPacketQuantity,
+        $productStock
+    ): void
     {
         $this->productStockPositionService->updateProductPositionQuantity(
             $productStockFirstPosition->position_quantity,
