@@ -241,7 +241,7 @@ Route::group(['prefix' => 'admin'], function () {
             'ProductStockPacketsController@create')->name('product_stock_packets.create');
         Route::post('products/stocks/{id}/packets',
             'ProductStockPacketsController@store')->name('product_stock_packets.store');
-        Route::get('products/stocks/{id}/packets/{packetId}/delete',
+        Route::delete('products/stocks/{id}/packets/{packetId}/delete',
             'ProductStockPacketsController@delete')->name('product_stock_packets.delete');
         Route::get('products/stocks/{id}/packets',
             'ProductStockPacketsController@index')->name('product_stock_packets.index');
@@ -249,7 +249,7 @@ Route::group(['prefix' => 'admin'], function () {
             'Api\ProductStockPacketsController@assign')->name('product_stock_packets.assign');
         Route::post('products/stocks/packets/orderItem/{orderItemId}/retain',
             'Api\ProductStockPacketsController@retain')->name('product_stock_packets.retain');
-        Route::delete('products/stocks/{id}/packets/{packetId}',
+        Route::get('products/stocks/{id}/packets/{packetId}',
             'ProductStockPacketsController@edit')->name('product_stock_packets.edit');
         Route::put('products/stocks/{id}/packets/{packetId}',
             'ProductStockPacketsController@update')->name('product_stock_packets.update');
