@@ -23,6 +23,6 @@ class OrderPaymentLog extends Model
         'client_return_payment_amount',
         'payment_sum_before_payment',
         'payment_sum_after_payment',
-        'employee_id'
+        'employee_id',
     ];
 }
