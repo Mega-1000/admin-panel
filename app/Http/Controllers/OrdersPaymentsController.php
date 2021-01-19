@@ -226,11 +226,7 @@ class OrdersPaymentsController extends Controller
 
         $type = $request->input('payment-type');
 
-        if($request->input('promise_date') === null) {
-            $promiseDate = '';
-        } else {
-            $promiseDate = $request->input('promise_date');
-        }
+        $promiseDate = $request->input('promise_date') ?: '';
 
         $orderPayment = $this->orderPaymentService->payOrder($orderId, $request->input('amount'),
             $masterPaymentId, $promise,
