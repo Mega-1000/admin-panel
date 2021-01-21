@@ -3,7 +3,7 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
@@ -45,7 +45,8 @@ class OrderItem extends Model implements Transformable
         'gross_selling_price_basic_unit',
         'gross_selling_price_calculated_unit',
         'gross_selling_price_aggregate_unit',
-        'gross_selling_price_the_largest_unit'
+        'gross_selling_price_the_largest_unit',
+        'product_stock_packet_id',
     ];
 
     /**
@@ -72,5 +73,10 @@ class OrderItem extends Model implements Transformable
     public function realProductPositions()
     {
         return $this->product->stock->position;
+    }
+
+    public function packet(): BelongsTo
+    {
+        return $this->belongsTo(ProductStockPacket::class, 'product_stock_packet_id');
     }
 }

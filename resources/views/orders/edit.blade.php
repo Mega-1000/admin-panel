@@ -1,6 +1,7 @@
 @extends('layouts.datatable')
 @section('app-header')
     <link rel="stylesheet" href="{{ URL::asset('css/views/orders/edit.css') }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <h1 class="page-title" style="margin-right: 0px;">
         <i class="voyager-window-list"></i> @lang('orders.edit')
         <a style="margin-left: 15px;" href="{{ action('OrdersController@index') }}"
@@ -915,7 +916,7 @@
                                    class="form-control price change-order quantityChange"
                                    id="quantity_commercial[{{$item->id}}]">
                         </td>
-                        <td colspan="3">
+                        <td>
                             @php
                                 $quantityAll = 0;
                             @endphp
@@ -928,6 +929,28 @@
                                 @endphp
                             @endforeach
                             Ilość wszystkich: {{ $quantityAll }} <br/>
+                        </td>
+                        <td>
+                            @if(!$item->packet)
+                                <div class="form-group">
+                                    <label for="packets">@lang('product_stock_packets.form.choose_packet')</label>
+                                    @if($item->product->stock->packets->count() > 0)
+                                        <select class="form-control" id="packets" name="packet">
+                                            @foreach($item->product->stock->packets as $packet)
+                                                <option value="{{ $packet->id }}">{{ $packet->packet_name }}</option>
+                                            @endforeach
+                                        </select>
+                                    @else
+                                        <h4>@lang('product_stock_packets.no_packets')</h4>
+                                    @endif
+                                </div>
+                                <button class="btn btn-success" data-orderItemId="{{ $item->id }}" id="assignPacketSubmit">Użyj wybranego pakietu</button>
+                            @else
+                                <div class="form-group">
+                                    @lang('product_stock_packets.currentPacket'): <b>{{ $item->packet->packet_name }}</b>
+                                </div>
+                                <button class="btn btn-danger" data-orderItemId="{{ $item->id }}" id="retainPacketSubmit">Usuń wybrany pakiet</button>
+                            @endif
                         </td>
                     </tr>
                     <tr class="row-{{$item->id}}">
@@ -4618,6 +4641,33 @@
                 });
             });
         });
+
+        $('#assignPacketSubmit').on('click', () => {
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                method: 'POST',
+                url: laroute.route('product_stock_packets.assign', { packetId: $('#packets').val(), orderItemId: $('#assignPacketSubmit').attr('data-orderItemId') }),
+            }).done((data) => {
+                document.getElementById('packet__modal--title').innerText = 'Pomyślnie przypisano pakiet ' + data.packet_name + ' do produktu ' + data.order_item_name;
+                $('#packet__modal').modal('show');
+            })
+        });
+
+        $('#retainPacketSubmit').on('click', () => {
+            $.ajax({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                },
+                method: 'POST',
+                url: laroute.route('product_stock_packets.retain', { orderItemId: $('#retainPacketSubmit').attr('data-orderItemId') })
+            }).done((data) => {
+                document.getElementById('packet__modal--title').innerText = 'Pomyślnie odłączono pakiet ' + data.packet_name + ' do produktu ' + data.order_item_name;
+                $('#packet__modal').modal('show');
+            });
+        });
+
         function goToNextOrder() {
             let lastOrderId = {{ $order->getLastOrder() }};
             let currentOrderId = {{ $order->id }};
@@ -4633,7 +4683,6 @@
             let previousOrderUrl = '{{ route('orders.edit', ['id' => $order->getPreviousOrderId($order->id)]) }}';
             window.location.href = previousOrderUrl;
         }
-
     </script>
 
     <script src="{{ URL::asset('js/views/orders/edit.js') }}"></script>

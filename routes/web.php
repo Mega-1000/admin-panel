@@ -237,6 +237,22 @@ Route::group(['prefix' => 'admin'], function () {
             'ProductStockLogsController@datatable')->name('product_stocks.logs.datatable');
         Route::get('products/stocks/{id}/logs/{log_id}/show',
             'ProductStockLogsController@show')->name('product_stocks.logs.show');
+        Route::get('products/stocks/{id}/packets/create',
+            'ProductStockPacketsController@create')->name('product_stock_packets.create');
+        Route::post('products/stocks/{id}/packets',
+            'ProductStockPacketsController@store')->name('product_stock_packets.store');
+        Route::delete('products/stocks/{id}/packets/{packetId}',
+            'ProductStockPacketsController@delete')->name('product_stock_packets.delete');
+        Route::get('products/stocks/{id}/packets',
+            'ProductStockPacketsController@index')->name('product_stock_packets.index');
+        Route::post('products/stocks/packets/{packetId}/orderItem/{orderItemId}/assign',
+            'Api\ProductStockPacketsController@assign')->name('product_stock_packets.assign');
+        Route::post('products/stocks/packets/orderItem/{orderItemId}/retain',
+            'Api\ProductStockPacketsController@retain')->name('product_stock_packets.retain');
+        Route::get('products/stocks/{id}/packets/{packetId}',
+            'ProductStockPacketsController@edit')->name('product_stock_packets.edit');
+        Route::put('products/stocks/{id}/packets/{packetId}',
+            'ProductStockPacketsController@update')->name('product_stock_packets.update');
         Route::post('positions/{from}/{to}/quantity/move',
             'ProductStockPositionsController@quantityMove')->name('product_stocks.quantity_move');
 
