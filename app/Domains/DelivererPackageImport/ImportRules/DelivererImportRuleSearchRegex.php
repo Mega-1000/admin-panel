@@ -19,6 +19,10 @@ class DelivererImportRuleSearchRegex extends DelivererImportRuleAbstract impleme
 
         $order = $this->columnRepository->findOrder($this->parsedData);
 
+        if (empty($order)) {
+            return null;
+        }
+
         if ($order->isNotEmpty() && $order->count() > 1) {
             throw new TooManyOrdersInDBException(
                 "Znaleziono więcej niż jedno zamówienie w bazie danych dla LP: {$this->parsedData}"

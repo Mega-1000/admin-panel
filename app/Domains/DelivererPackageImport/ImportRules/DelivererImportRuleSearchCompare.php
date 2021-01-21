@@ -17,6 +17,10 @@ class DelivererImportRuleSearchCompare extends DelivererImportRuleAbstract imple
 
         $order = $this->columnRepository->findOrder($this->getData());
 
+        if (empty($order)) {
+            return null;
+        }
+
         if ($order->isNotEmpty() && $order->count() > 1) {
             throw new TooManyOrdersInDBException(
                 "Znaleziono więcej niż jedno zamówienie w bazie danych dla LP: {$this->getData()}"
