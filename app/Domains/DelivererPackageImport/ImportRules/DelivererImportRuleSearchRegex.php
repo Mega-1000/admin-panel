@@ -4,31 +4,32 @@ declare(strict_types=1);
 
 namespace App\Domains\DelivererPackageImport\ImportRules;
 
+use App\Domains\DelivererPackageImport\Exceptions\TooManyOrdersInDBException;
 use App\Entities\Order;
 
 class DelivererImportRuleSearchRegex extends DelivererImportRuleAbstract implements DelivererImportRuleInterface
 {
-    private $parsedData;
-
-    public function run(): Order
+    public function run(): ?Order
     {
         $this->dataToImport = $this->getData();
 
         if (!$this->validate()) {
-            throw new \Exception('Data could not be parsed');
+            return null;
         }
 
         $order = $this->columnRepository->findOrder($this->parsedData);
 
-        if (is_null($order)) {
-            throw new \Exception('Order for ' . $this->parsedData . ' was not found');
+        if ($order->isNotEmpty() && $order->count() > 1) {
+            throw new TooManyOrdersInDBException(
+                "Znaleziono więcej niż jedno zamówienie w bazie danych dla LP: {$this->parsedData}"
+            );
         }
 
-        if ($order->count() > 1) {
-            throw new \Exception('Too many orders were found for rule');
+        if ($order->isNotEmpty() && $order->count() === 1) {
+            return $order->first();
         }
 
-        return $order->first();
+        return null;
     }
 
     private function validate(): bool

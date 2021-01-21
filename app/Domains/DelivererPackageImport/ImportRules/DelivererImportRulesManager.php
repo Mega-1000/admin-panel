@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Domains\DelivererPackageImport\ImportRules;
 
+use App\Domains\DelivererPackageImport\DelivererImportLogger;
 use App\Domains\DelivererPackageImport\Enums\DelivererRulesActionEnum;
+use App\Domains\DelivererPackageImport\Exceptions\OrderNotFoundException;
 use App\Domains\DelivererPackageImport\Factories\DelivererImportRuleFromEntityFactory;
 use App\Domains\DelivererPackageImport\Repositories\DelivererImportRuleRepositoryEloquent;
 use App\Entities\Deliverer;
@@ -18,6 +20,10 @@ class DelivererImportRulesManager
     private $delivererImportRuleFromEntityFactory;
 
     private $deliverer;
+
+    private $letterNumber;
+
+    public $importLogger;
 
     /* @var $importRules Collection */
     private $importRules;
@@ -37,27 +43,38 @@ class DelivererImportRulesManager
     public function __construct(
         DelivererImportRuleRepositoryEloquent $delivererImportRuleRepositoryEloquent,
         DelivererImportRuleFromEntityFactory $delivererImportRuleFromEntityFactory,
-        Deliverer $deliverer
+        DelivererImportLogger $delivererImportLogger,
+        Deliverer $deliverer,
+        string $logFileName
     ) {
         $this->delivererImportRulesRepository = $delivererImportRuleRepositoryEloquent;
         $this->delivererImportRuleFromEntityFactory = $delivererImportRuleFromEntityFactory;
         $this->deliverer = $deliverer;
 
+        $this->importLogger = $delivererImportLogger;
+        $this->importLogger->setLogFileName($logFileName);
+
         $this->prepareRules();
     }
 
-    public function runRules(array $line): void
+    public function runRules(array $line): int
     {
         if (empty($this->importRules)) {
-            throw new \Exception('No import rules for the ' . $this->deliverer->name . ' deliverer');
+            throw new \Exception("Brak reguł importu dla kuriera {$this->deliverer->name}");
         }
 
         $order = $this->findOrderByRules($line, clone $this->searchRules);
+
+        if (is_null($order)) {
+            throw new OrderNotFoundException($this->letterNumber);
+        }
 
         $this->runSetRules($order, $line);
         $this->runGetRules($order, $line);
         $this->runGetAndReplaceRules($order, $line);
         $this->runGetWithConditionRules($order, $line);
+
+        return $order->id;
     }
 
     private function prepareRules(): bool
@@ -152,6 +169,8 @@ class DelivererImportRulesManager
 
         $ruleToRun->setData($line);
         $order = $ruleToRun->run();
+
+        $this->letterNumber = $ruleToRun->getData() ?: $ruleToRun->getParsedData();
 
         return empty($order) ? $this->findOrderByRules($line, $searchRules) : $order;
     }

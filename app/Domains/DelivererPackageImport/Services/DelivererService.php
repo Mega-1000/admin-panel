@@ -57,11 +57,14 @@ class DelivererService
         $this->delivererImportRuleRepository->saveImportRules($delivererImportRules);
     }
 
-    public function saveFileToImport(UploadedFile $file): File
+    public function saveFileToImport(UploadedFile $file): array
     {
         $fileName = Str::random(40) . '.csv';
 
-        return $file->move(Storage::path('user-files/transport/'), $fileName);
+        return [
+            'oldFileName' => $file->getClientOriginalName(),
+            'file' => $file->move(Storage::path('user-files/transport/'), $fileName),
+        ];
     }
 
     public function updateDeliverer(

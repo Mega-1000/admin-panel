@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\DelivererPackageImport\Repositories;
 
+use App\Domains\DelivererPackageImport\Exceptions\OrderPackageWasNotFoundException;
 use App\Domains\DelivererPackageImport\PriceFormatter;
 use App\Entities\DelivererImportRule;
 use App\Entities\Order;
@@ -25,13 +26,7 @@ class RealCostForCompanyColumnRepositoryEloquent implements DelivererImportRuleC
         return null;
     }
 
-    /**
-     * @param Order $order
-     * @param DelivererImportRule $delivererImportRule
-     * @param $valueToUpdate
-     * @return OrderPackage|null
-     */
-    public function updateColumn(Order $order, DelivererImportRule $delivererImportRule, $valueToUpdate)
+    public function updateColumn(Order $order, DelivererImportRule $delivererImportRule, $valueToUpdate): OrderPackage
     {
         /* @var $orderPackage OrderPackage */
         $orderPackage = $this->orderPackageRepositoryEloquent->findWhere([
@@ -48,8 +43,6 @@ class RealCostForCompanyColumnRepositoryEloquent implements DelivererImportRuleC
             return $orderPackage;
         }
 
-        //todo log if order package does not exist
-
-        return null;
+        throw new OrderPackageWasNotFoundException((string) $order->id);
     }
 }

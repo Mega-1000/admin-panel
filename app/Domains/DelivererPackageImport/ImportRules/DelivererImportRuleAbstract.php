@@ -25,6 +25,8 @@ abstract class DelivererImportRuleAbstract
 
     protected $dataToImport;
 
+    protected $parsedData;
+
     private $column;
 
     public function __construct(
@@ -59,7 +61,7 @@ abstract class DelivererImportRuleAbstract
      * @return mixed
      * @throws Exception
      */
-    protected function getData()
+    public function getData()
     {
         $columnNumber = $this->getColumnNumber()->get();
 
@@ -68,9 +70,14 @@ abstract class DelivererImportRuleAbstract
         }
 
         throw new Exception(sprintf(
-            'No correct column number for %s column',
+            'W pliku CSV nie znaleziono kolumny %s',
             $this->importRuleEntity->getColumnName()->value
         ));
+    }
+
+    public function getParsedData(): ?string
+    {
+        return $this->parsedData;
     }
 
     /**
@@ -86,7 +93,7 @@ abstract class DelivererImportRuleAbstract
         }
 
         throw new Exception(sprintf(
-            'No correct condition column number for %s column',
+            'W pliku CSV nie znaleziono kolumny %s dla dodatkowego warunku',
             $this->importRuleEntity->getColumnName()->value
         ));
     }
