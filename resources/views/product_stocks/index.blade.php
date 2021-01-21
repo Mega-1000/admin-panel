@@ -124,6 +124,16 @@
                         html += '<i class="voyager-edit"></i>';
                         html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
                         html += '</a>';
+                        const listUrl = laroute.route('product_stock_packets.index', { id: id});
+                        html += '<a href="' + listUrl + '" class="btn btn-sm btn-warning edit">';
+                        html += '<i class="voyager-edit"></i>';
+                        html += '<span class="hidden-xs hidden-sm"> @lang('product_stock_packets.table.packet_list')</span>';
+                        html += '</a>';
+                        const createUrl = laroute.route('product_stock_packets.create', { id: id});
+                        html += '<a href="' + createUrl + '" class="btn btn-sm btn-success edit">';
+                        html += '<i class="voyager-edit"></i>';
+                        html += '<span class="hidden-xs hidden-sm"> @lang('product_stock_packets.table.packet_create')</span>';
+                        html += '</a>';
                         return html;
                     }
                 },
