@@ -11,6 +11,10 @@ class DelivererImportRuleSearchCompare extends DelivererImportRuleAbstract imple
 {
     public function run(): ?Order
     {
+        if (empty($this->getData())) {
+            return null;
+        }
+
         $order = $this->columnRepository->findOrder($this->getData());
 
         if ($order->isNotEmpty() && $order->count() > 1) {
