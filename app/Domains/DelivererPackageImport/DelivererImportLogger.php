@@ -26,11 +26,10 @@ class DelivererImportLogger
 
     public function setLogFileName(string $fileName): void
     {
-        //$this->logFileName = $fileName;
-        $this->logFileName = 'test.txt';
+        $this->logFileName = $fileName;
 
         $this->logger = new Logger($this->getLogFileBaseName(), [
-            new StreamHandler($this->getFileLogPath(),Logger::INFO),
+            new StreamHandler($this->getFileLogPath()),
         ]);
     }
 

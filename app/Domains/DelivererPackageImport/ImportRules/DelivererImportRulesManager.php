@@ -68,7 +68,7 @@ class DelivererImportRulesManager
         if (is_null($order)) {
             throw new OrderNotFoundException($this->letterNumber);
         }
-        
+
         $this->runSetRules($order, $line);
         $this->runGetRules($order, $line);
         $this->runGetAndReplaceRules($order, $line);
