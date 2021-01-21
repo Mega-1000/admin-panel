@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\CheckPackagesStatusJob;
 use App\Jobs\CheckStatusInpostPackagesJob;
 use Illuminate\Console\Command;
 
@@ -38,6 +39,6 @@ class CheckStatusInpostPackages extends Command
      */
     public function handle()
     {
-        dispatch_now(new CheckStatusInpostPackagesJob());
+        dispatch_now(new CheckPackagesStatusJob());
     }
 }

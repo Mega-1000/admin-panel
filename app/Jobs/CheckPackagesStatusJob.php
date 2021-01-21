@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Jobs;
 
@@ -11,7 +12,6 @@ use App\Integrations\Pocztex\envelopeStatusType;
 use App\Integrations\Pocztex\getEnvelopeContentShort;
 use App\Integrations\Pocztex\getEnvelopeStatus;
 use App\Integrations\Pocztex\statusType;
-use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderRepository;
 use GuzzleHttp\Client;
 use Illuminate\Bus\Queueable;
@@ -49,12 +49,7 @@ class CheckPackagesStatusJob
         $this->orderRepository = $orderRepository;
     }
 
-    /**
-     * Execute the job.
-     *
-     * @return void
-     */
-    public function handle()
+    public function handle(): void
     {
         $orders = Order::whereDate('shipment_date', '>', Carbon::today()->subDays(7)->toDateString())->get();
 
@@ -90,10 +85,7 @@ class CheckPackagesStatusJob
         }
     }
 
-    /**
-     * @param $package
-     */
-    protected function checkStatusInInpostPackages($package)
+    protected function checkStatusInInpostPackages(OrderPackage $package): void
     {
         $url = $this->config['inpost']['tracking_url'] . $package->letter_number;
         $params = [
