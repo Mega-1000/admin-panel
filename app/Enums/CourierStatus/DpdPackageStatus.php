@@ -1,12 +1,14 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Enums\CourierStatus;
 
+use BenSampo\Enum\Contracts\LocalizedEnum;
 use BenSampo\Enum\Enum;
 
-final class DpdPackageStatus extends Enum
+final class DpdPackageStatus extends Enum implements LocalizedEnum
 {
-    const DELIVERED = "Przesyłka doręczona";
-    const SENDING = "Przesyłka odebrana przez Kuriera";
-    const WAITING_FOR_SENDING = "Zarejestrowano dane przesyłki";
+    public const DELIVERED = 'delivered';
+    public const SENDING = 'sending';
+    public const WAITING_FOR_SENDING = 'waiting_for_sending';
 }

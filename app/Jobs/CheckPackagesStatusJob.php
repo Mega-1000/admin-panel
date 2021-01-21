@@ -12,7 +12,6 @@ use App\Integrations\Pocztex\envelopeStatusType;
 use App\Integrations\Pocztex\getEnvelopeContentShort;
 use App\Integrations\Pocztex\getEnvelopeStatus;
 use App\Integrations\Pocztex\statusType;
-use App\Repositories\OrderRepository;
 use GuzzleHttp\Client;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -33,20 +32,14 @@ class CheckPackagesStatusJob
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private const DpdPackageStatusRegex = '/(Przesyłka doręczona)|(Przesyłka odebrana przez Kuriera)|(Zarejestrowano dane przesyłki)/';
-    private const GlsPackageStatusRegex = '/(Paczka doreczona)|(Paczka zarejestrowana w filii GLS)|(Nadawca nadal numer paczce)/';
-
     /**
      * @var \Illuminate\Config\Repository|mixed
      */
     protected $config;
 
-    protected $orderRepository;
-
-    public function __construct(OrderRepository $orderRepository)
+    public function __construct()
     {
         $this->config = config('integrations');
-        $this->orderRepository = $orderRepository;
     }
 
     public function handle(): void
@@ -131,16 +124,20 @@ class CheckPackagesStatusJob
         $options = ['form_params' => $params];
         $response = $this->prepareConnectionForTrackingStatus($this->config['dpd']['tracking_url'], 'POST', $options)->getBody()->getContents();
 
-        preg_match(self::DpdPackageStatusRegex, $response, $matches);
+        $packageStatusRegex = '/(' . DpdPackageStatus::getDescription(DpdPackageStatus::DELIVERED)
+            .')|(' . DpdPackageStatus::getDescription(DpdPackageStatus::SENDING)
+            .')|(' . DpdPackageStatus::getDescription(DpdPackageStatus::WAITING_FOR_SENDING) . ')/';
+
+        preg_match($packageStatusRegex, $response, $matches);
 
         switch($matches[0]) {
-            case DpdPackageStatus::DELIVERED:
+            case DpdPackageStatus::getDescription(DpdPackageStatus::DELIVERED):
                 $package->status = OrderPackage::DELIVERED;
                 break;
-            case DpdPackageStatus::SENDING:
+            case DpdPackageStatus::getDescription(DpdPackageStatus::SENDING):
                 $package->status = OrderPackage::SENDING;
                 break;
-            case DpdPackageStatus::WAITING_FOR_SENDING:
+            case DpdPackageStatus::getDescription(DpdPackageStatus::WAITING_FOR_SENDING):
                 $package->status = OrderPackage::WAITING_FOR_SENDING;
                 break;
         }
@@ -218,16 +215,20 @@ class CheckPackagesStatusJob
         $url = $this->config['gls']['tracking_url'] . $package->letter_number;
         $response = $this->prepareConnectionForTrackingStatus($url, 'GET', [])->getBody()->getContents();
 
-        preg_match(self::GlsPackageStatusRegex, $response, $matches);
+        $packageStatusRegex = '/(' . GlsPackageStatus::getDescription(GlsPackageStatus::DELIVERED)
+            .')|(' . GlsPackageStatus::getDescription(GlsPackageStatus::SENDING)
+            .')|(' . GlsPackageStatus::getDescription(GlsPackageStatus::WAITING_FOR_SENDING) . ')/';
+
+        preg_match($packageStatusRegex, $response, $matches);
 
         switch($matches[0]) {
-            case GlsPackageStatus::DELIVERED:
+            case GlsPackageStatus::getDescription(GlsPackageStatus::DELIVERED):
                 $package->status = OrderPackage::DELIVERED;
                 break;
-            case GlsPackageStatus::SENDING:
+            case GlsPackageStatus::getDescription(GlsPackageStatus::SENDING):
                 $package->status = OrderPackage::SENDING;
                 break;
-            case GlsPackageStatus::WAITING_FOR_SENDING:
+            case GlsPackageStatus::getDescription(GlsPackageStatus::WAITING_FOR_SENDING):
                 $package->status = OrderPackage::WAITING_FOR_SENDING;
                 break;
         }
