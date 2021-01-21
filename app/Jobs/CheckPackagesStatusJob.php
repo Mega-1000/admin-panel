@@ -2,12 +2,17 @@
 
 namespace App\Jobs;
 
+use App\Entities\Order;
+use App\Enums\CourierStatus\DpdPackageStatus;
+use App\Enums\CourierStatus\GlsPackageStatus;
+use App\Enums\CourierStatus\InpostPackageStatus;
 use App\Integrations\Pocztex\ElektronicznyNadawca;
 use App\Integrations\Pocztex\envelopeStatusType;
 use App\Integrations\Pocztex\getEnvelopeContentShort;
 use App\Integrations\Pocztex\getEnvelopeStatus;
 use App\Integrations\Pocztex\statusType;
 use App\Repositories\OrderPackageRepository;
+use App\Repositories\OrderRepository;
 use GuzzleHttp\Client;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -18,6 +23,7 @@ use Illuminate\Support\Facades\Log;
 use App\Integrations\Jas\Jas;
 use App\Entities\OrderPackage;
 use OutOfRangeException;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class CheckPackagesStatusJob
@@ -27,24 +33,20 @@ class CheckPackagesStatusJob
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    private const DpdPackageStatusRegex = '/(Przesyłka doręczona)|(Przesyłka odebrana przez Kuriera)|(Zarejestrowano dane przesyłki)/';
+    private const GlsPackageStatusRegex = '/(Paczka doreczona)|(Paczka zarejestrowana w filii GLS)|(Nadawca nadal numer paczce)/';
+
     /**
      * @var \Illuminate\Config\Repository|mixed
      */
     protected $config;
 
-    /**
-     * @var OrderPackageRepository
-     */
-    protected $orderPackageRepository;
+    protected $orderRepository;
 
-    /**
-     * Create a new job instance.
-     *
-     * @return void
-     */
-    public function __construct()
+    public function __construct(OrderRepository $orderRepository)
     {
         $this->config = config('integrations');
+        $this->orderRepository = $orderRepository;
     }
 
     /**
@@ -54,32 +56,36 @@ class CheckPackagesStatusJob
      */
     public function handle()
     {
-        $packages = OrderPackage::whereDate('shipment_date', '>', Carbon::today()->subDays(7)->toDateString())->get();
-        foreach ($packages as $package) {
-            if (empty($package->letter_number)) {
-                continue;
-            }
-            switch ($package->service_courier_name) {
-                case 'INPOST' :
-                case 'ALLEGRO-INPOST' :
-                    $this->checkStatusInInpostPackages($package);
-                    break;
-                case 'DPD':
-                    $this->checkStatusInDpdPackages($package);
-                    break;
-                case 'APACZKA':
-                    $this->checkStatusInApaczkaPackages($package);
-                    break;
-                case 'POCZTEX':
-                    $this->checkStatusInPocztexPackages($package);
-                    break;
-                case 'JAS':
-                    $this->checkStatusInJasPackages($package);
-                    break;
-                case 'GLS':
-                    $this->checkStatusInGlsPackages($package);
-                default:
-                    break;
+        $orders = Order::whereDate('shipment_date', '>', Carbon::today()->subDays(7)->toDateString())->get();
+
+        foreach($orders as $order) {
+            foreach ($order->packages as $package) {
+                if ($package->status == 'DELIVERED' || empty($package->letter_number)) {
+                    continue;
+                }
+                switch ($package->service_courier_name) {
+                    case 'INPOST' :
+                    case 'ALLEGRO-INPOST' :
+                        $this->checkStatusInInpostPackages($package);
+                        break;
+                    case 'DPD':
+                        $this->checkStatusInDpdPackages($package);
+                        break;
+                    case 'APACZKA':
+                        $this->checkStatusInApaczkaPackages($package);
+                        break;
+                    case 'POCZTEX':
+                        $this->checkStatusInPocztexPackages($package);
+                        break;
+                    case 'JAS':
+                        $this->checkStatusInJasPackages($package);
+                        break;
+                    case 'GLS':
+                        $this->checkStatusInGlsPackages($package);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }
@@ -89,91 +95,65 @@ class CheckPackagesStatusJob
      */
     protected function checkStatusInInpostPackages($package)
     {
-        $status = [
-            'dispatched_by_sender',
-            'collected_from_sender',
-            'taken_by_courier',
-            'adopted_at_source_branch',
-            'sent_from_source_branch',
-            'ready_to_pickup_from_pok',
-            'ready_to_pickup_from_pok_registered',
-            'adopted_at_sorting_center',
-            'sent_from_sorting_center',
-            'adopted_at_target_branch',
-            'out_for_delivery',
-            'ready_to_pickup',
-            'pickup_reminder_sent',
-            'pickup_time_expired',
-            'dispatched_by_sender_to_pok',
-            'pickup_reminder_sent_address',
-            'taken_by_courier_from_pok',
-            'redirect_to_box',
-            'stack_parcel_pickup_time_expired',
-            'unstack_from_customer_service_point',
-            'courier_avizo_in_customer_service_point',
-            'out_for_delivery_to_address',
-        ];
-        $statusDelivered = [
-            'delivered',
-        ];
         $url = $this->config['inpost']['tracking_url'] . $package->letter_number;
-
-        $guzzle = new \GuzzleHttp\Client;
-
-
-        $response = $guzzle->get($url, [
+        $params = [
             'headers' => [
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Bearer ' . $this->config['inpost']['authorization']
             ],
-        ]);
+        ];
 
+        $response = $this->prepareConnectionForTrackingStatus($url, 'GET', $params);
         $result = json_decode((string)$response->getBody(), true);
 
-        if (! isset($result['items'][0])) {
+        if (!isset($result['items'][0])) {
             Log::info('Something went wrong with package:', ['order_id' => $package->order_id, 'package_id' => $package->id]);
             return;
         }
+
         try {
-            if (in_array($result['items'][0]['status'], $statusDelivered)) {
-                $package->status = 'DELIVERED';
-                $package->save();
+            $packageStatus = $result['items'][0]['status'];
+            switch(true) {
+                case in_array($packageStatus, InpostPackageStatus::DELIVERED):
+                    $package->status = OrderPackage::DELIVERED;
+                    break;
+                case in_array($packageStatus, InpostPackageStatus::SENDING):
+                    $package->status = OrderPackage::SENDING;
+                    break;
+                case in_array($packageStatus, InpostPackageStatus::WAITING_FOR_SENDING):
+                    $package->status = OrderPackage::WAITING_FOR_SENDING;
+                    break;
             }
-            if (in_array($result['items'][0]['status'], $status)) {
-                $package->status = 'SENDING';
-                $package->save();
-            }
+            $package->save();
         } catch(OutOfRangeException $e) {
             Log::info('Something went wrong with package:', ['order_id' => $package->order_id, 'package_id' => $package->id]);
         }
     }
 
-    /**
-     * @param $package
-     */
-    protected function checkStatusInDpdPackages($package)
+    protected function checkStatusInDpdPackages(OrderPackage $package): void
     {
-        $url = $this->config['dpd']['tracking_url'];
-
-        $guzzle = new \GuzzleHttp\Client(["base_uri" => $url]);
         $params = [
             'q' => $package->letter_number,
             'typ' => 1
         ];
         $options = ['form_params' => $params];
-        $response = $guzzle->post('', $options)->getBody()->getContents();
+        $response = $this->prepareConnectionForTrackingStatus($this->config['dpd']['tracking_url'], 'POST', $options)->getBody()->getContents();
 
-        $result = preg_match('/Przesyłka doręczona/', $response);
-        if ($result == '1') {
-            $package->status = 'DELIVERED';
-            $package->save();
-        } else {
-            $result = preg_match('/Przesyłka odebrana przez Kuriera/', $response);
-            if ($result == '1') {
-                $package->status = 'SENDING';
-                $package->save();
-            }
+        preg_match(self::DpdPackageStatusRegex, $response, $matches);
+
+        switch($matches[0]) {
+            case DpdPackageStatus::DELIVERED:
+                $package->status = OrderPackage::DELIVERED;
+                break;
+            case DpdPackageStatus::SENDING:
+                $package->status = OrderPackage::SENDING;
+                break;
+            case DpdPackageStatus::WAITING_FOR_SENDING:
+                $package->status = OrderPackage::WAITING_FOR_SENDING;
+                break;
         }
+
+        $package->save();
     }
 
     /**
@@ -241,29 +221,31 @@ class CheckPackagesStatusJob
         }
     }
 
-    private function checkStatusInGlsPackages($package)
+    private function checkStatusInGlsPackages(OrderPackage $package): void
     {
-        $guzzle = new Client();
-        $res = $guzzle->get('http://statusy.gls-poland.com.pl/last.php?nr_paczki=' . $package->letter_number);
-        $body = (string)$res->getBody();
+        $url = $this->config['gls']['tracking_url'] . $package->letter_number;
+        $response = $this->prepareConnectionForTrackingStatus($url, 'GET', [])->getBody()->getContents();
 
+        preg_match(self::GlsPackageStatusRegex, $response, $matches);
 
-        switch(true) {
-            case str_contains($body, 'Doreczona'):
+        switch($matches[0]) {
+            case GlsPackageStatus::DELIVERED:
                 $package->status = OrderPackage::DELIVERED;
                 break;
-            case str_contains($body, 'Paczka w magazynie') ||
-                 str_contains($body, 'W doreczeniu') ||
-                 str_contains($body, 'Skan kontrolny KK'):
+            case GlsPackageStatus::SENDING:
                 $package->status = OrderPackage::SENDING;
                 break;
-            case str_contains($body, 'Dane od KK otrzymane'):
+            case GlsPackageStatus::WAITING_FOR_SENDING:
                 $package->status = OrderPackage::WAITING_FOR_SENDING;
                 break;
         }
 
-        if ($package->isDirty()) {
-            $package->save();
-        }
+        $package->save();
+    }
+
+    private function prepareConnectionForTrackingStatus(string $url, string $method, array $params): ResponseInterface
+    {
+        $guzzle = new Client;
+        return $guzzle->request($method, $url, $params);
     }
 }
