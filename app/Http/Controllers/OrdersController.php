@@ -2042,7 +2042,20 @@ class OrdersController extends Controller
             $row->items = \DB::table('order_items')->where('order_id', $row->orderId)->get();
             $row->connected = \DB::table('orders')->where('master_order_id', $row->orderId)->get();
             $row->payments = \DB::table('order_payments')->where('order_id', $row->orderId)->get();
+
             $row->packages = \DB::table('order_packages')->where('order_id', $row->orderId)->get();
+            if ($row->packages) {
+                $row->packages->map(function($item) {
+                    $item->sumOfCosts = DB::table('order_packages_real_cost_for_company')
+                        ->select(DB::raw('SUM(cost) as sum'))
+                        ->where('order_package_id', $item->id)
+                        ->groupBy('order_package_id')
+                        ->first();
+
+                    return $item;
+                });
+            }
+
             $row->otherPackages = \DB::table('order_other_packages')->where('order_id', $row->orderId)->get();
             $row->addresses = \DB::table('order_addresses')->where('order_id', $row->orderId)->get();
             $row->history = Order::where('customer_id', $row->customer_id)->with('labels')->get();
