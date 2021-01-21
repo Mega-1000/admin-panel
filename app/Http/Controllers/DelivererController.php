@@ -171,7 +171,7 @@ class DelivererController extends Controller
                 $this->delivererService->saveFileToImport($request->file('file'))
             );
 
-            return redirect()->route('transportPayment.list')->with([
+            return redirect()->route('orders.index')->with([
                 'message' => __('transport.messages.import-finished'),
                 'alert-type' => 'success',
             ]);

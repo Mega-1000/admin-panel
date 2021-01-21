@@ -92,6 +92,10 @@ return [
             'driver' => 'errorlog',
             'level' => 'debug',
         ],
+/*        'deliverer-import' => [
+            'driver' => 'custom',
+            'via' => App\Domains\DelivererPackageImport\DelivererImportLogger::class,
+        ],*/
     ],
 
 ];
