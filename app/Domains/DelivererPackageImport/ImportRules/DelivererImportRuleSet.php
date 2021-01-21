@@ -14,7 +14,8 @@ class DelivererImportRuleSet extends DelivererImportRuleAbstract implements Deli
         return $this->columnRepository->updateColumn(
             $this->order,
             $this->importRuleEntity,
-            $this->getValue()
+            $this->getValue(),
+            $this->valueUsedToFindOrder
         );
     }
 }

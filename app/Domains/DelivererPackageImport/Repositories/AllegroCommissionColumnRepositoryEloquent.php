@@ -24,8 +24,12 @@ class AllegroCommissionColumnRepositoryEloquent implements DelivererImportRuleCo
         return null;
     }
 
-    public function updateColumn(Order $order, DelivererImportRule $delivererImportRule, $valueToUpdate)
-    {
+    public function updateColumn(
+        Order $order,
+        DelivererImportRule $delivererImportRule,
+        $valueToUpdate,
+        $valueUsedToFindOrder
+    ) {
         return $this->orderAllegroCommissionRepositoryEloquent->create([
             'order_id' => $order->id,
             'amount' => PriceFormatter::asAbsolute(PriceFormatter::fromString($valueToUpdate)),

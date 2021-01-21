@@ -21,7 +21,7 @@ class DelivererImportRulesManager
 
     private $deliverer;
 
-    private $letterNumber;
+    private $valueUsedToFindOrder;
 
     public $importLogger;
 
@@ -66,7 +66,7 @@ class DelivererImportRulesManager
         $order = $this->findOrderByRules($line, clone $this->searchRules);
 
         if (is_null($order)) {
-            throw new OrderNotFoundException($this->letterNumber);
+            throw new OrderNotFoundException($this->valueUsedToFindOrder);
         }
 
         $this->runSetRules($order, $line);
@@ -108,6 +108,7 @@ class DelivererImportRulesManager
                     /* @var $rule DelivererImportRuleAbstract */
                     $rule->setOrder($order);
                     $rule->setData($line);
+                    $rule->setValueUsedToFindOrder($this->valueUsedToFindOrder);
 
                     if ($rule->run()) {
                         break;
@@ -125,6 +126,7 @@ class DelivererImportRulesManager
                     /* @var $rule DelivererImportRuleAbstract */
                     $rule->setOrder($order);
                     $rule->setData($line);
+                    $rule->setValueUsedToFindOrder($this->valueUsedToFindOrder);
 
                     if ($rule->run()) {
                         break;
@@ -141,6 +143,7 @@ class DelivererImportRulesManager
                 /* @var $rule DelivererImportRuleAbstract */
                 $rule->setOrder($order);
                 $rule->setData($line);
+                $rule->setValueUsedToFindOrder($this->valueUsedToFindOrder);
                 $rule->run();
             });
         }
@@ -153,6 +156,7 @@ class DelivererImportRulesManager
                 /* @var $rule DelivererImportRuleAbstract */
                 $rule->setOrder($order);
                 $rule->setData($line);
+                $rule->setValueUsedToFindOrder($this->valueUsedToFindOrder);
                 $rule->run();
             });
         }
@@ -170,9 +174,13 @@ class DelivererImportRulesManager
         $ruleToRun->setData($line);
         $order = $ruleToRun->run();
 
-        $this->letterNumber = $ruleToRun->getData() ?: $ruleToRun->getParsedData();
+        if (empty($order)) {
+            return $this->findOrderByRules($line, $searchRules);
+        }
 
-        return empty($order) ? $this->findOrderByRules($line, $searchRules) : $order;
+        $this->valueUsedToFindOrder = $ruleToRun->getParsedData() ?: $ruleToRun->getData();
+
+        return $order;
     }
 
     private function setSearchRules(): void

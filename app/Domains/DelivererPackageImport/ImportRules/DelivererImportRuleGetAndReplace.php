@@ -18,7 +18,8 @@ class DelivererImportRuleGetAndReplace extends DelivererImportRuleAbstract imple
         return $this->columnRepository->updateColumn(
             $this->order,
             $this->importRuleEntity,
-            $this->getChangeTo()
+            $this->getChangeTo(),
+            $this->valueUsedToFindOrder
         );
     }
 

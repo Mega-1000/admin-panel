@@ -26,11 +26,15 @@ class RealCostForCompanyColumnRepositoryEloquent implements DelivererImportRuleC
         return null;
     }
 
-    public function updateColumn(Order $order, DelivererImportRule $delivererImportRule, $valueToUpdate): OrderPackage
-    {
-        /* @var $orderPackage OrderPackage */
+    public function updateColumn(
+        Order $order,
+        DelivererImportRule $delivererImportRule,
+        $valueToUpdate,
+        $valueUsedToFindOrder
+    ): OrderPackage {
         $orderPackage = $this->orderPackageRepositoryEloquent->findWhere([
             'order_id' => $order->id,
+            'letter_number' => $valueUsedToFindOrder,
         ])->first();
 
         if ($orderPackage) {

@@ -27,6 +27,8 @@ abstract class DelivererImportRuleAbstract
 
     protected $parsedData;
 
+    protected $valueUsedToFindOrder;
+
     private $column;
 
     public function __construct(
@@ -50,6 +52,14 @@ abstract class DelivererImportRuleAbstract
     public function setData(array $line): void
     {
         $this->line = $line;
+    }
+
+    /**
+     * @param $value mixed
+     */
+    public function setValueUsedToFindOrder($value): void
+    {
+        $this->valueUsedToFindOrder = $value;
     }
 
     public function getImportRuleEntity(): DelivererImportRule
