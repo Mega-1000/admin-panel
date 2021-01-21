@@ -26,8 +26,12 @@ class AllegroFormIdColumnRepositoryEloquent implements DelivererImportRuleColumn
         ]);
     }
 
-    public function updateColumn(Order $order, DelivererImportRule $delivererImportRule, $valueToUpdate)
-    {
+    public function updateColumn(
+        Order $order,
+        DelivererImportRule $delivererImportRule,
+        $valueToUpdate,
+        $valueUsedToFindOrder
+    ) {
         return null;
     }
 }

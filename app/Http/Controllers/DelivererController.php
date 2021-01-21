@@ -156,6 +156,8 @@ class DelivererController extends Controller
         TransportPaymentsImportRequest $request,
         TransportPaymentImporter $transportPaymentImporter
     ): RedirectResponse {
+        ini_set('max_execution_time', '10000');
+
         $deliverer = $this->delivererService->findDeliverer((int) $request->input('delivererId'));
 
         if (!$deliverer) {

@@ -24,8 +24,12 @@ class ServiceCourierNameColumnRepositoryEloquent implements DelivererImportRuleC
         return null;
     }
 
-    public function updateColumn(Order $order, DelivererImportRule $delivererImportRule, $valueToUpdate)
-    {
+    public function updateColumn(
+        Order $order,
+        DelivererImportRule $delivererImportRule,
+        $valueToUpdate,
+        $valueUsedToFindOrder
+    ) {
         $orderPackage = $this->orderPackageRepositoryEloquent->findWhere([
             'order_id' => $order->id,
         ])->first();

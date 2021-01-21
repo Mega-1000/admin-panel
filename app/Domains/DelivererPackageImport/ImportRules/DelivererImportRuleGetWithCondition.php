@@ -18,7 +18,8 @@ class DelivererImportRuleGetWithCondition extends DelivererImportRuleAbstract im
             return $this->columnRepository->updateColumn(
                 $this->order,
                 $this->importRuleEntity,
-                $this->getData()
+                $this->getData(),
+                $this->valueUsedToFindOrder
             );
         }
 

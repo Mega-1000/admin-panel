@@ -24,8 +24,12 @@ class AllegroOperationDateColumnRepositoryEloquent implements DelivererImportRul
         return null;
     }
 
-    public function updateColumn(Order $order, DelivererImportRule $delivererImportRule, $valueToUpdate)
-    {
+    public function updateColumn(
+        Order $order,
+        DelivererImportRule $delivererImportRule,
+        $valueToUpdate,
+        $valueUsedToFindOrder
+    ) {
         return $this->orderRepositoryEloquent->update([
             DelivererRulesColumnNameEnum::ORDER_ALLEGRO_OPERATION_DATE => $valueToUpdate,
         ], $order->id);

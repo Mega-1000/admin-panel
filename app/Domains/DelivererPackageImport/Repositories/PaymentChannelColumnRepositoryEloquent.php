@@ -24,8 +24,12 @@ class PaymentChannelColumnRepositoryEloquent implements DelivererImportRuleColum
         return null;
     }
 
-    public function updateColumn(Order $order, DelivererImportRule $delivererImportRule, $valueToUpdate)
-    {
+    public function updateColumn(
+        Order $order,
+        DelivererImportRule $delivererImportRule,
+        $valueToUpdate,
+        $valueUsedToFindOrder
+    ) {
         return $this->orderRepositoryEloquent->update([
             DelivererRulesColumnNameEnum::ORDER_PAYMENT_CHANNEL => $valueToUpdate,
         ], $order->id);

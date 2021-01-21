@@ -28,8 +28,12 @@ class SelloPaymentColumnRepositoryEloquent implements DelivererImportRuleColumnR
         return $order ? $order->order()->get() : null;
     }
 
-    public function updateColumn(Order $order, DelivererImportRule $delivererImportRule, $valueToUpdate)
-    {
+    public function updateColumn(
+        Order $order,
+        DelivererImportRule $delivererImportRule,
+        $valueToUpdate,
+        $valueUsedToFindOrder
+    ) {
         return null;
     }
 }

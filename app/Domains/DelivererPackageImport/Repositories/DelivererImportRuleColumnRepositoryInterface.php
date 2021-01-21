@@ -27,11 +27,13 @@ interface DelivererImportRuleColumnRepositoryInterface
      * @param Order $order
      * @param DelivererImportRuleInterface $delivererImportRule
      * @param $valueToUpdate
+     * @param $valueUsedToFindOrder
      * @return mixed
      */
     public function updateColumn(
         Order $order,
         DelivererImportRule $delivererImportRule,
-        $valueToUpdate
+        $valueToUpdate,
+        $valueUsedToFindOrder
     );
 }
