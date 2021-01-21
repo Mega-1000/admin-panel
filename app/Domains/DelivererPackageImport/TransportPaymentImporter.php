@@ -78,11 +78,7 @@ class TransportPaymentImporter
             }
 
             try {
-                $orderId = $this->delivererImportRulesManager->runRules($line);
-
-                $this->delivererImportRulesManager->importLogger->logInfo(
-                    "[{$counter}] Zamówienie {$orderId} zostało zaktualizowane"
-                );
+                $this->delivererImportRulesManager->runRules($line);
             } catch (OrderNotFoundException $exception) {
                 $this->delivererImportRulesManager->importLogger->logWarning(
                     "Nie znaleziono zamówienia dla LP: {$exception->getMessage()}"

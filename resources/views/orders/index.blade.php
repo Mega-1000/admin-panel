@@ -1134,7 +1134,7 @@
                                     name = value.symbol;
                                 }
                                 html += '<p style="margin: 8px 8px 0px 8px;">' + name + '</p> </div> '
-                                html += value.real_cost_for_company ?? '';
+                                html += value.sumOfCosts ? value.sumOfCosts.sum + ' zł' : '';
                                 if (value.letter_number === null) {
                                     html += '<a href="javascript:void()"><p>Brak listu przewozowego</p></a>';
                                 } else {

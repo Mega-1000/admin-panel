@@ -57,7 +57,7 @@ class DelivererImportRulesManager
         $this->prepareRules();
     }
 
-    public function runRules(array $line): int
+    public function runRules(array $line): void
     {
         if (empty($this->importRules)) {
             throw new \Exception("Brak reguł importu dla kuriera {$this->deliverer->name}");
@@ -73,8 +73,6 @@ class DelivererImportRulesManager
         $this->runGetRules($order, $line);
         $this->runGetAndReplaceRules($order, $line);
         $this->runGetWithConditionRules($order, $line);
-
-        return $order->id;
     }
 
     private function prepareRules(): bool
