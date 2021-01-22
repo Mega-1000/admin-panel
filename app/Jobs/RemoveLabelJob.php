@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Entities\Order;
-use App\Jobs\Orders\ChangeWarehouseStockJob;
+use App\Jobs\WarehouseStocks\ChangeWarehouseStockJob;
 use App\Mail\ConfirmData;
 use App\Mail\DifferentCustomerData;
 use App\Repositories\LabelRepository;
