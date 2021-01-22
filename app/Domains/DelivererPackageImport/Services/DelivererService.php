@@ -10,7 +10,6 @@ use App\Repositories\DelivererRepositoryEloquent;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use \Symfony\Component\HttpFoundation\File\File;
 
 class DelivererService
 {
@@ -59,11 +58,13 @@ class DelivererService
 
     public function saveFileToImport(UploadedFile $file): array
     {
-        $fileName = Str::random(40) . '.csv';
+        $uniqueFileName = Str::random(16);
+        $fileName = $uniqueFileName . '.csv';
 
         return [
             'oldFileName' => $file->getClientOriginalName(),
             'file' => $file->move(Storage::path('user-files/transport/'), $fileName),
+            'uniqueLogFileName' => $uniqueFileName,
         ];
     }
 

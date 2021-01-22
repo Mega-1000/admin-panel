@@ -9,5 +9,6 @@ return [
     ],
     'messages' => [
         'import-finished' => 'Import został wykonany',
+        'log-file-not-found' => 'Plik importu nie istnieje',
     ],
 ];

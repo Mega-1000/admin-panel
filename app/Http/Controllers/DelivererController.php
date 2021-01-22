@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Domains\DelivererPackageImport\Builders\DelivererImportRulesBuilder;
 use App\Domains\DelivererPackageImport\Enums\DelivererRulesActionEnum;
 use App\Domains\DelivererPackageImport\Enums\DelivererRulesColumnNameEnum;
+use App\Domains\DelivererPackageImport\Services\DelivererImportLogService;
 use App\Domains\DelivererPackageImport\TransportPaymentImporter;
 use App\Entities\Deliverer;
 use App\Http\DTOs\DelivererCreateImportRulesDTO;
@@ -23,9 +24,14 @@ class DelivererController extends Controller
 {
     private $delivererService;
 
-    public function __construct(DelivererService $delivererService)
-    {
+    private $delivererImportLogService;
+
+    public function __construct(
+        DelivererService $delivererService,
+        DelivererImportLogService $delivererImportLogService
+    ) {
         $this->delivererService = $delivererService;
+        $this->delivererImportLogService = $delivererImportLogService;
     }
 
     public function list(): View
@@ -168,7 +174,7 @@ class DelivererController extends Controller
         }
 
         try {
-            $transportPaymentImporter->import(
+            $uniqueLogFileName = $transportPaymentImporter->import(
                 $deliverer,
                 $this->delivererService->saveFileToImport($request->file('file'))
             );
@@ -176,6 +182,7 @@ class DelivererController extends Controller
             return redirect()->route('orders.index')->with([
                 'message' => __('transport.messages.import-finished'),
                 'alert-type' => 'success',
+                'delivererImportLogFileUrl' => route('deliverer.getImportLog', ['id' => $uniqueLogFileName]),
             ]);
         } catch (\Exception $e) {
             return redirect()->route('orders.index')->with([
@@ -221,5 +228,17 @@ class DelivererController extends Controller
                 'alert-type' => 'success'
             ]);
         }
+    }
+
+    public function getDelivererImportLog(string $id)
+    {
+        if ($this->delivererImportLogService->logFileExists($id)) {
+            return response()->download($this->delivererImportLogService->getLogFilePath($id));
+        }
+
+        return redirect()->route('orders.index')->with([
+            'message' => __('transport.messages.log-file-not-found'),
+            'alert-type' => 'error',
+        ]);
     }
 }

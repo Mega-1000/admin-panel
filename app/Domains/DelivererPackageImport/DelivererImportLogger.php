@@ -10,7 +10,9 @@ use Monolog\Logger;
 
 class DelivererImportLogger
 {
-    private const FILE_LOGS_DIRECTORY = 'app/user-files/deliverer-logs';
+    public const FILE_LOGS_DIRECTORY = 'app/public/deliverer-logs';
+
+    public const FILE_LOG_EXTENSION = 'txt';
 
     /* @var $logger Logger */
     private $logger;

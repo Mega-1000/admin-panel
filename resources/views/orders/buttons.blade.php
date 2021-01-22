@@ -178,6 +178,9 @@
             <label for="import_packages_payment">Wczytaj płatności dla paczek:</label>
             <a name="import_packages_payment" class="btn btn-success" onclick="$('#upload-payments').modal('show')">Wyślij
                 numery</a>
+            @if(session()->has('delivererImportLogFileUrl'))
+                <a href="{{ session()->get('delivererImportLogFileUrl') }}">Pobierz logi</a>
+            @endif
             @if(!empty(session('update_errors')))
                 @foreach(session('update_errors') as $error)
                     <table class="table table-bordered table-striped">
