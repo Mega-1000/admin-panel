@@ -12,7 +12,7 @@ class DelivererImportLogger
 {
     public const FILE_LOGS_DIRECTORY = 'app/public/deliverer-logs';
 
-    public const FILE_LOG_EXTENSION = 'txt';
+    public const FILE_LOG_EXTENSION = 'xlsx';
 
     /* @var $logger Logger */
     private $logger;
