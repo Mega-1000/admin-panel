@@ -83,7 +83,7 @@
                     </div>
                     <div class="col-md-2">
                         <label for="conditionValue">Warunek: wartość</label>
-                        <input type="text" class="form-control" id="conditionValue" name="conditionValue[]" value="{{ $rule->conditionValue }}" />
+                        <input type="text" class="form-control" id="conditionValue" name="conditionValue[]" value="{{ $rule->condition_value }}" />
                     </div>
                     <div class="col-md-1 manage-rule">
                         <a href="#" class="addNewRule inline-block">Dodaj +</a>
