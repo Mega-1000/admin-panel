@@ -35,6 +35,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/pages/{id}', 'PagesGeneratorController@edit')->name('pages.edit');
         Route::get('/pages', 'PagesGeneratorController@getPages')->name('pages.index');
 
+        Route::get('/getDelivererImportLog/{id}', 'DelivererController@getDelivererImportLog')->name('deliverer.getImportLog');
+
 
         Route::get('/warehouse/{id}',
             'OrdersController@getCalendar');

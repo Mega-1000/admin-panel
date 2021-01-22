@@ -40,13 +40,14 @@ class TransportPaymentImporter
         $this->delivererImportLogService = $delivererImportLogService;
     }
 
-    public function import(Deliverer $deliverer, array $fileData): void
+    public function import(Deliverer $deliverer, array $fileData): string
     {
         $this->file = $fileData['file'];
 
         $logFileName = $this->delivererImportLogService->createLog(
             $deliverer->id,
-            $fileData['oldFileName']
+            $fileData['oldFileName'],
+            $fileData['uniqueLogFileName']
         );
 
         $this->delivererImportRulesManager = $this->delivererImportRulesManagerFactory->create(
@@ -59,6 +60,8 @@ class TransportPaymentImporter
         $this->run();
 
         $this->delivererImportRulesManager->importLogger->logInfo('Import został zakończony');
+
+        return $fileData['uniqueLogFileName'];
     }
 
     private function run(): void
