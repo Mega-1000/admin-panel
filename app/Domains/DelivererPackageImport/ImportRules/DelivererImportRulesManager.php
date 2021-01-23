@@ -64,9 +64,7 @@ class DelivererImportRulesManager
         }
 
         $order = $this->findOrderByRules($line, clone $this->searchRules);
-
-        $this->importLogger->logInfo("valueUsedForFindOrder: {$this->valueUsedToFindOrder}");
-
+        
         if (is_null($order)) {
             throw new OrderNotFoundException($this->valueUsedToFindOrder);
         }
