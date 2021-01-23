@@ -49,7 +49,10 @@ class DelivererImportRule extends Model
             DelivererRulesActionEnum::GET_WITH_CONDITION,
         ],
         DelivererRulesColumnNameEnum::ORDER_ALLEGRO_COMMISSION => [
+            DelivererRulesActionEnum::SET,
             DelivererRulesActionEnum::GET,
+            DelivererRulesActionEnum::GET_AND_REPLACE,
+            DelivererRulesActionEnum::GET_WITH_CONDITION,
         ],
         DelivererRulesColumnNameEnum::ORDER_PACKAGES_SERVICE_COURIER_NAME => [
             DelivererRulesActionEnum::SET,
@@ -65,9 +68,11 @@ class DelivererImportRule extends Model
         ],
         DelivererRulesColumnNameEnum::SEL_TR_TRANSACTION_SELLO_PAYMENT => [
             DelivererRulesActionEnum::SEARCH_COMPARE,
+            DelivererRulesActionEnum::SEARCH_REGEX,
         ],
         DelivererRulesColumnNameEnum::SEL_TR_TRANSACTION_SELLO_FORM => [
             DelivererRulesActionEnum::SEARCH_COMPARE,
+            DelivererRulesActionEnum::SEARCH_REGEX,
         ],
     ];
 
