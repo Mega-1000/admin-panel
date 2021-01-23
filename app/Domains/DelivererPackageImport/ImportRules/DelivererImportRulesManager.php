@@ -68,9 +68,6 @@ class DelivererImportRulesManager
         $this->importLogger->logInfo("valueUsedForFindOrder: {$this->valueUsedToFindOrder}");
 
         if (is_null($order)) {
-            /*if (!$this->valueUsedToFindOrder) {
-                dd('aaaaaa', $line);
-            }*/
             throw new OrderNotFoundException($this->valueUsedToFindOrder);
         }
 
