@@ -65,7 +65,12 @@ class DelivererImportRulesManager
 
         $order = $this->findOrderByRules($line, clone $this->searchRules);
 
+        $this->importLogger->logInfo("valueUsedForFindOrder: {$this->valueUsedToFindOrder}");
+
         if (is_null($order)) {
+            /*if (!$this->valueUsedToFindOrder) {
+                dd('aaaaaa', $line);
+            }*/
             throw new OrderNotFoundException($this->valueUsedToFindOrder);
         }
 
@@ -172,11 +177,11 @@ class DelivererImportRulesManager
         $ruleToRun->setData($line);
         $order = $ruleToRun->run();
 
+        $this->valueUsedToFindOrder = $ruleToRun->getParsedData() ?: $ruleToRun->getData();
+
         if (empty($order)) {
             return $this->findOrderByRules($line, $searchRules);
         }
-
-        $this->valueUsedToFindOrder = $ruleToRun->getParsedData() ?: $ruleToRun->getData();
 
         return $order;
     }
