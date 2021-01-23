@@ -172,11 +172,11 @@ class DelivererImportRulesManager
         $ruleToRun->setData($line);
         $order = $ruleToRun->run();
 
+        $this->valueUsedToFindOrder = $ruleToRun->getParsedData() ?: $ruleToRun->getData();
+
         if (empty($order)) {
             return $this->findOrderByRules($line, $searchRules);
         }
-
-        $this->valueUsedToFindOrder = $ruleToRun->getParsedData() ?: $ruleToRun->getData();
 
         return $order;
     }
