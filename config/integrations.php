@@ -39,5 +39,7 @@ return [
         'production_login' => 'ebudownictwo@wp.pl',
         'production_password' => 'MEGA1000'
     ],
-
+    'gls' => [
+        'tracking_url' => 'https://gls-group.eu/app/service/open/rest/PL/pl/rstt001?match=',
+    ],
 ];
