@@ -9,5 +9,5 @@ final class PackageStatus extends Enum
 {
     const DELIVERED = 'DELIVERED';
     const SENDING = 'SENDING';
-    const WAITINGFORSENDING = 'WAITING_FOR_SENDING';
+    const WAITING_FOR_SENDING = 'WAITING_FOR_SENDING';
 }
