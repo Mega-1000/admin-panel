@@ -6,12 +6,12 @@ use BenSampo\Enum\Enum;
 
 final class CourierName extends Enum
 {
-    const Inpost = 'INPOST';
-    const AllegroInpost = 'ALLEGRO-INPOST';
-    const Dpd = 'DPD';
-    const Apaczka = 'APACZKA';
-    const Pocztex = 'POCZTEX';
-    const Jas = 'JAS';
-    const Gls = 'GLS';
+    const INPOST = 'INPOST';
+    const ALLEGROINPOST = 'ALLEGRO-INPOST';
+    const DPD = 'DPD';
+    const APACZKA = 'APACZKA';
+    const POCZTEX = 'POCZTEX';
+    const JAS = 'JAS';
+    const GLS = 'GLS';
 
 }

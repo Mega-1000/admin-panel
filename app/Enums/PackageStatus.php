@@ -6,7 +6,7 @@ use BenSampo\Enum\Enum;
 
 final class PackageStatus extends Enum
 {
-    const Delivered = 'DELIVERED';
-    const Sending = 'SENDING';
-    const WaitingForSending = 'WAITING_FOR_SENDING';
+    const DELIVERED = 'DELIVERED';
+    const SENDING = 'SENDING';
+    const WAITINGFORSENDING = 'WAITING_FOR_SENDING';
 }
