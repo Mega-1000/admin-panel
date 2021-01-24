@@ -7,7 +7,7 @@ use BenSampo\Enum\Enum;
 final class CourierName extends Enum
 {
     const INPOST = 'INPOST';
-    const ALLEGROINPOST = 'ALLEGRO-INPOST';
+    const ALLEGRO_INPOST = 'ALLEGRO-INPOST';
     const DPD = 'DPD';
     const APACZKA = 'APACZKA';
     const POCZTEX = 'POCZTEX';
