@@ -1216,7 +1216,6 @@
                     render: function (order, type, row) {
                         let data = order.packages
                         var html = ''
-                        let color = '#87D11B';
                         if (data.length != 0) {
                             if (order.otherPackages && order.otherPackages.find(el => el.type == 'not_calculable')) {
                                 html = '<div style="border: solid blue 4px" >'
@@ -1226,6 +1225,18 @@
                         }
                         let cancelled = 0;
                         $.each(data, function (key, value) {
+                            let color = '';
+                            switch(value.status) {
+                                case 'DELIVERED':
+                                    color = '#87D11B';
+                                    break;
+                                case 'SENDING':
+                                    color = '#4DCFFF';
+                                    break;
+                                case 'WAITING_FOR_SENDING':
+                                    color = '#5537f0';
+                                    break;
+                            }
                             if (value.status === 'CANCELLED') {
                                 cancelled++;
                             }
