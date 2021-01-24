@@ -81,7 +81,7 @@
         $('.addNewRule').click((event) => {
             event.preventDefault();
 
-            copyRuleSchema();
+            copyRuleSchema(event.target);
         });
 
         $('.removeRule').click((event) => {
@@ -89,25 +89,24 @@
 
             $(this).closest('.rule').remove();
         });
-        
-        function copyRuleSchema() {
-            const countRules = $('.rule').length;
+
+        function copyRuleSchema(clickedItem) {
             const newRule = $('.rule:first').clone(true);
             const id = Math.random().toString(36).substring(7);
 
-            if (countRules >= 2) {
-                newRule.find('.action option[value="searchCompare"]').remove();
-                newRule.find('.action option[value="searchRegex"]').remove();
-            }
-
             newRule.attr('id', id);
+            newRule.find("input[type=text], textarea").val('');
+            newRule.find('.manage-rule .removeRule').remove();
+            newRule.find('select').each(function() {
+                $(this).prop('selectedIndex', 0)
+            });
             newRule.find('.manage-rule').append(() => {
                 return $('<a href="#" class="removeRule inline-block">Usuń +</a>').click(() => {
                     $("#" + id).remove();
                 });
             });
 
-            $('.rule:last').after(newRule);
+            $(clickedItem).closest('.row.rule').after(newRule);
         }
     </script>
 @endsection
