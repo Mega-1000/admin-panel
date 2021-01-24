@@ -227,8 +227,6 @@ class CheckPackagesStatusJob
 
         preg_match($packageStatusRegex, $response, $matches);
 
-        var_dump($matches[0]);
-
         switch($matches[0]) {
             case GlsPackageStatus::getDescription(GlsPackageStatus::DELIVERED):
                 $package->status = PackageStatus::DELIVERED;
