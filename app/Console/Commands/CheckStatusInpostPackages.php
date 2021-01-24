@@ -1,8 +1,8 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use App\Jobs\CheckPackagesStatusJob;
 use App\Jobs\CheckStatusInpostPackagesJob;
 use Illuminate\Console\Command;
 
@@ -39,6 +39,6 @@ class CheckStatusInpostPackages extends Command
      */
     public function handle()
     {
-        dispatch_now(new CheckPackagesStatusJob());
+        dispatch_now(new CheckStatusInpostPackagesJob());
     }
 }

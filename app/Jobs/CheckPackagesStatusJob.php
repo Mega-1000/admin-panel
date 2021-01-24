@@ -4,9 +4,12 @@ declare(strict_types=1);
 namespace App\Jobs;
 
 use App\Entities\Order;
+use App\Enums\CourierName;
 use App\Enums\CourierStatus\DpdPackageStatus;
 use App\Enums\CourierStatus\GlsPackageStatus;
 use App\Enums\CourierStatus\InpostPackageStatus;
+use App\Enums\HttpMethod;
+use App\Enums\PackageStatus;
 use App\Integrations\Pocztex\ElektronicznyNadawca;
 use App\Integrations\Pocztex\envelopeStatusType;
 use App\Integrations\Pocztex\getEnvelopeContentShort;
@@ -37,9 +40,12 @@ class CheckPackagesStatusJob
      */
     protected $config;
 
+    protected $httpClient;
+
     public function __construct()
     {
         $this->config = config('integrations');
+        $this->httpClient = new Client();
     }
 
     public function handle(): void
@@ -48,27 +54,27 @@ class CheckPackagesStatusJob
 
         foreach($orders as $order) {
             foreach ($order->packages as $package) {
-                if ($package->status == 'DELIVERED' || empty($package->letter_number)) {
+                if ($package->status == PackageStatus::Delivered || empty($package->letter_number)) {
                     continue;
                 }
                 switch ($package->service_courier_name) {
-                    case 'INPOST' :
-                    case 'ALLEGRO-INPOST' :
+                    case CourierName::Inpost :
+                    case CourierName::AllegroInpost :
                         $this->checkStatusInInpostPackages($package);
                         break;
-                    case 'DPD':
+                    case CourierName::Dpd:
                         $this->checkStatusInDpdPackages($package);
                         break;
-                    case 'APACZKA':
+                    case CourierName::Apaczka:
                         $this->checkStatusInApaczkaPackages($package);
                         break;
-                    case 'POCZTEX':
+                    case CourierName::Pocztex:
                         $this->checkStatusInPocztexPackages($package);
                         break;
-                    case 'JAS':
+                    case CourierName::Jas:
                         $this->checkStatusInJasPackages($package);
                         break;
-                    case 'GLS':
+                    case CourierName::Gls:
                         $this->checkStatusInGlsPackages($package);
                         break;
                     default:
@@ -88,7 +94,7 @@ class CheckPackagesStatusJob
             ],
         ];
 
-        $response = $this->prepareConnectionForTrackingStatus($url, 'GET', $params);
+        $response = $this->prepareConnectionForTrackingStatus($url, HttpMethod::Get, $params);
         $result = json_decode((string)$response->getBody(), true);
 
         if (!isset($result['items'][0])) {
@@ -122,7 +128,7 @@ class CheckPackagesStatusJob
             'typ' => 1
         ];
         $options = ['form_params' => $params];
-        $response = $this->prepareConnectionForTrackingStatus($this->config['dpd']['tracking_url'], 'POST', $options)->getBody()->getContents();
+        $response = $this->prepareConnectionForTrackingStatus($this->config['dpd']['tracking_url'], HttpMethod::Post, $options)->getBody()->getContents();
 
         $packageStatusRegex = '/(' . DpdPackageStatus::getDescription(DpdPackageStatus::DELIVERED)
             .')|(' . DpdPackageStatus::getDescription(DpdPackageStatus::SENDING)
@@ -213,7 +219,7 @@ class CheckPackagesStatusJob
     private function checkStatusInGlsPackages(OrderPackage $package): void
     {
         $url = $this->config['gls']['tracking_url'] . $package->letter_number;
-        $response = $this->prepareConnectionForTrackingStatus($url, 'GET', [])->getBody()->getContents();
+        $response = $this->prepareConnectionForTrackingStatus($url, HttpMethod::Get, [])->getBody()->getContents();
 
         $packageStatusRegex = '/(' . GlsPackageStatus::getDescription(GlsPackageStatus::DELIVERED)
             .')|(' . GlsPackageStatus::getDescription(GlsPackageStatus::SENDING)
@@ -223,13 +229,13 @@ class CheckPackagesStatusJob
 
         switch($matches[0]) {
             case GlsPackageStatus::getDescription(GlsPackageStatus::DELIVERED):
-                $package->status = OrderPackage::DELIVERED;
+                $package->status = PackageStatus::Delivered;
                 break;
             case GlsPackageStatus::getDescription(GlsPackageStatus::SENDING):
-                $package->status = OrderPackage::SENDING;
+                $package->status = PackageStatus::Sending;
                 break;
             case GlsPackageStatus::getDescription(GlsPackageStatus::WAITING_FOR_SENDING):
-                $package->status = OrderPackage::WAITING_FOR_SENDING;
+                $package->status = PackageStatus::WaitingForSending;
                 break;
         }
 
@@ -238,7 +244,6 @@ class CheckPackagesStatusJob
 
     private function prepareConnectionForTrackingStatus(string $url, string $method, array $params): ResponseInterface
     {
-        $guzzle = new Client;
-        return $guzzle->request($method, $url, $params);
+        return $this->httpClient->request($method, $url, $params);
     }
 }

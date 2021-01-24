@@ -40,6 +40,6 @@ return [
         'production_password' => 'MEGA1000'
     ],
     'gls' => [
-        'tracking_url' => 'https://gls-group.eu/app/service/open/rest/PL/pl/rstt001?match='
+        'tracking_url' => 'https://gls-group.eu/app/service/open/rest/PL/pl/rstt001?match=',
     ],
 ];
