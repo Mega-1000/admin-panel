@@ -59,7 +59,7 @@ class CheckPackagesStatusJob
                 }
                 switch ($package->service_courier_name) {
                     case CourierName::INPOST :
-                    case CourierName::ALLEGROINPOST :
+                    case CourierName::ALLEGRO_INPOST :
                         $this->checkStatusInInpostPackages($package);
                         break;
                     case CourierName::DPD:
@@ -235,7 +235,7 @@ class CheckPackagesStatusJob
                 $package->status = PackageStatus::SENDING;
                 break;
             case GlsPackageStatus::getDescription(GlsPackageStatus::WAITING_FOR_SENDING):
-                $package->status = PackageStatus::WAITINGFORSENDING;
+                $package->status = PackageStatus::WAITING_FOR_SENDING;
                 break;
         }
 
