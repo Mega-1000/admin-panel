@@ -312,6 +312,18 @@
             <label for="products-stocks-changes">Pokaż zmiany w stanach magazynowych</label>
             <button class="btn btn-success" onclick="showProductsStockChangesModal()">Wyświetl</button>
         </div>
+        <div class="form-group">
+            <form method="POST" action="{{ route('orders.generate-allegro-orders')}}">
+                {{ csrf_field() }}
+                <label for="products-stocks-changes">Wygeneruj płatności allegro dla zamówień od:</label>
+                <input name="allegro_from" class="allegro__order--from" id="allegro__order--from"
+                        style="width: 100px;" type="text"/>
+                do zamówienia
+                <input name="allegro_to" class="allegro__order--to" id="allegro__order--to"
+                       style="width: 100px;" type="text"/>
+                <button class="btn btn-success">Wygeneruj</button>
+            </form>
+        </div>
         <div style="display: flex; align-items: center;" id="add-label-container">
             <button onclick="addLabel()" type="button" class="btn btn-primary">@lang('orders.table.save_label')</button>
             <select style="margin-left: 10px;" class="form-control text-uppercase selectpicker" data-live-search="true" id="choosen-label">

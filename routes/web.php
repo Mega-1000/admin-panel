@@ -311,6 +311,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('orders/allegro-new-letter', 'AllegroController@createNewLetter')->name('orders.newLettersFromAllegro');
         Route::post('orders/allegro-new-order', 'AllegroController@createNewOrder')->name('orders.newOrdersFromAllegroComissions');
         Route::post('orders/create-payments', 'OrdersController@createPayments')->name('orders.create-payments');
+        Route::post('orders/generate-allegro-payments', 'OrdersController@generateAllegroPayments')->name('orders.generate-allegro-orders');
         Route::post('orders/surplus/return', 'OrdersPaymentsController@returnSurplusPayment')->name('orders.returnSurplus');
 
         Route::get('orderPayments/datatable/{id}',
