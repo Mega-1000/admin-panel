@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Bank;
 use App\Entities\Auth_code;
 use App\Entities\ColumnVisibility;
 use App\Entities\Deliverer;
@@ -21,7 +22,13 @@ use App\Entities\Task;
 use App\Entities\UserSurplusPayment;
 use App\Entities\UserSurplusPaymentHistory;
 use App\Entities\Warehouse;
+use App\Enums\AllegroExcel\AllegroHeaders;
+use App\Enums\AllegroExcel\OrderHeaders;
+use App\Enums\AllegroExcel\PaymentsHeader;
+use App\Enums\AllegroExcel\SheetNames;
 use App\Enums\LabelStatusEnum;
+use App\Exports\BanksExport;
+use App\Exports\OrdersAllegroExport;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Helpers\GetCustomerForNewOrder;
@@ -88,7 +95,9 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 use Mailer;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Yajra\DataTables\Facades\DataTables;
 
 /**
@@ -3035,5 +3044,54 @@ class OrdersController extends Controller
                         ->orWhere('labels.id', Label::PRODUCTION_STOP_ID);
                 });
             });
+    }
+
+    public function generateAllegroPayments(Request $request): BinaryFileResponse
+    {
+        $orderData = [];
+        $allegroPayments = [];
+        $clientPayments = [];
+
+        $orderData[] = $this->prepareHeadersForSheet(SheetNames::ORDER_DATA);
+        $allegroPayments[] = $this->prepareHeadersForSheet(SheetNames::ALLEGRO_PAYMENTS);
+        $clientPayments[] = $this->prepareHeadersForSheet(SheetNames::CLIENT_PAYMENTS);
+
+        $orders = $this->orderRepository->findWhereBetween('id', [$request->input('allegro_from'), $request->input('allegro_to')]);
+        foreach($orders as $order) {
+            foreach($order->packages as $package) {
+                $orderData[] = [$order->id, $package->letter_number, $order->allegro_form_id, $order->total_price, $package->cost_for_company, $package->cost_for_client];
+                $allegroPayments[] = [$order->allegro_form_id, $order->return_payment_id];
+                $clientPayments[] = [$order->id, $order->bookedPaymentsSum()];
+            }
+        }
+
+        return Excel::download(new OrdersAllegroExport($orderData, $allegroPayments, $clientPayments), 'allegro.xlsx');
+    }
+
+    private function prepareHeadersForSheet(string $sheetName): array
+    {
+        switch($sheetName) {
+            case SheetNames::ORDER_DATA:
+                return [
+                    OrderHeaders::getDescription(OrderHeaders::ORDER_ID),
+                    OrderHeaders::getDescription(OrderHeaders::PACKAGE_LETTER_NUMBER),
+                    OrderHeaders::getDescription(OrderHeaders::ALLEGRO_ORDER_ID),
+                    OrderHeaders::getDescription(OrderHeaders::ORDER_SUM),
+                    OrderHeaders::getDescription(OrderHeaders::CLIENT_PACKAGE_COST),
+                    OrderHeaders::getDescription(OrderHeaders::FIRM_PACKAGE_COST)
+                ];
+            case SheetNames::ALLEGRO_PAYMENTS:
+                return [
+                    AllegroHeaders::getDescription(AllegroHeaders::ALLEGRO_ORDER_ID),
+                    AllegroHeaders::getDescription(AllegroHeaders::ALLEGRO_PAYMENT_ID)
+                ];
+            case SheetNames::CLIENT_PAYMENTS:
+                return [
+                    PaymentsHeader::getDescription(PaymentsHeader::ORDER_ID),
+                    PaymentsHeader::getDescription(PaymentsHeader::PAYMENT_SUM)
+                ];
+            default:
+                return [];
+        }
     }
 }

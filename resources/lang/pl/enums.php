@@ -1,8 +1,11 @@
 <?php
 
 use App\Domains\DelivererPackageImport\Enums\DelivererRulesColumnNameEnum;
+use App\Enums\AllegroExcel\AllegroHeaders;
+use App\Enums\AllegroExcel\OrderHeaders;
+use App\Enums\AllegroExcel\PaymentsHeader;
+use App\Enums\AllegroExcel\SheetNames;
 use App\Enums\CourierStatus\DpdPackageStatus;
-use App\Enums\CourierStatus\GlsPackageStatus;
 
 return [
     DelivererRulesColumnNameEnum::class => [
@@ -23,5 +26,26 @@ return [
         DpdPackageStatus::DELIVERED => 'Przesyłka doręczona',
         DpdPackageStatus::SENDING => 'Przesyłka odebrana przez Kuriera',
         DpdPackageStatus::WAITING_FOR_SENDING => 'Zarejestrowano dane przesyłki',
+    ],
+    OrderHeaders::class => [
+        OrderHeaders::ORDER_ID => 'Numer zlecenia',
+        OrderHeaders::PACKAGE_LETTER_NUMBER => 'Przesyłka - numer listu przewozowego',
+        OrderHeaders::ALLEGRO_ORDER_ID => 'ALLEGRO - numer zamówienia (ID operacji)',
+        OrderHeaders::ORDER_SUM => 'Wartość oferty - całkowita wartość oferty brutto',
+        OrderHeaders::CLIENT_PACKAGE_COST => 'Zakładany koszt brutto przesyłki dla nas',
+        OrderHeaders::FIRM_PACKAGE_COST => 'Zakładany koszt brutto przesyłki dla klienta',
+    ],
+    AllegroHeaders::class => [
+        AllegroHeaders::ALLEGRO_ORDER_ID => 'ALLEGRO - numer zamówienia (ID operacji)',
+        AllegroHeaders::ALLEGRO_PAYMENT_ID => 'ALLEGRO - numer płatności',
+    ],
+    PaymentsHeader::class => [
+        PaymentsHeader::ORDER_ID => 'Numer zlecenia',
+        PaymentsHeader::PAYMENT_SUM => 'Suma płatności klienta',
+    ],
+    SheetNames::class => [
+        SheetNames::ORDER_DATA => 'Zlecenia',
+        SheetNames::ALLEGRO_PAYMENTS => 'Wpłaty Allegro',
+        SheetNames::CLIENT_PAYMENTS => 'Wpłaty klienta'
     ]
 ];
