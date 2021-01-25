@@ -19,11 +19,6 @@ return [
         DelivererRulesColumnNameEnum::SEL_TR_TRANSACTION_SELLO_PAYMENT => 'ALLEGRO Id płatności',
         DelivererRulesColumnNameEnum::SEL_TR_TRANSACTION_SELLO_FORM => 'ALLEGRO numer zamówienia (sello_form)',
     ],
-    GlsPackageStatus::class => [
-        GlsPackageStatus::DELIVERED => 'Paczka doreczona',
-        GlsPackageStatus::SENDING => 'Paczka zarejestrowana w filii GLS',
-        GlsPackageStatus::WAITING_FOR_SENDING => 'Nadawca nadal numer paczce',
-    ],
     DpdPackageStatus::class => [
         DpdPackageStatus::DELIVERED => 'Przesyłka doręczona',
         DpdPackageStatus::SENDING => 'Przesyłka odebrana przez Kuriera',

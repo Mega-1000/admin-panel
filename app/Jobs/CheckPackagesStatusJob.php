@@ -160,6 +160,7 @@ class CheckPackagesStatusJob
         $request = new getEnvelopeContentShort();
         $request->idEnvelope = $package->sending_number;
         $status = $integration->getEnvelopeContentShort($request);
+
         if ($status->przesylka->status !== statusType::POTWIERDZONA) {
             return;
         }
@@ -167,12 +168,10 @@ class CheckPackagesStatusJob
         $request = new getEnvelopeStatus();
         $request->idEnvelope = $package->sending_number;
         $status = $integration->getEnvelopeStatus($request);
+
         switch ($status->envelopeStatus) {
-            case envelopeStatusType::DOSTARCZONY:
-                $package->status = OrderPackage::DELIVERED;
-                break;
             case envelopeStatusType::PRZYJETY:
-                $package->status = OrderPackage::SENDING;
+                $package->status = OrderPackage::DELIVERED;
                 break;
         }
         if ($package->isDirty()) {
@@ -219,22 +218,20 @@ class CheckPackagesStatusJob
     private function checkStatusInGlsPackages(OrderPackage $package): void
     {
         $url = $this->config['gls']['tracking_url'] . $package->letter_number;
-        $response = $this->prepareConnectionForTrackingStatus($url, Request::METHOD_GET, [])->getBody()->getContents();
+        $response = json_decode($this->prepareConnectionForTrackingStatus($url, Request::METHOD_GET, [])->getBody()->getContents());
 
-        $packageStatusRegex = '/(' . GlsPackageStatus::getDescription(GlsPackageStatus::DELIVERED)
-            .')|(' . GlsPackageStatus::getDescription(GlsPackageStatus::SENDING)
-            .')|(' . GlsPackageStatus::getDescription(GlsPackageStatus::WAITING_FOR_SENDING) . ')/';
+        $packageStatus = $response->tuStatus[0]->progressBar->statusInfo;
 
-        preg_match($packageStatusRegex, $response, $matches);
-
-        switch($matches[0]) {
-            case GlsPackageStatus::getDescription(GlsPackageStatus::DELIVERED):
+        switch($packageStatus) {
+            case GlsPackageStatus::DELIVERED:
                 $package->status = PackageStatus::DELIVERED;
                 break;
-            case GlsPackageStatus::getDescription(GlsPackageStatus::SENDING):
+            case GlsPackageStatus::INTRANSIT:
+            case GlsPackageStatus::INWAREHOUSE:
+            case GlsPackageStatus::INDELIVERY:
                 $package->status = PackageStatus::SENDING;
                 break;
-            case GlsPackageStatus::getDescription(GlsPackageStatus::WAITING_FOR_SENDING):
+            case GlsPackageStatus::PREADVICE:
                 $package->status = PackageStatus::WAITING_FOR_SENDING;
                 break;
         }
@@ -244,6 +241,11 @@ class CheckPackagesStatusJob
 
     private function prepareConnectionForTrackingStatus(string $url, string $method, array $params): ResponseInterface
     {
+        $curlSettings = ['curl' => [
+            CURLOPT_SSL_CIPHER_LIST => 'DEFAULT@SECLEVEL=1'
+        ]];
+        $params = array_merge($params, $curlSettings);
+
         return $this->httpClient->request($method, $url, $params);
     }
 }

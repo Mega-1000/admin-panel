@@ -8,7 +8,9 @@ use BenSampo\Enum\Enum;
 
 final class GlsPackageStatus extends Enum implements LocalizedEnum
 {
-    public const DELIVERED = 'delivered';
-    public const SENDING = 'sending';
-    public const WAITING_FOR_SENDING = 'waiting_for_sending';
+    public const DELIVERED = 'DELIVERED';
+    public const PREADVICE = 'PREADVICE';
+    public const INTRANSIT = 'INTRANSIT';
+    public const INWAREHOUSE = 'INWAREHOUSE';
+    public const INDELIVERY = 'INDELIVERY';
 }
