@@ -10,4 +10,6 @@ final class PackageStatus extends Enum
     const DELIVERED = 'DELIVERED';
     const SENDING = 'SENDING';
     const WAITING_FOR_SENDING = 'WAITING_FOR_SENDING';
+    const CANCELLED = 'CANCELLED';
+    const WAITING_FOR_CANCELLED = 'WAITING_FOR_CANCELLED';
 }

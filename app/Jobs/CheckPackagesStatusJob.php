@@ -54,7 +54,10 @@ class CheckPackagesStatusJob
 
         foreach($orders as $order) {
             foreach ($order->packages as $package) {
-                if ($package->status == PackageStatus::DELIVERED || empty($package->letter_number)) {
+                if ($package->status == PackageStatus::DELIVERED ||
+                    $package->status == PackageStatus::WAITING_FOR_CANCELLED ||
+                    $package->status == PackageStatus::CANCELLED ||
+                    empty($package->letter_number)) {
                     continue;
                 }
                 switch ($package->service_courier_name) {
