@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Entities;
 
+use App\Enums\PackageStatus;
 use App\Helpers\TaskTimeHelper;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
@@ -652,5 +654,10 @@ class Order extends Model implements Transformable
     public function getPreviousOrderId($orderId): int
     {
         return Order::where('id', '<', $orderId)->orderBy('id', 'desc')->first()->id;
+    }
+
+    public function getSentPackages(): Collection
+    {
+        return $this->hasMany(OrderPackage::class)->whereIn('status', [PackageStatus::DELIVERED, PackageStatus::SENDING])->get();
     }
 }

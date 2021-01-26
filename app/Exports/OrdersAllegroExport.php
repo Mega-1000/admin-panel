@@ -35,10 +35,8 @@ class OrdersAllegroExport implements FromCollection, WithMultipleSheets
             SheetNames::getDescription(SheetNames::CLIENT_PAYMENTS),
         ];
 
-        for($i = 0; $i < count($this->collection()); $i++) {
-            $sheets[] = new AllegroOrdersSheet($sheetsTitle[$i], $this->collection()[$i]);
-        }
-
-        return $sheets;
+        return $this->collection()->map(function($item, $key) use (&$sheetsTitle) {
+           return new AllegroOrdersSheet($sheetsTitle[$key], $item);
+        })->toArray();
     }
 }
