@@ -46,6 +46,6 @@ return [
     SheetNames::class => [
         SheetNames::ORDER_DATA => 'Zlecenia',
         SheetNames::ALLEGRO_PAYMENTS => 'Wpłaty Allegro',
-        SheetNames::CLIENT_PAYMENTS => 'Wpłaty klienta'
+        SheetNames::CLIENT_PAYMENTS => 'Wpłaty klienta',
     ]
 ];

@@ -3056,16 +3056,21 @@ class OrdersController extends Controller
         $allegroPayments[] = $this->prepareHeadersForSheet(SheetNames::ALLEGRO_PAYMENTS);
         $clientPayments[] = $this->prepareHeadersForSheet(SheetNames::CLIENT_PAYMENTS);
 
-        $orders = $this->orderRepository->findWhereBetween('id', [$request->input('allegro_from'), $request->input('allegro_to')]);
-        foreach($orders as $order) {
-            foreach($order->packages as $package) {
-                $orderData[] = [$order->id, $package->letter_number, $order->allegro_form_id, $order->total_price, $package->cost_for_company, $package->cost_for_client];
-                $allegroPayments[] = [$order->allegro_form_id, $order->return_payment_id];
-                $clientPayments[] = [$order->id, $order->bookedPaymentsSum()];
-            }
-        }
+        $orders = $this->orderRepository->findWhere([
+            ['id', '>=' ,$request->input('allegro_from')],
+            ['id', '<=', $request->input('allegro_to')],
+            ['allegro_transaction_id' , '!=', null]
+        ]);
 
-        return Excel::download(new OrdersAllegroExport($orderData, $allegroPayments, $clientPayments), 'allegro.xlsx');
+        $orders->each(function($order) use (&$orderData, &$allegroPayments, &$clientPayments) {
+            $order->getSentPackages()->each(function($package) use ($order, &$orderData, &$allegroPayments, &$clientPayments) {
+                $orderData[] = [$order->id, $package->letter_number, $order->selloTransaction->tr_CheckoutFormId, $order->total_price, $package->cost_for_company, $package->cost_for_client];
+                $allegroPayments[] = [$order->selloTransaction->tr_CheckoutFormId, $order->selloTransaction->tr_CheckoutFormPaymentId];
+                $clientPayments[] = [$order->id, $order->bookedPaymentsSum()];
+            });
+        });
+
+        return Excel::download(new OrdersAllegroExport($orderData, $allegroPayments, $clientPayments), 'allegrox.xlsx');
     }
 
     private function prepareHeadersForSheet(string $sheetName): array
