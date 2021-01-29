@@ -13,24 +13,24 @@ class CreateOrderPaymentsLogsTable extends Migration
         Schema::create('order_payments_logs', function (Blueprint $table) {
             $table->increments('id');
             $table->dateTime('booked_date')->nullable();
-            $table->enum('payment_type', ['CLIENT_PAYMENT', 'ORDER_PAYMENT', 'RETURN_PAYMENT']);
-            $table->unsignedInteger('order_payment_id');
+            $table->enum('payment_type', ['CLIENT_PAYMENT', 'ORDER_PAYMENT', 'RETURN_PAYMENT', 'REMOVE_PAYMENT']);
+            $table->unsignedInteger('order_payment_id')->nullable();
             $table->foreign('order_payment_id')
                 ->references('id')
-                ->on('order_payments')->onDelete('cascade')->nullable();
+                ->on('order_payments')->nullable();
             $table->unsignedInteger('user_id');
             $table->foreign('user_id')
                 ->references('id')
-                ->on('customers')->onDelete('cascade')->nullable();
+                ->on('customers')->nullable();
             $table->unsignedInteger('employee_id');
             $table->foreign('employee_id')
                 ->references('id')
-                ->on('users')->onDelete('cascade')->nullable();
+                ->on('users')->nullable();
             $table->string('payment_service_operator')->nullable();
             $table->unsignedInteger('order_id');
             $table->foreign('order_id')
                 ->references('id')
-                ->on('orders')->onDelete('cascade');
+                ->on('orders');
             $table->text('description')->nullable();
             $table->decimal('payment_amount')->nullable();
             $table->decimal('transfer_payment_amount')->nullable();
@@ -45,13 +45,13 @@ class CreateOrderPaymentsLogsTable extends Migration
     public function down(): void
     {
         Schema::table('order_payments_logs', function (Blueprint $table) {
-            $table->dropForeign('order_payment_id');
+            $table->dropForeign(['order_payment_id']);
             $table->dropColumn('order_payment_id');
-            $table->dropForeign('user_id');
+            $table->dropForeign(['user_id']);
             $table->dropColumn('user_id');
-            $table->dropForeign('order_id');
+            $table->dropForeign(['order_id']);
             $table->dropColumn('order_id');
-            $table->dropForeign('employee_id');
+            $table->dropForeign(['employee_id']);
             $table->dropColumn('employee_id');
         });
         Schema::dropIfExists('order_payments_logs');

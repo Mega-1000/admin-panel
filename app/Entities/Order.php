@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 declare(strict_types=1);
 
@@ -9,6 +9,7 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
@@ -647,11 +648,11 @@ class Order extends Model implements Transformable
         return $this->detailedCommissions()->sum('amount');
     }
 
-    public function paymentsTransactions()
+    public function paymentsTransactions(): HasMany
     {
         return $this->hasMany(OrderPaymentLog::class);
     }
-  
+
     public function getLastOrder(): int
     {
         return Order::orderBy('id', 'desc')->first()->id;

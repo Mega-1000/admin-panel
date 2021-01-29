@@ -19,21 +19,16 @@ class OrderPaymentLogService
 
     public function create(
         int $orderId,
-        int $orderPaymentId,
+        ?int $orderPaymentId,
         int $customerId,
-        string $clientPaymentAmount,
-        string $orderPaymentAmount,
+        float $clientPaymentAmount,
+        float $orderPaymentAmount,
         string $createdAt,
         string $notices,
         string $amount,
         string $type,
         bool $sign
     ) : void {
-        if($sign === true) {
-            $paymentSumAfterPayment = $clientPaymentAmount + $orderPaymentAmount;
-        } else {
-            $paymentSumAfterPayment = $clientPaymentAmount - $orderPaymentAmount;
-        }
         $this->repository->create([
             'booked_date' => $createdAt,
             'payment_type' => $type,
@@ -44,7 +39,7 @@ class OrderPaymentLogService
             'description' => $notices,
             'payment_amount' => PriceHelper::modifyPriceToValidFormat($amount),
             'payment_sum_before_payment' => $clientPaymentAmount,
-            'payment_sum_after_payment' => $paymentSumAfterPayment,
+            'payment_sum_after_payment' => $sign ? $clientPaymentAmount + $orderPaymentAmount : $clientPaymentAmount - $orderPaymentAmount,
         ]);
     }
 }

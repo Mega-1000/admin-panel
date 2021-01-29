@@ -42,39 +42,12 @@ use Yajra\DataTables\Facades\DataTables;
  */
 class OrdersPaymentsController extends Controller
 {
-    /**
-     * @var OrderPaymentRepository
-     */
     protected $repository;
-
-    /**
-     * @var OrderRepository
-     */
     protected $orderRepository;
-
-    /**
-     * @var PaymentRepository
-     */
     protected $paymentRepository;
-
-    /**
-     * @var CustomerRepository
-     */
     protected $customerRepository;
-
-    /**
-     * @var OrderPackageRepository
-     */
     protected $orderPackageRepository;
-
-    /**
-     * @var OrderPaymentLogService
-     */
     protected $orderPaymentLogService;
-
-    /**
-     * @var OrderPaymentService
-     */
     protected $orderPaymentService;
 
     public function __construct(
@@ -236,27 +209,19 @@ class OrdersPaymentsController extends Controller
 
 
         $orderPaymentAmount = PriceHelper::modifyPriceToValidFormat($request->input('amount'));
-        $clientPaymentAmount = $this->customerRepository->find($orderPayment->order->customer_id)->payments->sum('amount_left');
-
-        $createdAt = $request->input('created_at') ?: Carbon::now();
-
-        if($request->input('notices') === null) {
-            $notices = '';
-        } else {
-            $notices = $request->input('notices');
-        }
+        $orderPaymentsSum = $orderPayment->order->payments->sum('amount') - $orderPaymentAmount;
 
         $this->orderPaymentLogService->create(
             $orderId,
             $orderPayment->id,
             $orderPayment->order->customer_id,
-            $clientPaymentAmount,
+            $orderPaymentsSum,
             $orderPaymentAmount,
-            $createdAt,
-            $notices,
+            $request->input('created_at') ?: Carbon::now(),
+            $request->input('notices')  ?: '',
             $request->input('amount'),
             OrderPaymentLogTypeEnum::ORDER_PAYMENT,
-            false
+            true
         );
 
         return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
@@ -1663,9 +1628,6 @@ class OrdersPaymentsController extends Controller
                     );
                 }
 
-
-
-
                 OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
 
                 if ($payment != null && $order->status_id != 5) {
@@ -1715,7 +1677,7 @@ class OrdersPaymentsController extends Controller
 
             $this->orderPaymentLogService->create(
                 $orderId,
-                $payment->id,
+                null,
                 $validated['customer_id'],
                 $clientPaymentAmount,
                 $amount,
@@ -1815,10 +1777,23 @@ class OrdersPaymentsController extends Controller
                 Carbon::now(),
                 '',
                 $orderPayment->amount,
-                OrderPaymentLogTypeEnum::CLIENT_PAYMENT,
+                OrderPaymentLogTypeEnum::REMOVE_PAYMENT,
                 true
             );
         }
+
+        $this->orderPaymentLogService->create(
+            $orderPayment->order_id,
+            $orderPayment->master_payment_id,
+            $orderPayment->order->customer_id,
+            $orderPayment->order->payments->sum('amount'),
+            $orderPayment->amount,
+            Carbon::now(),
+            '',
+            $orderPayment->amount,
+            OrderPaymentLogTypeEnum::REMOVE_PAYMENT,
+            false
+        );
 
         $deleted = $this->repository->delete($id);
 
