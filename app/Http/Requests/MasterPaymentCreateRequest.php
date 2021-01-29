@@ -20,6 +20,7 @@ class MasterPaymentCreateRequest extends FormRequest
             'created_at' => 'required|date',
             'payment-type' => 'required',
             'customer_id' => 'required'
+```,
         ];
     }
 }
