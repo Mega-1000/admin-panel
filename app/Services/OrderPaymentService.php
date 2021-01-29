@@ -13,11 +13,9 @@ use App\Enums\OrderStatus;
 use App\Helpers\PriceHelper;
 use App\Helpers\TokenHelper;
 use App\Http\Controllers\OrdersPaymentsController;
-use App\Mail\WarehousePaymentAccept;
 use App\Repositories\OrderPaymentRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentRepository;
-use Illuminate\Support\Facades\Log;
 
 class OrderPaymentService
 {
