@@ -660,4 +660,28 @@ class Order extends Model implements Transformable
     {
         return $this->hasMany(OrderPackage::class)->whereIn('status', [PackageStatus::DELIVERED, PackageStatus::SENDING])->get();
     }
+
+    public function getItemsGrossValue(): float
+    {
+        $totalOfProductsPrices = 0;
+
+        foreach ($this->items as $item) {
+            $totalOfProductsPrices += $item->gross_selling_price_commercial_unit * intval($item->quantity);
+        }
+
+        return round($totalOfProductsPrices, 2);
+    }
+
+    public function getOrderProfit(): float
+    {
+        $orderProfit = 0;
+
+        foreach ($this->items as $item) {
+            $orderProfit += ($item->gross_selling_price_commercial_unit - ($item->net_purchase_price_commercial_unit * 1.23)) * $item->quantity;
+        }
+
+        $orderProfit += $this->additional_service_cost;
+
+        return round($orderProfit, 2);
+    }
 }
