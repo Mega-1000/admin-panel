@@ -3053,16 +3053,7 @@ class OrdersController extends Controller
         $allegroPayments[] = $this->prepareHeadersForSheet(SheetNames::ALLEGRO_PAYMENTS);
         $clientPayments[] = $this->prepareHeadersForSheet(SheetNames::CLIENT_PAYMENTS);
 
-        $orders = $this->orderRepository->with([
-            'labels'
-        ])->whereHas('labels', function ($query) {
-            $query->where('label_id', Label::BOOKED_FIRST_PAYMENT)
-                ->orWhere('label_id', Label::ORDER_ITEMS_CONSTRUCTED)
-                ->orWhere('label_id', Label::PACKAGE_NOTIFICATION_LABEL);
-        })->findWhere([
-            ['id', '>=' ,$request->input('allegro_from')],
-            ['id', '<=', $request->input('allegro_to')]
-        ]);
+        $orders = $this->orderRepository->getOrdersForExcelFile($request->input('allegro_from'), $request->input('allegro_to'));
 
         $orders->each(function($order) use (&$orderData, &$allegroPayments, &$clientPayments) {
             if($order->getSentPackages()->count() === 0) {
