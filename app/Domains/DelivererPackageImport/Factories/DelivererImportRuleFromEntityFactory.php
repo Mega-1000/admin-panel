@@ -7,51 +7,89 @@ namespace App\Domains\DelivererPackageImport\Factories;
 use App\Domains\DelivererPackageImport\Enums\DelivererRulesActionEnum;
 use App\Domains\DelivererPackageImport\ImportRules\DelivererImportRuleGet;
 use App\Domains\DelivererPackageImport\ImportRules\DelivererImportRuleGetAndReplace;
+use App\Domains\DelivererPackageImport\ImportRules\DelivererImportRuleGetWithCondition;
 use App\Domains\DelivererPackageImport\ImportRules\DelivererImportRuleSearchCompare;
 use App\Domains\DelivererPackageImport\ImportRules\DelivererImportRuleSearchRegex;
 use App\Domains\DelivererPackageImport\ImportRules\DelivererImportRuleSet;
 use App\Entities\DelivererImportRule;
-use App\Repositories\OrderRepositoryEloquent;
 
 class DelivererImportRuleFromEntityFactory
 {
-    private $orderRepository;
+    private $columnRepositoryFactory;
 
-    public function __construct(OrderRepositoryEloquent $orderRepository)
+    public function __construct(DelivererImportRuleColumnRepositoryFactory $columnRepositoryFactory)
     {
-        $this->orderRepository = $orderRepository;
+        $this->columnRepositoryFactory = $columnRepositoryFactory;
     }
 
-    public function create(DelivererImportRule $rule)
+    public function create(DelivererImportRule $delivererImportRuleEntity)
     {
-        switch ($rule->action) {
+        $this->validate($delivererImportRuleEntity);
+
+        switch ($delivererImportRuleEntity->getAction()->value) {
             case DelivererRulesActionEnum::SEARCH_COMPARE:
                 return new DelivererImportRuleSearchCompare(
-                    $this->orderRepository,
-                    $rule
+                    $delivererImportRuleEntity,
+                    $this->columnRepositoryFactory->create(
+                        $delivererImportRuleEntity->getColumnName()
+                    )
                 );
             case DelivererRulesActionEnum::SEARCH_REGEX:
                 return new DelivererImportRuleSearchRegex(
-                    $this->orderRepository,
-                    $rule
+                    $delivererImportRuleEntity,
+                    $this->columnRepositoryFactory->create(
+                        $delivererImportRuleEntity->getColumnName()
+                    )
                 );
             case DelivererRulesActionEnum::SET:
                 return new DelivererImportRuleSet(
-                    $this->orderRepository,
-                    $rule
+                    $delivererImportRuleEntity,
+                    $this->columnRepositoryFactory->create(
+                        $delivererImportRuleEntity->getColumnName()
+                    )
                 );
             case DelivererRulesActionEnum::GET:
                 return new DelivererImportRuleGet(
-                    $this->orderRepository,
-                    $rule
+                    $delivererImportRuleEntity,
+                    $this->columnRepositoryFactory->create(
+                        $delivererImportRuleEntity->getColumnName()
+                    )
                 );
             case DelivererRulesActionEnum::GET_AND_REPLACE:
                 return new DelivererImportRuleGetAndReplace(
-                    $this->orderRepository,
-                    $rule
+                    $delivererImportRuleEntity,
+                    $this->columnRepositoryFactory->create(
+                        $delivererImportRuleEntity->getColumnName()
+                    )
+                );
+            case DelivererRulesActionEnum::GET_WITH_CONDITION:
+                return new DelivererImportRuleGetWithCondition(
+                    $delivererImportRuleEntity,
+                    $this->columnRepositoryFactory->create(
+                        $delivererImportRuleEntity->getColumnName()
+                    )
                 );
             default:
-                throw new \Exception('Wrong entity action name for deliverer import rule: ' . $rule->action);
+                throw new \Exception(sprintf(
+                    'No import rule for action %s',
+                    $delivererImportRuleEntity->getAction()->value
+                ));
+        }
+    }
+
+    private function validate(DelivererImportRule $delivererImportRuleEntity): void
+    {
+        if (!DelivererImportRule::canActionBePerformedOnColumn(
+            $delivererImportRuleEntity->getColumnName(),
+            $delivererImportRuleEntity->getAction()
+        )) {
+            throw new \Exception(
+                sprintf(
+                    'Action %s is not performed for column %s',
+                    $delivererImportRuleEntity->getAction()->value,
+                    $delivererImportRuleEntity->getColumnName()->value
+                )
+            );
         }
     }
 }

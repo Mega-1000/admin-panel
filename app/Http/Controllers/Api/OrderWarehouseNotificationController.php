@@ -112,7 +112,8 @@ class OrderWarehouseNotificationController extends Controller
             Storage::disk('local')->put('public/invoices/' . $filename, file_get_contents($file));
             $invoice = $order->invoices()->create([
                 'invoice_type' => 'buy',
-                'invoice_name' => $filename
+                'invoice_name' => $filename,
+                'is_visible_for_client' => (boolean) $request->isVisibleForClient,
             ]);
             $invoiceRequest = $order->invoiceRequests()->first();
             if(!empty($invoiceRequest) && $invoiceRequest->status === 'MISSING')

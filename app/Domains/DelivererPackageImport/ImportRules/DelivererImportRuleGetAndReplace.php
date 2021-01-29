@@ -4,25 +4,27 @@ declare(strict_types=1);
 
 namespace App\Domains\DelivererPackageImport\ImportRules;
 
-use App\Entities\Order;
-
-class DelivererImportRuleGetAndReplace extends DelivererImportRuleAbstract
+class DelivererImportRuleGetAndReplace extends DelivererImportRuleAbstract implements DelivererImportRuleInterface
 {
-    public function run(array $line): ?Order
+    /**
+     * @return mixed
+     */
+    public function run()
     {
-        $this->line = $line;
-
         if (!$this->validate()) {
             return null;
         }
 
-        return $this->orderRepository->update([
-            $this->getDbColumnName()->value => $this->getChangeTo(),
-        ], $this->order->id);
+        return $this->columnRepository->updateColumn(
+            $this->order,
+            $this->importRuleEntity,
+            $this->getChangeTo(),
+            $this->valueUsedToFindOrder
+        );
     }
 
     private function validate(): bool
     {
-        return $this->getValue() === $this->getDataToImport();
+        return $this->getValue() === $this->getData();
     }
 }

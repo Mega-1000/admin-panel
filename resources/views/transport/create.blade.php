@@ -19,7 +19,7 @@
         </div>
 
         <div class="row rule">
-            <div class="col-md-2">
+            <div class="col-md-1">
                 <label for="action">Rodzaj akcji</label>
                 <select name="action[]" id="action" class="form-control action">
                     <option value="">--wybierz--</option>
@@ -33,16 +33,16 @@
                 <input type="text" class="form-control" id="value" name="value[]" value="" />
             </div>
             <div class="col-md-2">
-                <label for="columnName">Nazwa kolumny w bazie</label>
+                <label for="columnName">Kolumna w bazie</label>
                 <select name="columnName[]" id="columnName" class="form-control">
                     <option value="">--wybierz--</option>
                     @foreach ($columns as $column)
-                        <option value="{{ $column }}">{{ $column }}</option>
+                        <option value="{{ $column->value }}">{{ $column->description }}</option>
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-2">
-                <label for="columnNumber">Nr kolumny w pliku CSV</label>
+            <div class="col-md-1">
+                <label for="columnNumber">Nr kolumny w CSV</label>
                 <select name="columnNumber[]" id="columnNumber" class="form-control">
                     <option value="">--wybierz--</option>
                     @foreach ($csvColumnsNumbers as $number)
@@ -50,9 +50,22 @@
                     @endforeach
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-1">
                 <label for="value">Zamień na</label>
                 <input type="text" class="form-control" id="value" name="changeTo[]" value="" />
+            </div>
+            <div class="col-md-2">
+                <label for="conditionColumnNumber">Warunek: nr kolumny CSV</label>
+                <select name="conditionColumnNumber[]" id="conditionColumnNumber" class="form-control">
+                    <option value="">--wybierz--</option>
+                    @foreach ($csvColumnsNumbers as $number)
+                        <option value="{{ $number }}">{{ $number }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="conditionValue">Warunek: wartość</label>
+                <input type="text" class="form-control" id="conditionValue" name="conditionValue[]" value="" />
             </div>
             <div class="col-md-1 manage-rule">
                 <a href="#" class="addNewRule inline-block">Dodaj +</a>
@@ -68,7 +81,7 @@
         $('.addNewRule').click((event) => {
             event.preventDefault();
 
-            copyRuleSchema();
+            copyRuleSchema(event.target);
         });
 
         $('.removeRule').click((event) => {
@@ -77,24 +90,23 @@
             $(this).closest('.rule').remove();
         });
 
-        function copyRuleSchema() {
-            const countRules = $('.rule').length;
+        function copyRuleSchema(clickedItem) {
             const newRule = $('.rule:first').clone(true);
             const id = Math.random().toString(36).substring(7);
 
-            if (countRules >= 2) {
-                newRule.find('.action option[value="searchCompare"]').remove();
-                newRule.find('.action option[value="searchRegex"]').remove();
-            }
-
             newRule.attr('id', id);
+            newRule.find("input[type=text], textarea").val('');
+            newRule.find('.manage-rule .removeRule').remove();
+            newRule.find('select').each(function() {
+                $(this).prop('selectedIndex', 0)
+            });
             newRule.find('.manage-rule').append(() => {
                 return $('<a href="#" class="removeRule inline-block">Usuń +</a>').click(() => {
                     $("#" + id).remove();
                 });
             });
 
-            $('.rule:last').after(newRule);
+            $(clickedItem).closest('.row.rule').after(newRule);
         }
     </script>
 @endsection

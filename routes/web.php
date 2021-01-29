@@ -35,6 +35,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/pages/{id}', 'PagesGeneratorController@edit')->name('pages.edit');
         Route::get('/pages', 'PagesGeneratorController@getPages')->name('pages.index');
 
+        Route::get('/getDelivererImportLog/{id}', 'DelivererController@getDelivererImportLog')->name('deliverer.getImportLog');
+
 
         Route::get('/warehouse/{id}',
             'OrdersController@getCalendar');
@@ -237,6 +239,22 @@ Route::group(['prefix' => 'admin'], function () {
             'ProductStockLogsController@datatable')->name('product_stocks.logs.datatable');
         Route::get('products/stocks/{id}/logs/{log_id}/show',
             'ProductStockLogsController@show')->name('product_stocks.logs.show');
+        Route::get('products/stocks/{id}/packets/create',
+            'ProductStockPacketsController@create')->name('product_stock_packets.create');
+        Route::post('products/stocks/{id}/packets',
+            'ProductStockPacketsController@store')->name('product_stock_packets.store');
+        Route::delete('products/stocks/{id}/packets/{packetId}',
+            'ProductStockPacketsController@delete')->name('product_stock_packets.delete');
+        Route::get('products/stocks/{id}/packets',
+            'ProductStockPacketsController@index')->name('product_stock_packets.index');
+        Route::post('products/stocks/packets/{packetId}/orderItem/{orderItemId}/assign',
+            'Api\ProductStockPacketsController@assign')->name('product_stock_packets.assign');
+        Route::post('products/stocks/packets/orderItem/{orderItemId}/retain',
+            'Api\ProductStockPacketsController@retain')->name('product_stock_packets.retain');
+        Route::get('products/stocks/{id}/packets/{packetId}',
+            'ProductStockPacketsController@edit')->name('product_stock_packets.edit');
+        Route::put('products/stocks/{id}/packets/{packetId}',
+            'ProductStockPacketsController@update')->name('product_stock_packets.update');
         Route::post('positions/{from}/{to}/quantity/move',
             'ProductStockPositionsController@quantityMove')->name('product_stocks.quantity_move');
 
@@ -286,12 +304,14 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orders/getCosts', 'OrdersController@getCosts')->name('orders.getCosts');
         Route::post('orders/invoice/request', 'OrdersController@invoiceRequest')->name('orders.invoiceRequest');
         Route::get('orders/{id}/invoices', 'OrdersController@getInvoices')->name('orders.getInvoices');
+        Route::patch('orders/invoice/{id}/visibility', 'Api\InvoicesController@changeInvoiceVisibility')->name('orders.changeInvoiceVisibility');
         Route::get('orders/{id}/files', 'OrdersController@getFiles')->name('orders.getFiles');
         Route::post('orders/allegro-payment', 'OrdersPaymentsController@payAllegro')->name('orders.allegroPayments');
         Route::post('orders/allegro-commission', 'AllegroController@setCommission')->name('orders.allegroCommission');
         Route::post('orders/allegro-new-letter', 'AllegroController@createNewLetter')->name('orders.newLettersFromAllegro');
         Route::post('orders/allegro-new-order', 'AllegroController@createNewOrder')->name('orders.newOrdersFromAllegroComissions');
         Route::post('orders/create-payments', 'OrdersController@createPayments')->name('orders.create-payments');
+        Route::post('orders/generate-allegro-payments', 'OrdersController@generateAllegroPayments')->name('orders.generate-allegro-orders');
         Route::post('orders/surplus/return', 'OrdersPaymentsController@returnSurplusPayment')->name('orders.returnSurplus');
 
         Route::get('orderPayments/datatable/{id}',

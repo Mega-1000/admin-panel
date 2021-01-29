@@ -4,44 +4,46 @@ declare(strict_types=1);
 
 namespace App\Domains\DelivererPackageImport\ImportRules;
 
+use App\Domains\DelivererPackageImport\Exceptions\TooManyOrdersInDBException;
 use App\Entities\Order;
-use Illuminate\Support\Collection;
 
-class DelivererImportRuleSearchRegex extends DelivererImportRuleAbstract
+class DelivererImportRuleSearchRegex extends DelivererImportRuleAbstract implements DelivererImportRuleInterface
 {
-    public function run(array $line): ?Order
+    public function run(): ?Order
     {
-        $this->line = $line;
-        $this->dataToImport = $this->getDataToImport();
+        $this->dataToImport = $this->getData();
 
         if (!$this->validate()) {
             return null;
         }
 
-        /* @var $order Collection */
-        $order = $this->findOrder();
+        $order = $this->columnRepository->findOrder($this->parsedData);
 
-        if ($order->count() > 1) {
-            throw new \Exception('Too many orders were found for rule');
+        if (empty($order)) {
+            return null;
         }
 
-        return $order->first();
+        if ($order->isNotEmpty() && $order->count() > 1) {
+            throw new TooManyOrdersInDBException(
+                "Znaleziono więcej niż jedno zamówienie w bazie danych dla LP: {$this->parsedData}"
+            );
+        }
+
+        if ($order->isNotEmpty() && $order->count() === 1) {
+            return $order->first();
+        }
+
+        return null;
     }
 
     private function validate(): bool
     {
-        return strpos($this->dataToImport, $this->getValue()) === 0;
-    }
+        if (preg_match("/{$this->getValue()}(.*),/iU", $this->dataToImport, $match)) {
+            $this->parsedData = $match[1];
 
-    private function parseData(): string
-    {
-        return substr($this->dataToImport, strlen($this->getValue()));
-    }
+            return true;
+        }
 
-    private function findOrder(): Collection
-    {
-        return $this->orderRepository->findWhere([
-            $this->getDbColumnName()->value => $this->parseData(),
-        ]);
+        return false;
     }
 }

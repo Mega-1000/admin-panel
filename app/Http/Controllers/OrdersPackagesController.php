@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Domains\DelivererPackageImport\PriceFormatter;
 use App\Entities\ConfirmPackages;
 use App\Entities\ContainerType;
 use App\Entities\ContentType;
 use App\Entities\Order;
 use App\Entities\OrderOtherPackage;
 use App\Entities\OrderPackage;
+use App\Entities\OrderPackageRealCostForCompany;
 use App\Entities\PackageTemplate;
 use App\Entities\PackingType;
 use App\Entities\SelAddress;
@@ -32,6 +34,7 @@ use iio\libmergepdf\Merger;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -257,7 +260,6 @@ class OrdersPackagesController extends Controller
         $orderPackage->status = $data['status'];
         $orderPackage->cost_for_client = $data['cost_for_client'];
         $orderPackage->cost_for_company = $data['cost_for_company'];
-        $orderPackage->real_cost_for_company = $data['real_cost_for_company'];
         $orderPackage->content = $data['content'];
         $orderPackage->packing_type = $data['packing_type'];
         if (is_null($id)) {
@@ -267,6 +269,14 @@ class OrdersPackagesController extends Controller
             $orderPackage->chosen_data_template = $data['chosen_data_template'];
         }
         $orderPackage->save();
+
+        $orderPackage->realCostForCompany()->create([
+            'order_package_id' => $orderPackage->id,
+            'cost' => PriceFormatter::asAbsolute(
+                PriceFormatter::fromString($data['real_cost_for_company'])
+            ),
+        ]);
+
         return $orderPackage;
     }
 
@@ -452,14 +462,9 @@ class OrdersPackagesController extends Controller
         return DataTables::collection($collection)->make(true);
     }
 
-    /**
-     * @return mixed
-     */
-    public function prepareCollection($id)
+    public function prepareCollection(int $id): Collection
     {
-        $collection = $this->repository->findByField('order_id', $id);
-
-        return $collection;
+        return $this->repository->with(['realCostsForCompany'])->findByField('order_id', $id);
     }
 
     public function sendRequestForCancelled($id)
@@ -854,7 +859,6 @@ class OrdersPackagesController extends Controller
         $data['status'] = PackageTemplate::STATUS_NEW;
         $data['cost_for_client'] = $package->cost_for_client;
         $data['cost_for_company'] = $package->cost_for_company;
-        $data['real_cost_for_company'] = $package->real_cost_for_company;
         $data['content'] = $package->content;
         $data['packing_type'] = $package->packing_type;
         $packageNumber = OrderPackage::where('order_id', $package->order_id)->max('number');
