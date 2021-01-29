@@ -238,11 +238,7 @@ class OrdersPaymentsController extends Controller
         $orderPaymentAmount = PriceHelper::modifyPriceToValidFormat($request->input('amount'));
         $clientPaymentAmount = $this->customerRepository->find($orderPayment->order->customer_id)->payments->sum('amount_left');
 
-        if($request->input('created_at') === null) {
-            $createdAt = Carbon::now();
-        } else {
-            $createdAt = $request->input('created_at');
-        }
+        $createdAt = $request->input('created_at') ?: Carbon::now();
 
         if($request->input('notices') === null) {
             $notices = '';
