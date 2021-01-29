@@ -85,7 +85,25 @@ class DelivererImportRuleEntityFactory
             'db_column_name' => $columnNameEnum->value,
             'import_column_number' => $columnNumberVO->get(),
             'value' => $searchValue->get(),
-            'changeTo' => $replaceValue->get(),
+            'change_to' => $replaceValue->get(),
+        ]);
+    }
+
+    public static function createGetWithCondition(
+        Deliverer $deliverer,
+        DelivererRulesActionEnum $actionEnum,
+        DelivererRulesColumnNameEnum $columnNameEnum,
+        DelivererImportRulesColumnNumberVO $columnNumberVO,
+        DelivererImportRulesColumnNumberVO $conditionColumnNumberVO,
+        DelivererImportRulesValueVO $conditionValue
+    ): DelivererImportRule {
+        return new DelivererImportRule([
+            'deliverer_id' => $deliverer->id,
+            'action' => $actionEnum->value,
+            'db_column_name' => $columnNameEnum->value,
+            'import_column_number' => $columnNumberVO->get(),
+            'condition_column_number' => $conditionColumnNumberVO->get(),
+            'condition_value' => $conditionValue->get(),
         ]);
     }
 }

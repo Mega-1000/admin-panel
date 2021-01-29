@@ -1134,7 +1134,7 @@
                                     name = value.symbol;
                                 }
                                 html += '<p style="margin: 8px 8px 0px 8px;">' + name + '</p> </div> '
-                                html += value.real_cost_for_company ?? '';
+                                html += value.sumOfCosts ? value.sumOfCosts.sum + ' zł' : '';
                                 if (value.letter_number === null) {
                                     html += '<a href="javascript:void()"><p>Brak listu przewozowego</p></a>';
                                 } else {
@@ -1216,7 +1216,6 @@
                     render: function (order, type, row) {
                         let data = order.packages
                         var html = ''
-                        let color = '#87D11B';
                         if (data.length != 0) {
                             if (order.otherPackages && order.otherPackages.find(el => el.type == 'not_calculable')) {
                                 html = '<div style="border: solid blue 4px" >'
@@ -1226,6 +1225,18 @@
                         }
                         let cancelled = 0;
                         $.each(data, function (key, value) {
+                            let color = '';
+                            switch(value.status) {
+                                case 'DELIVERED':
+                                    color = '#87D11B';
+                                    break;
+                                case 'SENDING':
+                                    color = '#4DCFFF';
+                                    break;
+                                case 'WAITING_FOR_SENDING':
+                                    color = '#5537f0';
+                                    break;
+                            }
                             if (value.status === 'CANCELLED') {
                                 cancelled++;
                             }
@@ -1874,7 +1885,16 @@
                                 if (invoice.invoice_type !== 'buy') {
                                     return;
                                 }
+
                                 html += '<a target="_blank" href="/storage/invoices/' + invoice.invoice_name + '" style="margin-top: 5px;">Faktura</a>';
+
+                                if(invoice.is_visible_for_client) {
+                                    html += '<p class="invoice__visible">Widoczna</p>';
+                                } else {
+                                    html += '<p class="invoice__invisible">Niewidoczna</p>';
+                                }
+
+                                html += '<a href="#" class="change__invoice--visibility"' + 'onclick="changeInvoiceVisibility(' + invoice.id + ')">Zmień widoczność</a>';
                             });
                             let jsonInvoices = JSON.stringify(invoices);
                             html += '<br />'
@@ -2016,6 +2036,7 @@
                             let jsonInvoices = JSON.stringify(invoices);
                             html += '<br />'
                             html += '<a href="#" class="remove__invoices"' + 'onclick="getInvoicesList(' + data.orderId + ')">Usuń</a>'
+
                         }
                         html += '<a href="#" onclick="addNewSellInvoice(' + data.orderId + ')" style="margin-top: 5px;">Dodaj</a>';
 
@@ -2613,6 +2634,16 @@
                     option.text = invoice.invoice_name;
                     invoiceSelect.appendChild(option);
                 })
+            })
+        }
+
+        function changeInvoiceVisibility(invoiceId) {
+            $.ajax({
+                type: 'PATCH',
+                url: laroute.route('orders.changeInvoiceVisibility', { id : invoiceId })
+            }).done((data) => {
+                document.getElementById('invoice_name').innerText = data.invoice_name;
+                $('#order_invoices_change_visibility').modal('show');
             })
         }
 

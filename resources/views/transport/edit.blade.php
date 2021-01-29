@@ -18,10 +18,10 @@
             <input class="form-control" id="name" name="name" value="{{$deliverer->name}}">
         </div>
 
-        @if ($importRules = $deliverer->importRules()->get())
-            @foreach ($importRules as $rule)
+        @if ($deliverer->importRules()->count())
+            @foreach ($deliverer->importRules()->get() as $rule)
                 <div class="row rule">
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <label for="action">Rodzaj akcji</label>
                         <select name="action[]" id="action" class="form-control action">
                             <option value="">--wybierz--</option>
@@ -39,20 +39,20 @@
                         <input type="text" class="form-control" id="value" name="value[]" value="{{ $rule->value }}" />
                     </div>
                     <div class="col-md-2">
-                        <label for="columnName">Nazwa kolumny w bazie</label>
+                        <label for="columnName">Kolumna w bazie</label>
                         <select name="columnName[]" id="columnName" class="form-control">
                             <option value="">--wybierz--</option>
                             @foreach ($columns as $column)
-                                <option value="{{ $column }}"
-                                    @if ($column === $rule->db_column_name)
+                                <option value="{{ $column->value }}"
+                                    @if ($column->value === $rule->db_column_name)
                                         selected="selected"
                                     @endif
-                                >{{ $column }}</option>
+                                >{{ $column->description }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <label for="columnNumber">Nr kolumny w pliku CSV</label>
+                    <div class="col-md-1">
+                        <label for="columnNumber">Nr kolumny w CSV</label>
                         <select name="columnNumber[]" id="columnNumber" class="form-control">
                             <option value="">--wybierz--</option>
                             @foreach ($csvColumnsNumbers as $number)
@@ -64,15 +64,86 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-2">
+                    <div class="col-md-1">
                         <label for="value">Zamień na</label>
                         <input type="text" class="form-control" id="value" name="changeTo[]" value="{{ $rule->change_to }}" />
+                    </div>
+                    <div class="col-md-2">
+                        <label for="conditionColumnNumber">Warunek: nr kolumny CSV</label>
+                        <select name="conditionColumnNumber[]" id="conditionColumnNumber" class="form-control">
+                            <option value="">--wybierz--</option>
+                            @foreach ($csvColumnsNumbers as $number)
+                                <option value="{{ $number }}"
+                                        @if ($number === $rule->condition_column_number)
+                                        selected="selected"
+                                    @endif
+                                >{{ $number }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="conditionValue">Warunek: wartość</label>
+                        <input type="text" class="form-control" id="conditionValue" name="conditionValue[]" value="{{ $rule->condition_value }}" />
                     </div>
                     <div class="col-md-1 manage-rule">
                         <a href="#" class="addNewRule inline-block">Dodaj +</a>
                     </div>
                 </div>
             @endforeach
+        @else
+            <div class="row rule">
+                <div class="col-md-1">
+                    <label for="action">Rodzaj akcji</label>
+                    <select name="action[]" id="action" class="form-control action">
+                        <option value="">--wybierz--</option>
+                        @foreach ($actions as $action)
+                            <option value="{{ $action->value }}">{{ $action->description }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="value">Wartość</label>
+                    <input type="text" class="form-control" id="value" name="value[]" value="" />
+                </div>
+                <div class="col-md-2">
+                    <label for="columnName">Kolumna w bazie</label>
+                    <select name="columnName[]" id="columnName" class="form-control">
+                        <option value="">--wybierz--</option>
+                        @foreach ($columns as $column)
+                            <option value="{{ $column->value }}">{{ $column->description }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <label for="columnNumber">Nr kolumny w CSV</label>
+                    <select name="columnNumber[]" id="columnNumber" class="form-control">
+                        <option value="">--wybierz--</option>
+                        @foreach ($csvColumnsNumbers as $number)
+                            <option value="{{ $number }}">{{ $number }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <label for="value">Zamień na</label>
+                    <input type="text" class="form-control" id="value" name="changeTo[]" value="" />
+                </div>
+                <div class="col-md-2">
+                    <label for="conditionColumnNumber">Warunek: nr kolumny CSV</label>
+                    <select name="conditionColumnNumber[]" id="conditionColumnNumber" class="form-control">
+                        <option value="">--wybierz--</option>
+                        @foreach ($csvColumnsNumbers as $number)
+                            <option value="{{ $number }}">{{ $number }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="conditionValue">Warunek: wartość</label>
+                    <input type="text" class="form-control" id="conditionValue" name="conditionValue[]" value="" />
+                </div>
+                <div class="col-md-1 manage-rule">
+                    <a href="#" class="addNewRule inline-block">Dodaj +</a>
+                </div>
+            </div>
         @endif
         <button type="submit" class="btn btn-primary">Zapisz</button>
     </form>
@@ -83,7 +154,7 @@
         $('.addNewRule').click((event) => {
             event.preventDefault();
 
-            copyRuleSchema();
+            copyRuleSchema(event.target);
         });
 
         $('.removeRule').click((event) => {
@@ -94,36 +165,30 @@
 
         prepareRules();
 
-        function copyRuleSchema() {
-            const countRules = $('.rule').length;
+        function copyRuleSchema(clickedItem) {
             const newRule = $('.rule:first').clone(true);
             const id = Math.random().toString(36).substring(7);
 
-            if (countRules >= 2) {
-                newRule.find('.action option[value="searchCompare"]').remove();
-                newRule.find('.action option[value="searchRegex"]').remove();
-            }
-
             newRule.attr('id', id);
+            newRule.find("input[type=text], textarea").val('');
+            newRule.find('.manage-rule .removeRule').remove();
+            newRule.find('select').each(function() {
+                $(this).prop('selectedIndex', 0)
+            });
             newRule.find('.manage-rule').append(() => {
                 return $('<a href="#" class="removeRule inline-block">Usuń +</a>').click(() => {
                     $("#" + id).remove();
                 });
             });
 
-            $('.rule:last').after(newRule);
+            $(clickedItem).closest('.row.rule').after(newRule);
         }
 
         function prepareRules() {
             const $rules = $('.rule');
 
             if ($rules.length) {
-                $rules.each(function (index) {
-                    if (index >= 2) {
-                        $(this).find('.action option[value="searchCompare"]').remove();
-                        $(this).find('.action option[value="searchRegex"]').remove();
-                    }
-
+                $rules.each(function () {
                     const ruleId = Math.random().toString(36).substring(7);
                     $(this).attr('id', ruleId);
 

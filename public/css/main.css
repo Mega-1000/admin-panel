@@ -140,3 +140,14 @@
 .consultant__button--send {
     display: inline-block;
 }
+
+.invoice__visible {
+    color: green;
+    margin: 0px;
+}
+
+.invoice__invisible {
+    color: red;
+    margin: 0px;
+}
+

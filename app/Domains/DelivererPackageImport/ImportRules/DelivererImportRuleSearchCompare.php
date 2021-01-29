@@ -4,29 +4,33 @@ declare(strict_types=1);
 
 namespace App\Domains\DelivererPackageImport\ImportRules;
 
+use App\Domains\DelivererPackageImport\Exceptions\TooManyOrdersInDBException;
 use App\Entities\Order;
-use Illuminate\Support\Collection;
 
-class DelivererImportRuleSearchCompare extends DelivererImportRuleAbstract
+class DelivererImportRuleSearchCompare extends DelivererImportRuleAbstract implements DelivererImportRuleInterface
 {
-    public function run(array $line): ?Order
+    public function run(): ?Order
     {
-        $this->line = $line;
-
-        /* @var $order Collection */
-        $order = $this->findOrder();
-
-        if ($order->count() > 1) {
-            throw new \Exception('Too many orders were found for rule');
+        if (empty($this->getData())) {
+            return null;
         }
 
-        return $order->first();
-    }
+        $order = $this->columnRepository->findOrder($this->getData());
 
-    private function findOrder(): Collection
-    {
-        return $this->orderRepository->findWhere([
-            $this->getDbColumnName()->value => $this->getDataToImport(),
-        ]);
+        if (empty($order)) {
+            return null;
+        }
+
+        if ($order->isNotEmpty() && $order->count() > 1) {
+            throw new TooManyOrdersInDBException(
+                "Znaleziono więcej niż jedno zamówienie w bazie danych dla LP: {$this->getData()}"
+            );
+        }
+
+        if ($order->isNotEmpty() && $order->count() === 1) {
+            return $order->first();
+        }
+
+        return null;
     }
 }

@@ -18,6 +18,8 @@ final class DelivererRulesActionEnum extends Enum
 
     public const GET_AND_REPLACE = 'getAndReplace';
 
+    public const GET_WITH_CONDITION = 'getWithCondition';
+
     public static function getDescription($value): string
     {
         if ($value === self::SEARCH_COMPARE) {
@@ -38,6 +40,10 @@ final class DelivererRulesActionEnum extends Enum
 
         if ($value === self::GET_AND_REPLACE) {
             return 'Pobierz i zastąp';
+        }
+
+        if ($value === self::GET_WITH_CONDITION) {
+            return 'Pobierz pod warunkiem';
         }
 
         return parent::getDescription($value);

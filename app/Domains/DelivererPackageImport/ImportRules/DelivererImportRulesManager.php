@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\Domains\DelivererPackageImport\ImportRules;
 
+use App\Domains\DelivererPackageImport\DelivererImportLogger;
 use App\Domains\DelivererPackageImport\Enums\DelivererRulesActionEnum;
+use App\Domains\DelivererPackageImport\Exceptions\OrderNotFoundException;
 use App\Domains\DelivererPackageImport\Factories\DelivererImportRuleFromEntityFactory;
 use App\Domains\DelivererPackageImport\Repositories\DelivererImportRuleRepositoryEloquent;
 use App\Entities\Deliverer;
@@ -19,6 +21,10 @@ class DelivererImportRulesManager
 
     private $deliverer;
 
+    private $valueUsedToFindOrder;
+
+    public $importLogger;
+
     /* @var $importRules Collection */
     private $importRules;
 
@@ -32,57 +38,95 @@ class DelivererImportRulesManager
     /* @var $getAndReplaceRules Collection */
     private $getAndReplaceRules;
 
+    private $getWithConditionRules;
+
     public function __construct(
         DelivererImportRuleRepositoryEloquent $delivererImportRuleRepositoryEloquent,
-        DelivererImportRuleFromEntityFactory $delivererImportRuleFromEntityFactory
+        DelivererImportRuleFromEntityFactory $delivererImportRuleFromEntityFactory,
+        DelivererImportLogger $delivererImportLogger,
+        Deliverer $deliverer,
+        string $logFileName
     ) {
         $this->delivererImportRulesRepository = $delivererImportRuleRepositoryEloquent;
         $this->delivererImportRuleFromEntityFactory = $delivererImportRuleFromEntityFactory;
-    }
-
-    public function setDeliverer(Deliverer $deliverer): void
-    {
         $this->deliverer = $deliverer;
-    }
 
-    public function prepareRules(): bool
-    {
-        $rules = $this->delivererImportRulesRepository->getDelivererImportRules(
-            $this->deliverer
-        );
+        $this->importLogger = $delivererImportLogger;
+        $this->importLogger->setLogFileName($logFileName);
 
-        if (!empty($rules)) {
-            $this->importRules = $rules->map(function ($item) {
-                return $this->delivererImportRuleFromEntityFactory->create($item);
-            });
-
-            $this->setSearchRules();
-            $this->setSetRules();
-            $this->setGetRules();
-            $this->setGetAndReplaceRules();
-        }
-
-        return !empty($this->importRules);
+        $this->prepareRules();
     }
 
     public function runRules(array $line): void
     {
-        $order = $this->findOrderByRules($line);
+        if (empty($this->importRules)) {
+            throw new \Exception("Brak reguł importu dla kuriera {$this->deliverer->name}");
+        }
+
+        $order = $this->findOrderByRules($line, clone $this->searchRules);
+
+        if (is_null($order)) {
+            throw new OrderNotFoundException($this->valueUsedToFindOrder);
+        }
 
         $this->runSetRules($order, $line);
         $this->runGetRules($order, $line);
         $this->runGetAndReplaceRules($order, $line);
+        $this->runGetWithConditionRules($order, $line);
     }
 
-    private function runGetAndReplaceRules($order, $line): void
+    private function prepareRules(): bool
+    {
+        $rulesEntities = $this->delivererImportRulesRepository->getDelivererImportRules(
+            $this->deliverer
+        );
+
+        if (empty($rulesEntities)) {
+            return false;
+        }
+
+        $this->importRules = $rulesEntities->map(function ($importRuleEntity) {
+            return $this->delivererImportRuleFromEntityFactory->create($importRuleEntity);
+        });
+
+        $this->setSearchRules();
+        $this->setSetRules();
+        $this->setGetRules();
+        $this->setGetAndReplaceRules();
+        $this->setGetWithConditionRules();
+
+        return true;
+    }
+
+    private function runGetAndReplaceRules(Order $order, $line): void
     {
         if ($this->getAndReplaceRules->isNotEmpty()) {
-            $this->getAndReplaceRules->each(function ($rulesGroup, $key) use ($order, $line) {
+            $this->getAndReplaceRules->each(function ($rulesGroup) use ($order, $line) {
                 foreach ($rulesGroup as $rule) {
-                    /* @var $rule DelivererImportRuleInterface */
+                    /* @var $rule DelivererImportRuleAbstract */
                     $rule->setOrder($order);
+                    $rule->setData($line);
+                    $rule->setValueUsedToFindOrder($this->valueUsedToFindOrder);
 
-                    if ($rule->run($line)) {
+                    if ($rule->run()) {
+                        break;
+                    }
+                }
+            });
+        }
+    }
+
+    private function runGetWithConditionRules(Order $order, $line): void
+    {
+        if ($this->getWithConditionRules->isNotEmpty()) {
+            $this->getWithConditionRules->each(function ($rulesGroup) use ($order, $line) {
+                foreach ($rulesGroup as $rule) {
+                    /* @var $rule DelivererImportRuleAbstract */
+                    $rule->setOrder($order);
+                    $rule->setData($line);
+                    $rule->setValueUsedToFindOrder($this->valueUsedToFindOrder);
+
+                    if ($rule->run()) {
                         break;
                     }
                 }
@@ -94,9 +138,11 @@ class DelivererImportRulesManager
     {
         if ($this->getRules->isNotEmpty()) {
             $this->getRules->each(function ($rule) use ($order, $line) {
-                /* @var $rule DelivererImportRuleInterface */
+                /* @var $rule DelivererImportRuleAbstract */
                 $rule->setOrder($order);
-                $rule->run($line);
+                $rule->setData($line);
+                $rule->setValueUsedToFindOrder($this->valueUsedToFindOrder);
+                $rule->run();
             });
         }
     }
@@ -105,25 +151,34 @@ class DelivererImportRulesManager
     {
         if ($this->setRules->isNotEmpty()) {
             $this->setRules->each(function ($rule) use ($order, $line) {
-                /* @var $rule DelivererImportRuleInterface */
+                /* @var $rule DelivererImportRuleAbstract */
                 $rule->setOrder($order);
-                $rule->run($line);
+                $rule->setData($line);
+                $rule->setValueUsedToFindOrder($this->valueUsedToFindOrder);
+                $rule->run();
             });
         }
     }
 
-    private function findOrderByRules(array $line): ?Order
+    private function findOrderByRules(array $line, Collection $searchRules): ?Order
     {
-        if($this->searchRules->isEmpty()) {
+        if ($searchRules->isEmpty()) {
             return null;
         }
 
-        /* @var $ruleToRun DelivererImportRuleInterface */
-        $ruleToRun = $this->searchRules->shift();
+        /* @var $ruleToRun DelivererImportRuleAbstract */
+        $ruleToRun = $searchRules->shift();
 
-        $order = $ruleToRun->run($line);
+        $ruleToRun->setData($line);
+        $order = $ruleToRun->run();
 
-        return empty($order) ? $this->findOrderByRules($line) : $order;
+        $this->valueUsedToFindOrder = $ruleToRun->getParsedData() ?: $ruleToRun->getData();
+
+        if (empty($order)) {
+            return $this->findOrderByRules($line, $searchRules);
+        }
+
+        return $order;
     }
 
     private function setSearchRules(): void
@@ -150,7 +205,16 @@ class DelivererImportRulesManager
             'action',
             DelivererRulesActionEnum::GET_AND_REPLACE
         )->mapToGroups(function ($rule) {
-            /* @var $rule DelivererImportRuleInterface */
+            return [$rule->getImportRuleEntity()->db_column_name => $rule];
+        });
+    }
+
+    private function setGetWithConditionRules(): void
+    {
+        $this->getWithConditionRules = $this->importRules->whereStrict(
+            'action',
+            DelivererRulesActionEnum::GET_WITH_CONDITION
+        )->mapToGroups(function ($rule) {
             return [$rule->getImportRuleEntity()->db_column_name => $rule];
         });
     }

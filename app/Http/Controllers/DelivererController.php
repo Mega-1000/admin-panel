@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Domains\DelivererPackageImport\Builders\DelivererImportRulesBuilder;
 use App\Domains\DelivererPackageImport\Enums\DelivererRulesActionEnum;
 use App\Domains\DelivererPackageImport\Enums\DelivererRulesColumnNameEnum;
+use App\Domains\DelivererPackageImport\Services\DelivererImportLogService;
 use App\Domains\DelivererPackageImport\TransportPaymentImporter;
 use App\Entities\Deliverer;
 use App\Http\DTOs\DelivererCreateImportRulesDTO;
@@ -23,9 +24,14 @@ class DelivererController extends Controller
 {
     private $delivererService;
 
-    public function __construct(DelivererService $delivererService)
-    {
+    private $delivererImportLogService;
+
+    public function __construct(
+        DelivererService $delivererService,
+        DelivererImportLogService $delivererImportLogService
+    ) {
         $this->delivererService = $delivererService;
+        $this->delivererImportLogService = $delivererImportLogService;
     }
 
     public function list(): View
@@ -36,7 +42,7 @@ class DelivererController extends Controller
     public function create(): View
     {
         return view('transport.create', [
-            'columns' => DelivererRulesColumnNameEnum::getValues(),
+            'columns' => DelivererRulesColumnNameEnum::getInstances(),
             'csvColumnsNumbers' => range(1,20),
             'actions' => DelivererRulesActionEnum::getInstances(),
         ]);
@@ -86,7 +92,7 @@ class DelivererController extends Controller
         if ($deliverer = $this->delivererService->findDeliverer($delivererId)) {
             return view('transport.edit', [
                 'deliverer' => $deliverer,
-                'columns' => DelivererRulesColumnNameEnum::getValues(),
+                'columns' => DelivererRulesColumnNameEnum::getInstances(),
                 'csvColumnsNumbers' => range(1,20),
                 'actions' => DelivererRulesActionEnum::getInstances(),
             ]);
@@ -156,6 +162,8 @@ class DelivererController extends Controller
         TransportPaymentsImportRequest $request,
         TransportPaymentImporter $transportPaymentImporter
     ): RedirectResponse {
+        ini_set('max_execution_time', '10000');
+
         $deliverer = $this->delivererService->findDeliverer((int) $request->input('delivererId'));
 
         if (!$deliverer) {
@@ -166,14 +174,15 @@ class DelivererController extends Controller
         }
 
         try {
-            $transportPaymentImporter->import(
+            $uniqueLogFileName = $transportPaymentImporter->import(
                 $deliverer,
                 $this->delivererService->saveFileToImport($request->file('file'))
             );
 
-            return redirect()->route('transportPayment.list')->with([
+            return redirect()->route('orders.index')->with([
                 'message' => __('transport.messages.import-finished'),
                 'alert-type' => 'success',
+                'delivererImportLogFileUrl' => route('deliverer.getImportLog', ['id' => $uniqueLogFileName]),
             ]);
         } catch (\Exception $e) {
             return redirect()->route('orders.index')->with([
@@ -219,5 +228,17 @@ class DelivererController extends Controller
                 'alert-type' => 'success'
             ]);
         }
+    }
+
+    public function getDelivererImportLog(string $id)
+    {
+        if ($this->delivererImportLogService->logFileExists($id)) {
+            return response()->download($this->delivererImportLogService->getLogFilePath($id));
+        }
+
+        return redirect()->route('orders.index')->with([
+            'message' => __('transport.messages.log-file-not-found'),
+            'alert-type' => 'error',
+        ]);
     }
 }

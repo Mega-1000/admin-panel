@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Bank;
 use App\Entities\Auth_code;
 use App\Entities\ColumnVisibility;
 use App\Entities\Deliverer;
@@ -21,7 +22,13 @@ use App\Entities\Task;
 use App\Entities\UserSurplusPayment;
 use App\Entities\UserSurplusPaymentHistory;
 use App\Entities\Warehouse;
+use App\Enums\AllegroExcel\AllegroHeaders;
+use App\Enums\AllegroExcel\OrderHeaders;
+use App\Enums\AllegroExcel\PaymentsHeader;
+use App\Enums\AllegroExcel\SheetNames;
 use App\Enums\LabelStatusEnum;
+use App\Exports\BanksExport;
+use App\Exports\OrdersAllegroExport;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Helpers\GetCustomerForNewOrder;
@@ -68,6 +75,7 @@ use App\Repositories\StatusRepository;
 use App\Repositories\TaskRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
+use App\Services\OrderInvoiceService;
 use App\User;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
@@ -87,7 +95,9 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 use Mailer;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Yajra\DataTables\Facades\DataTables;
 
 /**
@@ -206,6 +216,9 @@ class OrdersController extends Controller
 
     /** @var TaskRepository */
     protected $taskRepository;
+
+    protected $orderInvoiceService;
+
     protected $dtColumns = [
         'clientFirstname' => 'customer_addresses.firstname',
         'clientLastname' => 'customer_addresses.lastname',
@@ -220,32 +233,6 @@ class OrdersController extends Controller
         'sello_payment' => 'sel_tr__transaction.tr_CheckoutFormPaymentId'
     ];
 
-    /**
-     * OrdersController constructor.
-     * @param FirmRepository $repository
-     * @param WarehouseRepository $warehouseRepository
-     * @param OrderRepository $orderRepository
-     * @param CustomerRepository $customerRepository
-     * @param EmployeeRepository $employeeRepository
-     * @param OrderPaymentRepository $orderPaymentRepository
-     * @param CustomerAddressRepository $customerAddressRepository
-     * @param OrderItemRepository $orderItemRepository
-     * @param StatusRepository $statusRepository
-     * @param OrderMessageRepository $orderMessageRepository
-     * @param OrderAddressRepository $orderAddressRepository
-     * @param UserRepository $userRepository
-     * @param ProductPackingRepository $productPackingRepository
-     * @param LabelGroupRepository $labelGroupRepository
-     * @param LabelRepository $labelRepository
-     * @param ProductStockRepository $productStockRepository
-     * @param ProductStockPositionRepository $productStockPositionRepository
-     * @param ProductStockLogRepository $productStockLogRepository
-     * @param FirmRepository $firmRepository
-     * @param ProductRepository $productRepository
-     * @param SpeditionExchangeRepository $speditionExchangeRepository
-     * @param OrderPackageRepository $orderPackageRepository
-     * @param TaskRepository $taskRepository
-     */
     public function __construct(
         FirmRepository $repository,
         WarehouseRepository $warehouseRepository,
@@ -269,7 +256,8 @@ class OrdersController extends Controller
         ProductRepository $productRepository,
         SpeditionExchangeRepository $speditionExchangeRepository,
         OrderPackageRepository $orderPackageRepository,
-        TaskRepository $taskRepository
+        TaskRepository $taskRepository,
+        OrderInvoiceService $orderInvoiceService
     )
     {
         $this->repository = $repository;
@@ -295,6 +283,7 @@ class OrdersController extends Controller
         $this->speditionExchangeRepository = $speditionExchangeRepository;
         $this->orderPackageRepository = $orderPackageRepository;
         $this->taskRepository = $taskRepository;
+        $this->orderInvoiceService = $orderInvoiceService;
     }
 
     /**
@@ -2062,7 +2051,20 @@ class OrdersController extends Controller
             $row->items = \DB::table('order_items')->where('order_id', $row->orderId)->get();
             $row->connected = \DB::table('orders')->where('master_order_id', $row->orderId)->get();
             $row->payments = \DB::table('order_payments')->where('order_id', $row->orderId)->get();
+
             $row->packages = \DB::table('order_packages')->where('order_id', $row->orderId)->get();
+            if ($row->packages) {
+                $row->packages->map(function($item) {
+                    $item->sumOfCosts = DB::table('order_packages_real_cost_for_company')
+                        ->select(DB::raw('SUM(cost) as sum'))
+                        ->where('order_package_id', $item->id)
+                        ->groupBy('order_package_id')
+                        ->first();
+
+                    return $item;
+                });
+            }
+
             $row->otherPackages = \DB::table('order_other_packages')->where('order_id', $row->orderId)->get();
             $row->addresses = \DB::table('order_addresses')->where('order_id', $row->orderId)->get();
             $row->history = Order::where('customer_id', $row->customer_id)->with('labels')->get();
@@ -3042,5 +3044,59 @@ class OrdersController extends Controller
                         ->orWhere('labels.id', Label::PRODUCTION_STOP_ID);
                 });
             });
+    }
+
+    public function generateAllegroPayments(Request $request): BinaryFileResponse
+    {
+        $orderData = [];
+        $allegroPayments = [];
+        $clientPayments = [];
+
+        $orderData[] = $this->prepareHeadersForSheet(SheetNames::ORDER_DATA);
+        $allegroPayments[] = $this->prepareHeadersForSheet(SheetNames::ALLEGRO_PAYMENTS);
+        $clientPayments[] = $this->prepareHeadersForSheet(SheetNames::CLIENT_PAYMENTS);
+
+        $orders = $this->orderRepository->findWhere([
+            ['id', '>=' ,$request->input('allegro_from')],
+            ['id', '<=', $request->input('allegro_to')],
+            ['allegro_transaction_id' , '!=', null]
+        ]);
+
+        $orders->each(function($order) use (&$orderData, &$allegroPayments, &$clientPayments) {
+            $order->getSentPackages()->each(function($package) use ($order, &$orderData, &$allegroPayments, &$clientPayments) {
+                $orderData[] = [$order->id, $package->letter_number, $order->selloTransaction->tr_CheckoutFormId, $order->total_price, $package->cost_for_company, $package->cost_for_client];
+                $allegroPayments[] = [$order->selloTransaction->tr_CheckoutFormId, $order->selloTransaction->tr_CheckoutFormPaymentId];
+                $clientPayments[] = [$order->id, $order->bookedPaymentsSum()];
+            });
+        });
+
+        return Excel::download(new OrdersAllegroExport($orderData, $allegroPayments, $clientPayments), 'allegrox.xlsx');
+    }
+
+    private function prepareHeadersForSheet(string $sheetName): array
+    {
+        switch($sheetName) {
+            case SheetNames::ORDER_DATA:
+                return [
+                    OrderHeaders::getDescription(OrderHeaders::ORDER_ID),
+                    OrderHeaders::getDescription(OrderHeaders::PACKAGE_LETTER_NUMBER),
+                    OrderHeaders::getDescription(OrderHeaders::ALLEGRO_ORDER_ID),
+                    OrderHeaders::getDescription(OrderHeaders::ORDER_SUM),
+                    OrderHeaders::getDescription(OrderHeaders::CLIENT_PACKAGE_COST),
+                    OrderHeaders::getDescription(OrderHeaders::FIRM_PACKAGE_COST)
+                ];
+            case SheetNames::ALLEGRO_PAYMENTS:
+                return [
+                    AllegroHeaders::getDescription(AllegroHeaders::ALLEGRO_ORDER_ID),
+                    AllegroHeaders::getDescription(AllegroHeaders::ALLEGRO_PAYMENT_ID)
+                ];
+            case SheetNames::CLIENT_PAYMENTS:
+                return [
+                    PaymentsHeader::getDescription(PaymentsHeader::ORDER_ID),
+                    PaymentsHeader::getDescription(PaymentsHeader::PAYMENT_SUM)
+                ];
+            default:
+                return [];
+        }
     }
 }
