@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repositories;
 
 use App\Entities\Label;
+use Illuminate\Support\Collection;
 use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
 use App\Entities\Order;
@@ -21,7 +22,7 @@ class OrderRepositoryEloquent extends BaseRepository implements OrderRepository
         $this->pushCriteria(app(RequestCriteria::class));
     }
 
-    public function getOrdersForExcelFile($from, $to)
+    public function getOrdersForExcelFile(string $from, string $to): Collection
     {
         return $this->with([
             'labels'
