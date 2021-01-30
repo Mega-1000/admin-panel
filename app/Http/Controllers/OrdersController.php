@@ -3083,7 +3083,7 @@ class OrdersController extends Controller
                         $order->getOrderProfit(),
                         $package->cost_for_company,
                         $package->cost_for_client,
-                        0
+                        0,
                     ];
                 });
             }
