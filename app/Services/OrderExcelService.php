@@ -10,7 +10,7 @@ use App\Enums\AllegroExcel\PaymentsHeader;
 use App\Enums\AllegroExcel\SheetNames;
 use App\Exports\OrdersAllegroExport;
 use App\Repositories\OrderRepository;
-use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -25,7 +25,7 @@ class OrderExcelService
         $this->orderRepository = $orderRepository;
     }
 
-    public function generateAllegroPaymentsExcel($allegroFrom, $allegroTo): BinaryFileResponse
+    public function generateAllegroPaymentsExcel(string $allegroFrom, string $allegroTo): BinaryFileResponse
     {
         $orderData = [];
         $allegroPayments = [];
@@ -44,7 +44,7 @@ class OrderExcelService
         ), self::EXCEL_FILENAME);
     }
 
-    private function prepareAllegroPayments($orders): array
+    private function prepareAllegroPayments(Collection $orders): array
     {
         $allegroPayments = [];
         $allegroPayments[] = $this->prepareHeadersForSheet(SheetNames::ALLEGRO_PAYMENTS);
@@ -65,7 +65,7 @@ class OrderExcelService
         return $allegroPayments;
     }
 
-    private function prepareClientPayments($orders): array
+    private function prepareClientPayments(Collection $orders): array
     {
         $clientPayments = [];
         $clientPayments[] = $this->prepareHeadersForSheet(SheetNames::CLIENT_PAYMENTS);
@@ -80,7 +80,7 @@ class OrderExcelService
         return $clientPayments;
     }
 
-    private function prepareOrderData($orders): array
+    private function prepareOrderData(Collection $orders): array
     {
         $orderData = [];
         $orderData[] = $this->prepareHeadersForSheet(SheetNames::ORDER_DATA);
