@@ -16,6 +16,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class OrderExcelService
 {
+    const EXCEL_FILENAME = 'allegro.xlsx';
+
     protected $orderRepository;
 
     public function __construct(OrderRepository $orderRepository)
@@ -23,7 +25,7 @@ class OrderExcelService
         $this->orderRepository = $orderRepository;
     }
 
-    public function generateAllegroPaymentsExcel(Request $request): BinaryFileResponse
+    public function generateAllegroPaymentsExcel($allegroFrom, $allegroTo): BinaryFileResponse
     {
         $orderData = [];
         $allegroPayments = [];
@@ -33,9 +35,57 @@ class OrderExcelService
         $allegroPayments[] = $this->prepareHeadersForSheet(SheetNames::ALLEGRO_PAYMENTS);
         $clientPayments[] = $this->prepareHeadersForSheet(SheetNames::CLIENT_PAYMENTS);
 
-        $orders = $this->orderRepository->getOrdersForExcelFile($request->input('allegro_from'), $request->input('allegro_to'));
+        $orders = $this->orderRepository->getOrdersForExcelFile($allegroFrom, $allegroTo);
 
-        $orders->each(function($order) use (&$orderData, &$allegroPayments, &$clientPayments) {
+        return Excel::download(new OrdersAllegroExport(
+            $this->prepareOrderData($orders),
+            $this->prepareAllegroPayments($orders),
+            $this->prepareClientPayments($orders)
+        ), self::EXCEL_FILENAME);
+    }
+
+    private function prepareAllegroPayments($orders): array
+    {
+        $allegroPayments = [];
+        $allegroPayments[] = $this->prepareHeadersForSheet(SheetNames::ALLEGRO_PAYMENTS);
+
+        $orders->each(function($order) use (&$allegroPayments) {
+            if($order->selloTransaction === null) {
+                return true;
+            }
+            $allegroPayments[] = [
+                $order->id,
+                $order->selloTransaction->tr_CheckoutFormPaymentId,
+                $order->promisePaymentsSum(),
+                $order->refund_id,
+                $order->refunded,
+            ];
+        });
+
+        return $allegroPayments;
+    }
+
+    private function prepareClientPayments($orders): array
+    {
+        $clientPayments = [];
+        $clientPayments[] = $this->prepareHeadersForSheet(SheetNames::CLIENT_PAYMENTS);
+
+        $orders->each(function($order) use (&$clientPayments) {
+            $clientPayments[] = [$order->id, $order->bookedPaymentsSum()];
+            if($order->selloTransaction === null) {
+                return true;
+            }
+        });
+
+        return $clientPayments;
+    }
+
+    private function prepareOrderData($orders): array
+    {
+        $orderData = [];
+        $orderData[] = $this->prepareHeadersForSheet(SheetNames::ORDER_DATA);
+
+        $orders->each(function($order) use (&$orderData) {
             if($order->getSentPackages()->count() === 0) {
                 $orderData[] = [
                     $order->id,
@@ -67,21 +117,9 @@ class OrderExcelService
                     ];
                 });
             }
-
-            $clientPayments[] = [$order->id, $order->bookedPaymentsSum()];
-            if($order->selloTransaction === null) {
-                return true;
-            }
-            $allegroPayments[] = [
-                $order->id,
-                $order->selloTransaction->tr_CheckoutFormPaymentId,
-                $order->promisePaymentsSum(),
-                $order->refund_id,
-                $order->refunded,
-            ];
         });
 
-        return Excel::download(new OrdersAllegroExport($orderData, $allegroPayments, $clientPayments), 'allegrox.xlsx');
+        return $orderData;
     }
 
     private function prepareHeadersForSheet(string $sheetName): array

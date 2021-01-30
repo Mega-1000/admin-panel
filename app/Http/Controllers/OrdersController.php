@@ -3050,6 +3050,6 @@ class OrdersController extends Controller
 
     public function downloadAllegroPaymentsExcel(Request $request): BinaryFileResponse
     {
-        return $this->orderExcelService->generateAllegroPaymentsExcel($request);
+        return $this->orderExcelService->generateAllegroPaymentsExcel($request->input('allegro_from'), $request->input('allegro_to'));
     }
 }
