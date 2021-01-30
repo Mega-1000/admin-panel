@@ -77,7 +77,7 @@ class OrderExcelService
                 $order->selloTransaction->tr_CheckoutFormPaymentId,
                 $order->promisePaymentsSum(),
                 $order->refund_id,
-                $order->refunded
+                $order->refunded,
             ];
         });
 
