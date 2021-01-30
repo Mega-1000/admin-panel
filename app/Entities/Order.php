@@ -32,6 +32,8 @@ class Order extends Model implements Transformable
     const COMMENT_WAREHOUSE_TYPE = 'warehouse_comment';
     const COMMENT_CONSULTANT_TYPE = 'consultant_comment';
     const COMMENT_FINANCIAL_TYPE = 'financial_comment';
+    const VAT_VALUE = 1.23;
+
     public $customColumnsVisibilities = [
         'mark',
         'spedition_exchange_invoiced_selector',
@@ -677,7 +679,7 @@ class Order extends Model implements Transformable
         $orderProfit = 0;
 
         foreach ($this->items as $item) {
-            $orderProfit += ($item->gross_selling_price_commercial_unit - ($item->net_purchase_price_commercial_unit * 1.23)) * $item->quantity;
+            $orderProfit += ($item->gross_selling_price_commercial_unit - ($item->net_purchase_price_commercial_unit * self::VAT_VALUE)) * $item->quantity;
         }
 
         $orderProfit += $this->additional_service_cost;
