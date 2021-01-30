@@ -27,14 +27,6 @@ class OrderExcelService
 
     public function generateAllegroPaymentsExcel(string $allegroFrom, string $allegroTo): BinaryFileResponse
     {
-        $orderData = [];
-        $allegroPayments = [];
-        $clientPayments = [];
-
-        $orderData[] = $this->prepareHeadersForSheet(SheetNames::ORDER_DATA);
-        $allegroPayments[] = $this->prepareHeadersForSheet(SheetNames::ALLEGRO_PAYMENTS);
-        $clientPayments[] = $this->prepareHeadersForSheet(SheetNames::CLIENT_PAYMENTS);
-
         $orders = $this->orderRepository->getOrdersForExcelFile($allegroFrom, $allegroTo);
 
         return Excel::download(new OrdersAllegroExport(
