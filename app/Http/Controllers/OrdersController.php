@@ -3068,7 +3068,7 @@ class OrdersController extends Controller
                     $order->getOrderProfit(),
                     '',
                     '',
-                    0
+                    0,
                 ];
             } else {
                 $order->getSentPackages()->each(function($package) use ($order, &$orderData, &$allegroPayments, &$clientPayments) {
