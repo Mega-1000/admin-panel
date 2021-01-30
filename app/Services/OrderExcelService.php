@@ -51,7 +51,7 @@ class OrderExcelService
                     0,
                 ];
             } else {
-                $order->getSentPackages()->each(function($package) use ($order, &$orderData, &$allegroPayments, &$clientPayments) {
+                $order->getSentPackages()->each(function($package) use ($order, &$orderData) {
                     $orderData[] = [
                         $order->id,
                         $package->letter_number,
