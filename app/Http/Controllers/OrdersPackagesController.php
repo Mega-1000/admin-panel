@@ -9,7 +9,6 @@ use App\Entities\ContentType;
 use App\Entities\Order;
 use App\Entities\OrderOtherPackage;
 use App\Entities\OrderPackage;
-use App\Entities\OrderPackageRealCostForCompany;
 use App\Entities\PackageTemplate;
 use App\Entities\PackingType;
 use App\Entities\SelAddress;
@@ -270,12 +269,14 @@ class OrdersPackagesController extends Controller
         }
         $orderPackage->save();
 
-        $orderPackage->realCostForCompany()->create([
-            'order_package_id' => $orderPackage->id,
-            'cost' => PriceFormatter::asAbsolute(
-                PriceFormatter::fromString($data['real_cost_for_company'])
-            ),
-        ]);
+        if ($data['real_cost_for_company']) {
+            $orderPackage->realCostsForCompany()->create([
+                'order_package_id' => $orderPackage->id,
+                'cost' => PriceFormatter::asAbsolute(
+                    PriceFormatter::fromString($data['real_cost_for_company'])
+                ),
+            ]);
+        }
 
         return $orderPackage;
     }
@@ -357,7 +358,6 @@ class OrdersPackagesController extends Controller
                 'shape' => $request->input('shape'),
                 'container_type' => $request->input('container_type'),
                 'notices' => $request->input('notices'),
-                'content' => $request->input('content'),
                 'weight' => $request->input('weight'),
                 'cost_for_client' => $request->input('cost_for_client'),
                 'cost_for_us' => $request->input('cost_for_company'),
