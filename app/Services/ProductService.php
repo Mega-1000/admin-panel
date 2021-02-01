@@ -29,6 +29,9 @@ class ProductService
         ]);
     }
 
+    /**
+     * @return mixed
+     */
     public function getStockProduct(int $productId)
     {
         $similarProducts = $this->checkForSimilarProducts($productId);

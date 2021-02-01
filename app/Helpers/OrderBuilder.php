@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Helpers;
 
@@ -89,7 +90,7 @@ class OrderBuilder
         return $this;
     }
 
-    public function setProductService(ProductService $productService)
+    public function setProductService(ProductService $productService): OrderBuilder
     {
         $this->productService = $productService;
         return $this;
