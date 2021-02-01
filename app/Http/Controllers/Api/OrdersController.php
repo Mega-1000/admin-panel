@@ -25,6 +25,7 @@ use App\Repositories\OrderRepository;
 use App\Http\Controllers\Controller;
 use App\Repositories\ProductRepository;
 use App\Repositories\ProductPriceRepository;
+use App\Services\ProductService;
 use Barryvdh\DomPDF\Facade as PDF;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -137,7 +138,8 @@ class OrdersController extends Controller
             $orderBuilder = new OrderBuilder();
             $orderBuilder
                 ->setPackageGenerator(new BackPackPackageDivider())
-                ->setPriceCalculator(new OrderPriceCalculator());
+                ->setPriceCalculator(new OrderPriceCalculator())
+                ->setProductService(new ProductService($this->productRepository));
             if (empty($data['cart_token'])) {
                 $orderBuilder->setTotalTransportSumCalculator(new TransportSumCalculator)
                     ->setUserSelector(new GetCustomerForNewOrder())

@@ -79,6 +79,9 @@ return [
             'logs' => 'Historia zmian',
             'position_create' => 'Dodaj pozycję w magazynie',
         ],
+        'found_similar_products' => 'Znaleziono produkty z innych działów',
+        'set_product_as_stock_product' => 'Czy ustawić produkt jako główny produkt w zleceniach?',
+        'product_is_stock_product' => 'Produkt jest oznaczony jako główny produkt w zleceniach',
     ],
     'message' => [
         'packet_store' => 'Pakiet produktu został pomyślnie utworzony',

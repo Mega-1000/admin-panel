@@ -20,6 +20,8 @@ use App\Helpers\SelloPriceCalculator;
 use App\Helpers\SelloTransportSumCalculator;
 use App\Helpers\TaskTimeHelper;
 use App\Http\Controllers\OrdersPaymentsController;
+use App\Repositories\ProductRepository;
+use App\Services\ProductService;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
@@ -51,7 +53,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(ProductRepository $productRepository)
     {
         $date = Carbon::now();
         $taskPrimal = Task::create([
@@ -103,7 +105,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $transactionArray['order_items'] = $orderItems;
             try {
                 DB::beginTransaction();
-                $this->buildOrder($transaction, $transactionArray, $products, $transactionGroup, $taskPrimal->id);
+                $this->buildOrder($transaction, $transactionArray, $products, $transactionGroup, $taskPrimal->id, $productRepository);
                 $count++;
                 DB::commit();
             } catch (\Exception $exception) {
@@ -269,7 +271,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         return $products;
     }
 
-    private function buildOrder($transaction, array $transactionArray, $products, $group, $taskPrimalId)
+    private function buildOrder($transaction, array $transactionArray, $products, $group, $taskPrimalId, ProductRepository $productRepository)
     {
         $calculator = new SelloPriceCalculator();
 
@@ -294,7 +296,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             ->setPriceCalculator($calculator)
             ->setPriceOverrider($priceOverrider)
             ->setTotalTransportSumCalculator($transportPrice)
-            ->setUserSelector(new GetCustomerForSello());
+            ->setUserSelector(new GetCustomerForSello())
+            ->setProductService(new ProductService($productRepository));
 
         ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($transactionArray);
 
