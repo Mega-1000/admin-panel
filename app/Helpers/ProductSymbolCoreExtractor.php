@@ -16,6 +16,6 @@ class ProductSymbolCoreExtractor
     {
         preg_match(self::PRODUCT_SYMBOL_CORE_REGEX, $productSymbol, $matches);
 
-        return isset($matches[1]) ? $matches[1] : '';
+        return $matches[1] ?? '';
     }
 }
