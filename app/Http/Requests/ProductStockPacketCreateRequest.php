@@ -16,9 +16,9 @@ class ProductStockPacketCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'packet_quantity' => 'required|integer',
-            'packet_product_quantity' => 'required|integer',
-            'packet_name' => 'required|max:255|string',
+            'packetsQuantity' => 'required|integer',
+            'packetName' => 'required|max:255|string',
+            'products' => 'required'
         ];
     }
 }

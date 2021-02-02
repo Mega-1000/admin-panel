@@ -84,7 +84,8 @@ class Product extends Model implements Transformable
         'value_of_the_order_for_free_transport',
         'show_on_page',
         'trade_group_name',
-        'displayed_group_name'
+        'displayed_group_name',
+        'stock_product'
     ];
 
     public $customColumnsVisibilities = [

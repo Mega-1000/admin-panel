@@ -6,6 +6,8 @@ namespace App\Services;
 
 use App\Enums\ProductStockLogActionEnum;
 use App\Repositories\OrderItemRepository;
+use App\Repositories\ProductRepository;
+use App\Repositories\ProductStockPacketItemRepository;
 use App\Repositories\ProductStockPacketRepository;
 use App\Repositories\ProductStockRepository;
 use Illuminate\Support\Facades\Auth;
@@ -28,13 +30,19 @@ class ProductStockPacketService
 
     protected $productStockService;
 
+    protected $productStockPacketItemRepository;
+
+    protected $productRepository;
+
     public function __construct(
         ProductStockPacketRepository $productStockPacketRepository,
         OrderItemRepository $orderItemRepository,
         ProductStockRepository $productStockRepository,
         ProductStockPositionService $productStockPositionService,
         ProductStockLogService $productStockLogService,
-        ProductStockService $productStockService
+        ProductStockService $productStockService,
+        ProductStockPacketItemRepository $productStockPacketItemRepository,
+        ProductRepository $productRepository
     )
     {
         $this->productStockPacketRepository = $productStockPacketRepository;
@@ -43,6 +51,8 @@ class ProductStockPacketService
         $this->productStockPositionService = $productStockPositionService;
         $this->productStockLogService = $productStockLogService;
         $this->productStockService = $productStockService;
+        $this->productStockPacketItemRepository = $productStockPacketItemRepository;
+        $this->productRepository = $productRepository;
     }
 
     /**
@@ -56,28 +66,23 @@ class ProductStockPacketService
     public function createProductPacket(
         string $packetQuantity,
         string $packetName,
-        string $packetProductQuantity,
-        int $productStockId
+        array $products
     ): void {
-        $packetQuantitySummary = $this->getProductsQuantityInCreatedPackets(
-            intval($packetQuantity),
-            intval($packetProductQuantity)
-        );
-
-        $productStock = $this->productStockRepository->find($productStockId);
-
-        $this->productStockPacketRepository->create([
+        $packet = $this->productStockPacketRepository->create([
             'packet_quantity' => $packetQuantity,
             'packet_name' => $packetName,
-            'packet_product_quantity' => $packetProductQuantity,
-            'product_stock_id' => $productStockId,
         ]);
 
-        $productStockFirstPosition = $productStock->position->first();
+        foreach($products[0] as $productId => $productQuantity) {
+            $this->productStockPacketItemRepository->create([
+                'product_id' => $productId,
+                'product_stock_packet_id' => $packet->id,
+                'quantity' => $productQuantity
+            ]);
 
-        $packetDifference = -abs($packetQuantitySummary);
-
-        $this->updateGlobalAndPositionStockQuantity($productStockFirstPosition, $packetDifference, self::SUBTRACTION_SIGN, $packetQuantitySummary, $productStock);
+            $product = $this->productRepository->find($productId);
+            $this->updateGlobalAndPositionStockQuantity($product->stock->position->first(), -abs($productQuantity), self::SUBTRACTION_SIGN, (int)$productQuantity, $product->stock);
+        }
     }
 
     /**
@@ -93,32 +98,34 @@ class ProductStockPacketService
     }
 
     public function updatePacketQuantity(
-        string $packetQuantity,
         string $packetName,
-        string $packetProductQuantity,
-        int $productStockId,
-        int $packetId
+        string $packetQuantity,
+        array $products,
+        string $packetId
     ): void {
-        $packetQuantity = intval($packetQuantity);
-        $packetProductQuantity = intval($packetProductQuantity);
 
-        $productStockPacket = $this->findPacket($packetId);
+        $packet = $this->productStockPacketRepository->update([
+            'packet_quantity' => $packetQuantity,
+            'packet_name' => $packetName,
+        ], $packetId);
 
-        $currentPacketQuantityDifference = $this->getPacketQuantityDifferenceAfterUpdate(
-            $productStockPacket->packet_quantity,
-            $productStockPacket->packet_product_quantity,
-            $packetQuantity,
-            $packetProductQuantity
-        );
-
-        $productStock = $this->productStockService->findProductStock($productStockId);
-
-        $productStockFirstPosition = $productStock->position->first();
-        $currentPacketQuantity = $this->getProductsQuantityInCreatedPackets($packetQuantity, $packetProductQuantity);
-
-        $this->updateGlobalAndPositionStockQuantity($productStockFirstPosition, $currentPacketQuantityDifference, self::SUBTRACTION_SIGN, $currentPacketQuantity, $productStock);
-
-        $this->updateProductStockPacket($packetQuantity, $packetName, $packetProductQuantity, $productStockId, $packetId);
+        foreach($products as $product) {
+            if($packetItem = $this->productStockPacketItemRepository->findWhere(
+                ['product_id' => $product['id'], 'product_stock_packet_id' => $packetId]
+            )->first()) {
+                $packetItem->update([
+                    'quantity' => $product['quantity']
+                ]);
+            } else {
+                $this->productStockPacketItemRepository->create([
+                    'product_id' => $product['id'],
+                    'product_stock_packet_id' => $packet->id,
+                    'quantity' => $product['quantity']
+                ]);
+            }
+            $product = $this->productRepository->find($product['id']);
+            $this->updateGlobalAndPositionStockQuantity($product->stock->position->first(), -abs($product['quantity']), self::SUBTRACTION_SIGN, (int)$product['id'], $product->stock);
+        }
     }
 
     private function updateProductStockPacket(int $packetQuantity, string $packetName, int $packetProductQuantity, int $productStockId, int $packetId): void

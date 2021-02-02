@@ -2,7 +2,7 @@
 @section('app-header')
     <h1 class="page-title">
         <i class="voyager-book"></i> @lang('product_stock_packets.edit')
-        <a style="margin-left: 15px;" href="{{ route('product_stock_packets.index', ['id' => $productStock->id]) }}"
+        <a style="margin-left: 15px;" href="{{ route('product_stock_packets.index') }}"
            class="btn btn-info install pull-right">
             <span>@lang('product_stock_packets.packet_list')</span>
         </a>
@@ -19,24 +19,10 @@
             </ul>
         </div>
     @endif
-    <form action="{{ action('ProductStockPacketsController@update', ['packetId' => $productStockPacket->id, 'id' => $productStock->id]) }}" method="POST" onsubmit="return checkStockQuantity()">
+    <form action="{{ action('ProductStockPacketsController@update', ['packetId' => $productStockPacket->id]) }}" method="POST">
         {{ csrf_field() }}
+        {{ method_field('PUT') }}
         <div class="product_stocks-general" id="general">
-            <div class="form-group">
-                <label for="name">@lang('product_stocks.form.name')</label>
-                <input type="text" class="form-control" id="name" name="name"
-                       value="{{ $productStock->product->name }}" disabled>
-            </div>
-            <div class="form-group">
-                <label for="symbol">@lang('product_stocks.form.symbol')</label>
-                <input type="text" class="form-control" id="symbol" name="symbol"
-                       value="{{ $productStock->product->symbol }}" disabled>
-            </div>
-            <div class="form-group">
-                <label for="manufacturer">@lang('product_stocks.form.manufacturer')</label>
-                <input type="text" class="form-control" id="manufacturer" name="manufacturer"
-                       value="{{ $productStock->product->manufacturer }}" disabled>
-            </div>
             <div class="form-group">
                 <label for="packet_name">@lang('product_stocks.form.packet_name')</label>
                 <input type="text" class="form-control" id="packet_name" name="packet_name"
@@ -47,13 +33,31 @@
                 <input type="text" class="form-control" id="packet_quantity" name="packet_quantity"
                        value="{{ $productStockPacket->packet_quantity }}">
             </div>
-            <div class="form-group">
-                <label for="packet_product_quantity">@lang('product_stocks.form.packet_product_quantity')</label>
-                <input type="text" class="form-control" id="packet_product_quantity" name="packet_product_quantity"
-                       value="{{ $productStockPacket->packet_product_quantity }}">
+            <h3>@lang('product_stock_packets.form.product_list')</h3>
+            @foreach($productStockPacket->items as $productStockPacketItem)
+                <div class="form-group">
+                    <label for="product__{{ $productStockPacketItem->product_id }}">{{ $productStockPacketItem->product->name }}</label>
+                    <input type="number" class="form-control product" data-product-id="{{ $productStockPacketItem->product_id }}" id="product__{{ $productStockPacketItem->product_id }}" value="{{ $productStockPacketItem->quantity }}" name="packet_quantity_{{ $productStockPacketItem->product_id }}">
+                </div>
+            @endforeach
+            <div id="products__list">
+
             </div>
+            <h3>@lang('product_stock_packets.form.add_product_header')</h3>
+            <select style="margin-left: 10px;" class="form-control text-uppercase selectpicker" data-live-search="true" id="product__select" name="product_id">
+                <option value="" selected="selected">@lang('product_stock_packets.form.choose_product')</option>
+                @foreach($products as $product)
+                    <option value="{{ $product->id }}">
+                        {{ $product->name }}
+                    </option>
+                @endforeach
+            </select>
+            <label for="packet_quantity">@lang('product_stocks.form.packet_product_quantity')</label>
+            <input type="text" class="form-control" id="packet_product_quantity" name="packet_product_quantity">
+            <input type="hidden" id="packet_id" value="{{ $productStockPacket->id }}">
         </div>
-        <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
+        <button id="product__assign" class="btn btn-success">@lang('product_stocks.form.buttons.add_product')</button>
+        <button type="submit" id="update__packet" class="btn btn-primary">@lang('voyager.generic.save')</button>
     </form>
 @endsection
 @include('product_stocks.packets.modals.formModals')

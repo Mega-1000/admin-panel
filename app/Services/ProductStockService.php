@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Repositories\ProductRepository;
 use App\Repositories\ProductStockRepository;
 
 class ProductStockService
 {
     protected $productStockRepository;
+    protected $productRepository;
 
-    public function __construct(ProductStockRepository $productStockRepository)
+    public function __construct(ProductStockRepository $productStockRepository, ProductRepository $productRepository)
     {
         $this->productStockRepository = $productStockRepository;
+        $this->productRepository = $productRepository;
     }
 
     /**
@@ -36,5 +39,20 @@ class ProductStockService
         return $this->productStockRepository->update([
             'quantity' => $stockQuantity,
         ], $productStockId);
+    }
+
+    public function checkProductStock(string $productId, int $productQuantity)
+    {
+        $product = $this->productRepository->find($productId);
+        $productStock = $this->findProductStock($product->stock->id);
+        if($stockPosition = $productStock->position->first()) {
+            if($stockPosition->position_quantity >= $productQuantity) {
+                return ['status' => true, 'message' => __('product_stocks.message.product_add_success')];
+            } else {
+                return ['status' => false, 'message' => __('product_stocks.message.position_quantity_is_smaller')];
+            }
+        } else {
+            return ['status' => false, 'message' => __('product_stocks.message.position_not_exists')];
+        }
     }
 }

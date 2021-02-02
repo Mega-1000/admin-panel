@@ -9,7 +9,7 @@
             </div>
             <div class="modal-body">
                 <h3>Ilość produktów w pakiecie przekracza ilość produktu na stanie.</h3>
-                <h5>Jeśli chcesz dodać stan - kliknij <a href="{{ route('product_stocks.edit', ['id' => $productStock->id, 'tab' => 'positions']) }}" target="_blank">tutaj</a> </h5>
+                <h5>Jeśli chcesz dodać stan - kliknij <a href="" target="_blank">tutaj</a> </h5>
             </div>
         </div>
     </div>
@@ -25,7 +25,7 @@
             </div>
             <div class="modal-body">
                 <h3>Ilość produktów w pakiecie przekracza ilość produktu na pierwszej pozycji</h3>
-                <h5>Jeśli chcesz przenieść stan na pozycję - kliknij <a href="{{ route('product_stocks.edit', ['id' => $productStock->id, 'tab' => 'positions']) }}" target="_blank">tutaj</a> </h5>
+                <h5>Jeśli chcesz przenieść stan na pozycję - kliknij <a href="" target="_blank">tutaj</a> </h5>
             </div>
         </div>
     </div>
@@ -41,7 +41,7 @@
             </div>
             <div class="modal-body">
                 <h3>Produkt nie posiada pozycji w stanach magazynowych</h3>
-                <h5>Jeśli chcesz utworzyć pozycję - kliknij <a href="{{ route('product_stocks.position.create', ['id' => $productStock->id]) }}" target="_blank">tutaj</a> </h5>
+                <h5>Jeśli chcesz utworzyć pozycję - kliknij <a href="" target="_blank">tutaj</a> </h5>
             </div>
         </div>
     </div>

@@ -18,6 +18,10 @@ return [
       'delete' => 'Pakiet został pomyślnie usunięty',
     ],
     'form' => [
+        'product_list' => 'Lista produktów w pakiecie',
+        'add_product_header' => 'Dodawanie produktu do pakietu',
+        'add_product' => 'Dodaj produkt',
+        'choose_product' => 'Wybierz produkt',
         'choose_packet' => 'Wybierz pakiet',
         'name' => 'Nazwa',
         'symbol' => 'Symbol',
@@ -46,6 +50,8 @@ return [
             'positions' => 'Pozycje w magazynie',
             'logs' => 'Historia zmian',
             'position_create' => 'Dodaj pozycję w magazynie',
+            'create' => 'Utwórz nowy pakiet',
+            'add_product' => 'Dodaj produkt do pakietu',
         ],
     ]
 ];
