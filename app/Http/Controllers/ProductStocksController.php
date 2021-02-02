@@ -127,7 +127,7 @@ class ProductStocksController extends Controller
             abort(404);
         }
         $request->merge([
-            'stock_product' => $request->get('stock_product') ? true : false
+            'stock_product' => $request->get('stock_product') ? true : false,
         ]);
 
         $this->repository->update($request->all(), $productStock->id);
