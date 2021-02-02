@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Entities\ColumnVisibility;
 use App\Entities\ProductStock;
 use App\Entities\ProductStockLog;
-use App\Helpers\ProductSymbolCoreExtractor;
 use App\Http\Requests\ProductStockUpdateRequest;
 use App\Repositories\ProductRepository;
 use App\Repositories\ProductStockLogRepository;

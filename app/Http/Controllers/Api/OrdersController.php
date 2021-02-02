@@ -26,8 +26,6 @@ use App\Http\Controllers\Controller;
 use App\Repositories\ProductRepository;
 use App\Repositories\ProductPriceRepository;
 use App\Services\ProductService;
-use Barryvdh\DomPDF\Facade as PDF;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;

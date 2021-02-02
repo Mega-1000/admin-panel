@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Entities\Product;
 use App\Helpers\ProductSymbolCoreExtractor;
 use App\Repositories\ProductRepository;
 
@@ -16,10 +17,7 @@ class ProductService
         $this->productRepository = $productRepository;
     }
 
-    /**
-     * @return mixed
-     */
-    public function checkForSimilarProducts(int $productId)
+    public function checkForSimilarProducts(int $productId): ?Product
     {
         $product = $this->productRepository->find($productId);
         $productSymbolCore = ProductSymbolCoreExtractor::getProductSymbolCore($product->symbol);

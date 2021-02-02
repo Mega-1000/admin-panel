@@ -71,7 +71,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         ]);
 
         $transactions = SelTransaction::all()->groupBy('tr_CheckoutFormPaymentId');
-        $count = $transactions->reduce(function ($count, $transactionGroup) use ($taskPrimal) {
+        $count = $transactions->reduce(function ($count, $transactionGroup) use ($taskPrimal, $productRepository) {
             $isGroup = !empty($transactionGroup->firstWhere('tr_Group', 1));
             if ($isGroup) {
                 $transaction = $transactionGroup->firstWhere('tr_Group', 1);
@@ -271,7 +271,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         return $products;
     }
 
-    private function buildOrder($transaction, array $transactionArray, $products, $group, $taskPrimalId, ProductRepository $productRepository)
+    private function buildOrder($transaction, array $transactionArray, $products, $group, $taskPrimalId, ProductService $productService)
     {
         $calculator = new SelloPriceCalculator();
 
@@ -297,7 +297,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             ->setPriceOverrider($priceOverrider)
             ->setTotalTransportSumCalculator($transportPrice)
             ->setUserSelector(new GetCustomerForSello())
-            ->setProductService(new ProductService($productRepository));
+            ->setProductService($productService);
 
         ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($transactionArray);
 

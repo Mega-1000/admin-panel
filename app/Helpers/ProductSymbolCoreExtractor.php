@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace App\Helpers;
 
-use App\Entities\Customer;
-use App\Entities\Employee;
-use App\Entities\Firm;
-
 class ProductSymbolCoreExtractor
 {
     const PRODUCT_SYMBOL_CORE_REGEX = '/^(.*?)-/';
