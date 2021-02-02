@@ -53,7 +53,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle(ProductRepository $productRepository)
+    public function handle(ProductService $productService)
     {
         $date = Carbon::now();
         $taskPrimal = Task::create([
@@ -71,7 +71,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         ]);
 
         $transactions = SelTransaction::all()->groupBy('tr_CheckoutFormPaymentId');
-        $count = $transactions->reduce(function ($count, $transactionGroup) use ($taskPrimal, $productRepository) {
+        $count = $transactions->reduce(function ($count, $transactionGroup) use ($taskPrimal, $productService) {
             $isGroup = !empty($transactionGroup->firstWhere('tr_Group', 1));
             if ($isGroup) {
                 $transaction = $transactionGroup->firstWhere('tr_Group', 1);
@@ -105,7 +105,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $transactionArray['order_items'] = $orderItems;
             try {
                 DB::beginTransaction();
-                $this->buildOrder($transaction, $transactionArray, $products, $transactionGroup, $taskPrimal->id, $productRepository);
+                $this->buildOrder($transaction, $transactionArray, $products, $transactionGroup, $taskPrimal->id, $productService);
                 $count++;
                 DB::commit();
             } catch (\Exception $exception) {
