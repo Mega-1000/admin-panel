@@ -255,11 +255,12 @@ Route::group(['prefix' => 'admin'], function () {
             'Api\ProductStockPacketsController@checkProductStockForPacketAssign')->name('product_stock_packets.product.stock.check');
         Route::get('products/stocks/packets/{packetId}',
             'ProductStockPacketsController@edit')->name('product_stock_packets.edit');
+        Route::get('products/stocks/packets/{packetId}/product/create',
+            'ProductStockPacketsController@edit')->name('product_stock_packets.edit');
         Route::put('products/stocks/packets',
             'ProductStockPacketsController@update')->name('product_stock_packets.update');
         Route::post('positions/{from}/{to}/quantity/move',
             'ProductStockPositionsController@quantityMove')->name('product_stocks.quantity_move');
-
         Route::get('orders', 'OrdersController@index')->name('orders.index');
         Route::post('orders/update-notices', 'OrdersController@updateNotices')->name('orders.updateNotice');
         Route::post('orders/returnItemsFromStock',
@@ -313,7 +314,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('orders/allegro-new-letter', 'AllegroController@createNewLetter')->name('orders.newLettersFromAllegro');
         Route::post('orders/allegro-new-order', 'AllegroController@createNewOrder')->name('orders.newOrdersFromAllegroComissions');
         Route::post('orders/create-payments', 'OrdersController@createPayments')->name('orders.create-payments');
-        Route::post('orders/generate-allegro-payments', 'OrdersController@generateAllegroPayments')->name('orders.generate-allegro-orders');
+        Route::post('orders/generate-allegro-payments', 'OrdersController@downloadAllegroPaymentsExcel')->name('orders.generate-allegro-orders');
         Route::post('orders/surplus/return', 'OrdersPaymentsController@returnSurplusPayment')->name('orders.returnSurplus');
 
         Route::get('orderPayments/datatable/{id}',
