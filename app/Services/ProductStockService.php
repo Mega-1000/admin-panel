@@ -41,7 +41,7 @@ class ProductStockService
         ], $productStockId);
     }
 
-    public function checkProductStock(string $productId, int $productQuantity)
+    public function checkProductStock(string $productId, string $productQuantity)
     {
         $product = $this->productRepository->find($productId);
         $productStock = $this->findProductStock($product->stock->id);

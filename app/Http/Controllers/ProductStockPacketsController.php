@@ -126,7 +126,7 @@ class ProductStockPacketsController extends Controller
         ]);
     }
 
-    public function update(ProductStockPacketUpdateRequest $request)
+    public function update(ProductStockPacketUpdateRequest $request): RedirectResponse
     {
         $validated = $request->validated();
 
@@ -137,10 +137,10 @@ class ProductStockPacketsController extends Controller
             $validated['id']
         );
 
-//        return redirect()->back()->with([
-//            'message' => __('product_stocks.message.packet_store'),
-//            'alert-type' => 'success',
-//        ]);
+        return redirect()->back()->with([
+            'message' => __('product_stocks.message.packet_store'),
+            'alert-type' => 'success',
+        ]);
     }
 
     public function delete(int $id, int $packetId): RedirectResponse

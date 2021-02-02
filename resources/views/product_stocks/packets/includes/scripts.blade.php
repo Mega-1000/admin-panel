@@ -1,26 +1,4 @@
 <script>
-    {{--function checkStockQuantity() {--}}
-    {{--    let productStockQuantity = {{ $productStock->quantity }};--}}
-    {{--        @if($productStock->position->first())--}}
-    {{--    let productStockFirstPositionQuantity = {{ $productStock->position->first()->position_quantity }};--}}
-    {{--        @else--}}
-    {{--    let productStockFirstPositionQuantity = null;--}}
-    {{--        @endif--}}
-    {{--    let packetQuantityResult = document.getElementById('packet_quantity').value * document.getElementById('packet_product_quantity').value;--}}
-    {{--    if(!productStockFirstPositionQuantity) {--}}
-    {{--        $('#stockPositionMissing').modal('show');--}}
-    {{--        return false;--}}
-    {{--    }--}}
-    {{--    if(productStockQuantity < packetQuantityResult) {--}}
-    {{--        $('#stockQuantityLow').modal('show');--}}
-    {{--        return false;--}}
-    {{--    }--}}
-    {{--    if(productStockQuantity < packetQuantityResult) {--}}
-    {{--        $('#stockPositionQuantityLow').modal('show');--}}
-    {{--        return false;--}}
-    {{--    }--}}
-    {{--    return true;--}}
-    {{--}--}}
     document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('packet_quantity').addEventListener('input', togglePacketProductAddForm);
         document.getElementById('product__assign').addEventListener('click', (e) => {
@@ -48,9 +26,7 @@
         let selectedOptionValue = productSelectElement.value;
         let selectedOptionName = productSelectElement.options[productSelectElement.selectedIndex].text;
         let productQuantityInPacket = document.getElementById('packet_product_quantity').value * document.getElementById('packet_quantity').value;
-        if(checkProductStock(selectedOptionValue, productQuantityInPacket, selectedOptionName)) {
-
-        }
+        checkProductStock(selectedOptionValue, productQuantityInPacket, selectedOptionName);
     }
 
     function renderProductRow(productId, productName, productQuantity) {

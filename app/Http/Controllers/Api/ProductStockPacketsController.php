@@ -43,7 +43,7 @@ class ProductStockPacketsController extends Controller
         return response()->json($data);
     }
 
-    public function checkProductStockForPacketAssign(Request $request)
+    public function checkProductStockForPacketAssign(Request $request): array
     {
         return $this->productStockService->checkProductStock($request->input('productId'), $request->input('productQuantity'));
     }
