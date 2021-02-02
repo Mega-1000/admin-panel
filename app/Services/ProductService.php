@@ -37,7 +37,7 @@ class ProductService
         $similarProducts = $this->checkForSimilarProducts($productId);
 
         return $similarProducts->first(function ($similarProduct) {
-            return $similarProduct->stock_product == true;
+            return $similarProduct->stock_product === true;
         });
     }
 }
