@@ -63,7 +63,7 @@
                 <input type="text" class="form-control" id="manufacturer" name="manufacturer"
                        value="{{ $productStocks->product->manufacturer }}" disabled>
             </div>
-            @if(count($similarProducts) > 0 && $productStocks->product->stock_product != true)
+            @if(count($similarProducts) > 0 && $productStocks->product->stock_product !== true)
                 <div class="form-group">
                     <label for="manufacturer">@lang('product_stocks.form.found_similar_products')</label>
                     @foreach($similarProducts as $similarProduct)
