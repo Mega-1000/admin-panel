@@ -841,6 +841,24 @@
 @section('datatable-scripts')
     <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
     <script>
+        @if (session('stock-response'))
+            let stockResponse = JSON.parse('{!! json_encode(session('stock-response')) !!}');
+            $('#position__errors').empty();
+            $('#quantity__errors').empty();
+            $('#exists__errors').empty();
+            stockResponse.forEach((error) => {
+                if (error.error == '{{ \App\Enums\ProductStockError::POSITION }}') {
+                    $('#position__errors').append(`<h5>{{ __('product_stocks.form.missing_position_for_product') }} <span class="modal__product">${error.productName}</span>. {{ __('product_stocks.form.go_to_create_position') }} <a href="/admin/products/stocks/${error.product}/positions/create" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
+                }
+                if (error.error == '{{ \App\Enums\ProductStockError::QUANTITY }}') {
+                    $('#quantity__errors').append(`<h5>{{ __('product_stocks.form.missing_product_quantity') }} <span class="modal__position">${error.position.position_quantity}</span>. {{ __('product_stocks.form.go_to_move_between_positions') }}<a href="/admin/products/stocks/${error.product}/edit?tab=positions" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
+                }
+                if (error.error == '{{ \App\Enums\ProductStockError::EXISTS }}') {
+                    $('#exists__errors').append(`<h5>{{ __('product_stocks.form.for_product') }} <span class="modal__product">${error.productName}</span> {{ __('product_stocks.form.stock_already_performed') }} {{ __('product_stocks.form.go_to_order') }} <a href="/admin/orders/${error.order_id}/edit" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
+                }
+            })
+            $('#stock_modal').modal('show');
+        @endif
         function taskSelected(select, input, control) {
             let selectedOption = select.options[select.selectedIndex];
             if (selectedOption.dataset.order === '') {
@@ -2348,14 +2366,14 @@
                     $('#quantity__errors').empty();
                     $('#exists__errors').empty();
                     res.forEach((error) => {
-                        if (error.error == 'position') {
-                            $('#position__errors').append(`<h5>Brak pozycji dla produktu: <span class="modal__product">${error.productName}</span>. Przejdź do tworzenia pozycji: <a href="/admin/products/stocks/${error.product}/positions/create" target="_blank">Kliknij tutaj</a>`)
+                        if (error.error == '{{ \App\Enums\ProductStockError::POSITION }}') {
+                            $('#position__errors').append(`<h5>{{ __('product_stocks.form.missing_position_for_product') }} <span class="modal__product">${error.productName}</span>. {{ __('product_stocks.form.go_to_create_position') }} <a href="/admin/products/stocks/${error.product}/positions/create" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
                         }
-                        if (error.error == 'quantity') {
-                            $('#quantity__errors').append(`<h5>Brak wystarczającej ilości produktu na pozycji głównej - ilość: <span class="modal__position">${error.position.position_quantity}</span>. Przejdź do przenoszenia pomiędzy pozycjami: <a href="/admin/products/stocks/${error.product}/edit?tab=positions" target="_blank">Kliknij tutaj</a>`)
+                        if (error.error == '{{ \App\Enums\ProductStockError::QUANTITY }}') {
+                            $('#quantity__errors').append(`<h5>{{ __('product_stocks.form.missing_product_quantity') }} <span class="modal__position">${error.position.position_quantity}</span>. {{ __('product_stocks.form.go_to_move_between_positions') }}<a href="/admin/products/stocks/${error.product}/edit?tab=positions" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
                         }
-                        if (error.error == 'exists') {
-                            $('#exists__errors').append(`<h5>Dla produktu: <span class="modal__product">${error.productName}</span> został już wykonany stan magazynowy. Jeśli chcesz usunąć daną etykietę - przejdź do edycji zamówienia i usuń etykietę na samym dole: <a href="/admin/orders/${error.order_id}/edit" target="_blank">Kliknij tutaj</a>`)
+                        if (error.error == '{{ \App\Enums\ProductStockError::EXISTS }}') {
+                            $('#exists__errors').append(`<h5>{{ __('product_stocks.form.for_product') }} <span class="modal__product">${error.productName}</span> {{ __('product_stocks.form.stock_already_performed') }} {{ __('product_stocks.form.go_to_order') }} <a href="/admin/orders/${error.order_id}/edit" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
                         }
                     })
                     $('#stock_modal').modal('show');
