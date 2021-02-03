@@ -128,7 +128,7 @@ class OrdersController extends Controller
         throw new \Exception("Method deprecated");
     }
 
-    public function newOrder(StoreOrderRequest $request)
+    public function newOrder(StoreOrderRequest $request, ProductService $productService)
     {
         $data = $request->all();
         DB::beginTransaction();
@@ -137,7 +137,7 @@ class OrdersController extends Controller
             $orderBuilder
                 ->setPackageGenerator(new BackPackPackageDivider())
                 ->setPriceCalculator(new OrderPriceCalculator())
-                ->setProductService(new ProductService($this->productRepository));
+                ->setProductService($productService);
             if (empty($data['cart_token'])) {
                 $orderBuilder->setTotalTransportSumCalculator(new TransportSumCalculator)
                     ->setUserSelector(new GetCustomerForNewOrder())

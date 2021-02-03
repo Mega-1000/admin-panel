@@ -84,7 +84,8 @@ class Product extends Model implements Transformable
         'value_of_the_order_for_free_transport',
         'show_on_page',
         'trade_group_name',
-        'displayed_group_name'
+        'displayed_group_name',
+        'stock_product'
     ];
 
     public $customColumnsVisibilities = [
@@ -154,6 +155,10 @@ class Product extends Model implements Transformable
         'gross_purchase_price_aggregate_unit_after_discounts',
         'gross_selling_price_the_largest_unit',
         'gross_purchase_price_the_largest_unit_after_discounts'
+    ];
+
+    protected $casts = [
+        'stock_product' => 'boolean',
     ];
 
     /**

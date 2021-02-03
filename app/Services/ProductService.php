@@ -7,6 +7,7 @@ namespace App\Services;
 use App\Entities\Product;
 use App\Helpers\ProductSymbolCoreExtractor;
 use App\Repositories\ProductRepository;
+use Illuminate\Database\Eloquent\Collection;
 
 class ProductService
 {
@@ -17,7 +18,7 @@ class ProductService
         $this->productRepository = $productRepository;
     }
 
-    public function checkForSimilarProducts(int $productId): ?Product
+    public function checkForSimilarProducts(int $productId): ?Collection
     {
         $product = $this->productRepository->find($productId);
         $productSymbolCore = ProductSymbolCoreExtractor::getProductSymbolCore($product->symbol);
@@ -27,10 +28,7 @@ class ProductService
         ]);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getStockProduct(int $productId)
+    public function getStockProduct(int $productId): ?Product
     {
         $similarProducts = $this->checkForSimilarProducts($productId);
 
