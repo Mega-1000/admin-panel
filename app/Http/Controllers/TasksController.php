@@ -704,7 +704,8 @@ class TasksController extends Controller
             if(!empty($response)) {
                 return redirect()->back()->with([
                     'message' => __('tasks.messages.stocks_invalid'),
-                    'alert-type' => 'error'
+                    'alert-type' => 'error',
+                    'stock-response' => $response->getData(),
                 ]);
             }
             $task->save();
