@@ -183,6 +183,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('packageTemplates/{id}/edit', 'PackageTemplatesController@edit')->name('package_templates.edit');
         Route::put('packageTemplates/{id}/update', 'PackageTemplatesController@update')->name('package_templates.update');
         Route::delete('packageTemplates/{id}/delete', 'PackageTemplatesController@destroy')->name('package_templates.destroy');
+        Route::get('packageTemplate/{id}/data', 'PackageTemplatesController@getPackageTemplate')->name('package_templates.getPackageTemplate');
 
         Route::get('employeeRoles', 'EmployeeRoleController@index')->name('employee_role.index');
         Route::get('employeeRoles/datatable', 'EmployeeRoleController@datatable')->name('employee_role.datatable');
@@ -371,6 +372,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orderPackages/{package_id}/send',
             'OrdersPackagesController@prepareGroupPackageToSend')->name('orders.package.prepareToSend');
         Route::post('orderPackages/changeValue', 'OrdersPackagesController@changeValue')->name('order_packages.changeValue');
+        Route::post('orderPackages/changePackageCosts', 'OrdersPackagesController@changePackageCost')->name('order_packages.changePackageCost');
 
         Route::get('orderMessages/datatable/{id}',
             'OrdersMessagesController@datatable')->name('order_messages.datatable');
