@@ -3438,7 +3438,7 @@
                 .draw();
         });
         $('.changePackageCosts').on('click', (element) => {
-            let packageId = element.target.dataset.packageId;
+            const packageId = element.target.dataset.packageId;
             $('#changePackageCost').val(packageId);
             $('#changePackageCostModal').modal('show');
         });
