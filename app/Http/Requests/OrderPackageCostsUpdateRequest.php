@@ -18,7 +18,7 @@ class OrderPackageCostsUpdateRequest extends FormRequest
             'templateList' => 'nullable|numeric',
             'cost_for_client' => 'required|numeric',
             'cost_for_company' => 'required|numeric',
-            'changePackageCostId' => 'required|numeric'
+            'changePackageCostId' => 'required|numeric',
         ];
     }
 }
