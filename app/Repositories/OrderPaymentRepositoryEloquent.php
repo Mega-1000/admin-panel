@@ -34,7 +34,7 @@ class OrderPaymentRepositoryEloquent extends BaseRepository implements OrderPaym
         return parent::findWhere([
             'order_id' => $orderId,
             'amount' => $amount,
-            'promise' => OrderPaymentPromiseType::PROMISED
+            'promise' => OrderPaymentPromiseType::PROMISED,
         ])->first();
     }
 
