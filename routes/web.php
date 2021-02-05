@@ -372,7 +372,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orderPackages/{package_id}/send',
             'OrdersPackagesController@prepareGroupPackageToSend')->name('orders.package.prepareToSend');
         Route::post('orderPackages/changeValue', 'OrdersPackagesController@changeValue')->name('order_packages.changeValue');
-        Route::post('orderPackages/changePackageCosts', 'OrdersPackagesController@changePackageCost')->name('order_packages.changePackageCost');
+        Route::put('orderPackages/changePackageCosts', 'OrdersPackagesController@changePackageCost')->name('order_packages.changePackageCost');
 
         Route::get('orderMessages/datatable/{id}',
             'OrdersMessagesController@datatable')->name('order_messages.datatable');

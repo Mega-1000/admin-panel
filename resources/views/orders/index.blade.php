@@ -20,6 +20,7 @@
                 <div class="modal-body">
                     <form id="changePackageCostForm" method="POST" action="{{ route('order_packages.changePackageCost') }}">
                         @csrf
+                        {{method_field('put')}}
                         <label for="packageTemplatesList">@lang('order_packages.form.choose_template')</label>
                         <select required name="templateList" class="form-control text-uppercase" id="packageTemplatesList"
                                 form="changePackageCostForm">
