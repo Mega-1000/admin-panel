@@ -89,7 +89,7 @@ class OrderPaymentService
             'promise_date' => $promiseDate ?: null,
             'type' => $type,
             'status' => $isWarehousePayment ? OrderPaymentStatus::PENDING : null,
-            'token' => $token ?: null
+            'token' => $token ?: null,
         ]);
 
         if ($promise == OrderPaymentPromiseType::BOOKED) {
