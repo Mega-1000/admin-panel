@@ -10,8 +10,10 @@ class ProductSymbolCoreExtractor
 
     public static function getProductSymbolCore(string $productSymbol): string
     {
-        preg_match(self::PRODUCT_SYMBOL_CORE_REGEX, $productSymbol, $matches);
+        if (preg_match(self::PRODUCT_SYMBOL_CORE_REGEX, $productSymbol, $matches)) {
+            return $matches[1];
+        }
 
-        return $matches[1] ?? '';
+        return '';
     }
 }
