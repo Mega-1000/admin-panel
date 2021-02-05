@@ -14,26 +14,21 @@ use App\Entities\OrderPayment;
  */
 class OrderPaymentRepositoryEloquent extends BaseRepository implements OrderPaymentRepository
 {
-    /**
-     * Specify Model class name
-     *
-     * @return string
-     */
-    public function model()
+    public function model(): string
     {
         return OrderPayment::class;
     }
 
 
 
-    /**
-     * Boot up the repository, pushing criteria
-     */
-    public function boot()
+    public function boot(): RequestCriteria
     {
         $this->pushCriteria(app(RequestCriteria::class));
     }
 
+    /**
+     * @return mixed
+     */
     public function getPromisedPayment(int $orderId, string $amount)
     {
         return parent::findWhere([
