@@ -20,6 +20,7 @@ use App\Helpers\SelloPriceCalculator;
 use App\Helpers\SelloTransportSumCalculator;
 use App\Helpers\TaskTimeHelper;
 use App\Http\Controllers\OrdersPaymentsController;
+use App\Services\ProductService;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
@@ -51,7 +52,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(ProductService $productService)
     {
         $date = Carbon::now();
         $taskPrimal = Task::create([
@@ -69,7 +70,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         ]);
 
         $transactions = SelTransaction::all()->groupBy('tr_CheckoutFormPaymentId');
-        $count = $transactions->reduce(function ($count, $transactionGroup) use ($taskPrimal) {
+        $count = $transactions->reduce(function ($count, $transactionGroup) use ($taskPrimal, $productService) {
             $isGroup = !empty($transactionGroup->firstWhere('tr_Group', 1));
             if ($isGroup) {
                 $transaction = $transactionGroup->firstWhere('tr_Group', 1);
@@ -103,7 +104,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $transactionArray['order_items'] = $orderItems;
             try {
                 DB::beginTransaction();
-                $this->buildOrder($transaction, $transactionArray, $products, $transactionGroup, $taskPrimal->id);
+                $this->buildOrder($transaction, $transactionArray, $products, $transactionGroup, $taskPrimal->id, $productService);
                 $count++;
                 DB::commit();
             } catch (\Exception $exception) {
@@ -269,7 +270,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         return $products;
     }
 
-    private function buildOrder($transaction, array $transactionArray, $products, $group, $taskPrimalId)
+    private function buildOrder($transaction, array $transactionArray, $products, $group, $taskPrimalId, ProductService $productService)
     {
         $calculator = new SelloPriceCalculator();
 
@@ -294,7 +295,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             ->setPriceCalculator($calculator)
             ->setPriceOverrider($priceOverrider)
             ->setTotalTransportSumCalculator($transportPrice)
-            ->setUserSelector(new GetCustomerForSello());
+            ->setUserSelector(new GetCustomerForSello())
+            ->setProductService($productService);
 
         ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($transactionArray);
 

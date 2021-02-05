@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Helpers;
 
@@ -13,6 +14,7 @@ use App\Helpers\interfaces\iOrderPriceOverrider;
 use App\Helpers\interfaces\iOrderTotalPriceCalculator;
 use App\Helpers\interfaces\iPostOrderAction;
 use App\Helpers\interfaces\iSumable;
+use App\Services\ProductService;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -50,6 +52,8 @@ class OrderBuilder
      */
     private $postOrderActions;
 
+    private $productService;
+
     public function setPackageGenerator(iDividable $generator)
     {
         $this->packageGenerator = $generator;
@@ -83,6 +87,12 @@ class OrderBuilder
     public function setPostOrderActions(iPostOrderAction $postOrderActions)
     {
         $this->postOrderActions = $postOrderActions;
+        return $this;
+    }
+
+    public function setProductService(ProductService $productService): OrderBuilder
+    {
+        $this->productService = $productService;
         return $this;
     }
 
@@ -271,9 +281,11 @@ class OrderBuilder
                 throw new Exception('wrong_product_id');
             }
 
+            $getStockProduct = $this->productService->getStockProduct($product->id);
+
             $orderItem = new OrderItem();
             $orderItem->quantity = $item['amount'];
-            $orderItem->product_id = $product->id;
+            $orderItem->product_id = $getStockProduct ? $getStockProduct->id : $product->id;
             foreach (OrderBuilder::getPriceColumns() as $column) {
                 if (empty($item['recalculate']) && isset($oldPrices[$product->id])) {
                     $orderItem->$column = $oldPrices[$product->id][$column];
