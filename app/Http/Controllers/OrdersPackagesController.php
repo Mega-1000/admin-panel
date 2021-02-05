@@ -961,7 +961,7 @@ class OrdersPackagesController extends Controller
             'cost_for_client' => $validated['cost_for_client'],
             'cost_for_company' => $validated['cost_for_company'],
             'chosen_data_template' => $packageTemplate->name,
-            'symbol' => $packageTemplate->symbol
+            'symbol' => $packageTemplate->symbol,
         ], $validated['changePackageCostId']);
 
         return redirect()->back();
