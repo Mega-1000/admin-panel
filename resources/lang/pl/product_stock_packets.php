@@ -15,7 +15,8 @@ return [
         'packet_create' => 'Stwórz pakiet',
     ],
     'messages' => [
-      'delete' => 'Pakiet został pomyślnie usunięty',
+        'delete' => 'Pakiet został pomyślnie usunięty',
+        'update' => 'Pakiet został pomyślnie zaktualizowany',
     ],
     'form' => [
         'product_list' => 'Lista produktów w pakiecie',

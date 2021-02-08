@@ -251,11 +251,9 @@ Route::group(['prefix' => 'admin'], function () {
             'Api\ProductStockPacketsController@assign')->name('product_stock_packets.assign');
         Route::post('products/stocks/packets/orderItem/{orderItemId}/retain',
             'Api\ProductStockPacketsController@retain')->name('product_stock_packets.retain');
-        Route::post('products/stocks/packets/product/stock/check',
+        Route::get('products/stocks/packets/product/stock/check',
             'Api\ProductStockPacketsController@checkProductStockForPacketAssign')->name('product_stock_packets.product.stock.check');
         Route::get('products/stocks/packets/{packetId}',
-            'ProductStockPacketsController@edit')->name('product_stock_packets.edit');
-        Route::get('products/stocks/packets/{packetId}/product/create',
             'ProductStockPacketsController@edit')->name('product_stock_packets.edit');
         Route::put('products/stocks/packets',
             'ProductStockPacketsController@update')->name('product_stock_packets.update');

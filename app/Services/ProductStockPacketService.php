@@ -123,6 +123,7 @@ class ProductStockPacketService
                     'quantity' => $product['quantity']
                 ]);
             }
+
             $product = $this->productRepository->find($product['id']);
             $this->updateGlobalAndPositionStockQuantity($product->stock->position->first(), -abs($product['quantity']), self::SUBTRACTION_SIGN, (int)$product['id'], $product->stock);
         }
@@ -161,6 +162,8 @@ class ProductStockPacketService
         );
 
         $action = ($currentPacketQuantityDifference < 0) ? ProductStockLogActionEnum::DELETE : ProductStockLogActionEnum::ADD;
+
+        dd($currentPacketQuantityDifference);
 
         $this->productStockLogService->storeProductQuantityChangeLog(
             $productStock->id,

@@ -88,6 +88,6 @@ return [
         'error_quantity' => 'Stan magazynowy danej pozycji nie może być niższy niż 0',
         'position_quantity_is_smaller' => 'Pozycja główna produktu nie posiada wystarczającej ilości produktu',
         'position_not_exists' => 'Pozycja główna produktu nie istnieje. Utwórz nową.',
-        'p' => 'Pomyślnie dodano produkt do pakietu',
+        'packet_product_store' => 'Pomyślnie dodano produkt do pakietu',
     ]
 ];

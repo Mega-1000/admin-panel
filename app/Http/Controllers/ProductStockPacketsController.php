@@ -16,6 +16,7 @@ use App\Services\ProductStockLogService;
 use App\Services\ProductStockPacketService;
 use App\Services\ProductStockPositionService;
 use App\Services\ProductStockService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -126,7 +127,7 @@ class ProductStockPacketsController extends Controller
         ]);
     }
 
-    public function update(ProductStockPacketUpdateRequest $request): RedirectResponse
+    public function update(ProductStockPacketUpdateRequest $request): JsonResponse
     {
         $validated = $request->validated();
 
@@ -137,10 +138,7 @@ class ProductStockPacketsController extends Controller
             $validated['id']
         );
 
-        return redirect()->back()->with([
-            'message' => __('product_stocks.message.packet_store'),
-            'alert-type' => 'success',
-        ]);
+        return response()->json(['status' => true, 'message' => __('product_stock_packets.messages.update')]);
     }
 
     public function delete(int $id, int $packetId): RedirectResponse

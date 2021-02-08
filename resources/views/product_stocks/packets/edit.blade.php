@@ -19,7 +19,7 @@
             </ul>
         </div>
     @endif
-    <form action="{{ action('ProductStockPacketsController@update', ['packetId' => $productStockPacket->id]) }}" method="POST">
+    <form method="POST">
         {{ csrf_field() }}
         {{ method_field('PUT') }}
         <div class="product_stocks-general" id="general">
