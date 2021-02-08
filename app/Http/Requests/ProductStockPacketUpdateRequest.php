@@ -19,7 +19,7 @@ class ProductStockPacketUpdateRequest extends FormRequest
             'packetsQuantity' => 'required|integer',
             'packetName' => 'required|max:255|string',
             'products' => 'required',
-            'id' => 'required'
+            'id' => 'required',
         ];
     }
 }
