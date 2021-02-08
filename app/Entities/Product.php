@@ -85,7 +85,7 @@ class Product extends Model implements Transformable
         'show_on_page',
         'trade_group_name',
         'displayed_group_name',
-        'stock_product'
+        'stock_product',
     ];
 
     public $customColumnsVisibilities = [

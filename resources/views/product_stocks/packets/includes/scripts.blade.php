@@ -59,7 +59,7 @@
 
     function togglePacketProductAddForm(element) {
         let productPacketForm = document.getElementById('product__packet--form');
-        element.target.value ? productPacketForm.style.display = 'block' : productPacketForm.style.display = 'none';
+        productPacketForm.style.display = element.target.value ? 'block' : 'none';
     }
 
     function storePacket() {

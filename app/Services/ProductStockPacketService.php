@@ -77,7 +77,7 @@ class ProductStockPacketService
             $this->productStockPacketItemRepository->create([
                 'product_id' => $productId,
                 'product_stock_packet_id' => $packet->id,
-                'quantity' => $productQuantity
+                'quantity' => $productQuantity,
             ]);
 
             $product = $this->productRepository->find($productId);
@@ -120,7 +120,7 @@ class ProductStockPacketService
                 $this->productStockPacketItemRepository->create([
                     'product_id' => $product['id'],
                     'product_stock_packet_id' => $packet->id,
-                    'quantity' => $product['quantity']
+                    'quantity' => $product['quantity'],
                 ]);
             }
 
