@@ -19,8 +19,6 @@ class OrderPaymentRepositoryEloquent extends BaseRepository implements OrderPaym
         return OrderPayment::class;
     }
 
-
-
     public function boot(): RequestCriteria
     {
         $this->pushCriteria(app(RequestCriteria::class));
@@ -29,7 +27,7 @@ class OrderPaymentRepositoryEloquent extends BaseRepository implements OrderPaym
     /**
      * @return mixed
      */
-    public function getPromisedPayment(int $orderId, string $amount)
+    public function getPromisedPayment(int $orderId, string $amount): ?OrderPayment
     {
         return parent::findWhere([
             'order_id' => $orderId,
