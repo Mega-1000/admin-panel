@@ -113,6 +113,10 @@ class OrderExcelService
             }
         });
 
+        usort($orderData, function ($i1, $i2) {
+            return $i1[0] <=> $i2[0];
+        });
+
         return $orderData;
     }
 
