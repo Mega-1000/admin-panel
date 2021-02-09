@@ -1,7 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Repositories\PackageTemplateRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Entities\PackageTemplate;
 use App\Entities\ContentType;
@@ -10,6 +13,13 @@ use App\Entities\ContainerType;
 
 class PackageTemplatesController extends Controller
 {
+    protected $packageTemplateRepository;
+
+    public function __construct(PackageTemplateRepository $packageTemplateRepository)
+    {
+        $this->packageTemplateRepository = $packageTemplateRepository;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -150,5 +160,10 @@ class PackageTemplatesController extends Controller
         $packageTemplate = PackageTemplate::find($id);
         $packageTemplate->delete();
         return redirect()->route('package_templates.index');
+    }
+
+    public function getPackageTemplate(int $id): JsonResponse
+    {
+        return response()->json($this->packageTemplateRepository->find($id));
     }
 }

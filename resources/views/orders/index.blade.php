@@ -8,6 +8,46 @@
 @endsection
 
 @section('table')
+    <div class="modal fade" tabindex="-1" id="changePackageCostModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Zmień wartości paczki</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="changePackageCostForm" method="POST" action="{{ route('order_packages.changePackageCost') }}">
+                        @csrf
+                        {{method_field('put')}}
+                        <label for="packageTemplatesList">@lang('order_packages.form.choose_template')</label>
+                        <select required name="templateList" class="form-control text-uppercase" id="packageTemplatesList"
+                                form="changePackageCostForm">
+                            <option value="" selected="selected"></option>
+                            @foreach($templateData as $template)
+                                <option value="{{ $template->id }}">{{ $template->name }}</option>
+                            @endforeach
+                        </select>
+                        <div class="form-group">
+                            <label for="cost_for_client">@lang('order_packages.form.cost_for_client')</label>
+                            <input id="cost_for_client" name="cost_for_client" type="text" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="cost_for_company">@lang('order_packages.form.cost_for_company')</label>
+                            <input id="cost_for_company" name="cost_for_company" type="text" class="form-control">
+                        </div>
+                        <input type="hidden" name="changePackageCostId" id="changePackageCost">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" form="changePackageCostForm" class="btn btn-success pull-right">Utwórz
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" tabindex="-1" id="add-custom-task" role="dialog">
         <div class="modal-dialog" id="modalDialog">
             <div class="modal-content">
@@ -882,7 +922,6 @@
                     response.forEach(task => $(select).append(`<option data-order="${task.order_id ?? ''}" class="temporary-option" value="${task.id}">${task.name}</option>`))
                 })
         }
-
         $('#accept-pack').click(event => {
             $("#mark-as-created").modal('show');
         });
@@ -1217,6 +1256,7 @@
 					html += '</div>';
                                     }
                                 }
+                                html += `<button class="btn btn-primary changePackageCosts" data-package-id="${value.id}">@lang('order_packages.form.buttons.changePackageCost')</button>`;
                                 html += '</div>';
                             }
                             if (isProblem) {
@@ -3398,6 +3438,21 @@
                 .search($('#searchLeft').val())
                 .draw();
         });
+        $('.changePackageCosts').on('click', (element) => {
+            const packageId = element.target.dataset.packageId;
+            $('#changePackageCost').val(packageId);
+            $('#changePackageCostModal').modal('show');
+        });
+        $('#packageTemplatesList').on('change', () => {
+            $.ajax({
+                url: laroute.route('package_templates.getPackageTemplate', {id: $('#packageTemplatesList').val()})
+            }).done((data) => {
+                $('#cost_for_client').val(data.approx_cost_client);
+                $('#cost_for_company').val(data.approx_cost_firm);
+            }).catch((error) => {
+                console.error(error);
+            });
+        })
 
     </script>
     <script>
