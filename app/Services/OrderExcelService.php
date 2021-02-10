@@ -85,6 +85,7 @@ class OrderExcelService
                     '',
                     $order->selloTransaction ? $order->selloTransaction->tr_CheckoutFormId : '',
                     $order->getItemsGrossValue(),
+                    $order->shipment_price_for_client,
                     $order->additional_service_cost,
                     $order->additional_cash_on_delivery_cost,
                     $order->getOrderProfit(),
@@ -100,6 +101,7 @@ class OrderExcelService
                         $package->cash_on_delivery ?? 0,
                         $order->selloTransaction ? $order->selloTransaction->tr_CheckoutFormId : '',
                         $order->getItemsGrossValue(),
+                        $order->shipment_price_for_client,
                         $order->additional_service_cost,
                         $order->additional_cash_on_delivery_cost,
                         $order->getOrderProfit(),
@@ -109,6 +111,10 @@ class OrderExcelService
                     ];
                 });
             }
+        });
+
+        usort($orderData, function ($i1, $i2) {
+            return $i1[0] <=> $i2[0];
         });
 
         return $orderData;
@@ -124,6 +130,7 @@ class OrderExcelService
                     OrderHeaders::getDescription(OrderHeaders::CASH_ON_DELIVERY_AMOUNT),
                     OrderHeaders::getDescription(OrderHeaders::ALLEGRO_ORDER_ID),
                     OrderHeaders::getDescription(OrderHeaders::ORDER_ITEMS_SUM),
+                    OrderHeaders::getDescription(OrderHeaders::SHIPMENT_PRICE_FOR_CLIENT),
                     OrderHeaders::getDescription(OrderHeaders::ADDITIONAL_SERVICE_COST),
                     OrderHeaders::getDescription(OrderHeaders::ADDITIONAL_CASH_ON_DELIVERY_COST),
                     OrderHeaders::getDescription(OrderHeaders::ORDER_PROFIT),

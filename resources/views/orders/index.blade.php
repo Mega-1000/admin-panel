@@ -3388,6 +3388,7 @@
         }
 
     </script>
+    <script type="text/javascript" src="{{ URL::asset('js/helpers/render-calendar.js') }}"></script>
     <script>
         $(document).ready(function () {
             localStorage.removeItem('differenceMode');
