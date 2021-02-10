@@ -10,6 +10,7 @@ use App\Repositories\ProductRepository;
 use App\Repositories\ProductStockLogRepository;
 use App\Repositories\ProductStockPositionRepository;
 use App\Repositories\ProductStockRepository;
+use App\Services\ProductService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
@@ -36,17 +37,21 @@ class ProductStocksController extends Controller
      */
     protected $productStockLogRepository;
 
+    protected $productService;
 
     public function __construct(
         ProductStockRepository $repository,
         ProductRepository $productRepository,
         ProductStockPositionRepository $productStockPositionRepository,
-        ProductStockLogRepository $productStockLogRepository
-    ) {
+        ProductStockLogRepository $productStockLogRepository,
+        ProductService $productService
+    )
+    {
         $this->repository = $repository;
         $this->productRepository = $productRepository;
         $this->productStockPositionRepository = $productStockPositionRepository;
         $this->productStockLogRepository = $productStockLogRepository;
+        $this->productService = $productService;
     }
 
     /**
@@ -55,12 +60,11 @@ class ProductStocksController extends Controller
     public function index()
     {
         $visibilities = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('product_stocks'));
-        foreach($visibilities as $key => $row)
-        {
-            $visibilities[$key]->show = json_decode($row->show,true);
-            $visibilities[$key]->hidden = json_decode($row->hidden,true);
+        foreach ($visibilities as $key => $row) {
+            $visibilities[$key]->show = json_decode($row->show, true);
+            $visibilities[$key]->hidden = json_decode($row->hidden, true);
         }
-        return view('product_stocks.index',compact('visibilities'));
+        return view('product_stocks.index', compact('visibilities'));
     }
 
     /**
@@ -70,19 +74,19 @@ class ProductStocksController extends Controller
     public function edit($id)
     {
         $productStocks = ProductStock::where('product_id', $id)->first();
+        $similarProducts = $this->productService->checkForSimilarProducts($id);
         $visibilitiesLogs = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('product_stock_logs'));
-        foreach($visibilitiesLogs as $key => $row)
-        {
-            $visibilitiesLogs[$key]->show = json_decode($row->show,true);
-            $visibilitiesLogs[$key]->hidden = json_decode($row->hidden,true);
+
+        foreach ($visibilitiesLogs as $key => $row) {
+            $visibilitiesLogs[$key]->show = json_decode($row->show, true);
+            $visibilitiesLogs[$key]->hidden = json_decode($row->hidden, true);
         }
         $visibilitiesPosition = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('product_stock_positions'));
-        foreach($visibilitiesPosition as $key => $row)
-        {
-            $visibilitiesPosition[$key]->show = json_decode($row->show,true);
-            $visibilitiesPosition[$key]->hidden = json_decode($row->hidden,true);
+        foreach ($visibilitiesPosition as $key => $row) {
+            $visibilitiesPosition[$key]->show = json_decode($row->show, true);
+            $visibilitiesPosition[$key]->hidden = json_decode($row->hidden, true);
         }
-        return view('product_stocks.edit', compact('visibilitiesLogs','visibilitiesPosition','productStocks', 'id'));
+        return view('product_stocks.edit', compact('visibilitiesLogs', 'visibilitiesPosition', 'productStocks', 'id', 'similarProducts'));
     }
 
     /**
@@ -121,6 +125,9 @@ class ProductStocksController extends Controller
         if (empty($productStock)) {
             abort(404);
         }
+        $request->merge([
+            'stock_product' => $request->get('stock_product') ? true : false,
+        ]);
 
         $this->repository->update($request->all(), $productStock->id);
         $this->productRepository->update($request->all(), $productStock->product_id);
@@ -190,7 +197,7 @@ class ProductStocksController extends Controller
             if ($column['searchable'] == 'true' && !empty($column['search']['value'])) {
                 if (array_key_exists($column['name'], $notSearchable)) {
 
-                }  else {
+                } else {
                     $query->where($column['name'], 'LIKE', "%{$column['search']['value']}%");
                 }
             } else if ($column['name'] == 'quantity' && !empty($column['search']['value'])) {
@@ -255,7 +262,7 @@ class ProductStocksController extends Controller
 
         $groupedProductsStocksChanges = [];
 
-        foreach($productsStocksChanges as $productsStocksChange) {
+        foreach ($productsStocksChanges as $productsStocksChange) {
             $groupedProductsStocksChanges[$productsStocksChange->product_stock_id][] = $productsStocksChange;
         }
 

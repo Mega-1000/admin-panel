@@ -20,4 +20,5 @@ final class OrderHeaders extends Enum implements LocalizedEnum
     const CLIENT_PACKAGE_COST = 'client_package_cost';
     const FIRM_PACKAGE_COST = 'firm_package_cost';
     const REAL_PACKAGE_COST = 'real_package_cost';
+    const SHIPMENT_PRICE_FOR_CLIENT = 'shipment_price_for_client';
 }

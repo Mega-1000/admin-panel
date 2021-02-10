@@ -922,11 +922,13 @@
                     response.forEach(task => $(select).append(`<option data-order="${task.order_id ?? ''}" class="temporary-option" value="${task.id}">${task.name}</option>`))
                 })
         }
+
         $('.changePackageCosts').on('click', (element) => {
             const packageId = element.target.dataset.packageId;
             $('#changePackageCost').val(packageId);
             $('#changePackageCostModal').modal('show');
         });
+
         $('#accept-pack').click(event => {
             $("#mark-as-created").modal('show');
         });
