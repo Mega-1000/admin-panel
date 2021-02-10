@@ -922,12 +922,14 @@
                     response.forEach(task => $(select).append(`<option data-order="${task.order_id ?? ''}" class="temporary-option" value="${task.id}">${task.name}</option>`))
                 })
         }
-
-        $('.changePackageCosts').on('click', (element) => {
-            const packageId = element.target.dataset.packageId;
+        function showPackageCostModal(packageId, dataTemplate, costForClient, costForCompany) {
             $('#changePackageCost').val(packageId);
+            $('#packageTemplatesList option').prop('selected', '');
+            $("#packageTemplatesList option:contains('" + dataTemplate + "')").prop('selected', 'selected');
+            $('#cost_for_client').val(costForClient);
+            $('#cost_for_company').val(costForCompany);
             $('#changePackageCostModal').modal('show');
-        });
+        }
 
         $('#accept-pack').click(event => {
             $("#mark-as-created").modal('show');
@@ -1263,7 +1265,7 @@
 					html += '</div>';
                                     }
                                 }
-                                html += `<button class="btn btn-primary changePackageCosts" data-package-id="${value.id}">@lang('order_packages.form.buttons.changePackageCost')</button>`;
+                                html += `<button class="btn btn-primary" onclick="showPackageCostModal('${value.id}', '${value.chosen_data_template}', '${value.cost_for_client}', '${value.cost_for_company}')">@lang('order_packages.form.buttons.changePackageCost')</button>`;
                                 html += '</div>';
                             }
                             if (isProblem) {
