@@ -934,6 +934,7 @@
             $('#cost_for_company').val(costForCompany);
             $('#changePackageCostModal').modal('show');
         }
+
         $('#accept-pack').click(event => {
             $("#mark-as-created").modal('show');
         });
