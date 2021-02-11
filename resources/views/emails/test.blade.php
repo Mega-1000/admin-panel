@@ -1,0 +1,3 @@
+<body>
+Test mail
+</body>
