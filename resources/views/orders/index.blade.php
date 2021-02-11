@@ -42,7 +42,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
-                    <button type="submit" form="changePackageCostForm" class="btn btn-success pull-right">Utwórz
+                    <button type="submit" form="changePackageCostForm" class="btn btn-success pull-right">@lang('order_packages.form.buttons.change')
                     </button>
                 </div>
             </div>
@@ -925,7 +925,11 @@
         function showPackageCostModal(packageId, dataTemplate, costForClient, costForCompany) {
             $('#changePackageCost').val(packageId);
             $('#packageTemplatesList option').prop('selected', '');
-            $("#packageTemplatesList option:contains('" + dataTemplate + "')").prop('selected', 'selected');
+            if(!isNaN(dataTemplate)) {
+                $('#packageTemplatesList option[value="' + dataTemplate + '"]').prop('selected', 'selected');
+            } else {
+                $("#packageTemplatesList option:contains('" + dataTemplate + "')").prop('selected', 'selected');
+            }
             $('#cost_for_client').val(costForClient);
             $('#cost_for_company').val(costForCompany);
             $('#changePackageCostModal').modal('show');

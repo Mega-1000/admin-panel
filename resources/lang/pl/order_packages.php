@@ -128,6 +128,7 @@ return [
             'messages' => 'Wiadomości',
             'packages' => 'Przesyłki',
             'changePackageCost' => 'Zmień',
+            'change' => 'Zamień',
         ],
         'cancelled_package' => 'Wyślij prośbę o anulowanie przesyłki',
         'maxWeight' => 'Maksymalna waga Paczki u wybranego kuriera',
