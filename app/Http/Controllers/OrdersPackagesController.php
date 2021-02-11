@@ -457,7 +457,7 @@ class OrdersPackagesController extends Controller
         return DataTables::collection($collection)->make(true);
     }
 
-    public function prepareCollection(int $id): Collection
+    public function prepareCollection($id): Collection
     {
         return $this->repository->with(['realCostsForCompany'])->findByField('order_id', $id);
     }
