@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Mail\TestMail;
+use App\Jobs\TestEmailJob;
 use Illuminate\Console\Command;
 
 class SendTestEmail extends Command
@@ -18,8 +18,6 @@ class SendTestEmail extends Command
 
     public function handle()
     {
-        \Mailer::create()
-            ->to('paweljar@gmail.com')
-            ->send(new TestMail());
+        dispatch(new TestEmailJob);
     }
 }
