@@ -50,7 +50,7 @@ class OrderPackage extends Model implements Transformable
         'created_at',
         'actions',
         'waiting_for_cancelled',
-        'reject_cancelled'
+        'reject_cancelled',
     ];
     /**
      * The attributes that are mass assignable.
@@ -82,7 +82,7 @@ class OrderPackage extends Model implements Transformable
         'chosen_data_template',
         'content',
         'send_protocol',
-        'symbol'
+        'symbol',
     ];
 
     /**
