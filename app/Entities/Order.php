@@ -648,6 +648,11 @@ class Order extends Model implements Transformable
         return $this->detailedCommissions()->sum('amount');
     }
 
+    public function paymentsTransactions(): HasMany
+    {
+        return $this->hasMany(OrderPaymentLog::class);
+    }
+
     public function getLastOrder(): int
     {
         return Order::orderBy('id', 'desc')->first()->id;

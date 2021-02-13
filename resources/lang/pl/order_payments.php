@@ -7,6 +7,7 @@ return [
     'edit' => 'Edytuj płatność',
     'list' => 'Wróć do listy płatności',
     'import' => 'Pomyślnie zaimportowano płatności',
+    'show_transaction_history' => 'Wyświetl historię transakcji',
     'table' => [
         'order_id' => 'Numer zlecenia',
         'amount' => 'Kwota',
