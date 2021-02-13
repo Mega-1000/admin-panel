@@ -19,7 +19,7 @@ class OrderPaymentRepositoryEloquent extends BaseRepository implements OrderPaym
         return OrderPayment::class;
     }
 
-    public function boot(): RequestCriteria
+    public function boot(): void
     {
         $this->pushCriteria(app(RequestCriteria::class));
     }
