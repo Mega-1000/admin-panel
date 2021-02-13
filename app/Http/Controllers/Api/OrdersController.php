@@ -25,8 +25,7 @@ use App\Repositories\OrderRepository;
 use App\Http\Controllers\Controller;
 use App\Repositories\ProductRepository;
 use App\Repositories\ProductPriceRepository;
-use Barryvdh\DomPDF\Facade as PDF;
-use Carbon\Carbon;
+use App\Services\ProductService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
@@ -129,7 +128,7 @@ class OrdersController extends Controller
         throw new \Exception("Method deprecated");
     }
 
-    public function newOrder(StoreOrderRequest $request)
+    public function newOrder(StoreOrderRequest $request, ProductService $productService)
     {
         $data = $request->all();
         DB::beginTransaction();
@@ -137,7 +136,8 @@ class OrdersController extends Controller
             $orderBuilder = new OrderBuilder();
             $orderBuilder
                 ->setPackageGenerator(new BackPackPackageDivider())
-                ->setPriceCalculator(new OrderPriceCalculator());
+                ->setPriceCalculator(new OrderPriceCalculator())
+                ->setProductService($productService);
             if (empty($data['cart_token'])) {
                 $orderBuilder->setTotalTransportSumCalculator(new TransportSumCalculator)
                     ->setUserSelector(new GetCustomerForNewOrder())

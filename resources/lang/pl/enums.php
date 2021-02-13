@@ -40,6 +40,7 @@ return [
         OrderHeaders::CLIENT_PACKAGE_COST => 'Zakładany koszt brutto przesyłki dla nas',
         OrderHeaders::FIRM_PACKAGE_COST => 'Zakładany koszt brutto przesyłki dla klienta',
         OrderHeaders::REAL_PACKAGE_COST => 'Oferta - Rzeczywisty koszt brutto przesyłki dla nas',
+        OrderHeaders::SHIPMENT_PRICE_FOR_CLIENT => 'koszt transportu dla całego zlecenia brutto (po uwzględnieniu ustawienia ręcznego)',
     ],
     AllegroHeaders::class => [
         AllegroHeaders::ALLEGRO_ORDER_ID => 'ALLEGRO - numer zamówienia (ID operacji)',

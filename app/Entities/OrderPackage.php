@@ -81,7 +81,8 @@ class OrderPackage extends Model implements Transformable
         'inpost_url',
         'chosen_data_template',
         'content',
-        'send_protocol'
+        'send_protocol',
+        'symbol',
     ];
 
     /**

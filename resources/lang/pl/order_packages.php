@@ -126,13 +126,16 @@ return [
             'payments' => 'Płatności',
             'tasks' => 'Zadania',
             'messages' => 'Wiadomości',
-            'packages' => 'Przesyłki'
+            'packages' => 'Przesyłki',
+            'changePackageCost' => 'Zmień',
+            'change' => 'Zamień',
         ],
         'cancelled_package' => 'Wyślij prośbę o anulowanie przesyłki',
         'maxWeight' => 'Maksymalna waga Paczki u wybranego kuriera',
         'weightVolume' => 'Objętość wagowa [cm3]',
         'cod_cost' => 'Koszt pobrania dla klienta',
         'cod_cost_for_us' => 'Koszt pobrania dla nas',
-        'maxStringLength' => 'Maksymalna ilość znaków w uwagach do spedycji'
+        'maxStringLength' => 'Maksymalna ilość znaków w uwagach do spedycji',
+        'choose_template' => 'Wybierz szablon',
     ]
 ];
