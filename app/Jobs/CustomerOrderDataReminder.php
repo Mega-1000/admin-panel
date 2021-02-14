@@ -36,7 +36,7 @@ class CustomerOrderDataReminder implements ShouldQueue
     public function handle()
     {
         $orders = Order::whereHas('labels', function ($query) {
-            $query->whereIn('id', Label::CUSTOMER_DATA_REMINDER_IDS);
+            $query->whereIn('labels.id', Label::CUSTOMER_DATA_REMINDER_IDS);
         })->get();
 
         foreach($orders as $order) {
