@@ -100,14 +100,14 @@ class ProductStockPacketsController extends Controller
     public function edit(int $packetId): View
     {
         $productStockPacket = $this->repository->find($packetId);
-        $products = $this->productRepository->all();
+        $products = $this->productRepository->findWhere(['deleted_at' => null]);
 
         return view('product_stocks.packets.edit', compact('productStockPacket', 'products'));
     }
 
     public function create(): View
     {
-        $products = $this->productRepository->all();
+        $products = $this->productRepository->findWhere(['deleted_at' => null]);
         return view('product_stocks.packets.create', compact('products'));
     }
 

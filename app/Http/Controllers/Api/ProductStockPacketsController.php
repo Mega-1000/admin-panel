@@ -14,8 +14,8 @@ use Illuminate\Support\Facades\Log;
 
 class ProductStockPacketsController extends Controller
 {
-    protected $productStockPacketService;
-    protected $productStockService;
+    private $productStockPacketService;
+    private $productStockService;
 
     public function __construct(ProductStockPacketService $productStockPacketService, ProductStockService $productStockService) {
         $this->productStockPacketService = $productStockPacketService;
