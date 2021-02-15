@@ -138,8 +138,8 @@ class WarehousesController extends Controller
             abort(404);
         }
         $postal = PostalCodeLatLon::where('postal_code', $request->input('postal_code'))->first();
-        Warehouse::update($request->all(), $warehouse->id);
-        Warehouse::update(['warehouse_email' => $request->input('warehouse-email')], $warehouse->id);
+        $this->repository->update($request->all(), $warehouse->id);
+        $this->repository->update(['warehouse_email' => $request->input('warehouse-email')], $warehouse->id);
 
         $warehouseAddress =  WarehouseAddress::find($id);
         if(!empty($warehouseAddress)) {
@@ -166,7 +166,7 @@ class WarehousesController extends Controller
         }
 
         if(!empty($warehouse->property)) {
-            WarehouseProperty::update([
+            $this->warehousePropertyRepository->update([
                 'firstname' => $request->input('firstname'),
                 'lastname' => $request->input('lastname'),
                 'phone' => $request->input('phone'),
