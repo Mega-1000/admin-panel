@@ -20,6 +20,7 @@ use App\Helpers\SelloPriceCalculator;
 use App\Helpers\SelloTransportSumCalculator;
 use App\Helpers\TaskTimeHelper;
 use App\Http\Controllers\OrdersPaymentsController;
+use App\Services\OrderPaymentService;
 use App\Services\ProductService;
 use App\User;
 use Carbon\Carbon;
@@ -52,7 +53,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle(ProductService $productService)
+    public function handle(ProductService $productService, OrderPaymentService $orderPaymentService)
     {
         $date = Carbon::now();
         $taskPrimal = Task::create([
@@ -70,7 +71,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         ]);
 
         $transactions = SelTransaction::all()->groupBy('tr_CheckoutFormPaymentId');
-        $count = $transactions->reduce(function ($count, $transactionGroup) use ($taskPrimal, $productService) {
+        $count = $transactions->reduce(function ($count, $transactionGroup) use ($taskPrimal, $productService, $orderPaymentService) {
             $isGroup = !empty($transactionGroup->firstWhere('tr_Group', 1));
             if ($isGroup) {
                 $transaction = $transactionGroup->firstWhere('tr_Group', 1);
@@ -104,7 +105,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $transactionArray['order_items'] = $orderItems;
             try {
                 DB::beginTransaction();
-                $this->buildOrder($transaction, $transactionArray, $products, $transactionGroup, $taskPrimal->id, $productService);
+                $this->buildOrder($transaction, $transactionArray, $products, $transactionGroup, $taskPrimal->id, $productService, $orderPaymentService);
                 $count++;
                 DB::commit();
             } catch (\Exception $exception) {
@@ -270,7 +271,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         return $products;
     }
 
-    private function buildOrder($transaction, array $transactionArray, $products, $group, $taskPrimalId, ProductService $productService)
+    private function buildOrder($transaction, array $transactionArray, $products, $group, $taskPrimalId, ProductService $productService, OrderPaymentService $orderPaymentService)
     {
         $calculator = new SelloPriceCalculator();
 
@@ -313,15 +314,15 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
         $order->save();
         if ($transaction->tr_Paid) {
-            $this->createPaymentPromise($order, $transaction);
+            $this->createPaymentPromise($order, $transaction, $orderPaymentService);
             $this->setLabels($order, $taskPrimalId);
         }
     }
 
-    private function createPaymentPromise(Order $order, $transaction)
+    private function createPaymentPromise(Order $order, $transaction, OrderPaymentService $orderPaymentService)
     {
         $amount = $transaction->tr_Payment;
-        OrdersPaymentsController::payOrder($order->id, $amount,
+        $orderPaymentService->payOrder($order->id, $amount,
             null, 1,
             null, Carbon::today()->addDay(7)->toDateTimeString());
     }
