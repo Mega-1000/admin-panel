@@ -24,7 +24,7 @@ class OrderPaymentLogService
         float $clientPaymentAmount,
         float $orderPaymentAmount,
         string $createdAt,
-        string $notices,
+        ?string $notices,
         string $amount,
         string $type,
         bool $sign
