@@ -18,12 +18,12 @@
             padding-top: 20px;
             font: 10px Arial, Helvetica, sans-serif;
         }
-        
+
         .quantity {
             font-size: 1.5em;
             font-weight: bold;
         }
-        
+
         .wz__image {
             width: 100px;
         }
@@ -39,16 +39,15 @@
     @endif
     <div style="position:absolute; right:40px; top:0px;">
         <h2 style="display: inline-block">
-            MEGA 1000 BIS SP Z O O<br/>
-            ZEROMSKIEGO 52/18<br/>
-            50-312 WROCLAW<br/>
-            NIP: 8971719229
+            ELEKTRONICZNA PLATFORMA HANDLOWA<br/>
+            UL. IWASZKIEWICZA 15A<br/>
+            55-200 OŁAWA<br/>
+            NIP: 9121027907
         </h2>
     </div>
 
     Waga zamowienia: {{ $order->weight }}<br/><br/>
 
-    <b>ZALICZKA - ZAKSIEGOWANA:</b> {{ $order->payments->sum('amount') }}<br/>
     <b>Data nadania przesylki:</b> {{ $tagHelper->cargoSentDate() }}<br/>
 
     {{--<b>uwagi klienta:</b> <br/>--}}
