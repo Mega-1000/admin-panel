@@ -2,12 +2,14 @@
 
 namespace App\Jobs;
 
+use App\Entities\Label;
 use App\Entities\Order;
 use App\Jobs\WarehouseStocks\ChangeWarehouseStockJob;
 use App\Mail\ConfirmData;
 use App\Mail\DifferentCustomerData;
 use App\Repositories\LabelRepository;
 use App\Repositories\OrderRepository;
+use App\Services\OrderWarehouseNotificationService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -41,11 +43,11 @@ class RemoveLabelJob extends Job
         $this->time = $time;
     }
 
-    /**
-     * Execute the job.
-     *
-     */
-    public function handle(OrderRepository $orderRepository, LabelRepository $labelRepository)
+    public function handle(
+        OrderRepository $orderRepository,
+        LabelRepository $labelRepository,
+        OrderWarehouseNotificationService $orderWarehouseNotificationService
+    )
     {
         if (!($this->order instanceof Order)) {
             $this->order = $orderRepository->find($this->order);
@@ -83,6 +85,10 @@ class RemoveLabelJob extends Job
 
                     }
                 }
+            }
+
+            if($labelId == Label::PACKAGE_NOTIFICATION_SENT_LABEL) {
+                $orderWarehouseNotificationService->removeNotifications($this->order->id);
             }
 
             $label = $labelRepository->find($labelId);
