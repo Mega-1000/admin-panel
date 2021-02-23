@@ -63,6 +63,25 @@
                 <input type="text" class="form-control" id="manufacturer" name="manufacturer"
                        value="{{ $productStocks->product->manufacturer }}" disabled>
             </div>
+            @if(count($similarProducts) > 0 && $productStocks->product->stock_product !== true)
+                <div class="form-group">
+                    <label for="manufacturer">@lang('product_stocks.form.found_similar_products')</label>
+                    @foreach($similarProducts as $similarProduct)
+                      <h4>@lang('product_stocks.form.symbol'): {{ $similarProduct->symbol }}</h4>
+                    @endforeach
+                    <label for="stock_product">@lang('product_stocks.form.set_product_as_stock_product')</label>
+                    <input type="checkbox" id="stock_product" name="stock_product">
+                </div>
+            @else
+                <div class="form-group">
+                    <label for="manufacturer">@lang('product_stocks.form.found_similar_products')</label>
+                    @foreach($similarProducts as $similarProduct)
+                        <h4>@lang('product_stocks.form.symbol'): {{ $similarProduct->symbol }}</h4>
+                    @endforeach
+                    <label for="stock_product">@lang('product_stocks.form.product_is_stock_product')</label>
+                    <input type="checkbox" id="stock_product" name="stock_product" checked>
+                </div>
+            @endif
         </div>
         <div class="product_stocks-stocks" id="stocks">
             <div class="form-group">

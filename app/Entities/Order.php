@@ -648,6 +648,11 @@ class Order extends Model implements Transformable
         return $this->detailedCommissions()->sum('amount');
     }
 
+    public function paymentsTransactions(): HasMany
+    {
+        return $this->hasMany(OrderPaymentLog::class);
+    }
+
     public function getLastOrder(): int
     {
         return Order::orderBy('id', 'desc')->first()->id;
@@ -679,7 +684,7 @@ class Order extends Model implements Transformable
         $orderProfit = 0;
 
         foreach ($this->items as $item) {
-            $orderProfit += ($item->gross_selling_price_commercial_unit - ($item->net_purchase_price_commercial_unit * self::VAT_VALUE)) * $item->quantity;
+            $orderProfit += ($item->gross_selling_price_commercial_unit - ($item->net_purchase_price_commercial_unit_after_discounts * self::VAT_VALUE)) * $item->quantity;
         }
 
         $orderProfit += $this->additional_service_cost;

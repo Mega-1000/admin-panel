@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
@@ -17,6 +18,7 @@ use App\Helpers\DateHelper;
 use App\Helpers\OrderPackagesDataHelper;
 use App\Helpers\PdfCharactersHelper;
 use App\Http\Requests\GetProtocolRequest;
+use App\Http\Requests\OrderPackageCostsUpdateRequest;
 use App\Http\Requests\OrderPackageCreateRequest;
 use App\Http\Requests\OrderPackageUpdateRequest;
 use App\Integrations\GLS\GLSClient;
@@ -27,11 +29,13 @@ use App\Mail\SendDailyProtocolToDeliveryFirmMail;
 use App\Repositories\FirmRepository;
 use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderRepository;
+use App\Repositories\PackageTemplateRepository;
 use Barryvdh\DomPDF\Facade as PDF;
 use Carbon\Carbon;
 use iio\libmergepdf\Merger;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
@@ -47,39 +51,30 @@ use Yajra\DataTables\Facades\DataTables;
  */
 class OrdersPackagesController extends Controller
 {
-    /**
-     * @var OrderPackageRepository
-     */
     protected $repository;
 
-    /** @var OrderRepository */
     protected $orderRepository;
 
-    /** @var OrderPackagesDataHelper */
     protected $orderPackagesDataHelper;
 
-    /**
-     * @var FirmRepository
-     */
     protected $firmRepository;
 
-    /**
-     * OrdersPackagesController constructor.
-     * @param OrderPackageRepository $repository
-     * @param OrderRepository $orderRepository
-     * @param OrderPackagesDataHelper $orderPackagesDataHelper
-     */
+    protected $packageTemplateRepository;
+
+
     public function __construct(
         OrderPackageRepository $repository,
         OrderRepository $orderRepository,
         OrderPackagesDataHelper $orderPackagesDataHelper,
-        FirmRepository $firmRepository
+        FirmRepository $firmRepository,
+        PackageTemplateRepository $packageTemplateRepository
     )
     {
         $this->repository = $repository;
         $this->orderRepository = $orderRepository;
         $this->orderPackagesDataHelper = $orderPackagesDataHelper;
         $this->firmRepository = $firmRepository;
+        $this->packageTemplateRepository = $packageTemplateRepository;
     }
 
 
@@ -462,7 +457,7 @@ class OrdersPackagesController extends Controller
         return DataTables::collection($collection)->make(true);
     }
 
-    public function prepareCollection(int $id): Collection
+    public function prepareCollection($id): Collection
     {
         return $this->repository->with(['realCostsForCompany'])->findByField('order_id', $id);
     }
@@ -954,5 +949,21 @@ class OrdersPackagesController extends Controller
             $file = Storage::disk('private')->get('labels/gls/' . $package->sending_number . '.pdf');
         }
         return $file;
+    }
+
+    public function changePackageCost(OrderPackageCostsUpdateRequest $request): RedirectResponse
+    {
+        $validated = $request->validated();
+
+        $packageTemplate = $this->packageTemplateRepository->find($validated['templateList']);
+
+        $this->repository->update([
+            'cost_for_client' => $validated['cost_for_client'],
+            'cost_for_company' => $validated['cost_for_company'],
+            'chosen_data_template' => $packageTemplate->name,
+            'symbol' => $packageTemplate->symbol,
+        ], $validated['changePackageCostId']);
+
+        return redirect()->back();
     }
 }

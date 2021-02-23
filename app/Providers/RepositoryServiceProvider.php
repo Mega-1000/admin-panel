@@ -71,8 +71,10 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(\App\Repositories\PaymentImportRepository::class, \App\Repositories\PaymentImportRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\ReportPropertyRepository::class, \App\Repositories\ReportPropertyRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\ReportDailyRepository::class, \App\Repositories\ReportDailyRepositoryEloquent::class);
+        $this->app->bind(\App\Repositories\OrderPaymentLogRepository::class, \App\Repositories\OrderPaymentLogRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\ProductStockPacketRepository::class, \App\Repositories\ProductStockPacketRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\ProductStockPacketItemRepository::class, \App\Repositories\ProductStockPacketItemRepositoryEloquent::class);
+        $this->app->bind(\App\Repositories\PackageTemplateRepository::class, \App\Repositories\PackageTemplateRepositoryEloquent::class);
         //:end-bindings:
     }
 }

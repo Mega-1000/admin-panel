@@ -30,6 +30,7 @@ class ProductStockUpdateRequest extends FormRequest
             'unit' => 'nullable|string',
             'start_quantity' => 'nullable|integer',
             'number_on_a_layer' => 'nullable|integer',
+            'stock_product' => 'nullable',
         ];
     }
 }
