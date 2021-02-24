@@ -36,7 +36,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\Orders\TriggerOrderLabelSchedulersJob::class)->everyFiveMinutes();
         $schedule->job(Jobs\AddNewWorkHourForUsers::class)->dailyAt("00:01");
         $schedule->job(Jobs\CheckTasksFromYesterdayJob::class)->dailyAt("00:01");
-        $schedule->job(Jobs\WarehouseDispatchPendingReminderJob::class)->everyFifteenMinutes()->between('9:00', '17:00');
+        $schedule->job(Jobs\WarehouseDispatchPendingReminderJob::class)->everyThirtyMinutes()->between('9:00', '17:00');
         $schedule->job(Jobs\CheckPromisePaymentsDates::class)->everyMinute();
         $schedule->job(Jobs\ValidateSubiekt::class)->everyFiveMinutes();
         // $schedule->job(Jobs\ChangeOrderInvoiceData::class)->dailyAt("07:00");
@@ -44,8 +44,8 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\ImportCsvFileJob::class)->everyMinute();
         $schedule->job(Jobs\ImportOrdersFromSelloJob::class)->cron('0 6,11,17,22 * * *');
         $schedule->job(Jobs\UpdatePackageRealCostJob::class)->dailyAt("00:30");
-        $schedule->job(Jobs\CheckIfInvoicesExistInOrders::class)->dailyAt("07:00");
-        $schedule->job(Jobs\UrgentInvoiceRequest::class)->everyFifteenMinutes()->between('9:00', '17:00');
+        // $schedule->job(Jobs\CheckIfInvoicesExistInOrders::class)->dailyAt("07:00");
+        // $schedule->job(Jobs\UrgentInvoiceRequest::class)->everyFifteenMinutes()->between('9:00', '17:00');
         $schedule->job(Jobs\CheckForHangedChats::class)->cron('0,15,30,45 7-17 * * 1-5');
         $schedule->job(Jobs\ConfirmSentPackagesJob::class)->dailyAt("23:34");
         $schedule->job(Jobs\AutomaticallyFinishOrdersJob::class)->everyFifteenMinutes();
