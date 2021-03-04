@@ -8,12 +8,8 @@ class ProductSymbolCoreExtractor
 {
     const PRODUCT_SYMBOL_CORE_REGEX = '/^(.*?)-/';
 
-    public static function getProductSymbolCore(string $productSymbol): string
+    public static function getProductSymbolCore(string $productSymbol)
     {
-        if (preg_match(self::PRODUCT_SYMBOL_CORE_REGEX, $productSymbol, $matches)) {
-            return $matches[1];
-        }
-
-        return '';
+        return strstr($productSymbol, '-', true) ?: $productSymbol;
     }
 }
