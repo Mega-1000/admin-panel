@@ -6,9 +6,7 @@ namespace App\Helpers;
 
 class ProductSymbolCoreExtractor
 {
-    const PRODUCT_SYMBOL_CORE_REGEX = '/^(.*?)-/';
-
-    public static function getProductSymbolCore(string $productSymbol)
+    public static function getProductSymbolCore(string $productSymbol): string
     {
         return strstr($productSymbol, '-', true) ?: $productSymbol;
     }
