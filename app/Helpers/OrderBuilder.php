@@ -286,6 +286,7 @@ class OrderBuilder
             $orderItem = new OrderItem();
             $orderItem->quantity = $item['amount'];
             $orderItem->product_id = $getStockProduct ? $getStockProduct->id : $product->id;
+            Log::info('Bazowe id produktu: ' . $product->id . ' oraz symbol' . $product->symbol . '. Wynikowe id produktu: ' . $orderItem->product_id);
             foreach (OrderBuilder::getPriceColumns() as $column) {
                 if (empty($item['recalculate']) && isset($oldPrices[$product->id])) {
                     $orderItem->$column = $oldPrices[$product->id][$column];
