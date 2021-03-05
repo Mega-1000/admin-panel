@@ -118,7 +118,7 @@ class ProductStocksController extends Controller
                 }
             }
             $this->productStockPositionRepository->update(['position_quantity' => $calc], $request->select_position);
-            $this->createLog($request->different, $request->id, $itemPosition->id);
+            $this->createLog($request->different, $request->id, $itemPosition->id, $calc);
         }
         $productStock = $this->repository->find($request->id);
 

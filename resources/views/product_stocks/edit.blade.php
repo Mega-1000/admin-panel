@@ -561,15 +561,12 @@
                     }
                 },
                 {
-                    data: 'id',
-                    name: 'quantity_after_action',
-                    render: function(id, type, row) {
-                       return '';
-                    }
-                },
-                {
                     data: 'quantity',
                     name: 'quantity'
+                },
+                {
+                    data: 'stock_quantity_after_action',
+                    name: 'stock_quantity_after_action'
                 },
                 {
                     data: 'order_id',

@@ -42,7 +42,7 @@ class ProductStockPositionsController extends Controller
         }
         $quantity = $productStock->quantity + $positionQuantity;
         $productStock->update(['quantity' => $quantity]);
-        $this->createLog('+' . $request->position_quantity, $productStock->id, $productStockPosition->id);
+        $this->createLog('+' . $request->position_quantity, $productStock->id, $productStockPosition->id, $quantity);
 
         return redirect()->route('product_stocks.edit', ['id' => $request->id, 'tab' => 'positions'])->with([
             'message' => __('product_stock_positions.message.store'),
@@ -97,7 +97,7 @@ class ProductStockPositionsController extends Controller
                 }
             }
             $productStock->update(['quantity' => $calc]);
-            $this->createLog($request->different, $productStock->id, $productStockPosition->id);
+            $this->createLog($request->different, $productStock->id, $productStockPosition->id, $calc);
         }
         $productStockPosition->update($request->all());
 
@@ -135,7 +135,7 @@ class ProductStockPositionsController extends Controller
         $quantity = $productStock->quantity - $positionQuantity;
         $productStock->update(['quantity' => $quantity]);
         $productStockPosition->delete();
-        // $this->createLog('-' . $positionQuantity, $productStock->id, $productStockPosition->id);
+        $this->createLog('-' . $positionQuantity, $productStock->id, $productStockPosition->id, $quantity);
         return redirect()->route('product_stocks.edit', ['id' => $id, 'tab' => 'positions'])->with([
             'message' => __('product_stock_positions.message.delete'),
             'alert-type' => 'info'
