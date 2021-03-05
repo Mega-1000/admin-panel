@@ -38,6 +38,7 @@ class User extends \TCG\Voyager\Models\User
     ];
     const OLAWA_USER_ID = 37;
     const CONTACT_PHONE = 691801594;
+    const ORDER_DELETE_USER = 12;
 
     const ID = 'id';
     const NAME = 'name';

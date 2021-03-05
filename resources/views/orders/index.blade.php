@@ -1596,7 +1596,7 @@
                         html += '<i class="voyager-edit"></i>';
                         html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
                         html += '</a>';
-                        @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 2)
+                        @if((Auth::user()->role_id == 1 || Auth::user()->role_id == 2) && Auth::user()->id === \App\User::ORDER_DELETE_USER)
                             html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecord(' + id + ')">';
                         html += '<i class="voyager-trash"></i>';
                         html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
