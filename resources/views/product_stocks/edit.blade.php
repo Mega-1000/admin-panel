@@ -147,6 +147,7 @@
                     <th>@lang('product_stock_logs.table.product_stock_position_id')</th>
                     <th>@lang('product_stock_logs.table.action')</th>
                     <th>@lang('product_stock_logs.table.quantity')</th>
+                    <th>@lang('product_stock_logs.table.quantity_after_action')</th>
                     <th>@lang('product_stock_logs.table.order_id')</th>
                     <th>@lang('product_stock_logs.table.username')</th>
                     <th>@lang('product_stock_logs.table.firstname')</th>
@@ -306,7 +307,7 @@
     </script>
     <script>
         const deleteRecordPositions = (id) =>{
-            $('#delete_form')[0].action = "/admin/products/stocks/{{$productStocks->id}}/positions/" + id + "/";
+            $('#delete_form')[0].action = "/admin/products/stocks/{{$productStocks->id}}/positions/" + id;
             $('#delete_modal').modal('show');
         };
         $.fn.dataTable.ext.errMode = 'throw';
@@ -557,6 +558,13 @@
                         } else {
                             return '<span style="color: red;">' + {!! json_encode(__('product_stock_logs.table.delete'), true) !!} + '</span>';
                         }
+                    }
+                },
+                {
+                    data: 'id',
+                    name: 'quantity_after_action',
+                    render: function(id, type, row) {
+                       return '';
                     }
                 },
                 {
