@@ -117,6 +117,13 @@ class ProductStockPositionsController extends Controller
     {
         $productStockPosition = ProductStockPosition::find($position_id);
 
+        if($productStockPosition->position_quantity != 0) {
+            return redirect()->route('product_stocks.edit', ['id' => $id, 'tab' => 'positions'])->with([
+                'message' => __('product_stock_positions.message.quantity_set'),
+                'alert-type' => 'error'
+            ]);
+        }
+
         if (empty($productStockPosition)) {
             abort(404);
         }
@@ -127,8 +134,8 @@ class ProductStockPositionsController extends Controller
         }
         $quantity = $productStock->quantity - $positionQuantity;
         $productStock->update(['quantity' => $quantity]);
-        $productStockPosition->delete($productStockPosition->id);
-        $this->createLog('-' . $positionQuantity, $productStock->id, $productStockPosition->id);
+        $productStockPosition->delete();
+        // $this->createLog('-' . $positionQuantity, $productStock->id, $productStockPosition->id);
         return redirect()->route('product_stocks.edit', ['id' => $id, 'tab' => 'positions'])->with([
             'message' => __('product_stock_positions.message.delete'),
             'alert-type' => 'info'
