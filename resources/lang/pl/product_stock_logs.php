@@ -15,7 +15,8 @@ return [
         'add' => 'Dodawanie',
         'delete' => 'Odejmowanie',
         'created_at' => 'Utworzone w',
-        'order_id' => 'Numer zlecenia'
+        'order_id' => 'Numer zlecenia',
+        'quantity_after_action' => 'Ilość jaka pozostała po wykonanej akcji'
     ],
     'form' => [
         'product_stock_id' => 'ID stanu magazynowego',

@@ -27,7 +27,8 @@ class ProductStockLog extends Model implements Transformable
         'action',
         'quantity',
         'user_id',
-        'order_id'
+        'order_id',
+        'stock_quantity_after_action'
     ];
 
     /**
