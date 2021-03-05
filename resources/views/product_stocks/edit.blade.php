@@ -564,7 +564,6 @@
                     data: 'id',
                     name: 'quantity_after_action',
                     render: function(id, type, row) {
-                       console.log(row);
                        return '';
                     }
                 },
