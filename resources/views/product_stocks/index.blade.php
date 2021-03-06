@@ -160,11 +160,23 @@
                         let html = '';
                         if (row.positions) {
                             row.positions.forEach(function (position) {
-                                html += 'Alejka: ' + position.lane + ' Regał: ' + position.bookstand + ' Półka: ' + position.shelf + ' Pozycja: ' + position.position + ' Ilość: ' + position.position_quantity + '<br/><br/>';
+                                html += 'Alejka: ' + position.lane + ' Regał: ' + position.bookstand + ' Półka: ' + position.shelf + ' Pozycja: ' + position.position + ' Ilość: ' + position.position_quantity;
+                                html += '<br/>';
+                                html += 'JZ:';
+                                if(row.number_of_sale_units_in_the_pack != 0)
+                                    html += Math.floor(position.position_quantity / row.number_of_sale_units_in_the_pack);
+                                else {
+                                    html += 0;
+                                }
+                                html += '<br/> JH:';
+                                if(row.number_of_sale_units_in_the_pack == 0 || position.position_quantity < 0) {
+                                    html += position.position_quantity;
+                                } else {
+                                    html += position.position_quantity - (Math.floor(position.position_quantity / row.number_of_sale_units_in_the_pack) * row.number_of_sale_units_in_the_pack);
+                                }
+                                html += '<br/><br/>';
                             });
-
                         }
-
                         return html;
 
                     }
