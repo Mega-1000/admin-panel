@@ -161,6 +161,7 @@ class ProductStocksController extends Controller
             ->distinct()
             ->select('*', 'product_stocks.id as stockId')
             ->join('products', 'product_stocks.product_id', '=', 'products.id')
+            ->join('product_packings', 'products.id', '=', 'product_packings.id')
             ->whereNull('deleted_at');
 
         $query->whereRaw('product_stocks.quantity <> ?', [0]);
@@ -185,6 +186,7 @@ class ProductStocksController extends Controller
             ->distinct()
             ->select('*', 'product_stocks.id as stock_id')
             ->join('products', 'product_stocks.product_id', '=', 'products.id')
+            ->join('product_packings', 'products.id', '=', 'product_packings.id')
             ->leftJoin('product_prices', 'product_stocks.product_id', '=', 'product_prices.product_id')
             ->whereNull('deleted_at');
 
