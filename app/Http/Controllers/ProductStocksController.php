@@ -160,7 +160,8 @@ class ProductStocksController extends Controller
         $query = \DB::table('product_stocks')
             ->distinct()
             ->select('*')
-            ->join('products', 'product_stocks.product_id', '=', 'products.id');
+            ->join('products', 'product_stocks.product_id', '=', 'products.id')
+            >whereNull('deleted_at');
 
 
         $query->whereRaw('product_stocks.quantity <> ?', [0]);
@@ -170,7 +171,7 @@ class ProductStocksController extends Controller
 
 
         foreach ($collection as $row) {
-            $row->positions = \DB::table('product_stock_positions')->where('product_stock_id', $row->product_id)->get();
+            $row->positions = \DB::table('product_stock_positions')->where('product_stock_id', $row->id)->get();
         }
 
         return View::make('product_stocks.print', [
