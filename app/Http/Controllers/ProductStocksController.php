@@ -161,7 +161,7 @@ class ProductStocksController extends Controller
             ->distinct()
             ->select('*')
             ->join('products', 'product_stocks.product_id', '=', 'products.id')
-            >whereNull('deleted_at');
+            ->whereNull('deleted_at');
 
 
         $query->whereRaw('product_stocks.quantity <> ?', [0]);
