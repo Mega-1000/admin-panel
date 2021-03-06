@@ -36,6 +36,20 @@
                         <p>
                             Pozycja: <b>{{ $position->lane }}</b> <b>{{ $position->bookstand }}</b> <b>{{ $position->shelf }}</b> <b>{{ $position->position }}</b> <br/>
                             Ilość na pozycji: <b style="color: red;">{{ $position->position_quantity }}</b> </p>
+                            JZ:
+                            @if($product->number_of_sale_units_in_the_pack != 0)
+                                {{ floor($position->position_quantity / $product->number_of_sale_units_in_the_pack) }}
+                            @else
+                                0
+                            @endif
+                            <br/>
+                            JH:
+                            @if($product->number_of_sale_units_in_the_pack == 0 || $position->position_quantity < 0)
+                                {{ $position->position_quantity }}
+                            @else
+                                {{ $position->position_quantity - (floor($position->position_quantity / $product->number_of_sale_units_in_the_pack) * $product->number_of_sale_units_in_the_pack) }}
+                            @endif
+                            <br/><br/>
                     @endforeach
                 </td>
             </tr>
@@ -55,6 +69,11 @@
 <script>
     window.print();
 </script>
+<style>
+    p {
+        margin: 0px;
+    }
+</style>
 
 </body>
 </html>
