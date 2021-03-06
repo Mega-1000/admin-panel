@@ -159,19 +159,16 @@ class ProductStocksController extends Controller
     {
         $query = \DB::table('product_stocks')
             ->distinct()
-            ->select('*')
+            ->select('*', 'product_stocks.id as stockId')
             ->join('products', 'product_stocks.product_id', '=', 'products.id')
             ->whereNull('deleted_at');
 
-
         $query->whereRaw('product_stocks.quantity <> ?', [0]);
-
 
         $collection = $query->get();
 
-
         foreach ($collection as $row) {
-            $row->positions = \DB::table('product_stock_positions')->where('product_stock_id', $row->id)->get();
+            $row->positions = \DB::table('product_stock_positions')->where('product_stock_id', $row->stockId)->get();
         }
 
         return View::make('product_stocks.print', [
