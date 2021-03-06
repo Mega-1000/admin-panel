@@ -23,7 +23,7 @@
                     Ilość: {{ $position->position_quantity }} </br>
                     JZ:
                     @if($orderItem->product->packing->number_of_sale_units_in_the_pack != 0)
-                        {{ floor($position->position_quantity / $orderItem->product->number_of_sale_units_in_the_pack) }}
+                        {{ floor($position->position_quantity / $orderItem->product->packing->number_of_sale_units_in_the_pack) }}
                     @else
                         0
                     @endif
