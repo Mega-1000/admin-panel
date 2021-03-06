@@ -22,17 +22,17 @@
                     Pozycja: {{ $position->position }} </br>
                     Ilość: {{ $position->position_quantity }} </br>
                     JZ:
-                    @if($orderItem->product->number_of_sale_units_in_the_pack != 0)
+                    @if($orderItem->product->packing->number_of_sale_units_in_the_pack != 0)
                         {{ floor($position->position_quantity / $orderItem->product->number_of_sale_units_in_the_pack) }}
                     @else
                         0
                     @endif
                     <br/>
                     JH:
-                    @if($orderItem->product->number_of_sale_units_in_the_pack == 0 || $position->position_quantity < 0)
+                    @if($orderItem->product->packing->number_of_sale_units_in_the_pack == 0 || $position->position_quantity < 0)
                         {{ $position->position_quantity }}
                     @else
-                        {{ $position->position_quantity - (floor($position->position_quantity / $orderItem->product->number_of_sale_units_in_the_pack) * $orderItem->product->number_of_sale_units_in_the_pack) }}
+                        {{ $position->position_quantity - (floor($position->position_quantity / $orderItem->product->packing->number_of_sale_units_in_the_pack) * $orderItem->product->packing->number_of_sale_units_in_the_pack) }}
                     @endif
                     <br/><br/>
                 </td>
