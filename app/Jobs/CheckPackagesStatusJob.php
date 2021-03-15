@@ -245,7 +245,8 @@ class CheckPackagesStatusJob
     private function prepareConnectionForTrackingStatus(string $url, string $method, array $params): ResponseInterface
     {
         $curlSettings = ['curl' => [
-            CURLOPT_SSL_CIPHER_LIST => 'DEFAULT@SECLEVEL=1'
+            CURLOPT_SSL_CIPHER_LIST => 'DEFAULT@SECLEVEL=1',
+            CURLOPT_USERAGENT => 'Mozilla Chrome Safari'
         ]];
         $params = array_merge($params, $curlSettings);
 
