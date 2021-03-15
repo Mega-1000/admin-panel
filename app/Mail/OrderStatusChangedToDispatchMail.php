@@ -8,7 +8,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
-class OrderStatusChangedToDispatchMail extends Mailable implements ShouldQueue
+class OrderStatusChangedToDispatchMail extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -54,6 +54,7 @@ class OrderStatusChangedToDispatchMail extends Mailable implements ShouldQueue
      */
     public function build()
     {
+        Log::notice('W buildzie', ['line' => __LINE__, 'file' => __FILE__]);
         if($this->self == true) {
             return $this->view('emails.order-status-changed-to-dispatch-self');
         } else {
