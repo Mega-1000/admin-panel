@@ -54,7 +54,6 @@ class OrderStatusChangedToDispatchMail extends Mailable
      */
     public function build()
     {
-        Log::notice('W buildzie', ['line' => __LINE__, 'file' => __FILE__]);
         if($this->self == true) {
             return $this->view('emails.order-status-changed-to-dispatch-self');
         } else {
