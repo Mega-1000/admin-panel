@@ -2,8 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\CheckPackagesStatusJob;
 use App\Jobs\CheckStatusInpostPackagesJob;
 use Illuminate\Console\Command;
+use GuzzleHttp\Client;
 
 class CheckStatusInpostPackages extends Command
 {
@@ -36,8 +38,8 @@ class CheckStatusInpostPackages extends Command
      *
      * @return mixed
      */
-    public function handle()
+    public function handle(Client $http)
     {
-        dispatch_now(new CheckStatusInpostPackagesJob());
+        dispatch_now(new CheckPackagesStatusJob($http));
     }
 }
