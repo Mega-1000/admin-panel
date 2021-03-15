@@ -33,7 +33,7 @@ class Mailer
         }
 
         if (empty($user)) {
-            $user = $this->userRepository->findWhere(['name' => '001'])->first();
+            $user = $this->userRepository->findWhere(['name' => '004'])->first();
         }
 
         /**
