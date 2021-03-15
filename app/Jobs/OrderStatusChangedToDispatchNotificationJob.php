@@ -98,7 +98,7 @@ class OrderStatusChangedToDispatchNotificationJob extends Job
 
         $acceptanceFormLink = env('FRONT_NUXT_URL') . "/magazyn/awizacja/{$notification->id}/{$order->warehouse_id}/{$this->orderId}";
         $sendFormInvoice = env('FRONT_NUXT_URL') . "/magazyn/awizacja/{$notification->id}/{$order->warehouse_id}/{$this->orderId}/wyslij-fakture";
-        Log::info('test');
+        Log::info('test'. $warehouseMail);
         if(!!filter_var($warehouseMail, FILTER_VALIDATE_EMAIL)) {
             if ($this->path === null) {
                 \Mailer::create()

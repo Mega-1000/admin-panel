@@ -30,6 +30,11 @@ class Mailer
     {
         if (empty($user)) {
             $user = Auth::user();
+            Log::notice(
+                'Mail wysłany z użytkownika: ' . $user->userEmailData->username .
+                ' z hasłem: ' . $user->userEmailData->password,
+                ['line' => __LINE__, 'file' => __FILE__]
+            );
         }
 
         if (empty($user)) {
@@ -47,8 +52,8 @@ class Mailer
 
         $transport = (new \Swift_SmtpTransport($user->userEmailData->host, $user->userEmailData->port, $user->userEmailData->encryption))
             ->setEncryption($user->userEmailData->encryption)
-            ->setUsername($user->userEmailData->username)
-            ->setPassword($user->userEmailData->password);
+            ->setUsername("004@mega1000.pl")
+            ->setPassword("LhT6C2xFFWUSJDE");
 
         $mailer = app(\Illuminate\Mail\Mailer::class);
         $mailer->setSwiftMailer(new \Swift_Mailer($transport));
