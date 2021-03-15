@@ -25,8 +25,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->job(Jobs\CheckStatusInpostPackagesJob::class)->everyMinute();
-        $schedule->job(Jobs\CheckPackagesStatusJob::class)->everyMinute();
+        $schedule->job(Jobs\CheckStatusInpostPackagesJob::class)->everyFiveMinutes();
+        $schedule->job(Jobs\CheckPackagesStatusJob::class)->everyThirtyMinutes();
         $schedule->job(Jobs\ChangeShipmentDatePackagesJob::class)->dailyAt("00:30");
         $schedule->job(Jobs\AllegroTrackingNumberUpdater::class)->dailyAt("02:00");
         $schedule->job(Jobs\SendLPWithReminderSendingToWarehouseJob::class)->dailyAt("05:00");
@@ -41,7 +41,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\ValidateSubiekt::class)->everyFiveMinutes();
         // $schedule->job(Jobs\ChangeOrderInvoiceData::class)->dailyAt("07:00");
         // $schedule->job(Jobs\JpgGeneratorJob::class)->dailyAt("01:00");
-        $schedule->job(Jobs\ImportCsvFileJob::class)->everyMinute();
+        $schedule->job(Jobs\ImportCsvFileJob::class)->everyFiveMinutes();
         $schedule->job(Jobs\ImportOrdersFromSelloJob::class)->cron('0 6,11,17,22 * * *');
         $schedule->job(Jobs\UpdatePackageRealCostJob::class)->dailyAt("00:30");
         // $schedule->job(Jobs\CheckIfInvoicesExistInOrders::class)->dailyAt("07:00");
