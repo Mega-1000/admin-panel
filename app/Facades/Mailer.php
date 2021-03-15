@@ -10,6 +10,7 @@ namespace App\Facades;
 use App\Repositories\UserRepository;
 use App\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class Mailer
 {
