@@ -15,6 +15,7 @@ use App\Integrations\Pocztex\getEnvelopeContentShort;
 use App\Integrations\Pocztex\getEnvelopeStatus;
 use App\Integrations\Pocztex\statusType;
 use GuzzleHttp\Client;
+use Http\Client\Exception\RequestException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Http\Request;
 use Illuminate\Queue\InteractsWithQueue;
@@ -221,32 +222,35 @@ class CheckPackagesStatusJob
     private function checkStatusInGlsPackages(OrderPackage $package): void
     {
         $url = $this->config['gls']['tracking_url'] . $package->letter_number;
-        $response = json_decode($this->prepareConnectionForTrackingStatus($url, Request::METHOD_GET, [])->getBody()->getContents());
+        try {
+            $response = json_decode($this->prepareConnectionForTrackingStatus($url, Request::METHOD_GET, [])->getBody()->getContents());
 
-        $packageStatus = $response->tuStatus[0]->progressBar->statusInfo;
+            $packageStatus = $response->tuStatus[0]->progressBar->statusInfo;
 
-        switch($packageStatus) {
-            case GlsPackageStatus::DELIVERED:
-                $package->status = PackageStatus::DELIVERED;
-                break;
-            case GlsPackageStatus::INTRANSIT:
-            case GlsPackageStatus::INWAREHOUSE:
-            case GlsPackageStatus::INDELIVERY:
-                $package->status = PackageStatus::SENDING;
-                break;
-            case GlsPackageStatus::PREADVICE:
-                $package->status = PackageStatus::WAITING_FOR_SENDING;
-                break;
+            switch($packageStatus) {
+                case GlsPackageStatus::DELIVERED:
+                    $package->status = PackageStatus::DELIVERED;
+                    break;
+                case GlsPackageStatus::INTRANSIT:
+                case GlsPackageStatus::INWAREHOUSE:
+                case GlsPackageStatus::INDELIVERY:
+                    $package->status = PackageStatus::SENDING;
+                    break;
+                case GlsPackageStatus::PREADVICE:
+                    $package->status = PackageStatus::WAITING_FOR_SENDING;
+                    break;
+            }
+
+            $package->save();
+        } catch (RequestException $e) {
+            Log::error('Wystąpił problem przy sprawdzaniu statusu paczki: ' . $package->letter_number . ' Błąd: ' . $e->getMessage());
         }
-
-        $package->save();
     }
 
     private function prepareConnectionForTrackingStatus(string $url, string $method, array $params): ResponseInterface
     {
         $curlSettings = ['curl' => [
-            CURLOPT_SSL_CIPHER_LIST => 'DEFAULT@SECLEVEL=1',
-            CURLOPT_USERAGENT => 'Mozilla Chrome Safari'
+            CURLOPT_SSL_CIPHER_LIST => 'DEFAULT@SECLEVEL=1'
         ]];
         $params = array_merge($params, $curlSettings);
 
