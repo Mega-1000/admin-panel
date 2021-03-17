@@ -484,7 +484,7 @@
                 <label for="order_delivery_address_email">@lang('customers.form.delivery_email')</label>
                 <input type="email" class="form-control" id="order_delivery_address_email"
                        name="order_delivery_address_email"
-                       value="{{ $orderDeliveryAddress->email ?? ''}}">
+                       value="{{ $orderDeliveryAddress->email ?? $order->customer->login }}">
             </div>
             <div class="form-group" style="width: 11%; float: left; padding: 5px;">
                 <label for="order_delivery_address_firmname">@lang('customers.form.delivery_firmname')</label>
@@ -539,7 +539,7 @@
                 <label for="order_invoice_address_email">@lang('customers.form.invoice_email')</label>
                 <input type="email" class="form-control" id="order_invoice_address_email"
                        name="order_invoice_address_email"
-                       value="{{ $orderInvoiceAddress->email ?? ''}}">
+                       value="{{ $orderInvoiceAddress->email ?? $order->customer->login }}">
             </div>
             <div class="form-group" style="width: 10%; float: left; padding: 5px;">
                 <label for="order_invoice_address_firmname">@lang('customers.form.invoice_firmname')</label>
@@ -1107,7 +1107,7 @@
             <div class="form-group">
                 <label for="customer_address.email">@lang('customers.table.email')</label>
                 <input type="email" class="form-control" id="customer_address.email" name="customer_address.email"
-                       value="{{ $orderDeliveryAddress->email ?? '' }}" disabled>
+                       value="{{ $order->customer->login ?? '' }}" disabled>
             </div>
             <h3>Etykiety (kasowanie etykiet nie wywołuje dodatkowych konsekwencji)</h3>
             @foreach($order->labels as $label)
