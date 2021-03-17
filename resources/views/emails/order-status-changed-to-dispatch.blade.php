@@ -38,9 +38,11 @@
 <p>
     Prosimy wpisywac nr oferty na wszystkich dokumentach poniewaz tylko po nim identyfikujemy zlecenia.
 </p>
-{{$order->employee->firstname . ' ' . $order->employee->lastname}}<br/>
-{{$order->employee->email . ' ' . $order->employee->phone}}<br/>
-{{'Numer konsultanta:' . $order->employee->name}}<br/>
+@isset($order->employee)
+    {{$order->employee->firstname . ' ' . $order->employee->lastname}}<br/>
+    {{$order->employee->email . ' ' . $order->employee->phone}}<br/>
+    {{'Numer konsultanta:' . $order->employee->name}}<br/>
+@endisset
 
 
 <p>
