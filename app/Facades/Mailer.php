@@ -36,15 +36,6 @@ class Mailer
             $user = $this->userRepository->findWhere(['name' => '001'])->first();
         }
 
-        /**
-         *  Weryfikujemy błędne hasło podczas wysyłania awizjacji na środowisku produkcyjnym
-        */
-        Log::notice(
-            'Mail wysłany z użytkownika: ' . $user->userEmailData->username .
-                ' z hasłem: ' . $user->userEmailData->password,
-            ['line' => __LINE__, 'file' => __FILE__]
-        );
-
         $transport = (new \Swift_SmtpTransport($user->userEmailData->host, $user->userEmailData->port, $user->userEmailData->encryption))
             ->setEncryption($user->userEmailData->encryption)
             ->setUsername($user->userEmailData->username)

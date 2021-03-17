@@ -273,11 +273,11 @@ class MenuItemsTableSeeder extends Seeder
 
         $menuItem = MenuItem::firstOrNew([
             'menu_id' => $menu->id,
-            'title' => __('warehouses_orders.title'),
+            'title' => __('warehouse_orders.title'),
             'url' => '',
             'route' => 'warehouse.orders.index',
-
         ]);
+
         if (!$menuItem->exists) {
             $menuItem->fill([
                 'target' => '_self',
@@ -403,7 +403,6 @@ class MenuItemsTableSeeder extends Seeder
             ])->save();
         }
 
-
         $menuItem = MenuItem::firstOrNew([
             'menu_id' => $menu->id,
             'title' => __('reports.title'),
@@ -419,7 +418,7 @@ class MenuItemsTableSeeder extends Seeder
                 'order' => 17,
             ])->save();
         }
-        
+
         $menuItem = MenuItem::firstOrNew([
             'menu_id' => $menu->id,
             'title' => 'Generator Stron',
@@ -435,8 +434,5 @@ class MenuItemsTableSeeder extends Seeder
                 'order' => 24,
             ])->save();
         }
-        
-        
-        
     }
 }

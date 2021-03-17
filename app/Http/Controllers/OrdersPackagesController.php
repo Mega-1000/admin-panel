@@ -264,7 +264,7 @@ class OrdersPackagesController extends Controller
         }
         $orderPackage->save();
 
-        if ($data['real_cost_for_company']) {
+        if (!empty($data['real_cost_for_company'])) {
             $orderPackage->realCostsForCompany()->create([
                 'order_package_id' => $orderPackage->id,
                 'cost' => PriceFormatter::asAbsolute(
