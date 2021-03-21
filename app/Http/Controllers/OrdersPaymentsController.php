@@ -159,7 +159,7 @@ class OrdersPaymentsController extends Controller
         }
 
         $payment = $this->repository->update([
-            'amount' => $request->input('amount'),
+            'amount' => PriceHelper::modifyPriceToValidFormat($request->input('amount')),
             'notices' => $request->input('notices'),
             'promise' => $promise,
             'promise_date' => $request->input('promise_date'),

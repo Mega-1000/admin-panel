@@ -24,7 +24,7 @@ class OrderPaymentUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            'amount' => 'required|regex:/^\d*(\.\d{2})?$/',
+            'amount' => 'required|regex:/^\d*([\.,]{1}\d{1,2})?$/',
         ];
     }
 }
