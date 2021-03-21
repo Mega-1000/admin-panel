@@ -251,7 +251,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                     $product = Product::getDefaultProduct();
                 }
                 if (!empty($quantity)) {
-                    $product->tt_quantity = $quantity * $singleTransaction->transactionItem->tt_Quantity;
+                    $quantity *= $singleTransaction->transactionItem->tt_Quantity;
+                    $product->tt_quantity = $quantity;
                     $product->price_override = [
                         'gross_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price / $quantity,
                         'net_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price / $quantity / $tax
