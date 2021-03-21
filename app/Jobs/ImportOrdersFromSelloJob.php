@@ -83,7 +83,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             try {
                 $transactionArray = $this->createAddressArray($transaction);
             } catch (\Exception $e) {
-                Log::error('sello adress creation', ['message' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
+                \Log::error('sello adress creation', ['message' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
                 return $count;
             }
             $tax = 1 + env('VAT');
