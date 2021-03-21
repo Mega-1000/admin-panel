@@ -253,14 +253,14 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                 if (!empty($quantity)) {
                     $product->tt_quantity = $quantity * $singleTransaction->transactionItem->tt_Quantity;
                     $product->price_override = [
-                        'gross_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price / $quantity,
-                        'net_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price / $quantity / $tax
+                        'gross_selling_price_commercial_unit' => round($singleTransaction->transactionItem->tt_Price / $quantity, 2),
+                        'net_selling_price_commercial_unit' => round($singleTransaction->transactionItem->tt_Price / $quantity / $tax, 2)
                     ];
                 } else {
                     $product->tt_quantity = $singleTransaction->transactionItem->tt_Quantity;
                     $product->price_override = [
-                        'gross_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price,
-                        'net_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price / $tax
+                        'gross_selling_price_commercial_unit' => round($singleTransaction->transactionItem->tt_Price, 2),
+                        'net_selling_price_commercial_unit' => round($singleTransaction->transactionItem->tt_Price / $tax, 2)
                     ];
                 }
                 $product->transaction_id = $singleTransaction->id;
