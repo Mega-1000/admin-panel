@@ -19,7 +19,6 @@ use App\Helpers\SelloPackageDivider;
 use App\Helpers\SelloPriceCalculator;
 use App\Helpers\SelloTransportSumCalculator;
 use App\Helpers\TaskTimeHelper;
-use App\Http\Controllers\OrdersPaymentsController;
 use App\Services\OrderPaymentService;
 use App\Services\ProductService;
 use App\User;
@@ -252,6 +251,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                     $product = Product::getDefaultProduct();
                 }
                 if (!empty($quantity)) {
+                    $quantity *= $singleTransaction->transactionItem->tt_Quantity;
                     $product->tt_quantity = $quantity;
                     $product->price_override = [
                         'gross_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price / $quantity,
