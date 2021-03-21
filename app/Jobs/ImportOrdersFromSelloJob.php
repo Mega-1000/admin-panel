@@ -19,7 +19,6 @@ use App\Helpers\SelloPackageDivider;
 use App\Helpers\SelloPriceCalculator;
 use App\Helpers\SelloTransportSumCalculator;
 use App\Helpers\TaskTimeHelper;
-use App\Http\Controllers\OrdersPaymentsController;
 use App\Services\OrderPaymentService;
 use App\Services\ProductService;
 use App\User;
@@ -84,7 +83,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             try {
                 $transactionArray = $this->createAddressArray($transaction);
             } catch (\Exception $e) {
-                \Log::error('sello adress creation', ['message' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
+                Log::error('sello adress creation', ['message' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
                 return $count;
             }
             $tax = 1 + env('VAT');
@@ -252,7 +251,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                     $product = Product::getDefaultProduct();
                 }
                 if (!empty($quantity)) {
-                    $product->tt_quantity = $quantity;
+                    $product->tt_quantity = $quantity * $singleTransaction->transactionItem->tt_Quantity;
                     $product->price_override = [
                         'gross_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price / $quantity,
                         'net_selling_price_commercial_unit' => $singleTransaction->transactionItem->tt_Price / $quantity / $tax
