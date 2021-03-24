@@ -4009,9 +4009,9 @@
                 var calc;
 
                 calc = parseFloat(purchasePrice) * parseFloat(vat);
-
-                sellingPrice.val(parseFloat(calc).toFixed(2));
-
+                if ((Math.floor(calc * 100) / 100) !== parseFloat(sellingPrice.val())) {
+                    sellingPrice.val(parseFloat(calc).toFixed(2));
+                }
             }
 
             function calculateNettoFromGross(netto, gross, id, fixed = 2) {
