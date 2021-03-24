@@ -38,8 +38,21 @@ class ChangeWarehouseStockJob extends Job
         $order = $orderRepository->find($this->orderId);
 
         $errors = [];
+        $productsIds = [];
+        foreach ($order->items as $key => $item) {
+            if (!isset($productsIds[$item->product->id])) {
+                $productsIds[$item->product->id] = $key;
+            } else {
+                $order->items->get($productsIds[$item->product->id])->quantity += $item->quantity;
+                $item->quantity = 0;
+            }
+        }
 
-        foreach($order->items as $item) {
+        $items = $order->items->filter(function ($item) {
+            return $item->quantity > 0;
+        });
+
+        foreach ($items as $item) {
             $product = $item->product;
             if($product !== null) {
                 $productStockPosition = $product->stock->position->first();
@@ -69,7 +82,7 @@ class ChangeWarehouseStockJob extends Job
             return response()->json($errors);
         }
 
-        foreach($order->items as $item) {
+        foreach($items as $item) {
             $product = $item->product;
             if($product === null) {
                 return response()->json(['error' => 'Product does not exist.']);
