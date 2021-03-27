@@ -244,7 +244,7 @@ class MessagesController extends Controller
         }
         $possibleUsers = collect();
         $notices = '';
-        if ($product) {
+        if ($product && !empty($chat->customers)) {
             $possibleUsers = $this->getNotAttachedChatUsersForProduct($product, $chat->customers->first());
         } else if ($order) {
             $possibleUsers = $this->getNotAttachedChatUsersForOrder($order, $users);

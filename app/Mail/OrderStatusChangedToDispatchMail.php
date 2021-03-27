@@ -36,7 +36,7 @@ class OrderStatusChangedToDispatchMail extends Mailable
      */
     public function __construct($subject, $formLink, $sendFormInvoice, $order, $self = null, $path = null, $packageNumber = null, $pathSecond = null)
     {
-        ini_set('max_execution_time', 90);
+        ini_set('max_execution_time', 60);
         $this->formLink = $formLink;
         $this->sendFormInvoice = $sendFormInvoice;
         $this->subject = $subject;
@@ -54,12 +54,15 @@ class OrderStatusChangedToDispatchMail extends Mailable
      */
     public function build()
     {
-        if($this->self == true) {
+        if ($this->self == true) {
+            Log::notice('timeout -> emails.order-status-changed-to-dispatch-self');
             return $this->view('emails.order-status-changed-to-dispatch-self');
         } else {
-            if($this->path == null) {
+            if ($this->path == null) {
+                Log::notice('timeout -> emails.order-status-changed-to-dispatch');
                 return $this->view('emails.order-status-changed-to-dispatch');
             } else {
+                Log::notice('timeout -> emails.reminder-order-status-changed-to-dispatch');
                 return $this->view('emails.reminder-order-status-changed-to-dispatch')->attach($this->path)->attach($this->pathSecond);
             }
         }
