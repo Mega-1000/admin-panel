@@ -1492,7 +1492,6 @@
                                             d2.setHours(0, 0, 0, 0)
                                             comparasion = d1 >= d2
                                         }
-                                        console.log(label)
                                         if (label[0].id == '{{ env('MIX_LABEL_WAITING_FOR_PAYMENT_ID') }}' && comparasion) {
                                             html += `<div data-toggle="label-tooltip" style="border: solid red 4px" data-html="true" title="${tooltipContent}" class="pointer" onclick="removeLabel(${row.orderId}, ${label[0].id}, ${label[0].manual_label_selection_to_add_after_removal}, '${label[0].added_type}', '${label[0].timed}');">
                                                         <span class="order-label" style="color: ${label[0].font_color}'; display: block; margin-top: 5px; background-color: ${label[0].color}">
@@ -2653,7 +2652,7 @@
             url = url.replace(':id', chosenLabel.val());
             let schedulerUrl = "{{ route('api.labels.get-labels-scheduler-await', ['userId' => ':id']) }}"
             schedulerUrl = schedulerUrl.replace(':id', {{ Auth::id() }});
-            if (timed === true) {
+            if (timed == false) {
                 data = {orderIds: orderIds, time: $('#time_label').val()};
             } else {
                 data = {orderIds: orderIds}
