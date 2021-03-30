@@ -500,6 +500,7 @@
                             event.preventDefault();
                             let start = new Date($("#start_new").val());
                             let end = new Date(start.getTime() + event.target.value * 60000);
+                            end.setHours(end.getHours() + (end.getTimezoneOffset() * -1) / 60);
                             let startMinutes = end.getUTCMinutes();
                             if (startMinutes < 10) {
                                 startMinutes = '0' + startMinutes;
