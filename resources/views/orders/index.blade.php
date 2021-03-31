@@ -2652,7 +2652,7 @@
             url = url.replace(':id', chosenLabel.val());
             let schedulerUrl = "{{ route('api.labels.get-labels-scheduler-await', ['userId' => ':id']) }}"
             schedulerUrl = schedulerUrl.replace(':id', {{ Auth::id() }});
-            if (timed == false) {
+            if (timed == true) {
                 data = {orderIds: orderIds, time: $('#time_label').val()};
             } else {
                 data = {orderIds: orderIds}

@@ -94,13 +94,13 @@ class AddLabelJob extends Job
                 $delay = $now->diffInSeconds($targetDatetime);
 
                 if($labelsAfterTime->count() > 0) {
-                    $removeLabelJob = (new RemoveLabelJob($this->order->id, [$labelId]))->delay($delay);
+                    $removeLabelJob = dispatch(new RemoveLabelJob($this->order->id, [$labelId]))->delay($delay);
                     foreach($labelsAfterTime as $labelAfterTime) {
-                        $addLabelJob = (new AddLabelJob($this->order->id, [$labelAfterTime->label_to_add_id]))->delay($delay);
+                        $addLabelJob = dispatch(new AddLabelJob($this->order->id, [$labelAfterTime->label_to_add_id]))->delay($delay);
                     }
                 } else {
-                    $removeLabelJob = (new RemoveLabelJob($this->order->id, [$labelId]))->delay($delay);
-                    $addLabelJob = (new AddLabelJob($this->order->id, [Label::URGENT_INTERVENTION]))->delay($delay);
+                    $removeLabelJob = dispatch(new RemoveLabelJob($this->order->id, [$labelId]))->delay($delay);
+                    $addLabelJob = dispatch(new AddLabelJob($this->order->id, [Label::URGENT_INTERVENTION]))->delay($delay);
                 }
             }
 
