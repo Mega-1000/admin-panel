@@ -13,6 +13,7 @@ return [
         'actions' => 'Akcje',
         'packet_list' => 'Lista pakietów',
         'packet_create' => 'Stwórz pakiet',
+        'packet_products' => 'Produkty w pakiecie',
     ],
     'messages' => [
         'delete' => 'Pakiet został pomyślnie usunięty',

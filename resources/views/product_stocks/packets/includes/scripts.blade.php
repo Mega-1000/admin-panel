@@ -99,7 +99,7 @@
             });
         });
 
-        axios.put(laroute.route('product_stock_packets.update'), {
+        axios.put(laroute.route('product_stock_packets.update', {packetId: document.getElementById('packet_id').value}), {
             'id': document.getElementById('packet_id').value,
             'packetName' : packetName,
             'packetsQuantity': packetsQuantity,

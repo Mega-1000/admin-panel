@@ -141,12 +141,12 @@ class ProductStockPacketsController extends Controller
         return response()->json(['status' => true, 'message' => __('product_stock_packets.messages.update')]);
     }
 
-    public function delete(int $id, int $packetId): RedirectResponse
+    public function delete(int $packetId): RedirectResponse
     {
         $this->productStockPacketService->deletePacket($packetId);
 
         return redirect()->back()->with([
-            'id' => $id,
+            'id' => $packetId,
             'message' => __('product_stock_packets.messages.delete'),
             'alert-type' => 'info'
         ]);

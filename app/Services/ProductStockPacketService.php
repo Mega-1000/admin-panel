@@ -163,8 +163,6 @@ class ProductStockPacketService
 
         $action = ($currentPacketQuantityDifference < 0) ? ProductStockLogActionEnum::DELETE : ProductStockLogActionEnum::ADD;
 
-        dd($currentPacketQuantityDifference);
-
         $this->productStockLogService->storeProductQuantityChangeLog(
             $productStock->id,
             $productStockFirstPosition->id,
@@ -239,16 +237,18 @@ class ProductStockPacketService
     {
         $packet = $this->findPacket($packetId);
 
-        $currentPacketQuantity = $this->getProductsQuantityInCreatedPackets(
-            $packet->packet_quantity,
-            $packet->packet_product_quantity
-        );
+        foreach($packet->items as $item) {
+            $currentPacketQuantity = $this->getProductsQuantityInCreatedPackets(
+                $packet->packet_quantity,
+                $item->quantity
+            );
 
-        $productStock = $this->productStockService->findProductStock($packet->product_stock_id);
+            $productStock = $this->productStockService->findProductStock($item->product->stock->id);
 
-        $productStockFirstPosition = $productStock->position->first();
+            $productStockFirstPosition = $productStock->position->first();
 
-        $this->updateGlobalAndPositionStockQuantity($productStockFirstPosition, $currentPacketQuantity, self::ADDITION_SIGN, $currentPacketQuantity, $productStock);
+            $this->updateGlobalAndPositionStockQuantity($productStockFirstPosition, $currentPacketQuantity, self::ADDITION_SIGN, $currentPacketQuantity, $productStock);
+        }
 
         return $packet->delete();
     }
