@@ -527,6 +527,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/transport/update/{delivererId}', 'DelivererController@update')->name('transportPayment.update');
         Route::get('/transport/delete', 'DelivererController@delete')->name('transportPayment.delete');
         Route::post('/transport/update-pricing', 'DelivererController@updatePricing')->name('transportPayment.update_pricing');
+
+        Route::get('/cacheClear', 'Controller@refreshCache')->name('admin.refresh');
     });
 });
 

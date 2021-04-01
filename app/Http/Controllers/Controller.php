@@ -7,6 +7,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use TCG\Voyager\Facades\Voyager;
@@ -56,5 +57,14 @@ class Controller extends BaseController
     public function test() {
         Menu::display('main');
         Voyager::setting('site.title');
+    }
+
+    /**
+     * Czyszczenie cache
+     */
+    public function refreshCache(){
+        Artisan::call('view:clear', []);
+        Artisan::call('cache:clear', []);
+        return redirect('/');
     }
 }
