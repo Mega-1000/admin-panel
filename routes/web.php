@@ -11,8 +11,6 @@
 |
  */
 
-use Illuminate\Support\Facades\Artisan;
-
 Route::redirect('/', '/admin');
 
 Route::group(['prefix' => 'admin'], function () {
@@ -529,12 +527,6 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/transport/update/{delivererId}', 'DelivererController@update')->name('transportPayment.update');
         Route::get('/transport/delete', 'DelivererController@delete')->name('transportPayment.delete');
         Route::post('/transport/update-pricing', 'DelivererController@updatePricing')->name('transportPayment.update_pricing');
-
-        Route::get('/cacheClear', function () {
-            Artisan::call('view:clear', []);
-            Artisan::call('cache:clear', []);
-            return redirect('/');
-        })->name('admin.refresh');
     });
 });
 
