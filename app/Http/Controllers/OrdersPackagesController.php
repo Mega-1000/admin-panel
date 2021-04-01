@@ -702,6 +702,7 @@ class OrdersPackagesController extends Controller
             $order->save();
         }
         $data = [
+            'warehouse' => $order->warehouse->symbol,
             'order_id' => $order->id,
             'symbol' => $package->symbol,
             'courier_type' => $package->delivery_courier_name,

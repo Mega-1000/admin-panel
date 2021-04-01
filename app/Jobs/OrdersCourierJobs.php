@@ -290,14 +290,24 @@ class OrdersCourierJobs extends Job
                 'email' => $this->data['pickup_address']['email'],
             ];
 
-            $response = $dpd->pickupRequest([$protocol->documentId], $pickupDate, $pickupTimeFrom, $pickupTimeTo, $contactInfo,
-                $pickupAddress, $parcels, $receiver);
+            if($this->data['warehouse'] != 'MEGA-OLAWA') {
+                $response = $dpd->pickupRequest([$protocol->documentId], $pickupDate, $pickupTimeFrom, $pickupTimeTo, $contactInfo, $pickupAddress, $parcels, $receiver);
+
+                return [
+                    'status' => 200,
+                    'error_code' => 0,
+                    'sending_number' => $response->return->orderNumber,
+                    'letter_number' => $result->parcels[0]->Waybill
+                ];
+            }
+
             return [
                 'status' => 200,
                 'error_code' => 0,
-                'sending_number' => $response->return->orderNumber,
+                'sending_number' => '',
                 'letter_number' => $result->parcels[0]->Waybill
             ];
+
         } catch (Exception $exception) {
             \Log::info(
                 'Problem in DPD integration',
