@@ -291,8 +291,7 @@ class OrdersCourierJobs extends Job
             ];
 
             if($this->data['warehouse'] != 'MEGA-OLAWA') {
-                $response = $dpd->pickupRequest([$protocol->documentId], $pickupDate, $pickupTimeFrom, $pickupTimeTo, $contactInfo,
-                    $pickupAddress, $parcels, $receiver);
+                $response = $dpd->pickupRequest([$protocol->documentId], $pickupDate, $pickupTimeFrom, $pickupTimeTo, $contactInfo, $pickupAddress, $parcels, $receiver);
 
                 return [
                     'status' => 200,
