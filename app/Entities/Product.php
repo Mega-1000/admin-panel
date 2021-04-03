@@ -157,6 +157,10 @@ class Product extends Model implements Transformable
         'gross_purchase_price_the_largest_unit_after_discounts'
     ];
 
+    protected $casts = [
+        'stock_product' => 'boolean',
+    ];
+
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */

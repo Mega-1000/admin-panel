@@ -70,6 +70,7 @@ class OrderStatusChangedToDispatchNotificationJob extends Job
             Log::notice('Brak adresu mailowego w firmie, lub magazyn nie istnieje', ['line' => __LINE__, 'file' => __FILE__, 'order' => $order->id]);
             return;
         }
+
         $subject = "Przypomnienie o potwierdzenie awizacji dla zamówienia nr. " . $this->orderId;
 
         $dataArray = [
@@ -90,13 +91,14 @@ class OrderStatusChangedToDispatchNotificationJob extends Job
             return;
         }
 
-        if (!$notification) {
+        if (!$notification && !$order->isOrderHasLabel(Label::WAREHOUSE_REMINDER)) {
             $subject = "Prośba o potwierdzenie awizacji dla zamówienia nr. " . $this->orderId;
             $notification = OrderWarehouseNotification::create($dataArray);
         }
 
         $acceptanceFormLink = env('FRONT_NUXT_URL') . "/magazyn/awizacja/{$notification->id}/{$order->warehouse_id}/{$this->orderId}";
         $sendFormInvoice = env('FRONT_NUXT_URL') . "/magazyn/awizacja/{$notification->id}/{$order->warehouse_id}/{$this->orderId}/wyslij-fakture";
+        Log::info('test');
         if(!!filter_var($warehouseMail, FILTER_VALIDATE_EMAIL)) {
             if ($this->path === null) {
                 \Mailer::create()

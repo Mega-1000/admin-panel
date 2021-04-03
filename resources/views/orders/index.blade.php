@@ -8,6 +8,46 @@
 @endsection
 
 @section('table')
+    <div class="modal fade" tabindex="-1" id="changePackageCostModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Zmień wartości paczki</h4>
+                </div>
+                <div class="modal-body">
+                    <form id="changePackageCostForm" method="POST" action="{{ route('order_packages.changePackageCost') }}">
+                        @csrf
+                        {{method_field('put')}}
+                        <label for="packageTemplatesList">@lang('order_packages.form.choose_template')</label>
+                        <select required name="templateList" class="form-control text-uppercase" id="packageTemplatesList"
+                                form="changePackageCostForm">
+                            <option value="" selected="selected"></option>
+                            @foreach($templateData as $template)
+                                <option value="{{ $template->id }}">{{ $template->name }}</option>
+                            @endforeach
+                        </select>
+                        <div class="form-group">
+                            <label for="cost_for_client">@lang('order_packages.form.cost_for_client')</label>
+                            <input id="cost_for_client" name="cost_for_client" type="text" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="cost_for_company">@lang('order_packages.form.cost_for_company')</label>
+                            <input id="cost_for_company" name="cost_for_company" type="text" class="form-control">
+                        </div>
+                        <input type="hidden" name="changePackageCostId" id="changePackageCost">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" form="changePackageCostForm" class="btn btn-success pull-right">@lang('order_packages.form.buttons.change')
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" tabindex="-1" id="add-custom-task" role="dialog">
         <div class="modal-dialog" id="modalDialog">
             <div class="modal-content">
@@ -841,6 +881,24 @@
 @section('datatable-scripts')
     <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
     <script>
+        @if (session('stock-response'))
+            let stockResponse = JSON.parse('{!! json_encode(session('stock-response')) !!}');
+            $('#position__errors').empty();
+            $('#quantity__errors').empty();
+            $('#exists__errors').empty();
+            stockResponse.forEach((error) => {
+                if (error.error == '{{ \App\Enums\ProductStockError::POSITION }}') {
+                    $('#position__errors').append(`<h5>{{ __('product_stocks.form.missing_position_for_product') }} <span class="modal__product">${error.productName}</span>. {{ __('product_stocks.form.go_to_create_position') }} <a href="/admin/products/stocks/${error.product}/positions/create" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
+                }
+                if (error.error == '{{ \App\Enums\ProductStockError::QUANTITY }}') {
+                    $('#quantity__errors').append(`<h5>{{ __('product_stocks.form.missing_product_quantity') }} <span class="modal__position">${error.position.position_quantity}</span>. {{ __('product_stocks.form.go_to_move_between_positions') }}<a href="/admin/products/stocks/${error.product}/edit?tab=positions" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
+                }
+                if (error.error == '{{ \App\Enums\ProductStockError::EXISTS }}') {
+                    $('#exists__errors').append(`<h5>{{ __('product_stocks.form.for_product') }} <span class="modal__product">${error.productName}</span> {{ __('product_stocks.form.stock_already_performed') }} {{ __('product_stocks.form.go_to_order') }} <a href="/admin/orders/${error.order_id}/edit" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
+                }
+            })
+            $('#stock_modal').modal('show');
+        @endif
         function taskSelected(select, input, control) {
             let selectedOption = select.options[select.selectedIndex];
             if (selectedOption.dataset.order === '') {
@@ -863,6 +921,18 @@
                     }
                     response.forEach(task => $(select).append(`<option data-order="${task.order_id ?? ''}" class="temporary-option" value="${task.id}">${task.name}</option>`))
                 })
+        }
+        function showPackageCostModal(packageId, dataTemplate, costForClient, costForCompany) {
+            $('#changePackageCost').val(packageId);
+            $('#packageTemplatesList option').prop('selected', '');
+            if(!isNaN(dataTemplate)) {
+                $('#packageTemplatesList option[value="' + dataTemplate + '"]').prop('selected', 'selected');
+            } else {
+                $("#packageTemplatesList option:contains('" + dataTemplate + "')").prop('selected', 'selected');
+            }
+            $('#cost_for_client').val(costForClient);
+            $('#cost_for_company').val(costForCompany);
+            $('#changePackageCostModal').modal('show');
         }
 
         $('#accept-pack').click(event => {
@@ -1199,6 +1269,7 @@
 					html += '</div>';
                                     }
                                 }
+                                html += `<button class="btn btn-primary" onclick="showPackageCostModal('${value.id}', '${value.chosen_data_template}', '${value.cost_for_client}', '${value.cost_for_company}')">@lang('order_packages.form.buttons.changePackageCost')</button>`;
                                 html += '</div>';
                             }
                             if (isProblem) {
@@ -2348,14 +2419,14 @@
                     $('#quantity__errors').empty();
                     $('#exists__errors').empty();
                     res.forEach((error) => {
-                        if (error.error == 'position') {
-                            $('#position__errors').append(`<h5>Brak pozycji dla produktu: <span class="modal__product">${error.productName}</span>. Przejdź do tworzenia pozycji: <a href="/admin/products/stocks/${error.product}/positions/create" target="_blank">Kliknij tutaj</a>`)
+                        if (error.error == '{{ \App\Enums\ProductStockError::POSITION }}') {
+                            $('#position__errors').append(`<h5>{{ __('product_stocks.form.missing_position_for_product') }} <span class="modal__product">${error.productName}</span>. {{ __('product_stocks.form.go_to_create_position') }} <a href="/admin/products/stocks/${error.product}/positions/create" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
                         }
-                        if (error.error == 'quantity') {
-                            $('#quantity__errors').append(`<h5>Brak wystarczającej ilości produktu na pozycji głównej - ilość: <span class="modal__position">${error.position.position_quantity}</span>. Przejdź do przenoszenia pomiędzy pozycjami: <a href="/admin/products/stocks/${error.product}/edit?tab=positions" target="_blank">Kliknij tutaj</a>`)
+                        if (error.error == '{{ \App\Enums\ProductStockError::QUANTITY }}') {
+                            $('#quantity__errors').append(`<h5>{{ __('product_stocks.form.missing_product_quantity') }} <span class="modal__position">${error.position.position_quantity}</span>. {{ __('product_stocks.form.go_to_move_between_positions') }}<a href="/admin/products/stocks/${error.product}/edit?tab=positions" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
                         }
-                        if (error.error == 'exists') {
-                            $('#exists__errors').append(`<h5>Dla produktu: <span class="modal__product">${error.productName}</span> został już wykonany stan magazynowy. Jeśli chcesz usunąć daną etykietę - przejdź do edycji zamówienia i usuń etykietę na samym dole: <a href="/admin/orders/${error.order_id}/edit" target="_blank">Kliknij tutaj</a>`)
+                        if (error.error == '{{ \App\Enums\ProductStockError::EXISTS }}') {
+                            $('#exists__errors').append(`<h5>{{ __('product_stocks.form.for_product') }} <span class="modal__product">${error.productName}</span> {{ __('product_stocks.form.stock_already_performed') }} {{ __('product_stocks.form.go_to_order') }} <a href="/admin/orders/${error.order_id}/edit" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
                         }
                     })
                     $('#stock_modal').modal('show');
@@ -3380,6 +3451,16 @@
                 .search($('#searchLeft').val())
                 .draw();
         });
+        $('#packageTemplatesList').on('change', () => {
+            $.ajax({
+                url: laroute.route('package_templates.getPackageTemplate', {id: $('#packageTemplatesList').val()})
+            }).done((data) => {
+                $('#cost_for_client').val(data.approx_cost_client);
+                $('#cost_for_company').val(data.approx_cost_firm);
+            }).catch((error) => {
+                console.error(error);
+            });
+        })
 
     </script>
     <script>

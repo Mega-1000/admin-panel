@@ -90,7 +90,6 @@
     $orderValue = str_replace(',', '', number_format($sumOfItems + $order->shipment_price_for_client + $order->additional_service_cost + $order->additional_cash_on_delivery_cost, 2));
     $paymentsValue = 0;
     $paymentsPromise = 0;
-
     foreach($order->bookedPayments($order->id) as $payment){
         $paymentsValue += $payment->amount;
     }
