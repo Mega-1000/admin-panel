@@ -6,16 +6,20 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Services\ProductStockPacketService;
+use App\Services\ProductStockService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class ProductStockPacketsController extends Controller
 {
-    protected $productStockPacketService;
+    private $productStockPacketService;
+    private $productStockService;
 
-    public function __construct(ProductStockPacketService $productStockPacketService) {
+    public function __construct(ProductStockPacketService $productStockPacketService, ProductStockService $productStockService) {
         $this->productStockPacketService = $productStockPacketService;
+        $this->productStockService = $productStockService;
     }
 
     public function assign(int $packetId, int $orderItemId): JsonResponse
@@ -37,5 +41,10 @@ class ProductStockPacketsController extends Controller
         $data = $this->productStockPacketService->unassignPacket($orderItemId);
 
         return response()->json($data);
+    }
+
+    public function checkProductStockForPacketAssign(Request $request): array
+    {
+        return $this->productStockService->checkProductStock($request->input('productId'), $request->input('productQuantity'));
     }
 }

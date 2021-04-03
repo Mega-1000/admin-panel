@@ -597,6 +597,14 @@
             <button type="button" class="btn btn-success" onclick="loadAllegroPrices()">
                 Przelicz po cenach allegro
             </button>
+            <select name="" id="packetList" class="form-control">
+                @foreach($packets as $packet)
+                    <option value="{{ $packet->id }}">{{ $packet->packet_name }}</option>
+                @endforeach
+            </select>
+            <button type="button" class="btn btn-default" id="usePackageButton">
+                Przydziel pakiet
+            </button>
             <table id="productsTable" class="table table1 table-venice-blue productsTableEdit">
                 <tbody id="products-tbody">
                 @php
@@ -929,28 +937,6 @@
                                 @endphp
                             @endforeach
                             Ilość wszystkich: {{ $quantityAll }} <br/>
-                        </td>
-                        <td>
-                            @if(!$item->packet)
-                                <div class="form-group">
-                                    <label for="packets">@lang('product_stock_packets.form.choose_packet')</label>
-                                    @if($item->product->stock->packets->count() > 0)
-                                        <select class="form-control" id="packets" name="packet">
-                                            @foreach($item->product->stock->packets as $packet)
-                                                <option value="{{ $packet->id }}">{{ $packet->packet_name }}</option>
-                                            @endforeach
-                                        </select>
-                                    @else
-                                        <h4>@lang('product_stock_packets.no_packets')</h4>
-                                    @endif
-                                </div>
-                                <button class="btn btn-success" data-orderItemId="{{ $item->id }}" id="assignPacketSubmit">Użyj wybranego pakietu</button>
-                            @else
-                                <div class="form-group">
-                                    @lang('product_stock_packets.currentPacket'): <b>{{ $item->packet->packet_name }}</b>
-                                </div>
-                                <button class="btn btn-danger" data-orderItemId="{{ $item->id }}" id="retainPacketSubmit">Usuń wybrany pakiet</button>
-                            @endif
                         </td>
                     </tr>
                     <tr class="row-{{$item->id}}">
@@ -4737,6 +4723,11 @@
             let previousOrderUrl = '{{ route('orders.edit', ['id' => $order->getPreviousOrderId($order->id)]) }}';
             window.location.href = previousOrderUrl;
         }
+
+        $('#usePackageButton').on('click', () => {
+            let assignPacketUrl = '/admin/orders/' + {{ $order->id}} + '/packet/' + $('#packetList').val() + '/use';
+            window.location.href = assignPacketUrl;
+        })
     </script>
 
     <script src="{{ URL::asset('js/views/orders/edit.js') }}"></script>

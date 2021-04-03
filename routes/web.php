@@ -246,15 +246,17 @@ Route::group(['prefix' => 'admin'], function () {
             'ProductStockPacketsController@delete')->name('product_stock_packets.delete');
         Route::get('products/stocks/packets',
             'ProductStockPacketsController@index')->name('product_stock_packets.index');
+        Route::get('orders/{orderId}/packet/{packetId}/use',
+            'OrdersController@usePacket')->name('orders.usePacket');
         Route::post('products/stocks/packets/{packetId}/orderItem/{orderItemId}/assign',
             'Api\ProductStockPacketsController@assign')->name('product_stock_packets.assign');
         Route::post('products/stocks/packets/orderItem/{orderItemId}/retain',
             'Api\ProductStockPacketsController@retain')->name('product_stock_packets.retain');
+        Route::get('products/stocks/packets/product/stock/check',
+            'Api\ProductStockPacketsController@checkProductStockForPacketAssign')->name('product_stock_packets.product.stock.check');
         Route::get('products/stocks/packets/{packetId}',
             'ProductStockPacketsController@edit')->name('product_stock_packets.edit');
-        Route::get('products/stocks/packets/{packetId}/product/create',
-            'ProductStockPacketsController@edit')->name('product_stock_packets.edit');
-        Route::put('products/stocks/packets/{packetId}',
+        Route::put('products/stocks/packets',
             'ProductStockPacketsController@update')->name('product_stock_packets.update');
         Route::post('positions/{from}/{to}/quantity/move',
             'ProductStockPositionsController@quantityMove')->name('product_stocks.quantity_move');

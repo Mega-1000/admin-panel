@@ -15,6 +15,7 @@ use App\Entities\OrderPackage;
 use App\Entities\OrderPayment;
 use App\Entities\PackageTemplate;
 use App\Entities\Product;
+use App\Entities\ProductStockPacket;
 use App\Entities\Role;
 use App\Entities\Task;
 use App\Entities\UserSurplusPayment;
@@ -65,6 +66,7 @@ use App\Repositories\OrderRepository;
 use App\Repositories\ProductPackingRepository;
 use App\Repositories\ProductRepository;
 use App\Repositories\ProductStockLogRepository;
+use App\Repositories\ProductStockPacketRepository;
 use App\Repositories\ProductStockPositionRepository;
 use App\Repositories\ProductStockRepository;
 use App\Repositories\SpeditionExchangeRepository;
@@ -219,6 +221,8 @@ class OrdersController extends Controller
 
     protected $orderExcelService;
 
+    protected $productStockPacketRepository;
+
     protected $dtColumns = [
         'clientFirstname' => 'customer_addresses.firstname',
         'clientLastname' => 'customer_addresses.lastname',
@@ -258,7 +262,8 @@ class OrdersController extends Controller
         OrderPackageRepository $orderPackageRepository,
         TaskRepository $taskRepository,
         OrderInvoiceService $orderInvoiceService,
-        OrderExcelService $orderExcelService
+        OrderExcelService $orderExcelService,
+        ProductStockPacketRepository $productStockPacketRepository
     )
     {
         $this->repository = $repository;
@@ -286,6 +291,7 @@ class OrdersController extends Controller
         $this->taskRepository = $taskRepository;
         $this->orderInvoiceService = $orderInvoiceService;
         $this->orderExcelService = $orderExcelService;
+        $this->productStockPacketRepository = $productStockPacketRepository;
     }
 
     /**
@@ -505,6 +511,8 @@ class OrdersController extends Controller
         $selInvoices = $order->sellInvoices ?? [];
         $subiektInvoices = $order->subiektInvoices ?? [];
         $orderHasSentLP = $order->hasOrderSentLP();
+        $packets = ProductStockPacket::with('items')->get();
+
         if ($order->customer_id == 4128) {
             return view('orders.edit_self',
                 compact('visibilitiesTask', 'visibilitiesPackage', 'visibilitiesPayments', 'warehouses', 'order',
@@ -518,7 +526,7 @@ class OrdersController extends Controller
                     'users', 'customerInfo', 'orderInvoiceAddress', 'selInvoices', 'subiektInvoices',
                     'orderDeliveryAddress', 'orderItems', 'warehouse', 'statuses', 'messages', 'productPacking',
                     'customerDeliveryAddress', 'firms', 'productsVariation', 'allProductsFromSupplier', 'orderId',
-                    'customerOrdersToPay', 'orderHasSentLP', 'emails', 'clientTotalCost', 'ourTotalCost', 'labelsButtons'));
+                    'customerOrdersToPay', 'orderHasSentLP', 'emails', 'clientTotalCost', 'ourTotalCost', 'labelsButtons', 'packets'));
         }
     }
 
@@ -1887,7 +1895,7 @@ class OrdersController extends Controller
     public function datatable(Request $request)
     {
         $data = $request->all();
-        list($collection, $countFiltred) = $this->prepareCollection($data);
+        [$collection, $countFiltred] = $this->prepareCollection($data);
         $count = $this->orderRepository->all();
         $count = count($count);
         $collection = $this->prepareAdditionalOrderData($collection);
@@ -2234,7 +2242,7 @@ class OrdersController extends Controller
     public function sendVisibleCouriers(Request $request)
     {
         $data = $request->all();
-        list($collection, $countFiltred) = $this->prepareCollection($data);
+        [$collection, $countFiltred] = $this->prepareCollection($data);
         if (!$countFiltred) {
             return \response("Brak zamówień");
         }
@@ -2255,7 +2263,7 @@ class OrdersController extends Controller
         $packages = $order->packages->where('status', 'NEW');
         foreach ($packages as $package) {
             try {
-                list($message, $messages) = app(OrdersPackagesController::class)->sendPackage($package, $messages);
+                [$message, $messages] = app(OrdersPackagesController::class)->sendPackage($package, $messages);
                 if (!empty($message)) {
                     $messages [] = $message;
                 }
@@ -2277,7 +2285,7 @@ class OrdersController extends Controller
         }
         file_put_contents($lockName, '');
         $data = $request->all();
-        list($collection, $count) = $this->prepareCollection($data, true);
+        [$collection, $count] = $this->prepareCollection($data, true);
         $tagHelper = new EmailTagHandlerHelper();
         $merger = new Merger;
         $i = 0;
@@ -2866,7 +2874,7 @@ class OrdersController extends Controller
 
     public function findPage(Request $request, $id)
     {
-        list($collection, $count) = $this->prepareCollection($request->all(), false, $id);
+        [$collection, $count] = $this->prepareCollection($request->all(), false, $id);
         return response($count / $request->all()['length']);
     }
 
@@ -3051,5 +3059,13 @@ class OrdersController extends Controller
     public function downloadAllegroPaymentsExcel(Request $request): BinaryFileResponse
     {
         return $this->orderExcelService->generateAllegroPaymentsExcel($request->input('allegro_from'), $request->input('allegro_to'));
+    }
+
+    public function usePacket($orderId, $packetId)
+    {
+        $order = $this->orderRepository->find($orderId);
+        $packet = $this->productStockPacketRepository->find($packetId);
+
+        return view('product_stocks.packets.assign', compact('order', 'packet'));
     }
 }

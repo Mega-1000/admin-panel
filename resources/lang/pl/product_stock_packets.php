@@ -13,11 +13,17 @@ return [
         'actions' => 'Akcje',
         'packet_list' => 'Lista pakietów',
         'packet_create' => 'Stwórz pakiet',
+        'packet_products' => 'Produkty w pakiecie',
     ],
     'messages' => [
-      'delete' => 'Pakiet został pomyślnie usunięty',
+        'delete' => 'Pakiet został pomyślnie usunięty',
+        'update' => 'Pakiet został pomyślnie zaktualizowany',
     ],
     'form' => [
+        'product_list' => 'Lista produktów w pakiecie',
+        'add_product_header' => 'Dodawanie produktu do pakietu',
+        'add_product' => 'Dodaj produkt',
+        'choose_product' => 'Wybierz produkt',
         'choose_packet' => 'Wybierz pakiet',
         'name' => 'Nazwa',
         'symbol' => 'Symbol',
@@ -46,6 +52,8 @@ return [
             'positions' => 'Pozycje w magazynie',
             'logs' => 'Historia zmian',
             'position_create' => 'Dodaj pozycję w magazynie',
+            'create' => 'Utwórz nowy pakiet',
+            'add_product' => 'Dodaj produkt do pakietu',
         ],
     ]
 ];

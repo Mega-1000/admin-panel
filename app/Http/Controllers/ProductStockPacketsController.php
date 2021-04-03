@@ -7,13 +7,16 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProductStockPacketCreateRequest;
 use App\Http\Requests\ProductStockPacketUpdateRequest;
 use App\Repositories\OrderItemRepository;
+use App\Repositories\ProductRepository;
 use App\Repositories\ProductStockLogRepository;
+use App\Repositories\ProductStockPacketItemRepository;
 use App\Repositories\ProductStockPacketRepository;
 use App\Repositories\ProductStockRepository;
 use App\Services\ProductStockLogService;
 use App\Services\ProductStockPacketService;
 use App\Services\ProductStockPositionService;
 use App\Services\ProductStockService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
@@ -59,6 +62,10 @@ class ProductStockPacketsController extends Controller
      */
     protected $productStockPositionService;
 
+    protected $productRepository;
+
+    protected $productStockPacketItemRepository;
+
     public function __construct(
         ProductStockPacketRepository $repository,
         ProductStockRepository $productStockRepository,
@@ -67,7 +74,9 @@ class ProductStockPacketsController extends Controller
         ProductStockPacketService $productStockPacketService,
         ProductStockService $productStockService,
         ProductStockLogService $productStockLogService,
-        ProductStockPositionService $productStockPositionService
+        ProductStockPositionService $productStockPositionService,
+        ProductRepository $productRepository,
+        ProductStockPacketItemRepository $productStockPacketItemRepository
     ) {
         $this->repository = $repository;
         $this->productStockRepository = $productStockRepository;
@@ -77,39 +86,39 @@ class ProductStockPacketsController extends Controller
         $this->productStockService = $productStockService;
         $this->productStockLogService = $productStockLogService;
         $this->productStockPositionService = $productStockPositionService;
+        $this->productRepository = $productRepository;
+        $this->productStockPacketItemRepository = $productStockPacketItemRepository;
     }
 
-    public function index(int $id): View
+    public function index(): View
     {
-        $productStock = $this->productStockRepository->find($id);
+        $productStockPackets = $this->repository->all();
 
-        return view('product_stocks.packets.index', compact('productStock'));
+        return view('product_stocks.packets.index', compact('productStockPackets'));
     }
 
-    public function edit(int $id, int $packetId): View
+    public function edit(int $packetId): View
     {
-        $productStock = $this->productStockRepository->find($id);
         $productStockPacket = $this->repository->find($packetId);
+        $products = $this->productRepository->findWhere(['deleted_at' => null]);
 
-        return view('product_stocks.packets.edit', compact('productStockPacket', 'productStock'));
+        return view('product_stocks.packets.edit', compact('productStockPacket', 'products'));
     }
 
-    public function create(int $id): View
+    public function create(): View
     {
-        $productStock = $this->productStockRepository->find($id);
-
-        return view('product_stocks.packets.create', compact('productStock'));
+        $products = $this->productRepository->findWhere(['deleted_at' => null]);
+        return view('product_stocks.packets.create', compact('products'));
     }
 
-    public function store(ProductStockPacketCreateRequest $request, int $productStockId): RedirectResponse
+    public function store(ProductStockPacketCreateRequest $request): RedirectResponse
     {
         $validated = $request->validated();
 
         $this->productStockPacketService->createProductPacket(
-            $validated['packet_quantity'],
-            $validated['packet_name'],
-            $validated['packet_product_quantity'],
-            $productStockId
+            $validated['packetsQuantity'],
+            $validated['packetName'],
+            $validated['products']
         );
 
         return redirect()->back()->with([
@@ -118,30 +127,26 @@ class ProductStockPacketsController extends Controller
         ]);
     }
 
-    public function update(ProductStockPacketUpdateRequest $request, int $productStockId, int $packetId): RedirectResponse
+    public function update(ProductStockPacketUpdateRequest $request): JsonResponse
     {
         $validated = $request->validated();
 
         $this->productStockPacketService->updatePacketQuantity(
-            $validated['packet_quantity'],
-            $validated['packet_name'],
-            $validated['packet_product_quantity'],
-            $productStockId,
-            $packetId
+            $validated['packetName'],
+            $validated['packetsQuantity'],
+            $validated['products'],
+            $validated['id']
         );
 
-        return redirect()->back()->with([
-            'message' => __('product_stocks.message.packet_store'),
-            'alert-type' => 'success',
-        ]);
+        return response()->json(['status' => true, 'message' => __('product_stock_packets.messages.update')]);
     }
 
-    public function delete(int $id, int $packetId): RedirectResponse
+    public function delete(int $packetId): RedirectResponse
     {
         $this->productStockPacketService->deletePacket($packetId);
 
         return redirect()->back()->with([
-            'id' => $id,
+            'id' => $packetId,
             'message' => __('product_stock_packets.messages.delete'),
             'alert-type' => 'info'
         ]);

@@ -78,6 +78,7 @@ return [
             'positions' => 'Pozycje w magazynie',
             'logs' => 'Historia zmian',
             'position_create' => 'Dodaj pozycję w magazynie',
+            'add_product' => 'Dodaj produkt do pakietu',
         ],
         'found_similar_products' => 'Znaleziono produkty z innych działów',
         'set_product_as_stock_product' => 'Czy ustawić produkt jako główny produkt w zleceniach?',
@@ -96,5 +97,8 @@ return [
         'change_status' => 'Status produktu został pomyślnie zaktualizowany',
         'update' => 'Stan magazynowy produktu został pomyślnie zaktualizowany',
         'error_quantity' => 'Stan magazynowy danej pozycji nie może być niższy niż 0',
+        'position_quantity_is_smaller' => 'Pozycja główna produktu nie posiada wystarczającej ilości produktu',
+        'position_not_exists' => 'Pozycja główna produktu nie istnieje. Utwórz nową.',
+        'packet_product_store' => 'Pomyślnie dodano produkt do pakietu',
     ]
 ];

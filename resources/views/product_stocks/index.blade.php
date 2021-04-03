@@ -7,6 +7,7 @@
 @endsection
 
 @section('table')
+    <a href="{{ route('product_stock_packets.index') }}" class="btn btn-success">@lang('product_stock_packets.packet_list')</a>
     <a href="{{ route('product_stocks.print') }}" class="btn btn-success">Wydrukuj stany</a>
     <table id="dataTable" class="table table-hover">
         <thead>
@@ -123,16 +124,6 @@
                         let html = '<a href="{{ url()->current() }}/' + id + '/edit" class="btn btn-sm btn-primary edit">';
                         html += '<i class="voyager-edit"></i>';
                         html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
-                        html += '</a>';
-                        const listUrl = laroute.route('product_stock_packets.index', { id: id});
-                        html += '<a href="' + listUrl + '" class="btn btn-sm btn-warning edit">';
-                        html += '<i class="voyager-edit"></i>';
-                        html += '<span class="hidden-xs hidden-sm"> @lang('product_stock_packets.table.packet_list')</span>';
-                        html += '</a>';
-                        const createUrl = laroute.route('product_stock_packets.create', { id: id});
-                        html += '<a href="' + createUrl + '" class="btn btn-sm btn-success edit">';
-                        html += '<i class="voyager-edit"></i>';
-                        html += '<span class="hidden-xs hidden-sm"> @lang('product_stock_packets.table.packet_create')</span>';
                         html += '</a>';
                         return html;
                     }
