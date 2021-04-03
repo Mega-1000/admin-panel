@@ -39,8 +39,10 @@
 
     function checkProductStock(productId, productQuantity, productName) {
         return axios.get(laroute.route('product_stock_packets.product.stock.check'), {
-            'productId': productId,
-            'productQuantity': productQuantity
+            params: {
+                'productId': productId,
+                'productQuantity': productQuantity
+            }
         }).then((response) => {
             switch(response.data.status) {
                 case true:
