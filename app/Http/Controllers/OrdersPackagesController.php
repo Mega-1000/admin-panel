@@ -479,23 +479,23 @@ class OrdersPackagesController extends Controller
 
         if ($courierName !== 'WSZYSTKIE') {
             $packages = OrderPackage::where('delivery_courier_name', '=', $courierName)
-                ->where('shipment_date', '<=', Carbon::createFromFormat('d/m/yy',$request->date_to)->format('yy-m-d'))
-                ->where('shipment_date', '>=', Carbon::createFromFormat('d/m/yy',$request->date_from)->format('yy-m-d'))
+                ->where('shipment_date', '<=', Carbon::createFromFormat('d/m/Y',$request->date_to)->format('Y/m/d H:i:s'))
+                ->where('shipment_date', '>=', Carbon::createFromFormat('d/m/Y',$request->date_from)->format('Y/m/d H:i:s'))
                 ->where('status', '!=', 'CANCELLED')
                 ->where('status', '!=', 'WAITING_FOR_CANCELLED')
                 ->where('status', '!=', 'REJECT_CANCELLED')
                 ->get();
         } else {
             $courierName = 'wszystkie';
-            $packages = OrderPackage::whereDate('shipment_date', '<=', Carbon::createFromFormat('d/m/yy',$request->date_to)->format('yy-m-d'))
-                ->where('shipment_date', '>=', Carbon::createFromFormat('d/m/yy',$request->date_from)->format('yy-m-d'))
+            $packages = OrderPackage::where('shipment_date', '<=', Carbon::createFromFormat('d/m/Y',$request->date_to)->format('Y/m/d H:i:s'))
+                ->where('shipment_date', '>=', Carbon::createFromFormat('d/m/Y',$request->date_from)->format('Y/m/d H:i:s'))
                 ->where('status', '!=', 'CANCELLED')
                 ->where('status', '!=', 'WAITING_FOR_CANCELLED')
                 ->where('status', '!=', 'REJECT_CANCELLED')
                 ->get();
         }
 
-        if ($packages->count() > 0 ){
+        if ($packages->count() > 0){
             $packagesArray = [];
             foreach ($packages as $package) {
                 if ($package->order->warehouse !== null) {
@@ -517,7 +517,7 @@ class OrdersPackagesController extends Controller
                     'letter_number' => $package->letter_number,
                     'phone' => $package->order->addresses->first->id->phone,
                     'postal_code' => $package->order->addresses->first->id->postal_code,
-                    'city' => PdfCharactersHelper::changePolishCharactersToNonAccented($package->order->addresses->first->id->city),
+                    'city' => PdfCharactersHelper::changePolishCharactersToNonAccented($package->order->addresses->first->id->city ?? ''),
                 ];
                 array_push($packagesArray, $packagesArr);
             }
