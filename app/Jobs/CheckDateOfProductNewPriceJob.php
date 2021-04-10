@@ -145,6 +145,9 @@ class CheckDateOfProductNewPriceJob
             $price['gross_selling_price_the_largest_unit'] = number_format($price['net_purchase_price_the_largest_unit_after_discounts'] * ((100 + $product->price->coating) / 100) * 1.23,
                 2, '.', '');
 
+            // cena brutto opakowania na wzór importu z pliku
+            $price['gross_price_of_packing'] = $price['gross_selling_price_commercial_unit'];
+
             $productsRelated = Product::where('products_related_to_the_automatic_price_change', $product->symbol)->get();
 
             $ids = [$product->id];
