@@ -35,6 +35,9 @@ class CheckDateOfProductNewPriceJob
 
         foreach ($products as $product) {
             $group = $product->product_group_for_change_price;
+            if (!empty($product->parentProduct)) {
+                $group = $product->parentProduct->product_group_for_change_price;
+            }
             if (empty($group)) {
                 $groupExp = 'UC';
             } else {
@@ -148,14 +151,7 @@ class CheckDateOfProductNewPriceJob
             // cena brutto opakowania na wzór importu z pliku
             $price['gross_price_of_packing'] = $price['gross_selling_price_commercial_unit'];
 
-            $productsRelated = Product::where('products_related_to_the_automatic_price_change', $product->symbol)->get();
-
-            $ids = [$product->id];
-            foreach ($productsRelated as $productRelated) {
-                $ids[] = $productRelated->id;
-            }
-
-            ProductPrice::whereIn('product_id', $ids)->update($price);
+            $product->price->update($price);
         }
     }
 
