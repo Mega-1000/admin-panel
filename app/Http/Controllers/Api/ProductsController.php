@@ -111,13 +111,16 @@ class ProductsController extends Controller
                 if (empty($product)) {
                     continue;
                 }
-                $product->date_of_price_change = (new Carbon($item['date_of_price_change']))->toDateString();
-                $product->date_of_the_new_prices = (new Carbon($item['date_of_the_new_prices']))->toDateString();
-                $product->value_of_price_change_data_first = (float) str_replace(',', '.', $item['value_of_price_change_data_first'] ?? 0);
-                $product->value_of_price_change_data_second = (float) str_replace(',', '.', $item['value_of_price_change_data_second'] ?? 0);
-                $product->value_of_price_change_data_third = (float) str_replace(',', '.', $item['value_of_price_change_data_third'] ?? 0);
-                $product->value_of_price_change_data_fourth = (float) str_replace(',', '.', $item['value_of_price_change_data_fourth'] ?? 0);
-                $product->save();
+                $productsRelatedIds = Product::where('products_related_to_the_automatic_price_change', $product->symbol)->pluck('id');
+                $productsRelatedIds[] = $product->id;
+
+                $array['date_of_price_change'] = (new Carbon($item['date_of_price_change']))->toDateString();
+                $array['date_of_the_new_prices'] = (new Carbon($item['date_of_the_new_prices']))->toDateString();
+                $array['value_of_price_change_data_first'] = (float)str_replace(',', '.', $item['value_of_price_change_data_first'] ?? 0);
+                $array['value_of_price_change_data_second'] = (float)str_replace(',', '.', $item['value_of_price_change_data_second'] ?? 0);
+                $array['value_of_price_change_data_third'] = (float)str_replace(',', '.', $item['value_of_price_change_data_third'] ?? 0);
+                $array['value_of_price_change_data_fourth'] = (float)str_replace(',', '.', $item['value_of_price_change_data_fourth'] ?? 0);
+                Product::whereIn('id', $productsRelatedIds)->update($array);
             }
 
             return $this->createdResponse();
@@ -149,7 +152,7 @@ class ProductsController extends Controller
         header('Content-type: text/csv');
         header('Content-Disposition: attachment; filename="aktualneCeny.csv"');
         $file = fopen('php://output', 'w');
-        fputcsv($file, array('id', 'Nazwa produktu', 'Symbol Produktu', 'Wed³ug czego przeliczane beda ceny(kolumna 108)', 'Data Zmiany', 'Wstêpna data nastêpnej zmiany ceny', 'Zmienna1', 'Zmienna2', 'Zmienna3', 'Zmienna4'));
+        fputcsv($file, array('id', 'Nazwa produktu', 'Symbol Produktu', 'Wedï¿½ug czego przeliczane beda ceny(kolumna 108)', 'Data Zmiany', 'Wstï¿½pna data nastï¿½pnej zmiany ceny', 'Zmienna1', 'Zmienna2', 'Zmienna3', 'Zmienna4'));
         foreach ($data as $row) {
             fputcsv($file, $row);
         }
