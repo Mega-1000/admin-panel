@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Entities\Product;
-use App\Entities\ProductPrice;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -35,7 +34,7 @@ class CheckDateOfProductNewPriceJob
 
         foreach ($products as $product) {
             $group = $product->product_group_for_change_price;
-            if (!empty($product->parentProduct)) {
+            if (empty($group) && !empty($product->parentProduct)) {
                 $group = $product->parentProduct->product_group_for_change_price;
             }
             if (empty($group)) {
