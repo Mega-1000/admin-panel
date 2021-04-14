@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Entities\Product;
-use App\Entities\ProductPrice;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -35,6 +34,9 @@ class CheckDateOfProductNewPriceJob
 
         foreach ($products as $product) {
             $group = $product->product_group_for_change_price;
+            if (empty($group) && !empty($product->parentProduct)) {
+                $group = $product->parentProduct->product_group_for_change_price;
+            }
             if (empty($group)) {
                 $groupExp = 'UC';
             } else {
@@ -145,14 +147,10 @@ class CheckDateOfProductNewPriceJob
             $price['gross_selling_price_the_largest_unit'] = number_format($price['net_purchase_price_the_largest_unit_after_discounts'] * ((100 + $product->price->coating) / 100) * 1.23,
                 2, '.', '');
 
-            $productsRelated = Product::where('products_related_to_the_automatic_price_change', $product->symbol)->get();
+            // cena brutto opakowania na wzór importu z pliku
+            $price['gross_price_of_packing'] = $price['gross_selling_price_commercial_unit'];
 
-            $ids = [$product->id];
-            foreach ($productsRelated as $productRelated) {
-                $ids[] = $productRelated->id;
-            }
-
-            ProductPrice::whereIn('product_id', $ids)->update($price);
+            $product->price->update($price);
         }
     }
 
