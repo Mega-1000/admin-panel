@@ -83,7 +83,6 @@ class WarehousesController extends Controller
         $warehouseAddress->warehouse_number = $request->input('warehouse_number');
         $warehouseAddress->postal_code = $request->input('postal_code');
         $warehouseAddress->city = $request->input('city');
-
         if(!empty($postal)) {
             $warehouseAddress->latitude = $postal->latitude;
             $warehouseAddress->longitude = $postal->longitude;
