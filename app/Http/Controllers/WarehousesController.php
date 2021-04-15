@@ -82,6 +82,7 @@ class WarehousesController extends Controller
         $warehouseAddress->address = $request->input('address');
         $warehouseAddress->warehouse_number = $request->input('warehouse_number');
         $warehouseAddress->postal_code = $request->input('postal_code');
+        $warehouseAddress->city = $request->input('city');
         if(!empty($postal)) {
             $warehouseAddress->latitude = $postal->latitude;
             $warehouseAddress->longitude = $postal->longitude;
@@ -147,6 +148,7 @@ class WarehousesController extends Controller
             $warehouseAddress->address = $request->input('address');
             $warehouseAddress->warehouse_number = $request->input('warehouse_number');
             $warehouseAddress->postal_code = $request->input('postal_code');
+            $warehouseAddress->city = $request->input('city');
             if(!empty($postal)) {
                 $warehouseAddress->latitude = $postal->latitude ?: null;
                 $warehouseAddress->longitude = $postal->longitude ?: null;
@@ -158,6 +160,7 @@ class WarehousesController extends Controller
             $warehouseAddress->address = '';
             $warehouseAddress->warehouse_number = '';
             $warehouseAddress->postal_code = '';
+            $warehouseAddress->city = $request->input('city');
             if(!empty($postal)) {
                 $warehouseAddress->latitude = $postal->latitude ?: null;
                 $warehouseAddress->longitude = $postal->longitude ?: null;
