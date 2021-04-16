@@ -2255,7 +2255,7 @@
         },
         {
             "id": 181,
-            "label_group_id": 5,
+            "label_group_id": 1,
             "name": "Dane teleadresowe wymagaj\u0105 sprawdzenia",
             "order": 1,
             "color": "#FF0000",
@@ -2264,7 +2264,7 @@
             "manual_label_selection_to_add_after_removal": 0,
             "status": "ACTIVE",
             "created_at": "2021-04-16 11:50:09",
-            "updated_at": "2021-04-16 11:50:09",
+            "updated_at": "2021-04-16 15:35:22",
             "message": null,
             "timed": 0
         }
