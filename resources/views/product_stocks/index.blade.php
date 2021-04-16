@@ -7,7 +7,7 @@
 @endsection
 
 @section('table')
-    <a href="{{ route('product_stock_packets.index') }}" class="btn btn-success">@lang('product_stock_packets.packet_list')</a>
+    <a href="{{ route('sets.index') }}" class="btn btn-success">@lang('sets.packet_list')</a>
     <a href="{{ route('product_stocks.print') }}" class="btn btn-success">Wydrukuj stany</a>
     <table id="dataTable" class="table table-hover">
         <thead>

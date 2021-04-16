@@ -238,26 +238,8 @@ Route::group(['prefix' => 'admin'], function () {
             'ProductStockLogsController@datatable')->name('product_stocks.logs.datatable');
         Route::get('products/stocks/{id}/logs/{log_id}/show',
             'ProductStockLogsController@show')->name('product_stocks.logs.show');
-        Route::get('products/stocks/packets/create',
-            'ProductStockPacketsController@create')->name('product_stock_packets.create');
-        Route::post('products/stocks/packets',
-            'ProductStockPacketsController@store')->name('product_stock_packets.store');
-        Route::delete('products/stocks/packets/{packetId}',
-            'ProductStockPacketsController@delete')->name('product_stock_packets.delete');
-        Route::get('products/stocks/packets',
-            'ProductStockPacketsController@index')->name('product_stock_packets.index');
         Route::get('orders/{orderId}/packet/{packetId}/use',
             'OrdersController@usePacket')->name('orders.usePacket');
-        Route::post('products/stocks/packets/{packetId}/orderItem/{orderItemId}/assign',
-            'Api\ProductStockPacketsController@assign')->name('product_stock_packets.assign');
-        Route::post('products/stocks/packets/orderItem/{orderItemId}/retain',
-            'Api\ProductStockPacketsController@retain')->name('product_stock_packets.retain');
-        Route::get('products/stocks/packets/product/stock/check',
-            'Api\ProductStockPacketsController@checkProductStockForPacketAssign')->name('product_stock_packets.product.stock.check');
-        Route::get('products/stocks/packets/{packetId}',
-            'ProductStockPacketsController@edit')->name('product_stock_packets.edit');
-        Route::put('products/stocks/packets',
-            'ProductStockPacketsController@update')->name('product_stock_packets.update');
         Route::post('positions/{from}/{to}/quantity/move',
             'ProductStockPositionsController@quantityMove')->name('product_stocks.quantity_move');
         Route::get('orders', 'OrdersController@index')->name('orders.index');
