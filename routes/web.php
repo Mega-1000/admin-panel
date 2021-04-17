@@ -28,6 +28,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::group(['prefix' => 'customers', 'as' => 'customers.'], __DIR__ . '/web/CustomersRoutes.php');
         Route::group(['prefix' => 'packageTemplates', 'as' => 'package_templates.'], __DIR__ . '/web/PackageTemplatesRoutes.php');
         Route::group(['prefix' => 'orders', 'as' => 'orders.'], __DIR__ . '/web/OrdersRoutes.php');
+        Route::group(['prefix' => 'employeeRoles', 'as' => 'employee_role.'], __DIR__ . '/web/EmployeeRolesRoutes.php');
 
         Route::group(['prefix' => 'users', 'as' => 'users.'], __DIR__ . '/web/UsersRoutes.php');
         Route::delete('users-destroy/{id}/', ['uses' => 'UserController@destroy',])->name('users.destroy');
@@ -39,14 +40,6 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/get/user/{id}', 'OrdersController@getUserInfo');
         Route::get('/order/task/create/', 'TasksController@createTask');
 
-
-        Route::get('employeeRoles', 'EmployeeRoleController@index')->name('employee_role.index');
-        Route::get('employeeRoles/datatable', 'EmployeeRoleController@datatable')->name('employee_role.datatable');
-        Route::get('employeeRoles/create', 'EmployeeRoleController@create')->name('employee_role.create');
-        Route::post('employeeRoles/store', 'EmployeeRoleController@store')->name('employee_role.store');
-        Route::get('employeeRoles/{id}/edit', 'EmployeeRoleController@edit')->name('employee_role.edit');
-        Route::put('employeeRoles/{id}/update', 'EmployeeRoleController@update')->name('employee_role.update');
-        Route::delete('employeeRoles/{id}/delete', 'EmployeeRoleController@destroy')->name('employee_role.destroy');
 
         Route::get('contentTypes', 'ContentTypesController@index')->name('content_type.index');
         Route::get('contentTypes/create', 'ContentTypesController@create')->name('content_type.create');
@@ -175,7 +168,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orders/status/{id}/message', 'OrdersController@getStatusMessage')->name('order.status.message');
 
         Route::get('invoice/{id}/delete', 'OrdersController@deleteInvoice')->name('order.deleteInvoice');
-        
+
 
         Route::get('import', 'ImportController@index')->name('import.index');
         Route::post('products/stocks/changes', 'ProductStocksController@productsStocksChanges')->name('productsStocks.changes');
