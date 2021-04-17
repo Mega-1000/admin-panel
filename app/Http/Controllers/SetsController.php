@@ -155,16 +155,44 @@ class SetsController extends Controller
         ]);
     }
 
-    public function completing()
+    public function completing(Set $set, Request $request)
     {
+        $this->validate(request(), [
+            'number' => 'required',
+        ]);
+
+        $set->stock = $set->stock + $request->number;
+
+        if ($set->update()) {
+            return redirect()->route('sets.index')->with([
+                'message' => 'Zostału utworzone '.$request->number.' zestawy',
+                'alert-type' => 'success'
+            ]);
+        }
+
         return redirect()->route('sets.index')->with([
             'message' => __('sets.message.error'),
             'alert-type' => 'error'
         ]);
     }
 
-    public function disassembly()
+    public function disassembly(Set $set, Request $request)
     {
+        $this->validate(request(), [
+            'number' => 'required',
+        ]);
+
+        $setsNumber = $set->stock - $request->number;
+
+        $set->stock = ($setsNumber < 0) ? 0 : $setsNumber;
+
+        if ($set->update()) {
+            return redirect()->route('sets.index')->with([
+                'message' => 'Zostału zdekompletowane '.$request->number.' zestawy',
+                'alert-type' => 'success'
+            ]);
+        }
+
         return redirect()->route('sets.index')->with([
             'message' => __('sets.message.error'),
             'alert-type' => 'error'
