@@ -24,6 +24,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::group(['prefix' => 'employees', 'as' => 'employees.'], __DIR__ . '/web/EmployeesRoutes.php');
         Route::group(['prefix' => 'statuses', 'as' => 'statuses.'], __DIR__ . '/web/StatusesRoutes.php');
         Route::group(['prefix' => 'labels', 'as' => 'labels.'], __DIR__ . '/web/LabelsRoutes.php');
+        Route::group(['prefix' => 'label-groups', 'as' => 'label_groups.'], __DIR__ . '/web/LabelsRoutes.php');
 
         Route::group(['prefix' => 'users', 'as' => 'users.'], __DIR__ . '/web/UsersRoutes.php');
         Route::delete('users-destroy/{id}/', ['uses' => 'UserController@destroy',])->name('users.destroy');
@@ -37,18 +38,6 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/order/task/create/', 'TasksController@createTask');
 
 
-
-        Route::get('label-groups', 'LabelGroupsController@index')->name('label_groups.index');
-        Route::get('label-groups/datatable/', 'LabelGroupsController@datatable')->name('label_groups.datatable');
-        Route::get('label-groups/create/', 'LabelGroupsController@create')->name('label_groups.create');
-        Route::post('label-groups/store/', 'LabelGroupsController@store')->name('label_groups.store');
-        Route::get('label-groups/{id}/edit', 'LabelGroupsController@edit')->name('label_groups.edit');
-        Route::put('label-groups/{id}/update', [
-            'uses' => 'LabelGroupsController@update',
-        ])->name('label_groups.update');
-        Route::delete('label-groups/{id}/', [
-            'uses' => 'LabelGroupsController@destroy',
-        ])->name('label_groups.destroy');
 
         Route::get('customers', 'CustomersController@index')->name('customers.index');
         Route::get('customers/datatable', 'CustomersController@datatable')->name('customers.datatable');
