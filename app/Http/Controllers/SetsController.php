@@ -49,9 +49,15 @@ class SetsController extends Controller
         $set->stock = 0;
 
         if ($set->save()) {
-            return view('product_stocks.sets.index');
+            return redirect()->route('sets.index')->with([
+                'message' => __('sets.message.store'),
+                'alert-type' => 'success'
+            ]);
         }
-        return redirect()->back()->withErrors('Błąd. Spróbuj ponownie.');
+        return redirect()->back()->with([
+            'message' => __('sets.message.error'),
+            'alert-type' => 'error'
+        ]);
     }
 
     public function update(Set $set, Request $request)
@@ -66,21 +72,29 @@ class SetsController extends Controller
         $set->stock = $request->stock;
 
         if ($set->update()) {
-            $sets = Set::get()->all();
-
-            return  view('product_stocks.sets.index', compact('sets'));
+            return redirect()->route('sets.edit', ['set' => $set->id])->with([
+                'message' => __('sets.message.store'),
+                'alert-type' => 'success'
+            ]);
         }
-        return redirect()->back()->withErrors('Błąd. Spróbuj ponownie.');
+        return redirect()->back()->with([
+            'message' => __('sets.message.error'),
+            'alert-type' => 'error'
+        ]);
     }
 
     public function delete(Set $set)
     {
         if ($set->delete()) {
-            $sets = Set::get()->all();
-
-            return  view('product_stocks.sets.index', compact('sets'));
+            return redirect()->route('sets.index')->with([
+                'message' => __('sets.message.delete'),
+                'alert-type' => 'success'
+            ]);
         }
-        return redirect()->back()->withErrors('Błąd. Spróbuj ponownie.');
+        return redirect()->back()->with([
+            'message' => __('sets.message.error'),
+            'alert-type' => 'error'
+        ]);
     }
 
     public function addProduct(Request $request, Set $set)
@@ -96,11 +110,15 @@ class SetsController extends Controller
         $setItem->stock = $request->stock;
 
         if ($setItem->save()) {
-            $set = Set::where('id', $set->id)->get()->first();
-            $products = Product::get()->all();
-            return  view('product_stocks.sets.edit', compact(['set', 'products']));
+            return redirect()->route('sets.edit', ['set' => $set->id])->with([
+                'message' => __('sets.message.store'),
+                'alert-type' => 'success'
+            ]);
         }
-        return redirect()->back()->withErrors('Błąd. Spróbuj ponownie.');
+        return redirect()->back()->with([
+            'message' => __('sets.message.error'),
+            'alert-type' => 'error'
+        ]);
     }
 
     public function editProduct(Set $set, SetItem $productSet, Request $request)
@@ -112,20 +130,28 @@ class SetsController extends Controller
         $productSet->stock = $request->stock;
 
         if ($productSet->update()) {
-            $set = Set::where('id', $set->id)->get()->first();
-            $products = Product::get()->all();
-            return  view('product_stocks.sets.edit', compact(['set', 'products']));
+            return redirect()->route('sets.edit', ['set' => $set->id])->with([
+                'message' => __('sets.message.store'),
+                'alert-type' => 'success'
+            ]);
         }
-        return redirect()->back()->withErrors('Błąd. Spróbuj ponownie.');
+        return redirect()->back()->with([
+            'message' => __('sets.message.error'),
+            'alert-type' => 'error'
+        ]);
     }
 
     public function deleteProduct(Set $set, SetItem $productSet)
     {
         if ($productSet->delete()) {
-            $set = Set::where('id', $set->id)->get()->first();
-            $products = Product::get()->all();
-            return  view('product_stocks.sets.edit', compact(['set', 'products']));
+            return redirect()->route('sets.edit', ['set' => $set->id])->with([
+                'message' => __('sets.message.store'),
+                'alert-type' => 'success'
+            ]);
         }
-        return redirect()->back()->withErrors('Błąd. Spróbuj ponownie.');
+        return redirect()->back()->with([
+            'message' => __('sets.message.error'),
+            'alert-type' => 'error'
+        ]);
     }
 }
