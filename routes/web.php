@@ -16,8 +16,12 @@ Route::redirect('/', '/admin');
 Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
     Route::group(['middleware' => 'admin'], function () {
-        Route::group(['prefix' => 'products/sets', 'as' => 'sets.'], __DIR__ . '/web/ProductsSetsRoutes.php');
-        Route::group(['prefix' => 'products/stocks', 'as' => 'product_stocks.'], __DIR__ . '/web/ProductsRoutes.php');
+
+        Route::group(['prefix' => 'products'], function () {
+            Route::group(['prefix' => 'sets', 'as' => 'sets.'], __DIR__ . '/web/ProductsSetsRoutes.php');
+            Route::group(['prefix' => 'stocks', 'as' => 'product_stocks.'], __DIR__ . '/web/ProductsRoutes.php');
+            Route::group(['prefix' => 'stocks/packets/', 'as' => 'product_stock_packets.'], __DIR__ . '/web/PacketsRoutes.php');
+        });
 
         Route::group(['prefix' => 'bonus', 'as' => 'bonus.'], __DIR__ . '/web/BonusRoutes.php');
         Route::group(['prefix' => 'pages', 'as' => 'pages.'], __DIR__ . '/web/PagesRoutes.php');
@@ -67,10 +71,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('sello-import', 'OrdersController@selloImport')->name('orders.sello_import');
         Route::get('send_tracking_numbers', 'OrdersController@sendTrackingNumbers')->name('orders.send_tracking_numbers');
 
-
         Route::post('positions/{from}/{to}/quantity/move',
             'ProductStockPositionsController@quantityMove')->name('product_stocks.quantity_move');
-
 
         Route::get('orderPayments/datatable/{id}',
             'OrdersPaymentsController@datatable')->name('order_payments.datatable');
@@ -148,7 +150,6 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orders/status/{id}/message', 'OrdersController@getStatusMessage')->name('order.status.message');
 
         Route::get('invoice/{id}/delete', 'OrdersController@deleteInvoice')->name('order.deleteInvoice');
-
 
         Route::get('import', 'ImportController@index')->name('import.index');
         Route::post('products/stocks/changes', 'ProductStocksController@productsStocksChanges')->name('productsStocks.changes');
