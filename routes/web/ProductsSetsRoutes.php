@@ -9,3 +9,5 @@ Route::post('/{set}/usun', ['as' => 'delete', 'uses' => 'SetsController@delete']
 Route::post('/{set}/products/add', ['as' => 'addProduct', 'uses' => 'SetsController@addProduct']);
 Route::post('/{set}/products/edytuj/{productSet}', ['as' => 'editProduct', 'uses' => 'SetsController@editProduct']);
 Route::post('/{set}/products/{productSet}', ['as' => 'deleteProduct', 'uses' => 'SetsController@deleteProduct']);
+Route::post('/{set}/completing/', ['as' => 'completingSets', 'uses' => 'SetsController@completing']);
+Route::post('/{set}/disassembly/', ['as' => 'disassemblySets', 'uses' => 'SetsController@disassembly']);

@@ -29,6 +29,8 @@
                 <th>@lang('sets.table.packet_quantity')</th>
                 <th>@lang('sets.table.products')</th>
                 <th>@lang('sets.table.actions')</th>
+                <th>@lang('sets.table.actions')</th>
+                <th>@lang('sets.table.actions')</th>
             </tr>
         </thead>
         <tbody>
@@ -54,6 +56,30 @@
                         </ul>
                     </td>
                     <td>
+                        <form action="{{ route('sets.completingSets', ['set' => $set->id]) }}" method="POST">
+                            @csrf
+                            <div class="form-group">
+                                <label for="number">@lang('sets.form.number')</label>
+                                <input type="number" class="form-control" id="number" name="number" min="1">
+                            </div>
+                            <button clclass="btn btn-sm btn-primary" type="submit">
+                                <span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>
+                            </button>
+                        </form>
+                    </td>
+                    <td>
+                        <form action="{{ route('sets.disassemblySets', ['set' => $set->id]) }}" method="POST">
+                            @csrf
+                            <div class="form-group">
+                                <label for="number">@lang('sets.form.number')</label>
+                                <input type="number" class="form-control" id="number" name="number" min="1" max="{{ $set->stock }}">
+                            </div>
+                            <button clclass="btn btn-sm btn-primary" type="submit">
+                                <span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>
+                            </button>
+                        </form>
+                    </td>
+                    <td>
                         <a class="btn btn-sm btn-primary" href="{{ route('sets.edit', ['set' => $set->id]) }}">
                             <i class="voyager-trash"></i>
                             <span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>
@@ -61,8 +87,8 @@
                         <form action="{{ route('sets.delete', ['set' => $set->id]) }}" method="POST">
                             @csrf
                             <button class="btn btn-sm btn-danger" type="submit">
-                               <i class="voyager-trash"></i>
-                               <span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>
+                                <i class="voyager-trash"></i>
+                                <span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>
                             </button>
                         </form>
                     </td>

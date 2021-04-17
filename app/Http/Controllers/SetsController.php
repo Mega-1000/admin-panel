@@ -154,4 +154,20 @@ class SetsController extends Controller
             'alert-type' => 'error'
         ]);
     }
+
+    public function completing()
+    {
+        return redirect()->route('sets.index')->with([
+            'message' => __('sets.message.error'),
+            'alert-type' => 'error'
+        ]);
+    }
+
+    public function disassembly()
+    {
+        return redirect()->route('sets.index')->with([
+            'message' => __('sets.message.error'),
+            'alert-type' => 'error'
+        ]);
+    }
 }
