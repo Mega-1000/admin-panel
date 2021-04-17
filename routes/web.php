@@ -25,6 +25,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::group(['prefix' => 'statuses', 'as' => 'statuses.'], __DIR__ . '/web/StatusesRoutes.php');
         Route::group(['prefix' => 'labels', 'as' => 'labels.'], __DIR__ . '/web/LabelsRoutes.php');
         Route::group(['prefix' => 'label-groups', 'as' => 'label_groups.'], __DIR__ . '/web/LabelsRoutes.php');
+        Route::group(['prefix' => 'customers', 'as' => 'customers.'], __DIR__ . '/web/CustomersRoutes.php');
 
         Route::group(['prefix' => 'users', 'as' => 'users.'], __DIR__ . '/web/UsersRoutes.php');
         Route::delete('users-destroy/{id}/', ['uses' => 'UserController@destroy',])->name('users.destroy');
@@ -39,15 +40,7 @@ Route::group(['prefix' => 'admin'], function () {
 
 
 
-        Route::get('customers', 'CustomersController@index')->name('customers.index');
-        Route::get('customers/datatable', 'CustomersController@datatable')->name('customers.datatable');
-        Route::get('customers/create', 'CustomersController@create')->name('customers.create');
-        Route::post('customers/store', 'CustomersController@store')->name('customers.store');
-        Route::get('customers/{id}/edit', 'CustomersController@edit')->name('customers.edit');
-        Route::put('customers/{id}/update', 'CustomersController@update')->name('customers.update');
-        Route::post('customers/{id}/override-customer-data', 'CustomersController@changeLoginOrPassword')->name('customers.change.login-or-password');
-        Route::delete('customers/{id}/', 'CustomersController@destroy')->name('customers.destroy');
-        Route::put('customers/{id}/change-status', 'CustomersController@changeStatus')->name('customers.change.status');
+
 
         Route::get('packageTemplates', 'PackageTemplatesController@index')->name('package_templates.index');
         Route::get('packageTemplates/datatable', 'PackageTemplatesController@datatable')->name('package_templates.datatable');
