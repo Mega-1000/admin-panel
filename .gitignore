@@ -20,6 +20,7 @@ yarn-error.log
 /public/css/app.css
 /public/*pdf
 /public/js/app.js
+/public/js/lararoute.js
 /storage/logs
 docker
 admin-panel.iml
