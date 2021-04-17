@@ -16,141 +16,27 @@ Route::redirect('/', '/admin');
 Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
     Route::group(['middleware' => 'admin'], function () {
+        Route::group(['prefix' => 'products/sets', 'as' => 'sets.'], __DIR__ . '/web/ProductsSetsRoutes.php');
+        Route::group(['prefix' => 'bonus', 'as' => 'bonus.'], __DIR__ . '/web/BonusRoutes.php');
+        Route::group(['prefix' => 'pages', 'as' => 'pages.'], __DIR__ . '/web/PagesRoutes.php');
+        Route::group(['prefix' => 'firms', 'as' => 'firms.'], __DIR__ . '/web/FirmsRoutes.php');
+        Route::group(['prefix' => 'warehouses', 'as' => 'warehouses.'], __DIR__ . '/web/WarehousesRoutes.php');
+        Route::group(['prefix' => 'employees', 'as' => 'employees.'], __DIR__ . '/web/EmployeesRoutes.php');
+        Route::group(['prefix' => 'statuses', 'as' => 'statuses.'], __DIR__ . '/web/StatusesRoutes.php');
+        Route::group(['prefix' => 'labels', 'as' => 'labels.'], __DIR__ . '/web/LabelsRoutes.php');
 
-        Route::get('/bonus', 'BonusController@index')->name('bonus.index');
-        Route::post('/bonus', 'BonusController@create')->name('bonus.create');
-        Route::post('/bonus/delete', 'BonusController@destroy')->name('bonus.destroy');
+        Route::group(['prefix' => 'users', 'as' => 'users.'], __DIR__ . '/web/UsersRoutes.php');
+        Route::delete('users-destroy/{id}/', ['uses' => 'UserController@destroy',])->name('users.destroy');
 
+        //Different custom routes
         Route::get('prices/allegro-prices/{id}', 'ProductPricesController@getAllegroPrices')->name('prices.allegroPrices');
         Route::get('orders/{id}/get-basket', 'OrdersController@goToBasket')->name('orders.goToBasket');
-        Route::get('/pages/content/delete', 'PagesGeneratorController@deleteContent')->name('pages.deleteContent');
-        Route::get('/pages/{id}/content/edit', 'PagesGeneratorController@editContent')->name('pages.editContent');
-        Route::get('/pages/{id}/content/new', 'PagesGeneratorController@newContent')->name('pages.newContent');
-        Route::post('/pages/{id}/content/store', 'PagesGeneratorController@storeContent')->name('pages.saveContent');
-        Route::get('/pages/{id}/content', 'PagesGeneratorController@contentList')->name('pages.list');
-
-        Route::get('/pages/new', 'PagesGeneratorController@createPage')->name('pages.create');
-        Route::post('/pages/store', 'PagesGeneratorController@store')->name('pages.store');
-        Route::get('/pages/{id}/delete', 'PagesGeneratorController@delete')->name('pages.delete');
-        Route::get('/pages/{id}', 'PagesGeneratorController@edit')->name('pages.edit');
-        Route::get('/pages', 'PagesGeneratorController@getPages')->name('pages.index');
-
         Route::get('/getDelivererImportLog/{id}', 'DelivererController@getDelivererImportLog')->name('deliverer.getImportLog');
-
         Route::get('/warehouse/{id}', 'OrdersController@getCalendar');
+        Route::get('/get/user/{id}', 'OrdersController@getUserInfo');
+        Route::get('/order/task/create/', 'TasksController@createTask');
 
-        Route::get('/get/user/{id}',
-            'OrdersController@getUserInfo');
 
-        Route::get('/order/task/create/',
-            'TasksController@createTask');
-
-        Route::get('users', 'UserController@index')->name('users.index');
-        Route::get('users/datatable/all', 'UserController@datatable')->name('users.datatable');
-        Route::get('users/create', 'UserController@create')->name('users.create');
-        Route::post('users/store', 'UserController@store')->name('users.store');
-        Route::get('users/{id}/editItem', 'UserController@edit')->name('users.edit');
-        Route::put('users/{id}/update', [
-            'uses' => 'UserController@update',
-        ])->name('users.update');
-        Route::delete('users-destroy/{id}/', [
-            'uses' => 'UserController@destroy',
-        ])->name('users.destroy');
-        Route::put('users/{id}/change-status', [
-            'uses' => 'UserController@changeStatus',
-        ])->name('users.change.status');
-
-        Route::get('firms', 'FirmsController@index')->name('firms.index');
-        Route::get('firms/datatable', 'FirmsController@datatable')->name('firms.datatable');
-        Route::get('firms/create', 'FirmsController@create')->name('firms.create');
-        Route::post('firms/store', 'FirmsController@store')->name('firms.store');
-        Route::get('firms/{id}/edit', 'FirmsController@edit')->name('firms.edit');
-        Route::put('firms/{id}/update', [
-            'uses' => 'FirmsController@update',
-        ])->name('firms.update');
-        Route::delete('firms/{id}/', [
-            'uses' => 'FirmsController@destroy',
-        ])->name('firms.destroy');
-        Route::put('firms/{id}/change-status', [
-            'uses' => 'FirmsController@changeStatus',
-        ])->name('firms.change.status');
-        Route::get('firms/{id}/sendRequestToUpdateFirmData',
-            'FirmsController@sendRequestToUpdateFirmData')->name('firms.sendRequestToUpdateFirmData');
-
-        Route::get('warehouses/datatable/{id}', 'WarehousesController@datatable')->name('warehouses.datatable');
-        Route::get('warehouses/create/{firm_id}', 'WarehousesController@create')->name('warehouses.create');
-        Route::post('warehouses/store/{firm_id}', 'WarehousesController@store')->name('warehouses.store');
-        Route::get('warehouses/{id}/edit', 'WarehousesController@edit')->name('warehouses.edit');
-        Route::put('warehouses/{id}/update', [
-            'uses' => 'WarehousesController@update',
-        ])->name('warehouses.update');
-        Route::delete('warehouses/{id}/', [
-            'uses' => 'WarehousesController@destroy',
-        ])->name('warehouses.destroy');
-        Route::put('warehouses/{id}/change-status', [
-            'uses' => 'WarehousesController@changeStatus',
-        ])->name('warehouses.change.status');
-        Route::get('warehouses/search/autocomplete', 'WarehousesController@autocomplete');
-        Route::get('warehouses/{symbol}/editBySymbol', 'WarehousesController@editBySymbol');
-
-        Route::get('warehouse/orders/new', 'WarehouseOrdersController@index')->name('warehouse.orders.index');
-        Route::post('warehouse/orders/datatable',
-            'WarehouseOrdersController@datatable')->name('warehouse.orders.datatable');
-        Route::post('warehouse/orders/datatable/all',
-            'WarehouseOrdersController@datatableAll')->name('warehouse.orders.datatable.all');
-        Route::post('warehouse/orders/makeOrder',
-            'WarehouseOrdersController@makeOrder')->name('warehouse.orders.makeOrder');
-        Route::get('warehouse/orders/{id}/edit', 'WarehouseOrdersController@edit')->name('warehouse.orders.edit');
-        Route::put('warehouse/orders/{id}/update', 'WarehouseOrdersController@update')->name('warehouse.orders.update');
-        Route::get('warehouse/orders', 'WarehouseOrdersController@all')->name('warehouse.orders.all');
-        Route::post('warehouse/orders/sendEmail',
-            'WarehouseOrdersController@sendEmail')->name('warehouse.orders.sendEmail');
-
-        Route::get('employees/datatable/{id}', 'EmployeesController@datatable')->name('employees.datatable');
-        Route::get('employees/create/{firm_id}', 'EmployeesController@create')->name('employees.create');
-        Route::post('employees/store/{firm_id}', 'EmployeesController@store')->name('employees.store');
-        Route::get('employees/{id}/edit', 'EmployeesController@edit')->name('employees.edit');
-        Route::put('employees/{id}/update', [
-            'uses' => 'EmployeesController@update',
-        ])->name('employees.update');
-        Route::delete('employees/{id}/', [
-            'uses' => 'EmployeesController@destroy',
-        ])->name('employees.destroy');
-        Route::put('employees/{id}/change-status', [
-            'uses' => 'EmployeesController@changeStatus',
-        ])->name('employees.change.status');
-
-        Route::get('statuses', 'StatusesController@index')->name('statuses.index');
-        Route::get('statuses/datatable/', 'StatusesController@datatable')->name('statuses.datatable');
-        Route::get('statuses/create/', 'StatusesController@create')->name('statuses.create');
-        Route::post('statuses/store/', 'StatusesController@store')->name('statuses.store');
-        Route::get('statuses/{id}/edit', 'StatusesController@edit')->name('statuses.edit');
-        Route::put('statuses/{id}/update', [
-            'uses' => 'StatusesController@update',
-        ])->name('statuses.update');
-        Route::delete('statuses/{id}/', [
-            'uses' => 'StatusesController@destroy',
-        ])->name('statuses.destroy');
-        Route::put('statuses/{id}/change-status', [
-            'uses' => 'StatusesController@changeStatus',
-        ])->name('statuses.change.status');
-
-        Route::get('labels', 'LabelsController@index')->name('labels.index');
-        Route::get('labels/datatable/', 'LabelsController@datatable')->name('labels.datatable');
-        Route::get('labels/create/', 'LabelsController@create')->name('labels.create');
-        Route::post('labels/store/', 'LabelsController@store')->name('labels.store');
-        Route::get('labels/{id}/edit', 'LabelsController@edit')->name('labels.edit');
-        Route::put('labels/{id}/update', [
-            'uses' => 'LabelsController@update',
-        ])->name('labels.update');
-        Route::delete('labels/{id}/', [
-            'uses' => 'LabelsController@destroy',
-        ])->name('labels.destroy');
-        Route::put('labels/{id}/change-status', [
-            'uses' => 'LabelsController@changeStatus',
-        ])->name('labels.change.status');
-        Route::get('labels/{id}/associated-labels-to-add-after-removal',
-            'LabelsController@associatedLabelsToAddAfterRemoval')->name('labels.associatedLabelsToAddAfterRemoval');
 
         Route::get('label-groups', 'LabelGroupsController@index')->name('label_groups.index');
         Route::get('label-groups/datatable/', 'LabelGroupsController@datatable')->name('label_groups.datatable');
