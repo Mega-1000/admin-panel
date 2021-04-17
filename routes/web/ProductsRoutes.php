@@ -12,5 +12,5 @@ Route::post('/{id}/positions/store', ['as' => 'position.store', 'uses' => 'Produ
 Route::get('/{id}/positions/{position_id}/edit', ['as' => 'position.edit', 'uses' => 'ProductStockPositionsController@edit']);
 Route::put('/{id}/positions/{position_id}/update', ['as' => 'position.update', 'uses' => 'ProductStockPositionsController@update']);
 Route::delete('/{id}/positions/{position_id}', ['as' => 'position.destroy', 'uses' => 'ProductStockPositionsController@destroy']);
-Route::get('/{id}/logs/datatable', ['as' => 'index', 'logs.datatable' => 'ProductStockLogsController@datatable']);
+Route::get('/{id}/logs/datatable', ['as' => 'logs.datatable', 'uses' => 'ProductStockLogsController@datatable']);
 Route::get('/{id}/logs/{log_id}/show', ['as' => 'logs.show', 'uses' => 'ProductStockLogsController@show']);

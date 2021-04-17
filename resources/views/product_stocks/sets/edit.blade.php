@@ -26,10 +26,6 @@
                 <label for="number">@lang('sets.form.number')</label>
                 <input type="text" class="form-control" id="number" name="number" value="{{ $set->number }}">
             </div>
-            <div class="form-group">
-                <label for="stock">@lang('sets.form.stock')</label>
-                <input type="text" class="form-control" id="stock" name="stock" value="{{ $set->stock }}">
-            </div>
         </div>
         <button type="submit" id="store__packet" class="btn btn-primary">@lang('voyager.generic.save')</button>
     </form>
@@ -76,22 +72,92 @@
         </table>
 
     @endif
-    <form action="{{ action('SetsController@addProduct', ['set' => $set->id]) }}" method="POST">
-        {{ csrf_field() }}
-        <div class="product_stocks-general" id="general">
-            <div class="form-group">
-                <label for="name">@lang('sets.form.add_product_header')</label>
-                <select class="form-control text-uppercase" name="product_id">
-                    @foreach ($products as $product)
-                        <option value="{{ $product->id }}">{{ $product->symbol }}  => {{ $product->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="stock">@lang('sets.form.packet_product_quantity')</label>
-                <input type="number" class="form-control" id="stock" name="stock" min="1" value="1">
-            </div>
-        </div>
-        <button type="submit" id="store__packet" class="btn btn-primary">@lang('sets.form.add_product')</button>
-    </form>
+    <div class="form-group">
+        <label for="search">Wyszukaj produkct aby dodać do zestawu</label>
+        <input type="text" class="form-control" id="search">
+    </div>
+    <table id="dataTable" class="table table-hover">
+        <thead>
+        <tr>
+            <th></th>
+            <th>ID</th>
+            <th>@lang('product_stocks.table.name')</th>
+            <th>@lang('product_stocks.table.symbol')</th>
+            <th>@lang('voyager.generic.actions')</th>
+        </tr>
+        </thead>
+        <tbody id="productTable">
+        </tbody>
+    </table>
+@endsection
+@section('datatable-scripts')
+    <script>
+        const existProducts = [
+            @foreach ($set->products() as $product)
+                {{ $product->product_id }},
+            @endforeach
+        ];
+
+        const products = [
+            @foreach ($products as $product)
+                {
+                  "id": "{{ $product->id }}",
+                  "name": "{{ $product->name }}",
+                  "symbol": "{{ $product->symbol }}"
+                },
+            @endforeach
+        ];
+
+        const searchInput = document.querySelector('#search');
+        const resultTable = document.querySelector('#productTable');
+
+        searchInput.addEventListener('change', (event) => {
+            createTable(searchProducts(searchInput.value));
+        });
+
+        function searchProducts(word) {
+            return products.filter((product) => {
+                if (product.name.search(word) != -1) {
+                    return true;
+                } else if (product.symbol.search(word) != -1) {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+        }
+
+        function createTable(products) {
+            resultTable.innerHTML = "";
+            products.forEach((product, index) => {
+                resultTable.innerHTML = resultTable.innerHTML + createRow(product, index);
+            })
+        }
+
+        function createRow(product, index) {
+            const form =
+                '<td>'+
+                    '<form action="{{ action('SetsController@addProduct', ['set' => $set->id]) }}" method="POST">'+
+                        '@csrf'+
+                        '<input type="hidden" name="product_id" value="'+product.id+'">'+
+                        '<div class="form-group">'+
+                            '<label for="stock">@lang('sets.form.packet_product_quantity')</label>'+
+                            '<input type="number" class="form-control" id="stock" name="stock" min="1" value="1">'+
+                        '</div>'+
+                        '<button type="submit" id="store__packet" class="btn btn-primary">@lang('sets.form.add_product')</button>'+
+                    '</form>'+
+                '</td>';
+            const message = '<td>Produkt został już dodany</td>';
+            const action = (existProducts.includes(parseInt(product.id))) ? message : form;
+            console.log(existProducts);
+            console.log(product.id);
+
+            return '<tr>'+
+                        '<td></td><td>'+(index + 1)+'</td>' +
+                        '<td>'+product.name+'</td>' +
+                        '<td>'+product.symbol+'</td>' +
+                        action +
+                   '</tr>';
+        }
+    </script>
 @endsection
