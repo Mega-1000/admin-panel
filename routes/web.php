@@ -17,6 +17,8 @@ Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
     Route::group(['middleware' => 'admin'], function () {
         Route::group(['prefix' => 'products/sets', 'as' => 'sets.'], __DIR__ . '/web/ProductsSetsRoutes.php');
+        Route::group(['prefix' => 'products/stocks', 'as' => 'product_stocks.'], __DIR__ . '/web/ProductsRoutes.php');
+
         Route::group(['prefix' => 'bonus', 'as' => 'bonus.'], __DIR__ . '/web/BonusRoutes.php');
         Route::group(['prefix' => 'pages', 'as' => 'pages.'], __DIR__ . '/web/PagesRoutes.php');
         Route::group(['prefix' => 'firms', 'as' => 'firms.'], __DIR__ . '/web/FirmsRoutes.php');
@@ -65,29 +67,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('sello-import', 'OrdersController@selloImport')->name('orders.sello_import');
         Route::get('send_tracking_numbers', 'OrdersController@sendTrackingNumbers')->name('orders.send_tracking_numbers');
 
-        Route::get('products/stocks', 'ProductStocksController@index')->name('product_stocks.index');
-        Route::post('products/stocks/datatable', 'ProductStocksController@datatable')->name('product_stocks.datatable');
-        Route::get('products/stocks/print', 'ProductStocksController@print')->name('product_stocks.print');
-        Route::get('products/stocks/{id}/edit', 'ProductStocksController@edit')->name('product_stocks.edit');
-        Route::put('products/stocks/{id}/update', 'ProductStocksController@update')->name('product_stocks.update');
-        Route::put('products/stocks/{id}/change-status',
-            'ProductStocksController@changeStatus')->name('product_stocks.change.status');
-        Route::get('products/stocks/{id}/positions/create',
-            'ProductStockPositionsController@create')->name('product_stocks.position.create');
-        Route::get('products/stocks/{id}/positions/datatable',
-            'ProductStockPositionsController@datatable')->name('product_stocks.position.datatable');
-        Route::post('products/stocks/{id}/positions/store',
-            'ProductStockPositionsController@store')->name('product_stocks.position.store');
-        Route::get('products/stocks/{id}/positions/{position_id}/edit',
-            'ProductStockPositionsController@edit')->name('product_stocks.position.edit');
-        Route::put('products/stocks/{id}/positions/{position_id}/update',
-            'ProductStockPositionsController@update')->name('product_stocks.position.update');
-        Route::delete('products/stocks/{id}/positions/{position_id}',
-            'ProductStockPositionsController@destroy')->name('product_stocks.position.destroy');
-        Route::get('products/stocks/{id}/logs/datatable',
-            'ProductStockLogsController@datatable')->name('product_stocks.logs.datatable');
-        Route::get('products/stocks/{id}/logs/{log_id}/show',
-            'ProductStockLogsController@show')->name('product_stocks.logs.show');
+
         Route::post('positions/{from}/{to}/quantity/move',
             'ProductStockPositionsController@quantityMove')->name('product_stocks.quantity_move');
 
