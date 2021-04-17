@@ -3549,4 +3549,25 @@
         })
 
     </script>
+
+    <script>
+
+
+        $(document).ready( function() {
+            var now = new Date();
+            const dateFrom = document.querySelector('#protocol_datepicker_from');
+            const dateTo = document.querySelector('#protocol_datepicker_to');
+
+            var day = ("0" + now.getDate()).slice(-2);
+            var month = ("0" + (now.getMonth() + 1)).slice(-2);
+
+            var today = (day)+"/"+(month)+"/"+now.getFullYear() ;
+
+
+            dateFrom.value = today;
+            dateTo.value = today;
+        });
+
+    </script>
+
 @endsection
