@@ -37,7 +37,7 @@ class OrderAddressObserver
     protected function addLabelIfManualCheckIsRequired(OrderAddress $orderAddress): void
     {
         if(!(new OrderAddressService())->addressIsValid($orderAddress)){
-            dispatch_now(new AddLabelJob($orderAddress->order->id, [181]));
+            dispatch_now(new AddLabelJob($orderAddress->order->id, [184]));
         }
     }
 }
