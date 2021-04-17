@@ -26,6 +26,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::group(['prefix' => 'labels', 'as' => 'labels.'], __DIR__ . '/web/LabelsRoutes.php');
         Route::group(['prefix' => 'label-groups', 'as' => 'label_groups.'], __DIR__ . '/web/LabelsRoutes.php');
         Route::group(['prefix' => 'customers', 'as' => 'customers.'], __DIR__ . '/web/CustomersRoutes.php');
+        Route::group(['prefix' => 'packageTemplates', 'as' => 'package_templates.'], __DIR__ . '/web/PackageTemplatesRoutes.php');
 
         Route::group(['prefix' => 'users', 'as' => 'users.'], __DIR__ . '/web/UsersRoutes.php');
         Route::delete('users-destroy/{id}/', ['uses' => 'UserController@destroy',])->name('users.destroy');
@@ -39,17 +40,6 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/order/task/create/', 'TasksController@createTask');
 
 
-
-
-
-        Route::get('packageTemplates', 'PackageTemplatesController@index')->name('package_templates.index');
-        Route::get('packageTemplates/datatable', 'PackageTemplatesController@datatable')->name('package_templates.datatable');
-        Route::get('packageTemplates/create', 'PackageTemplatesController@create')->name('package_templates.create');
-        Route::post('packageTemplates/store', 'PackageTemplatesController@store')->name('package_templates.store');
-        Route::get('packageTemplates/{id}/edit', 'PackageTemplatesController@edit')->name('package_templates.edit');
-        Route::put('packageTemplates/{id}/update', 'PackageTemplatesController@update')->name('package_templates.update');
-        Route::delete('packageTemplates/{id}/delete', 'PackageTemplatesController@destroy')->name('package_templates.destroy');
-        Route::get('packageTemplate/{id}/data', 'PackageTemplatesController@getPackageTemplate')->name('package_templates.getPackageTemplate');
 
         Route::get('employeeRoles', 'EmployeeRoleController@index')->name('employee_role.index');
         Route::get('employeeRoles/datatable', 'EmployeeRoleController@datatable')->name('employee_role.datatable');
