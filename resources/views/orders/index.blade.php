@@ -3551,8 +3551,6 @@
     </script>
 
     <script>
-
-
         $(document).ready( function() {
             var now = new Date();
             const dateFrom = document.querySelector('#protocol_datepicker_from');
@@ -3563,11 +3561,9 @@
 
             var today = (day)+"/"+(month)+"/"+now.getFullYear() ;
 
-
             dateFrom.value = today;
             dateTo.value = today;
         });
-
     </script>
 
 @endsection
