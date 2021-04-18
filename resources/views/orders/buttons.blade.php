@@ -85,10 +85,10 @@
                 {{csrf_field()}}
                 <label for="protocols">Protokoły z dnia</label>
                 <input name="date_from" class="protocol_datepicker" id="protocol_datepicker_from"
-                       value="{{ Carbon\Carbon::now()->format('d/m/yy') }}" style="width: 100px;"/>
+                        style="width: 100px;"/>
                 do dnia
                 <input name="date_to" class="protocol_datepicker" id="protocol_datepicker_to"
-                       value="{{ Carbon\Carbon::now()->format('d/m/yy') }}"/ style="width: 100px;">
+                        style="width: 100px;"/>
                 z magazynu:
                 <input type="text" id="delivery_warehouse" name="delivery_warehouse"
                        value="MEGA-OLAWA"/>
