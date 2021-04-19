@@ -394,21 +394,19 @@
     </div>
     <div class="col-md-2">
         <h4>Drukuj paczki z grupy:</h4>
-        <div class="row">
-            <button class="btn btn-info print-group" name="paczkomat">Paczkomat</button> ({{ $couriersCount['inpost'] }})
-        </div>
-        <div class="row">
-            <button class="btn btn-info print-group" name="gls">Gls</button> ({{ $couriersCount['gls'] }})
-        </div>
-        <div class="row">
-            <button class="btn btn-info print-group" name="dpd">Dpd</button> ({{ $couriersCount['dpd'] }})
-        </div>
-        <div class="row">
-            <button class="btn btn-info print-group" name="pocztex">Pocztex</button> ({{ $couriersCount['pocztex'] }})
-        </div>
-        <div class="row">
-            <button class="btn btn-info" id="create-new-task-button" name="custom">Dodatkowe Zadanie</button>
-        </div>
+        @foreach($couriersTasks as $courierCode => $tasksInDay)
+            <div class="row">
+                <button class="btn btn-info print-group col-lg-12" name="{{$courierCode}}"
+                        data-courierTasks="{{ json_encode($tasksInDay) }}">
+                    {{ \App\Enums\CourierName::DELIVERY_TYPE_LABELS[$courierCode] }}
+                    <div>
+                        @foreach($tasksInDay as $date => $tasks)
+                            <span class="badge badge-light">{{ count($tasks) }}</span>
+                        @endforeach
+                    </div>
+                </button>
+            </div>
+        @endforeach
         <div class="row">
             <button id="accept-pack" class="btn btn-success">Wykonano</button>
             <button id="deny-pack" class="btn btn-danger">Odrzucono</button>

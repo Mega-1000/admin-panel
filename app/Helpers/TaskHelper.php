@@ -62,32 +62,4 @@ class TaskHelper
         $task->parent_id = null;
         $task->save();
     }
-
-    /**
-     * Group tasks by shipment date
-     *
-     * @param Builder $taskCourierQuery
-     * @return Collection
-     */
-    public static function groupTaskByShipmentDate(Builder $taskCourierQuery)
-    {
-        $result = [];
-        $today = Carbon::today()->addDay(-1);
-        foreach ($taskCourierQuery->get() as $task) {
-            $orderDate = Carbon::parse($task->order->shipment_date);
-            if ($today->isSameDay($orderDate)) {
-                $result[][] = $task->id;
-            } elseif ($today->addDay()->isSameDay($orderDate)) {
-                $result[1][] = $task->id;
-            } elseif ($today->addDay(2)->isSameDay($orderDate)) {
-                $result[2][] = $task->id;
-            } elseif ($today->addDay(3)->isSameDay($orderDate)) {
-                $result[3][] = $task->id;
-            } else {
-                $result[4][] = $task->id;
-            }
-        }
-
-        return $result;
-    }
 }

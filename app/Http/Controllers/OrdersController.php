@@ -25,6 +25,7 @@ use App\Enums\AllegroExcel\AllegroHeaders;
 use App\Enums\AllegroExcel\OrderHeaders;
 use App\Enums\AllegroExcel\PaymentsHeader;
 use App\Enums\AllegroExcel\SheetNames;
+use App\Enums\CourierName;
 use App\Enums\LabelStatusEnum;
 use App\Exports\OrdersAllegroExport;
 use App\Helpers\BackPackPackageDivider;
@@ -222,6 +223,7 @@ class OrdersController extends Controller
 
     protected $orderExcelService;
 
+    /** @var TaskService  */
     protected $taskService;
 
     protected $productStockPacketRepository;
@@ -368,19 +370,8 @@ class OrdersController extends Controller
         }
         $templateData = PackageTemplate::orderBy('list_order', 'asc')->get();
         $deliverers = Deliverer::all();
-        dump($this->taskService);exit;
-//        $glsQuery = ;
-//        $dpdQuery = $this->getTaskQuery(['DPD']);
-//        $pocztexQuery = $this->getTaskQuery(['POCZTEX']);
-//        $inpostQuery = $this->getTaskQuery(['INPOST', 'ALLEGRO-INPOST']);
-//        dump(TaskHelper::groupTaskByShipmentDate($pocztexQuery));
-        $couriersCount = [
-            'gls' => TaskHelper::groupTaskByShipmentDate($this->taskService->getTaskQuery(['GLS'])),
-            'dpd' => TaskHelper::groupTaskByShipmentDate($this->taskService->getTaskQuery(['DPD'])),
-            'pocztex' => TaskHelper::groupTaskByShipmentDate($this->taskService->getTaskQuery(['POCZTEX'])),
-            'inpost' => TaskHelper::groupTaskByShipmentDate($this->taskService->getTaskQuery(['INPOST', 'ALLEGRO-INPOST']))
-        ];
-//        dd($couriersCount);
+        $couriersTasks = $this->taskService->groupTaskByShipmentDate();
+
         return view('orders.index', compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses'))
             ->withOuts($out)
             ->withLabIds($labIds)
@@ -388,7 +379,7 @@ class OrdersController extends Controller
             ->withDeliverers($deliverers)
             ->withTemplateData($templateData)
             ->withUsers($storekeepers)
-            ->withCouriersCount($couriersCount)
+            ->withCouriersTasks($couriersTasks)
             ->withAllWarehouses($allWarehouses);
     }
 
@@ -745,7 +736,11 @@ class OrdersController extends Controller
         }
         file_put_contents($lockName, '');
         try {
-            $task = $this->prepareTask($data['package_type'], $skip);
+            if (empty($data['task_id'])) {
+                $task = $this->prepareTask($data['package_type'], $skip);
+            } else {
+                $task = $this->taskRepository->find($data['task_id']);
+            }
         } catch (Exception $e) {
             unlink(public_path($lockName));
             return redirect()->back()->with([

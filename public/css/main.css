@@ -151,3 +151,9 @@
     margin: 0px;
 }
 
+.print-group {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px !important;
+}
+

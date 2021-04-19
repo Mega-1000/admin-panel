@@ -25,6 +25,7 @@ class OrdersFindPackageRequest extends FormRequest
     {
         return [
             'user_id' => 'exists:users,id',
+            'task_id' => 'nullable|exists:tasks,id',
             'package_type' => 'required',
             'skip' => 'integer',
             'action' => '',
