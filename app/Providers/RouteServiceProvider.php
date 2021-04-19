@@ -39,8 +39,7 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapWebGeneralRoutes();
 
-        //$this->mapCustomWebRoutes();
-        //
+        $this->mapCustomWebRoutes();
     }
 
     /**
@@ -66,14 +65,14 @@ class RouteServiceProvider extends ServiceProvider
      */
     protected function mapCustomWebRoutes()
     {
-        $folders = ['Packets', 'ProductsSets'];
+        //Example ['Packets', 'ProductsSets'];
+        $folders = [];
 
         foreach ($folders as $folder) {
             Route::middleware('web')
                 ->namespace($this->namespace)
                 ->group(base_path('routes/'.$folder.'/'.$folder.'Routes.php'));
         }
-
     }
 
     /**
