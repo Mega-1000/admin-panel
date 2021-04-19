@@ -28,8 +28,8 @@
                 <th>@lang('sets.table.number')</th>
                 <th>@lang('sets.table.packet_quantity')</th>
                 <th>@lang('sets.table.products')</th>
-                <th>@lang('sets.table.actions')</th>
-                <th>@lang('sets.table.actions')</th>
+                <th>@lang('sets.table.completingSets')</th>
+                <th>@lang('sets.table.disassemblySets')</th>
                 <th>@lang('sets.table.actions')</th>
             </tr>
         </thead>
@@ -59,11 +59,11 @@
                         <form action="{{ route('sets.completingSets', ['set' => $set->id]) }}" method="POST">
                             @csrf
                             <div class="form-group">
-                                <label for="number">@lang('sets.form.number')</label>
+                                <label for="number">@lang('sets.form.number_sets')</label>
                                 <input type="number" class="form-control" id="number" name="number" min="1">
                             </div>
-                            <button clclass="btn btn-sm btn-primary" type="submit">
-                                <span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>
+                            <button class="btn btn-sm btn-primary" type="submit">
+                                <span class="hidden-xs hidden-sm"> @lang('sets.form.completingSets')</span>
                             </button>
                         </form>
                     </td>
@@ -71,11 +71,11 @@
                         <form action="{{ route('sets.disassemblySets', ['set' => $set->id]) }}" method="POST">
                             @csrf
                             <div class="form-group">
-                                <label for="number">@lang('sets.form.number')</label>
+                                <label for="number">@lang('sets.form.number_sets')</label>
                                 <input type="number" class="form-control" id="number" name="number" min="1" max="{{ $set->stock }}">
                             </div>
-                            <button clclass="btn btn-sm btn-primary" type="submit">
-                                <span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>
+                            <button class="btn btn-sm btn-primary" type="submit">
+                                <span class="hidden-xs hidden-sm"> @lang('sets.form.disassemblySets')</span>
                             </button>
                         </form>
                     </td>

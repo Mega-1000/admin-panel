@@ -1,5 +1,7 @@
 <?php
 return [
+    'sets' => 'zestawy',
+    'set' => 'zestaw',
     'packet_list' => 'Lista zestawów',
     'edit' => 'Edycja zestawu',
     'packet_assign' > 'Pakiet przypisany do przedmiotu',
@@ -15,10 +17,19 @@ return [
         'packet_list' => 'Lista zestawów',
         'packet_create' => 'Stwórz zestaw',
         'packet_products' => 'Produkty w pakiecie',
+        'products' => 'Lista produktów w zestawie',
+        'completingSets' => 'Stwórz podaną ilość zestawów',
+        'disassemblySets' => 'Zdekompletuj podaną liczbę zestawów',
     ],
     'messages' => [
         'delete' => 'Pakiet został pomyślnie usunięty',
         'update' => 'Pakiet został pomyślnie zaktualizowany',
+        'exist_product' => 'Produkt został już dodany',
+        'empty_id' => 'Błędny stock id',
+        'disassembly_success' => 'Zostały zdekompletowane',
+        'completing_success' => 'Zostały utworzone',
+        'not_enough_product' => 'Brak wymaganej ilości towaru:',
+        'error' => 'Wystąpił nieoczekiwany błąd',
     ],
     'form' => [
         'product_list' => 'Lista produktów w pakiecie',
@@ -48,6 +59,10 @@ return [
         'packet_quantity' => 'Ilość zestawów do utworzenia',
         'packet_product_quantity' => 'Ilość produktu w pakiecie',
         'packet_name' => 'Nazwa zestawu',
+        'edit_stock' => 'Edytuj ilość',
+        'completingSets' => 'Stwórz',
+        'disassemblySets' => 'Zdekompletuj',
+        'number_sets' => 'Ilość zestawów',
         'buttons' => [
             'general' => 'Główne',
             'stocks' => 'Stan magazynowy',

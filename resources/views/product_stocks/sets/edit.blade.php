@@ -147,10 +147,8 @@
                         '<button type="submit" id="store__packet" class="btn btn-primary">@lang('sets.form.add_product')</button>'+
                     '</form>'+
                 '</td>';
-            const message = '<td>Produkt został już dodany</td>';
+            const message = '<td>@lang('sets.messages.exist_product')</td>';
             const action = (existProducts.includes(parseInt(product.id))) ? message : form;
-            console.log(existProducts);
-            console.log(product.id);
 
             return '<tr>'+
                         '<td></td><td>'+(index + 1)+'</td>' +

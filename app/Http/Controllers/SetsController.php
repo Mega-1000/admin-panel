@@ -57,7 +57,7 @@ class SetsController extends Controller
             ]);
         }
         return redirect()->back()->with([
-            'message' => __('sets.message.error'),
+            'message' => __('sets.messages.error'),
             'alert-type' => 'error'
         ]);
     }
@@ -80,7 +80,7 @@ class SetsController extends Controller
             ]);
         }
         return redirect()->back()->with([
-            'message' => __('sets.message.error'),
+            'message' => __('sets.messages.error'),
             'alert-type' => 'error'
         ]);
     }
@@ -94,7 +94,7 @@ class SetsController extends Controller
             ]);
         }
         return redirect()->back()->with([
-            'message' => __('sets.message.error'),
+            'message' => __('sets.messages.error'),
             'alert-type' => 'error'
         ]);
     }
@@ -125,12 +125,12 @@ class SetsController extends Controller
                 ]);
             }
             return redirect()->back()->with([
-                'message' => __('sets.message.error'),
+                'message' => __('sets.messages.error'),
                 'alert-type' => 'error'
             ]);
         } else {
             return redirect()->back()->with([
-                'message' => "Brak wymaganej ilości towaru",
+                'message' => __('sets.messages.not_enough_product'),
                 'alert-type' => 'error'
             ]);
         }
@@ -159,12 +159,12 @@ class SetsController extends Controller
                 ]);
             }
             return redirect()->back()->with([
-                'message' => __('sets.message.error'),
+                'message' => __('sets.messages.error'),
                 'alert-type' => 'error'
             ]);
         } else {
             return redirect()->back()->with([
-                'message' => "Brak wymaganej ilości towaru",
+                'message' => __('sets.messages.not_enough_product'),
                 'alert-type' => 'error'
             ]);
         }
@@ -182,7 +182,7 @@ class SetsController extends Controller
             ]);
         }
         return redirect()->back()->with([
-            'message' => __('sets.message.error'),
+            'message' => __('sets.messages.error'),
             'alert-type' => 'error'
         ]);
     }
@@ -198,7 +198,7 @@ class SetsController extends Controller
             $requiredStock = $product->stock * $request->number;
             if($stock->quantity < $requiredStock) {
                 return redirect()->back()->with([
-                    'message' => "Brak wymaganej ilości towaru:'".$product->name."'",
+                    'message' => __('sets.messages.not_enough_product')."'".$product->name."'",
                     'alert-type' => 'error'
                 ]);
             }
@@ -212,13 +212,13 @@ class SetsController extends Controller
                 $this->updateProductStock($product->id, $requiredStock);
             }
             return redirect()->route('sets.index')->with([
-                'message' => 'Zostału utworzone '.$request->number.' zestawy',
+                'message' => __('sets.messages.disassembly_success').' '.$request->number.' '.__('sets.sets'),
                 'alert-type' => 'success'
             ]);
         }
 
         return redirect()->route('sets.index')->with([
-            'message' => __('sets.message.error'),
+            'message' => __('sets.messages.error'),
             'alert-type' => 'error'
         ]);
     }
@@ -240,13 +240,13 @@ class SetsController extends Controller
                 $this->updateProductStock($product->id, -$requiredStock);
             }
             return redirect()->route('sets.index')->with([
-                'message' => 'Zostału zdekompletowane '.$request->number.' zestawy',
+                'message' => __('sets.messages.disassembly_success').' '.$request->number.' '.__('sets.sets'),
                 'alert-type' => 'success'
             ]);
         }
 
         return redirect()->route('sets.index')->with([
-            'message' => __('sets.message.error'),
+            'message' => __('sets.messages.error'),
             'alert-type' => 'error'
         ]);
     }
@@ -262,7 +262,7 @@ class SetsController extends Controller
                     $position->update();
                 } else {
                     return redirect()->back()->with([
-                        'message' => "Empty stock id",
+                        'message' => __('sets.messages.empty_id'),
                         'alert-type' => 'error'
                     ]);
                 }
