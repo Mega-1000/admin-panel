@@ -17,6 +17,7 @@ class OrderAddressObserver
     public function updated(OrderAddress $orderAddress)
     {
         $this->removingMissingDeliveryAddressLabelHandler($orderAddress);
+        $this->addLabelIfManualCheckIsRequired($orderAddress);
     }
 
     protected function removingMissingDeliveryAddressLabelHandler(OrderAddress $orderAddress)

@@ -46,10 +46,10 @@ class OrderAddressService
     protected function namesAndNipCombined(OrderAddress $address): bool
     {
         if ($address->nip && ($address->first_name || $address->last_name)) {
-            return false;
+            return true;
         }
 
-        return true;
+        return false;
     }
 
 }
