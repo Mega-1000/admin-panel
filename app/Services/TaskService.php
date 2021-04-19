@@ -54,27 +54,28 @@ class TaskService
     public function groupTaskByShipmentDate(): array
     {
         $result = [];
-        $tasks = [
+        $dates = [
             'inne' => []
         ];
-        $today = Carbon::today()->subDay(2);
-        $lastShowedDate = Carbon::today()->addDays(1);
+        $today = Carbon::today();
+        $lastShowedDate = Carbon::today()->addDays(3);
         $period = CarbonPeriod::create($today, $lastShowedDate);
         foreach ($period as $date) {
-            $tasks[$date->toDateString()] = [];
+            $dates[$date->toDateString()] = [];
         }
         foreach (CourierName::DELIVERY_TYPE_FOR_TASKS as $deliveryTypeName => $deliveryTypes) {
+            $tasksByDay = $dates;
             foreach ($this->getTaskQuery($deliveryTypes)->get() as $task) {
                 $orderDate = Carbon::parse($task->order->shipment_date);
                 $key = $orderDate->toDateString();
                 if ($orderDate->isBetween($today, $lastShowedDate)) {
-                    $tasks[$key][] = $task;
+                    $tasksByDay[$key][] = $task;
                 } else {
-                    $tasks['inne'][] = $task;
+                    $tasksByDay['inne'][] = $task;
                 }
             }
-            ksort($tasks);
-            $result[$deliveryTypeName] = $tasks;
+            ksort($tasksByDay);
+            $result[$deliveryTypeName] = $tasksByDay;
         }
         return $result;
     }
