@@ -5,14 +5,11 @@ namespace App\Helpers;
 use App\Entities\Task;
 use App\Entities\TaskSalaryDetails;
 use App\Entities\TaskTime;
-use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
 
 class TaskHelper
 {
     /**
-     * @param Collection $newGroup
+     * @param \Illuminate\Support\Collection $newGroup
      * @param $task
      * @param $duration
      * @param $data

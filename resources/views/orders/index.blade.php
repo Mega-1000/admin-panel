@@ -92,7 +92,7 @@
                     <button type="button" class="close" data-dismiss="modal"
                             aria-label="{{ __('voyager::generic.close') }}"><span
                             aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">Pobranie zadania</h4>
+                    <h4 class="modal-title">@lang('orders.task_get')</h4>
                 </div>
                 <div class="modal-body">
                     <form method="POST" target="_blank" id="print-package-form"
@@ -132,7 +132,7 @@
                     <button type="button" class="close" data-dismiss="modal"
                             aria-label="{{ __('voyager::generic.close') }}"><span
                             aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="titleModal">Wykonanie zadania</h4>
+                    <h4 class="modal-title" id="titleModal">@lang('orders.task_realize')</h4>
                 </div>
                 <div class="modal-body">
                     <form method="POST" id="finish-task-form"
