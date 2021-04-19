@@ -18,7 +18,6 @@ class CreateProductSetsTable extends Migration
             $table->integer('product_id')->unsigned();
             $table->integer('set_id')->unsigned();
             $table->integer('stock')->default(0);
-
             $table->timestamps();
 
             $table->foreign('product_id')->references('id')->on('products');
