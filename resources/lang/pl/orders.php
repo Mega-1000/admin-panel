@@ -161,4 +161,8 @@ return [
     'order_not_found' => 'Nie znaleziono zamówienia',
     'next_order' => 'Przejdź do kolejnego zlecenia',
     'previous_order' => 'Przejdź do poprzedniego zlecenia',
+    'task_get' => 'Pobranie zadania',
+    'task_realized' => 'Zakończenie zadania',
+    'additional_task' => 'Pobranie zadania dodatkowego',
+    'task_performing_employee' => 'Pracownik realizujący zadanie',
 ];

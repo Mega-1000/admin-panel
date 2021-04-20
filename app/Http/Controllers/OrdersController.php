@@ -76,6 +76,7 @@ use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
 use App\Services\OrderExcelService;
 use App\Services\OrderInvoiceService;
+use App\Services\TaskService;
 use App\User;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
@@ -221,6 +222,9 @@ class OrdersController extends Controller
 
     protected $orderExcelService;
 
+    /** @var TaskService  */
+    protected $taskService;
+
     protected $productStockPacketRepository;
 
     protected $dtColumns = [
@@ -263,9 +267,9 @@ class OrdersController extends Controller
         TaskRepository $taskRepository,
         OrderInvoiceService $orderInvoiceService,
         OrderExcelService $orderExcelService,
-        ProductStockPacketRepository $productStockPacketRepository
-    )
-    {
+        ProductStockPacketRepository $productStockPacketRepository,
+        TaskService $taskService
+    ) {
         $this->repository = $repository;
         $this->warehouseRepository = $warehouseRepository;
         $this->orderRepository = $orderRepository;
@@ -292,6 +296,7 @@ class OrdersController extends Controller
         $this->orderInvoiceService = $orderInvoiceService;
         $this->orderExcelService = $orderExcelService;
         $this->productStockPacketRepository = $productStockPacketRepository;
+        $this->taskService = $taskService;
     }
 
     /**
@@ -364,11 +369,8 @@ class OrdersController extends Controller
         }
         $templateData = PackageTemplate::orderBy('list_order', 'asc')->get();
         $deliverers = Deliverer::all();
-        $glsCount = $this->getTaskQuery(['GLS'])->count();
-        $dpdCount = $this->getTaskQuery(['DPD'])->count();
-        $pocztexCount = $this->getTaskQuery(['POCZTEX'])->count();
-        $inpostCount = $this->getTaskQuery(['INPOST', 'ALLEGRO-INPOST'])->count();
-        $couriersCount = ['gls' => $glsCount, 'dpd' => $dpdCount, 'pocztex' => $pocztexCount, 'inpost' => $inpostCount];
+        $couriersTasks = $this->taskService->groupTaskByShipmentDate();
+
         return view('orders.index', compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses'))
             ->withOuts($out)
             ->withLabIds($labIds)
@@ -376,7 +378,7 @@ class OrdersController extends Controller
             ->withDeliverers($deliverers)
             ->withTemplateData($templateData)
             ->withUsers($storekeepers)
-            ->withCouriersCount($couriersCount)
+            ->withCouriersTasks($couriersTasks)
             ->withAllWarehouses($allWarehouses);
     }
 
@@ -674,7 +676,7 @@ class OrdersController extends Controller
             default:
                 throw new \Exception(__('order_packages.message.package_error'));
         }
-        $task = $this->getTaskQuery($courierArray)->offset($skip)->first();
+        $task = $this->taskService->getTaskQuery($courierArray)->offset($skip)->first();
         return $task;
     }
 
@@ -733,7 +735,11 @@ class OrdersController extends Controller
         }
         file_put_contents($lockName, '');
         try {
-            $task = $this->prepareTask($data['package_type'], $skip);
+            if (empty($data['task_id'])) {
+                $task = $this->prepareTask($data['package_type'], $skip);
+            } else {
+                $task = $this->taskRepository->find($data['task_id']);
+            }
         } catch (Exception $e) {
             unlink(public_path($lockName));
             return redirect()->back()->with([
@@ -3030,30 +3036,6 @@ class OrdersController extends Controller
             }, 0);
             return $acu + $totalAmountForPack;
         }, 0);
-    }
-
-    /**
-     * @param array $courierArray
-     * @return mixed
-     */
-    private function getTaskQuery(array $courierArray)
-    {
-        return Task::where('user_id', Task::WAREHOUSE_USER_ID)
-            ->with(['taskTime' => function ($query) {
-                $query->orderBy('date_start', 'asc');
-            }])
-            ->whereHas('order', function ($query) use ($courierArray) {
-                $query->whereHas('packages', function ($query) use ($courierArray) {
-                    $query->whereIn('service_courier_name', $courierArray);
-                })->whereHas('labels', function ($query) {
-                    $query
-                        ->where('labels.id', Label::BLUE_HAMMER_ID);
-                })->whereDoesntHave('labels', function ($query) {
-                    $query->where('labels.id', Label::RED_HAMMER_ID)
-                        ->orWhere('labels.id', Label::GRAY_HAMMER_ID)
-                        ->orWhere('labels.id', Label::PRODUCTION_STOP_ID);
-                });
-            });
     }
 
     public function downloadAllegroPaymentsExcel(Request $request): BinaryFileResponse

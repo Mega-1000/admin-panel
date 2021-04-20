@@ -55,24 +55,28 @@
                     <button type="button" class="close" data-dismiss="modal"
                             aria-label="{{ __('voyager::generic.close') }}"><span
                             aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="titleModal"></h4>
+                    <h4 class="modal-title" id="titleModal">@lang('orders.additional_task')</h4>
                 </div>
                 <div class="modal-body">
                     <form method="POST" target="_blank" id="create-new-task"
                           action="{{ route('planning.tasks.store') }}">
                         @csrf()
-                        <select name="user_id" required class="form-control">
-                            <option value="" selected="selected">wybierz użytkownika</option>
-                            @foreach($users as $user)
-                                <option
-                                    value="{{$user->id}}">{{$user->name}} {{$user->firstname}} {{$user->lastname}}</option>
-                            @endforeach
-                        </select>
+                        <div class="form-group">
+                            <label for="user_id">@lang('orders.task_performing_employee')</label>
+                            <select name="user_id" required class="form-control">
+                                <option value="" selected="selected">wybierz użytkownika</option>
+                                @foreach($users as $user)
+                                    <option
+                                        value="{{$user->id}}">{{$user->name}} {{$user->firstname}} {{$user->lastname}}</option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="form-group">
                             <label for="task-name">Podaj nazwę zadania</label>
                             <input class="form-control" required name="name" id="task-name" type="text">
                         </div>
-                        <input type="hidden" name="warehouse_id" value="{{ \App\Entities\Warehouse::OLAWA_WAREHOUSE_ID }}">
+                        <input type="hidden" name="warehouse_id"
+                               value="{{ \App\Entities\Warehouse::OLAWA_WAREHOUSE_ID }}">
                         <input type="hidden" name="quickTask" value="1">
                         <input type="hidden" name="color" value="008000">
                     </form>
@@ -92,19 +96,28 @@
                     <button type="button" class="close" data-dismiss="modal"
                             aria-label="{{ __('voyager::generic.close') }}"><span
                             aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="titleModal"></h4>
+                    <h4 class="modal-title">@lang('orders.task_performing_employee')</h4>
                 </div>
                 <div class="modal-body">
                     <form method="POST" target="_blank" id="print-package-form"
                           action="{{ route('orders.findPackage') }}">
                         @csrf()
-                        <select name="user_id" required class="form-control">
-                            <option value="" selected="selected">wybierz użytkownika</option>
-                            @foreach($users as $user)
-                                <option
-                                    value="{{$user->id}}">{{$user->name}} {{$user->firstname}} {{$user->lastname}}</option>
-                            @endforeach
-                        </select>
+                        <div class="form-group">
+                            <label for="user_id">Pracownik realizujący zadanie</label>
+                            <select name="user_id" required class="form-control">
+                                <option value="" selected="selected">wybierz użytkownika</option>
+                                @foreach($users as $user)
+                                    <option
+                                        value="{{$user->id}}">{{$user->name}} {{$user->firstname}} {{$user->lastname}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="task_id">Identyfikator zadania</label>
+                            <select name="task_id" class="form-control" data-size="5">
+                                <option value="" selected="selected">Kolejne zadanie</option>
+                            </select>
+                        </div>
                         <input name="package_type" id="print-package-type" type="hidden">
                     </form>
                 </div>
@@ -123,7 +136,7 @@
                     <button type="button" class="close" data-dismiss="modal"
                             aria-label="{{ __('voyager::generic.close') }}"><span
                             aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="titleModal"></h4>
+                    <h4 class="modal-title" id="titleModal">@lang('orders.task_realize')</h4>
                 </div>
                 <div class="modal-body">
                     <form method="POST" id="finish-task-form"
@@ -944,6 +957,18 @@
         })
         $('.print-group').click(event => {
             $('#print-package-type').val(event.currentTarget.name);
+            let opt = $(event.currentTarget).data('couriertasks');
+            let select = $('#print-package-group').find('[name="task_id"]');
+            select.find('optgroup').remove();
+            $.each(opt, function (key, value) {
+                if (value.length > 0) {
+                    let group = $('<optgroup label="' + key + '" />');
+                    $.each(value, function () {
+                        $('<option />').html(this.name).val(this.id).appendTo(group);
+                    });
+                    group.appendTo(select);
+                }
+            });
             $('#print-package-group').modal('show');
         })
         $(".send_courier_class").click(event => {
