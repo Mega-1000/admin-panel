@@ -20,13 +20,13 @@ final class CourierName extends Enum
      * Delivery types labels
      */
     const DELIVERY_TYPE_LABELS = [
-        self::INPOST => 'Inpost',
-        self::ALLEGRO_INPOST => 'inpost',
+        self::INPOST => 'Paczkomaty',
+        self::ALLEGRO_INPOST => 'Paczkomaty',
         self::DPD => 'Dpd',
         self::APACZKA => 'Apaczka',
         self::POCZTEX => 'Pocztex',
         self::JAS => 'Jas',
-        self::GLS => 'GLS',
+        self::GLS => 'Gls',
         self::ODBIOR_OSOBISTY => 'Odbiór osobisty',
     ];
 
