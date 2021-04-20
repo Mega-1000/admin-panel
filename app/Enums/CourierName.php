@@ -17,7 +17,7 @@ final class CourierName extends Enum
     const ODBIOR_OSOBISTY = 'ODBIOR_OSOBISTY';
 
     /**
-     * Opisy firm kurierskich/ sposób dostawy
+     * Delivery types labels
      */
     const DELIVERY_TYPE_LABELS = [
         self::INPOST => 'Inpost',
@@ -31,7 +31,7 @@ final class CourierName extends Enum
     ];
 
     /**
-     * Typy dostaw do pobierania tasków
+     * Deliveries types for task grouping
      */
     const DELIVERY_TYPE_FOR_TASKS = [
         self::GLS => [self::GLS],
