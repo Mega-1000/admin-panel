@@ -660,7 +660,7 @@ class OrdersController extends Controller
     private function prepareTask($package_type, $skip)
     {
         $courierArray = [];
-        switch ($package_type) {
+        switch (lcfirst($package_type)) {
             case 'paczkomat':
                 $courierArray = ['INPOST', 'ALLEGRO-INPOST'];
                 break;
