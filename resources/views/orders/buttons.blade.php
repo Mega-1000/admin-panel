@@ -408,6 +408,9 @@
             </div>
         @endforeach
         <div class="row">
+            <button class="btn btn-info" id="create-new-task-button" name="custom">Dodatkowe Zadanie</button>
+        </div>
+        <div class="row">
             <button id="accept-pack" class="btn btn-success">Wykonano</button>
             <button id="deny-pack" class="btn btn-danger">Odrzucono</button>
         </div>

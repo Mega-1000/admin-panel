@@ -55,24 +55,28 @@
                     <button type="button" class="close" data-dismiss="modal"
                             aria-label="{{ __('voyager::generic.close') }}"><span
                             aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="titleModal"></h4>
+                    <h4 class="modal-title" id="titleModal">@lang('orders.additional_task')</h4>
                 </div>
                 <div class="modal-body">
                     <form method="POST" target="_blank" id="create-new-task"
                           action="{{ route('planning.tasks.store') }}">
                         @csrf()
-                        <select name="user_id" required class="form-control">
-                            <option value="" selected="selected">wybierz użytkownika</option>
-                            @foreach($users as $user)
-                                <option
-                                    value="{{$user->id}}">{{$user->name}} {{$user->firstname}} {{$user->lastname}}</option>
-                            @endforeach
-                        </select>
+                        <div class="form-group">
+                            <label for="user_id">@lang('orders.task_performing_employee')</label>
+                            <select name="user_id" required class="form-control">
+                                <option value="" selected="selected">wybierz użytkownika</option>
+                                @foreach($users as $user)
+                                    <option
+                                        value="{{$user->id}}">{{$user->name}} {{$user->firstname}} {{$user->lastname}}</option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="form-group">
                             <label for="task-name">Podaj nazwę zadania</label>
                             <input class="form-control" required name="name" id="task-name" type="text">
                         </div>
-                        <input type="hidden" name="warehouse_id" value="{{ \App\Entities\Warehouse::OLAWA_WAREHOUSE_ID }}">
+                        <input type="hidden" name="warehouse_id"
+                               value="{{ \App\Entities\Warehouse::OLAWA_WAREHOUSE_ID }}">
                         <input type="hidden" name="quickTask" value="1">
                         <input type="hidden" name="color" value="008000">
                     </form>
@@ -92,7 +96,7 @@
                     <button type="button" class="close" data-dismiss="modal"
                             aria-label="{{ __('voyager::generic.close') }}"><span
                             aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">@lang('orders.task_get')</h4>
+                    <h4 class="modal-title">@lang('orders.task_performing_employee')</h4>
                 </div>
                 <div class="modal-body">
                     <form method="POST" target="_blank" id="print-package-form"
