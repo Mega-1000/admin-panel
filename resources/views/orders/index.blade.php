@@ -2300,25 +2300,6 @@
                     }
                 }
             });
-        // $("#columnSearch-shipment_date")
-        //     .click(function (e) {
-        //         e.stopPropagation();
-        //     })
-        //     .change(function () {
-        //         if (table.column("shipment_date:name").search() !== this.value) {
-        //             if (this.value == '') {
-        //                 table
-        //                     .column("shipment_date:name")
-        //                     .search('')
-        //                     .draw();
-        //             } else {
-        //                 table
-        //                     .column("shipment_date:name")
-        //                     .search(this.value)
-        //                     .draw();
-        //             }
-        //         }
-        //     });
         $('#orderFilter').change(function () {
             if (this.value == 'ALL') {
                 table
