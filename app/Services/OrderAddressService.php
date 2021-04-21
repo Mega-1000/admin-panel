@@ -19,8 +19,11 @@ class OrderAddressService
             'phone' => 'regex:/^[0-9]{9}\b/'
         ]);
 
-        $nipIsValid = array_key_exists('nip', $addressArray) && $addressArray['nip'] &&
-            $this->validateNIP($addressArray['nip']);
+        if (array_key_exists('nip', $addressArray) && $addressArray['nip'] != null) {
+            $nipIsValid = $this->validateNIP($addressArray['nip']);
+        } else {
+            $nipIsValid = true;
+        }
 
         return !$validator->fails() && !$this->namesAndNipCombined($address) && $nipIsValid;
     }
