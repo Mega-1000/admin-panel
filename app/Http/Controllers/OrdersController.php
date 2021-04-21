@@ -2050,6 +2050,17 @@ class OrdersController extends Controller
             $query->where($sortingColumns[6], '>', $minId);
         }
 
+        if(isset($data['same'])) {
+            $query->whereRaw("date({$data["dateColumn"]}) = '{$data['dateFrom']}'");
+        } else {
+            if(isset($data['dateFrom'])) {
+                $query->whereRaw("date({$data["dateColumn"]}) >= '{$data['dateFrom']}'");
+            }
+            if(isset($data['dateTo'])) {
+                $query->whereRaw("date({$data["dateColumn"]}) <= '{$data['dateTo']}'");
+            }
+        }
+
         $count = $query->count();
 
         if ($withoutPagination) {
@@ -2882,6 +2893,11 @@ class OrdersController extends Controller
     {
         [$collection, $count] = $this->prepareCollection($request->all(), false, $id);
         return response($count / $request->all()['length']);
+    }
+
+    public function findByDates(Request $request)
+    {
+        return $this->datatable($request);
     }
 
     public function sendTrackingNumbers()

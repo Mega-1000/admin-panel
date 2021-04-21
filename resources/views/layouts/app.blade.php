@@ -415,6 +415,22 @@
         #dataTable-warehouseOrder .itemPrice {
             width: 100px;
         }
+        #columnSearch-choose_date {
+            margin-top: 0px;
+            display: inline-block;
+        }
+        #columnSearch-shipment_date {
+            margin-top: 0px;
+            display: inline-block;
+        }
+        #dates_from, #dates_to {
+            width: 100px;
+            display: inline-block;
+        }
+        .date__search--text {
+            margin-top: 1em !important;
+            margin-bottom: 0.5em;
+        }
     </style>
     <link href='/fullcalendar/core/main.css' rel='stylesheet' />
     <link href='/fullcalendar/daygrid/main.css' rel='stylesheet' />
