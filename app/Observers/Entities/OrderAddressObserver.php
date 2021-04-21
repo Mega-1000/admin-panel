@@ -6,6 +6,7 @@ use App\Entities\OrderAddress;
 use App\Jobs\AddLabelJob;
 use App\Jobs\DispatchLabelEventByNameJob;
 use App\Services\OrderAddressService;
+use App\Services\OrderPaymentService;
 
 class OrderAddressObserver
 {
@@ -34,7 +35,8 @@ class OrderAddressObserver
 
     protected function addLabelIfManualCheckIsRequired(OrderAddress $orderAddress): void
     {
-        if (!(new OrderAddressService())->addressIsValid($orderAddress)) {
+        if (app(OrderPaymentService::class)->hasAnyPayment($orderAddress->order) &&
+            !(new OrderAddressService())->addressIsValid($orderAddress)) {
             dispatch_now(new AddLabelJob($orderAddress->order->id, [184]));
         }
     }
