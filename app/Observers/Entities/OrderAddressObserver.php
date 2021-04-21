@@ -5,6 +5,7 @@ namespace App\Observers\Entities;
 use App\Entities\OrderAddress;
 use App\Jobs\AddLabelJob;
 use App\Jobs\DispatchLabelEventByNameJob;
+use App\Jobs\RemoveLabelJob;
 use App\Services\OrderAddressService;
 use App\Services\OrderPaymentService;
 
@@ -38,6 +39,8 @@ class OrderAddressObserver
         if (app(OrderPaymentService::class)->hasAnyPayment($orderAddress->order) &&
             !(new OrderAddressService())->addressIsValid($orderAddress)) {
             dispatch_now(new AddLabelJob($orderAddress->order->id, [184]));
+        } else {
+            dispatch_now(new RemoveLabelJob($orderAddress->order->id, [184]));
         }
     }
 }
