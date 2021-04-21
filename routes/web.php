@@ -278,6 +278,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orders/{id}/files/{file_id}', 'OrdersController@getFile')->name('orders.getFile');
         Route::get('orders/files/delete/{file_id}', 'OrdersController@deleteFile')->name('orders.fileDelete');
         Route::post('orders/find-page/{id}', 'OrdersController@findPage')->name('orders.findPage');
+        Route::post('orders/find-by-dates', 'OrdersController@findByDates')->name('orders.findByDates');
         Route::delete('orders/{id}/', 'OrdersController@destroy')->name('orders.destroy');
         Route::put('orders/{id}/update', [
             'uses' => 'OrdersController@update',

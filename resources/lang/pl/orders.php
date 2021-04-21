@@ -68,6 +68,7 @@ return [
         'allegro_operation_date' => 'ALLEGRO data operacji',
         'allegro_additional_service' => 'ALLEGRO nazwa usługi dodatkowej',
         'payment_channel' => 'Kanał wpłaty',
+        'dates' => 'Daty'
     ],
     'message' => [
         'store' => 'Zamówienie zostało dodane pomyślnie!',

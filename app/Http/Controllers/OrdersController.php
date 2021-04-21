@@ -1887,7 +1887,7 @@ class OrdersController extends Controller
     public function datatable(Request $request)
     {
         $data = $request->all();
-        list($collection, $countFiltred) = $this->prepareCollection($data);
+        [$collection, $countFiltred] = $this->prepareCollection($data);
         $count = $this->orderRepository->all();
         $count = count($count);
         $collection = $this->prepareAdditionalOrderData($collection);
@@ -2034,6 +2034,17 @@ class OrdersController extends Controller
 
         if ($minId) {
             $query->where($sortingColumns[6], '>', $minId);
+        }
+
+        if(isset($data['same'])) {
+            $query->whereRaw("date({$data["dateColumn"]}) = '{$data['dateFrom']}'");
+        } else {
+            if(isset($data['dateFrom'])) {
+                $query->whereRaw("date({$data["dateColumn"]}) >= '{$data['dateFrom']}'");
+            }
+            if(isset($data['dateTo'])) {
+                $query->whereRaw("date({$data["dateColumn"]}) <= '{$data['dateTo']}'");
+            }
         }
 
         $count = $query->count();
@@ -2234,7 +2245,7 @@ class OrdersController extends Controller
     public function sendVisibleCouriers(Request $request)
     {
         $data = $request->all();
-        list($collection, $countFiltred) = $this->prepareCollection($data);
+        [$collection, $countFiltred] = $this->prepareCollection($data);
         if (!$countFiltred) {
             return \response("Brak zamówień");
         }
@@ -2255,7 +2266,7 @@ class OrdersController extends Controller
         $packages = $order->packages->where('status', 'NEW');
         foreach ($packages as $package) {
             try {
-                list($message, $messages) = app(OrdersPackagesController::class)->sendPackage($package, $messages);
+                [$message, $messages] = app(OrdersPackagesController::class)->sendPackage($package, $messages);
                 if (!empty($message)) {
                     $messages [] = $message;
                 }
@@ -2277,7 +2288,7 @@ class OrdersController extends Controller
         }
         file_put_contents($lockName, '');
         $data = $request->all();
-        list($collection, $count) = $this->prepareCollection($data, true);
+        [$collection, $count] = $this->prepareCollection($data, true);
         $tagHelper = new EmailTagHandlerHelper();
         $merger = new Merger;
         $i = 0;
@@ -2866,8 +2877,13 @@ class OrdersController extends Controller
 
     public function findPage(Request $request, $id)
     {
-        list($collection, $count) = $this->prepareCollection($request->all(), false, $id);
+        [$collection, $count] = $this->prepareCollection($request->all(), false, $id);
         return response($count / $request->all()['length']);
+    }
+
+    public function findByDates(Request $request)
+    {
+        return $this->datatable($request);
     }
 
     public function sendTrackingNumbers()
