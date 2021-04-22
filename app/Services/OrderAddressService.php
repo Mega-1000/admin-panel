@@ -15,8 +15,11 @@ class OrderAddressService
         $rules = [
             'firstname' => 'required_with:lastname',
             'lastname' => 'required_with:firstname',
-            'email' => 'email',
-            'postal_code' => 'regex:/^[0-9]{2}-?[0-9]{3}$/Du',
+            'email' => 'required|email',
+            'address' => 'required',
+            'city' => 'required',
+            'flat_number' => 'required',
+            'postal_code' => 'required|regex:/^[0-9]{2}-?[0-9]{3}$/Du',
             'phone' => 'regex:/^[0-9]{9}\b/'
         ];
         if ($address->type == self::TYPE_INVOICE) {
