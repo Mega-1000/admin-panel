@@ -31,7 +31,7 @@ class SetsController extends Controller
 
     public function edit(Set $set)
     {
-        $set = Set::where('id', $set->id)->get()->first();
+        $set = Set::find($set->id)->get()->first();
         $products = Product::get()->all();
         $setItems = $set->products();
 
@@ -40,7 +40,7 @@ class SetsController extends Controller
 
     public function store(Request $request)
     {
-        $this->validate(request(), [
+        $this->validate($request, [
             'name' => 'required',
             'number' => 'required',
         ]);
@@ -64,7 +64,7 @@ class SetsController extends Controller
 
     public function update(Set $set, Request $request)
     {
-        $this->validate(request(), [
+        $this->validate($request, [
             'name' => 'required',
             'number' => 'required',
         ]);
@@ -101,12 +101,12 @@ class SetsController extends Controller
 
     public function addProduct(Request $request, Set $set)
     {
-        $this->validate(request(), [
+        $this->validate($request, [
             'product_id' => 'required',
             'stock' => 'required',
         ]);
 
-        $stock = ProductStock::where('product_id', $request->product_id)->get()->first();
+        $stock = ProductStock::find($request->product_id)->get()->first();
         $requiredStock = $set->stock * $request->stock;
 
         //The number of products must be greater than the number of sets multiplied by the number of products in one package.
@@ -138,7 +138,7 @@ class SetsController extends Controller
 
     public function editProduct(Set $set, SetItem $productSet, Request $request)
     {
-        $this->validate(request(), [
+        $this->validate($request, [
             'stock' => 'required'
         ]);
 
@@ -189,7 +189,7 @@ class SetsController extends Controller
 
     public function completing(Set $set, Request $request)
     {
-        $this->validate(request(), [
+        $this->validate($request, [
             'number' => 'required',
         ]);
 
@@ -225,7 +225,7 @@ class SetsController extends Controller
 
     public function disassembly(Set $set, Request $request)
     {
-        $this->validate(request(), [
+        $this->validate($request, [
             'number' => 'required',
         ]);
 
