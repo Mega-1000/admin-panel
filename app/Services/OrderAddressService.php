@@ -12,6 +12,22 @@ class OrderAddressService
     public function addressIsValid(OrderAddress $address): bool
     {
         $addressArray = $address->toArray();
+        $rules = $this->getRules($address);
+
+        $validator = Validator::make($addressArray, $rules);
+
+        if (array_key_exists('nip', $addressArray) && $addressArray['nip'] != null) {
+            $nipIsValid = $this->validateNIP($addressArray['nip']);
+        } else {
+            $nipIsValid = true;
+        }
+
+        return !$validator->fails() && !$this->namesAndNipCombined($address) &&
+            $nipIsValid && $this->haveNameOrFirmname($address);
+    }
+
+    protected function getRules(OrderAddress $address): array
+    {
         $rules = [
             'firstname' => 'required_with:lastname',
             'lastname' => 'required_with:firstname',
@@ -27,18 +43,8 @@ class OrderAddressService
             $rules['nip'] = 'required_with:firmname';
         }
 
-        $validator = Validator::make($addressArray, $rules);
-
-        if (array_key_exists('nip', $addressArray) && $addressArray['nip'] != null) {
-            $nipIsValid = $this->validateNIP($addressArray['nip']);
-        } else {
-            $nipIsValid = true;
-        }
-
-        return !$validator->fails() && !$this->namesAndNipCombined($address) &&
-            $nipIsValid && $this->haveNameOrFirmname($address);
+        return $rules;
     }
-
 
     protected function validateNIP($nip): bool
     {
