@@ -293,8 +293,6 @@
         }
     </script>
     <script>
-        console.log('test-b')
-
         function renderCalendarMins(number) {
             window.localStorage.setItem('mins', number);
             renderCalendar(document.calendarMinTime, document.calendarMaxTime, number);
@@ -1043,12 +1041,20 @@
                 }
             };
             var idFromUrl = 'task-{{ $selectId }}';
-            var viewTypeFromUrl = getUrlParameter('view_type');
-            var activeStartFromUrl = getUrlParameter('active_start');
-            var activeEndFromUrl = getUrlParameter('active_end');
+            let mins = '00:15';
             if (idFromUrl !== 'undefined' && idFromUrl !== 'task-') {
+                if ({{ $taskDiffInMins }} < 5) {
+                    mins = '00:02';
+                } else if ({{ $taskDiffInMins }} < 15) {
+                    mins = '00:05';
+                }
+
+                if (window.localStorage.getItem('mins') !== mins) {
+                    renderCalendarMins(mins);
+                }
+
                 setTimeout(function () {
-                    $('#' + idFromUrl).css('border', '4px solid rgb(96,2,1)');
+                    $('#' + idFromUrl).css('border', '4px solid rgb(96,2,1)').css('background-color', 'rgb(96,2,1)');
                     $(".fc-scroller").animate({
                         scrollLeft: $('#' + idFromUrl).position().left - 600
                     }, 500);

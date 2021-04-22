@@ -45,6 +45,7 @@ class TimetablesController extends Controller
                     $selectId = $task->id;
                     $dateView = new Carbon($task->taskTime->date_start);
                     $activeDay = $dateView->toDateTimeString();
+                    $taskDiffInMins = $dateView->diffInMinutes(new Carbon($task->taskTime->date_end));
 
                     $viewType = 'resourceTimelineDay';
                 }
@@ -52,7 +53,7 @@ class TimetablesController extends Controller
         }
         $warehouses = $this->warehouseRepository->findByField('symbol', 'MEGA-OLAWA');
 
-        return view('planning.timetable.index', compact(['warehouses', 'viewType', 'activeDay', 'selectId']));
+        return view('planning.timetable.index', compact(['warehouses', 'viewType', 'activeDay', 'selectId', 'taskDiffInMins']));
     }
 
     public function getStorekeepers($id)
