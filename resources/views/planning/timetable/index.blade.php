@@ -1054,7 +1054,7 @@
                 }
 
                 setTimeout(function () {
-                    $('#' + idFromUrl).css('border', '4px solid rgb(96,2,1)').css('background-color', 'rgb(96,2,1)');
+                    $('#' + idFromUrl).toggleClass('active-task');
                     $(".fc-scroller").animate({
                         scrollLeft: $('#' + idFromUrl).position().left - 600
                     }, 500);
