@@ -37,9 +37,9 @@ class RouteServiceProvider extends ServiceProvider
     {
         $this->mapApiRoutes();
 
-        $this->mapWebGeneralRoutes();
+        $this->mapWebRoutes();
 
-        $this->mapCustomWebRoutes();
+        //
     }
 
     /**
@@ -49,30 +49,11 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function mapWebGeneralRoutes()
+    protected function mapWebRoutes()
     {
         Route::middleware('web')
              ->namespace($this->namespace)
              ->group(base_path('routes/web.php'));
-    }
-
-    /**
-     * Define the "web" routes for the application.
-     *
-     * These routes all receive session state, CSRF protection, etc.
-     *
-     * @return void
-     */
-    protected function mapCustomWebRoutes()
-    {
-        //Example ['Packets', 'ProductsSets'];
-        $folders = [];
-
-        foreach ($folders as $folder) {
-            Route::middleware('web')
-                ->namespace($this->namespace)
-                ->group(base_path('routes/'.$folder.'/'.$folder.'Routes.php'));
-        }
     }
 
     /**

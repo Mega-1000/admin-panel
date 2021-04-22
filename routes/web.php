@@ -17,35 +17,179 @@ Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
     Route::group(['middleware' => 'admin'], function () {
 
-        Route::group(['prefix' => 'products'], function () {
-            Route::group(['prefix' => 'sets', 'as' => 'sets.'], __DIR__ . '/web/ProductsSetsRoutes.php');
-            Route::group(['prefix' => 'stocks', 'as' => 'product_stocks.'], __DIR__ . '/web/ProductsRoutes.php');
-            Route::group(['prefix' => 'stocks/packets/', 'as' => 'product_stock_packets.'], __DIR__ . '/web/PacketsRoutes.php');
-        });
+        Route::get('/bonus', 'BonusController@index')->name('bonus.index');
+        Route::post('/bonus', 'BonusController@create')->name('bonus.create');
+        Route::post('/bonus/delete', 'BonusController@destroy')->name('bonus.destroy');
 
-        Route::group(['prefix' => 'bonus', 'as' => 'bonus.'], __DIR__ . '/web/BonusRoutes.php');
-        Route::group(['prefix' => 'pages', 'as' => 'pages.'], __DIR__ . '/web/PagesRoutes.php');
-        Route::group(['prefix' => 'firms', 'as' => 'firms.'], __DIR__ . '/web/FirmsRoutes.php');
-        Route::group(['prefix' => 'warehouses', 'as' => 'warehouses.'], __DIR__ . '/web/WarehousesRoutes.php');
-        Route::group(['prefix' => 'employees', 'as' => 'employees.'], __DIR__ . '/web/EmployeesRoutes.php');
-        Route::group(['prefix' => 'statuses', 'as' => 'statuses.'], __DIR__ . '/web/StatusesRoutes.php');
-        Route::group(['prefix' => 'labels', 'as' => 'labels.'], __DIR__ . '/web/LabelsRoutes.php');
-        Route::group(['prefix' => 'label-groups', 'as' => 'label_groups.'], __DIR__ . '/web/LabelsRoutes.php');
-        Route::group(['prefix' => 'customers', 'as' => 'customers.'], __DIR__ . '/web/CustomersRoutes.php');
-        Route::group(['prefix' => 'packageTemplates', 'as' => 'package_templates.'], __DIR__ . '/web/PackageTemplatesRoutes.php');
-        Route::group(['prefix' => 'orders', 'as' => 'orders.'], __DIR__ . '/web/OrdersRoutes.php');
-        Route::group(['prefix' => 'employeeRoles', 'as' => 'employee_role.'], __DIR__ . '/web/EmployeeRolesRoutes.php');
-
-        Route::group(['prefix' => 'users', 'as' => 'users.'], __DIR__ . '/web/UsersRoutes.php');
-        Route::delete('users-destroy/{id}/', ['uses' => 'UserController@destroy',])->name('users.destroy');
-
-        //Different custom routes
         Route::get('prices/allegro-prices/{id}', 'ProductPricesController@getAllegroPrices')->name('prices.allegroPrices');
-        Route::get('/getDelivererImportLog/{id}', 'DelivererController@getDelivererImportLog')->name('deliverer.getImportLog');
-        Route::get('/warehouse/{id}', 'OrdersController@getCalendar');
-        Route::get('/get/user/{id}', 'OrdersController@getUserInfo');
-        Route::get('/order/task/create/', 'TasksController@createTask');
+        Route::get('orders/{id}/get-basket', 'OrdersController@goToBasket')->name('orders.goToBasket');
+        Route::get('/pages/content/delete', 'PagesGeneratorController@deleteContent')->name('pages.deleteContent');
+        Route::get('/pages/{id}/content/edit', 'PagesGeneratorController@editContent')->name('pages.editContent');
+        Route::get('/pages/{id}/content/new', 'PagesGeneratorController@newContent')->name('pages.newContent');
+        Route::post('/pages/{id}/content/store', 'PagesGeneratorController@storeContent')->name('pages.saveContent');
+        Route::get('/pages/{id}/content', 'PagesGeneratorController@contentList')->name('pages.list');
 
+        Route::get('/pages/new', 'PagesGeneratorController@createPage')->name('pages.create');
+        Route::post('/pages/store', 'PagesGeneratorController@store')->name('pages.store');
+        Route::get('/pages/{id}/delete', 'PagesGeneratorController@delete')->name('pages.delete');
+        Route::get('/pages/{id}', 'PagesGeneratorController@edit')->name('pages.edit');
+        Route::get('/pages', 'PagesGeneratorController@getPages')->name('pages.index');
+
+        Route::get('/getDelivererImportLog/{id}', 'DelivererController@getDelivererImportLog')->name('deliverer.getImportLog');
+
+        Route::get('/warehouse/{id}', 'OrdersController@getCalendar');
+
+        Route::get('/get/user/{id}',
+            'OrdersController@getUserInfo');
+
+        Route::get('/order/task/create/',
+            'TasksController@createTask');
+
+        Route::get('users', 'UserController@index')->name('users.index');
+        Route::get('users/datatable/all', 'UserController@datatable')->name('users.datatable');
+        Route::get('users/create', 'UserController@create')->name('users.create');
+        Route::post('users/store', 'UserController@store')->name('users.store');
+        Route::get('users/{id}/editItem', 'UserController@edit')->name('users.edit');
+        Route::put('users/{id}/update', [
+            'uses' => 'UserController@update',
+        ])->name('users.update');
+        Route::delete('users-destroy/{id}/', [
+            'uses' => 'UserController@destroy',
+        ])->name('users.destroy');
+        Route::put('users/{id}/change-status', [
+            'uses' => 'UserController@changeStatus',
+        ])->name('users.change.status');
+
+        Route::get('firms', 'FirmsController@index')->name('firms.index');
+        Route::get('firms/datatable', 'FirmsController@datatable')->name('firms.datatable');
+        Route::get('firms/create', 'FirmsController@create')->name('firms.create');
+        Route::post('firms/store', 'FirmsController@store')->name('firms.store');
+        Route::get('firms/{id}/edit', 'FirmsController@edit')->name('firms.edit');
+        Route::put('firms/{id}/update', [
+            'uses' => 'FirmsController@update',
+        ])->name('firms.update');
+        Route::delete('firms/{id}/', [
+            'uses' => 'FirmsController@destroy',
+        ])->name('firms.destroy');
+        Route::put('firms/{id}/change-status', [
+            'uses' => 'FirmsController@changeStatus',
+        ])->name('firms.change.status');
+        Route::get('firms/{id}/sendRequestToUpdateFirmData',
+            'FirmsController@sendRequestToUpdateFirmData')->name('firms.sendRequestToUpdateFirmData');
+
+        Route::get('warehouses/datatable/{id}', 'WarehousesController@datatable')->name('warehouses.datatable');
+        Route::get('warehouses/create/{firm_id}', 'WarehousesController@create')->name('warehouses.create');
+        Route::post('warehouses/store/{firm_id}', 'WarehousesController@store')->name('warehouses.store');
+        Route::get('warehouses/{id}/edit', 'WarehousesController@edit')->name('warehouses.edit');
+        Route::put('warehouses/{id}/update', [
+            'uses' => 'WarehousesController@update',
+        ])->name('warehouses.update');
+        Route::delete('warehouses/{id}/', [
+            'uses' => 'WarehousesController@destroy',
+        ])->name('warehouses.destroy');
+        Route::put('warehouses/{id}/change-status', [
+            'uses' => 'WarehousesController@changeStatus',
+        ])->name('warehouses.change.status');
+        Route::get('warehouses/search/autocomplete', 'WarehousesController@autocomplete');
+        Route::get('warehouses/{symbol}/editBySymbol', 'WarehousesController@editBySymbol');
+
+        Route::get('warehouse/orders/new', 'WarehouseOrdersController@index')->name('warehouse.orders.index');
+        Route::post('warehouse/orders/datatable',
+            'WarehouseOrdersController@datatable')->name('warehouse.orders.datatable');
+        Route::post('warehouse/orders/datatable/all',
+            'WarehouseOrdersController@datatableAll')->name('warehouse.orders.datatable.all');
+        Route::post('warehouse/orders/makeOrder',
+            'WarehouseOrdersController@makeOrder')->name('warehouse.orders.makeOrder');
+        Route::get('warehouse/orders/{id}/edit', 'WarehouseOrdersController@edit')->name('warehouse.orders.edit');
+        Route::put('warehouse/orders/{id}/update', 'WarehouseOrdersController@update')->name('warehouse.orders.update');
+        Route::get('warehouse/orders', 'WarehouseOrdersController@all')->name('warehouse.orders.all');
+        Route::post('warehouse/orders/sendEmail',
+            'WarehouseOrdersController@sendEmail')->name('warehouse.orders.sendEmail');
+
+        Route::get('employees/datatable/{id}', 'EmployeesController@datatable')->name('employees.datatable');
+        Route::get('employees/create/{firm_id}', 'EmployeesController@create')->name('employees.create');
+        Route::post('employees/store/{firm_id}', 'EmployeesController@store')->name('employees.store');
+        Route::get('employees/{id}/edit', 'EmployeesController@edit')->name('employees.edit');
+        Route::put('employees/{id}/update', [
+            'uses' => 'EmployeesController@update',
+        ])->name('employees.update');
+        Route::delete('employees/{id}/', [
+            'uses' => 'EmployeesController@destroy',
+        ])->name('employees.destroy');
+        Route::put('employees/{id}/change-status', [
+            'uses' => 'EmployeesController@changeStatus',
+        ])->name('employees.change.status');
+
+        Route::get('statuses', 'StatusesController@index')->name('statuses.index');
+        Route::get('statuses/datatable/', 'StatusesController@datatable')->name('statuses.datatable');
+        Route::get('statuses/create/', 'StatusesController@create')->name('statuses.create');
+        Route::post('statuses/store/', 'StatusesController@store')->name('statuses.store');
+        Route::get('statuses/{id}/edit', 'StatusesController@edit')->name('statuses.edit');
+        Route::put('statuses/{id}/update', [
+            'uses' => 'StatusesController@update',
+        ])->name('statuses.update');
+        Route::delete('statuses/{id}/', [
+            'uses' => 'StatusesController@destroy',
+        ])->name('statuses.destroy');
+        Route::put('statuses/{id}/change-status', [
+            'uses' => 'StatusesController@changeStatus',
+        ])->name('statuses.change.status');
+
+        Route::get('labels', 'LabelsController@index')->name('labels.index');
+        Route::get('labels/datatable/', 'LabelsController@datatable')->name('labels.datatable');
+        Route::get('labels/create/', 'LabelsController@create')->name('labels.create');
+        Route::post('labels/store/', 'LabelsController@store')->name('labels.store');
+        Route::get('labels/{id}/edit', 'LabelsController@edit')->name('labels.edit');
+        Route::put('labels/{id}/update', [
+            'uses' => 'LabelsController@update',
+        ])->name('labels.update');
+        Route::delete('labels/{id}/', [
+            'uses' => 'LabelsController@destroy',
+        ])->name('labels.destroy');
+        Route::put('labels/{id}/change-status', [
+            'uses' => 'LabelsController@changeStatus',
+        ])->name('labels.change.status');
+        Route::get('labels/{id}/associated-labels-to-add-after-removal',
+            'LabelsController@associatedLabelsToAddAfterRemoval')->name('labels.associatedLabelsToAddAfterRemoval');
+
+        Route::get('label-groups', 'LabelGroupsController@index')->name('label_groups.index');
+        Route::get('label-groups/datatable/', 'LabelGroupsController@datatable')->name('label_groups.datatable');
+        Route::get('label-groups/create/', 'LabelGroupsController@create')->name('label_groups.create');
+        Route::post('label-groups/store/', 'LabelGroupsController@store')->name('label_groups.store');
+        Route::get('label-groups/{id}/edit', 'LabelGroupsController@edit')->name('label_groups.edit');
+        Route::put('label-groups/{id}/update', [
+            'uses' => 'LabelGroupsController@update',
+        ])->name('label_groups.update');
+        Route::delete('label-groups/{id}/', [
+            'uses' => 'LabelGroupsController@destroy',
+        ])->name('label_groups.destroy');
+
+        Route::get('customers', 'CustomersController@index')->name('customers.index');
+        Route::get('customers/datatable', 'CustomersController@datatable')->name('customers.datatable');
+        Route::get('customers/create', 'CustomersController@create')->name('customers.create');
+        Route::post('customers/store', 'CustomersController@store')->name('customers.store');
+        Route::get('customers/{id}/edit', 'CustomersController@edit')->name('customers.edit');
+        Route::put('customers/{id}/update', 'CustomersController@update')->name('customers.update');
+        Route::post('customers/{id}/override-customer-data', 'CustomersController@changeLoginOrPassword')->name('customers.change.login-or-password');
+        Route::delete('customers/{id}/', 'CustomersController@destroy')->name('customers.destroy');
+        Route::put('customers/{id}/change-status', 'CustomersController@changeStatus')->name('customers.change.status');
+
+        Route::get('packageTemplates', 'PackageTemplatesController@index')->name('package_templates.index');
+        Route::get('packageTemplates/datatable', 'PackageTemplatesController@datatable')->name('package_templates.datatable');
+        Route::get('packageTemplates/create', 'PackageTemplatesController@create')->name('package_templates.create');
+        Route::post('packageTemplates/store', 'PackageTemplatesController@store')->name('package_templates.store');
+        Route::get('packageTemplates/{id}/edit', 'PackageTemplatesController@edit')->name('package_templates.edit');
+        Route::put('packageTemplates/{id}/update', 'PackageTemplatesController@update')->name('package_templates.update');
+        Route::delete('packageTemplates/{id}/delete', 'PackageTemplatesController@destroy')->name('package_templates.destroy');
+        Route::get('packageTemplate/{id}/data', 'PackageTemplatesController@getPackageTemplate')->name('package_templates.getPackageTemplate');
+
+        Route::get('employeeRoles', 'EmployeeRoleController@index')->name('employee_role.index');
+        Route::get('employeeRoles/datatable', 'EmployeeRoleController@datatable')->name('employee_role.datatable');
+        Route::get('employeeRoles/create', 'EmployeeRoleController@create')->name('employee_role.create');
+        Route::post('employeeRoles/store', 'EmployeeRoleController@store')->name('employee_role.store');
+        Route::get('employeeRoles/{id}/edit', 'EmployeeRoleController@edit')->name('employee_role.edit');
+        Route::put('employeeRoles/{id}/update', 'EmployeeRoleController@update')->name('employee_role.update');
+        Route::delete('employeeRoles/{id}/delete', 'EmployeeRoleController@destroy')->name('employee_role.destroy');
 
         Route::get('contentTypes', 'ContentTypesController@index')->name('content_type.index');
         Route::get('contentTypes/create', 'ContentTypesController@create')->name('content_type.create');
@@ -71,8 +215,108 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('sello-import', 'OrdersController@selloImport')->name('orders.sello_import');
         Route::get('send_tracking_numbers', 'OrdersController@sendTrackingNumbers')->name('orders.send_tracking_numbers');
 
+        Route::get('products/stocks', 'ProductStocksController@index')->name('product_stocks.index');
+        Route::post('products/stocks/datatable', 'ProductStocksController@datatable')->name('product_stocks.datatable');
+        Route::get('products/stocks/print', 'ProductStocksController@print')->name('product_stocks.print');
+        Route::get('products/stocks/{id}/edit', 'ProductStocksController@edit')->name('product_stocks.edit');
+        Route::put('products/stocks/{id}/update', 'ProductStocksController@update')->name('product_stocks.update');
+        Route::put('products/stocks/{id}/change-status',
+            'ProductStocksController@changeStatus')->name('product_stocks.change.status');
+        Route::get('products/stocks/{id}/positions/create',
+            'ProductStockPositionsController@create')->name('product_stocks.position.create');
+        Route::get('products/stocks/{id}/positions/datatable',
+            'ProductStockPositionsController@datatable')->name('product_stocks.position.datatable');
+        Route::post('products/stocks/{id}/positions/store',
+            'ProductStockPositionsController@store')->name('product_stocks.position.store');
+        Route::get('products/stocks/{id}/positions/{position_id}/edit',
+            'ProductStockPositionsController@edit')->name('product_stocks.position.edit');
+        Route::put('products/stocks/{id}/positions/{position_id}/update',
+            'ProductStockPositionsController@update')->name('product_stocks.position.update');
+        Route::delete('products/stocks/{id}/positions/{position_id}',
+            'ProductStockPositionsController@destroy')->name('product_stocks.position.destroy');
+        Route::get('products/stocks/{id}/logs/datatable',
+            'ProductStockLogsController@datatable')->name('product_stocks.logs.datatable');
+        Route::get('products/stocks/{id}/logs/{log_id}/show',
+            'ProductStockLogsController@show')->name('product_stocks.logs.show');
+        Route::get('products/stocks/packets/create',
+            'ProductStockPacketsController@create')->name('product_stock_packets.create');
+        Route::post('products/stocks/packets',
+            'ProductStockPacketsController@store')->name('product_stock_packets.store');
+        Route::delete('products/stocks/packets/{packetId}',
+            'ProductStockPacketsController@delete')->name('product_stock_packets.delete');
+        Route::get('products/stocks/packets',
+            'ProductStockPacketsController@index')->name('product_stock_packets.index');
+        Route::get('orders/{orderId}/packet/{packetId}/use',
+            'OrdersController@usePacket')->name('orders.usePacket');
+        Route::post('products/stocks/packets/{packetId}/orderItem/{orderItemId}/assign',
+            'Api\ProductStockPacketsController@assign')->name('product_stock_packets.assign');
+        Route::post('products/stocks/packets/orderItem/{orderItemId}/retain',
+            'Api\ProductStockPacketsController@retain')->name('product_stock_packets.retain');
+        Route::get('products/stocks/packets/product/stock/check',
+            'Api\ProductStockPacketsController@checkProductStockForPacketAssign')->name('product_stock_packets.product.stock.check');
+        Route::get('products/stocks/packets/{packetId}',
+            'ProductStockPacketsController@edit')->name('product_stock_packets.edit');
+        Route::put('products/stocks/packets',
+            'ProductStockPacketsController@update')->name('product_stock_packets.update');
         Route::post('positions/{from}/{to}/quantity/move',
             'ProductStockPositionsController@quantityMove')->name('product_stocks.quantity_move');
+        Route::get('orders', 'OrdersController@index')->name('orders.index');
+        Route::post('orders/update-notices', 'OrdersController@updateNotices')->name('orders.updateNotice');
+        Route::post('orders/returnItemsFromStock',
+            'OrdersController@returnItemsFromStock')->name('orders.returnItemsFromStock');
+        Route::post('orders/acceptItemsToStock',
+            'OrdersController@acceptItemsToStock')->name('orders.acceptItemsToStock');
+        Route::post('orders/sendSelfOrderToWarehouse/{id}',
+            'OrdersController@sendSelfOrderToWarehouse')->name('orders.sendSelfOrderToWarehouse');
+        Route::post('orders/findPackage', 'OrdersController@findPackage')->name('orders.findPackage');
+        Route::post('orders/accept-deny', 'OrdersController@acceptDeny')->name('accept-deny');
+        Route::post('orders/datatable', 'OrdersController@datatable')->name('orders.datatable');
+        Route::post('orders/printAll', 'OrdersController@printAll')->name('orders.printAll');
+        Route::post('orders/sendVisibleCouriers', 'OrdersController@sendVisibleCouriers')->name('orders.sendVisibleCouriers');
+        Route::get('orders/create', 'OrdersController@create')->name('orders.create');
+        Route::get('orders/{id}/edit', 'OrdersController@edit')->name('orders.edit');
+        Route::get('orders/{id}/edit/packages', 'OrdersController@editPackages')->name('orders.editPackages');
+        Route::post('orders/{id}/files/add', 'OrdersController@addFile')->name('orders.fileAdd');
+        Route::get('orders/{id}/files/{file_id}', 'OrdersController@getFile')->name('orders.getFile');
+        Route::get('orders/files/delete/{file_id}', 'OrdersController@deleteFile')->name('orders.fileDelete');
+        Route::post('orders/find-page/{id}', 'OrdersController@findPage')->name('orders.findPage');
+        Route::post('orders/find-by-dates', 'OrdersController@findByDates')->name('orders.findByDates');
+        Route::delete('orders/{id}/', 'OrdersController@destroy')->name('orders.destroy');
+        Route::put('orders/{id}/update', [
+            'uses' => 'OrdersController@update',
+        ])->name('orders.update');
+        Route::put('orders/{id}/updateSelf', [
+            'uses' => 'OrdersController@updateSelf',
+        ])->name('orders.updateSelf');
+        Route::get('orders/{token}/print', 'OrdersController@print')->name('orders.print');
+        Route::post('orders/splitOrders', 'OrdersController@splitOrders');
+        Route::get('orders/{orderIdToGet}/data/{orderIdToSend}/move',
+            'OrdersController@moveData')->name('orders.moveData');
+        Route::post('orders/{orderIdToGet}/data/{orderIdToSend}/payment/move',
+            'OrdersController@movePaymentData')->name('orders.movePaymentData');
+        Route::post('orders/{orderId}/surplus/move',
+            'OrdersController@moveSurplus')->name('orders.moveSurplus');
+        Route::get('orders/{id}/getDataFromLastOrder',
+            'OrdersController@getDataFromLastOrder')->name('orders.getDataFromLastOrder');
+        Route::get('orders/{id}/getDataFromCustomer',
+            'OrdersController@getDataFromCustomer')->name('orders.getDataFromCustomer');
+        Route::get('orders/{id}/getDataFromFirm/{firm_symbol}',
+            'OrdersController@getDataFromFirm')->name('orders.getDataFromFirm');
+        Route::get('orders/{id}/sendOfferToCustomer',
+            'OrdersController@sendOfferToCustomer')->name('orders.sendOfferToCustomer');
+        Route::get('orders/getCosts', 'OrdersController@getCosts')->name('orders.getCosts');
+        Route::post('orders/invoice/request', 'OrdersController@invoiceRequest')->name('orders.invoiceRequest');
+        Route::get('orders/{id}/invoices', 'OrdersController@getInvoices')->name('orders.getInvoices');
+        Route::patch('orders/invoice/{id}/visibility', 'Api\InvoicesController@changeInvoiceVisibility')->name('orders.changeInvoiceVisibility');
+        Route::get('orders/{id}/files', 'OrdersController@getFiles')->name('orders.getFiles');
+        Route::post('orders/allegro-payment', 'OrdersPaymentsController@payAllegro')->name('orders.allegroPayments');
+        Route::post('orders/allegro-commission', 'AllegroController@setCommission')->name('orders.allegroCommission');
+        Route::post('orders/allegro-new-letter', 'AllegroController@createNewLetter')->name('orders.newLettersFromAllegro');
+        Route::post('orders/allegro-new-order', 'AllegroController@createNewOrder')->name('orders.newOrdersFromAllegroComissions');
+        Route::post('orders/create-payments', 'OrdersController@createPayments')->name('orders.create-payments');
+        Route::post('orders/generate-allegro-payments', 'OrdersController@downloadAllegroPaymentsExcel')->name('orders.generate-allegro-orders');
+        Route::post('orders/surplus/return', 'OrdersPaymentsController@returnSurplusPayment')->name('orders.returnSurplus');
+
         Route::get('orderPayments/datatable/{id}',
             'OrdersPaymentsController@datatable')->name('order_payments.datatable');
         Route::get('orderPayments/create/{id}', 'OrdersPaymentsController@create')->name('order_payments.create');
@@ -149,6 +393,22 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orders/status/{id}/message', 'OrdersController@getStatusMessage')->name('order.status.message');
 
         Route::get('invoice/{id}/delete', 'OrdersController@deleteInvoice')->name('order.deleteInvoice');
+
+        Route::post('orders/detach-label',
+            'LabelsController@detachLabelFromOrder')->name('orders.detachLabel');
+
+        Route::post('orders/label-removal/{orderId}/{labelId}',
+            'OrdersController@swapLabelsAfterLabelRemoval')->name('orders.label-removal');
+        Route::post('orders/payment-deadline', 'OrdersController@setPaymentDeadline')->name('orders.payment-deadline');
+        Route::post('orders/label-addition/{labelId}',
+            'OrdersController@swapLabelsAfterLabelAddition')->name('orders.label-addition');
+        Route::get('orders/products/autocomplete',
+            'OrdersController@autocomplete')->name('orders.products.autocomplete');
+        Route::get('orders/products/{symbol}', 'OrdersController@addProduct')->name('orders.products.add');
+        Route::get('orders/{order_id}/package/{package_id}/send',
+            'OrdersPackagesController@preparePackageToSend')->name('orders.package.prepareToSend');
+        Route::get('orders/package/{package_id}/sticker',
+            'OrdersPackagesController@getSticker')->name('orders.package.getSticker');
 
         Route::get('import', 'ImportController@index')->name('import.index');
         Route::post('products/stocks/changes', 'ProductStocksController@productsStocksChanges')->name('productsStocks.changes');
