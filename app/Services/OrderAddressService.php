@@ -35,7 +35,8 @@ class OrderAddressService
             $nipIsValid = true;
         }
 
-        return !$validator->fails() && !$this->namesAndNipCombined($address) && $nipIsValid;
+        return !$validator->fails() && !$this->namesAndNipCombined($address) &&
+            $nipIsValid && $this->haveNameOrFirmname($address);
     }
 
 
@@ -63,6 +64,11 @@ class OrderAddressService
         }
 
         return false;
+    }
+
+    protected function haveNameOrFirmname(OrderAddress $address)
+    {
+        return $address->firmname != null || $address->firstname != null || $address->lastname != null;
     }
 
 }
