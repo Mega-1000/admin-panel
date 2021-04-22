@@ -6,18 +6,15 @@ use Illuminate\Support\Facades\Validator;
 class OrderAddressService
 {
 
+    const TYPE_DELIVERY = 'DELIVERY_ADDRESS';
+    const TYPE_INVOICE = 'INVOICE_ADDRESS';
+
     public function addressIsValid(OrderAddress $address): bool
     {
         $addressArray = $address->toArray();
-        $validator = Validator::make($addressArray, [
-            'firstname' => 'required_with:lastname',
-            'lastname' => 'required_with:firstname',
-            'email' => 'email',
-            'firmname' => 'required_with:nip',
-            'nip' => 'required_with:firmname',
-            'postal_code' => 'regex:/^[0-9]{2}-?[0-9]{3}$/Du',
-            'phone' => 'regex:/^[0-9]{9}\b/'
-        ]);
+        $rules = $this->getRules($address);
+
+        $validator = Validator::make($addressArray, $rules);
 
         if (array_key_exists('nip', $addressArray) && $addressArray['nip'] != null) {
             $nipIsValid = $this->validateNIP($addressArray['nip']);
@@ -25,9 +22,29 @@ class OrderAddressService
             $nipIsValid = true;
         }
 
-        return !$validator->fails() && !$this->namesAndNipCombined($address) && $nipIsValid;
+        return !$validator->fails() && !$this->namesAndNipCombined($address) &&
+            $nipIsValid && $this->haveNameOrFirmname($address);
     }
 
+    protected function getRules(OrderAddress $address): array
+    {
+        $rules = [
+            'firstname' => 'required_with:lastname',
+            'lastname' => 'required_with:firstname',
+            'email' => 'required|email',
+            'address' => 'required',
+            'city' => 'required',
+            'flat_number' => 'required|max:10',
+            'postal_code' => 'required|regex:/^[0-9]{2}-?[0-9]{3}$/Du',
+            'phone' => 'regex:/^[0-9]{9}\b/'
+        ];
+        if ($address->type == self::TYPE_INVOICE) {
+            $rules['firmname'] = 'required_with:nip';
+            $rules['nip'] = 'required_with:firmname';
+        }
+
+        return $rules;
+    }
 
     protected function validateNIP($nip): bool
     {
@@ -48,11 +65,16 @@ class OrderAddressService
 
     protected function namesAndNipCombined(OrderAddress $address): bool
     {
-        if ($address->nip && ($address->first_name || $address->last_name)) {
+        if ($address->type == self::TYPE_INVOICE && $address->nip && ($address->first_name || $address->last_name)) {
             return true;
         }
 
         return false;
+    }
+
+    protected function haveNameOrFirmname(OrderAddress $address)
+    {
+        return $address->firmname != null || $address->firstname != null || $address->lastname != null;
     }
 
 }
