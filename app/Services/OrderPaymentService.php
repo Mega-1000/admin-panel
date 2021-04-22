@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Entities\Label;
+use App\Entities\Order;
 use App\Entities\OrderPayment;
 use App\Enums\LabelEventName;
 use App\Enums\OrderPaymentPayer;
@@ -108,6 +109,11 @@ class OrderPaymentService
         }
 
         return $payment;
+    }
+
+    public function hasAnyPayment(Order $order): bool
+    {
+        return $order->payments->count() > 0;
     }
 
     private function removePromisedPayment(string $masterPaymentId, string $amount, int $orderId): void

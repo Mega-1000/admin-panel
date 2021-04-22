@@ -68,6 +68,7 @@ return [
         'allegro_operation_date' => 'ALLEGRO data operacji',
         'allegro_additional_service' => 'ALLEGRO nazwa usługi dodatkowej',
         'payment_channel' => 'Kanał wpłaty',
+        'dates' => 'Daty'
     ],
     'message' => [
         'store' => 'Zamówienie zostało dodane pomyślnie!',
@@ -161,4 +162,8 @@ return [
     'order_not_found' => 'Nie znaleziono zamówienia',
     'next_order' => 'Przejdź do kolejnego zlecenia',
     'previous_order' => 'Przejdź do poprzedniego zlecenia',
+    'task_get' => 'Pobranie zadania',
+    'task_realized' => 'Zakończenie zadania',
+    'additional_task' => 'Pobranie zadania dodatkowego',
+    'task_performing_employee' => 'Pracownik realizujący zadanie',
 ];

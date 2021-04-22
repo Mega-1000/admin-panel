@@ -55,24 +55,28 @@
                     <button type="button" class="close" data-dismiss="modal"
                             aria-label="{{ __('voyager::generic.close') }}"><span
                             aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="titleModal"></h4>
+                    <h4 class="modal-title" id="titleModal">@lang('orders.additional_task')</h4>
                 </div>
                 <div class="modal-body">
                     <form method="POST" target="_blank" id="create-new-task"
                           action="{{ route('planning.tasks.store') }}">
                         @csrf()
-                        <select name="user_id" required class="form-control">
-                            <option value="" selected="selected">wybierz użytkownika</option>
-                            @foreach($users as $user)
-                                <option
-                                    value="{{$user->id}}">{{$user->name}} {{$user->firstname}} {{$user->lastname}}</option>
-                            @endforeach
-                        </select>
+                        <div class="form-group">
+                            <label for="user_id">@lang('orders.task_performing_employee')</label>
+                            <select name="user_id" required class="form-control">
+                                <option value="" selected="selected">wybierz użytkownika</option>
+                                @foreach($users as $user)
+                                    <option
+                                        value="{{$user->id}}">{{$user->name}} {{$user->firstname}} {{$user->lastname}}</option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="form-group">
                             <label for="task-name">Podaj nazwę zadania</label>
                             <input class="form-control" required name="name" id="task-name" type="text">
                         </div>
-                        <input type="hidden" name="warehouse_id" value="{{ \App\Entities\Warehouse::OLAWA_WAREHOUSE_ID }}">
+                        <input type="hidden" name="warehouse_id"
+                               value="{{ \App\Entities\Warehouse::OLAWA_WAREHOUSE_ID }}">
                         <input type="hidden" name="quickTask" value="1">
                         <input type="hidden" name="color" value="008000">
                     </form>
@@ -92,19 +96,28 @@
                     <button type="button" class="close" data-dismiss="modal"
                             aria-label="{{ __('voyager::generic.close') }}"><span
                             aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="titleModal"></h4>
+                    <h4 class="modal-title">@lang('orders.task_performing_employee')</h4>
                 </div>
                 <div class="modal-body">
                     <form method="POST" target="_blank" id="print-package-form"
                           action="{{ route('orders.findPackage') }}">
                         @csrf()
-                        <select name="user_id" required class="form-control">
-                            <option value="" selected="selected">wybierz użytkownika</option>
-                            @foreach($users as $user)
-                                <option
-                                    value="{{$user->id}}">{{$user->name}} {{$user->firstname}} {{$user->lastname}}</option>
-                            @endforeach
-                        </select>
+                        <div class="form-group">
+                            <label for="user_id">Pracownik realizujący zadanie</label>
+                            <select name="user_id" required class="form-control">
+                                <option value="" selected="selected">wybierz użytkownika</option>
+                                @foreach($users as $user)
+                                    <option
+                                        value="{{$user->id}}">{{$user->name}} {{$user->firstname}} {{$user->lastname}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="task_id">Identyfikator zadania</label>
+                            <select name="task_id" class="form-control" data-size="5">
+                                <option value="" selected="selected">Kolejne zadanie</option>
+                            </select>
+                        </div>
                         <input name="package_type" id="print-package-type" type="hidden">
                     </form>
                 </div>
@@ -123,7 +136,7 @@
                     <button type="button" class="close" data-dismiss="modal"
                             aria-label="{{ __('voyager::generic.close') }}"><span
                             aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="titleModal"></h4>
+                    <h4 class="modal-title" id="titleModal">@lang('orders.task_realized')</h4>
                 </div>
                 <div class="modal-body">
                     <form method="POST" id="finish-task-form"
@@ -690,16 +703,7 @@
             </th>
             <th>@lang('orders.table.production_date')</th>
             <th>
-                <div><span>@lang('orders.table.shipment_date')</span></div>
-                <div class="input_div">
-                    <select class="columnSearchSelect" id="columnSearch-shipment_date">
-                        <option value="all">Wszystkie</option>
-                        <option value="yesterday">Wczoraj</option>
-                        <option value="today">Dzisiaj</option>
-                        <option value="tomorrow">Jutro</option>
-                        <option value="from_tomorrow">Wszystkie od jutra</option>
-                    </select>
-                </div>
+                <div style="width: 120px;"><span>@lang('orders.table.dates')</span></div>
             </th>
             @foreach($customColumnLabels as $key => $label)
                 <th>
@@ -944,6 +948,18 @@
         })
         $('.print-group').click(event => {
             $('#print-package-type').val(event.currentTarget.name);
+            let opt = $(event.currentTarget).data('couriertasks');
+            let select = $('#print-package-group').find('[name="task_id"]');
+            select.find('optgroup').remove();
+            $.each(opt, function (key, value) {
+                if (value.length > 0) {
+                    let group = $('<optgroup label="' + key + '" />');
+                    $.each(value, function () {
+                        $('<option />').html(this.name).val(this.id).appendTo(group);
+                    });
+                    group.appendTo(select);
+                }
+            });
             $('#print-package-group').modal('show');
         })
         $(".send_courier_class").click(event => {
@@ -1081,7 +1097,8 @@
         }
 
         // DataTable
-        window.table = table = $('#dataTable').DataTable({
+        let datatable = function(ajaxParams = null) {
+            return $('#dataTable').DataTable({
             language: {!! json_encode( __('voyager.datatable'), true) !!},
             processing: true,
             serverSide: true,
@@ -1136,8 +1153,15 @@
             ajax: {
                 url: '{!! route('orders.datatable') !!}',
                 type: 'POST',
-                "data": function ( d ) {
-                    d.differenceMode = localStorage.getItem('differenceMode');
+                data: function ( d ) {
+                    if(ajaxParams !== null) {
+                        d.dateFrom = ajaxParams.dateFrom;
+                        d.dateTo = ajaxParams.dateTo;
+                        d.dateColumn = ajaxParams.dateColumn;
+                        d.same = ajaxParams.same;
+                    }
+                    let differenceMode = localStorage.getItem('differenceMode');
+                    if(differenceMode !== null) d.differenceMode = localStorage.getItem('differenceMode');
                 },
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -1409,16 +1433,41 @@
                     name: 'shipment_date',
                     searchable: false,
                     render: function (shipment_date, option, row) {
+                        let html = '';
                         let date = moment(shipment_date);
+                        let DRNP = null;
+
                         if (date.isValid()) {
                             let formatedDate = date.format('YYYY-MM-DD');
                             let startDaysVariation = "";
                             if (row.shipment_start_days_variation) {
                                 startDaysVariation = "<br>&plusmn; " + row.shipment_start_days_variation + " dni";
                             }
-                            return formatedDate + startDaysVariation;
+                            DRNP = html + formatedDate + startDaysVariation;
                         }
-                        return "";
+
+                        const datesObject = {
+                            'DRNP': DRNP,
+                            'WDNKL': row.initial_sending_date_client,
+                            'WDNK': row.initial_sending_date_consultant,
+                            'WDNM': row.initial_sending_date_magazine,
+                            'ZDNK': row.confirmed_sending_date_consultant,
+                            'ZDNM': row.confirmed_sending_date_warehouse,
+                            'WDOK': row.initial_pickup_date_client,
+                            'PDKL': row.confirmed_pickup_date_client,
+                            'PDK': row.confirmed_pickup_date_consultant,
+                            'PDM': row.confirmed_pickup_date_warehouse,
+                            'WDDK': row.initial_delivery_date_consultant,
+                            'WDDM': row.initial_delivery_date_warehouse,
+                            'PDD': row.confirmed_delivery_date
+                        }
+
+                        for (const [key, value] of Object.entries(datesObject)) {
+                            if(value != null)
+                                html += `${key}: <br/> ${value} <br/>`
+                        }
+
+                        return html;
                     }
                 },
                     @foreach($customColumnLabels as $labelGroupName => $label)
@@ -2132,9 +2181,11 @@
                     visible: false
                 },
             ],
-        });
+        })};
 
-        window.table.on('draw', function () {
+        window.table = table = datatable();
+
+            window.table.on('draw', function () {
 
             $('.order-id-checkbox').on('click', e => {
                 if (e.shiftKey && lastChecked) {
@@ -2269,25 +2320,6 @@
                     } else {
                         table
                             .column("packages_not_sent:name")
-                            .search(this.value)
-                            .draw();
-                    }
-                }
-            });
-        $("#columnSearch-shipment_date")
-            .click(function (e) {
-                e.stopPropagation();
-            })
-            .change(function () {
-                if (table.column("shipment_date:name").search() !== this.value) {
-                    if (this.value == '') {
-                        table
-                            .column("shipment_date:name")
-                            .search('')
-                            .draw();
-                    } else {
-                        table
-                            .column("shipment_date:name")
                             .search(this.value)
                             .draw();
                     }
@@ -2615,6 +2647,22 @@
                     window.table.page(Math.floor(data)).draw('page')
                 });
         }
+        function findByDates() {
+            let dateColumn = $('#columnSearch-choose_date').val();
+            let dateFrom = $('#dates_from').val();
+            let dateTo = $('#dates_to').val();
+            let ajaxParams = {};
+
+            ajaxParams['dateFrom'] = dateFrom;
+            ajaxParams['dateTo'] = dateTo;
+            ajaxParams['dateColumn'] = dateColumn;
+
+            if(dateFrom == dateTo) ajaxParams['same'] = true;
+
+            window.table.destroy();
+            window.table = table = datatable(ajaxParams);
+        }
+
 
         function addLabel() {
             let chosenLabel = $("#choosen-label");
@@ -3548,5 +3596,60 @@
             alert('Włączono pokazywanie +/- 2 zł');
         })
 
+        $('#findByDates').on('click', () => {
+            findByDates();
+        })
+
+        $('#columnSearch-shipment_date').on('change', () => {
+            let value = $('#columnSearch-shipment_date').val();
+            const today = new Date();
+            const yesterday = ( d => new Date(d.setDate(d.getDate()-1)) )(new Date);
+            const tomorrow = ( d => new Date(d.setDate(d.getDate()+1)) )(new Date);
+
+            switch(value) {
+                case 'all':
+                    $('#dates_from').data("DateTimePicker").date(null);
+                    $('#dates_to').data("DateTimePicker").date(null);
+                    break;
+                case 'today':
+                    $('#dates_from').data("DateTimePicker").date(today);
+                    $('#dates_to').data("DateTimePicker").date(today);
+                    break;
+                case 'yesterday':
+                    $('#dates_from').data("DateTimePicker").date(yesterday);
+                    $('#dates_to').data("DateTimePicker").date(yesterday);
+                    break;
+                case 'tomorrow':
+                    $('#dates_from').data("DateTimePicker").date(tomorrow);
+                    $('#dates_to').data("DateTimePicker").date(tomorrow);
+                    break;
+                case 'tomorrow':
+                    $('#dates_from').data("DateTimePicker").date(tomorrow);
+                    $('#dates_to').data("DateTimePicker").date(tomorrow);
+                    break;
+                case 'from_tomorrow':
+                    $('#dates_from').data("DateTimePicker").date(tomorrow);
+                    $('#dates_to').data("DateTimePicker").date(null);
+                    break;
+            }
+        })
+
     </script>
+
+    <script>
+        $(document).ready( function() {
+            var now = new Date();
+            const dateFrom = document.querySelector('#protocol_datepicker_from');
+            const dateTo = document.querySelector('#protocol_datepicker_to');
+
+            var day = ("0" + now.getDate()).slice(-2);
+            var month = ("0" + (now.getMonth() + 1)).slice(-2);
+
+            var today = (day)+"/"+(month)+"/"+now.getFullYear() ;
+
+            dateFrom.value = today;
+            dateTo.value = today;
+        });
+    </script>
+
 @endsection

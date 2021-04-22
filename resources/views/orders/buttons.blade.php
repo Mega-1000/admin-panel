@@ -85,10 +85,10 @@
                 {{csrf_field()}}
                 <label for="protocols">Protokoły z dnia</label>
                 <input name="date_from" class="protocol_datepicker" id="protocol_datepicker_from"
-                       value="{{ Carbon\Carbon::now()->format('d/m/yy') }}" style="width: 100px;"/>
+                        style="width: 100px;"/>
                 do dnia
                 <input name="date_to" class="protocol_datepicker" id="protocol_datepicker_to"
-                       value="{{ Carbon\Carbon::now()->format('d/m/yy') }}"/ style="width: 100px;">
+                        style="width: 100px;"/>
                 z magazynu:
                 <input type="text" id="delivery_warehouse" name="delivery_warehouse"
                        value="MEGA-OLAWA"/>
@@ -390,22 +390,55 @@
                 <label for="selectAllOrders">Zaznacz wszystkie zlecenia</label>
                 <input id="selectAllOrders" type="checkbox"/>
             </div>
+            <div class="col-md-12">
+                <h4 class="date__search--text">Wyszukaj po dacie</h4>
+                <div class="dates__box">
+                    <select class="form-control columnSearchSelect" id="columnSearch-choose_date">
+                        <option value="shipment_date">DRNP</option>
+                        <option value="initial_sending_date_client">WDNKL</option>
+                        <option value="initial_sending_date_consultant">WDNK</option>
+                        <option value="initial_sending_date_magazine">WDNM</option>
+                        <option value="confirmed_sending_date_consultant">ZDNK</option>
+                        <option value="confirmed_sending_date_warehouse">ZDNM</option>
+                        <option value="initial_pickup_date_client">WDOK</option>
+                        <option value="confirmed_pickup_date_client">PDKL</option>
+                        <option value="confirmed_pickup_date_consultant">PDK</option>
+                        <option value="confirmed_pickup_date_warehouse">PDM</option>
+                        <option value="initial_delivery_date_consultant">WDDK</option>
+                        <option value="initial_delivery_date_warehouse">WDDM</option>
+                        <option value="confirmed_delivery_date">PDD</option>
+                    </select>
+                    <select class="form-control columnSearchSelect" id="columnSearch-shipment_date">
+                        <option value="all">Wszystkie</option>
+                        <option value="yesterday">Wczoraj</option>
+                        <option value="today">Dzisiaj</option>
+                        <option value="tomorrow">Jutro</option>
+                        <option value="from_tomorrow">Wszystkie od jutra</option>
+                    </select>
+                    <input type="text" id="dates_from" name="dates_from" value="" class="form-control default-date-picker-now">
+                    -
+                    <input type="text" id="dates_to" name="dates_to" value="" class="form-control default-date-picker-now">
+                    <button class="btn btn-success" id="findByDates">Znajdź</button>
+                </div>
+            </div>
         </div>
     </div>
     <div class="col-md-2">
         <h4>Drukuj paczki z grupy:</h4>
-        <div class="row">
-            <button class="btn btn-info print-group" name="paczkomat">Paczkomat</button> ({{ $couriersCount['inpost'] }})
-        </div>
-        <div class="row">
-            <button class="btn btn-info print-group" name="gls">Gls</button> ({{ $couriersCount['gls'] }})
-        </div>
-        <div class="row">
-            <button class="btn btn-info print-group" name="dpd">Dpd</button> ({{ $couriersCount['dpd'] }})
-        </div>
-        <div class="row">
-            <button class="btn btn-info print-group" name="pocztex">Pocztex</button> ({{ $couriersCount['pocztex'] }})
-        </div>
+        @foreach($couriersTasks as $courierCode => $tasksInDay)
+            <div class="row">
+                <button class="btn btn-info print-group col-lg-12"
+                        name="{{ \App\Enums\CourierName::DELIVERY_TYPE_LABELS[$courierCode] }}"
+                        data-courierTasks="{{ json_encode($tasksInDay) }}">
+                    {{ \App\Enums\CourierName::DELIVERY_TYPE_LABELS[$courierCode] }}
+                    <div>
+                        @foreach($tasksInDay as $date => $tasks)
+                            <span class="badge badge-light">{{ count($tasks) }}</span>
+                        @endforeach
+                    </div>
+                </button>
+            </div>
+        @endforeach
         <div class="row">
             <button class="btn btn-info" id="create-new-task-button" name="custom">Dodatkowe Zadanie</button>
         </div>

@@ -184,6 +184,7 @@ return [
         \App\Providers\Entities\OrderModelServiceProvider::class,
         \App\Providers\Entities\OrderMessageModelServiceProvider::class,
         \App\Providers\Entities\OrderAddressModelProvider::class,
+        \App\Providers\Entities\OrderPaymentModelServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
         Lord\Laroute\LarouteServiceProvider::class,
     ],

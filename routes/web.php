@@ -73,7 +73,6 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::post('positions/{from}/{to}/quantity/move',
             'ProductStockPositionsController@quantityMove')->name('product_stocks.quantity_move');
-
         Route::get('orderPayments/datatable/{id}',
             'OrdersPaymentsController@datatable')->name('order_payments.datatable');
         Route::get('orderPayments/create/{id}', 'OrdersPaymentsController@create')->name('order_payments.create');
