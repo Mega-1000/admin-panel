@@ -34,7 +34,7 @@ class OrderAddressService
             'email' => 'required|email',
             'address' => 'required',
             'city' => 'required',
-            'flat_number' => 'required',
+            'flat_number' => 'required|max:10',
             'postal_code' => 'required|regex:/^[0-9]{2}-?[0-9]{3}$/Du',
             'phone' => 'regex:/^[0-9]{9}\b/'
         ];
