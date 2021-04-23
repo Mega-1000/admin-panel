@@ -25,7 +25,7 @@ class TimetablesController extends Controller
     {
         $activeDay = null;
         $viewType = null;
-        $selectId = null;
+        $selectId = $taskDiffInMins = $taskHour = null;
         if (isset($request->id)) {
             $string = explode('-', $request->id);
             if (isset($string[1])) {
@@ -46,14 +46,14 @@ class TimetablesController extends Controller
                     $dateView = new Carbon($task->taskTime->date_start);
                     $activeDay = $dateView->toDateTimeString();
                     $taskDiffInMins = $dateView->diffInMinutes(new Carbon($task->taskTime->date_end));
-
+                    $taskHour = $dateView->hour;
                     $viewType = 'resourceTimelineDay';
                 }
             }
         }
         $warehouses = $this->warehouseRepository->findByField('symbol', 'MEGA-OLAWA');
 
-        return view('planning.timetable.index', compact(['warehouses', 'viewType', 'activeDay', 'selectId', 'taskDiffInMins']));
+        return view('planning.timetable.index', compact(['warehouses', 'viewType', 'activeDay', 'selectId', 'taskDiffInMins', 'taskHour']));
     }
 
     public function getStorekeepers($id)
