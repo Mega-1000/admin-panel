@@ -1045,11 +1045,13 @@
             if (idFromUrl !== 'undefined' && idFromUrl !== 'task-') {
                 if ({{ $taskDiffInMins }} < 5) {
                     mins = '00:02';
-                } else if ({{ $taskDiffInMins }} < 15) {
+                } else if ({{ $taskDiffInMins }} < 20) {
                     mins = '00:05';
                 }
 
-                if (window.localStorage.getItem('mins') !== mins) {
+                if (7 < {{ $taskHour  }} || {{ $taskHour }} > 18) {
+                    renderCalendar("06:00:00", "23:00:00", mins);
+                } else if (window.localStorage.getItem('mins') !== mins) {
                     renderCalendarMins(mins);
                 }
 
