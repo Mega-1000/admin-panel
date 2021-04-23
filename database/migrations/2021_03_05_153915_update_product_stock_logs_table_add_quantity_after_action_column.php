@@ -14,7 +14,7 @@ class UpdateProductStockLogsTableAddQuantityAfterActionColumn extends Migration
     public function up()
     {
         Schema::table('product_stock_logs', function (Blueprint $table) {
-            $table->integer('stock_quantity_after_action')->nullable();
+            # $table->integer('stock_quantity_after_action')->nullable();
         });
     }
 
