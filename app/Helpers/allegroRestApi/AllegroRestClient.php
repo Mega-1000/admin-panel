@@ -10,7 +10,7 @@ class AllegroRestClient
 
     public function __construct()
     {
-        $this->token = Allegro_Auth::first();
+        $this->token = Allegro_Auth::find(1);
         if (empty($this->token)) {
             \Log::error('Brak tokena autoryzującego allegro');
             return;
@@ -19,7 +19,6 @@ class AllegroRestClient
             'base_uri' => env('ALLEGRO_HOST'),
             'verify' => false
         ]);
-
     }
 
     public function sendTrackingNumber($package)

@@ -17,6 +17,10 @@ Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
     Route::group(['middleware' => 'admin'], function () {
 
+        Route::get('/disputes', 'AllegroDisputeController@list');
+        Route::get('/disputes/view/{id}', 'AllegroDisputeController@view');
+        Route::post('/disputes/send/{id}', 'AllegroDisputeController@sendMessage');
+
         Route::get('/bonus', 'BonusController@index')->name('bonus.index');
         Route::post('/bonus', 'BonusController@create')->name('bonus.create');
         Route::post('/bonus/delete', 'BonusController@destroy')->name('bonus.destroy');
