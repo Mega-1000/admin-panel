@@ -1421,10 +1421,11 @@
                             DRNP = html + formatedDate + startDaysVariation;
                         }
 
+                        let datesLabels = ['WDNKL', 'WDNM', 'ZDNK', 'ZDNM'];
+
                         const datesObject = {
-                            'DRNP': DRNP,
+                            'WDNK': DRNP,
                             'WDNKL': row.initial_sending_date_client,
-                            'WDNK': row.initial_sending_date_consultant,
                             'WDNM': row.initial_sending_date_magazine,
                             'ZDNK': row.confirmed_sending_date_consultant,
                             'ZDNM': row.confirmed_sending_date_warehouse,
@@ -1439,7 +1440,11 @@
 
                         for (const [key, value] of Object.entries(datesObject)) {
                             if(value != null)
-                                html += `${key}: <br/> ${value} <br/>`
+                                if(datesLabels.includes(key)) {
+                                    html += `${key}: <br/> ${value.slice(0,10)} <br/>`
+                                } else {
+                                    html += `${key}: <br/> ${value} <br/>`
+                                }
                         }
 
                         return html;

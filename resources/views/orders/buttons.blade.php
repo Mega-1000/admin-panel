@@ -394,9 +394,8 @@
                 <h4 class="date__search--text">Wyszukaj po dacie</h4>
                 <div class="dates__box">
                     <select class="form-control columnSearchSelect" id="columnSearch-choose_date">
-                        <option value="shipment_date">DRNP</option>
+                        <option value="shipment_date">WDNK</option>
                         <option value="initial_sending_date_client">WDNKL</option>
-                        <option value="initial_sending_date_consultant">WDNK</option>
                         <option value="initial_sending_date_magazine">WDNM</option>
                         <option value="confirmed_sending_date_consultant">ZDNK</option>
                         <option value="confirmed_sending_date_warehouse">ZDNM</option>
