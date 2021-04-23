@@ -1060,7 +1060,7 @@
                     $(".fc-scroller").animate({
                         scrollLeft: $('#' + idFromUrl).position().left - 600
                     }, 500);
-                }, 1500);
+                }, 2000);
             }
         });
     </script>
