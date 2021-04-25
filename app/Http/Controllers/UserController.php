@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Entities\ColumnVisibility;
 use App\Http\Requests\UserCreateRequest;
 use App\Http\Requests\UserUpdateRequest;
-use App\Jobs\AddNewWorkHourForUsers;
 use App\Repositories\UserRepository;
 use App\Repositories\UserEmailRepository;
 use App\Repositories\WarehouseRepository;
@@ -93,9 +92,7 @@ class UserController extends Controller
             'warehouse_id' => $request->input('warehouse_id'),
             'rate_hour' => $request->input('rate_hour')
         ]);
-        if($request->warehouse_id !== null){
-            dispatch_now(new AddNewWorkHourForUsers());
-        }
+
         $this->userEmailRepository->create([
             'username' => $request->input('email-username'),
             'host' => $request->input('host'),

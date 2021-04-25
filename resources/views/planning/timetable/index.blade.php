@@ -273,7 +273,7 @@
 @endsection
 
 @section('javascript')
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"/>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
         function sendComment(type, order_id) {
             $.post(
@@ -291,8 +291,7 @@
                     alert(Object.values(json.errors));
                 })
         }
-    </script>
-    <script>
+
         function renderCalendarMins(number) {
             window.localStorage.setItem('mins', number);
             renderCalendar(document.calendarMinTime, document.calendarMaxTime, number);
@@ -1043,13 +1042,15 @@
             var idFromUrl = 'task-{{ $selectId }}';
             let mins = '00:15';
             if (idFromUrl !== 'undefined' && idFromUrl !== 'task-') {
-                if ({{ $taskDiffInMins }} < 5) {
+                let taskDiffInMins = {{ $taskDiffInMins ?? 'undefined'}};
+                let taskHour = {{ $taskHour ?? 'undefined'}};
+                if (taskDiffInMins < 5) {
                     mins = '00:02';
-                } else if ({{ $taskDiffInMins }} < 20) {
+                } else if (taskDiffInMins < 20) {
                     mins = '00:05';
                 }
 
-                if (7 < {{ $taskHour  }} || {{ $taskHour }} > 18) {
+                if (7 > taskHour || taskHour > 18) {
                     renderCalendar("06:00:00", "23:00:00", mins);
                 } else if (window.localStorage.getItem('mins') !== mins) {
                     renderCalendarMins(mins);
