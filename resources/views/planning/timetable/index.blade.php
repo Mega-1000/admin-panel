@@ -273,7 +273,7 @@
 @endsection
 
 @section('javascript')
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"/>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
         function sendComment(type, order_id) {
             $.post(
@@ -291,8 +291,7 @@
                     alert(Object.values(json.errors));
                 })
         }
-    </script>
-    <script>
+
         function renderCalendarMins(number) {
             window.localStorage.setItem('mins', number);
             renderCalendar(document.calendarMinTime, document.calendarMaxTime, number);
