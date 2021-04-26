@@ -37,7 +37,7 @@ final class CourierName extends Enum
         self::GLS => [self::GLS],
         self::DPD => [self::DPD],
         self::POCZTEX => [self::POCZTEX],
-        self::INPOST => [self::POCZTEX, self::ALLEGRO_INPOST],
+        self::INPOST => [self::INPOST, self::ALLEGRO_INPOST],
         self::ODBIOR_OSOBISTY => [self::ODBIOR_OSOBISTY],
     ];
 }
