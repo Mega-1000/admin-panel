@@ -132,10 +132,9 @@ class AllegroDisputeService
     public function checkAuthorizationStatus(string $deviceId)
     {
         $url = env('ALLEGRO_AUTH_STATUS_URL') . $deviceId;
-        $authString = base64_encode(env('ALLEGRO_CLIENT_ID') . ':' . env('ALLEGRO_CLIENT_SECRET'));
         $response = $this->client->post($url, [
             'headers' => [
-                'Authorization' => 'Basic ' . $authString,
+                'Authorization' => $this->getBasicAuthString(),
             ]
         ]);
 
@@ -144,7 +143,16 @@ class AllegroDisputeService
 
     private function refreshTokens()
     {
-
+        $url = env('ALLEGRO_REFRESH_URL') . $this->getRefreshToken();
+        $response = $this->client->post($url, [
+            'headers' => [
+                'Authorization' => $this->getBasicAuthString()
+            ]
+        ]);
+        $response = json_decode((string) $response->getBody(), true);
+        $this->authModel->access_token = $response['access_token'];
+        $this->authModel->refresh_token = $response['refresh_token'];
+        $this->authModel->save();
     }
 
     private function request(string $method, string $url, array $params)
@@ -182,11 +190,6 @@ class AllegroDisputeService
     private function getRefreshToken()
     {
         return $this->authModel->refresh_token;
-    }
-
-    private function findOrderByFormId(string $id): ?Order
-    {
-
     }
 
     private function getRestUrl(string $resource): string

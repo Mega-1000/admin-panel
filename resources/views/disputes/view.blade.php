@@ -23,11 +23,13 @@
             </li>
         @endforeach
     </ul>
+    @if($dispute->status == 'ONGOING')
     <form method="post" action="/admin/disputes/send/{{ $dispute->id }}">
         {{ csrf_field() }}
         <textarea name="text" class='form-control' name="" id="" cols="30" rows="3"></textarea>
         <button class="btn btn-primary">Wyślij</button>
     </form>
+    @endif
 
     <style>
         ul.chat {

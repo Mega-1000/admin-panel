@@ -14,6 +14,7 @@
             <th>Zamówienie</th>
             <th>Klient allegro</th>
             <th>Temat</th>
+            <th>Status</th>
             <th></th>
         </tr>
         </thead>
@@ -24,6 +25,7 @@
                 <td>{!!  $dispute->order !!}</td>
                 <td>{{ $dispute->buyer_login }}</td>
                 <td>{{ $dispute->subject }}</td>
+                <td>{{ $dispute->status == 'ONGOING' ? 'Otwarta' : 'Zamknięta' }}</td>
                 <td><a href="/admin/disputes/view/{{ $dispute->id }}" class="btn btn-default">Zobacz</a></td>
             </tr>
         @endforeach
