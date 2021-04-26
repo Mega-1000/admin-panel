@@ -14,6 +14,11 @@ const mix = require('laravel-mix');
 mix.js('resources/js/app.js', 'public/js')
    .sass('resources/sass/app.scss', 'public/css');
 
+mix.js('resources/layout/dist/js/app.*.js', 'public/js/vue-scripts.js')
+    .js('resources/layout/dist/js/chunk-vendors.*.js', 'public/js/vue-chunk.js');
+
+mix.copy('resources/layout/dist/css/app.*.css', 'public/css/vue/styles.css');
+
 mix.copyDirectory('node_modules/tinymce/plugins', 'public/node_modules/tinymce/plugins');
 mix.copyDirectory('node_modules/tinymce/skins', 'public/node_modules/tinymce/skins');
 mix.copyDirectory('node_modules/tinymce/themes', 'public/node_modules/tinymce/themes');

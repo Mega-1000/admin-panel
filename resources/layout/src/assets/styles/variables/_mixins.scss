@@ -1,0 +1,4 @@
+@mixin container {
+  width: $breakpoint-desktop;
+  margin: 0 15px;
+}

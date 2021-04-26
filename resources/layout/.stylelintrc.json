@@ -1,0 +1,28 @@
+{
+  "extends": [
+    "stylelint-config-standard"
+  ],
+  "plugins": [
+    "stylelint-declaration-use-variable"
+  ],
+  "rules": {
+    "at-rule-no-unknown": null,
+    "selector-type-no-unknown": null,
+    "no-descending-specificity": null,
+    "no-empty-source": true,
+    "sh-waqar/declaration-use-variable": [
+      ["/color/", "z-index", { "ignoreValues": ["transparent", "inherit"] }]
+    ],
+    "font-family-no-missing-generic-family-keyword": null,
+    "selector-class-pattern": "^[a-zA-Z0-9-_]+$",
+    "indentation": [
+      2,
+      {
+        "baseIndentLevel": 1
+      }
+    ],
+    "max-nesting-depth": [4, {
+      "ignoreAtRules": ["include"]
+    }]
+  }
+}
