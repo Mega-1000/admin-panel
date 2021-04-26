@@ -445,7 +445,7 @@
     <script src='/fullcalendar/resource-common/main.js'></script>
     <script src='/fullcalendar/resource-timeline/main.js'></script>
     <script src="/js/laroute.js"></script>
-    <link href="{{ assets('css/vue/style.css') }}" rel="stylesheet" />
+    <link href="{{ asset('css/vue/styles.css') }}" rel="stylesheet" />
 @endsection
 
 @section('page_header')
@@ -490,7 +490,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/eonasdan-bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
     <script src="{{ URL::asset('js/app.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
-    <script src="{{ assets('js/vue-chunk.js') }}"></script>
-    <script src="{{ assets('js/vue-scripts.js') }}"></script>
+    <script src="{{ asset('js/vue-chunk.js') }}"></script>
+    <script src="{{ asset('js/vue-scripts.js') }}"></script>
     @yield('scripts')
 @endsection
