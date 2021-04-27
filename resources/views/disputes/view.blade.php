@@ -11,7 +11,7 @@
     <ul style="list-style-type: none; padding: 0;">
         @foreach(array_reverse($messages) as $message)
             <li style="padding: 10px; border-radius: 5px; margin-bottom: 10px; border:1px solid #ccc;
-                background: {{ $message['author']['role'] == 'BUYER' ? '#ddd' : '#ded' }}
+                background: {{ $message['author']['role'] == 'BUYER' ? '#eee' : '#efe' }}
                 ">
                 <b>{{ $message['author']['login'] }}</b>
                 <small>{{ $message['author']['role'] == 'BUYER' ? '(kupujący)' : '(sprzedawca)' }}</small>:
