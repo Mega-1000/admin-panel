@@ -13,13 +13,6 @@ class UpdateAllegroDisputes implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $allegroDisputeService;
-
-    public function __construct(AllegroDisputeService $service)
-    {
-        $this->allegroDisputeService = $service;
-    }
-
     /**
      * Execute the job.
      *
@@ -27,6 +20,7 @@ class UpdateAllegroDisputes implements ShouldQueue
      */
     public function handle()
     {
-        $this->allegroDisputeService->updateOngoingDisputes();
+        $allegroDisputeService = app(AllegroDisputeService::class);
+        $allegroDisputeService->updateOngoingDisputes();
     }
 }

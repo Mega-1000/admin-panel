@@ -8,9 +8,11 @@
 
 @section('table')
 
-    <ul class="chat">
+    <ul style="list-style-type: none; padding: 0;">
         @foreach(array_reverse($messages) as $message)
-            <li class="{{ $message['author']['role'] }}">
+            <li style="padding: 10px; border-radius: 5px; margin-bottom: 10px; border:1px solid #ccc;
+                background: {{ $message['author']['role'] == 'BUYER' ? '#eee' : '#efe' }}
+                ">
                 <b>{{ $message['author']['login'] }}</b>
                 <small>{{ $message['author']['role'] == 'BUYER' ? '(kupujący)' : '(sprzedawca)' }}</small>:
                 <span class="pull-right"><small>{{ (new \Carbon\Carbon($message['createdAt'])) }}</small></span>
@@ -31,28 +33,6 @@
     </form>
     @endif
 
-    <style>
-        ul.chat {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        ul.chat li {
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-        }
-
-        ul.chat li.SELLER {
-            border: 1px solid #ddd;
-            background: #eee;
-        }
-
-        ul.chat li.BUYER {
-            border: 1px solid #ddf;
-            background: #eef;
-        }
-    </style>
 @endsection
 
 
