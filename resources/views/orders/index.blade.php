@@ -164,6 +164,10 @@
                             <label for="warehouse_notice">Podaj nazwę zadania</label>
                             <input id="warehouse-done-notice-input" class="form-control" name="warehouse_notice" type="text">
                         </div>
+                        <div class="form-group">
+                            <label for="description">Opis przebiegu zadania</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        </div>
                     </form>
                 </div>
                 <div class="modal-footer">

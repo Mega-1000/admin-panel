@@ -698,6 +698,7 @@ class TasksController extends Controller
             $end->second = 0;
             $task->TaskTime->date_end = $end;
             $task->status = Task::FINISHED;
+            $task->description = $request->description;
             $task->TaskTime->save();
 
             $response = $this->markTaskAsProduced($task);
