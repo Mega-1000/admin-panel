@@ -13,29 +13,41 @@ use App\Entities\Product;
 
 class SetsController extends Controller
 {
-    public function __construct()
-    {
-    }
-
     public function index()
     {
-        $sets = Set::get()->all();
+        $sets = [];
+        foreach (Set::get() as $item) {
+            $sets[$item->id] = [
+                'set' => [$item],
+                'products' => $item->products()
+            ];
+        }
 
-        return  view('product_stocks.sets.index', compact('sets'));
+        return  $sets;
     }
 
-    public function create()
+    public function set(Set $set)
     {
-        return view('product_stocks.sets.create');
+        $set = Set::where('id', $set->id)->get();
+
+        return  [
+            'set' => $set,
+            'products' => $set->first()->products()
+        ];
     }
 
-    public function edit(Set $set)
+    public function products()
     {
-        $set = Set::find($set->id)->get()->first();
-        $products = Product::get()->all();
-        $setItems = $set->products();
+        return  Product::get();
+    }
 
-        return  view('product_stocks.sets.edit', compact(['set', 'products', 'setItems']));
+    public function productsStocks(Product $product)
+    {
+        $stock = ProductStock::where('product_id', $product->id)->get();
+        return [
+            'stock' => $stock,
+            'positions' => ProductStockPosition::where('product_stock_id', $stock->first()->id)->get()->all()
+        ];
     }
 
     public function store(Request $request)
@@ -51,15 +63,15 @@ class SetsController extends Controller
         $set->stock = 0;
 
         if ($set->save()) {
-            return redirect()->route('sets.index')->with([
-                'message' => __('sets.message.store'),
-                'alert-type' => 'success'
-            ]);
+            return response(json_encode([
+                'set' => $set,
+            ]),200);
         }
-        return redirect()->back()->with([
-            'message' => __('sets.messages.error'),
-            'alert-type' => 'error'
-        ]);
+
+        return response(json_encode([
+            'error_code' => 500,
+            'error_message' => __('sets.messages.error')
+        ]),500);
     }
 
     public function update(Set $set, Request $request)
@@ -74,29 +86,25 @@ class SetsController extends Controller
         $set->stock = $request->stock;
 
         if ($set->update()) {
-            return redirect()->route('sets.edit', ['set' => $set->id])->with([
-                'message' => __('sets.message.store'),
-                'alert-type' => 'success'
-            ]);
+            return response(json_encode([
+                'set' => $set,
+            ]),200);
         }
-        return redirect()->back()->with([
-            'message' => __('sets.messages.error'),
-            'alert-type' => 'error'
-        ]);
+        return response(json_encode([
+            'error_code' => 500,
+            'error_message' => __('sets.messages.error')
+        ]),500);
     }
 
     public function delete(Set $set)
     {
         if ($set->delete()) {
-            return redirect()->route('sets.index')->with([
-                'message' => __('sets.message.delete'),
-                'alert-type' => 'success'
-            ]);
+            return response(json_encode([]),200);
         }
-        return redirect()->back()->with([
-            'message' => __('sets.messages.error'),
-            'alert-type' => 'error'
-        ]);
+        return response(json_encode([
+            'error_code' => 500,
+            'error_message' => __('sets.messages.error')
+        ]),500);
     }
 
     public function addProduct(Request $request, Set $set)
@@ -119,72 +127,63 @@ class SetsController extends Controller
             $this->updateProductStock($request->product_id, $requiredStock);
 
             if ($setItem->save()) {
-                return redirect()->route('sets.edit', ['set' => $set->id])->with([
-                    'message' => __('sets.message.store'),
-                    'alert-type' => 'success'
-                ]);
+                return response(json_encode($setItem),200);
             }
-            return redirect()->back()->with([
-                'message' => __('sets.messages.error'),
-                'alert-type' => 'error'
-            ]);
+            return response(json_encode([
+                'error_code' => 500,
+                'error_message' => __('sets.messages.error')
+            ]),500);
         } else {
-            return redirect()->back()->with([
-                'message' => __('sets.messages.not_enough_product'),
-                'alert-type' => 'error'
-            ]);
+            return response(json_encode([
+                'error_code' => 500,
+                'error_message' => __('sets.messages.not_enough_product')
+            ]),500);
         }
     }
 
-    public function editProduct(Set $set, SetItem $productSet, Request $request)
+    public function editProduct(Set $set, SetItem $product, Request $request)
     {
         $this->validate($request, [
             'stock' => 'required'
         ]);
 
-        $stock = ProductStock::where('product_id', $productSet->product_id)->get()->first();
-        $lastSetStock = $productSet->stock * $set->stock;
+        $stock = ProductStock::where('product_id', $product->product_id)->get()->first();
+        $lastSetStock = $product->stock * $set->stock;
         $requiredStock = $set->stock * $request->stock;
         $updatedStock = $requiredStock - $lastSetStock;
 
         if ($stock->quantity >= $updatedStock) {
 
-            $this->updateProductStock($productSet->product_id, $updatedStock);
-            $productSet->stock = $request->stock;
+            $this->updateProductStock($product->product_id, $updatedStock);
+            $product->stock = $request->stock;
 
-            if ($productSet->update()) {
-                return redirect()->route('sets.edit', ['set' => $set->id])->with([
-                    'message' => __('sets.message.store'),
-                    'alert-type' => 'success'
-                ]);
+            if ($product->update()) {
+                return response(json_encode($product),200);
             }
-            return redirect()->back()->with([
-                'message' => __('sets.messages.error'),
-                'alert-type' => 'error'
-            ]);
+            return response(json_encode([
+                'error_code' => 500,
+                'error_message' => __('sets.messages.error')
+            ]),500);
         } else {
-            return redirect()->back()->with([
-                'message' => __('sets.messages.not_enough_product'),
-                'alert-type' => 'error'
-            ]);
+            return response(json_encode([
+                'error_code' => 500,
+                'error_message' => __('sets.messages.not_enough_product')
+            ]),500);
         }
     }
 
-    public function deleteProduct(Set $set, SetItem $productSet)
+    public function deleteProduct(Set $set, SetItem $product)
     {
-        $productStock = $set->stock * $productSet->stock;
-        $this->updateProductStock($productSet->product_id, -$productStock);
+        $productStock = $set->stock * $product->stock;
+        $this->updateProductStock($product->product_id, -$productStock);
 
-        if ($productSet->delete()) {
-            return redirect()->route('sets.edit', ['set' => $set->id])->with([
-                'message' => __('sets.message.store'),
-                'alert-type' => 'success'
-            ]);
+        if ($product->delete()) {
+            return response(json_encode([]),200);
         }
-        return redirect()->back()->with([
-            'message' => __('sets.messages.error'),
-            'alert-type' => 'error'
-        ]);
+        return response(json_encode([
+            'error_code' => 500,
+            'error_message' => __('sets.messages.error')
+        ]),500);
     }
 
     public function completing(Set $set, Request $request)
@@ -197,10 +196,10 @@ class SetsController extends Controller
             $stock = ProductStock::where('product_id', $product->id)->get()->first();
             $requiredStock = $product->stock * $request->number;
             if($stock->quantity < $requiredStock) {
-                return redirect()->back()->with([
-                    'message' => __('sets.messages.not_enough_product')."'".$product->name."'",
-                    'alert-type' => 'error'
-                ]);
+                return response(json_encode([
+                    'error_code' => 500,
+                    'error_message' => __('sets.messages.not_enough_product')."'".$product->name."'"
+                ]),500);
             }
         }
 
@@ -211,16 +210,15 @@ class SetsController extends Controller
                 $requiredStock = $product->stock * $request->number;
                 $this->updateProductStock($product->id, $requiredStock);
             }
-            return redirect()->route('sets.index')->with([
-                'message' => __('sets.messages.disassembly_success').' '.$request->number.' '.__('sets.sets'),
-                'alert-type' => 'success'
-            ]);
+            return response(json_encode([
+                'message' => __('sets.messages.completing_success').' '.$request->number.' '.__('sets.sets')
+            ]),200);
         }
 
-        return redirect()->route('sets.index')->with([
-            'message' => __('sets.messages.error'),
-            'alert-type' => 'error'
-        ]);
+        return response(json_encode([
+            'error_code' => 500,
+            'error_message' => __('sets.messages.error')
+        ]),500);
     }
 
     public function disassembly(Set $set, Request $request)
@@ -239,16 +237,15 @@ class SetsController extends Controller
                 $requiredStock = $product->stock * (($setsNumber < 0) ? $oldStock : $setsNumber);
                 $this->updateProductStock($product->id, -$requiredStock);
             }
-            return redirect()->route('sets.index')->with([
-                'message' => __('sets.messages.disassembly_success').' '.$request->number.' '.__('sets.sets'),
-                'alert-type' => 'success'
-            ]);
+            return response(json_encode([
+                'message' => __('sets.messages.disassembly_success').' '.$request->number.' '.__('sets.sets')
+            ]),200);
         }
 
-        return redirect()->route('sets.index')->with([
-            'message' => __('sets.messages.error'),
-            'alert-type' => 'error'
-        ]);
+        return response(json_encode([
+            'error_code' => 500,
+            'error_message' => __('sets.messages.error')
+        ]),500);
     }
 
     private function updateProductStock(int $productId, int $numberProducts) {
