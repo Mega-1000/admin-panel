@@ -13,11 +13,11 @@
             <li style="padding: 10px; border-radius: 5px; margin-bottom: 10px; border:1px solid #ccc;
                 background: {{ $message['author']['role'] == 'BUYER' ? '#eee' : '#efe' }}
                 ">
-                <b>{{ $message['author']['login'] }}</b>
-                <small>{{ $message['author']['role'] == 'BUYER' ? '(kupujący)' : '(sprzedawca)' }}</small>:
+                <b>{{ array_key_exists('login', $message['author']) ? $message['author']['login'] : 'SYSTEM ALLEGRO' }}</b>
+                <small>{{ $message['author']['role'] == 'BUYER' ? '(kupujący)' : '' }}</small>:
                 <span class="pull-right"><small>{{ (new \Carbon\Carbon($message['createdAt'])) }}</small></span>
                 <br>
-                {{ $message['text'] }}
+                {{ array_key_exists('text', $message) ? $message['text'] : '' }}
                 <br>
                 @if(array_key_exists('attachment', $message))
                     <a target="_blank" href="{{ $message['attachment']['url'] }}">{{ $message['attachment']['fileName'] }}</a>

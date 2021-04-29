@@ -52,6 +52,14 @@
         <button class="btn btn-primary"
                 name="change-button-form" id="button-messages"
                 value="messages">@lang('orders.form.buttons.messages')</button>
+        @if($order->dispute)
+        <a href="/admin/disputes/view/{{$order->dispute->id}}" class="btn btn-primary">
+            @if($order->dispute->unseen_changes)
+                <i class="fas fa-exclamation-cirle"></i>
+            @endif
+            Dyskusja allegro
+        </a>
+        @endif
         <button class="btn btn-primary"
                 name="change-button-form" id="button-packages"
                 value="packages">@lang('orders.form.buttons.packages')</button>
