@@ -80,11 +80,8 @@ class AllegroDisputeService
 
     public function getDisputesList(int $offset = 0, int $limit = 100)
     {
-        $url = $this->getRestUrl('/sale/disputes');
-        $response = $this->request('GET', $url, [
-            'limit' => $limit,
-            'offset' => $offset
-        ]);
+        $url = $this->getRestUrl("/sale/disputes?limit={$limit}&offset={$offset}");
+        $response = $this->request('GET', $url, []);
         return json_decode((string)$response->getBody(), true)['disputes'];
     }
 
@@ -101,7 +98,7 @@ class AllegroDisputeService
         $cursor = 0;
 
         do {
-            $url = $this->getRestUrl("/sale/disputes/{$id}/messages");
+            $url = $this->getRestUrl("/sale/disputes/{$id}/messages?limit=100&offset={$cursor}");
             $response = $this->request('GET', $url, [
                 'offset' => $cursor,
                 'limit' => 100
@@ -154,12 +151,14 @@ class AllegroDisputeService
 
     private function updateLabels(AllegroDispute $dispute)
     {
-        if ($dispute->order_id && $dispute->unseen_changes) {
-            dispatch_now(new AddLabelJob($dispute->order->id, [186]));
-            dispatch_now(new RemoveLabelJob($dispute->order->id, [185]));
-        } else if ($dispute->order_id && !$dispute->unseen_changes) {
-            dispatch_now(new AddLabelJob($dispute->order->id, [185]));
-            dispatch_now(new RemoveLabelJob($dispute->order->id, [186]));
+        if ($dispute->order_id) {
+            if ($this->getDisputeMessages($dispute->dispute_id)[0]['author']['role'] != 'SELLER') {
+                dispatch_now(new AddLabelJob($dispute->order->id, [186]));
+                dispatch_now(new RemoveLabelJob($dispute->order->id, [185]));
+            } else {
+                dispatch_now(new AddLabelJob($dispute->order->id, [185]));
+                dispatch_now(new RemoveLabelJob($dispute->order->id, [186]));
+            }
         }
     }
 
