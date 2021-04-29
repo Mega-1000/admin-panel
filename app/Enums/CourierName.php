@@ -15,6 +15,7 @@ final class CourierName extends Enum
     const JAS = 'JAS';
     const GLS = 'GLS';
     const ODBIOR_OSOBISTY = 'ODBIOR_OSOBISTY';
+    const GIELDA = 'GIELDA';
 
     /**
      * Delivery types labels
@@ -28,6 +29,7 @@ final class CourierName extends Enum
         self::JAS => 'Jas',
         self::GLS => 'Gls',
         self::ODBIOR_OSOBISTY => 'Odbiór osobisty',
+        self::GIELDA => 'Giełda',
     ];
 
     /**
@@ -39,5 +41,6 @@ final class CourierName extends Enum
         self::POCZTEX => [self::POCZTEX],
         self::INPOST => [self::INPOST, self::ALLEGRO_INPOST],
         self::ODBIOR_OSOBISTY => [self::ODBIOR_OSOBISTY],
+        self::GIELDA => [self::GIELDA],
     ];
 }

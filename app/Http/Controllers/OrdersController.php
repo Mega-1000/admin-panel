@@ -632,7 +632,7 @@ class OrdersController extends Controller
         if ($data['action'] == 'accept') {
             $skip = $skip - 1;
             try {
-                $task = $this->prepareTask($data['package_type'], $skip);
+                $task = $this->taskService->prepareTask($data['package_type'], $skip);
                 $similar = OrdersHelper::findSimilarOrders($task->order);
                 $this->attachTaskForUser($task, $data['user_id'], $similar);
             } catch (Exception $e) {
@@ -649,35 +649,6 @@ class OrdersController extends Controller
         } else {
             return $this->findPackage($request);
         }
-    }
-
-    /**
-     * @param $package_type
-     * @param $skip
-     * @return mixed
-     * @throws Exception
-     */
-    private function prepareTask($package_type, $skip)
-    {
-        $courierArray = [];
-        switch (lcfirst($package_type)) {
-            case 'paczkomat':
-                $courierArray = ['INPOST', 'ALLEGRO-INPOST'];
-                break;
-            case 'gls':
-                $courierArray = ['GLS'];
-                break;
-            case 'dpd':
-                $courierArray = ['DPD'];
-                break;
-            case 'pocztex':
-                $courierArray = ['POCZTEX'];
-                break;
-            default:
-                throw new \Exception(__('order_packages.message.package_error'));
-        }
-        $task = $this->taskService->getTaskQuery($courierArray)->offset($skip)->first();
-        return $task;
     }
 
     /**
@@ -736,7 +707,7 @@ class OrdersController extends Controller
         file_put_contents($lockName, '');
         try {
             if (empty($data['task_id'])) {
-                $task = $this->prepareTask($data['package_type'], $skip);
+                $task = $this->taskService->prepareTask($data['package_type'], $skip);
             } else {
                 $task = $this->taskRepository->find($data['task_id']);
             }
