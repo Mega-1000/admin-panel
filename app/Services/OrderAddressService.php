@@ -1,5 +1,6 @@
 <?php namespace App\Services;
 
+use App\Entities\Order;
 use App\Entities\OrderAddress;
 use Illuminate\Support\Facades\Validator;
 
@@ -24,6 +25,22 @@ class OrderAddressService
 
         return !$validator->fails() && !$this->namesAndNipCombined($address) &&
             $nipIsValid && $this->haveNameOrFirmname($address);
+    }
+
+    public function preSaveCleanup(OrderAddress $address)
+    {
+        foreach ($address->getFillable() as $field) {
+            $address->$field = trim($address->$field);
+        }
+        $this->reformatPhoneNumber($address);
+    }
+
+    protected function reformatPhoneNumber(OrderAddress $address)
+    {
+        $phoneString = (string)$address->phone;
+        if ($phoneString[0] == 0) {
+            $address->phone = substr($phoneString, 1);
+        }
     }
 
     protected function getRules(OrderAddress $address): array
