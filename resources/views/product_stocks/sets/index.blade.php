@@ -20,6 +20,7 @@
         </div>
     @endif
     <a class="btn btn-success" id="create__button" href="{{ route('sets.create') }}">@lang('sets.form.buttons.create')</a>
+    <div id="setsList"></div>
     <table class="table">
         <thead>
         <tr>
