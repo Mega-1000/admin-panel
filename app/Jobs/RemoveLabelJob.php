@@ -13,6 +13,7 @@ use App\Services\OrderWarehouseNotificationService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class RemoveLabelJob extends Job
 {
@@ -106,6 +107,7 @@ class RemoveLabelJob extends Job
                     if ($item->id == 50) {
                         $response = dispatch_now(new ChangeWarehouseStockJob($this->order));
                         if (strlen((string) $response) > 0) {
+                            Session::put('removeLabelJobAfterProductStockMove', $this);
                             return $response;
                         } else {
                             $this->order->labels()->detach($label);
