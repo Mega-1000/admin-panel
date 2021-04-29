@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Prettus\Repository\Contracts\Transformable;
@@ -187,6 +188,11 @@ class Order extends Model implements Transformable
     public function packages(): HasMany
     {
         return $this->hasMany(OrderPackage::class);
+    }
+
+    public function dispute(): HasOne
+    {
+        return $this->hasOne(AllegroDispute::class);
     }
 
     /**

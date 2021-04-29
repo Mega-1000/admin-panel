@@ -31,6 +31,7 @@ class AllegroDisputeController extends Controller
         $dispute->unseen_changes = false;
         $dispute->save();
         $messages = $this->allegroDisputeService->getDisputeMessages($dispute->dispute_id);
+        $this->allegroDisputeService->updateDisputeRecord($dispute->dispute_id);
 
         return view('disputes.view', [
             'dispute' => $dispute,

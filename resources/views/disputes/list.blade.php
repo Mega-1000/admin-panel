@@ -22,7 +22,7 @@
         @foreach($disputes as $dispute)
             <tr class="{{ $dispute->unseen_changes ? 'font-weight-bold' : '' }}">
                 <td>{{ $dispute->id }}</td>
-                <td>{!!  $dispute->order !!}</td>
+                <td>{{  $dispute->order_id ? $dispute->order_id : $dispute->form_id}}</td>
                 <td>{{ $dispute->buyer_login }}</td>
                 <td>{{ $dispute->subject }}</td>
                 <td>{{ $dispute->status == 'ONGOING' ? 'Otwarta' : 'Zamknięta' }}</td>

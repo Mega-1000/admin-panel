@@ -3,6 +3,9 @@
 use App\Entities\Allegro_Auth;
 use App\Entities\AllegroDispute;
 use App\Entities\Order;
+use App\Entities\SelTransaction;
+use App\Jobs\AddLabelJob;
+use App\Jobs\RemoveLabelJob;
 use GuzzleHttp\Client;
 
 class AllegroDisputeService
@@ -69,14 +72,19 @@ class AllegroDisputeService
         $disputeModel->buyer_login = $dispute['buyer']['login'];
         $disputeModel->form_id = $dispute['checkoutForm']['id'];
         $disputeModel->ordered_date = $dispute['checkoutForm']['createdAt'];
-
+        $disputeModel->order_id = $this->findOrderId($disputeModel);
         $disputeModel->save();
+
+        $this->updateLabels($disputeModel);
     }
 
     public function getDisputesList(int $offset = 0, int $limit = 100)
     {
         $url = $this->getRestUrl('/sale/disputes');
-        $response = $this->request('GET', $url, []);
+        $response = $this->request('GET', $url, [
+            'limit' => $limit,
+            'offset' => $offset
+        ]);
         return json_decode((string)$response->getBody(), true)['disputes'];
     }
 
@@ -94,7 +102,10 @@ class AllegroDisputeService
 
         do {
             $url = $this->getRestUrl("/sale/disputes/{$id}/messages");
-            $response = $this->request('GET', $url, []);
+            $response = $this->request('GET', $url, [
+                'offset' => $cursor,
+                'limit' => 100
+            ]);
             $messages = json_decode((string)$response->getBody(), true)['messages'];
             $messagesCount = count($messages);
             $cursor += $messagesCount;
@@ -141,6 +152,17 @@ class AllegroDisputeService
         return json_decode((string)$response->getBody(), true);
     }
 
+    private function updateLabels(AllegroDispute $dispute)
+    {
+        if ($dispute->order_id && $dispute->unseen_changes) {
+            dispatch_now(new AddLabelJob($dispute->order->id, [186]));
+            dispatch_now(new RemoveLabelJob($dispute->order->id, [185]));
+        } else if ($dispute->order_id && !$dispute->unseen_changes) {
+            dispatch_now(new AddLabelJob($dispute->order->id, [185]));
+            dispatch_now(new RemoveLabelJob($dispute->order->id, [186]));
+        }
+    }
+
     private function refreshTokens()
     {
         $url = env('ALLEGRO_REFRESH_URL') . $this->getRefreshToken();
@@ -149,10 +171,25 @@ class AllegroDisputeService
                 'Authorization' => $this->getBasicAuthString()
             ]
         ]);
-        $response = json_decode((string) $response->getBody(), true);
+        $response = json_decode((string)$response->getBody(), true);
         $this->authModel->access_token = $response['access_token'];
         $this->authModel->refresh_token = $response['refresh_token'];
         $this->authModel->save();
+    }
+
+    private function findOrderId(AllegroDispute $dispute): ?int
+    {
+        $transactionsIds = SelTransaction::where('tr_CheckoutFormId', '=', $dispute->form_id)->pluck('id');
+        if (count($transactionsIds)) {
+            $order = Order::whereIn('sello_id', $transactionsIds)->first();
+        } else {
+            $order = null;
+        }
+        if ($order) {
+            return $order->id;
+        } else {
+            return null;
+        }
     }
 
     private function request(string $method, string $url, array $params)
