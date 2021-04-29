@@ -76,7 +76,10 @@ class AllegroDisputeService
     public function getDisputesList(int $offset = 0, int $limit = 100)
     {
         $url = $this->getRestUrl('/sale/disputes');
-        $response = $this->request('GET', $url, []);
+        $response = $this->request('GET', $url, [
+            'limit' => $limit,
+            'offset' => $offset
+        ]);
         return json_decode((string)$response->getBody(), true)['disputes'];
     }
 
@@ -94,7 +97,10 @@ class AllegroDisputeService
 
         do {
             $url = $this->getRestUrl("/sale/disputes/{$id}/messages");
-            $response = $this->request('GET', $url, []);
+            $response = $this->request('GET', $url, [
+                'offset' => $cursor,
+                'limit' => 100
+            ]);
             $messages = json_decode((string)$response->getBody(), true)['messages'];
             $messagesCount = count($messages);
             $cursor += $messagesCount;
