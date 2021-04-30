@@ -23,4 +23,15 @@ export interface Set {
   set: SetItem,
   products: SetProduct[]
 }
+
+export interface SetsStore {
+  error: string,
+  isLoading: boolean,
+  sets: Set[]
+}
+
+export interface SetsCount {
+  setId: number,
+  count: number
+}
 /* eslint-enabled camelcase */
