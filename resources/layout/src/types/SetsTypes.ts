@@ -27,11 +27,19 @@ export interface Set {
 export interface SetsStore {
   error: string,
   isLoading: boolean,
-  sets: Set[]
+  sets: Set[],
+  products: SetProduct[]
 }
 
 export interface SetsCount {
   setId: number,
   count: number
+}
+
+export interface SetsProductParams {
+  name: string,
+  symbol: string,
+  manufacturer: string,
+  word: string
 }
 /* eslint-enabled camelcase */

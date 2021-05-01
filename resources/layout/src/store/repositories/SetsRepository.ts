@@ -1,6 +1,6 @@
 /* eslint @typescript-eslint/no-empty-function: ["error", { "allow": ["constructors"] }] */
 /* eslint-disable no-useless-constructor */
-import { Set, SetsCount } from '@/types/SetsTypes'
+import { Set, SetsCount, SetsProductParams } from '@/types/SetsTypes'
 import { getFullUrl } from '@/helpers/urls'
 
 export default {
@@ -58,6 +58,25 @@ export default {
         'X-Requested-Width': 'XMLHttpRequest'
       }),
       body: JSON.stringify({})
+    })
+      .then((response) => {
+        return response.json()
+      })
+  },
+  async products (params: SetsProductParams): Promise<any> {
+    return fetch(getFullUrl('api/sets/products'), {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/json; charset=utf-8',
+        'X-Requested-Width': 'XMLHttpRequest'
+      }),
+      body: JSON.stringify({
+        name: params.name ? params.name : '',
+        symbol: params.symbol ? params.symbol : '',
+        manufacturer: params.manufacturer ? params.manufacturer : '',
+        word: params.word ? params.word : ''
+      })
     })
       .then((response) => {
         return response.json()

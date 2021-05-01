@@ -36,8 +36,23 @@ class SetsController extends Controller
         ];
     }
 
-    public function products()
+    public function products(Request $request)
     {
+        if(isset($request->name) && $request->name!='') {
+            return Product::where('name', 'LIKE', '%'.$request->name.'%')->get();
+        }
+        if(isset($request->symbol) && $request->symbol != '') {
+            return Product::where('symbol', 'LIKE', '%'.$request->symbol.'%')->get();
+        }
+        if(isset($request->manufacturer) && $request->manufacturer != '') {
+            return Product::where('manufacturer', 'LIKE', '%'.$request->manufacturer.'%')->get();
+        }
+        if(isset($request->word) && $request->word != '') {
+            return Product::where('name', 'LIKE', '%'.$request->word.'%')
+                            ->orWhere('symbol', 'LIKE', '%'.$request->word.'%')
+                            ->orWhere('manufacturer', 'LIKE', '%'.$request->word.'%')->get();
+        }
+
         return  Product::get();
     }
 

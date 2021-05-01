@@ -64,7 +64,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { Set } from '@/types/SetsTypes'
+import { Set, SetProduct, SetsProductParams } from '@/types/SetsTypes'
 import { getFullUrl } from '@/helpers/urls'
 
 @Component({

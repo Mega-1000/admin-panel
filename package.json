@@ -9,11 +9,13 @@
         "build": "npm run buildVue && npm run prod",
         "prod": "npm run production",
         "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-        "buildVue": "cd ./resources/layout && npm install && npm run build"
+        "buildVue": "cd ./resources/layout && npm install && npm run build",
+        "buildVueLocal": "cd ./resources/layout && npm run build"
     },
     "devDependencies": {
         "axios": "^0.18.1",
         "bootstrap": "^4.4.1",
+        "copy-webpack-plugin": "^8.1.1",
         "cross-env": "^5.1",
         "jquery": "^3.4.1",
         "laravel-mix": "^4.0.15",

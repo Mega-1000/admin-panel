@@ -72,23 +72,24 @@
         </table>
 
     @endif
-    <div class="form-group">
-        <label for="search">Wyszukaj produkct aby dodać do zestawu</label>
-        <input type="text" class="form-control" id="search">
-    </div>
-    <table id="dataTable" class="table table-hover">
-        <thead>
-        <tr>
-            <th></th>
-            <th>ID</th>
-            <th>@lang('product_stocks.table.name')</th>
-            <th>@lang('product_stocks.table.symbol')</th>
-            <th>@lang('voyager.generic.actions')</th>
-        </tr>
-        </thead>
-        <tbody id="productTable">
-        </tbody>
-    </table>
+{{--    <div class="form-group">--}}
+{{--        <label for="search">Wyszukaj produkct aby dodać do zestawu</label>--}}
+{{--        <input type="text" class="form-control" id="search">--}}
+{{--    </div>--}}
+{{--    <table id="dataTable" class="table table-hover">--}}
+{{--        <thead>--}}
+{{--        <tr>--}}
+{{--            <th></th>--}}
+{{--            <th>ID</th>--}}
+{{--            <th>@lang('product_stocks.table.name')</th>--}}
+{{--            <th>@lang('product_stocks.table.symbol')</th>--}}
+{{--            <th>@lang('voyager.generic.actions')</th>--}}
+{{--        </tr>--}}
+{{--        </thead>--}}
+{{--        <tbody id="productTable">--}}
+{{--        </tbody>--}}
+{{--    </table>--}}
+    <div id="setEdit"></div>
 @endsection
 @section('datatable-scripts')
     <script>
