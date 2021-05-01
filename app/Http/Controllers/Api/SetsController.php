@@ -28,11 +28,11 @@ class SetsController extends Controller
 
     public function set(Set $set)
     {
-        $set = Set::where('id', $set->id)->get();
+        $set = Set::where('id', $set->id)->get()->first();
 
         return  [
             'set' => $set,
-            'products' => $set->first()->products()
+            'products' => $set->products()
         ];
     }
 

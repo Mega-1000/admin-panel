@@ -11,12 +11,16 @@ new Vue({
   render: h => h(App)
 }).$mount('#app')
 
-new Vue({
-  store,
-  render: h => h(SetsList)
-}).$mount('#setsList')
+if (document.querySelector('#setsList')) {
+  new Vue({
+    store,
+    render: h => h(SetsList)
+  }).$mount('#setsList')
+}
 
-new Vue({
-  store,
-  render: h => h(SetEdit)
-}).$mount('#setEdit')
+if (document.querySelector('#setEdit')) {
+  new Vue({
+    store,
+    render: h => h(SetEdit)
+  }).$mount('#setEdit')
+}

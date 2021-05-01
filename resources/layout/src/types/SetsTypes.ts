@@ -28,7 +28,8 @@ export interface SetsStore {
   error: string,
   isLoading: boolean,
   sets: Set[],
-  products: SetProduct[]
+  products: SetProduct[],
+  set: Set | null
 }
 
 export interface SetsCount {
@@ -41,5 +42,17 @@ export interface SetsProductParams {
   symbol: string,
   manufacturer: string,
   word: string
+}
+
+export interface SetParams {
+  id: number,
+  name: string,
+  number: string,
+}
+
+export interface SetProductParams {
+  id: number,
+  setId: number,
+  stock: number
 }
 /* eslint-enabled camelcase */

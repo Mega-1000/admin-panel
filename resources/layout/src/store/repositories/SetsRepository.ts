@@ -1,11 +1,70 @@
 /* eslint @typescript-eslint/no-empty-function: ["error", { "allow": ["constructors"] }] */
 /* eslint-disable no-useless-constructor */
-import { Set, SetsCount, SetsProductParams } from '@/types/SetsTypes'
+import { Set, SetParams, SetProductParams, SetsCount, SetsProductParams } from '@/types/SetsTypes'
 import { getFullUrl } from '@/helpers/urls'
 
 export default {
+  async setItem (id: number): Promise<any> {
+    return fetch(getFullUrl('api/sets/' + id), {
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/json; charset=utf-8',
+        'X-Requested-Width': 'XMLHttpRequest'
+      })
+    })
+      .then((response) => {
+        return response.json()
+      })
+  },
+  async setItemUpdate (item: SetParams): Promise<any> {
+    return fetch(getFullUrl('api/sets/' + item.id), {
+      method: 'PUT',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/json; charset=utf-8',
+        'X-Requested-Width': 'XMLHttpRequest'
+      }),
+      body: JSON.stringify({
+        name: item.name,
+        number: item.number
+      })
+    })
+      .then((response) => {
+        return response.json()
+      })
+  },
+  async setProductUpdate (item: SetProductParams): Promise<any> {
+    return fetch(getFullUrl('api/sets/' + item.setId + '/products/' + item.id), {
+      method: 'PUT',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/json; charset=utf-8',
+        'X-Requested-Width': 'XMLHttpRequest'
+      }),
+      body: JSON.stringify({
+        stock: item.stock
+      })
+    })
+      .then((response) => {
+        return response.json()
+      })
+  },
+  async setProductDelete (item: SetProductParams): Promise<any> {
+    return fetch(getFullUrl('api/sets/' + item.setId + '/products/' + item.id), {
+      method: 'DELETE',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/json; charset=utf-8',
+        'X-Requested-Width': 'XMLHttpRequest'
+      })
+    })
+      .then((response) => {
+        return response.json()
+      })
+  },
   async getSets (): Promise<Set[]> {
-    return fetch(getFullUrl('api/sets'), {
+    return fetch(getFullUrl('api/sets/'), {
       method: 'GET',
       credentials: 'same-origin',
       headers: new Headers({

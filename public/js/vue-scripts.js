@@ -86,9 +86,9 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./resources/layout/dist/js/app.f0c95102.js":
+/***/ "./resources/layout/dist/js/app.87c33009.js":
 /*!**************************************************!*\
-  !*** ./resources/layout/dist/js/app.f0c95102.js ***!
+  !*** ./resources/layout/dist/js/app.87c33009.js ***!
   \**************************************************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -103,12 +103,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
 (function (t) {
   function e(e) {
-    for (var n, o, i = e[0], u = e[1], c = e[2], d = 0, p = []; d < i.length; d++) {
+    for (var r, o, i = e[0], u = e[1], c = e[2], d = 0, p = []; d < i.length; d++) {
       o = i[d], Object.prototype.hasOwnProperty.call(s, o) && s[o] && p.push(s[o][0]), s[o] = 0;
     }
 
-    for (n in u) {
-      Object.prototype.hasOwnProperty.call(u, n) && (t[n] = u[n]);
+    for (r in u) {
+      Object.prototype.hasOwnProperty.call(u, r) && (t[r] = u[r]);
     }
 
     l && l(e);
@@ -117,42 +117,42 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       p.shift()();
     }
 
-    return a.push.apply(a, c || []), r();
+    return a.push.apply(a, c || []), n();
   }
 
-  function r() {
+  function n() {
     for (var t, e = 0; e < a.length; e++) {
-      for (var r = a[e], n = !0, i = 1; i < r.length; i++) {
-        var u = r[i];
-        0 !== s[u] && (n = !1);
+      for (var n = a[e], r = !0, i = 1; i < n.length; i++) {
+        var u = n[i];
+        0 !== s[u] && (r = !1);
       }
 
-      n && (a.splice(e--, 1), t = o(o.s = r[0]));
+      r && (a.splice(e--, 1), t = o(o.s = n[0]));
     }
 
     return t;
   }
 
-  var n = {},
+  var r = {},
       s = {
     app: 0
   },
       a = [];
 
   function o(e) {
-    if (n[e]) return n[e].exports;
-    var r = n[e] = {
+    if (r[e]) return r[e].exports;
+    var n = r[e] = {
       i: e,
       l: !1,
       exports: {}
     };
-    return t[e].call(r.exports, r, r.exports, o), r.l = !0, r.exports;
+    return t[e].call(n.exports, n, n.exports, o), n.l = !0, n.exports;
   }
 
-  o.m = t, o.c = n, o.d = function (t, e, r) {
+  o.m = t, o.c = r, o.d = function (t, e, n) {
     o.o(t, e) || Object.defineProperty(t, e, {
       enumerable: !0,
-      get: r
+      get: n
     });
   }, o.r = function (t) {
     "undefined" !== typeof Symbol && Symbol.toStringTag && Object.defineProperty(t, Symbol.toStringTag, {
@@ -163,16 +163,16 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
   }, o.t = function (t, e) {
     if (1 & e && (t = o(t)), 8 & e) return t;
     if (4 & e && "object" === _typeof(t) && t && t.__esModule) return t;
-    var r = Object.create(null);
-    if (o.r(r), Object.defineProperty(r, "default", {
+    var n = Object.create(null);
+    if (o.r(n), Object.defineProperty(n, "default", {
       enumerable: !0,
       value: t
-    }), 2 & e && "string" != typeof t) for (var n in t) {
-      o.d(r, n, function (e) {
+    }), 2 & e && "string" != typeof t) for (var r in t) {
+      o.d(n, r, function (e) {
         return t[e];
-      }.bind(null, n));
+      }.bind(null, r));
     }
-    return r;
+    return n;
   }, o.n = function (t) {
     var e = t && t.__esModule ? function () {
       return t["default"];
@@ -192,80 +192,92 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
   }
 
   var l = u;
-  a.push([0, "chunk-vendors"]), r();
+  a.push([0, "chunk-vendors"]), n();
 })({
-  0: function _(t, e, r) {
-    t.exports = r("cd49");
+  0: function _(t, e, n) {
+    t.exports = n("cd49");
   },
-  "2f36": function f36(t, e, r) {
+  "17b2": function b2(t, e, n) {},
+  "2f36": function f36(t, e, n) {
     "use strict";
 
-    r("7cc0");
+    n("7cc0");
   },
-  "4f0e": function f0e(t, e, r) {
+  "442a": function a(t, e, n) {
     "use strict";
 
-    r("cb80");
+    n("6302");
   },
-  "75e7": function e7(t, e, r) {},
-  "7cc0": function cc0(t, e, r) {},
-  b2a5: function b2a5(t, e, r) {
+  "4b82": function b82(t, e, n) {
     "use strict";
 
-    r("75e7");
+    n("bdce");
   },
-  c3d4: function c3d4(t, e, r) {},
-  c44d: function c44d(t, e, r) {
+  "4d8a": function d8a(t, e, n) {
     "use strict";
 
-    r("c3d4");
+    n("e075");
   },
-  cb80: function cb80(t, e, r) {},
-  cd49: function cd49(t, e, r) {
+  6302: function _(t, e, n) {},
+  "75e7": function e7(t, e, n) {},
+  "7cc0": function cc0(t, e, n) {},
+  b2a5: function b2a5(t, e, n) {
     "use strict";
 
-    r.r(e);
-    r("e260"), r("e6cf"), r("cca6"), r("a79d");
+    n("75e7");
+  },
+  bdce: function bdce(t, e, n) {},
+  c3d4: function c3d4(t, e, n) {},
+  c44d: function c44d(t, e, n) {
+    "use strict";
 
-    var n = r("2b0e"),
+    n("c3d4");
+  },
+  cd49: function cd49(t, e, n) {
+    "use strict";
+
+    n.r(e);
+    n("e260"), n("e6cf"), n("cca6"), n("a79d");
+
+    var r = n("2b0e"),
         s = function s() {
       var t = this,
           e = t.$createElement,
-          n = t._self._c || e;
-      return n("div", {
+          r = t._self._c || e;
+      return r("div", {
         attrs: {
           id: "app"
         }
-      }, [n("img", {
+      }, [r("img", {
         attrs: {
           alt: "Vue logo",
-          src: r("cf05")
+          src: n("cf05")
         }
-      }), n("HelloWorld", {
+      }), r("HelloWorld", {
         attrs: {
           msg: "Welcome to Your Vue.js + TypeScript App"
         }
       })], 1);
     },
         a = [],
-        o = r("d4ec"),
-        i = r("262e"),
-        u = r("2caf"),
-        c = r("9ab4"),
-        l = r("1b40"),
+        o = n("d4ec"),
+        i = n("262e"),
+        u = n("2caf"),
+        c = n("9ab4"),
+        l = n("1b40"),
         d = function d() {
       var t = this,
           e = t.$createElement,
-          r = t._self._c || e;
-      return r("div", {
+          n = t._self._c || e;
+      return n("div", {
         staticClass: "hello"
-      }, [r("h1", [t._v(t._s(t.msg))]), t._m(0), r("h3", [t._v("Installed CLI Plugins")]), t._m(1), r("h3", [t._v("Essential Links")]), t._m(2), r("h3", [t._v("Ecosystem")]), t._m(3)]);
+      }, [n("h1", [t._v(t._s(t.msg))]), t._m(0), n("h3", [t._v("Installed CLI Plugins")]), t._m(1), n("h3", [t._v("Essential Links")]), t._m(2), n("h3", [t._v("Ecosystem")]), t._m(3)]);
     },
         p = [function () {
       var t = this,
           e = t.$createElement,
-          r = t._self._c || e;
-      return r("p", [t._v(" For a guide and recipes on how to configure / customize this project,"), r("br"), t._v(" check out the "), r("a", {
+          n = t._self._c || e;
+      return n("p", [t._v(" For a guide and recipes on how to configure / customize this project,"), n("br"), t._v(" check out the "), n("a", {
         attrs: {
           href: "https://cli.vuejs.org",
           target: "_blank",
@@ -275,32 +287,32 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     }, function () {
       var t = this,
           e = t.$createElement,
-          r = t._self._c || e;
-      return r("ul", [r("li", [r("a", {
+          n = t._self._c || e;
+      return n("ul", [n("li", [n("a", {
         attrs: {
           href: "https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel",
           target: "_blank",
           rel: "noopener"
         }
-      }, [t._v("babel")])]), r("li", [r("a", {
+      }, [t._v("babel")])]), n("li", [n("a", {
         attrs: {
           href: "https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-typescript",
           target: "_blank",
           rel: "noopener"
         }
-      }, [t._v("typescript")])]), r("li", [r("a", {
+      }, [t._v("typescript")])]), n("li", [n("a", {
         attrs: {
           href: "https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-vuex",
           target: "_blank",
           rel: "noopener"
         }
-      }, [t._v("vuex")])]), r("li", [r("a", {
+      }, [t._v("vuex")])]), n("li", [n("a", {
         attrs: {
           href: "https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint",
           target: "_blank",
           rel: "noopener"
         }
-      }, [t._v("eslint")])]), r("li", [r("a", {
+      }, [t._v("eslint")])]), n("li", [n("a", {
         attrs: {
           href: "https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-unit-jest",
           target: "_blank",
@@ -310,32 +322,32 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     }, function () {
       var t = this,
           e = t.$createElement,
-          r = t._self._c || e;
-      return r("ul", [r("li", [r("a", {
+          n = t._self._c || e;
+      return n("ul", [n("li", [n("a", {
         attrs: {
           href: "https://vuejs.org",
           target: "_blank",
           rel: "noopener"
         }
-      }, [t._v("Core Docs")])]), r("li", [r("a", {
+      }, [t._v("Core Docs")])]), n("li", [n("a", {
         attrs: {
           href: "https://forum.vuejs.org",
           target: "_blank",
           rel: "noopener"
         }
-      }, [t._v("Forum")])]), r("li", [r("a", {
+      }, [t._v("Forum")])]), n("li", [n("a", {
         attrs: {
           href: "https://chat.vuejs.org",
           target: "_blank",
           rel: "noopener"
         }
-      }, [t._v("Community Chat")])]), r("li", [r("a", {
+      }, [t._v("Community Chat")])]), n("li", [n("a", {
         attrs: {
           href: "https://twitter.com/vuejs",
           target: "_blank",
           rel: "noopener"
         }
-      }, [t._v("Twitter")])]), r("li", [r("a", {
+      }, [t._v("Twitter")])]), n("li", [n("a", {
         attrs: {
           href: "https://news.vuejs.org",
           target: "_blank",
@@ -345,32 +357,32 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     }, function () {
       var t = this,
           e = t.$createElement,
-          r = t._self._c || e;
-      return r("ul", [r("li", [r("a", {
+          n = t._self._c || e;
+      return n("ul", [n("li", [n("a", {
         attrs: {
           href: "https://router.vuejs.org",
           target: "_blank",
           rel: "noopener"
         }
-      }, [t._v("vue-router")])]), r("li", [r("a", {
+      }, [t._v("vue-router")])]), n("li", [n("a", {
         attrs: {
           href: "https://vuex.vuejs.org",
           target: "_blank",
           rel: "noopener"
         }
-      }, [t._v("vuex")])]), r("li", [r("a", {
+      }, [t._v("vuex")])]), n("li", [n("a", {
         attrs: {
           href: "https://github.com/vuejs/vue-devtools#vue-devtools",
           target: "_blank",
           rel: "noopener"
         }
-      }, [t._v("vue-devtools")])]), r("li", [r("a", {
+      }, [t._v("vue-devtools")])]), n("li", [n("a", {
         attrs: {
           href: "https://vue-loader.vuejs.org",
           target: "_blank",
           rel: "noopener"
         }
-      }, [t._v("vue-loader")])]), r("li", [r("a", {
+      }, [t._v("vue-loader")])]), n("li", [n("a", {
         attrs: {
           href: "https://github.com/vuejs/awesome-vue",
           target: "_blank",
@@ -378,73 +390,73 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         }
       }, [t._v("awesome-vue")])])]);
     }],
-        v = function (t) {
-      Object(i["a"])(r, t);
-      var e = Object(u["a"])(r);
+        m = function (t) {
+      Object(i["a"])(n, t);
+      var e = Object(u["a"])(n);
 
-      function r() {
-        return Object(o["a"])(this, r), e.apply(this, arguments);
+      function n() {
+        return Object(o["a"])(this, n), e.apply(this, arguments);
       }
 
-      return r;
+      return n;
     }(l["c"]);
 
-    Object(c["a"])([Object(l["b"])()], v.prototype, "msg", void 0), v = Object(c["a"])([l["a"]], v);
+    Object(c["a"])([Object(l["b"])()], m.prototype, "msg", void 0), m = Object(c["a"])([l["a"]], m);
 
-    var h = v,
-        m = h,
-        f = (r("b2a5"), r("2877")),
-        b = Object(f["a"])(m, d, p, !1, null, "34db786d", null),
+    var v = m,
+        h = v,
+        f = (n("b2a5"), n("2877")),
+        b = Object(f["a"])(h, d, p, !1, null, "34db786d", null),
         g = b.exports,
-        _ = function (t) {
-      Object(i["a"])(r, t);
-      var e = Object(u["a"])(r);
+        y = function (t) {
+      Object(i["a"])(n, t);
+      var e = Object(u["a"])(n);
 
-      function r() {
-        return Object(o["a"])(this, r), e.apply(this, arguments);
+      function n() {
+        return Object(o["a"])(this, n), e.apply(this, arguments);
       }
 
-      return r;
+      return n;
     }(l["c"]);
 
-    _ = Object(c["a"])([Object(l["a"])({
+    y = Object(c["a"])([Object(l["a"])({
       components: {
         HelloWorld: g
       }
-    })], _);
+    })], y);
 
-    var w = _,
-        y = w,
-        j = (r("2f36"), Object(f["a"])(y, s, a, !1, null, "553d7f44", null)),
-        S = j.exports,
+    var _ = y,
+        w = _,
+        S = (n("2f36"), Object(f["a"])(w, s, a, !1, null, "553d7f44", null)),
+        j = S.exports,
         k = function k() {
       var t = this,
           e = t.$createElement,
-          r = t._self._c || e;
-      return r("div", {
+          n = t._self._c || e;
+      return n("div", {
         staticClass: "v-setsList"
-      }, [r("a", {
+      }, [n("a", {
         staticClass: "btn btn-success",
         attrs: {
           id: "create__button",
           href: t.addSetLink
         }
-      }, [t._v("Stwórz")]), r("table", {
+      }, [t._v("Stwórz")]), n("table", {
         staticClass: "table"
-      }, [t._m(0), r("tbody", t._l(t.sets, function (e, n) {
-        return r("tr", {
-          key: n
-        }, [r("td", [t._v(t._s(n))]), r("td", [t._v(" " + t._s(e.set[0].name) + " ")]), r("td", [t._v(" " + t._s(e.set[0].number) + " ")]), r("td", [t._v(" " + t._s(e.set[0].stock) + " ")]), r("td", [r("ul", t._l(e.products, function (e) {
-          return r("li", {
+      }, [t._m(0), n("tbody", t._l(t.sets, function (e, r) {
+        return n("tr", {
+          key: r
+        }, [n("td", [t._v(t._s(r))]), n("td", [t._v(" " + t._s(e.set[0].name) + " ")]), n("td", [t._v(" " + t._s(e.set[0].number) + " ")]), n("td", [t._v(" " + t._s(e.set[0].stock) + " ")]), n("td", [n("ul", t._l(e.products, function (e) {
+          return n("li", {
             key: e.id
-          }, [r("b", [t._v(t._s(e.symbol))]), t._v(" => " + t._s(e.name) + " "), r("b", [t._v("Ilość: " + t._s(e.stock))])]);
-        }), 0)]), r("td", [r("div", {
+          }, [n("b", [t._v(t._s(e.symbol))]), t._v(" => " + t._s(e.name) + " "), n("b", [t._v("Ilość: " + t._s(e.stock))])]);
+        }), 0)]), n("td", [n("div", {
           staticClass: "form-group"
-        }, [r("label", [t._v("Ilość zestawów")]), r("input", {
+        }, [n("label", [t._v("Ilość zestawów")]), n("input", {
           directives: [{
             name: "model",
             rawName: "v-model",
-            value: t.completingSet[n],
+            value: t.completingSet[r],
             expression: "completingSet[index]"
           }],
           staticClass: "form-control",
@@ -454,32 +466,32 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
             min: "1"
           },
           domProps: {
-            value: t.completingSet[n]
+            value: t.completingSet[r]
           },
           on: {
             input: function input(e) {
-              e.target.composing || t.$set(t.completingSet, n, e.target.value);
+              e.target.composing || t.$set(t.completingSet, r, e.target.value);
             }
           }
-        })]), r("button", {
+        })]), n("button", {
           staticClass: "btn btn-sm btn-primary",
           attrs: {
             type: "submit"
           }
-        }, [r("span", {
+        }, [n("span", {
           staticClass: "hidden-xs hidden-sm",
           on: {
             click: function click(e) {
-              return t.completing(n, t.completingSet[n]);
+              return t.completing(r, t.completingSet[r]);
             }
           }
-        }, [t._v("Stwórz")])])]), r("td", [r("div", {
+        }, [t._v("Stwórz")])])]), n("td", [n("div", {
           staticClass: "form-group"
-        }, [r("label", [t._v("Ilość zestawów")]), r("input", {
+        }, [n("label", [t._v("Ilość zestawów")]), n("input", {
           directives: [{
             name: "model",
             rawName: "v-model",
-            value: t.disassemblySet[n],
+            value: t.disassemblySet[r],
             expression: "disassemblySet[index]"
           }],
           staticClass: "form-control",
@@ -489,47 +501,47 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
             min: "1"
           },
           domProps: {
-            value: t.disassemblySet[n]
+            value: t.disassemblySet[r]
           },
           on: {
             input: function input(e) {
-              e.target.composing || t.$set(t.disassemblySet, n, e.target.value);
+              e.target.composing || t.$set(t.disassemblySet, r, e.target.value);
             }
           }
-        })]), r("button", {
+        })]), n("button", {
           staticClass: "btn btn-sm btn-primary",
           attrs: {
             type: "submit"
           }
-        }, [r("span", {
+        }, [n("span", {
           staticClass: "hidden-xs hidden-sm",
           on: {
             click: function click(e) {
-              return t.disassembly(n, t.disassemblySet[n]);
+              return t.disassembly(r, t.disassemblySet[r]);
             }
           }
-        }, [t._v("Zdekompletuj")])])]), r("td", [r("a", {
+        }, [t._v("Zdekompletuj")])])]), n("td", [n("a", {
           staticClass: "btn btn-sm btn-primary",
           attrs: {
-            href: t.getSetEditLink(n)
+            href: t.getSetEditLink(r)
           }
-        }, [r("i", {
+        }, [n("i", {
           staticClass: "voyager-trash"
-        }), r("span", {
+        }), n("span", {
           staticClass: "hidden-xs hidden-sm"
-        }, [t._v("Edytuj")])]), r("button", {
+        }, [t._v("Edytuj")])]), n("button", {
           staticClass: "btn btn-sm btn-danger",
           attrs: {
             type: "submit"
           },
           on: {
             click: function click(e) {
-              return t.deleteSet(n);
+              return t.deleteSet(r);
             }
           }
-        }, [r("i", {
+        }, [n("i", {
           staticClass: "voyager-trash"
-        }), r("span", {
+        }), n("span", {
           staticClass: "hidden-xs hidden-sm"
         }, [t._v("Usuń")])])])]);
       }), 0)])]);
@@ -537,28 +549,28 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         O = [function () {
       var t = this,
           e = t.$createElement,
-          r = t._self._c || e;
-      return r("thead", [r("tr", [r("th", [t._v("Id")]), r("th", [t._v("Nazwa zestawu")]), r("th", [t._v("Numer wewnętrzny zestawu")]), r("th", [t._v("Ilość zestawów")]), r("th", [t._v("Lista produktów w zestawie")]), r("th", [t._v("Stwórz podaną ilość zestawów")]), r("th", [t._v("Zdekompletuj podaną liczbę zestawów")]), r("th", [t._v("Akcje")])])]);
+          n = t._self._c || e;
+      return n("thead", [n("tr", [n("th", [t._v("Id")]), n("th", [t._v("Nazwa zestawu")]), n("th", [t._v("Numer wewnętrzny zestawu")]), n("th", [t._v("Ilość zestawów")]), n("th", [t._v("Lista produktów w zestawie")]), n("th", [t._v("Stwórz podaną ilość zestawów")]), n("th", [t._v("Zdekompletuj podaną liczbę zestawów")]), n("th", [t._v("Akcje")])])]);
     }],
-        x = r("1da1"),
-        R = r("bee2");
+        x = n("1da1"),
+        C = n("bee2");
 
-    r("96cf");
+    n("96cf");
 
-    function C(t) {
+    function P(t) {
       return window.location.protocol + "//" + window.location.hostname + ":8000/" + t;
     }
 
-    var E = function (t) {
-      Object(i["a"])(r, t);
-      var e = Object(u["a"])(r);
+    var R = function (t) {
+      Object(i["a"])(n, t);
+      var e = Object(u["a"])(n);
 
-      function r() {
+      function n() {
         var t;
-        return Object(o["a"])(this, r), t = e.apply(this, arguments), t.completingSet = [], t.disassemblySet = [], t;
+        return Object(o["a"])(this, n), t = e.apply(this, arguments), t.completingSet = [], t.disassemblySet = [], t;
       }
 
-      return Object(R["a"])(r, [{
+      return Object(C["a"])(n, [{
         key: "sets",
         get: function get() {
           var t;
@@ -567,12 +579,12 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       }, {
         key: "getSetEditLink",
         value: function value(t) {
-          return C("admin/products/sets/" + t + "/edytuj");
+          return P("admin/products/sets/" + t + "/edytuj");
         }
       }, {
         key: "addSetLink",
         get: function get() {
-          return C("/admin/products/sets/nowy");
+          return P("/admin/products/sets/nowy");
         }
       }, {
         key: "mounted",
@@ -602,19 +614,19 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       }, {
         key: "completing",
         value: function () {
-          var t = Object(x["a"])(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function t(e, r) {
-            var n;
+          var t = Object(x["a"])(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function t(e, n) {
+            var r;
             return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function (t) {
               while (1) {
                 switch (t.prev = t.next) {
                   case 0:
-                    return console.log("Zestaw: " + e + "  sztuk: " + r), t.next = 3, this.$store.dispatch("SetsService/completing", {
+                    return console.log("Zestaw: " + e + "  sztuk: " + n), t.next = 3, this.$store.dispatch("SetsService/completing", {
                       setId: e,
-                      count: r
+                      count: n
                     });
 
                   case 3:
-                    return t.next = 5, null === (n = this.$store) || void 0 === n ? void 0 : n.dispatch("SetsService/loadSets");
+                    return t.next = 5, null === (r = this.$store) || void 0 === r ? void 0 : r.dispatch("SetsService/loadSets");
 
                   case 5:
                   case "end":
@@ -624,7 +636,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
             }, t, this);
           }));
 
-          function e(e, r) {
+          function e(e, n) {
             return t.apply(this, arguments);
           }
 
@@ -633,19 +645,19 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       }, {
         key: "disassembly",
         value: function () {
-          var t = Object(x["a"])(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function t(e, r) {
-            var n;
+          var t = Object(x["a"])(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function t(e, n) {
+            var r;
             return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function (t) {
               while (1) {
                 switch (t.prev = t.next) {
                   case 0:
-                    return console.log("Zestaw: " + e + "  sztuk: " + r), t.next = 3, this.$store.dispatch("SetsService/disassembly", {
+                    return console.log("Zestaw: " + e + "  sztuk: " + n), t.next = 3, this.$store.dispatch("SetsService/disassembly", {
                       setId: e,
-                      count: r
+                      count: n
                     });
 
                   case 3:
-                    return t.next = 5, null === (n = this.$store) || void 0 === n ? void 0 : n.dispatch("SetsService/loadSets");
+                    return t.next = 5, null === (r = this.$store) || void 0 === r ? void 0 : r.dispatch("SetsService/loadSets");
 
                   case 5:
                   case "end":
@@ -655,7 +667,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
             }, t, this);
           }));
 
-          function e(e, r) {
+          function e(e, n) {
             return t.apply(this, arguments);
           }
 
@@ -665,7 +677,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         key: "deleteSet",
         value: function () {
           var t = Object(x["a"])(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function t(e) {
-            var r;
+            var n;
             return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function (t) {
               while (1) {
                 switch (t.prev = t.next) {
@@ -673,7 +685,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
                     return console.log("Zestaw: " + e), t.next = 3, this.$store.dispatch("SetsService/delete", e);
 
                   case 3:
-                    return t.next = 5, null === (r = this.$store) || void 0 === r ? void 0 : r.dispatch("SetsService/loadSets");
+                    return t.next = 5, null === (n = this.$store) || void 0 === n ? void 0 : n.dispatch("SetsService/loadSets");
 
                   case 5:
                   case "end":
@@ -689,26 +701,53 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
           return e;
         }()
-      }]), r;
+      }]), n;
     }(l["c"]);
 
-    E = Object(c["a"])([Object(l["a"])({
+    R = Object(c["a"])([Object(l["a"])({
       components: {}
-    })], E);
+    })], R);
 
-    var T = E,
-        $ = T,
-        P = (r("c44d"), Object(f["a"])($, k, O, !1, null, "0d6391b3", null)),
-        L = P.exports,
-        z = function z() {
+    var E = R,
+        T = E,
+        $ = (n("c44d"), Object(f["a"])(T, k, O, !1, null, "0d6391b3", null)),
+        L = $.exports,
+        I = function I() {
       var t = this,
           e = t.$createElement,
-          r = t._self._c || e;
-      return r("div", {
+          n = t._self._c || e;
+      return n("div", {
         staticClass: "v-setEdit"
-      }, [r("div", {
+      }, [n("EditForm", {
+        on: {
+          "load-set": function loadSet(e) {
+            return t.loadSet();
+          }
+        }
+      }), n("SetProductsList", {
+        on: {
+          "load-set": function loadSet(e) {
+            return t.loadSet();
+          }
+        }
+      }), n("ProductTable", {
+        on: {
+          "load-set": function loadSet(e) {
+            return t.loadSet();
+          }
+        }
+      })], 1);
+    },
+        N = [],
+        z = (n("ac1f"), n("1276"), n("a9e3"), function () {
+      var t = this,
+          e = t.$createElement,
+          n = t._self._c || e;
+      return n("div", {
+        staticClass: "c-productTable"
+      }, [n("div", {
         staticClass: "form-group"
-      }, [r("label", [t._v("Wyszukaj produkct aby dodać do zestawu")]), r("input", {
+      }, [n("label", [t._v("Wyszukaj produkct aby dodać do zestawu")]), n("input", {
         directives: [{
           name: "model",
           rawName: "v-model",
@@ -730,34 +769,121 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
             e.target.composing || (t.word = e.target.value);
           }
         }
-      })]), r("table", {
+      })]), n("table", {
         staticClass: "table table-hover",
         attrs: {
           id: "dataTable"
         }
-      }, [t._m(0), t.products.length > 0 ? r("tbody", {
+      }, [n("thead", [n("tr", [n("th", [t._v("ID")]), n("th", [t._v(" Nazwa produktu "), t.existProduct ? n("input", {
+        directives: [{
+          name: "model",
+          rawName: "v-model",
+          value: t.name,
+          expression: "name"
+        }],
+        attrs: {
+          type: "text",
+          placeholder: "Filtruj wyniki po nazwie"
+        },
+        domProps: {
+          value: t.name
+        },
+        on: {
+          input: function input(e) {
+            e.target.composing || (t.name = e.target.value);
+          }
+        }
+      }) : t._e()]), n("th", [t._v(" Symbol "), t.existProduct ? n("input", {
+        directives: [{
+          name: "model",
+          rawName: "v-model",
+          value: t.symbol,
+          expression: "symbol"
+        }],
+        attrs: {
+          type: "text",
+          placeholder: "Filtruj wyniki po symbolu"
+        },
+        domProps: {
+          value: t.symbol
+        },
+        on: {
+          input: function input(e) {
+            e.target.composing || (t.symbol = e.target.value);
+          }
+        }
+      }) : t._e()]), n("th", [t._v(" Producent "), t.existProduct ? n("input", {
+        directives: [{
+          name: "model",
+          rawName: "v-model",
+          value: t.manufacturer,
+          expression: "manufacturer"
+        }],
+        attrs: {
+          type: "text",
+          placeholder: "Filtruj wyniki po producencie"
+        },
+        domProps: {
+          value: t.manufacturer
+        },
+        on: {
+          input: function input(e) {
+            e.target.composing || (t.manufacturer = e.target.value);
+          }
+        }
+      }) : t._e()]), n("th", [t._v("Akcja")])])]), t.existProduct ? n("tbody", {
         attrs: {
           id: "productTable"
         }
-      }, t._l(t.products, function (e, n) {
-        return r("tr", {
-          key: n
-        }, [r("td"), r("td", [t._v(t._s(n))]), r("td", [t._v(t._s(e.name))]), r("td", [t._v(t._s(e.symbol))]), r("td", [t._v(t._s(e.manufacturer))]), r("td")]);
+      }, t._l(t.filterProducts, function (e, r) {
+        return n("tr", {
+          key: r
+        }, [n("td", [t._v(t._s(r))]), n("td", [t._v(t._s(e.name))]), n("td", [t._v(t._s(e.symbol))]), n("td", [t._v(t._s(e.manufacturer))]), n("td", [t.checkExistProduct(e.id) ? n("span", [t._v(" Produkt już został dodany ")]) : n("div", {
+          staticClass: "form-group"
+        }, [n("label", [t._v("Ilość w zestawie")]), n("input", {
+          directives: [{
+            name: "model",
+            rawName: "v-model",
+            value: t.productCount[e.id],
+            expression: "productCount[product.id]"
+          }],
+          staticClass: "form-control",
+          attrs: {
+            type: "number",
+            min: "1",
+            value: "1"
+          },
+          domProps: {
+            value: t.productCount[e.id]
+          },
+          on: {
+            input: function input(n) {
+              n.target.composing || t.$set(t.productCount, e.id, n.target.value);
+            }
+          }
+        }), n("button", {
+          staticClass: "btn btn-sm btn-primary",
+          attrs: {
+            type: "submit"
+          }
+        }, [n("span", {
+          staticClass: "hidden-xs hidden-sm",
+          on: {
+            click: function click(n) {
+              return t.addProduct(e.id);
+            }
+          }
+        }, [t._v("Dodaj")])])])])]);
       }), 0) : t._e()])]);
-    },
-        I = [function () {
-      var t = this,
-          e = t.$createElement,
-          r = t._self._c || e;
-      return r("thead", [r("tr", [r("th"), r("th", [t._v("ID")]), r("th", [t._v("Nazwa produktu")]), r("th", [t._v("Symbol")]), r("th", [t._v("Producent")]), r("th", [t._v("Akcja")])])]);
-    }],
-        H = function (t) {
-      Object(i["a"])(r, t);
-      var e = Object(u["a"])(r);
+    }),
+        q = [],
+        H = (n("b0c0"), n("4de4"), n("841c"), function (t) {
+      Object(i["a"])(n, t);
+      var e = Object(u["a"])(n);
 
-      function r() {
+      function n() {
         var t;
-        return Object(o["a"])(this, r), t = e.apply(this, arguments), t.word = "", t.searchParams = {
+        return Object(o["a"])(this, n), t = e.apply(this, arguments), t.word = "", t.name = "", t.symbol = "", t.manufacturer = "", t.productCount = [], t.url = "", t.searchParams = {
           name: "",
           symbol: "",
           manufacturer: "",
@@ -765,11 +891,22 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         }, t;
       }
 
-      return Object(R["a"])(r, [{
+      return Object(C["a"])(n, [{
         key: "products",
         get: function get() {
           var t;
           return null === (t = this.$store) || void 0 === t ? void 0 : t.getters["SetsService/products"];
+        }
+      }, {
+        key: "set",
+        get: function get() {
+          var t;
+          return null === (t = this.$store) || void 0 === t ? void 0 : t.getters["SetsService/set"];
+        }
+      }, {
+        key: "existProduct",
+        get: function get() {
+          return this.products.length > 0;
         }
       }, {
         key: "searchProducts",
@@ -800,27 +937,575 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
           return e;
         }()
-      }]), r;
-    }(l["c"]);
+      }, {
+        key: "filterProducts",
+        get: function get() {
+          var t = this,
+              e = this.products;
+          return "" !== this.name && (e = e.filter(function (e) {
+            return e.name.toLowerCase().search(t.name.toLowerCase()) > -1;
+          })), "" !== this.symbol && (e = e.filter(function (e) {
+            return e.symbol.toLowerCase().search(t.symbol.toLowerCase()) > -1;
+          })), "" !== this.manufacturer && (e = e.filter(function (e) {
+            return e.manufacturer.toLowerCase().search(t.manufacturer.toLowerCase()) > -1;
+          })), e;
+        }
+      }, {
+        key: "addProduct",
+        value: function () {
+          var t = Object(x["a"])(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function t(e) {
+            return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function (t) {
+              while (1) {
+                switch (t.prev = t.next) {
+                  case 0:
+                    return console.log("Produkt: " + e + " number products: " + this.productCount[e]), t.next = 3, this.$emit("load-set");
+
+                  case 3:
+                  case "end":
+                    return t.stop();
+                }
+              }
+            }, t, this);
+          }));
+
+          function e(e) {
+            return t.apply(this, arguments);
+          }
+
+          return e;
+        }()
+      }, {
+        key: "checkExistProduct",
+        value: function value(t) {
+          var e = this.set.products.filter(function (e) {
+            return e.product_id === t;
+          });
+          return e.length > 0;
+        }
+      }]), n;
+    }(l["c"]));
 
     H = Object(c["a"])([Object(l["a"])({
       components: {}
     })], H);
-    var N,
-        q = H,
-        X = q,
-        M = (r("4f0e"), Object(f["a"])(X, z, I, !1, null, "633f0149", null)),
-        W = M.exports,
-        J = r("2f62"),
-        A = r("ade3"),
-        D = (r("d3b7"), r("b0c0"), {
+
+    var X = H,
+        M = X,
+        W = (n("4b82"), Object(f["a"])(M, z, q, !1, null, "4b24d5b6", null)),
+        D = W.exports,
+        U = function U() {
+      var t = this,
+          e = t.$createElement,
+          n = t._self._c || e;
+      return t.set ? n("div", {
+        staticClass: "c-setEditForm"
+      }, [n("div", {
+        staticClass: "product_stocks-general",
+        attrs: {
+          id: "general"
+        }
+      }, [n("div", {
+        staticClass: "form-group"
+      }, [n("label", {
+        attrs: {
+          "for": "name"
+        }
+      }, [t._v("Nazwa")]), n("input", {
+        directives: [{
+          name: "model",
+          rawName: "v-model",
+          value: t.setName,
+          expression: "setName"
+        }],
+        staticClass: "form-control",
+        attrs: {
+          type: "text",
+          id: "name",
+          name: "name"
+        },
+        domProps: {
+          value: t.setName
+        },
+        on: {
+          input: function input(e) {
+            e.target.composing || (t.setName = e.target.value);
+          }
+        }
+      })]), n("div", {
+        staticClass: "form-group"
+      }, [n("label", {
+        attrs: {
+          "for": "number"
+        }
+      }, [t._v("Symbol")]), n("input", {
+        directives: [{
+          name: "model",
+          rawName: "v-model",
+          value: t.setSymbol,
+          expression: "setSymbol"
+        }],
+        staticClass: "form-control",
+        attrs: {
+          type: "text",
+          id: "number",
+          name: "number"
+        },
+        domProps: {
+          value: t.setSymbol
+        },
+        on: {
+          input: function input(e) {
+            e.target.composing || (t.setSymbol = e.target.value);
+          }
+        }
+      })])]), n("button", {
+        staticClass: "btn btn-primary",
+        attrs: {
+          id: "store__packet"
+        },
+        on: {
+          click: function click(e) {
+            return t.updateSet();
+          }
+        }
+      }, [t._v("Zapisz")])]) : t._e();
+    },
+        F = [],
+        J = function (t) {
+      Object(i["a"])(n, t);
+      var e = Object(u["a"])(n);
+
+      function n() {
+        var t;
+        return Object(o["a"])(this, n), t = e.apply(this, arguments), t.setName = "", t.setSymbol = "", t;
+      }
+
+      return Object(C["a"])(n, [{
+        key: "set",
+        get: function get() {
+          var t;
+          return null === (t = this.$store) || void 0 === t ? void 0 : t.getters["SetsService/set"];
+        }
+      }, {
+        key: "setItem",
+        get: function get() {
+          return this.set.set;
+        }
+      }, {
+        key: "updateSet",
+        value: function () {
+          var t = Object(x["a"])(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function t() {
+            var e, n;
+            return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function (t) {
+              while (1) {
+                switch (t.prev = t.next) {
+                  case 0:
+                    return n = {
+                      id: this.setItem.id,
+                      name: this.setName,
+                      number: this.setSymbol
+                    }, t.next = 3, null === (e = this.$store) || void 0 === e ? void 0 : e.dispatch("SetsService/updateSet", n);
+
+                  case 3:
+                    return t.next = 5, this.$emit("load-set");
+
+                  case 5:
+                  case "end":
+                    return t.stop();
+                }
+              }
+            }, t, this);
+          }));
+
+          function e() {
+            return t.apply(this, arguments);
+          }
+
+          return e;
+        }()
+      }, {
+        key: "mounted",
+        value: function value() {
+          this.set && (this.setName = this.setItem.name, this.setSymbol = this.setItem.number);
+        }
+      }, {
+        key: "setOldValues",
+        value: function value() {
+          this.setName = this.setItem.name, this.setSymbol = this.setItem.number;
+        }
+      }]), n;
+    }(l["c"]);
+
+    Object(c["a"])([Object(l["d"])("set")], J.prototype, "setOldValues", null), J = Object(c["a"])([Object(l["a"])({
+      components: {}
+    })], J);
+
+    var Z = J,
+        A = Z,
+        V = (n("d6cc"), Object(f["a"])(A, U, F, !1, null, "60a43fca", null)),
+        G = V.exports,
+        Y = function Y() {
+      var t = this,
+          e = t.$createElement,
+          n = t._self._c || e;
+      return t.set ? n("div", {
+        staticClass: "c-setProductsList"
+      }, [t.products.length > 0 ? n("table", {
+        staticClass: "table"
+      }, [t._m(0), n("tbody", t._l(t.products, function (e, r) {
+        return n("tr", {
+          key: r
+        }, [n("td", [t._v(" " + t._s(e.id) + " ")]), n("td", [t._v(" " + t._s(e.symbol) + " => " + t._s(e.name) + " ")]), n("td", [n("div", {
+          staticClass: "form-group"
+        }, [n("input", {
+          directives: [{
+            name: "model",
+            rawName: "v-model",
+            value: t.productsStock[e.id],
+            expression: "productsStock[product.id]"
+          }],
+          staticClass: "form-control",
+          attrs: {
+            type: "number",
+            min: "1",
+            id: "stock",
+            name: "stock"
+          },
+          domProps: {
+            value: t.productsStock[e.id]
+          },
+          on: {
+            input: function input(n) {
+              n.target.composing || t.$set(t.productsStock, e.id, n.target.value);
+            }
+          }
+        })]), n("button", {
+          staticClass: "btn btn-primary",
+          attrs: {
+            id: "store__packet"
+          },
+          on: {
+            click: function click(n) {
+              return t.updateProduct(e.id);
+            }
+          }
+        }, [t._v("Zmień")])]), n("td", [n("button", {
+          staticClass: "btn btn-sm btn-danger",
+          on: {
+            click: function click(n) {
+              return t.deleteProduct(e.id);
+            }
+          }
+        }, [n("i", {
+          staticClass: "voyager-trash"
+        }), n("span", {
+          staticClass: "hidden-xs hidden-sm"
+        }, [t._v("Usuń")])])])]);
+      }), 0)]) : t._e()]) : t._e();
+    },
+        B = [function () {
+      var t = this,
+          e = t.$createElement,
+          n = t._self._c || e;
+      return n("thead", [n("tr", [n("th", [t._v("ID")]), n("th", [t._v("Nazwa")]), n("th", [t._v("Ilość produktu w zestawie")]), n("th", [t._v("Akcje")])])]);
+    }],
+        K = (n("d81d"), function (t) {
+      Object(i["a"])(n, t);
+      var e = Object(u["a"])(n);
+
+      function n() {
+        var t;
+        return Object(o["a"])(this, n), t = e.apply(this, arguments), t.productsStock = [], t;
+      }
+
+      return Object(C["a"])(n, [{
+        key: "set",
+        get: function get() {
+          var t;
+          return null === (t = this.$store) || void 0 === t ? void 0 : t.getters["SetsService/set"];
+        }
+      }, {
+        key: "products",
+        get: function get() {
+          return this.set.products;
+        }
+      }, {
+        key: "updateProduct",
+        value: function () {
+          var t = Object(x["a"])(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function t(e) {
+            var n, r;
+            return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function (t) {
+              while (1) {
+                switch (t.prev = t.next) {
+                  case 0:
+                    return r = {
+                      id: e,
+                      setId: this.set.set.id,
+                      stock: this.productsStock[e]
+                    }, t.next = 3, null === (n = this.$store) || void 0 === n ? void 0 : n.dispatch("SetsService/updateSetProduct", r);
+
+                  case 3:
+                    return t.next = 5, this.$emit("load-set");
+
+                  case 5:
+                  case "end":
+                    return t.stop();
+                }
+              }
+            }, t, this);
+          }));
+
+          function e(e) {
+            return t.apply(this, arguments);
+          }
+
+          return e;
+        }()
+      }, {
+        key: "deleteProduct",
+        value: function () {
+          var t = Object(x["a"])(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function t(e) {
+            var n, r;
+            return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function (t) {
+              while (1) {
+                switch (t.prev = t.next) {
+                  case 0:
+                    return r = {
+                      id: e,
+                      setId: this.set.set.id,
+                      stock: 0
+                    }, t.next = 3, null === (n = this.$store) || void 0 === n ? void 0 : n.dispatch("SetsService/deleteSetProduct", r);
+
+                  case 3:
+                    return t.next = 5, this.$emit("load-set");
+
+                  case 5:
+                  case "end":
+                    return t.stop();
+                }
+              }
+            }, t, this);
+          }));
+
+          function e(e) {
+            return t.apply(this, arguments);
+          }
+
+          return e;
+        }()
+      }, {
+        key: "setOldValues",
+        value: function value() {
+          var t = this;
+          this.products.length > 0 && this.products.map(function (e) {
+            t.productsStock[e.id] = e.stock;
+          });
+        }
+      }]), n;
+    }(l["c"]));
+
+    Object(c["a"])([Object(l["d"])("set")], K.prototype, "setOldValues", null), K = Object(c["a"])([Object(l["a"])({
+      components: {}
+    })], K);
+
+    var Q = K,
+        tt = Q,
+        et = (n("442a"), Object(f["a"])(tt, Y, B, !1, null, "29dc364c", null)),
+        nt = et.exports,
+        rt = function (t) {
+      Object(i["a"])(n, t);
+      var e = Object(u["a"])(n);
+
+      function n() {
+        return Object(o["a"])(this, n), e.apply(this, arguments);
+      }
+
+      return Object(C["a"])(n, [{
+        key: "mounted",
+        value: function () {
+          var t = Object(x["a"])(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function t() {
+            return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function (t) {
+              while (1) {
+                switch (t.prev = t.next) {
+                  case 0:
+                    return t.next = 2, this.loadSet();
+
+                  case 2:
+                  case "end":
+                    return t.stop();
+                }
+              }
+            }, t, this);
+          }));
+
+          function e() {
+            return t.apply(this, arguments);
+          }
+
+          return e;
+        }()
+      }, {
+        key: "loadSet",
+        value: function () {
+          var t = Object(x["a"])(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function t() {
+            var e, n, r;
+            return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function (t) {
+              while (1) {
+                switch (t.prev = t.next) {
+                  case 0:
+                    if (n = null !== (e = window.location.pathname.split("/")[4]) && void 0 !== e ? e : 0, !n) {
+                      t.next = 4;
+                      break;
+                    }
+
+                    return t.next = 4, null === (r = this.$store) || void 0 === r ? void 0 : r.dispatch("SetsService/loadSet", Number(n));
+
+                  case 4:
+                  case "end":
+                    return t.stop();
+                }
+              }
+            }, t, this);
+          }));
+
+          function e() {
+            return t.apply(this, arguments);
+          }
+
+          return e;
+        }()
+      }]), n;
+    }(l["c"]);
+
+    rt = Object(c["a"])([Object(l["a"])({
+      components: {
+        SetProductsList: nt,
+        EditForm: G,
+        ProductTable: D
+      }
+    })], rt);
+    var st,
+        at = rt,
+        ot = at,
+        it = (n("4d8a"), Object(f["a"])(ot, I, N, !1, null, "cadd3aa6", null)),
+        ut = it.exports,
+        ct = n("2f62"),
+        lt = n("ade3"),
+        dt = (n("d3b7"), {
+      setItem: function setItem(t) {
+        return Object(x["a"])(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function e() {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function (e) {
+            while (1) {
+              switch (e.prev = e.next) {
+                case 0:
+                  return e.abrupt("return", fetch(P("api/sets/" + t), {
+                    method: "GET",
+                    credentials: "same-origin",
+                    headers: new Headers({
+                      "Content-Type": "application/json; charset=utf-8",
+                      "X-Requested-Width": "XMLHttpRequest"
+                    })
+                  }).then(function (t) {
+                    return t.json();
+                  }));
+
+                case 1:
+                case "end":
+                  return e.stop();
+              }
+            }
+          }, e);
+        }))();
+      },
+      setItemUpdate: function setItemUpdate(t) {
+        return Object(x["a"])(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function e() {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function (e) {
+            while (1) {
+              switch (e.prev = e.next) {
+                case 0:
+                  return e.abrupt("return", fetch(P("api/sets/" + t.id), {
+                    method: "PUT",
+                    credentials: "same-origin",
+                    headers: new Headers({
+                      "Content-Type": "application/json; charset=utf-8",
+                      "X-Requested-Width": "XMLHttpRequest"
+                    }),
+                    body: JSON.stringify({
+                      name: t.name,
+                      number: t.number
+                    })
+                  }).then(function (t) {
+                    return t.json();
+                  }));
+
+                case 1:
+                case "end":
+                  return e.stop();
+              }
+            }
+          }, e);
+        }))();
+      },
+      setProductUpdate: function setProductUpdate(t) {
+        return Object(x["a"])(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function e() {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function (e) {
+            while (1) {
+              switch (e.prev = e.next) {
+                case 0:
+                  return e.abrupt("return", fetch(P("api/sets/" + t.setId + "/products/" + t.id), {
+                    method: "PUT",
+                    credentials: "same-origin",
+                    headers: new Headers({
+                      "Content-Type": "application/json; charset=utf-8",
+                      "X-Requested-Width": "XMLHttpRequest"
+                    }),
+                    body: JSON.stringify({
+                      stock: t.stock
+                    })
+                  }).then(function (t) {
+                    return t.json();
+                  }));
+
+                case 1:
+                case "end":
+                  return e.stop();
+              }
+            }
+          }, e);
+        }))();
+      },
+      setProductDelete: function setProductDelete(t) {
+        return Object(x["a"])(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function e() {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function (e) {
+            while (1) {
+              switch (e.prev = e.next) {
+                case 0:
+                  return e.abrupt("return", fetch(P("api/sets/" + t.setId + "/products/" + t.id), {
+                    method: "DELETE",
+                    credentials: "same-origin",
+                    headers: new Headers({
+                      "Content-Type": "application/json; charset=utf-8",
+                      "X-Requested-Width": "XMLHttpRequest"
+                    })
+                  }).then(function (t) {
+                    return t.json();
+                  }));
+
+                case 1:
+                case "end":
+                  return e.stop();
+              }
+            }
+          }, e);
+        }))();
+      },
       getSets: function getSets() {
         return Object(x["a"])(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function t() {
           return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function (t) {
             while (1) {
               switch (t.prev = t.next) {
                 case 0:
-                  return t.abrupt("return", fetch(C("api/sets"), {
+                  return t.abrupt("return", fetch(P("api/sets/"), {
                     method: "GET",
                     credentials: "same-origin",
                     headers: new Headers({
@@ -845,7 +1530,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
             while (1) {
               switch (e.prev = e.next) {
                 case 0:
-                  return e.abrupt("return", fetch(C("api/sets/" + t.setId + "/completing"), {
+                  return e.abrupt("return", fetch(P("api/sets/" + t.setId + "/completing"), {
                     method: "POST",
                     credentials: "same-origin",
                     headers: new Headers({
@@ -873,7 +1558,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
             while (1) {
               switch (e.prev = e.next) {
                 case 0:
-                  return e.abrupt("return", fetch(C("api/sets/" + t.setId + "/disassembly"), {
+                  return e.abrupt("return", fetch(P("api/sets/" + t.setId + "/disassembly"), {
                     method: "POST",
                     credentials: "same-origin",
                     headers: new Headers({
@@ -901,7 +1586,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
             while (1) {
               switch (e.prev = e.next) {
                 case 0:
-                  return e.abrupt("return", fetch(C("api/sets/" + t), {
+                  return e.abrupt("return", fetch(P("api/sets/" + t), {
                     method: "DELETE",
                     credentials: "same-origin",
                     headers: new Headers({
@@ -927,7 +1612,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
             while (1) {
               switch (e.prev = e.next) {
                 case 0:
-                  return e.abrupt("return", fetch(C("api/sets/products"), {
+                  return e.abrupt("return", fetch(P("api/sets/products"), {
                     method: "POST",
                     credentials: "same-origin",
                     headers: new Headers({
@@ -953,18 +1638,20 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         }))();
       }
     }),
-        Z = "SETS_SET_ALL",
-        F = "SETS_SET_ERROR",
-        G = "SETS_SET_IS_LOADING",
-        U = "SETS_SET_PRODUCTS",
-        V = !0,
-        Y = {
+        pt = "SETS_SET_ALL",
+        mt = "SETS_SET_SETITEM",
+        vt = "SETS_SET_ERROR",
+        ht = "SETS_SET_IS_LOADING",
+        ft = "SETS_SET_PRODUCTS",
+        bt = !0,
+        gt = {
       error: "",
       isLoading: !1,
       sets: [],
-      products: []
+      products: [],
+      set: null
     },
-        B = {
+        yt = {
       isLoading: function isLoading(t) {
         return t.isLoading;
       },
@@ -974,94 +1661,137 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       sets: function sets(t) {
         return t.sets;
       },
+      set: function set(t) {
+        return t.set;
+      },
       products: function products(t) {
         return t.products;
       }
     },
-        K = {
+        _t = {
       loadSets: function loadSets(t) {
         var e = t.commit;
-        return e(G, !0), D.getSets().then(function (t) {
-          return e(G, !1), e(Z, t), t;
+        return e(ht, !0), dt.getSets().then(function (t) {
+          return e(ht, !1), e(pt, t), t;
         })["catch"](function (t) {
-          e(F, t.message);
+          e(vt, t.message);
         });
       },
       completing: function completing(t, e) {
-        var r = t.commit;
-        return r(G, !0), D.completingSets(e).then(function (t) {
-          return r(G, !1), t;
+        var n = t.commit;
+        return n(ht, !0), dt.completingSets(e).then(function (t) {
+          return n(ht, !1), t;
         })["catch"](function (t) {
-          r(F, t.message);
+          n(vt, t.message);
         });
       },
       disassembly: function disassembly(t, e) {
-        var r = t.commit;
-        return r(G, !0), D.disassemblySets(e).then(function (t) {
-          return r(G, !1), t;
+        var n = t.commit;
+        return n(ht, !0), dt.disassemblySets(e).then(function (t) {
+          return n(ht, !1), t;
         })["catch"](function (t) {
-          r(F, t.message);
+          n(vt, t.message);
         });
       },
       "delete": function _delete(t, e) {
-        var r = t.commit;
-        return r(G, !0), D.deleteSet(e).then(function (t) {
-          return r(G, !1), t;
+        var n = t.commit;
+        return n(ht, !0), dt.deleteSet(e).then(function (t) {
+          return n(ht, !1), t;
         })["catch"](function (t) {
-          r(F, t.message);
+          n(vt, t.message);
         });
       },
       loadProducts: function loadProducts(t, e) {
-        var r = t.commit;
-        return r(G, !0), D.products(e).then(function (t) {
-          return r(G, !1), r(U, t), t;
+        var n = t.commit;
+        return n(ht, !0), dt.products(e).then(function (t) {
+          return n(ht, !1), n(ft, t), t;
         })["catch"](function (t) {
-          r(F, t.message);
+          n(vt, t.message);
+        });
+      },
+      loadSet: function loadSet(t, e) {
+        var n = t.commit;
+        return n(ht, !0), dt.setItem(e).then(function (t) {
+          return n(ht, !1), n(mt, t), t;
+        })["catch"](function (t) {
+          console.log(t), n(vt, t.message);
+        });
+      },
+      updateSet: function updateSet(t, e) {
+        var n = t.commit;
+        return n(ht, !0), dt.setItemUpdate(e).then(function (t) {
+          return n(ht, !1), t;
+        })["catch"](function (t) {
+          console.log(t), n(vt, t.message);
+        });
+      },
+      updateSetProduct: function updateSetProduct(t, e) {
+        var n = t.commit;
+        return n(ht, !0), dt.setProductUpdate(e).then(function (t) {
+          return n(ht, !1), t;
+        })["catch"](function (t) {
+          console.log(t), n(vt, t.message);
+        });
+      },
+      deleteSetProduct: function deleteSetProduct(t, e) {
+        var n = t.commit;
+        return n(ht, !0), dt.setProductDelete(e).then(function (t) {
+          return n(ht, !1), t;
+        })["catch"](function (t) {
+          console.log(t), n(vt, t.message);
         });
       }
     },
-        Q = (N = {}, Object(A["a"])(N, Z, function (t, e) {
+        wt = (st = {}, Object(lt["a"])(st, pt, function (t, e) {
       t.sets = e;
-    }), Object(A["a"])(N, U, function (t, e) {
+    }), Object(lt["a"])(st, mt, function (t, e) {
+      t.set = e;
+    }), Object(lt["a"])(st, ft, function (t, e) {
       t.products = e;
-    }), Object(A["a"])(N, F, function (t, e) {
+    }), Object(lt["a"])(st, vt, function (t, e) {
       t.error = e;
-    }), Object(A["a"])(N, G, function (t, e) {
+    }), Object(lt["a"])(st, ht, function (t, e) {
       t.isLoading = e;
-    }), N),
-        tt = {
-      namespaced: V,
-      state: Y,
-      getters: B,
-      actions: K,
-      mutations: Q
+    }), st),
+        St = {
+      namespaced: bt,
+      state: gt,
+      getters: yt,
+      actions: _t,
+      mutations: wt
     };
-    n["a"].use(J["a"]);
-    var et = new J["a"].Store({
+    r["a"].use(ct["a"]);
+    var jt = new ct["a"].Store({
       modules: {
-        SetsService: tt
+        SetsService: St
       }
     });
-    n["a"].config.productionTip = !1, new n["a"]({
-      store: et,
+    r["a"].config.productionTip = !1, new r["a"]({
+      store: jt,
       render: function render(t) {
-        return t(S);
+        return t(j);
       }
-    }).$mount("#app"), new n["a"]({
-      store: et,
+    }).$mount("#app"), document.querySelector("#setsList") && new r["a"]({
+      store: jt,
       render: function render(t) {
         return t(L);
       }
-    }).$mount("#setsList"), new n["a"]({
-      store: et,
+    }).$mount("#setsList"), document.querySelector("#setEdit") && new r["a"]({
+      store: jt,
       render: function render(t) {
-        return t(W);
+        return t(ut);
       }
     }).$mount("#setEdit");
   },
-  cf05: function cf05(t, e, r) {
-    t.exports = r.p + "img/logo.82b9c7a5.png";
-  }
+  cf05: function cf05(t, e, n) {
+    t.exports = n.p + "img/logo.82b9c7a5.png";
+  },
+  d6cc: function d6cc(t, e, n) {
+    "use strict";
+
+    n("17b2");
+  },
+  e075: function e075(t, e, n) {}
 });
 
 /***/ }),
@@ -1839,12 +2569,12 @@ try {
 
 /***/ 1:
 /*!********************************************************!*\
-  !*** multi ./resources/layout/dist/js/app.f0c95102.js ***!
+  !*** multi ./resources/layout/dist/js/app.87c33009.js ***!
   \********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /home/adrian/admin-panel/resources/layout/dist/js/app.f0c95102.js */"./resources/layout/dist/js/app.f0c95102.js");
+module.exports = __webpack_require__(/*! /home/adrian/admin-panel/resources/layout/dist/js/app.87c33009.js */"./resources/layout/dist/js/app.87c33009.js");
 
 
 /***/ })
