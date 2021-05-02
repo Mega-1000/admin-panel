@@ -14,19 +14,33 @@
         <template v-if="newSetFromProduct">
           <button @click="togggleButtonVisible()">Powrót</button>
           <div class="form-group">
-            <label>Wyszukaj produkt który jest zestawem</label>
+            <label>Wyszukaj produkt</label>
             <input type="text" class="form-control" v-on:keyup="searchProducts()" v-model="word">
           </div>
           <template v-if="products.length > 0">
             <select v-model="productId">
               <option v-for="(product, index) in products" :key="index" :value="product.product_id">{{ product.symbol }} => {{ product.name }}</option>
             </select>
-            <button>Stwórz</button>
+            <button @click="createSetFromProduct()">Stwórz</button>
           </template>
         </template>
         <template v-if="createNewSet">
           <button @click="togggleButtonVisible()">Powrót</button>
-          Test2
+          <div class="product_stocks-general" id="general">
+            <div class="form-group">
+              <label for="name">Nazwa</label>
+              <input type="text" class="form-control" id="name" v-model="name">
+            </div>
+            <div class="form-group">
+              <label for="number">Symbol</label>
+              <input type="text" class="form-control" id="number" v-model="symbol">
+            </div>
+            <div class="form-group">
+              <label for="number">Cena(domyślna)</label>
+              <input type="number" class="form-control" id="price" v-model="price">
+            </div>
+          </div>
+          <button @click="createSet()">Stwórz</button>
         </template>
       </div>
     </div>
@@ -34,7 +48,7 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { SetProduct, SetsProductParams } from '@/types/SetsTypes'
+import { CreateSetParams, SetProduct, SetsProductParams } from '@/types/SetsTypes'
 
 @Component({
   components: {
@@ -45,6 +59,9 @@ export default class AddSetModal extends Vue {
   public newSetFromProduct = false
   public createNewSet = false
   public word = ''
+  public name = ''
+  public symbol = ''
+  public price = 0
   public productId = null
 
   public searchParams: SetsProductParams = {
@@ -78,6 +95,27 @@ export default class AddSetModal extends Vue {
     if (this.word.length > 2) {
       this.searchParams.word = this.word
       await this.$store.dispatch('SetsService/loadProducts', this.searchParams)
+    }
+  }
+
+  public async createSetFromProduct (): Promise<void> {
+    if (this.productId !== null) {
+      await this.$store.dispatch('SetsService/cerateSetFromProduct', this.productId)
+      this.$emit('load-sets')
+      this.$emit('close')
+    }
+  }
+
+  public async createSet (): Promise<void> {
+    if ((this.name !== '') && (this.symbol !== '') && (this.price > 0)) {
+      const params: CreateSetParams = {
+        name: this.name,
+        symbol: this.symbol,
+        price: this.price
+      }
+      await this.$store.dispatch('SetsService/cerateSet', params)
+      this.$emit('load-sets')
+      this.$emit('close')
     }
   }
 }

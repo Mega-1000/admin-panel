@@ -13,10 +13,6 @@ use App\Entities\Product;
 
 class SetsController extends Controller
 {
-    public function __construct()
-    {
-    }
-
     public function index()
     {
         $sets = Set::get()->all();

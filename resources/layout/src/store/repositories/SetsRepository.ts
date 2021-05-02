@@ -2,7 +2,7 @@
 /* eslint-disable no-useless-constructor */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { Set, SetParams, SetProductParams, SetsCount, SetsProductParams } from '@/types/SetsTypes'
+import { CreateSetParams, Set, SetParams, SetProductParams, SetsCount, SetsProductParams } from '@/types/SetsTypes'
 import { getFullUrl } from '@/helpers/urls'
 
 export default {
@@ -89,6 +89,40 @@ export default {
       headers: new Headers({
         'Content-Type': 'application/json; charset=utf-8',
         'X-Requested-Width': 'XMLHttpRequest'
+      })
+    })
+      .then((response) => {
+        return response.json()
+      })
+  },
+  async createSetFromProduct (productId: number): Promise<Set> {
+    return fetch(getFullUrl('api/sets/'), {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/json; charset=utf-8',
+        'X-Requested-Width': 'XMLHttpRequest'
+      }),
+      body: JSON.stringify({
+        product_id: productId
+      })
+    })
+      .then((response) => {
+        return response.json()
+      })
+  },
+  async createSet (params: CreateSetParams): Promise<Set> {
+    return fetch(getFullUrl('api/sets/'), {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/json; charset=utf-8',
+        'X-Requested-Width': 'XMLHttpRequest'
+      }),
+      body: JSON.stringify({
+        name: params.name,
+        symbol: params.symbol,
+        price: params.price
       })
     })
       .then((response) => {

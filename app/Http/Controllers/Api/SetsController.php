@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers\Api;
 
+use App\Entities\ProductPrice;
 use App\Entities\ProductStock;
 use App\Entities\ProductStockPosition;
 use App\Http\Controllers\Controller;
@@ -38,16 +39,16 @@ class SetsController extends Controller
 
     public function products(Request $request)
     {
-        if(isset($request->name) && $request->name!='') {
+        if($request->has('name') && $request->name!='') {
             return Product::where('name', 'LIKE', '%'.$request->name.'%')->get();
         }
-        if(isset($request->symbol) && $request->symbol != '') {
+        if($request->has('symbol') && $request->symbol != '') {
             return Product::where('symbol', 'LIKE', '%'.$request->symbol.'%')->get();
         }
-        if(isset($request->manufacturer) && $request->manufacturer != '') {
+        if($request->has('manufacturer') && $request->manufacturer != '') {
             return Product::where('manufacturer', 'LIKE', '%'.$request->manufacturer.'%')->get();
         }
-        if(isset($request->word) && $request->word != '') {
+        if($request->has('word') && $request->word != '') {
             return Product::where('name', 'LIKE', '%'.$request->word.'%')
                             ->orWhere('symbol', 'LIKE', '%'.$request->word.'%')
                             ->orWhere('manufacturer', 'LIKE', '%'.$request->word.'%')->get();
@@ -67,22 +68,52 @@ class SetsController extends Controller
 
     public function store(Request $request)
     {
-        $this->validate($request, [
-            'name' => 'required',
-            'number' => 'required',
-        ]);
+        if($request->has('product_id')) {
+            $product = Product::find('id', $request->product_id)->get()->first();
+            $stock = ProductStock::where('product_id', $request->product_id)->get()->first();
 
-        $set = new Set;
-        $set->name = $request->name;
-        $set->number = $request->number;
-        $set->stock = 0;
-
-        if ($set->save()) {
+            $set = new Set;
+            $set->name = $product->name;
+            $set->number = $product->symbol;
+            $set->stock = $stock->quantity;
+            $set->product_id = $product->id;
+            if ($set->save()) {
+                return response(json_encode([
+                    'set' => $set,
+                ]),200);
+            }
             return response(json_encode([
-                'set' => $set,
-            ]),200);
+                'error_code' => 500,
+                'error_message' => __('sets.messages.error')
+            ]),500);
         }
+        if($request->has('name') && $request->has('symbol') && $request->has('price')) {
+            $product = new Product;
+            $product->name = $request->name;
+            $product->symbol = $request->symbol;
+            $product->trade_group_name = '';
 
+            if ($product->save()) {
+                $productPrice = new ProductPrice;
+                $productPrice->product_id = $product->id;
+                $productPrice->vat = 23;
+                $productPrice->allegro_selling_gross_commercial_price = $request->price;
+
+                if ($productPrice->save()) {
+                    $set = new Set;
+                    $set->name = $product->name;
+                    $set->number = $product->symbol;
+                    $set->stock = 0;
+                    $set->product_id = $product->id;
+
+                    if ($set->save()) {
+                        return response(json_encode([
+                            'set' => $set,
+                        ]), 200);
+                    }
+                }
+            }
+        }
         return response(json_encode([
             'error_code' => 500,
             'error_message' => __('sets.messages.error')

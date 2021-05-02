@@ -55,4 +55,16 @@ export interface SetProductParams {
   setId: number,
   stock: number
 }
+
+export interface CreateSetParams {
+  name: string,
+  symbol: string,
+  price: number
+}
+
+export interface Error {
+  name: string,
+  symbol: string,
+  price: number
+}
 /* eslint-enabled camelcase */

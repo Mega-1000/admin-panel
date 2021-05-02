@@ -1,5 +1,6 @@
 <template>
   <div class="v-setEdit">
+    <Error></Error>
     <EditForm @load-set="loadSet()"></EditForm>
     <SetProductsList @load-set="loadSet()"></SetProductsList>
     <ProductTable @load-set="loadSet()"></ProductTable>

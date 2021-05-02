@@ -1,11 +1,13 @@
 <template>
   <div class="v-setsList">
+    <Error></Error>
     <a class="btn btn-success" id="create__button" @click="toggleShowAddModal()">Stwórz</a>
-    <AddSetModal v-if="showAddModal" @close="toggleShowAddModal()"></AddSetModal>
+    <AddSetModal v-if="showAddModal" @close="toggleShowAddModal()" @load-sets="loadSets()"></AddSetModal>
     <table class="table">
       <thead>
       <tr>
         <th>Id</th>
+        <th>ID produktu</th>
         <th>Nazwa zestawu</th>
         <th>Numer wewnętrzny zestawu</th>
         <th>Ilość zestawów</th>
@@ -18,6 +20,7 @@
       <tbody>
         <tr v-for="(item, index) in sets" :key="index">
           <td>{{ index }}</td>
+          <td> {{ item.set[0].product_id }} </td>
           <td> {{ item.set[0].name }} </td>
           <td> {{ item.set[0].number }} </td>
           <td> {{ item.set[0].stock }} </td>
@@ -67,9 +70,11 @@ import { Component, Vue } from 'vue-property-decorator'
 import { Set } from '@/types/SetsTypes'
 import { getFullUrl } from '@/helpers/urls'
 import AddSetModal from '@/components/Sets/AddSetModal.vue'
+import Error from '@/components/Error.vue'
 
 @Component({
   components: {
+    Error,
     AddSetModal
   }
 })

@@ -2,7 +2,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import setRepository from '@/store/repositories/SetsRepository'
-import { Set, SetParams, SetProduct, SetProductParams, SetsCount, SetsProductParams, SetsStore } from '@/types/SetsTypes'
+import {
+  CreateSetParams,
+  Set,
+  SetParams,
+  SetProduct,
+  SetProductParams,
+  SetsCount,
+  SetsProductParams,
+  SetsStore
+} from '@/types/SetsTypes'
 
 import {
   SETS_SET_ALL,
@@ -116,6 +125,32 @@ const actions = {
     commit(SETS_SET_IS_LOADING, true)
     return setRepository
       .setItemUpdate(set)
+      .then((data: any) => {
+        commit(SETS_SET_IS_LOADING, false)
+        return data
+      })
+      .catch((error: any) => {
+        console.log(error)
+        commit(SETS_SET_ERROR, error.message)
+      })
+  },
+  cerateSetFromProduct ({ commit }: any, productId: number) {
+    commit(SETS_SET_IS_LOADING, true)
+    return setRepository
+      .createSetFromProduct(productId)
+      .then((data: any) => {
+        commit(SETS_SET_IS_LOADING, false)
+        return data
+      })
+      .catch((error: any) => {
+        console.log(error)
+        commit(SETS_SET_ERROR, error.message)
+      })
+  },
+  cerateSet ({ commit }: any, params: CreateSetParams) {
+    commit(SETS_SET_IS_LOADING, true)
+    return setRepository
+      .createSet(params)
       .then((data: any) => {
         commit(SETS_SET_IS_LOADING, false)
         return data
