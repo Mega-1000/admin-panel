@@ -1,7 +1,7 @@
 <template>
   <div class="v-setsList">
-    <a class="btn btn-success" id="create__button" :href="addSetLink">Stwórz</a>
-
+    <a class="btn btn-success" id="create__button" @click="toggleShowAddModal()">Stwórz</a>
+    <AddSetModal v-if="showAddModal" @close="toggleShowAddModal()"></AddSetModal>
     <table class="table">
       <thead>
       <tr>
@@ -66,15 +66,23 @@
 import { Component, Vue } from 'vue-property-decorator'
 import { Set } from '@/types/SetsTypes'
 import { getFullUrl } from '@/helpers/urls'
+import AddSetModal from '@/components/Sets/AddSetModal.vue'
 
 @Component({
   components: {
+    AddSetModal
   }
 })
 export default class SetsList extends Vue {
-  public completingSet: number[] = [];
+  public completingSet: number[] = []
 
-  public disassemblySet: number[] = [];
+  public disassemblySet: number[] = []
+
+  public showAddModal = false
+
+  public toggleShowAddModal ():void {
+    this.showAddModal = !this.showAddModal
+  }
 
   public get sets (): Set[] {
     return this.$store?.getters['SetsService/sets']
@@ -94,16 +102,20 @@ export default class SetsList extends Vue {
 
   public async completing (setId: number, count: number): Promise<void> {
     await this.$store.dispatch('SetsService/completing', { setId: setId, count: count })
-    await this.$store?.dispatch('SetsService/loadSets')
+    await this.loadSets()
   }
 
   public async disassembly (setId: number, count: number): Promise<void> {
     await this.$store.dispatch('SetsService/disassembly', { setId: setId, count: count })
-    await this.$store?.dispatch('SetsService/loadSets')
+    await this.loadSets()
   }
 
   public async deleteSet (setId: number): Promise<void> {
     await this.$store.dispatch('SetsService/delete', setId)
+    await this.loadSets()
+  }
+
+  private async loadSets (): Promise<void> {
     await this.$store?.dispatch('SetsService/loadSets')
   }
 }

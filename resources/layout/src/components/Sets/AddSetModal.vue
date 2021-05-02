@@ -1,0 +1,117 @@
+<template>
+  <div class="c-addSetModal">
+    <div class="overlay" @click="$emit('close')"></div>
+    <div class="c-modal">
+      <div class="header">
+          <p>Dodaj nowy zestaw</p>
+          <span @click="$emit('close')">X</span>
+      </div>
+      <div class="content">
+        <template v-if="buttonsVisible">
+          <button @click="togggleCreateNewSet()">Stwórz nowy zestaw</button>
+          <button @click="togggleNewSetFromProduct()">Stwórz nowy zestaw z istniejącego produktu</button>
+        </template>
+        <template v-if="newSetFromProduct">
+          <button @click="togggleButtonVisible()">Powrót</button>
+          <div class="form-group">
+            <label>Wyszukaj produkt który jest zestawem</label>
+            <input type="text" class="form-control" v-on:keyup="searchProducts()" v-model="word">
+          </div>
+          <template v-if="products.length > 0">
+            <select v-model="productId">
+              <option v-for="(product, index) in products" :key="index" :value="product.product_id">{{ product.symbol }} => {{ product.name }}</option>
+            </select>
+            <button>Stwórz</button>
+          </template>
+        </template>
+        <template v-if="createNewSet">
+          <button @click="togggleButtonVisible()">Powrót</button>
+          Test2
+        </template>
+      </div>
+    </div>
+  </div>
+</template>
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+import { SetProduct, SetsProductParams } from '@/types/SetsTypes'
+
+@Component({
+  components: {
+  }
+})
+export default class AddSetModal extends Vue {
+  public buttonsVisible = true
+  public newSetFromProduct = false
+  public createNewSet = false
+  public word = ''
+  public productId = null
+
+  public searchParams: SetsProductParams = {
+    name: '',
+    symbol: '',
+    manufacturer: '',
+    word: ''
+  };
+
+  public togggleButtonVisible (): void {
+    this.buttonsVisible = true
+    this.newSetFromProduct = false
+    this.createNewSet = false
+  }
+
+  public togggleNewSetFromProduct (): void {
+    this.buttonsVisible = false
+    this.newSetFromProduct = true
+  }
+
+  public togggleCreateNewSet (): void {
+    this.buttonsVisible = false
+    this.createNewSet = true
+  }
+
+  public get products (): SetProduct[] {
+    return this.$store?.getters['SetsService/products']
+  }
+
+  public async searchProducts (): Promise<void> {
+    if (this.word.length > 2) {
+      this.searchParams.word = this.word
+      await this.$store.dispatch('SetsService/loadProducts', this.searchParams)
+    }
+  }
+}
+</script>
+
+<style scoped lang="scss">
+  @import "@/assets/styles/main";
+
+  .c-addSetModal {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: $index-addSetModal;
+  }
+
+  .overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background: $cl-black00;
+    opacity: 0.5;
+    z-index: $index-addSetModalOverlay;
+  }
+
+  .c-modal {
+    max-width: 100%;
+    width: 450px;
+    margin: 150px auto;
+    background: $cl-whiteff;
+    padding: 50px;
+    z-index: $index-addSetModalContent;
+  }
+</style>
