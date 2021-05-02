@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import setRepository from '@/store/repositories/SetsRepository'
 import { Set, SetParams, SetProduct, SetProductParams, SetsCount, SetsProductParams, SetsStore } from '@/types/SetsTypes'
 
@@ -113,6 +116,19 @@ const actions = {
     commit(SETS_SET_IS_LOADING, true)
     return setRepository
       .setItemUpdate(set)
+      .then((data: any) => {
+        commit(SETS_SET_IS_LOADING, false)
+        return data
+      })
+      .catch((error: any) => {
+        console.log(error)
+        commit(SETS_SET_ERROR, error.message)
+      })
+  },
+  addSetProduct ({ commit }: any, params: SetProductParams) {
+    commit(SETS_SET_IS_LOADING, true)
+    return setRepository
+      .setProductAdd(params)
       .then((data: any) => {
         commit(SETS_SET_IS_LOADING, false)
         return data

@@ -86,9 +86,9 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./resources/layout/dist/js/app.87c33009.js":
+/***/ "./resources/layout/dist/js/app.e981a2c2.js":
 /*!**************************************************!*\
-  !*** ./resources/layout/dist/js/app.87c33009.js ***!
+  !*** ./resources/layout/dist/js/app.e981a2c2.js ***!
   \**************************************************/
 /*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
@@ -198,6 +198,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     t.exports = n("cd49");
   },
   "17b2": function b2(t, e, n) {},
+  "22b5": function b5(t, e, n) {},
   "2f36": function f36(t, e, n) {
     "use strict";
 
@@ -208,30 +209,29 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
     n("6302");
   },
-  "4b82": function b82(t, e, n) {
-    "use strict";
-
-    n("bdce");
-  },
   "4d8a": function d8a(t, e, n) {
     "use strict";
 
     n("e075");
   },
+  "5e03": function e03(t, e, n) {
+    "use strict";
+
+    n("22b5");
+  },
   6302: function _(t, e, n) {},
   "75e7": function e7(t, e, n) {},
   "7cc0": function cc0(t, e, n) {},
+  "95c7": function c7(t, e, n) {},
   b2a5: function b2a5(t, e, n) {
     "use strict";
 
     n("75e7");
   },
-  bdce: function bdce(t, e, n) {},
-  c3d4: function c3d4(t, e, n) {},
-  c44d: function c44d(t, e, n) {
+  b2fc: function b2fc(t, e, n) {
     "use strict";
 
-    n("c3d4");
+    n("95c7");
   },
   cd49: function cd49(t, e, n) {
     "use strict";
@@ -403,10 +403,10 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
     Object(c["a"])([Object(l["b"])()], m.prototype, "msg", void 0), m = Object(c["a"])([l["a"]], m);
 
-    var v = m,
-        h = v,
-        f = (n("b2a5"), n("2877")),
-        b = Object(f["a"])(h, d, p, !1, null, "34db786d", null),
+    var h = m,
+        f = h,
+        v = (n("b2a5"), n("2877")),
+        b = Object(v["a"])(f, d, p, !1, null, "34db786d", null),
         g = b.exports,
         y = function (t) {
       Object(i["a"])(n, t);
@@ -427,7 +427,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
     var _ = y,
         w = _,
-        S = (n("2f36"), Object(f["a"])(w, s, a, !1, null, "553d7f44", null)),
+        S = (n("2f36"), Object(v["a"])(w, s, a, !1, null, "553d7f44", null)),
         j = S.exports,
         k = function k() {
       var t = this,
@@ -710,7 +710,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
     var E = R,
         T = E,
-        $ = (n("c44d"), Object(f["a"])(T, k, O, !1, null, "0d6391b3", null)),
+        $ = (n("5e03"), Object(v["a"])(T, k, O, !1, null, "f974836c", null)),
         L = $.exports,
         I = function I() {
       var t = this,
@@ -954,13 +954,21 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         key: "addProduct",
         value: function () {
           var t = Object(x["a"])(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function t(e) {
+            var n, r;
             return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function (t) {
               while (1) {
                 switch (t.prev = t.next) {
                   case 0:
-                    return console.log("Produkt: " + e + " number products: " + this.productCount[e]), t.next = 3, this.$emit("load-set");
+                    return r = {
+                      id: e,
+                      setId: this.set.set.id,
+                      stock: this.productCount[e]
+                    }, t.next = 3, null === (n = this.$store) || void 0 === n ? void 0 : n.dispatch("SetsService/addSetProduct", r);
 
                   case 3:
+                    return t.next = 5, this.$emit("load-set");
+
+                  case 5:
                   case "end":
                     return t.stop();
                 }
@@ -991,9 +999,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
     var X = H,
         M = X,
-        W = (n("4b82"), Object(f["a"])(M, z, q, !1, null, "4b24d5b6", null)),
+        W = (n("b2fc"), Object(v["a"])(M, z, q, !1, null, "e22f386a", null)),
         D = W.exports,
-        U = function U() {
+        J = function J() {
       var t = this,
           e = t.$createElement,
           n = t._self._c || e;
@@ -1070,8 +1078,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         }
       }, [t._v("Zapisz")])]) : t._e();
     },
-        F = [],
-        J = function (t) {
+        U = [],
+        A = function (t) {
       Object(i["a"])(n, t);
       var e = Object(u["a"])(n);
 
@@ -1136,13 +1144,13 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       }]), n;
     }(l["c"]);
 
-    Object(c["a"])([Object(l["d"])("set")], J.prototype, "setOldValues", null), J = Object(c["a"])([Object(l["a"])({
+    Object(c["a"])([Object(l["d"])("set")], A.prototype, "setOldValues", null), A = Object(c["a"])([Object(l["a"])({
       components: {}
-    })], J);
+    })], A);
 
-    var Z = J,
-        A = Z,
-        V = (n("d6cc"), Object(f["a"])(A, U, F, !1, null, "60a43fca", null)),
+    var F = A,
+        Z = F,
+        V = (n("d6cc"), Object(v["a"])(Z, J, U, !1, null, "60a43fca", null)),
         G = V.exports,
         Y = function Y() {
       var t = this,
@@ -1310,7 +1318,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
     var Q = K,
         tt = Q,
-        et = (n("442a"), Object(f["a"])(tt, Y, B, !1, null, "29dc364c", null)),
+        et = (n("442a"), Object(v["a"])(tt, Y, B, !1, null, "29dc364c", null)),
         nt = et.exports,
         rt = function (t) {
       Object(i["a"])(n, t);
@@ -1387,7 +1395,7 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     var st,
         at = rt,
         ot = at,
-        it = (n("4d8a"), Object(f["a"])(ot, I, N, !1, null, "cadd3aa6", null)),
+        it = (n("4d8a"), Object(v["a"])(ot, I, N, !1, null, "cadd3aa6", null)),
         ut = it.exports,
         ct = n("2f62"),
         lt = n("ade3"),
@@ -1433,6 +1441,35 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
                     body: JSON.stringify({
                       name: t.name,
                       number: t.number
+                    })
+                  }).then(function (t) {
+                    return t.json();
+                  }));
+
+                case 1:
+                case "end":
+                  return e.stop();
+              }
+            }
+          }, e);
+        }))();
+      },
+      setProductAdd: function setProductAdd(t) {
+        return Object(x["a"])(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function e() {
+          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function (e) {
+            while (1) {
+              switch (e.prev = e.next) {
+                case 0:
+                  return e.abrupt("return", fetch(P("api/sets/" + t.setId + "/products/"), {
+                    method: "POST",
+                    credentials: "same-origin",
+                    headers: new Headers({
+                      "Content-Type": "application/json; charset=utf-8",
+                      "X-Requested-Width": "XMLHttpRequest"
+                    }),
+                    body: JSON.stringify({
+                      product_id: t.id,
+                      stock: t.stock
                     })
                   }).then(function (t) {
                     return t.json();
@@ -1640,9 +1677,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     }),
         pt = "SETS_SET_ALL",
         mt = "SETS_SET_SETITEM",
-        vt = "SETS_SET_ERROR",
-        ht = "SETS_SET_IS_LOADING",
-        ft = "SETS_SET_PRODUCTS",
+        ht = "SETS_SET_ERROR",
+        ft = "SETS_SET_IS_LOADING",
+        vt = "SETS_SET_PRODUCTS",
         bt = !0,
         gt = {
       error: "",
@@ -1671,74 +1708,82 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         _t = {
       loadSets: function loadSets(t) {
         var e = t.commit;
-        return e(ht, !0), dt.getSets().then(function (t) {
-          return e(ht, !1), e(pt, t), t;
+        return e(ft, !0), dt.getSets().then(function (t) {
+          return e(ft, !1), e(pt, t), t;
         })["catch"](function (t) {
-          e(vt, t.message);
+          e(ht, t.message);
         });
       },
       completing: function completing(t, e) {
         var n = t.commit;
-        return n(ht, !0), dt.completingSets(e).then(function (t) {
-          return n(ht, !1), t;
+        return n(ft, !0), dt.completingSets(e).then(function (t) {
+          return n(ft, !1), t;
         })["catch"](function (t) {
-          n(vt, t.message);
+          n(ht, t.message);
         });
       },
       disassembly: function disassembly(t, e) {
         var n = t.commit;
-        return n(ht, !0), dt.disassemblySets(e).then(function (t) {
-          return n(ht, !1), t;
+        return n(ft, !0), dt.disassemblySets(e).then(function (t) {
+          return n(ft, !1), t;
         })["catch"](function (t) {
-          n(vt, t.message);
+          n(ht, t.message);
         });
       },
       "delete": function _delete(t, e) {
         var n = t.commit;
-        return n(ht, !0), dt.deleteSet(e).then(function (t) {
-          return n(ht, !1), t;
+        return n(ft, !0), dt.deleteSet(e).then(function (t) {
+          return n(ft, !1), t;
         })["catch"](function (t) {
-          n(vt, t.message);
+          n(ht, t.message);
         });
       },
       loadProducts: function loadProducts(t, e) {
         var n = t.commit;
-        return n(ht, !0), dt.products(e).then(function (t) {
-          return n(ht, !1), n(ft, t), t;
+        return n(ft, !0), dt.products(e).then(function (t) {
+          return n(ft, !1), n(vt, t), t;
         })["catch"](function (t) {
-          n(vt, t.message);
+          n(ht, t.message);
         });
       },
       loadSet: function loadSet(t, e) {
         var n = t.commit;
-        return n(ht, !0), dt.setItem(e).then(function (t) {
-          return n(ht, !1), n(mt, t), t;
+        return n(ft, !0), dt.setItem(e).then(function (t) {
+          return n(ft, !1), n(mt, t), t;
         })["catch"](function (t) {
-          console.log(t), n(vt, t.message);
+          console.log(t), n(ht, t.message);
         });
       },
       updateSet: function updateSet(t, e) {
         var n = t.commit;
-        return n(ht, !0), dt.setItemUpdate(e).then(function (t) {
-          return n(ht, !1), t;
+        return n(ft, !0), dt.setItemUpdate(e).then(function (t) {
+          return n(ft, !1), t;
         })["catch"](function (t) {
-          console.log(t), n(vt, t.message);
+          console.log(t), n(ht, t.message);
+        });
+      },
+      addSetProduct: function addSetProduct(t, e) {
+        var n = t.commit;
+        return n(ft, !0), dt.setProductAdd(e).then(function (t) {
+          return n(ft, !1), t;
+        })["catch"](function (t) {
+          console.log(t), n(ht, t.message);
         });
       },
       updateSetProduct: function updateSetProduct(t, e) {
         var n = t.commit;
-        return n(ht, !0), dt.setProductUpdate(e).then(function (t) {
-          return n(ht, !1), t;
+        return n(ft, !0), dt.setProductUpdate(e).then(function (t) {
+          return n(ft, !1), t;
         })["catch"](function (t) {
-          console.log(t), n(vt, t.message);
+          console.log(t), n(ht, t.message);
         });
       },
       deleteSetProduct: function deleteSetProduct(t, e) {
         var n = t.commit;
-        return n(ht, !0), dt.setProductDelete(e).then(function (t) {
-          return n(ht, !1), t;
+        return n(ft, !0), dt.setProductDelete(e).then(function (t) {
+          return n(ft, !1), t;
         })["catch"](function (t) {
-          console.log(t), n(vt, t.message);
+          console.log(t), n(ht, t.message);
         });
       }
     },
@@ -1746,11 +1791,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       t.sets = e;
     }), Object(lt["a"])(st, mt, function (t, e) {
       t.set = e;
-    }), Object(lt["a"])(st, ft, function (t, e) {
-      t.products = e;
     }), Object(lt["a"])(st, vt, function (t, e) {
-      t.error = e;
+      t.products = e;
     }), Object(lt["a"])(st, ht, function (t, e) {
+      t.error = e;
+    }), Object(lt["a"])(st, ft, function (t, e) {
       t.isLoading = e;
     }), st),
         St = {
@@ -2569,12 +2614,12 @@ try {
 
 /***/ 1:
 /*!********************************************************!*\
-  !*** multi ./resources/layout/dist/js/app.87c33009.js ***!
+  !*** multi ./resources/layout/dist/js/app.e981a2c2.js ***!
   \********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(/*! /home/adrian/admin-panel/resources/layout/dist/js/app.87c33009.js */"./resources/layout/dist/js/app.87c33009.js");
+module.exports = __webpack_require__(/*! /home/adrian/admin-panel/resources/layout/dist/js/app.e981a2c2.js */"./resources/layout/dist/js/app.e981a2c2.js");
 
 
 /***/ })

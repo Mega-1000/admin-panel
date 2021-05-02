@@ -64,7 +64,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { Set, SetProduct, SetsProductParams } from '@/types/SetsTypes'
+import { Set } from '@/types/SetsTypes'
 import { getFullUrl } from '@/helpers/urls'
 
 @Component({
@@ -93,19 +93,16 @@ export default class SetsList extends Vue {
   }
 
   public async completing (setId: number, count: number): Promise<void> {
-    console.log('Zestaw: ' + setId + '  sztuk: ' + count)
     await this.$store.dispatch('SetsService/completing', { setId: setId, count: count })
     await this.$store?.dispatch('SetsService/loadSets')
   }
 
   public async disassembly (setId: number, count: number): Promise<void> {
-    console.log('Zestaw: ' + setId + '  sztuk: ' + count)
     await this.$store.dispatch('SetsService/disassembly', { setId: setId, count: count })
     await this.$store?.dispatch('SetsService/loadSets')
   }
 
   public async deleteSet (setId: number): Promise<void> {
-    console.log('Zestaw: ' + setId)
     await this.$store.dispatch('SetsService/delete', setId)
     await this.$store?.dispatch('SetsService/loadSets')
   }

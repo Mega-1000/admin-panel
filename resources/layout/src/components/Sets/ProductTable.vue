@@ -46,7 +46,7 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { SetProduct, SetsProductParams, Set } from '@/types/SetsTypes'
+import { SetProduct, SetsProductParams, Set, SetProductParams } from '@/types/SetsTypes'
 
 @Component({
   components: {
@@ -107,8 +107,13 @@ export default class ProductTable extends Vue {
     return tempPtoducts
   }
 
-  public async addProduct (productId: number): Promise<void> {
-    console.log('Produkt: ' + productId + ' number products: ' + this.productCount[productId])
+  public async addProduct (id: number): Promise<void> {
+    const params: SetProductParams = {
+      id: id,
+      setId: this.set.set.id,
+      stock: this.productCount[id]
+    }
+    await this.$store?.dispatch('SetsService/addSetProduct', params)
     await this.$emit('load-set')
   }
 
