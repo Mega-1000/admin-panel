@@ -698,7 +698,10 @@ class TasksController extends Controller
             $end->second = 0;
             $task->TaskTime->date_end = $end;
             $task->status = Task::FINISHED;
-            $task->description = $request->description;
+            if (!empty($request->description)) {
+                $task->order->warehouse_notice .= Order::formatMessage($task->user, $request->description);
+                $task->order->save();
+            }
             $task->TaskTime->save();
 
             $response = $this->markTaskAsProduced($task);
