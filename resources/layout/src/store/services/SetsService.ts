@@ -50,6 +50,10 @@ const actions = {
       .getSets()
       .then((data: any) => {
         commit(SETS_SET_IS_LOADING, false)
+        if (data.error_code) {
+          console.log(data)
+          commit(SETS_SET_ERROR, data.error_message)
+        }
         commit(SETS_SET_ALL, data)
         return data
       })
@@ -64,6 +68,10 @@ const actions = {
       .completingSets(set)
       .then((data: any) => {
         commit(SETS_SET_IS_LOADING, false)
+        if (data.error_code) {
+          console.log(data)
+          commit(SETS_SET_ERROR, data.error_message)
+        }
         return data
       })
       .catch((error: any) => {
@@ -77,6 +85,10 @@ const actions = {
       .disassemblySets(set)
       .then((data: any) => {
         commit(SETS_SET_IS_LOADING, false)
+        if (data.error_code) {
+          console.log(data)
+          commit(SETS_SET_ERROR, data.error_message)
+        }
         return data
       })
       .catch((error: any) => {
@@ -90,6 +102,10 @@ const actions = {
       .deleteSet(id)
       .then((data: any) => {
         commit(SETS_SET_IS_LOADING, false)
+        if (data.error_code) {
+          console.log(data)
+          commit(SETS_SET_ERROR, data.error_message)
+        }
         return data
       })
       .catch((error: any) => {
@@ -103,6 +119,10 @@ const actions = {
       .products(params)
       .then((data: any) => {
         commit(SETS_SET_IS_LOADING, false)
+        if (data.error_code) {
+          console.log(data)
+          commit(SETS_SET_ERROR, data.error_message)
+        }
         commit(SETS_SET_PRODUCTS, data)
         return data
       })
@@ -116,6 +136,10 @@ const actions = {
       .setItem(id)
       .then((data: any) => {
         commit(SETS_SET_IS_LOADING, false)
+        if (data.error_code) {
+          console.log(data)
+          commit(SETS_SET_ERROR, data.error_message)
+        }
         commit(SETS_SET_SETITEM, data)
         return data
       })
@@ -130,6 +154,10 @@ const actions = {
       .setItemUpdate(set)
       .then((data: any) => {
         commit(SETS_SET_IS_LOADING, false)
+        if (data.error_code) {
+          console.log(data)
+          commit(SETS_SET_ERROR, data.error_message)
+        }
         return data
       })
       .catch((error: any) => {
@@ -143,6 +171,10 @@ const actions = {
       .createSetFromProduct(productId)
       .then((data: any) => {
         commit(SETS_SET_IS_LOADING, false)
+        if (data.error_code) {
+          console.log(data)
+          commit(SETS_SET_ERROR, data.error_message)
+        }
         return data
       })
       .catch((error: any) => {
@@ -156,6 +188,10 @@ const actions = {
       .createSet(params)
       .then((data: any) => {
         commit(SETS_SET_IS_LOADING, false)
+        if (data.error_code) {
+          console.log(data)
+          commit(SETS_SET_ERROR, data.error_message)
+        }
         return data
       })
       .catch((error: any) => {
@@ -169,6 +205,10 @@ const actions = {
       .setProductAdd(params)
       .then((data: any) => {
         commit(SETS_SET_IS_LOADING, false)
+        if (data.error_code) {
+          console.log(data)
+          commit(SETS_SET_ERROR, data.error_message)
+        }
         return data
       })
       .catch((error: any) => {
@@ -182,11 +222,15 @@ const actions = {
       .setProductUpdate(params)
       .then((data: any) => {
         commit(SETS_SET_IS_LOADING, false)
+        if (data.error_code) {
+          console.log(data)
+          commit(SETS_SET_ERROR, data.error_message)
+        }
         return data
       })
       .catch((error: any) => {
         console.log(error)
-        commit(SETS_SET_ERROR, error.message)
+        commit(SETS_SET_ERROR, error)
       })
   },
   deleteSetProduct ({ commit }: any, params: SetProductParams) {
@@ -195,6 +239,10 @@ const actions = {
       .setProductDelete(params)
       .then((data: any) => {
         commit(SETS_SET_IS_LOADING, false)
+        if (data.error_code) {
+          console.log(data)
+          commit(SETS_SET_ERROR, data.error_message)
+        }
         return data
       })
       .catch((error: any) => {
@@ -208,6 +256,10 @@ const actions = {
       .productsStock(setId)
       .then((data: any) => {
         commit(SETS_SET_IS_LOADING, false)
+        if (data.error_code) {
+          console.log(data)
+          commit(SETS_SET_ERROR, data.error_message)
+        }
         commit(SETS_SET_PRODUCTS_STOCKS, data)
         return data
       })

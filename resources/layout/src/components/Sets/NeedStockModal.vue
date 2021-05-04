@@ -4,12 +4,14 @@
     <div class="c-modal">
       <div class="header">
         <p>Brakuje towaru na półce. Przenieś asortyment aby móc stworzyć zestaw</p>
-        <span @click="$emit('close')">X</span>
+        <span @click="$emit('close')" class="close">X</span>
       </div>
       <div class="content">
         <ul>
           <li v-for="product in products" :key="product.id">
-            <b>{{ product.symbol }}</b> => {{ product.name }} <b>Wymagana Ilość: {{ product.stock*count }}</b>
+            <a :href="getProductUrl(product.id)" target="_blank">
+              <span>{{ product.symbol }}</span> => {{ product.name }} <span>Wymagana Ilość: {{ product.stock*count }}</span>
+            </a>
           </li>
         </ul>
       </div>
@@ -19,6 +21,7 @@
 <script lang="ts">
 import { Component, Vue, Prop } from 'vue-property-decorator'
 import { SetProduct, Set } from '@/types/SetsTypes'
+import { getFullUrl } from '@/helpers/urls'
 
 @Component({
   components: {
@@ -30,16 +33,14 @@ export default class NeedStockModal extends Vue {
   @Prop() public count!: number
 
   // public get products (): SetProduct[] {
-  //   return this.set.products.filter((product) => this.needStock.find((number) => number === product.id))
+  //   return this.set.products.filter((product) => this.needStock.includes(product.id))
   // }
   public get products (): SetProduct[] {
     return this.set.products
   }
 
-  public mounted (): void {
-    console.log(this.needStock)
-    console.log(this.set)
-    console.log(this.count)
+  public getProductUrl (id:number): string {
+    return getFullUrl('admin/products/stocks/' + id + '/edit')
   }
 }
 </script>
@@ -54,6 +55,13 @@ export default class NeedStockModal extends Vue {
     top: 0;
     left: 0;
     z-index: $index-addSetModal;
+    text-align: left;
+  }
+
+  .close {
+    position: absolute;
+    right: 10px;
+    top: 10px;
   }
 
   .overlay {
@@ -69,10 +77,15 @@ export default class NeedStockModal extends Vue {
 
   .c-modal {
     max-width: 100%;
-    width: 450px;
+    width: 750px;
     margin: 150px auto;
     background: $cl-whiteff;
     padding: 50px;
     z-index: $index-addSetModalContent;
+    position: relative;
+  }
+
+  span {
+    font-weight: 600;
   }
 </style>

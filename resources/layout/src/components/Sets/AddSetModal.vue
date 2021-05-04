@@ -4,12 +4,12 @@
     <div class="c-modal">
       <div class="header">
           <p>Dodaj nowy zestaw</p>
-          <span @click="$emit('close')">X</span>
+          <span @click="$emit('close')" class="close">X</span>
       </div>
       <div class="content">
         <template v-if="buttonsVisible">
-          <button @click="togggleCreateNewSet()">Stwórz nowy zestaw</button>
-          <button @click="togggleNewSetFromProduct()">Stwórz nowy zestaw z istniejącego produktu</button>
+          <button class="btn btn-sm btn-success" @click="togggleCreateNewSet()">Stwórz nowy zestaw</button>
+          <button class="btn btn-sm btn-warning" @click="togggleNewSetFromProduct()">Stwórz nowy zestaw z istniejącego produktu</button>
         </template>
         <template v-if="newSetFromProduct">
           <button @click="togggleButtonVisible()">Powrót</button>
@@ -133,6 +133,12 @@ export default class AddSetModal extends Vue {
     z-index: $index-addSetModal;
   }
 
+  .close {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+  }
+
   .overlay {
     position: absolute;
     width: 100%;
@@ -151,5 +157,10 @@ export default class AddSetModal extends Vue {
     background: $cl-whiteff;
     padding: 50px;
     z-index: $index-addSetModalContent;
+    position: relative;
+  }
+
+  span {
+    font-weight: 600;
   }
 </style>

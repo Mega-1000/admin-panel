@@ -15,9 +15,7 @@ class SetsController extends Controller
 {
     public function index()
     {
-        $sets = Set::get()->all();
-
-        return  view('product_stocks.sets.index', compact('sets'));
+        return  view('product_stocks.sets.index');
     }
 
     public function create()
@@ -27,11 +25,7 @@ class SetsController extends Controller
 
     public function edit(Set $set)
     {
-        $set = Set::find($set->id)->get()->first();
-        $products = Product::get()->all();
-        $setItems = $set->products();
-
-        return  view('product_stocks.sets.edit', compact(['set', 'products', 'setItems']));
+        return  view('product_stocks.sets.edit');
     }
 
     public function store(Request $request)
