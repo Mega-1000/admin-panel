@@ -46,4 +46,11 @@ class AllegroDisputeController extends Controller
         return redirect('/admin/disputes/view/' . $dispute->id);
     }
 
+    public function getAttachment($url)
+    {
+        $url = base64_decode($url);
+        $path = $this->allegroDisputeService->getAttachment($url);
+        return response()->download($path);
+    }
+
 }
