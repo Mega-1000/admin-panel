@@ -165,7 +165,7 @@
                             <input id="warehouse-done-notice-input" class="form-control" name="warehouse_notice" type="text">
                         </div>
                         <div class="form-group" id="task_description">
-                            <label for="task_description_input">Opis przebiegu zadania</label>
+                            <label for="description">Opis przebiegu zadania</label>
                             <textarea class="form-control" id="task_description_input" name="description" rows="3"></textarea>
                         </div>
                     </form>
