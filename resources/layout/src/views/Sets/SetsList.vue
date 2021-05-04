@@ -1,6 +1,7 @@
 <template>
   <div class="v-setsList">
     <Error></Error>
+    <NeedStockModal v-if="needStock.length > 0" :need-stock="needStock" :set="needStockSet" :count="needCount" @close="restoreNeedStock()"></NeedStockModal>
     <a class="btn btn-success" id="create__button" @click="toggleShowAddModal()">Stwórz</a>
     <AddSetModal v-if="showAddModal" @close="toggleShowAddModal()" @load-sets="loadSets()"></AddSetModal>
     <table class="table">
@@ -20,10 +21,10 @@
       <tbody>
         <tr v-for="(item, index) in sets" :key="index">
           <td>{{ index }}</td>
-          <td> {{ item.set[0].product_id }} </td>
-          <td> {{ item.set[0].name }} </td>
-          <td> {{ item.set[0].number }} </td>
-          <td> {{ item.set[0].stock }} </td>
+          <td> {{ item.set.product_id }} </td>
+          <td> {{ item.set.name }} </td>
+          <td> {{ item.set.number }} </td>
+          <td> {{ item.set.stock }} </td>
           <td>
             <ul>
               <li v-for="product in item.products" :key="product.id">
@@ -37,7 +38,7 @@
               <input type="number" class="form-control" name="number" min="1" v-model="completingSet[index]">
             </div>
             <button class="btn btn-sm btn-primary" type="submit">
-              <span class="hidden-xs hidden-sm" @click="completing(index, completingSet[index])">Stwórz</span>
+              <span class="hidden-xs hidden-sm" @click="completing(item, completingSet[index])">Stwórz</span>
             </button>
           </td>
           <td>
@@ -67,13 +68,15 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { Set } from '@/types/SetsTypes'
+import { ProductStocks, Set } from '@/types/SetsTypes'
 import { getFullUrl } from '@/helpers/urls'
 import AddSetModal from '@/components/Sets/AddSetModal.vue'
 import Error from '@/components/Error.vue'
+import NeedStockModal from '@/components/Sets/NeedStockModal.vue'
 
 @Component({
   components: {
+    NeedStockModal,
     Error,
     AddSetModal
   }
@@ -82,6 +85,12 @@ export default class SetsList extends Vue {
   public completingSet: number[] = []
 
   public disassemblySet: number[] = []
+
+  public needStock: number[] = []
+
+  public needStockSet: Set | null = null
+
+  public needCount = 0
 
   public showAddModal = false
 
@@ -101,13 +110,19 @@ export default class SetsList extends Vue {
     return getFullUrl('/admin/products/sets/nowy')
   }
 
+  private get productsStocks (): ProductStocks[] {
+    return this.$store?.getters['SetsService/productsStocks']
+  }
+
   public async mounted (): Promise<void> {
     await this.$store?.dispatch('SetsService/loadSets')
   }
 
-  public async completing (setId: number, count: number): Promise<void> {
-    await this.$store.dispatch('SetsService/completing', { setId: setId, count: count })
-    await this.loadSets()
+  public async completing (item: Set, count: number): Promise<void> {
+    if (await this.checkStock(item, count)) {
+      await this.$store.dispatch('SetsService/completing', { setId: item.set.id, count: count })
+      await this.loadSets()
+    }
   }
 
   public async disassembly (setId: number, count: number): Promise<void> {
@@ -122,6 +137,26 @@ export default class SetsList extends Vue {
 
   private async loadSets (): Promise<void> {
     await this.$store?.dispatch('SetsService/loadSets')
+  }
+
+  private async checkStock (item: Set, count: number): Promise<boolean> {
+    await this.$store.dispatch('SetsService/getProductsStocks', item.set.id)
+    this.productsStocks.forEach((item) => {
+      if (item.stocks.length === 0 || item.stocks[0]?.position_quantity < count) {
+        this.needStock.push(item.id)
+      }
+    })
+    if (this.needStock.length > 0) {
+      this.needStockSet = item
+      this.needCount = count
+    }
+    return (this.needStock.length === 0)
+  }
+
+  public restoreNeedStock (): void{
+    this.needStockSet = null
+    this.needStock = []
+    this.needCount = 0
   }
 }
 </script>

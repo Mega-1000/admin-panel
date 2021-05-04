@@ -193,5 +193,18 @@ export default {
       .then((response) => {
         return response.json()
       })
+  },
+  async productsStock (setId: number): Promise<any> {
+    return fetch(getFullUrl('api/sets/' + setId + '/products'), {
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/json; charset=utf-8',
+        'X-Requested-Width': 'XMLHttpRequest'
+      })
+    })
+      .then((response) => {
+        return response.json()
+      })
   }
 }

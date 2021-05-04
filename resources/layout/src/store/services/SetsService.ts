@@ -3,7 +3,7 @@
 
 import setRepository from '@/store/repositories/SetsRepository'
 import {
-  CreateSetParams,
+  CreateSetParams, ProductStocks,
   Set,
   SetParams,
   SetProduct,
@@ -18,7 +18,8 @@ import {
   SETS_SET_ERROR,
   SETS_SET_IS_LOADING,
   SETS_SET_PRODUCTS,
-  SETS_SET_SETITEM
+  SETS_SET_SETITEM,
+  SETS_SET_PRODUCTS_STOCKS
 } from '@/store/mutation-types'
 
 const namespaced = true
@@ -28,7 +29,8 @@ const state: SetsStore = {
   isLoading: false,
   sets: [],
   products: [],
-  set: null
+  set: null,
+  productsStocks: []
 }
 
 const getters = {
@@ -36,7 +38,8 @@ const getters = {
   error: (state: SetsStore) => state.error,
   sets: (state: SetsStore) => state.sets,
   set: (state: SetsStore) => state.set,
-  products: (state: SetsStore) => state.products
+  products: (state: SetsStore) => state.products,
+  productsStocks: (state: SetsStore) => state.productsStocks
 }
 
 const actions = {
@@ -198,6 +201,20 @@ const actions = {
         console.log(error)
         commit(SETS_SET_ERROR, error.message)
       })
+  },
+  getProductsStocks ({ commit }: any, setId: number) {
+    commit(SETS_SET_IS_LOADING, true)
+    return setRepository
+      .productsStock(setId)
+      .then((data: any) => {
+        commit(SETS_SET_IS_LOADING, false)
+        commit(SETS_SET_PRODUCTS_STOCKS, data)
+        return data
+      })
+      .catch((error: any) => {
+        console.log(error)
+        commit(SETS_SET_ERROR, error.message)
+      })
   }
 }
 
@@ -216,6 +233,9 @@ const mutations = {
   },
   [SETS_SET_IS_LOADING] (state: SetsStore, isLoading: boolean) {
     state.isLoading = isLoading
+  },
+  [SETS_SET_PRODUCTS_STOCKS] (state: SetsStore, productsStocks: ProductStocks[]) {
+    state.productsStocks = productsStocks
   }
 }
 

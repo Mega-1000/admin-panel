@@ -37,5 +37,6 @@ export default class Error extends Vue {
     background: $cl-red9c;
     border-radius: 20px;
     padding: 20px;
+    z-index: $index-alert;
   }
 </style>

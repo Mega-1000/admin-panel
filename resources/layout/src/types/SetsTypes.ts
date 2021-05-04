@@ -24,12 +24,30 @@ export interface Set {
   products: SetProduct[]
 }
 
+export interface Stock {
+  bookstand: string
+  created_at: string
+  id: number
+  lane: string
+  position: string
+  position_quantity: number
+  product_stock_id: number
+  shelf: string
+  updated_at: string
+}
+
+export interface ProductStocks {
+  id: number,
+  stocks: Stock[]
+}
+
 export interface SetsStore {
   error: string,
   isLoading: boolean,
   sets: Set[],
   products: SetProduct[],
-  set: Set | null
+  set: Set | null,
+  productsStocks: ProductStocks[]
 }
 
 export interface SetsCount {
