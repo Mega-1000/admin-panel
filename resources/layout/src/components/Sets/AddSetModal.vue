@@ -12,7 +12,7 @@
           <button class="btn btn-sm btn-warning" @click="togggleNewSetFromProduct()">Stwórz nowy zestaw z istniejącego produktu</button>
         </template>
         <template v-if="newSetFromProduct">
-          <button @click="togggleButtonVisible()">Powrót</button>
+          <button class="btn btn-sm btn-info" @click="togggleButtonVisible()">Powrót</button>
           <div class="form-group">
             <label>Wyszukaj produkt</label>
             <input type="text" class="form-control" v-on:keyup="searchProducts()" v-model="word">
@@ -40,7 +40,7 @@
               <input type="number" class="form-control" id="price" v-model="price">
             </div>
           </div>
-          <button @click="createSet()">Stwórz</button>
+          <button class="btn btn-sm btn-success" @click="createSet()">Stwórz</button>
         </template>
       </div>
     </div>

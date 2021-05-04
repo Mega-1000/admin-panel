@@ -205,6 +205,10 @@ export default class SetsList extends Vue {
     top: 10px;
   }
 
+  span {
+    font-weight: 600;
+  }
+
   .error {
     position: fixed;
     top: 0;

@@ -1,5 +1,6 @@
 <template>
   <div class="v-setEdit">
+    <a class="btn btn-info" :href="getSetsLink">Powrót do listy zestawów</a>
     <div class="error" v-if="message">
       <span @click="close()" class="close">X</span>
       <p>{{ message }}</p>
@@ -14,6 +15,7 @@ import { Component, Vue, Watch } from 'vue-property-decorator'
 import ProductTable from '@/components/Sets/ProductTable.vue'
 import EditForm from '@/components/Sets/EditForm.vue'
 import SetProductsList from '@/components/Sets/SetProductsList.vue'
+import { getFullUrl } from '@/helpers/urls'
 
 @Component({
   components: {
@@ -37,6 +39,10 @@ export default class SetEdit extends Vue {
       await this.$store?.dispatch('SetsService/loadSet', Number(id))
       this.message = this.error
     }
+  }
+
+  public get getSetsLink (): string {
+    return getFullUrl('admin/products/sets')
   }
 
   public get error (): string {
@@ -81,5 +87,9 @@ export default class SetEdit extends Vue {
     border-radius: 10px;
     padding: 25px 30px 20px;
     z-index: $index-alert;
+  }
+
+  .btn-info {
+    margin-bottom: 25px;
   }
 </style>
