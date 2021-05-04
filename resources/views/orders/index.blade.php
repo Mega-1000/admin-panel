@@ -96,14 +96,14 @@
                     <button type="button" class="close" data-dismiss="modal"
                             aria-label="{{ __('voyager::generic.close') }}"><span
                             aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">@lang('orders.task_performing_employee')</h4>
+                    <h4 class="modal-title">@lang('orders.task_get')</h4>
                 </div>
                 <div class="modal-body">
                     <form method="POST" target="_blank" id="print-package-form"
                           action="{{ route('orders.findPackage') }}">
                         @csrf()
                         <div class="form-group">
-                            <label for="user_id">Pracownik realizujący zadanie</label>
+                            <label for="user_id">@lang('orders.task_performing_employee')</label>
                             <select name="user_id" required class="form-control">
                                 <option value="" selected="selected">wybierz użytkownika</option>
                                 @foreach($users as $user)
@@ -156,7 +156,7 @@
                         </div>
                         <div class="form-group">
                             <label for="select-task-for-finish">Wybierz zadanie</label>
-                            <select onchange="taskSelected(this, '#warehouse-done-notice', '#warehouse-done-notice-input')" name="id" id="select-task-for-finish" required class="form-control">
+                            <select onchange="taskSelected(this)" name="id" id="select-task-for-finish" required class="form-control">
                                 <option value="" selected="selected">brak</option>
                             </select>
                         </div>
@@ -164,9 +164,9 @@
                             <label for="warehouse_notice">Podaj nazwę zadania</label>
                             <input id="warehouse-done-notice-input" class="form-control" name="warehouse_notice" type="text">
                         </div>
-                        <div class="form-group">
-                            <label for="description">Opis przebiegu zadania</label>
-                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                        <div class="form-group" id="task_description">
+                            <label for="task_description_input">Opis przebiegu zadania</label>
+                            <textarea class="form-control" id="task_description_input" name="description" rows="3"></textarea>
                         </div>
                     </form>
                 </div>
@@ -910,10 +910,13 @@
         function taskSelected(select, input, control) {
             let selectedOption = select.options[select.selectedIndex];
             if (selectedOption.dataset.order === '') {
-                $(input).show();
+                $('#warehouse-done-notice').show();
+                $('#task_description').hide();
+                $('#task-description-input').val('');
             } else {
-                $(input).hide();
-                $(control).val('');
+                $('#warehouse-done-notice').hide();
+                $('#warehouse-done-notice-input').val('');
+                $('#task_description').show();
             }
         }
         function fetchUsersTasks(user, select) {
@@ -3455,6 +3458,8 @@
     <script>
         $(document).ready(function () {
             localStorage.removeItem('differenceMode');
+            $('#task_description').hide();
+            $('#warehouse-done-notice').hide();
             var getUrlParameter = function getUrlParameter(sParam) {
                 var sPageURL = window.location.search.substring(1),
                     sURLVariables = sPageURL.split('&'),
