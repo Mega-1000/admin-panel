@@ -55,14 +55,11 @@ class OrderStatusChangedToDispatchMail extends Mailable
     public function build()
     {
         if ($this->self == true) {
-            Log::notice('timeout -> emails.order-status-changed-to-dispatch-self');
             return $this->view('emails.order-status-changed-to-dispatch-self');
         } else {
             if ($this->path == null) {
-                Log::notice('timeout -> emails.order-status-changed-to-dispatch');
                 return $this->view('emails.order-status-changed-to-dispatch');
             } else {
-                Log::notice('timeout -> emails.reminder-order-status-changed-to-dispatch');
                 return $this->view('emails.reminder-order-status-changed-to-dispatch')->attach($this->path)->attach($this->pathSecond);
             }
         }

@@ -7,6 +7,7 @@ use App\Entities\ProductStockPosition;
 use App\Http\Requests\ProductStockPositionCreate;
 use App\Http\Requests\ProductStockPositionUpdate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
 use Yajra\DataTables\Facades\DataTables;
 
 /**
@@ -174,6 +175,12 @@ class ProductStockPositionsController extends Controller
         $toPosition->update([
             'position_quantity' => $toPosition->position_quantity + $request->input('quantity__move')
         ]);
+        if (Session::exists('removeLabelJobAfterProductStockMove')) {
+            $response = dispatch_now(Session::get('removeLabelJobAfterProductStockMove'));
+            if (!strlen((string) $response) > 0) {
+                Session::forget('removeLabelJobAfterProductStockMove');
+            }
+        }
     }
 
 }

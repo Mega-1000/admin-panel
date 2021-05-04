@@ -93,3 +93,6 @@ Route::post('chat/removeUser/{token}', 'Api\MessagesController@removeUser')->nam
 Route::post('chat/editPrices/{token}', 'Api\MessagesController@editPrices')->name('api.messages.edit-prices');
 
 Route::post('auth/code/{id}', 'Api\AutheticationController@getToken')->name('api.authenticate.get-token');
+
+Route::group(['prefix' => 'sets', 'as' => 'sets.'], __DIR__ . '/api/ProductsSetsRoutes.php');
+

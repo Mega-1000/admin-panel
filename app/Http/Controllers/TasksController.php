@@ -393,6 +393,7 @@ class TasksController extends Controller
                 })
             ->where('warehouse_id', $id)
             ->whereNull('parent_id')
+            ->whereNull('rendering')
             ->get();
 
         $array = [];

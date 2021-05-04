@@ -17,6 +17,10 @@ Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
     Route::group(['middleware' => 'admin'], function () {
 
+        Route::group(['prefix' => 'products'], function () {
+            Route::group(['prefix' => 'sets', 'as' => 'sets.'], __DIR__ . '/web/ProductsSetsRoutes.php');
+        });
+
         Route::get('/disputes', 'AllegroDisputeController@list');
         Route::get('/disputes/view/{id}', 'AllegroDisputeController@view');
         Route::post('/disputes/send/{id}', 'AllegroDisputeController@sendMessage');

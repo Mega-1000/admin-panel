@@ -3,6 +3,7 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AllegroDispute extends Model
 {
@@ -18,21 +19,9 @@ class AllegroDispute extends Model
         'order_date',
     ];
 
-    // @TODO refactor sello import to include form_id @ orders table
-    // add db indexes
-    public function getOrderAttribute(): string
+    public function order(): BelongsTo
     {
-        $transaction = SelTransaction::where('tr_CheckoutFormId', '=', $this->form_id)->first();
-        if ($transaction) {
-            $order = Order::where('sello_id', '=', $transaction->id)->first();
-        } else {
-            $order = null;
-        }
-        if ($order) {
-            return "<a href='/admin/orders/{$order->id}/edit'>" . $order->id . "</a>";
-        } else {
-            return "b/d";
-        }
+        return $this->belongsTo(Order::class);
     }
 
 }

@@ -24,3 +24,4 @@ yarn-error.log
 docker
 admin-panel.iml
 /public/js/laroute.js
+/public/mix-manifest.json

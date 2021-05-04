@@ -8,9 +8,7 @@ use App\Enums\CourierName;
 use App\Repositories\TaskRepository;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
-use Doctrine\DBAL\Query\QueryBuilder;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Collection;
+use Exception;
 
 class TaskService
 {
@@ -25,7 +23,7 @@ class TaskService
     }
 
     /**
-     *
+     * Get task query
      *
      * @param array $courierArray
      * @return mixed
@@ -80,5 +78,23 @@ class TaskService
             $result[$deliveryTypeName] = $tasksByDay;
         }
         return $result;
+    }
+
+    /**
+     * Prepare task for handling
+     *
+     * @param $package_type
+     * @param $skip
+     * @return mixed
+     * @throws Exception
+     */
+    public function prepareTask($package_type, $skip)
+    {
+        $courierArray = CourierName::DELIVERY_TYPE_FOR_TASKS[$package_type] ?? [];
+        if (empty($courierArray)) {
+            throw new Exception(__('order_packages.message.package_error'));
+        }
+        $task = $this->getTaskQuery($courierArray)->offset($skip)->first();
+        return $task;
     }
 }

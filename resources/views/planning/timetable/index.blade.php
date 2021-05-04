@@ -338,7 +338,7 @@
                 ],
                 header: {
                     left: 'promptResource today prev,next',
-                    center: 'title changeTimeLine twoMins fiveMins fifteenMins',
+                    center: 'title changeTimeLine wholeDay twoMins fiveMins fifteenMins',
                     right: 'resourceTimelineDay,resourceTimelineThreeDays,timeGridWeek,dayGridMonth'
                 },
                 slotWidth: 15,
@@ -379,6 +379,10 @@
                     changeTimeLine: {
                         text: 'Zmień zakres czasu',
                         click: () => renderCalendarExtendTime()
+                    },
+                    wholeDay: {
+                        text: 'Cała doba',
+                        click: () => renderCalendar("00:00:00","23:59:59", document.calendarSlot)
                     },
                     twoMins: {text: '2 minuty', click: () => renderCalendarMins("00:02")},
                     fifteenMins: {text: '15 minut', click: () => renderCalendarMins("00:15")},

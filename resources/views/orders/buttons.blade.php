@@ -427,7 +427,7 @@
         @foreach($couriersTasks as $courierCode => $tasksInDay)
             <div class="row">
                 <button class="btn btn-info print-group col-lg-12"
-                        name="{{ \App\Enums\CourierName::DELIVERY_TYPE_LABELS[$courierCode] }}"
+                        name="{{ $courierCode }}"
                         data-courierTasks="{{ json_encode($tasksInDay) }}">
                     {{ \App\Enums\CourierName::DELIVERY_TYPE_LABELS[$courierCode] }}
                     <div>
