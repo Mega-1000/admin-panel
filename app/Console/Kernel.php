@@ -52,6 +52,8 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\ChangeDdpShipmentDatePackagesJob::class)->dailyAt("12:01");
         $schedule->job(Jobs\UpdateAllegroDisputes::class)->everyMinute();
         $schedule->job(Jobs\GetNewAllegroDisputesJob::class)->everyMinute();
+        $schedule->job(Jobs\FindNewAllegroOrders::class)->everyMinute();
+        $schedule->job(Jobs\SendMessagesOnNewAllegroOrders::class)->everyMinute();
     }
 
     /**

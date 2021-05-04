@@ -7,7 +7,6 @@ use App\Entities\SelTransaction;
 use App\Jobs\AddLabelJob;
 use App\Jobs\RemoveLabelJob;
 use GuzzleHttp\Client;
-use function GuzzleHttp\Psr7\str;
 
 class AllegroDisputeService
 {
@@ -207,7 +206,7 @@ class AllegroDisputeService
     private function request(string $method, string $url, array $params)
     {
         $headers = [
-            #'Accept' => 'application/vnd.allegro.public.v1+json',
+            // 'Accept' => 'application/vnd.allegro.public.v1+json',
             'Authorization' => "Bearer " . $this->getAccessToken(),
             'Content-Type' => 'application/vnd.allegro.public.v1+json'
         ];
