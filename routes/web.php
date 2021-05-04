@@ -20,6 +20,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/disputes', 'AllegroDisputeController@list');
         Route::get('/disputes/view/{id}', 'AllegroDisputeController@view');
         Route::post('/disputes/send/{id}', 'AllegroDisputeController@sendMessage');
+        Route::get('/disputes/attachment/{url}', 'AllegroDisputeController@getAttachment');
 
         Route::get('/bonus', 'BonusController@index')->name('bonus.index');
         Route::post('/bonus', 'BonusController@create')->name('bonus.create');

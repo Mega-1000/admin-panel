@@ -7,6 +7,7 @@ use App\Entities\SelTransaction;
 use App\Jobs\AddLabelJob;
 use App\Jobs\RemoveLabelJob;
 use GuzzleHttp\Client;
+use function GuzzleHttp\Psr7\str;
 
 class AllegroDisputeService
 {
@@ -149,9 +150,17 @@ class AllegroDisputeService
         return json_decode((string)$response->getBody(), true);
     }
 
+    public function getAttachment(string $url)
+    {
+        $response = $this->request('GET', $url, []);
+        $path = '/tmp/' . base64_encode($url);
+        file_put_contents($path, (string)$response->getBody());
+        return $path;
+    }
+
     private function updateLabels(AllegroDispute $dispute)
     {
-        if ($dispute->order_id) {
+        if ($dispute->order_id && $dispute->status != self::STATUS_CLOSED) {
             if ($this->getDisputeMessages($dispute->dispute_id)[0]['author']['role'] != 'SELLER') {
                 dispatch_now(new AddLabelJob($dispute->order->id, [186]));
                 dispatch_now(new RemoveLabelJob($dispute->order->id, [185]));
@@ -159,6 +168,10 @@ class AllegroDisputeService
                 dispatch_now(new AddLabelJob($dispute->order->id, [185]));
                 dispatch_now(new RemoveLabelJob($dispute->order->id, [186]));
             }
+        } else if ($dispute->status == self::STATUS_CLOSED) {
+            dispatch_now(new RemoveLabelJob($dispute->order->id, [186]));
+            dispatch_now(new RemoveLabelJob($dispute->order->id, [185]));
+            dispatch_now(new AddLabelJob($dispute->order->id, [187]));
         }
     }
 
@@ -194,7 +207,7 @@ class AllegroDisputeService
     private function request(string $method, string $url, array $params)
     {
         $headers = [
-            'Accept' => 'application/vnd.allegro.public.v1+json',
+            #'Accept' => 'application/vnd.allegro.public.v1+json',
             'Authorization' => "Bearer " . $this->getAccessToken(),
             'Content-Type' => 'application/vnd.allegro.public.v1+json'
         ];
@@ -203,7 +216,8 @@ class AllegroDisputeService
             $response = $this->client->request(
                 $method,
                 $url,
-                ['headers' => $headers,
+                [
+                    'headers' => $headers,
                     'json' => $params
                 ]
             );

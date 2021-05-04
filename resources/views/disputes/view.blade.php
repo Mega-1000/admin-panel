@@ -20,7 +20,7 @@
                 {{ array_key_exists('text', $message) ? $message['text'] : '' }}
                 <br>
                 @if(array_key_exists('attachment', $message))
-                    <a target="_blank" href="{{ $message['attachment']['url'] }}">{{ $message['attachment']['fileName'] }}</a>
+                    <a target="_blank" href="/admin/disputes/attachment/{{ base64_encode($message['attachment']['url']) }}">{{ $message['attachment']['fileName'] }}</a>
                 @endif
             </li>
         @endforeach
