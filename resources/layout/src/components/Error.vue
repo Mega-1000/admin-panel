@@ -1,30 +1,15 @@
 <template>
-  <div class="error" v-if="isError">
-      <span @click="close()">X</span>
-      <p>{{ message }}</p>
+  <div class="error">
+      <span @click="$emit('close')">X</span>
+      <p>{{ errorMessage }}</p>
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator'
+import { Component, Vue, Prop } from 'vue-property-decorator'
 
 @Component
 export default class Error extends Vue {
-  public isError = false
-  public message = ''
-
-  public close (): void {
-    this.isError = false
-  }
-
-  public get error (): string {
-    return this.$store?.getters['SetsService/error']
-  }
-
-  @Watch('error')
-  private listenError () {
-    this.message = this.error
-    this.isError = true
-  }
+  @Prop() public errorMessage!: string
 }
 </script>
 <style scoped lang="scss">
@@ -37,5 +22,6 @@ export default class Error extends Vue {
     background: $cl-red9c;
     border-radius: 20px;
     padding: 20px;
+    z-index: $index-alert;
   }
 </style>

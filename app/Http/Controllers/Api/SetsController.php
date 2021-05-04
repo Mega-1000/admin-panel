@@ -6,6 +6,7 @@ use App\Entities\ProductStock;
 use App\Entities\ProductStockPosition;
 use App\Http\Controllers\Controller;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Entities\Set;
@@ -19,7 +20,7 @@ class SetsController extends Controller
         $sets = [];
         foreach (Set::get() as $item) {
             $sets[$item->id] = [
-                'set' => [$item],
+                'set' => $item,
                 'products' => $item->products()
             ];
         }
@@ -64,6 +65,21 @@ class SetsController extends Controller
             'stock' => $stock,
             'positions' => ProductStockPosition::where('product_stock_id', $stock->first()->id)->get()->all()
         ];
+    }
+
+    public function stocksAllSetsProducts(Set $set)
+    {
+        $products = collect($set->products())->pluck('product_id');
+        $stocks = [];
+        foreach ($products as $productId) {
+            $stock = ProductStock::where('product_id', $productId)->get()->pluck('id');
+            $stocks[] = [
+                'id' => $productId,
+                'stocks' => ProductStockPosition::whereIn('product_stock_id', $stock)->get()->all()
+            ];
+        }
+
+        return $stocks;
     }
 
     public function store(Request $request)
