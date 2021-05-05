@@ -37,8 +37,7 @@ class Task extends Model implements Transformable
         'color',
         'status',
         'rendering',
-        'parent_id',
-        'description',
+        'parent_id'
     ];
 
     protected static function boot()
