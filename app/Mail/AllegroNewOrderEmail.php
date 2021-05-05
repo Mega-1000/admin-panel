@@ -11,7 +11,7 @@ class AllegroNewOrderEmail extends Mailable
 
     public function build()
     {
-        return $this->view('emails.allegro-new-order.blade.php')
+        return $this->view('emails.allegro-new-order')
             ->subject('Informacje o Twoim zakupie');
     }
 }
