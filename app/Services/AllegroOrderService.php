@@ -45,7 +45,7 @@ class AllegroOrderService
         $orders = json_decode((string)$this->request('GET', $url, [])->getBody(), true)['checkoutForms'];
 
         foreach ($orders as $order) {
-            $orderModel = new AllegroOrder();
+            $orderModel = new AllegroOrder::firstOrNew(['order_id' => $order['id']]);
             $orderModel->order_id = $order['id'];
             $orderModel->buyer_email = $order['buyer']['email'];
             $orderModel->save();
