@@ -2,6 +2,9 @@
 
 use App\Entities\Allegro_Auth;
 use App\Entities\AllegroOrder;
+use App\Facades\Mailer;
+use App\Mail\AllegroNewOrderEmail;
+use App\Mail\TestMail;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Mail;
 
@@ -64,11 +67,9 @@ class AllegroOrderService
         $orderModel->new_order_message_sent = true;
         $orderModel->save();
 
-        Mail::raw(setting('site.new_allegro_order_msg'), function ($message) use ($orderModel) {
-            $message
-                ->to($orderModel->buyer_email)
-                ->subject('Prosimy nie odpowiadać na tę wiadomość.');
-        });
+        \Mailer::create()
+            ->to($orderModel->buyer_email)
+            ->send(new AllegroNewOrderEmail());
     }
 
     public function getAuthCodes()
