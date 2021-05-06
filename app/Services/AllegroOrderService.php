@@ -47,7 +47,6 @@ class AllegroOrderService
             "&updatedAt.gte=" . $today .
             "&status=" . self::READY_FOR_PROCESSING
         );
-        echo $url;
         $orders = json_decode((string)$this->request('GET', $url, [])->getBody(), true)['checkoutForms'];
         foreach ($orders as $order) {
             $orderModel = AllegroOrder::firstOrNew(['order_id' => $order['id']]);
@@ -135,7 +134,6 @@ class AllegroOrderService
                 ]
             );
         } catch (\Exception $e) {
-            echo $e->getMessage();
             if ($e->getCode() == 401) {
                 $this->refreshTokens();
                 $response = $this->request($method, $url, $params);
