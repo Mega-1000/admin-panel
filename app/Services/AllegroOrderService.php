@@ -5,6 +5,7 @@ use App\Entities\AllegroOrder;
 use App\Facades\Mailer;
 use App\Mail\AllegroNewOrderEmail;
 use App\Mail\TestMail;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Mail;
 
@@ -38,12 +39,15 @@ class AllegroOrderService
         $this->authModel = Allegro_Auth::find(self::AUTH_RECORD_ID);
     }
 
-    public function findNewOrders(): void
+    public function findNewOrders()
     {
-        $url = $this->getRestUrl("/order/checkout-forms?offset=0&limit=100&sort=-updatedAt&status=" .
-            self::READY_FOR_PROCESSING);
+        $today = urlencode((new Carbon())->startOfDay()->toIso8601ZuluString());
+        $url = $this->getRestUrl(
+            "/order/checkout-forms?offset=0&limit=100" .
+            "&updatedAt.gte=" . $today .
+            "&status=" . self::READY_FOR_PROCESSING
+        );
         $orders = json_decode((string)$this->request('GET', $url, [])->getBody(), true)['checkoutForms'];
-
         foreach ($orders as $order) {
             $orderModel = AllegroOrder::firstOrNew(['order_id' => $order['id']]);
             $orderModel->order_id = $order['id'];
