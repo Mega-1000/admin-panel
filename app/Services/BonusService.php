@@ -2,6 +2,7 @@
 
 use App\Entities\Order;
 use App\User;
+use Carbon\Carbon;
 
 class BonusService
 {
@@ -9,14 +10,17 @@ class BonusService
     const CONSULTANT_INDEX = -1;
     const WAREHOUSE_INDEX = -2;
 
-    public function getChat()
+    public function getChat(Order $order)
     {
-
+        return json_decode($order->chat, true);
     }
 
-    public function sendMessage()
+    public function sendMessage(Order $order, string $message, User $sender)
     {
-
+        $chat = $this->getChat($order);
+        $chat[$sender->firstname.' '.$sender->lastname] = $message;
+        $order->chat = json_encode($chat);
+        $order->save();
     }
 
     public function findResponsibleUsers(int $orderId): array
@@ -35,17 +39,17 @@ class BonusService
         ];
     }
 
-    public function updateLabels()
+    public function updateLabels(Order $order)
     {
 
     }
 
-    public function generateUserReport()
+    public function generateUserReport(User $user, Carbon $dateFrom, Carbon $dateTo)
     {
 
     }
 
-    public function generateMasterReport()
+    public function generateMasterReport(Carbon $dateFrom, Carbon $dateTo)
     {
 
     }
