@@ -12,14 +12,22 @@
                     <form action="{{ route('bonus.create') }}" id="add_new_bonus_form" method="POST">
                         {{ csrf_field() }}
                         <div class="form-group">
-                            <select name="user_id" required class="form-control">
-                                <option value="-1">Magazynier</option>
-                                <option value="-2">Konsultant</option>
-                            </select>
+                            <div class="form-check">
+                                <input name="user_id" class="form-check-input" type="radio" name="exampleRadios" id="select-consultant" value="-1">
+                                <label class="form-check-label" for="select-consultant">
+                                    Konsultant (<span id="consultant-name"></span>)
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input name="user_id" class="form-check-input" type="radio" name="exampleRadios" id="select-warehouse" value="-2">
+                                <label class="form-check-label" for="select-warehouse">
+                                    Magazynier (<span id="warehouse-name"></span>)
+                                </label>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label>Nr zamówienia</label>
-                            <input disabled id="order_id" value="" class="form-control" name="order_id">
+                            <input readonly="readonly" id="order_id" value="" class="form-control" name="order_id">
                         </div>
                         <div class="form-group">
                             <label>Kwota</label>

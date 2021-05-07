@@ -37,8 +37,13 @@ class BonusController extends Controller
                 'alert-type' => 'error']);
         }
         $data = $request->validated();
-        if (in_array($data['user_id'], [-1, -2])) {
-            $data['user_id'] = $this->service->findResponsibleUser($data['order_id']);
+        if (in_array($data['user_id'], [BonusService::CONSULTANT_INDEX, BonusService::WAREHOUSE_INDEX])) {
+            $users = $this->service->findResponsibleUsers($data['order_id']);
+            if ($data['user_id'] == BonusService::CONSULTANT_INDEX) {
+                $data['user_id'] = $users['consultant']->id;
+            } else {
+                $data['user_id'] = $users['warehouse']->id;
+            }
         }
         $bonus = BonusAndPenalty::create($data);
         if ($data['amount'] > 0) {
@@ -49,6 +54,20 @@ class BonusController extends Controller
         $this->service->updateLabels($bonus);
         return back()->with(['message' => $message,
             'alert-type' => 'success']);
+    }
+
+    public function getResponsibleUsers(int $taskId): \Illuminate\Http\JsonResponse
+    {
+        $users = $this->service->findResponsibleUsers($taskId);
+        $consultantName = is_string($users['consultant']) ?
+            'BRAK' : $users['consultant']->firstname . ' ' . $users['consultant']->lastname;
+        $warehouseName = is_string($users['warehouse']) ?
+            'BRAK' : $users['warehouse']->firstname . ' ' . $users['warehouse']->lastname;
+
+        return response()->json([
+            'consultant' => $consultantName,
+            'warehouse' => $warehouseName
+        ]);
     }
 
     public function destroy(DeleteNewBonus $request)

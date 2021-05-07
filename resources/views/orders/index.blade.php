@@ -896,10 +896,25 @@
     <script>
         @can('create-bonus')
             $(document).on('click', '.penalty', (e)=>{
-                orderId = $(e.target).attr('data-order');
-                console.log(orderId)
+                let orderId = $(e.target).attr('data-order');
                 $('#add_bonus_modal').modal('show');
                 $('#order_id').val(orderId);
+                $('#consultant-name').html('<i class="fas fa-spinner fa-spin  fa-fw"></i>');
+                $('#select-consultant').attr('disabled',true);
+                $('#warehouse-name').html('<i class="fas fa-spinner fa-spin  fa-fw"></i>');
+                $('#select-warehouse').attr('disabled',true);
+
+                $.get('{{ route('bonus.users') }}/'+orderId, (data)=>{
+                    $('#consultant-name').html(data['consultant']);
+                    $('#warehouse-name').html(data['warehouse']);
+
+                    if(data['consultant'] != 'BRAK') {
+                        $('#select-consultant').removeAttr('disabled');
+                    }
+                    if(data['warehouse'] != 'BRAK'){
+                        $('#select-warehouse').removeAttr('disabled');
+                    }
+                });
             });
         @endcan
 
@@ -1446,7 +1461,8 @@
                         data: 'production_date',
                         name: 'production_date',
                         searchable: false,
-                        render: (production_date, option, row) => ((production_date ?? '') + ' ' + (row.taskUserFirstName ?? ''))
+                        render: (production_date, option, row) => ((production_date ?? '') + ' ' + (row.taskUserFirstName ?? '') + ' ' +
+                            (row.taskUserLastName ?? ''))
                     },
                     {
                         data: 'shipment_date',
