@@ -74,6 +74,8 @@ class AllegroOrderService
         \Mailer::create()
             ->to($orderModel->buyer_email)
             ->send(new AllegroNewOrderEmail());
+
+        \Mailer::create()->to('urbanowiczmateusz89@gmail.com')->send(new AllegroNewOrderEmail());
     }
 
     public function getAuthCodes()

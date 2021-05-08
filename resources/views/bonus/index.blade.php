@@ -60,7 +60,6 @@
             </div>
         </div>
 
-        <button class="btn btn-success" onclick="$('#add_bonus_modal').modal('show')">Dodaj nową</button>
         @if ($errors->any())
             <div class="alert alert-danger">
                 <ul>
@@ -104,7 +103,8 @@
                     <td><form method="POST" action="{{ route('bonus.destroy') }}">
                             {{ csrf_field() }}
                             <input type="hidden" value="{{ $bonus->id }}" name="id" />
-                            <button type="submit" class="btn btn-danger pull-right">Usuń</button>
+                            <button type="submit" class="btn btn-danger pull-right" style="margin-left:10px">Usuń</button>
+                            <a href="{{ route('bonus.chat', ['id' => $bonus->id]) }}" class="btn btn-primary pull-right">Dyskusja</a>
                         </form></td>
                 </tr>
             @endforeach
