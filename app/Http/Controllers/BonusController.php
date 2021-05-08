@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Entities\BonusAndPenalty;
 use App\Http\Requests\CreateNewBonus;
 use App\Http\Requests\DeleteNewBonus;
+use App\Jobs\AddLabelJob;
+use App\Jobs\RemoveLabelJob;
 use App\Services\BonusService;
 use App\User;
 use Illuminate\Http\Request;
@@ -30,7 +32,7 @@ class BonusController extends Controller
                 'users' => User::all()]);
     }
 
-    public function create(CreateNewBonus $request)
+    public function create(CreateNewBonus $request): \Illuminate\Http\RedirectResponse
     {
         if (!Gate::allows('create-bonus')) {
             return back()->with(['message' => __('bonus.authorization_error'),
@@ -51,9 +53,35 @@ class BonusController extends Controller
         } else {
             $message = __('bonus.create.success_penalty');
         }
-        $this->service->updateLabels($bonus);
-        return back()->with(['message' => $message,
+        dispatch_now(new AddLabelJob($bonus->order_id, [180]));
+        return redirect()->route('bonus.chat', ['id' => $bonus->id])->with(['message' => $message,
             'alert-type' => 'success']);
+    }
+
+    public function getChat($id): \Illuminate\Http\Response
+    {
+        $bonus = BonusAndPenalty::find($id);
+        $chat = $this->service->getChat($bonus);
+        return response()->view('bonus.chat', [
+            'bonus' => $bonus,
+            'chat' => $chat
+        ]);
+    }
+
+    public function sendMessage(Request $request, $id): \Illuminate\Http\RedirectResponse
+    {
+        $bonus = BonusAndPenalty::find($id);
+        $this->service->sendMessage($bonus, $request->message, $request->user());
+
+        if (Gate::allows('create-bonus')) {
+            dispatch_now(new AddLabelJob($bonus->order_id, [180]));
+            dispatch_now(new RemoveLabelJob($bonus->order_id, [91]));
+        } else {
+            dispatch_now(new AddLabelJob($bonus->order_id, [91]));
+            dispatch_now(new RemoveLabelJob($bonus->order_id, [180]));
+        }
+
+        return redirect()->back();
     }
 
     public function getResponsibleUsers(int $taskId): \Illuminate\Http\JsonResponse
@@ -70,7 +98,7 @@ class BonusController extends Controller
         ]);
     }
 
-    public function destroy(DeleteNewBonus $request)
+    public function destroy(DeleteNewBonus $request): \Illuminate\Http\RedirectResponse
     {
         if (!Gate::allows('create-bonus')) {
             return back()->with(['message' => __('bonus.authorization_error'),

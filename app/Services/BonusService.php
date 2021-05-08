@@ -1,5 +1,6 @@
 <?php namespace App\Services;
 
+use App\Entities\BonusAndPenalty;
 use App\Entities\Order;
 use App\User;
 use Carbon\Carbon;
@@ -10,17 +11,24 @@ class BonusService
     const CONSULTANT_INDEX = -1;
     const WAREHOUSE_INDEX = -2;
 
-    public function getChat(Order $order)
+    public function getChat(BonusAndPenalty $bonus)
     {
-        return json_decode($order->chat, true);
+        if ($bonus->chat) {
+            return json_decode($bonus->chat, true);
+        } else {
+            return [];
+        }
     }
 
-    public function sendMessage(Order $order, string $message, User $sender)
+    public function sendMessage(BonusAndPenalty $bonus, string $message, User $sender)
     {
-        $chat = $this->getChat($order);
-        $chat[$sender->firstname.' '.$sender->lastname] = $message;
-        $order->chat = json_encode($chat);
-        $order->save();
+        $chat = $this->getChat($bonus);
+        $chat[] = [
+            'name' => $sender->firstname . ' ' . $sender->lastname,
+            'message' => $message
+        ];
+        $bonus->chat = json_encode($chat);
+        $bonus->save();
     }
 
     public function findResponsibleUsers(int $orderId): array
@@ -29,7 +37,7 @@ class BonusService
 
         try {
             $warehouse = $order->taskSchedule()->orderBy('created_at', 'desc')->first()->user;
-        } catch (\ErrorException $e){
+        } catch (\ErrorException $e) {
             $warehouse = 'BRAK';
         }
 
@@ -37,21 +45,6 @@ class BonusService
             'warehouse' => $warehouse,
             'consultant' => $order->employee ?: 'BRAK'
         ];
-    }
-
-    public function updateLabels(Order $order)
-    {
-
-    }
-
-    public function generateUserReport(User $user, Carbon $dateFrom, Carbon $dateTo)
-    {
-
-    }
-
-    public function generateMasterReport(Carbon $dateFrom, Carbon $dateTo)
-    {
-
     }
 
 }
