@@ -177,6 +177,9 @@ class CheckPackagesStatusJob
             case envelopeStatusType::PRZYJETY:
                 $package->status = OrderPackage::DELIVERED;
                 break;
+            case envelopeStatusType::WYSLANY:
+                $package->status = OrderPackage::SENDING;
+                break;
         }
         if ($package->isDirty()) {
             $package->save();
