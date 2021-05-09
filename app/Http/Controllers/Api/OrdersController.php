@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Entities\Chat;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\ChatHelper;
 use App\Helpers\GetCustomerForAdminEdit;
@@ -265,7 +266,8 @@ class OrdersController extends Controller
             "INVOICE_ADDRESS" => $order->addresses->where('type', '=', 'INVOICE_ADDRESS')->first(),
             "DELIVERY_LOCK" => $isDeliveryChangeLocked,
             "INVOICE_LOCK" => $isInvoiceChangeLocked,
-            "shipment_date" => $order->shipment_date,
+            "shipment_date" => (!empty($order->date)) ? $order->date->customer_preferred_shipment_date : $order->shipment_date,
+            "delivery_date" => (!empty($order->date)) ? $order->date->customer_preferred_delivery_date : $order->shipment_date,
         ];
     }
 
@@ -283,7 +285,19 @@ class OrdersController extends Controller
             $invoiceAddress = $order->addresses->where('type', '=', 'INVOICE_ADDRESS')->first();
 
             $order->shipment_date = $request->get('shipment_date');
+            $order->date->customer_preferred_shipment_date = $request->get('shipment_date');
+            $order->date->customer_preferred_delivery_date = $request->get('delivery_date');
+            $order->date->save();
             $order->save();
+
+            if (!empty($request->get('delivery_description'))) {
+                $helper = new MessagesHelper();
+                $helper->orderId = $orderId;
+                $helper->currentUserId = $order->customer_id;
+                $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
+                $helper->createNewChat();
+                $helper->addMessage($request->get('delivery_description'));
+            }
 
             if (!$isDeliveryChangeLocked) {
                 $deliveryAddress->update($request->get('DELIVERY_ADDRESS'));

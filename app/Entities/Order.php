@@ -697,4 +697,14 @@ class Order extends Model implements Transformable
 
         return round($orderProfit, 2);
     }
+
+    public function date()
+    {
+        return $this->hasOne(OrderDates::class);
+    }
+
+    public function chat()
+    {
+        $this->hasOne(Chat::class);
+    }
 }

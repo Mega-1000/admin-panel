@@ -25,6 +25,8 @@ class UpdateOrderDeliveryAndInvoiceAddressesRequest extends FormRequest
     {
         return [
             'shipment_date' => 'required',
+            'delivery_date' => 'required',
+            'delivery_description' => 'nullable',
             'remember_delivery_address' => 'required',
             'remember_invoice_address' => 'required',
             'DELIVERY_ADDRESS.firstname' => 'required',

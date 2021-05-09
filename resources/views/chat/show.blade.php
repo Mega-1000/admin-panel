@@ -37,9 +37,12 @@
                     @endforeach
                 </div>
             @endif
-
-            @include('chat.chat_body')
-
+            @if($order->dates)
+                @include('orders.dates')
+            @endif
+            @if ($chat)
+                @include('chat.chat_body')
+            @endif
             <form id="new-message" action="{{ $route }}">
                 <div class="row">
                     <div class="col-sm-9">
