@@ -261,14 +261,24 @@ class OrdersController extends Controller
         $order = $this->orderRepository->find($orderId);
         list($isDeliveryChangeLocked, $isInvoiceChangeLocked) = $this->getLocks($order);
 
-        return [
-            "DELIVERY_ADDRESS" => $order->addresses->where('type', '=', 'DELIVERY_ADDRESS')->first(),
-            "INVOICE_ADDRESS" => $order->addresses->where('type', '=', 'INVOICE_ADDRESS')->first(),
-            "DELIVERY_LOCK" => $isDeliveryChangeLocked,
-            "INVOICE_LOCK" => $isInvoiceChangeLocked,
-            "shipment_date" => (!empty($order->date)) ? $order->date->customer_preferred_shipment_date : $order->shipment_date,
-            "delivery_date" => (!empty($order->date)) ? $order->date->customer_preferred_delivery_date : $order->shipment_date,
-        ];
+        if (!empty($order->dates)) {
+            $orderDates = [
+                "shipment_date_from" => $order->dates->customer_preferred_shipment_date_from,
+                "shipment_date_to" => $order->dates->customer_preferred_shipment_date_to,
+                "delivery_date_from" => $order->dates->customer_preferred_delivery_date_from,
+                "delivery_date_to" => $order->dates->customer_preferred_delivery_date_to,
+            ];
+        }
+
+        return array_merge(
+            [
+                "DELIVERY_ADDRESS" => $order->addresses->where('type', '=', 'DELIVERY_ADDRESS')->first(),
+                "INVOICE_ADDRESS" => $order->addresses->where('type', '=', 'INVOICE_ADDRESS')->first(),
+                "DELIVERY_LOCK" => $isDeliveryChangeLocked,
+                "INVOICE_LOCK" => $isInvoiceChangeLocked,
+            ],
+            $orderDates ?? []
+        );
     }
 
     public function updateOrderDeliveryAndInvoiceAddresses(
@@ -285,9 +295,11 @@ class OrdersController extends Controller
             $invoiceAddress = $order->addresses->where('type', '=', 'INVOICE_ADDRESS')->first();
 
             $order->shipment_date = $request->get('shipment_date');
-            $order->date->customer_preferred_shipment_date = $request->get('shipment_date');
-            $order->date->customer_preferred_delivery_date = $request->get('delivery_date');
-            $order->date->save();
+            $order->dates->customer_preferred_shipment_date_from = $request->get('shipment_date_from');
+            $order->dates->customer_preferred_shipment_date_to = $request->get('shipment_date_to');
+            $order->dates->customer_preferred_delivery_date_from = $request->get('delivery_date_from');
+            $order->dates->customer_preferred_delivery_date_to = $request->get('delivery_date_to');
+            $order->dates->save();
             $order->save();
 
             if (!empty($request->get('delivery_description'))) {

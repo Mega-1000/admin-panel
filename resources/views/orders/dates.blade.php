@@ -3,7 +3,7 @@
         <table class="table">
             <thead>
             <tr>
-                <th scope="col" style="width: 15%"></th>
+                <th scope="col" style="width: 25%"></th>
                 <th scope="col" style="width: 15%" class="text-center">Klient</th>
                 <th scope="col" style="width: 15%" class="text-center">Konsultant</th>
                 <th scope="col" style="width: 15%" class="text-center">Magazyn</th>
@@ -11,16 +11,28 @@
             </thead>
             <tbody>
             <tr>
-                <th scope="row">Preferowana data nadania</th>
-                <td>{{ $order->dates->customer_preferred_shipment_date }}</td>
-                <td>{{ $order->dates->consultant_preferred_shipment_date }}</td>
-                <td>{{ $order->dates->warehouse_preferred_shipment_date }}</td>
+                <th scope="row">Preferowana data nadania od</th>
+                <td>{{ $order->dates->customer_preferred_shipment_date_from }}</td>
+                <td>{{ $order->dates->consultant_preferred_shipment_date_from }}</td>
+                <td>{{ $order->dates->warehouse_preferred_shipment_date_from }}</td>
             </tr>
             <tr>
-                <th scope="row">Preferowana data dostawy</th>
-                <td>{{ $order->dates->customer_preferred_delivery_date }}</td>
-                <td>{{ $order->dates->consultant_preferred_delivery_date }}</td>
-                <td>{{ $order->dates->warehouse_preferred_delivery_date }}</td>
+                <th scope="row">Preferowana data nadania do</th>
+                <td>{{ $order->dates->customer_preferred_shipment_date_to }}</td>
+                <td>{{ $order->dates->consultant_preferred_shipment_date_to }}</td>
+                <td>{{ $order->dates->warehouse_preferred_shipment_date_to }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Preferowana data dostawy od</th>
+                <td>{{ $order->dates->customer_preferred_delivery_date_from }}</td>
+                <td>{{ $order->dates->consultant_preferred_delivery_date_from }}</td>
+                <td>{{ $order->dates->warehouse_preferred_delivery_date_from }}</td>
+            </tr>
+            <tr>
+                <th scope="row">Preferowana data dostawy do</th>
+                <td>{{ $order->dates->customer_preferred_delivery_date_to }}</td>
+                <td>{{ $order->dates->consultant_preferred_delivery_date_to }}</td>
+                <td>{{ $order->dates->warehouse_preferred_delivery_date_to }}</td>
             </tr>
             <tr>
                 <th scope="row">Akceptacja</th>
