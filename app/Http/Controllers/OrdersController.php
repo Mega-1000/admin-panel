@@ -2141,7 +2141,8 @@ class OrdersController extends Controller
                 'customer_addresses.firstname as clientFirstname', 'customer_addresses.lastname as clientLastname',
                 'customer_addresses.phone as clientPhone', 'sel_tr__transaction.tr_CheckoutFormPaymentId as sello_payment',
                 'sel_tr__transaction.tr_CheckoutFormId as sello_form',
-                'task_times.date_start as production_date', 'taskUser.firstname as taskUserFirstName')
+                'task_times.date_start as production_date', 'taskUser.firstname as taskUserFirstName',
+                'taskUser.lastname as taskUserLastName')
             //poniższe left joiny mają na celu wyświetlenie czasów oraz wykonwaców zadań z tabeli tasks na "gridzie"
             ->leftJoin('tasks', 'orders.id', '=', 'tasks.order_id')
             ->leftJoin('tasks as parentTask', 'parentTask.id', '=', 'tasks.parent_id')

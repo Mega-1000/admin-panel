@@ -25,7 +25,7 @@ class CreateNewBonus extends FormRequest
     {
         return [
             'order_id' => 'nullable|exists:orders,id',
-            'user_id' => 'required|exists:users,id',
+            'user_id' => 'required',
             'amount' => 'required',
             'cause' => 'required',
             'date' => 'required'
