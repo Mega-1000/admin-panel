@@ -4,11 +4,13 @@ namespace App\Jobs;
 
 use App\Entities\Label;
 use App\Entities\Order;
+use App\Enums\LabelLogType;
 use App\Repositories\LabelRepository;
 use App\Repositories\OrderLabelSchedulerAwaitRepository;
 use App\Repositories\OrderLabelSchedulerRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\TaskRepository;
+use App\Services\LabelLogService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -55,7 +57,8 @@ class AddLabelJob extends Job
         LabelRepository $labelRepository,
         OrderLabelSchedulerRepository $orderLabelSchedulerRepository,
         OrderLabelSchedulerAwaitRepository $awaitRepository,
-        TaskRepository $taskRepository
+        TaskRepository $taskRepository,
+        LabelLogService $labelLogService
     ) {
         if (!($this->order instanceof Order)) {
             $this->order = $orderRepository->find($this->order);
@@ -71,6 +74,7 @@ class AddLabelJob extends Job
             if ($labelId instanceof Label) {
                 $labelId = $labelId->id;
             }
+            $labelLogService->saveLabelLog($this->order->id, $labelId, LabelLogType::ATTACH, true);
 
             if (!empty($this->loopPreventionArray['already-added']) && in_array($labelId,
                     $this->loopPreventionArray['already-added'])) {

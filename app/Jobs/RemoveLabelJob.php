@@ -4,11 +4,13 @@ namespace App\Jobs;
 
 use App\Entities\Label;
 use App\Entities\Order;
+use App\Enums\LabelLogType;
 use App\Jobs\WarehouseStocks\ChangeWarehouseStockJob;
 use App\Mail\ConfirmData;
 use App\Mail\DifferentCustomerData;
 use App\Repositories\LabelRepository;
 use App\Repositories\OrderRepository;
+use App\Services\LabelLogService;
 use App\Services\OrderWarehouseNotificationService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -47,7 +49,8 @@ class RemoveLabelJob extends Job
     public function handle(
         OrderRepository $orderRepository,
         LabelRepository $labelRepository,
-        OrderWarehouseNotificationService $orderWarehouseNotificationService
+        OrderWarehouseNotificationService $orderWarehouseNotificationService,
+        LabelLogService $labelLogService
     )
     {
         if (!($this->order instanceof Order)) {
@@ -66,6 +69,8 @@ class RemoveLabelJob extends Job
             if ($labelId == 49 && Auth::user()->role_id == 4) {
                 continue;
             }
+
+            $labelLogService->saveLabelLog($this->order->id, $labelId, LabelLogType::DETACH, true);
 
             if ($labelId == 41 && !strpos($this->order->customer->login, 'allegromail.pl')) {
                 $noData = DB::table('gt_invoices')->where('order_id', $this->order->id)->where('gt_invoice_status_id', '13')->first();

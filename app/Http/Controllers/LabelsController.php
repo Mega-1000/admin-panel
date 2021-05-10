@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Entities\ColumnVisibility;
 use App\Entities\Label;
 use App\Entities\Order;
+use App\Enums\LabelLogType;
 use App\Http\Requests\LabelCreateRequest;
 use App\Http\Requests\LabelUpdateRequest;
 use App\Http\Requests\OrderEditLabel;
 use App\Repositories\LabelGroupRepository;
 use App\Repositories\LabelRepository;
+use App\Services\LabelLogService;
 use Carbon\Carbon;
 use http\Env\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,15 +32,19 @@ class LabelsController extends Controller
     /** @var LabelGroupRepository */
     protected $labelGroupRepository;
 
+    protected $labelLogService;
+
     /**
      * LabelsController constructor.
      * @param LabelRepository $repository
      * @param LabelGroupRepository $labelGroupRepository
+     * @param LabelLogService $labelLogService
      */
-    public function __construct(LabelRepository $repository, LabelGroupRepository $labelGroupRepository)
+    public function __construct(LabelRepository $repository, LabelGroupRepository $labelGroupRepository, LabelLogService $labelLogService)
     {
         $this->repository = $repository;
         $this->labelGroupRepository = $labelGroupRepository;
+        $this->labelLogService = $labelLogService;
     }
 
     /**
@@ -111,6 +117,7 @@ class LabelsController extends Controller
             $user = Auth::user();
             $label = Label::find($request->label_id);
             $order->labels_log .= Order::formatMessage($user, "usunął etykietę: $label->name");
+            $this->labelLogService->saveLabelLog($order->id, $request->label_id, LabelLogType::DETACH, false);
             $order->save();
             return response('success');
         } catch (\Exception $exception) {
