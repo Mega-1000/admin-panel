@@ -24,8 +24,10 @@ class UpdateOrderDeliveryAndInvoiceAddressesRequest extends FormRequest
     public function rules()
     {
         return [
-            'shipment_date' => 'required',
-            'delivery_date' => 'required',
+            'shipment_date_from' => 'required',
+            'shipment_date_to' => 'required',
+            'delivery_date_from' => 'required',
+            'delivery_date_to' => 'required',
             'delivery_description' => 'nullable',
             'remember_delivery_address' => 'required',
             'remember_invoice_address' => 'required',
