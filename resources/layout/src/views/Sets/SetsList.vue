@@ -68,6 +68,7 @@
         </tr>
       </tbody>
     </table>
+    <ActionTrackers></ActionTrackers>
     <debugger :keepAlive="true" :components="$children"></debugger>
   </div>
 </template>
@@ -79,12 +80,14 @@ import { getFullUrl } from '@/helpers/urls'
 import AddSetModal from '@/components/Sets/AddSetModal.vue'
 import Error from '@/components/Error.vue'
 import NeedStockModal from '@/components/Sets/NeedStockModal.vue'
+import ActionTrackers from '@/components/ActionTrackers.vue'
 
 @Component({
   components: {
     NeedStockModal,
     Error,
-    AddSetModal
+    AddSetModal,
+    ActionTrackers
   }
 })
 export default class SetsList extends Vue {
