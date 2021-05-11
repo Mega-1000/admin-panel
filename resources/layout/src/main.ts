@@ -10,6 +10,7 @@ import RenderComponent from '@/helpers/renderComponent'
 
 Vue.config.productionTip = false
 Vue.use(require('electron-vue-debugger'))
+Vue.config.devtools = true
 
 new Vue({
   store,
