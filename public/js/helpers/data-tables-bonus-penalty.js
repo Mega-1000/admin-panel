@@ -35,6 +35,16 @@ $(document).ready(function() {
                      + "zł</th> </tr>"
             );
 
+            $('#pkt_info').html(
+                `<tr>
+                    <th colspan="4" style="text-align:right" >Suma: </th>
+                    <th>` +
+                api.column( 4, {page:'current'} ).data().reduce(function (a, b) {
+                    return intVal(a) + intVal(b);
+                }, 0)
+                + "pkt</th> </tr>"
+            );
+
         }
     } );
     $.fn.dataTable.ext.search.push(

@@ -10,7 +10,7 @@
 @section('table')
     <h3>Dyskusja: {{ $bonus->cause }}</h3>
     <h4>Zamówienie: {{ $bonus->order_id }}</h4>
-    <h5>{{ $bonus->amount }} {{ $bonus->user->firstname }} {{ $bonus->user->lastname }}</h5>
+    <h5>{{ $bonus->amount }} zł / {{ $bonus->points }} pkt / {{ $bonus->user->firstname }} {{ $bonus->user->lastname }}</h5>
     <hr>
     @if(count($chat))
         @foreach($chat as $message)

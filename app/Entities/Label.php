@@ -41,6 +41,7 @@ class Label extends Model implements Transformable
     const WAREHOUSE_REMINDER = 77;
 
     const CHAT_TYPE = 'chat';
+    const BONUS_TYPE = 'bonus';
     const PAYMENTS_IDS_FOR_TABLE = [119, 134, 120, 101, 99, 102];
     const PRODUCTION_IDS_FOR_TABLE = [96, 51, 54, 77, 118];
     const TRANSPORT_IDS_FOR_TABLE = [68, 103, 104, 105, 106];

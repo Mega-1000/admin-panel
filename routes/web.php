@@ -31,6 +31,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/bonus/delete', 'BonusController@destroy')->name('bonus.destroy');
         Route::get('/bonus/users/{id?}', 'BonusController@getResponsibleUsers')->name('bonus.users');
         Route::get('/bonus/chat/{id}', 'BonusController@getChat')->name('bonus.chat');
+        Route::get('/bonus/order-chat/{id}', 'BonusController@firstOrderChat')->name('bonus.order-chat');
         Route::post('/bonus/send/{id}', 'BonusController@sendMessage')->name('bonus.send_message');
 
         Route::get('prices/allegro-prices/{id}', 'ProductPricesController@getAllegroPrices')->name('prices.allegroPrices');
