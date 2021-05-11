@@ -564,3 +564,8 @@ Route::post('/payment/confirmation/{token}', 'OrdersPaymentsController@warehouse
 
 Route::get('/chat/{token}', 'MessagesController@show')->name('chat.show');
 Route::get('/chat/getUrl/{mediaId}/{postCode}/{email}/{phone}', 'MessagesController@getUrl')->name('messages.get-url');
+
+Route::get('/clear-cache', function() {
+    $exitCode = Artisan::call('cache:clear');
+    return 'Cashe clear code['.$exitCode.']';
+});
