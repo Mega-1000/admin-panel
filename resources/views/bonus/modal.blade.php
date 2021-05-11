@@ -9,7 +9,7 @@
                     <h4 class="modal-title">Dodaj potrącenie</h4>
                 </div>
                 <div class="modal-body">
-                    <form action="{{ route('bonus.create') }}" id="add_new_bonus_form" method="POST">
+                    <form target="_blank" action="{{ route('bonus.create') }}" id="add_new_bonus_form" method="POST">
                         {{ csrf_field() }}
                         <div class="form-group">
                             <div class="form-check">
@@ -31,7 +31,11 @@
                         </div>
                         <div class="form-group">
                             <label>Kwota</label>
-                            <input class="form-control" max="0" required name="amount" type="number" step="0.01">
+                            <input class="form-control" min="0" required name="amount" type="number" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label>Ocena szkodliwości (0-10)</label>
+                            <input class="form-control" min="0" max="10" required name="points" type="number" step="1">
                         </div>
                         <div class="form-group">
                             <label>Powód</label>

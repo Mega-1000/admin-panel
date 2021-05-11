@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Entities\BonusAndPenalty;
+use App\Entities\Label;
+use App\Entities\Order;
 use App\Http\Requests\CreateNewBonus;
 use App\Http\Requests\DeleteNewBonus;
 use App\Jobs\AddLabelJob;
@@ -53,7 +55,10 @@ class BonusController extends Controller
         } else {
             $message = __('bonus.create.success_penalty');
         }
-        dispatch_now(new AddLabelJob($bonus->order_id, [180]));
+        $loopPrevention = [];
+        dispatch_now(new AddLabelJob($bonus->order_id, [180], $loopPrevention, [
+            'added_type' => Label::BONUS_TYPE
+        ]));
         return redirect()->route('bonus.chat', ['id' => $bonus->id])->with(['message' => $message,
             'alert-type' => 'success']);
     }
@@ -68,16 +73,32 @@ class BonusController extends Controller
         ]);
     }
 
+    public function firstOrderChat($id): \Illuminate\Http\Response
+    {
+        $order = Order::find($id);
+        $bonus = BonusAndPenalty::where('order_id', '=', $order->id)->orderBy('updated_at','desc')->first();
+        $chat = $this->service->getChat($bonus);
+        return response()->view('bonus.chat', [
+            'bonus' => $bonus,
+            'chat' => $chat
+        ]);
+    }
+
     public function sendMessage(Request $request, $id): \Illuminate\Http\RedirectResponse
     {
         $bonus = BonusAndPenalty::find($id);
         $this->service->sendMessage($bonus, $request->message, $request->user());
 
         if (Gate::allows('create-bonus')) {
-            dispatch_now(new AddLabelJob($bonus->order_id, [180]));
+            $loopPrevention = [];
+            dispatch_now(new AddLabelJob($bonus->order_id, [180], $loopPrevention, [
+                'added_type' => Label::BONUS_TYPE
+            ]));
             dispatch_now(new RemoveLabelJob($bonus->order_id, [91]));
         } else {
-            dispatch_now(new AddLabelJob($bonus->order_id, [91]));
+            dispatch_now(new AddLabelJob($bonus->order_id, [91, $loopPrevention, [
+                'added_type' => Label::BONUS_TYPE
+            ]]));
             dispatch_now(new RemoveLabelJob($bonus->order_id, [180]));
         }
 
