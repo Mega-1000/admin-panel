@@ -68,6 +68,7 @@
         </tr>
       </tbody>
     </table>
+    <debugger :keepAlive="true" :components="$children"></debugger>
   </div>
 </template>
 
