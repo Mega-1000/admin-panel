@@ -94,5 +94,5 @@ Route::post('chat/editPrices/{token}', 'Api\MessagesController@editPrices')->nam
 
 Route::post('auth/code/{id}', 'Api\AutheticationController@getToken')->name('api.authenticate.get-token');
 
-Route::group(['prefix' => 'sets', 'as' => 'sets.'], __DIR__ . '/api/ProductsSetsRoutes.php');
+Route::group(['prefix' => 'sets', 'as' => 'sets.', 'middleware' => ['https']], __DIR__ . '/api/ProductsSetsRoutes.php');
 
