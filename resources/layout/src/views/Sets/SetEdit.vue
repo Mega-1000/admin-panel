@@ -8,6 +8,7 @@
     <EditForm @load-set="loadSet()"></EditForm>
     <SetProductsList @load-set="loadSet()"></SetProductsList>
     <ProductTable @load-set="loadSet()"></ProductTable>
+    <debugger :keepAlive="true" :components="$children"></debugger>
   </div>
 </template>
 <script lang="ts">

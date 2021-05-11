@@ -1,0 +1,5 @@
+.vue-debugger-container {
+  ::v-deep .pane {
+    z-index: $index-debugger !important;
+  }
+}

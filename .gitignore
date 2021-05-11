@@ -25,3 +25,8 @@ docker
 admin-panel.iml
 /public/js/laroute.js
 /public/mix-manifest.json
+
+# generate files
+/public/js/vue-scripts.js
+/public/js/vue-chunk.js
+/public/css/vue/styles.css
