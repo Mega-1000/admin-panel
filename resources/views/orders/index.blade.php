@@ -18,11 +18,13 @@
                     <h4 class="modal-title">Zmień wartości paczki</h4>
                 </div>
                 <div class="modal-body">
-                    <form id="changePackageCostForm" method="POST" action="{{ route('order_packages.changePackageCost') }}">
+                    <form id="changePackageCostForm" method="POST"
+                          action="{{ route('order_packages.changePackageCost') }}">
                         @csrf
                         {{method_field('put')}}
                         <label for="packageTemplatesList">@lang('order_packages.form.choose_template')</label>
-                        <select required name="templateList" class="form-control text-uppercase" id="packageTemplatesList"
+                        <select required name="templateList" class="form-control text-uppercase"
+                                id="packageTemplatesList"
                                 form="changePackageCostForm">
                             <option value="" selected="selected"></option>
                             @foreach($templateData as $template)
@@ -42,7 +44,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
-                    <button type="submit" form="changePackageCostForm" class="btn btn-success pull-right">@lang('order_packages.form.buttons.change')
+                    <button type="submit" form="changePackageCostForm"
+                            class="btn btn-success pull-right">@lang('order_packages.form.buttons.change')
                     </button>
                 </div>
             </div>
@@ -156,13 +159,16 @@
                         </div>
                         <div class="form-group">
                             <label for="select-task-for-finish">Wybierz zadanie</label>
-                            <select onchange="taskSelected(this, '#warehouse-done-notice', '#warehouse-done-notice-input')" name="id" id="select-task-for-finish" required class="form-control">
+                            <select
+                                onchange="taskSelected(this, '#warehouse-done-notice', '#warehouse-done-notice-input')"
+                                name="id" id="select-task-for-finish" required class="form-control">
                                 <option value="" selected="selected">brak</option>
                             </select>
                         </div>
                         <div class="form-group" id="warehouse-done-notice">
                             <label for="warehouse_notice">Podaj nazwę zadania</label>
-                            <input id="warehouse-done-notice-input" class="form-control" name="warehouse_notice" type="text">
+                            <input id="warehouse-done-notice-input" class="form-control" name="warehouse_notice"
+                                   type="text">
                         </div>
                     </form>
                 </div>
@@ -408,7 +414,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
-                    <button type="submit" form="uploadAllegroComission" class="btn btn-success pull-right">Wyślij</button>
+                    <button type="submit" form="uploadAllegroComission" class="btn btn-success pull-right">Wyślij
+                    </button>
                 </div>
             </div>
         </div>
@@ -880,28 +887,54 @@
         </tr>
         </thead>
     </table>
+
+    @include('bonus.modal')
 @endsection
 
 @section('datatable-scripts')
     <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
     <script>
+        @can('create-bonus')
+            $(document).on('click', '.penalty', (e)=>{
+                let orderId = $(e.target).attr('data-order');
+                $('#add_bonus_modal').modal('show');
+                $('#order_id').val(orderId);
+                $('#consultant-name').html('<i class="fas fa-spinner fa-spin  fa-fw"></i>');
+                $('#select-consultant').attr('disabled',true);
+                $('#warehouse-name').html('<i class="fas fa-spinner fa-spin  fa-fw"></i>');
+                $('#select-warehouse').attr('disabled',true);
+
+                $.get('{{ route('bonus.users') }}/'+orderId, (data)=>{
+                    $('#consultant-name').html(data['consultant']);
+                    $('#warehouse-name').html(data['warehouse']);
+
+                    if(data['consultant'] != 'BRAK') {
+                        $('#select-consultant').removeAttr('disabled');
+                    }
+                    if(data['warehouse'] != 'BRAK'){
+                        $('#select-warehouse').removeAttr('disabled');
+                    }
+                });
+            });
+        @endcan
+
         @if (session('stock-response'))
-            let stockResponse = JSON.parse('{!! json_encode(session('stock-response')) !!}');
-            $('#position__errors').empty();
-            $('#quantity__errors').empty();
-            $('#exists__errors').empty();
-            stockResponse.forEach((error) => {
-                if (error.error == '{{ \App\Enums\ProductStockError::POSITION }}') {
-                    $('#position__errors').append(`<h5>{{ __('product_stocks.form.missing_position_for_product') }} <span class="modal__product">${error.productName}</span>. {{ __('product_stocks.form.go_to_create_position') }} <a href="/admin/products/stocks/${error.product}/positions/create" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
-                }
-                if (error.error == '{{ \App\Enums\ProductStockError::QUANTITY }}') {
-                    $('#quantity__errors').append(`<h5>{{ __('product_stocks.form.missing_product_quantity') }} <span class="modal__position">${error.position.position_quantity}</span>. {{ __('product_stocks.form.go_to_move_between_positions') }}<a href="/admin/products/stocks/${error.product}/edit?tab=positions" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
-                }
-                if (error.error == '{{ \App\Enums\ProductStockError::EXISTS }}') {
-                    $('#exists__errors').append(`<h5>{{ __('product_stocks.form.for_product') }} <span class="modal__product">${error.productName}</span> {{ __('product_stocks.form.stock_already_performed') }} {{ __('product_stocks.form.go_to_order') }} <a href="/admin/orders/${error.order_id}/edit" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
-                }
-            })
-            $('#stock_modal').modal('show');
+        let stockResponse = JSON.parse('{!! json_encode(session('stock-response')) !!}');
+        $('#position__errors').empty();
+        $('#quantity__errors').empty();
+        $('#exists__errors').empty();
+        stockResponse.forEach((error) => {
+            if (error.error == '{{ \App\Enums\ProductStockError::POSITION }}') {
+                $('#position__errors').append(`<h5>{{ __('product_stocks.form.missing_position_for_product') }} <span class="modal__product">${error.productName}</span>. {{ __('product_stocks.form.go_to_create_position') }} <a href="/admin/products/stocks/${error.product}/positions/create" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
+            }
+            if (error.error == '{{ \App\Enums\ProductStockError::QUANTITY }}') {
+                $('#quantity__errors').append(`<h5>{{ __('product_stocks.form.missing_product_quantity') }} <span class="modal__position">${error.position.position_quantity}</span>. {{ __('product_stocks.form.go_to_move_between_positions') }}<a href="/admin/products/stocks/${error.product}/edit?tab=positions" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
+            }
+            if (error.error == '{{ \App\Enums\ProductStockError::EXISTS }}') {
+                $('#exists__errors').append(`<h5>{{ __('product_stocks.form.for_product') }} <span class="modal__product">${error.productName}</span> {{ __('product_stocks.form.stock_already_performed') }} {{ __('product_stocks.form.go_to_order') }} <a href="/admin/orders/${error.order_id}/edit" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
+            }
+        })
+        $('#stock_modal').modal('show');
         @endif
         function taskSelected(select, input, control) {
             let selectedOption = select.options[select.selectedIndex];
@@ -912,6 +945,7 @@
                 $(control).val('');
             }
         }
+
         function fetchUsersTasks(user, select) {
             $(select).empty();
             $(select).append('<option value="" selected="selected">brak</option>');
@@ -926,10 +960,11 @@
                     response.forEach(task => $(select).append(`<option data-order="${task.order_id ?? ''}" class="temporary-option" value="${task.id}">${task.name}</option>`))
                 })
         }
+
         function showPackageCostModal(packageId, dataTemplate, costForClient, costForCompany) {
             $('#changePackageCost').val(packageId);
             $('#packageTemplatesList option').prop('selected', '');
-            if(!isNaN(dataTemplate)) {
+            if (!isNaN(dataTemplate)) {
                 $('#packageTemplatesList option[value="' + dataTemplate + '"]').prop('selected', 'selected');
             } else {
                 $("#packageTemplatesList option:contains('" + dataTemplate + "')").prop('selected', 'selected');
@@ -1082,10 +1117,10 @@
                 }
                 $('#package-' + id).attr("disabled", false);
                 $('#success-ok').on('click', function () {
-		    setTimeout(() => {
-			table.ajax.reload(null, false);
+                    setTimeout(() => {
+                        table.ajax.reload(null, false);
                         window.location.href = '/admin/orders?order_id=' + orderId;
-		    }, 500);
+                    }, 500);
                 });
             }).fail(function () {
                 $('#package-' + id).attr("disabled", false);
@@ -1097,1100 +1132,1104 @@
         }
 
         // DataTable
-        let datatable = function(ajaxParams = null) {
+        let datatable = function (ajaxParams = null) {
             return $('#dataTable').DataTable({
-            language: {!! json_encode( __('voyager.datatable'), true) !!},
-            processing: true,
-            serverSide: true,
-            stateSave: true,
-            "lengthMenu": [[10, 25, 50, 100, 200, 500, -1], [10, 25, 50, 100, 200, 500, "Wszystkie"]],
-            "oLanguage": {
-                "sSearch": "Szukaj: "
-            },
-            columnDefs: [
-                {className: "dt-center", targets: "_all"},
-                {
-                    'targets': 15,
-                    'createdCell': function (td, cellData, rowData, row, col) {
-                        $(td).attr('id', 'action-' + rowData.orderId);
-                    }
+                language: {!! json_encode( __('voyager.datatable'), true) !!},
+                processing: true,
+                serverSide: true,
+                stateSave: true,
+                "lengthMenu": [[10, 25, 50, 100, 200, 500, -1], [10, 25, 50, 100, 200, 500, "Wszystkie"]],
+                "oLanguage": {
+                    "sSearch": "Szukaj: "
                 },
-                {
-                    'targets': 21,
-                    'createdCell': function (td, cellData, rowData, row, col) {
-                        $(td).attr('id', 'consultant_notices-' + rowData.orderId);
-                        $(td).attr('class', 'hoverable');
-                    }
-                }
-            ],
-            responsive: true,
-            'fnCreatedRow': function (nRow, aData, iDataIndex) {
-                $(nRow).attr('id', 'id-' + aData.orderId);
-            },
-            dom: 'Bfrtip',
-            language: {
-                buttons: {
-                    pageLength: {
-                        _: "Pokaż %d zamówień",
-                        '-1': "Wszystkie"
-                    }
-                }
-            },
-            buttons: [
-                'pageLength',
-                {
-                    extend: 'colvis',
-                    text: 'Widzialność kolumn',
-                    columns: ':not(.noVis)'
-                },
-                {
-                    extend: 'colvisGroup',
-                    text: 'Pokaż wszystkie',
-                    show: ':hidden'
-                },
-            ],
-            order: [[7, "desc"]],//ma być sortowane po id czyli 7 kolumna!!!
-            ajax: {
-                url: '{!! route('orders.datatable') !!}',
-                type: 'POST',
-                data: function ( d ) {
-                    if(ajaxParams !== null) {
-                        d.dateFrom = ajaxParams.dateFrom;
-                        d.dateTo = ajaxParams.dateTo;
-                        d.dateColumn = ajaxParams.dateColumn;
-                        d.same = ajaxParams.same;
-                    }
-                    let differenceMode = localStorage.getItem('differenceMode');
-                    if(differenceMode !== null) d.differenceMode = localStorage.getItem('differenceMode');
-                },
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                },
-            },
-            rowCallback: function (row, data, index) {
-                if (data.login == 'magazyn-olawa@mega1000.pl') {
-                    $('td', row).css('background-color', 'rgb(0, 0, 255, 0.1)');
-                }
-            },
-            drawCallback: function (settings) {
-                setTimeout(function () {
-                    $('.ui-tooltip-content').parent().remove()
-
-                    $('[data-toggle="tooltip"]').tooltip();
-                    $('[data-toggle="transport-exchange-tooltip"]').tooltip();
-                    $('[data-toggle="label-tooltip"]').tooltip();
-                }, 1000);
-
-                $(".spedition-exchange-selector-no-invoice").on('click', function () {
-                    updateSpeditionExchangeSelectedItem(this.value, 'no-invoice');
-                });
-
-                $(".spedition-exchange-selector-invoiced").on('click', function () {
-                    updateSpeditionExchangeSelectedItem(this.value, 'invoiced');
-                });
-            },
-
-            columns: [
-                {
-                    data: 'orderId',
-                    name: 'mark',
-                    orderable: false,
-                    render: function (id) {
-                        return '<input class="order-id-checkbox" value="' + id + '" type="checkbox">';
-                    },
-                },
-                {
-                    data: 'orderId',
-                    name: 'spedition_exchange_invoiced_selector',
-                    orderable: false,
-                    render: function (id) {
-                        return '<input class="spedition-exchange-selector-no-invoice" value="' + id + '" type="checkbox"><br><input class="spedition-exchange-selector-invoiced" value="' + id + '" type="checkbox">';
-                    },
-                },
-                {
-                    data: 'packages',
-                    name: 'packages_sent',
-                    searchable: false,
-                    orderable: false,
-                    render: function (data, type, row) {
-                        var html = '';
-                        $.each(data, function (key, value) {
-                            let isProblem = Math.abs((value.real_cost_for_company ?? 0) - (value.cost_for_company ?? 0)) > 2
-                            if (isProblem) {
-                                html += '<div style="border: solid red 4px" >'
-                            }
-                            if (value.status == 'SENDING' || value.status == 'DELIVERED') {
-                                html += '<div style="display: flex; align-items: center; flex-direction: column;" > ' +
-                                    '<div style="display: flex; align-items: center;">' +
-                                    '<p style="margin: 8px 0px 0px 0px;">' + row.orderId + '/' + value.number + '</p>'
-                                let name = value.container_type
-                                if (value.symbol) {
-                                    name = value.symbol;
-                                }
-                                html += '<p style="margin: 8px 8px 0px 8px;">' + name + '</p> </div> '
-                                html += value.sumOfCosts ? value.sumOfCosts.sum + ' zł' : '';
-                                if (value.letter_number === null) {
-                                    html += '<a href="javascript:void()"><p>Brak listu przewozowego</p></a>';
-                                } else {
-				    let color = '';
-				    switch(value.status) {
-					case 'DELIVERED':
-						color = '#87D11B';
-						break;
-					case 'SENDING':
-						color = '#4DCFFF';
-                                                break;
-					case 'WAITING_FOR_SENDING':
-						color = '#5537f0';
-                                                break;
-				    }
-                                    if (value.service_courier_name === 'INPOST' || value.service_courier_name === 'ALLEGRO-INPOST') {
-                                        html += '<a target="_blank" href="/storage/inpost/stickers/sticker' + value.letter_number + '.pdf"><p style="margin-bottom: 0px;">' + value.letter_number + '</p></a>';
-					html += '<div>';
-					 if(value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
-                                                html += '<span>' + value.cash_on_delivery + ' zł</span>';
-                                        }
-					html += '<a target="_blank" style="color: green; font-weight: bold; color: #FFFFFF; display: inline-block; margin-top: 5px; margin-left: 5px; padding: 5px; background-color:' + color + '" href="https://inpost.pl/sledzenie-przesylek?number=' + value.letter_number + '"<i class="fas fa-shipping-fast"></i></a>';
-					html += '</div>';
-                                    } else if (value.delivery_courier_name === 'DPD') {
-                                        html += '<p style="margin-bottom: 0px;">' + value.sending_number + '</p>';
-                                        html += '<a target="_blank" href="/storage/dpd/stickers/sticker' + value.letter_number + '.pdf"><p style="margin-bottom: 0px;">' + value.letter_number + '</p></a>';
-					html += '<div>';
-					if(value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
-						html += '<span>' + value.cash_on_delivery + ' zł</span>';
-					}
-					html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; margin-top: 5px;padding: 5px;margin-left: 5px; background-color:' + color + '" href="https://tracktrace.dpd.com.pl/parcelDetails?typ=1&p1=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
-					 html += '</div>';
-                                    } else if (value.delivery_courier_name === 'POCZTEX') {
-                                        html += '<a target="_blank" href="/storage/pocztex/protocols/protocol' + value.sending_number + '.pdf"><p style="margin-bottom: 0px;">' + value.letter_number + '</p></a>';
-					html += '<div>';
-					 if(value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
-                                                html += '<span>' + value.cash_on_delivery + ' zł</span>';
-                                        }
-					html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; margin-top: 5px;padding: 5px;margin-left: 5px; background-color:' + color + '" href="http://www.pocztex.pl/sledzenie-przesylek/?numer=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
-					html += '</div>';
-                                    } else if (value.delivery_courier_name === 'JAS') {
-                                        html += '<a target="_blank" href="/storage/jas/protocols/protocol' + value.sending_number + '.pdf"><p>' + value.letter_number + '</p></a>';
-					 if(value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
-                                                html += '<span>' + value.cash_on_delivery + ' zł</span>';
-                                        }
-
-                                        html += '<a target="_blank" href="/storage/jas/labels/label' + value.sending_number + '.pdf"><p>' + value.letter_number + '</p></a>';
-                                    } else if (value.delivery_courier_name === 'GIELDA') {
-                                        html += '<a target="_blank" href="/storage/gielda/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
-                                    } else if (value.delivery_courier_name === 'ODBIOR_OSOBISTY') {
-                                        html += '<a target="_blank" href="/storage/odbior_osobisty/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
-                                    } else if (value.delivery_courier_name === 'GLS') {
-                                        let url = "{{ route('orders.package.getSticker', ['id' => '%%'])}}"
-                                        html += '<a target="_blank" href="' + url.replace('%%', value.id) + '"><p style="margin-bottom: 0px;">';
-                                        html += value.letter_number ? value.letter_number : 'wygeneruj naklejkę';
-					html += '<div>';
-					 if(value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
-                                                html += '<span>' + value.cash_on_delivery + ' zł</span>';
-                                        }
-					html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; padding: 5px; margin-top: 5px;margin-left: 5px; background-color:' + color + '" href="https://gls-group.eu/PL/pl/sledzenie-paczek?match=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
-                                        html += '</p></a>';
-					html += '</div>';
-                                    }
-                                }
-                                html += `<button class="btn btn-primary" onclick="showPackageCostModal('${value.id}', '${value.chosen_data_template}', '${value.cost_for_client}', '${value.cost_for_company}')">@lang('order_packages.form.buttons.changePackageCost')</button>`;
-                                html += '</div>';
-                            }
-                            if (isProblem) {
-                                html += '</div>'
-                            }
-                        });
-                        return html;
-                    }
-                },
-                {
-                    data: null,
-                    name: 'packages_not_sent',
-                    searchable: false,
-                    orderable: false,
-                    render: function (order, type, row) {
-                        let data = order.packages
-                        var html = ''
-                        if (data.length != 0) {
-                            if (order.otherPackages && order.otherPackages.find(el => el.type == 'not_calculable')) {
-                                html = '<div style="border: solid blue 4px" >'
-                            } else {
-                                html = '<div style="border: solid green 4px" >'
-                            }
+                columnDefs: [
+                    {className: "dt-center", targets: "_all"},
+                    {
+                        'targets': 15,
+                        'createdCell': function (td, cellData, rowData, row, col) {
+                            $(td).attr('id', 'action-' + rowData.orderId);
                         }
-                        let cancelled = 0;
-                        $.each(data, function (key, value) {
-                            let color = '';
-                            switch(value.status) {
-                                case 'DELIVERED':
-                                    color = '#87D11B';
-                                    break;
-                                case 'SENDING':
-                                    color = '#4DCFFF';
-                                    break;
-                                case 'WAITING_FOR_SENDING':
-                                    color = '#5537f0';
-                                    break;
-                            }
-                            if (value.status === 'CANCELLED') {
-                                cancelled++;
-                            }
-                            if (value.status !== 'SENDING' && value.status !== 'DELIVERED' && value.status !== 'CANCELLED') {
-                                html += '<div style="display: flex; align-items: center; flex-direction: column;" > ' +
-                                    '<div style="display: flex; align-items: stretch;">' +
-                                    '<p style="margin: 8px 0px 0px 0px;"> ' + row.orderId + '/' + value.number + '</p>'
-                                let name = value.container_type
-                                if (value.symbol) {
-                                    name = value.symbol;
-                                }
-                                html += '<p style="margin: 8px 8px 0px 8px;">' + name + '</p> </div> '
+                    },
+                    {
+                        'targets': 21,
+                        'createdCell': function (td, cellData, rowData, row, col) {
+                            $(td).attr('id', 'consultant_notices-' + rowData.orderId);
+                            $(td).attr('class', 'hoverable');
+                        }
+                    }
+                ],
+                responsive: true,
+                'fnCreatedRow': function (nRow, aData, iDataIndex) {
+                    $(nRow).attr('id', 'id-' + aData.orderId);
+                },
+                dom: 'Bfrtip',
+                language: {
+                    buttons: {
+                        pageLength: {
+                            _: "Pokaż %d zamówień",
+                            '-1': "Wszystkie"
+                        }
+                    }
+                },
+                buttons: [
+                    'pageLength',
+                    {
+                        extend: 'colvis',
+                        text: 'Widzialność kolumn',
+                        columns: ':not(.noVis)'
+                    },
+                    {
+                        extend: 'colvisGroup',
+                        text: 'Pokaż wszystkie',
+                        show: ':hidden'
+                    },
+                ],
+                order: [[7, "desc"]],//ma być sortowane po id czyli 7 kolumna!!!
+                ajax: {
+                    url: '{!! route('orders.datatable') !!}',
+                    type: 'POST',
+                    data: function (d) {
+                        if (ajaxParams !== null) {
+                            d.dateFrom = ajaxParams.dateFrom;
+                            d.dateTo = ajaxParams.dateTo;
+                            d.dateColumn = ajaxParams.dateColumn;
+                            d.same = ajaxParams.same;
+                        }
+                        let differenceMode = localStorage.getItem('differenceMode');
+                        if (differenceMode !== null) d.differenceMode = localStorage.getItem('differenceMode');
+                    },
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                },
+                rowCallback: function (row, data, index) {
+                    if (data.login == 'magazyn-olawa@mega1000.pl') {
+                        $('td', row).css('background-color', 'rgb(0, 0, 255, 0.1)');
+                    }
+                },
+                drawCallback: function (settings) {
+                    setTimeout(function () {
+                        $('.ui-tooltip-content').parent().remove()
 
-                                if (value.status === 'WAITING_FOR_CANCELLED') {
-                                    html += '<p>WYSŁANO DO ANULACJI</p>';
+                        $('[data-toggle="tooltip"]').tooltip();
+                        $('[data-toggle="transport-exchange-tooltip"]').tooltip();
+                        $('[data-toggle="label-tooltip"]').tooltip();
+                    }, 1000);
+
+                    $(".spedition-exchange-selector-no-invoice").on('click', function () {
+                        updateSpeditionExchangeSelectedItem(this.value, 'no-invoice');
+                    });
+
+                    $(".spedition-exchange-selector-invoiced").on('click', function () {
+                        updateSpeditionExchangeSelectedItem(this.value, 'invoiced');
+                    });
+                },
+
+                columns: [
+                    {
+                        data: 'orderId',
+                        name: 'mark',
+                        orderable: false,
+                        render: function (id) {
+                            return '<input class="order-id-checkbox" value="' + id + '" type="checkbox">';
+                        },
+                    },
+                    {
+                        data: 'orderId',
+                        name: 'spedition_exchange_invoiced_selector',
+                        orderable: false,
+                        render: function (id) {
+                            return '<input class="spedition-exchange-selector-no-invoice" value="' + id + '" type="checkbox"><br><input class="spedition-exchange-selector-invoiced" value="' + id + '" type="checkbox">';
+                        },
+                    },
+                    {
+                        data: 'packages',
+                        name: 'packages_sent',
+                        searchable: false,
+                        orderable: false,
+                        render: function (data, type, row) {
+                            var html = '';
+                            $.each(data, function (key, value) {
+                                let isProblem = Math.abs((value.real_cost_for_company ?? 0) - (value.cost_for_company ?? 0)) > 2
+                                if (isProblem) {
+                                    html += '<div style="border: solid red 4px" >'
                                 }
-                                if (value.status === 'REJECT_CANCELLED') {
-                                    html += '<p style="color:red;">ANULACJA ODRZUCONA</p>';
+                                if (value.status == 'SENDING' || value.status == 'DELIVERED') {
+                                    html += '<div style="display: flex; align-items: center; flex-direction: column;" > ' +
+                                        '<div style="display: flex; align-items: center;">' +
+                                        '<p style="margin: 8px 0px 0px 0px;">' + row.orderId + '/' + value.number + '</p>'
+                                    let name = value.container_type
+                                    if (value.symbol) {
+                                        name = value.symbol;
+                                    }
+                                    html += '<p style="margin: 8px 8px 0px 8px;">' + name + '</p> </div> '
+                                    html += value.sumOfCosts ? value.sumOfCosts.sum + ' zł' : '';
+                                    if (value.letter_number === null) {
+                                        html += '<a href="javascript:void()"><p>Brak listu przewozowego</p></a>';
+                                    } else {
+                                        let color = '';
+                                        switch (value.status) {
+                                            case 'DELIVERED':
+                                                color = '#87D11B';
+                                                break;
+                                            case 'SENDING':
+                                                color = '#4DCFFF';
+                                                break;
+                                            case 'WAITING_FOR_SENDING':
+                                                color = '#5537f0';
+                                                break;
+                                        }
+                                        if (value.service_courier_name === 'INPOST' || value.service_courier_name === 'ALLEGRO-INPOST') {
+                                            html += '<a target="_blank" href="/storage/inpost/stickers/sticker' + value.letter_number + '.pdf"><p style="margin-bottom: 0px;">' + value.letter_number + '</p></a>';
+                                            html += '<div>';
+                                            if (value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
+                                                html += '<span>' + value.cash_on_delivery + ' zł</span>';
+                                            }
+                                            html += '<a target="_blank" style="color: green; font-weight: bold; color: #FFFFFF; display: inline-block; margin-top: 5px; margin-left: 5px; padding: 5px; background-color:' + color + '" href="https://inpost.pl/sledzenie-przesylek?number=' + value.letter_number + '"<i class="fas fa-shipping-fast"></i></a>';
+                                            html += '</div>';
+                                        } else if (value.delivery_courier_name === 'DPD') {
+                                            html += '<p style="margin-bottom: 0px;">' + value.sending_number + '</p>';
+                                            html += '<a target="_blank" href="/storage/dpd/stickers/sticker' + value.letter_number + '.pdf"><p style="margin-bottom: 0px;">' + value.letter_number + '</p></a>';
+                                            html += '<div>';
+                                            if (value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
+                                                html += '<span>' + value.cash_on_delivery + ' zł</span>';
+                                            }
+                                            html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; margin-top: 5px;padding: 5px;margin-left: 5px; background-color:' + color + '" href="https://tracktrace.dpd.com.pl/parcelDetails?typ=1&p1=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
+                                            html += '</div>';
+                                        } else if (value.delivery_courier_name === 'POCZTEX') {
+                                            html += '<a target="_blank" href="/storage/pocztex/protocols/protocol' + value.sending_number + '.pdf"><p style="margin-bottom: 0px;">' + value.letter_number + '</p></a>';
+                                            html += '<div>';
+                                            if (value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
+                                                html += '<span>' + value.cash_on_delivery + ' zł</span>';
+                                            }
+                                            html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; margin-top: 5px;padding: 5px;margin-left: 5px; background-color:' + color + '" href="http://www.pocztex.pl/sledzenie-przesylek/?numer=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
+                                            html += '</div>';
+                                        } else if (value.delivery_courier_name === 'JAS') {
+                                            html += '<a target="_blank" href="/storage/jas/protocols/protocol' + value.sending_number + '.pdf"><p>' + value.letter_number + '</p></a>';
+                                            if (value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
+                                                html += '<span>' + value.cash_on_delivery + ' zł</span>';
+                                            }
+
+                                            html += '<a target="_blank" href="/storage/jas/labels/label' + value.sending_number + '.pdf"><p>' + value.letter_number + '</p></a>';
+                                        } else if (value.delivery_courier_name === 'GIELDA') {
+                                            html += '<a target="_blank" href="/storage/gielda/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
+                                        } else if (value.delivery_courier_name === 'ODBIOR_OSOBISTY') {
+                                            html += '<a target="_blank" href="/storage/odbior_osobisty/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
+                                        } else if (value.delivery_courier_name === 'GLS') {
+                                            let url = "{{ route('orders.package.getSticker', ['id' => '%%'])}}"
+                                            html += '<a target="_blank" href="' + url.replace('%%', value.id) + '"><p style="margin-bottom: 0px;">';
+                                            html += value.letter_number ? value.letter_number : 'wygeneruj naklejkę';
+                                            html += '<div>';
+                                            if (value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
+                                                html += '<span>' + value.cash_on_delivery + ' zł</span>';
+                                            }
+                                            html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; padding: 5px; margin-top: 5px;margin-left: 5px; background-color:' + color + '" href="https://gls-group.eu/PL/pl/sledzenie-paczek?match=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
+                                            html += '</p></a>';
+                                            html += '</div>';
+                                        }
+                                    }
+                                    html += `<button class="btn btn-primary" onclick="showPackageCostModal('${value.id}', '${value.chosen_data_template}', '${value.cost_for_client}', '${value.cost_for_company}')">@lang('order_packages.form.buttons.changePackageCost')</button>`;
+                                    html += '</div>';
                                 }
-                                if (value.letter_number === null) {
-                                    if (value.status !== 'CANCELLED' && value.status !== 'WAITING_FOR_CANCELLED' && value.delivery_courier_name !== 'GIELDA' && value.service_courier_name !== 'GIELDA' && value.delivery_courier_name !== 'ODBIOR_OSOBISTY' && value.service_courier_name !== 'ODBIOR_OSOBISTY') {
+                                if (isProblem) {
+                                    html += '</div>'
+                                }
+                            });
+                            return html;
+                        }
+                    },
+                    {
+                        data: null,
+                        name: 'packages_not_sent',
+                        searchable: false,
+                        orderable: false,
+                        render: function (order, type, row) {
+                            let data = order.packages
+                            var html = ''
+                            if (data.length != 0) {
+                                if (order.otherPackages && order.otherPackages.find(el => el.type == 'not_calculable')) {
+                                    html = '<div style="border: solid blue 4px" >'
+                                } else {
+                                    html = '<div style="border: solid green 4px" >'
+                                }
+                            }
+                            let cancelled = 0;
+                            $.each(data, function (key, value) {
+                                let color = '';
+                                switch (value.status) {
+                                    case 'DELIVERED':
+                                        color = '#87D11B';
+                                        break;
+                                    case 'SENDING':
+                                        color = '#4DCFFF';
+                                        break;
+                                    case 'WAITING_FOR_SENDING':
+                                        color = '#5537f0';
+                                        break;
+                                }
+                                if (value.status === 'CANCELLED') {
+                                    cancelled++;
+                                }
+                                if (value.status !== 'SENDING' && value.status !== 'DELIVERED' && value.status !== 'CANCELLED') {
+                                    html += '<div style="display: flex; align-items: center; flex-direction: column;" > ' +
+                                        '<div style="display: flex; align-items: stretch;">' +
+                                        '<p style="margin: 8px 0px 0px 0px;"> ' + row.orderId + '/' + value.number + '</p>'
+                                    let name = value.container_type
+                                    if (value.symbol) {
+                                        name = value.symbol;
+                                    }
+                                    html += '<p style="margin: 8px 8px 0px 8px;">' + name + '</p> </div> '
+
+                                    if (value.status === 'WAITING_FOR_CANCELLED') {
+                                        html += '<p>WYSŁANO DO ANULACJI</p>';
+                                    }
+                                    if (value.status === 'REJECT_CANCELLED') {
+                                        html += '<p style="color:red;">ANULACJA ODRZUCONA</p>';
+                                    }
+                                    if (value.letter_number === null) {
+                                        if (value.status !== 'CANCELLED' && value.status !== 'WAITING_FOR_CANCELLED' && value.delivery_courier_name !== 'GIELDA' && value.service_courier_name !== 'GIELDA' && value.delivery_courier_name !== 'ODBIOR_OSOBISTY' && value.service_courier_name !== 'ODBIOR_OSOBISTY') {
+                                            html += '<div style="display: flex;">'
+                                            html += '<button class="btn btn-success" id="package-' + value.id + '" onclick="sendPackage(' + value.id + ',' + value.order_id + ')">Wyślij</button>';
+                                            html += '<button class="btn btn-danger" onclick="deletePackage(' + value.id + ', ' + value.order_id + ')">Usuń</button>'
+                                            html += '<button class="btn btn-info" onclick="createSimilar(' + value.id + ', ' + value.order_id + ')">Podobna</button>'
+                                            html += '</div>'
+                                        }
+                                    } else {
+                                        if (value.service_courier_name === 'INPOST' || value.service_courier_name === 'ALLEGRO-INPOST') {
+                                            html += '<a target="_blank" href="/storage/inpost/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
+                                            html += '<div>';
+                                            if (value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
+                                                html += '<span>' + value.cash_on_delivery + ' zł</span>';
+                                            }
+                                            html += '<a target="_blank" style="color: green; font-weight: bold; color: #FFFFFF; display: inline-block; margin-top: 5px; margin-left: 5px; padding: 5px; background-color:' + color + '" href="https://inpost.pl/sledzenie-przesylek?number=' + value.letter_number + '"<i class="fas fa-shipping-fast"></i></a>';
+                                            html += '</div>';
+                                        } else if (value.delivery_courier_name === 'DPD') {
+                                            html += '<a target="_blank" href="/storage/dpd/protocols/protocol' + value.letter_number + '.pdf"><p>' + value.sending_number + '</p></a>';
+                                            html += '<a target="_blank" href="/storage/dpd/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
+                                            html += '<div>';
+                                            if (value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
+                                                html += '<span>' + value.cash_on_delivery + ' zł</span>';
+                                            }
+                                            html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; margin-top: 5px;padding: 5px;margin-left: 5px; background-color:' + color + '" href="https://tracktrace.dpd.com.pl/parcelDetails?typ=1&p1=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
+                                            html += '</div>';
+                                        } else if (value.delivery_courier_name === 'POCZTEX') {
+                                            html += '<a target="_blank" href="/storage/pocztex/protocols/protocol' + value.sending_number + '.pdf"><p>' + value.letter_number + '</p></a>';
+                                            html += '<div>';
+                                            if (value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
+                                                html += '<span>' + value.cash_on_delivery + ' zł</span>';
+                                            }
+                                            html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; margin-top: 5px;padding: 5px;margin-left: 5px; background-color:' + color + '" href="http://www.pocztex.pl/sledzenie-przesylek/?numer=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
+                                            html += '</div>';
+                                        } else if (value.delivery_courier_name === 'JAS') {
+                                            html += '<a target="_blank" href="/storage/jas/protocols/protocol' + value.sending_number + '.pdf"><p>' + value.letter_number + '</p></a>';
+                                            html += '<a target="_blank" href="/storage/jas/labels/label' + value.sending_number + '.pdf"><p>' + value.letter_number + '</p></a>';
+                                        } else if (value.delivery_courier_name === 'GIELDA') {
+                                            html += '<a target="_blank" href="/storage/gielda/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
+                                        } else if (value.delivery_courier_name === 'ODBIOR_OSOBISTY') {
+                                            html += '<a target="_blank" href="/storage/odbior_osobisty/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
+                                        } else if (value.delivery_courier_name === 'GLS') {
+                                            let url = "{{ route('orders.package.getSticker', ['id' => '%%'])}}"
+                                            html += '<a target="_blank" href="' + url.replace('%%', value.id) + '"><p>';
+                                            html += value.letter_number ? value.letter_number : 'wygeneruj naklejkę';
+                                            html += '</p></a>';
+                                            html += '<div>';
+                                            if (value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
+                                                html += '<span>' + value.cash_on_delivery + ' zł</span>';
+                                            }
+                                            html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; padding: 5px; margin-top: 5px;margin-left: 5px; background-color:' + color + '" href="https://gls-group.eu/PL/pl/sledzenie-paczek?match=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
+                                            html += '</p></a>';
+                                            html += '</div>';
+                                        }
                                         html += '<div style="display: flex;">'
-                                        html += '<button class="btn btn-success" id="package-' + value.id + '" onclick="sendPackage(' + value.id + ',' + value.order_id + ')">Wyślij</button>';
-                                        html += '<button class="btn btn-danger" onclick="deletePackage(' + value.id + ', ' + value.order_id + ')">Usuń</button>'
+                                        html += '<button class="btn btn-danger" onclick="cancelPackage(' + value.id + ', ' + value.order_id + ')">Anuluj</button>'
                                         html += '<button class="btn btn-info" onclick="createSimilar(' + value.id + ', ' + value.order_id + ')">Podobna</button>'
                                         html += '</div>'
                                     }
-                                } else {
-                                    if (value.service_courier_name === 'INPOST' || value.service_courier_name === 'ALLEGRO-INPOST') {
-                                        html += '<a target="_blank" href="/storage/inpost/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
-                                        html += '<div>';
-                                        if(value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
-                                            html += '<span>' + value.cash_on_delivery + ' zł</span>';
-                                        }
-                                        html += '<a target="_blank" style="color: green; font-weight: bold; color: #FFFFFF; display: inline-block; margin-top: 5px; margin-left: 5px; padding: 5px; background-color:' + color + '" href="https://inpost.pl/sledzenie-przesylek?number=' + value.letter_number + '"<i class="fas fa-shipping-fast"></i></a>';
-                                        html += '</div>';
-                                    } else if (value.delivery_courier_name === 'DPD') {
-                                        html += '<a target="_blank" href="/storage/dpd/protocols/protocol' + value.letter_number + '.pdf"><p>' + value.sending_number + '</p></a>';
-                                        html += '<a target="_blank" href="/storage/dpd/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
-                                        html += '<div>';
-                                        if(value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
-                                            html += '<span>' + value.cash_on_delivery + ' zł</span>';
-                                        }
-                                        html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; margin-top: 5px;padding: 5px;margin-left: 5px; background-color:' + color + '" href="https://tracktrace.dpd.com.pl/parcelDetails?typ=1&p1=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
-                                        html += '</div>';
-                                    } else if (value.delivery_courier_name === 'POCZTEX') {
-                                        html += '<a target="_blank" href="/storage/pocztex/protocols/protocol' + value.sending_number + '.pdf"><p>' + value.letter_number + '</p></a>';
-                                        html += '<div>';
-                                        if(value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
-                                            html += '<span>' + value.cash_on_delivery + ' zł</span>';
-                                        }
-                                        html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; margin-top: 5px;padding: 5px;margin-left: 5px; background-color:' + color + '" href="http://www.pocztex.pl/sledzenie-przesylek/?numer=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
-                                        html += '</div>';
-                                    } else if (value.delivery_courier_name === 'JAS') {
-                                        html += '<a target="_blank" href="/storage/jas/protocols/protocol' + value.sending_number + '.pdf"><p>' + value.letter_number + '</p></a>';
-                                        html += '<a target="_blank" href="/storage/jas/labels/label' + value.sending_number + '.pdf"><p>' + value.letter_number + '</p></a>';
-                                    } else if (value.delivery_courier_name === 'GIELDA') {
-                                        html += '<a target="_blank" href="/storage/gielda/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
-                                    } else if (value.delivery_courier_name === 'ODBIOR_OSOBISTY') {
-                                        html += '<a target="_blank" href="/storage/odbior_osobisty/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
-                                    } else if (value.delivery_courier_name === 'GLS') {
-                                        let url = "{{ route('orders.package.getSticker', ['id' => '%%'])}}"
-                                        html += '<a target="_blank" href="' + url.replace('%%', value.id) + '"><p>';
-                                        html += value.letter_number ? value.letter_number : 'wygeneruj naklejkę';
-                                        html += '</p></a>';
-                                        html += '<div>';
-                                        if(value.cash_on_delivery !== null && value.cash_on_delivery > 0) {
-                                            html += '<span>' + value.cash_on_delivery + ' zł</span>';
-                                        }
-                                        html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; padding: 5px; margin-top: 5px;margin-left: 5px; background-color:' + color + '" href="https://gls-group.eu/PL/pl/sledzenie-paczek?match=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
-                                        html += '</p></a>';
-                                        html += '</div>';
+
+                                    html += '</div>';
+                                }
+                            });
+                            if (cancelled > 0) {
+                                let url = "{{ route('orders.editPackages', ['id' => '%%']) }}";
+                                url = url.replace('%%', order.orderId)
+                                html += `<a target=+_blank href="${url}">Anulowano: ${cancelled}</a>`;
+                            }
+                            return html;
+                        }
+                    },
+                    {
+                        data: 'production_date',
+                        name: 'production_date',
+                        searchable: false,
+                        render: (production_date, option, row) => ((production_date ?? '') + ' ' + (row.taskUserFirstName ?? '') + ' ' +
+                            (row.taskUserLastName ?? ''))
+                    },
+                    {
+                        data: 'shipment_date',
+                        name: 'shipment_date',
+                        searchable: false,
+                        render: function (shipment_date, option, row) {
+                            let html = '';
+                            let date = moment(shipment_date);
+                            let DRNP = null;
+
+                            if (date.isValid()) {
+                                let formatedDate = date.format('YYYY-MM-DD');
+                                let startDaysVariation = "";
+                                if (row.shipment_start_days_variation) {
+                                    startDaysVariation = "<br>&plusmn; " + row.shipment_start_days_variation + " dni";
+                                }
+                                DRNP = html + formatedDate + startDaysVariation;
+                            }
+
+                            let datesLabels = ['WDNKL', 'WDNM', 'ZDNK', 'ZDNM'];
+
+                            const datesObject = {
+                                'WDNK': DRNP,
+                                'WDNKL': row.initial_sending_date_client,
+                                'WDNM': row.initial_sending_date_magazine,
+                                'ZDNK': row.confirmed_sending_date_consultant,
+                                'ZDNM': row.confirmed_sending_date_warehouse,
+                                'WDOK': row.initial_pickup_date_client,
+                                'PDKL': row.confirmed_pickup_date_client,
+                                'PDK': row.confirmed_pickup_date_consultant,
+                                'PDM': row.confirmed_pickup_date_warehouse,
+                                'WDDK': row.initial_delivery_date_consultant,
+                                'WDDM': row.initial_delivery_date_warehouse,
+                                'PDD': row.confirmed_delivery_date
+                            }
+
+                            for (const [key, value] of Object.entries(datesObject)) {
+                                if (value != null)
+                                    if (datesLabels.includes(key)) {
+                                        html += `${key}: <br/> ${value.slice(0, 10)} <br/>`
+                                    } else {
+                                        html += `${key}: <br/> ${value} <br/>`
                                     }
-                                    html += '<div style="display: flex;">'
-                                    html += '<button class="btn btn-danger" onclick="cancelPackage(' + value.id + ', ' + value.order_id + ')">Anuluj</button>'
-                                    html += '<button class="btn btn-info" onclick="createSimilar(' + value.id + ', ' + value.order_id + ')">Podobna</button>'
-                                    html += '</div>'
+                            }
+
+                            return html;
+                        }
+                    },
+                        @foreach($customColumnLabels as $labelGroupName => $label)
+                    {
+                        data: null,
+                        name: 'label_{{str_replace(" ", "_", $labelGroupName)}}',
+                        searchable: false,
+                        orderable: false,
+                        render: function (order, option, row) {
+                            let labels = order.labels;
+                            let html = '';
+                            let currentLabelGroup = "{{ $labelGroupName }}";
+                            if (row.closest_label_schedule_type_c && currentLabelGroup == "info dodatkowe") {
+                                html += row.closest_label_schedule_type_c.trigger_time;
+                            }
+                            if (currentLabelGroup == "info dodatkowe") {
+                                html += '<a href="#" class="add__file"' + 'onclick="addNewFile(' + order.orderId + ')">Dodaj</a>'
+                                html += '<br />'
+                                let url = "{{ route('orders.getFile', ['id' => '%%', 'file_id' => 'QQ']) }}";
+                                let files = order.files;
+                                if (files.length > 0) {
+                                    let orderUrl = url.replace('%%', order.orderId);
+                                    files.forEach(function (file) {
+                                        let href = orderUrl.replace('QQ', file.hash);
+                                        html += `<a target="_blank" href="${href}" style="margin-top: 5px;">${file.file_name}</a>`;
+                                        html += '<br />'
+                                    });
+                                    html += '<a href="#" class="remove__file"' + 'onclick="getFilesList(' + order.orderId + ')">Usuń</a>'
                                 }
-
-                                html += '</div>';
                             }
-                        });
-                        if (cancelled > 0) {
-                            let url = "{{ route('orders.editPackages', ['id' => '%%']) }}";
-                            url = url.replace('%%', order.orderId)
-                            html += `<a target=+_blank href="${url}">Anulowano: ${cancelled}</a>`;
-                        }
-                        return html;
-                    }
-                },
-                {
-                    data: 'production_date',
-                    name: 'production_date',
-                    searchable: false,
-                    render: (production_date, option, row) => ((production_date ?? '') + ' ' + (row.taskUserFirstName ?? ''))
-                },
-                {
-                    data: 'shipment_date',
-                    name: 'shipment_date',
-                    searchable: false,
-                    render: function (shipment_date, option, row) {
-                        let html = '';
-                        let date = moment(shipment_date);
-                        let DRNP = null;
 
-                        if (date.isValid()) {
-                            let formatedDate = date.format('YYYY-MM-DD');
-                            let startDaysVariation = "";
-                            if (row.shipment_start_days_variation) {
-                                startDaysVariation = "<br>&plusmn; " + row.shipment_start_days_variation + " dni";
-                            }
-                            DRNP = html + formatedDate + startDaysVariation;
-                        }
-
-                        let datesLabels = ['WDNKL', 'WDNM', 'ZDNK', 'ZDNM'];
-
-                        const datesObject = {
-                            'WDNK': DRNP,
-                            'WDNKL': row.initial_sending_date_client,
-                            'WDNM': row.initial_sending_date_magazine,
-                            'ZDNK': row.confirmed_sending_date_consultant,
-                            'ZDNM': row.confirmed_sending_date_warehouse,
-                            'WDOK': row.initial_pickup_date_client,
-                            'PDKL': row.confirmed_pickup_date_client,
-                            'PDK': row.confirmed_pickup_date_consultant,
-                            'PDM': row.confirmed_pickup_date_warehouse,
-                            'WDDK': row.initial_delivery_date_consultant,
-                            'WDDM': row.initial_delivery_date_warehouse,
-                            'PDD': row.confirmed_delivery_date
-                        }
-
-                        for (const [key, value] of Object.entries(datesObject)) {
-                            if(value != null)
-                                if(datesLabels.includes(key)) {
-                                    html += `${key}: <br/> ${value.slice(0,10)} <br/>`
-                                } else {
-                                    html += `${key}: <br/> ${value} <br/>`
-                                }
-                        }
-
-                        return html;
-                    }
-                },
-                    @foreach($customColumnLabels as $labelGroupName => $label)
-                {
-                    data: null,
-                    name: 'label_{{str_replace(" ", "_", $labelGroupName)}}',
-                    searchable: false,
-                    orderable: false,
-                    render: function (order, option, row) {
-                        let labels = order.labels;
-                        let html = '';
-                        let currentLabelGroup = "{{ $labelGroupName }}";
-                        if (row.closest_label_schedule_type_c && currentLabelGroup == "info dodatkowe") {
-                            html += row.closest_label_schedule_type_c.trigger_time;
-                        }
-                        if (currentLabelGroup == "info dodatkowe") {
-                            html += '<a href="#" class="add__file"' + 'onclick="addNewFile(' + order.orderId + ')">Dodaj</a>'
-                            html += '<br />'
-                            let url = "{{ route('orders.getFile', ['id' => '%%', 'file_id' => 'QQ']) }}";
-                            let files = order.files;
-                            if (files.length > 0) {
-                                let orderUrl = url.replace('%%', order.orderId);
-                                files.forEach(function (file) {
-                                    let href = orderUrl.replace('QQ', file.hash);
-                                    html += `<a target="_blank" href="${href}" style="margin-top: 5px;">${file.file_name}</a>`;
-                                    html += '<br />'
-                                });
-                                html += '<a href="#" class="remove__file"' + 'onclick="getFilesList(' + order.orderId + ')">Usuń</a>'
-                            }
-                        }
-
-                        labels.forEach(function (label) {
-                            if (label.length > 0) {
-                                if (label[0].label_group_id != null) {
-                                    if (label[0].label_group[0].name == currentLabelGroup) {
-                                        let tooltipContent = label[0].name
-                                        if (
-                                            label[0].id == 55 ||
-                                            label[0].id == 56 ||
-                                            label[0].id == 57 ||
-                                            label[0].id == 58
-                                        ) {
-                                            tooltipContent = row.generalMessage;
-                                        } else if (
-                                            label[0].id == 78 ||
-                                            label[0].id == 79 ||
-                                            label[0].id == 80 ||
-                                            label[0].id == 81
-                                        ) {
-                                            tooltipContent = row.shippingMessage;
-                                        } else if (
-                                            label[0].id == 82 ||
-                                            label[0].id == 83 ||
-                                            label[0].id == 84 ||
-                                            label[0].id == 85
-                                        ) {
-                                            tooltipContent = row.warehouseMessage;
-                                        } else if (
-                                            label[0].id == 59 ||
-                                            label[0].id == 60 ||
-                                            label[0].id == 61 ||
-                                            label[0].id == 62
-                                        ) {
-                                            tooltipContent = row.complaintMessage;
-                                        }
-                                        let comparasion = false
-                                        if (row.payment_deadline) {
-                                            let d1 = new Date();
-                                            let d2 = new Date(row.payment_deadline);
-                                            d1.setHours(0, 0, 0, 0)
-                                            d2.setHours(0, 0, 0, 0)
-                                            comparasion = d1 >= d2
-                                        }
-                                        if (label[0].id == '{{ env('MIX_LABEL_WAITING_FOR_PAYMENT_ID') }}' && comparasion) {
-                                            html += `<div data-toggle="label-tooltip" style="border: solid red 4px" data-html="true" title="${tooltipContent}" class="pointer" onclick="removeLabel(${row.orderId}, ${label[0].id}, ${label[0].manual_label_selection_to_add_after_removal}, '${label[0].added_type}', '${label[0].timed}');">
+                            labels.forEach(function (label) {
+                                if (label.length > 0) {
+                                    if (label[0].label_group_id != null) {
+                                        if (label[0].label_group[0].name == currentLabelGroup) {
+                                            let tooltipContent = label[0].name
+                                            if (
+                                                label[0].id == 55 ||
+                                                label[0].id == 56 ||
+                                                label[0].id == 57 ||
+                                                label[0].id == 58
+                                            ) {
+                                                tooltipContent = row.generalMessage;
+                                            } else if (
+                                                label[0].id == 78 ||
+                                                label[0].id == 79 ||
+                                                label[0].id == 80 ||
+                                                label[0].id == 81
+                                            ) {
+                                                tooltipContent = row.shippingMessage;
+                                            } else if (
+                                                label[0].id == 82 ||
+                                                label[0].id == 83 ||
+                                                label[0].id == 84 ||
+                                                label[0].id == 85
+                                            ) {
+                                                tooltipContent = row.warehouseMessage;
+                                            } else if (
+                                                label[0].id == 59 ||
+                                                label[0].id == 60 ||
+                                                label[0].id == 61 ||
+                                                label[0].id == 62
+                                            ) {
+                                                tooltipContent = row.complaintMessage;
+                                            }
+                                            let comparasion = false
+                                            if (row.payment_deadline) {
+                                                let d1 = new Date();
+                                                let d2 = new Date(row.payment_deadline);
+                                                d1.setHours(0, 0, 0, 0)
+                                                d2.setHours(0, 0, 0, 0)
+                                                comparasion = d1 >= d2
+                                            }
+                                            if (label[0].id == '{{ env('MIX_LABEL_WAITING_FOR_PAYMENT_ID') }}' && comparasion) {
+                                                html += `<div data-toggle="label-tooltip" style="border: solid red 4px" data-html="true" title="${tooltipContent}" class="pointer" onclick="removeLabel(${row.orderId}, ${label[0].id}, ${label[0].manual_label_selection_to_add_after_removal}, '${label[0].added_type}', '${label[0].timed}');">
                                                         <span class="order-label" style="color: ${label[0].font_color}'; display: block; margin-top: 5px; background-color: ${label[0].color}">
                                                             <i class="${label[0].icon_name}"></i>
                                                         </span>
                                                      </div>`;
-                                        } else {
-                                            html += `<div data-toggle="label-tooltip" data-html="true" title="${tooltipContent}" class="pointer" onclick="removeLabel(${row.orderId}, ${label[0].id}, ${label[0].manual_label_selection_to_add_after_removal}, '${label[0].added_type}', '${label[0].timed}');">
+                                            } else {
+                                                html += `<div data-toggle="label-tooltip" data-html="true" title="${tooltipContent}" class="pointer" onclick="removeLabel(${row.orderId}, ${label[0].id}, ${label[0].manual_label_selection_to_add_after_removal}, '${label[0].added_type}', '${label[0].timed}');">
                                                         <span class="order-label" style="color: ${label[0].font_color}; display: block; margin-top: 5px; background-color: ${label[0].color}">
                                                             <i class="${label[0].icon_name}"></i>
                                                         </span>
                                                      </div>`;
+                                            }
                                         }
                                     }
                                 }
-                            }
-                        });
-
-                        return html;
-                    }
-                },
-                    @endforeach
-                {
-                    data: 'token',
-                    name: 'print',
-                    orderable: false,
-                    render: function (token, row, data) {
-                        let html = '';
-                        if (data.print_order == '0') {
-                            html = '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-default" id="btn-print">W</a>';
-                        } else {
-                            html = '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-success">W</a>';
-                        }
-                        return html;
-                    }
-                },
-                {
-                    data: 'name',
-                    name: 'name',
-                    defaultContent: ''
-
-                },
-                {
-                    data: 'orderDate',
-                    name: 'orderDate'
-                },
-                {
-                    data: 'orderId',
-                    name: 'orderId',
-                    render: function (orderId, row, data) {
-                        let html = '';
-                        if (data.master_order_id == null) {
-                            if (data.sello_id) {
-                                html += ' (A)'
-                            }
-                            for (let i = 0; i < data.connected.length; i++) {
-                                html += '<span style="display: block;">(P)' + data.connected[i].id + '</span>';
-                            }
-                            html = '<a target="_blank" href="/admin/planning/timetable?id=taskOrder-' + orderId + '">(G)' + orderId + '</a>' + html;
-                        } else {
-                            html = '<a target="_blank" href="/admin/planning/timetable?id=taskOrder-' + orderId + '">(P)' + orderId + '</a><span style="display: block;">(G)' + data.master_order_id + '</span>';
-                        }
-                        let array = {{ json_encode(\App\Entities\Label::NOT_SENT_YET_LABELS_IDS) }};
-                        let batteryId = {{ \App\Entities\Label::ORDER_ITEMS_REDEEMED_LABEL }};
-                        let hasHammerOrBagLabel = data.labels.filter(label => {
-                            return array.includes(parseInt(label[0].id));
-                        }).length > 0;
-                        let isNotProducedYet = data.labels.filter(label => {
-                            return parseInt(label[0].id) == batteryId;
-                        }).length == 0;
-                        if (hasHammerOrBagLabel && isNotProducedYet) {
-                            html += data.history.reduce((acu, order) => {
-                                if (order.id == orderId) {
-                                    return acu;
-                                }
-                                let hasChildHammerOrBagLabel = order.labels.filter(label => {
-                                    return array.includes(parseInt(label.id));
-                                }).length > 0;
-                                let isChildNotProducedYet = order.labels.filter(label => {
-                                    return parseInt(label.id) == batteryId;
-                                }).length == 0;
-                                if (hasChildHammerOrBagLabel && isChildNotProducedYet) {
-                                    let url = "{{ route('orders.edit', ['id' => ':id:']) }}"
-                                    return acu += '<a target="_blank" href="' + url.replace(":id:", order.id) + `"> (D)${order.id}</a>`
-                                }
-                                return acu;
-                            }, '');
-
-                        }
-                        return html;
-                    }
-                },
-                {
-                    data: 'orderId',
-                    name: 'actions',
-                    orderable: false,
-                    render: function (id) {
-                        let html = '';
-                        html += '<button id="moveButton-' + id + '" class="btn btn-sm btn-warning edit" onclick="moveData(' + id + ')">Przenieś</button>';
-                        html += '<button id="moveButtonAjax-' + id + '" class="btn btn-sm btn-success btn-move edit hidden" onclick="moveDataAjax(' + id + ')">Przenieś dane tutaj</button>';
-                        html += '<a href="{{ url()->current() }}/' + id + '/edit" class="btn btn-sm btn-primary edit">';
-                        html += '<i class="voyager-edit"></i>';
-                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
-                        html += '</a>';
-                        @if((Auth::user()->role_id == 1 || Auth::user()->role_id == 2) && Auth::user()->id === \App\User::ORDER_DELETE_USER)
-                            html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecord(' + id + ')">';
-                        html += '<i class="voyager-trash"></i>';
-                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
-                        html += '</button>';
-                        @endif
+                            });
 
                             return html;
-                    }
-                },
-                {
-                    data: 'orderId',
-                    name: 'section',
-                    orderable: false,
-                    render: function () {
-                        let html = 'tymczasowy brak';
-                        return html;
-                    }
-                },
-                {
-                    data: 'statusName',
-                    name: 'statusName',
-                    render: function (field, type, row) {
-                        if (field == null) {
-                            return "";
                         }
-
-                        let color = "";
-
-                        function checkReminder(row, color) {
-                            if (row.remainder_date) {
-                                if (moment(row.remainder_date).isBefore()) {
-                                    color = "orange";
-                                }
+                    },
+                        @endforeach
+                    {
+                        data: 'token',
+                        name: 'print',
+                        orderable: false,
+                        render: function (token, row, data) {
+                            let html = '';
+                            if (data.print_order == '0') {
+                                html = '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-default" id="btn-print">W</a>';
+                            } else {
+                                html = '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-success">W</a>';
                             }
-                            return color
+                            return html;
                         }
+                    },
+                    {
+                        data: 'name',
+                        name: 'name',
+                        defaultContent: ''
 
-                        switch (field) {
-                            case "przyjete zapytanie ofertowe":
-                                color = "red";
-                                break;
-                            case "oferta bez realizacji":
-                                color = "#AAB78F";
-                                break;
-                            case "oferta zakonczona":
-                                color = checkReminder(row, "green");
-                                break;
-                            case "w trakcie realizacji":
-                            case "w trakcie analizowania przez konsultanta":
-                            case "mozliwa do realizacji":
-                            case "mozliwa do realizacji kominy":
-                            case "oferta oczekujaca":
-                                color = checkReminder(row, "blue");
-                                break;
+                    },
+                    {
+                        data: 'orderDate',
+                        name: 'orderDate'
+                    },
+                    {
+                        data: 'orderId',
+                        name: 'orderId',
+                        render: function (orderId, row, data) {
+                            let html = '';
+                            if (data.master_order_id == null) {
+                                if (data.sello_id) {
+                                    html += ' (A)'
+                                }
+                                for (let i = 0; i < data.connected.length; i++) {
+                                    html += '<span style="display: block;">(P)' + data.connected[i].id + '</span>';
+                                }
+                                html = '<a target="_blank" href="/admin/planning/timetable?id=taskOrder-' + orderId + '">(G)' + orderId + '</a>' + html;
+                            } else {
+                                html = '<a target="_blank" href="/admin/planning/timetable?id=taskOrder-' + orderId + '">(P)' + orderId + '</a><span style="display: block;">(G)' + data.master_order_id + '</span>';
+                            }
+                            let array = {{ json_encode(\App\Entities\Label::NOT_SENT_YET_LABELS_IDS) }};
+                            let batteryId = {{ \App\Entities\Label::ORDER_ITEMS_REDEEMED_LABEL }};
+                            let hasHammerOrBagLabel = data.labels.filter(label => {
+                                return array.includes(parseInt(label[0].id));
+                            }).length > 0;
+                            let isNotProducedYet = data.labels.filter(label => {
+                                return parseInt(label[0].id) == batteryId;
+                            }).length == 0;
+                            if (hasHammerOrBagLabel && isNotProducedYet) {
+                                html += data.history.reduce((acu, order) => {
+                                    if (order.id == orderId) {
+                                        return acu;
+                                    }
+                                    let hasChildHammerOrBagLabel = order.labels.filter(label => {
+                                        return array.includes(parseInt(label.id));
+                                    }).length > 0;
+                                    let isChildNotProducedYet = order.labels.filter(label => {
+                                        return parseInt(label.id) == batteryId;
+                                    }).length == 0;
+                                    if (hasChildHammerOrBagLabel && isChildNotProducedYet) {
+                                        let url = "{{ route('orders.edit', ['id' => ':id:']) }}"
+                                        return acu += '<a target="_blank" href="' + url.replace(":id:", order.id) + `"> (D)${order.id}</a>`
+                                    }
+                                    return acu;
+                                }, '');
+
+                            }
+                            return html;
                         }
+                    },
+                    {
+                        data: 'orderId',
+                        name: 'actions',
+                        orderable: false,
+                        render: function (id) {
+                            let html = '';
+                            html += '<button id="moveButton-' + id + '" class="btn btn-sm btn-warning edit" onclick="moveData(' + id + ')">Przenieś</button>';
+                            html += '<button id="moveButtonAjax-' + id + '" class="btn btn-sm btn-success btn-move edit hidden" onclick="moveDataAjax(' + id + ')">Przenieś dane tutaj</button>';
+                            html += '<a href="{{ url()->current() }}/' + id + '/edit" class="btn btn-sm btn-primary edit">';
+                            html += '<i class="voyager-edit"></i>';
+                            html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
+                            html += '</a>';
+                            @if((Auth::user()->role_id == 1 || Auth::user()->role_id == 2) && Auth::user()->id === \App\User::ORDER_DELETE_USER)
+                                html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecord(' + id + ')">';
+                            html += '<i class="voyager-trash"></i>';
+                            html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
+                            html += '</button>'
+                            html += '<button data-order="'+id+'"';
+                            html += ' class="btn penalty btn-default btn-sm edit"><i class="fas fa-minus"></i> Potrącenie</button>';
+                            @endif
 
-                        return "<span style='color: " + color + "'>" + field + "</span>";
-                    }
-                },
-                {
-
-                    data: 'symbol',
-                    name: 'symbol',
-                    defaultContent: '',
-                    render: function (data) {
-                        var warehouse = '';
-                        if (data !== null) {
-                            warehouse = '<a href="/admin/warehouses/' + data + '/editBySymbol">' + data + '</a>';
-                        } else {
-                            warehouse = '';
+                                return html;
                         }
-                        return warehouse;
-                    }
-                },
-                {
-                    data: 'warehouse_notice',
-                    name: 'warehouse_notice'
-                },
-                {
-                    data: 'customer_notices',
-                    name: 'customer_notices'
-                },
-                {
-                    data: 'consultant_notices',
-                    name: 'consultant_notices',
-                    render: function (data, type, row) {
-                        if (data !== null) {
-                            var text = data;
-                            var shortText = data.substr(0, 49) + "...";
-                            $('#consultant_notices-' + row.orderId).hover(function () {
-                                $('#consultant_notices-' + row.orderId).text(text);
-                            }, function () {
+                    },
+                    {
+                        data: 'orderId',
+                        name: 'section',
+                        orderable: false,
+                        render: function () {
+                            let html = 'tymczasowy brak';
+                            return html;
+                        }
+                    },
+                    {
+                        data: 'statusName',
+                        name: 'statusName',
+                        render: function (field, type, row) {
+                            if (field == null) {
+                                return "";
+                            }
+
+                            let color = "";
+
+                            function checkReminder(row, color) {
+                                if (row.remainder_date) {
+                                    if (moment(row.remainder_date).isBefore()) {
+                                        color = "orange";
+                                    }
+                                }
+                                return color
+                            }
+
+                            switch (field) {
+                                case "przyjete zapytanie ofertowe":
+                                    color = "red";
+                                    break;
+                                case "oferta bez realizacji":
+                                    color = "#AAB78F";
+                                    break;
+                                case "oferta zakonczona":
+                                    color = checkReminder(row, "green");
+                                    break;
+                                case "w trakcie realizacji":
+                                case "w trakcie analizowania przez konsultanta":
+                                case "mozliwa do realizacji":
+                                case "mozliwa do realizacji kominy":
+                                case "oferta oczekujaca":
+                                    color = checkReminder(row, "blue");
+                                    break;
+                            }
+
+                            return "<span style='color: " + color + "'>" + field + "</span>";
+                        }
+                    },
+                    {
+
+                        data: 'symbol',
+                        name: 'symbol',
+                        defaultContent: '',
+                        render: function (data) {
+                            var warehouse = '';
+                            if (data !== null) {
+                                warehouse = '<a href="/admin/warehouses/' + data + '/editBySymbol">' + data + '</a>';
+                            } else {
+                                warehouse = '';
+                            }
+                            return warehouse;
+                        }
+                    },
+                    {
+                        data: 'warehouse_notice',
+                        name: 'warehouse_notice'
+                    },
+                    {
+                        data: 'customer_notices',
+                        name: 'customer_notices'
+                    },
+                    {
+                        data: 'consultant_notices',
+                        name: 'consultant_notices',
+                        render: function (data, type, row) {
+                            if (data !== null) {
+                                var text = data;
+                                var shortText = data.substr(0, 49) + "...";
+                                $('#consultant_notices-' + row.orderId).hover(function () {
+                                    $('#consultant_notices-' + row.orderId).text(text);
+                                }, function () {
+                                    $('#consultant_notices-' + row.orderId).text(shortText);
+                                });
                                 $('#consultant_notices-' + row.orderId).text(shortText);
+                            }
+                            return data;
+                        }
+                    },
+                    {
+                        data: 'clientPhone',
+                        name: 'clientPhone',
+                        render: function (data, type, row) {
+                            var phone = row['clientPhone'];
+                            var email = row['clientEmail'];
+
+                            if (email === null) {
+                                email = 'Brak adresu email.'
+                            }
+
+                            let tooltipTitle = email;
+                            tooltipTitle += '&#013;';
+                            tooltipTitle += '&#013;' + 'Dane do wysylki:';
+                            $.each(row.addresses[0], function (index, value) {
+                                if (index !== 'type' && index !== 'created_at' && index !== 'updated_at') {
+                                    if (value === null) {
+                                        tooltipTitle += ' Brak';
+                                    } else {
+                                        tooltipTitle += ' ' + value + ',';
+                                    }
+                                }
                             });
-                            $('#consultant_notices-' + row.orderId).text(shortText);
-                        }
-                        return data;
-                    }
-                },
-                {
-                    data: 'clientPhone',
-                    name: 'clientPhone',
-                    render: function (data, type, row) {
-                        var phone = row['clientPhone'];
-                        var email = row['clientEmail'];
-
-                        if (email === null) {
-                            email = 'Brak adresu email.'
-                        }
-
-                        let tooltipTitle = email;
-                        tooltipTitle += '&#013;';
-                        tooltipTitle += '&#013;' + 'Dane do wysylki:';
-                        $.each(row.addresses[0], function (index, value) {
-                            if (index !== 'type' && index !== 'created_at' && index !== 'updated_at') {
-                                if (value === null) {
-                                    tooltipTitle += ' Brak';
-                                } else {
-                                    tooltipTitle += ' ' + value + ',';
+                            tooltipTitle += '&#013;' + 'Dane do faktury:';
+                            $.each(row.addresses[1], function (index, value) {
+                                if (index !== 'type' && index !== 'created_at' && index !== 'updated_at') {
+                                    if (value === null) {
+                                        tooltipTitle += ' Brak,';
+                                    } else {
+                                        tooltipTitle += ' ' + value + ',';
+                                    }
                                 }
+                            });
+                            tooltipTitle += '&#013;';
+                            let html = '';
+
+                            if (data) {
+                                html += '<button class="btn btn-default btn-xs" onclick="filterByPhone(' + data + ')">F</button><button class="btn btn-default btn-xs" onclick="clearAndfilterByPhone(' + data + ')">OF</button>';
                             }
-                        });
-                        tooltipTitle += '&#013;' + 'Dane do faktury:';
-                        $.each(row.addresses[1], function (index, value) {
-                            if (index !== 'type' && index !== 'created_at' && index !== 'updated_at') {
-                                if (value === null) {
-                                    tooltipTitle += ' Brak,';
-                                } else {
-                                    tooltipTitle += ' ' + value + ',';
+
+                            html += '<p data-toggle="tooltip" data-html="true" title="' + tooltipTitle + '">' + phone + '</p>';
+
+                            return html;
+                        }
+                    },
+                    {
+                        data: 'clientEmail',
+                        name: 'clientEmail',
+                        render: function (data, type, row) {
+                            var email = row['clientEmail'];
+
+                            let html = email;
+
+                            return html;
+                        }
+                    },
+                    {
+                        data: 'clientFirstname',
+                        name: 'clientFirstname',
+                        render: function (data, type, row) {
+                            var firstname = row['clientFirstname'];
+
+                            let html = firstname;
+
+                            return html;
+                        }
+                    },
+                    {
+                        data: 'clientLastname',
+                        name: 'clientLastname',
+                        render: function (data, type, row) {
+                            var lastname = row['clientLastname'];
+
+                            let html = lastname;
+
+                            return html;
+                        }
+                    },
+                    {
+                        data: 'nick_allegro',
+                        name: 'nick_allegro',
+                    },
+                    {
+                        data: 'orderId',
+                        name: 'profit',
+                        searchable: false,
+                        orderable: false,
+                        render: function (date, type, row) {
+                            let sumOfSelling = 0;
+                            let sumOfPurchase = 0;
+                            var items = row['items'];
+
+                            for (let index = 0; index < items.length; index++) {
+                                let priceSelling = items[index].gross_selling_price_commercial_unit;
+                                let pricePurchase = items[index].net_purchase_price_commercial_unit_after_discounts;
+                                let quantity = items[index].quantity;
+
+                                if (priceSelling == null) {
+                                    priceSelling = 0;
                                 }
+                                if (pricePurchase == null) {
+                                    pricePurchase = 0;
+                                }
+                                if (quantity == null) {
+                                    quantity = 0;
+                                }
+                                sumOfSelling += parseFloat(priceSelling) * parseInt(quantity);
+                                sumOfPurchase += parseFloat(pricePurchase) * parseInt(quantity);
                             }
-                        });
-                        tooltipTitle += '&#013;';
-                        let html = '';
 
-                        if (data) {
-                            html += '<button class="btn btn-default btn-xs" onclick="filterByPhone(' + data + ')">F</button><button class="btn btn-default btn-xs" onclick="clearAndfilterByPhone(' + data + ')">OF</button>';
+                            return (sumOfSelling - (sumOfPurchase * 1.23)).toFixed(2);
+
                         }
+                    },
+                    {
+                        data: 'weight',
+                        name: 'weight',
+                    },
+                    {
+                        data: 'values_data',
+                        name: 'values_data',
+                        render: function (data, type, row) {
 
-                        html += '<p data-toggle="tooltip" data-html="true" title="' + tooltipTitle + '">' + phone + '</p>';
-
-                        return html;
-                    }
-                },
-                {
-                    data: 'clientEmail',
-                    name: 'clientEmail',
-                    render: function (data, type, row) {
-                        var email = row['clientEmail'];
-
-                        let html = email;
-
-                        return html;
-                    }
-                },
-                {
-                    data: 'clientFirstname',
-                    name: 'clientFirstname',
-                    render: function (data, type, row) {
-                        var firstname = row['clientFirstname'];
-
-                        let html = firstname;
-
-                        return html;
-                    }
-                },
-                {
-                    data: 'clientLastname',
-                    name: 'clientLastname',
-                    render: function (data, type, row) {
-                        var lastname = row['clientLastname'];
-
-                        let html = lastname;
-
-                        return html;
-                    }
-                },
-                {
-                    data: 'nick_allegro',
-                    name: 'nick_allegro',
-                },
-                {
-                    data: 'orderId',
-                    name: 'profit',
-                    searchable: false,
-                    orderable: false,
-                    render: function (date, type, row) {
-                        let sumOfSelling = 0;
-                        let sumOfPurchase = 0;
-                        var items = row['items'];
-
-                        for (let index = 0; index < items.length; index++) {
-                            let priceSelling = items[index].gross_selling_price_commercial_unit;
-                            let pricePurchase = items[index].net_purchase_price_commercial_unit_after_discounts;
-                            let quantity = items[index].quantity;
-
-                            if (priceSelling == null) {
-                                priceSelling = 0;
-                            }
-                            if (pricePurchase == null) {
-                                pricePurchase = 0;
-                            }
-                            if (quantity == null) {
-                                quantity = 0;
-                            }
-                            sumOfSelling += parseFloat(priceSelling) * parseInt(quantity);
-                            sumOfPurchase += parseFloat(pricePurchase) * parseInt(quantity);
-                        }
-
-                        return (sumOfSelling - (sumOfPurchase * 1.23)).toFixed(2);
-
-                    }
-                },
-                {
-                    data: 'weight',
-                    name: 'weight',
-                },
-                {
-                    data: 'values_data',
-                    name: 'values_data',
-                    render: function (data, type, row) {
-
-                        return '<p><span title="Wartość Zamówienia">WZ: ' + row['values_data']['sum_of_gross_values'] + '</p>\n\
+                            return '<p><span title="Wartość Zamówienia">WZ: ' + row['values_data']['sum_of_gross_values'] + '</p>\n\
                         <p><span title="Wartość Towaru">WT: ' + row['values_data']['products_value_gross'] + '</p>\n\
                         <p><span title="Koszt Transportu Dla Klienta">KT: ' + row['values_data']['shipment_price_for_client'] + '</p>\n\
                         <p><span title="Dodatkowy Koszt Pobrania">DKP: ' + row['values_data']['additional_cash_on_delivery_cost'] + '</p>\n\
                         <p><span title="Dodatkowy Koszt Obsługi">DKO: ' + row['values_data']['additional_service_cost'] + '</p>'
-                    }
-                },
-                {
-                    data: 'shipment_price_for_us',
-                    name: 'shipment_price_for_us',
-                },
-                {
-                    data: 'orderId',
-                    name: 'sum_of_payments',
-                    searchable: false,
-                    render: function (data, type, row) {
-                        let totalOfPayments = 0;
-                        let totalOfDeclaredPayments = 0;
-                        let totalofWarehousePayments = 0;
-                        var payments = row['payments'];
+                        }
+                    },
+                    {
+                        data: 'shipment_price_for_us',
+                        name: 'shipment_price_for_us',
+                    },
+                    {
+                        data: 'orderId',
+                        name: 'sum_of_payments',
+                        searchable: false,
+                        render: function (data, type, row) {
+                            let totalOfPayments = 0;
+                            let totalOfDeclaredPayments = 0;
+                            let totalofWarehousePayments = 0;
+                            var payments = row['payments'];
 
-                        for (let index = 0; index < payments.length; index++) {
-                            if (payments[index].type === 'WAREHOUSE') {
-                                totalofWarehousePayments += parseFloat(payments[index].amount);
-                            } else if (payments[index].promise != "1") {
-                                totalOfPayments += parseFloat(payments[index].amount);
+                            for (let index = 0; index < payments.length; index++) {
+                                if (payments[index].type === 'WAREHOUSE') {
+                                    totalofWarehousePayments += parseFloat(payments[index].amount);
+                                } else if (payments[index].promise != "1") {
+                                    totalOfPayments += parseFloat(payments[index].amount);
+                                } else {
+                                    totalOfDeclaredPayments += parseFloat(payments[index].amount);
+                                }
+                            }
+                            if (totalofWarehousePayments > 0) {
+                                return '<p>DM: ' + totalofWarehousePayments + '</p>';
+                            }
+                            if (totalOfDeclaredPayments > 0) {
+                                return '<p>Z: ' + totalOfPayments + '</p><p>D: ' + totalOfDeclaredPayments + '</p>';
                             } else {
-                                totalOfDeclaredPayments += parseFloat(payments[index].amount);
+                                return '<p>Z: ' + totalOfPayments + '</p>';
                             }
-                        }
-                        if (totalofWarehousePayments > 0) {
-                            return '<p>DM: ' + totalofWarehousePayments + '</p>';
-                        }
-                        if (totalOfDeclaredPayments > 0) {
-                            return '<p>Z: ' + totalOfPayments + '</p><p>D: ' + totalOfDeclaredPayments + '</p>';
-                        } else {
-                            return '<p>Z: ' + totalOfPayments + '</p>';
-                        }
 
-                    }
-                },
-                {
-                    data: 'id',
-                    name: 'left_to_pay',
-                    searchable: false,
-                    render: function (date, type, row) {
-                        let totalOfProductsPrices = 0;
-                        let additionalServiceCost = row['additional_service_cost'];
-                        let additionalPackageCost = row['additional_cash_on_delivery_cost'];
-                        let shipmentPriceForClient = row['shipment_price_for_client'];
-                        if (additionalServiceCost == null) {
-                            additionalServiceCost = 0;
                         }
-                        if (shipmentPriceForClient == null) {
-                            shipmentPriceForClient = 0;
-                        }
-                        if (additionalPackageCost == null) {
-                            additionalPackageCost = 0;
-                        }
-                        var items = row['items'];
-
-                        for (let index = 0; index < items.length; index++) {
-                            let price = items[index].gross_selling_price_commercial_unit;
-                            let quantity = items[index].quantity;
-                            if (price == null) {
-                                price = 0;
+                    },
+                    {
+                        data: 'id',
+                        name: 'left_to_pay',
+                        searchable: false,
+                        render: function (date, type, row) {
+                            let totalOfProductsPrices = 0;
+                            let additionalServiceCost = row['additional_service_cost'];
+                            let additionalPackageCost = row['additional_cash_on_delivery_cost'];
+                            let shipmentPriceForClient = row['shipment_price_for_client'];
+                            if (additionalServiceCost == null) {
+                                additionalServiceCost = 0;
                             }
-                            if (quantity == null) {
-                                quantity = 0;
+                            if (shipmentPriceForClient == null) {
+                                shipmentPriceForClient = 0;
                             }
-                            totalOfProductsPrices += parseFloat(price) * parseInt(quantity);
-                        }
-                        let orderSum = (totalOfProductsPrices + parseFloat(shipmentPriceForClient) + parseFloat(additionalServiceCost) + parseFloat(additionalPackageCost)).toFixed(2);
-                        let totalOfPayments = 0;
-                        var payments = row['payments'];
-
-                        for (let index = 0; index < payments.length; index++) {
-                            if (payments[index].promise != "1") {
-                                totalOfPayments += parseFloat(payments[index].amount);
+                            if (additionalPackageCost == null) {
+                                additionalPackageCost = 0;
                             }
+                            var items = row['items'];
+
+                            for (let index = 0; index < items.length; index++) {
+                                let price = items[index].gross_selling_price_commercial_unit;
+                                let quantity = items[index].quantity;
+                                if (price == null) {
+                                    price = 0;
+                                }
+                                if (quantity == null) {
+                                    quantity = 0;
+                                }
+                                totalOfProductsPrices += parseFloat(price) * parseInt(quantity);
+                            }
+                            let orderSum = (totalOfProductsPrices + parseFloat(shipmentPriceForClient) + parseFloat(additionalServiceCost) + parseFloat(additionalPackageCost)).toFixed(2);
+                            let totalOfPayments = 0;
+                            var payments = row['payments'];
+
+                            for (let index = 0; index < payments.length; index++) {
+                                if (payments[index].promise != "1") {
+                                    totalOfPayments += parseFloat(payments[index].amount);
+                                }
+                            }
+
+                            return (orderSum - totalOfPayments).toFixed(2);
+
                         }
+                    },
+                    {
+                        data: 'transport_exchange_offers',
+                        name: 'transport_exchange_offers',
+                        searchable: false,
+                        orderable: false,
+                        render: function (data, option, row) {
+                            let html = "";
+                            if (!data.length) {
+                                return html;
+                            }
 
-                        return (orderSum - totalOfPayments).toFixed(2);
+                            let generateTitleTooltip = function (offer) {
+                                return `Nr: ${offer.firm_name} | NIP: ${offer.nip} | Osoba kontaktowa: ${offer.contact_person} | Telefon: ${offer.phone_number} | Email: ${offer.email} | Adres: ${offer.street} ${offer.number}, ${offer.postal_code} ${offer.city} | Uwagi: ${offer.comments} ||| Kierowca: ${offer.driver_first_name} ${offer.driver_last_name} | ${offer.driver_phone_number} | Nr dokumentu: ${offer.driver_document_number} | Nr rej.: ${offer.driver_car_registration_number} | Przybycie: ${offer.driver_arrical_date} ${offer.driver_approx_arrival_time}`;
+                            };
 
-                    }
-                },
-                {
-                    data: 'transport_exchange_offers',
-                    name: 'transport_exchange_offers',
-                    searchable: false,
-                    orderable: false,
-                    render: function (data, option, row) {
-                        let html = "";
-                        if (!data.length) {
+                            data.forEach(function (spedition) {
+                                let chosenSpeditionClass = "";
+                                if (spedition.chosen_spedition) {
+                                    chosenSpeditionClass = "transport-exchange__spedition-chosen"
+                                }
+                                html += `<div class='transport-exchange ${chosenSpeditionClass}'>`;
+
+                                html += `<div>Nr: ${spedition.id}</div>`;
+
+                                if (spedition.chosen_spedition) {
+                                    let title = generateTitleTooltip(spedition.chosen_spedition);
+                                    html += `<div class="transport-exchange-offer" data-toggle="transport-exchange-tooltip" data-html="true" title="${title}">${spedition.chosen_spedition.firm_name.substr(0, 10)}</div>`;
+                                } else if (spedition.spedition_offers.length) {
+                                    spedition.spedition_offers.forEach(function (offer) {
+                                        let title = generateTitleTooltip(offer);
+                                        html += `<div class="transport-exchange-offer" onclick="chooseExchangeOffer(${offer.id})" data-toggle="transport-exchange-tooltip" data-html="true" title="${title}">${offer.firm_name.substr(0, 10)}</div>`;
+                                    });
+                                }
+                                html += "</div>";
+                            });
+
+
                             return html;
                         }
+                    },
+                    {
+                        data: null,
+                        name: 'invoices',
+                        render: function (data) {
+                            let invoices = data.invoices
+                            let html = ''
+                            if (invoices !== undefined) {
+                                invoices.forEach(function (invoice) {
+                                    if (invoice.invoice_type !== 'buy') {
+                                        return;
+                                    }
 
-                        let generateTitleTooltip = function (offer) {
-                            return `Nr: ${offer.firm_name} | NIP: ${offer.nip} | Osoba kontaktowa: ${offer.contact_person} | Telefon: ${offer.phone_number} | Email: ${offer.email} | Adres: ${offer.street} ${offer.number}, ${offer.postal_code} ${offer.city} | Uwagi: ${offer.comments} ||| Kierowca: ${offer.driver_first_name} ${offer.driver_last_name} | ${offer.driver_phone_number} | Nr dokumentu: ${offer.driver_document_number} | Nr rej.: ${offer.driver_car_registration_number} | Przybycie: ${offer.driver_arrical_date} ${offer.driver_approx_arrival_time}`;
-                        };
+                                    html += '<a target="_blank" href="/storage/invoices/' + invoice.invoice_name + '" style="margin-top: 5px;">Faktura</a>';
 
-                        data.forEach(function (spedition) {
-                            let chosenSpeditionClass = "";
-                            if (spedition.chosen_spedition) {
-                                chosenSpeditionClass = "transport-exchange__spedition-chosen"
-                            }
-                            html += `<div class='transport-exchange ${chosenSpeditionClass}'>`;
+                                    if (invoice.is_visible_for_client) {
+                                        html += '<p class="invoice__visible">Widoczna</p>';
+                                    } else {
+                                        html += '<p class="invoice__invisible">Niewidoczna</p>';
+                                    }
 
-                            html += `<div>Nr: ${spedition.id}</div>`;
-
-                            if (spedition.chosen_spedition) {
-                                let title = generateTitleTooltip(spedition.chosen_spedition);
-                                html += `<div class="transport-exchange-offer" data-toggle="transport-exchange-tooltip" data-html="true" title="${title}">${spedition.chosen_spedition.firm_name.substr(0, 10)}</div>`;
-                            } else if (spedition.spedition_offers.length) {
-                                spedition.spedition_offers.forEach(function (offer) {
-                                    let title = generateTitleTooltip(offer);
-                                    html += `<div class="transport-exchange-offer" onclick="chooseExchangeOffer(${offer.id})" data-toggle="transport-exchange-tooltip" data-html="true" title="${title}">${offer.firm_name.substr(0, 10)}</div>`;
+                                    html += '<a href="#" class="change__invoice--visibility"' + 'onclick="changeInvoiceVisibility(' + invoice.id + ')">Zmień widoczność</a>';
                                 });
+                                let jsonInvoices = JSON.stringify(invoices);
+                                html += '<br />'
+                                html += '<a href="#" class="remove__invoices"' + 'onclick="getInvoicesList(' + data.orderId + ')">Usuń</a>'
                             }
-                            html += "</div>";
-                        });
+                            html += '<a href="{{env('FRONT_NUXT_URL')}}' + '/magazyn/awizacja/0/0/' + data.orderId + '/wyslij-fakture">Dodaj</a>'
 
-
-                        return html;
-                    }
-                },
-                {
-                    data: null,
-                    name: 'invoices',
-                    render: function (data) {
-                        let invoices = data.invoices
-                        let html = ''
-                        if (invoices !== undefined) {
-                            invoices.forEach(function (invoice) {
-                                if (invoice.invoice_type !== 'buy') {
-                                    return;
-                                }
-
-                                html += '<a target="_blank" href="/storage/invoices/' + invoice.invoice_name + '" style="margin-top: 5px;">Faktura</a>';
-
-                                if(invoice.is_visible_for_client) {
-                                    html += '<p class="invoice__visible">Widoczna</p>';
-                                } else {
-                                    html += '<p class="invoice__invisible">Niewidoczna</p>';
-                                }
-
-                                html += '<a href="#" class="change__invoice--visibility"' + 'onclick="changeInvoiceVisibility(' + invoice.id + ')">Zmień widoczność</a>';
-                            });
-                            let jsonInvoices = JSON.stringify(invoices);
-                            html += '<br />'
-                            html += '<a href="#" class="remove__invoices"' + 'onclick="getInvoicesList(' + data.orderId + ')">Usuń</a>'
+                            return html;
                         }
-                        html += '<a href="{{env('FRONT_NUXT_URL')}}' + '/magazyn/awizacja/0/0/' + data.orderId + '/wyslij-fakture">Dodaj</a>'
+                    },
+                    {
+                        data: null,
+                        name: 'invoice_gross_sum',
+                        render: function (data, type, row) {
+                            let sumOfPurchase = 0;
+                            let items = row['items'];
 
-                        return html;
-                    }
-                },
-                {
-                    data: null,
-                    name: 'invoice_gross_sum',
-                    render: function (data, type, row) {
-                        let sumOfPurchase = 0;
-                        let items = row['items'];
-
-                        for (let index = 0; index < items.length; index++) {
-                            let pricePurchase = items[index].net_purchase_price_commercial_unit_after_discounts;
-                            let quantity = items[index].quantity;
-                            if (pricePurchase == null) {
-                                pricePurchase = 0;
+                            for (let index = 0; index < items.length; index++) {
+                                let pricePurchase = items[index].net_purchase_price_commercial_unit_after_discounts;
+                                let quantity = items[index].quantity;
+                                if (pricePurchase == null) {
+                                    pricePurchase = 0;
+                                }
+                                if (quantity == null) {
+                                    quantity = 0;
+                                }
+                                sumOfPurchase += parseFloat(pricePurchase) * parseInt(quantity);
                             }
-                            if (quantity == null) {
-                                quantity = 0;
+                            let totalItemsCost = sumOfPurchase * 1.23;
+                            let transportCost = 0
+
+                            let html = 'wartość towaru: <br />' +
+                                (totalItemsCost).toFixed(2) + '<br/>';
+                            if (data.shipment_price_for_us) {
+                                html += 'Koszt tran.: <br/>' +
+                                    data.shipment_price_for_us + '<br />'
+                                transportCost = parseFloat(data.shipment_price_for_us)
                             }
-                            sumOfPurchase += parseFloat(pricePurchase) * parseInt(quantity);
+                            html += 'Suma: <br /><b>' + (totalItemsCost + transportCost).toFixed(2) + '<b/>'
+                            return html;
                         }
-                        let totalItemsCost = sumOfPurchase * 1.23;
-                        let transportCost = 0
+                    },
+                    {
+                        data: 'orderId',
+                        name: 'icons',
+                        render: function () {
+                            let html = 'do zrobienia';
 
-                        let html = 'wartość towaru: <br />' +
-                            (totalItemsCost).toFixed(2) + '<br/>';
-                        if (data.shipment_price_for_us) {
-                            html += 'Koszt tran.: <br/>' +
-                                data.shipment_price_for_us + '<br />'
-                            transportCost = parseFloat(data.shipment_price_for_us)
+                            return html;
                         }
-                        html += 'Suma: <br /><b>' + (totalItemsCost + transportCost).toFixed(2) + '<b/>'
-                        return html;
-                    }
-                },
-                {
-                    data: 'orderId',
-                    name: 'icons',
-                    render: function () {
-                        let html = 'do zrobienia';
-
-                        return html;
-                    }
-                },
-                {
-                    data: 'consultant_earning',
-                    name: 'consultant_earning',
-                },
-                {
-                    data: 'packages',
-                    name: 'real_cost_for_company',
-                    render: function (packages) {
-                        return '<span style="margin-top: 5px;">' +
-                            packages.reduce((prev, next) => (prev + parseFloat(next.real_cost_for_company ?? 0)), 0) + '</span>';
-                    }
-                },
-                {
-                    data: 'shipment_price_for_client',
-                    name: 'difference',
-                    render: function (data, type, row) {
-                        let priceForClient = row['shipment_price_for_client'];
-                        let priceForUs = row['shipment_price_for_us'];
-
-                        if (priceForClient == null) {
-                            priceForClient = 0;
+                    },
+                    {
+                        data: 'consultant_earning',
+                        name: 'consultant_earning',
+                    },
+                    {
+                        data: 'packages',
+                        name: 'real_cost_for_company',
+                        render: function (packages) {
+                            return '<span style="margin-top: 5px;">' +
+                                packages.reduce((prev, next) => (prev + parseFloat(next.real_cost_for_company ?? 0)), 0) + '</span>';
                         }
-                        if (priceForUs == null) {
-                            priceForUs = 0;
+                    },
+                    {
+                        data: 'shipment_price_for_client',
+                        name: 'difference',
+                        render: function (data, type, row) {
+                            let priceForClient = row['shipment_price_for_client'];
+                            let priceForUs = row['shipment_price_for_us'];
+
+                            if (priceForClient == null) {
+                                priceForClient = 0;
+                            }
+                            if (priceForUs == null) {
+                                priceForUs = 0;
+                            }
+
+                            let price = (parseFloat(priceForClient) - parseFloat(priceForUs)).toFixed(2);
+                            let html = '<span style="margin-top: 5px;">' + price + '</span>';
+
+                            return html;
                         }
+                    },
+                    {
+                        data: 'correction_amount',
+                        name: 'correction_amount',
+                    },
+                    {
+                        data: 'correction_description',
+                        name: 'correction_description',
+                    },
+                    {
+                        data: 'document_number',
+                        name: 'document_number'
+                    },
+                    {
+                        data: null,
+                        name: 'sello_payment',
+                        render: (data, type, row) => (data.sello_payment ?? data.return_payment_id)
+                    },
+                    {
+                        data: 'allegro_deposit_value',
+                        name: 'allegro_deposit_value',
+                        searchable: false,
+                    },
+                    {
+                        data: 'allegro_operation_date',
+                        name: 'allegro_operation_date',
+                        searchable: false,
+                    },
+                    {
+                        data: 'allegro_additional_service',
+                        name: 'allegro_additional_service',
+                        searchable: false,
+                    },
+                    {
+                        data: 'payment_channel',
+                        name: 'payment_channel',
+                        searchable: false,
+                    },
+                    {
+                        data: 'remainder_date',
+                        name: 'remainder_date',
+                        searchable: false
+                    },
+                    {
+                        data: null,
+                        name: 'invoices',
+                        render: function (data) {
+                            let invoices = data.invoices
+                            let html = ''
+                            if (invoices !== undefined) {
+                                invoices.forEach(function (invoice) {
+                                    if (invoice.invoice_type !== 'sell') {
+                                        return;
+                                    }
+                                    html += '<a target="_blank" href="/storage/invoices/' + invoice.invoice_name + '" style="margin-top: 5px;">Faktura</a>';
+                                });
+                                let jsonInvoices = JSON.stringify(invoices);
+                                html += '<br />'
+                                html += '<a href="#" class="remove__invoices"' + 'onclick="getInvoicesList(' + data.orderId + ')">Usuń</a>'
 
-                        let price = (parseFloat(priceForClient) - parseFloat(priceForUs)).toFixed(2);
-                        let html = '<span style="margin-top: 5px;">' + price + '</span>';
+                            }
+                            html += '<a href="#" onclick="addNewSellInvoice(' + data.orderId + ')" style="margin-top: 5px;">Dodaj</a>';
 
-                        return html;
-                    }
-                },
-                {
-                    data: 'correction_amount',
-                    name: 'correction_amount',
-                },
-                {
-                    data: 'correction_description',
-                    name: 'correction_description',
-                },
-                {
-                    data: 'document_number',
-                    name: 'document_number'
-                },
-                {
-                    data: null,
-                    name: 'sello_payment',
-                    render: (data, type, row) => (data.sello_payment ?? data.return_payment_id)
-                },
-                {
-                    data: 'allegro_deposit_value',
-                    name: 'allegro_deposit_value',
-                    searchable: false,
-                },
-                {
-                    data: 'allegro_operation_date',
-                    name: 'allegro_operation_date',
-                    searchable: false,
-                },
-                {
-                    data: 'allegro_additional_service',
-                    name: 'allegro_additional_service',
-                    searchable: false,
-                },
-                {
-                    data: 'payment_channel',
-                    name: 'payment_channel',
-                    searchable: false,
-                },
-                {
-                    data: 'remainder_date',
-                    name: 'remainder_date',
-                    searchable: false
-                },
-                {
-                    data: null,
-                    name: 'invoices',
-                    render: function (data) {
-                        let invoices = data.invoices
-                        let html = ''
-                        if (invoices !== undefined) {
-                            invoices.forEach(function (invoice) {
-                                if (invoice.invoice_type !== 'sell') {
-                                    return;
-                                }
-                                html += '<a target="_blank" href="/storage/invoices/' + invoice.invoice_name + '" style="margin-top: 5px;">Faktura</a>';
-                            });
-                            let jsonInvoices = JSON.stringify(invoices);
-                            html += '<br />'
-                            html += '<a href="#" class="remove__invoices"' + 'onclick="getInvoicesList(' + data.orderId + ')">Usuń</a>'
-
+                            return html;
                         }
-                        html += '<a href="#" onclick="addNewSellInvoice(' + data.orderId + ')" style="margin-top: 5px;">Dodaj</a>';
-
-                        return html;
-                    }
-                },
-                {
-                    data: 'sello_form',
-                    name: 'sello_form',
-                    searchable: false,
-                },
-                {
-                    data: 'allegro_commission',
-                    name: 'allegro_commission',
-                    searchable: false,
-                },
-                {
-                    data: 'id',
-                    name: 'search_on_lp',
-                    searchable: false,
-                    orderable: false,
-                    visible: false
-                },
-            ],
-        })};
+                    },
+                    {
+                        data: 'sello_form',
+                        name: 'sello_form',
+                        searchable: false,
+                    },
+                    {
+                        data: 'allegro_commission',
+                        name: 'allegro_commission',
+                        searchable: false,
+                    },
+                    {
+                        data: 'id',
+                        name: 'search_on_lp',
+                        searchable: false,
+                        orderable: false,
+                        visible: false
+                    },
+                ],
+            })
+        };
 
         window.table = table = datatable();
 
-            window.table.on('draw', function () {
+        window.table.on('draw', function () {
 
             $('.order-id-checkbox').on('click', e => {
                 if (e.shiftKey && lastChecked) {
@@ -2589,6 +2628,11 @@
                     url = url.replace(':id', orderId);
                     window.location.href = url
                     return
+                } else if (addedType == "{{ \App\Entities\Label::BONUS_TYPE }}") {
+                    let url = '{{ route("bonus.order-chat", ['id' => ":id"]) }}';
+                    url = url.replace(':id', orderId);
+                    window.location.href = url
+                    return
                 } else if (addedType != "C") {
                     let confirmed = confirm("Na pewno usunąć etykietę?");
                     if (!confirmed) {
@@ -2652,6 +2696,7 @@
                     window.table.page(Math.floor(data)).draw('page')
                 });
         }
+
         function findByDates() {
             let dateColumn = $('#columnSearch-choose_date').val();
             let dateFrom = $('#dates_from').val();
@@ -2662,7 +2707,7 @@
             ajaxParams['dateTo'] = dateTo;
             ajaxParams['dateColumn'] = dateColumn;
 
-            if(dateFrom == dateTo) ajaxParams['same'] = true;
+            if (dateFrom == dateTo) ajaxParams['same'] = true;
 
             window.table.destroy();
             window.table = table = datatable(ajaxParams);
@@ -2764,7 +2809,7 @@
         function changeInvoiceVisibility(invoiceId) {
             $.ajax({
                 type: 'PATCH',
-                url: laroute.route('orders.changeInvoiceVisibility', { id : invoiceId })
+                url: laroute.route('orders.changeInvoiceVisibility', {id: invoiceId})
             }).done((data) => {
                 document.getElementById('invoice_name').innerText = data.invoice_name;
                 $('#order_invoices_change_visibility').modal('show');
@@ -3608,10 +3653,10 @@
         $('#columnSearch-shipment_date').on('change', () => {
             let value = $('#columnSearch-shipment_date').val();
             const today = new Date();
-            const yesterday = ( d => new Date(d.setDate(d.getDate()-1)) )(new Date);
-            const tomorrow = ( d => new Date(d.setDate(d.getDate()+1)) )(new Date);
+            const yesterday = (d => new Date(d.setDate(d.getDate() - 1)))(new Date);
+            const tomorrow = (d => new Date(d.setDate(d.getDate() + 1)))(new Date);
 
-            switch(value) {
+            switch (value) {
                 case 'all':
                     $('#dates_from').data("DateTimePicker").date(null);
                     $('#dates_to').data("DateTimePicker").date(null);
@@ -3642,7 +3687,7 @@
     </script>
 
     <script>
-        $(document).ready( function() {
+        $(document).ready(function () {
             var now = new Date();
             const dateFrom = document.querySelector('#protocol_datepicker_from');
             const dateTo = document.querySelector('#protocol_datepicker_to');
@@ -3650,7 +3695,7 @@
             var day = ("0" + now.getDate()).slice(-2);
             var month = ("0" + (now.getMonth() + 1)).slice(-2);
 
-            var today = (day)+"/"+(month)+"/"+now.getFullYear() ;
+            var today = (day) + "/" + (month) + "/" + now.getFullYear();
 
             dateFrom.value = today;
             dateTo.value = today;

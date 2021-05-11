@@ -11,6 +11,16 @@ use App\Services\OrderPaymentService;
 
 class OrderAddressObserver
 {
+    public function creating(OrderAddress $address)
+    {
+        app(OrderAddressService::class)->preSaveCleanup($address);
+    }
+
+    public function updating(OrderAddress $address)
+    {
+        app(OrderAddressService::class)->preSaveCleanup($address);
+    }
+
     public function created(OrderAddress $orderAddress)
     {
         $this->removingMissingDeliveryAddressLabelHandler($orderAddress);
