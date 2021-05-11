@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Entities;
 
 use App\Enums\PackageStatus;
-use App\Helpers\LabelsHelper;
 use App\Helpers\TaskTimeHelper;
 use App\User;
 use Carbon\Carbon;
@@ -697,10 +696,5 @@ class Order extends Model implements Transformable
         $orderProfit += $this->additional_service_cost;
 
         return round($orderProfit, 2);
-    }
-
-    public function getLabelsLogs(): string
-    {
-        return LabelsHelper::prepareLabelLogsContent($this->id);
     }
 }
