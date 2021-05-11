@@ -27,7 +27,6 @@ admin-panel.iml
 /public/mix-manifest.json
 
 # generate files
-public/mix-manifest.json
-public/js/vue-scripts.js
-public/js/vue-chunk.js
-public/css/vue/styles.css
+/public/js/vue-scripts.js
+/public/js/vue-chunk.js
+/public/css/vue/styles.css
