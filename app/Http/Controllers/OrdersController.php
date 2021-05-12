@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Entities\Auth_code;
 use App\Entities\ColumnVisibility;
+use App\Entities\Customer;
 use App\Entities\Deliverer;
 use App\Entities\InvoiceRequest;
 use App\Entities\Label;
@@ -1138,6 +1139,56 @@ class OrdersController extends Controller
             'message' => __('orders.message.update'),
             'alert-type' => 'success',
         ]);
+    }
+
+    public function createQuickOrder()
+    {
+        return view('orders.quick_order');
+    }
+
+    public function storeQuickOrder(Request $request)
+    {
+        $custom = new Customer();
+        $custom->save();
+
+        $order = $this->orderRepository->create([
+            'customer_id' => $custom->id,
+            'status_id' => 1,
+            'consultant_notices' => $request->get('content')
+        ]);
+        $this->orderAddressRepository->create([
+            'order_id' => $order->id,
+            'type' => 'DELIVERY_ADDRESS',
+            'address' => '---',
+            'flat_number' => '---',
+            'postal_code' => '55-200',
+            'city' => 'Oława',
+            'phone' => '111111111',
+        ]);
+        $this->orderAddressRepository->create([
+            'order_id' => $order->id,
+            'type' => 'INVOICE_ADDRESS',
+            'address' => '---',
+            'flat_number' => '---',
+            'postal_code' => '55-200',
+            'city' => 'Oława',
+            'phone' => '111111111',
+        ]);
+
+        if ($request->get('accountant', false)) {
+            dispatch_now(new AddLabelJob($order, ['153']));
+        }
+        if ($request->get('warehouse', false)) {
+            dispatch_now(new AddLabelJob($order, ['151']));
+        }
+        if ($request->get('master', false)) {
+            dispatch_now(new AddLabelJob($order, ['91']));
+        }
+        if ($request->get('consultant', false)) {
+            dispatch_now(new AddLabelJob($order, ['152']));
+        }
+
+        return redirect('/admin/orders');
     }
 
     /**

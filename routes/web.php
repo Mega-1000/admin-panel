@@ -58,6 +58,9 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/order/task/create/',
             'TasksController@createTask');
 
+        Route::get('/quick-order', 'OrdersController@createQuickOrder');
+        Route::get('/store-quick-order', 'OrdersController@storeQuickOrder');
+
         Route::get('users', 'UserController@index')->name('users.index');
         Route::get('users/datatable/all', 'UserController@datatable')->name('users.datatable');
         Route::get('users/create', 'UserController@create')->name('users.create');
