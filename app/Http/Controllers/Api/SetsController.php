@@ -25,7 +25,7 @@ class SetsController extends Controller
             ];
         }
 
-        return  $sets;
+        return  response($sets);
     }
 
     public function set(Set $set)
