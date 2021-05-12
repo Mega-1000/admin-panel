@@ -37,7 +37,7 @@ export default {
       })
   },
   async setProductAdd (item: SetProductParams): Promise<any> {
-    return fetch(getFullUrl('api/sets/' + item.setId + '/products/'), {
+    return fetch(getFullUrl('api/sets/' + item.setId + '/products'), {
       method: 'POST',
       credentials: 'same-origin',
       headers: new Headers({
@@ -83,7 +83,7 @@ export default {
       })
   },
   async getSets (): Promise<Set[]> {
-    return fetch(getFullUrl('api/sets/'), {
+    return fetch(getFullUrl('api/sets'), {
       method: 'GET',
       credentials: 'same-origin',
       headers: new Headers({
@@ -96,7 +96,7 @@ export default {
       })
   },
   async createSetFromProduct (productId: number): Promise<Set> {
-    return fetch(getFullUrl('api/sets/'), {
+    return fetch(getFullUrl('api/sets'), {
       method: 'POST',
       credentials: 'same-origin',
       headers: new Headers({
@@ -112,7 +112,7 @@ export default {
       })
   },
   async createSet (params: CreateSetParams): Promise<Set> {
-    return fetch(getFullUrl('api/sets/'), {
+    return fetch(getFullUrl('api/sets'), {
       method: 'POST',
       credentials: 'same-origin',
       headers: new Headers({
