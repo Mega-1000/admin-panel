@@ -1692,7 +1692,7 @@
                             html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
                             html += '</button>'
                             html += '<button data-order="'+id+'"';
-                            html += ' class="btn penalty btn-default btn-sm edit"><i class="fas fa-minus"></i> Potrącenie</button>';
+                            html += ' class="btn penalty btn-danger btn-sm edit"><i class="fas fa-minus"></i> Potrącenie</button>';
                             @endif
 
                                 return html;
