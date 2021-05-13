@@ -1143,7 +1143,11 @@ class OrdersController extends Controller
 
     public function createQuickOrder()
     {
-        return view('orders.quick_order');
+        $users = $this->userRepository->orderBy('name')->findWhereNotIn('role_id', [1])->all();
+
+        return view('orders.quick_order', [
+            'users' => $users
+        ]);
     }
 
     public function storeQuickOrder(Request $request)
@@ -1154,7 +1158,8 @@ class OrdersController extends Controller
         $order = $this->orderRepository->create([
             'customer_id' => $custom->id,
             'status_id' => 1,
-            'consultant_notices' => $request->get('content')
+            'consultant_notices' => $request->get('content'),
+            'employee_id' => $request->get('employee')
         ]);
         $this->orderAddressRepository->create([
             'order_id' => $order->id,

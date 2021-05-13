@@ -16,6 +16,17 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="employee">Konsultant</label>
+                    <select name="employee" id="employee" class="form-control">
+                        @foreach($users as $user)
+
+                            <option value="{{ $user->id }}">{{ $user->name }}
+                                - {{ $user->firstname }} {{ $user->lastname }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <div class="form-check">
                         <input id="1" name="master" class="form-check-input" type="checkbox">
                         <label for="1" class="form-check-label">Informacja dla mastera</label>
