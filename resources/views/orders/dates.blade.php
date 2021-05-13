@@ -3,7 +3,8 @@
         <table class="table">
             <thead>
             <tr>
-                <th scope="col" style="width: 25%"></th>
+                <th scope="col" style="width: 20%"></th>
+                <th scope="col" style="width: 5%" class="text-center"></th>
                 <th scope="col" style="width: 15%" class="text-center">Klient</th>
                 <th scope="col" style="width: 15%" class="text-center">Konsultant</th>
                 <th scope="col" style="width: 15%" class="text-center">Magazyn</th>
@@ -11,31 +12,33 @@
             </thead>
             <tbody>
             <tr>
-                <th scope="row">Preferowana data nadania od</th>
-                <td>{{ $order->dates->customer_preferred_shipment_date_from }}</td>
-                <td>{{ $order->dates->consultant_preferred_shipment_date_from }}</td>
-                <td>{{ $order->dates->warehouse_preferred_shipment_date_from }}</td>
+                <th scope="row" rowspan="2" style="vertical-align: middle">Preferowana data nadania</th>
+                <th scope="row">Od</th>
+                <td>{{ $order->dates->customer_shipment_date_from }}</td>
+                <td>{{ $order->dates->consultant_shipment_date_from }}</td>
+                <td>{{ $order->dates->warehouse_shipment_date_from }}</td>
             </tr>
             <tr>
-                <th scope="row">Preferowana data nadania do</th>
-                <td>{{ $order->dates->customer_preferred_shipment_date_to }}</td>
-                <td>{{ $order->dates->consultant_preferred_shipment_date_to }}</td>
-                <td>{{ $order->dates->warehouse_preferred_shipment_date_to }}</td>
+                <th scope="row">Do</th>
+                <td>{{ $order->dates->customer_shipment_date_to }}</td>
+                <td>{{ $order->dates->consultant_shipment_date_to }}</td>
+                <td>{{ $order->dates->warehouse_shipment_date_to }}</td>
             </tr>
             <tr>
-                <th scope="row">Preferowana data dostawy od</th>
-                <td>{{ $order->dates->customer_preferred_delivery_date_from }}</td>
-                <td>{{ $order->dates->consultant_preferred_delivery_date_from }}</td>
-                <td>{{ $order->dates->warehouse_preferred_delivery_date_from }}</td>
+                <th scope="row" rowspan="2" style="vertical-align: middle">Preferowana data dostawy</th>
+                <th scope="row">Od</th>
+                <td>{{ $order->dates->customer_delivery_date_from }}</td>
+                <td>{{ $order->dates->consultant_delivery_date_from }}</td>
+                <td>{{ $order->dates->warehouse_delivery_date_from }}</td>
             </tr>
             <tr>
-                <th scope="row">Preferowana data dostawy do</th>
-                <td>{{ $order->dates->customer_preferred_delivery_date_to }}</td>
-                <td>{{ $order->dates->consultant_preferred_delivery_date_to }}</td>
-                <td>{{ $order->dates->warehouse_preferred_delivery_date_to }}</td>
+                <th scope="row">Do</th>
+                <td>{{ $order->dates->customer_delivery_date_to }}</td>
+                <td>{{ $order->dates->consultant_delivery_date_to }}</td>
+                <td>{{ $order->dates->warehouse_delivery_date_to }}</td>
             </tr>
             <tr>
-                <th scope="row">Akceptacja</th>
+                <th scope="row" colspan="2" style="text-align: center">Akceptacja</th>
                 <td>
                     <span
                         class="glyphicon glyphicon-{{ ($order->dates->customer_acceptance) ? 'ok text-success' : 'remove text-danger'}}"></span>
@@ -50,33 +53,33 @@
                 </td>
             </tr>
             <tr>
-                <th scope="row">Akcje</th>
+                <th scope="row" colspan="2" style="text-align: center">Akcje</th>
                 <td>
-                    <button
+                    <a
                         class="btn btn-sm btn-primary {{ is_a(Auth::user(), \App\Entities\Customer::class) ?:'disabled' }}">
                         Modyfikuj
-                    </button>
-                    <button
+                    </a>
+                    <a
                         class="btn btn-sm btn-success {{ is_a(Auth::user(), \App\Entities\Customer::class) ?:'disabled' }}">
                         Akceptuj
-                    </button>
+                    </a>
                 </td>
 
                 <td>
-                    <button class="btn btn-sm btn-primary {{ is_a(Auth::user(), \App\User::class) ?:'disabled' }}">
+                    <a class="btn btn-sm btn-primary {{ is_a(Auth::user(), \App\User::class) ?:'disabled' }}">
                         Modyfikuj
-                    </button>
-                    <button class="btn btn-sm btn-success {{ is_a(Auth::user(), \App\User::class) ?:'disabled' }}">
+                    </a>
+                    <a class="btn btn-sm btn-success {{ is_a(Auth::user(), \App\User::class) ?:'disabled' }}">
                         Akceptuj
-                    </button>
+                    </a>
                 </td>
                 <td>
-                    <button class="btn btn-sm btn-primary {{ is_a(Auth::user(), \App\User::class) ?:'disabled' }}">
+                    <a class="btn btn-sm btn-primary {{ is_a(Auth::user(), \App\User::class) ?:'disabled' }}">
                         Modyfikuj
-                    </button>
-                    <button class="btn btn-sm btn-success {{ is_a(Auth::user(), \App\User::class) ?:'disabled' }}">
+                    </a>
+                    <a class="btn btn-sm btn-success {{ is_a(Auth::user(), \App\User::class) ?:'disabled' }}">
                         Akceptuj
-                    </button>
+                    </a>
                 </td>
             </tr>
             </tbody>

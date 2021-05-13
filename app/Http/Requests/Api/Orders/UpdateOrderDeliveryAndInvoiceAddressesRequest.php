@@ -24,10 +24,10 @@ class UpdateOrderDeliveryAndInvoiceAddressesRequest extends FormRequest
     public function rules()
     {
         return [
-            'shipment_date_from' => 'required',
-            'shipment_date_to' => 'required',
-            'delivery_date_from' => 'required',
-            'delivery_date_to' => 'required',
+            'customer_shipment_date_from' => 'required',
+            'customer_shipment_date_to' => 'required',
+            'customer_delivery_date_from' => 'required',
+            'customer_delivery_date_to' => 'required',
             'delivery_description' => 'nullable',
             'remember_delivery_address' => 'required',
             'remember_invoice_address' => 'required',
@@ -51,4 +51,14 @@ class UpdateOrderDeliveryAndInvoiceAddressesRequest extends FormRequest
             'INVOICE_ADDRESS.flat_number' => 'nullable',
         ];
     }
+
+//    public function getDates()
+//    {
+//        return [
+//            'customer_shipment_date_from' => $this->request->get('shipment_date_from'),
+//            'customer_shipment_date_to' => $this->request->get('shipment_date_to'),
+//            'customer_delivery_date_from' => $this->request->get('delivery_date_from'),
+//            'customer_delivery_date_to' => $this->request->get('delivery_date_to'),
+//        ];
+//    }
 }

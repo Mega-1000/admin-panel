@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Entities\Chat;
+use App\Entities\OrderDates;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\ChatHelper;
 use App\Helpers\GetCustomerForAdminEdit;
@@ -263,10 +264,10 @@ class OrdersController extends Controller
 
         if (!empty($order->dates)) {
             $orderDates = [
-                "shipment_date_from" => $order->dates->customer_preferred_shipment_date_from,
-                "shipment_date_to" => $order->dates->customer_preferred_shipment_date_to,
-                "delivery_date_from" => $order->dates->customer_preferred_delivery_date_from,
-                "delivery_date_to" => $order->dates->customer_preferred_delivery_date_to,
+                "shipment_date_from" => $order->dates->customer_shipment_date_from,
+                "shipment_date_to" => $order->dates->customer_shipment_date_to,
+                "delivery_date_from" => $order->dates->customer_delivery_date_from,
+                "delivery_date_to" => $order->dates->customer_delivery_date_to,
             ];
         }
 
@@ -295,11 +296,7 @@ class OrdersController extends Controller
             $invoiceAddress = $order->addresses->where('type', '=', 'INVOICE_ADDRESS')->first();
 
             $order->shipment_date = $request->get('shipment_date');
-            $order->dates->customer_preferred_shipment_date_from = $request->get('shipment_date_from');
-            $order->dates->customer_preferred_shipment_date_to = $request->get('shipment_date_to');
-            $order->dates->customer_preferred_delivery_date_from = $request->get('delivery_date_from');
-            $order->dates->customer_preferred_delivery_date_to = $request->get('delivery_date_to');
-            $order->dates->save();
+            $order->dates()->updateOrCreate(['order_id' => $orderId], $request->all());
             $order->save();
 
             if (!empty($request->get('delivery_description'))) {
@@ -336,6 +333,7 @@ class OrdersController extends Controller
 
             return $this->okResponse();
         } catch (\Exception $e) {
+            dd($e->getLine());
             Log::error('Problem with update customer invoice and delivery address.',
                 ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
             );
