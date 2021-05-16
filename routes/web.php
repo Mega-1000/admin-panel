@@ -546,6 +546,7 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get('/cacheClear', 'Controller@refreshCache')->name('admin.refresh');
     });
+    Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/web/TrackerLogsRoutes.php');
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
@@ -569,3 +570,4 @@ Route::get('/clear-cache', function() {
     $exitCode = Artisan::call('cache:clear');
     return 'Cashe clear code['.$exitCode.']';
 });
+

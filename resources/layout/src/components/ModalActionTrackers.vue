@@ -7,20 +7,34 @@
           Proszę wytłumacz poniżej jaki był powód Twojej zwłoki</p>
           <span @click="$emit('close')" class="close">X</span>
       </div>
-      <textarea class="textarea" rows="4" cols="50">
+      <textarea class="textarea" rows="4" cols="50" v-model="description">
       </textarea>
-      <button type="submit" class="btn btn-sm btn-primary">Wyślij</button>
+      <button @click="sendDescription()" class="btn btn-sm btn-primary">Wyślij</button>
     </div>
   </div>
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
+import { LogItem, updateDescriptionLogParam, updateTimeLogParam } from '@/types/LogsTrackerType'
 
 @Component({
   components: {
   }
 })
 export default class ModalActionTracker extends Vue {
+  public description = ''
+
+  public get log (): LogItem {
+    return this.$store?.getters['LogsTrackerService/log']
+  }
+
+  public async sendDescription (): Promise<void> {
+    const param: updateDescriptionLogParam = {
+      id: this.log.id,
+      description: this.description
+    }
+    await this.$store?.dispatch('LogsTrackerService/updateDescriptionLog', param)
+  }
 }
 </script>
 
