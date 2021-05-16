@@ -19,7 +19,7 @@
           </div>
           <template v-if="products.length > 0">
             <select v-model="productId">
-              <option v-for="(product, index) in products" :key="index" :value="product.product_id">{{ product.symbol }} => {{ product.name }}</option>
+              <option v-for="(product, index) in products" :key="index" :value="product.id">{{ product.symbol }} => {{ product.name }}</option>
             </select>
             <button @click="createSetFromProduct()">Stwórz</button>
           </template>
@@ -99,7 +99,7 @@ export default class AddSetModal extends Vue {
   }
 
   public async createSetFromProduct (): Promise<void> {
-    if (this.productId !== null) {
+    if (this.productId) {
       await this.$store.dispatch('SetsService/cerateSetFromProduct', this.productId)
       this.$emit('load-sets')
       this.$emit('close')

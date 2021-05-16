@@ -85,22 +85,22 @@ class SetsController extends Controller
     public function store(Request $request)
     {
         if($request->has('product_id')) {
-            $product = Product::find('id', $request->product_id)->get()->first();
-            $stock = ProductStock::where('product_id', $request->product_id)->get()->first();
-
-            $set = new Set;
-            $set->name = $product->name;
-            $set->number = $product->symbol;
-            $set->stock = $stock->quantity;
-            $set->product_id = $product->id;
-            if ($set->save()) {
-                return response(json_encode([
-                    'set' => $set,
-                ]),200);
-            }
+            $product = Product::find('id', 994)->get()->first();
+            $stock = ProductStock::where('product_id', 994)->get()->first();
+//
+//            $set = new Set;
+//            $set->name = $product->name;
+//            $set->number = $product->symbol;
+//            $set->stock = $stock->quantity;
+//            $set->product_id = $product->id;
+//            if ($set->save()) {
+//                return response(json_encode([
+//                    'set' => $set,
+//                ]),200);
+//            }
             return response(json_encode([
                 'error_code' => 500,
-                'error_message' => __('sets.messages.error')
+                'error_message' => __('sets.messages.error').' PRODUCT_ID'
             ]),500);
         }
         if($request->has('name') && $request->has('symbol') && $request->has('price')) {
