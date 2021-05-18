@@ -79,6 +79,7 @@ export default class ModalActionTracker extends Vue {
 
   .textarea,
   .text {
+    max-width: 100%;
     margin-bottom: 20px;
   }
 
