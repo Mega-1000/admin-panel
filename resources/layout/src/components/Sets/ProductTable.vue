@@ -89,6 +89,10 @@ export default class ProductTable extends Vue {
   public get filterProducts ():SetProduct[] {
     let tempPtoducts: SetProduct[] = this.products
 
+    tempPtoducts = tempPtoducts.filter((product) => {
+      return (product.id !== this.set.set.product_id)
+    })
+
     if (this.name !== '') {
       tempPtoducts = tempPtoducts.filter((product) => {
         return (product.name.toLowerCase().search(this.name.toLowerCase()) > -1)
