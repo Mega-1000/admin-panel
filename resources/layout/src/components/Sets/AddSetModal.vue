@@ -3,7 +3,7 @@
     <div class="overlay" @click="$emit('close')"></div>
     <div class="c-modal">
       <div class="header">
-          <p>Dodaj nowy zestaw</p>
+          <p class="modal-title">Dodaj nowy zestaw</p>
           <span @click="$emit('close')" class="close">X</span>
       </div>
       <div class="content">
@@ -12,20 +12,20 @@
           <button class="btn btn-sm btn-warning" @click="togggleNewSetFromProduct()">Stwórz nowy zestaw z istniejącego produktu</button>
         </template>
         <template v-if="newSetFromProduct">
-          <button class="btn btn-sm btn-info" @click="togggleButtonVisible()">Powrót</button>
+          <button class="btn btn-sm btn-info return" @click="togggleButtonVisible()">Powrót</button>
           <div class="form-group">
             <label>Wyszukaj produkt</label>
             <input type="text" class="form-control" v-on:keyup="searchProducts()" v-model="word">
           </div>
           <template v-if="products.length > 0">
             <select v-model="productId">
-              <option v-for="(product, index) in products" :key="index" :value="product.product_id">{{ product.symbol }} => {{ product.name }}</option>
+              <option v-for="(product, index) in filteredProducts" :key="index" :value="product.id">{{ product.symbol }} => {{ product.name }}</option>
             </select>
-            <button @click="createSetFromProduct()">Stwórz</button>
+            <button @click="createSetFromProduct()" class="btn btn-success btn-create">Stwórz</button>
           </template>
         </template>
         <template v-if="createNewSet">
-          <button @click="togggleButtonVisible()">Powrót</button>
+          <button @click="togggleButtonVisible()" class="btn btn-sm btn-info return">Powrót</button>
           <div class="product_stocks-general" id="general">
             <div class="form-group">
               <label for="name">Nazwa</label>
@@ -48,7 +48,7 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { CreateSetParams, SetProduct, SetsProductParams } from '@/types/SetsTypes'
+import { CreateSetParams, Set, SetProduct, SetsProductParams } from '@/types/SetsTypes'
 
 @Component({
   components: {
@@ -91,6 +91,23 @@ export default class AddSetModal extends Vue {
     return this.$store?.getters['SetsService/products']
   }
 
+  public get sets (): Set[] {
+    return Object.values(this.$store?.getters['SetsService/sets'])
+  }
+
+  public get filteredProducts (): SetProduct[] {
+    return this.products.filter((product) => {
+      return (!this.findExistProductSet(product.id))
+    })
+  }
+
+  private findExistProductSet (id: number): boolean {
+    const result = this.sets.filter((set) => {
+      return (set.set.product_id === id)
+    })
+    return (result.length > 0)
+  }
+
   public async searchProducts (): Promise<void> {
     if (this.word.length > 2) {
       this.searchParams.word = this.word
@@ -99,7 +116,7 @@ export default class AddSetModal extends Vue {
   }
 
   public async createSetFromProduct (): Promise<void> {
-    if (this.productId !== null) {
+    if (this.productId) {
       await this.$store.dispatch('SetsService/cerateSetFromProduct', this.productId)
       this.$emit('load-sets')
       this.$emit('close')
@@ -162,5 +179,34 @@ export default class AddSetModal extends Vue {
 
   span {
     font-weight: 600;
+  }
+
+  .return {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+  }
+
+  .modal-title {
+    font-size: 18px;
+    line-height: 43px;
+    color: $cl-grey5;
+    font-weight: 700;
+    margin: 15px 0;
+  }
+
+  .btn-create {
+    display: block;
+    margin: 25px auto 0 auto;
+  }
+
+  .select {
+    padding: 10px;
+    border: 1px solid $cl-greye;
+    word-wrap: break-word;
+    white-space: -moz-pre-wrap;
+    white-space: pre-wrap;
+    max-width: 100%;
+    display: inline-block;
   }
 </style>
