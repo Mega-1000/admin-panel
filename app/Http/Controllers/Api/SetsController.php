@@ -86,7 +86,7 @@ class SetsController extends Controller
     {
         if($request->has('product_id')) {
             $product = Product::where('id', $request->product_id)->get()->first();
-            $stock = ProductStock::where('product_id',  $request->product_id)->get()->first();
+            $stock = ProductStock::where('product_id', $request->product_id)->get()->first();
 
             $set = new Set;
             $set->name = $product->name;
@@ -100,7 +100,7 @@ class SetsController extends Controller
             }
             return response(json_encode([
                 'error_code' => 500,
-                'error_message' => __('sets.messages.error').' PRODUCT:'.$product
+                'error_message' => __('sets.messages.error')
             ]),500);
         }
         if($request->has('name') && $request->has('symbol') && $request->has('price')) {
