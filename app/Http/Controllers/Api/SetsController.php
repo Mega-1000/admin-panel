@@ -85,22 +85,22 @@ class SetsController extends Controller
     public function store(Request $request)
     {
         if($request->has('product_id')) {
-            $product = Product::find('id', 994)->get()->first();
-            $stock = ProductStock::where('product_id', 994)->get()->first();
-//
-//            $set = new Set;
-//            $set->name = $product->name;
-//            $set->number = $product->symbol;
-//            $set->stock = $stock->quantity;
-//            $set->product_id = $product->id;
-//            if ($set->save()) {
-//                return response(json_encode([
-//                    'set' => $set,
-//                ]),200);
-//            }
+            $product = Product::where('id', $request->product_id)->get()->first();
+            $stock = ProductStock::where('product_id',  $request->product_id)->get()->first();
+
+            $set = new Set;
+            $set->name = $product->name;
+            $set->number = $product->symbol;
+            $set->stock = $stock->quantity;
+            $set->product_id = $product->id;
+            if ($set->save()) {
+                return response(json_encode([
+                    'set' => $set,
+                ]),200);
+            }
             return response(json_encode([
                 'error_code' => 500,
-                'error_message' => __('sets.messages.error').' PRODUCT_ID'
+                'error_message' => __('sets.messages.error').' PRODUCT:'.$product
             ]),500);
         }
         if($request->has('name') && $request->has('symbol') && $request->has('price')) {
@@ -176,30 +176,38 @@ class SetsController extends Controller
             'stock' => 'required',
         ]);
 
-        $stock = ProductStock::find($request->product_id)->get()->first();
-        $requiredStock = $set->stock * $request->stock;
+        $stock = ProductStock::where('id', $request->product_id)->get()->first();
+        if(!is_null($stock)) {
+            $requiredStock = $set->stock * $request->stock;
 
-        //The number of products must be greater than the number of sets multiplied by the number of products in one package.
-        if ($stock->quantity >= $requiredStock) {
-            $setItem = new SetItem;
-            $setItem->product_id = $request->product_id;
-            $setItem->set_id = $set->id;
-            $setItem->stock = $request->stock;
 
-            $this->updateProductStock($request->product_id, $requiredStock);
+            //The number of products must be greater than the number of sets multiplied by the number of products in one package.
+            if ($stock->quantity >= $requiredStock) {
+                $setItem = new SetItem;
+                $setItem->product_id = $request->product_id;
+                $setItem->set_id = $set->id;
+                $setItem->stock = $request->stock;
 
-            if ($setItem->save()) {
-                return response(json_encode($setItem),200);
+                $this->updateProductStock($request->product_id, $requiredStock);
+
+                if ($setItem->save()) {
+                    return response(json_encode($setItem), 200);
+                }
+                return response(json_encode([
+                    'error_code' => 500,
+                    'error_message' => __('sets.messages.error')
+                ]), 500);
+            } else {
+                return response(json_encode([
+                    'error_code' => 500,
+                    'error_message' => __('sets.messages.not_enough_product')
+                ]), 500);
             }
-            return response(json_encode([
-                'error_code' => 500,
-                'error_message' => __('sets.messages.error')
-            ]),500);
         } else {
             return response(json_encode([
                 'error_code' => 500,
                 'error_message' => __('sets.messages.not_enough_product')
-            ]),500);
+            ]), 500);
         }
     }
 

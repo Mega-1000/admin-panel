@@ -19,7 +19,7 @@
           </div>
           <template v-if="products.length > 0">
             <select v-model="productId">
-              <option v-for="(product, index) in products" :key="index" :value="product.id">{{ product.symbol }} => {{ product.name }}</option>
+              <option v-for="(product, index) in filteredProducts" :key="index" :value="product.id">{{ product.symbol }} => {{ product.name }}</option>
             </select>
             <button @click="createSetFromProduct()">Stwórz</button>
           </template>
@@ -48,7 +48,7 @@
 </template>
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { CreateSetParams, SetProduct, SetsProductParams } from '@/types/SetsTypes'
+import { CreateSetParams, Set, SetProduct, SetsProductParams } from '@/types/SetsTypes'
 
 @Component({
   components: {
@@ -89,6 +89,23 @@ export default class AddSetModal extends Vue {
 
   public get products (): SetProduct[] {
     return this.$store?.getters['SetsService/products']
+  }
+
+  public get sets (): Set[] {
+    return Object.values(this.$store?.getters['SetsService/sets'])
+  }
+
+  public get filteredProducts (): SetProduct[] {
+    return this.products.filter((product) => {
+      return (!this.findExistProductSet(product.id))
+    })
+  }
+
+  private findExistProductSet (id: number): boolean {
+    const result = this.sets.filter((set) => {
+      return (set.set.product_id === id)
+    })
+    return (result.length > 0)
   }
 
   public async searchProducts (): Promise<void> {
