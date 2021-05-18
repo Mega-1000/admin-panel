@@ -96,3 +96,4 @@ Route::post('auth/code/{id}', 'Api\AutheticationController@getToken')->name('api
 
 Route::group(['prefix' => 'sets', 'as' => 'sets.', 'middleware' => ['https']], __DIR__ . '/api/ProductsSetsRoutes.php');
 Route::group(['prefix' => 'tracker', 'as' => 'tracker.', 'middleware' => ['https']], __DIR__ . '/api/TrackerLogsRoutes.php');
+

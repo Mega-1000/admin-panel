@@ -58,6 +58,9 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/order/task/create/',
             'TasksController@createTask');
 
+        Route::get('/quick-order', 'OrdersController@createQuickOrder');
+        Route::get('/store-quick-order', 'OrdersController@storeQuickOrder');
+
         Route::get('users', 'UserController@index')->name('users.index');
         Route::get('users/datatable/all', 'UserController@datatable')->name('users.datatable');
         Route::get('users/create', 'UserController@create')->name('users.create');
@@ -565,9 +568,3 @@ Route::post('/payment/confirmation/{token}', 'OrdersPaymentsController@warehouse
 
 Route::get('/chat/{token}', 'MessagesController@show')->name('chat.show');
 Route::get('/chat/getUrl/{mediaId}/{postCode}/{email}/{phone}', 'MessagesController@getUrl')->name('messages.get-url');
-
-Route::get('/clear-cache', function() {
-    $exitCode = Artisan::call('cache:clear');
-    return 'Cashe clear code['.$exitCode.']';
-});
-

@@ -70,6 +70,11 @@
         <a name="actualization-price" target="_blank" class="btn btn-success" href="/admin/actualizationPrice">Wyślij
             prośbę o aktualizację cen</a>
     </div>
+    <div style="display: flex; align-items: center;" id="add-label-container">
+        <a  class="btn btn-success" href="/admin/quick-order">
+            Szybkie zadanie
+        </a>
+    </div>
     <div class="col-md-10">
         <form method="POST" action="{{ route('order_packages.getProtocols') }}">
             @if ($errors->any())
