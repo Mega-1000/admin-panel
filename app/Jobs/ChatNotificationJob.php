@@ -33,18 +33,13 @@ class ChatNotificationJob implements ShouldQueue
     public function handle()
     {
         $chat = \App\Entities\Chat
-            ::with(['chatUsers' => function ($q) {
-                $q->with('user');
-                $q->with('customer');
-                $q->whereNull('employee_id');
-            }])
-            ->with('messages')
-            ->find($this->chatId);
+            ::with(['chatUsers', 'messages'])->find($this->chatId);
+
         foreach ($chat->chatUsers as $chatUser) {
-            if (!MessagesHelper::hasNewMessageStatic($chat, $chatUser, true)) {
+            /*if (!MessagesHelper::hasNewMessageStatic($chat, $chatUser, true)) {
                 continue;
-            }
-            $userObject = $chatUser->employee ?: $chatUser->customer ?: false;
+            }*/
+            $userObject = $chatUser->user ?: $chatUser->employee ?: $chatUser->customer ?: $chatUser->user ?:false;
             if (!$userObject) {
                 continue;
             }

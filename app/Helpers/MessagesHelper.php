@@ -279,7 +279,7 @@ class MessagesHelper
         }
         //\App\Jobs\ChatNotificationJob::dispatch($chat->id)->delay(now()->addSeconds(self::NOTIFICATION_TIME + 5));
         // @TODO this should use queue, but at this point (08.05.2021) queue is bugged
-        dispatch_now(new ChatNotificationJob($chat->id));
+        (new ChatNotificationJob($chat->id))->handle();
     }
 
     private function getAdminChatUser($secondTry = false)
