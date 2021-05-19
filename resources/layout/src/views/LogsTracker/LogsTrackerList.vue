@@ -18,7 +18,7 @@
         <td> {{ item.created_at}} </td>
         <td> {{ item.page}} </td>
         <td> {{ item.time }} min</td>
-        <td> {{ item.description }} </td>
+        <td> <p v-html="item.description"></p></td>
       </tr>
       </tbody>
     </table>
