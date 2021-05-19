@@ -503,4 +503,8 @@ class OrdersController extends Controller
                 ->count() > 0;
         return array($isDeliveryChangeLocked, $isInvoiceChangeLocked);
     }
+
+    public function acceptDates(){
+
+    }
 }
