@@ -7,7 +7,9 @@ use App\Entities\CustomerAddress;
 use App\Entities\Label;
 use App\Entities\Product;
 use App\Entities\Order;
+use App\Jobs\AddLabelJob;
 use App\Jobs\ChatNotificationJob;
+use App\Jobs\RemoveLabelJob;
 use App\User;
 use App\Entities\Customer;
 use App\Entities\Employee;
@@ -275,6 +277,11 @@ class MessagesHelper
                 $this->clearIntervention($chat);
             } else {
                 $this->setChatLabel($chat, false);
+            }
+            if ($this->currentUserType == self::TYPE_CUSTOMER) {
+                dispatch_now(new AddLabelJob($chat->order, [self::MESSAGE_YELLOW_LABEL_ID]));
+            } else {
+                dispatch_now(new RemoveLabelJob($chat->order, [self::MESSAGE_YELLOW_LABEL_ID]));
             }
         }
         //\App\Jobs\ChatNotificationJob::dispatch($chat->id)->delay(now()->addSeconds(self::NOTIFICATION_TIME + 5));
