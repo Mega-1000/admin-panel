@@ -1,7 +1,7 @@
 <template>
   <div class="c-productTable">
     <div class="form-group">
-      <label>Wyszukaj produkct aby dodać do zestawu</label>
+      <label>Wyszukaj produkt, aby dodać do zestawu</label>
       <input type="text" class="form-control" v-on:keyup="searchProducts()" v-model="word">
     </div>
     <table id="dataTable" class="table table-hover">
@@ -88,6 +88,10 @@ export default class ProductTable extends Vue {
 
   public get filterProducts ():SetProduct[] {
     let tempPtoducts: SetProduct[] = this.products
+
+    tempPtoducts = tempPtoducts.filter((product) => {
+      return (product.id !== this.set.set.product_id)
+    })
 
     if (this.name !== '') {
       tempPtoducts = tempPtoducts.filter((product) => {

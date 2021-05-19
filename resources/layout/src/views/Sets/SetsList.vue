@@ -2,7 +2,7 @@
   <div class="v-setsList">
     <div class="error" v-if="message">
       <span @click="close()" class="close">X</span>
-      <p>{{ message }}</p>
+      <p  class="message">{{ message }}</p>
     </div>
     <NeedStockModal v-if="needStock.length > 0" :need-stock="needStock" :set="needStockSet" :count="needCount" @close="restoreNeedStock()"></NeedStockModal>
     <a class="btn btn-success" id="create__button" @click="toggleShowAddModal()">Stwórz zestaw</a>
@@ -68,6 +68,8 @@
         </tr>
       </tbody>
     </table>
+    <ActionTrackers></ActionTrackers>
+    <debugger :keepAlive="true" :components="$children"></debugger>
   </div>
 </template>
 
@@ -78,12 +80,14 @@ import { getFullUrl } from '@/helpers/urls'
 import AddSetModal from '@/components/Sets/AddSetModal.vue'
 import Error from '@/components/Error.vue'
 import NeedStockModal from '@/components/Sets/NeedStockModal.vue'
+import ActionTrackers from '@/components/ActionTrackers.vue'
 
 @Component({
   components: {
     NeedStockModal,
     Error,
-    AddSetModal
+    AddSetModal,
+    ActionTrackers
   }
 })
 export default class SetsList extends Vue {
@@ -196,13 +200,12 @@ export default class SetsList extends Vue {
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
     color: $cl-blue2c;
-    margin-top: 60px;
   }
 
   .close {
     position: absolute;
-    right: 10px;
-    top: 10px;
+    right: 15px;
+    top: 15px;
   }
 
   span {
@@ -211,15 +214,35 @@ export default class SetsList extends Vue {
 
   .error {
     position: fixed;
-    top: 0;
-    right: 0;
+    top: 15px;
+    right: 10px;
     background: $cl-rede4;
     border-radius: 10px;
-    padding: 25px 30px 20px;
+    padding: 15px 40px 15px 20px;
     z-index: $index-alert;
+    color: $cl-whiteff;
+  }
+
+  .message {
+    margin-bottom: 0;
   }
 
   .btn-success {
     float: left;
+    margin-bottom: 25px;
+  }
+
+  .voyager-pen,
+  .voyager-trash {
+    @media (min-width: 992px) {
+      margin-right: 7px;
+    }
+  }
+
+  .voyager-double-down,
+  .voyager-double-up {
+    @media (min-width: 992px) {
+      margin-right: 4px;
+    }
   }
 </style>

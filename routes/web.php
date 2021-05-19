@@ -31,6 +31,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/bonus/delete', 'BonusController@destroy')->name('bonus.destroy');
         Route::get('/bonus/users/{id?}', 'BonusController@getResponsibleUsers')->name('bonus.users');
         Route::get('/bonus/chat/{id}', 'BonusController@getChat')->name('bonus.chat');
+        Route::get('/bonus/order-chat/{id}', 'BonusController@firstOrderChat')->name('bonus.order-chat');
         Route::post('/bonus/send/{id}', 'BonusController@sendMessage')->name('bonus.send_message');
 
         Route::get('prices/allegro-prices/{id}', 'ProductPricesController@getAllegroPrices')->name('prices.allegroPrices');
@@ -56,6 +57,9 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get('/order/task/create/',
             'TasksController@createTask');
+
+        Route::get('/quick-order', 'OrdersController@createQuickOrder');
+        Route::get('/store-quick-order', 'OrdersController@storeQuickOrder');
 
         Route::get('users', 'UserController@index')->name('users.index');
         Route::get('users/datatable/all', 'UserController@datatable')->name('users.datatable');
@@ -545,6 +549,7 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get('/cacheClear', 'Controller@refreshCache')->name('admin.refresh');
     });
+    Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/web/TrackerLogsRoutes.php');
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');

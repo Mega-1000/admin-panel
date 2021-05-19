@@ -270,11 +270,37 @@
         </div>
     </div>
     <input type="hidden" name="status_move">
+    @include('bonus.modal')
 @endsection
 
 @section('javascript')
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
+        @can('create-bonus')
+        $(document).on('click', '.penalty', (e)=>{
+            e.preventDefault();
+            $('#updateTaskModal').hide();
+            let orderId = $(e.target).attr('data-order');
+            $('#add_bonus_modal').modal('show');
+            $('#order_id').val(orderId);
+            $('#consultant-name').html('<i class="fas fa-spinner fa-spin  fa-fw"></i>');
+            $('#select-consultant').attr('disabled',true);
+            $('#warehouse-name').html('<i class="fas fa-spinner fa-spin  fa-fw"></i>');
+            $('#select-warehouse').attr('disabled',true);
+
+            $.get('{{ route('bonus.users') }}/'+orderId, (data)=>{
+                $('#consultant-name').html(data['consultant']);
+                $('#warehouse-name').html(data['warehouse']);
+
+                if(data['consultant'] != 'BRAK') {
+                    $('#select-consultant').removeAttr('disabled');
+                }
+                if(data['warehouse'] != 'BRAK'){
+                    $('#select-warehouse').removeAttr('disabled');
+                }
+            });
+        });
+        @endcan
         function sendComment(type, order_id) {
             $.post(
                 {
@@ -691,7 +717,9 @@
                         let tooltipText = item.order.warehouse_notice ?? ''
                         let tooltipElement = item.order.warehouse_notice ? `<i title="${tooltipText}" data-toggle="tooltip" class="comment-icon fas fa-comment"></i>` : '';
                         duplicates = duplicates.length > 0 ? ' (D):' + duplicates.join(', (D)') : '';
-                        return input + labels + tooltipElement + `<a href="${url}">Edycja zlecenia</a>` + duplicates
+                        return input + labels + tooltipElement + `<a href="${url}">Edycja zlecenia</a>` +
+                            ` | <a href="javascript:void(0);" class="penalty" data-order="`+
+                            item.order.id+`">Potrącenie</a>`+ duplicates;
                     }
 
                     $.ajax({

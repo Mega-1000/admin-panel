@@ -11,6 +11,7 @@ class BonusAndPenalty extends Model
 
     protected $fillable = [
         'amount',
+        'points',
         'user_id',
         'order_id',
         'cause',

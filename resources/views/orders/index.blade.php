@@ -894,6 +894,29 @@
 @section('datatable-scripts')
     <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
     <script>
+        let getUrlParameter = function getUrlParameter(sParam) {
+            var sPageURL = window.location.search.substring(1),
+                sURLVariables = sPageURL.split('&'),
+                sParameterName,
+                i;
+
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=');
+
+                if (sParameterName[0] === sParam) {
+                    return typeof sParameterName[1] === undefined ? true : decodeURIComponent(sParameterName[1]);
+                }
+            }
+            return false;
+        };
+
+        $(document).ready(()=>{
+            let nof = getUrlParameter('nof');
+            if (nof) {
+                filterByPhone(nof);
+            }
+        });
+
         @can('create-bonus')
             $(document).on('click', '.penalty', (e)=>{
                 let orderId = $(e.target).attr('data-order');
@@ -1692,7 +1715,7 @@
                             html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
                             html += '</button>'
                             html += '<button data-order="'+id+'"';
-                            html += ' class="btn penalty btn-default btn-sm edit"><i class="fas fa-minus"></i> Potrącenie</button>';
+                            html += ' class="btn penalty btn-danger btn-sm edit"><i class="fas fa-minus"></i> Potrącenie</button>';
                             @endif
 
                                 return html;
@@ -1827,6 +1850,7 @@
                             if (data) {
                                 html += '<button class="btn btn-default btn-xs" onclick="filterByPhone(' + data + ')">F</button><button class="btn btn-default btn-xs" onclick="clearAndfilterByPhone(' + data + ')">OF</button>';
                             }
+                            html += "<a style='width:100%' target='_blank' href='/admin/orders?nof="+data+"' class='btn btn-success'>NOF</a>";
 
                             html += '<p data-toggle="tooltip" data-html="true" title="' + tooltipTitle + '">' + phone + '</p>';
 
@@ -2625,6 +2649,11 @@
                     return;
                 } else if (addedType == "{{ \App\Entities\Label::CHAT_TYPE }}") {
                     var url = '{{ route("chat.index", ["all" => 1, "id" => ":id"]) }}';
+                    url = url.replace(':id', orderId);
+                    window.location.href = url
+                    return
+                } else if (addedType == "{{ \App\Entities\Label::BONUS_TYPE }}") {
+                    let url = '{{ route("bonus.order-chat", ['id' => ":id"]) }}';
                     url = url.replace(':id', orderId);
                     window.location.href = url
                     return

@@ -57,7 +57,7 @@ class Helper
             return;
         }
         try {
-            return \Mail::send(
+            return \Mailer::create()->send(
                 "emails/$template",
                 array_merge(['email' => $email], $additionalData),
                 function ($m) use ($email, $subject) {

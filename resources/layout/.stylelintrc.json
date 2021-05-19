@@ -23,6 +23,12 @@
     ],
     "max-nesting-depth": [4, {
       "ignoreAtRules": ["include"]
-    }]
+    }],
+    "selector-pseudo-element-no-unknown": [
+      true,
+      {
+        "ignorePseudoElements": ["v-deep"]
+      }
+    ]
   }
 }
