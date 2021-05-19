@@ -15,14 +15,17 @@ class ChatNotificationJob implements ShouldQueue
 
     private $chatId;
 
+    private $senderEmail;
+
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($chatId)
+    public function __construct($chatId, $senderEmail = false)
     {
         $this->chatId = $chatId;
+        $this->senderEmail = $senderEmail;
     }
 
     /**
@@ -33,18 +36,13 @@ class ChatNotificationJob implements ShouldQueue
     public function handle()
     {
         $chat = \App\Entities\Chat
-            ::with(['chatUsers' => function ($q) {
-                $q->with('user');
-                $q->with('customer');
-                $q->whereNull('employee_id');
-            }])
-            ->with('messages')
-            ->find($this->chatId);
+            ::with(['chatUsers', 'messages'])->find($this->chatId);
+
         foreach ($chat->chatUsers as $chatUser) {
-            if (!MessagesHelper::hasNewMessageStatic($chat, $chatUser, true)) {
+            /*if (!MessagesHelper::hasNewMessageStatic($chat, $chatUser, true)) {
                 continue;
-            }
-            $userObject = $chatUser->employee ?: $chatUser->customer ?: false;
+            }*/
+            $userObject = $chatUser->user ?: $chatUser->employee ?: $chatUser->customer ?: $chatUser->user ?:false;
             if (!$userObject) {
                 continue;
             }
@@ -60,6 +58,9 @@ class ChatNotificationJob implements ShouldQueue
         $helper->currentUserId = $userObject->id;
         try {
             $email = $userObject->email ?? $userObject->login;
+            if ($email == $this->senderEmail) {
+                return;
+            }
             self::sendNewMessageEmail($email, $helper);
             $chatUser->last_notification_time = now();
             $chatUser->save();

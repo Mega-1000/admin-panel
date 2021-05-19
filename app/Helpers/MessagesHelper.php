@@ -7,7 +7,9 @@ use App\Entities\CustomerAddress;
 use App\Entities\Label;
 use App\Entities\Product;
 use App\Entities\Order;
+use App\Jobs\AddLabelJob;
 use App\Jobs\ChatNotificationJob;
+use App\Jobs\RemoveLabelJob;
 use App\User;
 use App\Entities\Customer;
 use App\Entities\Employee;
@@ -276,10 +278,23 @@ class MessagesHelper
             } else {
                 $this->setChatLabel($chat, false);
             }
+            if ($this->currentUserType == self::TYPE_CUSTOMER) {
+                $loopPrevention = [];
+                dispatch_now(new AddLabelJob(
+                    $chat->order,
+                    [self::MESSAGE_YELLOW_LABEL_ID],
+                    $loopPrevention,
+                    ['added_type' => Label::CHAT_TYPE]
+                ));
+            } else {
+                dispatch_now(new RemoveLabelJob($chat->order, [self::MESSAGE_YELLOW_LABEL_ID]));
+            }
         }
         //\App\Jobs\ChatNotificationJob::dispatch($chat->id)->delay(now()->addSeconds(self::NOTIFICATION_TIME + 5));
         // @TODO this should use queue, but at this point (08.05.2021) queue is bugged
-        dispatch_now(new ChatNotificationJob($chat->id));
+        $email = $this->getCurrentChatUser()->email ?? $this->getCurrentChatUser()->login;
+
+        (new ChatNotificationJob($chat->id))->handle();
     }
 
     private function getAdminChatUser($secondTry = false)
