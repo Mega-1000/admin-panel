@@ -279,10 +279,18 @@ class MessagesHelper
                 $this->setChatLabel($chat, false);
             }
             if ($this->currentUserType == self::TYPE_CUSTOMER) {
-                dispatch_now(new AddLabelJob($chat->order, [self::MESSAGE_YELLOW_LABEL_ID]));
+                $loopPrevention = [];
+                dispatch_now(new AddLabelJob(
+                    $chat->order,
+                    [self::MESSAGE_YELLOW_LABEL_ID],
+                    $loopPrevention,
+                    ['added_type' => Label::CHAT_TYPE]
+                ));
             } else {
                 dispatch_now(new RemoveLabelJob($chat->order, [self::MESSAGE_YELLOW_LABEL_ID]));
             }
+            /** quick fix - should be ALWAYS visible */
+            dispatch_now(new AddLabelJob($chat->order, [self::MESSAGE_BLUE_LABEL_ID]));
         }
         //\App\Jobs\ChatNotificationJob::dispatch($chat->id)->delay(now()->addSeconds(self::NOTIFICATION_TIME + 5));
         // @TODO this should use queue, but at this point (08.05.2021) queue is bugged

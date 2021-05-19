@@ -15,14 +15,17 @@ class ChatNotificationJob implements ShouldQueue
 
     private $chatId;
 
+    private $senderEmail;
+
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($chatId)
+    public function __construct($chatId, $senderEmail = false)
     {
         $this->chatId = $chatId;
+        $this->senderEmail = $senderEmail;
     }
 
     /**
@@ -55,6 +58,9 @@ class ChatNotificationJob implements ShouldQueue
         $helper->currentUserId = $userObject->id;
         try {
             $email = $userObject->email ?? $userObject->login;
+            if ($email == $this->senderEmail) {
+                return;
+            }
             self::sendNewMessageEmail($email, $helper);
             $chatUser->last_notification_time = now();
             $chatUser->save();
