@@ -60,6 +60,7 @@
         </tr>
         </thead>
     </table>
+    <div id="actionTracker"></div>
 @endsection
 
 

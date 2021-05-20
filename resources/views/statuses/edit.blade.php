@@ -36,12 +36,12 @@
             <div class="form-group">
                 <label for="name">@lang('statuses.form.name')</label>
                 <input type="text" class="form-control" id="name" name="name"
-                       value="{{ $status->name }}">
+                       value="{{ $status->name }}" track-write>
             </div>
             <div class="form-group">
                 <label for="color">@lang('statuses.form.color')</label>
                 <input type="text" class="form-control jscolor {onFineChange:'update(this)'}" id="color" name="color"
-                       value="{{ $status->color }}">
+                       value="{{ $status->color }}" track-write>
             </div>
             <div class="form-group">
                 <label for="tags">@lang('statuses.form.tags')</label>
@@ -56,12 +56,12 @@
             <div class="form-group">
                 <label for="message">@lang('statuses.form.message')</label>
                 <textarea rows="10" cols="50" class="form-control" id="message"
-                          name="message"
+                          name="message" track-write
                 >{{ $status->message }}</textarea>
             </div>
             <div class="form-group">
                 <label for="labels_to_add">@lang('statuses.form.labels_to_add')</label>
-                <select multiple class="form-control text-uppercase" name="labels_to_add[]" size="8">
+                <select multiple class="form-control text-uppercase" name="labels_to_add[]" size="8" track-click>
                     @foreach($labels as $label)
                         <option {{ in_array($label->id, $labelsToAddOnChange) ? 'selected="selected"' : '' }} value="{{ $label->id }}">{{ $label->name }}</option>
                     @endforeach
@@ -69,14 +69,15 @@
             </div>
             <div class="form-group">
                 <label for="status">@lang('statuses.form.status')</label>
-                <select class="form-control text-uppercase" name="status">
+                <select class="form-control text-uppercase" name="status" track-click>
                     <option value="ACTIVE">@lang('statuses.form.active')</option>
                     <option value="PENDING">@lang('statuses.form.pending')</option>
                 </select>
             </div>
         </div>
-        <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
+        <button type="submit" class="btn btn-primary" track-click>@lang('voyager.generic.save')</button>
     </form>
+    <div id="actionTracker"></div>
 @endsection
 @section('scripts')
     <script src="{{URL::asset('js/jscolor.js')}}"></script>
