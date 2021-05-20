@@ -465,7 +465,7 @@
 @endsection
 
 @section('content')
-    <div class="page-content" id="vue">
+    <div class="page-content" id="vue" track-click>
         @include('voyager::alerts')
         @include('voyager::dimmers')
         @yield('app-content')

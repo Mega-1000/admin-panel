@@ -10,7 +10,7 @@ class TrackerLogsController extends Controller
 {
   public function index()
   {
-      return TrackerLogs::get();
+      return TrackerLogs::orderBy('id', 'DESC')->get();
   }
 
     public function new(Request $request)
@@ -48,14 +48,16 @@ class TrackerLogsController extends Controller
             $log->time = $request->time;
         }
         if($request->has('description')) {
-            $log->description = $request->description;
+            $oldDescription = $log->description;
+            $oldDescription .= 'Time: '.$log->time.'<br>';
+            $log->description = $oldDescription.$request->description.'<br><br>';
         }
 
 
         if ($log->update()) {
-            return response(json_encode([
+            return response(json_encode(
                 $log
-            ]),200);
+            ),200);
         }
         return response(json_encode([
             'error_code' => 500,

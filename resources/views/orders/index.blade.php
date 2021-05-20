@@ -887,7 +887,7 @@
         </tr>
         </thead>
     </table>
-
+    <div id="actionTracker"></div>
     @include('bonus.modal')
 @endsection
 

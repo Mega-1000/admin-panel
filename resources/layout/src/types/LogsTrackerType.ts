@@ -28,5 +28,6 @@ export interface updateTimeLogParam {
 
 export interface updateDescriptionLogParam {
   id: number,
-  description: string
+  description: string,
+  time: number
 }

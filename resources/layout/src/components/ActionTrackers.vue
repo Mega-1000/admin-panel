@@ -1,6 +1,6 @@
 <template>
   <div class="c-actionTracker">
-    <ModalActionTrackers v-if="showModal" @close="toggleShowModal()"></ModalActionTrackers>
+    <ModalActionTrackers v-if="showModal" @close="toggleShowModal()" :time="trackTime"></ModalActionTrackers>
   </div>
 </template>
 
@@ -34,7 +34,7 @@ export default class ActionTrackers extends Vue {
     setInterval(async () => {
       this.trackTime++
 
-      if (this.trackTime === this.finalTime) {
+      if ((this.trackTime >= this.finalTime) && (this.trackTime % this.finalTime === 0)) {
         this.setLog()
         this.showModal = true
       }
