@@ -294,7 +294,7 @@ class MessagesHelper
         // @TODO this should use queue, but at this point (08.05.2021) queue is bugged
         $email = $this->getCurrentChatUser()->email ?? $this->getCurrentChatUser()->login;
 
-        (new ChatNotificationJob($chat->id))->handle();
+        (new ChatNotificationJob($chat->id, $email))->handle();
     }
 
     private function getAdminChatUser($secondTry = false)
