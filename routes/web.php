@@ -567,4 +567,5 @@ Route::get('/payment/confirmation/{token}', 'OrdersPaymentsController@warehouseP
 Route::post('/payment/confirmation/{token}', 'OrdersPaymentsController@warehousePaymentConfirmationStore')->name('ordersPayment.warehousePaymentConfirmationStore');
 
 Route::get('/chat/{token}', 'MessagesController@show')->name('chat.show');
+Route::get('/chat-show-or-new/{orderId}/{userId}', 'MessagesController@showOrNew')->name('chat.show-or-new');
 Route::get('/chat/getUrl/{mediaId}/{postCode}/{email}/{phone}', 'MessagesController@getUrl')->name('messages.get-url');

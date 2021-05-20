@@ -105,6 +105,26 @@ class MessagesController extends Controller
         }
     }
 
+    public function showOrNew(int $orderId, int $userId)
+    {
+        $chat = Chat::where('order_id', '=', $orderId)->first();
+        if (!$chat) {
+            $helper = new MessagesHelper();
+            $helper->orderId = $orderId;
+            $helper->currentUserId = $userId;
+            $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
+            $userToken = $helper->encrypt();
+        } else {
+            $helper = new MessagesHelper();
+            $helper->chatId = $chat->id;
+            $helper->currentUserId = $userId;
+            $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
+            $userToken = $helper->encrypt();
+        }
+
+        return redirect()->route('chat.show', ['token' => $userToken]);
+    }
+
     /**
      * Show the form for editing the specified resource.
      *
