@@ -549,6 +549,9 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/transport/update-pricing', 'DelivererController@updatePricing')->name('transportPayment.update_pricing');
 
         Route::get('/cacheClear', 'Controller@refreshCache')->name('admin.refresh');
+
+        Route::get('/edit-allegro-terms', 'AllegroController@editTerms')->name('allegro.edit-terms');
+        Route::post('/edit-allegro-terms', 'AllegroController@saveTerms')->name('allegro.edit-terms');
     });
     Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/web/TrackerLogsRoutes.php');
 });

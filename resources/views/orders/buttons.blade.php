@@ -73,6 +73,9 @@
     <div style="display: flex; align-items: center;" id="add-label-container">
         <a  class="btn btn-success" href="/admin/quick-order">
             Szybkie zadanie
+        </a>&nbsp;
+        <a  class="btn btn-success" href="{{ route('allegro.edit-terms') }}">
+            Edytuj regulamin allegro
         </a>
     </div>
     <div class="col-md-10">
