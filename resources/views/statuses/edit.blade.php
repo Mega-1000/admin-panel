@@ -77,7 +77,7 @@
         </div>
         <button type="submit" class="btn btn-primary" track-click>@lang('voyager.generic.save')</button>
     </form>
-    <div id="actionTracker"></div>
+    <div id="disabled-actionTracker"></div>
 @endsection
 @section('scripts')
     <script src="{{URL::asset('js/jscolor.js')}}"></script>
