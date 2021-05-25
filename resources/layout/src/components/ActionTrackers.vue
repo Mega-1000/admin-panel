@@ -1,4 +1,9 @@
 <template>
+  <!--
+  IMPORTANT !!!
+  tracker modal was disabled by changing <div id="actionTracker"></div> to <div id="disabled-actionTracker"></div>
+  to related views
+  -->
   <div class="c-actionTracker">
     <ModalActionTrackers v-if="showModal" @close="toggleShowModal()" :time="trackTime"></ModalActionTrackers>
   </div>
