@@ -2,6 +2,9 @@
 
 use App\Entities\Allegro_Auth;
 use App\Entities\AllegroOrder;
+use App\Entities\Label;
+use App\Entities\Order;
+use App\Entities\SelTransaction;
 use App\Facades\Mailer;
 use App\Mail\AllegroNewOrderEmail;
 use App\Mail\TestMail;
@@ -22,6 +25,7 @@ class AllegroOrderService
 
     const AUTH_RECORD_ID = 2;
     const READY_FOR_PROCESSING = 'READY_FOR_PROCESSING';
+    const INVALID_DATA_LABEL = 184;
 
     /**
      * @var Client
@@ -102,6 +106,38 @@ class AllegroOrderService
         ]);
 
         return json_decode((string)$response->getBody(), true);
+    }
+
+    public function fixOrdersWithInvalidData()
+    {
+        $orders = $this->findNotValidatedOrdersWithInvalidData();
+
+        foreach ($orders as $order) {
+
+        }
+    }
+
+    // @TODO PRIV
+    public function findNotValidatedOrdersWithInvalidData()
+    {
+        $orders = Order::whereHas('labels', function ($query) {
+            $query->where('labels.id', self::INVALID_DATA_LABEL);
+        })->where('data_verified_by_allegro_api', '=', false)->get();
+
+        return $orders;
+    }
+
+    // @TODO PRIV
+    public function getOrderDetailsFromApi(Order $order)
+    {
+        if (!$order->sello_id) {
+            return false;
+        }
+        $id = $order->selloTransaction->tr_CheckoutFormId;
+        $url = $this->getRestUrl(
+            "/order/checkout-forms/{$id}"
+        );
+        return json_decode((string)$this->request('GET', $url, [])->getBody(), true);
     }
 
     private function refreshTokens()
