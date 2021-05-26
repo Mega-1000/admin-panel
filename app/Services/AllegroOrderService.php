@@ -159,7 +159,7 @@ class AllegroOrderService
 
     private function findNotValidatedOrdersWithInvalidData()
     {
-        $yesterday = (new Carbon())->startOfDay()->subDay(1);
+        $yesterday = (new Carbon())->startOfDay();//->subDay(1); @TODO do testow
         return Order::where('data_verified_by_allegro_api', '=', false)
             ->where('sello_id', '!=', null)
             ->where('created_at', '>=', $yesterday)->get();
