@@ -553,7 +553,7 @@ class OrdersController extends Controller
         }
         return response(json_encode([
             'error_code' => 500,
-            'error_message' => __('sets.messages.error')
+            'error_message' => __('order_dates.messages.error')
         ]), 500);
     }
 
@@ -585,7 +585,7 @@ class OrdersController extends Controller
         }
         return response(json_encode([
             'error_code' => 500,
-            'error_message' => __('sets.messages.error')
+            'error_message' => __('order_dates.messages.error')
         ]), 500);
     }
 }
