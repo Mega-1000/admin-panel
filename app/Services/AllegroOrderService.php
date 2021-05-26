@@ -170,8 +170,16 @@ class AllegroOrderService
         $allegroData = $this->getOrderDetailsFromApi($order);
 
         if ($allegroData['invoice']['required'] == false) {
-            return;
+            $this->fixInvoiceAddressInvoiceNotRequired($order);
+        } else {
+            $this->fixInvoiceAddressInvoiceRequired($order);
         }
+    }
+
+    private function fixInvoiceAddressInvoiceRequired(Order $order)
+    {
+        $address = $order->invoiceAddress;
+        $allegroData = $this->getOrderDetailsFromApi($order);
 
         $allegroAddress = $allegroData['invoice']['address'];
         $phone = preg_replace('/[^0-9]/', '', $allegroAddress['phoneNumber']);
@@ -188,6 +196,33 @@ class AllegroOrderService
         $address->flat_number = $flat;
         $address->city = $allegroAddress['city'];
         $address->postal_code = $allegroAddress['zipCode'];
+        $address->phone = $phone;
+        $address->save();
+
+        $order->data_verified_by_allegro_api = true;
+        $order->save();
+    }
+
+    private function fixInvoiceAddressInvoiceNotRequired(Order $order)
+    {
+        $address = $order->invoiceAddress;
+        $allegroData = $this->getOrderDetailsFromApi($order);
+
+        $allegroAddress = $allegroData['buyer']['address'];
+        $phone = preg_replace('/[^0-9]/', '', $allegroData['buyer']['phoneNumber']);
+        $phone = substr($phone, -9);
+        $street = AddressSplitter::splitAddress($allegroAddress['street'])['streetName'];
+        $flat = AddressSplitter::splitAddress($allegroAddress['street'])['houseNumber'];
+
+        $address->firstname = $allegroData['buyer']['firstName'];
+        $address->lastname = $allegroData['buyer']['lastName'];
+        $address->email = $allegroData['buyer']['email'];
+        $address->firmname = null;
+        $address->nip = null;
+        $address->address = $street;
+        $address->flat_number = $flat;
+        $address->city = $allegroAddress['city'];
+        $address->postal_code = $allegroAddress['postCode'];
         $address->phone = $phone;
         $address->save();
 
