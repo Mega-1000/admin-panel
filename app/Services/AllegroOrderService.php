@@ -178,11 +178,12 @@ class AllegroOrderService
 
     private function fixInvoiceAddressInvoiceRequired(Order $order)
     {
-        $address = $order->invoiceAddress;
+        $address = $order->getInvoiceAddress();
         $allegroData = $this->getOrderDetailsFromApi($order);
 
         $allegroAddress = $allegroData['invoice']['address'];
-        $phone = preg_replace('/[^0-9]/', '', $allegroAddress['phoneNumber']);
+        $rawPhone = $allegroAddress['phoneNumber'] ?? $allegroData['buyer']['phoneNumber'] ?? '';
+        $phone = preg_replace('/[^0-9]/', '', $rawPhone);
         $phone = substr($phone, -9);
         $street = AddressSplitter::splitAddress($allegroAddress['street'])['streetName'];
         $flat = AddressSplitter::splitAddress($allegroAddress['street'])['houseNumber'];
@@ -205,11 +206,12 @@ class AllegroOrderService
 
     private function fixInvoiceAddressInvoiceNotRequired(Order $order)
     {
-        $address = $order->invoiceAddress;
+        $address = $order->getInvoiceAddress();
         $allegroData = $this->getOrderDetailsFromApi($order);
 
         $allegroAddress = $allegroData['buyer']['address'];
-        $phone = preg_replace('/[^0-9]/', '', $allegroData['buyer']['phoneNumber']);
+        $rawPhone = $allegroAddress['phoneNumber'] ?? $allegroData['buyer']['phoneNumber'] ?? '';
+        $phone = preg_replace('/[^0-9]/', '', $rawPhone);
         $phone = substr($phone, -9);
         $street = AddressSplitter::splitAddress($allegroAddress['street'])['streetName'];
         $flat = AddressSplitter::splitAddress($allegroAddress['street'])['houseNumber'];
