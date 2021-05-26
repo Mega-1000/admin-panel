@@ -1,34 +1,32 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import setRepository from '@/store/repositories/SetsRepository'
 import {
   Dates,
   OrdersStore,
-  Acceptance
-  // CreateSetParams, ProductStocks,
-  // Set,
-  // SetParams,
-  // SetProduct,
-  // SetProductParams,
-  // SetsCount,
-  // SetsProductParams,
-  // SetsStore
+  Acceptance, AcceptDatesParams, UpdateDatesParams
 } from '@/types/OrdersTypes'
 
 import {
-  ORDERS_SET_CUSTOMER_DATES,
-  ORDERS_SET_CONSULTANT_DATES,
-  ORDERS_SET_WAREHOUSE_DATES,
-  ORDERS_SET_ACCEPTANCE,
+  ORDERS_DATES_SET_CUSTOMER,
+  ORDERS_DATES_SET_CONSULTANT,
+  ORDERS_DATES_SET_WAREHOUSE,
+  ORDERS_DATES_SET_ACCEPTANCE,
+  ORDERS_DATES_SET_IS_LOADING,
+  ORDERS_DATES_SET_ERROR
 } from '@/store/mutation-types'
+
+import OrdersRepository from '@/store/repositories/OrdersRepository'
 
 const namespaced = true
 
 const state: OrdersStore = {
   error: '',
   isLoading: false,
-  customerDates: '',
+  customerDates: null,
+  consultantDates: null,
+  warehouseDates: null,
+  acceptance: null
 }
 
 const getters = {
@@ -41,58 +39,81 @@ const getters = {
 }
 
 const actions = {
-  loadDates({commit}: any) {
-    commit(ORDERS_SET_CUSTOMER_DATES, true)
-    commit(ORDERS_SET_CONSULTANT_DATES, true)
-    commit(ORDERS_SET_WAREHOUSE_DATES, true)
-    commit(ORDERS_SET_ACCEPTANCE, true)
+  loadDates ({ commit }: any, orderId: number) {
+    commit(ORDERS_DATES_SET_IS_LOADING, true)
 
-    return setRepository
-      .getSets()
+    return OrdersRepository
+      .getDates(orderId)
       .then((data: any) => {
-        commit(SETS_SET_IS_LOADING, false)
+        commit(ORDERS_DATES_SET_IS_LOADING, false)
         if (data.error_code) {
-          console.log(data)
-          commit(SETS_SET_ERROR, data.error_message)
+          commit(ORDERS_DATES_SET_ERROR, data.error_message)
         }
-        commit(SETS_SET_ALL, data)
+
+        commit(ORDERS_DATES_SET_CUSTOMER, data.customer)
+        commit(ORDERS_DATES_SET_CONSULTANT, data.consultant)
+        commit(ORDERS_DATES_SET_WAREHOUSE, data.warehouse)
+        commit(ORDERS_DATES_SET_ACCEPTANCE, data.acceptance)
         return data
       })
       .catch((error: any) => {
-        commit(SETS_SET_ERROR, error.message)
+        commit(ORDERS_DATES_SET_ERROR, error.message)
       })
   },
-  completing({commit}: any, set: SetsCount) {
-    commit(SETS_SET_IS_LOADING, true)
 
-    return setRepository
-      .completingSets(set)
+  saveAccept ({ commit }: any, params: AcceptDatesParams) {
+    commit(ORDERS_DATES_SET_IS_LOADING, true)
+
+    return OrdersRepository.acceptDates(params)
       .then((data: any) => {
-        commit(SETS_SET_IS_LOADING, false)
+        commit(ORDERS_DATES_SET_IS_LOADING, false)
         if (data.error_code) {
-          console.log(data)
-          commit(SETS_SET_ERROR, data.error_message)
+          commit(ORDERS_DATES_SET_ERROR, data.error_message)
         }
+
+        commit(ORDERS_DATES_SET_ACCEPTANCE, data.acceptance)
         return data
       })
       .catch((error: any) => {
-        commit(SETS_SET_ERROR, error.message)
+        commit(ORDERS_DATES_SET_ERROR, error.message)
       })
   },
+
+  updateDateParams ({ commit }: any, params: UpdateDatesParams) {
+    commit(ORDERS_DATES_SET_IS_LOADING, true)
+
+    return OrdersRepository.updateDatesParams(params)
+      .then((data: any) => {
+        commit(ORDERS_DATES_SET_IS_LOADING, false)
+        if (data.error_code) {
+          commit(ORDERS_DATES_SET_ERROR, data.error_message)
+        }
+
+        commit(`ORDERS_DATES_SET_${params.type.toUpperCase()}`, data[params.type])
+        commit(ORDERS_DATES_SET_ACCEPTANCE, data.acceptance)
+        return data
+      })
+      .catch((error: any) => {
+        commit(ORDERS_DATES_SET_ERROR, error.message)
+      })
+  }
 }
 
 const mutations = {
-  [ORDERS_SET_CUSTOMER_DATES](state: OrdersStore, customerDates: Dates) {
+  [ORDERS_DATES_SET_CUSTOMER] (state: OrdersStore, customerDates: Dates) {
     state.customerDates = customerDates
   },
-  [ORDERS_SET_CONSULTANT_DATES](state: OrdersStore, consultantDates: Dates) {
+  [ORDERS_DATES_SET_CONSULTANT] (state: OrdersStore, consultantDates: Dates) {
     state.consultantDates = consultantDates
   },
-  [ORDERS_SET_WAREHOUSE_DATES](state: OrdersStore, warehouseDates: Dates) {
+  [ORDERS_DATES_SET_WAREHOUSE] (state: OrdersStore, warehouseDates: Dates) {
     state.warehouseDates = warehouseDates
   },
-  [ORDERS_SET_ACCEPTANCE](state: OrdersStore, acceptance: Acceptance) {
+  [ORDERS_DATES_SET_ACCEPTANCE] (state: OrdersStore, acceptance: Acceptance) {
     state.acceptance = acceptance
+  },
+  [ORDERS_DATES_SET_IS_LOADING] (state: OrdersStore, isLoading: boolean) {
+    state.isLoading = isLoading
   }
 }
 

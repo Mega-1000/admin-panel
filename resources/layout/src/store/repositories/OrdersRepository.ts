@@ -2,12 +2,12 @@
 /* eslint-disable no-useless-constructor */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import {CreateSetParams, Set, SetParams, SetProductParams, SetsCount, SetsProductParams} from '@/types/SetsTypes'
-import {getFullUrl} from '@/helpers/urls'
+import { getFullUrl } from '@/helpers/urls'
+import { AcceptDatesParams, UpdateDatesParams } from '@/types/OrdersTypes'
 
 export default {
-  async setItem(id: number): Promise<any> {
-    return fetch(getFullUrl('api/sets/' + id), {
+  async getDates (orderId: number): Promise<any> {
+    return fetch(getFullUrl('api/orders/' + orderId + '/dates/'), {
       method: 'GET',
       credentials: 'same-origin',
       headers: new Headers({
@@ -19,8 +19,8 @@ export default {
         return response.json()
       })
   },
-  async setItemUpdate(item: SetParams): Promise<any> {
-    return fetch(getFullUrl('api/sets/' + item.id), {
+  async acceptDates (params: AcceptDatesParams): Promise<any> {
+    return fetch(getFullUrl('api/orders/' + params.orderId + '/acceptDates'), {
       method: 'PUT',
       credentials: 'same-origin',
       headers: new Headers({
@@ -28,29 +28,30 @@ export default {
         'X-Requested-Width': 'XMLHttpRequest'
       }),
       body: JSON.stringify({
-        name: item.name,
-        number: item.number
+        type: params.type
       })
+    }).then((response) => {
+      return response.json()
     })
-      .then((response) => {
-        return response.json()
-      })
   },
-  async setProductAdd(item: SetProductParams): Promise<any> {
-    return fetch(getFullUrl('api/sets/' + item.setId + '/products/'), {
-      method: 'POST',
+
+  async updateDatesParams (params: UpdateDatesParams): Promise<any> {
+    return fetch(getFullUrl('api/orders/' + params.orderId + '/updateDateParams'), {
+      method: 'PUT',
       credentials: 'same-origin',
       headers: new Headers({
         'Content-Type': 'application/json; charset=utf-8',
         'X-Requested-Width': 'XMLHttpRequest'
       }),
       body: JSON.stringify({
-        product_id: item.id,
-        stock: item.stock
+        type: params.type,
+        shipmentDateFrom: params.shipmentDateFrom,
+        shipmentDateTo: params.shipmentDateTo,
+        deliveryDateFrom: params.deliveryDateFrom,
+        deliveryDateTo: params.deliveryDateTo
       })
+    }).then((response) => {
+      return response.json()
     })
-      .then((response) => {
-        return response.json()
-      })
-  },
+  }
 }

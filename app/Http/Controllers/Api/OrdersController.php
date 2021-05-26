@@ -504,7 +504,91 @@ class OrdersController extends Controller
         return array($isDeliveryChangeLocked, $isInvoiceChangeLocked);
     }
 
-    public function acceptDates(){
+    public function dates(Order $order)
+    {
+        /** @var OrderDates $dates */
+        $dates = $order->dates;
+        return [
+            'customer' => [
+                'delivery_date_from' => $dates->customer_delivery_date_from,
+                'delivery_date_to' => $dates->customer_delivery_date_to,
+                'shipment_date_from' => $dates->customer_shipment_date_from,
+                'shipment_date_to' => $dates->customer_shipment_date_to,
+            ],
+            'consultant' => [
+                'delivery_date_from' => $dates->consultant_delivery_date_from,
+                'delivery_date_to' => $dates->consultant_delivery_date_to,
+                'shipment_date_from' => $dates->consultant_shipment_date_from,
+                'shipment_date_to' => $dates->consultant_shipment_date_to,
+            ],
+            'warehouse' => [
+                'delivery_date_from' => $dates->warehouse_delivery_date_from,
+                'delivery_date_to' => $dates->warehouse_delivery_date_to,
+                'shipment_date_from' => $dates->warehouse_shipment_date_from,
+                'shipment_date_to' => $dates->warehouse_shipment_date_to,
+            ],
+            'acceptance' => [
+                'customer' => $dates->customer_acceptance,
+                'consultant' => $dates->consultant_acceptance,
+                'warehouse' => $dates->warehouse_acceptance,
+            ]
+        ];
+    }
 
+    public function acceptOrderDates(Order $order, Request $request)
+    {
+        $result = null;
+        if ($request->has('type')) {
+            $result = $order->dates()->update([
+                $request->type . '_acceptance' => true
+            ]);
+        }
+        if ($result) {
+            return response(json_encode([
+                'acceptance' => [
+                    'customer' => $order->dates->customer_acceptance,
+                    'consultant' => $order->dates->consultant_acceptance,
+                    'warehouse' => $order->dates->warehouse_acceptance,
+                ]
+            ]), 200);
+        }
+        return response(json_encode([
+            'error_code' => 500,
+            'error_message' => __('sets.messages.error')
+        ]), 500);
+    }
+
+    public function updateOrderDates(Order $order, Request $request)
+    {
+        $result = null;
+        /** @var OrderDates $dates */
+        $dates = $order->dates;
+        if ($request->has('type')) {
+            $result = $order->dates()->update([
+                $request->type . '_shipment_date_from' => $request->shipmentDateFrom,
+                $request->type . '_shipment_date_to' => $request->shipmentDateTo,
+                $request->type . '_delivery_date_from' => $request->deliveryDateFrom,
+                $request->type . '_delivery_date_to' => $request->deliveryDateTo,
+                $request->type . '_acceptance' => true
+            ]);
+        }
+
+        if ($result) {
+            return response(json_encode([
+                $request->type => [
+                    'shipment_date_from' =>  $request->shipmentDateFrom,
+                    'shipment_date_to' =>$request->shipmentDateTo,
+                    'delivery_date_from' => $request->deliveryDateFrom,
+                    'delivery_date_to' => $request->deliveryDateTo,
+                ],
+                'acceptance' => [
+                    $request->type => true
+                ]
+            ]), 200);
+        }
+        return response(json_encode([
+            'error_code' => 500,
+            'error_message' => __('sets.messages.error')
+        ]), 500);
     }
 }

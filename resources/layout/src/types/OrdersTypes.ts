@@ -1,7 +1,5 @@
 /* eslint-disable camelcase */
 
-import {ProductStocks, Set, SetProduct} from "@/types/SetsTypes";
-
 export interface Dates {
   shipment_date_from: string,
   shipment_date_to: string,
@@ -10,18 +8,32 @@ export interface Dates {
 }
 
 export interface Acceptance {
-  customer_acceptance: boolean,
-  consultant_acceptance: boolean,
-  warehouse_acceptance: boolean,
+  customer: boolean,
+  consultant: boolean,
+  warehouse: boolean,
 }
 
 export interface OrdersStore {
   error: string,
   isLoading: boolean,
-  customerDates: Dates,
-  consultantDates: Dates,
-  warehouseDates: Dates,
-  acceptance: Acceptance
+  customerDates: Dates | null,
+  consultantDates: Dates | null,
+  warehouseDates: Dates | null,
+  acceptance: Acceptance | null
+}
+
+export interface AcceptDatesParams {
+  type: string,
+  orderId: number
+}
+
+export interface UpdateDatesParams {
+  type: string,
+  orderId: number,
+  shipmentDateFrom: string,
+  shipmentDateTo: string,
+  deliveryDateFrom: string,
+  deliveryDateTo: string
 }
 
 /* eslint-enabled camelcase */

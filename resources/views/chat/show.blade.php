@@ -38,7 +38,7 @@
                 </div>
             @endif
             @if($order->dates)
-                @include('orders.dates')
+                <div id="orderDates"></div>
             @endif
             @if ($chat)
                 @include('chat.chat_body')
