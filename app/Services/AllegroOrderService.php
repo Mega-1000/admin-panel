@@ -190,6 +190,9 @@ class AllegroOrderService
         $address->postal_code = $allegroAddress['zipCode'];
         $address->phone = $phone;
         $address->save();
+
+        $order->data_verified_by_allegro_api = true;
+        $order->save();
     }
 
     private function findNotValidatedOrdersWithInvalidData()
