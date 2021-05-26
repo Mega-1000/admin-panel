@@ -122,6 +122,18 @@ class AllegroOrderService
         }
     }
 
+    public function getOrderDetailsFromApi(Order $order)
+    {
+        if (!$order->sello_id) {
+            return false;
+        }
+        $id = $order->selloTransaction->tr_CheckoutFormId;
+        $url = $this->getRestUrl(
+            "/order/checkout-forms/{$id}"
+        );
+        return json_decode((string)$this->request('GET', $url, [])->getBody(), true);
+    }
+
     private function fixDeliveryAddress(Order $order): void
     {
         $address = $order->deliveryAddress;
@@ -154,7 +166,30 @@ class AllegroOrderService
 
     private function fixInvoiceAddress(Order $order): void
     {
+        $address = $order->invoiceAddress;
+        $allegroData = $this->getOrderDetailsFromApi($order);
 
+        if ($allegroData['invoice']['required'] == false) {
+            return;
+        }
+
+        $allegroAddress = $allegroData['invoice']['address'];
+        $phone = preg_replace('/[^0-9]/', '', $allegroAddress['phoneNumber']);
+        $phone = substr($phone, -9);
+        $street = AddressSplitter::splitAddress($allegroAddress['street'])['streetName'];
+        $flat = AddressSplitter::splitAddress($allegroAddress['street'])['houseNumber'];
+
+        $address->firstname = null;
+        $address->lastname = null;
+        $address->email = $allegroData['buyer']['email'];
+        $address->firmname = $allegroAddress['company']['name'];
+        $address->nip = $allegroAddress['company']['taxId'];
+        $address->address = $street;
+        $address->flat_number = $flat;
+        $address->city = $allegroAddress['city'];
+        $address->postal_code = $allegroAddress['zipCode'];
+        $address->phone = $phone;
+        $address->save();
     }
 
     private function findNotValidatedOrdersWithInvalidData()
@@ -163,18 +198,6 @@ class AllegroOrderService
         return Order::where('data_verified_by_allegro_api', '=', false)
             ->where('sello_id', '!=', null)
             ->where('created_at', '>=', $yesterday)->get();
-    }
-
-    private function getOrderDetailsFromApi(Order $order)
-    {
-        if (!$order->sello_id) {
-            return false;
-        }
-        $id = $order->selloTransaction->tr_CheckoutFormId;
-        $url = $this->getRestUrl(
-            "/order/checkout-forms/{$id}"
-        );
-        return json_decode((string)$this->request('GET', $url, [])->getBody(), true);
     }
 
     private function refreshTokens()
