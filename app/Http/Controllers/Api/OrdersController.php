@@ -333,7 +333,6 @@ class OrdersController extends Controller
 
             return $this->okResponse();
         } catch (\Exception $e) {
-            dd($e->getLine());
             Log::error('Problem with update customer invoice and delivery address.',
                 ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
             );
@@ -504,7 +503,7 @@ class OrdersController extends Controller
         return array($isDeliveryChangeLocked, $isInvoiceChangeLocked);
     }
 
-    public function dates(Order $order)
+    public function getDates(Order $order)
     {
         /** @var OrderDates $dates */
         $dates = $order->dates;
@@ -535,7 +534,7 @@ class OrdersController extends Controller
         ];
     }
 
-    public function acceptOrderDates(Order $order, Request $request)
+    public function acceptDates(Order $order, Request $request)
     {
         $result = null;
         if ($request->has('type')) {
@@ -558,11 +557,9 @@ class OrdersController extends Controller
         ]), 500);
     }
 
-    public function updateOrderDates(Order $order, Request $request)
+    public function updateDates(Order $order, Request $request)
     {
         $result = null;
-        /** @var OrderDates $dates */
-        $dates = $order->dates;
         if ($request->has('type')) {
             $result = $order->dates()->update([
                 $request->type . '_shipment_date_from' => $request->shipmentDateFrom,

@@ -82,7 +82,7 @@ const actions = {
   updateDateParams ({ commit }: any, params: UpdateDatesParams) {
     commit(ORDERS_DATES_SET_IS_LOADING, true)
 
-    return OrdersRepository.updateDatesParams(params)
+    return OrdersRepository.updateDates(params)
       .then((data: any) => {
         commit(ORDERS_DATES_SET_IS_LOADING, false)
         if (data.error_code) {
@@ -114,6 +114,9 @@ const mutations = {
   },
   [ORDERS_DATES_SET_IS_LOADING] (state: OrdersStore, isLoading: boolean) {
     state.isLoading = isLoading
+  },
+  [ORDERS_DATES_SET_ERROR] (state: OrdersStore, error: string) {
+    state.error = error
   }
 }
 

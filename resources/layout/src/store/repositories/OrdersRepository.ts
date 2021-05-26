@@ -7,7 +7,7 @@ import { AcceptDatesParams, UpdateDatesParams } from '@/types/OrdersTypes'
 
 export default {
   async getDates (orderId: number): Promise<any> {
-    return fetch(getFullUrl('api/orders/' + orderId + '/dates/'), {
+    return fetch(getFullUrl('api/orders/' + orderId + '/getDates/'), {
       method: 'GET',
       credentials: 'same-origin',
       headers: new Headers({
@@ -35,8 +35,8 @@ export default {
     })
   },
 
-  async updateDatesParams (params: UpdateDatesParams): Promise<any> {
-    return fetch(getFullUrl('api/orders/' + params.orderId + '/updateDateParams'), {
+  async updateDates (params: UpdateDatesParams): Promise<any> {
+    return fetch(getFullUrl('api/orders/' + params.orderId + '/updateDates'), {
       method: 'PUT',
       credentials: 'same-origin',
       headers: new Headers({
