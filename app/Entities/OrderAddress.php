@@ -21,7 +21,18 @@ class OrderAddress extends Model implements Transformable
      * @var array
      */
     protected $fillable = [
-        'order_id', 'type', 'firstname', 'lastname', 'firmname', 'nip', 'phone', 'address', 'flat_number', 'city', 'postal_code', 'email'
+        'order_id',
+        'type',
+        'firstname',
+        'lastname',
+        'firmname',
+        'nip',
+        'phone',
+        'address',
+        'flat_number',
+        'city',
+        'postal_code',
+        'email'
     ];
 
     /**

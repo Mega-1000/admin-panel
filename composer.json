@@ -34,6 +34,7 @@
         "spatie/browsershot": "^3.34",
         "tcg/voyager": "^1.1",
         "vaibhavpandeyvpz/phemail": "^1.0",
+        "viison/address-splitter": "^0.3.4",
         "yajra/laravel-datatables-oracle": "~8.0"
     },
     "require-dev": {
