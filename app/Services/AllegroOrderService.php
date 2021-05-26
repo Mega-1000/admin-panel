@@ -11,6 +11,8 @@ use App\Mail\TestMail;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Mail;
+use VIISON\AddressSplitter\AddressSplitter;
+use VIISON\AddressSplitter\Exceptions\SplittingException;
 
 
 /**
@@ -78,8 +80,6 @@ class AllegroOrderService
         \Mailer::create()
             ->to($orderModel->buyer_email)
             ->send(new AllegroNewOrderEmail());
-
-        \Mailer::create()->to('urbanowiczmateusz89@gmail.com')->send(new AllegroNewOrderEmail());
     }
 
     public function getAuthCodes()
@@ -113,22 +113,59 @@ class AllegroOrderService
         $orders = $this->findNotValidatedOrdersWithInvalidData();
 
         foreach ($orders as $order) {
-
+            try {
+                $this->fixDeliveryAddress($order);
+                $this->fixInvoiceAddress($order);
+            } catch (SplittingException $e) {
+                //
+            }
         }
     }
 
-    // @TODO PRIV
-    public function findNotValidatedOrdersWithInvalidData()
+    private function fixDeliveryAddress(Order $order): void
     {
-        $orders = Order::whereHas('labels', function ($query) {
-            $query->where('labels.id', self::INVALID_DATA_LABEL);
-        })->where('data_verified_by_allegro_api', '=', false)->get();
+        $address = $order->deliveryAddress;
 
-        return $orders;
+        if ($address->firstname == 'Paczkomat') {
+            return;
+        }
+
+        $allegroData = $this->getOrderDetailsFromApi($order);
+        $allegroAddress = $allegroData['delivery']['address'];
+        $phone = preg_replace('/[^0-9]/', '', $allegroAddress['phoneNumber']);
+        $phone = substr($phone, -9);
+        $street = AddressSplitter::splitAddress($allegroAddress['street'])['streetName'];
+        $flat = AddressSplitter::splitAddress($allegroAddress['street'])['houseNumber'];
+
+        $address->firstname = $allegroAddress['firstName'];
+        $address->lastname = $allegroAddress['lastName'];
+        $address->email = $allegroData['buyer']['email'];
+        $address->firmname = $allegroAddress['companyName'];
+        $address->address = $street;
+        $address->flat_number = $flat;
+        $address->city = $allegroAddress['city'];
+        $address->postal_code = $allegroAddress['zipCode'];
+        $address->phone = $phone;
+        $address->save();
+
+        $order->data_verified_by_allegro_api = true;
+        $order->save();
     }
 
-    // @TODO PRIV
-    public function getOrderDetailsFromApi(Order $order)
+    private function fixInvoiceAddress(Order $order): void
+    {
+
+    }
+
+    private function findNotValidatedOrdersWithInvalidData()
+    {
+        $yesterday = (new Carbon())->startOfDay()->subDay(1);
+        return Order::where('data_verified_by_allegro_api', '=', false)
+            ->where('sello_id', '!=', null)
+            ->where('created_at', '>=', $yesterday)->get();
+    }
+
+    private function getOrderDetailsFromApi(Order $order)
     {
         if (!$order->sello_id) {
             return false;
