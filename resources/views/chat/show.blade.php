@@ -20,7 +20,7 @@
 
 </head>
 <body>
-<div>
+<div id="app">
     <div class="container" id="flex-container">
         <div id="chat-container">
             <div class="text-center alert alert-info">{!! $title !!}</div>
@@ -110,8 +110,6 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
         integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
         crossorigin="anonymous"></script>
-<script src="{{ URL::asset('js/app.js') }}"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
 <script src="{{ asset('js/vue-chunk.js') }}"></script>
 <script src="{{ asset('js/vue-scripts.js') }}"></script>
 <script type="text/javascript" src="{{ URL::asset('js/helpers/dynamic-calculator.js') }}"></script>
