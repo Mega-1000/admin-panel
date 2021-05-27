@@ -32,6 +32,7 @@ class CreateOrderDatesTable extends Migration
             $table->boolean('customer_acceptance')->default(0);
             $table->boolean('consultant_acceptance')->default(0);
             $table->boolean('warehouse_acceptance')->default(0);
+            $table->text('message');
             $table->timestamps();
         });
     }

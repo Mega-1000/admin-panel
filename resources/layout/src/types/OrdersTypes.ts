@@ -11,6 +11,7 @@ export interface Acceptance {
   customer: boolean,
   consultant: boolean,
   warehouse: boolean,
+  message: string,
 }
 
 export interface OrdersStore {
@@ -24,7 +25,8 @@ export interface OrdersStore {
 
 export interface AcceptDatesParams {
   type: string,
-  orderId: number
+  orderId: number,
+  userType: string
 }
 
 export interface UpdateDatesParams {

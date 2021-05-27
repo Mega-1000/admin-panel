@@ -28,7 +28,8 @@ export default {
         'X-Requested-Width': 'XMLHttpRequest'
       }),
       body: JSON.stringify({
-        type: params.type
+        type: params.type,
+        userType: params.userType
       })
     }).then((response) => {
       return response.json()

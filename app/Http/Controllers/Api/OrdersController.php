@@ -28,6 +28,7 @@ use App\Http\Controllers\Controller;
 use App\Repositories\ProductRepository;
 use App\Repositories\ProductPriceRepository;
 use App\Services\ProductService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
@@ -530,6 +531,7 @@ class OrdersController extends Controller
                 'customer' => $dates->customer_acceptance,
                 'consultant' => $dates->consultant_acceptance,
                 'warehouse' => $dates->warehouse_acceptance,
+                'message' => $dates->message ?? '',
             ]
         ];
     }
@@ -537,17 +539,33 @@ class OrdersController extends Controller
     public function acceptDates(Order $order, Request $request)
     {
         $result = null;
-        if ($request->has('type')) {
+        if ($request->has('type') && $request->has('userType')) {
+        /** @var OrderDates $dates */
+        $dates = $order->dates;
             $result = $order->dates()->update([
-                $request->type . '_acceptance' => true
+                $request->userType . '_delivery_date_from' => $dates->getAttribute($request->type . '_delivery_date_from'),
+                $request->userType . '_delivery_date_to' => $dates->getAttribute($request->type . '_delivery_date_to'),
+                $request->userType . '_shipment_date_from' => $dates->getAttribute($request->type . '_shipment_date_from'),
+                $request->userType . '_shipment_date_to' => $dates->getAttribute($request->type . '_shipment_date_to'),
+                $request->userType . '_acceptance' => true,
+                'message' => __('order_dates.' . $request->userType) . ' <strong>zaakceptował</strong> daty dotyczące przesyłki. Proszę o weryfikacje i akceptacje'
+
             ]);
         }
         if ($result) {
+            $order->dates->refresh();
             return response(json_encode([
                 'acceptance' => [
                     'customer' => $order->dates->customer_acceptance,
                     'consultant' => $order->dates->consultant_acceptance,
                     'warehouse' => $order->dates->warehouse_acceptance,
+                    'message' => $order->dates->message,
+                ],
+                $request->userType =>[
+                    'delivery_date_from' => $dates->getAttribute($request->type . '_delivery_date_from'),
+                    'delivery_date_to' => $dates->getAttribute($request->type . '_delivery_date_to'),
+                    'shipment_date_from' => $dates->getAttribute($request->type . '_shipment_date_from'),
+                    'shipment_date_to' => $dates->getAttribute($request->type . '_shipment_date_to'),
                 ]
             ]), 200);
         }
@@ -561,16 +579,19 @@ class OrdersController extends Controller
     {
         $result = null;
         if ($request->has('type')) {
+            $order->dates->resetAcceptance();
             $result = $order->dates()->update([
                 $request->type . '_shipment_date_from' => $request->shipmentDateFrom,
                 $request->type . '_shipment_date_to' => $request->shipmentDateTo,
                 $request->type . '_delivery_date_from' => $request->deliveryDateFrom,
                 $request->type . '_delivery_date_to' => $request->deliveryDateTo,
-                $request->type . '_acceptance' => true
+                $request->type . '_acceptance' => true,
+                'message' => __('order_dates.' . $request->type) . ' <strong>zmodyfikował</strong> daty dotyczące przesyłki. Proszę o weryfikacje i akceptacje'
             ]);
         }
 
         if ($result) {
+            $order->dates->refresh();
             return response(json_encode([
                 $request->type => [
                     'shipment_date_from' =>  $request->shipmentDateFrom,
@@ -579,7 +600,8 @@ class OrdersController extends Controller
                     'delivery_date_to' => $request->deliveryDateTo,
                 ],
                 'acceptance' => [
-                    $request->type => true
+                    $request->type => true,
+                    'message' => $order->dates->message,
                 ]
             ]), 200);
         }

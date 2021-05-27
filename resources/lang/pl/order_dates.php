@@ -1,7 +1,11 @@
 <?php
 
 return [
-    'message' => [
+    'messages' => [
         'error' => 'Wystąpił nieoczekiwany błąd',
-    ]
+    ],
+    'customer' => 'Klient',
+    'consultant' => 'Konsultant',
+    'warehouse' => 'Pracownik magazynu'
+
 ];

@@ -20,7 +20,7 @@
 
 </head>
 <body>
-<div id="app">
+<div>
     <div class="container" id="flex-container">
         <div id="chat-container">
             <div class="text-center alert alert-info">{!! $title !!}</div>
@@ -38,7 +38,7 @@
                 </div>
             @endif
             @if($order->dates)
-                <div id="orderDates"></div>
+                <div id="orderDates" :orderId="{{ $order->id }}" :userType="{{ $user_type }}"></div>
             @endif
             @if ($chat)
                 @include('chat.chat_body')

@@ -45,4 +45,18 @@ class OrderDates extends Model implements Transformable
     {
         return $this->belongsTo(Order::class);
     }
+
+    /**
+     * Reset acceptance dates
+     *
+     * @return void
+     */
+    public function resetAcceptance(): void
+    {
+        $this->update([
+            'customer_acceptance' => false,
+            'consultant_acceptance' => false,
+            'warehouse_acceptance' => false,
+        ]);
+    }
 }

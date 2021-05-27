@@ -71,6 +71,7 @@ const actions = {
           commit(ORDERS_DATES_SET_ERROR, data.error_message)
         }
 
+        commit(`ORDERS_DATES_SET_${params.userType.toUpperCase()}`, data[params.userType])
         commit(ORDERS_DATES_SET_ACCEPTANCE, data.acceptance)
         return data
       })

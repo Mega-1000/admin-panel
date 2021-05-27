@@ -52,20 +52,26 @@
       <th scope="row" colspan="2" class="text-center">Akcje</th>
       <td>
         <div class="btn-group" role="group">
-          <a class="btn btn-sm btn-primary" @click="$emit('modify','customer')">Modyfikuj</a>
-          <a class="btn btn-sm btn-success" :class="{ disabled: acceptance.customer}" @click="$emit('accept','customer')">Akceptuj</a>
+          <a class="btn btn-sm btn-primary" :class="{ disabled: userType!=='customer'}"
+             @click="$emit('modify','customer')">Modyfikuj</a>
+          <a class="btn btn-sm btn-success" :class="{ disabled: !canAccept('customer')}"
+             @click="$emit('accept','customer')">Akceptuj</a>
         </div>
       </td>
       <td>
         <div class="btn-group" role="group">
-          <a class="btn btn-sm btn-primary" @click="$emit('modify','consultant')">Modyfikuj</a>
-          <a class="btn btn-sm btn-success" :class="{ disabled: acceptance.consultant }" @click="$emit('accept','consultant')">Akceptuj</a>
+          <a class="btn btn-sm btn-primary" :class="{ disabled: userType!=='consultant'}"
+             @click="$emit('modify','consultant')">Modyfikuj</a>
+          <a class="btn btn-sm btn-success" :class="{ disabled: !canAccept('consultant') }"
+             @click="$emit('accept','consultant')">Akceptuj</a>
         </div>
       </td>
       <td>
         <div class="btn-group" role="group">
-          <a class="btn btn-sm btn-primary" @click="$emit('modify','warehouse')">Modyfikuj</a>
-          <a class="btn btn-sm btn-success" :class="{ disabled: acceptance.warehouse }"  @click="$emit('accept','warehouse')">Akceptuj</a>
+          <a class="btn btn-sm btn-primary" :class="{ disabled: userType!=='warehouse'}"
+             @click="$emit('modify','warehouse')">Modyfikuj</a>
+          <a class="btn btn-sm btn-success" :class="{ disabled: !canAccept('warehouse') }"
+             @click="$emit('accept','warehouse')">Akceptuj</a>
         </div>
       </td>
     </tr>
@@ -81,6 +87,7 @@ import { Acceptance, Dates } from '@/types/OrdersTypes'
 })
 export default class DatesTable extends Vue {
   @Prop() public orderId!: number
+  @Prop() public userType!: string
 
   public get customerDates (): Dates[] {
     return this.$store?.getters['OrdersService/customerDates']
@@ -100,6 +107,14 @@ export default class DatesTable extends Vue {
 
   public getGlyphiconClass (accept: boolean): string {
     return 'glyphicon-' + (accept ? 'ok text-success' : 'remove text-danger')
+  }
+
+  public canAccept (userType: string): boolean {
+    if (userType === this.userType) {
+      return false
+    }
+    const dates = this.$store?.getters['OrdersService/' + userType + 'Dates']
+    return Object.values(dates).some(date => (date !== null))
   }
 }
 </script>
