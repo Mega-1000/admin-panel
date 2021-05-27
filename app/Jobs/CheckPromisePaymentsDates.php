@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Entities\OrderPayment;
 use App\Repositories\OrderPaymentRepository;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -30,11 +31,11 @@ class CheckPromisePaymentsDates implements ShouldQueue
      *
      * @return void
      */
-    public function handle(OrderPaymentRepository $orderPaymentRepository)
+    public function handle()
     {
         $now = new Carbon('now');
 
-        $notConfirmedPayments = $orderPaymentRepository->findWhere(['promise' => 1]);
+        $notConfirmedPayments = OrderPayment::with('order')->where('promise', '=', 1)->get();
 
         if (!empty($notConfirmedPayments)) {
             foreach ($notConfirmedPayments as $notConfirmedPayment) {
@@ -53,7 +54,8 @@ class CheckPromisePaymentsDates implements ShouldQueue
         if ($notConfirmedPayment->created_at == null) {
             return;
         }
-        if($notConfirmedPayment->order->toPay() == 0 || $notConfirmedPayment->order->hasLabel(40)) {
+        /** @TODO toPay() value should be precalculated on events instead of calculated every single time on fly */
+        if ($notConfirmedPayment->order->toPay() == 0 || $notConfirmedPayment->order->hasLabel(40)) {
             return false;
         } else {
             return $notConfirmedPayment->created_at->diff($now)->h >= 15; //only schedules that wait longer then 2h
