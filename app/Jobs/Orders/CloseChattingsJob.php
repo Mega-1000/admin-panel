@@ -6,9 +6,13 @@ use App\Jobs\DispatchLabelEventByNameJob;
 use App\Jobs\Job;
 use App\Repositories\OrderRepository;
 use Carbon\Carbon;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
-class CloseChattingsJob extends Job
+class CloseChattingsJob extends Job implements ShouldQueue
 {
+    use IsMonitored;
+
     public function handle(OrderRepository $orderRepository)
     {
         //currently there is only manual way to "Close" chatting by removing labels

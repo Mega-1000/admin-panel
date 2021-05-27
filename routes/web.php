@@ -15,6 +15,10 @@ Route::redirect('/', '/admin');
 
 Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
+    Route::prefix('jobs')->group(function () {
+        Route::queueMonitor();
+    });
+
     Route::group(['middleware' => 'admin'], function () {
 
         Route::group(['prefix' => 'products'], function () {
