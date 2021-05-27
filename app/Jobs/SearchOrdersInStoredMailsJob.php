@@ -5,9 +5,10 @@ namespace App\Jobs;
 use App\Repositories\OrderMessageRepository;
 use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderRepository;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
 
-class SearchOrdersInStoredMailsJob extends Job
+class SearchOrdersInStoredMailsJob extends Job implements ShouldQueue
 {
     /**
      * Execute the job.

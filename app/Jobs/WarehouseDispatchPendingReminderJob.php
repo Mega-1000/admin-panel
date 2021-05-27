@@ -4,11 +4,12 @@ namespace App\Jobs;
 
 use App\Mail\WarehouseDispatchPendingReminderMail;
 use App\Repositories\OrderWarehouseNotificationRepository;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
-class WarehouseDispatchPendingReminderJob extends Job
+class WarehouseDispatchPendingReminderJob extends Job implements ShouldQueue
 {
     /**
      * Execute the job.

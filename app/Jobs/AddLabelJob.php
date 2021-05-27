@@ -10,11 +10,15 @@ use App\Repositories\OrderLabelSchedulerRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\TaskRepository;
 use Carbon\Carbon;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
-class AddLabelJob extends Job
+class AddLabelJob extends Job implements ShouldQueue
 {
+    use IsMonitored;
+
     protected $order;
     protected $labelIdsToAdd;
     protected $loopPreventionArray;

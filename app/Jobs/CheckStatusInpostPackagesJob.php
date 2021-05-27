@@ -4,13 +4,17 @@ namespace App\Jobs;
 
 use App\Repositories\OrderPackageRepository;
 use App\Integrations\Inpost\Inpost;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 use App\Mail\SendLPToTheWarehouseAfterOrderCourierMail;
 use Carbon\Carbon;
 use App\Entities\OrderPackage;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
-class CheckStatusInpostPackagesJob extends Job
+class CheckStatusInpostPackagesJob extends Job implements ShouldQueue
 {
+    use IsMonitored;
+
     protected $orderPackageRepository;
 
     const COURIER = ['INPOST', 'ALLEGRO-INPOST'];
