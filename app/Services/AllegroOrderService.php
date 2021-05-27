@@ -188,8 +188,8 @@ class AllegroOrderService
         $street = AddressSplitter::splitAddress($allegroAddress['street'])['streetName'];
         $flat = AddressSplitter::splitAddress($allegroAddress['street'])['houseNumber'];
 
-        $address->firstname = $allegroAddress['company'] == null ?: $allegroAddress['naturalPerson']['firstName'];
-        $address->lastname = $allegroAddress['company'] == null ?: $allegroAddress['naturalPerson']['lastName'];;
+        $address->firstname = $allegroAddress['company'] == null ? $allegroAddress['naturalPerson']['firstName'] : null;
+        $address->lastname = $allegroAddress['company'] == null ? $allegroAddress['naturalPerson']['lastName'] : null;
         $address->email = $allegroData['buyer']['email'];
         $address->firmname = $allegroAddress['company']['name'];
         $address->nip = $allegroAddress['company']['taxId'];
