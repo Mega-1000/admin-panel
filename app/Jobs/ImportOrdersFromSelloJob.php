@@ -19,6 +19,7 @@ use App\Helpers\SelloPackageDivider;
 use App\Helpers\SelloPriceCalculator;
 use App\Helpers\SelloTransportSumCalculator;
 use App\Helpers\TaskTimeHelper;
+use App\Services\AllegroOrderService;
 use App\Services\OrderPaymentService;
 use App\Services\ProductService;
 use App\User;
@@ -128,6 +129,9 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $taskPrimal->delete();
             $taskSalaryDetails->delete();
         }
+
+        $orderSerivce = new AllegroOrderService();
+        $orderSerivce->fixOrdersWithInvalidData();
     }
 
     /**

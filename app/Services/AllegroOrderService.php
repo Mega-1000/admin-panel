@@ -175,7 +175,6 @@ class AllegroOrderService
 
     private function fixInvoiceAddress(Order $order): void
     {
-        $address = $order->invoiceAddress;
         $allegroData = $this->getOrderDetailsFromApi($order);
 
         if ($allegroData['invoice']['required'] == false) {
