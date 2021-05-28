@@ -156,7 +156,7 @@ class AllegroOrderService
             $street = AddressSplitter::splitAddress($allegroData['delivery']['pickupPoint']['address']['street'])['streetName'];
             $flat = AddressSplitter::splitAddress($allegroData['delivery']['pickupPoint']['address']['street'])['houseNumber'];
 
-            $address->firstname = $allegroData['delivery']['pickupPoint']['name'];
+            $address->firstname = 'Paczkomat';
             $address->lastname = $allegroData['delivery']['pickupPoint']['id'];
             $address->address = $street;
             $address->flat_number = $flat;
