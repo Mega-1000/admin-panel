@@ -6,13 +6,14 @@ use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\OrderWarehouseNotification;
 use App\Mail\OrderStatusChangedToDispatchMail;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 
 /**
  * Class OrderStatusChangedToDispatchNotificationJob
  * @package App\Jobs
  */
-class OrderStatusChangedToDispatchNotificationJob extends Job
+class OrderStatusChangedToDispatchNotificationJob extends Job implements ShouldQueue
 {
     /**
      * @var

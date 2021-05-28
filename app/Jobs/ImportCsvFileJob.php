@@ -14,6 +14,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Entities;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 /**
  * Class ImportCsvFileJob
@@ -25,7 +26,8 @@ class ImportCsvFileJob implements ShouldQueue
     use Dispatchable,
         InteractsWithQueue,
         Queueable,
-        SerializesModels;
+        SerializesModels,
+        IsMonitored;
 
     private $categories = ['id' => 0, 'children' => []];
     private $productsRelated = [];

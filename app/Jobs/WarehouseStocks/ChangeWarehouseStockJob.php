@@ -10,10 +10,14 @@ use App\Repositories\ProductStockPositionRepository;
 use App\Repositories\ProductStockRepository;
 use App\Repositories\ProductRepository;
 use Carbon\Carbon;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Auth;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
-class ChangeWarehouseStockJob extends Job
+class ChangeWarehouseStockJob extends Job implements ShouldQueue
 {
+    use IsMonitored;
+
     /**
      * @var $orderId
      */

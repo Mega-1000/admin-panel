@@ -4,14 +4,17 @@ namespace App\Jobs;
 
 use App\Repositories\CustomerAddressRepository;
 use App\Repositories\CustomerRepository;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Storage;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 /**
  * Class ImportCustomersJob
  * @package App\Jobs
  */
-class ImportCustomersJob extends Job
+class ImportCustomersJob extends Job implements ShouldQueue
 {
+    use IsMonitored;
 
     /**
      * @var

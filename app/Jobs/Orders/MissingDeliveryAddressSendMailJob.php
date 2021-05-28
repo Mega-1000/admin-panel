@@ -7,9 +7,13 @@ use App\Jobs\DispatchLabelEventByNameJob;
 use App\Jobs\Job;
 use App\Mail\MissingDeliveryAddressMail;
 use App\Repositories\OrderRepository;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
-class MissingDeliveryAddressSendMailJob extends Job
+class MissingDeliveryAddressSendMailJob extends Job implements ShouldQueue
 {
+    use IsMonitored;
+
     protected $order;
     protected $options;
 
