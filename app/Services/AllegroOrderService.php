@@ -27,7 +27,6 @@ class AllegroOrderService
 
     const AUTH_RECORD_ID = 2;
     const READY_FOR_PROCESSING = 'READY_FOR_PROCESSING';
-    const INVALID_DATA_LABEL = 184;
 
     /**
      * @var Client
@@ -138,25 +137,35 @@ class AllegroOrderService
     {
         $address = $order->deliveryAddress;
 
-        if ($address->firstname == 'Paczkomat') {
-            return;
-        }
-
         $allegroData = $this->getOrderDetailsFromApi($order);
         $allegroAddress = $allegroData['delivery']['address'];
         $phone = preg_replace('/[^0-9]/', '', $allegroAddress['phoneNumber']);
         $phone = substr($phone, -9);
-        $street = AddressSplitter::splitAddress($allegroAddress['street'])['streetName'];
-        $flat = AddressSplitter::splitAddress($allegroAddress['street'])['houseNumber'];
 
-        $address->firstname = $allegroAddress['firstName'];
-        $address->lastname = $allegroAddress['lastName'];
-        $address->email = $allegroData['buyer']['email'];
+        if ($allegroData['delivery']['pickupPoint'] == null) {
+            $street = AddressSplitter::splitAddress($allegroAddress['street'])['streetName'];
+            $flat = AddressSplitter::splitAddress($allegroAddress['street'])['houseNumber'];
+
+            $address->firstname = $allegroAddress['firstName'];
+            $address->lastname = $allegroAddress['lastName'];
+            $address->address = $street;
+            $address->flat_number = $flat;
+            $address->city = $allegroAddress['city'];
+            $address->postal_code = $allegroAddress['zipCode'];
+        } else {
+            $street = AddressSplitter::splitAddress($allegroData['delivery']['pickupPoint']['address']['street'])['streetName'];
+            $flat = AddressSplitter::splitAddress($allegroData['delivery']['pickupPoint']['address']['street'])['houseNumber'];
+
+            $address->firstname = $allegroData['delivery']['pickupPoint']['name'];
+            $address->lastname = $allegroData['delivery']['pickupPoint']['id'];
+            $address->address = $street;
+            $address->flat_number = $flat;
+            $address->city = $allegroData['delivery']['pickupPoint']['address']['city'];
+            $address->postal_code = $allegroData['delivery']['pickupPoint']['address']['zipCode'];
+        }
+
         $address->firmname = $allegroAddress['companyName'];
-        $address->address = $street;
-        $address->flat_number = $flat;
-        $address->city = $allegroAddress['city'];
-        $address->postal_code = $allegroAddress['zipCode'];
+        $address->email = $allegroData['buyer']['email'];
         $address->phone = $phone;
         $address->save();
 
