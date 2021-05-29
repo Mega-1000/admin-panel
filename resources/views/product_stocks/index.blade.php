@@ -9,6 +9,9 @@
 @section('table')
     <a href="{{ route('sets.index') }}" class="btn btn-success">@lang('sets.packet_list')</a>
     <a href="{{ route('product_stocks.print') }}" class="btn btn-success">Wydrukuj stany</a>
+    <div class="vue-components">
+        <tracker :enabled="true"/>
+    </div>
     <table id="dataTable" class="table table-hover">
         <thead>
         <tr>
@@ -60,7 +63,7 @@
         </tr>
         </thead>
     </table>
-    <div id="actionTracker"></div>
+
 @endsection
 
 

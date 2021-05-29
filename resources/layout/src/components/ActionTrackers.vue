@@ -1,11 +1,11 @@
 <template>
-  <div class="c-actionTracker">
+  <div class="c-actionTracker" v-if="enabled">
     <ModalActionTrackers v-if="showModal" @close="toggleShowModal()" :time="trackTime"></ModalActionTrackers>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Prop } from 'vue-property-decorator'
 import ModalActionTrackers from '@/components/ModalActionTrackers.vue'
 import { addLogParam, LogItem, updateTimeLogParam } from '@/types/LogsTrackerType'
 
@@ -15,6 +15,7 @@ import { addLogParam, LogItem, updateTimeLogParam } from '@/types/LogsTrackerTyp
   }
 })
 export default class ActionTrackers extends Vue {
+  @Prop() private enabled!: boolean
   private trackTime = 0
   private finalTime = 3
   private timeInterval = 60000
