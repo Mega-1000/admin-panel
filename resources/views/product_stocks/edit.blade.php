@@ -160,7 +160,7 @@
         </div>
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
     </form>
-    <div id="actionTracker"></div>
+    <div id="disabled-actionTracker"></div>
 @endsection
 @section('datatable-scripts')
     <script>

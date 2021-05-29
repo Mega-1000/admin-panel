@@ -10,6 +10,7 @@ use App\Repositories\StatusRepository;
 use App\Repositories\TagRepository;
 use Barryvdh\DomPDF\Facade as PDF;
 use Carbon\Carbon;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -18,7 +19,7 @@ use Illuminate\Support\Str;
  * Class OrderStatusChangedNotificationJob
  * @package App\Jobs
  */
-class OrderStatusChangedNotificationJob extends Job
+class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
 {
 
     /**

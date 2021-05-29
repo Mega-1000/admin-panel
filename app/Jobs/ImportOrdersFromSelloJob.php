@@ -19,6 +19,7 @@ use App\Helpers\SelloPackageDivider;
 use App\Helpers\SelloPriceCalculator;
 use App\Helpers\SelloTransportSumCalculator;
 use App\Helpers\TaskTimeHelper;
+use App\Services\AllegroOrderService;
 use App\Services\OrderPaymentService;
 use App\Services\ProductService;
 use App\User;
@@ -30,10 +31,11 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class ImportOrdersFromSelloJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, IsMonitored;
 
     const DEFAULT_WAREHOUSE = 'MEGA-OLAWA';
 
@@ -127,6 +129,9 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $taskPrimal->delete();
             $taskSalaryDetails->delete();
         }
+
+        $orderSerivce = new AllegroOrderService();
+        $orderSerivce->fixOrdersWithInvalidData();
     }
 
     /**

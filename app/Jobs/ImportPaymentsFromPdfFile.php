@@ -11,6 +11,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 use Spatie\PdfToText\Pdf;
 
 class ImportPaymentsFromPdfFile implements ShouldQueue
@@ -19,7 +20,8 @@ class ImportPaymentsFromPdfFile implements ShouldQueue
     use Dispatchable,
         InteractsWithQueue,
         Queueable,
-        SerializesModels;
+        SerializesModels,
+        IsMonitored;
 
     protected $orderRepository;
     protected $filename;

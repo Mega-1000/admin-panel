@@ -7,6 +7,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 abstract class Job implements ShouldQueue
 {
@@ -21,5 +22,5 @@ abstract class Job implements ShouldQueue
     |
     */
 
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, IsMonitored;
 }

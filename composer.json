@@ -29,11 +29,13 @@
         "predis/predis": "~1.0",
         "prettus/l5-repository": "^2.6",
         "rap2hpoutre/laravel-log-viewer": "^1.0",
+        "romanzipp/laravel-queue-monitor": "2.0.19",
         "sentry/sentry-laravel": "1.0.0",
         "smalot/pdfparser": "*",
         "spatie/browsershot": "^3.34",
         "tcg/voyager": "^1.1",
         "vaibhavpandeyvpz/phemail": "^1.0",
+        "viison/address-splitter": "^0.3.4",
         "yajra/laravel-datatables-oracle": "~8.0"
     },
     "require-dev": {

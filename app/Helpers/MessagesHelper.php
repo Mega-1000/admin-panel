@@ -292,9 +292,15 @@ class MessagesHelper
         }
         //\App\Jobs\ChatNotificationJob::dispatch($chat->id)->delay(now()->addSeconds(self::NOTIFICATION_TIME + 5));
         // @TODO this should use queue, but at this point (08.05.2021) queue is bugged
-        $email = $this->getCurrentChatUser()->email ?? $this->getCurrentChatUser()->login;
+        $email = null;
 
-        (new ChatNotificationJob($chat->id))->handle();
+        if ($this->getCurrentChatUser()->customer_id) {
+            $email = $this->getCurrentChatUser()->customer->login;
+        } else if ($this->getCurrentChatUser()->user_id) {
+            $email = $this->getCurrentChatUser()->user->email;
+        }
+
+        (new ChatNotificationJob($chat->id, $email))->handle();
     }
 
     private function getAdminChatUser($secondTry = false)

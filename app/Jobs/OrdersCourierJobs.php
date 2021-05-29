@@ -18,16 +18,20 @@ use App\Integrations\Pocztex\sendEnvelope;
 use App\Mail\SendLPToTheWarehouseAfterOrderCourierMail;
 use App\Repositories\OrderPackageRepository;
 use Carbon\Carbon;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Mockery\Exception;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 /**
  * Class OrdersCourierJobs
  * @package App\Jobs
  */
-class OrdersCourierJobs extends Job
+class OrdersCourierJobs extends Job implements ShouldQueue
 {
+    use IsMonitored;
+
     /**
      *
      */
