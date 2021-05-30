@@ -5,12 +5,15 @@ import Vue from 'vue'
 import SetsList from '@/views/Sets/SetsList.vue'
 import SetEdit from '@/views/Sets/SetEdit.vue'
 import store from './store'
+import VueCookies from 'vue-cookies-reactive'
 import RenderComponent from '@/helpers/renderComponent'
 import ActionTrackers from '@/components/ActionTrackers.vue'
 import LogsTrackerList from '@/views/LogsTracker/LogsTrackerList.vue'
 
 Vue.config.productionTip = false
 Vue.use(require('electron-vue-debugger'))
+Vue.use(VueCookies)
+Vue.$cookies.config('1d')
 Vue.config.devtools = true
 
 const components = {
