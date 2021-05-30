@@ -63,7 +63,6 @@
         </tr>
         </thead>
     </table>
-
 @endsection
 
 

@@ -10,17 +10,18 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class GetAllegroOrders implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, IsMonitored;
 
 
 
     const TOKEN_URI = 'https://allegro.pl/auth/oauth/token';
-	
+
     const AUTHORIZATION_URI = 'https://allegro.pl/auth/oauth/device';
-	
+
 	const API_URL = 'https://api.allegro.pl';
 
     /**
@@ -39,7 +40,7 @@ class GetAllegroOrders implements ShouldQueue
      * @return void
      */
     public function handle(OrderRepository $orderRepository, CustomerRepository $customerRepository, CustomerAddressRepository $customerAddressRepository)
-    {   
+    {
         $orders = $this->getOrders()["checkoutForms"];
 
         foreach($orders as $order) {
@@ -95,11 +96,11 @@ class GetAllegroOrders implements ShouldQueue
 			'Authorization: Basic ' . base64_encode(config('allegro.client_id') . ':' . config('allegro.client_secret')),
 			'Content-Type: application/x-www-form-urlencoded'
 		];
-			
+
 		$curl_post_data = array(
 			'client_id' => config('allegro.client_id'),
 		);
-		
+
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($curl, CURLOPT_HEADER, false);
 		curl_setopt($curl, CURLOPT_HTTPHEADER, $header);
@@ -113,14 +114,14 @@ class GetAllegroOrders implements ShouldQueue
 		var_dump($decode);
 
     }
-	
+
 	protected function getToken($deviceCode)
 	{
 		$curl = curl_init($this::TOKEN_URI.'?grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Adevice_code&device_code=' . $deviceCode);
 		$header = [
 			'Authorization: Basic ' . base64_encode(config('allegro.client_id') . ':' . config('allegro.client_secret')),
 		];
-		
+
 		curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($curl, CURLOPT_HEADER, false);
 		curl_setopt($curl, CURLOPT_HTTPHEADER, $header);

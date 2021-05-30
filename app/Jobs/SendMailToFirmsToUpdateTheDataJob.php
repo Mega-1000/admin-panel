@@ -8,10 +8,11 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Mail\SendRequestToUpdateDataMail;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
-class SendMailToFirmsToUpdateTheDataJob
+class SendMailToFirmsToUpdateTheDataJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, IsMonitored;
 
     protected $id;
 

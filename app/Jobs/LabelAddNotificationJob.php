@@ -16,10 +16,11 @@ use App\Repositories\TagRepository;
 use App\Repositories\LabelRepository;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Mail\LabelAdd;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class LabelAddNotificationJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, IsMonitored;
 
     /**
     * @var

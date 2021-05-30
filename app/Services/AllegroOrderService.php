@@ -2,12 +2,17 @@
 
 use App\Entities\Allegro_Auth;
 use App\Entities\AllegroOrder;
+use App\Entities\Label;
+use App\Entities\Order;
+use App\Entities\SelTransaction;
 use App\Facades\Mailer;
 use App\Mail\AllegroNewOrderEmail;
 use App\Mail\TestMail;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\Mail;
+use VIISON\AddressSplitter\AddressSplitter;
+use VIISON\AddressSplitter\Exceptions\SplittingException;
 
 
 /**
@@ -74,8 +79,6 @@ class AllegroOrderService
         \Mailer::create()
             ->to($orderModel->buyer_email)
             ->send(new AllegroNewOrderEmail());
-
-        \Mailer::create()->to('urbanowiczmateusz89@gmail.com')->send(new AllegroNewOrderEmail());
     }
 
     public function getAuthCodes()
@@ -102,6 +105,147 @@ class AllegroOrderService
         ]);
 
         return json_decode((string)$response->getBody(), true);
+    }
+
+    public function fixOrdersWithInvalidData()
+    {
+        $orders = $this->findNotValidatedOrdersWithInvalidData();
+
+        foreach ($orders as $order) {
+            try {
+                $this->fixDeliveryAddress($order);
+                $this->fixInvoiceAddress($order);
+            } catch (SplittingException $e) {
+                //
+            }
+        }
+    }
+
+    public function getOrderDetailsFromApi(Order $order)
+    {
+        if (!$order->sello_id) {
+            return false;
+        }
+        $id = $order->selloTransaction->tr_CheckoutFormId;
+        $url = $this->getRestUrl(
+            "/order/checkout-forms/{$id}"
+        );
+        return json_decode((string)$this->request('GET', $url, [])->getBody(), true);
+    }
+
+    private function fixDeliveryAddress(Order $order): void
+    {
+        $address = $order->deliveryAddress;
+
+        $allegroData = $this->getOrderDetailsFromApi($order);
+        $allegroAddress = $allegroData['delivery']['address'];
+        $phone = preg_replace('/[^0-9]/', '', $allegroAddress['phoneNumber']);
+        $phone = substr($phone, -9);
+
+        if ($allegroData['delivery']['pickupPoint'] == null) {
+            $street = AddressSplitter::splitAddress($allegroAddress['street'])['streetName'];
+            $flat = AddressSplitter::splitAddress($allegroAddress['street'])['houseNumber'];
+
+            $address->firstname = $allegroAddress['firstName'];
+            $address->lastname = $allegroAddress['lastName'];
+            $address->address = $street;
+            $address->flat_number = $flat;
+            $address->city = $allegroAddress['city'];
+            $address->postal_code = $allegroAddress['zipCode'];
+        } else {
+            $street = AddressSplitter::splitAddress($allegroData['delivery']['pickupPoint']['address']['street'])['streetName'];
+            $flat = AddressSplitter::splitAddress($allegroData['delivery']['pickupPoint']['address']['street'])['houseNumber'];
+
+            $address->firstname = 'Paczkomat';
+            $address->lastname = $allegroData['delivery']['pickupPoint']['id'];
+            $address->address = $street;
+            $address->flat_number = $flat;
+            $address->city = $allegroData['delivery']['pickupPoint']['address']['city'];
+            $address->postal_code = $allegroData['delivery']['pickupPoint']['address']['zipCode'];
+        }
+
+        $address->firmname = $allegroAddress['companyName'];
+        $address->email = $allegroData['buyer']['email'];
+        $address->phone = $phone;
+        $address->save();
+
+        $order->data_verified_by_allegro_api = true;
+        $order->save();
+    }
+
+    private function fixInvoiceAddress(Order $order): void
+    {
+        $allegroData = $this->getOrderDetailsFromApi($order);
+
+        if ($allegroData['invoice']['required'] == false) {
+            $this->fixInvoiceAddressInvoiceNotRequired($order);
+        } else {
+            $this->fixInvoiceAddressInvoiceRequired($order);
+        }
+    }
+
+    private function fixInvoiceAddressInvoiceRequired(Order $order)
+    {
+        $address = $order->getInvoiceAddress();
+        $allegroData = $this->getOrderDetailsFromApi($order);
+
+        $allegroAddress = $allegroData['invoice']['address'];
+        $rawPhone = $allegroAddress['phoneNumber'] ?? $allegroData['buyer']['phoneNumber'] ?? '';
+        $phone = preg_replace('/[^0-9]/', '', $rawPhone);
+        $phone = substr($phone, -9);
+        $street = AddressSplitter::splitAddress($allegroAddress['street'])['streetName'];
+        $flat = AddressSplitter::splitAddress($allegroAddress['street'])['houseNumber'];
+
+        $address->firstname = $allegroAddress['company'] == null ? $allegroAddress['naturalPerson']['firstName'] : null;
+        $address->lastname = $allegroAddress['company'] == null ? $allegroAddress['naturalPerson']['lastName'] : null;
+        $address->email = $allegroData['buyer']['email'];
+        $address->firmname = $allegroAddress['company']['name'];
+        $address->nip = $allegroAddress['company']['taxId'];
+        $address->address = $street;
+        $address->flat_number = $flat;
+        $address->city = $allegroAddress['city'];
+        $address->postal_code = $allegroAddress['zipCode'];
+        $address->phone = $phone;
+        $address->save();
+
+        $order->data_verified_by_allegro_api = true;
+        $order->save();
+    }
+
+    private function fixInvoiceAddressInvoiceNotRequired(Order $order)
+    {
+        $address = $order->getInvoiceAddress();
+        $allegroData = $this->getOrderDetailsFromApi($order);
+
+        $allegroAddress = $allegroData['buyer']['address'];
+        $rawPhone = $allegroAddress['phoneNumber'] ?? $allegroData['buyer']['phoneNumber'] ?? '';
+        $phone = preg_replace('/[^0-9]/', '', $rawPhone);
+        $phone = substr($phone, -9);
+        $street = AddressSplitter::splitAddress($allegroAddress['street'])['streetName'];
+        $flat = AddressSplitter::splitAddress($allegroAddress['street'])['houseNumber'];
+
+        $address->firstname = $allegroData['buyer']['firstName'];
+        $address->lastname = $allegroData['buyer']['lastName'];
+        $address->email = $allegroData['buyer']['email'];
+        $address->firmname = null;
+        $address->nip = null;
+        $address->address = $street;
+        $address->flat_number = $flat;
+        $address->city = $allegroAddress['city'];
+        $address->postal_code = $allegroAddress['postCode'];
+        $address->phone = $phone;
+        $address->save();
+
+        $order->data_verified_by_allegro_api = true;
+        $order->save();
+    }
+
+    private function findNotValidatedOrdersWithInvalidData()
+    {
+        $yesterday = (new Carbon())->startOfDay()->subDay(1);
+        return Order::where('data_verified_by_allegro_api', '=', false)
+            ->where('sello_id', '!=', null)
+            ->where('created_at', '>=', $yesterday)->get();
     }
 
     private function refreshTokens()

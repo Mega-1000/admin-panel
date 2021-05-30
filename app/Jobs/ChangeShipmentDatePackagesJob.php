@@ -8,14 +8,16 @@ use App\Helpers\OrderPackagesDataHelper;
 use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderRepository;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Carbon\Carbon;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
-class ChangeShipmentDatePackagesJob
+class ChangeShipmentDatePackagesJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, IsMonitored;
 
     protected $orderPackageRepository;
 

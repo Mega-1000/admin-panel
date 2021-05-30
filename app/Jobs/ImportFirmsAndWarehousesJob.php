@@ -8,14 +8,18 @@ use App\Repositories\FirmRepository;
 use App\Repositories\WarehouseAddressRepository;
 use App\Repositories\WarehousePropertyRepository;
 use App\Repositories\WarehouseRepository;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Storage;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 /**
  * Class ImportFirmsAndWarehousesJob
  * @package App\Jobs
  */
-class ImportFirmsAndWarehousesJob extends Job
+class ImportFirmsAndWarehousesJob extends Job implements ShouldQueue
 {
+    use IsMonitored;
+
     /**
      * @var
      */

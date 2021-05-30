@@ -2,8 +2,13 @@
 
 namespace App\Jobs;
 
-class DispatchLabelEventByNameJob extends Job
+use Illuminate\Contracts\Queue\ShouldQueue;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
+
+class DispatchLabelEventByNameJob extends Job implements ShouldQueue
 {
+    use IsMonitored;
+
     protected $order;
     protected $eventName;
 

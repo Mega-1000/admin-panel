@@ -11,11 +11,12 @@ use App\Repositories\LabelRepository;
 use App\Repositories\OrderRepository;
 use App\Services\OrderWarehouseNotificationService;
 use Carbon\Carbon;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 
-class RemoveLabelJob extends Job
+class RemoveLabelJob extends Job implements ShouldQueue
 {
     protected $order;
     protected $labelIdsToRemove;
@@ -73,7 +74,7 @@ class RemoveLabelJob extends Job
                     try {
                         \Mailer::create()
                             ->to($this->order->customer->login)
-                            ->send(new DifferentCustomerData('Wybór danych do wystawienia faktury - zlecenie' . $this->order->id, $this->order->id, $noData->id));
+                            ->send(new DifferentCustomerData('Wybór danych do wystawienia faktury - zlecenie ' . $this->order->id, $this->order->id, $noData->id));
                     } catch (\Swift_TransportException $e) {
 
                     }
@@ -81,7 +82,7 @@ class RemoveLabelJob extends Job
                     try {
                         \Mailer::create()
                             ->to($this->order->customer->login)
-                            ->send(new ConfirmData('Wybór danych do wystawienia faktury  - zlecenie' . $this->order->id, $this->order->id));
+                            ->send(new ConfirmData('Wybór danych do wystawienia faktury  - zlecenie ' . $this->order->id, $this->order->id));
                     } catch (\Swift_TransportException $e) {
 
                     }

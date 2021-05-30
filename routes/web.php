@@ -15,6 +15,10 @@ Route::redirect('/', '/admin');
 
 Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
+    Route::prefix('jobs')->group(function () {
+        Route::queueMonitor();
+    });
+
     Route::group(['middleware' => 'admin'], function () {
 
         Route::group(['prefix' => 'products'], function () {
@@ -31,6 +35,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/bonus/delete', 'BonusController@destroy')->name('bonus.destroy');
         Route::get('/bonus/users/{id?}', 'BonusController@getResponsibleUsers')->name('bonus.users');
         Route::get('/bonus/chat/{id}', 'BonusController@getChat')->name('bonus.chat');
+        Route::get('/bonus/close/{id}', 'BonusController@resolve')->name('bonus.close');
         Route::get('/bonus/order-chat/{id}', 'BonusController@firstOrderChat')->name('bonus.order-chat');
         Route::post('/bonus/send/{id}', 'BonusController@sendMessage')->name('bonus.send_message');
 
@@ -548,6 +553,9 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/transport/update-pricing', 'DelivererController@updatePricing')->name('transportPayment.update_pricing');
 
         Route::get('/cacheClear', 'Controller@refreshCache')->name('admin.refresh');
+
+        Route::get('/edit-allegro-terms', 'AllegroController@editTerms')->name('allegro.edit-terms');
+        Route::post('/edit-allegro-terms', 'AllegroController@saveTerms')->name('allegro.edit-terms');
     });
     Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/web/TrackerLogsRoutes.php');
 });
@@ -567,4 +575,5 @@ Route::get('/payment/confirmation/{token}', 'OrdersPaymentsController@warehouseP
 Route::post('/payment/confirmation/{token}', 'OrdersPaymentsController@warehousePaymentConfirmationStore')->name('ordersPayment.warehousePaymentConfirmationStore');
 
 Route::get('/chat/{token}', 'MessagesController@show')->name('chat.show');
+Route::get('/chat-show-or-new/{orderId}/{userId}', 'MessagesController@showOrNew')->name('chat.show-or-new');
 Route::get('/chat/getUrl/{mediaId}/{postCode}/{email}/{phone}', 'MessagesController@getUrl')->name('messages.get-url');
