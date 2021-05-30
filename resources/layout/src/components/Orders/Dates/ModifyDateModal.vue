@@ -106,46 +106,11 @@ export default class ModifyOrderDatesModal extends Vue {
     top: 20px;
   }
 
-  .overlay {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    background: $cl-black00;
-    opacity: 0.5;
-  }
-
-  span {
-    font-weight: 600;
-  }
-
-  .return {
-    position: absolute;
-    left: 10px;
-    top: 10px;
-  }
-
   .modal-title {
     font-size: 18px;
     line-height: 30px;
     color: $cl-grey5;
     font-weight: 700;
     margin: 5px 0;
-  }
-
-  .btn-create {
-    display: block;
-    margin: 25px auto 0 auto;
-  }
-
-  .select {
-    padding: 10px;
-    border: 1px solid $cl-greye;
-    word-wrap: break-word;
-    white-space: -moz-pre-wrap;
-    white-space: pre-wrap;
-    max-width: 100%;
-    display: inline-block;
   }
 </style>
