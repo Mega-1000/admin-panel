@@ -6,6 +6,7 @@ use App\Helpers\AllegroCommissionParser;
 use App\Http\Requests\AllegroSetCommission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use TCG\Voyager\Models\Setting;
 
 class AllegroController extends Controller
 {
@@ -73,6 +74,20 @@ class AllegroController extends Controller
         foreach ($orders as $id) {
             $parser->createNewOrder($id);
         }
+        return redirect()->route('orders.index')->with(['message' => __('voyager.generic.successfully_updated'),
+            'alert-type' => 'success']);
+    }
+
+    public function editTerms()
+    {
+        return view('allegro.edit-terms');
+    }
+
+    public function saveTerms(Request $request)
+    {
+        $setting = Setting::where('key','=','site.new_allegro_order_msg')->first();
+        $setting->value = $request->get('content');
+        $setting->save();
         return redirect()->route('orders.index')->with(['message' => __('voyager.generic.successfully_updated'),
             'alert-type' => 'success']);
     }

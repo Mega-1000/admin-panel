@@ -1,11 +1,17 @@
 <template>
+  <div class="c-actionTracker" v-if="enabled">
+  <!--
+  IMPORTANT !!!
+  tracker modal was disabled by changing <div id="actionTracker"></div> to <div id="disabled-actionTracker"></div>
+  to related views
+  -->
   <div class="c-actionTracker">
-    <ModalActionTrackers v-if="showModal" @close="toggleShowModal()"></ModalActionTrackers>
+    <ModalActionTrackers v-if="showModal" @close="toggleShowModal()" :time="trackTime"></ModalActionTrackers>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Prop } from 'vue-property-decorator'
 import ModalActionTrackers from '@/components/ModalActionTrackers.vue'
 import { addLogParam, LogItem, updateTimeLogParam } from '@/types/LogsTrackerType'
 
@@ -15,6 +21,7 @@ import { addLogParam, LogItem, updateTimeLogParam } from '@/types/LogsTrackerTyp
   }
 })
 export default class ActionTrackers extends Vue {
+  @Prop() private enabled!: boolean
   private trackTime = 0
   private finalTime = 3
   private timeInterval = 60000
@@ -34,7 +41,7 @@ export default class ActionTrackers extends Vue {
     setInterval(async () => {
       this.trackTime++
 
-      if (this.trackTime === this.finalTime) {
+      if ((this.trackTime >= this.finalTime) && (this.trackTime % this.finalTime === 0)) {
         this.setLog()
         this.showModal = true
       }

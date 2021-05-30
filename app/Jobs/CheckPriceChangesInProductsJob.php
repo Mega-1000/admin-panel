@@ -5,14 +5,16 @@ namespace App\Jobs;
 use App\Mail\SendTableWithProductPriceChangeMail;
 use App\Mail\SendToMega1000WarehouseNotFoundMail;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
-class CheckPriceChangesInProductsJob
+class CheckPriceChangesInProductsJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, IsMonitored;
 
     const ROLE_CHANGE_PRICE = 'ZC';
     protected $date;

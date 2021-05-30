@@ -3,7 +3,7 @@
     <div class="overlay" @click="$emit('close')"></div>
     <div class="c-modal">
       <div class="header">
-          <p class="text">Nie wykonywałeś żadnej akcji przez 5 minut. Został wykonany zrzut ekranu.
+          <p class="text">Nie wykonywałeś żadnej akcji przez {{ time }} minut/y. Został wykonany zrzut ekranu.
           Proszę wytłumacz poniżej jaki był powód Twojej zwłoki</p>
           <span @click="$emit('close')" class="close">X</span>
       </div>
@@ -14,14 +14,16 @@
   </div>
 </template>
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
-import { LogItem, updateDescriptionLogParam, updateTimeLogParam } from '@/types/LogsTrackerType'
+import { Component, Vue, Prop } from 'vue-property-decorator'
+import { LogItem, updateDescriptionLogParam } from '@/types/LogsTrackerType'
 
 @Component({
   components: {
   }
 })
 export default class ModalActionTracker extends Vue {
+  @Prop() public time!: number;
+
   public description = ''
 
   public get log (): LogItem {
@@ -31,9 +33,11 @@ export default class ModalActionTracker extends Vue {
   public async sendDescription (): Promise<void> {
     const param: updateDescriptionLogParam = {
       id: this.log.id,
-      description: this.description
+      description: this.description,
+      time: this.time
     }
     await this.$store?.dispatch('LogsTrackerService/updateDescriptionLog', param)
+    this.$emit('close')
   }
 }
 </script>

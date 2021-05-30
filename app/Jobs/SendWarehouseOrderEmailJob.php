@@ -6,12 +6,13 @@ use App\Helpers\EmailTagHandlerHelper;
 use App\Mail\WarehouseOrder;
 use App\Repositories\OrderRepository;
 use App\Repositories\TagRepository;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 /**
  * Class OrderStatusChangedNotificationJob
  * @package App\Jobs
  */
-class SendWarehouseOrderEmailJob extends Job
+class SendWarehouseOrderEmailJob extends Job implements ShouldQueue
 {
 
     /**

@@ -446,6 +446,17 @@
     <script src='/fullcalendar/resource-common/main.js'></script>
     <script src='/fullcalendar/resource-timeline/main.js'></script>
     <script src="/js/laroute.js"></script>
+    <!-- Hotjar Tracking Code for https://www.admin.mega1000.pl/ -->
+    <script>
+        (function(h,o,t,j,a,r){
+            h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+            h._hjSettings={hjid:2410304,hjsv:6};
+            a=o.getElementsByTagName('head')[0];
+            r=o.createElement('script');r.async=1;
+            r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+            a.appendChild(r);
+        })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+    </script>
     <link href="{{ asset('css/vue/styles.css') }}" rel="stylesheet" />
 @endsection
 
@@ -454,7 +465,7 @@
 @endsection
 
 @section('content')
-    <div class="page-content" id="vue">
+    <div class="page-content" id="vue" track-click>
         @include('voyager::alerts')
         @include('voyager::dimmers')
         @yield('app-content')

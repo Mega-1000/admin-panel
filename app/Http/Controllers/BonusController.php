@@ -76,7 +76,7 @@ class BonusController extends Controller
     public function firstOrderChat($id): \Illuminate\Http\Response
     {
         $order = Order::find($id);
-        $bonus = BonusAndPenalty::where('order_id', '=', $order->id)->orderBy('updated_at','desc')->first();
+        $bonus = BonusAndPenalty::where('order_id', '=', $order->id)->orderBy('updated_at', 'desc')->first();
         $chat = $this->service->getChat($bonus);
         return response()->view('bonus.chat', [
             'bonus' => $bonus,
@@ -117,6 +117,17 @@ class BonusController extends Controller
             'consultant' => $consultantName,
             'warehouse' => $warehouseName
         ]);
+    }
+
+    public function resolve(int $id)
+    {
+        $bonus = BonusAndPenalty::find($id);
+        $bonus->resolved = true;
+        $bonus->save();
+        dispatch_now(new RemoveLabelJob($bonus->order_id, [91]));
+        dispatch_now(new RemoveLabelJob($bonus->order_id, [180]));
+        return back()->with(['message' => 'Zamknięto dyskusję.',
+            'alert-type' => 'error']);
     }
 
     public function destroy(DeleteNewBonus $request): \Illuminate\Http\RedirectResponse

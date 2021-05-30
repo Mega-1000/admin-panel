@@ -17,6 +17,7 @@ use App\Integrations\Pocztex\statusType;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Http\Request;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
@@ -27,14 +28,15 @@ use App\Integrations\Jas\Jas;
 use App\Entities\OrderPackage;
 use OutOfRangeException;
 use Psr\Http\Message\ResponseInterface;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 /**
  * Class CheckPackagesStatusJob
  * @package App\Jobs
  */
-class CheckPackagesStatusJob
+class CheckPackagesStatusJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, IsMonitored;
 
     /**
      * @var \Illuminate\Config\Repository|mixed

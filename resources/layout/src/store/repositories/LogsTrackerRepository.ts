@@ -61,7 +61,8 @@ export default {
         'X-Requested-Width': 'XMLHttpRequest'
       }),
       body: JSON.stringify({
-        description: params.description
+        description: params.description,
+        time: params.time
       })
     })
       .then((response) => {

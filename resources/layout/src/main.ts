@@ -2,10 +2,8 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 
 import Vue from 'vue'
-import App from './App.vue'
 import SetsList from '@/views/Sets/SetsList.vue'
 import SetEdit from '@/views/Sets/SetEdit.vue'
-import OrderDates from '@/views/Orders/Dates.vue'
 import store from './store'
 import RenderComponent from '@/helpers/renderComponent'
 import ActionTrackers from '@/components/ActionTrackers.vue'
@@ -17,11 +15,12 @@ Vue.config.devtools = true
 
 new Vue({
   store,
-  render: h => h(App)
-}).$mount('#app')
+  components: {
+    tracker: ActionTrackers
+  }
+}).$mount('.vue-components')
 
 RenderComponent.startRender()
-new RenderComponent(App, '#app')
 /* LOGS TRACKER */
 new RenderComponent(ActionTrackers, '#actionTracker')
 new RenderComponent(LogsTrackerList, '#logsTrackerList')
@@ -30,6 +29,4 @@ new RenderComponent(LogsTrackerList, '#logsTrackerList')
 new RenderComponent(SetsList, '#setsList')
 new RenderComponent(SetEdit, '#setEdit')
 
-/* ORDER_DATES */
-new RenderComponent(OrderDates, '#orderDates')
 RenderComponent.endRender()

@@ -13,8 +13,11 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use App\Entities\OrderPackage;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class UpdatePackageRealCostJob implements ShouldQueue {
+
+    use IsMonitored;
 
     public function __construct() {
         $this->orderPackageRepository = OrderPackage::all();

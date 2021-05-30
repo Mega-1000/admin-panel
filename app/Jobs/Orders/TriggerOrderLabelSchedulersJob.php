@@ -8,9 +8,13 @@ use App\Jobs\Job;
 use App\Jobs\RemoveLabelJob;
 use App\Repositories\OrderLabelSchedulerRepository;
 use Carbon\Carbon;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 
-class TriggerOrderLabelSchedulersJob extends Job
+class TriggerOrderLabelSchedulersJob extends Job implements ShouldQueue
 {
+    use IsMonitored;
+
     /** @var DateHelper */
     protected $dateHelper;
 
