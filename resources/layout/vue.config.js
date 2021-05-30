@@ -3,6 +3,7 @@
 const StyleLintPlugin = require('stylelint-webpack-plugin')
 
 module.exports = {
+  runtimeCompiler: true,
   configureWebpack: {
     plugins: [
       new StyleLintPlugin({

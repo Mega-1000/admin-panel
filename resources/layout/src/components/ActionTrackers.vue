@@ -1,4 +1,5 @@
 <template>
+  <div class="c-actionTracker" v-if="enabled">
   <!--
   IMPORTANT !!!
   tracker modal was disabled by changing <div id="actionTracker"></div> to <div id="disabled-actionTracker"></div>
@@ -10,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Vue, Prop } from 'vue-property-decorator'
 import ModalActionTrackers from '@/components/ModalActionTrackers.vue'
 import { addLogParam, LogItem, updateTimeLogParam } from '@/types/LogsTrackerType'
 
@@ -20,6 +21,7 @@ import { addLogParam, LogItem, updateTimeLogParam } from '@/types/LogsTrackerTyp
   }
 })
 export default class ActionTrackers extends Vue {
+  @Prop() private enabled!: boolean
   private trackTime = 0
   private finalTime = 3
   private timeInterval = 60000

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-new */
 
 import Vue from 'vue'
 import store from '@/store'
