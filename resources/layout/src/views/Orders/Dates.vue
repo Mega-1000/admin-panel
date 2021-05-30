@@ -26,6 +26,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator'
 import DatesTable from '@/components/Orders/Dates/DatesTable.vue'
 import ModifyDateModal from '@/components/Orders/Dates/ModifyDateModal.vue'
 import { Acceptance, AcceptDatesParams, Dates } from '@/types/OrdersTypes'
+import { USER_TYPES } from '@/constant/Orders'
 
 @Component({
   components: {
@@ -35,7 +36,7 @@ import { Acceptance, AcceptDatesParams, Dates } from '@/types/OrdersTypes'
 })
 export default class OrderDates extends Vue {
   @Prop() public orderId!: number
-  @Prop() public userType!: string
+  @Prop({ default: 'u' }) public userType!: string
 
   public showModal = false;
   public type: string | null = null;
@@ -75,11 +76,6 @@ export default class OrderDates extends Vue {
   }
 
   public getUserType (): string {
-    const USER_TYPES: any = {
-      c: 'customer',
-      e: 'warehouse',
-      u: 'consultant'
-    }
     return USER_TYPES[this.userType]
   }
 }
