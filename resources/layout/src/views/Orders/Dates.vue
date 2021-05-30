@@ -34,8 +34,8 @@ import { Acceptance, AcceptDatesParams, Dates } from '@/types/OrdersTypes'
   }
 })
 export default class OrderDates extends Vue {
-  @Prop({ default: 15005 }) public orderId!: number
-  @Prop({ default: 'c' }) public userType!: string
+  @Prop() public orderId!: number
+  @Prop() public userType!: string
 
   public showModal = false;
   public type: string | null = null;

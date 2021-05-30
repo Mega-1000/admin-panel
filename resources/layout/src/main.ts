@@ -8,6 +8,7 @@ import store from './store'
 import RenderComponent from '@/helpers/renderComponent'
 import ActionTrackers from '@/components/ActionTrackers.vue'
 import LogsTrackerList from '@/views/LogsTracker/LogsTrackerList.vue'
+import OrderDates from '@/views/Orders/Dates.vue'
 
 Vue.config.productionTip = false
 Vue.use(require('electron-vue-debugger'))
@@ -16,7 +17,8 @@ Vue.config.devtools = true
 new Vue({
   store,
   components: {
-    tracker: ActionTrackers
+    tracker: ActionTrackers,
+    orderDates: OrderDates
   }
 }).$mount('.vue-components')
 

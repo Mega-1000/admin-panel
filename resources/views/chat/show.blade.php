@@ -37,9 +37,9 @@
                     @endforeach
                 </div>
             @endif
-            @if($order->dates)
-                <div id="orderDates" :orderId="{{ $order->id }}" :userType="{{ $user_type }}"></div>
-            @endif
+            <div class="vue-components">
+                <order-dates order-id="{{ $order->id }}" user-type="{{ $user_type }}"></order-dates>
+            </div>
             @if ($chat)
                 @include('chat.chat_body')
             @endif

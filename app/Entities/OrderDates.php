@@ -36,6 +36,7 @@ class OrderDates extends Model implements Transformable
         'customer_acceptance',
         'consultant_acceptance',
         'warehouse_acceptance',
+        'message',
     ];
 
     /**

@@ -509,7 +509,10 @@ class OrdersController extends Controller
         /** @var OrderDates $dates */
         $dates = $order->dates;
         if(empty($dates)){
-            $order->dates()->create();
+            $order->dates()->create([
+                'message' => 'Proszę o uzupełnienie dat'
+            ]);
+            $order->refresh();
             $dates = $order->dates;
         }
         return [
