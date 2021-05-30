@@ -508,6 +508,10 @@ class OrdersController extends Controller
     {
         /** @var OrderDates $dates */
         $dates = $order->dates;
+        if(empty($dates)){
+            $order->dates()->create();
+            $dates = $order->dates;
+        }
         return [
             'customer' => [
                 'delivery_date_from' => $dates->customer_delivery_date_from,
