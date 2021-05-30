@@ -5,11 +5,22 @@ import Vue from 'vue'
 import store from '@/store'
 
 export default class RenderComponent {
-  public constructor (component: any, hookElement: string) {
+  public static render (component: any, hookElement: string): void {
     if (document.querySelector(hookElement)) {
       new Vue({
         store,
         render: h => h(component)
+      }).$mount(hookElement)
+      const mountElement = !(document.querySelectorAll(hookElement + ':empty').length > 0)
+      this.renderComponentLog(hookElement, mountElement)
+    }
+  }
+
+  public static renderComponents (components: any, hookElement: string): void {
+    if (document.querySelector(hookElement)) {
+      new Vue({
+        store,
+        components: components
       }).$mount(hookElement)
       const mountElement = !(document.querySelectorAll(hookElement + ':empty').length > 0)
       this.renderComponentLog(hookElement, mountElement)
@@ -27,7 +38,7 @@ export default class RenderComponent {
     console.groupEnd()
   }
 
-  public renderComponentLog (component: string, success: boolean): void {
+  public static renderComponentLog (component: string, success: boolean): void {
     const name = component.replace('#', '')
     if (success) {
       console.log('%c [Render] Component ' + name + ' %c success ',

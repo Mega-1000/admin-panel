@@ -13,20 +13,20 @@ Vue.config.productionTip = false
 Vue.use(require('electron-vue-debugger'))
 Vue.config.devtools = true
 
-new Vue({
-  store,
-  components: {
-    tracker: ActionTrackers
-  }
-}).$mount('.vue-components')
+const components = {
+  tracker: ActionTrackers
+}
 
 RenderComponent.startRender()
+/* Render Components */
+RenderComponent.renderComponents(components, '.vue-components')
+
 /* LOGS TRACKER */
-new RenderComponent(ActionTrackers, '#actionTracker')
-new RenderComponent(LogsTrackerList, '#logsTrackerList')
+RenderComponent.render(ActionTrackers, '#actionTracker')
+RenderComponent.render(LogsTrackerList, '#logsTrackerList')
 
 /* SETS */
-new RenderComponent(SetsList, '#setsList')
-new RenderComponent(SetEdit, '#setEdit')
+RenderComponent.render(SetsList, '#setsList')
+RenderComponent.render(SetEdit, '#setEdit')
 
 RenderComponent.endRender()
