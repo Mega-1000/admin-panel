@@ -2,16 +2,16 @@
   <table class="table">
     <thead>
     <tr>
-      <th scope="col" style="width: 20%;"></th>
-      <th scope="col" style="width: 5%;" class="text-center"></th>
-      <th scope="col" style="width: 15%;" class="text-center">Klient</th>
-      <th scope="col" style="width: 15%;" class="text-center">Konsultant</th>
-      <th scope="col" style="width: 15%;" class="text-center">Magazyn</th>
+      <th scope="col"></th>
+      <th scope="col" class="text-center"></th>
+      <th scope="col" class="text-center">Klient</th>
+      <th scope="col" class="text-center">Konsultant</th>
+      <th scope="col" class="text-center">Magazyn</th>
     </tr>
     </thead>
     <tbody>
     <tr>
-      <th scope="row" rowspan="2" style="vertical-align: middle;">Preferowana data nadania</th>
+      <th scope="row" rowspan="2" class="v-align-middle">Preferowana data nadania</th>
       <th scope="row">Od</th>
       <td>{{ customerDates.shipment_date_from }}</td>
       <td>{{ consultantDates.shipment_date_from }}</td>
@@ -24,7 +24,7 @@
       <td>{{ warehouseDates.shipment_date_to }}</td>
     </tr>
     <tr>
-      <th scope="row" rowspan="2" style="vertical-align: middle;">Preferowana data dostawy</th>
+      <th scope="row" rowspan="2" class="v-align-middle">Preferowana data dostawy</th>
       <th scope="row">Od</th>
       <td>{{ customerDates.delivery_date_from }}</td>
       <td>{{ consultantDates.delivery_date_from }}</td>
@@ -37,15 +37,15 @@
       <td>{{ warehouseDates.delivery_date_to }}</td>
     </tr>
     <tr>
-      <th scope="row" colspan="2" style="text-align: center;">Akceptacja</th>
+      <th scope="row" colspan="2" class="text-center">Akceptacja</th>
       <td class="text-center">
-        <span v-bind:class="getGlyphiconClass(acceptance.customer)" class="glyphicon"></span>
+        <span :class="getGlyphiconClass(acceptance.customer)" class="glyphicon"></span>
       </td>
       <td class="text-center">
-        <span v-bind:class="getGlyphiconClass(acceptance.consultant)" class="glyphicon"></span>
+        <span :class="getGlyphiconClass(acceptance.consultant)" class="glyphicon"></span>
       </td>
       <td class="text-center">
-        <span v-bind:class="getGlyphiconClass(acceptance.warehouse)" class="glyphicon"></span>
+        <span :class="getGlyphiconClass(acceptance.warehouse)" class="glyphicon"></span>
       </td>
     </tr>
     <tr>
@@ -118,3 +118,10 @@ export default class DatesTable extends Vue {
   }
 }
 </script>
+<style scoped lang="scss">
+  @import "@/assets/styles/main";
+
+  .v-align-middle {
+    vertical-align: middle;
+  }
+</style>

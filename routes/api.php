@@ -96,7 +96,4 @@ Route::post('auth/code/{id}', 'Api\AutheticationController@getToken')->name('api
 
 Route::group(['prefix' => 'sets', 'as' => 'sets.', 'middleware' => ['https']], __DIR__ . '/api/ProductsSetsRoutes.php');
 Route::group(['prefix' => 'tracker', 'as' => 'tracker.', 'middleware' => ['https']], __DIR__ . '/api/TrackerLogsRoutes.php');
-Route::get('orders/{order}/getDates', 'Api\OrdersController@getDates')->name('api.orders.get-dates');
-Route::put('orders/{order}/acceptDates', 'Api\OrdersController@acceptDates')->name('api.orders.accept-dates');
-Route::put('orders/{order}/updateDates', 'Api\OrdersController@updateDates')->name('api.orders.update-dates');
-
+Route::group(['prefix' => 'orders', 'as' => 'orders.', 'middleware' => ['https']], __DIR__ . '/api/OrdersRoutes.php');
