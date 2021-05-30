@@ -20,7 +20,7 @@
 
 </head>
 <body>
-<div id="app">
+<div>
     <div class="container" id="flex-container">
         <div id="chat-container">
             <div class="text-center alert alert-info">{!! $title !!}</div>
@@ -37,9 +37,12 @@
                     @endforeach
                 </div>
             @endif
-
-            @include('chat.chat_body')
-
+            <div class="vue-components">
+                <order-dates order-id="{{ $order->id }}" user-type="{{ $user_type }}"></order-dates>
+            </div>
+            @if ($chat)
+                @include('chat.chat_body')
+            @endif
             <form id="new-message" action="{{ $route }}">
                 <div class="row">
                     <div class="col-sm-9">
@@ -107,7 +110,8 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"
         integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
         crossorigin="anonymous"></script>
-
+<script src="{{ asset('js/vue-chunk.js') }}"></script>
+<script src="{{ asset('js/vue-scripts.js') }}"></script>
 <script type="text/javascript" src="{{ URL::asset('js/helpers/dynamic-calculator.js') }}"></script>
 <script>
     $(document).ready(function () {

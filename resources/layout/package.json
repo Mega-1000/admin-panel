@@ -16,10 +16,12 @@
     "vue-class-component": "^7.2.3",
     "vue-property-decorator": "^9.1.2",
     "vue-router": "^3.5.1",
+    "vue2-datepicker": "^3.9.0",
     "vuex": "^3.4.0"
   },
   "devDependencies": {
     "@types/jest": "^24.0.19",
+    "@types/vue2-datepicker": "^3.3.0",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
     "@vue/cli-plugin-babel": "~4.5.0",
