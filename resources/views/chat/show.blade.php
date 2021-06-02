@@ -39,7 +39,7 @@
                 </div>
             @endif
             <div class="vue-components">
-                <order-dates order-id="{{ $order->id }}" user-type="{{ $user_type }}"></order-dates>
+                <order-dates order-id="{{ $order->id }}" user-type="{{ $user_type }}" chat-id="{{ $chat->id }}"></order-dates>
             </div>
             @if ($chat)
                 @include('chat.chat_body')

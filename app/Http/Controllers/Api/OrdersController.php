@@ -297,7 +297,18 @@ class OrdersController extends Controller
             $invoiceAddress = $order->addresses->where('type', '=', 'INVOICE_ADDRESS')->first();
 
             $order->shipment_date = $request->get('shipment_date');
-            $order->dates()->updateOrCreate(['order_id' => $orderId], $request->all());
+            $order->dates()->updateOrCreate(
+                [
+                    'order_id' => $orderId,
+                ],
+                array_merge(
+                    $request->all(),
+                    [
+                        'customer_acceptance' => true,
+                        'message' => 'Klient uzupełnił preferowane daty nadania przesyłki. Proszę o weryfikacje'
+                    ]
+                )
+            );
             $order->save();
 
             if (!empty($request->get('delivery_description'))) {
@@ -608,6 +619,48 @@ class OrdersController extends Controller
                 ],
                 'acceptance' => [
                     $request->type => true,
+                    'message' => $order->dates->message,
+                ]
+            ]), 200);
+        }
+        return response(json_encode([
+            'error_code' => 500,
+            'error_message' => __('order_dates.messages.error')
+        ]), 500);
+    }
+
+    public function acceptDatesAsCustomer(Order $order, Request $request)
+    {
+        $result = null;
+        $result = $order->dates()->update([
+            'customer_shipment_date_from' => $order->dates->consultant_shipment_date_from,
+            'customer_shipment_date_to' => $order->dates->consultant_shipment_date_to,
+            'customer_delivery_date_from' => $order->dates->consultant_delivery_date_from,
+            'customer_delivery_date_to' => $order->dates->consultant_delivery_date_to,
+            'customer_acceptance' => true,
+            'message' => 'Konsultant <strong>zaakceptował</strong> daty dotyczące przesyłki w imieniu klienta.'
+        ]);
+
+        if($request->has('chatId') && $result){
+            $helper = new MessagesHelper();
+            $helper->chatId = $request->chatId;
+            $helper->currentUserType = MessagesHelper::TYPE_USER;
+            $helper->addMessage('Konsultant zaakceptował daty w imieniu klienta.');
+        }
+
+        if ($result) {
+            $order->dates->refresh();
+            return response(json_encode([
+                'customer' => [
+                    'shipment_date_from' => $order->dates->customer_shipment_date_from,
+                    'shipment_date_to' => $order->dates->customer_shipment_date_to,
+                    'delivery_date_from' => $order->dates->customer_delivery_date_from,
+                    'delivery_date_to' => $order->dates->customer_delivery_date_to,
+                ],
+                'acceptance' => [
+                    'customer' => $order->dates->customer_acceptance,
+                    'consultant' => $order->dates->consultant_acceptance,
+                    'warehouse' => $order->dates->warehouse_acceptance,
                     'message' => $order->dates->message,
                 ]
             ]), 200);

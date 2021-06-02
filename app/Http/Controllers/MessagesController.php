@@ -274,7 +274,7 @@ class MessagesController extends Controller
         }
         $possibleUsers = $this->addCustomerToChatList($chat, $possibleUsers, $users, $helper);
         $productList = $this->prepareProductList($helper);
-
+dump($users,$chat);
         $token = $helper->encrypt();
         $view = view('chat.show')->with([
             'product_list' => $productList,

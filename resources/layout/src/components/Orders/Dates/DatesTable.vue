@@ -51,11 +51,19 @@
     <tr>
       <th scope="row" colspan="2" class="text-center">Akcje</th>
       <td>
-        <div class="btn-group" role="group">
-          <a class="btn btn-sm btn-primary" :class="{ disabled: userType!=='customer'}"
-             @click="$emit('modify','customer')">Modyfikuj</a>
-          <a class="btn btn-sm btn-success" :class="{ disabled: !canAccept('customer')}"
-             @click="$emit('accept','customer')">Akceptuj</a>
+        <div class="row">
+          <div class="btn-group mb-5" role="group">
+            <a class="btn btn-sm btn-primary" :class="{ disabled: userType!=='customer'}"
+               @click="$emit('modify','customer')">Modyfikuj</a>
+            <a class="btn btn-sm btn-success" :class="{ disabled: !canAccept('customer')}"
+               @click="$emit('accept','customer')">Akceptuj</a>
+          </div>
+        </div>
+        <div class="row">
+          <div class="btn-group" role="group">
+            <a class="btn btn-sm btn-info" v-show="canAccept('customer')"
+               @click="$emit('acceptAsCustomer','customer')">Akceptuj w imieniu klienta</a>
+          </div>
         </div>
       </td>
       <td>
@@ -123,5 +131,9 @@ export default class DatesTable extends Vue {
 
   .v-align-middle {
     vertical-align: middle;
+  }
+
+  .mb-5 {
+    margin-bottom: 5px;
   }
 </style>
