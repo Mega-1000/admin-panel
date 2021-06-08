@@ -652,10 +652,10 @@ class OrdersController extends Controller
             $order->dates->refresh();
             return response(json_encode([
                 'customer' => [
-                    'shipment_date_from' => $order->dates->customer_shipment_date_from,
-                    'shipment_date_to' => $order->dates->customer_shipment_date_to,
-                    'delivery_date_from' => $order->dates->customer_delivery_date_from,
-                    'delivery_date_to' => $order->dates->customer_delivery_date_to,
+                    'shipment_date_from' => $order->dates->getDateAttribute('customer_shipment_date_from'),
+                    'shipment_date_to' => $order->dates->getDateAttribute('customer_shipment_date_to'),
+                    'delivery_date_from' => $order->dates->getDateAttribute('customer_delivery_date_from'),
+                    'delivery_date_to' => $order->dates->getDateAttribute('customer_delivery_date_to'),
                 ],
                 'acceptance' => [
                     'customer' => $order->dates->customer_acceptance,
