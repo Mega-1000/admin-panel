@@ -59,19 +59,21 @@
                @click="$emit('accept','customer')">Akceptuj</a>
           </div>
         </div>
-        <div class="row">
-          <div class="btn-group" role="group">
-            <a class="btn btn-sm btn-info" v-show="canAccept('customer')"
-               @click="$emit('acceptAsCustomer','customer')">Akceptuj w imieniu klienta</a>
-          </div>
-        </div>
       </td>
       <td>
-        <div class="btn-group" role="group">
-          <a class="btn btn-sm btn-primary" :class="{ disabled: userType!=='consultant'}"
-             @click="$emit('modify','consultant')">Modyfikuj</a>
-          <a class="btn btn-sm btn-success" :class="{ disabled: !canAccept('consultant') }"
-             @click="$emit('accept','consultant')">Akceptuj</a>
+        <div class="row text-center">
+          <div class="btn-group" role="group">
+            <a class="btn btn-sm btn-primary" :class="{ disabled: userType!=='consultant'}"
+               @click="$emit('modify','consultant')">Modyfikuj</a>
+            <a class="btn btn-sm btn-success" :class="{ disabled: !canAccept('consultant') }"
+               @click="$emit('accept','consultant')">Akceptuj</a>
+          </div>
+        </div>
+        <div class="row text-center mt-5">
+          <div class="btn-group" role="group">
+            <a class="btn btn-sm btn-info"
+               @click="$emit('acceptAsCustomer')">Akceptuj w imieniu klienta</a>
+          </div>
         </div>
       </td>
       <td>
@@ -135,5 +137,9 @@ export default class DatesTable extends Vue {
 
   .mb-5 {
     margin-bottom: 5px;
+  }
+
+  .mt-5 {
+    margin-top: 5px;
   }
 </style>

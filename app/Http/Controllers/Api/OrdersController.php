@@ -631,7 +631,6 @@ class OrdersController extends Controller
 
     public function acceptDatesAsCustomer(Order $order, Request $request)
     {
-        $result = null;
         $result = $order->dates()->update([
             'customer_shipment_date_from' => $order->dates->consultant_shipment_date_from,
             'customer_shipment_date_to' => $order->dates->consultant_shipment_date_to,
