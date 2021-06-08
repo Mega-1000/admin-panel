@@ -13,28 +13,28 @@
     <tr>
       <th scope="row" rowspan="2" class="v-align-middle">Preferowana data nadania</th>
       <th scope="row">Od</th>
-      <td>{{ customerDates.shipment_date_from }}</td>
-      <td>{{ consultantDates.shipment_date_from }}</td>
-      <td>{{ warehouseDates.shipment_date_from }}</td>
+      <td class="text-center">{{ customerDates.shipment_date_from }}</td>
+      <td class="text-center">{{ consultantDates.shipment_date_from }}</td>
+      <td class="text-center">{{ warehouseDates.shipment_date_from }}</td>
     </tr>
     <tr>
       <th scope="row">Do</th>
-      <td>{{ customerDates.shipment_date_to }}</td>
-      <td>{{ consultantDates.shipment_date_to }}</td>
-      <td>{{ warehouseDates.shipment_date_to }}</td>
+      <td class="text-center">{{ customerDates.shipment_date_to }}</td>
+      <td class="text-center">{{ consultantDates.shipment_date_to }}</td>
+      <td class="text-center">{{ warehouseDates.shipment_date_to }}</td>
     </tr>
     <tr>
       <th scope="row" rowspan="2" class="v-align-middle">Preferowana data dostawy</th>
       <th scope="row">Od</th>
-      <td>{{ customerDates.delivery_date_from }}</td>
-      <td>{{ consultantDates.delivery_date_from }}</td>
-      <td>{{ warehouseDates.delivery_date_from }}</td>
+      <td class="text-center">{{ customerDates.delivery_date_from }}</td>
+      <td class="text-center">{{ consultantDates.delivery_date_from }}</td>
+      <td class="text-center">{{ warehouseDates.delivery_date_from }}</td>
     </tr>
     <tr>
       <th scope="row">Do</th>
-      <td>{{ customerDates.delivery_date_to }}</td>
-      <td>{{ consultantDates.delivery_date_to }}</td>
-      <td>{{ warehouseDates.delivery_date_to }}</td>
+      <td class="text-center">{{ customerDates.delivery_date_to }}</td>
+      <td class="text-center">{{ consultantDates.delivery_date_to }}</td>
+      <td class="text-center">{{ warehouseDates.delivery_date_to }}</td>
     </tr>
     <tr>
       <th scope="row" colspan="2" class="text-center">Akceptacja</th>
@@ -71,7 +71,7 @@
         </div>
         <div class="row text-center mt-5">
           <div class="btn-group" role="group">
-            <a class="btn btn-sm btn-info"
+            <a class="btn btn-sm btn-info" :class="{ disabled: canAccept('consultant')}"
                @click="$emit('acceptAsCustomer')">Akceptuj w imieniu klienta</a>
           </div>
         </div>

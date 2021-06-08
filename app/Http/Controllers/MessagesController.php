@@ -5,14 +5,12 @@ namespace App\Http\Controllers;
 use App\Entities\Employee;
 use App\Entities\Firm;
 use App\Entities\PostalCodeLatLon;
-use App\User;
 use Illuminate\Http\Request;
 use App\Helpers\MessagesHelper;
 use App\Helpers\Exceptions\ChatException;
 use App\Entities\Chat;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
@@ -274,7 +272,7 @@ class MessagesController extends Controller
         }
         $possibleUsers = $this->addCustomerToChatList($chat, $possibleUsers, $users, $helper);
         $productList = $this->prepareProductList($helper);
-dump($users,$chat);
+
         $token = $helper->encrypt();
         $view = view('chat.show')->with([
             'product_list' => $productList,
