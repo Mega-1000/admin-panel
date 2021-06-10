@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Entities\Chat;
+use App\Entities\OrderDates;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\ChatHelper;
 use App\Helpers\GetCustomerForAdminEdit;
@@ -26,6 +28,7 @@ use App\Http\Controllers\Controller;
 use App\Repositories\ProductRepository;
 use App\Repositories\ProductPriceRepository;
 use App\Services\ProductService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
@@ -260,13 +263,24 @@ class OrdersController extends Controller
         $order = $this->orderRepository->find($orderId);
         list($isDeliveryChangeLocked, $isInvoiceChangeLocked) = $this->getLocks($order);
 
-        return [
-            "DELIVERY_ADDRESS" => $order->addresses->where('type', '=', 'DELIVERY_ADDRESS')->first(),
-            "INVOICE_ADDRESS" => $order->addresses->where('type', '=', 'INVOICE_ADDRESS')->first(),
-            "DELIVERY_LOCK" => $isDeliveryChangeLocked,
-            "INVOICE_LOCK" => $isInvoiceChangeLocked,
-            "shipment_date" => $order->shipment_date,
-        ];
+        if (!empty($order->dates)) {
+            $orderDates = [
+                "shipment_date_from" => $order->dates->customer_shipment_date_from,
+                "shipment_date_to" => $order->dates->customer_shipment_date_to,
+                "delivery_date_from" => $order->dates->customer_delivery_date_from,
+                "delivery_date_to" => $order->dates->customer_delivery_date_to,
+            ];
+        }
+
+        return array_merge(
+            [
+                "DELIVERY_ADDRESS" => $order->addresses->where('type', '=', 'DELIVERY_ADDRESS')->first(),
+                "INVOICE_ADDRESS" => $order->addresses->where('type', '=', 'INVOICE_ADDRESS')->first(),
+                "DELIVERY_LOCK" => $isDeliveryChangeLocked,
+                "INVOICE_LOCK" => $isInvoiceChangeLocked,
+            ],
+            $orderDates ?? []
+        );
     }
 
     public function updateOrderDeliveryAndInvoiceAddresses(
@@ -283,7 +297,17 @@ class OrdersController extends Controller
             $invoiceAddress = $order->addresses->where('type', '=', 'INVOICE_ADDRESS')->first();
 
             $order->shipment_date = $request->get('shipment_date');
+            $order->dates()->updateOrCreate(['order_id' => $orderId], $request->all());
             $order->save();
+
+            if (!empty($request->get('delivery_description'))) {
+                $helper = new MessagesHelper();
+                $helper->orderId = $orderId;
+                $helper->currentUserId = $order->customer_id;
+                $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
+                $helper->createNewChat();
+                $helper->addMessage($request->get('delivery_description'));
+            }
 
             if (!$isDeliveryChangeLocked) {
                 $deliveryAddress->update($request->get('DELIVERY_ADDRESS'));
@@ -478,5 +502,119 @@ class OrdersController extends Controller
                 })
                 ->count() > 0;
         return array($isDeliveryChangeLocked, $isInvoiceChangeLocked);
+    }
+
+    public function getDates(Order $order)
+    {
+        /** @var OrderDates $dates */
+        $dates = $order->dates;
+        if(empty($dates)){
+            $order->dates()->create([
+                'message' => 'Proszę o uzupełnienie dat'
+            ]);
+            $order->refresh();
+            $dates = $order->dates;
+        }
+        return [
+            'customer' => [
+                'delivery_date_from' => $dates->customer_delivery_date_from,
+                'delivery_date_to' => $dates->customer_delivery_date_to,
+                'shipment_date_from' => $dates->customer_shipment_date_from,
+                'shipment_date_to' => $dates->customer_shipment_date_to,
+            ],
+            'consultant' => [
+                'delivery_date_from' => $dates->consultant_delivery_date_from,
+                'delivery_date_to' => $dates->consultant_delivery_date_to,
+                'shipment_date_from' => $dates->consultant_shipment_date_from,
+                'shipment_date_to' => $dates->consultant_shipment_date_to,
+            ],
+            'warehouse' => [
+                'delivery_date_from' => $dates->warehouse_delivery_date_from,
+                'delivery_date_to' => $dates->warehouse_delivery_date_to,
+                'shipment_date_from' => $dates->warehouse_shipment_date_from,
+                'shipment_date_to' => $dates->warehouse_shipment_date_to,
+            ],
+            'acceptance' => [
+                'customer' => $dates->customer_acceptance,
+                'consultant' => $dates->consultant_acceptance,
+                'warehouse' => $dates->warehouse_acceptance,
+                'message' => $dates->message ?? '',
+            ]
+        ];
+    }
+
+    public function acceptDates(Order $order, Request $request)
+    {
+        $result = null;
+        if ($request->has('type') && $request->has('userType')) {
+        /** @var OrderDates $dates */
+        $dates = $order->dates;
+            $result = $order->dates()->update([
+                $request->userType . '_delivery_date_from' => $dates->getAttribute($request->type . '_delivery_date_from'),
+                $request->userType . '_delivery_date_to' => $dates->getAttribute($request->type . '_delivery_date_to'),
+                $request->userType . '_shipment_date_from' => $dates->getAttribute($request->type . '_shipment_date_from'),
+                $request->userType . '_shipment_date_to' => $dates->getAttribute($request->type . '_shipment_date_to'),
+                $request->userType . '_acceptance' => true,
+                'message' => __('order_dates.' . $request->userType) . ' <strong>zaakceptował</strong> daty dotyczące przesyłki. Proszę o weryfikacje i akceptacje'
+
+            ]);
+        }
+        if ($result) {
+            $order->dates->refresh();
+            return response(json_encode([
+                'acceptance' => [
+                    'customer' => $order->dates->customer_acceptance,
+                    'consultant' => $order->dates->consultant_acceptance,
+                    'warehouse' => $order->dates->warehouse_acceptance,
+                    'message' => $order->dates->message,
+                ],
+                $request->userType =>[
+                    'delivery_date_from' => $dates->getAttribute($request->type . '_delivery_date_from'),
+                    'delivery_date_to' => $dates->getAttribute($request->type . '_delivery_date_to'),
+                    'shipment_date_from' => $dates->getAttribute($request->type . '_shipment_date_from'),
+                    'shipment_date_to' => $dates->getAttribute($request->type . '_shipment_date_to'),
+                ]
+            ]), 200);
+        }
+        return response(json_encode([
+            'error_code' => 500,
+            'error_message' => __('order_dates.messages.error')
+        ]), 500);
+    }
+
+    public function updateDates(Order $order, Request $request)
+    {
+        $result = null;
+        if ($request->has('type')) {
+            $order->dates->resetAcceptance();
+            $result = $order->dates()->update([
+                $request->type . '_shipment_date_from' => $request->shipmentDateFrom,
+                $request->type . '_shipment_date_to' => $request->shipmentDateTo,
+                $request->type . '_delivery_date_from' => $request->deliveryDateFrom,
+                $request->type . '_delivery_date_to' => $request->deliveryDateTo,
+                $request->type . '_acceptance' => true,
+                'message' => __('order_dates.' . $request->type) . ' <strong>zmodyfikował</strong> daty dotyczące przesyłki. Proszę o weryfikacje i akceptacje'
+            ]);
+        }
+
+        if ($result) {
+            $order->dates->refresh();
+            return response(json_encode([
+                $request->type => [
+                    'shipment_date_from' =>  $request->shipmentDateFrom,
+                    'shipment_date_to' =>$request->shipmentDateTo,
+                    'delivery_date_from' => $request->deliveryDateFrom,
+                    'delivery_date_to' => $request->deliveryDateTo,
+                ],
+                'acceptance' => [
+                    $request->type => true,
+                    'message' => $order->dates->message,
+                ]
+            ]), 200);
+        }
+        return response(json_encode([
+            'error_code' => 500,
+            'error_message' => __('order_dates.messages.error')
+        ]), 500);
     }
 }
