@@ -6,7 +6,7 @@
     to related views
     -->
     <div class="c-actionTracker">
-      <ModalActionTrackers v-if="showModal" @close="toggleShowModal()" :time="time"></ModalActionTrackers>
+      <ModalActionTrackers v-if="showModal && time >= finalTime" @close="toggleShowModal()" :time="time"></ModalActionTrackers>
     </div>
   </div>
 </template>
@@ -25,7 +25,7 @@ export default class ActionTrackers extends Vue {
   @Prop() private enabled!: boolean
   private time = 0
   private finalTime = 3
-  private timeInterval = 1000
+  private timeInterval = 60000
   private intervalId = 0
   public showModal = false
 
