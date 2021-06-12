@@ -57,7 +57,7 @@
             </button>
           </td>
           <td>
-            <a class="btn btn-sm btn-primary" :href="getSetEditLink(index)">
+            <a class="btn btn-sm btn-primary" :href="getSetEditLink(index)" v-if="item.set.stock === 0">
               <i class="voyager-pen"></i>
               <span class="hidden-xs hidden-sm">Zarządzaj produktami w zestawie</span>
             </a>

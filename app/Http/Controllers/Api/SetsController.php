@@ -19,7 +19,8 @@ class SetsController extends Controller
     {
         $sets = [];
         $getSets = Set::leftJoin('products', 'products.id', '=', 'sets.product_id')
-            ->select('sets.id as id', 'products.name as name', 'products.symbol as number', 'products.stock_product as stock', 'products.*', 'sets.*')
+            ->leftJoin('product_stocks', 'product_stocks.product_id', '=', 'sets.product_id')
+            ->select('sets.id as id', 'products.name as name', 'products.symbol as number', 'product_stocks.quantity as stock', 'products.*', 'sets.*')
             ->get();
         foreach ($getSets as $item) {
             $sets[$item->id] = [
@@ -34,8 +35,8 @@ class SetsController extends Controller
     public function set(Set $set)
     {
         $set = Set::where('sets.id', $set->id)
-            ->leftJoin('products', 'products.id', '=', 'sets.product_id')
-            ->select('sets.id as id', 'products.name as name', 'products.symbol as number', 'products.stock_product as stock', 'products.*', 'sets.*')
+            ->leftJoin('product_stocks', 'product_stocks.product_id', '=', 'sets.product_id')
+            ->select('sets.id as id', 'products.name as name', 'products.symbol as number', 'product_stocks.quantity as stock', 'products.*', 'sets.*')
             ->get()
             ->first();
 
@@ -257,8 +258,19 @@ class SetsController extends Controller
         }
 
         $set->stock = $set->stock + $request->number;
-
-        if ($set->update()) {
+        $stock->quantity = Product::where('id', $set->product_id)->get()->first();
+        if($stock->quantity->stock_product !== null && $product->stock_product > 0) {
+            $product->stock_product = $product->stock_product + $request->number;
+        } else {
+            $product->stock_product = $request->number;
+        }
+        $stock = ProductStock::where('product_id', $request->product_id)->get()->first();
+        if($stock->quantity !== null && $stock->quantity > 0) {
+            $stock->quantity = $stock->quantity + $request->number;
+        } else {
+            $stock->quantity = $request->number;
+        }
+        if ($set->update() && $stock->update() && $product->update()) {
             foreach ($set->products() as $product) {
                 $requiredStock = $product->stock * $request->number;
                 $this->updateProductStock($product->id, $requiredStock);
