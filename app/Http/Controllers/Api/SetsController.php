@@ -18,7 +18,10 @@ class SetsController extends Controller
     public function index()
     {
         $sets = [];
-        foreach (Set::get() as $item) {
+        $getSets = Set::leftJoin('products', 'products.id', '=', 'sets.product_id')
+            ->select('sets.id as id', 'products.name as name', 'products.symbol as number', 'products.stock_product as stock', 'products.*', 'sets.*')
+            ->get();
+        foreach ($getSets as $item) {
             $sets[$item->id] = [
                 'set' => $item,
                 'products' => $item->products()
@@ -30,7 +33,11 @@ class SetsController extends Controller
 
     public function set(Set $set)
     {
-        $set = Set::where('id', $set->id)->get()->first();
+        $set = Set::where('sets.id', $set->id)
+            ->leftJoin('products', 'products.id', '=', 'sets.product_id')
+            ->select('sets.id as id', 'products.name as name', 'products.symbol as number', 'products.stock_product as stock', 'products.*', 'sets.*')
+            ->get()
+            ->first();
 
         return  [
             'set' => $set,
@@ -103,33 +110,7 @@ class SetsController extends Controller
                 'error_message' => __('sets.messages.error')
             ]),500);
         }
-        if($request->has('name') && $request->has('symbol') && $request->has('price')) {
-            $product = new Product;
-            $product->name = $request->name;
-            $product->symbol = $request->symbol;
-            $product->trade_group_name = '';
 
-            if ($product->save()) {
-                $productPrice = new ProductPrice;
-                $productPrice->product_id = $product->id;
-                $productPrice->vat = 23;
-                $productPrice->allegro_selling_gross_commercial_price = $request->price;
-
-                if ($productPrice->save()) {
-                    $set = new Set;
-                    $set->name = $product->name;
-                    $set->number = $product->symbol;
-                    $set->stock = 0;
-                    $set->product_id = $product->id;
-
-                    if ($set->save()) {
-                        return response(json_encode([
-                            'set' => $set,
-                        ]), 200);
-                    }
-                }
-            }
-        }
         return response(json_encode([
             'error_code' => 500,
             'error_message' => __('sets.messages.error')
@@ -145,9 +126,11 @@ class SetsController extends Controller
 
         $set->name = $request->name;
         $set->number = $request->number;
-        $set->stock = $request->stock;
+        $product = Product::where('id', $set->product_id)->get();
+        $product->name = $request->name;
+        $product->symbol = $request->number;
 
-        if ($set->update()) {
+        if ($set->update() && $product->update()) {
             return response(json_encode([
                 'set' => $set,
             ]),200);

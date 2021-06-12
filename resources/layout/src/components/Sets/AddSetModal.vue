@@ -7,11 +7,6 @@
           <span @click="$emit('close')" class="close">X</span>
       </div>
       <div class="content">
-        <template v-if="buttonsVisible">
-          <button class="btn btn-sm btn-success" @click="togggleCreateNewSet()">Stwórz nowy zestaw</button>
-          <button class="btn btn-sm btn-warning" @click="togggleNewSetFromProduct()">Stwórz nowy zestaw z istniejącego produktu</button>
-        </template>
-        <template v-if="newSetFromProduct">
           <button class="btn btn-sm btn-info return" @click="togggleButtonVisible()">Powrót</button>
           <div class="form-group">
             <label>Wyszukaj produkt</label>
@@ -23,25 +18,6 @@
             </select>
             <button @click="createSetFromProduct()" class="btn btn-success btn-create">Stwórz</button>
           </template>
-        </template>
-        <template v-if="createNewSet">
-          <button @click="togggleButtonVisible()" class="btn btn-sm btn-info return">Powrót</button>
-          <div class="product_stocks-general" id="general">
-            <div class="form-group">
-              <label for="name">Nazwa</label>
-              <input type="text" class="form-control" id="name" v-model="name">
-            </div>
-            <div class="form-group">
-              <label for="number">Symbol</label>
-              <input type="text" class="form-control" id="number" v-model="symbol">
-            </div>
-            <div class="form-group">
-              <label for="number">Cena(domyślna)</label>
-              <input type="number" class="form-control" id="price" v-model="price">
-            </div>
-          </div>
-          <button class="btn btn-sm btn-success" @click="createSet()">Stwórz</button>
-        </template>
       </div>
     </div>
   </div>
@@ -56,8 +32,6 @@ import { CreateSetParams, Set, SetProduct, SetsProductParams } from '@/types/Set
 })
 export default class AddSetModal extends Vue {
   public buttonsVisible = true
-  public newSetFromProduct = false
-  public createNewSet = false
   public word = ''
   public name = ''
   public symbol = ''
@@ -73,18 +47,14 @@ export default class AddSetModal extends Vue {
 
   public togggleButtonVisible (): void {
     this.buttonsVisible = true
-    this.newSetFromProduct = false
-    this.createNewSet = false
   }
 
   public togggleNewSetFromProduct (): void {
     this.buttonsVisible = false
-    this.newSetFromProduct = true
   }
 
   public togggleCreateNewSet (): void {
     this.buttonsVisible = false
-    this.createNewSet = true
   }
 
   public get products (): SetProduct[] {
