@@ -19,10 +19,13 @@ class SetsController extends Controller
     {
         $sets = [];
         $getSets = Set::leftJoin('products', 'products.id', '=', 'sets.product_id')
-            ->leftJoin('product_stocks', 'product_stocks.product_id', '=', 'sets.product_id')
-            ->select('sets.id as id', 'products.name as name', 'products.symbol as number', 'product_stocks.quantity as stock', 'products.*', 'sets.*')
+            ->select('sets.id as id', 'products.name as name', 'products.symbol as number', 'products.stock_product as stock', 'products.*', 'sets.*')
             ->get();
         foreach ($getSets as $item) {
+            $stock = ProductStock::where('id', $item->product_id)->get()->first();
+            if($stock) {
+                $item->stock = $stock->quantity;
+            }
             $sets[$item->id] = [
                 'set' => $item,
                 'products' => $item->products()
@@ -35,10 +38,15 @@ class SetsController extends Controller
     public function set(Set $set)
     {
         $set = Set::where('sets.id', $set->id)
-            ->leftJoin('product_stocks', 'product_stocks.product_id', '=', 'sets.product_id')
-            ->select('sets.id as id', 'products.name as name', 'products.symbol as number', 'product_stocks.quantity as stock', 'products.*', 'sets.*')
+            ->leftJoin('products', 'products.id', '=', 'sets.product_id')
+            ->select('sets.id as id', 'products.name as name', 'products.symbol as number', 'products.stock_product as stock', 'products.*', 'sets.*')
             ->get()
             ->first();
+
+        $stock = ProductStock::where('id', $set->product_id)->get()->first();
+        if($stock) {
+            $set->stock = $stock->quantity;
+        }
 
         return  [
             'set' => $set,
@@ -161,9 +169,9 @@ class SetsController extends Controller
         ]);
 
         $stock = ProductStock::where('id', $request->product_id)->get()->first();
+        $setStock = ProductStock::where('id', $set->product_id)->get()->first()->quantity;
         if(!is_null($stock)) {
-            $requiredStock = $set->stock * $request->stock;
-
+            $requiredStock = $setStock * $request->stock;
 
             //The number of products must be greater than the number of sets multiplied by the number of products in one package.
             if ($stock->quantity >= $requiredStock) {
@@ -246,31 +254,23 @@ class SetsController extends Controller
             'number' => 'required',
         ]);
 
+        $setProductStock = ProductStock::where('product_id', $set->product_id)->get()->first();
+
         foreach ($set->products() as $product) {
-            $stock = ProductStock::where('product_id', $product->id)->get()->first();
+            $stock = ProductStock::where('product_id', $product->product_id)->get()->first();
             $requiredStock = $product->stock * $request->number;
             if($stock->quantity < $requiredStock) {
                 return response(json_encode([
                     'error_code' => 500,
-                    'error_message' => __('sets.messages.not_enough_product')."'".$product->name."'"
+                    'error_message' => __('sets.messages.not_enough_product')."'".$product->name."'".$product->id."   ".$stock->quantity.'     '.$product->stock * $request->number
                 ]),500);
             }
         }
 
-        $set->stock = $set->stock + $request->number;
-        $stock->quantity = Product::where('id', $set->product_id)->get()->first();
-        if($stock->quantity->stock_product !== null && $product->stock_product > 0) {
-            $product->stock_product = $product->stock_product + $request->number;
-        } else {
-            $product->stock_product = $request->number;
-        }
-        $stock = ProductStock::where('product_id', $request->product_id)->get()->first();
-        if($stock->quantity !== null && $stock->quantity > 0) {
-            $stock->quantity = $stock->quantity + $request->number;
-        } else {
-            $stock->quantity = $request->number;
-        }
-        if ($set->update() && $stock->update() && $product->update()) {
+        $setProductStock->quantity = $setProductStock->quantity + $request->number;
+
+
+        if ($setProductStock->update()) {
             foreach ($set->products() as $product) {
                 $requiredStock = $product->stock * $request->number;
                 $this->updateProductStock($product->id, $requiredStock);
