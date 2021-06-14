@@ -1,13 +1,13 @@
 <template>
   <div class="c-productsSets" v-if="sets">
-    <div v-for="(item, index) in sets" :key="index" :productId="item.set.product_id">
-      <div v-if="Number(productId) === Number(item.set.product_id)">
+    <div v-for="(item, index) in sets" :key="index">
+      <template v-if="Number(productId) === Number(item.set.product_id)">
         <p class="title">Produkty w 1 sztuce zestawu: </p>
         <div v-for="product in item.products" :key="product.id" class="list">
           <img class="image" :src="product.url_for_website">
           {{ product.name }} <span class="count">sztuk: {{ product.stock }}</span>
         </div>
-      </div>
+      </template>
     </div>
     <debugger :keepAlive="true" :components="$children"></debugger>
   </div>
