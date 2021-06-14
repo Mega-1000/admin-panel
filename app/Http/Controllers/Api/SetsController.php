@@ -292,12 +292,21 @@ class SetsController extends Controller
             'number' => 'required',
         ]);
 
-        $setsNumber = $set->stock - $request->number;
-        $oldStock = $set->stock;
+        $setProductStock = ProductStock::where('product_id', $set->product_id)->get()->first();
+        $position = ProductStockPosition::where('product_stock_id', $set->product_id)->get()->first();
+        $setsNumber = $setProductStock->quantity - $request->number;
+        $oldStock = $setProductStock->quantity;
+        $firstPositionNumber = $position->position_quantity - $request->number;
+        if($firstPositionNumber < 0) {
+            return response(json_encode([
+                'error_code' => 500,
+                'error_message' => "Przenieś na pierwszą pozycje w magazynie komplety aby móc je zdekompletować"
+            ]),500);
+        }
 
-        $set->stock = ($setsNumber < 0) ? 0 : $setsNumber;
-
-        if ($set->update()) {
+        $setProductStock->quantity = ($setsNumber < 0) ? 0 : $setsNumber;
+        $position->position_quantity = $firstPositionNumber;
+        if ($setProductStock->update() && $position->update()) {
             foreach ($set->products() as $product) {
                 $requiredStock = $product->stock * (($setsNumber < 0) ? $oldStock : $setsNumber);
                 $this->updateProductStock($product->id, -$requiredStock);
