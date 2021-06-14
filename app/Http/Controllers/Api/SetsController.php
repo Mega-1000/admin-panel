@@ -18,7 +18,14 @@ class SetsController extends Controller
     public function index()
     {
         $sets = [];
-        foreach (Set::get() as $item) {
+        $getSets = Set::leftJoin('products', 'products.id', '=', 'sets.product_id')
+            ->select('sets.id as id', 'products.name as name', 'products.symbol as number', 'products.stock_product as stock', 'products.*', 'sets.*')
+            ->get();
+        foreach ($getSets as $item) {
+            $stock = ProductStock::where('id', $item->product_id)->get()->first();
+            if($stock) {
+                $item->stock = $stock->quantity;
+            }
             $sets[$item->id] = [
                 'set' => $item,
                 'products' => $item->products()
@@ -30,7 +37,16 @@ class SetsController extends Controller
 
     public function set(Set $set)
     {
-        $set = Set::where('id', $set->id)->get()->first();
+        $set = Set::where('sets.id', $set->id)
+            ->leftJoin('products', 'products.id', '=', 'sets.product_id')
+            ->select('sets.id as id', 'products.name as name', 'products.symbol as number', 'products.stock_product as stock', 'products.*', 'sets.*')
+            ->get()
+            ->first();
+
+        $stock = ProductStock::where('id', $set->product_id)->get()->first();
+        if($stock) {
+            $set->stock = $stock->quantity;
+        }
 
         return  [
             'set' => $set,
@@ -103,33 +119,7 @@ class SetsController extends Controller
                 'error_message' => __('sets.messages.error')
             ]),500);
         }
-        if($request->has('name') && $request->has('symbol') && $request->has('price')) {
-            $product = new Product;
-            $product->name = $request->name;
-            $product->symbol = $request->symbol;
-            $product->trade_group_name = '';
 
-            if ($product->save()) {
-                $productPrice = new ProductPrice;
-                $productPrice->product_id = $product->id;
-                $productPrice->vat = 23;
-                $productPrice->allegro_selling_gross_commercial_price = $request->price;
-
-                if ($productPrice->save()) {
-                    $set = new Set;
-                    $set->name = $product->name;
-                    $set->number = $product->symbol;
-                    $set->stock = 0;
-                    $set->product_id = $product->id;
-
-                    if ($set->save()) {
-                        return response(json_encode([
-                            'set' => $set,
-                        ]), 200);
-                    }
-                }
-            }
-        }
         return response(json_encode([
             'error_code' => 500,
             'error_message' => __('sets.messages.error')
@@ -145,9 +135,11 @@ class SetsController extends Controller
 
         $set->name = $request->name;
         $set->number = $request->number;
-        $set->stock = $request->stock;
+        $product = Product::where('id', $set->product_id)->get();
+        $product->name = $request->name;
+        $product->symbol = $request->number;
 
-        if ($set->update()) {
+        if ($set->update() && $product->update()) {
             return response(json_encode([
                 'set' => $set,
             ]),200);
@@ -177,9 +169,9 @@ class SetsController extends Controller
         ]);
 
         $stock = ProductStock::where('id', $request->product_id)->get()->first();
+        $setStock = ProductStock::where('id', $set->product_id)->get()->first()->quantity;
         if(!is_null($stock)) {
-            $requiredStock = $set->stock * $request->stock;
-
+            $requiredStock = $setStock * $request->stock;
 
             //The number of products must be greater than the number of sets multiplied by the number of products in one package.
             if ($stock->quantity >= $requiredStock) {
@@ -262,20 +254,23 @@ class SetsController extends Controller
             'number' => 'required',
         ]);
 
+        $setProductStock = ProductStock::where('product_id', $set->product_id)->get()->first();
+
         foreach ($set->products() as $product) {
-            $stock = ProductStock::where('product_id', $product->id)->get()->first();
+            $stock = ProductStock::where('product_id', $product->product_id)->get()->first();
             $requiredStock = $product->stock * $request->number;
             if($stock->quantity < $requiredStock) {
                 return response(json_encode([
                     'error_code' => 500,
-                    'error_message' => __('sets.messages.not_enough_product')."'".$product->name."'"
+                    'error_message' => __('sets.messages.not_enough_product')."'".$product->name."'".$product->id."   ".$stock->quantity.'     '.$product->stock * $request->number
                 ]),500);
             }
         }
 
-        $set->stock = $set->stock + $request->number;
+        $setProductStock->quantity = $setProductStock->quantity + $request->number;
 
-        if ($set->update()) {
+
+        if ($setProductStock->update()) {
             foreach ($set->products() as $product) {
                 $requiredStock = $product->stock * $request->number;
                 $this->updateProductStock($product->id, $requiredStock);
@@ -297,12 +292,21 @@ class SetsController extends Controller
             'number' => 'required',
         ]);
 
-        $setsNumber = $set->stock - $request->number;
-        $oldStock = $set->stock;
+        $setProductStock = ProductStock::where('product_id', $set->product_id)->get()->first();
+        $position = ProductStockPosition::where('product_stock_id', $set->product_id)->get()->first();
+        $setsNumber = $setProductStock->quantity - $request->number;
+        $oldStock = $setProductStock->quantity;
+        $firstPositionNumber = $position->position_quantity - $request->number;
+        if($firstPositionNumber < 0) {
+            return response(json_encode([
+                'error_code' => 500,
+                'error_message' => "Przenieś na pierwszą pozycje w magazynie komplety aby móc je zdekompletować"
+            ]),500);
+        }
 
-        $set->stock = ($setsNumber < 0) ? 0 : $setsNumber;
-
-        if ($set->update()) {
+        $setProductStock->quantity = ($setsNumber < 0) ? 0 : $setsNumber;
+        $position->position_quantity = $firstPositionNumber;
+        if ($setProductStock->update() && $position->update()) {
             foreach ($set->products() as $product) {
                 $requiredStock = $product->stock * (($setsNumber < 0) ? $oldStock : $setsNumber);
                 $this->updateProductStock($product->id, -$requiredStock);
