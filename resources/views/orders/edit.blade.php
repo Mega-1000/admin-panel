@@ -2543,7 +2543,9 @@
             </div>
         </div>
     </div>
-    <div id="disabled-actionTracker"></div>
+    <div class="vue-components">
+        <tracker :enabled="true"/>
+    </div>
     <style>
         .firstOrder, .secondOrder, .thirdOrder, .fourthOrder, .fifthOrder {
             display: none;
