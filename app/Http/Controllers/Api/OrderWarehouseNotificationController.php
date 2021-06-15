@@ -16,6 +16,7 @@ use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Repositories\OrderInvoiceRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\OrderWarehouseNotificationRepository;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
@@ -75,6 +76,9 @@ class OrderWarehouseNotificationController extends Controller
         try {
             $data = $request->validated();
             $data['waiting_for_response'] = false;
+
+            $data['realization_date'] = $data['realization_date_from'];
+            $data['possible_delay_days'] = Carbon::parse($data['realization_date_from'])->diffInDays(Carbon::parse($data['realization_date_to']));
             $notification = $this->orderWarehouseNotificationRepository->update($data, $notificationId);
 
             if (!empty($data['customer_notices'])) {
@@ -84,6 +88,12 @@ class OrderWarehouseNotificationController extends Controller
             $notification->order->shipment_date = $notification->realization_date;
             $notification->order->shipment_start_days_variation = $notification->possible_delay_days;
             $notification->order->save();
+            $notification->order->dates->update([
+                'warehouse_shipment_date_from' => Carbon::parse($data['realization_date_from']),
+                'warehouse_shipment_date_to' => Carbon::parse($data['realization_date_to']),
+                'warehouse_acceptance' => true,
+                'message' => 'Magazyn <strong>wprowadził</strong> daty dotyczące przesyłki.'
+            ]);
 
             dispatch_now(new DispatchLabelEventByNameJob($data['order_id'], "warehouse-notification-accepted"));
 
