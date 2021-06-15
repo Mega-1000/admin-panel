@@ -17,7 +17,8 @@ export interface SetProduct {
   producent_override: string,
   product_id: number,
   stock: number,
-  symbol: string
+  symbol: string,
+  url_for_website: string
 }
 
 export interface Set {

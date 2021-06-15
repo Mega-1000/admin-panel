@@ -1,5 +1,5 @@
 <template>
-  <div class="c-productTable">
+  <div class="c-productTable" v-if="set.set.stock === 0">
     <div class="form-group">
       <label>Wyszukaj produkt, aby dodać do zestawu</label>
       <input type="text" class="form-control" v-on:keyup="searchProducts()" v-model="word">
