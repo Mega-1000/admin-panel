@@ -40,10 +40,11 @@
               <label>Ilość zestawów</label>
               <input type="number" class="form-control" name="number" min="1" v-model="completingSet[index]">
             </div>
-            <button class="btn btn-sm btn-primary" type="submit">
+            <button class="btn btn-sm btn-primary" type="submit" v-if="item.products.length > 0">
               <i class="voyager-double-up"></i>
               <span class="hidden-xs hidden-sm" @click="completing(item, completingSet[index])">Stwórz</span>
             </button>
+            <p v-else>Dodaj produkty aby móc skompletować nowe zestawy</p>
           </td>
           <td>
             <div class="form-group">
@@ -56,9 +57,13 @@
             </button>
           </td>
           <td>
-            <a class="btn btn-sm btn-primary" :href="getSetEditLink(index)">
+            <a class="btn btn-sm btn-primary" :href="getSetEditLink(index)" v-if="item.set.stock === 0">
               <i class="voyager-pen"></i>
-              <span class="hidden-xs hidden-sm">Edytuj</span>
+              <span class="hidden-xs hidden-sm">Zarządzaj produktami w zestawie</span>
+            </a>
+            <a class="btn btn-sm btn-primary" :href="getProductEditLink(item.set.product_id)">
+              <i class="voyager-pen"></i>
+              <span class="hidden-xs hidden-sm">Przejdź do produktu</span>
             </a>
             <button class="btn btn-sm btn-danger" type="submit" @click="deleteSet(index)">
               <i class="voyager-trash"></i>
@@ -115,6 +120,10 @@ export default class SetsList extends Vue {
 
   public getSetEditLink (setId: string): string {
     return getFullUrl('admin/products/sets/' + setId + '/edytuj')
+  }
+
+  public getProductEditLink (productId: string): string {
+    return getFullUrl('admin/products/stocks/' + productId + '/edit')
   }
 
   public get addSetLink (): string {

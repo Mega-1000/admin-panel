@@ -9,7 +9,7 @@
       <div class="content">
         <ul>
           <li v-for="product in products" :key="product.id">
-            <a :href="getProductUrl(product.id)" target="_blank">
+            <a :href="getProductUrl(product.product_id)" target="_blank">
               <span>{{ product.symbol }}</span> => {{ product.name }} <span>Wymagana Ilość: {{ product.stock*count }}</span>
             </a>
           </li>

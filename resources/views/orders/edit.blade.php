@@ -645,6 +645,9 @@
                         <td colspan="4"><h4><img src="{!! $item->product->url_for_website !!}"
                                                  style="width: 179px; height: 130px;"><strong>{{ $loop->iteration }}
                                     . </strong>{{ $item->product->name }} (symbol: {{ $item->product->symbol }}) </h4>
+                            <div class="vue-components">
+                                <products-sets product-id="{{$item->product->id}}"></products-sets>
+                            </div>
                         </td>
 
                         <input name="id[{{$item->id}}]"
@@ -2540,7 +2543,9 @@
             </div>
         </div>
     </div>
-    <div id="disabled-actionTracker"></div>
+    <div class="vue-components">
+        <tracker :enabled="true"/>
+    </div>
     <style>
         .firstOrder, .secondOrder, .thirdOrder, .fourthOrder, .fifthOrder {
             display: none;
