@@ -58,7 +58,8 @@ const actions = {
         return data
       })
       .catch((error: any) => {
-        commit(SETS_SET_ERROR, error.message)
+        console.log(error)
+        commit(SETS_SET_ERROR, 'Wystąpił nieoczekiwany błąd. Spróbuj później.')
       })
   },
   completing ({ commit }: any, set: SetsCount) {
@@ -75,7 +76,8 @@ const actions = {
         return data
       })
       .catch((error: any) => {
-        commit(SETS_SET_ERROR, error.message)
+        console.log(error)
+        commit(SETS_SET_ERROR, 'Wystąpił nieoczekiwany błąd. Spróbuj później.')
       })
   },
   disassembly ({ commit }: any, set: SetsCount) {
@@ -92,7 +94,8 @@ const actions = {
         return data
       })
       .catch((error: any) => {
-        commit(SETS_SET_ERROR, error.message)
+        console.log(error)
+        commit(SETS_SET_ERROR, 'Wystąpił nieoczekiwany błąd. Spróbuj później.')
       })
   },
   delete ({ commit }: any, id: number) {
@@ -109,7 +112,8 @@ const actions = {
         return data
       })
       .catch((error: any) => {
-        commit(SETS_SET_ERROR, error.message)
+        console.log(error)
+        commit(SETS_SET_ERROR, 'Wystąpił nieoczekiwany błąd. Spróbuj później.')
       })
   },
   loadProducts ({ commit }: any, params: SetsProductParams) {
@@ -127,7 +131,8 @@ const actions = {
         return data
       })
       .catch((error: any) => {
-        commit(SETS_SET_ERROR, error.message)
+        console.log(error)
+        commit(SETS_SET_ERROR, 'Wystąpił nieoczekiwany błąd. Spróbuj później.')
       })
   },
   loadSet ({ commit }: any, id: number) {
@@ -145,7 +150,7 @@ const actions = {
       })
       .catch((error: any) => {
         console.log(error)
-        commit(SETS_SET_ERROR, error.message)
+        commit(SETS_SET_ERROR, 'Wystąpił nieoczekiwany błąd. Spróbuj później.')
       })
   },
   updateSet ({ commit }: any, set: SetParams) {
@@ -162,7 +167,7 @@ const actions = {
       })
       .catch((error: any) => {
         console.log(error)
-        commit(SETS_SET_ERROR, error.message)
+        commit(SETS_SET_ERROR, 'Wystąpił nieoczekiwany błąd. Spróbuj później.')
       })
   },
   cerateSetFromProduct ({ commit }: any, productId: number) {
@@ -179,7 +184,7 @@ const actions = {
       })
       .catch((error: any) => {
         console.log(error)
-        commit(SETS_SET_ERROR, error.message)
+        commit(SETS_SET_ERROR, 'Wystąpił nieoczekiwany błąd. Spróbuj później.')
       })
   },
   cerateSet ({ commit }: any, params: CreateSetParams) {
@@ -196,7 +201,7 @@ const actions = {
       })
       .catch((error: any) => {
         console.log(error)
-        commit(SETS_SET_ERROR, error.message)
+        commit(SETS_SET_ERROR, 'Wystąpił nieoczekiwany błąd. Spróbuj później.')
       })
   },
   addSetProduct ({ commit }: any, params: SetProductParams) {
@@ -213,7 +218,7 @@ const actions = {
       })
       .catch((error: any) => {
         console.log(error)
-        commit(SETS_SET_ERROR, error.message)
+        commit(SETS_SET_ERROR, 'Wystąpił nieoczekiwany błąd. Spróbuj później.')
       })
   },
   updateSetProduct ({ commit }: any, params: SetProductParams) {
@@ -247,7 +252,7 @@ const actions = {
       })
       .catch((error: any) => {
         console.log(error)
-        commit(SETS_SET_ERROR, error.message)
+        commit(SETS_SET_ERROR, 'Wystąpił nieoczekiwany błąd. Spróbuj później.')
       })
   },
   getProductsStocks ({ commit }: any, setId: number) {
@@ -265,7 +270,7 @@ const actions = {
       })
       .catch((error: any) => {
         console.log(error)
-        commit(SETS_SET_ERROR, error.message)
+        commit(SETS_SET_ERROR, 'Wystąpił nieoczekiwany błąd. Spróbuj później.')
       })
   }
 }
