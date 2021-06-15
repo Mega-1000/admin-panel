@@ -160,7 +160,9 @@
         </div>
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
     </form>
-    <div id="disabled-actionTracker"></div>
+    <div class="vue-components">
+        <tracker :enabled="true"/>
+    </div>
 @endsection
 @section('datatable-scripts')
     <script>

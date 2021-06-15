@@ -887,7 +887,9 @@
         </tr>
         </thead>
     </table>
-    <div id="disabled-actionTracker"></div>
+    <div class="vue-components">
+        <tracker :enabled="true"/>
+    </div>
     @include('bonus.modal')
 @endsection
 
