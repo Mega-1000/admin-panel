@@ -9,6 +9,7 @@
     <dates-table
       @modify="toggleShowModifyDatesModal"
       @accept="saveAccept"
+      @acceptAsCustomer="acceptAsCustomer"
       :user-type="getUserType()"
     ></dates-table>
     <modify-date-modal
@@ -25,7 +26,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import DatesTable from '@/components/Orders/Dates/DatesTable.vue'
 import ModifyDateModal from '@/components/Orders/Dates/ModifyDateModal.vue'
-import { Acceptance, AcceptDatesParams, Dates } from '@/types/OrdersTypes'
+import { Acceptance, AcceptAsCustomerParams, AcceptDatesParams, Dates } from '@/types/OrdersTypes'
 import { USER_TYPES } from '@/constant/Orders'
 
 @Component({
@@ -37,6 +38,7 @@ import { USER_TYPES } from '@/constant/Orders'
 export default class OrderDates extends Vue {
   @Prop() public orderId!: number
   @Prop({ default: 'u' }) public userType!: string
+  @Prop() public chatId!: number
 
   public showModal = false;
   public type: string | null = null;
@@ -44,6 +46,14 @@ export default class OrderDates extends Vue {
   public toggleShowModifyDatesModal (type: string): void {
     this.type = type
     this.showModal = !this.showModal
+  }
+
+  public async acceptAsCustomer (): Promise<void> {
+    const params: AcceptAsCustomerParams = {
+      orderId: this.orderId,
+      chatId: this.chatId
+    }
+    await this.$store?.dispatch('OrdersService/saveAcceptAsCustomer', params)
   }
 
   public get error (): Dates[] {

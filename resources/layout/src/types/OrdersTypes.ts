@@ -38,4 +38,9 @@ export interface UpdateDatesParams {
   deliveryDateTo: string
 }
 
+export interface AcceptAsCustomerParams{
+  orderId: number,
+  chatId: number
+}
+
 /* eslint-enabled camelcase */

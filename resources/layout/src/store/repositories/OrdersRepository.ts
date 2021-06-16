@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { getFullUrl } from '@/helpers/urls'
-import { AcceptDatesParams, UpdateDatesParams } from '@/types/OrdersTypes'
+import { AcceptAsCustomerParams, AcceptDatesParams, UpdateDatesParams } from '@/types/OrdersTypes'
 
 export default {
   async getDates (orderId: number): Promise<any> {
@@ -30,6 +30,23 @@ export default {
       body: JSON.stringify({
         type: params.type,
         userType: params.userType
+      })
+    }).then((response) => {
+      return response.json()
+    })
+  },
+
+  async acceptDatesAsCustomer (params: AcceptAsCustomerParams): Promise<any> {
+    return fetch(getFullUrl('api/orders/' + params.orderId + '/acceptDatesAsCustomer'), {
+      method: 'PUT',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/json; charset=utf-8',
+        'X-Requested-Width': 'XMLHttpRequest'
+      }),
+      body: JSON.stringify({
+        orderId: params.orderId,
+        chatId: params.chatId
       })
     }).then((response) => {
       return response.json()

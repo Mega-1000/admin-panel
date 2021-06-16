@@ -5,14 +5,12 @@ namespace App\Http\Controllers;
 use App\Entities\Employee;
 use App\Entities\Firm;
 use App\Entities\PostalCodeLatLon;
-use App\User;
 use Illuminate\Http\Request;
 use App\Helpers\MessagesHelper;
 use App\Helpers\Exceptions\ChatException;
 use App\Entities\Chat;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 

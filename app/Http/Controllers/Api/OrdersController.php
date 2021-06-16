@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Entities\Chat;
 use App\Entities\OrderDates;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\ChatHelper;
@@ -28,7 +27,6 @@ use App\Http\Controllers\Controller;
 use App\Repositories\ProductRepository;
 use App\Repositories\ProductPriceRepository;
 use App\Services\ProductService;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
@@ -297,7 +295,18 @@ class OrdersController extends Controller
             $invoiceAddress = $order->addresses->where('type', '=', 'INVOICE_ADDRESS')->first();
 
             $order->shipment_date = $request->get('shipment_date');
-            $order->dates()->updateOrCreate(['order_id' => $orderId], $request->all());
+            $order->dates()->updateOrCreate(
+                [
+                    'order_id' => $orderId,
+                ],
+                array_merge(
+                    $request->all(),
+                    [
+                        'customer_acceptance' => true,
+                        'message' => 'Klient uzupełnił preferowane daty nadania przesyłki. Proszę o weryfikacje'
+                    ]
+                )
+            );
             $order->save();
 
             if (!empty($request->get('delivery_description'))) {
@@ -517,22 +526,22 @@ class OrdersController extends Controller
         }
         return [
             'customer' => [
-                'delivery_date_from' => $dates->customer_delivery_date_from,
-                'delivery_date_to' => $dates->customer_delivery_date_to,
-                'shipment_date_from' => $dates->customer_shipment_date_from,
-                'shipment_date_to' => $dates->customer_shipment_date_to,
+                'delivery_date_from' => $dates->getDateAttribute('customer_delivery_date_from'),
+                'delivery_date_to' => $dates->getDateAttribute('customer_delivery_date_to'),
+                'shipment_date_from' => $dates->getDateAttribute('customer_shipment_date_from'),
+                'shipment_date_to' => $dates->getDateAttribute('customer_shipment_date_to'),
             ],
             'consultant' => [
-                'delivery_date_from' => $dates->consultant_delivery_date_from,
-                'delivery_date_to' => $dates->consultant_delivery_date_to,
-                'shipment_date_from' => $dates->consultant_shipment_date_from,
-                'shipment_date_to' => $dates->consultant_shipment_date_to,
+                'delivery_date_from' => $dates->getDateAttribute('consultant_delivery_date_from'),
+                'delivery_date_to' => $dates->getDateAttribute('consultant_delivery_date_to'),
+                'shipment_date_from' => $dates->getDateAttribute('consultant_shipment_date_from'),
+                'shipment_date_to' => $dates->getDateAttribute('consultant_shipment_date_to'),
             ],
             'warehouse' => [
-                'delivery_date_from' => $dates->warehouse_delivery_date_from,
-                'delivery_date_to' => $dates->warehouse_delivery_date_to,
-                'shipment_date_from' => $dates->warehouse_shipment_date_from,
-                'shipment_date_to' => $dates->warehouse_shipment_date_to,
+                'delivery_date_from' => $dates->getDateAttribute('warehouse_delivery_date_from'),
+                'delivery_date_to' => $dates->getDateAttribute('warehouse_delivery_date_to'),
+                'shipment_date_from' => $dates->getDateAttribute('warehouse_shipment_date_from'),
+                'shipment_date_to' => $dates->getDateAttribute('warehouse_shipment_date_to'),
             ],
             'acceptance' => [
                 'customer' => $dates->customer_acceptance,
@@ -550,10 +559,10 @@ class OrdersController extends Controller
         /** @var OrderDates $dates */
         $dates = $order->dates;
             $result = $order->dates()->update([
-                $request->userType . '_delivery_date_from' => $dates->getAttribute($request->type . '_delivery_date_from'),
-                $request->userType . '_delivery_date_to' => $dates->getAttribute($request->type . '_delivery_date_to'),
-                $request->userType . '_shipment_date_from' => $dates->getAttribute($request->type . '_shipment_date_from'),
-                $request->userType . '_shipment_date_to' => $dates->getAttribute($request->type . '_shipment_date_to'),
+                $request->userType . '_delivery_date_from' => $dates->getDateAttribute($request->type . '_delivery_date_from'),
+                $request->userType . '_delivery_date_to' => $dates->getDateAttribute($request->type . '_delivery_date_to'),
+                $request->userType . '_shipment_date_from' => $dates->getDateAttribute($request->type . '_shipment_date_from'),
+                $request->userType . '_shipment_date_to' => $dates->getDateAttribute($request->type . '_shipment_date_to'),
                 $request->userType . '_acceptance' => true,
                 'message' => __('order_dates.' . $request->userType) . ' <strong>zaakceptował</strong> daty dotyczące przesyłki. Proszę o weryfikacje i akceptacje'
 
@@ -569,10 +578,10 @@ class OrdersController extends Controller
                     'message' => $order->dates->message,
                 ],
                 $request->userType =>[
-                    'delivery_date_from' => $dates->getAttribute($request->type . '_delivery_date_from'),
-                    'delivery_date_to' => $dates->getAttribute($request->type . '_delivery_date_to'),
-                    'shipment_date_from' => $dates->getAttribute($request->type . '_shipment_date_from'),
-                    'shipment_date_to' => $dates->getAttribute($request->type . '_shipment_date_to'),
+                    'delivery_date_from' => $dates->getDateAttribute($request->type . '_delivery_date_from'),
+                    'delivery_date_to' => $dates->getDateAttribute($request->type . '_delivery_date_to'),
+                    'shipment_date_from' => $dates->getDateAttribute($request->type . '_shipment_date_from'),
+                    'shipment_date_to' => $dates->getDateAttribute($request->type . '_shipment_date_to'),
                 ]
             ]), 200);
         }
@@ -608,6 +617,50 @@ class OrdersController extends Controller
                 ],
                 'acceptance' => [
                     $request->type => true,
+                    'message' => $order->dates->message,
+                ]
+            ]), 200);
+        }
+        return response(json_encode([
+            'error_code' => 500,
+            'error_message' => __('order_dates.messages.error')
+        ]), 500);
+    }
+
+    public function acceptDatesAsCustomer(Order $order, Request $request)
+    {
+        $result = $order->dates()->update([
+            'customer_shipment_date_from' => $order->dates->consultant_shipment_date_from,
+            'customer_shipment_date_to' => $order->dates->consultant_shipment_date_to,
+            'customer_delivery_date_from' => $order->dates->consultant_delivery_date_from,
+            'customer_delivery_date_to' => $order->dates->consultant_delivery_date_to,
+            'customer_acceptance' => true,
+            'message' => 'Konsultant <strong>zaakceptował</strong> daty dotyczące przesyłki w imieniu klienta.'
+        ]);
+
+        if ($request->has('chatId') && $result) {
+            $helper = new MessagesHelper();
+            $helper->chatId = $request->chatId;
+            $helper->currentUserType = MessagesHelper::TYPE_USER;
+            if (empty($helper->getCurrentUser())) {
+                $helper->currentUserId = $helper->getChat()->chatUsers->first()->user_id;
+            }
+            $helper->addMessage('Konsultant zaakceptował daty w imieniu klienta.');
+        }
+
+        if ($result) {
+            $order->dates->refresh();
+            return response(json_encode([
+                'customer' => [
+                    'shipment_date_from' => $order->dates->getDateAttribute('customer_shipment_date_from'),
+                    'shipment_date_to' => $order->dates->getDateAttribute('customer_shipment_date_to'),
+                    'delivery_date_from' => $order->dates->getDateAttribute('customer_delivery_date_from'),
+                    'delivery_date_to' => $order->dates->getDateAttribute('customer_delivery_date_to'),
+                ],
+                'acceptance' => [
+                    'customer' => $order->dates->customer_acceptance,
+                    'consultant' => $order->dates->consultant_acceptance,
+                    'warehouse' => $order->dates->warehouse_acceptance,
                     'message' => $order->dates->message,
                 ]
             ]), 200);

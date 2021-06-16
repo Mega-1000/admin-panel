@@ -13,28 +13,28 @@
     <tr>
       <th scope="row" rowspan="2" class="v-align-middle">Preferowana data nadania</th>
       <th scope="row">Od</th>
-      <td>{{ customerDates.shipment_date_from }}</td>
-      <td>{{ consultantDates.shipment_date_from }}</td>
-      <td>{{ warehouseDates.shipment_date_from }}</td>
+      <td class="text-center">{{ customerDates.shipment_date_from }}</td>
+      <td class="text-center">{{ consultantDates.shipment_date_from }}</td>
+      <td class="text-center">{{ warehouseDates.shipment_date_from }}</td>
     </tr>
     <tr>
       <th scope="row">Do</th>
-      <td>{{ customerDates.shipment_date_to }}</td>
-      <td>{{ consultantDates.shipment_date_to }}</td>
-      <td>{{ warehouseDates.shipment_date_to }}</td>
+      <td class="text-center">{{ customerDates.shipment_date_to }}</td>
+      <td class="text-center">{{ consultantDates.shipment_date_to }}</td>
+      <td class="text-center">{{ warehouseDates.shipment_date_to }}</td>
     </tr>
     <tr>
       <th scope="row" rowspan="2" class="v-align-middle">Preferowana data dostawy</th>
       <th scope="row">Od</th>
-      <td>{{ customerDates.delivery_date_from }}</td>
-      <td>{{ consultantDates.delivery_date_from }}</td>
-      <td>{{ warehouseDates.delivery_date_from }}</td>
+      <td class="text-center">{{ customerDates.delivery_date_from }}</td>
+      <td class="text-center">{{ consultantDates.delivery_date_from }}</td>
+      <td class="text-center">{{ warehouseDates.delivery_date_from }}</td>
     </tr>
     <tr>
       <th scope="row">Do</th>
-      <td>{{ customerDates.delivery_date_to }}</td>
-      <td>{{ consultantDates.delivery_date_to }}</td>
-      <td>{{ warehouseDates.delivery_date_to }}</td>
+      <td class="text-center">{{ customerDates.delivery_date_to }}</td>
+      <td class="text-center">{{ consultantDates.delivery_date_to }}</td>
+      <td class="text-center">{{ warehouseDates.delivery_date_to }}</td>
     </tr>
     <tr>
       <th scope="row" colspan="2" class="text-center">Akceptacja</th>
@@ -51,19 +51,29 @@
     <tr>
       <th scope="row" colspan="2" class="text-center">Akcje</th>
       <td>
-        <div class="btn-group" role="group">
-          <a class="btn btn-sm btn-primary" :class="{ disabled: userType!=='customer'}"
-             @click="$emit('modify','customer')">Modyfikuj</a>
-          <a class="btn btn-sm btn-success" :class="{ disabled: !canAccept('customer')}"
-             @click="$emit('accept','customer')">Akceptuj</a>
+        <div class="row">
+          <div class="btn-group mb-5" role="group">
+            <a class="btn btn-sm btn-primary" :class="{ disabled: userType!=='customer'}"
+               @click="$emit('modify','customer')">Modyfikuj</a>
+            <a class="btn btn-sm btn-success" :class="{ disabled: !canAccept('customer')}"
+               @click="$emit('accept','customer')">Akceptuj</a>
+          </div>
         </div>
       </td>
       <td>
-        <div class="btn-group" role="group">
-          <a class="btn btn-sm btn-primary" :class="{ disabled: userType!=='consultant'}"
-             @click="$emit('modify','consultant')">Modyfikuj</a>
-          <a class="btn btn-sm btn-success" :class="{ disabled: !canAccept('consultant') }"
-             @click="$emit('accept','consultant')">Akceptuj</a>
+        <div class="row text-center">
+          <div class="btn-group" role="group">
+            <a class="btn btn-sm btn-primary" :class="{ disabled: userType!=='consultant'}"
+               @click="$emit('modify','consultant')">Modyfikuj</a>
+            <a class="btn btn-sm btn-success" :class="{ disabled: !canAccept('consultant') }"
+               @click="$emit('accept','consultant')">Akceptuj</a>
+          </div>
+        </div>
+        <div class="row text-center mt-5" v-if="!acceptance.customer">
+          <div class="btn-group" role="group">
+            <a class="btn btn-sm btn-info" :class="{ disabled: canAccept('consultant')}"
+               @click="$emit('acceptAsCustomer')">Akceptuj w imieniu klienta</a>
+          </div>
         </div>
       </td>
       <td>
@@ -123,5 +133,13 @@ export default class DatesTable extends Vue {
 
   .v-align-middle {
     vertical-align: middle;
+  }
+
+  .mb-5 {
+    margin-bottom: 5px;
+  }
+
+  .mt-5 {
+    margin-top: 5px;
   }
 </style>

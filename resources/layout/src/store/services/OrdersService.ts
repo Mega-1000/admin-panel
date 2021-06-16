@@ -4,7 +4,7 @@
 import {
   Dates,
   OrdersStore,
-  Acceptance, AcceptDatesParams, UpdateDatesParams
+  Acceptance, AcceptDatesParams, UpdateDatesParams, AcceptAsCustomerParams
 } from '@/types/OrdersTypes'
 
 import {
@@ -72,6 +72,25 @@ const actions = {
         }
 
         commit(`ORDERS_DATES_SET_${params.userType.toUpperCase()}`, data[params.userType])
+        commit(ORDERS_DATES_SET_ACCEPTANCE, data.acceptance)
+        return data
+      })
+      .catch((error: any) => {
+        commit(ORDERS_DATES_SET_ERROR, error.message)
+      })
+  },
+
+  saveAcceptAsCustomer ({ commit }: any, params: AcceptAsCustomerParams) {
+    commit(ORDERS_DATES_SET_IS_LOADING, true)
+
+    return OrdersRepository.acceptDatesAsCustomer(params)
+      .then((data: any) => {
+        commit(ORDERS_DATES_SET_IS_LOADING, false)
+        if (data.error_code) {
+          commit(ORDERS_DATES_SET_ERROR, data.error_message)
+        }
+
+        commit('ORDERS_DATES_SET_CUSTOMER', data.customer)
         commit(ORDERS_DATES_SET_ACCEPTANCE, data.acceptance)
         return data
       })

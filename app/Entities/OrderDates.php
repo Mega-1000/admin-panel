@@ -39,6 +39,33 @@ class OrderDates extends Model implements Transformable
         'message',
     ];
 
+    protected $dates = [
+        'customer_shipment_date_from',
+        'customer_shipment_date_to',
+        'customer_delivery_date_from',
+        'customer_delivery_date_to',
+        'consultant_shipment_date_from',
+        'consultant_shipment_date_to',
+        'consultant_delivery_date_from',
+        'consultant_delivery_date_to',
+        'warehouse_shipment_date_from',
+        'warehouse_shipment_date_to',
+        'warehouse_delivery_date_from',
+        'warehouse_delivery_date_to',
+        'created_at',
+        'updated_at'
+    ];
+
+    public function getDateAttribute($dateType)
+    {
+        if (!empty($this->$dateType)) {
+            return $this->$dateType->format('Y-m-d');
+        } else {
+            return '';
+        }
+    }
+
+
     /**
      * @return BelongsTo
      */
