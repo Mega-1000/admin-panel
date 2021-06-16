@@ -69,7 +69,7 @@
                @click="$emit('accept','consultant')">Akceptuj</a>
           </div>
         </div>
-        <div class="row text-center mt-5">
+        <div class="row text-center mt-5" v-if="!acceptance.customer">
           <div class="btn-group" role="group">
             <a class="btn btn-sm btn-info" :class="{ disabled: canAccept('consultant')}"
                @click="$emit('acceptAsCustomer')">Akceptuj w imieniu klienta</a>
