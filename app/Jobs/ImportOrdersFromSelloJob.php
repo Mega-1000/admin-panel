@@ -323,6 +323,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $warehouseSymbol = $withWarehouse->first()->packing->warehouse_physical ?? self::DEFAULT_WAREHOUSE;
         $warehouse = Warehouse::where('symbol', $warehouseSymbol)->first();
         $order->warehouse()->associate($warehouse);
+        $order->setDefaultDates();
 
         $order->save();
         if ($transaction->tr_Paid) {
