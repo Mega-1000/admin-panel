@@ -26,8 +26,8 @@ class AcceptShipmentRequest extends FormRequest
         return [
             'order_id' => 'required|numeric',
             'warehouse_id' => 'required|numeric',
-            'realization_date' => 'required|date',
-            'possible_delay_days' => 'required|numeric',
+            'realization_date_from' => 'required|date',
+            'realization_date_to' => 'required|date',
             'file' => 'nullable|min:5',
             'contact_person' => 'required|min:3',
             'contact_person_phone' => 'required|min:7',
