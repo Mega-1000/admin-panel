@@ -140,19 +140,21 @@ class CheckPackagesStatusJob
 
         preg_match($packageStatusRegex, $response, $matches);
 
-        switch($matches[0]) {
-            case DpdPackageStatus::getDescription(DpdPackageStatus::DELIVERED):
-                $package->status = OrderPackage::DELIVERED;
-                break;
-            case DpdPackageStatus::getDescription(DpdPackageStatus::SENDING):
-                $package->status = OrderPackage::SENDING;
-                break;
-            case DpdPackageStatus::getDescription(DpdPackageStatus::WAITING_FOR_SENDING):
-                $package->status = OrderPackage::WAITING_FOR_SENDING;
-                break;
-        }
+        if (!empty($matches)) {
+            switch ($matches[0]) {
+                case DpdPackageStatus::getDescription(DpdPackageStatus::DELIVERED):
+                    $package->status = OrderPackage::DELIVERED;
+                    break;
+                case DpdPackageStatus::getDescription(DpdPackageStatus::SENDING):
+                    $package->status = OrderPackage::SENDING;
+                    break;
+                case DpdPackageStatus::getDescription(DpdPackageStatus::WAITING_FOR_SENDING):
+                    $package->status = OrderPackage::WAITING_FOR_SENDING;
+                    break;
+            }
 
-        $package->save();
+            $package->save();
+        }
     }
 
     /**

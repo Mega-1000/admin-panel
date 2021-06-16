@@ -27,6 +27,7 @@ use App\Http\Controllers\Controller;
 use App\Repositories\ProductRepository;
 use App\Repositories\ProductPriceRepository;
 use App\Services\ProductService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
@@ -299,13 +300,12 @@ class OrdersController extends Controller
                 [
                     'order_id' => $orderId,
                 ],
-                array_merge(
-                    $request->all(),
-                    [
-                        'customer_acceptance' => true,
-                        'message' => 'Klient uzupełnił preferowane daty nadania przesyłki. Proszę o weryfikacje'
-                    ]
-                )
+                [
+                    'customer_shipment_date_from' => Carbon::parse($request->get('customer_shipment_date_from'))->toDate(),
+                    'customer_shipment_date_to' => Carbon::parse($request->get('customer_shipment_date_to'))->toDate(),
+                    'customer_acceptance' => true,
+                    'message' => 'Klient uzupełnił preferowane daty nadania przesyłki. Proszę o weryfikacje'
+                ]
             );
             $order->save();
 
@@ -638,10 +638,16 @@ class OrdersController extends Controller
             'message' => 'Konsultant <strong>zaakceptował</strong> daty dotyczące przesyłki w imieniu klienta.'
         ]);
 
-        if ($request->has('chatId') && $result) {
+        if ($request->get('chatId') && $result) {
             $helper = new MessagesHelper();
-            $helper->chatId = $request->chatId;
+            $helper->orderId = $order->id;
             $helper->currentUserType = MessagesHelper::TYPE_USER;
+            if (empty($request->chatId)) {
+                $helper->createNewChat();
+            } else {
+                $helper->chatId = $request->chatId;
+            }
+
             if (empty($helper->getCurrentUser())) {
                 $helper->currentUserId = $helper->getChat()->chatUsers->first()->user_id;
             }
