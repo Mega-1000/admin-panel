@@ -5,6 +5,7 @@ namespace App\Helpers;
 use App\Entities\Task;
 use App\Entities\TaskSalaryDetails;
 use App\Entities\TaskTime;
+use Illuminate\Support\Facades\Log;
 
 class TaskHelper
 {
@@ -33,6 +34,7 @@ class TaskHelper
             'date_start' => $time['start'],
             'date_end' => $time['end']
         ]);
+        Log::notice('Sprawdzam daty zadania createNewGroup', ['dataStart' => $time['start'], 'dataStop' => $time['end']]);
         TaskSalaryDetails::create([
             'task_id' => $taskNew->id,
             'consultant_value' => 0,
@@ -53,6 +55,7 @@ class TaskHelper
     {
         $taskTime = $task->taskTime;
         $time = TaskTimeHelper::getFirstAvailableTime($duration, $data);
+        Log::notice('Sprawdzam daty zadania updateAbandonedTaskTime', ['dataStart' => $time['start'], 'dataStop' => $time['end']]);
         $taskTime->date_start = $time['start'];
         $taskTime->date_end = $time['end'];
         $taskTime->save();
