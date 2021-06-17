@@ -27,6 +27,7 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
 /**
@@ -765,6 +766,7 @@ class TasksController extends Controller
 
         $end = Carbon::now();
         $end->second = 0;
+        Log::notice('Sprawdzam czas odrzuconego zadania',['data zakonczenia'=>$end->toDateString()]);
         TaskTime::create([
             'task_id' => $newTask->id,
             'date_start' => $time->date_start,

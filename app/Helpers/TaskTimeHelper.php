@@ -5,6 +5,7 @@ namespace App\Helpers;
 use App\Entities\Task;
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class TaskTimeHelper
 {
@@ -20,6 +21,7 @@ class TaskTimeHelper
                 'id' => User::OLAWA_USER_ID,
                 'user_id' => User::OLAWA_USER_ID
             ];
+            Log::notice('Sprawdzam daty zadania', ['dataStart' => $data['start'], 'dataStop' => $data['end']]);
         }
 
         $allow = false;
@@ -37,6 +39,7 @@ class TaskTimeHelper
             }
             $data['start'] = $date->toDateTimeString();
             $data['end'] = $date->addMinutes($duration)->toDateTimeString();
+            Log::notice('Sprawdzam daty zadania', ['dataStart' => $data['start'], 'dataStop' => $data['end']]);
         }
     }
 
