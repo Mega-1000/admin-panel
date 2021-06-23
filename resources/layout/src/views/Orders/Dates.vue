@@ -3,7 +3,7 @@
     <div class="row">
       <div class="col-sm-12">
         <div class="alert alert-danger" v-if="error.length">{{ error }}</div>
-        <div class="alert alert-info" v-if="acceptance.message.length" v-html="acceptance.message"></div>
+        <div class="alert alert-info" v-html="getMessage()"></div>
       </div>
     </div>
     <dates-table
@@ -56,11 +56,11 @@ export default class OrderDates extends Vue {
     await this.$store?.dispatch('OrdersService/saveAcceptAsCustomer', params)
   }
 
-  public get error (): Dates[] {
+  public get error (): Dates {
     return this.$store?.getters['OrdersService/error']
   }
 
-  public get acceptance (): Acceptance[] {
+  public get acceptance (): Acceptance {
     return this.$store?.getters['OrdersService/acceptance']
   }
 
@@ -87,6 +87,12 @@ export default class OrderDates extends Vue {
 
   public getUserType (): string {
     return USER_TYPES[this.userType]
+  }
+
+  public getMessage () {
+    return 'Aby zaakceptować daty wybranej strony transakcji kliknij przycisk <strong>Akceptuj</strong> w odpowiedniej kolumnie<br/>' +
+      'Aby zaakceptować daty w imieniu klienta wybierz przycisk <strong>Akceptuj w imieniu klienta</strong><br/>' +
+      'W celu modyfikacji dat wybierz przycisk <strong>Modyfikuj</strong> a następnie wypełnij formularz. <br>' + this.acceptance.message
   }
 }
 </script>

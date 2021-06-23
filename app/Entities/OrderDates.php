@@ -61,7 +61,7 @@ class OrderDates extends Model implements Transformable
         if (!empty($this->$dateType)) {
             return $this->$dateType->format('Y-m-d');
         } else {
-            return '';
+            return null;
         }
     }
 
