@@ -139,8 +139,9 @@ export default class ModifyOrderDatesModal extends Vue {
     position: fixed;
     width: 100%;
     height: 100%;
-    top: 0;
+    top: 30px;
     left: 0;
+    z-index: $index-modal;
   }
 
   .close {

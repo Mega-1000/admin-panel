@@ -388,6 +388,11 @@
                            value="{{ $order->refunded ?? ''}}">
                 </div>
             </div>
+            <div class="vue-components">
+                <div class="col-sm-8 col-sm-offset-2">
+                    <order-dates order-id="{{ $order->id }}"></order-dates>
+                </div>
+            </div>
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-4">

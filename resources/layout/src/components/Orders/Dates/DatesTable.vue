@@ -53,35 +53,48 @@
       <td>
         <div class="row">
           <div class="btn-group mb-5" role="group">
-            <a class="btn btn-sm btn-primary" :class="{ disabled: userType!=='customer'}"
-               @click="$emit('modify','customer')">Modyfikuj</a>
-            <a class="btn btn-sm btn-success" :class="{ disabled: !canAccept('customer')}"
-               @click="$emit('accept','customer')">Akceptuj</a>
+            <button type="button" class="btn btn-sm btn-primary" :class="{ disabled: userType!=='customer'}"
+                    :disabled="userType!=='customer'"
+                    @click="$emit('modify','customer')">Modyfikuj
+            </button>
+            <button type="button" class="btn btn-sm btn-success" :class="{ disabled: !canAccept('customer')}"
+                    :disabled="!canAccept('customer')"
+                    @click="$emit('accept','customer')">Akceptuj
+            </button>
           </div>
         </div>
       </td>
       <td>
         <div class="row text-center">
           <div class="btn-group" role="group">
-            <a class="btn btn-sm btn-primary" :class="{ disabled: userType!=='consultant'}"
-               @click="$emit('modify','consultant')">Modyfikuj</a>
-            <a class="btn btn-sm btn-success" :class="{ disabled: !canAccept('consultant') }"
-               @click="$emit('accept','consultant')">Akceptuj</a>
+            <button type="button" class="btn btn-sm btn-primary" :class="{ disabled: userType!=='consultant'}"
+                    :disabled="userType!=='consultant'"
+                    @click="$emit('modify','consultant')">Modyfikuj
+            </button>
+            <button type="button" class="btn btn-sm btn-success" :class="{ disabled: !canAccept('consultant') }"
+                    :disabled="!canAccept('consultant')"
+                    @click="$emit('accept','consultant')">Akceptuj
+            </button>
           </div>
         </div>
-        <div class="row text-center mt-5" v-if="!acceptance.customer">
+        <div class="row text-center mt-5" v-if="!acceptance.customer && canAcceptAsCustomer">
           <div class="btn-group" role="group">
-            <a class="btn btn-sm btn-info" :class="{ disabled: canAccept('consultant')}"
-               @click="$emit('acceptAsCustomer')">Akceptuj w imieniu klienta</a>
+            <button type="button" class="btn btn-sm btn-info"
+                    @click="$emit('acceptAsCustomer')">Akceptuj w imieniu klienta
+            </button>
           </div>
         </div>
       </td>
       <td>
         <div class="btn-group" role="group">
-          <a class="btn btn-sm btn-primary" :class="{ disabled: userType!=='warehouse'}"
-             @click="$emit('modify','warehouse')">Modyfikuj</a>
-          <a class="btn btn-sm btn-success" :class="{ disabled: !canAccept('warehouse') }"
-             @click="$emit('accept','warehouse')">Akceptuj</a>
+          <button type="button" class="btn btn-sm btn-primary" :class="{ disabled: userType!=='warehouse'}"
+                  :disabled="userType!=='warehouse'"
+                  @click="$emit('modify','warehouse')">Modyfikuj
+          </button>
+          <button type="button" class="btn btn-sm btn-success" :class="{ disabled: !canAccept('warehouse') }"
+                  :disabled="!canAccept('warehouse')"
+                  @click="$emit('accept','warehouse')">Akceptuj
+          </button>
         </div>
       </td>
     </tr>
@@ -99,19 +112,19 @@ export default class DatesTable extends Vue {
   @Prop() public orderId!: number
   @Prop() public userType!: string
 
-  public get customerDates (): Dates[] {
+  public get customerDates (): Dates {
     return this.$store?.getters['OrdersService/customerDates']
   }
 
-  public get consultantDates (): Dates[] {
+  public get consultantDates (): Dates {
     return this.$store?.getters['OrdersService/consultantDates']
   }
 
-  public get warehouseDates (): Dates[] {
+  public get warehouseDates (): Dates {
     return this.$store?.getters['OrdersService/warehouseDates']
   }
 
-  public get acceptance (): Acceptance[] {
+  public get acceptance (): Acceptance {
     return this.$store?.getters['OrdersService/acceptance']
   }
 
@@ -125,6 +138,13 @@ export default class DatesTable extends Vue {
     }
     const dates = this.$store?.getters['OrdersService/' + userType + 'Dates']
     return Object.values(dates).some(date => (date !== null))
+  }
+
+  public canAcceptAsCustomer () {
+    if (this.userType === 'consultant') {
+      const dates = this.$store?.getters['OrdersService/consultantDates']
+      return Object.values(dates).some(date => (date !== null))
+    }
   }
 }
 </script>
