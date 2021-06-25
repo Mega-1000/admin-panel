@@ -389,6 +389,8 @@ Route::group(['prefix' => 'admin'], function () {
             'OrdersPackagesController@sendRequestForCancelled')->name('order_packages.sendRequestForCancelled');
         Route::post('orderPackages/protocols',
             'OrdersPackagesController@getProtocols')->name('order_packages.getProtocols');
+        Route::post('orderPackages/closeDay',
+            'OrdersPackagesController@closeDay')->name('order_packages.closeDay');
         Route::get('orderPackages/{courier_name}/letters',
             'OrdersPackagesController@letters')->name('order_packages.letters');
         Route::get('orderPackages/{package_id}/send',

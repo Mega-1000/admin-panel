@@ -973,4 +973,31 @@ class OrdersPackagesController extends Controller
 
         return redirect()->back();
     }
+
+    public function closeDay(Request $request)
+    {
+        $today = new Carbon();
+        $packages = OrderPackage::where('delivery_courier_name', 'like', $request->get('courier_name'))
+        ->whereNotNull('letter_number')
+            ->whereNotIn('status',
+                [
+                    PackageTemplate::WAITING_FOR_CANCELLED,
+                    PackageTemplate::SENDING,
+                    PackageTemplate::DELIVERED,
+                    PackageTemplate::CANCELLED
+                ]
+            )
+            ->whereHas('order', function ($query) {
+                $query->where('status_id', '<>', Order::STATUS_WITHOUT_REALIZATION);
+            })
+//            ->limit(10)->orderBy('id','desc')
+            ->get();
+
+        foreach ($packages as $package) {
+            $date = Carbon::parse($package->shipment_date)->addWeekday();
+            dump($package->shipment_date, $date);
+        }
+        dump($packages);
+        exit;
+    }
 }
