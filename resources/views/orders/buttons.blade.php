@@ -139,6 +139,29 @@
                     id="filtered-packages">Wyślij przefiltrowane
             </button>
         </div>
+        <div class="row">
+            <form method="POST" action="{{ route('order_packages.closeDay') }}">
+                {{csrf_field()}}
+                <div class="form-group col-md-6" style="margin-bottom: 5px">
+                    <label for="courier_name" class="col-md-3 " style="margin-top: 10px; padding-left: 0">Wybierz
+                        kuriera</label>
+                    <div class="col-md-5" style="margin-top: 5px">
+                        <select class="form-control" name="courier_name" required>
+                            <option disabled selected value="">Wybierz kuriera</option>
+                            @foreach(\App\Enums\CourierName::NAMES_FOR_DAY_CLOSE as $code => $courierName)
+                                <option value="{{ $code }}">{{ $courierName }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button name="close_day" class="btn btn-success" data-toggle="tooltip" data-placement="right"
+                                title="Spowoduje przepięcie daty wysyłki na kolejny dzień roboczy"
+                                id="close_day">Zamknij dzień wysyłkowy
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
         <div id="packages_errors" class="form-group">
         </div>
         <div class="form-group">

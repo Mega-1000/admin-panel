@@ -973,4 +973,57 @@ class OrdersPackagesController extends Controller
 
         return redirect()->back();
     }
+
+    public function closeDay(Request $request)
+    {
+        Carbon::setWeekendDays([Carbon::SUNDAY, Carbon::SATURDAY]);
+        $today = new Carbon();
+        $courierName = $request->get('courier_name');
+        $packages = OrderPackage::where('delivery_courier_name', 'like', $courierName)
+            ->whereNotNull('letter_number')
+            ->whereNotIn('status',
+                [
+                    PackageTemplate::WAITING_FOR_CANCELLED,
+                    PackageTemplate::SENDING,
+                    PackageTemplate::DELIVERED,
+                    PackageTemplate::CANCELLED
+                ]
+            )
+            ->whereDate('shipment_date', $today)
+            ->whereHas('order', function ($query) {
+                $query->where('status_id', '<>', Order::STATUS_WITHOUT_REALIZATION);
+            })
+            ->get();
+
+        try {
+            foreach ($packages as $package) {
+                $package->update(
+                    [
+                        'shipment_date' => Carbon::parse($package->shipment_date)->addWeekday(),
+                        'delivery_date' => Carbon::parse($package->delivery_date)->addWeekday()
+                    ]
+                );
+            }
+
+            $pdfFilename = 'day-close-protocol-' . $courierName . '-' . Carbon::today()->toDateString() . '.pdf';
+
+            $pdf = PDF::loadView('pdf.close-day-protocol', [
+                'packages' => $packages,
+                'date' => $today,
+                'courierName' => strtoupper($courierName),
+                'mode' => 'utf-8'
+            ])->setPaper('a4', 'landscape');
+            if (!file_exists(storage_path('app/public/protocols'))) {
+                mkdir(storage_path('app/public/protocols'));
+            }
+            $path = storage_path('app/public/protocols/' . $pdfFilename);
+            $pdf->save($path);
+        } catch (\Exception $e) {
+            return redirect()->back()->with([
+                'message' => __('order_packages.message.close_day_protocol_error'),
+                'alert-type' => 'error'
+            ]);
+        }
+        return $pdf->download($pdfFilename);
+    }
 }

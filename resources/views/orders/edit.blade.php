@@ -302,70 +302,10 @@
                            value="{{ $order->warehouse_value ?? ''}}">
                 </div>
                 <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                    <label for="initial_sending_date_client">@lang('orders.form.initial_sending_date_client')</label>
-                    <input type="text" class="form-control default-date-picker-now" id="initial_sending_date_client"
-                           name="initial_sending_date_client"
-                           value="{{ $order->initial_sending_date_client ?? ''}}">
-                </div>
-                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                    <label for="initial_sending_date_magazine">@lang('orders.form.initial_sending_date_magazine')</label>
-                    <input type="text" class="form-control default-date-picker-now" id="initial_sending_date_magazine"
-                           name="initial_sending_date_magazine"
-                           value="{{ $order->initial_sending_date_magazine ?? ''}}">
-                </div>
-                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
                     <label for="confirmed_sending_date_consultant">@lang('orders.form.confirmed_sending_date_consultant')</label>
                     <input type="text" class="form-control default-date-picker-now" id="confirmed_sending_date_consultant"
                            name="confirmed_sending_date_consultant"
                            value="{{ $order->confirmed_sending_date_consultant ?? ''}}">
-                </div>
-                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                    <label for="confirmed_sending_date_warehouse">@lang('orders.form.confirmed_sending_date_warehouse')</label>
-                    <input type="text" class="form-control default-date-picker-now" id="confirmed_sending_date_warehouse"
-                           name="confirmed_sending_date_warehouse"
-                           value="{{ $order->confirmed_sending_date_warehouse ?? ''}}">
-                </div>
-                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                    <label for="initial_pickup_date_client">@lang('orders.form.initial_pickup_date_client')</label>
-                    <input type="text" class="form-control default-date-time-picker-now" id="initial_pickup_date_client"
-                           name="initial_pickup_date_client"
-                           value="{{ $order->initial_pickup_date_client ?? ''}}">
-                </div>
-                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                    <label for="confirmed_pickup_date_client">@lang('orders.form.confirmed_pickup_date_client')</label>
-                    <input type="text" class="form-control default-date-time-picker-now" id="confirmed_pickup_date_client"
-                           name="confirmed_pickup_date_client"
-                           value="{{ $order->confirmed_pickup_date_client ?? ''}}">
-                </div>
-                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                    <label for="confirmed_pickup_date_consultant">@lang('orders.form.confirmed_pickup_date_consultant')</label>
-                    <input type="text" class="form-control default-date-time-picker-now" id="confirmed_pickup_date_consultant"
-                           name="confirmed_pickup_date_consultant"
-                           value="{{ $order->confirmed_pickup_date_consultant ?? ''}}">
-                </div>
-                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                    <label for="confirmed_pickup_date_warehouse">@lang('orders.form.confirmed_pickup_date_warehouse')</label>
-                    <input type="text" class="form-control default-date-time-picker-now" id="confirmed_pickup_date_warehouse"
-                           name="confirmed_pickup_date_warehouse"
-                           value="{{ $order->confirmed_pickup_date_warehouse ?? ''}}">
-                </div>
-                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                    <label for="initial_delivery_date_consultant">@lang('orders.form.initial_delivery_date_consultant')</label>
-                    <input type="text" class="form-control default-date-time-picker-now" id="initial_delivery_date_consultant"
-                           name="initial_delivery_date_consultant"
-                           value="{{ $order->initial_delivery_date_consultant ?? ''}}">
-                </div>
-                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                    <label for="initial_delivery_date_consultant">@lang('orders.form.initial_delivery_date_warehouse')</label>
-                    <input type="text" class="form-control default-date-time-picker-now" id="initial_delivery_date_consultant"
-                           name="initial_delivery_date_consultant"
-                           value="{{ $order->initial_delivery_date_consultant ?? ''}}">
-                </div>
-                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                    <label for="confirmed_delivery_date">@lang('orders.form.confirmed_delivery_date')</label><br><br>
-                    <input type="text" class="form-control default-date-time-picker-now" id="confirmed_delivery_date"
-                           name="confirmed_delivery_date"
-                           value="{{ $order->confirmed_delivery_date ?? ''}}">
                 </div>
                 <div class="form-group" style="width: 25%; float: left; padding: 5px;">
                     <label for="consultant_value">@lang('orders.form.consultant_value')</label>
