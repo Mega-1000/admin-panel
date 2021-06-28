@@ -301,12 +301,6 @@
                     <input type="number" class="form-control" id="warehouse_value" name="warehouse_value"
                            value="{{ $order->warehouse_value ?? ''}}">
                 </div>
-                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                    <label for="confirmed_sending_date_consultant">@lang('orders.form.confirmed_sending_date_consultant')</label>
-                    <input type="text" class="form-control default-date-picker-now" id="confirmed_sending_date_consultant"
-                           name="confirmed_sending_date_consultant"
-                           value="{{ $order->confirmed_sending_date_consultant ?? ''}}">
-                </div>
                 <div class="form-group" style="width: 25%; float: left; padding: 5px;">
                     <label for="consultant_value">@lang('orders.form.consultant_value')</label>
                     <input type="number" class="form-control" id="consultant_value" name="consultant_value"
