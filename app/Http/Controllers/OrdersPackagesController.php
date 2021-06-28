@@ -989,10 +989,7 @@ class OrdersPackagesController extends Controller
                     PackageTemplate::CANCELLED
                 ]
             )
-            ->whereDate('shipment_date', $today)
-            ->whereHas('order', function ($query) {
-                $query->where('status_id', '<>', Order::STATUS_WITHOUT_REALIZATION);
-            })
+            ->whereDate('shipment_date','<=', $today)
             ->get();
 
         try {

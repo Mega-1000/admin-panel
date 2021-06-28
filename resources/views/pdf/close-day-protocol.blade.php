@@ -77,7 +77,6 @@
             <th>Ilosc</th>
             <th>Maksymalna waga paczki</th>
             <th class="text-center">Opak</th>
-            <th>Przeniesiony z:</th>
             <th>Przeniesiony na:</th>
             <th class="text-center">Przeniesione na kolejny dzien</th>
         </tr>
@@ -99,7 +98,6 @@
                     <td>{{$package['quantity']}}</td>
                     <td>{{$package['weight']}}</td>
                     <td>{{$package['container_type']}}</td>
-                    <td>{{ $date->toDateString() }}</td>
                     <td>{{ $package['shipment_date']->toDateString() }}</td>
                     <td class="text-center"><input type="checkbox" name="check"/></td>
                 </tr>
