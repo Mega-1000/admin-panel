@@ -55,7 +55,6 @@ final class CourierName extends Enum
         self::POCZTEX => 'Pocztex',
         self::JAS => 'Jas',
         self::GLS => 'Gls',
-        self::ODBIOR_OSOBISTY => 'Odbiór osobisty',
         self::GIELDA => 'Giełda',
     ];
 }
