@@ -148,7 +148,7 @@
                     <div class="col-md-5" style="margin-top: 5px">
                         <select class="form-control" name="courier_name" required>
                             <option disabled selected value="">Wybierz kuriera</option>
-                            @foreach(\App\Enums\CourierName::DELIVERY_TYPE_LABELS as $code => $courierName)
+                            @foreach(\App\Enums\CourierName::NAMES_FOR_DAY_CLOSE as $code => $courierName)
                                 <option value="{{ $code }}">{{ $courierName }}</option>
                             @endforeach
                         </select>
@@ -156,7 +156,7 @@
                     <div class="col-md-4">
                         <button name="close_day" class="btn btn-success" data-toggle="tooltip" data-placement="right"
                                 title="Spowoduje przepięcie daty wysyłki na kolejny dzień roboczy"
-                                id="close_day">Zamknij wysyłkę
+                                id="close_day">Zamknij dzień wysyłkowy
                         </button>
                     </div>
                 </div>

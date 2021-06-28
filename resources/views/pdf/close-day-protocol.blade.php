@@ -99,8 +99,8 @@
                     <td>{{$package['quantity']}}</td>
                     <td>{{$package['weight']}}</td>
                     <td>{{$package['container_type']}}</td>
-                    <td>{{ $date }}</td>
-                    <td>{{ $package['shipment_date'] }}</td>
+                    <td>{{ $date->toDateString() }}</td>
+                    <td>{{ $package['shipment_date']->toDateString() }}</td>
                     <td class="text-center"><input type="checkbox" name="check"/></td>
                 </tr>
             @endif

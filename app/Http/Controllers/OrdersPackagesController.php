@@ -999,7 +999,8 @@ class OrdersPackagesController extends Controller
             foreach ($packages as $package) {
                 $package->update(
                     [
-                        'shipment_date' => Carbon::parse($package->shipment_date)->addWeekday()
+                        'shipment_date' => Carbon::parse($package->shipment_date)->addWeekday(),
+                        'delivery_date' => Carbon::parse($package->delivery_date)->addWeekday()
                     ]
                 );
             }
