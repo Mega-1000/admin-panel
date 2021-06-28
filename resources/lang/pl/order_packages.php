@@ -68,7 +68,8 @@ return [
         'packing_delete' => 'Typ opakowania przesyłki usunięty pomyślnie!',
         'package_error' => 'Podana paczka nie istnieje, lub szablon został usunięty',
         'package_not_found_error' => 'Podana paczka nie istnieje',
-        'package_not_ordered_error' => 'Podana paczka nie została jeszcze zamówiona'
+        'package_not_ordered_error' => 'Podana paczka nie została jeszcze zamówiona',
+        'close_day_protocol_error' => 'Wystąpił błąd w procesie zamknięcie dnia wysyłkowego'
     ],
     'form' => [
         'delivery' => 'Id dostawy z SELLO (tr_DeliveryId)',

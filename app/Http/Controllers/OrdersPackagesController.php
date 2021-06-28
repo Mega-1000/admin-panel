@@ -976,9 +976,11 @@ class OrdersPackagesController extends Controller
 
     public function closeDay(Request $request)
     {
+        Carbon::setWeekendDays([Carbon::SUNDAY, Carbon::SATURDAY]);
         $today = new Carbon();
-        $packages = OrderPackage::where('delivery_courier_name', 'like', $request->get('courier_name'))
-        ->whereNotNull('letter_number')
+        $courierName = $request->get('courier_name');
+        $packages = OrderPackage::where('delivery_courier_name', 'like', $courierName)
+            ->whereNotNull('letter_number')
             ->whereNotIn('status',
                 [
                     PackageTemplate::WAITING_FOR_CANCELLED,
@@ -987,17 +989,40 @@ class OrdersPackagesController extends Controller
                     PackageTemplate::CANCELLED
                 ]
             )
+            ->whereDate('shipment_date', $today)
             ->whereHas('order', function ($query) {
                 $query->where('status_id', '<>', Order::STATUS_WITHOUT_REALIZATION);
             })
-//            ->limit(10)->orderBy('id','desc')
             ->get();
 
-        foreach ($packages as $package) {
-            $date = Carbon::parse($package->shipment_date)->addWeekday();
-            dump($package->shipment_date, $date);
+        try {
+            foreach ($packages as $package) {
+                $package->update(
+                    [
+                        'shipment_date' => Carbon::parse($package->shipment_date)->addWeekday()
+                    ]
+                );
+            }
+
+            $pdfFilename = 'day-close-protocol-' . $courierName . '-' . Carbon::today()->toDateString() . '.pdf';
+
+            $pdf = PDF::loadView('pdf.close-day-protocol', [
+                'packages' => $packages,
+                'date' => $today,
+                'courierName' => strtoupper($courierName),
+                'mode' => 'utf-8'
+            ])->setPaper('a4', 'landscape');
+            if (!file_exists(storage_path('app/public/protocols'))) {
+                mkdir(storage_path('app/public/protocols'));
+            }
+            $path = storage_path('app/public/protocols/' . $pdfFilename);
+            $pdf->save($path);
+        } catch (\Exception $e) {
+            return redirect()->back()->with([
+                'message' => __('order_packages.message.close_day_protocol_error'),
+                'alert-type' => 'error'
+            ]);
         }
-        dump($packages);
-        exit;
+        return $pdf->download($pdfFilename);
     }
 }
