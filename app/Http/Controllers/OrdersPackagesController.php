@@ -980,7 +980,6 @@ class OrdersPackagesController extends Controller
         $today = new Carbon();
         $courierName = $request->get('courier_name');
         $packages = OrderPackage::where('delivery_courier_name', 'like', $courierName)
-            ->whereNotNull('letter_number')
             ->whereNotIn('status',
                 [
                     PackageTemplate::WAITING_FOR_CANCELLED,
@@ -996,8 +995,8 @@ class OrdersPackagesController extends Controller
             foreach ($packages as $package) {
                 $package->update(
                     [
-                        'shipment_date' => Carbon::parse($package->shipment_date)->addWeekday(),
-                        'delivery_date' => Carbon::parse($package->delivery_date)->addWeekday()
+                        'shipment_date' => $today->copy()->addWeekday(),
+                        'delivery_date' => (empty($package->delivery_date)) ? null : $today->copy()->addWeekday(2)
                     ]
                 );
             }

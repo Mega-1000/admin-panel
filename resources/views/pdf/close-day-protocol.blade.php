@@ -86,7 +86,6 @@
             $i = 0;
         @endphp
         @foreach($packages as $package)
-            @if($package['letter_number'] !== null)
                 {{$i++}}
                 <tr>
                     <td>{{$i}}</td>
@@ -98,10 +97,9 @@
                     <td>{{$package['quantity']}}</td>
                     <td>{{$package['weight']}}</td>
                     <td>{{$package['container_type']}}</td>
-                    <td>{{ $package['shipment_date']->toDateString() }}</td>
+                    <td>{{ ($package['shipment_date'] instanceof DateTime) ? $package['shipment_date']->toDateString() : null }}</td>
                     <td class="text-center"><input type="checkbox" name="check"/></td>
                 </tr>
-            @endif
         @endforeach
         </tbody>
         <tfoot>

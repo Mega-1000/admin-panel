@@ -48,7 +48,7 @@ final class CourierName extends Enum
      * Delivery types labels
      */
     const NAMES_FOR_DAY_CLOSE = [
-        self::INPOST => 'Inpost',
+        self::INPOST => 'Paczkomaty',
         self::ALLEGRO_INPOST => 'Allegro-Inpost',
         self::DPD => 'Dpd',
         self::APACZKA => 'Apaczka',
