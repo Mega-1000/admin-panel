@@ -480,8 +480,8 @@ class OrdersPackagesController extends Controller
         if ($courierName !== 'WSZYSTKIE') {
             $packages = OrderPackage::where('delivery_courier_name', '=', $courierName)
                 ->leftJoin('orders', 'order_packages.order_id', '=', 'orders.id')
-                ->where('orders.shipment_date', '<=', Carbon::createFromFormat('d/m/Y',$request->date_to)->format('Y/m/d H:i:s'))
-                ->where('orders.shipment_date', '>=', Carbon::createFromFormat('d/m/Y',$request->date_from)->subDays(1)->format('Y/m/d H:i:s'))
+                ->where('order_packages.shipment_date', '<=', Carbon::createFromFormat('d/m/Y',$request->date_to)->format('Y/m/d H:i:s'))
+                ->where('order_packages.shipment_date', '>=', Carbon::createFromFormat('d/m/Y',$request->date_from)->subDays(1)->format('Y/m/d H:i:s'))
                 ->where('order_packages.status', '!=', 'CANCELLED')
                 ->where('order_packages.status', '!=', 'WAITING_FOR_CANCELLED')
                 ->where('order_packages.status', '!=', 'REJECT_CANCELLED')
@@ -491,8 +491,8 @@ class OrdersPackagesController extends Controller
         } else {
             $courierName = 'wszystkie';
                 $packages = OrderPackage::leftJoin('orders', 'order_packages.order_id', '=', 'orders.id')
-                ->where('orders.shipment_date', '<=', Carbon::createFromFormat('d/m/Y',$request->date_to)->format('Y/m/d H:i:s'))
-                ->where('orders.shipment_date', '>=', Carbon::createFromFormat('d/m/Y',$request->date_from)->subDays(1)->format('Y/m/d H:i:s'))
+                ->where('order_packages.shipment_date', '<=', Carbon::createFromFormat('d/m/Y',$request->date_to)->format('Y/m/d H:i:s'))
+                ->where('order_packages.shipment_date', '>=', Carbon::createFromFormat('d/m/Y',$request->date_from)->subDays(1)->format('Y/m/d H:i:s'))
                 ->where('order_packages.status', '!=', 'CANCELLED')
                 ->where('order_packages.status', '!=', 'WAITING_FOR_CANCELLED')
                 ->where('order_packages.status', '!=', 'REJECT_CANCELLED')
