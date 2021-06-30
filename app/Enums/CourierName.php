@@ -9,6 +9,7 @@ final class CourierName extends Enum
 {
     const INPOST = 'INPOST';
     const ALLEGRO_INPOST = 'ALLEGRO-INPOST';
+    const PACZKOMAT = 'PACZKOMAT';
     const DPD = 'DPD';
     const APACZKA = 'APACZKA';
     const POCZTEX = 'POCZTEX';
@@ -48,13 +49,13 @@ final class CourierName extends Enum
      * Delivery types labels
      */
     const NAMES_FOR_DAY_CLOSE = [
-        self::INPOST => 'Paczkomaty',
-        self::ALLEGRO_INPOST => 'Allegro-Inpost',
+        self::PACZKOMAT => 'Paczkomat',
         self::DPD => 'Dpd',
         self::APACZKA => 'Apaczka',
         self::POCZTEX => 'Pocztex',
         self::JAS => 'Jas',
         self::GLS => 'Gls',
         self::GIELDA => 'Giełda',
+        'all' => 'Wszystkie',
     ];
 }

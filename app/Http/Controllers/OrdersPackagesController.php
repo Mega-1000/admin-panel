@@ -979,7 +979,7 @@ class OrdersPackagesController extends Controller
         Carbon::setWeekendDays([Carbon::SUNDAY, Carbon::SATURDAY]);
         $today = new Carbon();
         $courierName = $request->get('courier_name');
-        $packages = OrderPackage::where('delivery_courier_name', 'like', $courierName)
+        $query = OrderPackage::query()
             ->whereNotIn('status',
                 [
                     PackageTemplate::WAITING_FOR_CANCELLED,
@@ -988,8 +988,11 @@ class OrdersPackagesController extends Controller
                     PackageTemplate::CANCELLED
                 ]
             )
-            ->whereDate('shipment_date','<=', $today)
-            ->get();
+            ->whereDate('shipment_date', '<=', $today);
+        if ($courierName !== 'all') {
+            $query->where('delivery_courier_name', 'like', $courierName);
+        }
+        $packages = $query->get();
 
         try {
             foreach ($packages as $package) {
