@@ -8,6 +8,7 @@ use App\Entities\OrderPackage;
 use App\Entities\PackageTemplate;
 use App\Entities\Product;
 use App\Helpers\interfaces\iDividable;
+use Carbon\Carbon;
 
 class BackPackPackageDivider implements iDividable
 {
@@ -57,7 +58,10 @@ class BackPackPackageDivider implements iDividable
         $pack->notices = $orderId . '/' . $packageNumber;
         $pack->symbol = $packTemplate->symbol;
         $helper = new OrderPackagesDataHelper();
-        if ($packTemplate->accept_time) {
+
+        if (file_exists(storage_path('app/public/protocols/day-close-protocol-' . $packTemplate->delivery_courier_name . '-' . Carbon::today()->toDateString() . '.pdf'))) {
+            $date = Carbon::today()->addWeekday();
+        } else if ($packTemplate->accept_time) {
             $date = $helper->calculateShipmentDate($packTemplate->accept_time, $packTemplate->accept_time);
         } else {
             $date = $helper->calculateShipmentDate(9, 9);

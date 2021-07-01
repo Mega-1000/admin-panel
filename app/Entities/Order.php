@@ -710,9 +710,8 @@ class Order extends Model implements Transformable
 
     public function setDefaultDates()
     {
-        Carbon::setWeekendDays([ Carbon::SUNDAY, Carbon::SATURDAY ]);
-        $dateFrom = Carbon::parse($this->shimpent_date);
-        $dateTo = (Carbon::parse($this->shimpent_date))->addWeekdays(2);
+        $dateFrom = Carbon::parse($this->selloTransaction->tr_RemittanceDate);
+        $dateTo = (Carbon::parse($this->selloTransaction->tr_RemittanceDate))->addWeekdays(2);
         $this->dates()->updateOrCreate(['order_id' => $this->id], [
             'customer_shipment_date_from' => $dateFrom,
             'customer_shipment_date_to' => $dateTo,
