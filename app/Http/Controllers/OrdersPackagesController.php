@@ -976,7 +976,6 @@ class OrdersPackagesController extends Controller
 
     public function closeDay(Request $request)
     {
-        Carbon::setWeekendDays([Carbon::SUNDAY, Carbon::SATURDAY]);
         $today = new Carbon();
         $courierName = $request->get('courier_name');
         $query = OrderPackage::query()

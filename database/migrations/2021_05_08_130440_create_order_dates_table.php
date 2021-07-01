@@ -16,7 +16,7 @@ class CreateOrderDatesTable extends Migration
         Schema::create('order_dates', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('order_id');
-            $table->foreign('order_id')->references('id')->on('orders');
+            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
             $table->dateTime('customer_shipment_date_from')->nullable();
             $table->dateTime('customer_shipment_date_to')->nullable();
             $table->dateTime('customer_delivery_date_from')->nullable();

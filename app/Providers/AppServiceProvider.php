@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Carbon\Carbon;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 
@@ -25,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
         if (in_array($this->app->environment(), $forceHttpsEnvs)) {
             \URL::forceScheme('https');
         }
+        Carbon::setWeekendDays([Carbon::SUNDAY, Carbon::SATURDAY]);
     }
 
     /**
