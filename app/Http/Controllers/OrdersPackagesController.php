@@ -988,6 +988,7 @@ class OrdersPackagesController extends Controller
                     PackageTemplate::CANCELLED
                 ]
             )
+            ->whereNull('letter_number')
             ->whereDate('shipment_date', '<=', $today);
         if ($courierName !== 'all') {
             $query->where('delivery_courier_name', 'like', $courierName);
