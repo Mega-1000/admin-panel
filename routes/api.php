@@ -69,6 +69,7 @@ Route::get('products/price-changes/{id}/get', 'Api\ProductsController@getProduct
 Route::post('products/send-products-new-price/{id}/send', 'Api\ProductsController@updateProductsPrice')->name('api.update-products-price');
 Route::get('products/categories/get', 'Api\ProductsController@getProductsByCategory')->name('api.get-products-by-category');
 Route::get('products/categories', 'Api\ProductsController@getCategoriesTree')->name('api.get-product-categories');
+Route::get('products/categories/{id}', 'Api\ProductsController@getCategory')->name('api.get-category');
 Route::get('products/chimney', 'Api\ProductsController@getProductsForChimney')->name('api.get-products-for-chimney');
 Route::get('products/{id}', 'Api\ProductsController@getProduct')->name('api.get-product');
 Route::get('products/', 'Api\ProductsController@getProducts')->name('api.get-products');
