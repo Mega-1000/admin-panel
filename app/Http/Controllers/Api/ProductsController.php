@@ -269,6 +269,18 @@ class ProductsController extends Controller
         return response(json_encode($tree));
     }
 
+    /**
+     * @param $id
+     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     */
+    public function getCategory(int $id)
+    {
+        $category = Category::where('id', $id)->get()->first();
+        $children =  Category::where('parent_id', $id)->orderBy('parent_id')->orderBy('priority')->get()->toArray();
+        $category->children = $children ?? [];
+        return $category;
+    }
+
     private function parseTree($tree, $root = 0)
     {
         $return = [];
