@@ -33,16 +33,18 @@ class TaskService
         return $this->taskRepository->where('user_id', Task::WAREHOUSE_USER_ID)
             ->whereHas('order', function ($query) use ($courierArray) {
                 $query->whereHas('packages', function ($query) use ($courierArray) {
-                    $query->whereIn('service_courier_name', $courierArray)
-                        ->orderBy('shipment_date');
+                    $query->whereIn('service_courier_name', $courierArray);
                 })->whereHas('labels', function ($query) {
                     $query
                         ->where('labels.id', Label::BLUE_HAMMER_ID);
-                })->whereDoesntHave('labels', function ($query) {
-                    $query->where('labels.id', Label::RED_HAMMER_ID)
-                        ->orWhere('labels.id', Label::GRAY_HAMMER_ID)
-                        ->orWhere('labels.id', Label::PRODUCTION_STOP_ID);
-                });
+                })->whereHas('dates', function ($query) {
+                    $query->orderBy('customer_shipment_date_to');
+                })
+                    ->whereDoesntHave('labels', function ($query) {
+                        $query->where('labels.id', Label::RED_HAMMER_ID)
+                            ->orWhere('labels.id', Label::GRAY_HAMMER_ID)
+                            ->orWhere('labels.id', Label::PRODUCTION_STOP_ID);
+                    });
             });
     }
 
@@ -66,7 +68,7 @@ class TaskService
         foreach (CourierName::DELIVERY_TYPE_FOR_TASKS as $deliveryTypeName => $deliveryTypes) {
             $tasksByDay = $dates;
             foreach ($this->getTaskQuery($deliveryTypes)->get() as $task) {
-                $orderDate = Carbon::parse($task->order->shipment_date);
+                $orderDate = Carbon::parse($task->order->dates->customer_shipment_date_to);
                 $key = $orderDate->toDateString();
                 if ($orderDate->isBetween($today, $lastShowedDate)) {
                     $tasksByDay[$key][] = $task;
