@@ -440,7 +440,7 @@ class OrdersController extends Controller
         $order = Order
             ::where('token', $token)
             ->with(['items' => function ($q) {
-                $q->with(['Product' => function ($q) {
+                $q->with(['product' => function ($q) {
                     $q->join('product_prices', 'products.id', '=', 'product_prices.product_id');
                     $q->join('product_packings', 'products.id', '=', 'product_packings.product_id');
                 }]);
