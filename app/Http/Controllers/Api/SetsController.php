@@ -152,8 +152,10 @@ class SetsController extends Controller
 
     public function delete(Set $set)
     {
-        if ($set->delete()) {
-            return response(json_encode([]),200);
+        if(SetItem::where('set_id',$set->id)->delete()) {
+            if ($set->delete()) {
+                return response(json_encode([]),200);
+            }
         }
         return response(json_encode([
             'error_code' => 500,
