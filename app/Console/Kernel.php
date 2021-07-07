@@ -51,7 +51,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\CheckForHangedChats::class)->cron('0,15,30,45 7-17 * * 1-5');
         $schedule->job(Jobs\ConfirmSentPackagesJob::class)->dailyAt("23:34");
         $schedule->job(Jobs\AutomaticallyFinishOrdersJob::class)->everyFifteenMinutes();
-        $schedule->job(Jobs\ChangeDdpShipmentDatePackagesJob::class)->dailyAt("12:01");
+//        $schedule->job(Jobs\ChangeDdpShipmentDatePackagesJob::class)->dailyAt("12:01");
 
         $schedule->job(Jobs\FindNewAllegroOrders::class)->everyMinute();
         $schedule->job(Jobs\SendMessagesOnNewAllegroOrders::class)->everyMinute();

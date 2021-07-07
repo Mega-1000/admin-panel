@@ -749,7 +749,7 @@ class OrdersPackagesController extends Controller
             ],
         ];
 
-
+        $shipmentDate = Carbon::parse($package->shipment_date);
         if ($order->warehouse_id !== null) {
             $pickupAddress = [
                 'pickup_address' => [
@@ -764,11 +764,20 @@ class OrdersPackagesController extends Controller
                     'nip' => $order->warehouse->firm->nip,
                     'postal_code' => $order->warehouse->address->postal_code,
                     'country' => 'Polska',
-                    'parcel_date' => $package->shipment_date !== null ? $package->shipment_date : null,
                 ],
             ];
-            $data = array_merge($data, $pickupAddress);
 
+            if ($package->shipment_date !== null) {
+                if ((Carbon::now()->greaterThan(Carbon::createFromTimeString('12:00')))) {
+                    $pickupAddress['pickup_address']['parcel_date'] = $shipmentDate->addWeekday()->toDateString();
+                } else {
+                    $pickupAddress['pickup_address']['parcel_date'] = $shipmentDate->toDateString();
+                }
+            } else {
+                $pickupAddress['pickup_address']['parcel_date'] = null;
+            }
+
+            $data = array_merge($data, $pickupAddress);
         }
         $validator = $this->validatePackage($data);
         if ($data['price_for_cash_on_delivery'] == '0.00') {
