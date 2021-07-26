@@ -149,9 +149,12 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $transactionArray['is_standard'] = 1;
         $transactionArray['rewrite'] = 0;
         $transactionArray['nick_allegro'] = $transaction->customer->cs_Nick;
-        $phone = Helper::preparePhone($transaction->customer->phone->cp_Phone);
+
         if (strpos($transactionArray['invoice_address']['email'], '+') === false) {
             $transactionArray['invoice_address']['email'] = $transactionArray['delivery_address']['email'];
+        }
+        if(!empty($transaction->customer->phone)){
+            $phone = Helper::preparePhone($transaction->customer->phone->cp_Phone);
         }
         if (empty($phone)) {
             $phone = Helper::preparePhone($transactionArray['delivery_address']['phone']);
