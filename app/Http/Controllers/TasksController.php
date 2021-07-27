@@ -766,7 +766,6 @@ class TasksController extends Controller
 
         $end = Carbon::now();
         $end->second = 0;
-        Log::notice('Sprawdzam czas odrzuconego zadania',['data zakonczenia'=>$end->toDateString()]);
         TaskTime::create([
             'task_id' => $newTask->id,
             'date_start' => $time->date_start,
