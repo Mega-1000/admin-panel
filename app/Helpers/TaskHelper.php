@@ -55,7 +55,6 @@ class TaskHelper
     {
         $taskTime = $task->taskTime;
         $time = TaskTimeHelper::getFirstAvailableTime($duration, $data);
-        Log::notice('Sprawdzam daty zadania updateAbandonedTaskTime', ['dataStart' => $time['start'], 'dataStop' => $time['end']]);
         $taskTime->date_start = $time['start'];
         $taskTime->date_end = $time['end'];
         $taskTime->save();
