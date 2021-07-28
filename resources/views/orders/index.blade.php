@@ -1495,22 +1495,22 @@
                         searchable: false,
                         render: function (shipment_date, option, row) {
                             let html = '';
-                            let date = moment(shipment_date);
-                            let DRNP = null;
-
-                            if (date.isValid()) {
-                                let formatedDate = date.format('YYYY-MM-DD');
-                                let startDaysVariation = "";
-                                if (row.shipment_start_days_variation) {
-                                    startDaysVariation = "<br>&plusmn; " + row.shipment_start_days_variation + " dni";
-                                }
-                                DRNP = html + formatedDate + startDaysVariation;
+                            let date_from = moment(row.consultant_shipment_date_from);
+                            let date_to = moment(row.consultant_shipment_date_to);
+                            let DRNPF = null;
+                            let DRNPT = null;
+                            if (date_from.isValid()) {
+                                let formatedDate_from = date_from.format('YYYY-MM-DD');
+                                let formatedDate_to = date_to.format('YYYY-MM-DD');
+                                DRNPF = formatedDate_from;
+                                DRNPT = formatedDate_to;  
                             }
 
                             let datesLabels = ['WDNKL', 'WDNM', 'ZDNK', 'ZDNM'];
 
                             const datesObject = {
-                                'WDNK': DRNP,
+                                'OD': DRNPF ,
+                                'DO': DRNPT ,
                                 'WDNKL': row.initial_sending_date_client,
                                 'WDNM': row.initial_sending_date_magazine,
                                 'ZDNK': row.confirmed_sending_date_consultant,
