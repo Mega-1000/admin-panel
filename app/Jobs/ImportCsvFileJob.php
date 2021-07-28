@@ -360,9 +360,11 @@ class ImportCsvFileJob implements ShouldQueue
         $product->save();
         $product->restore();
 
-        $price = $product->price ?? new Entities\ProductPrice();
-        $price->fill($array);
-        $product->price()->save($price);
+        if ($updatePrices) {
+            $price = $product->price ?? new Entities\ProductPrice();
+            $price->fill($array);
+            $product->price()->save($price);
+        }
 
         $packing = $product->packing ?? new Entities\ProductPacking();
         $packing->fill($array);
