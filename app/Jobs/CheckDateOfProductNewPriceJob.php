@@ -32,7 +32,7 @@ class CheckDateOfProductNewPriceJob implements ShouldQueue
      */
     public function handle()
     {
-        $products = Product::whereDate('date_of_the_new_prices', '<=', Carbon::today()->addDay())->where('subject_to_price_change', 0)->get();
+        $products = Product::whereDate('date_of_the_new_prices', '<=', Carbon::today()->addDay())->get();
 
         foreach ($products as $product) {
             $group = $product->product_group_for_change_price;
