@@ -8,6 +8,7 @@ use App\Mail\OrderStatusChanged;
 use App\Repositories\OrderRepository;
 use App\Repositories\StatusRepository;
 use App\Repositories\TagRepository;
+use App\Services\AllegroDisputeService;
 use Barryvdh\DomPDF\Facade as PDF;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -91,6 +92,13 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
                 if (strpos($order->customer->login,'allegromail.pl')) {
                     return;
                 }
+                //send to chat pdf file
+                $service = new AllegroDisputeService();
+                $attachment = $service->createAttachmentId($order->proforma_filename, sizeof($pdf));
+                if(isset($attachment['id']) && $service->uploadAttachment($attachment['id'], $pdf)){
+                    $service->sendMessage($order->dispute()->first()->dispute_id, 'proforma', false, $attachment['id']);
+                }
+                //end send
                 \Mailer::create()
                     ->to($order->customer->login)
                     ->send(new OrderStatusChanged($subject, $message, $pdf));

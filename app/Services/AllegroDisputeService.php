@@ -112,12 +112,12 @@ class AllegroDisputeService
         return $result;
     }
 
-    public function sendMessage(string $disputeId, string $text, bool $endRequest = false)
+    public function sendMessage(string $disputeId, string $text, bool $endRequest = false, $attachment = null)
     {
         $url = $this->getRestUrl("/sale/disputes/{$disputeId}/messages");
         $response = $this->request('POST', $url, [
             'text' => $text,
-            'attachment' => null,
+            'attachment' => $attachment,
             'type' => self::TYPE_REGULAR
         ]);
         return json_decode((string)$response->getBody(), true);
@@ -147,6 +147,27 @@ class AllegroDisputeService
         ]);
 
         return json_decode((string)$response->getBody(), true);
+    }
+
+    /** Create a request add attachment */
+    public function createAttachmentId($fileName, $fileSize)
+    {
+        $url = $this->getRestUrl("/sale/dispute-attachments");
+        $response = $this->request('POST', $url, [
+            'fileName' => $fileName,
+            'size' => $fileSize
+        ]);
+        return json_decode((string)$response->getBody(), true);
+    }
+    /** Upload attachment */
+    public function uploadAttachment($attachmentId, $pathFile)
+    {
+        $url = $this->getRestUrl("/sale/dispute-attachments/" . $attachmentId);
+        $response = $this->request('PUT', $url, [], [
+            'name' => $attachmentId,
+            'contents' => ($pathFile)
+        ]);
+        return $response->getStatusCode() == 200;
     }
 
     public function getAttachment(string $url)
