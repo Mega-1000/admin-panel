@@ -112,12 +112,12 @@ class AllegroDisputeService
         return $result;
     }
 
-    public function sendMessage(string $disputeId, string $text, bool $endRequest = false)
+    public function sendMessage(string $disputeId, string $text, bool $endRequest = false, $attachment = null)
     {
         $url = $this->getRestUrl("/sale/disputes/{$disputeId}/messages");
         $response = $this->request('POST', $url, [
-            'text' => $text,
-            'attachment' => null,
+            'text' => $text, 
+            'attachment' => $attachment,
             'type' => self::TYPE_REGULAR
         ]);
         return json_decode((string)$response->getBody(), true);
@@ -147,6 +147,28 @@ class AllegroDisputeService
         ]);
 
         return json_decode((string)$response->getBody(), true);
+    }
+
+    /** Create a request add attachment */
+    public function createAttachmentId($fileName, $fileSize)
+    {
+        $url = $this->getRestUrl("/sale/dispute-attachments");
+        $response = $this->request('POST', $url, [
+            'fileName' => $fileName,
+            'size' => $fileSize
+        ]);
+        return json_decode((string)$response->getBody(), true);
+    }
+    /** Upload attachment */
+    public function uploadAttachment($attachmentId, $pathFile)
+    {
+        $url = $this->getRestUrl("/sale/dispute-attachments/" . $attachmentId);
+        $response = $this->request('PUT', $url, [], [
+            'name' => 'file',
+            'contents' => ($pathFile),
+            'filename' => $attachmentId
+        ]);
+        return $response->getStatusCode() == 200;
     }
 
     public function getAttachment(string $url)
@@ -203,7 +225,7 @@ class AllegroDisputeService
         }
     }
 
-    private function request(string $method, string $url, array $params)
+    private function request(string $method, string $url, array $params, $attachment = null)
     {
         $headers = [
             // 'Accept' => 'application/vnd.allegro.public.v1+json',
@@ -212,13 +234,18 @@ class AllegroDisputeService
         ];
 
         try {
+            $data =
+            [
+                'headers' => $headers,
+                'json' => $params
+            ];
+            if($attachment){
+                $data['multipart'] = [$attachment];
+            }
             $response = $this->client->request(
                 $method,
                 $url,
-                [
-                    'headers' => $headers,
-                    'json' => $params
-                ]
+                $data
             );
         } catch (\Exception $e) {
             if ($e->getCode() == 401) {
