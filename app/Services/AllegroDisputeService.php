@@ -116,7 +116,7 @@ class AllegroDisputeService
     {
         $url = $this->getRestUrl("/sale/disputes/{$disputeId}/messages");
         $response = $this->request('POST', $url, [
-            'text' => $text,
+            'text' => $text, 
             'attachment' => $attachment,
             'type' => self::TYPE_REGULAR
         ]);
@@ -164,8 +164,9 @@ class AllegroDisputeService
     {
         $url = $this->getRestUrl("/sale/dispute-attachments/" . $attachmentId);
         $response = $this->request('PUT', $url, [], [
-            'name' => $attachmentId,
-            'contents' => ($pathFile)
+            'name' => 'file',
+            'contents' => ($pathFile),
+            'filename' => $attachmentId
         ]);
         return $response->getStatusCode() == 200;
     }
@@ -224,7 +225,7 @@ class AllegroDisputeService
         }
     }
 
-    private function request(string $method, string $url, array $params)
+    private function request(string $method, string $url, array $params, $attachment = null)
     {
         $headers = [
             // 'Accept' => 'application/vnd.allegro.public.v1+json',
@@ -233,13 +234,18 @@ class AllegroDisputeService
         ];
 
         try {
+            $data =
+            [
+                'headers' => $headers,
+                'json' => $params
+            ];
+            if($attachment){
+                $data['multipart'] = [$attachment];
+            }
             $response = $this->client->request(
                 $method,
                 $url,
-                [
-                    'headers' => $headers,
-                    'json' => $params
-                ]
+                $data
             );
         } catch (\Exception $e) {
             if ($e->getCode() == 401) {
