@@ -1497,40 +1497,18 @@
                             let html = '';
                             let date_from = moment(row.consultant_shipment_date_from);
                             let date_to = moment(row.consultant_shipment_date_to);
-                            let DRNPF = null;
-                            let DRNPT = null;
-                            if (date_from.isValid()) {
-                                let formatedDate_from = date_from.format('YYYY-MM-DD');
-                                let formatedDate_to = date_to.format('YYYY-MM-DD');
-                                DRNPF = formatedDate_from;
-                                DRNPT = formatedDate_to;  
-                            }
-
-                            let datesLabels = ['WDNKL', 'WDNM', 'ZDNK', 'ZDNM'];
-
+                            let shipmentDateFrom = date_from.isValid() ? date_from.format('YYYY-MM-DD') : null;
+                            let shipmentDateTo = date_to.isValid() ? date_to.format('YYYY-MM-DD') : null;
+           
                             const datesObject = {
-                                'OD': DRNPF ,
-                                'DO': DRNPT ,
-                                'WDNKL': row.initial_sending_date_client,
-                                'WDNM': row.initial_sending_date_magazine,
-                                'ZDNK': row.confirmed_sending_date_consultant,
-                                'ZDNM': row.confirmed_sending_date_warehouse,
-                                'WDOK': row.initial_pickup_date_client,
-                                'PDKL': row.confirmed_pickup_date_client,
-                                'PDK': row.confirmed_pickup_date_consultant,
-                                'PDM': row.confirmed_pickup_date_warehouse,
-                                'WDDK': row.initial_delivery_date_consultant,
-                                'WDDM': row.initial_delivery_date_warehouse,
-                                'PDD': row.confirmed_delivery_date
+                                'Od': shipmentDateFrom,
+                                'Do': shipmentDateTo,
                             }
-
+                            
                             for (const [key, value] of Object.entries(datesObject)) {
-                                if (value != null)
-                                    if (datesLabels.includes(key)) {
-                                        html += `${key}: <br/> ${value.slice(0, 10)} <br/>`
-                                    } else {
-                                        html += `${key}: <br/> ${value} <br/>`
-                                    }
+                                if (value != null) { 
+                                    html += `${key}: <br/> ${value} <br/>`
+                                }
                             }
 
                             return html;
