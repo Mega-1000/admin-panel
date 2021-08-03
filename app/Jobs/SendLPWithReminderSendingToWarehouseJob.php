@@ -37,7 +37,7 @@ class SendLPWithReminderSendingToWarehouseJob implements ShouldQueue
             $pathSecond = null;
             if ($orderPackage->service_courier_name === 'INPOST' || $orderPackage->service_courier_name === 'ALLEGRO-INPOST') {
                 $path = storage_path('app/public/inpost/stickers/sticker' . $orderPackage->letter_number . '.pdf');
-            } elseif ($orderPackage->delivery_courier_name === 'DPD') {
+            } elseif ($orderPackage->delivery_courier_name === 'DPD' && !empty($orderPackage->letter_number)) {
                 $path = storage_path('app/public/dpd/protocols/protocol' . $orderPackage->letter_number . '.pdf');
                 $pathSecond = storage_path('app/public/dpd/stickers/sticker' . $orderPackage->letter_number . '.pdf');
             } elseif ($orderPackage->delivery_courier_name === 'JAS') {
