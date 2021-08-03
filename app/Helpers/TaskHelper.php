@@ -29,12 +29,12 @@ class TaskHelper
             'status' => $task->status
         ]);
         $time = TaskTimeHelper::getFirstAvailableTime($duration, $data);
+        Log::notice('Czas zakończenia pracy', ['line' => __LINE__, 'file' => __FILE__, 'timeStart' => $time['start'], 'timeEnd' => $time['end']]);
         TaskTime::create([
             'task_id' => $taskNew->id,
             'date_start' => $time['start'],
             'date_end' => $time['end']
         ]);
-        Log::notice('Sprawdzam daty zadania createNewGroup', ['dataStart' => $time['start'], 'dataStop' => $time['end']]);
         TaskSalaryDetails::create([
             'task_id' => $taskNew->id,
             'consultant_value' => 0,
@@ -57,6 +57,7 @@ class TaskHelper
         $time = TaskTimeHelper::getFirstAvailableTime($duration, $data);
         $taskTime->date_start = $time['start'];
         $taskTime->date_end = $time['end'];
+        Log::notice('Czas zakończenia pracy', ['line' => __LINE__, 'file' => __FILE__, 'timeStart' => $time['start'], 'timeEnd' => $time['end']]);
         $taskTime->save();
         $task->parent_id = null;
         $task->save();

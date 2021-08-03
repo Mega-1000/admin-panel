@@ -120,6 +120,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         if ($count > 0) {
             $time = ceil($count * 2 / 5) * 5;
             $time = TaskTimeHelper::getFirstAvailableTime($time);
+            Log::notice('Czas zakończenia pracy', ['line' => __LINE__, 'file' => __FILE__, 'timeStart' => $time['start'], 'timeEnd' => $time['end']]);
             TaskTime::create([
                 'task_id' => $taskPrimal->id,
                 'date_start' => $time['start'],
