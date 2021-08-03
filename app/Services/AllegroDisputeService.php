@@ -160,12 +160,12 @@ class AllegroDisputeService
         return json_decode((string)$response->getBody(), true);
     }
     /** Upload attachment */
-    public function uploadAttachment($attachmentId, $pathFile)
+    public function uploadAttachment($attachmentId, $contentsFile)
     {
         $url = $this->getRestUrl("/sale/dispute-attachments/" . $attachmentId);
         $response = $this->request('PUT', $url, [], [
             'name' => 'file',
-            'contents' => ($pathFile),
+            'contents' => ($contentsFile),
             'filename' => $attachmentId
         ]);
         return $response->getStatusCode() == 200;
