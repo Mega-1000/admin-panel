@@ -168,7 +168,7 @@ class AllegroDisputeService
             'contents' => ($contentsFile),
             'filename' => $attachmentId
         ]);
-        return $response->getStatusCode() == 200;
+        return $response;
     }
 
     public function getAttachment(string $url)
