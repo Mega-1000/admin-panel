@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Entities\TaskTime;
+use App\Observers\Entities\TaskTimeObserver;
 use Carbon\Carbon;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
@@ -27,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
             \URL::forceScheme('https');
         }
         Carbon::setWeekendDays([Carbon::SUNDAY, Carbon::SATURDAY]);
+        TaskTime::observe(TaskTimeObserver::class);
     }
 
     /**
