@@ -116,7 +116,7 @@ class AllegroDisputeService
     {
         $url = $this->getRestUrl("/sale/disputes/{$disputeId}/messages");
         $response = $this->request('POST', $url, [
-            'text' => $text, 
+            'text' => $text,
             'attachment' => $attachment,
             'type' => self::TYPE_REGULAR
         ]);
@@ -157,7 +157,9 @@ class AllegroDisputeService
             'fileName' => $fileName,
             'size' => $fileSize
         ]);
-        return json_decode((string)$response->getBody(), true);
+
+        $data = json_decode((string)$response->getBody(), true);
+        return ($data && isset($data['id'])) ? $data['id'] : false;
     }
     /** Upload attachment */
     public function uploadAttachment($attachmentId, $contentsFile)

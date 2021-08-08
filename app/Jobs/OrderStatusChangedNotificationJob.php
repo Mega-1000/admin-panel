@@ -88,19 +88,17 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
             $pdf = PDF::loadView('pdf.proform', compact('date', 'proformDate', 'order'))->output();
             Storage::disk('local')->put('public/proforma/' . $order->proforma_filename, $pdf);
 
+            $mail_to = $order->customer->login;
+            
             try {
-                if (strpos($order->customer->login,'allegromail.pl')) {
-                    return;
+                if ($selloTransaction = $order->selloTransaction) {
+	                if ($allegroOrder = $selloTransaction->allegroOrder) {
+		                $mail_to = $allegroOrder->buyer_email;
+	                }
                 }
-                //send to chat pdf file
-                $service = new AllegroDisputeService();
-                $attachment = $service->createAttachmentId($order->proforma_filename, strlen($pdf));
-                if(isset($attachment['id']) && $service->uploadAttachment($attachment['id'], $pdf)){
-                    $service->sendMessage($order->dispute()->first()->dispute_id, 'proforma', false, $attachment['id']);
-                }
-                //end send
+
                 \Mailer::create()
-                    ->to($order->customer->login)
+                    ->to($mail_to)
                     ->send(new OrderStatusChanged($subject, $message, $pdf));
             } catch (\Exception $e) {
                 \Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);

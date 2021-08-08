@@ -3,6 +3,7 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SelTransaction extends Model
 {
@@ -68,4 +69,9 @@ class SelTransaction extends Model
     {
         return $this->hasOne(Order::class, 'sello_id', 'id');
     }
+	
+	public function allegroOrder(): BelongsTo
+	{
+		return $this->belongsTo(AllegroOrder::class, 'tr_CheckoutFormId', 'order_id');
+	}
 }
