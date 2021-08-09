@@ -621,13 +621,13 @@
                     $(info.el).attr('title', info.event.extendedProps.text);
                 },
                 eventDrop: function (info) {
-                    let firstDate = new Date(info.event.start);
+                    let firstDate = new Date(info.event._instance.range.start);
                     let startMinutes = firstDate.getUTCMinutes();
                     if (startMinutes < 10) {
                         startMinutes = '0' + startMinutes;
                     }
                     let dateTime = firstDate.getUTCFullYear() + '-' + ('0' + (firstDate.getUTCMonth() + 1)).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getUTCHours() + ':' + startMinutes;
-                    let endDate = new Date(info.event.end);
+                    let endDate = new Date(info.event._instance.range.end);
                     let minutes = endDate.getUTCMinutes();
                     if (minutes < 10) {
                         minutes = '0' + minutes;
