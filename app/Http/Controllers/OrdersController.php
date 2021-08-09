@@ -2210,6 +2210,7 @@ class OrdersController extends Controller
             ->leftJoin('statuses', 'orders.status_id', '=', 'statuses.id')
             ->leftJoin('sel_tr__transaction', 'orders.sello_id', '=', 'sel_tr__transaction.id')
             ->leftJoin('users', 'orders.employee_id', '=', 'users.id')
+            ->leftJoin('order_dates', 'orders.id', '=', 'order_dates.order_id')
             ->leftJoin('customer_addresses', function ($join) {
                 $join->on('customers.id', '=', 'customer_addresses.customer_id')
                     ->where('type', '=', 'STANDARD_ADDRESS');

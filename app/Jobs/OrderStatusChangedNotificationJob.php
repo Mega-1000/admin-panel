@@ -94,7 +94,7 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
                 }
                 //send to chat pdf file
                 $service = new AllegroDisputeService();
-                $attachment = $service->createAttachmentId($order->proforma_filename, sizeof($pdf));
+                $attachment = $service->createAttachmentId($order->proforma_filename, strlen($pdf));
                 if(isset($attachment['id']) && $service->uploadAttachment($attachment['id'], $pdf)){
                     $service->sendMessage($order->dispute()->first()->dispute_id, 'proforma', false, $attachment['id']);
                 }

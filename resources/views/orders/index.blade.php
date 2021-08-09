@@ -1495,42 +1495,20 @@
                         searchable: false,
                         render: function (shipment_date, option, row) {
                             let html = '';
-                            let date = moment(shipment_date);
-                            let DRNP = null;
-
-                            if (date.isValid()) {
-                                let formatedDate = date.format('YYYY-MM-DD');
-                                let startDaysVariation = "";
-                                if (row.shipment_start_days_variation) {
-                                    startDaysVariation = "<br>&plusmn; " + row.shipment_start_days_variation + " dni";
-                                }
-                                DRNP = html + formatedDate + startDaysVariation;
-                            }
-
-                            let datesLabels = ['WDNKL', 'WDNM', 'ZDNK', 'ZDNM'];
-
+                            let date_from = moment(row.consultant_shipment_date_from);
+                            let date_to = moment(row.consultant_shipment_date_to);
+                            let shipmentDateFrom = date_from.isValid() ? date_from.format('YYYY-MM-DD') : null;
+                            let shipmentDateTo = date_to.isValid() ? date_to.format('YYYY-MM-DD') : null;
+           
                             const datesObject = {
-                                'WDNK': DRNP,
-                                'WDNKL': row.initial_sending_date_client,
-                                'WDNM': row.initial_sending_date_magazine,
-                                'ZDNK': row.confirmed_sending_date_consultant,
-                                'ZDNM': row.confirmed_sending_date_warehouse,
-                                'WDOK': row.initial_pickup_date_client,
-                                'PDKL': row.confirmed_pickup_date_client,
-                                'PDK': row.confirmed_pickup_date_consultant,
-                                'PDM': row.confirmed_pickup_date_warehouse,
-                                'WDDK': row.initial_delivery_date_consultant,
-                                'WDDM': row.initial_delivery_date_warehouse,
-                                'PDD': row.confirmed_delivery_date
+                                'Od': shipmentDateFrom,
+                                'Do': shipmentDateTo,
                             }
-
+                            
                             for (const [key, value] of Object.entries(datesObject)) {
-                                if (value != null)
-                                    if (datesLabels.includes(key)) {
-                                        html += `${key}: <br/> ${value.slice(0, 10)} <br/>`
-                                    } else {
-                                        html += `${key}: <br/> ${value} <br/>`
-                                    }
+                                if (value != null) { 
+                                    html += `${key}: <br/> ${value} <br/>`
+                                }
                             }
 
                             return html;
