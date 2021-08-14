@@ -198,7 +198,6 @@
                     data: 'id',
                     name: 'id',
                     render: function (id, type, row) {
-                        console.log(row);
                         let html = '<a href="{{ url()->current() }}/' + row['customer_id'] + '/list" class="btn btn-sm btn-primary edit">';
                         html += '<i class="voyager-edit"></i>';
                         html += '<span class="hidden-xs hidden-sm">Płatności</span>';
@@ -262,7 +261,7 @@
                     let columnSearch =  $("#columnSearch" + (column));
                     columnSearch.parent().hide();
             }
-            
+
         });
     </script>
     <style>

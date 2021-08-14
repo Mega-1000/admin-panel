@@ -198,7 +198,6 @@
                     data: 'id',
                     name: 'id',
                     render: function (id, type, row) {
-			console.log(row);
                         let html = '<form action="{{ url()->current() }}/' + row.customer_id + '/change-status" method="POST" style="display: inline;">';
                         html += '{{ method_field('put') }}';
                         html += '{{ csrf_field() }}';
@@ -211,6 +210,11 @@
                         html += '<a href="{{ url()->current() }}/' + row.customer_id + '/edit" class="btn btn-sm btn-primary edit">';
                         html += '<i class="voyager-edit"></i>';
                         html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
+                        html += '</a>';
+
+                        html += '<a href="{{ url()->current() }}/' + row.customer_id + '/payments" class="btn btn-sm btn-success edit">';
+                        html += '<i class="fas fa-hand-holding-usd"></i>';
+                        html += '<span class="hidden-xs hidden-sm"> @lang('customers.table.payments')sdas</span>';
                         html += '</a>';
 
                         html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecord(' + row.customer_id + ')">';
@@ -275,7 +279,7 @@
                     let columnSearch =  $("#columnSearch" + (column));
                     columnSearch.parent().hide();
             }
-            
+
         });
     </script>
     <style>

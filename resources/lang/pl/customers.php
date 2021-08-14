@@ -26,6 +26,7 @@ return [
         'customer_adresses' => [
             'firstname' => ' imię ',
         ],
+        'payments' => 'Płatności'
     ],
     'form' => [
         'status' => 'Status',
@@ -77,4 +78,20 @@ return [
         'delete' => 'Klient został usunięty pomyślnie!',
         'change_status' => 'Status klienta został pomyślnie zaktualizowany!',
     ],
+    'payments' => [
+        'title' => 'Płatności',
+        'create' => 'Dodaj płatność',
+        'history' => 'Historia transakcji',
+        'postedInSystemDate' => 'Data zaksięgowania w systemie',
+        'postedInBankDate' => 'Data zaksięgowania w banku',
+        'paymentId' => 'Identyfikator płatności',
+        'kindOfOperation' => 'Rodzaj operacji',
+        'orderId' => 'Identyfikator zlecenia',
+        'operator' => 'Operator płatności',
+        'value' => 'Wartość operacji',
+        'balance' => 'Saldo',
+        'accountingNotes' => 'Notatki księgowe',
+        'transactionNotes' => 'Notatki transakcyjne',
+        'actions' => 'Akcje'
+    ]
 ];

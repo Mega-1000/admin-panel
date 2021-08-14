@@ -27,10 +27,14 @@ use App\Repositories\OrderPackageRepository;
 use App\Services\OrderPaymentLogService;
 use App\Services\OrderPaymentService;
 use Carbon\Carbon;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Foundation\Application;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 use TCG\Voyager\Models\Role;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -70,7 +74,7 @@ class OrdersPaymentsController extends Controller
 
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      * @var integer $id Order ID
      */
     public function create($id)
@@ -79,7 +83,7 @@ class OrdersPaymentsController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      * @var integer $id Order ID
      */
     public function createMaster($id)
@@ -1833,6 +1837,23 @@ class OrdersPaymentsController extends Controller
             compact('payment'));
     }
 
+    /**
+     * @return Factory|Application|View
+     */
+    public function paymentsList()
+    {
+        return view('payments.list');
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function paymentsDatatable($id): JsonResponse
+    {
+        $collection = $this->repository->findWhere(['customer_id' => $id]);
+        return DataTables::collection($collection)->make(true);
+    }
+
     public function paymentUpdate(Request $request, $id)
     {
         $payment = $this->paymentRepository->find($id);
@@ -1846,7 +1867,7 @@ class OrdersPaymentsController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function datatable($id)
     {

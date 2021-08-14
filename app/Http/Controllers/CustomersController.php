@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Entities\ColumnVisibility;
 use App\Entities\Customer;
+use App\Entities\CustomerPayments;
 use App\Entities\Order;
 use App\Http\Requests\CustomerCreateRequest;
 use App\Http\Requests\CustomerUpdateRequest;
@@ -502,6 +503,22 @@ class CustomersController extends Controller
         }
         $delivery->save();
         $customer->save();
+    }
+
+    /**
+     * Action for customer payments
+     *
+     * @param Customer $customer Klient
+     */
+    public function payments(Customer $customer)
+    {
+//        $customerPayments = CustomerPayments::find($id);
+        dd($customer);
+
+        return view('customers.payments'
+//            compact('customer', 'customerAddressStandard', 'customerAddressInvoice', 'customerAddressDelivery',
+//                'roleName')
+        );
     }
 }
 
