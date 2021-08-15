@@ -888,7 +888,7 @@
         </thead>
     </table>
     <div class="vue-components">
-        <tracker :enabled="true"/>
+        <tracker :enabled="true" :user="{{ Auth::user()->id }}"/>
     </div>
     @include('bonus.modal')
 @endsection
@@ -1499,14 +1499,14 @@
                             let date_to = moment(row.consultant_shipment_date_to);
                             let shipmentDateFrom = date_from.isValid() ? date_from.format('YYYY-MM-DD') : null;
                             let shipmentDateTo = date_to.isValid() ? date_to.format('YYYY-MM-DD') : null;
-           
+
                             const datesObject = {
                                 'Od': shipmentDateFrom,
                                 'Do': shipmentDateTo,
                             }
-                            
+
                             for (const [key, value] of Object.entries(datesObject)) {
-                                if (value != null) { 
+                                if (value != null) {
                                     html += `${key}: <br/> ${value} <br/>`
                                 }
                             }

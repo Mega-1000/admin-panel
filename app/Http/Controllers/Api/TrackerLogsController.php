@@ -16,13 +16,14 @@ class TrackerLogsController extends Controller
     public function new(Request $request)
     {
         $this->validate($request, [
+            'user_id' => 'required',
             'time' => 'required',
             'page' => 'required',
         ]);
 
         $log = new TrackerLogs();
-        if(Auth::user()) {
-            $log->user_id = Auth::user()->id;
+        if($request->user_id) {
+            $log->user_id = $request->user_id;
         } else {
             $log->user_id = 1;
         }

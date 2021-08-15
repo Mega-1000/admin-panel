@@ -78,7 +78,7 @@
         <button type="submit" class="btn btn-primary" track-click>@lang('voyager.generic.save')</button>
     </form>
     <div class="vue-components">
-        <tracker :enabled="true"/>
+        <tracker :enabled="true" :user="{{ Auth::user()->id }}"/>
     </div>
 @endsection
 @section('scripts')
