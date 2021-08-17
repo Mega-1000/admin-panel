@@ -2483,7 +2483,7 @@
         </div>
     </div>
     <div class="vue-components">
-        <tracker :enabled="true"/>
+        <tracker :enabled="true" :user="{{ Auth::user()->id }}"/>
     </div>
     <style>
         .firstOrder, .secondOrder, .thirdOrder, .fourthOrder, .fifthOrder {

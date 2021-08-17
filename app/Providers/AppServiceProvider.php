@@ -29,7 +29,7 @@ class AppServiceProvider extends ServiceProvider
             \URL::forceScheme('https');
         }
         Carbon::setWeekendDays([Carbon::SUNDAY, Carbon::SATURDAY]);
-        TaskTime::observe(TaskTimeObserver::class);
+//        TaskTime::observe(TaskTimeObserver::class);
     }
 
     /**

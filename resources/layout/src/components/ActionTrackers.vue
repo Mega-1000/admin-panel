@@ -23,6 +23,7 @@ import { addLogParam, LogItem, updateTimeLogParam } from '@/types/LogsTrackerTyp
 })
 export default class ActionTrackers extends Vue {
   @Prop() private enabled!: boolean
+  @Prop() private user!: number
   private time = 0
   private finalTime = 3
   private timeInterval = 60000
@@ -104,6 +105,7 @@ export default class ActionTrackers extends Vue {
       await this.$store?.dispatch('LogsTrackerService/updateTimeLog', param)
     } else {
       const param: addLogParam = {
+        userId: this.user,
         time: this.trackTime,
         page: window.location.href
       }

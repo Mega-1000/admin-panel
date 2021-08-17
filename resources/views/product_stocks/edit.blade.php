@@ -161,7 +161,7 @@
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
     </form>
     <div class="vue-components">
-        <tracker :enabled="true"/>
+        <tracker :enabled="true" :user="{{ Auth::user()->id }}"/>
     </div>
 @endsection
 @section('datatable-scripts')

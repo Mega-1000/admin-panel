@@ -26,7 +26,7 @@ class TaskTimeObserver
      */
     public function updated(TaskTime $taskTime)
     {
-        Log::notice('Kontrola czasu updated', ['line' => __LINE__, 'file' => __FILE__, 'start' => $taskTime->date_start, 'end' => $taskTime->date_end]);
+        Log::notice('Kontrola czasu updated', ['uri'=> request()->getRequestUri(), 'start' => $taskTime->date_start, 'end' => $taskTime->date_end]);
     }
 
     /**
