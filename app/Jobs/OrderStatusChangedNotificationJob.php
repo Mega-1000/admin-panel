@@ -103,11 +103,10 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
 	
 	            \Log::info("Order: {$order->id}. Send to: {$mail_to}");
                 
-                /*
                 \Mailer::create()
                     ->to($mail_to)
                     ->send(new OrderStatusChanged($subject, $message, $pdf));
-                */
+                
             } catch (\Exception $e) {
                 \Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);
             }
