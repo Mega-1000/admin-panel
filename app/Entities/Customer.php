@@ -94,9 +94,9 @@ class Customer extends Authenticatable implements Transformable
         return $this->belongsToMany(Chat::class, 'chat_user')->withTimestamps();
     }
 
-    public function customerPayments()
+    public function transactions()
     {
-        return $this->hasMany(CustomerPayment::class);
+        return $this->hasMany(Transaction::class);
 
     }
 }

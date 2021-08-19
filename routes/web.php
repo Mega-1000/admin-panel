@@ -561,6 +561,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/edit-allegro-terms', 'AllegroController@saveTerms')->name('allegro.edit-terms');
     });
     Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/web/TrackerLogsRoutes.php');
+    Route::group(['as' => 'transactions.'], __DIR__ . '/web/TransactionsRoutes.php');
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');

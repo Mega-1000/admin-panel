@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use App\Mail\DifferentCustomerData;
 use App\Mail\InvoiceSent;
-use App\Repositories\OrderRepository;
+use App\Repositories\TransactionRepository;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -23,7 +23,7 @@ class ValidateSubiekt implements ShouldQueue
      *
      * @return void
      */
-    public function handle(OrderRepository $orderRepository)
+    public function handle(TransactionRepository $orderRepository)
     {
         $toCheck = DB::table('gt_invoices')->where('created_at', '>', Carbon::now()->subMinutes(5)->toDateTimeString())->get();
 
