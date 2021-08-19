@@ -3,17 +3,10 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Prettus\Repository\Contracts\Transformable;
-use Prettus\Repository\Traits\TransformableTrait;
 
-/**
- * Class CustomerPayments.
- *
- * @package namespace App\Entities;
- */
-class CustomerPayment extends Model implements Transformable
+class Transaction extends Model
 {
-    use TransformableTrait;
+    protected $table = 'transactions';
 
     /**
      * The attributes that are mass assignable.
@@ -34,12 +27,8 @@ class CustomerPayment extends Model implements Transformable
         'transaction_notes',
     ];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function customer()
     {
         return $this->belongsTo(Customer::class);
     }
-
 }
