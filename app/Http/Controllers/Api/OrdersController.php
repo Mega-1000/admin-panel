@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Entities\FirmSource;
 use App\Entities\OrderDates;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\ChatHelper;
@@ -149,7 +150,12 @@ class OrdersController extends Controller
             }
             ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($data);
             DB::commit();
+            
             $order = Order::find($id);
+	        $firmSource = FirmSource::byFirmSource(env('FIRM_ID'), 2)->first();
+	        $order->firm_source_id = $firmSource ? $firmSource->id : null;
+	        $order->save();
+	        
             return $this->createdResponse(['order_id' => $id, 'canPay' => $canPay, 'token' => $order->getToken()]);
         } catch (\Exception $e) {
             DB::rollBack();

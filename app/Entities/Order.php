@@ -709,7 +709,15 @@ class Order extends Model implements Transformable
     {
         $this->hasOne(Chat::class);
     }
-
+	
+	/**
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+	 */
+	public function firmSource()
+	{
+		return $this->belongsTo(FirmSource::class);
+	}
+	
     public function setDefaultDates()
     {
         $dateFrom = Carbon::parse($this->selloTransaction->tr_RemittanceDate);
