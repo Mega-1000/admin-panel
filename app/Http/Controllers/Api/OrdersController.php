@@ -293,7 +293,8 @@ class OrdersController extends Controller
         $orderId
     )
     {
-
+	    $message = [];
+	    
         try {
             $order = $this->orderRepository->find($orderId);
             list($isDeliveryChangeLocked, $isInvoiceChangeLocked) = $this->getLocks($order);
@@ -332,10 +333,16 @@ class OrdersController extends Controller
                 } else {
                     $deliveryMail = $request->get('DELIVERY_ADDRESS')['email'];
                 }
+	            $message[] = __('orders.message.delivery_address_changed');
+            } else {
+            	$message[] = __('orders.message.delivery_address_change_failure');
             }
 
             if (!$isInvoiceChangeLocked) {
                 $invoiceAddress->update($request->get('INVOICE_ADDRESS'));
+	            $message[] = __('orders.message.invoice_address_changed');
+            } else {
+	            $message[] = __('orders.message.invoice_address_change_failure');
             }
 
             if ($request->get('remember_delivery_address')) {
@@ -346,8 +353,8 @@ class OrdersController extends Controller
                 $data = array_merge($request->get('INVOICE_ADDRESS'), ['type' => 'INVOICE_ADDRESS']);
                 $order->customer->addresses()->updateOrCreate(["type" => "INVOICE_ADDRESS"], $data);
             }
-
-            return $this->okResponse();
+	
+	        return response()->json(implode(" ", $message), 200, [], JSON_UNESCAPED_UNICODE);
         } catch (\Exception $e) {
             Log::error('Problem with update customer invoice and delivery address.',
                 ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
@@ -499,6 +506,7 @@ class OrdersController extends Controller
     {
         $deliveryLock [] = config('labels-map')['list']['produkt w przygotowaniu-po wyprodukowaniu magazyn kasuje etykiete'];
         $deliveryLock [] = config('labels-map')['list']['wyprodukowana'];
+	    $deliveryLock [] = config('labels-map')['list']['wyprodukowano czesciowo'];
         $deliveryLock [] = config('labels-map')['list']['wyslana do awizacji'];
         $deliveryLock [] = config('labels-map')['list']['awizacja przyjeta'];
         $deliveryLock [] = config('labels-map')['list']['awizacja odrzucona'];
