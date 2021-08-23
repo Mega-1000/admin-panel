@@ -158,7 +158,7 @@ class AllegroApiService
                 } else {
                 	$this->fetchAccessToken();
                 }
-                $response = $this->request($method, $url, $params, $attachment, false);
+                return $response = $this->request($method, $url, $params, $attachment, false);
             } else {
                 return $this->cantGetAlert();
             }
