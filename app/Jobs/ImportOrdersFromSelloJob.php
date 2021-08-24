@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Entities\FirmSource;
 use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\Product;
@@ -320,13 +319,6 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
         $order = Order::find($id);
         $order->sello_id = $transaction->id;
-	    /**
-	     * @TODO create determining source by params when there will be more info about sources
-	     * maybe move to cron or something else
-	     */
-	    $firmSource = FirmSource::firmSource(env('FIRM_ID'), 1)->first();
-        $order->firm_source_id = $firmSource ? $firmSource->id : null;
-        
         $user = User::where('name', '001')->first();
         $order->employee()->associate($user);
         $withWarehouse = $products->filter(function ($prod) {

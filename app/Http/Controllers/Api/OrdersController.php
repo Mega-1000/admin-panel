@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Entities\FirmSource;
 use App\Entities\OrderDates;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\ChatHelper;
@@ -150,12 +149,7 @@ class OrdersController extends Controller
             }
             ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($data);
             DB::commit();
-            
             $order = Order::find($id);
-	        $firmSource = FirmSource::byFirmSource(env('FIRM_ID'), 2)->first();
-	        $order->firm_source_id = $firmSource ? $firmSource->id : null;
-	        $order->save();
-	        
             return $this->createdResponse(['order_id' => $id, 'canPay' => $canPay, 'token' => $order->getToken()]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -293,8 +287,7 @@ class OrdersController extends Controller
         $orderId
     )
     {
-	    $message = [];
-	    
+
         try {
             $order = $this->orderRepository->find($orderId);
             list($isDeliveryChangeLocked, $isInvoiceChangeLocked) = $this->getLocks($order);
@@ -333,16 +326,10 @@ class OrdersController extends Controller
                 } else {
                     $deliveryMail = $request->get('DELIVERY_ADDRESS')['email'];
                 }
-	            $message[] = __('orders.message.delivery_address_changed');
-            } else {
-            	$message[] = __('orders.message.delivery_address_change_failure');
             }
 
             if (!$isInvoiceChangeLocked) {
                 $invoiceAddress->update($request->get('INVOICE_ADDRESS'));
-	            $message[] = __('orders.message.invoice_address_changed');
-            } else {
-	            $message[] = __('orders.message.invoice_address_change_failure');
             }
 
             if ($request->get('remember_delivery_address')) {
@@ -353,8 +340,8 @@ class OrdersController extends Controller
                 $data = array_merge($request->get('INVOICE_ADDRESS'), ['type' => 'INVOICE_ADDRESS']);
                 $order->customer->addresses()->updateOrCreate(["type" => "INVOICE_ADDRESS"], $data);
             }
-	
-	        return response()->json(implode(" ", $message), 200, [], JSON_UNESCAPED_UNICODE);
+
+            return $this->okResponse();
         } catch (\Exception $e) {
             Log::error('Problem with update customer invoice and delivery address.',
                 ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
@@ -506,7 +493,6 @@ class OrdersController extends Controller
     {
         $deliveryLock [] = config('labels-map')['list']['produkt w przygotowaniu-po wyprodukowaniu magazyn kasuje etykiete'];
         $deliveryLock [] = config('labels-map')['list']['wyprodukowana'];
-	    $deliveryLock [] = config('labels-map')['list']['wyprodukowano czesciowo'];
         $deliveryLock [] = config('labels-map')['list']['wyslana do awizacji'];
         $deliveryLock [] = config('labels-map')['list']['awizacja przyjeta'];
         $deliveryLock [] = config('labels-map')['list']['awizacja odrzucona'];

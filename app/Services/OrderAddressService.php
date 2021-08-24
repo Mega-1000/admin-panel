@@ -1,75 +1,97 @@
 <?php namespace App\Services;
 
+use App\Entities\Order;
 use App\Entities\OrderAddress;
-use App\Rules\ValidNIP;
 use Illuminate\Support\Facades\Validator;
 
 class OrderAddressService
 {
-	public function addressIsValid(OrderAddress $address): bool
-	{
-		$addressArray = $address->toArray();
-		$rules = $this->getRules($address);
-		
-		$validator = Validator::make($addressArray, $rules);
-		
-		return !$validator->fails();
-	}
-	
-	public function preSaveCleanup(OrderAddress $address)
-	{
-		foreach ($address->getFillable() as $field) {
-			$address->$field = $address->$field !== null ?? trim($address->$field);
-			if ($address->type == OrderAddress::TYPE_INVOICE) {
-				if ($field == 'firmname' && $address->$field) {
-					$address->firstname = '';
-					$address->lastname = '';
-				}
-			}
-		}
-		$this->reformatPhoneNumber($address);
-		$this->reformatPostalCode($address);
-	}
-	
-	protected function reformatPhoneNumber(OrderAddress $address)
-	{
-		$phoneString = (string)$address->phone;
-		if ($phoneString && $phoneString[0] == 0) {
-			$address->phone = substr($phoneString, 1);
-		}
-	}
-	
-	protected function reformatPostalCode(OrderAddress $address)
-	{
-		$postalCodeString = (string)$address->postal_code;
-		if (preg_match('/^[0-9]{5}$/', $postalCodeString)) {
-			$address->postal_code = substr_replace($postalCodeString, '-', 2, 0);
-		}
-	}
-	
-	protected function getRules(OrderAddress $address): array
-	{
-		$rules = [
-			'email' => ['required', 'email'],
-			'address' => ['required'],
-			'flat_number' => ['required', 'string', 'max:10'],
-			'city' => ['required'],
-			'postal_code' => ['required', 'regex:/^[0-9]{2}-?[0-9]{3}$\b/'],
-			'phone' => ['required', 'regex:/^[0-9]{9}$\b/']
-		];
-		
-		if ($address->type == OrderAddress::TYPE_DELIVERY) {
-			$rules['firstname'] = ['required'];
-			$rules['lastname'] = ['required'];
-			$rules['firmname'] = ['string'];
-			$rules['nip'] = ['string', 'size:0'];
-		} elseif ($address->type == OrderAddress::TYPE_INVOICE) {
-			$rules['firstname'] = ['required_without_all:firmname'];
-			$rules['lastname'] = ['required_without_all:firmname'];
-			$rules['firmname'] = ['required_with_all:nip', 'required_without:firstname,lastname'];
-			$rules['nip'] = ['required_with_all:firmname', 'required_without:firstname,lastname', new ValidNIP()];
-		}
-		
-		return $rules;
-	}
+
+    const TYPE_DELIVERY = 'DELIVERY_ADDRESS';
+    const TYPE_INVOICE = 'INVOICE_ADDRESS';
+
+    public function addressIsValid(OrderAddress $address): bool
+    {
+        $addressArray = $address->toArray();
+        $rules = $this->getRules($address);
+
+        $validator = Validator::make($addressArray, $rules);
+
+        if (array_key_exists('nip', $addressArray) && $addressArray['nip'] != null) {
+            $nipIsValid = $this->validateNIP($addressArray['nip']);
+        } else {
+            $nipIsValid = true;
+        }
+
+        return !$validator->fails() && !$this->namesAndNipCombined($address) &&
+            $nipIsValid && $this->haveNameOrFirmname($address);
+    }
+
+    public function preSaveCleanup(OrderAddress $address)
+    {
+        foreach ($address->getFillable() as $field) {
+            $address->$field = trim($address->$field);
+        }
+        $this->reformatPhoneNumber($address);
+    }
+
+    protected function reformatPhoneNumber(OrderAddress $address)
+    {
+        $phoneString = (string)$address->phone;
+        if ($phoneString[0] == 0) {
+            $address->phone = substr($phoneString, 1);
+        }
+    }
+
+    protected function getRules(OrderAddress $address): array
+    {
+        $rules = [
+            'firstname' => 'required_with:lastname',
+            'lastname' => 'required_with:firstname',
+            'email' => 'required|email',
+            'address' => 'required',
+            'city' => 'required',
+            //'flat_number' => 'required|max:10',
+            'postal_code' => 'required|regex:/^[0-9]{2}-?[0-9]{3}$/Du',
+            'phone' => 'regex:/^[0-9]{9}\b/'
+        ];
+        if ($address->type == self::TYPE_INVOICE) {
+            $rules['firmname'] = 'required_with:nip';
+            $rules['nip'] = 'required_with:firmname';
+        }
+
+        return $rules;
+    }
+
+    protected function validateNIP($nip): bool
+    {
+        $nipWithoutDashes = preg_replace("/-/", "", $nip);
+        $reg = '/^[0-9]{10}$/';
+        if (preg_match($reg, $nipWithoutDashes) == false)
+            return false;
+        else {
+            $digits = str_split($nipWithoutDashes);
+            $checksum = (6 * intval($digits[0]) + 5 * intval($digits[1]) +
+                    7 * intval($digits[2]) + 2 * intval($digits[3]) + 3 * intval($digits[4]) +
+                    4 * intval($digits[5]) + 5 * intval($digits[6]) + 6 * intval($digits[7]) +
+                    7 * intval($digits[8])) % 11;
+
+            return (intval($digits[9]) == $checksum);
+        }
+    }
+
+    protected function namesAndNipCombined(OrderAddress $address): bool
+    {
+        if ($address->type == self::TYPE_INVOICE && $address->nip && ($address->first_name || $address->last_name)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    protected function haveNameOrFirmname(OrderAddress $address)
+    {
+        return $address->firmname != null || $address->firstname != null || $address->lastname != null;
+    }
+
 }

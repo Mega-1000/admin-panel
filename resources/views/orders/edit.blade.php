@@ -404,12 +404,10 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-12">
-                <div class="form-group">
-                    <label>@lang('orders.form.labels_log')</label>
-                    <textarea id="labels_log" disabled class="form-control scrollable-notice" name="financial_comment" id="labels_log"
-                              rows="5">{{ $order->labels_log ?? ''}}</textarea>
-                </div>
+            <div class="form-group" style="width: 25%; float: left; padding: 5px;">
+                <label>@lang('orders.form.labels_log')</label>
+                <textarea id="labels_log" disabled class="form-control scrollable-notice" name="financial_comment" id="labels_log"
+                          rows="5">{{ $order->labels_log ?? ''}}</textarea>
             </div>
             <div class="form-group" style="width: 40%; float: left; padding: 5px;">
                 <label for="remainder_date">@lang('orders.form.remainder_date')</label>
