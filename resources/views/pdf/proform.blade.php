@@ -51,27 +51,13 @@
                     <h4>Sprzedawca</h4>
 
                     <p>
-                        @if ($order->firmSource && ($firm = $order->firmSource->firm))
-
-	                    {{ $firm->name }}<br/>
-                        @if ($firm->address)
-                        {{$firm->address->address}} {{$firm->address->flat_number}}<br/>
-                        {{$firm->address->postal_code}} {{$firm->address->city}}<br/>
-                        @endif
-                        NIP: {{$firm->nip}}<br/>
-                        Nr konta: {{$firm->account_number}}<br/>
-                        Telefony: {{$firm->phone}}<br/>
-                        E-mail ogólny : {{$firm->email}} <br/>
-                        @else
-
                         ELEKTRONICZNA PLATFORMA HANDLOWA WOJCIECH WEISSBROT<br/>
                         IWASZKIEWICZA 15A<br/>
                         55-200 OLAWA<br/>
                         NIP: 9121027907<br/>
-                        Nr konta: {{ env('ACCOUNT_PROFORMA') }}<br/>
-                        Telefony: {{ env('FRONT_URL') }}/kontakt<br/>
-                        E-mail ogólny : info@{{ env('DOMAIN_NAME') }}<br/>
-                        @endif
+                        Nr konta: {{env('ACCOUNT_PROFORMA')}} <br/>
+                        Telefony: {{env('FRONT_URL')}}/kontakt <br/>
+                        E-mail ogólny : {{'info@' . env('DOMAIN_NAME')}} <br/>
                     </p>
                 </td>
                 <td>
