@@ -69,7 +69,15 @@ class Firm extends Model implements Transformable
     {
         return $this->hasOne(Warehouse::class, 'delivery_warehouse_id');
     }
-
+	
+	/**
+	 * @return \Illuminate\Database\Eloquent\Relations\HasMany
+	 */
+	public function firmSources()
+	{
+		return $this->hasMany(FirmSource::class);
+	}
+	
     public $customColumnsVisibilities = [
         'name',
         'short_name',

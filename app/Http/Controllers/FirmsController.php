@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Entities\ColumnVisibility;
+use App\Entities\FirmSource;
+use App\Entities\OrderSource;
 use App\Jobs\SendMailToFirmsToUpdateTheDataJob;
 use App\Repositories\WarehouseRepository;
 use App\Http\Requests\FirmCreateRequest;
@@ -111,7 +113,16 @@ class FirmsController extends Controller
             'address2' => $request->input('address2'),
             'postal_code' => $request->input('postal_code'),
         ]);
-
+	
+	    if ($request->get('firm_source')) {
+	    	foreach ($request->firm_source as $source_id) {
+			    FirmSource::firstOrNew(
+				    ['firm_id' => $firm->id, 'order_source_id' => $source_id],
+				    ['firm_id' => $firm->id, 'order_source_id' => $source_id]
+			    );
+		    }
+	    }
+	    
         return redirect()->route('firms.edit', ['id' => $firm->id])->with([
             'message' => __('firms.message.store'),
             'alert-type' => 'success'
@@ -125,9 +136,13 @@ class FirmsController extends Controller
     public function edit($id)
     {
         $firm = $this->repository->find($id);
+        
         $firmAddress = $this->firmAddressRepository->findByField('firm_id', $firm->id);
         $warehouses = $this->warehouseRepository->all();
         $employees = Employee::where('firm_id', $id)->get();
+        
+        $orderSources = OrderSource::notInUse($firm->id)->get();
+        
         foreach ($employees as $employee) {
            $roles = $employee->employeeRoles;
            $employee->role = '';
@@ -148,7 +163,7 @@ class FirmsController extends Controller
             $visibilitiesEmployee[$key]->hidden = json_decode($row->hidden, true);
         }
         return view('firms.edit',
-            compact('visibilitiesWarehouse', 'visibilitiesEmployee', 'firm', 'firmAddress', 'warehouses'))->withEmployees($employees);
+            compact('visibilitiesWarehouse', 'visibilitiesEmployee', 'firm', 'firmAddress', 'warehouses', 'orderSources'))->withEmployees($employees);
     }
 
     /**
@@ -181,7 +196,27 @@ class FirmsController extends Controller
         }
         $firm->save();
         $this->firmAddressRepository->update($request->all(), $firm->address->id);
-
+	
+	    if (!$request->has('firm_source') || !$request->get('firm_source')) {
+		    $firm->firmSources()->delete();
+	    }
+	
+	    if ($request->get('firm_source')) {
+		    $firm->firmSources()->where('firm_id', $firm->id)->whereNotIn('order_source_id', $request->firm_source)->delete();
+		    
+	    	foreach ($request->firm_source as $source_id) {
+	    		$firmSource = FirmSource::withTrashed()->firstOrNew(
+				    ['firm_id' => $firm->id, 'order_source_id' => $source_id],
+				    ['firm_id' => $firm->id, 'order_source_id' => $source_id]
+			    );
+	    		if ($firmSource->trashed()) {
+				    $firmSource->restore();
+			    } else {
+				    $firmSource->save();
+			    }
+		    }
+	    }
+	    
         return redirect()->back()->with([
             'message' => __('firms.message.update'),
             'alert-type' => 'success'
