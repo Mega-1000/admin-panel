@@ -1,3 +1,3 @@
 <?php
 
-Route::get('/transactions',  ['as' => 'transactions', 'uses' => 'Api\TransactionsController@index']);
+Route::get('/index',  ['as' => 'index', 'uses' => 'Api\TransactionsController@index']);

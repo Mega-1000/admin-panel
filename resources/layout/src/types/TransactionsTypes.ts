@@ -1,7 +1,18 @@
 /* eslint-disable camelcase */
 
-import { Acceptance, Dates } from '@/types/OrdersTypes'
-import TransactionsRepository from '@/store/repositories/TransactionsRepository'
+export interface Transaction {
+  id: number,
+  postedInSystemDate: string,
+  postedInBankDate: string,
+  paymentId: string,
+  kindOfOperation: string,
+  orderId: number,
+  operator: string,
+  operation_value: number,
+  balance: number,
+  accounting_notes: string,
+  transaction_notes: string
+}
 
 export interface Customer {
   id: number,
@@ -21,24 +32,11 @@ export interface Customer {
   transactions: Transaction[]
 }
 
-export interface Transaction {
-  id: number,
-  postedInSystemDate: string,
-  postedInBankDate: string,
-  paymentId: string,
-  kindOfOperation: string,
-  orderId: number,
-  operator: string,
-  operation_value: number,
-  balance: number,
-  accounting_notes: string,
-  transaction_notes: string
-}
-
 export interface TransactionsStore {
   error: string,
   isLoading: boolean,
-  customers: Customer[] | null
+  customers: Customer[] | null,
+  customer: Customer | null
 }
 
 /* eslint-enabled camelcase */

@@ -11,6 +11,6 @@
 
 @section('table')
     <div class="vue-components">
-        <transactions-list/>
+        <transactions/>
     </div>
 @endsection

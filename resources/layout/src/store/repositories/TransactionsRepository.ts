@@ -6,7 +6,7 @@ import { getFullUrl } from '@/helpers/urls'
 
 export default {
   async getTransactions (): Promise<any> {
-    return fetch(getFullUrl('api/transactions'), {
+    return fetch(getFullUrl('api/transactions/index'), {
       method: 'GET',
       credentials: 'same-origin',
       headers: new Headers({

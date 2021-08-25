@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Repositories\TransactionRepository;
+use App\Entities\Customer;
 use App\Http\Controllers\Controller;
+use App\Repositories\TransactionRepository;
 
 class TransactionsController extends Controller
 {
@@ -11,7 +12,6 @@ class TransactionsController extends Controller
 
     /** @var TransactionRepository */
     protected $transactionRepository;
-
 
     private $error_code = null;
 
@@ -22,7 +22,7 @@ class TransactionsController extends Controller
     private $defaultError = 'Wystąpił wewnętrzny błąd systemu przy składaniu zamówienia. Dział techniczny został o tym poinformowany.';
 
     /**
-     * OrdersController constructor.
+     * TransactionRepository constructor.
      * @param TransactionRepository $transactionRepository
      */
     public function __construct(
@@ -34,8 +34,9 @@ class TransactionsController extends Controller
 
     public function index()
     {
-        $transaction = TransactionRepository::all();
-
+        return Customer::with(['addresses' => function ($query) {
+            $query->where('type', 'STANDARD_ADDRESS');
+        }])
+            ->with('transactions')->has('transactions')->get();
     }
-
 }
