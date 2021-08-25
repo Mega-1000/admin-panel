@@ -194,7 +194,6 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('customers/{id}/override-customer-data', 'CustomersController@changeLoginOrPassword')->name('customers.change.login-or-password');
         Route::delete('customers/{id}/', 'CustomersController@destroy')->name('customers.destroy');
         Route::put('customers/{id}/change-status', 'CustomersController@changeStatus')->name('customers.change.status');
-        Route::get('customers/{customer}/payments', 'CustomersController@payments')->name('customers.payments');
 
         Route::get('packageTemplates', 'PackageTemplatesController@index')->name('package_templates.index');
         Route::get('packageTemplates/datatable', 'PackageTemplatesController@datatable')->name('package_templates.datatable');
@@ -347,7 +346,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orderPayments/create/{id}/master/without',
             'OrdersPaymentsController@createMasterWithoutOrder')->name('order_payments.createMasterWithoutOrder');
         Route::get('payments', 'OrdersPaymentsController@payments')->name('payments.index');
-        Route::get('payments/{id}/list', 'OrdersPaymentsController@paymentsList')->name('payments.list');
+        Route::get('payments/{id}/list', 'OrdersPaymentsController@paymentsEdit')->name('payments.edit');
         Route::get('payments/{id}/delete', 'OrdersPaymentsController@paymentsDestroy')->name('payments.destroy');
         Route::get('payments/{id}/edit', 'OrdersPaymentsController@paymentsEdit')->name('payments.edit');
         Route::put('payments/{id}/update', 'OrdersPaymentsController@paymentUpdate')->name('payments.update');

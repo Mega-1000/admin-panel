@@ -212,11 +212,6 @@
                         html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
                         html += '</a>';
 
-                        html += '<a href="{{ url()->current() }}/' + row.customer_id + '/payments" class="btn btn-sm btn-success edit">';
-                        html += '<i class="fas fa-hand-holding-usd"></i>';
-                        html += '<span class="hidden-xs hidden-sm"> @lang('customers.table.payments')sdas</span>';
-                        html += '</a>';
-
                         html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecord(' + row.customer_id + ')">';
                         html += '<i class="voyager-trash"></i>';
                         html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
@@ -279,7 +274,6 @@
                     let columnSearch =  $("#columnSearch" + (column));
                     columnSearch.parent().hide();
             }
-
         });
     </script>
     <style>
