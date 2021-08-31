@@ -120,7 +120,6 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         if ($count > 0) {
             $time = ceil($count * 2 / 5) * 5;
             $time = TaskTimeHelper::getFirstAvailableTime($time);
-            Log::notice('Czas zakończenia pracy', ['line' => __LINE__, 'file' => __FILE__, 'timeStart' => $time['start'], 'timeEnd' => $time['end']]);
             TaskTime::create([
                 'task_id' => $taskPrimal->id,
                 'date_start' => $time['start'],
@@ -262,6 +261,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
                     $newSymbol = [$symbol[0], $symbol[1], '0'];
                     $newSymbol = join('-', $newSymbol);
+                    Log::notice('Symbole', ['symbolPo' => $newSymbol, 'symbol' => $singleTransaction->transactionItem->item->it_Symbol]);
                     $product = Product::where('symbol', $newSymbol)->first();
                 }
                 if (empty($product)) {
@@ -298,7 +298,11 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
         $prices = [];
         foreach ($products as $product) {
-            $prices[$product->id] = $product->price_override;
+            if (empty($prices[$product->id])) {
+                $prices[$product->id] = $product->price_override;
+            } else {
+                $prices[$product->id . '_' . $product->tt_quantity] = $product->price_override;
+            }
         }
 
         $priceOverrider = new OrderPriceOverrider($prices);

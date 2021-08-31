@@ -29,7 +29,6 @@ class TaskHelper
             'status' => $task->status
         ]);
         $time = TaskTimeHelper::getFirstAvailableTime($duration, $data);
-        Log::notice('Czas zakończenia pracy', ['line' => __LINE__, 'file' => __FILE__, 'timeStart' => $time['start'], 'timeEnd' => $time['end']]);
         TaskTime::create([
             'task_id' => $taskNew->id,
             'date_start' => $time['start'],
@@ -57,7 +56,6 @@ class TaskHelper
         $time = TaskTimeHelper::getFirstAvailableTime($duration, $data);
         $taskTime->date_start = $time['start'];
         $taskTime->date_end = $time['end'];
-        Log::notice('Czas zakończenia pracy', ['line' => __LINE__, 'file' => __FILE__, 'timeStart' => $time['start'], 'timeEnd' => $time['end']]);
         $taskTime->save();
         $task->parent_id = null;
         $task->save();
