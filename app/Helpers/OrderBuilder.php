@@ -285,6 +285,7 @@ class OrderBuilder
 
             $orderItem = new OrderItem();
             $orderItem->quantity = $item['amount'];
+            $orderItem->type = $item['type'];
             $orderItem->product_id = $getStockProduct ? $getStockProduct->id : $product->id;
             Log::info('Bazowe id produktu: ' . $product->id . ' oraz symbol' . $product->symbol . '. Wynikowe id produktu: ' . $orderItem->product_id);
             foreach (OrderBuilder::getPriceColumns() as $column) {
@@ -301,6 +302,7 @@ class OrderBuilder
             if ($this->priceOverrider) {
                 $orderItem = $this->priceOverrider->override($orderItem);
             }
+            unset($orderItem->type);
             $this->priceCalculator->addItem($product->price->gross_price_of_packing, $orderItem->quantity);
 
             $order->items()->save($orderItem);

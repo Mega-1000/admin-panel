@@ -19,7 +19,7 @@ class OrderPriceOverrider implements iOrderPriceOverrider
     public function override(OrderItem $orderItem)
     {
         $key = $orderItem->product_id;
-        if ($orderItem->quantity > 1) {
+        if ($orderItem->type == 'multiple') {
             $key = $orderItem->product_id . '_' . $orderItem->quantity;
         }
         if (empty($this->overrides[$key])) {
