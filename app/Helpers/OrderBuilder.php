@@ -14,7 +14,6 @@ use App\Helpers\interfaces\iOrderPriceOverrider;
 use App\Helpers\interfaces\iOrderTotalPriceCalculator;
 use App\Helpers\interfaces\iPostOrderAction;
 use App\Helpers\interfaces\iSumable;
-use App\Services\OrderSourceService;
 use App\Services\ProductService;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -54,7 +53,7 @@ class OrderBuilder
     private $postOrderActions;
 
     private $productService;
-	
+
     public function setPackageGenerator(iDividable $generator)
     {
         $this->packageGenerator = $generator;
@@ -96,7 +95,7 @@ class OrderBuilder
         $this->productService = $productService;
         return $this;
     }
-    
+
     public function newStore($data)
     {
         if (empty($this->packageGenerator) || empty($this->priceCalculator) || empty($this->userSelector)) {

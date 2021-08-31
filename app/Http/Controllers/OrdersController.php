@@ -22,7 +22,12 @@ use App\Entities\Task;
 use App\Entities\UserSurplusPayment;
 use App\Entities\UserSurplusPaymentHistory;
 use App\Entities\Warehouse;
+use App\Enums\AllegroExcel\AllegroHeaders;
+use App\Enums\AllegroExcel\OrderHeaders;
+use App\Enums\AllegroExcel\PaymentsHeader;
+use App\Enums\AllegroExcel\SheetNames;
 use App\Enums\LabelStatusEnum;
+use App\Exports\OrdersAllegroExport;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Helpers\GetCustomerForNewOrder;
@@ -40,7 +45,6 @@ use App\Http\Requests\OrderUpdateRequest;
 use App\Jobs\AddLabelJob;
 use App\Jobs\AllegroTrackingNumberUpdater;
 use App\Jobs\ImportOrdersFromSelloJob;
-use App\Jobs\Orders\CheckDeliveryAddressSendMailJob;
 use App\Jobs\Orders\MissingDeliveryAddressSendMailJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Jobs\RemoveFileLockJob;
@@ -1119,12 +1123,10 @@ class OrdersController extends Controller
 
         if ($request->input('status') != $order->status_id && $request->input('status') == 3) {      //mozliwa do realizacji
             dispatch_now(new MissingDeliveryAddressSendMailJob($order));
-	        dispatch_now(new CheckDeliveryAddressSendMailJob($order));
         }
 
         if ($request->input('status') != $order->status_id && $request->input('status') == 4) {      //mozliwa do realizacji
             dispatch_now(new MissingDeliveryAddressSendMailJob($order));
-	        dispatch_now(new CheckDeliveryAddressSendMailJob($order));
         }
 
         if ($request->submit == 'updateAndStay') {

@@ -36,8 +36,7 @@ return [
             'general' => 'Główne',
             'address' => 'Adres Siedziby Głównej',
             'warehouses' => 'Magazyny',
-            'employees' => 'Pracownicy',
-	        'order_sources' => 'Zródła zamówień',
+            'employees' => 'Pracownicy'
         ],
         'name' => 'Nazwa',
         'short_name' => 'Nazwa skrócona',
@@ -66,7 +65,6 @@ return [
             'postal_code' => 'Kod pocztowy'
         ],
         'firm_type' => 'Typ firmy',
-	    'firm_source' => 'Zródła zamówień',
         'production' => 'Firma produkcyjna',
         'delivery' => 'Firma kurierska',
         'other' => 'Inna firma',
