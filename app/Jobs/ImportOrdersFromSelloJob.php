@@ -262,7 +262,6 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
                     $newSymbol = [$symbol[0], $symbol[1], '0'];
                     $newSymbol = join('-', $newSymbol);
-                    Log::notice('Symbole', ['symbolPo' => $newSymbol, 'symbol' => $singleTransaction->transactionItem->item->it_Symbol]);
                     $product = Product::where('symbol', $newSymbol)->first();
                 }
                 if (empty($product)) {
