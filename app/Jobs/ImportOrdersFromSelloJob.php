@@ -2,7 +2,6 @@
 
 namespace App\Jobs;
 
-use App\Entities\FirmSource;
 use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\Product;
@@ -101,7 +100,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                 return [
                     'id' => $product->id,
                     'amount' => $product->tt_quantity,
-                    'transactionId' => $product->transaction_id
+                    'transactionId' => $product->transaction_id,
+                    'type' => $product->type
                 ];
             })->toArray();
             $transactionArray['order_items'] = $orderItems;
@@ -121,7 +121,6 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         if ($count > 0) {
             $time = ceil($count * 2 / 5) * 5;
             $time = TaskTimeHelper::getFirstAvailableTime($time);
-            Log::notice('Czas zakończenia pracy', ['line' => __LINE__, 'file' => __FILE__, 'timeStart' => $time['start'], 'timeEnd' => $time['end']]);
             TaskTime::create([
                 'task_id' => $taskPrimal->id,
                 'date_start' => $time['start'],
@@ -269,6 +268,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                     $product = Product::getDefaultProduct();
                 }
                 if (!empty($quantity)) {
+                    $product->type = 'multiple';
                     $product->tt_quantity = $quantity * $singleTransaction->transactionItem->tt_Quantity;
                     $product->price_override = [
                         'gross_selling_price_commercial_unit' => round($singleTransaction->transactionItem->tt_Price / $quantity, 2),
@@ -299,7 +299,11 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
         $prices = [];
         foreach ($products as $product) {
-            $prices[$product->id] = $product->price_override;
+            if (empty($prices[$product->id])) {
+                $prices[$product->id] = $product->price_override;
+            } else {
+                $prices[$product->id . '_' . $product->tt_quantity] = $product->price_override;
+            }
         }
 
         $priceOverrider = new OrderPriceOverrider($prices);
@@ -320,13 +324,6 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
         $order = Order::find($id);
         $order->sello_id = $transaction->id;
-	    /**
-	     * @TODO create determining source by params when there will be more info about sources
-	     * maybe move to cron or something else
-	     */
-	    $firmSource = FirmSource::firmSource(env('FIRM_ID'), 1)->first();
-        $order->firm_source_id = $firmSource ? $firmSource->id : null;
-        
         $user = User::where('name', '001')->first();
         $order->employee()->associate($user);
         $withWarehouse = $products->filter(function ($prod) {

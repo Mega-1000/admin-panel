@@ -82,7 +82,7 @@ class Helper
         if ($pos === 0) {
             $phone = substr($phone, 2);
         }
-        if (strlen($phone) > 4) {
+        if (strlen($phone) > 7) {
             return $phone;
         }
     }

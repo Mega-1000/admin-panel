@@ -18,10 +18,14 @@ class OrderPriceOverrider implements iOrderPriceOverrider
 
     public function override(OrderItem $orderItem)
     {
-        if (empty($this->overrides[$orderItem->product_id])) {
+        $key = $orderItem->product_id;
+        if ($orderItem->type == 'multiple') {
+            $key = $orderItem->product_id . '_' . $orderItem->quantity;
+        }
+        if (empty($this->overrides[$key])) {
             return $orderItem;
         }
-        $prices = $this->overrides[$orderItem->product_id];
+        $prices = $this->overrides[$key];
         foreach (OrderBuilder::getPriceColumns() as $column) {
             if (isset($prices[$column])) {
                 $orderItem->$column = $prices[$column];

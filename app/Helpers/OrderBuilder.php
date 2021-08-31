@@ -14,7 +14,6 @@ use App\Helpers\interfaces\iOrderPriceOverrider;
 use App\Helpers\interfaces\iOrderTotalPriceCalculator;
 use App\Helpers\interfaces\iPostOrderAction;
 use App\Helpers\interfaces\iSumable;
-use App\Services\OrderSourceService;
 use App\Services\ProductService;
 use Exception;
 use Illuminate\Support\Facades\Log;
@@ -54,7 +53,7 @@ class OrderBuilder
     private $postOrderActions;
 
     private $productService;
-	
+
     public function setPackageGenerator(iDividable $generator)
     {
         $this->packageGenerator = $generator;
@@ -96,7 +95,7 @@ class OrderBuilder
         $this->productService = $productService;
         return $this;
     }
-    
+
     public function newStore($data)
     {
         if (empty($this->packageGenerator) || empty($this->priceCalculator) || empty($this->userSelector)) {
@@ -286,6 +285,9 @@ class OrderBuilder
 
             $orderItem = new OrderItem();
             $orderItem->quantity = $item['amount'];
+            if(!empty($item['type'])){
+                $orderItem->type = $item['type'];
+            }
             $orderItem->product_id = $getStockProduct ? $getStockProduct->id : $product->id;
             Log::info('Bazowe id produktu: ' . $product->id . ' oraz symbol' . $product->symbol . '. Wynikowe id produktu: ' . $orderItem->product_id);
             foreach (OrderBuilder::getPriceColumns() as $column) {
@@ -302,6 +304,7 @@ class OrderBuilder
             if ($this->priceOverrider) {
                 $orderItem = $this->priceOverrider->override($orderItem);
             }
+            unset($orderItem->type);
             $this->priceCalculator->addItem($product->price->gross_price_of_packing, $orderItem->quantity);
 
             $order->items()->save($orderItem);
