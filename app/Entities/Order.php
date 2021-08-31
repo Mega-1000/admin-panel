@@ -149,9 +149,7 @@ class Order extends Model implements Transformable
      */
     public static function formatMessage(?Authenticatable $user, string $message): string
     {
-        return PHP_EOL . Carbon::now()->toDateTimeString()
-	        . ($user ? ' ' . $user->name . ' ' . $user->firstname . ' ' . $user->lastname : '')
-	        . ': ' . $message;
+        return PHP_EOL . Carbon::now()->toDateTimeString() . ' ' . $user->name . ' ' . $user->firstname . ' ' . $user->lastname . ': ' . $message;
     }
 
     public function getPackagesCashOnSum()
@@ -710,15 +708,7 @@ class Order extends Model implements Transformable
     {
         $this->hasOne(Chat::class);
     }
-	
-	/**
-	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-	 */
-	public function firmSource()
-	{
-		return $this->belongsTo(FirmSource::class);
-	}
-	
+
     public function setDefaultDates()
     {
         $dateFrom = Carbon::parse($this->selloTransaction->tr_RemittanceDate);

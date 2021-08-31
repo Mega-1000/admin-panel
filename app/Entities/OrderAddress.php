@@ -15,11 +15,6 @@ class OrderAddress extends Model implements Transformable
 {
     use TransformableTrait;
 
-	const TYPE_GENERAL = 'GENERAL';
-	const TYPE_STANDARD = 'STANDARD_ADDRESS';
-	const TYPE_DELIVERY = 'DELIVERY_ADDRESS';
-	const TYPE_INVOICE = 'INVOICE_ADDRESS';
-	
     /**
      * The attributes that are mass assignable.
      *

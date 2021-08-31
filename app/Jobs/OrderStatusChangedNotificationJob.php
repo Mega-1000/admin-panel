@@ -94,20 +94,12 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
                 if ($selloTransaction = $order->selloTransaction) {
 	                if ($allegroOrder = $selloTransaction->allegroOrder) {
 		                $mail_to = $allegroOrder->buyer_email;
-	                } else {
-		                \Log::info("Order: {$order->id}. Allegro order not found.");
 	                }
-                } else {
-	                \Log::info("Order: {$order->id}. Sello transaction not found.");
                 }
-	
-	            \Log::info("Order: {$order->id}. Send to: {$mail_to}");
-                
-                if (env('APP_ENV') != 'development') {
-	                \Mailer::create()
-		                ->to($mail_to)
-		                ->send(new OrderStatusChanged($subject, $message, $pdf));
-                }
+
+                \Mailer::create()
+                    ->to($mail_to)
+                    ->send(new OrderStatusChanged($subject, $message, $pdf));
             } catch (\Exception $e) {
                 \Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);
             }
