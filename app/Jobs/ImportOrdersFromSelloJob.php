@@ -100,7 +100,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                 return [
                     'id' => $product->id,
                     'amount' => $product->tt_quantity,
-                    'transactionId' => $product->transaction_id
+                    'transactionId' => $product->transaction_id,
+                    'type' => $product->type
                 ];
             })->toArray();
             $transactionArray['order_items'] = $orderItems;
@@ -261,13 +262,13 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
                     $newSymbol = [$symbol[0], $symbol[1], '0'];
                     $newSymbol = join('-', $newSymbol);
-                    Log::notice('Symbole', ['symbolPo' => $newSymbol, 'symbol' => $singleTransaction->transactionItem->item->it_Symbol]);
                     $product = Product::where('symbol', $newSymbol)->first();
                 }
                 if (empty($product)) {
                     $product = Product::getDefaultProduct();
                 }
                 if (!empty($quantity)) {
+                    $product->type = 'multiple';
                     $product->tt_quantity = $quantity * $singleTransaction->transactionItem->tt_Quantity;
                     $product->price_override = [
                         'gross_selling_price_commercial_unit' => round($singleTransaction->transactionItem->tt_Price / $quantity, 2),
