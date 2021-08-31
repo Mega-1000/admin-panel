@@ -140,7 +140,6 @@ class TasksController extends Controller
                 $prev = [];
                 dispatch_now(new AddLabelJob($request->order_id, [47], $prev));
             }
-            Log::notice('Czas zakończenia pracy', ['line' => __LINE__, 'file' => __FILE__, 'timeStart' => $request->date_start, 'timeEnd' => $request->date_end]);
             $this->taskTimeRepository->create([
                 'task_id' => $task->id,
                 'date_start' => $request->date_start,
@@ -220,7 +219,6 @@ class TasksController extends Controller
             }
             $task->update($dataToStore);
             $task->taskTime->update($request->all());
-            Log::notice('Czas zakończenia pracy', ['line' => __LINE__, 'file' => __FILE__, 'id' => $task->taskTime->id]);
             $task->taskSalaryDetail->update($request->all());
             if ($request->order_id !== null) {
                 $orderItemKMD = 0;
@@ -635,7 +633,6 @@ class TasksController extends Controller
                         $dateS = $dateStart->addMinutes($different)->toDateTimeString();
                         $dateE = $dateEnd->addMinutes($different)->toDateTimeString();
                     }
-                    Log::notice('Czas zakończenia pracy', ['line' => __LINE__, 'file' => __FILE__, 'timeStart' => $dateS, 'timeEnd' => $dateE]);
                     $item->taskTime->update([
                         'date_start' => $dateS,
                         'date_end' => $dateE
@@ -768,7 +765,6 @@ class TasksController extends Controller
 
         $end = Carbon::now();
         $end->second = 0;
-        Log::notice('Czas zakończenia pracy', ['line' => __LINE__, 'file' => __FILE__, 'timeStart' => $time->date_start, 'timeEnd' => $end]);
         TaskTime::create([
             'task_id' => $newTask->id,
             'date_start' => $time->date_start,
