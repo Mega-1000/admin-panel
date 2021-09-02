@@ -34,9 +34,13 @@ class OrderSource extends Model implements Transformable
 	
 	public function scopeNotInUse($query, $firmId)
 	{
-		$usedSources = FirmSource::where('firm_id', '!=', $firmId)->get()->pluck('order_source_id');
-		
 		$query->where('multiple', true)
-			->orWhere('id', $usedSources);
+			->orWhere(function ($query) use ($firmId) {
+			$query->where('multiple', false);
+			$usedSources = FirmSource::where('firm_id', '!=', $firmId)->get()->pluck('order_source_id');
+			if ($usedSources->count()) {
+				$query->whereNotIn('id', $usedSources);
+			}
+		});
 	}
 }
