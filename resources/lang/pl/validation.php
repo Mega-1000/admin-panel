@@ -130,6 +130,9 @@ return [
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
+	    'NIP' => [
+	    	'ValidNip' => 'NIP jest nieprawidłowy.'
+	    ]
     ],
 
     /*
@@ -152,5 +155,6 @@ return [
         'date_to' => 'data początkowa',
         'date_from' => 'data końcowa',
         'order_id' => 'identyfikator zamówienia',
+	    'NIP' => 'NIP'
     ],
 ];

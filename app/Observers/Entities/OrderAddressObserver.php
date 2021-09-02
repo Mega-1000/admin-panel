@@ -2,12 +2,14 @@
 
 namespace App\Observers\Entities;
 
+use App\Entities\Order;
 use App\Entities\OrderAddress;
 use App\Jobs\AddLabelJob;
 use App\Jobs\DispatchLabelEventByNameJob;
 use App\Jobs\RemoveLabelJob;
 use App\Services\OrderAddressService;
 use App\Services\OrderPaymentService;
+use Illuminate\Support\Facades\Route;
 
 class OrderAddressObserver
 {
@@ -30,6 +32,8 @@ class OrderAddressObserver
     {
         $this->removingMissingDeliveryAddressLabelHandler($orderAddress);
         $this->addLabelIfManualCheckIsRequired($orderAddress);
+        
+        $this->addHistoryLog($orderAddress);
     }
 
     protected function removingMissingDeliveryAddressLabelHandler(OrderAddress $orderAddress)
@@ -53,4 +57,35 @@ class OrderAddressObserver
             dispatch_now(new RemoveLabelJob($orderAddress->order->id, [184]));
         }
     }
+    
+    protected function addHistoryLog(OrderAddress $orderAddress): void {
+	    $type = 'api';
+	    if (Route::currentRouteName() != 'api.orders.update-order-delivery-and-invoice-addresses') {
+	    	return;
+	    }
+	    
+	    $original = $orderAddress->getOriginal();
+	    
+	    $changes = $orderAddress->getChanges();
+	
+	    $original = array_intersect_key($original, $changes);
+	    $changeLog = [];
+	
+	    foreach ($changes as $field => $new_value) {
+		    if ($field == 'updated_at' || $new_value == $original[$field]) {
+			    continue;
+		    }
+		    
+		    $changeLog[] = __("customers.table.{$field}") . ": z `{$original[$field]}` na `{$new_value}`";
+	    }
+	
+	    if ($changeLog) {
+		    $messageTitle = sprintf(__('order_addresses.message.title.' . $type),
+			    __('customers.form.buttons.' . strtolower($orderAddress->type))
+		    );
+		    
+		    $orderAddress->order->labels_log .= Order::formatMessage(null, $messageTitle . implode(', ', $changeLog));
+		    $orderAddress->order->save();
+	    }
+	}
 }
