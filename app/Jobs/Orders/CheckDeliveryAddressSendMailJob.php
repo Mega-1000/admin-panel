@@ -32,10 +32,6 @@ class CheckDeliveryAddressSendMailJob extends Job implements ShouldQueue
 			$this->order = $orderRepository->find($this->order);
 		}
 		
-		if (strpos($this->order->customer->login, 'allegromail.pl')) {
-			return;
-		}
-		
 		$formLink = env('FRONT_NUXT_URL') . "/zamowienie/mozliwe-do-realizacji/brak-danych/{$this->order->id}";
 		
 		\Mailer::create()
