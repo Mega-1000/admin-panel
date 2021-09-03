@@ -152,7 +152,7 @@ class OrdersController extends Controller
             DB::commit();
             
             $order = Order::find($id);
-	        $firmSource = FirmSource::byFirmSource(env('FIRM_ID'), 2)->first();
+	        $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 2)->first();
 	        $order->firm_source_id = $firmSource ? $firmSource->id : null;
 	        $order->save();
 	        
