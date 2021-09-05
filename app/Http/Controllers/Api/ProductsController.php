@@ -392,6 +392,7 @@ class ProductsController extends Controller
         foreach ($products as $product) {
             $product->quantity = $productsData[$product->symbol]['quantity'];
             $product->optional = $productsData[$product->symbol]['optional'];
+            $product->id = $product->product_id;
         }
 
         return $products;
