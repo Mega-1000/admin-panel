@@ -8,6 +8,7 @@ use App\Entities\Order;
 use App\Entities\Task;
 use App\Entities\TaskSalaryDetails;
 use App\Entities\TaskTime;
+use App\Entities\TrackerLogs;
 use App\Entities\Warehouse;
 use App\Helpers\OrderCalcHelper;
 use App\Helpers\OrdersHelper;
@@ -397,6 +398,10 @@ class TasksController extends Controller
             ->whereNull('rendering')
             ->get();
 
+        $laziness = TrackerLogs::whereDate('created_at', '>=', $request->start)
+                ->whereDate('updated_at', '<=', $request->end)->get();
+
+
         $array = [];
         foreach ($tasks as $task) {
             $start = new Carbon($task->taskTime->date_start);
@@ -422,6 +427,25 @@ class TasksController extends Controller
                 'text' => $text,
                 'customOrderId' => $task->order_id != null ? 'taskOrder-' . $task->order_id : null,
                 'customTaskId' => 'task-' . $task->id
+            ];
+        }
+
+        foreach ($laziness as $task) {
+            $start = new Carbon($task->created_at);
+            $end = new Carbon($task->updated_at);
+            $consultantNotice = $warehouseNotice = '';
+            $text = $task->description;
+
+            $array[] = [
+                'id' => 'tracker_id_'.$task->id,
+                'resourceId' => $task->user_id,
+                'title' => 'Brak aktywności',
+                'start' => $start->format('Y-m-d\TH:i'),
+                'end' => $end->format('Y-m-d\TH:i'),
+                'color' => '#FF0000',
+                'text' => $text ?? 'Brak uzasadnienia',
+                'customOrderId' => '',
+                'customTaskId' => ''
             ];
         }
 

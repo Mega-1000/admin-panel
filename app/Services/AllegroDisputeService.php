@@ -1,35 +1,22 @@
 <?php namespace App\Services;
 
-use App\Entities\Allegro_Auth;
 use App\Entities\AllegroDispute;
 use App\Entities\Order;
 use App\Entities\SelTransaction;
 use App\Jobs\AddLabelJob;
 use App\Jobs\RemoveLabelJob;
-use GuzzleHttp\Client;
 
-class AllegroDisputeService
+class AllegroDisputeService extends AllegroApiService
 {
-
-    const AUTH_RECORD_ID = 2;
+    protected $auth_record_id = 2;
+    
     const STATUS_ONGOING = 'ONGOING';
     const STATUS_CLOSED = 'CLOSED';
     const TYPE_REGULAR = 'REGULAR';
 
-    /**
-     * @var Client
-     */
-    private $client;
-
-    /**
-     * @var Allegro_Auth
-     */
-    private $authModel;
-
     public function __construct()
     {
-        $this->client = new Client();
-        $this->authModel = Allegro_Auth::find(self::AUTH_RECORD_ID);
+        parent::__construct();
     }
 
     public function lookForNewDisputes(): void
@@ -81,15 +68,20 @@ class AllegroDisputeService
     public function getDisputesList(int $offset = 0, int $limit = 100)
     {
         $url = $this->getRestUrl("/sale/disputes?limit={$limit}&offset={$offset}");
-        $response = $this->request('GET', $url, []);
-        return json_decode((string)$response->getBody(), true)['disputes'];
+        if (!($response = $this->request('GET', $url, []))) {
+        	return [];
+        }
+        
+        return $response['disputes'];
     }
 
     public function getDispute(string $id): array
     {
         $url = $this->getRestUrl("/sale/disputes/{$id}");
-        $response = $this->request('GET', $url, []);
-        return json_decode((string)$response->getBody(), true);
+	    if (!($response = $this->request('GET', $url, []))) {
+		    return false;
+	    }
+        return $response;
     }
 
     public function getDisputeMessages(string $id): array
@@ -99,11 +91,13 @@ class AllegroDisputeService
 
         do {
             $url = $this->getRestUrl("/sale/disputes/{$id}/messages?limit=100&offset={$cursor}");
-            $response = $this->request('GET', $url, [
+            if (!($response = $this->request('GET', $url, [
                 'offset' => $cursor,
                 'limit' => 100
-            ]);
-            $messages = json_decode((string)$response->getBody(), true)['messages'];
+            ]))) {
+            	break;
+            }
+            $messages = $response['messages'];
             $messagesCount = count($messages);
             $cursor += $messagesCount;
             $result = array_merge($result, $messages);
@@ -115,62 +109,35 @@ class AllegroDisputeService
     public function sendMessage(string $disputeId, string $text, bool $endRequest = false, $attachment = null)
     {
         $url = $this->getRestUrl("/sale/disputes/{$disputeId}/messages");
-        $response = $this->request('POST', $url, [
+        return $response = $this->request('POST', $url, [
             'text' => $text,
             'attachment' => $attachment,
             'type' => self::TYPE_REGULAR
         ]);
-        return json_decode((string)$response->getBody(), true);
     }
-
-    public function getAuthCodes()
-    {
-        $response = $this->client->post(env('ALLEGRO_AUTH_CODES_URL'), [
-            'headers' => [
-                'Authorization' => $this->getBasicAuthString(),
-                'Content-type' => 'application/x-www-form-urlencoded'
-            ],
-            'form_params' => [
-                'client_id' => env('ALLEGRO_CLIENT_ID')
-            ]
-        ]);
-        return json_decode((string)$response->getBody(), true);
-    }
-
-    public function checkAuthorizationStatus(string $deviceId)
-    {
-        $url = env('ALLEGRO_AUTH_STATUS_URL') . $deviceId;
-        $response = $this->client->post($url, [
-            'headers' => [
-                'Authorization' => $this->getBasicAuthString(),
-            ]
-        ]);
-
-        return json_decode((string)$response->getBody(), true);
-    }
-
+    
     /** Create a request add attachment */
     public function createAttachmentId($fileName, $fileSize)
     {
         $url = $this->getRestUrl("/sale/dispute-attachments");
-        $response = $this->request('POST', $url, [
+        if (!($response = $this->request('POST', $url, [
             'fileName' => $fileName,
             'size' => $fileSize
-        ]);
+        ]))) {
+        	return false;
+        }
 
-        $data = json_decode((string)$response->getBody(), true);
-        return ($data && isset($data['id'])) ? $data['id'] : false;
+        return ($response && isset($response['id'])) ? $response['id'] : false;
     }
     /** Upload attachment */
     public function uploadAttachment($attachmentId, $contentsFile)
     {
         $url = $this->getRestUrl("/sale/dispute-attachments/" . $attachmentId);
-        $response = $this->request('PUT', $url, [], [
+        return $response = $this->request('PUT', $url, [], [
             'name' => 'file',
             'contents' => ($contentsFile),
             'filename' => $attachmentId
         ]);
-        return $response;
     }
 
     public function getAttachment(string $url)
@@ -198,20 +165,6 @@ class AllegroDisputeService
         }
     }
 
-    private function refreshTokens()
-    {
-        $url = env('ALLEGRO_REFRESH_URL') . $this->getRefreshToken();
-        $response = $this->client->post($url, [
-            'headers' => [
-                'Authorization' => $this->getBasicAuthString()
-            ]
-        ]);
-        $response = json_decode((string)$response->getBody(), true);
-        $this->authModel->access_token = $response['access_token'];
-        $this->authModel->refresh_token = $response['refresh_token'];
-        $this->authModel->save();
-    }
-
     private function findOrderId(AllegroDispute $dispute): ?int
     {
         $transactionsIds = SelTransaction::where('tr_CheckoutFormId', '=', $dispute->form_id)->pluck('id');
@@ -227,68 +180,8 @@ class AllegroDisputeService
         }
     }
 
-    private function request(string $method, string $url, array $params, $attachment = null)
-    {
-        $headers = [
-            // 'Accept' => 'application/vnd.allegro.public.v1+json',
-            'Authorization' => "Bearer " . $this->getAccessToken(),
-            'Content-Type' => 'application/vnd.allegro.public.v1+json'
-        ];
-
-        try {
-            $data =
-            [
-                'headers' => $headers,
-                'json' => $params
-            ];
-            if($attachment){
-                $data['multipart'] = [$attachment];
-            }
-            $response = $this->client->request(
-                $method,
-                $url,
-                $data
-            );
-        } catch (\Exception $e) {
-            if ($e->getCode() == 401) {
-                $this->refreshTokens();
-                $response = $this->request($method, $url, $params);
-            } else {
-                return $this->cantGetDisputesAlert();
-            }
-        }
-        return $response;
-    }
-
-    private function getAccessToken()
-    {
-        return $this->authModel->access_token;
-    }
-
-    private function getRefreshToken()
-    {
-        return $this->authModel->refresh_token;
-    }
-
-    private function getRestUrl(string $resource): string
-    {
-        return env('ALLEGRO_REST_URL') . $resource;
-    }
-
-    private function getBasicAuthString(): string
-    {
-        return 'Basic ' . base64_encode(env('ALLEGRO_CLIENT_ID') . ':' . env('ALLEGRO_CLIENT_SECRET'));
-    }
-
     private function disputeHash(array $dispute): string
     {
         return md5(json_encode($dispute));
     }
-
-    private function cantGetDisputesAlert(): bool
-    {
-        // what should we do in this case?
-        return false;
-    }
-
 }
