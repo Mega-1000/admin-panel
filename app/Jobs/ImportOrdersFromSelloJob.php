@@ -300,10 +300,10 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
         $prices = [];
         foreach ($products as $product) {
-            if (empty($prices[$product->id])) {
-                $prices[$product->id] = $product->price_override;
-            } else {
+            if ($product->type === 'multiple') {
                 $prices[$product->id . '_' . $product->tt_quantity] = $product->price_override;
+            } else {
+                $prices[$product->id] = $product->price_override;
             }
         }
 
@@ -331,7 +331,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 	     */
 	    $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 1)->first();
         $order->firm_source_id = $firmSource ? $firmSource->id : null;
-        
+
         $user = User::where('name', '001')->first();
         $order->employee()->associate($user);
         $withWarehouse = $products->filter(function ($prod) {
