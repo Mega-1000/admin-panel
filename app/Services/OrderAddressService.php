@@ -65,7 +65,10 @@ class OrderAddressService
 			$rules['firstname'] = ['required_without_all:firmname'];
 			$rules['lastname'] = ['required_without_all:firmname'];
 			$rules['firmname'] = ['required_with_all:nip', 'required_without:firstname,lastname'];
-			$rules['nip'] = ['required_with_all:firmname', 'required_without:firstname,lastname', new ValidNIP()];
+			$rules['nip'] = ['required_with_all:firmname', 'required_without:firstname,lastname'];
+			if ($address->firmname || $address->nip) {
+				$rules['nip'][] = new ValidNIP();
+			}
 		}
 		
 		return $rules;

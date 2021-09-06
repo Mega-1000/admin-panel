@@ -28,10 +28,6 @@ class ValidNIP implements Rule
 		$nipWithoutDashes = preg_replace("/-/", "", $value);
 		$reg = '/^[0-9]{10}$/';
 		
-		if (!$nipWithoutDashes) {
-			return true;
-		}
-		
 		if (preg_match($reg, $nipWithoutDashes) == false) {
 			return false;
 		} else {
