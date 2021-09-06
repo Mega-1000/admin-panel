@@ -93,4 +93,8 @@ class Customer extends Authenticatable implements Transformable
     {
         return $this->belongsToMany(Chat::class, 'chat_user')->withTimestamps();
     }
+    
+    public function getIsAllegroAttribute() {
+    	return strpos($this->login, 'allegro') !== false;
+    }
 }

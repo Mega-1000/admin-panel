@@ -75,6 +75,7 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
             $method = $tag->handler;
             $message = preg_replace("[" . preg_quote($tag->name) . "]", $emailTagHandler->$method(), $message);
         }
+        
         if ($order->status_id == 3 || $order->status_id == 4) {
             $subject = "Zmiana statusu - numer oferty: " . $this->orderId . " z: " . $oldStatus->name . " na: " . $order->status->name . ' oraz proforma';
             $order = Order::find($order->id);
@@ -91,18 +92,14 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
             $mail_to = $order->customer->login;
             
             try {
+            	/*
                 if ($selloTransaction = $order->selloTransaction) {
 	                if ($allegroOrder = $selloTransaction->allegroOrder) {
 		                $mail_to = $allegroOrder->buyer_email;
-	                } else {
-		                \Log::info("Order: {$order->id}. Allegro order not found.");
 	                }
-                } else {
-	                \Log::info("Order: {$order->id}. Sello transaction not found.");
                 }
-	
-	            \Log::info("Order: {$order->id}. Send to: {$mail_to}");
-                
+				*/
+	            
                 if (env('APP_ENV') != 'development') {
 	                \Mailer::create()
 		                ->to($mail_to)

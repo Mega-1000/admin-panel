@@ -1114,7 +1114,9 @@ class OrdersController extends Controller
         }
 
         if ($request->input('status') != $order->status_id && $request->input('shouldBeSent') == 'on') {
-            dispatch_now(new OrderStatusChangedNotificationJob($order->id, $request->input('mail_message'), $oldStatus));
+	        $message = $order->customer->isAllegro ? setting('site.allegro_order_change_status_msg') : $request->input('mail_message');
+	        
+            dispatch_now(new OrderStatusChangedNotificationJob($order->id, $message, $oldStatus));
         }
 
         if ($request->input('status') != $order->status_id && $request->input('status') == 3) {      //mozliwa do realizacji
