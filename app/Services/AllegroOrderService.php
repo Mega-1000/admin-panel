@@ -2,6 +2,8 @@
 
 use App\Entities\AllegroOrder;
 use App\Entities\Order;
+use App\Jobs\Orders\CheckDeliveryAddressSendMailJob;
+use App\Jobs\Orders\GenerateOrderProformJob;
 use App\Mail\AllegroNewOrderEmail;
 use Carbon\Carbon;
 use VIISON\AddressSplitter\AddressSplitter;
@@ -23,14 +25,20 @@ class AllegroOrderService extends AllegroApiService
         parent::__construct();
     }
 
-    public function findNewOrders()
+    public function findNewOrders($today = true)
     {
-        $today = urlencode((new Carbon())->startOfDay()->toIso8601ZuluString());
-        $url = $this->getRestUrl(
-            "/order/checkout-forms?offset=0&limit=100" .
-            "&updatedAt.gte=" . $today .
-            "&status=" . self::READY_FOR_PROCESSING
-        );
+        $params = [
+	        'offset' => 0,
+	        'limit' => '100',
+	        'status' => self::READY_FOR_PROCESSING
+        ];
+        
+        if ($today) {
+	        $params['updatedAt.gte'] = (new Carbon())->startOfDay()->toIso8601ZuluString();
+        }
+        
+        $url = $this->getRestUrl("/order/checkout-forms?" . http_build_query($params));
+        
         if (!($orders = $this->request('GET', $url, []))) {
         	return;
         }
@@ -69,8 +77,14 @@ class AllegroOrderService extends AllegroApiService
 
         foreach ($orders as $order) {
             try {
-                $this->fixDeliveryAddress($order);
-                $this->fixInvoiceAddress($order);
+                $deliveryAddressChanged = $this->fixDeliveryAddress($order);
+	            $invoiceAddressChanged = $this->fixInvoiceAddress($order);
+	            dispatch(new CheckDeliveryAddressSendMailJob($order));
+	            
+	            if ($deliveryAddressChanged || $invoiceAddressChanged) {
+	            	dispatch(new GenerateOrderProformJob($order, true));
+	            }
+	
             } catch (SplittingException $e) {
                 //
             }
@@ -141,7 +155,7 @@ class AllegroOrderService extends AllegroApiService
         $order->data_verified_by_allegro_api = true;
         $order->save();
         
-        return true;
+        return $address->wasChanged();
     }
 
     private function fixInvoiceAddress(Order $order): bool
@@ -150,11 +164,7 @@ class AllegroOrderService extends AllegroApiService
         	return false;
         }
 
-        if ($allegroData['invoice']['required'] == false) {
-            return $this->fixInvoiceAddressInvoice($order, false);
-        } else {
-            return $this->fixInvoiceAddressInvoice($order, true);
-        }
+        return $this->fixInvoiceAddressInvoice($order, $allegroData['invoice']['required']);
     }
 	
 	private function fixInvoiceAddressInvoice(Order $order, $required): bool {
@@ -208,7 +218,7 @@ class AllegroOrderService extends AllegroApiService
 		$order->data_verified_by_allegro_api = true;
 		$order->save();
 		
-		return true;
+		return $address->wasChanged();
 	}
 
     private function findNotValidatedOrdersWithInvalidData()

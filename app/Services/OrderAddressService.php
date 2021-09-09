@@ -12,7 +12,6 @@ class OrderAddressService
 		$rules = $this->getRules($address);
 		
 		$validator = Validator::make($addressArray, $rules);
-		
 		return !$validator->fails();
 	}
 	
@@ -61,12 +60,14 @@ class OrderAddressService
 			$rules['firstname'] = ['required'];
 			$rules['lastname'] = ['required'];
 			$rules['firmname'] = ['string'];
-			$rules['nip'] = ['string', 'size:0'];
 		} elseif ($address->type == OrderAddress::TYPE_INVOICE) {
 			$rules['firstname'] = ['required_without_all:firmname'];
 			$rules['lastname'] = ['required_without_all:firmname'];
 			$rules['firmname'] = ['required_with_all:nip', 'required_without:firstname,lastname'];
-			$rules['nip'] = ['required_with_all:firmname', 'required_without:firstname,lastname', new ValidNIP()];
+			$rules['nip'] = ['required_with_all:firmname', 'required_without:firstname,lastname'];
+			if ($address->firmname || $address->nip) {
+				$rules['nip'][] = new ValidNIP();
+			}
 		}
 		
 		return $rules;
