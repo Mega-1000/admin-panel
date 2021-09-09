@@ -5,35 +5,30 @@ namespace App\Jobs\Orders;
 use App\Entities\Order;
 use App\Jobs\Job;
 use App\Mail\CheckDeliveryAddressMail;
-use App\Repositories\OrderRepository;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\SerializesModels;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class CheckDeliveryAddressSendMailJob extends Job implements ShouldQueue
 {
-	use IsMonitored;
-	
+	use IsMonitored, Queueable, SerializesModels;
+
 	protected $order;
-	protected $options;
-	
+
 	/**
-	 * MissingDeliveryAddressSendMailJob constructor.
+	 * CheckDeliveryAddressSendMailJob constructor.
 	 * @param $order
 	 */
-	public function __construct($order, $options = [])
+	public function __construct(Order $order)
 	{
 		$this->order = $order;
-		$this->options = $options;
 	}
-	
-	public function handle(OrderRepository $orderRepository)
+
+	public function handle()
 	{
-		if (! ($this->order instanceof Order)) {
-			$this->order = $orderRepository->find($this->order);
-		}
-		
-		$formLink = env('FRONT_NUXT_URL') . "/zamowienie/mozliwe-do-realizacji/brak-danych/{$this->order->id}";
-		
+		$formLink = env('FRONT_NUXT_URL') . "zamowienie/mozliwe-do-realizacji/brak-danych/{$this->order->id}";
+
 		\Mailer::create()
 			->to($this->order->customer->login)
 			->send(new CheckDeliveryAddressMail("Sprawdz dane do dostawy i faktury - numer zamówienia: {$this->order->id}", $formLink));

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Entities\FirmSource;
+use App\Entities\OrderAddress;
 use App\Entities\OrderDates;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\ChatHelper;
@@ -16,6 +17,7 @@ use App\Helpers\TransportSumCalculator;
 use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
 use App\Http\Requests\Api\Orders\StoreOrderRequest;
 use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
+use App\Jobs\Orders\GenerateOrderProformJob;
 use App\Repositories\CustomerRepository;
 use App\Repositories\OrderAddressRepository;
 use App\Repositories\OrderItemRepository;
@@ -299,8 +301,8 @@ class OrdersController extends Controller
             $order = $this->orderRepository->find($orderId);
             list($isDeliveryChangeLocked, $isInvoiceChangeLocked) = $this->getLocks($order);
 
-            $deliveryAddress = $order->addresses->where('type', '=', 'DELIVERY_ADDRESS')->first();
-            $invoiceAddress = $order->addresses->where('type', '=', 'INVOICE_ADDRESS')->first();
+            $deliveryAddress = $order->addresses->where('type', '=', OrderAddress::TYPE_DELIVERY)->first();
+            $invoiceAddress = $order->addresses->where('type', '=', OrderAddress::TYPE_INVOICE)->first();
 
             $order->shipment_date = $request->get('shipment_date');
             $order->dates()->updateOrCreate(
@@ -345,6 +347,10 @@ class OrdersController extends Controller
 	            $message[] = __('orders.message.invoice_address_change_failure');
             }
 
+            if ($deliveryAddress->wasChanged() || $invoiceAddress->wasChanged()) {
+	            dispatch_now(new GenerateOrderProformJob($order, true));
+            }
+            
             if ($request->get('remember_delivery_address')) {
                 $data = array_merge($request->get('DELIVERY_ADDRESS'), ['type' => 'DELIVERY_ADDRESS']);
                 $order->customer->addresses()->updateOrCreate(["type" => "DELIVERY_ADDRESS"], $data);

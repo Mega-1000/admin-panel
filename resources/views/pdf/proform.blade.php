@@ -69,8 +69,8 @@
                         55-200 OLAWA<br/>
                         NIP: 9121027907<br/>
                         Nr konta: {{ env('ACCOUNT_PROFORMA') }}<br/>
-                        Telefony: {{ env('FRONT_URL') }}/kontakt<br/>
-                        E-mail ogólny : info@{{ env('DOMAIN_NAME') }}<br/>
+                        Telefony: {{ env('FRONT_URL') }}kontakt<br/>
+                        E-mail ogólny : {{'info@' . env('DOMAIN_NAME') }}<br/>
                         @endif
                     </p>
                 </td>

@@ -40,7 +40,6 @@ use App\Http\Requests\OrderUpdateRequest;
 use App\Jobs\AddLabelJob;
 use App\Jobs\AllegroTrackingNumberUpdater;
 use App\Jobs\ImportOrdersFromSelloJob;
-use App\Jobs\Orders\CheckDeliveryAddressSendMailJob;
 use App\Jobs\Orders\MissingDeliveryAddressSendMailJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Jobs\RemoveFileLockJob;
@@ -1114,19 +1113,15 @@ class OrdersController extends Controller
         }
 
         if ($request->input('status') != $order->status_id && $request->input('shouldBeSent') == 'on') {
-	        $message = $order->customer->isAllegro ? setting('site.allegro_order_change_status_msg') : $request->input('mail_message');
-	        
-            dispatch_now(new OrderStatusChangedNotificationJob($order->id, $message, $oldStatus));
+            dispatch_now(new OrderStatusChangedNotificationJob($order->id, $request->input('mail_message'), $oldStatus));
         }
 
         if ($request->input('status') != $order->status_id && $request->input('status') == 3) {      //mozliwa do realizacji
             dispatch_now(new MissingDeliveryAddressSendMailJob($order));
-	        dispatch_now(new CheckDeliveryAddressSendMailJob($order));
         }
 
         if ($request->input('status') != $order->status_id && $request->input('status') == 4) {      //mozliwa do realizacji
             dispatch_now(new MissingDeliveryAddressSendMailJob($order));
-	        dispatch_now(new CheckDeliveryAddressSendMailJob($order));
         }
 
         if ($request->submit == 'updateAndStay') {

@@ -73,7 +73,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         ]);
 
         $transactions = SelTransaction::all()->groupBy('tr_CheckoutFormPaymentId');
-        $count = $transactions->reduce(function ($count, $transactionGroup) use ($taskPrimal, $productService, $orderPaymentService) {
+        $count = $transactions->reduce(function ($count, $transactionGroup) use ($taskPrimal, $productService, $orderPaymentService, $newOrders) {
             $isGroup = !empty($transactionGroup->firstWhere('tr_Group', 1));
             if ($isGroup) {
                 $transaction = $transactionGroup->firstWhere('tr_Group', 1);
@@ -108,7 +108,9 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $transactionArray['order_items'] = $orderItems;
             try {
                 DB::beginTransaction();
-                $this->buildOrder($transaction, $transactionArray, $products, $transactionGroup, $taskPrimal->id, $productService, $orderPaymentService);
+                $order = $this->buildOrder($transaction, $transactionArray, $products, $transactionGroup, $taskPrimal->id, $productService, $orderPaymentService);
+	            dispatch(new OrderProformSendMailJob($order, setting('site.new_allegro_order_on_sello_import_msg')));
+	            
                 $count++;
                 DB::commit();
             } catch (\Exception $exception) {
@@ -347,6 +349,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $this->createPaymentPromise($order, $transaction, $orderPaymentService);
             $this->setLabels($order, $taskPrimalId);
         }
+        
+        return $order;
     }
 
     private function createPaymentPromise(Order $order, $transaction, OrderPaymentService $orderPaymentService)

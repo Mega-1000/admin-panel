@@ -36,6 +36,8 @@ class Order extends Model implements Transformable
     const COMMENT_FINANCIAL_TYPE = 'financial_comment';
     const VAT_VALUE = 1.23;
 
+    const PROFORM_DIR = 'public/proforma/';
+
     public $customColumnsVisibilities = [
         'mark',
         'spedition_exchange_invoiced_selector',
@@ -732,5 +734,9 @@ class Order extends Model implements Transformable
             'consultant_acceptance' => true,
             'message' => 'Ustawiono domyślne daty dla zamówienia'
         ]);
+    }
+
+    public function getProformStoragePathAttribute() {
+		return self::PROFORM_DIR . $this->proforma_filename;
     }
 }
