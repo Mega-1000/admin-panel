@@ -14,6 +14,7 @@ class UpdateSettingsItem extends Migration
 	{
 		if ($setting = Setting::where(['key' => 'site.allegro_order_change_status_msg'])->first()) {
 			$setting->key = 'site.new_allegro_order_on_sello_import_msg';
+			$setting->group = 'Site';
 			$setting->save();
 		}
 	}
