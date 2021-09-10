@@ -2067,7 +2067,7 @@
                                 html += '<br />'
                                 html += '<a href="#" class="remove__invoices"' + 'onclick="getInvoicesList(' + data.orderId + ')">Usuń</a>'
                             }
-                            html += '<a href="{{env('FRONT_NUXT_URL')}}' + '/magazyn/awizacja/0/0/' + data.orderId + '/wyslij-fakture">Dodaj</a>'
+                            html += '<a href="{{rtrim(env('FRONT_NUXT_URL'),"/")}}' + '/magazyn/awizacja/0/0/' + data.orderId + '/wyslij-fakture">Dodaj</a>'
 
                             return html;
                         }

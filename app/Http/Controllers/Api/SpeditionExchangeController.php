@@ -145,6 +145,6 @@ class SpeditionExchangeController extends Controller
     /** Helper function */
     protected function generateLinkForExchange($hash)
     {
-        return env('FRONT_NUXT_URL') . "/gielda/transport/{$hash}";
+        return rtrim(env('FRONT_NUXT_URL'),"/") . "/gielda/transport/{$hash}";
     }
 }
