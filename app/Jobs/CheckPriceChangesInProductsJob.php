@@ -91,7 +91,7 @@ class CheckPriceChangesInProductsJob implements ShouldQueue
 
     private function sendEmail($warehouse, $email)
     {
-        $sendFormWithProducts = env('FRONT_NUXT_URL') . "/magazyn/aktualizacja-cen/{$warehouse->id}/zaktualizuj";
+        $sendFormWithProducts = rtrim(env('FRONT_NUXT_URL'),"/") . "/magazyn/aktualizacja-cen/{$warehouse->id}/zaktualizuj";
         \Mailer::create()
             ->to($email)
             ->send(

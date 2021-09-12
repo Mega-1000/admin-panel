@@ -27,7 +27,7 @@ class CheckDeliveryAddressSendMailJob extends Job implements ShouldQueue
 
 	public function handle()
 	{
-		$formLink = env('FRONT_NUXT_URL') . "zamowienie/mozliwe-do-realizacji/brak-danych/{$this->order->id}";
+		$formLink = rtrim(env('FRONT_NUXT_URL'),"/") . "/zamowienie/mozliwe-do-realizacji/brak-danych/{$this->order->id}";
 
 		\Mailer::create()
 			->to($this->order->customer->login)
