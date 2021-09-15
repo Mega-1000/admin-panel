@@ -57,10 +57,10 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
     public function handle(EmailTagHandlerHelper $emailTagHandler, OrderRepository $orderRepository, TagRepository $tagRepository, StatusRepository $statusRepository)
     {
 	    $order = $orderRepository->find($this->orderId);
-    	if ($order->status_id != 3 || $order->status_id != 4) {
-    		return;
-	    }
-        
+//    	if ($order->status_id != 3 || $order->status_id != 4) {
+//    		return;
+//	    }
+
         $tags = $tagRepository->all();
         $oldStatus = $statusRepository->find($this->oldStatus);
 
@@ -72,11 +72,11 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
             $method = $tag->handler;
             $message = preg_replace("[" . preg_quote($tag->name) . "]", $emailTagHandler->$method(), $message);
         }
-        
+
         $subject = "Zmiana statusu - numer oferty: " . $this->orderId . " z: " . $oldStatus->name . " na: " . $order->status->name . ' oraz proforma';
-        
+
         $mail_to = $order->customer->login;
-        
+
         try {
             \Mailer::create()
                 ->to($mail_to)

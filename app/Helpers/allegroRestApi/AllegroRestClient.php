@@ -46,7 +46,7 @@ class AllegroRestClient extends AllegroApiService
     {
         $formId = $package->order->selloTransaction->tr_CheckoutFormId;
         $url = "/order/checkout-forms/$formId";
-        $resp = json_decode((string)$this->request('GET', $url)->getBody());
+        $resp = json_decode((string)$this->request('GET', $url,[])->getBody());
         return $resp->lineItems[0]->id;
     }
 }
