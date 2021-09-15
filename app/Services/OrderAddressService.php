@@ -18,6 +18,8 @@ class OrderAddressService
 	public function preSaveCleanup(OrderAddress $address)
 	{
 		foreach ($address->getFillable() as $field) {
+			$address->$field = is_null($address->$field) ? $address->$field : trim($address->$field);
+			
 			if ($address->type == OrderAddress::TYPE_INVOICE) {
 				if ($field == 'firmname' && $address->$field) {
 					$address->firstname = '';
