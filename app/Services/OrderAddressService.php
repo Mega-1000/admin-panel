@@ -6,12 +6,21 @@ use Illuminate\Support\Facades\Validator;
 
 class OrderAddressService
 {
+	protected $errors = false;
+	
+	public function errors() {
+		return $this->errors;
+	}
+	
 	public function addressIsValid(OrderAddress $address): bool
 	{
 		$addressArray = $address->toArray();
 		$rules = $this->getRules($address);
 		
 		$validator = Validator::make($addressArray, $rules);
+		
+		$this->errors = $validator->errors();
+		
 		return !$validator->fails();
 	}
 	
