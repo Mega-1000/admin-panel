@@ -53,7 +53,7 @@ class OrderProformSendMailJob extends Job implements ShouldQueue
      *
      * @return void
      */
-    public function handle(EmailTagHandlerHelper $emailTagHandler, TagRepository $tagRepository, StatusRepository $statusRepository)
+    public function handle(EmailTagHandlerHelper $emailTagHandler, TagRepository $tagRepository)
     {
         $tags = $tagRepository->all();
 

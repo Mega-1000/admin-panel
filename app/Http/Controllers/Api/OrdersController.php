@@ -17,7 +17,7 @@ use App\Helpers\TransportSumCalculator;
 use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
 use App\Http\Requests\Api\Orders\StoreOrderRequest;
 use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
-use App\Jobs\Orders\GenerateOrderProformJob;
+use App\Jobs\OrderProformSendMailJob;
 use App\Repositories\CustomerRepository;
 use App\Repositories\OrderAddressRepository;
 use App\Repositories\OrderItemRepository;
@@ -348,7 +348,7 @@ class OrdersController extends Controller
             }
 
             if ($deliveryAddress->wasChanged() || $invoiceAddress->wasChanged()) {
-	            dispatch_now(new GenerateOrderProformJob($order, true));
+	            dispatch(new OrderProformSendMailJob($order, setting('allegro.address_changed_msg')));
             }
             
             if ($request->get('remember_delivery_address')) {
