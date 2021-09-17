@@ -73,7 +73,7 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
             $message = preg_replace("[" . preg_quote($tag->name) . "]", $emailTagHandler->$method(), $message);
         }
 
-        $subject = "Zmiana statusu - numer oferty: " . $this->orderId . " z: " . $oldStatus->name . " na: " . $order->status->name . ' oraz proforma';
+        $subject = "Zmiana statusu - numer oferty: " . $this->orderId . " z: " . $oldStatus->name . " na: " . $order->status->name;
 
         $mail_to = $order->customer->login;
 
