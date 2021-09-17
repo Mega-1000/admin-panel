@@ -48,6 +48,15 @@ Jeżeli chcielibyście jeszcze je skorygować to prosimy o dokonanie takich czyn
 		$setting->group = 'Allegro';
 		$setting->save();
 		
+		$setting = Setting::firstOrNew(['key' => 'allegro.final_confirmation_msg']);
+		$setting->display_name = 'Ostateczne potwierdzenie zgodnosci oferty pod wzlgdedem danych i asortymentu';
+		$setting->value = '';
+		$setting->details = '';
+		$setting->type = 'text_area';
+		$setting->order = '9';
+		$setting->group = 'Allegro';
+		$setting->save();
+		
 		Tag::create(['name' => '[LINK-DO-FORMULARZA-ADRESU]', 'handler' => 'addressFormLink']);
 	}
 	
@@ -70,6 +79,7 @@ Jeżeli chcielibyście jeszcze je skorygować to prosimy o dokonanie takich czyn
 		
 		Setting::where('key', '=', 'allegro.check_address_msg')->delete();
 		Setting::where('key', '=', 'allegro.address_changed_msg')->delete();
+		Setting::where('key', '=', 'allegro.final_confirmation_msg')->delete();
 		
 		Tag::where('name', '=', '[LINK-DO-FORMULARZA-ADRESU]')->delete();
 	}
