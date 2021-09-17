@@ -58,6 +58,7 @@ Jeżeli chcielibyście jeszcze je skorygować to prosimy o dokonanie takich czyn
 		$setting->save();
 		
 		Tag::create(['name' => '[LINK-DO-FORMULARZA-ADRESU]', 'handler' => 'addressFormLink']);
+		Tag::create(['name' => '[LINK-DO-FORMULARZA-NIEZGODNOŚCI]', 'handler' => 'declineProformFormLink']);
 	}
 	
 	/**
@@ -82,5 +83,6 @@ Jeżeli chcielibyście jeszcze je skorygować to prosimy o dokonanie takich czyn
 		Setting::where('key', '=', 'allegro.final_confirmation_msg')->delete();
 		
 		Tag::where('name', '=', '[LINK-DO-FORMULARZA-ADRESU]')->delete();
+		Tag::where('name', '=', '[LINK-DO-FORMULARZA-NIEZGODNOŚCI]')->delete();
 	}
 }
