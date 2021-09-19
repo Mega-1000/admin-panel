@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\OrderWarehouseNotification;
+use App\Helpers\Helper;
 use App\Mail\OrderStatusChangedToDispatchMail;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
@@ -96,9 +97,9 @@ class OrderStatusChangedToDispatchNotificationJob extends Job implements ShouldQ
             $subject = "Prośba o potwierdzenie awizacji dla zamówienia nr. " . $this->orderId;
             $notification = OrderWarehouseNotification::create($dataArray);
         }
-
-        $acceptanceFormLink = rtrim(env('FRONT_NUXT_URL'),"/") . "/magazyn/awizacja/{$notification->id}/{$order->warehouse_id}/{$this->orderId}";
-        $sendFormInvoice = rtrim(env('FRONT_NUXT_URL'),"/") . "/magazyn/awizacja/{$notification->id}/{$order->warehouse_id}/{$this->orderId}/wyslij-fakture";
+        $hashedOrderId = Helper::encodeId($this->orderId);
+        $acceptanceFormLink = rtrim(env('FRONT_NUXT_URL'),"/") . "/magazyn/awizacja/{$notification->id}/{$order->warehouse_id}/{$hashedOrderId}";
+        $sendFormInvoice = rtrim(env('FRONT_NUXT_URL'),"/") . "/magazyn/awizacja/{$notification->id}/{$order->warehouse_id}/{$hashedOrderId}/wyslij-fakture";
 
         if(!!filter_var($warehouseMail, FILTER_VALIDATE_EMAIL)) {
             if ($this->path === null) {

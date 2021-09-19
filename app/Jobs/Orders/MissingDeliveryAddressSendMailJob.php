@@ -3,6 +3,7 @@
 namespace App\Jobs\Orders;
 
 use App\Entities\Order;
+use App\Helpers\Helper;
 use App\Jobs\DispatchLabelEventByNameJob;
 use App\Jobs\Job;
 use App\Mail\MissingDeliveryAddressMail;
@@ -32,8 +33,8 @@ class MissingDeliveryAddressSendMailJob extends Job implements ShouldQueue
         if (! ($this->order instanceof Order)) {
             $this->order = $orderRepository->find($this->order);
         }
-
-        $formLink = rtrim(env('FRONT_NUXT_URL'),"/") . "/zamowienie/mozliwe-do-realizacji/brak-danych/{$this->order->id}";
+        $hashedOrderId = Helper::encodeId($this->order->id);
+        $formLink = rtrim(env('FRONT_NUXT_URL'),"/") . "/zamowienie/mozliwe-do-realizacji/brak-danych/{$hashedOrderId}";
         if (! $this->order->isDeliveryDataComplete()) {
             if(!empty($this->options)) {
                 if(!empty($this->options["dispatch-labels-by-name"])) {

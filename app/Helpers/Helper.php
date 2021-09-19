@@ -86,4 +86,26 @@ class Helper
             return $phone;
         }
     }
+
+    /**
+     * Kodowanie identyfikatora
+     *
+     * @param int $id
+     * @return string
+     */
+    public static function encodeId(int $id):string
+    {
+        return urlencode(base64_encode($id));
+    }
+
+    /**
+     * Rozkodowanie identyfikatora
+     *
+     * @param string $code
+     * @return int
+     */
+    public static function decodeId(string $code):int
+    {
+        return base64_decode(urldecode($code));
+    }
 }
