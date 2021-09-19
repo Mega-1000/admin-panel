@@ -37,10 +37,14 @@ class Mailer
         }
 
         if (env('APP_ENV') !== 'production') {
-            $transport = (new \Swift_SmtpTransport('smtp.mailtrap.io', 2525, 'tls'))
-                ->setEncryption('tls')
-                ->setUsername('1320d1e69b90c7')
-                ->setPassword('cb7a4a3f6f3fc3');
+            $transport = (new \Swift_SmtpTransport(
+                env('MAIL_HOST'),
+                env('MAIL_PORT'),
+                env('MAIL_ENCRYPTION')
+            ))
+                ->setEncryption(env('MAIL_ENCRYPTION'))
+                ->setUsername(env('MAIL_USERNAME'))
+                ->setPassword(env('MAIL_PASSWORD'));
         } else {
             $transport = (new \Swift_SmtpTransport($user->userEmailData->host, $user->userEmailData->port, $user->userEmailData->encryption))
                 ->setEncryption($user->userEmailData->encryption)

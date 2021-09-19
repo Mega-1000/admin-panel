@@ -3498,14 +3498,15 @@
             ClassicEditor
                 .create(document.querySelector('.editor'))
                 .then(editor => {
-                    console.log(editor);
                     $('#status').on('change', function () {
                         $('#status option').each(function () {
                             if ($(this).is(':selected')) {
                                 $.ajax({
                                     url: '/admin/orders/status/' + this.value + '/message',
                                     success: function (result) {
-                                        editor.data.set(result);
+                                        if (result.length > 0) {
+                                            editor.data.set(result);
+                                        }
                                     }
                                 });
                             }
@@ -3516,7 +3517,9 @@
                             $.ajax({
                                 url: '/admin/orders/status/' + this.value + '/message',
                                 success: function (result) {
-                                    editor.data.set(result);
+                                    if (result.length > 0) {
+                                        editor.data.set(result);
+                                    }
                                 }
                             });
                         }
