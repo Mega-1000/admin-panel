@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 
 use App\Entities\OrderAddress;
+use App\Jobs\Cron\FinalProformConfirmationAutoApprovementJob;
+use App\Jobs\Cron\SendInvoicesMailsJob;
 use App\Jobs\FindNewAllegroOrders;
 use App\Jobs\ImportOrdersFromSelloJob;
 use App\Jobs\OrderProformSendMailJob;
-use App\Jobs\Orders\CheckDeliveryAddressSendMailJob;
+use App\Jobs\Cron\SendFinalProformConfirmationMailsJob;
 use App\Services\AllegroOrderService;
+use Carbon\Carbon;
 
 class DebugController extends Controller
 {
@@ -17,11 +20,16 @@ class DebugController extends Controller
     	$oa = OrderAddress::find(1);
     	//$oa->firstname = 'test';
     	//$oa->save();
-    	
-	    dispatch_now(new CheckDeliveryAddressSendMailJob($oa->order));
-    	dispatch(new OrderProformSendMailJob($oa->order, setting('allegro.address_changed_msg')));
+    	$o = $oa->order;
+    	$l = $o->labels;
 	    
+	    
+	    dispatch_now(new SendFinalProformConfirmationMailsJob());
+	    dispatch_now(new FinalProformConfirmationAutoApprovementJob());
+	    dispatch_now(new SendInvoicesMailsJob());
     	return;
+    	
+	    dispatch(new OrderProformSendMailJob($oa->order, setting('allegro.address_changed_msg')));
 	    
 	    dispatch_now(new ImportOrdersFromSelloJob());
 	    dispatch_now(new FindNewAllegroOrders());
