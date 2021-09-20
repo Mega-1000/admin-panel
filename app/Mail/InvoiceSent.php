@@ -37,7 +37,9 @@ class InvoiceSent extends Mailable
     public function build()
     {
         return $this->view('emails.invoice-sent')
-            ->subject($this->subject)
-            ->attach('/home/mega1000/domains/mega1000.pro-linuxpl.com/public_html/subiekt/invoices/' . $this->attachment);
+	        ->subject($this->subject)
+	        ->attach('/home/mega1000/domains/mega1000.pro-linuxpl.com/public_html/subiekt/invoices/' . $this->attachment);
+        
+        return $this;
     }
 }

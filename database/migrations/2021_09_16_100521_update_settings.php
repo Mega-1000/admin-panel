@@ -49,12 +49,22 @@ Jeżeli chcielibyście jeszcze je skorygować to prosimy o dokonanie takich czyn
 		$setting->save();
 		
 		$setting = Setting::firstOrNew(['key' => 'allegro.final_confirmation_msg']);
-		$setting->display_name = 'Ostateczne potwierdzenie zgodnosci oferty pod wzlgdedem danych i asortymentu';
+		$setting->display_name = 'Ostateczne potwierdzenie zgodnosci oferty pod wzlgdedem danych i asortymentu (Allegro)';
 		$setting->value = '';
 		$setting->details = '';
 		$setting->type = 'text_area';
 		$setting->order = '9';
 		$setting->group = 'Allegro';
+		$setting->save();
+		
+		$setting = Setting::firstOrNew(['key' => 'site.final_confirmation_msg']);
+		$setting->display_name = 'Ostateczne potwierdzenie zgodnosci oferty pod wzlgdedem danych i asortymentu';
+		$setting->value = 'W zwiazku z wysylaniem towaru do panstwa z oferty [NUMER-OFERTY] informujemy iż przygotowujemy się do wystawienia faktury ostatecznej
+		prosimy sprawdzic otrzymana w tym momencie fakture proforme pod wzgldem danych osobowych, asortyemtnu oraz cen i o jej zatwierdzenie bądź zanegowanie';
+		$setting->details = '';
+		$setting->type = 'text_area';
+		$setting->order = '5';
+		$setting->group = 'Site';
 		$setting->save();
 		
 		Tag::create(['name' => '[LINK-DO-FORMULARZA-ADRESU]', 'handler' => 'addressFormLink']);
