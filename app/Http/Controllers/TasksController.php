@@ -429,25 +429,25 @@ class TasksController extends Controller
                 'customTaskId' => 'task-' . $task->id
             ];
         }
-
-        foreach ($laziness as $task) {
-            $start = new Carbon($task->created_at);
-            $end = new Carbon($task->updated_at);
-            $consultantNotice = $warehouseNotice = '';
-            $text = $task->description;
-
-            $array[] = [
-                'id' => 'tracker_id_'.$task->id,
-                'resourceId' => $task->user_id,
-                'title' => 'Brak aktywności',
-                'start' => $start->format('Y-m-d\TH:i'),
-                'end' => $end->format('Y-m-d\TH:i'),
-                'color' => '#FF0000',
-                'text' => $text ?? 'Brak uzasadnienia',
-                'customOrderId' => '',
-                'customTaskId' => ''
-            ];
-        }
+        //Zaśmieca timetable - narazie zakomentujemy
+//        foreach ($laziness as $task) {
+//            $start = new Carbon($task->created_at);
+//            $end = new Carbon($task->updated_at);
+//            $consultantNotice = $warehouseNotice = '';
+//            $text = $task->description;
+//
+//            $array[] = [
+//                'id' => 'tracker_id_'.$task->id,
+//                'resourceId' => $task->user_id,
+//                'title' => 'Brak aktywności',
+//                'start' => $start->format('Y-m-d\TH:i'),
+//                'end' => $end->format('Y-m-d\TH:i'),
+//                'color' => '#FF0000',
+//                'text' => $text ?? 'Brak uzasadnienia',
+//                'customOrderId' => '',
+//                'customTaskId' => ''
+//            ];
+//        }
 
         return response()->json($array);
     }
