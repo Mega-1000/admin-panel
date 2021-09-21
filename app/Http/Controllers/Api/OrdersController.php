@@ -21,6 +21,7 @@ use App\Http\Requests\Api\Orders\StoreOrderRequest;
 use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
 use App\Jobs\AddLabelJob;
 use App\Jobs\OrderProformSendMailJob;
+use App\Jobs\Orders\CheckDeliveryAddressSendMailJob;
 use App\Jobs\RemoveLabelJob;
 use App\Repositories\CustomerRepository;
 use App\Repositories\OrderAddressRepository;
@@ -162,6 +163,8 @@ class OrdersController extends Controller
 	        $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 2)->first();
 	        $order->firm_source_id = $firmSource ? $firmSource->id : null;
 	        $order->save();
+	
+	        dispatch(new CheckDeliveryAddressSendMailJob($order));
 	        
             return $this->createdResponse(['order_id' => $id, 'canPay' => $canPay, 'token' => $order->getToken()]);
         } catch (\Exception $e) {
