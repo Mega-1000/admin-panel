@@ -30,7 +30,9 @@ class CheckDeliveryAddressSendMailJob extends Job implements ShouldQueue
 	public function handle(EmailTagHandlerHelper $emailTagHandler, TagRepository $tagRepository)
 	{
 		$tags = $tagRepository->all();
-		$message = setting('allegro.check_address_msg');
+		$message = $this->order->sello_id
+			? setting('allegro.check_address_msg')
+			: setting('site.check_address_msg');
 		
 		$subject = "Sprawdz dane do dostawy i faktury - numer zamówienia: {$this->order->id}";
 		

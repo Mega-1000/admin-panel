@@ -68,7 +68,7 @@ Jeżeli chcielibyście jeszcze je skorygować to prosimy o dokonanie takich czyn
 		$setting->save();
 		
 		Tag::create(['name' => '[LINK-DO-FORMULARZA-ADRESU]', 'handler' => 'addressFormLink']);
-		Tag::create(['name' => '[LINK-DO-FORMULARZA-NIEZGODNOŚCI]', 'handler' => 'declineProformFormLink']);
+		Tag::create(['name' => '[LINK-DO-FORMULARZA-NIEZGODNOSCI]', 'handler' => 'declineProformFormLink']);
 	}
 	
 	/**
