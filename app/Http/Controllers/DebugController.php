@@ -17,13 +17,17 @@ class DebugController extends Controller
 {
     public function index()
     {
+    	if (env('APP_ENV') != 'development') {
+    		return;
+	    }
+    	
     	$oa = OrderAddress::find(1);
     	//$oa->firstname = 'test';
     	//$oa->save();
     	$o = $oa->order;
     	$l = $o->labels;
 	    
-	    
+	    return;
 	    dispatch_now(new SendFinalProformConfirmationMailsJob());
 	    dispatch_now(new FinalProformConfirmationAutoApprovementJob());
 	    dispatch_now(new SendInvoicesMailsJob());
