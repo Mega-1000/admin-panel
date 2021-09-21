@@ -79,7 +79,7 @@ return [
 	    'delivery_address_change_failure' => 'Dane do dostawy nie mogą być zmienione bo już jest rozpoczęty proces nadawania paczki.',
 	    'delivery_address_changed' => 'Dane do dostawy zostały zamienione na takie jakie państwo zescie zatwierdzili.',
 	    'invoice_address_changed' => 'Dane do faktury zostały zamienione na takie jakie państwo zescie zatwierdzili.',
-	    'invoice_address_change_failure' => 'Dane do faktury nie mogą być zmienione.',
+	    'invoice_address_change_failure' => 'Dane do faktury nie mogą być zmienione.'
     ],
     'form' => [
         'buttons' => [

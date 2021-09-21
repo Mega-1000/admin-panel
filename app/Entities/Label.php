@@ -50,7 +50,14 @@ class Label extends Model implements Transformable
     const CUSTOMER_DATA_REMINDER_IDS = [53, 74];
     const DIALOG_TYPE_LABELS_IDS = [55, 56, 57, 58, 78, 79, 80, 81, 82, 83, 84, 85];
     const NOT_SENT_YET_LABELS_IDS = [self::BLUE_HAMMER_ID, self::GREEN_HAMMER_ID, self::ORDER_ITEMS_UNDER_CONSTRUCTION];
-
+	
+	const INVOICE_SENDED = 192;
+	const INVOICE_INCORRECT = 193;
+    const FINAL_CONFIRMATION_SENDED = 194;
+	const FINAL_CONFIRMATION_APPROVED = 195;
+	const FINAL_CONFIRMATION_DECLINED = 196;
+	const REDEEMED_LABEL_PROCESSED_IDS = [self::INVOICE_SENDED, self::INVOICE_INCORRECT, self::FINAL_CONFIRMATION_SENDED, self::FINAL_CONFIRMATION_APPROVED, self::FINAL_CONFIRMATION_DECLINED];
+		
     public $customColumnsVisibilities = [
         'name',
         'group',
