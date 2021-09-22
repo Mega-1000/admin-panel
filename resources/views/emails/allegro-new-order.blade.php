@@ -1,1 +1,1 @@
-{!! setting('allegro.new_allegro_order_msg') !!}
+{!! setting('site.new_allegro_order_msg') !!}

@@ -25,6 +25,7 @@ use Prettus\Repository\Traits\TransformableTrait;
  */
 class Order extends Model implements Transformable
 {
+
     use TransformableTrait;
 
     const STATUS_WITHOUT_REALIZATION = 8;
@@ -34,10 +35,7 @@ class Order extends Model implements Transformable
     const COMMENT_CONSULTANT_TYPE = 'consultant_comment';
     const COMMENT_FINANCIAL_TYPE = 'financial_comment';
     const VAT_VALUE = 1.23;
-	
-    const FINAL_CONFIRMATION_DAYS_ALLEGRO = 15;
-	const FINAL_CONFIRMATION_DAYS = 2;
-	
+
     const PROFORM_DIR = 'public/proforma/';
 
     public $customColumnsVisibilities = [
@@ -305,11 +303,7 @@ class Order extends Model implements Transformable
 
     public function hasLabel($labelId)
     {
-    	if (!is_array($labelId)) {
-		    $labelId = [$labelId];
-	    }
-    	
-        return $this->labels()->whereIn('label_id', $labelId)->count();
+        return $this->labels()->where('label_id', $labelId)->count();
     }
 
     /**
@@ -319,12 +313,7 @@ class Order extends Model implements Transformable
     {
         return $this->belongsToMany(Label::class, 'order_labels')->withPivot('added_type');
     }
-	
-	public function orderLabels()
-	{
-		return $this->hasMany(OrderLabel::class);
-	}
-	
+
     public function promisePayments()
     {
         $promisePayments = $this->payments()->where('promise', 'like', '1')->get();
@@ -749,20 +738,5 @@ class Order extends Model implements Transformable
 
     public function getProformStoragePathAttribute() {
 		return self::PROFORM_DIR . $this->proforma_filename;
-    }
-    
-    public function getIsFinalConfirmationDayAttribute() {
-	    if (!($orderLabel = $this->orderLabels()->redeemed()->first())){
-		    return false;
-	    }
-	    
-	    $days = self::FINAL_CONFIRMATION_DAYS;
-	    if ($this->sello_id) {
-		    $days = self::FINAL_CONFIRMATION_DAYS_ALLEGRO;
-	    }
-	
-	    $finalConfirmationStartOfDay = Carbon::now()->subDays($days)->startOfDay();
-	    $finalConfirmationEndOfDay = $finalConfirmationStartOfDay->copy()->endOfDay();
-	    return $orderLabel->created_at <= $finalConfirmationEndOfDay;
     }
 }

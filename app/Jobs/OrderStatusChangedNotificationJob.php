@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Helpers\EmailTagHandlerHelper;
-use App\Jobs\Orders\GenerateOrderProformJob;
 use App\Mail\OrderStatusChanged;
 use App\Repositories\OrderRepository;
 use App\Repositories\StatusRepository;
@@ -58,6 +57,9 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
     public function handle(EmailTagHandlerHelper $emailTagHandler, OrderRepository $orderRepository, TagRepository $tagRepository, StatusRepository $statusRepository)
     {
 	    $order = $orderRepository->find($this->orderId);
+//    	if ($order->status_id != 3 || $order->status_id != 4) {
+//    		return;
+//	    }
 
         $tags = $tagRepository->all();
         $oldStatus = $statusRepository->find($this->oldStatus);
@@ -71,20 +73,14 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
             $message = preg_replace("[" . preg_quote($tag->name) . "]", $emailTagHandler->$method(), $message);
         }
 
-        $subject = "Zmiana statusu - numer oferty: " . $this->orderId . " z: " . $oldStatus->name . " na: " . $order->status->name;
+        $subject = "Zmiana statusu - numer oferty: " . $this->orderId . " z: " . $oldStatus->name . " na: " . $order->status->name . ' oraz proforma';
 
         $mail_to = $order->customer->login;
-	    $pdf = "";
-	
-	    if (($order->status_id == 3 || $order->status_id == 4) && !$order->sello_id) {
-    		dispatch_now(new GenerateOrderProformJob($order));
-		    $pdf = Storage::disk('local')->get($order->proformStoragePath);
-	    }
-	    
+
         try {
             \Mailer::create()
                 ->to($mail_to)
-                ->send(new OrderStatusChanged($subject, $message, $pdf));
+                ->send(new OrderStatusChanged($subject, $message));
         } catch (\Exception $e) {
             \Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);
         }

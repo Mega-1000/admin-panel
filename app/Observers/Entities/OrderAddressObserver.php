@@ -10,7 +10,6 @@ use App\Jobs\RemoveLabelJob;
 use App\Services\OrderAddressService;
 use App\Services\OrderPaymentService;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Storage;
 
 class OrderAddressObserver
 {
@@ -33,12 +32,6 @@ class OrderAddressObserver
     {
         $this->removingMissingDeliveryAddressLabelHandler($orderAddress);
         $this->addLabelIfManualCheckIsRequired($orderAddress);
-        
-	    if ($orderAddress->wasChanged() && $orderAddress->order->proforma_filename && Storage::disk('local')->exists($orderAddress->order->proformStoragePath)) {
-		    Storage::disk('local')->delete($orderAddress->order->proformStoragePath);
-		    $orderAddress->order->proforma_filename = '';
-		    $orderAddress->order->save();
-	    }
         
         $this->addHistoryLog($orderAddress);
     }

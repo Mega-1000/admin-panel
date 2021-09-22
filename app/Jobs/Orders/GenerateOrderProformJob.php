@@ -4,6 +4,7 @@ namespace App\Jobs\Orders;
 
 use App\Entities\Order;
 use App\Jobs\Job;
+use App\Jobs\OrderProformSendMailJob;
 use Barryvdh\DomPDF\Facade as PDF;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
@@ -12,16 +13,16 @@ use Illuminate\Support\Str;
 class GenerateOrderProformJob extends Job
 {
 	protected $order;
-	protected $regenerate;
+	protected $sendToCustomer;
 
 	/**
 	 * GenerateOrderProformJob constructor.
 	 * @param $order
 	 */
-	public function __construct(Order $order, $regenerate = false)
+	public function __construct(Order $order, $sendToCustomer = false)
 	{
 		$this->order = $order;
-		$this->regenerate = $regenerate;
+		$this->sendToCustomer = $sendToCustomer;
 	}
 
     /**
@@ -31,20 +32,11 @@ class GenerateOrderProformJob extends Job
      */
     public function handle()
     {
-    	$exists = $this->order->proforma_filename && Storage::disk('local')->exists($this->order->proformStoragePath);
-    	
-    	if ($this->regenerate && $exists) {
-    		Storage::disk('local')->delete($this->order->proformStoragePath);
-    		$exists = false;
-	    }
-	    
-    	if ($exists) {
-    		return;
-	    }
-    	
 	    $proformDate = Carbon::now()->format('m/Y');
 	    $date = Carbon::now()->toDateString();
-	    
+	    if ($this->order->proforma_filename && Storage::disk('local')->exists($this->order->proformStoragePath)) {
+		    Storage::disk('local')->delete($this->order->proformStoragePath);
+	    }
 	    $this->order->proforma_filename = Str::random(40) . '.pdf';
 	    $this->order->save();
 	    
@@ -52,5 +44,9 @@ class GenerateOrderProformJob extends Job
 	    
 	    $pdf = PDF::loadView('pdf.proform', compact('date', 'proformDate', 'order'))->output();
 	    Storage::disk('local')->put($this->order->proformStoragePath, $pdf);
+	    
+	    if ($this->sendToCustomer) {
+	    	dispatch(new OrderProformSendMailJob($this->order));
+	    }
     }
 }
