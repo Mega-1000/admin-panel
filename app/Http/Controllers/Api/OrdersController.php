@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Entities\FirmSource;
+use App\Entities\Label;
 use App\Entities\OrderAddress;
 use App\Entities\OrderDates;
 use App\Helpers\BackPackPackageDivider;
@@ -14,10 +15,14 @@ use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceCalculator;
 use App\Helpers\SendCommunicationEmail;
 use App\Helpers\TransportSumCalculator;
+use App\Http\Requests\Api\Orders\DeclineProformRequest;
 use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
 use App\Http\Requests\Api\Orders\StoreOrderRequest;
 use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
-use App\Jobs\Orders\GenerateOrderProformJob;
+use App\Jobs\AddLabelJob;
+use App\Jobs\OrderProformSendMailJob;
+use App\Jobs\Orders\CheckDeliveryAddressSendMailJob;
+use App\Jobs\RemoveLabelJob;
 use App\Repositories\CustomerRepository;
 use App\Repositories\OrderAddressRepository;
 use App\Repositories\OrderItemRepository;
@@ -31,6 +36,7 @@ use App\Repositories\ProductRepository;
 use App\Repositories\ProductPriceRepository;
 use App\Services\ProductService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
@@ -157,6 +163,8 @@ class OrdersController extends Controller
 	        $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 2)->first();
 	        $order->firm_source_id = $firmSource ? $firmSource->id : null;
 	        $order->save();
+	
+	        dispatch(new CheckDeliveryAddressSendMailJob($order));
 	        
             return $this->createdResponse(['order_id' => $id, 'canPay' => $canPay, 'token' => $order->getToken()]);
         } catch (\Exception $e) {
@@ -348,7 +356,7 @@ class OrdersController extends Controller
             }
 
             if ($deliveryAddress->wasChanged() || $invoiceAddress->wasChanged()) {
-	            dispatch_now(new GenerateOrderProformJob($order, true));
+	            dispatch(new OrderProformSendMailJob($order, setting('allegro.address_changed_msg')));
             }
             
             if ($request->get('remember_delivery_address')) {
@@ -696,4 +704,22 @@ class OrdersController extends Controller
             'error_message' => __('order_dates.messages.error')
         ]), 500);
     }
+	
+	public function declineProform(
+		DeclineProformRequest $request,
+		$orderId
+	)
+	{
+		if (!($order = $this->orderRepository->find($orderId))) {
+			return [];
+		}
+		
+		$order->labels_log .= Order::formatMessage(Auth::user(), $request->description);
+		$order->save();
+		
+		dispatch(new RemoveLabelJob($order->id, [Label::FINAL_CONFIRMATION_SENDED]));
+		dispatch(new AddLabelJob($order->id, [Label::FINAL_CONFIRMATION_DECLINED]));
+		
+		return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
+	}
 }

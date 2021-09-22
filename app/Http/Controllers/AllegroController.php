@@ -85,7 +85,7 @@ class AllegroController extends Controller
 
     public function saveTerms(Request $request)
     {
-        $setting = Setting::where('key','=','site.new_allegro_order_msg')->first();
+        $setting = Setting::where('key','=','allegro.new_allegro_order_msg')->first();
         $setting->value = $request->get('content');
         $setting->save();
         return redirect()->route('orders.index')->with(['message' => __('voyager.generic.successfully_updated'),
