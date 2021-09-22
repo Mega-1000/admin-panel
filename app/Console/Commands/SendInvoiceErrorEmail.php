@@ -40,11 +40,8 @@ w razie niejasnosci prosimy dzwonic 691801594 bądź pisac info@mega1000.pl";
 					->to($mail_to)
 					->send(new HtmlMessageMail($message, $subject));
 				dispatch_now(new RemoveLabelJob($orderLabel->order_id, [194]));
-				
-				/**
-				 * maybe to create label with id=200 to keep this orders?
-				 */
-				//dispatch_now(new AddLabelJob($orderLabel->order_id, [200]));
+				/*just for info*/
+				dispatch_now(new AddLabelJob($orderLabel->order_id, [197]));
 			} catch (\Exception $e) {
 				Log::error('Send email failed', [$e]);
 			}
