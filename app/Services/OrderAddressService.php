@@ -6,18 +6,29 @@ use Illuminate\Support\Facades\Validator;
 
 class OrderAddressService
 {
+	protected $errors = false;
+	
+	public function errors() {
+		return $this->errors;
+	}
+	
 	public function addressIsValid(OrderAddress $address): bool
 	{
 		$addressArray = $address->toArray();
 		$rules = $this->getRules($address);
 		
 		$validator = Validator::make($addressArray, $rules);
+		
+		$this->errors = $validator->errors();
+		
 		return !$validator->fails();
 	}
 	
 	public function preSaveCleanup(OrderAddress $address)
 	{
 		foreach ($address->getFillable() as $field) {
+			$address->$field = is_null($address->$field) ? $address->$field : trim($address->$field);
+			
 			if ($address->type == OrderAddress::TYPE_INVOICE) {
 				if ($field == 'firmname' && $address->$field) {
 					$address->firstname = '';

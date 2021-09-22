@@ -2,24 +2,27 @@
 
 namespace App\Jobs\Orders;
 
+use App\Entities\Label;
 use App\Entities\Order;
 use App\Helpers\EmailTagHandlerHelper;
+use App\Jobs\AddLabelJob;
 use App\Jobs\Job;
-use App\Mail\CheckDeliveryAddressMail;
+use App\Mail\OrderMessageMail;
 use App\Repositories\TagRepository;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
-class CheckDeliveryAddressSendMailJob extends Job implements ShouldQueue
+class SendFinalProformConfirmationMailJob extends Job implements ShouldQueue
 {
 	use IsMonitored, Queueable, SerializesModels;
 
 	protected $order;
 
 	/**
-	 * CheckDeliveryAddressSendMailJob constructor.
+	 * SendFinalProformConfirmationMailJob constructor.
 	 * @param $order
 	 */
 	public function __construct(Order $order)
@@ -29,12 +32,16 @@ class CheckDeliveryAddressSendMailJob extends Job implements ShouldQueue
 
 	public function handle(EmailTagHandlerHelper $emailTagHandler, TagRepository $tagRepository)
 	{
-		$tags = $tagRepository->all();
-		$message = $this->order->sello_id
-			? setting('allegro.check_address_msg')
-			: setting('site.check_address_msg');
+		dispatch_now(new GenerateOrderProformJob($this->order));
 		
-		$subject = "Sprawdz dane do dostawy i faktury - numer zamówienia: {$this->order->id}";
+		$tags = $tagRepository->all();
+		if ($this->order->sello_id) {
+			$message = setting('allegro.final_confirmation_msg');
+		} else {
+			$message = setting('site.final_confirmation_msg');
+		}
+		
+		$subject = "Prosbe o ostateczne potwierdzenie zgodnosci oferty pod wzlgdedem danych i asortymentu - numer zamówienia: {$this->order->id}";
 		
 		$emailTagHandler->setOrder($this->order);
 		
@@ -43,10 +50,13 @@ class CheckDeliveryAddressSendMailJob extends Job implements ShouldQueue
 			$message = preg_replace("[" . preg_quote($tag->name) . "]", $emailTagHandler->$method(), $message);
 		}
 		
+		$pdf = Storage::disk('local')->get($this->order->proformStoragePath);
+		
 		try {
 			\Mailer::create()
 				->to($this->order->customer->login)
-				->send(new CheckDeliveryAddressMail($subject, $message));
+				->send(new OrderMessageMail($subject, $message, $pdf));
+			dispatch_now(new AddLabelJob($this->order->id, [Label::FINAL_CONFIRMATION_SENDED]));
 		} catch (\Exception $e) {
 			\Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);
 		}
