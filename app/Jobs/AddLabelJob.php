@@ -110,7 +110,7 @@ class AddLabelJob extends Job implements ShouldQueue
 
             if (count($alreadyHasLabel) == 0) {
 
-                $this->order->labels()->attach($this->order->id, ['label_id' => $label->id, 'added_type' => $this->options['added_type']]);
+                $this->order->labels()->attach($this->order->id, ['label_id' => $label->id, 'added_type' => $this->options['added_type'], 'created_at' => Carbon::now()]);
                 $this->setScheduledLabelsAfterAddition($this->order->id, $label, $orderLabelSchedulerRepository);
                 $this->loopPreventionArray['already-added'][] = $labelId;
 

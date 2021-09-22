@@ -314,4 +314,14 @@ class EmailTagHandlerHelper
 
         return "Numer magazynu: {$address->warehouse_number}<br>Adres: {$address->address}<br>{$address->postal_code} {$address->city}";
     }
+
+	//[LINK-DO-FORMULARZA-ADRESU]
+	public function addressFormLink() {
+		return rtrim(env('FRONT_NUXT_URL'),"/") . "/zamowienie/mozliwe-do-realizacji/brak-danych/{$this->order->id}";
+	}
+	
+	//[LINK-DO-FORMULARZA-NIEZGODNOŚCI]
+	public function declineProformFormLink() {
+		return rtrim(env('FRONT_NUXT_URL'),"/") . "/zamowienie/niezgodnosc-w-proformie/{$this->order->id}";
+	}
 }
