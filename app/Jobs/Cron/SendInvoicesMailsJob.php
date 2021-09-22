@@ -35,7 +35,8 @@ class SendInvoicesMailsJob extends Job implements ShouldQueue
      */
     public function handle()
     {
-	    if (!($orderLabels = OrderLabel::where('label_id', Label::FINAL_CONFIRMATION_APPROVED)->with('order')->get())){
+	    $orderLabels = OrderLabel::where('label_id', Label::FINAL_CONFIRMATION_APPROVED)->with('order')->get();
+	    if (!($orderLabels->count())){
 		    return;
 	    }
 	

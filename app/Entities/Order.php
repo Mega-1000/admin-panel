@@ -763,6 +763,6 @@ class Order extends Model implements Transformable
 	
 	    $finalConfirmationStartOfDay = Carbon::now()->subDays($days)->startOfDay();
 	    $finalConfirmationEndOfDay = $finalConfirmationStartOfDay->copy()->endOfDay();
-	    return $orderLabel->created_at <= $finalConfirmationEndOfDay;
+	    return $orderLabel->created_at >= $finalConfirmationStartOfDay && $orderLabel->created_at <= $finalConfirmationEndOfDay;
     }
 }

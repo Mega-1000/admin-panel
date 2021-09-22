@@ -35,12 +35,14 @@ class SendFinalProformConfirmationMailsJob extends Job implements ShouldQueue
      */
     public function handle()
     {
-	    if (!($orderLabels = OrderLabel::redeemed()->with('order')->get())){
+	    $orderLabels = OrderLabel::redeemed()->with('order')->get();
+	    if (!($orderLabels->count())){
 		    return;
 	    }
 	
 	    $orderLabels->map(function ($orderLabel) {
-		    if ($orderLabel->order->isFinalConfirmationDay && !$orderLabel->order->hasLabel(Label::REDEEMED_LABEL_PROCESSED_IDS)) {
+		    if ($orderLabel->order->isFinalConfirmationDay
+			    && !$orderLabel->order->hasLabel(Label::REDEEMED_LABEL_PROCESSED_IDS)) {
 			    dispatch(new SendFinalProformConfirmationMailJob($orderLabel->order));
 		    }
 	    });
