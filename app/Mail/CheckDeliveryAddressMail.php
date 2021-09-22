@@ -10,20 +10,17 @@ class CheckDeliveryAddressMail extends Mailable
 {
 	use Queueable, SerializesModels;
 	
-	public $mailBody;
-	public $pdf;
+	public $formLink;
 	
 	/**
-	 * CheckDeliveryAddressMail constructor.
+	 * OrderStatusChangedToDispatchMail constructor.
 	 * @param $subject
-	 * @param $message
-	 * @param $pdf
+	 * @param $formLink
 	 */
-	public function __construct($subject, $message, $pdf = false)
+	public function __construct($subject, $formLink)
 	{
+		$this->formLink = $formLink;
 		$this->subject = $subject;
-		$this->mailBody = $message;
-		$this->pdf = $pdf;
 	}
 	
 	/**
@@ -33,13 +30,6 @@ class CheckDeliveryAddressMail extends Mailable
 	 */
 	public function build()
 	{
-		if($this->pdf != false) {
-			return $this->view('emails.check-delivery-address')
-				->attachData($this->pdf, 'attachment.pdf', [
-					'mime' => 'application/pdf',
-				]);
-		} else {
-			return $this->view('emails.check-delivery-address');
-		}
+		return $this->view('emails.check-delivery-address');
 	}
 }

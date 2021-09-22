@@ -155,15 +155,6 @@ return [
         'date_to' => 'data początkowa',
         'date_from' => 'data końcowa',
         'order_id' => 'identyfikator zamówienia',
-	    'NIP' => 'NIP',
-	    'email' => 'Email',
-	    'address' => 'Ulica/Wioska',
-	    'flat_number' => 'Numer budynku',
-	    'city' => 'Miasto',
-	    'postal_code' => 'Kod pocztowy',
-	    'phone' => 'Numer telefonu',
-	    'firstname' => 'Imię',
-	    'lastname' => 'Nazwisko',
-	    'firmname' => 'Nazwa firmy'
+	    'NIP' => 'NIP'
     ],
 ];

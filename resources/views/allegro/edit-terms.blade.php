@@ -12,7 +12,7 @@
         {{ csrf_field() }}
 
         <div class="form-group">
-            <textarea name="content" id="" cols="30" rows="30" class="form-control">{{ setting('allegro.new_allegro_order_msg') }}</textarea>
+            <textarea name="content" id="" cols="30" rows="30" class="form-control">{{ setting('site.new_allegro_order_msg') }}</textarea>
         </div>
 
         <div class="form-group">
