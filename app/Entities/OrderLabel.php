@@ -13,18 +13,18 @@ use Prettus\Repository\Traits\TransformableTrait;
  */
 class OrderLabel extends Model implements Transformable
 {
-    use TransformableTrait;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'order_id',
-        'label_id',
-        'added_type'
-    ];
+	use TransformableTrait;
+	
+	/**
+	 * The attributes that are mass assignable.
+	 *
+	 * @var array
+	 */
+	protected $fillable = [
+		'order_id',
+		'label_id',
+		'added_type'
+	];
 	
 	/**
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -36,6 +36,10 @@ class OrderLabel extends Model implements Transformable
 	
 	public function scopeRedeemed($query) {
 		$query->where('label_id', Label::ORDER_ITEMS_REDEEMED_LABEL);
+	}
+	
+	public function scopeConfirmationSended($query) {
+		$query->where('label_id', 194);
 	}
 	
 	public function scopeApproved($query) {
