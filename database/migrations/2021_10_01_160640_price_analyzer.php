@@ -28,26 +28,25 @@ class PriceAnalyzer extends Migration
 		$item->save();
 		
 		$perm = new Permission();
-		$perm->id = 171;
 		$perm->key = 'browse_product_analyzer';
 		$perm->table_name = 'product_analyzer';
 		$perm->save();
+		DB::raw('INSERT INTO permission_role (permission_id, role_id) VALUES (' . $perm->id .' }, 1)');
+		
 		$perm = new Permission();
-		$perm->id = 172;
 		$perm->key = 'read_product_analyzer';
 		$perm->table_name = 'product_analyzer';
 		$perm->save();
 		
+		DB::raw('INSERT INTO permission_role (permission_id, role_id) VALUES (' . $perm->id .' }, 1)');
 		
-		Schema::table('products', function (Blueprint $table) {
-			$table->string('allegro_analyze_id', 36);
-		});
-		
-		Schema::create('product_analyzer', function (Blueprint $table) {
+		Schema::create('product_analyzers', function (Blueprint $table) {
 			$table->increments('id');
 			$table->unsignedInteger('product_id');
-			$table->decimal('price');
-			$table->dateTime('analyze_date');
+			$table->decimal('price')->nullable();
+			$table->dateTime('analyze_date')->nullable();
+			$table->string('parse_service', 50);
+			$table->string('parse_url', 500);
 			
 			$table->foreign('product_id')->references('id')->on('products')->onUpdate('cascade')->onDelete('cascade');
 		});
@@ -60,10 +59,6 @@ class PriceAnalyzer extends Migration
 	 */
 	public function down()
 	{
-		Schema::table('products', function (Blueprint $table) {
-			$table->dropColumn('allegro_analyze_id');
-		});
-		
-		Schema::dropIfExists('product_analyzer');
+		Schema::dropIfExists('product_analyzers');
 	}
 }

@@ -14,7 +14,9 @@ use Prettus\Repository\Traits\TransformableTrait;
 class ProductAnalyzer extends Model implements Transformable
 {
     use TransformableTrait;
-
+	
+	public $timestamps = false;
+	
     /**
      * The attributes that are mass assignable.
      *
@@ -23,7 +25,9 @@ class ProductAnalyzer extends Model implements Transformable
     protected $fillable = [
         'product_id',
         'price',
-        'analyze_date'
+        'analyze_date',
+	    'parse_url',
+	    'parse_service',
     ];
 
     /**
@@ -31,6 +35,6 @@ class ProductAnalyzer extends Model implements Transformable
      */
     public function product()
     {
-        return $this->belongsTo(Product::class)->withTrashed();
+        return $this->belongsTo(Product::class);
     }
 }

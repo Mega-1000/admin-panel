@@ -87,6 +87,14 @@ class ImportCsvFileJob implements ShouldQueue
                     if ($media) {
                         $this->createProductMedia($media, $product);
                     }
+	
+	                if ($line[500]) {
+	                	$productAnalyze = new Entities\ProductAnalyzer();
+		                $productAnalyze->product_id = $product->id;
+		                $productAnalyze->parse_service = 'allegro';
+		                $productAnalyze->parse_url = $line[500];
+	                }
+	                
                     $this->setProductTradeGroups($line, $product);
                     if (!empty($multiCalcBase)) {
                         $this->productsRelated[$categoryColumn.'-'.$multiCalcBase] = $product->id;
@@ -513,8 +521,7 @@ class ImportCsvFileJob implements ShouldQueue
             'gross_selling_price_aggregate_unit' => $line[255],
             'gross_selling_price_the_largest_unit' => $line[256],
             'show_on_page' => $this->getShowOnPageParameter($line, $categoryColumn),
-            'priority' => $this->getProductsOrder($line, $categoryColumn),
-	        'allegro_analyze_id' => $line['500']
+            'priority' => $this->getProductsOrder($line, $categoryColumn)
         ];
 
         foreach ($array as $key => $value) {
@@ -606,7 +613,7 @@ class ImportCsvFileJob implements ShouldQueue
             $newMedia->save();
         }
     }
-
+    
     private function setProductTradeGroups(array $line, Entities\Product $product)
     {
         $this->getTradeGroupParams(379, 'price', $line, $product);

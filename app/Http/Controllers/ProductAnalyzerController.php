@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\ColumnVisibility;
 use App\Entities\ProductAnalyzer;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
@@ -18,7 +19,14 @@ class ProductAnalyzerController extends Controller
      */
     public function index()
     {
-        return view('product_analyzer.index');
+	    $visibilities = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('labels'));
+	    foreach($visibilities as $key => $row)
+	    {
+		    $visibilities[$key]->show = json_decode($row->show,true);
+		    $visibilities[$key]->hidden = json_decode($row->hidden,true);
+	    }
+	    
+        return view('product_analyzer.index', compact('visibilities'));
     }
 	
 	public function datatable(Request $request)
@@ -33,7 +41,7 @@ class ProductAnalyzerController extends Controller
      */
     public function prepareCollection()
     {
-        $collection = ProductAnalyzer::with('product')->all();
+        $collection = ProductAnalyzer::with('product')->get();
 
         return $collection;
     }
