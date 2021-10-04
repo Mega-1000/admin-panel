@@ -58,9 +58,9 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\UpdateAllegroDisputes::class)->everyFifteenMinutes();
         $schedule->job(Jobs\GetNewAllegroDisputesJob::class)->everyFifteenMinutes();
         
-	    //$schedule->job(Jobs\Cron\SendFinalProformConfirmationMailsJob::class)->dailyAt("09:00");
-	    //$schedule->job(Jobs\Cron\FinalProformConfirmationAutoApprovementJob::class)->dailyAt("23:00");
-	    //$schedule->job(Jobs\Cron\SendInvoicesMailsJob::class)->dailyAt("23:45");
+	    $schedule->job(Jobs\Cron\SendFinalProformConfirmationMailsJob::class)->dailyAt("09:00");
+	    $schedule->job(Jobs\Cron\FinalProformConfirmationAutoApprovementJob::class)->dailyAt("23:00");
+	    $schedule->job(Jobs\Cron\SendInvoicesMailsJob::class)->dailyAt("23:45");
     }
 
     /**
