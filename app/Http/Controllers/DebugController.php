@@ -26,7 +26,6 @@ class DebugController extends Controller
     	//$oa->save();
     	$o = $oa->order;
     	$l = $o->labels;
-	    
 	    return;
 	    dispatch_now(new SendFinalProformConfirmationMailsJob());
 	    dispatch_now(new FinalProformConfirmationAutoApprovementJob());

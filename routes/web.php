@@ -281,7 +281,10 @@ Route::group(['prefix' => 'admin'], function () {
             'ProductStockPacketsController@update')->name('product_stock_packets.update');
         Route::post('positions/{from}/{to}/quantity/move',
             'ProductStockPositionsController@quantityMove')->name('product_stocks.quantity_move');
-        Route::get('orders', 'OrdersController@index')->name('orders.index');
+	    Route::get('products/analyzer', 'ProductAnalyzerController@index')->name('product_analyzer.index');
+	    Route::post('products/analyzer/datatable', 'ProductAnalyzerController@datatable')->name('product_analyzer.datatable');
+	
+	    Route::get('orders', 'OrdersController@index')->name('orders.index');
         Route::post('orders/update-notices', 'OrdersController@updateNotices')->name('orders.updateNotice');
         Route::post('orders/returnItemsFromStock',
             'OrdersController@returnItemsFromStock')->name('orders.returnItemsFromStock');

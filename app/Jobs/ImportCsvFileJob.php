@@ -513,7 +513,8 @@ class ImportCsvFileJob implements ShouldQueue
             'gross_selling_price_aggregate_unit' => $line[255],
             'gross_selling_price_the_largest_unit' => $line[256],
             'show_on_page' => $this->getShowOnPageParameter($line, $categoryColumn),
-            'priority' => $this->getProductsOrder($line, $categoryColumn)
+            'priority' => $this->getProductsOrder($line, $categoryColumn),
+	        'allegro_analyze_id' => $line['500']
         ];
 
         foreach ($array as $key => $value) {
