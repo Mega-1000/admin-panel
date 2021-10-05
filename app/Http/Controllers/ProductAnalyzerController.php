@@ -41,7 +41,7 @@ class ProductAnalyzerController extends Controller
      */
     public function prepareCollection()
     {
-        $collection = ProductAnalyzer::with('product')->get();
+        $collection = ProductAnalyzer::whereHas('product')->with('product')->get();
 
         return $collection;
     }
