@@ -48,14 +48,10 @@ class SendInvoiceMailJob extends Job implements ShouldQueue
 			$message = preg_replace("[" . preg_quote($tag->name) . "]", $emailTagHandler->$method(), $message);
 		}
 		
-		try {
-			\Mailer::create()
-				->to($this->order->customer->login)
-				->send(new InvoiceSent($subject, $message, $invoiceRow->ftp_invoice_filename));
+		\Mailer::create()
+			->to($this->order->customer->login)
+			->send(new InvoiceSent($subject, $message, $invoiceRow->ftp_invoice_filename));
 
-			dispatch_now(new AddLabelJob($this->order, [Label::INVOICE_SENDED]));
-		} catch (\Exception $e) {
-			\Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);
-		}
+		dispatch_now(new AddLabelJob($this->order, [Label::INVOICE_SENDED]));
 	}
 }
