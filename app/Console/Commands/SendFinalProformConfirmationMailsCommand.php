@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Cron;
+namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 
