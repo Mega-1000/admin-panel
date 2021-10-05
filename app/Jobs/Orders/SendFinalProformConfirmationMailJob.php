@@ -52,13 +52,9 @@ class SendFinalProformConfirmationMailJob extends Job implements ShouldQueue
 		
 		$pdf = Storage::disk('local')->get($this->order->proformStoragePath);
 		
-		try {
-			\Mailer::create()
-				->to($this->order->customer->login)
-				->send(new OrderMessageMail($subject, $message, $pdf));
-			dispatch_now(new AddLabelJob($this->order->id, [Label::FINAL_CONFIRMATION_SENDED]));
-		} catch (\Exception $e) {
-			\Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);
-		}
+		\Mailer::create()
+			->to($this->order->customer->login)
+			->send(new OrderMessageMail($subject, $message, $pdf));
+		dispatch_now(new AddLabelJob($this->order->id, [Label::FINAL_CONFIRMATION_SENDED]));
 	}
 }

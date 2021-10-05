@@ -8,6 +8,7 @@ use App\Jobs\Job;
 use App\Jobs\Orders\SendFinalProformConfirmationMailJob;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 /**
@@ -16,35 +17,41 @@ use romanzipp\QueueMonitor\Traits\IsMonitored;
  */
 class SendFinalProformConfirmationMailsJob extends Job implements ShouldQueue
 {
-    use Queueable, IsMonitored;
-
-
-    /**
-     * Create a new job instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-    }
-
-    /**
-     * Execute the job.
-     *
-     * @return void
-     */
-    public function handle()
-    {
-	    $orderLabels = OrderLabel::redeemed()->with('order')->get();
-	    if (!($orderLabels->count())){
-		    return;
-	    }
+	use Queueable, IsMonitored;
 	
-	    $orderLabels->map(function ($orderLabel) {
-		    if ($orderLabel->order->isFinalConfirmationDay
-			    && !$orderLabel->order->hasLabel(Label::REDEEMED_LABEL_PROCESSED_IDS)) {
-			    dispatch(new SendFinalProformConfirmationMailJob($orderLabel->order));
-		    }
-	    });
-    }
+	
+	/**
+	 * Create a new job instance.
+	 *
+	 * @return void
+	 */
+	public function __construct()
+	{
+	}
+	
+	/**
+	 * Execute the job.
+	 *
+	 * @return void
+	 */
+	public function handle()
+	{
+		$orderLabels = OrderLabel::redeemed()->with('order')->get();
+		if (!($orderCount = $orderLabels->count())) {
+			Log::info('Send proform. Orders total count: 0');
+			return;
+		}
+		
+		Log::info('Send proform. Orders total count: ' . $orderCount);
+		$processedCount = 0;
+		foreach ($orderLabels as $orderLabel) {
+			if ($orderLabel->order->isFinalConfirmationDay
+				&& !$orderLabel->order->hasLabel(Label::REDEEMED_LABEL_PROCESSED_IDS)) {
+				$processedCount++;
+				dispatch(new SendFinalProformConfirmationMailJob($orderLabel->order));
+			}
+		}
+		
+		Log::info('Send proform. Orders processed count: ' . $processedCount);
+	}
 }
