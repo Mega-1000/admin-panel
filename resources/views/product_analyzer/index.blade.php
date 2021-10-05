@@ -40,7 +40,7 @@
             ],
             dom: 'Bfrtip',
 			buttons: [
-				{extend: 'colvis', text: 'Widzialność kolumn'}
+
 			],
             order: [[0, "asc"]],
 			ajax: {
