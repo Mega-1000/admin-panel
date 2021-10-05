@@ -44,14 +44,31 @@ class SendFinalProformConfirmationMailsJob extends Job implements ShouldQueue
 		
 		Log::info('Send proform. Orders total count: ' . $orderCount);
 		$processedCount = 0;
+		$notFinalDayCount = 0;
+		$hasProcessedLables = 0;
+		$logOrderCount = 0;
 		foreach ($orderLabels as $orderLabel) {
-			if ($orderLabel->order->isFinalConfirmationDay
-				&& !$orderLabel->order->hasLabel(Label::REDEEMED_LABEL_PROCESSED_IDS)) {
-				$processedCount++;
-				dispatch(new SendFinalProformConfirmationMailJob($orderLabel->order));
+			if (!$orderLabel->order->isFinalConfirmationDay) {
+				$notFinalDayCount++;
+				continue;
 			}
+			
+			if ($orderLabel->order->hasLabel(Label::REDEEMED_LABEL_PROCESSED_IDS)) {
+				$hasProcessedLables++;
+				if ($logOrderCount < 5) {
+					Log::info('Send proform. Order with labels: ' . $orderLabel->order->id);
+					$logOrderCount++;
+				}
+				
+				continue;
+			}
+			
+			$processedCount++;
+			dispatch(new SendFinalProformConfirmationMailJob($orderLabel->order));
 		}
 		
 		Log::info('Send proform. Orders processed count: ' . $processedCount);
+		Log::info('Send proform. Orders not at final day count: ' . $notFinalDayCount);
+		Log::info('Send proform. Orders processed labels count: ' . $hasProcessedLables);
 	}
 }
