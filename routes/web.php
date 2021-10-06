@@ -20,7 +20,9 @@ Route::group(['prefix' => 'admin'], function () {
     });
 
     Route::group(['middleware' => 'admin'], function () {
-
+	    Route::get('/allegro-api/auth/device/{code?}', 'AllegroApiController@auth_device');
+	    Route::get('/allegro-api/auth/oauth2', 'AllegroApiController@auth_oauth2');
+	    
         Route::group(['prefix' => 'products'], function () {
             Route::group(['prefix' => 'sets', 'as' => 'sets.'], __DIR__ . '/web/ProductsSetsRoutes.php');
         });

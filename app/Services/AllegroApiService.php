@@ -36,29 +36,11 @@ class AllegroApiService
 		$this->client = new Client();
 		
 		if (empty($this->authModel)) {
-			/**
-			 * TODO maybe here shoud be something other. User flow?
-			 */
-			if (env('APP_ENV') == 'development') {
-				$res = $this->getAuthCodes();
-				/**
-				 * after that you need to go to - verification_uri_complete and confirm
-				 * then go to here anf check auth
-				 */
-				if ($response = $this->checkAuthorizationStatus($res['device_code'])) {
-					$this->authModel = new Allegro_Auth();
-					$this->authModel->id = $this->auth_record_id;
-					$this->authModel->access_token = $response['access_token'];
-					$this->authModel->refresh_token = $response['refresh_token'];
-					$this->authModel->save();
-				}
-			}
 			\Log::error('Brak tokena autoryzującego allegro');
-			return;
 		}
 	}
 	
-	protected function getAuthCodes()
+	public function getAuthCodes()
 	{
 		$response = $this->client->post(
 			$this->getAuthUrl('/device'), [
@@ -96,9 +78,27 @@ class AllegroApiService
 		return json_decode((string)$response->getBody(), true);
 	}
 	
-	protected function checkAuthorizationStatus(string $deviceId)
-	{
+	public function authToken($authorization_code) {
+		try {
+			$response = $this->client->post(
+				$this->getAuthUrl('/token?grant_type=authorization_code'), [
+				'headers' => [
+					'Authorization' => $this->getBasicAuthString(),
+					'Content-type' => 'application/x-www-form-urlencoded'
+				],
+				'form_params' => [
+					'code' => $authorization_code
+				]
+			]);
+		} catch (\Exception $e) {
+			return false;
+		}
 		
+		return json_decode((string)$response->getBody(), true);
+	}
+	
+	public function checkAuthorizationStatus(string $deviceId)
+	{
 		$url = $this->getAuthUrl('/token?grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Adevice_code&device_code=') . $deviceId;
 		$response = $this->client->post($url, [
 			'headers' => [
@@ -131,6 +131,10 @@ class AllegroApiService
 	
 	protected function request(string $method, string $url, array $params, $attachment = null, $first = true)
 	{
+		if (!$this->getAccessToken()) {
+			return false;
+		}
+		
 		$headers = [
 			// 'Accept' => 'application/vnd.allegro.public.v1+json',
 			'Authorization' => "Bearer " . $this->getAccessToken(),
@@ -173,7 +177,7 @@ class AllegroApiService
 	
 	protected function getAccessToken()
 	{
-		return $this->authModel->access_token;
+		return $this->authModel ? false : $this->authModel->access_token;
 	}
 	
 	protected function fetchAccessToken()
@@ -196,15 +200,15 @@ class AllegroApiService
 	
 	protected function getRefreshToken()
 	{
-		return $this->authModel->refresh_token;
+		return $this->authModel ? $this->authModel->refresh_token : false;
 	}
 	
-	protected function getRestUrl(string $resource): string
+	public function getRestUrl(string $resource): string
 	{
 		return $this->api_url . $resource;
 	}
 	
-	protected function getAuthUrl(string $resource): string
+	public function getAuthUrl(string $resource): string
 	{
 		return $this->auth_url . $resource;
 	}
