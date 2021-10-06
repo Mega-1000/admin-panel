@@ -864,7 +864,7 @@ class OrdersPackagesController extends Controller
         $data['delivery_date'] = $package->delivery_date;
         $data['quantity'] = 1;
         $data['chosen_data_template'] = $template->id;
-        $packageNumber = OrderPackage::where('order_id', $package->order_id)->max('number');
+        $packageNumber = OrderPackage::where('order_id', $package->order_id)->max('number') + 1;
         $data['notices'] = $data['order_id'] . '/' . $packageNumber;
         $data['cash_on_delivery'] = $package->cash_on_delivery;
         $data['status'] = PackageTemplate::STATUS_NEW;
@@ -872,8 +872,7 @@ class OrdersPackagesController extends Controller
         $data['cost_for_company'] = $package->cost_for_company;
         $data['content'] = $package->content;
         $data['packing_type'] = $package->packing_type;
-        $packageNumber = OrderPackage::where('order_id', $package->order_id)->max('number');
-        $data['number'] = $packageNumber + 1;
+        $data['number'] = $packageNumber;
         $newPackage = $this->saveOrderPackage($data);
 
         $toCancel = [
