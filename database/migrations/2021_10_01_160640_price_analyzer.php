@@ -19,7 +19,7 @@ class PriceAnalyzer extends Migration
 		$item->title = 'Analizator cen';
 		$item->url = '';
 		$item->target = '_self';
-		$item->icon_class = 'voyager-money';
+		$item->icon_class = 'voyager-pie-chart';
 		$item->color = null;
 		$item->parent_id = 20;
 		$item->order = 5;
