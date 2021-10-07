@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Jobs\Cron;
+namespace App\Console\Commands;
 
+use App\Jobs\Cron\SendFinalProformConfirmationMailsJob;
 use Illuminate\Console\Command;
 
 /**
