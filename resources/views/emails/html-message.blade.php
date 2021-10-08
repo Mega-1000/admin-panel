@@ -1,4 +1,4 @@
 <body>
-    {{$messageBody}}
+    {!! $messageBody !!}
 </body>
 

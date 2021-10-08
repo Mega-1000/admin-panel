@@ -20,7 +20,7 @@ class HtmlMessageMail extends Mailable implements ShouldQueue
 	 */
 	public function __construct($message, $subject)
 	{
-		$this->messageBody = $message;
+		$this->messageBody = nl2br($message);
 		$this->subject = $subject;
 	}
 	
