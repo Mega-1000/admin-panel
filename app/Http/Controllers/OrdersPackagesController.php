@@ -262,6 +262,7 @@ class OrdersPackagesController extends Controller
             $orderPackage->symbol = $data['symbol'];
             $orderPackage->chosen_data_template = $data['chosen_data_template'];
         }
+        $this->orderPackagesDataHelper->findFreeShipmentDate($orderPackage);
         $orderPackage->save();
 
         if (!empty($data['real_cost_for_company'])) {
