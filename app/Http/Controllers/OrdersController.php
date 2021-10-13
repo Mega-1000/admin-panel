@@ -2224,8 +2224,7 @@ class OrdersController extends Controller
                 if (Auth::user()->role_id == 4) {
                     $query->where('orders.employee_id', '=', Auth::user()->id);
                 }
-            })
-            ->where('orders.id', '>', 17000);
+            });
         return $query;
     }
 
