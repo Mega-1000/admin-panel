@@ -99,3 +99,6 @@ Route::post('auth/code/{id}', 'Api\AutheticationController@getToken')->name('api
 Route::group(['prefix' => 'sets', 'as' => 'sets.'], __DIR__ . '/api/ProductsSetsRoutes.php');
 Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/api/TrackerLogsRoutes.php');
 Route::group(['prefix' => 'orders', 'as' => 'orders.'], __DIR__ . '/api/OrdersRoutes.php');
+
+Route::post('faq/save','Api\FaqController@savePath')->name('api.faq.save');
+Route::get('faq/get','Api\FaqController@getQuestions')->name('api.faq.get');
