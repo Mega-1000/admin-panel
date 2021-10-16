@@ -25,4 +25,8 @@ class Faq extends Model implements Transformable
         'questions'
     ];
 
+    protected $casts = [
+        'questions' => 'array'
+    ];
+
 }
