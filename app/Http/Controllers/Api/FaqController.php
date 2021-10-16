@@ -36,18 +36,24 @@ class FaqController
      *
      * @author Norbert Grzechnik <norbert.grzechnik@netro42.digital>
      */
-    public function savePath(Request $request)
+    public function store(Request $request)
     {
         $this->repository->create(
             [
                 'category' => $request->get('category'),
-                'questions' => json_encode($request->get('questions')),
+                'questions' => $request->get('questions'),
             ]
         );
     }
 
     public function getQuestions()
     {
-        return $this->repository->all(['category','questions']);
+        $result = [];
+        $rawQuestions = $this->repository->all(['category', 'questions']);
+        foreach ($rawQuestions as $value) {
+            $result[$value->category] = array_merge($result[$value->category] ?? [], $value->questions);
+        }
+
+        return response()->json($result);
     }
 }
