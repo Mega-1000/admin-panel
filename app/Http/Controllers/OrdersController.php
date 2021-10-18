@@ -2083,7 +2083,7 @@ class OrdersController extends Controller
         }
 
         if ($minId) {
-            $query->where($sortingColumns[6], '>', $minId);
+            $query->where($sortingColumns[14], '>', $minId);
         }
 
         if(isset($data['same'])) {

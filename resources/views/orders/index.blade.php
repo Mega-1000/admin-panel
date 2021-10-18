@@ -2695,10 +2695,12 @@
         function findPage() {
             let id = $('#searchById').val()
             let url = "{{route('orders.findPage', ['id' => '%%'])}}"
-            $.post(url.replace('%%', id), table.ajax.params())
-                .done((data) => {
-                    window.table.page(Math.floor(data)).draw('page')
-                });
+            if (id.length !== 0) {
+                $.post(url.replace('%%', id), table.ajax.params())
+                    .done((data) => {
+                        window.table.page(Math.floor(data)).draw('page')
+                    });
+            }
         }
 
         function findByDates() {
