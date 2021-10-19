@@ -100,5 +100,9 @@ Route::group(['prefix' => 'sets', 'as' => 'sets.'], __DIR__ . '/api/ProductsSets
 Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/api/TrackerLogsRoutes.php');
 Route::group(['prefix' => 'orders', 'as' => 'orders.'], __DIR__ . '/api/OrdersRoutes.php');
 
-Route::post('faq','Api\FaqController@store')->name('api.faq.save');
-Route::get('faq/get','Api\FaqController@getQuestions')->name('api.faq.get');
+Route::post('faqs','Api\FaqController@store')->name('api.faq.save');
+Route::get('faqs/get','Api\FaqController@getQuestions')->name('api.faq.get');
+Route::get('faqs','Api\FaqController@index')->name('api.faq.index');
+Route::get('faqs/{id}','Api\FaqController@show')->name('api.faq.show');
+Route::put('faqs/{id}','Api\FaqController@update')->name('api.faq.update');
+Route::delete('faqs/{id}','Api\FaqController@destroy')->name('api.faq.destroy');
