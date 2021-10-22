@@ -418,6 +418,14 @@ class Order extends Model implements Transformable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
+    public function orderAllegro()
+    {
+        return $this->belongsTo(AllegroOrder::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function status()
     {
         return $this->belongsTo(Status::class);
