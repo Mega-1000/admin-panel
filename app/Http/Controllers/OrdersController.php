@@ -1955,15 +1955,15 @@ class OrdersController extends Controller
 
         $sortingColumns = [
             4 => 'users.name',
-            5 => 'orders.created_at',
-            6 => 'orders.id',
-            9 => 'statuses.name',
+            13 => 'orders.created_at',
+            14 => 'orders.id',
+            17 => 'statuses.name',
             10 => 'symbol',
-            11 => 'customer_notices',
-            12 => 'customer_addresses.phone',
-            13 => 'customer_addresses.email',
-            14 => 'customer_addresses.firstname',
-            15 => 'customer_addresses.lastname',
+            20 => 'customer_notices',
+            22 => 'customer_addresses.phone',
+            23 => 'customer_addresses.email',
+            24 => 'customer_addresses.firstname',
+            25 => 'customer_addresses.lastname',
             46 => 'sel_tr__transaction.tr_CheckoutFormPaymentId'
         ];
 
@@ -2083,7 +2083,7 @@ class OrdersController extends Controller
         }
 
         if ($minId) {
-            $query->where($sortingColumns[6], '>', $minId);
+            $query->where($sortingColumns[14], '>', $minId);
         }
 
         if(isset($data['same'])) {

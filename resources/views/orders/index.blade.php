@@ -1592,7 +1592,7 @@
                                                         </span>
                                                      </div>`;
                                             } else {
-                                                html += `<div data-toggle="label-tooltip" data-html="true" title="${tooltipContent + ' ' + row.created_at}" class="pointer" onclick="removeLabel(${row.orderId}, ${label[0].id}, ${label[0].manual_label_selection_to_add_after_removal}, '${label[0].added_type}', '${label[0].timed}');">
+                                                html += `<div data-toggle="label-tooltip" data-html="true" title="${tooltipContent + ' ' + (label[0].id === '66') ? row.production_date : row.created_at}" class="pointer" onclick="removeLabel(${row.orderId}, ${label[0].id}, ${label[0].manual_label_selection_to_add_after_removal}, '${label[0].added_type}', '${label[0].timed}');">
                                                         <span class="order-label" style="color: ${label[0].font_color}; display: block; margin-top: 5px; background-color: ${label[0].color}">
                                                             <i class="${label[0].icon_name}"></i>
                                                         </span>
@@ -2695,10 +2695,12 @@
         function findPage() {
             let id = $('#searchById').val()
             let url = "{{route('orders.findPage', ['id' => '%%'])}}"
-            $.post(url.replace('%%', id), table.ajax.params())
-                .done((data) => {
-                    window.table.page(Math.floor(data)).draw('page')
-                });
+            if (id.length !== 0) {
+                $.post(url.replace('%%', id), table.ajax.params())
+                    .done((data) => {
+                        window.table.page(Math.floor(data)).draw('page')
+                    });
+            }
         }
 
         function findByDates() {
