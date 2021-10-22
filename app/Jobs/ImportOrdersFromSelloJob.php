@@ -109,7 +109,6 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             try {
                 DB::beginTransaction();
                 $order = $this->buildOrder($transaction, $transactionArray, $products, $transactionGroup, $taskPrimal->id, $productService, $orderPaymentService);
-	            dispatch(new OrderProformSendMailJob($order, setting('allegro.new_allegro_order_on_sello_import_msg')));
 
                 $count++;
                 DB::commit();
