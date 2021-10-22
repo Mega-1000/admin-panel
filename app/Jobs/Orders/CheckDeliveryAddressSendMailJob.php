@@ -10,6 +10,7 @@ use App\Repositories\TagRepository;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class CheckDeliveryAddressSendMailJob extends Job implements ShouldQueue
@@ -43,10 +44,13 @@ class CheckDeliveryAddressSendMailJob extends Job implements ShouldQueue
 			$message = preg_replace("[" . preg_quote($tag->name) . "]", $emailTagHandler->$method(), $message);
 		}
 		
+		dispatch_now(new GenerateOrderProformJob($this->order));
+		$pdf = Storage::disk('local')->get($this->order->proformStoragePath);
+		
 		try {
 			\Mailer::create()
 				->to($this->order->customer->login)
-				->send(new CheckDeliveryAddressMail($subject, $message));
+				->send(new CheckDeliveryAddressMail($subject, $message, $pdf));
 		} catch (\Exception $e) {
 			\Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);
 		}
