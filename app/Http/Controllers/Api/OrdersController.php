@@ -722,4 +722,15 @@ class OrdersController extends Controller
 		
 		return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
 	}
+	
+	public function acceptDeliveryInvoiceData($orderId)
+	{
+		if (!($order = $this->orderRepository->find($orderId))) {
+			return [];
+		}
+		
+		dispatch(new AddLabelJob($order->id, [116, 137]));
+		
+		return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
+	}
 }
