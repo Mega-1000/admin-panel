@@ -320,7 +320,7 @@ class EmailTagHandlerHelper
 		return rtrim(env('FRONT_NUXT_URL'),"/") . "/zamowienie/mozliwe-do-realizacji/brak-danych/{$this->order->id}";
 	}
 	
-	//[LINK-DO-FORMULARZA-NIEZGODNOŚCI]
+	//[LINK-DO-FORMULARZA-NIEZGODNOSCI]
 	public function declineProformFormLink() {
 		return rtrim(env('FRONT_NUXT_URL'),"/") . "/zamowienie/niezgodnosc-w-proformie/{$this->order->id}";
 	}
