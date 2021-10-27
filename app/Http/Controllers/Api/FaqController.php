@@ -2,8 +2,13 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Helpers\MessagesHelper;
+use App\Mail\AskQuestion;
 use App\Repositories\FaqRepository;
+use App\Repositories\OrderAllegroRepository;
+use App\Repositories\OrderRepository;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Klasa kontrolera obsługująca
@@ -18,15 +23,33 @@ class FaqController
     /**
      * @var FaqRepository
      */
-    protected $repository;
+    protected $faqRepository;
+
+    /**
+     * @var OrderRepository
+     */
+    protected $orderRepository;
+
+    /**
+     * @var OrderAllegroRepository
+     */
+    protected $orderAllegroRepository;
 
     /**
      * FaqController constructor.
-     * @param FaqRepository $faqRepository
+     *
+     * @param FaqRepository          $faqRepository
+     * @param OrderRepository        $orderRepository
+     * @param OrderAllegroRepository $orderAllegroRepository
      */
-    public function __construct(FaqRepository $faqRepository)
+    public function __construct(
+        FaqRepository $faqRepository,
+        OrderRepository $orderRepository,
+        OrderAllegroRepository $orderAllegroRepository)
     {
-        $this->repository = $faqRepository;
+        $this->faqRepository = $faqRepository;
+        $this->orderRepository = $orderRepository;
+        $this->orderAllegroRepository = $orderAllegroRepository;
     }
 
     /**
@@ -34,19 +57,22 @@ class FaqController
      *
      * @param Request $request
      *
+     * @return \Illuminate\Http\JsonResponse
      * @author Norbert Grzechnik <norbert.grzechnik@netro42.digital>
      */
     public function store(Request $request)
     {
         $response = [];
         try {
-            $result = $this->repository->create(
+            $result = $this->faqRepository->create(
                 [
                     'category' => $request->get('category'),
                     'questions' => $request->get('questions'),
                 ]
             );
-            $response['status'] = 200;
+            if ($result) {
+                $response['status'] = 200;
+            }
         } catch (\Exception $exception) {
             $response = [
                 'status' => 500,
@@ -57,10 +83,17 @@ class FaqController
         return response()->json($response);
     }
 
+    /**
+     * Pobranie zestawów pytań i odpowiedzi.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @author Norbert Grzechnik <norbert.grzechnik@netro42.digital>
+     */
     public function getQuestions()
     {
         $result = [];
-        $rawQuestions = $this->repository->all(['category', 'questions']);
+        $rawQuestions = $this->faqRepository->all(['category', 'questions']);
         foreach ($rawQuestions as $value) {
             $result[$value->category] = array_merge($result[$value->category] ?? [], $value->questions);
         }
@@ -68,27 +101,53 @@ class FaqController
         return response()->json($result, 200);
     }
 
+    /**
+     * Pobranie listy pytań i odpowiedzi do tabeli
+     *
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @author Norbert Grzechnik <norbert.grzechnik@netro42.digital>
+     */
     public function index()
     {
-        return response()->json($this->repository->all(), 200);
+        return response()->json($this->faqRepository->all(), 200);
     }
 
+
+    /**
+     * Pobranie pojedynczego rekordu.
+     *
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @author Norbert Grzechnik <norbert.grzechnik@netro42.digital>
+     */
     public function show($id)
     {
-        return response()->json($this->repository->find($id), 200);
+        return response()->json($this->faqRepository->find($id), 200);
     }
 
+
+    /**
+     * Aktualizacja rekordu.
+     *
+     * @param integer $id Identyfikator ścieżki.
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @author Norbert Grzechnik <norbert.grzechnik@netro42.digital>
+     */
     public function update($id, Request $request)
     {
         $response = [];
         try {
-            $result = $this->repository->update([
+            $result = $this->faqRepository->update([
                 'questions' => $request->get('questions'),
             ], $id);
             if ($result) {
                 $response['status'] = 200;
             }
-            $this->repository->find($id)->refresh();
+            $this->faqRepository->find($id)->refresh();
         } catch (\Exception $exception) {
             $response = [
                 'status' => 500,
@@ -98,11 +157,21 @@ class FaqController
         return response()->json($response);
     }
 
+
+    /**
+     * Usunięcie ścieżki.
+     *
+     * @param integer $id Identyfikator ścieżki
+     *
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @author Norbert Grzechnik <norbert.grzechnik@netro42.digital>
+     */
     public function destroy($id)
     {
         $response = [];
         try {
-            $result = $this->repository->delete($id);
+            $result = $this->faqRepository->delete($id);
             if ($result) {
                 $response['status'] = 200;
             }
@@ -113,5 +182,62 @@ class FaqController
             ];
         }
         return response()->json($response);
+    }
+
+
+    public function askQuestion(Request $request)
+    {
+        $response = [];
+        try {
+            if ($request->filled('orderId')) {
+                $order = $this->orderRepository->find($request->get('orderId'));
+            } elseif ($request->filled('allegroOrderId')) {
+//                $order = $this->orderAllegroRepository->findByField('order_id', $request->get('orderId'))->order;
+            } else {
+                $result = \Mailer::create()
+                    ->to('info@mega1000.pl')
+                    ->send(new AskQuestion(
+                        $request->get('firstName'),
+                        $request->get('lastName'),
+                        $request->get('details'),
+                        $request->get('phone'),
+                        $request->get('email')
+                    ));
+            }
+
+            if (!empty($order)) {
+                $helper = new MessagesHelper();
+                $helper->orderId = $order->id;
+                $helper->currentUserId = $order->customer_id;
+                $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
+                $helper->createNewChat();
+                $helper->addMessage($request->get('details'));
+                $result = true;
+            }
+            if ($result) {
+                $response['status'] = 200;
+            }
+        } catch (\Exception $exception) {
+            $response = [
+                'status' => 500,
+                'error' => $exception->getMessage()
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    public function getCategories()
+    {
+        $result = [];
+        $categories = DB::table('faqs')
+            ->select('category')
+            ->distinct()
+            ->get();
+        foreach ($categories as $category) {
+            $result[] = $category->category;
+        }
+
+        return response()->json($result);
     }
 }
