@@ -769,11 +769,7 @@ class OrdersPackagesController extends Controller
             ];
 
             if ($package->shipment_date !== null) {
-                if ((Carbon::now()->greaterThan(Carbon::createFromTimeString('12:00')))) {
-                    $pickupAddress['pickup_address']['parcel_date'] = $shipmentDate->addWeekday()->toDateString();
-                } else {
-                    $pickupAddress['pickup_address']['parcel_date'] = $shipmentDate->toDateString();
-                }
+                $pickupAddress['pickup_address']['parcel_date'] = $shipmentDate->toDateString();
             } else {
                 $pickupAddress['pickup_address']['parcel_date'] = null;
             }
