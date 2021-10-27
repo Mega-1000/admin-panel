@@ -259,6 +259,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                         $quantity = (int)(explode('Q', end($symbol))[1]);
                     } elseif (strpos(end($symbol), 'Y') !== false) {
                         $quantity = (int)(explode('Y', end($symbol))[1]);
+                    } elseif (strpos(end($symbol), 'Z') !== false) {
+                        $quantity = (int)(explode('Z', end($symbol))[1]);
                     } else {
                         $quantity = false;
                     }
