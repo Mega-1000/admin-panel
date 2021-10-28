@@ -52,6 +52,6 @@ class SendInvoiceMailJob extends Job implements ShouldQueue
 			->to($this->order->customer->login)
 			->send(new InvoiceSent($subject, $message, $invoiceRow->ftp_invoice_filename));
 
-		dispatch_now(new AddLabelJob($this->order, [Label::INVOICE_SENDED]));
+		dispatch_now(new AddLabelJob($this->order, [Label::INVOICE_ISSUED_WITH_EXERTED_EFFECT]));
 	}
 }

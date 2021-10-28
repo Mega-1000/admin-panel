@@ -41,8 +41,4 @@ class OrderLabel extends Model implements Transformable
 	public function scopeConfirmationSended($query) {
 		$query->where('label_id', 194);
 	}
-	
-	public function scopeApproved($query) {
-		$query->where('label_id', Label::FINAL_CONFIRMATION_APPROVED);
-	}
 }

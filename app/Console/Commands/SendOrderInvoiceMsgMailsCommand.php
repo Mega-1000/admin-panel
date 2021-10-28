@@ -2,28 +2,28 @@
 
 namespace App\Console\Commands;
 
-use App\Jobs\Cron\SendFinalProformConfirmationMailsJob;
+use App\Jobs\Cron\SendOrderInvoiceMsgMailsJob;
 use Illuminate\Console\Command;
 
 /**
- * Class SendFinalProformConfirmationMailsJob
+ * Class SendOrderInvoiceMsgMailsJob
  * @package App\Jobs
  */
-class SendFinalProformConfirmationMailsCommand extends Command
+class SendOrderInvoiceMsgMailsCommand extends Command
 {
 	/**
 	 * The name and signature of the console command.
 	 *
 	 * @var string
 	 */
-	protected $signature = 'mail:final-proform-confirmation';
+	protected $signature = 'mail:order-invoice-message';
 	
 	/**
 	 * The console command description.
 	 *
 	 * @var string
 	 */
-	protected $description = 'Send final proform confirmation mails';
+	protected $description = 'Send order invoice message';
 	
 	/**
 	 * Create a new command instance.
@@ -42,6 +42,6 @@ class SendFinalProformConfirmationMailsCommand extends Command
 	 */
     public function handle()
     {
-	    dispatch_now(new SendFinalProformConfirmationMailsJob());
+	    dispatch_now(new SendOrderInvoiceMsgMailsJob());
     }
 }

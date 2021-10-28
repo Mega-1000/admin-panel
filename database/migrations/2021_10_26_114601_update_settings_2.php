@@ -31,7 +31,7 @@ PHP_EOL .
 		$setting->save();
 		
 		$settingSite = $setting->replicate();
-		$settingSite->key = 'allegro.order_items_constructed_msg';
+		$settingSite->key = 'site.order_items_constructed_msg';
 		$settingSite->group = 'Site';
 		$settingSite->order = '9';
 		$settingSite->save();

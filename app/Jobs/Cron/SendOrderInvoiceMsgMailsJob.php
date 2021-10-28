@@ -5,17 +5,17 @@ namespace App\Jobs\Cron;
 use App\Entities\Label;
 use App\Entities\OrderLabel;
 use App\Jobs\Job;
-use App\Jobs\Orders\SendFinalProformConfirmationMailJob;
+use App\Jobs\Orders\SendOrderInvoiceMsgMailJob;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 /**
- * Class SendFinalProformConfirmationMailsJob
+ * Class SendOrderInvoiceMsgMailsJob
  * @package App\Jobs
  */
-class SendFinalProformConfirmationMailsJob extends Job implements ShouldQueue
+class SendOrderInvoiceMsgMailsJob extends Job implements ShouldQueue
 {
 	use Queueable, IsMonitored;
 	
@@ -37,26 +37,27 @@ class SendFinalProformConfirmationMailsJob extends Job implements ShouldQueue
 	public function handle()
 	{
 		$orderLabels = OrderLabel::redeemed()->with('order')->get();
-		if (!($orderCount = $orderLabels->count())) {
-			Log::info('Send proform. Orders total count: 0');
+		$orderCount = $orderLabels->count();
+		Log::info('Send order invoice msg. Orders total count: ' . $orderCount);
+		
+		if (!$orderCount) {
 			return;
 		}
 		
-		Log::info('Send proform. Orders total count: ' . $orderCount);
 		$processedCount = 0;
-		$notFinalDayCount = 0;
+		$notInvoiceDayCount = 0;
 		$hasProcessedLables = 0;
 		$logOrderCount = 0;
 		foreach ($orderLabels as $orderLabel) {
-			if (!$orderLabel->order->isFinalConfirmationDay) {
-				$notFinalDayCount++;
+			if (!$orderLabel->order->isInvoiceMsgDay) {
+				$notInvoiceDayCount++;
 				continue;
 			}
 			
 			if ($orderLabel->order->hasLabel(Label::REDEEMED_LABEL_PROCESSED_IDS)) {
 				$hasProcessedLables++;
 				if ($logOrderCount < 5) {
-					Log::info('Send proform. Order with labels: ' . $orderLabel->order->id);
+					Log::info('Send order invoice msg. Order with labels: ' . $orderLabel->order->id);
 					$logOrderCount++;
 				}
 				
@@ -64,11 +65,11 @@ class SendFinalProformConfirmationMailsJob extends Job implements ShouldQueue
 			}
 			
 			$processedCount++;
-			dispatch(new SendFinalProformConfirmationMailJob($orderLabel->order));
+			dispatch(new SendOrderInvoiceMsgMailJob($orderLabel->order));
 		}
 		
-		Log::info('Send proform. Orders processed count: ' . $processedCount);
-		Log::info('Send proform. Orders not at final day count: ' . $notFinalDayCount);
-		Log::info('Send proform. Orders processed labels count: ' . $hasProcessedLables);
+		Log::info('Send order invoice msg. Orders processed count: ' . $processedCount);
+		Log::info('Send order invoice msg. Orders not at invoice day count: ' . $notInvoiceDayCount);
+		Log::info('Send order invoice msg. Orders processed labels count: ' . $hasProcessedLables);
 	}
 }
