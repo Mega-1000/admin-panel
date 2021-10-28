@@ -24,7 +24,7 @@ class AcceptReceivingOrderRequest extends FormRequest
     public function rules()
     {
         return [
-            'invoice_day' => ['in:today,standard']
+            'invoice_day' => ['required', 'in:today,standard']
         ];
     }
 }

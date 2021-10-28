@@ -35,9 +35,6 @@ class Order extends Model implements Transformable
     const COMMENT_FINANCIAL_TYPE = 'financial_comment';
     const VAT_VALUE = 1.23;
 	
-    const INVOICE_MSG_DAYS_ALLEGRO = 4;
-	const INVOICE_MSG_DAYS = 2;
-	
     const PROFORM_DIR = 'public/proforma/';
 
     public $customColumnsVisibilities = [
@@ -757,20 +754,5 @@ class Order extends Model implements Transformable
 
     public function getProformStoragePathAttribute() {
 		return self::PROFORM_DIR . $this->proforma_filename;
-    }
-    
-    public function getIsInvoiceMsgDayAttribute() {
-	    if (!($orderLabel = $this->orderLabels()->redeemed()->first())){
-		    return false;
-	    }
-	    
-	    $days = self::INVOICE_MSG_DAYS;
-	    if ($this->sello_id) {
-		    $days = self::INVOICE_MSG_DAYS_ALLEGRO;
-	    }
-	
-	    $startOfDay = Carbon::now()->subDays($days)->startOfDay();
-	    $endOfDay = $startOfDay->copy()->endOfDay();
-	    return $orderLabel->created_at >= $startOfDay && $orderLabel->created_at <= $endOfDay;
     }
 }

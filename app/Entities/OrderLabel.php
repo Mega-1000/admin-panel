@@ -33,12 +33,4 @@ class OrderLabel extends Model implements Transformable
 	{
 		return $this->belongsTo(Order::class);
 	}
-	
-	public function scopeRedeemed($query) {
-		$query->where('label_id', Label::ORDER_ITEMS_REDEEMED_LABEL);
-	}
-	
-	public function scopeConfirmationSended($query) {
-		$query->where('label_id', 194);
-	}
 }

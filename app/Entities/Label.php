@@ -58,12 +58,6 @@ class Label extends Model implements Transformable
 	const ORDER_RECEIVED_INVOICE_STANDARD = 198;
 	
 	const FINAL_CONFIRMATION_DECLINED = 196;
-	const REDEEMED_LABEL_PROCESSED_IDS = [
-		self::INVOICE_ISSUED_WITH_EXERTED_EFFECT,
-		self::ORDER_INVOICE_MSG_SENDED,
-		self::ORDER_RECEIVED_INVOICE_TODAY,
-		self::ORDER_RECEIVED_INVOICE_STANDARD,
-		self::FINAL_CONFIRMATION_DECLINED];
 		
     public $customColumnsVisibilities = [
         'name',

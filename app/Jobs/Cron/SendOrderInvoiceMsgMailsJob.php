@@ -3,9 +3,10 @@
 namespace App\Jobs\Cron;
 
 use App\Entities\Label;
-use App\Entities\OrderLabel;
+use App\Entities\Order;
 use App\Jobs\Job;
 use App\Jobs\Orders\SendOrderInvoiceMsgMailJob;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
@@ -21,55 +22,32 @@ class SendOrderInvoiceMsgMailsJob extends Job implements ShouldQueue
 	
 	
 	/**
-	 * Create a new job instance.
-	 *
-	 * @return void
-	 */
-	public function __construct()
-	{
-	}
-	
-	/**
 	 * Execute the job.
 	 *
 	 * @return void
 	 */
 	public function handle()
 	{
-		$orderLabels = OrderLabel::redeemed()->with('order')->get();
-		$orderCount = $orderLabels->count();
+		$orders = Order::whereHas('orderLabels', function($query){
+			$query->where('label_id', Label::ORDER_ITEMS_REDEEMED_LABEL);
+			$startOfDay = Carbon::now()->subDays(4)->startOfDay();
+			$endOfDay = $startOfDay->copy()->endOfDay();
+			$query->where('created_at', '>=', $startOfDay);
+			$query->where('created_at', '<=', $endOfDay);
+		})->whereDoesntHave('orderLabels', function($query){
+			$query->where('label_id', Label::ORDER_INVOICE_MSG_SENDED);
+			$query->where('label_id', Label::INVOICE_ISSUED_WITH_EXERTED_EFFECT);
+		})->get();
+		
+		$orderCount = $orders->count();
 		Log::info('Send order invoice msg. Orders total count: ' . $orderCount);
 		
 		if (!$orderCount) {
 			return;
 		}
 		
-		$processedCount = 0;
-		$notInvoiceDayCount = 0;
-		$hasProcessedLables = 0;
-		$logOrderCount = 0;
-		foreach ($orderLabels as $orderLabel) {
-			if (!$orderLabel->order->isInvoiceMsgDay) {
-				$notInvoiceDayCount++;
-				continue;
-			}
-			
-			if ($orderLabel->order->hasLabel(Label::REDEEMED_LABEL_PROCESSED_IDS)) {
-				$hasProcessedLables++;
-				if ($logOrderCount < 5) {
-					Log::info('Send order invoice msg. Order with labels: ' . $orderLabel->order->id);
-					$logOrderCount++;
-				}
-				
-				continue;
-			}
-			
-			$processedCount++;
-			dispatch(new SendOrderInvoiceMsgMailJob($orderLabel->order));
-		}
-		
-		Log::info('Send order invoice msg. Orders processed count: ' . $processedCount);
-		Log::info('Send order invoice msg. Orders not at invoice day count: ' . $notInvoiceDayCount);
-		Log::info('Send order invoice msg. Orders processed labels count: ' . $hasProcessedLables);
+		$orders->map(function ($order) {
+			dispatch(new SendOrderInvoiceMsgMailJob($order));
+		});
 	}
 }
