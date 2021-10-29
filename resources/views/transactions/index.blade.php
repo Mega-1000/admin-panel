@@ -1,4 +1,4 @@
-@extends('layouts.datatable')
+@extends('layouts.app')
 
 @section('app-header')
     <h1 class="page-title">
@@ -9,8 +9,10 @@
     </h1>
 @endsection
 
-@section('table')
-    <div class="vue-components">
-        <transactions/>
+@section('app-content')
+    <div class="panel">
+        <div class="vue-components panel-body">
+            <transactions/>
+        </div>
     </div>
 @endsection

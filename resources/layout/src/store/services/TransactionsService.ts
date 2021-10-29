@@ -42,8 +42,8 @@ const actions = {
         if (data.error_code) {
           commit(TRANSACTIONS_SET_ERROR, data.error_message)
         }
-        commit(TRANSACTIONS_SET_ALL, data)
-        return data
+        commit(TRANSACTIONS_SET_ALL, data.customers)
+        return data.customers
       })
       .catch((error: any) => {
         commit(TRANSACTIONS_SET_ERROR, error.message)
