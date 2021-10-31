@@ -65,6 +65,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(\App\Repositories\ReportRepository::class, \App\Repositories\ReportRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\UserWorkRepository::class, \App\Repositories\UserWorkRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\TaskSalaryDetailsRepository::class, \App\Repositories\TaskSalaryDetailsRepositoryEloquent::class);
+        $this->app->bind(\App\Repositories\TransactionRepository::class, \App\Repositories\TransactionRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\SpeditionExchangeRepository::class, \App\Repositories\SpeditionExchangeRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\SpeditionExchangeItemRepository::class, \App\Repositories\SpeditionExchangeItemRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\SpeditionExchangeOfferRepository::class, \App\Repositories\SpeditionExchangeOfferRepositoryEloquent::class);
