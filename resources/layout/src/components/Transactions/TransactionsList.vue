@@ -92,6 +92,11 @@
         </div>
       </div>
     </div>
+    <div class="row">
+      <div class="col-md-12">
+        <button class="btn btn-light" @click="$emit('back')">Powrót</button>
+      </div>
+    </div>
     <debugger :keepAlive="true" :components="$children"></debugger>
   </div>
 </template>

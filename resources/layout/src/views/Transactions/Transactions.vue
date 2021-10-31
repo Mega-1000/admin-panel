@@ -1,8 +1,10 @@
 <template>
   <div class="v-transactions">
-    <customers-list v-if="customer==null && !transactionForm"></customers-list>
-    <transactions-list @add="transactionForm = true" v-if="customer !== null && !transactionForm"></transactions-list>
-    <transactions-form v-if="transactionForm"></transactions-form>
+    <customers-list v-if="customer==null && !transactionForm" @add="transactionForm = true"></customers-list>
+    <transactions-list @back="back" @add="transactionForm = true"
+                       v-if="customer !== null && !transactionForm"></transactions-list>
+    <transactions-form v-if="transactionForm" @transactionAdded="transactionAdded"
+                       @back="transactionForm=false"></transactions-form>
     <debugger :keepAlive="true" :components="$children"></debugger>
   </div>
 </template>
@@ -21,12 +23,7 @@ export default class Transactions extends Vue {
   public transactionForm = false;
 
   public async mounted (): Promise<void> {
-    if (localStorage.getItem('customer') !== null) {
-      const customer = localStorage.getItem('customer')
-      await this.$store?.dispatch('TransactionsService/setCustomer', JSON.parse(customer ?? ''))
-    } else {
-      await this.$store?.dispatch('TransactionsService/loadTransactions')
-    }
+    await this.load()
   }
 
   public get customers (): Customer[] {
@@ -35,6 +32,33 @@ export default class Transactions extends Vue {
 
   public get customer (): Customer {
     return this.$store?.getters['TransactionsService/customer']
+  }
+
+  public async back () {
+    await this.$store?.dispatch('TransactionsService/setCustomer', null)
+    localStorage.removeItem('customer')
+  }
+
+  public async transactionAdded () {
+    this.transactionForm = false
+    localStorage.removeItem('customer')
+    await this.load()
+    if (this.customer !== null) {
+      const customer = this.customers.filter((item) => {
+        return this.customer.id === item.id
+      })[0]
+      await this.$store?.dispatch('TransactionsService/setCustomer', customer)
+      localStorage.setItem('customer', JSON.stringify(customer))
+    }
+  }
+
+  public async load () {
+    if (localStorage.getItem('customer') !== null) {
+      const customer = localStorage.getItem('customer')
+      await this.$store?.dispatch('TransactionsService/setCustomer', JSON.parse(customer ?? ''))
+    } else {
+      await this.$store?.dispatch('TransactionsService/loadTransactions')
+    }
   }
 }
 </script>

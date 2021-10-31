@@ -2,10 +2,10 @@
 
 export interface Transaction {
     id: number,
-    postedInSystemDate: string,
-    postedInBankDate: string,
+    registrationInSystemDate: string,
+    registrationInBankDate: string,
     paymentId: string,
-    kindOfOperation: string,
+    operationKind: string,
     orderId: number,
     operator: string,
     operation_value: number,
@@ -15,15 +15,16 @@ export interface Transaction {
 }
 
 export interface CreateTransactionParams {
-    postedInSystemDate: string,
-    postedInBankDate: string,
+    registrationInSystemDate: string,
+    registrationInBankDate: string,
     paymentId: string,
-    kindOfOperation: string,
+    operationKind: string,
+    customerId: number,
     orderId: string,
     operator: string,
-    operation_value: string,
-    accounting_notes: string,
-    transaction_notes: string
+    operationValue: string,
+    accountingNotes: string,
+    transactionNotes: string
 }
 
 export interface Customer {

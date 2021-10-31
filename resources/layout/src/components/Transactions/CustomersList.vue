@@ -1,8 +1,13 @@
 <template>
   <div class="c-customersList ">
     <div class="row">
-      <div class="col-sm-12">
+      <div class="col-sm-10">
         <h4>Formularz wyszukiwania</h4>
+      </div>
+      <div class="col-sm-2">
+        <button class="btn btn-success float-right" @click="$emit('add')"><i class="voyager-plus"></i> Dodaj
+          Transakcje
+        </button>
       </div>
     </div>
     <div class="row">

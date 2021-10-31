@@ -79,15 +79,57 @@ class TransactionsController extends Controller
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'kindOfOperation' => 'required',
-            'orderId' => 'required',
-            'operator' => 'required'
-        ]);
+        $validator = Validator::make($request->all(),
+            [
+                'registrationInSystemDate' => 'required|date',
+                'registrationInBankDate' => 'required|date',
+                'paymentId' => 'nullable',
+                'operationKind' => 'required',
+                'customerId' => 'required:customer:id',
+                'orderId' => ($request->get('orderId') === '0') ? 'nullable' : 'required|order:id',
+                'operator' => 'required|string',
+                'operationValue' => 'required|numeric',
+                'accountingNotes' => 'nullable|string',
+                'transactionNotes' => 'nullable|string',
+            ],
+            [
+                'registrationInSystemDate.required' => 'Uzupełnij date rejestracji przelewu w systemie.',
+                'registrationInBankDate.required' => 'Uzupełnij date rejestracji przelewu w banku.',
+                'operationKind.required' => 'Pole rodzaj operacji jest wymagane.',
+                'customerId.required' => 'Pole identyfikator klienta jest wymagane',
+                'orderId.required' => 'Pole identyfikator zamówienia jest wymagane',
+                'operator.required' => 'Pole operator jest wymagane.',
+                'operationValue.required' => 'Pole wartość operacji jest wymagane',
+            ]);
+
         if ($validator->passes()) {
+            $this->transactionRepository->create([
+                'customer_id' => $request->get('customerId'),
+                'posted_in_system_date' => $request->get('registrationInSystemDate'),
+                'posted_in_bank_date' => $request->get('registrationInBankDate'),
+                'payment_id' => $request->get('paymentId'),
+                'kind_of_operation' => $request->get('operationKind'),
+                'order_id' => ($request->get('orderId') === '0') ? null : $request->get('orderId'),
+                'operator' => $request->get('operator'),
+                'operation_value' => ((in_array($request->get('operationKind'),
+                        [
+                            'Wpłata',
+                            'Uznanie'
+                        ]
+                    ) ? '+' : '-')) . $request->get('operationValue'),
+                'balance' => 0,
+                'accounting_notes' => $request->get('accountingNotes'),
+                'transaction_notes' => $request->get('transactionNotes'),
+            ]);
             return response()->json(['success' => 'Added new records.']);
         } else {
-            return response()->json(['error' => $validator->errors()]);
+            return response()->json(
+                [
+                    'errorCode' => 442,
+                    'errorMessage' => 'Wystąpił błąd podczas zapisu transakcji.',
+                    'errors' => $validator->errors(),
+                ],
+                422);
         }
     }
 }

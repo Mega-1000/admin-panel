@@ -62,8 +62,8 @@ const actions = {
       .storeTransaction(params)
       .then((data: any) => {
         commit(TRANSACTIONS_SET_IS_LOADING, false)
-        if (data.error_code) {
-          commit(TRANSACTIONS_SET_ERROR, data.error_message)
+        if (data.errorCode) {
+          commit(TRANSACTIONS_SET_ERROR, data.errorMessage)
         }
         return data
       })
