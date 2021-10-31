@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Entities\Customer;
 use App\Http\Controllers\Controller;
 use App\Repositories\TransactionRepository;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class TransactionsController extends Controller
 {
@@ -39,6 +41,7 @@ class TransactionsController extends Controller
             $result = Customer::with(['addresses' => function ($query) {
                 $query->where('type', 'STANDARD_ADDRESS');
             }])
+                ->with('orders:id,customer_id')
                 ->with('transactions')->has('transactions')->limit(25)->get();
 
             if (!empty($result)) {
@@ -55,7 +58,8 @@ class TransactionsController extends Controller
                         'phone' => $customer->addresses[0]->phone,
                         'address' => $customer->addresses[0]->city,
                         'email' => $customer->addresses[0]->email,
-                        'transactions' => $customer->transactions
+                        'transactions' => $customer->transactions,
+                        'orderIds' => $customer->orders->pluck('id')
                     ];
                 }
             } else {
@@ -71,5 +75,19 @@ class TransactionsController extends Controller
             ];
         }
         return response()->json($response);
+    }
+
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'kindOfOperation' => 'required',
+            'orderId' => 'required',
+            'operator' => 'required'
+        ]);
+        if ($validator->passes()) {
+            return response()->json(['success' => 'Added new records.']);
+        } else {
+            return response()->json(['error' => $validator->errors()]);
+        }
     }
 }

@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import {
+  CreateTransactionParams,
   Customer,
   TransactionsStore
 } from '@/types/TransactionsTypes'
@@ -53,6 +54,22 @@ const actions = {
     commit(TRANSACTIONS_SET_IS_LOADING, true)
     commit(TRANSACTIONS_SET_CUSTOMER, customer)
     commit(TRANSACTIONS_SET_IS_LOADING, false)
+  },
+  storeTransaction ({ commit }: any, params: CreateTransactionParams) {
+    commit(TRANSACTIONS_SET_IS_LOADING, true)
+
+    return TransactionsRepository
+      .storeTransaction(params)
+      .then((data: any) => {
+        commit(TRANSACTIONS_SET_IS_LOADING, false)
+        if (data.error_code) {
+          commit(TRANSACTIONS_SET_ERROR, data.error_message)
+        }
+        return data
+      })
+      .catch((error: any) => {
+        commit(TRANSACTIONS_SET_ERROR, error.message)
+      })
   }
 }
 

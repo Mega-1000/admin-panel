@@ -14,6 +14,18 @@ export interface Transaction {
     transaction_notes: string
 }
 
+export interface CreateTransactionParams {
+    postedInSystemDate: string,
+    postedInBankDate: string,
+    paymentId: string,
+    kindOfOperation: string,
+    orderId: string,
+    operator: string,
+    operation_value: string,
+    accounting_notes: string,
+    transaction_notes: string
+}
+
 export interface Customer {
     id: number,
     type: string,
@@ -30,7 +42,8 @@ export interface Customer {
     email: string | null,
     phone: string | null,
     status: string,
-    transactions: Transaction[]
+    transactions: Transaction[],
+    orderIds: number[]
 }
 
 export interface TransactionsStore {

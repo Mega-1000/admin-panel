@@ -2,7 +2,7 @@
   <div class="c-transactionsList">
     <div class="row">
       <div class="col-md-10">
-        <h4>Szczegóły Klienta</h4>
+        <h4>Transakcje klienta</h4>
       </div>
       <div class="col-sm-2">
         <button class="btn btn-success float-right" @click="$emit('add')"><i class="voyager-plus"></i> Dodaj

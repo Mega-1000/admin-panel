@@ -2,10 +2,8 @@
 
 @section('app-header')
     <h1 class="page-title">
-        <i class="voyager-plus"></i> @lang('transactions.title')
-        <a href="{!! route('transactions.create') !!}" class="btn btn-success btn-add-new">
-            <i class="voyager-plus"></i> <span>@lang('transactions.create')</span>
-        </a>
+        <i class="voyager-plus"></i> Transakcje
+
     </h1>
 @endsection
 
