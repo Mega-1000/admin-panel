@@ -262,6 +262,7 @@ class OrdersPackagesController extends Controller
             $orderPackage->symbol = $data['symbol'];
             $orderPackage->chosen_data_template = $data['chosen_data_template'];
         }
+        $this->orderPackagesDataHelper->findFreeShipmentDate($orderPackage);
         $orderPackage->save();
 
         if (!empty($data['real_cost_for_company'])) {
@@ -768,11 +769,7 @@ class OrdersPackagesController extends Controller
             ];
 
             if ($package->shipment_date !== null) {
-                if ((Carbon::now()->greaterThan(Carbon::createFromTimeString('12:00')))) {
-                    $pickupAddress['pickup_address']['parcel_date'] = $shipmentDate->addWeekday()->toDateString();
-                } else {
-                    $pickupAddress['pickup_address']['parcel_date'] = $shipmentDate->toDateString();
-                }
+                $pickupAddress['pickup_address']['parcel_date'] = $shipmentDate->toDateString();
             } else {
                 $pickupAddress['pickup_address']['parcel_date'] = null;
             }
@@ -864,7 +861,7 @@ class OrdersPackagesController extends Controller
         $data['delivery_date'] = $package->delivery_date;
         $data['quantity'] = 1;
         $data['chosen_data_template'] = $template->id;
-        $packageNumber = OrderPackage::where('order_id', $package->order_id)->max('number');
+        $packageNumber = OrderPackage::where('order_id', $package->order_id)->max('number') + 1;
         $data['notices'] = $data['order_id'] . '/' . $packageNumber;
         $data['cash_on_delivery'] = $package->cash_on_delivery;
         $data['status'] = PackageTemplate::STATUS_NEW;
@@ -872,8 +869,7 @@ class OrdersPackagesController extends Controller
         $data['cost_for_company'] = $package->cost_for_company;
         $data['content'] = $package->content;
         $data['packing_type'] = $package->packing_type;
-        $packageNumber = OrderPackage::where('order_id', $package->order_id)->max('number');
-        $data['number'] = $packageNumber + 1;
+        $data['number'] = $packageNumber;
         $newPackage = $this->saveOrderPackage($data);
 
         $toCancel = [

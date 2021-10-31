@@ -23,7 +23,7 @@ class OrderStatusChanged extends Mailable
     public function __construct($subject, $message, $pdf = false)
     {
         $this->subject = $subject;
-        $this->mailBody = $message;
+        $this->mailBody = nl2br($message);
         $this->pdf = $pdf;
     }
 

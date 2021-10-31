@@ -78,6 +78,15 @@
                 <input type="text" class="form-control" id="delivery_warehouse" name="delivery_warehouse"
                        value="{{ $firm->delivery_warehouse }}">
             </div>
+            <div class="form-group">
+                <label for="firm_source">@lang('firms.form.firm_source')</label>
+
+                <select class="form-control text-uppercase" name="firm_source[]" multiple>
+                    @foreach ($orderSources as $orderSource)
+                    <option {{$firm->firmSources->firstWhere('order_source_id', $orderSource->id) ? 'selected' : ''}} value="{{$orderSource->id}}">{{$orderSource->name}} ({{$orderSource->short_name}})</option>
+                    @endforeach
+                </select>
+            </div>
             <a href="/admin/firms/{{$firm->id}}/sendRequestToUpdateFirmData" class="btn btn-success">
                 <span class="hidden-xs hidden-sm">Wyślij prośbę o aktualizację danych</span>
             </a>

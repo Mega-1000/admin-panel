@@ -28,6 +28,7 @@ export default {
         'X-Requested-Width': 'XMLHttpRequest'
       }),
       body: JSON.stringify({
+        user_id: params.userId,
         time: params.time,
         page: params.page
       })

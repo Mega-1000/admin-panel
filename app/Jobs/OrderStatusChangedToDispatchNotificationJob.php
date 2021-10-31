@@ -97,8 +97,8 @@ class OrderStatusChangedToDispatchNotificationJob extends Job implements ShouldQ
             $notification = OrderWarehouseNotification::create($dataArray);
         }
 
-        $acceptanceFormLink = env('FRONT_NUXT_URL') . "/magazyn/awizacja/{$notification->id}/{$order->warehouse_id}/{$this->orderId}";
-        $sendFormInvoice = env('FRONT_NUXT_URL') . "/magazyn/awizacja/{$notification->id}/{$order->warehouse_id}/{$this->orderId}/wyslij-fakture";
+        $acceptanceFormLink = rtrim(env('FRONT_NUXT_URL'),"/") . "/magazyn/awizacja/{$notification->id}/{$order->warehouse_id}/{$this->orderId}";
+        $sendFormInvoice = rtrim(env('FRONT_NUXT_URL'),"/") . "/magazyn/awizacja/{$notification->id}/{$order->warehouse_id}/{$this->orderId}/wyslij-fakture";
 
         if(!!filter_var($warehouseMail, FILTER_VALIDATE_EMAIL)) {
             if ($this->path === null) {

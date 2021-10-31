@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Entities\FirmSource;
+use App\Entities\Label;
+use App\Entities\OrderAddress;
 use App\Entities\OrderDates;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\ChatHelper;
@@ -12,9 +15,14 @@ use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceCalculator;
 use App\Helpers\SendCommunicationEmail;
 use App\Helpers\TransportSumCalculator;
+use App\Http\Requests\Api\Orders\DeclineProformRequest;
 use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
 use App\Http\Requests\Api\Orders\StoreOrderRequest;
 use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
+use App\Jobs\AddLabelJob;
+use App\Jobs\OrderProformSendMailJob;
+use App\Jobs\Orders\CheckDeliveryAddressSendMailJob;
+use App\Jobs\RemoveLabelJob;
 use App\Repositories\CustomerRepository;
 use App\Repositories\OrderAddressRepository;
 use App\Repositories\OrderItemRepository;
@@ -28,6 +36,7 @@ use App\Repositories\ProductRepository;
 use App\Repositories\ProductPriceRepository;
 use App\Services\ProductService;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
@@ -149,7 +158,14 @@ class OrdersController extends Controller
             }
             ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($data);
             DB::commit();
+            
             $order = Order::find($id);
+	        $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 2)->first();
+	        $order->firm_source_id = $firmSource ? $firmSource->id : null;
+	        $order->save();
+	
+	        dispatch(new CheckDeliveryAddressSendMailJob($order));
+	        
             return $this->createdResponse(['order_id' => $id, 'canPay' => $canPay, 'token' => $order->getToken()]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -287,13 +303,14 @@ class OrdersController extends Controller
         $orderId
     )
     {
-
+	    $message = [];
+	    
         try {
             $order = $this->orderRepository->find($orderId);
             list($isDeliveryChangeLocked, $isInvoiceChangeLocked) = $this->getLocks($order);
 
-            $deliveryAddress = $order->addresses->where('type', '=', 'DELIVERY_ADDRESS')->first();
-            $invoiceAddress = $order->addresses->where('type', '=', 'INVOICE_ADDRESS')->first();
+            $deliveryAddress = $order->addresses->where('type', '=', OrderAddress::TYPE_DELIVERY)->first();
+            $invoiceAddress = $order->addresses->where('type', '=', OrderAddress::TYPE_INVOICE)->first();
 
             $order->shipment_date = $request->get('shipment_date');
             $order->dates()->updateOrCreate(
@@ -326,12 +343,22 @@ class OrdersController extends Controller
                 } else {
                     $deliveryMail = $request->get('DELIVERY_ADDRESS')['email'];
                 }
+	            $message[] = __('orders.message.delivery_address_changed');
+            } else {
+            	$message[] = __('orders.message.delivery_address_change_failure');
             }
 
             if (!$isInvoiceChangeLocked) {
                 $invoiceAddress->update($request->get('INVOICE_ADDRESS'));
+	            $message[] = __('orders.message.invoice_address_changed');
+            } else {
+	            $message[] = __('orders.message.invoice_address_change_failure');
             }
 
+            if ($deliveryAddress->wasChanged() || $invoiceAddress->wasChanged()) {
+	            dispatch(new OrderProformSendMailJob($order, setting('allegro.address_changed_msg')));
+            }
+            
             if ($request->get('remember_delivery_address')) {
                 $data = array_merge($request->get('DELIVERY_ADDRESS'), ['type' => 'DELIVERY_ADDRESS']);
                 $order->customer->addresses()->updateOrCreate(["type" => "DELIVERY_ADDRESS"], $data);
@@ -340,8 +367,8 @@ class OrdersController extends Controller
                 $data = array_merge($request->get('INVOICE_ADDRESS'), ['type' => 'INVOICE_ADDRESS']);
                 $order->customer->addresses()->updateOrCreate(["type" => "INVOICE_ADDRESS"], $data);
             }
-
-            return $this->okResponse();
+	
+	        return response()->json(implode(" ", $message), 200, [], JSON_UNESCAPED_UNICODE);
         } catch (\Exception $e) {
             Log::error('Problem with update customer invoice and delivery address.',
                 ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
@@ -493,6 +520,7 @@ class OrdersController extends Controller
     {
         $deliveryLock [] = config('labels-map')['list']['produkt w przygotowaniu-po wyprodukowaniu magazyn kasuje etykiete'];
         $deliveryLock [] = config('labels-map')['list']['wyprodukowana'];
+	    $deliveryLock [] = config('labels-map')['list']['wyprodukowano czesciowo'];
         $deliveryLock [] = config('labels-map')['list']['wyslana do awizacji'];
         $deliveryLock [] = config('labels-map')['list']['awizacja przyjeta'];
         $deliveryLock [] = config('labels-map')['list']['awizacja odrzucona'];
@@ -676,4 +704,22 @@ class OrdersController extends Controller
             'error_message' => __('order_dates.messages.error')
         ]), 500);
     }
+	
+	public function declineProform(
+		DeclineProformRequest $request,
+		$orderId
+	)
+	{
+		if (!($order = $this->orderRepository->find($orderId))) {
+			return [];
+		}
+		
+		$order->labels_log .= Order::formatMessage(Auth::user(), $request->description);
+		$order->save();
+		
+		dispatch(new RemoveLabelJob($order->id, [Label::FINAL_CONFIRMATION_SENDED]));
+		dispatch(new AddLabelJob($order->id, [Label::FINAL_CONFIRMATION_DECLINED]));
+		
+		return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
+	}
 }

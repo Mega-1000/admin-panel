@@ -404,10 +404,12 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group" style="width: 25%; float: left; padding: 5px;">
-                <label>@lang('orders.form.labels_log')</label>
-                <textarea id="labels_log" disabled class="form-control scrollable-notice" name="financial_comment" id="labels_log"
-                          rows="5">{{ $order->labels_log ?? ''}}</textarea>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label>@lang('orders.form.labels_log')</label>
+                    <textarea id="labels_log" disabled class="form-control scrollable-notice" name="financial_comment" id="labels_log"
+                              rows="5">{{ $order->labels_log ?? ''}}</textarea>
+                </div>
             </div>
             <div class="form-group" style="width: 40%; float: left; padding: 5px;">
                 <label for="remainder_date">@lang('orders.form.remainder_date')</label>
@@ -426,6 +428,13 @@
 
             </div>
             <h3 style="float: left; width: 100%;">Dane do wysyłki</h3>
+
+            @if($orderDeliveryAddressErrors->any())
+                <div class="form-group is-empty-info" style="float: left; width: 100%;">
+                {!! implode(' ', $orderDeliveryAddressErrors->all(':message')) !!}
+                </div>
+            @endif
+
             <div class="form-group" style="width: 11%; float: left; padding: 5px;">
                 <label for="order_delivery_address_firstname">@lang('customers.form.delivery_firstname')</label>
                 <input type="text" class="form-control" id="order_delivery_address_firstname"
@@ -480,7 +489,13 @@
                        name="order_delivery_address_phone"
                        value="{{ $orderDeliveryAddress->phone ?? ''}}">
             </div>
+
             <h3 style="float: left; width: 100%;">Dane do faktury</h3>
+            @if($orderInvoiceAddressErrors->any())
+                <div class="form-group is-empty-info" style="float: left; width: 100%;">
+                {!! implode(' ', $orderInvoiceAddressErrors->all(':message')) !!}
+                </div>
+            @endif
             <div class="form-group" style="width: 10%; float: left; padding: 5px;">
                 <label for="order_invoice_address_firstname">@lang('customers.form.invoice_firstname')</label>
                 <input type="text" class="form-control" id="order_invoice_address_firstname"
@@ -2483,7 +2498,7 @@
         </div>
     </div>
     <div class="vue-components">
-        <tracker :enabled="true"/>
+        <tracker :enabled="true" :user="{{ Auth::user()->id }}"/>
     </div>
     <style>
         .firstOrder, .secondOrder, .thirdOrder, .fourthOrder, .fifthOrder {

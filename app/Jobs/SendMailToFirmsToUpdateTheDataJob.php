@@ -36,7 +36,7 @@ class SendMailToFirmsToUpdateTheDataJob implements ShouldQueue
      */
     public function handle()
     {
-        $url = env('FRONT_NUXT_URL') . "/firmy/aktualizacja/{$this->id}/";
+        $url = rtrim(env('FRONT_NUXT_URL'),"/") . "/firmy/aktualizacja/{$this->id}/";
         \Mailer::create()
             ->to($this->email)
             ->send(new SendRequestToUpdateDataMail("Prośba o aktualizację danych firmy", $url));

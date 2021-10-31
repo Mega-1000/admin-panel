@@ -25,7 +25,6 @@ use Prettus\Repository\Traits\TransformableTrait;
  */
 class Order extends Model implements Transformable
 {
-
     use TransformableTrait;
 
     const STATUS_WITHOUT_REALIZATION = 8;
@@ -35,6 +34,11 @@ class Order extends Model implements Transformable
     const COMMENT_CONSULTANT_TYPE = 'consultant_comment';
     const COMMENT_FINANCIAL_TYPE = 'financial_comment';
     const VAT_VALUE = 1.23;
+	
+    const FINAL_CONFIRMATION_DAYS_ALLEGRO = 15;
+	const FINAL_CONFIRMATION_DAYS = 2;
+	
+    const PROFORM_DIR = 'public/proforma/';
 
     public $customColumnsVisibilities = [
         'mark',
@@ -149,7 +153,9 @@ class Order extends Model implements Transformable
      */
     public static function formatMessage(?Authenticatable $user, string $message): string
     {
-        return PHP_EOL . Carbon::now()->toDateTimeString() . ' ' . $user->name . ' ' . $user->firstname . ' ' . $user->lastname . ': ' . $message;
+        return PHP_EOL . Carbon::now()->toDateTimeString()
+	        . ($user ? ' ' . $user->name . ' ' . $user->firstname . ' ' . $user->lastname : '')
+	        . ': ' . $message;
     }
 
     public function getPackagesCashOnSum()
@@ -299,7 +305,11 @@ class Order extends Model implements Transformable
 
     public function hasLabel($labelId)
     {
-        return $this->labels()->where('label_id', $labelId)->count();
+    	if (!is_array($labelId)) {
+		    $labelId = [$labelId];
+	    }
+    	
+        return $this->labels()->whereIn('label_id', $labelId)->count();
     }
 
     /**
@@ -309,7 +319,12 @@ class Order extends Model implements Transformable
     {
         return $this->belongsToMany(Label::class, 'order_labels')->withPivot('added_type');
     }
-
+	
+	public function orderLabels()
+	{
+		return $this->hasMany(OrderLabel::class);
+	}
+	
     public function promisePayments()
     {
         $promisePayments = $this->payments()->where('promise', 'like', '1')->get();
@@ -398,6 +413,14 @@ class Order extends Model implements Transformable
     public function customer()
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function orderAllegro()
+    {
+        return $this->belongsTo(AllegroOrder::class);
     }
 
     /**
@@ -633,7 +656,6 @@ class Order extends Model implements Transformable
             'parent_id' => $parentId
         ]);
         $time = TaskTimeHelper::getFirstAvailableTime($duration);
-        Log::notice('Czas zakończenia pracy', ['line' => __LINE__, 'file' => __FILE__, 'timeStart' => $time['start'], 'timeEnd' => $time['end']]);
         TaskTime::create([
             'task_id' => $task->id,
             'date_start' => $time['start'],
@@ -709,7 +731,15 @@ class Order extends Model implements Transformable
     {
         $this->hasOne(Chat::class);
     }
-
+	
+	/**
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+	 */
+	public function firmSource()
+	{
+		return $this->belongsTo(FirmSource::class);
+	}
+	
     public function setDefaultDates()
     {
         $dateFrom = Carbon::parse($this->selloTransaction->tr_RemittanceDate);
@@ -723,5 +753,24 @@ class Order extends Model implements Transformable
             'consultant_acceptance' => true,
             'message' => 'Ustawiono domyślne daty dla zamówienia'
         ]);
+    }
+
+    public function getProformStoragePathAttribute() {
+		return self::PROFORM_DIR . $this->proforma_filename;
+    }
+    
+    public function getIsFinalConfirmationDayAttribute() {
+	    if (!($orderLabel = $this->orderLabels()->redeemed()->first())){
+		    return false;
+	    }
+	    
+	    $days = self::FINAL_CONFIRMATION_DAYS;
+	    if ($this->sello_id) {
+		    $days = self::FINAL_CONFIRMATION_DAYS_ALLEGRO;
+	    }
+	
+	    $finalConfirmationStartOfDay = Carbon::now()->subDays($days)->startOfDay();
+	    $finalConfirmationEndOfDay = $finalConfirmationStartOfDay->copy()->endOfDay();
+	    return $orderLabel->created_at >= $finalConfirmationStartOfDay && $orderLabel->created_at <= $finalConfirmationEndOfDay;
     }
 }

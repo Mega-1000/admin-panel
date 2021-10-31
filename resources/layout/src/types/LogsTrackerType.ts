@@ -17,6 +17,7 @@ export interface LogsTrackerStore {
 }
 
 export interface addLogParam {
+  userId: number,
   time: number,
   page: string
 }

@@ -43,6 +43,7 @@ Route::get('orders/{orderId}/customer-delivery-address', 'Api\OrdersController@g
 Route::get('orders/{orderId}/customer-standard-address', 'Api\OrdersController@getCustomerStandardAddress')->name('api.orders.get-customer-standard-address');
 Route::get('orders/{orderId}/ready-to-ship-form-autocomplete-data', 'Api\OrdersController@getReadyToShipFormAutocompleteData')->name('api.orders.get-ready-to-ship-form-autocomplete-data');
 Route::post('orders/{orderId}/update-order-delivery-and-invoice-addresses', 'Api\OrdersController@updateOrderDeliveryAndInvoiceAddresses')->name('api.orders.update-order-delivery-and-invoice-addresses');
+Route::post('orders/{orderId}/decline-proform', 'Api\OrdersController@declineProform')->name('api.orders.decline-proform');
 
 Route::get('orders/getByToken/{token}', 'Api\OrdersController@getByToken');
 
@@ -99,3 +100,12 @@ Route::group(['prefix' => 'sets', 'as' => 'sets.'], __DIR__ . '/api/ProductsSets
 Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/api/TrackerLogsRoutes.php');
 Route::group(['prefix' => 'orders', 'as' => 'orders.'], __DIR__ . '/api/OrdersRoutes.php');
 Route::group(['prefix' => 'transactions', 'as' => 'transactions.'], __DIR__ . '/api/TransactionsRoutes.php');
+
+Route::post('/faqs', 'Api\FaqController@store')->name('api.faq.save');
+Route::get('/faqs/categories', 'Api\FaqController@getCategories')->name('api.faq.categories');
+Route::get('/faqs/get', 'Api\FaqController@getQuestions')->name('api.faq.get');
+Route::get('/faqs', 'Api\FaqController@index')->name('api.faq.index');
+Route::get('/faqs/{id}', 'Api\FaqController@show')->name('api.faq.show');
+Route::put('/faqs/{id}', 'Api\FaqController@update')->name('api.faq.update');
+Route::delete('/faqs/{id}', 'Api\FaqController@destroy')->name('api.faq.destroy');
+Route::post('/faqs/ask', 'Api\FaqController@askQuestion')->name('api.faq.ask');

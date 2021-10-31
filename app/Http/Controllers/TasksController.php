@@ -8,6 +8,7 @@ use App\Entities\Order;
 use App\Entities\Task;
 use App\Entities\TaskSalaryDetails;
 use App\Entities\TaskTime;
+use App\Entities\TrackerLogs;
 use App\Entities\Warehouse;
 use App\Helpers\OrderCalcHelper;
 use App\Helpers\OrdersHelper;
@@ -140,7 +141,6 @@ class TasksController extends Controller
                 $prev = [];
                 dispatch_now(new AddLabelJob($request->order_id, [47], $prev));
             }
-            Log::notice('Czas zakończenia pracy', ['line' => __LINE__, 'file' => __FILE__, 'timeStart' => $request->date_start, 'timeEnd' => $request->date_end]);
             $this->taskTimeRepository->create([
                 'task_id' => $task->id,
                 'date_start' => $request->date_start,
@@ -220,7 +220,6 @@ class TasksController extends Controller
             }
             $task->update($dataToStore);
             $task->taskTime->update($request->all());
-            Log::notice('Czas zakończenia pracy', ['line' => __LINE__, 'file' => __FILE__, 'id' => $task->taskTime->id]);
             $task->taskSalaryDetail->update($request->all());
             if ($request->order_id !== null) {
                 $orderItemKMD = 0;
@@ -399,6 +398,10 @@ class TasksController extends Controller
             ->whereNull('rendering')
             ->get();
 
+        $laziness = TrackerLogs::whereDate('created_at', '>=', $request->start)
+                ->whereDate('updated_at', '<=', $request->end)->get();
+
+
         $array = [];
         foreach ($tasks as $task) {
             $start = new Carbon($task->taskTime->date_start);
@@ -426,6 +429,25 @@ class TasksController extends Controller
                 'customTaskId' => 'task-' . $task->id
             ];
         }
+        //Zaśmieca timetable - narazie zakomentujemy
+//        foreach ($laziness as $task) {
+//            $start = new Carbon($task->created_at);
+//            $end = new Carbon($task->updated_at);
+//            $consultantNotice = $warehouseNotice = '';
+//            $text = $task->description;
+//
+//            $array[] = [
+//                'id' => 'tracker_id_'.$task->id,
+//                'resourceId' => $task->user_id,
+//                'title' => 'Brak aktywności',
+//                'start' => $start->format('Y-m-d\TH:i'),
+//                'end' => $end->format('Y-m-d\TH:i'),
+//                'color' => '#FF0000',
+//                'text' => $text ?? 'Brak uzasadnienia',
+//                'customOrderId' => '',
+//                'customTaskId' => ''
+//            ];
+//        }
 
         return response()->json($array);
     }
@@ -635,7 +657,6 @@ class TasksController extends Controller
                         $dateS = $dateStart->addMinutes($different)->toDateTimeString();
                         $dateE = $dateEnd->addMinutes($different)->toDateTimeString();
                     }
-                    Log::notice('Czas zakończenia pracy', ['line' => __LINE__, 'file' => __FILE__, 'timeStart' => $dateS, 'timeEnd' => $dateE]);
                     $item->taskTime->update([
                         'date_start' => $dateS,
                         'date_end' => $dateE
@@ -768,7 +789,6 @@ class TasksController extends Controller
 
         $end = Carbon::now();
         $end->second = 0;
-        Log::notice('Czas zakończenia pracy', ['line' => __LINE__, 'file' => __FILE__, 'timeStart' => $time->date_start, 'timeEnd' => $end]);
         TaskTime::create([
             'task_id' => $newTask->id,
             'date_start' => $time->date_start,

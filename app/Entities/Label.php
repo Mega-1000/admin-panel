@@ -39,7 +39,8 @@ class Label extends Model implements Transformable
     const ORDER_FOR_REALISATION = 44;
     const BOOKED_FIRST_PAYMENT = 5;
     const WAREHOUSE_REMINDER = 77;
-
+	const INVOICE_ISSUED_WITH_EXERTED_EFFECT = 42;
+	
     const CHAT_TYPE = 'chat';
     const BONUS_TYPE = 'bonus';
     const PAYMENTS_IDS_FOR_TABLE = [119, 134, 120, 101, 99, 102];
@@ -50,7 +51,20 @@ class Label extends Model implements Transformable
     const CUSTOMER_DATA_REMINDER_IDS = [53, 74];
     const DIALOG_TYPE_LABELS_IDS = [55, 56, 57, 58, 78, 79, 80, 81, 82, 83, 84, 85];
     const NOT_SENT_YET_LABELS_IDS = [self::BLUE_HAMMER_ID, self::GREEN_HAMMER_ID, self::ORDER_ITEMS_UNDER_CONSTRUCTION];
-
+	
+	const INVOICE_SENDED = 192;
+	const INVOICE_INCORRECT = 193;
+    const FINAL_CONFIRMATION_SENDED = 194;
+	const FINAL_CONFIRMATION_APPROVED = 195;
+	const FINAL_CONFIRMATION_DECLINED = 196;
+	const REDEEMED_LABEL_PROCESSED_IDS = [
+		self::INVOICE_ISSUED_WITH_EXERTED_EFFECT,
+		self::INVOICE_SENDED,
+		self::INVOICE_INCORRECT,
+		self::FINAL_CONFIRMATION_SENDED,
+		self::FINAL_CONFIRMATION_APPROVED,
+		self::FINAL_CONFIRMATION_DECLINED];
+		
     public $customColumnsVisibilities = [
         'name',
         'group',

@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Entities\FirmSource;
 use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\Product;
@@ -100,13 +101,16 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                 return [
                     'id' => $product->id,
                     'amount' => $product->tt_quantity,
-                    'transactionId' => $product->transaction_id
+                    'transactionId' => $product->transaction_id,
+                    'type' => $product->type
                 ];
             })->toArray();
             $transactionArray['order_items'] = $orderItems;
             try {
                 DB::beginTransaction();
-                $this->buildOrder($transaction, $transactionArray, $products, $transactionGroup, $taskPrimal->id, $productService, $orderPaymentService);
+                $order = $this->buildOrder($transaction, $transactionArray, $products, $transactionGroup, $taskPrimal->id, $productService, $orderPaymentService);
+	            dispatch(new OrderProformSendMailJob($order, setting('allegro.new_allegro_order_on_sello_import_msg')));
+
                 $count++;
                 DB::commit();
             } catch (\Exception $exception) {
@@ -120,7 +124,6 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         if ($count > 0) {
             $time = ceil($count * 2 / 5) * 5;
             $time = TaskTimeHelper::getFirstAvailableTime($time);
-            Log::notice('Czas zakończenia pracy', ['line' => __LINE__, 'file' => __FILE__, 'timeStart' => $time['start'], 'timeEnd' => $time['end']]);
             TaskTime::create([
                 'task_id' => $taskPrimal->id,
                 'date_start' => $time['start'],
@@ -256,6 +259,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                         $quantity = (int)(explode('Q', end($symbol))[1]);
                     } elseif (strpos(end($symbol), 'Y') !== false) {
                         $quantity = (int)(explode('Y', end($symbol))[1]);
+                    } elseif (strpos(end($symbol), 'Z') !== false) {
+                        $quantity = (int)(explode('Z', end($symbol))[1]);
                     } else {
                         $quantity = false;
                     }
@@ -268,6 +273,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
                     $product = Product::getDefaultProduct();
                 }
                 if (!empty($quantity)) {
+                    $product->type = 'multiple';
                     $product->tt_quantity = $quantity * $singleTransaction->transactionItem->tt_Quantity;
                     $product->price_override = [
                         'gross_selling_price_commercial_unit' => round($singleTransaction->transactionItem->tt_Price / $quantity, 2),
@@ -298,7 +304,11 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
         $prices = [];
         foreach ($products as $product) {
-            $prices[$product->id] = $product->price_override;
+            if ($product->type === 'multiple') {
+                $prices[$product->id . '_' . $product->tt_quantity] = $product->price_override;
+            } else {
+                $prices[$product->id] = $product->price_override;
+            }
         }
 
         $priceOverrider = new OrderPriceOverrider($prices);
@@ -319,6 +329,13 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
         $order = Order::find($id);
         $order->sello_id = $transaction->id;
+	    /**
+	     * @TODO create determining source by params when there will be more info about sources
+	     * maybe move to cron or something else
+	     */
+	    $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 1)->first();
+        $order->firm_source_id = $firmSource ? $firmSource->id : null;
+
         $user = User::where('name', '001')->first();
         $order->employee()->associate($user);
         $withWarehouse = $products->filter(function ($prod) {
@@ -334,6 +351,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             $this->createPaymentPromise($order, $transaction, $orderPaymentService);
             $this->setLabels($order, $taskPrimalId);
         }
+
+        return $order;
     }
 
     private function createPaymentPromise(Order $order, $transaction, OrderPaymentService $orderPaymentService)

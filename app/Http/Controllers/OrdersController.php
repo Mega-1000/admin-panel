@@ -22,12 +22,7 @@ use App\Entities\Task;
 use App\Entities\UserSurplusPayment;
 use App\Entities\UserSurplusPaymentHistory;
 use App\Entities\Warehouse;
-use App\Enums\AllegroExcel\AllegroHeaders;
-use App\Enums\AllegroExcel\OrderHeaders;
-use App\Enums\AllegroExcel\PaymentsHeader;
-use App\Enums\AllegroExcel\SheetNames;
 use App\Enums\LabelStatusEnum;
-use App\Exports\OrdersAllegroExport;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Helpers\GetCustomerForNewOrder;
@@ -75,6 +70,7 @@ use App\Repositories\StatusRepository;
 use App\Repositories\TaskRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
+use App\Services\OrderAddressService;
 use App\Services\OrderExcelService;
 use App\Services\OrderInvoiceService;
 use App\Services\TaskService;
@@ -417,6 +413,7 @@ class OrdersController extends Controller
             "order_id" => $order->id,
             'type' => 'INVOICE_ADDRESS',
         ])->first();
+	
         $orderDeliveryAddress = $this->orderAddressRepository->findWhere([
             "order_id" => $order->id,
             'type' => 'DELIVERY_ADDRESS',
@@ -425,7 +422,16 @@ class OrdersController extends Controller
             "customer_id" => $order->customer->id,
             'type' => 'DELIVERY_ADDRESS',
         ])->first();
-        $messages = $this->orderMessageRepository->orderBy('type')->findWhere(["order_id" => $order->id]);
+	
+	    $orderAddressService = new OrderAddressService();
+	
+	    $orderAddressService->addressIsValid($orderInvoiceAddress);
+	    $orderInvoiceAddressErrors = $orderAddressService->errors();
+	    
+	    $orderAddressService->addressIsValid($orderDeliveryAddress);
+	    $orderDeliveryAddressErrors = $orderAddressService->errors();
+	    
+	    $messages = $this->orderMessageRepository->orderBy('type')->findWhere(["order_id" => $order->id]);
         $emails = DB::table('emails_messages')->where('order_id', $orderId)->get();
         $orderItems = $order->items;
         $productsArray = [];
@@ -515,19 +521,19 @@ class OrdersController extends Controller
         $subiektInvoices = $order->subiektInvoices ?? [];
         $orderHasSentLP = $order->hasOrderSentLP();
         $packets = ProductStockPacket::with('items')->get();
-
+	    
         if ($order->customer_id == 4128) {
             return view('orders.edit_self',
                 compact('visibilitiesTask', 'visibilitiesPackage', 'visibilitiesPayments', 'warehouses', 'order',
-                    'users', 'customerInfo', 'orderInvoiceAddress', 'selInvoices', 'subiektInvoices',
-                    'orderDeliveryAddress', 'orderItems', 'warehouse', 'statuses', 'messages', 'productPacking',
+                    'users', 'customerInfo', 'orderInvoiceAddress', 'orderInvoiceAddressErrors', 'selInvoices', 'subiektInvoices',
+                    'orderDeliveryAddress', 'orderDeliveryAddressErrors', 'orderItems', 'warehouse', 'statuses', 'messages', 'productPacking',
                     'customerDeliveryAddress', 'firms', 'productsVariation', 'allProductsFromSupplier', 'orderId',
                     'customerOrdersToPay', 'clientTotalCost', 'ourTotalCost', 'labelsButtons'));
         } else {
             return view('orders.edit',
                 compact('visibilitiesTask', 'visibilitiesPackage', 'visibilitiesPayments', 'warehouses', 'order',
-                    'users', 'customerInfo', 'orderInvoiceAddress', 'selInvoices', 'subiektInvoices',
-                    'orderDeliveryAddress', 'orderItems', 'warehouse', 'statuses', 'messages', 'productPacking',
+                    'users', 'customerInfo', 'orderInvoiceAddress', 'orderInvoiceAddressErrors', 'selInvoices', 'subiektInvoices',
+                    'orderDeliveryAddress', 'orderDeliveryAddressErrors', 'orderItems', 'warehouse', 'statuses', 'messages', 'productPacking',
                     'customerDeliveryAddress', 'firms', 'productsVariation', 'allProductsFromSupplier', 'orderId',
                     'customerOrdersToPay', 'orderHasSentLP', 'emails', 'clientTotalCost', 'ourTotalCost', 'labelsButtons', 'packets'));
         }
@@ -1949,15 +1955,15 @@ class OrdersController extends Controller
 
         $sortingColumns = [
             4 => 'users.name',
-            5 => 'orders.created_at',
-            6 => 'orders.id',
-            9 => 'statuses.name',
+            13 => 'orders.created_at',
+            14 => 'orders.id',
+            17 => 'statuses.name',
             10 => 'symbol',
-            11 => 'customer_notices',
-            12 => 'customer_addresses.phone',
-            13 => 'customer_addresses.email',
-            14 => 'customer_addresses.firstname',
-            15 => 'customer_addresses.lastname',
+            20 => 'customer_notices',
+            22 => 'customer_addresses.phone',
+            23 => 'customer_addresses.email',
+            24 => 'customer_addresses.firstname',
+            25 => 'customer_addresses.lastname',
             46 => 'sel_tr__transaction.tr_CheckoutFormPaymentId'
         ];
 
@@ -2077,7 +2083,7 @@ class OrdersController extends Controller
         }
 
         if ($minId) {
-            $query->where($sortingColumns[6], '>', $minId);
+            $query->where($sortingColumns[14], '>', $minId);
         }
 
         if(isset($data['same'])) {

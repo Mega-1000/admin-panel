@@ -76,6 +76,8 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(\App\Repositories\ProductStockPacketRepository::class, \App\Repositories\ProductStockPacketRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\ProductStockPacketItemRepository::class, \App\Repositories\ProductStockPacketItemRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\PackageTemplateRepository::class, \App\Repositories\PackageTemplateRepositoryEloquent::class);
+        $this->app->bind(\App\Repositories\FaqRepository::class, \App\Repositories\FaqRepositoryEloquent::class);
+        $this->app->bind(\App\Repositories\OrderAllegroRepository::class, \App\Repositories\OrderAllegroRepositoryEloquent::class);
         //:end-bindings:
     }
 }
