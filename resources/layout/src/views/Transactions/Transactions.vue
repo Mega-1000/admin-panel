@@ -20,7 +20,7 @@ import TransactionsForm from '@/components/Transactions/TransactionsForm.vue'
   components: { TransactionsForm, TransactionsList, CustomersList }
 })
 export default class Transactions extends Vue {
-  public transactionForm = false;
+  public transactionForm = true;
 
   public async mounted (): Promise<void> {
     await this.load()
