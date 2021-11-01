@@ -80,7 +80,6 @@
                 </option>
               </select>
               <span class="form-control-feedback">{{ orderId.errorMessage }}</span>
-
             </div>
           </div>
           <div class="form-group" v-else
@@ -96,8 +95,10 @@
         <div class="col-md-6" v-if="customer === null">
           <div class="form-group"
                :class="[{'has-error': customerId.error===true},{'has-success': customerId.error===false && customerId.value !== ''}]">
-            <label for="customerId" class="col-md-5 col-form-label">Identyfikator klienta</label>
-            <div class="col-md-5">
+            <label for="customerId" class="col-md-5 col-form-label">Identyfikator klienta
+              <span @click="showCustomerSearcher=true" class="icon voyager-search"></span>
+            </label>
+            <div class="col-md-5 form-row">
               <input type="text" required id="customerId" class="form-control" name="customerId"
                      v-model="customerId.value">
               <span class="form-control-feedback">{{ customerId.errorMessage }}</span>
@@ -174,6 +175,7 @@
         </div>
       </div>
     </form>
+    <searcher v-if="showCustomerSearcher" @selected="selectCustomer" @close="toggleShowModal()"></searcher>
     <debugger :keepAlive="true" :components="$children"></debugger>
   </div>
 </template>
@@ -185,9 +187,11 @@ import DatePicker from 'vue2-datepicker'
 import 'vue2-datepicker/index.css'
 import 'vue2-datepicker/locale/pl'
 import { CreateSetParams } from '@/types/SetsTypes'
+import Searcher from '@/components/Customers/Searcher.vue'
 
 @Component({
   components: {
+    Searcher,
     DatePicker
   }
 })
@@ -198,6 +202,8 @@ export default class TransactionsForm extends Vue {
     charge: 'Obciążenie',
     credit: 'Uznanie'
   };
+
+  private showCustomerSearcher = false
 
   private registrationInSystemDate = {
     value: '',
@@ -308,6 +314,15 @@ export default class TransactionsForm extends Vue {
       this.$emit('transactionAdded')
     }
   }
+
+  public async selectCustomer (customerId: string) {
+    this.customerId.value = customerId
+    this.toggleShowModal()
+  }
+
+  public toggleShowModal (): void {
+    this.showCustomerSearcher = !this.showCustomerSearcher
+  }
 }
 </script>
 
@@ -317,5 +332,9 @@ export default class TransactionsForm extends Vue {
   .form-control-feedback {
     position: static;
     display: inline;
+  }
+
+  .voyager-search {
+    cursor: pointer;
   }
 </style>

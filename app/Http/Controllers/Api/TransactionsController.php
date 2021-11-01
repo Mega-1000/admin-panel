@@ -15,14 +15,6 @@ class TransactionsController extends Controller
     /** @var TransactionRepository */
     protected $transactionRepository;
 
-    private $error_code = null;
-
-    private $errors = [
-
-    ];
-
-    private $defaultError = 'Wystąpił wewnętrzny błąd systemu przy składaniu zamówienia. Dział techniczny został o tym poinformowany.';
-
     /**
      * TransactionRepository constructor.
      * @param TransactionRepository $transactionRepository
