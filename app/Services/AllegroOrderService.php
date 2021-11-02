@@ -2,8 +2,6 @@
 
 use App\Entities\AllegroOrder;
 use App\Entities\Order;
-use App\Jobs\OrderProformSendMailJob;
-use App\Jobs\Orders\CheckDeliveryAddressSendMailJob;
 use App\Mail\AllegroNewOrderEmail;
 use Carbon\Carbon;
 use VIISON\AddressSplitter\AddressSplitter;
@@ -79,12 +77,6 @@ class AllegroOrderService extends AllegroApiService
             try {
                 $deliveryAddressChanged = $this->fixDeliveryAddress($order);
 	            $invoiceAddressChanged = $this->fixInvoiceAddress($order);
-	            dispatch(new CheckDeliveryAddressSendMailJob($order));
-	            
-	            if ($deliveryAddressChanged || $invoiceAddressChanged) {
-		            dispatch(new OrderProformSendMailJob($order, setting('allegro.address_changed_msg')));
-	            }
-	
             } catch (SplittingException $e) {
                 //
             }

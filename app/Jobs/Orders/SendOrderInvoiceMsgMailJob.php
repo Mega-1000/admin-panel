@@ -15,14 +15,14 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
-class SendFinalProformConfirmationMailJob extends Job implements ShouldQueue
+class SendOrderInvoiceMsgMailJob extends Job implements ShouldQueue
 {
 	use IsMonitored, Queueable, SerializesModels;
 
 	protected $order;
 
 	/**
-	 * SendFinalProformConfirmationMailJob constructor.
+	 * SendOrderInvoiceMsgMailJob constructor.
 	 * @param $order
 	 */
 	public function __construct(Order $order)
@@ -35,13 +35,9 @@ class SendFinalProformConfirmationMailJob extends Job implements ShouldQueue
 		dispatch_now(new GenerateOrderProformJob($this->order));
 		
 		$tags = $tagRepository->all();
-		if ($this->order->sello_id) {
-			$message = setting('allegro.final_confirmation_msg');
-		} else {
-			$message = setting('site.final_confirmation_msg');
-		}
+		$message = setting('allegro.order_invoice_msg');
 		
-		$subject = "Prosbe o ostateczne potwierdzenie zgodnosci oferty pod wzlgdedem danych i asortymentu - numer zamówienia: {$this->order->id}";
+		$subject = "Faktura za zakupy dokonane na allegro";
 		
 		$emailTagHandler->setOrder($this->order);
 		
@@ -55,6 +51,6 @@ class SendFinalProformConfirmationMailJob extends Job implements ShouldQueue
 		\Mailer::create()
 			->to($this->order->customer->login)
 			->send(new OrderMessageMail($subject, $message, $pdf));
-		dispatch_now(new AddLabelJob($this->order->id, [Label::FINAL_CONFIRMATION_SENDED]));
+		dispatch_now(new AddLabelJob($this->order->id, [Label::ORDER_INVOICE_MSG_SENDED]));
 	}
 }
