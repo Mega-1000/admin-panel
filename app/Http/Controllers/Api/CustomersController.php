@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use App\Http\Requests\Api\Customers\StoreCustomerRequest;
 use App\Http\Controllers\Controller;
@@ -21,13 +22,14 @@ class CustomersController extends Controller
 
     /**
      * CustomersController constructor.
-     * @param CustomerRepository $customerRepository
+     * @param CustomerRepository        $customerRepository
      * @param CustomerAddressRepository $customerAddressRepository
      */
     public function __construct(
         CustomerRepository $customerRepository,
         CustomerAddressRepository $customerAddressRepository
-    ) {
+    )
+    {
         $this->customerRepository = $customerRepository;
         $this->customerAddressRepository = $customerAddressRepository;
     }
@@ -90,7 +92,7 @@ class CustomersController extends Controller
             }
 
             return $this->createdResponse();
-        } catch (\Exception $e){
+        } catch (\Exception $e) {
             Log::error('Problem with create new customer.',
                 ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
             );
@@ -114,5 +116,77 @@ class CustomersController extends Controller
         unset($user->nick_allegro);
         unset($user->remember_token);
         return $user;
+    }
+
+    /**
+     *
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     *
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    public function getCustomers(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $response = [];
+        try {
+            /** @var Builder $query */
+            $query = $this->customerRepository
+                ->join('customer_addresses', 'customers.id', '=', 'customer_addresses.customer_id')
+                ->where('customer_addresses.type', '=', 'STANDARD_ADDRESS');
+
+            if (!empty($request->get('firstName'))) {
+                $query->where('customer_addresses.firstname', 'like', $request->get('firstName'));
+            }
+            if (!empty($request->get('lastName'))) {
+                $query->where('customer_addresses.lastname', 'like', $request->get('lastName'));
+            }
+            if (!empty($request->get('phone'))) {
+                $query->where('customer_addresses.phone', 'like', $request->get('phone') . '%');
+            }
+            if (!empty($request->get('nickAllegro'))) {
+                $query->where('nick_allegro', 'like', $request->get('nickAllegro') . '%');
+            }
+            if (!empty($request->get('email'))) {
+                $query->where('login', 'like', $request->get('email') . '%');
+            }
+
+            $result = $query->get();
+
+            if (!empty($result->all())) {
+                $response['status'] = 200;
+                if ($result->count() < 50) {
+                    foreach ($result as $customer) {
+                        $response['customers'][] = [
+                            'id' => $customer->id,
+                            'login' => $customer->login,
+                            'nickAllegro' => $customer->nick_allegro,
+                            'firstName' => $customer->firstname,
+                            'lastName' => $customer->lastname,
+                            'phone' => $customer->phone,
+                            'email' => $customer->login,
+                        ];
+                    }
+                } else {
+                    $response = [
+                        'error_code' => 423,
+                        'error_message' => 'Zbyt duża ilość wyników. Wpisz dodatkowe dane.',
+                        'customers' => []
+                    ];
+                }
+            } else {
+                $response = [
+                    'error_code' => 505,
+                    'error_message' => 'Brak klientów',
+                    'customers' => []
+                ];
+            }
+        } catch (\Exception $exception) {
+            $response = [
+                'error_code' => $exception->getCode(),
+                'error_message' => $exception->getMessage()
+            ];
+        }
+        return response()->json($response);
     }
 }

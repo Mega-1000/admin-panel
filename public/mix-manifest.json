@@ -1,10 +1,10 @@
 {
-    "/js/app.js": "/js/app.js?id=66035b6165e18acd4d4e",
-    "/css/app.css": "/css/app.css?id=97ea5ce3f7cb68712f89",
-    "/js/vue-chunk.js": "/js/vue-chunk.js?id=ca38bb40083297023a43",
-    "/js/vue-scripts.js": "/js/vue-scripts.js?id=eca96f780f8b3bb35593",
-    "/node_modules/tinymce/jquery.tinymce.js": "/node_modules/tinymce/jquery.tinymce.js?id=a154c15cd3488c8f93b3",
-    "/node_modules/tinymce/jquery.tinymce.min.js": "/node_modules/tinymce/jquery.tinymce.min.js?id=a154c15cd3488c8f93b3",
-    "/node_modules/tinymce/tinymce.js": "/node_modules/tinymce/tinymce.js?id=65d061e286548a02aa53",
-    "/node_modules/tinymce/tinymce.min.js": "/node_modules/tinymce/tinymce.min.js?id=bfb928774012134b6b1f"
+    "/js/app.js": "/js/app.js?id=f3922fd4f164fc8fd5d3",
+    "/css/app.css": "/css/app.css?id=0e733a28c837cc84545e",
+    "/js/vue-chunk.js": "/js/vue-chunk.js?id=510ee686d12523cdc807",
+    "/js/vue-scripts.js": "/js/vue-scripts.js?id=6c339e2bcf5cb85e642e",
+    "/node_modules/tinymce/jquery.tinymce.js": "/node_modules/tinymce/jquery.tinymce.js?id=03ec7cf962cf39bbffd0",
+    "/node_modules/tinymce/jquery.tinymce.min.js": "/node_modules/tinymce/jquery.tinymce.min.js?id=03ec7cf962cf39bbffd0",
+    "/node_modules/tinymce/tinymce.js": "/node_modules/tinymce/tinymce.js?id=ab4f5d71c7de739c196e",
+    "/node_modules/tinymce/tinymce.min.js": "/node_modules/tinymce/tinymce.min.js?id=c4b1c20ec44fedc847a7"
 }

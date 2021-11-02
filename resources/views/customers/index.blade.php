@@ -198,7 +198,6 @@
                     data: 'id',
                     name: 'id',
                     render: function (id, type, row) {
-			console.log(row);
                         let html = '<form action="{{ url()->current() }}/' + row.customer_id + '/change-status" method="POST" style="display: inline;">';
                         html += '{{ method_field('put') }}';
                         html += '{{ csrf_field() }}';
@@ -275,7 +274,6 @@
                     let columnSearch =  $("#columnSearch" + (column));
                     columnSearch.parent().hide();
             }
-            
         });
     </script>
     <style>

@@ -262,7 +262,7 @@
                     let columnSearch =  $("#columnSearch" + (column));
                     columnSearch.parent().hide();
             }
-            
+
         });
     </script>
     <style>
