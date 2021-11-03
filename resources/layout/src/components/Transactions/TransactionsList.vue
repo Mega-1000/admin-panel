@@ -43,7 +43,7 @@
         </div>
       </div>
     </div>
-    <div class="row">
+    <div class="row table-transactions">
       <div class="col-md-12">
         <div class="table-responsive">
           <table class="table table-hover table-bordered">
@@ -73,10 +73,10 @@
               <td>{{ transaction.order_id }}</td>
               <td>{{ transaction.operator }}</td>
               <td :class="[{'text-success': transaction.operation_value>0}, {'text-danger': transaction.operation_value<0}]">
-                {{ transaction.operation_value.toString().replace('-','') }}
+                {{ transaction.operation_value.toString().replace('-', '') }}
               </td>
               <td :class="[{'text-success': transaction.balance>0}, {'text-danger': transaction.balance<0}]">
-                {{ transaction.balance.toString().replace('-','') }}
+                {{ transaction.balance.toString().replace('-', '') }}
               </td>
               <td>{{ transaction.accounting_notes }}</td>
               <td>{{ transaction.transaction_notes }}</td>
@@ -134,5 +134,10 @@ export default class TransactionsList extends Vue {
         font-weight: 600;
       }
     }
+  }
+
+  .table-transactions {
+    max-height: 550px;
+    overflow-y: auto;
   }
 </style>

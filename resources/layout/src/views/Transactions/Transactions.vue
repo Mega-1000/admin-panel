@@ -37,6 +37,7 @@ export default class Transactions extends Vue {
   public async back (): Promise<void> {
     await this.$store?.dispatch('TransactionsService/setCustomer', null)
     localStorage.removeItem('customer')
+    await this.load()
   }
 
   public async transactionAdded (): Promise<void> {
