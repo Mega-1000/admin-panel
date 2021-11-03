@@ -46,7 +46,19 @@ const actions = {
       })
       .catch((error: any) => {
         commit(CUSTOMERS_SET_ERROR, error.message)
-      })
+      }).finally(
+        commit(CUSTOMERS_SET_IS_LOADING, false)
+      )
+  },
+  setCustomers ({ commit }: any, customer: Customer) {
+    commit(CUSTOMERS_SET_IS_LOADING, true)
+    commit(CUSTOMERS_SET_ALL, customer)
+    commit(CUSTOMERS_SET_IS_LOADING, false)
+  },
+  setError ({ commit }: any, message: string) {
+    commit(CUSTOMERS_SET_IS_LOADING, true)
+    commit(CUSTOMERS_SET_ERROR, message)
+    commit(CUSTOMERS_SET_IS_LOADING, false)
   }
 }
 
