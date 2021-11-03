@@ -186,7 +186,6 @@ import { CreateTransactionParams, Customer, Transaction } from '@/types/Transact
 import DatePicker from 'vue2-datepicker'
 import 'vue2-datepicker/index.css'
 import 'vue2-datepicker/locale/pl'
-import { CreateSetParams } from '@/types/SetsTypes'
 import Searcher from '@/components/Customers/Searcher.vue'
 
 @Component({
@@ -206,7 +205,7 @@ export default class TransactionsForm extends Vue {
   private showCustomerSearcher = false
 
   private registrationInSystemDate = {
-    value: '',
+    value: (new Date()).toISOString(),
     error: false,
     errorMessage: ''
   }

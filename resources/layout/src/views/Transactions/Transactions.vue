@@ -34,12 +34,12 @@ export default class Transactions extends Vue {
     return this.$store?.getters['TransactionsService/customer']
   }
 
-  public async back () {
+  public async back (): Promise<void> {
     await this.$store?.dispatch('TransactionsService/setCustomer', null)
     localStorage.removeItem('customer')
   }
 
-  public async transactionAdded () {
+  public async transactionAdded (): Promise<void> {
     this.transactionForm = false
     localStorage.removeItem('customer')
     await this.load()
@@ -52,7 +52,7 @@ export default class Transactions extends Vue {
     }
   }
 
-  public async load () {
+  public async load (): Promise<void> {
     if (localStorage.getItem('customer') !== null) {
       const customer = localStorage.getItem('customer')
       await this.$store?.dispatch('TransactionsService/setCustomer', JSON.parse(customer ?? ''))
