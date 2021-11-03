@@ -50,7 +50,7 @@ class TransactionsController extends Controller
                         'phone' => $customer->addresses[0]->phone,
                         'address' => $customer->addresses[0]->city,
                         'email' => $customer->addresses[0]->email,
-                        'transactions' => $customer->transactions,
+                        'transactions' => $customer->getOrderedTransaction(),
                         'orderIds' => $customer->orders->pluck('id')
                     ];
                 }

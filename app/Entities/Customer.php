@@ -2,6 +2,7 @@
 
 namespace App\Entities;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Notifications\Notifiable;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
@@ -94,13 +95,25 @@ class Customer extends Authenticatable implements Transformable
         return $this->belongsToMany(Chat::class, 'chat_user')->withTimestamps();
     }
 
-    public function getIsAllegroAttribute() {
-    	return strpos($this->login, 'allegro') !== false;
+    public function getIsAllegroAttribute()
+    {
+        return strpos($this->login, 'allegro') !== false;
     }
 
     public function transactions()
     {
         return $this->hasMany(Transaction::class);
+    }
 
+    /**
+     * Zwraca kolekcje posortowaną od najnowszych
+     *
+     * @return Collection
+     *
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    public function getOrderedTransaction()
+    {
+        return $this->transactions->sortBy('id', true, true)->values();
     }
 }
