@@ -74,7 +74,6 @@ class TransactionsController extends Controller
         $validator = Validator::make($request->all(),
             [
                 'registrationInSystemDate' => 'required|date',
-                'registrationInBankDate' => 'required|date',
                 'paymentId' => 'nullable',
                 'operationKind' => 'required',
                 'customerId' => 'required|exists:customers,id',
@@ -95,6 +94,17 @@ class TransactionsController extends Controller
             ]);
 
         if ($validator->passes()) {
+            $operationValue = ((in_array($request->get('operationKind'),
+                    [
+                        'Wpłata',
+                        'Uznanie'
+                    ]
+                ) ? '+' : '-')) . $request->get('operationValue');
+
+            $balance = $this->transactionRepository->findWhere([
+                ['customer_id', '=', $request->get('customerId')]
+            ])->last()->balance;
+
             $this->transactionRepository->create([
                 'customer_id' => $request->get('customerId'),
                 'posted_in_system_date' => $request->get('registrationInSystemDate'),
@@ -103,13 +113,8 @@ class TransactionsController extends Controller
                 'kind_of_operation' => $request->get('operationKind'),
                 'order_id' => ($request->get('orderId') === '0') ? null : $request->get('orderId'),
                 'operator' => $request->get('operator'),
-                'operation_value' => ((in_array($request->get('operationKind'),
-                        [
-                            'Wpłata',
-                            'Uznanie'
-                        ]
-                    ) ? '+' : '-')) . $request->get('operationValue'),
-                'balance' => 0,
+                'operation_value' => $operationValue,
+                'balance' => (int)$balance + (int)$operationValue,
                 'accounting_notes' => $request->get('accountingNotes'),
                 'transaction_notes' => $request->get('transactionNotes'),
             ]);

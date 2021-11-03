@@ -73,9 +73,11 @@
               <td>{{ transaction.order_id }}</td>
               <td>{{ transaction.operator }}</td>
               <td :class="[{'text-success': transaction.operation_value>0}, {'text-danger': transaction.operation_value<0}]">
-                {{ transaction.operation_value }}
+                {{ transaction.operation_value.toString().replace('-','') }}
               </td>
-              <td>{{ transaction.balance }}</td>
+              <td :class="[{'text-success': transaction.balance>0}, {'text-danger': transaction.balance<0}]">
+                {{ transaction.balance.toString().replace('-','') }}
+              </td>
               <td>{{ transaction.accounting_notes }}</td>
               <td>{{ transaction.transaction_notes }}</td>
               <td class="text-center">
