@@ -20,46 +20,46 @@
             <div class="col-md-3">
               <div class="form-group">
                 <label for="nickAllegro">Nick allegro</label>
-                <input type="text" @keypress="loadCustomers" id="nickAllegro" name="nickAllegro"
+                <input type="text" @input="loadCustomers" id="nickAllegro" name="nickAllegro"
                        class="form-control" v-model="nickAllegro">
               </div>
             </div>
             <div class="col-md-2">
               <div class="form-group">
                 <label for="firstName">Imię</label>
-                <input type="text" @keypress="loadCustomers" id="firstName" name="firstName"
+                <input type="text" @input="loadCustomers" @keypress.enter="loadCustomers" id="firstName"
+                       name="firstName"
                        class="form-control" v-model="firstName">
               </div>
             </div>
             <div class="col-md-2">
               <div class="form-group">
                 <label for="lastName">Nazwisko</label>
-                <input type="text" @keypress="loadCustomers" id="lastName" name="lastName"
+                <input type="text" @input="loadCustomers" @keypress.enter="loadCustomers" id="lastName" name="lastName"
                        class="form-control" v-model="lastName">
               </div>
             </div>
             <div class="col-md-2">
               <div class="form-group">
                 <label for="phone">Telefon</label>
-                <input type="text" @keypress="loadCustomers" id="phone" name="phone"
+                <input type="text" @input="loadCustomers" @keypress.enter="loadCustomers" id="phone" name="phone"
                        class="form-control" v-model="phone">
               </div>
             </div>
             <div class="col-md-3">
               <div class="form-group">
                 <label for="email">Adres email</label>
-                <input type="text" @keypress="loadCustomers" id="email" name="email"
+                <input type="text" @input="loadCustomers" @keypress.enter="loadCustomers" id="email" name="email"
                        class="form-control" v-model="email">
               </div>
             </div>
           </div>
-          <div class="row">
+          <div class="row table-customers">
             <div class="col-md-12">
               <div class="table-responsive">
                 <table class="table table-hover overflow-auto">
                   <thead>
                   <tr>
-                    <th scope="col">Id</th>
                     <th scope="col">Nick allegro</th>
                     <th scope="col">Imię</th>
                     <th scope="col">Nazwisko</th>
@@ -70,14 +70,13 @@
                   </thead>
                   <tbody v-if="customers.length">
                   <tr v-for="(customer,index) in customers" :key="index">
-                    <th scope="col">{{ customer.id }}</th>
                     <td>{{ customer.nickAllegro }}</td>
                     <td>{{ customer.firstName }}</td>
                     <td>{{ customer.lastName }}</td>
                     <td>{{ customer.phone }}</td>
                     <td>{{ customer.email }}</td>
                     <td>
-                      <button class="badge badge-pill badge-success" @click="$emit('selected',customer.id)">Wybierz
+                      <button class="btn btn-small btn-success" @click="$emit('selected',customer.id)">Wybierz
                       </button>
                     </td>
                   </tr>
@@ -118,16 +117,25 @@ export default class Searcher extends Vue {
     return this.$store.getters['CustomersService/error']
   }
 
+  public get isLoading (): boolean {
+    return this.$store.getters['CustomersService/isLoading']
+  }
+
   public get customers () {
     return this.$store?.getters['CustomersService/customers']
   }
 
-  public reset () {
+  public async mounted () {
+    await this.$store.dispatch('CustomersService/setCustomers', [])
+  }
+
+  public async reset () {
     this.firstName = ''
     this.lastName = ''
     this.phone = ''
     this.email = ''
     this.nickAllegro = ''
+    await this.$store.dispatch('CustomersService/setError', '')
   }
 
   public async loadCustomers () {
@@ -140,6 +148,9 @@ export default class Searcher extends Vue {
     }
     if (this.firstName.length || this.lastName.length || this.phone.length || this.email.length || this.nickAllegro.length) {
       await this.$store.dispatch('CustomersService/loadCustomers', searchedCustomer)
+    } else {
+      await this.$store.dispatch('CustomersService/setCustomers', [])
+      await this.$store.dispatch('CustomersService/setError', '')
     }
   }
 }
@@ -177,7 +188,12 @@ export default class Searcher extends Vue {
     margin-right: 30px;
   }
 
-  .badge-pill {
-    padding: 5px 10px;
+  .modal {
+    display: block !important;
+  }
+
+  .table-customers {
+    max-height: 550px;
+    overflow-y: auto;
   }
 </style>

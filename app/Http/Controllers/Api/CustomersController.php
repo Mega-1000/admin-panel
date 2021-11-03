@@ -136,10 +136,10 @@ class CustomersController extends Controller
                 ->where('customer_addresses.type', '=', 'STANDARD_ADDRESS');
 
             if (!empty($request->get('firstName'))) {
-                $query->where('customer_addresses.firstname', 'like', $request->get('firstName'));
+                $query->where('customer_addresses.firstname', 'like', $request->get('firstName') . '%');
             }
             if (!empty($request->get('lastName'))) {
-                $query->where('customer_addresses.lastname', 'like', $request->get('lastName'));
+                $query->where('customer_addresses.lastname', 'like', $request->get('lastName') . '%');
             }
             if (!empty($request->get('phone'))) {
                 $query->where('customer_addresses.phone', 'like', $request->get('phone') . '%');
@@ -155,16 +155,16 @@ class CustomersController extends Controller
 
             if (!empty($result->all())) {
                 $response['status'] = 200;
-                if ($result->count() < 50) {
+                if ($result->count() < 500) {
                     foreach ($result as $customer) {
                         $response['customers'][] = [
-                            'id' => $customer->id,
-                            'login' => $customer->login,
-                            'nickAllegro' => $customer->nick_allegro,
-                            'firstName' => $customer->firstname,
-                            'lastName' => $customer->lastname,
-                            'phone' => $customer->phone,
-                            'email' => $customer->login,
+                            'id' => trim($customer->id),
+                            'login' => trim($customer->login),
+                            'nickAllegro' => trim($customer->nick_allegro),
+                            'firstName' => trim($customer->firstname),
+                            'lastName' => trim($customer->lastname),
+                            'phone' => trim($customer->phone),
+                            'email' => trim($customer->login),
                         ];
                     }
                 } else {
@@ -176,7 +176,7 @@ class CustomersController extends Controller
                 }
             } else {
                 $response = [
-                    'error_code' => 505,
+                    'error_code' => 424,
                     'error_message' => 'Brak klientów',
                     'customers' => []
                 ];
