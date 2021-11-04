@@ -158,7 +158,7 @@ class CustomersController extends Controller
                 if ($result->count() < 500) {
                     foreach ($result as $customer) {
                         $response['customers'][] = [
-                            'id' => trim($customer->id),
+                            'id' => trim($customer->customer_id),
                             'login' => trim($customer->login),
                             'nickAllegro' => trim($customer->nick_allegro),
                             'firstName' => trim($customer->firstname),

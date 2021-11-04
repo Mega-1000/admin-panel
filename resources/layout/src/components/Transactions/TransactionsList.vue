@@ -81,10 +81,10 @@
               <td>{{ transaction.accounting_notes }}</td>
               <td>{{ transaction.transaction_notes }}</td>
               <td class="text-center">
-                <button class="btn btn-primary" href="#">
+                <button @click="edit(transaction)" class="btn btn-primary" href="#">
                   <span>Modyfikuj</span>
                 </button>
-                <button class="btn btn-danger" href="#">
+                <button @click="destroy(transaction)" class="btn btn-danger" href="#">
                   <span>Usuń</span>
                 </button>
               </td>
@@ -105,7 +105,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { Customer } from '@/types/TransactionsTypes'
+import { Customer, Transaction } from '@/types/TransactionsTypes'
 
 @Component({
   components: {}
@@ -113,6 +113,28 @@ import { Customer } from '@/types/TransactionsTypes'
 export default class TransactionsList extends Vue {
   public get customer (): Customer {
     return this.$store?.getters['TransactionsService/customer']
+  }
+
+  public async destroy (transaction: Transaction): Promise<void> {
+    await this.$store?.dispatch('TransactionsService/delete', transaction)
+  }
+
+  public async edit (transaction: any): Promise<void> {
+    const editedTransaction: Transaction = {
+      accountingNotes: transaction.accounting_notes,
+      balance: transaction.balance,
+      id: transaction.id,
+      operationKind: transaction.kind_of_operation,
+      operationValue: transaction.operation_value,
+      operator: transaction.operator,
+      orderId: transaction.order_id,
+      paymentId: transaction.payment_id,
+      registrationInBankDate: transaction.posted_in_bank_date,
+      registrationInSystemDate: transaction.posted_in_system_date,
+      transactionNotes: transaction.transaction_notes
+    }
+    await this.$store?.dispatch('TransactionsService/setTransaction', editedTransaction)
+    this.$emit('edit')
   }
 }
 </script>
