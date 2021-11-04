@@ -70,7 +70,7 @@ class OrderAddressService
 		if ($address->type == OrderAddress::TYPE_DELIVERY) {
 			$rules['firstname'] = ['required'];
 			$rules['lastname'] = ['required'];
-			$rules['firmname'] = ['string'];
+			$rules['firmname'] = ['nullable', 'string'];
 		} elseif ($address->type == OrderAddress::TYPE_INVOICE) {
 			$rules['firstname'] = ['required_without_all:firmname'];
 			$rules['lastname'] = ['required_without_all:firmname'];
