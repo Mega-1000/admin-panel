@@ -78,6 +78,22 @@ const actions = {
         commit(TRANSACTIONS_SET_ERROR, error.message)
       })
   },
+  updateTransaction ({ commit }: any, params: CreateTransactionParams) {
+    commit(TRANSACTIONS_SET_IS_LOADING, true)
+
+    return TransactionsRepository
+      .updateTransaction(params)
+      .then((data: any) => {
+        commit(TRANSACTIONS_SET_IS_LOADING, false)
+        if (data.errorCode) {
+          commit(TRANSACTIONS_SET_ERROR, data.errorMessage)
+        }
+        return data
+      })
+      .catch((error: any) => {
+        commit(TRANSACTIONS_SET_ERROR, error.message)
+      })
+  },
   delete ({ commit }: any, transaction: Transaction) {
     commit(TRANSACTIONS_SET_IS_LOADING, true)
 

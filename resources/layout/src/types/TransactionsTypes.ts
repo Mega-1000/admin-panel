@@ -15,6 +15,7 @@ export interface Transaction {
 }
 
 export interface CreateTransactionParams {
+    id: number | null
     registrationInSystemDate: string,
     registrationInBankDate: string,
     paymentId: string,

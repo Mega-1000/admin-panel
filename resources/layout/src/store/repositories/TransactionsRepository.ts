@@ -33,6 +33,20 @@ export default {
         return response.json()
       })
   },
+  async updateTransaction (params: CreateTransactionParams): Promise<any> {
+    return fetch(getFullUrl('api/transactions/' + params.id), {
+      method: 'PUT',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/json; charset=utf-8',
+        'X-Requested-Width': 'XMLHttpRequest'
+      }),
+      body: JSON.stringify(params)
+    })
+      .then((response) => {
+        return response.json()
+      })
+  },
   async deleteTransaction (transaction: Transaction): Promise<any> {
     return fetch(getFullUrl('api/transactions/' + transaction.id), {
       method: 'DELETE',
