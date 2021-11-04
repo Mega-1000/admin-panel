@@ -268,6 +268,10 @@ export default class TransactionsForm extends Vue {
     return this.$store?.getters['TransactionsService/customer']
   }
 
+  public get transaction (): Transaction {
+    return this.$store?.getters['TransactionsService/transaction']
+  }
+
   public get error (): string {
     return this.$store.getters['TransactionsService/error']
   }
@@ -321,6 +325,18 @@ export default class TransactionsForm extends Vue {
 
   public toggleShowModal (): void {
     this.showCustomerSearcher = !this.showCustomerSearcher
+  }
+
+  public async mounted () {
+    if (this.transaction !== null) {
+      for (const [key, variable] of Object.entries(this.$data)) {
+        if (Object.prototype.hasOwnProperty.call(variable, 'value')) {
+          // const kesadas = 'id'
+          console.log(key, this.transaction[`${key}`])
+          // variable.value = this.transaction[key]
+        }
+      }
+    }
   }
 }
 </script>

@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { getFullUrl } from '@/helpers/urls'
-import { CreateTransactionParams } from '@/types/TransactionsTypes'
+import { CreateTransactionParams, Transaction } from '@/types/TransactionsTypes'
 
 export default {
   async getTransactions (): Promise<any> {
@@ -28,6 +28,19 @@ export default {
         'X-Requested-Width': 'XMLHttpRequest'
       }),
       body: JSON.stringify(params)
+    })
+      .then((response) => {
+        return response.json()
+      })
+  },
+  async deleteTransaction (transaction: Transaction): Promise<any> {
+    return fetch(getFullUrl('api/transactions/' + transaction.id), {
+      method: 'DELETE',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/json; charset=utf-8',
+        'X-Requested-Width': 'XMLHttpRequest'
+      })
     })
       .then((response) => {
         return response.json()

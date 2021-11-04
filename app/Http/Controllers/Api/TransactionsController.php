@@ -129,4 +129,21 @@ class TransactionsController extends Controller
                 422);
         }
     }
+
+    public function destroy($id)
+    {
+        $response = [];
+        try {
+            $result = $this->transactionRepository->delete($id);
+            if ($result) {
+                $response['status'] = 200;
+            }
+        } catch (\Exception $exception) {
+            $response = [
+                'status' => 500,
+                'error' => $exception->getMessage()
+            ];
+        }
+        return response()->json($response);
+    }
 }
