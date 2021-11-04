@@ -10,4 +10,5 @@ class LabelsHelper
     const VALIDATE_ORDER = 45;
     const SEND_TO_WAREHOUSE_FOR_VALIDATION = 52;
     const WAIT_FOR_WAREHOUSE_TO_ACCEPT = 47;
+    const INVALID_ORDER_ADDRESS = 184;
 }

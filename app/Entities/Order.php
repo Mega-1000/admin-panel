@@ -687,7 +687,8 @@ class Order extends Model implements Transformable
 
     public function getPreviousOrderId($orderId): int
     {
-        return Order::where('id', '<', $orderId)->orderBy('id', 'desc')->first()->id;
+    	$order = Order::where('id', '<', $orderId)->orderBy('id', 'desc')->first();
+        return $order ? $order->id : 0;
     }
 
     public function getSentPackages(): Collection
