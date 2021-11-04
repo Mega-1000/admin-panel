@@ -20,6 +20,7 @@ use App\Helpers\SelloPackageDivider;
 use App\Helpers\SelloPriceCalculator;
 use App\Helpers\SelloTransportSumCalculator;
 use App\Helpers\TaskTimeHelper;
+use App\Jobs\Orders\CheckDeliveryAddressSendMailJob;
 use App\Services\AllegroOrderService;
 use App\Services\OrderPaymentService;
 use App\Services\ProductService;
@@ -109,8 +110,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             try {
                 DB::beginTransaction();
                 $order = $this->buildOrder($transaction, $transactionArray, $products, $transactionGroup, $taskPrimal->id, $productService, $orderPaymentService);
-	            dispatch(new OrderProformSendMailJob($order, setting('allegro.new_allegro_order_on_sello_import_msg')));
-
+	            dispatch(new CheckDeliveryAddressSendMailJob($order));
+	
                 $count++;
                 DB::commit();
             } catch (\Exception $exception) {

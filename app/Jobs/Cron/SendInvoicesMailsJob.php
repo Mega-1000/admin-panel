@@ -3,9 +3,10 @@
 namespace App\Jobs\Cron;
 
 use App\Entities\Label;
-use App\Entities\OrderLabel;
+use App\Entities\Order;
 use App\Jobs\Job;
 use App\Jobs\Orders\SendInvoiceMailJob;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
@@ -20,30 +21,33 @@ class SendInvoicesMailsJob extends Job implements ShouldQueue
 
 
     /**
-     * Create a new job instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-    }
-
-    /**
      * Execute the job.
      *
      * @return void
      */
     public function handle()
     {
-	    $orderLabels = OrderLabel::where('label_id', Label::FINAL_CONFIRMATION_APPROVED)->with('order')->get();
-	    if (!($orderLabels->count())){
-		    return;
-	    }
-	
-	    $orderLabels->map(function ($orderLabel) {
-		    if (!$orderLabel->order->hasLabel(Label::INVOICE_SENDED)) {
-			    dispatch_now(new SendInvoiceMailJob($orderLabel->order));
-		    }
+	    $orders = Order::where(function($query){
+	    	$query->whereHas('orderLabels', function($query){
+			    $query->where('label_id', Label::ORDER_RECEIVED_INVOICE_TODAY);
+		    })->whereDoesntHave('orderLabels', function($query){
+			    $query->where('label_id', Label::INVOICE_ISSUED_WITH_EXERTED_EFFECT);
+		    });
+	    })->orWhere(function($query){
+	    	$query->whereHas('orderLabels', function($query){
+			    $query->where('label_id', Label::ORDER_RECEIVED_INVOICE_STANDARD);
+			
+			    $startOfDay = Carbon::now()->subDays(15)->startOfDay();
+			    $endOfDay = $startOfDay->copy()->endOfDay();
+			    $query->where('created_at', '>=', $startOfDay);
+			    $query->where('created_at', '<=', $endOfDay);
+		    })->whereDoesntHave('orderLabels', function($query){
+			    $query->where('label_id', Label::INVOICE_ISSUED_WITH_EXERTED_EFFECT);
+		    });
+	    })->get();
+		   
+	    $orders->map(function ($order) {
+		    dispatch_now(new SendInvoiceMailJob($order));
 	    });
     }
 }

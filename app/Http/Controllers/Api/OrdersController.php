@@ -15,6 +15,7 @@ use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceCalculator;
 use App\Helpers\SendCommunicationEmail;
 use App\Helpers\TransportSumCalculator;
+use App\Http\Requests\Api\Orders\AcceptReceivingOrderRequest;
 use App\Http\Requests\Api\Orders\DeclineProformRequest;
 use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
 use App\Http\Requests\Api\Orders\StoreOrderRequest;
@@ -717,8 +718,36 @@ class OrdersController extends Controller
 		$order->labels_log .= Order::formatMessage(Auth::user(), $request->description);
 		$order->save();
 		
-		dispatch(new RemoveLabelJob($order->id, [Label::FINAL_CONFIRMATION_SENDED]));
-		dispatch(new AddLabelJob($order->id, [Label::FINAL_CONFIRMATION_DECLINED]));
+		dispatch(new AddLabelJob($order->id, [Label::FINAL_CONFIRMATION_DECLINED, Label::MASTER_MARK]));
+		
+		return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
+	}
+	
+	public function acceptDeliveryInvoiceData($orderId)
+	{
+		if (!($order = $this->orderRepository->find($orderId))) {
+			return [];
+		}
+		
+		dispatch(new AddLabelJob($order->id, [116, 137]));
+		
+		return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
+	}
+	
+	public function acceptReceivingOrder(AcceptReceivingOrderRequest $request, $orderId)
+	{
+		if (!($order = $this->orderRepository->find($orderId))) {
+			return [];
+		}
+		
+		switch($request->invoice_day) {
+			case 'standard':
+				dispatch(new AddLabelJob($order->id, [Label::ORDER_RECEIVED_INVOICE_STANDARD]));
+				break;
+			case 'today':
+				dispatch(new AddLabelJob($order->id, [Label::ORDER_RECEIVED_INVOICE_TODAY]));
+				break;
+		}
 		
 		return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
 	}

@@ -4,6 +4,8 @@ namespace App\Jobs;
 
 use App\Entities\Label;
 use App\Entities\Order;
+use App\Jobs\Orders\SendItemsConstructedMailJob;
+use App\Jobs\Orders\SendItemsRedeemedMailJob;
 use App\Repositories\LabelRepository;
 use App\Repositories\OrderLabelSchedulerAwaitRepository;
 use App\Repositories\OrderLabelSchedulerRepository;
@@ -130,7 +132,9 @@ class AddLabelJob extends Job implements ShouldQueue
                     dispatch_now(new StartCommunicationMailSenderJob($this->order->id, $this->order->customer->login));
                 }
 
-                if($labelId == 50){
+                if($labelId == Label::ORDER_ITEMS_CONSTRUCTED){
+                	dispatch(new SendItemsConstructedMailJob($this->order));
+
                     $tasks = $taskRepository->findByField('order_id',$this->order->id)->all();
                     if(count($tasks) != 0) {
                         foreach ($tasks as $task) {
@@ -141,7 +145,10 @@ class AddLabelJob extends Job implements ShouldQueue
                         }
                     }
                 }
-                if($labelId == 66){
+
+                if($labelId == Label::ORDER_ITEMS_REDEEMED_LABEL){
+	                dispatch(new SendItemsRedeemedMailJob($this->order));
+
                     $tasks = $taskRepository->findByField('order_id',$this->order->id)->all();
 
                     if(count($tasks) != 0) {
