@@ -1,5 +1,8 @@
 /* eslint-disable camelcase */
 
+/**
+ * Obiekt transakcji
+ */
 export interface Transaction {
     id: number,
     registrationInSystemDate: string,
@@ -14,6 +17,9 @@ export interface Transaction {
     transactionNotes: string
 }
 
+/**
+ * Obiekt do utworzenia transakcji
+ */
 export interface CreateTransactionParams {
     id: number | null
     registrationInSystemDate: string,
@@ -28,6 +34,9 @@ export interface CreateTransactionParams {
     transactionNotes: string
 }
 
+/**
+ * Obiekt klienta posiadającego transakcje
+ */
 export interface Customer {
     id: number,
     type: string,
@@ -48,6 +57,9 @@ export interface Customer {
     orderIds: number[]
 }
 
+/**
+ * Store transakcji
+ */
 export interface TransactionsStore {
     error: string,
     isLoading: boolean,

@@ -19,6 +19,11 @@ export default {
         return response.json()
       })
   },
+  /**
+     * Zapis transakcji
+     *
+     * @param params:CreateTransactionParams
+     */
   async storeTransaction (params: CreateTransactionParams): Promise<any> {
     return fetch(getFullUrl('api/transactions'), {
       method: 'POST',
@@ -33,6 +38,11 @@ export default {
         return response.json()
       })
   },
+  /**
+     * Aktualizacja transakcji
+     *
+     * @param params:CreateTransactionParams
+     */
   async updateTransaction (params: CreateTransactionParams): Promise<any> {
     return fetch(getFullUrl('api/transactions/' + params.id), {
       method: 'PUT',
@@ -47,6 +57,11 @@ export default {
         return response.json()
       })
   },
+  /**
+     * Usunięcie transakcji
+     *
+     * @param transaction:Transaction
+     */
   async deleteTransaction (transaction: Transaction): Promise<any> {
     return fetch(getFullUrl('api/transactions/' + transaction.id), {
       method: 'DELETE',
