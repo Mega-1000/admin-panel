@@ -198,17 +198,17 @@ class TransactionsController extends Controller
     /**
      * Usunięcie transakcji
      *
-     * @param integer $id Identyfikator transakcji
+     * @param Transaction $transaction Transakcja
      *
      * @return JsonResponse
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    public function destroy(int $id): JsonResponse
+    public function destroy(Transaction $transaction): JsonResponse
     {
         $response = [];
         try {
-            $result = $this->transactionRepository->delete($id);
+            $result = $this->transactionRepository->delete($transaction->id);
             if ($result) {
                 $response['status'] = 200;
             }

@@ -81,9 +81,6 @@
                 <button class="btn btn-primary" @click="setCustomer(customer)">
                   <span>Transakcje</span>
                 </button>
-                <button class="btn btn-secondary" href="#">
-                  <span>Zamówienia</span>
-                </button>
               </td>
             </tr>
             </tbody>

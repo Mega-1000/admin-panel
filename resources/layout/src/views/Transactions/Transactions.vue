@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { Customer, Transaction } from '@/types/TransactionsTypes'
+import { Customer } from '@/types/TransactionsTypes'
 import CustomersList from '@/components/Transactions/CustomersList.vue'
 import TransactionsList from '@/components/Transactions/TransactionsList.vue'
 import TransactionsForm from '@/components/Transactions/TransactionsForm.vue'
