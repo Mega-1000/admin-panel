@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 
 export interface Customer {
-    id: number | null,
+    id: number,
     nickAllegro: string | null,
     firstName: string | null,
     lastName: string | null,
@@ -13,6 +13,7 @@ export interface Customer {
     postCode: string | null,
     email: string | null,
     phone: string | null,
+    ordersIds: number[] | null,
 }
 
 export interface searchCustomerParams {

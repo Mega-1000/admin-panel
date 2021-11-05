@@ -76,7 +76,7 @@
                     <td>{{ customer.phone }}</td>
                     <td>{{ customer.email }}</td>
                     <td>
-                      <button class="btn btn-small btn-success" @click="$emit('selected',customer.id)">Wybierz
+                      <button class="btn btn-small btn-success" @click="$emit('selected',customer)">Wybierz
                       </button>
                     </td>
                   </tr>

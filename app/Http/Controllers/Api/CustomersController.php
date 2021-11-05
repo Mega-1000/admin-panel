@@ -132,7 +132,9 @@ class CustomersController extends Controller
         try {
             /** @var Builder $query */
             $query = $this->customerRepository
-                ->join('customer_addresses', 'customers.id', '=', 'customer_addresses.customer_id')
+                ->select('orders.id as ordersId', 'customers.*', 'customer_addresses.*')
+                ->leftJoin('customer_addresses', 'customers.id', '=', 'customer_addresses.customer_id')
+                ->leftJoin('orders', 'customers.id', '=', 'orders.id')
                 ->where('customer_addresses.type', '=', 'STANDARD_ADDRESS');
 
             if (!empty($request->get('firstName'))) {
@@ -165,6 +167,7 @@ class CustomersController extends Controller
                             'lastName' => trim($customer->lastname),
                             'phone' => trim($customer->phone),
                             'email' => trim($customer->login),
+                            'ordersIds' => $customer->orders->pluck('id'),
                         ];
                     }
                 } else {
