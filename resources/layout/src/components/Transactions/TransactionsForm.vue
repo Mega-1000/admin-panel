@@ -68,7 +68,7 @@
       </div>
       <div class="row">
         <div class="col-md-6">
-          <div class="form-group" v-if="customer !== null"
+          <div class="form-group"
                :class="[{'has-error': orderId.error===true},{'has-success': orderId.error===false && orderId.value !== ''}]">
             <label for="orderId" class="col-md-5 col-form-label">Identyfikator zamówienia</label>
             <div class="col-md-5">
@@ -79,15 +79,6 @@
                   {{ orderId }}
                 </option>
               </select>
-              <span class="form-control-feedback">{{ orderId.errorMessage }}</span>
-            </div>
-          </div>
-          <div class="form-group" v-else
-               :class="[{'has-error': orderId.error===true},{'has-success': orderId.error===false && orderId.value !== ''}]">
-            <label for="orderIdInput" class="col-md-5 col-form-label">Identyfikator zamówienia</label>
-            <div class="col-md-5">
-              <input type="text" required id="orderIdInput" class="form-control" name="orderIdInput"
-                     v-model="orderId.value">
               <span class="form-control-feedback">{{ orderId.errorMessage }}</span>
             </div>
           </div>
@@ -186,6 +177,7 @@
 <script lang="ts">
 import { Component, Vue, Watch } from 'vue-property-decorator'
 import { CreateTransactionParams, Customer, Transaction } from '@/types/TransactionsTypes'
+import { Customer as SearchedCustomer } from '@/types/CustomersTypes'
 import DatePicker from 'vue2-datepicker'
 import 'vue2-datepicker/index.css'
 import 'vue2-datepicker/locale/pl'
@@ -267,6 +259,8 @@ export default class TransactionsForm extends Vue {
     errorMessage: ''
   }
 
+  private orderIds: number[] | null = []
+
   public get customer (): Customer {
     return this.$store?.getters['TransactionsService/customer']
   }
@@ -281,7 +275,7 @@ export default class TransactionsForm extends Vue {
 
   public get customerIds (): number[] {
     if (this.customer === null) {
-      return []
+      return this.orderIds ?? []
     } else {
       return this.customer.orderIds
     }
@@ -358,8 +352,9 @@ export default class TransactionsForm extends Vue {
     }
   }
 
-  public async selectCustomer (customerId: string) {
-    this.customerId.value = customerId
+  public async selectCustomer (customer: SearchedCustomer) {
+    this.customerId.value = customer.id.toString()
+    this.orderIds = customer.ordersIds ?? []
     this.toggleShowModal()
   }
 
