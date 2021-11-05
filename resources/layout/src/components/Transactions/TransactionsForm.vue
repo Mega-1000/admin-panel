@@ -19,7 +19,7 @@
                :class="[{'has-error': operationKind.error===true},{'has-success': operationKind.error===false && operationKind.value !== ''}]">
             <label for="operationKind" class="col-md-5 col-form-label">Rodzaj operacji</label>
             <div class="col-md-5">
-              <select v-model="operationKind.value" required
+              <select v-model="operationKind.value" required @change="operationValue.value = ''"
                       id="operationKind" class="form-control">
                 <option selected value="">-- wybierz --</option>
                 <option v-for="(operation,index) in operations" :key="index" :value="operation">
@@ -170,7 +170,10 @@
       </div>
       <div class="row">
         <div class="col-md-12 btn-group">
-          <button type="submit" class="btn btn-primary" @click="saveTransaction">Zapisz</button>
+          <button v-if="transaction === null" type="submit" class="btn btn-primary" @click="saveTransaction">Zapisz
+          </button>
+          <button v-else type="submit" class="btn btn-primary" @click="updateTransaction">Zaktualizuj
+          </button>
           <button class="btn btn-default" @click="$emit('back')">Powrót</button>
         </div>
       </div>
@@ -268,6 +271,10 @@ export default class TransactionsForm extends Vue {
     return this.$store?.getters['TransactionsService/customer']
   }
 
+  public get transaction (): Transaction {
+    return this.$store?.getters['TransactionsService/transaction']
+  }
+
   public get error (): string {
     return this.$store.getters['TransactionsService/error']
   }
@@ -282,6 +289,7 @@ export default class TransactionsForm extends Vue {
 
   public async saveTransaction () {
     const params: CreateTransactionParams = {
+      id: null,
       registrationInSystemDate: this.registrationInSystemDate.value,
       registrationInBankDate: this.registrationInBankDate.value,
       paymentId: this.paymentId.value,
@@ -314,6 +322,42 @@ export default class TransactionsForm extends Vue {
     }
   }
 
+  public async updateTransaction () {
+    const params: CreateTransactionParams = {
+      id: this.transaction.id,
+      registrationInSystemDate: this.registrationInSystemDate.value,
+      registrationInBankDate: this.registrationInBankDate.value,
+      paymentId: this.paymentId.value,
+      operationKind: this.operationKind.value,
+      customerId: (this.customer === null) ? parseInt(this.customerId.value) : this.customer.id,
+      orderId: this.orderId.value,
+      operator: this.operator.value,
+      operationValue: this.operationValue.value,
+      accountingNotes: this.accountingNotes.value,
+      transactionNotes: this.transactionNotes.value
+    }
+    const response = await this.$store.dispatch('TransactionsService/updateTransaction', params)
+    if (response.errorCode === 442) {
+      for (const [key, variable] of Object.entries(this.$data)) {
+        if (Object.prototype.hasOwnProperty.call(variable, 'error')) {
+          if (Object.keys(response.errors).includes(key)) {
+            variable.error = true
+            variable.errorMessage = response.errors[key][0]
+          } else if (variable.value === '') {
+            variable.error = null
+            variable.errorMessage = ''
+          } else {
+            variable.error = false
+            variable.errorMessage = ''
+          }
+        }
+      }
+    } else {
+      await this.$store?.dispatch('TransactionsService/setTransaction', null)
+      this.$emit('transactionAdded')
+    }
+  }
+
   public async selectCustomer (customerId: string) {
     this.customerId.value = customerId
     this.toggleShowModal()
@@ -321,6 +365,28 @@ export default class TransactionsForm extends Vue {
 
   public toggleShowModal (): void {
     this.showCustomerSearcher = !this.showCustomerSearcher
+  }
+
+  public async mounted () {
+    if (this.transaction !== null) {
+      this.accountingNotes.value = this.transaction.accountingNotes
+      this.operationKind.value = this.transaction.operationKind
+      this.operationValue.value = this.transaction.operationValue.toString().replace('-', '')
+      this.operator.value = this.transaction.operator
+      this.orderId.value = this.transaction.orderId.toString()
+      this.paymentId.value = this.transaction.paymentId
+      this.registrationInBankDate.value = this.transaction.registrationInBankDate
+      this.registrationInSystemDate.value = this.transaction.registrationInSystemDate
+      this.transactionNotes.value = this.transaction.transactionNotes
+      /**
+       * W wolnej chwili do modyfikacji
+       */
+      // for (const [key, variable] of Object.entries(this.$data)) {
+      //   if (Object.prototype.hasOwnProperty.call(variable, 'value')) {
+      //     variable.value = Object.entries(this.transaction)[key]
+      //   }
+      // }
+    }
   }
 }
 </script>

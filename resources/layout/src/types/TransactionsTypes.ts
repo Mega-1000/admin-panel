@@ -8,13 +8,14 @@ export interface Transaction {
     operationKind: string,
     orderId: number,
     operator: string,
-    operation_value: number,
+    operationValue: number,
     balance: number,
-    accounting_notes: string,
-    transaction_notes: string
+    accountingNotes: string,
+    transactionNotes: string
 }
 
 export interface CreateTransactionParams {
+    id: number | null
     registrationInSystemDate: string,
     registrationInBankDate: string,
     paymentId: string,
@@ -51,7 +52,8 @@ export interface TransactionsStore {
     error: string,
     isLoading: boolean,
     customers: Customer[] | null,
-    customer: Customer | null
+    customer: Customer | null,
+    transaction: Transaction | null,
 }
 
 /* eslint-enabled camelcase */

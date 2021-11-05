@@ -1,7 +1,7 @@
 <template>
   <div class="v-transactions">
     <customers-list v-if="customer==null && !transactionForm" @add="transactionForm = true"></customers-list>
-    <transactions-list @back="back" @add="transactionForm = true"
+    <transactions-list @back="back" @add="transactionForm = true" @edit="edit"
                        v-if="customer !== null && !transactionForm"></transactions-list>
     <transactions-form v-if="transactionForm" @transactionAdded="transactionAdded"
                        @back="transactionForm=false"></transactions-form>
@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { Customer } from '@/types/TransactionsTypes'
+import { Customer, Transaction } from '@/types/TransactionsTypes'
 import CustomersList from '@/components/Transactions/CustomersList.vue'
 import TransactionsList from '@/components/Transactions/TransactionsList.vue'
 import TransactionsForm from '@/components/Transactions/TransactionsForm.vue'
@@ -36,8 +36,13 @@ export default class Transactions extends Vue {
 
   public async back (): Promise<void> {
     await this.$store?.dispatch('TransactionsService/setCustomer', null)
+    await this.$store?.dispatch('TransactionsService/setTransaction', null)
     localStorage.removeItem('customer')
     await this.load()
+  }
+
+  public async edit (): Promise<void> {
+    this.transactionForm = true
   }
 
   public async transactionAdded (): Promise<void> {
