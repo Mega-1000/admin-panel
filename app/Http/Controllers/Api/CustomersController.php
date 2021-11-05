@@ -119,7 +119,7 @@ class CustomersController extends Controller
     }
 
     /**
-     *
+     * Zwraca klientów do wyszukiwarki
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -172,22 +172,22 @@ class CustomersController extends Controller
                     }
                 } else {
                     $response = [
-                        'error_code' => 423,
-                        'error_message' => 'Zbyt duża ilość wyników. Wpisz dodatkowe dane.',
+                        'errorCode' => 423,
+                        'errorMessage' => 'Zbyt duża ilość wyników. Wpisz dodatkowe dane.',
                         'customers' => []
                     ];
                 }
             } else {
                 $response = [
-                    'error_code' => 424,
-                    'error_message' => 'Brak klientów',
+                    'errorCode' => 424,
+                    'errorMessage' => 'Brak klientów',
                     'customers' => []
                 ];
             }
         } catch (\Exception $exception) {
             $response = [
-                'error_code' => $exception->getCode(),
-                'error_message' => $exception->getMessage()
+                'errorCode' => $exception->getCode(),
+                'errorMessage' => $exception->getMessage()
             ];
         }
         return response()->json($response);

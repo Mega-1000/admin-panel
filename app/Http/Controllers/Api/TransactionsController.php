@@ -6,6 +6,7 @@ use App\Entities\Customer;
 use App\Entities\Transaction;
 use App\Http\Controllers\Controller;
 use App\Repositories\TransactionRepository;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -27,7 +28,14 @@ class TransactionsController extends Controller
         $this->transactionRepository = $transactionRepository;
     }
 
-    public function index()
+    /**
+     * Zwraca klientów z transakcjami
+     *
+     * @return JsonResponse
+     *
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    public function index(): JsonResponse
     {
         $response = [];
         try {
@@ -57,20 +65,28 @@ class TransactionsController extends Controller
                 }
             } else {
                 $response = [
-                    'error_code' => 505,
-                    'error_message' => 'Brak transakcji'
+                    'errorCode' => 424,
+                    'errorMessage' => 'Brak transakcji'
                 ];
             }
         } catch (\Exception $exception) {
             $response = [
-                'error_code' => $exception->getCode(),
-                'error_message' => $exception->getMessage()
+                'errorCode' => $exception->getCode(),
+                'errorMessage' => $exception->getMessage()
             ];
         }
         return response()->json($response);
     }
 
-    public function store(Request $request)
+    /**
+     * Zapis nowej transakcji
+     *
+     * @param Request $request
+     * @return JsonResponse
+     *
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    public function store(Request $request): JsonResponse
     {
         $validator = Validator::make(
             $request->all(),
@@ -107,7 +123,7 @@ class TransactionsController extends Controller
                 'accounting_notes' => $request->get('accountingNotes'),
                 'transaction_notes' => $request->get('transactionNotes'),
             ]);
-            return response()->json(['success' => 'Added new records.']);
+            return response()->json(['success' => 'Transakcja została zapisana.']);
         } else {
             return response()->json(
                 [
@@ -119,7 +135,16 @@ class TransactionsController extends Controller
         }
     }
 
-    public function update(Transaction $transaction, Request $request)
+    /**
+     * Aktualizacja transakcji
+     *
+     * @param Transaction $transaction Transakcja
+     * @param Request     $request Request
+     * @return JsonResponse
+     *
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    public function update(Transaction $transaction, Request $request): JsonResponse
     {
         $validator = Validator::make(
             $request->all(),
@@ -134,10 +159,12 @@ class TransactionsController extends Controller
                         'Uznanie'
                     ]
                 ) ? '+' : '-')) . $request->get('operationValue');
+
             $balance = $this->transactionRepository->findWhere([
                 ['customer_id', '=', $request->get('customerId')]
             ])->last()->balance;
-            if ( (int)$transaction->operation_value < 0) {
+
+            if ((int)$transaction->operation_value < 0) {
                 $oldBalance = (int)$balance + abs((int)$transaction->operation_value);
             } else {
                 $oldBalance = (int)$balance - (int)$transaction->operation_value;
@@ -156,7 +183,7 @@ class TransactionsController extends Controller
                 'accounting_notes' => $request->get('accountingNotes'),
                 'transaction_notes' => $request->get('transactionNotes'),
             ]);
-            return response()->json(['success' => 'Added new records.']);
+            return response()->json(['success' => 'Transakcja została zaktualizowana.']);
         } else {
             return response()->json(
                 [
@@ -171,13 +198,13 @@ class TransactionsController extends Controller
     /**
      * Usunięcie transakcji
      *
-     * @param $id
+     * @param integer $id Identyfikator transakcji
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
         $response = [];
         try {
@@ -187,11 +214,12 @@ class TransactionsController extends Controller
             }
         } catch (\Exception $exception) {
             $response = [
-                'status' => 500,
-                'error' => $exception->getMessage()
+                'status' => 424,
+                'errorCode' => $exception->getCode(),
+                'errorMessage' => $exception->getMessage()
             ];
         }
-        return response()->json($response);
+        return response()->json($response, $response['status']);
     }
 
     /**
