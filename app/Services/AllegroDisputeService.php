@@ -79,7 +79,7 @@ class AllegroDisputeService extends AllegroApiService
     {
         $url = $this->getRestUrl("/sale/disputes/{$id}");
 	    if (!($response = $this->request('GET', $url, []))) {
-		    return false;
+		    return [];
 	    }
         return $response;
     }

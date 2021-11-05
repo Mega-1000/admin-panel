@@ -2,6 +2,7 @@
 
 use App\Entities\Allegro_Auth;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Log;
 
 class AllegroApiService
 {
@@ -132,6 +133,7 @@ class AllegroApiService
 	protected function request(string $method, string $url, array $params, $attachment = null, $first = true)
 	{
 		if (!$this->getAccessToken()) {
+			Log::error('AllegroApiService: acces token not found');
 			return false;
 		}
 		
@@ -164,6 +166,7 @@ class AllegroApiService
 				}
 				return $response = $this->request($method, $url, $params, $attachment, false);
 			} else {
+				Log::error('AllegroApiService: request: ' . $e->getMessage());
 				return $this->cantGetAlert();
 			}
 		}
@@ -221,6 +224,7 @@ class AllegroApiService
 	private function cantGetAlert(): bool
 	{
 		// what should we do in this case?
+		Log::error('AllegroApiService: request error.');
 		return false;
 	}
 }
