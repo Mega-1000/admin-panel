@@ -6,6 +6,11 @@ import { getFullUrl } from '@/helpers/urls'
 import { searchCustomerParams } from '@/types/CustomersTypes'
 
 export default {
+  /**
+     * Pobranie klientów według parametrów
+     *
+     * @param params
+     */
   async getCustomers (params: searchCustomerParams): Promise<any> {
     return fetch(getFullUrl('api/customers/getCustomers'), {
       method: 'POST',

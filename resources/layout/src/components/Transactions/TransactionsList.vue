@@ -57,7 +57,7 @@
               <th scope="col">Identyfikator zamówienia</th>
               <th scope="col">Operator płatności</th>
               <th scope="col">Wartość operacji</th>
-              <th scope="col">Saldo</th>
+              <th scope="col">Saldo po operacji</th>
               <th scope="col">Notatki księgowe</th>
               <th scope="col">Notatki transakcyjne</th>
               <th scope="col" class="text-center">Akcje</th>

@@ -1,5 +1,8 @@
 /* eslint-disable camelcase */
 
+/**
+ * Obiekt klienta
+ */
 export interface Customer {
     id: number,
     nickAllegro: string | null,
@@ -16,6 +19,9 @@ export interface Customer {
     ordersIds: number[] | null,
 }
 
+/**
+ * Parametry do wyszukiwania klienta
+ */
 export interface searchCustomerParams {
     firstName: string | null,
     lastName: string | null,
@@ -24,6 +30,9 @@ export interface searchCustomerParams {
     nickAllegro: string | null,
 }
 
+/**
+ * Store klienta
+ */
 export interface CustomersStore {
     error: string,
     isLoading: boolean,
