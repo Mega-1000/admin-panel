@@ -119,7 +119,7 @@ class EmailTagHandlerHelper
                 $content .= "<td>";
                     $content .= "<b>Nazwa:</b> {$item->product->name}<br>";
                     $content .= "<b>Symbol:</b> {$item->product->symbol}<br>";
-                    $content .= "<b>Ilość:</b> {$item->quantity}, <b>Cena jednostkowa netto:</b> {$item->net_selling_price_commercial_unit} / {$item->product->packing->calciation_unit}<br>";
+                    $content .= "<b>Ilość:</b> {$item->quantity}, <b>Cena jednostkowa netto:</b> {$item->net_selling_price_commercial_unit} / {$item->product->packing->calculation_unit}<br>";
                     $content .= "<b>Wartość:</b> " . $item->quantity * $item->net_selling_price_commercial_unit . " Netto";
                 $content .= "</td>";
             $content .= "</tr>";
@@ -319,7 +319,7 @@ class EmailTagHandlerHelper
 	public function addressFormLink() {
 		return rtrim(env('FRONT_NUXT_URL'),"/") . "/zamowienie/mozliwe-do-realizacji/brak-danych/{$this->order->id}";
 	}
-	
+
 	//[LINK-DO-FORMULARZA-NIEZGODNOSCI]
 	public function declineProformFormLink() {
 		return rtrim(env('FRONT_NUXT_URL'),"/") . "/zamowienie/niezgodnosc-w-proformie/{$this->order->id}";
