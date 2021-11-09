@@ -5,7 +5,7 @@
                 class="wz__image"/></td>
     <td class="wz__container"><span
                 class="wz__description">{{ $item->name }}</span><br/>symbol: {{ $item->symbol }}
-        <br/>Ilość: <span class="quantity">{{ $quantity }} {{ $item->packing->calciation_unit }}</span><br/>
+        <br/>Ilość: <span class="quantity">{{ $quantity }} {{ $item->packing->calculation_unit }}</span><br/>
         @if($orderItem->packet)
             Pobrane z pakietu {{ $orderItem->packet->packet_name }}: <span class="quantity">{{ $orderItem->packet->packet_product_quantity }}</span>
             <br>
