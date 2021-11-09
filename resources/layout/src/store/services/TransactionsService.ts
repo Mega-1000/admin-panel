@@ -42,14 +42,14 @@ const actions = {
       .getTransactions()
       .then((data: any) => {
         commit(TRANSACTIONS_SET_IS_LOADING, false)
-        if (data.error_code) {
-          commit(TRANSACTIONS_SET_ERROR, data.error_message)
+        if (data.errorCode) {
+          commit(TRANSACTIONS_SET_ERROR, data.errorMessage)
         }
         commit(TRANSACTIONS_SET_ALL, data.customers)
         return data.customers
       })
       .catch((error: any) => {
-        commit(TRANSACTIONS_SET_ERROR, error.message)
+        commit(TRANSACTIONS_SET_ERROR, error.errorMessage)
       })
   },
   setCustomer ({ commit }: any, customer: Customer) {
@@ -75,7 +75,7 @@ const actions = {
         return data
       })
       .catch((error: any) => {
-        commit(TRANSACTIONS_SET_ERROR, error.message)
+        commit(TRANSACTIONS_SET_ERROR, error.errorMessage)
       })
   },
   updateTransaction ({ commit }: any, params: CreateTransactionParams) {
@@ -91,7 +91,7 @@ const actions = {
         return data
       })
       .catch((error: any) => {
-        commit(TRANSACTIONS_SET_ERROR, error.message)
+        commit(TRANSACTIONS_SET_ERROR, error.errorMessage)
       })
   },
   delete ({ commit }: any, transaction: Transaction) {
@@ -109,7 +109,7 @@ const actions = {
         return data
       })
       .catch((error: any) => {
-        commit(TRANSACTIONS_SET_ERROR, error.message)
+        commit(TRANSACTIONS_SET_ERROR, error.errorMessage)
       })
   }
 }

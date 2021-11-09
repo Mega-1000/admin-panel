@@ -1,7 +1,10 @@
 /* eslint-disable camelcase */
 
+/**
+ * Obiekt klienta
+ */
 export interface Customer {
-    id: number | null,
+    id: number,
     nickAllegro: string | null,
     firstName: string | null,
     lastName: string | null,
@@ -13,8 +16,12 @@ export interface Customer {
     postCode: string | null,
     email: string | null,
     phone: string | null,
+    ordersIds: number[] | null,
 }
 
+/**
+ * Parametry do wyszukiwania klienta
+ */
 export interface searchCustomerParams {
     firstName: string | null,
     lastName: string | null,
@@ -23,6 +30,9 @@ export interface searchCustomerParams {
     nickAllegro: string | null,
 }
 
+/**
+ * Store klienta
+ */
 export interface CustomersStore {
     error: string,
     isLoading: boolean,

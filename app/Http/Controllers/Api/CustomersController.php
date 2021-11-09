@@ -119,7 +119,7 @@ class CustomersController extends Controller
     }
 
     /**
-     *
+     * Zwraca klientów do wyszukiwarki
      *
      * @param Request $request
      * @return \Illuminate\Http\JsonResponse
@@ -132,7 +132,21 @@ class CustomersController extends Controller
         try {
             /** @var Builder $query */
             $query = $this->customerRepository
-                ->join('customer_addresses', 'customers.id', '=', 'customer_addresses.customer_id')
+                ->select(
+                    'customers.id',
+                    'customers.nick_allegro',
+                    'customer_addresses.firstname',
+                    'customer_addresses.lastname',
+                    'customer_addresses.firmname',
+                    'customer_addresses.nip',
+                    'customer_addresses.address',
+                    'customer_addresses.flat_number',
+                    'customer_addresses.city',
+                    'customer_addresses.postal_code',
+                    'customer_addresses.email',
+                    'customer_addresses.phone',
+                )
+                ->leftJoin('customer_addresses', 'customers.id', '=', 'customer_addresses.customer_id')
                 ->where('customer_addresses.type', '=', 'STANDARD_ADDRESS');
 
             if (!empty($request->get('firstName'))) {
@@ -150,7 +164,7 @@ class CustomersController extends Controller
             if (!empty($request->get('email'))) {
                 $query->where('login', 'like', $request->get('email') . '%');
             }
-
+//dump($query->toSql());exit;
             $result = $query->get();
 
             if (!empty($result->all())) {
@@ -165,26 +179,27 @@ class CustomersController extends Controller
                             'lastName' => trim($customer->lastname),
                             'phone' => trim($customer->phone),
                             'email' => trim($customer->login),
+                            'ordersIds' => $customer->orders->pluck('id'),
                         ];
                     }
                 } else {
                     $response = [
-                        'error_code' => 423,
-                        'error_message' => 'Zbyt duża ilość wyników. Wpisz dodatkowe dane.',
+                        'errorCode' => 423,
+                        'errorMessage' => 'Zbyt duża ilość wyników. Wpisz dodatkowe dane.',
                         'customers' => []
                     ];
                 }
             } else {
                 $response = [
-                    'error_code' => 424,
-                    'error_message' => 'Brak klientów',
+                    'errorCode' => 424,
+                    'errorMessage' => 'Brak klientów',
                     'customers' => []
                 ];
             }
         } catch (\Exception $exception) {
             $response = [
-                'error_code' => $exception->getCode(),
-                'error_message' => $exception->getMessage()
+                'errorCode' => $exception->getCode(),
+                'errorMessage' => $exception->getMessage()
             ];
         }
         return response()->json($response);

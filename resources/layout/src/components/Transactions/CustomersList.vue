@@ -1,12 +1,15 @@
 <template>
   <div class="c-customersList ">
     <div class="row">
-      <div class="col-sm-10">
+      <div class="col-sm-5">
         <h4>Formularz wyszukiwania</h4>
       </div>
-      <div class="col-sm-2">
-        <button class="btn btn-success float-right" @click="$emit('add')"><i class="voyager-plus"></i> Dodaj
+      <div class="col-sm-7 buttons">
+        <button class="btn btn-success float-right ml-2" @click="$emit('add')"><i class="voyager-plus"></i> Dodaj
           Transakcje
+        </button>
+        <button class="btn btn-secondary float-right" @click="$emit('import')"><i class="voyager-file-text"></i>
+          Import
         </button>
       </div>
     </div>
@@ -81,9 +84,6 @@
                 <button class="btn btn-primary" @click="setCustomer(customer)">
                   <span>Transakcje</span>
                 </button>
-                <button class="btn btn-secondary" href="#">
-                  <span>Zamówienia</span>
-                </button>
               </td>
             </tr>
             </tbody>
@@ -151,4 +151,10 @@ export default class CustomersList extends Vue {
 </script>
 <style scoped lang="scss">
   @import "@/assets/styles/main";
+
+  .buttons {
+    button {
+      margin: 0.25rem 0.125rem;
+    }
+  }
 </style>

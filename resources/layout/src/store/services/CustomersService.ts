@@ -36,8 +36,8 @@ const actions = {
       .getCustomers(params)
       .then((data: any) => {
         commit(CUSTOMERS_SET_IS_LOADING, false)
-        if (data.error_code) {
-          commit(CUSTOMERS_SET_ERROR, data.error_message)
+        if (data.errorCode) {
+          commit(CUSTOMERS_SET_ERROR, data.errorMessage)
         } else {
           commit(CUSTOMERS_SET_ERROR, '')
         }
