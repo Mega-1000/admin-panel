@@ -601,11 +601,11 @@ class przesylkaZagranicznaType
     public $kraj; // string
 }
 
-class przesylkaRejestrowanaType
+class przesylkaRejestrowanaType extends przesylkaType
 {
-    public $adres; // adresType
-    public $nadawca; // adresType
-    public $numerNadania; // numerNadaniaType
+    protected adresType $adres; // adresType
+    public adresType $nadawca; // adresType
+    public adresType $numerNadania; // numerNadaniaType
 }
 
 class przesylkaNieRejestrowanaType
@@ -617,17 +617,18 @@ class anonymous94
 {
 }
 
-class przesylkaBiznesowaType
-{
-    public $pobranie; // pobranieType
-    public $urzadWydaniaEPrzesylki; // urzadWydaniaEPrzesylkiType
-    public $subPrzesylka; // subPrzesylkaBiznesowaType
-    public $ubezpieczenie; // ubezpieczenieType
-    public $masa; // masaType
-    public $gabaryt; // gabarytBiznesowaType
-    public $wartosc; // wartoscType
-    public $ostroznie; // boolean
-}
+//class przesylkaBiznesowaType
+//{
+//    protected $zasadySpecjalne;
+//    public $pobranie; // pobranieType
+//    public $urzadWydaniaEPrzesylki; // urzadWydaniaEPrzesylkiType
+//    public $subPrzesylka; // subPrzesylkaBiznesowaType
+//    public $ubezpieczenie; // ubezpieczenieType
+//    public $masa; // masaType
+//    public $gabaryt; // gabarytBiznesowaType
+//    public $wartosc; // wartoscType
+//    public $ostroznie; // boolean
+//}
 
 class gabarytBiznesowaType
 {
@@ -2635,11 +2636,18 @@ class ElektronicznyNadawca extends SoapClient {
 
         foreach (self::$classmap as $key => $value) {
             if (!isset($options['classmap'][$key])) {
-                $options['classmap'][$key] = '\App\Integrations\Pocztex'.'\\'.$value;
+                $options['classmap'][$key] = '\App\Integrations\Pocztex' . '\\' . $value;
             }
         }
-        $options["login"] = 'ebudownictwo@wp.pl';
-        $options["password"] = 'Mega201909';
+
+        if (empty($options['login'])) {
+            $options["login"] = 'ebudownictwo@wp.pl';
+        }
+
+        if (empty($options['password'])) {
+            $options["password"] = 'Mega201909';
+        }
+
         $options["trace"] = 1;
 
         parent::__construct($wsdl, $options);

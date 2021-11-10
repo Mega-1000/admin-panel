@@ -17,6 +17,7 @@ use App\Integrations\Pocztex\ElektronicznyNadawca;
 use App\Integrations\Pocztex\sendEnvelope;
 use App\Mail\SendLPToTheWarehouseAfterOrderCourierMail;
 use App\Repositories\OrderPackageRepository;
+use App\Traits\Pocztex;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Session;
@@ -30,7 +31,7 @@ use romanzipp\QueueMonitor\Traits\IsMonitored;
  */
 class OrdersCourierJobs extends Job implements ShouldQueue
 {
-    use IsMonitored;
+    use IsMonitored, Pocztex;
 
     /**
      *
@@ -526,56 +527,26 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         }
     }
 
+    private function createPackageForKurier48()
+    {
+        $integration = new ElektronicznyNadawca();
+        $integration->clearEnvelope(new clearEnvelope());
+        $shipment = new addShipment();
+
+        $dom = new \DOMDocument("1.0", "utf-8");
+        $dom->preserveWhiteSpace = false;
+        $dom->formatOutput = true;
+    }
+
     /**
      * @return array
      */
     public function createPackageForPocztex()
     {
 
-        $xml = '<tns:addShipment xmlns:tns="http://e-nadawca.poczta-polska.pl">';
         $integration = new ElektronicznyNadawca();
         $integration->clearEnvelope(new clearEnvelope());
-        $xml .= '<przesylki';
-        $xml .= ' zawartosc = "' . $this->data['content'] . '"';
         $shipment = new addShipment();
-
-        $address = new adresType();
-
-        $address->nazwa = $this->data['delivery_address']['firstname'];
-        $address->nazwa2 = $this->data['delivery_address']['lastname'];
-        $address->ulica = $this->data['delivery_address']['address'];
-        $address->numerDomu = $this->data['delivery_address']['flat_number'];
-        $address->miejscowosc = $this->data['delivery_address']['city'];
-        $address->kodPocztowy = $this->data['delivery_address']['postal_code'];
-        $address->telefon = $this->data['delivery_address']['phone'];
-        $address->email = $this->data['delivery_address']['email'];
-        $address->osobaKontaktowa = $this->data['delivery_address']['firstname'] . ' ' . $this->data['delivery_address']['lastname'];
-        $xml .= '<adres';
-        foreach ($address as $key => $value) {
-            $xml .= ' ' . $key . ' = "' . $value . '';
-        }
-        $xml .= '/>';
-        $xml .= '</przesylki>';
-        $soapXML = new \SoapVar($xml, XSD_STRING);
-        //   $integration->__call('addShipment', $soapXML);
-        //     Log::debug($integration->__getLastRequest());
-
-        //      $package->miejsceDoreczenia = $address;
-        $pickupAddress = new adresType();
-
-        $pickupAddress->nazwa = $this->data['pickup_address']['firstname'];
-        $pickupAddress->nazwa2 = $this->data['pickup_address']['lastname'];
-        $pickupAddress->ulica = $this->data['pickup_address']['address'];
-        $pickupAddress->numerDomu = $this->data['pickup_address']['flat_number'];
-        $pickupAddress->miejscowosc = $this->data['pickup_address']['city'];
-        $pickupAddress->kodPocztowy = $this->data['pickup_address']['postal_code'];
-        $pickupAddress->telefon = $this->data['pickup_address']['phone'];
-        $pickupAddress->email = $this->data['pickup_address']['email'];
-        $pickupAddress->kraj = 'Polska';
-        $pickupAddress->osobaKontaktowa = $this->data['pickup_address']['firstname'] . ' ' . $this->data['pickup_address']['lastname'];
-
-        $tag['guid'] = $this->getGuid();
-        $tag['_'] = '';
 
         $dom = new \DOMDocument("1.0", "utf-8");
         $dom->preserveWhiteSpace = false;
@@ -735,35 +706,35 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         $shipment->przesylki[] = new \SoapVar($dom->saveXML($dom->documentElement), XSD_ANYXML);
         $sendingNumber = $integration->addShipment($shipment);
 
-        $eSender = new ElektronicznyNadawca();
-        $send = new sendEnvelope();
-        $idSend = $eSender->sendEnvelope($send);
-        $param = new \App\Integrations\Pocztex\getAddresLabelCompact();
-        $param->idEnvelope = $idSend->idEnvelope;
-        $retval = $eSender->getAddresLabelCompact($param);
-        if ($idSend->idEnvelope !== false) {
-            Storage::disk('local')->put('public/pocztex/protocols/protocol' . $idSend->idEnvelope . '.pdf',
-                $retval->pdfContent);
-            $parser = new \Smalot\PdfParser\Parser();
-            $pdf = $parser->parseFile(storage_path() . '/app/public/pocztex/protocols/protocol' . $idSend->idEnvelope . '.pdf');
-            $text = $pdf->getText();
-            preg_match('/(?:(?<!\d)\d{20}(?!\d))/', $text, $matches);
-            $letter_number = $matches[0];
-        } else {
-            Session::put('message', $idSend);
-            Session::put('message', $retval);
-            \Log::info(
-                'Problem in Pocztex integration',
-                ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
-            );
-            die();
-        }
-        return [
-            'status' => 200,
-            'error_code' => 0,
-            'sending_number' => $idSend->idEnvelope,
-            'letter_number' => $letter_number,
-        ];
+//        $eSender = new ElektronicznyNadawca();
+//        $send = new sendEnvelope();
+//        $idSend = $eSender->sendEnvelope($send);
+//        $param = new \App\Integrations\Pocztex\getAddresLabelCompact();
+//        $param->idEnvelope = $idSend->idEnvelope;
+//        $retval = $eSender->getAddresLabelCompact($param);
+//        if ($idSend->idEnvelope !== false) {
+//            Storage::disk('local')->put('public/pocztex/protocols/protocol' . $idSend->idEnvelope . '.pdf',
+//                $retval->pdfContent);
+//            $parser = new \Smalot\PdfParser\Parser();
+//            $pdf = $parser->parseFile(storage_path() . '/app/public/pocztex/protocols/protocol' . $idSend->idEnvelope . '.pdf');
+//            $text = $pdf->getText();
+//            preg_match('/(?:(?<!\d)\d{20}(?!\d))/', $text, $matches);
+//            $letter_number = $matches[0];
+//        } else {
+//            Session::put('message', $idSend);
+//            Session::put('message', $retval);
+//            \Log::info(
+//                'Problem in Pocztex integration',
+//                ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
+//            );
+//            die();
+//        }
+//        return [
+//            'status' => 200,
+//            'error_code' => 0,
+//            'sending_number' => $idSend->idEnvelope,
+//            'letter_number' => $letter_number,
+//        ];
     }
 
     public function getGuid()

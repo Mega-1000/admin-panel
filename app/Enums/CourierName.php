@@ -13,6 +13,7 @@ final class CourierName extends Enum
     const DPD = 'DPD';
     const APACZKA = 'APACZKA';
     const POCZTEX = 'POCZTEX';
+    const KURIER48 = 'KURIER48';
     const JAS = 'JAS';
     const GLS = 'GLS';
     const ODBIOR_OSOBISTY = 'ODBIOR_OSOBISTY';
