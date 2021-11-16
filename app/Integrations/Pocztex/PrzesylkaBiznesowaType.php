@@ -8,7 +8,7 @@ namespace App\Integrations\Pocztex;
  *
  * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
  */
-final class PrzesylkaBiznesowaType extends przesylkaRejestrowanaType
+final class PrzesylkaBiznesowaType extends PrzesylkaRejestrowanaType
 {
     /**
      * Atrybut opcjonalny, przeznaczony do uzupełniania dla Klientów nadających
@@ -29,9 +29,9 @@ final class PrzesylkaBiznesowaType extends przesylkaRejestrowanaType
     /**
      * Określa gabaryt przesyłki. Dopuszczalne wartości to: XS, S, M, L, XL, XXL.
      *
-     * @var gabarytBiznesowaType
+     * @var string
      */
-    protected gabarytBiznesowaType $gabaryt;
+    protected string $gabaryt;
 
     /**
      * TRUE jeżeli przesyłka niestandardowa. Za przesyłkę niestandardową uważa się przesyłkę
@@ -64,17 +64,17 @@ final class PrzesylkaBiznesowaType extends przesylkaRejestrowanaType
     /**
      * Numer transakcji
      *
-     * @var int
+     * @var integer|null
      */
-    protected int $numerTransakcjiOdbioru;
+    protected ?int $numerTransakcjiOdbioru;
 
     /**
      * Element typu pobranieType. Opisujący pobranie. Jedynym możliwym sposobem pobrania dla tego typu
      * przesyłki to wpłata na rachunek bankowy.
      *
-     * @var pobranieType
+     * @var pobranieType|null
      */
-    protected pobranieType $pobranie;
+    protected ?pobranieType $pobranie;
 
     /**
      * Określenie, w jakim urzędzie ma zostać odebrana przesyłka.
@@ -87,32 +87,32 @@ final class PrzesylkaBiznesowaType extends przesylkaRejestrowanaType
     /**
      * Elementy typu subPrzesylkaBiznesowaType (minimalna ilość wystąpień 4).
      *
-     * @var subPrzesylkaBiznesowaType
+     * @var subPrzesylkaBiznesowaType[]|null
      */
-    protected subPrzesylkaBiznesowaType $subPrzesylka;
+    protected ?array $subPrzesylka;
 
     /**
      * Element typu ubezpieczenieType określający rodzaj ubezpieczenia przesyłki.
      *
-     * @var ubezpieczenieType
+     * @var ubezpieczenieType|null
      */
-    protected ubezpieczenieType $ubezpieczenie;
+    protected ?ubezpieczenieType $ubezpieczenie;
 
     /**
      * Określenie usługi komplementarnej EPO. Należy przekazać element zgodny z interfejsem EPOType,
      * obecnie możliwe są dwa typy EPOSimpleType lub EPOExtendedType. Atrybut występuje tylko w przypadku
      * podpisanej umowy na EPO do paczki pocztowej
      *
-     * @var EPOType
+     * @var EPOType|null
      */
-    protected EPOType $epo;
+    protected ?EPOType $epo;
 
     /**
      * Element zawierający adres na który zostanie zwrócona przesyłka w przypadku nieodebrania przez adresata (zwrot przesyłki).
      *
-     * @var adresType
+     * @var adresType|null
      */
-    protected adresType $adresDlaZwrotu;
+    protected ?adresType $adresDlaZwrotu;
 
     /**
      * Określa usługę komplementarną Sprawdzenie zawartości przez odbiorcę
@@ -124,25 +124,88 @@ final class PrzesylkaBiznesowaType extends przesylkaRejestrowanaType
     /**
      * Określa usługę komplementarną Potwierdzenie odbioru.
      *
-     * @var PotwierdzenieOdbioruBiznesowaType
+     * @var PotwierdzenieOdbioruBiznesowaType|null
      */
-    protected PotwierdzenieOdbioruBiznesowaType $potwierdzenieOdbioru;
+    protected ?PotwierdzenieOdbioruBiznesowaType $potwierdzenieOdbioru;
 
     /**
      * Określa usługę komplementarne dotyczące doręczenia przesyłki
      *
-     * @var PotwierdzenieOdbioruBiznesowaType
+     * @var PotwierdzenieOdbioruBiznesowaType|null
      */
-    protected PotwierdzenieOdbioruBiznesowaType $doreczenie;
+    protected ?PotwierdzenieOdbioruBiznesowaType $doreczenie;
 
     /**
      * Określa usługę komplementarną Dokumenty zwrotne
      *
-     * @var ZwrotDokumentowBiznesowaType
+     * @var ZwrotDokumentowBiznesowaType|null
      */
-    protected ZwrotDokumentowBiznesowaType $zwrotDokumentow;
+    protected ?ZwrotDokumentowBiznesowaType $zwrotDokumentow;
 
-
+    /**
+     * PrzesylkaBiznesowaType constructor.
+     *
+     * @param integer                                $masa
+     * @param string                                 $gabaryt
+     * @param boolean                                $niestandardowa
+     * @param integer                                $wartosc
+     * @param boolean                                $ostroznie
+     * @param adresType                              $adresType
+     * @param zasadySpecjalneEnum|null               $zasadySpecjalne
+     * @param integer|null                           $numerTransakcjiOdbioru
+     * @param pobranieType|null                      $pobranie
+     * @param placowkaPocztowaType|null              $urzadWydaniaEPrzesylki
+     * @param subPrzesylkaBiznesowaType[]            $subPrzesylka
+     * @param ubezpieczenieType|null                 $ubezpieczenie
+     * @param EPOType|null                           $epo
+     * @param adresType|null                         $adresDlaZwrotu
+     * @param boolean                                $sprawdzenieZawartosciPrzesylkiPrzezOdbiorce
+     * @param PotwierdzenieOdbioruBiznesowaType|null $potwierdzenieOdbioru
+     * @param PotwierdzenieOdbioruBiznesowaType|null $doreczenie
+     * @param ZwrotDokumentowBiznesowaType|null      $zwrotDokumentow
+     * @param string|null                            $guid
+     */
+    public function __construct(
+        int $masa,
+        string $gabaryt,
+        bool $niestandardowa,
+        int $wartosc,
+        bool $ostroznie,
+        adresType $adresType,
+        ?zasadySpecjalneEnum $zasadySpecjalne,
+        ?int $numerTransakcjiOdbioru = null,
+        ?pobranieType $pobranie = null,
+        ?placowkaPocztowaType $urzadWydaniaEPrzesylki = null,
+        ?array $subPrzesylka = null,
+        ?ubezpieczenieType $ubezpieczenie = null,
+        ?EPOType $epo = null,
+        ?adresType $adresDlaZwrotu = null,
+        bool $sprawdzenieZawartosciPrzesylkiPrzezOdbiorce = false,
+        ?PotwierdzenieOdbioruBiznesowaType $potwierdzenieOdbioru = null,
+        ?PotwierdzenieOdbioruBiznesowaType $doreczenie = null,
+        ?ZwrotDokumentowBiznesowaType $zwrotDokumentow = null,
+        ?string $guid = null
+    )
+    {
+        $this->zasadySpecjalne = $zasadySpecjalne;
+        $this->masa = $masa;
+        $this->gabaryt = $gabaryt;
+        $this->niestandardowa = $niestandardowa;
+        $this->wartosc = $wartosc;
+        $this->ostroznie = $ostroznie;
+        $this->numerTransakcjiOdbioru = $numerTransakcjiOdbioru;
+        $this->pobranie = $pobranie;
+        $this->urzadWydaniaEPrzesylki = $urzadWydaniaEPrzesylki;
+        $this->subPrzesylka = $subPrzesylka;
+        $this->ubezpieczenie = $ubezpieczenie;
+        $this->epo = $epo;
+        $this->adresDlaZwrotu = $adresDlaZwrotu;
+        $this->sprawdzenieZawartosciPrzesylkiPrzezOdbiorce = $sprawdzenieZawartosciPrzesylkiPrzezOdbiorce;
+        $this->potwierdzenieOdbioru = $potwierdzenieOdbioru;
+        $this->doreczenie = $doreczenie;
+        $this->zwrotDokumentow = $zwrotDokumentow;
+        $this->guid = $guid;
+    }
 
     /**
      * @return zasadySpecjalneEnum|null
@@ -177,17 +240,17 @@ final class PrzesylkaBiznesowaType extends przesylkaRejestrowanaType
     }
 
     /**
-     * @return gabarytBiznesowaType
+     * @return string
      */
-    public function getGabaryt(): gabarytBiznesowaType
+    public function getGabaryt(): string
     {
         return $this->gabaryt;
     }
 
     /**
-     * @param gabarytBiznesowaType $gabaryt
+     * @param string $gabaryt
      */
-    public function setGabaryt(gabarytBiznesowaType $gabaryt): void
+    public function setGabaryt(string $gabaryt): void
     {
         $this->gabaryt = $gabaryt;
     }
@@ -241,33 +304,33 @@ final class PrzesylkaBiznesowaType extends przesylkaRejestrowanaType
     }
 
     /**
-     * @return mixed
+     * @return int|null
      */
-    public function getNumerTransakcjiOdbioru()
+    public function getNumerTransakcjiOdbioru(): ?int
     {
         return $this->numerTransakcjiOdbioru;
     }
 
     /**
-     * @param mixed $numerTransakcjiOdbioru
+     * @param int|null $numerTransakcjiOdbioru
      */
-    public function setNumerTransakcjiOdbioru($numerTransakcjiOdbioru): void
+    public function setNumerTransakcjiOdbioru(?int $numerTransakcjiOdbioru): void
     {
         $this->numerTransakcjiOdbioru = $numerTransakcjiOdbioru;
     }
 
     /**
-     * @return pobranieType
+     * @return pobranieType|null
      */
-    public function getPobranie(): pobranieType
+    public function getPobranie(): ?pobranieType
     {
         return $this->pobranie;
     }
 
     /**
-     * @param pobranieType $pobranie
+     * @param pobranieType|null $pobranie
      */
-    public function setPobranie(pobranieType $pobranie): void
+    public function setPobranie(?pobranieType $pobranie): void
     {
         $this->pobranie = $pobranie;
     }
@@ -289,65 +352,65 @@ final class PrzesylkaBiznesowaType extends przesylkaRejestrowanaType
     }
 
     /**
-     * @return subPrzesylkaBiznesowaType
+     * @return subPrzesylkaBiznesowaType[]|null
      */
-    public function getSubPrzesylka(): subPrzesylkaBiznesowaType
+    public function getSubPrzesylka(): ?array
     {
         return $this->subPrzesylka;
     }
 
     /**
-     * @param subPrzesylkaBiznesowaType $subPrzesylka
+     * @param subPrzesylkaBiznesowaType[]|null $subPrzesylka
      */
-    public function setSubPrzesylka(subPrzesylkaBiznesowaType $subPrzesylka): void
+    public function setSubPrzesylka(?array $subPrzesylka): void
     {
         $this->subPrzesylka = $subPrzesylka;
     }
 
     /**
-     * @return ubezpieczenieType
+     * @return ubezpieczenieType|null
      */
-    public function getUbezpieczenie(): ubezpieczenieType
+    public function getUbezpieczenie(): ?ubezpieczenieType
     {
         return $this->ubezpieczenie;
     }
 
     /**
-     * @param ubezpieczenieType $ubezpieczenie
+     * @param ubezpieczenieType|null $ubezpieczenie
      */
-    public function setUbezpieczenie(ubezpieczenieType $ubezpieczenie): void
+    public function setUbezpieczenie(?ubezpieczenieType $ubezpieczenie): void
     {
         $this->ubezpieczenie = $ubezpieczenie;
     }
 
     /**
-     * @return EPOType
+     * @return EPOType|null
      */
-    public function getEpo(): EPOType
+    public function getEpo(): ?EPOType
     {
         return $this->epo;
     }
 
     /**
-     * @param EPOType $epo
+     * @param EPOType|null $epo
      */
-    public function setEpo(EPOType $epo): void
+    public function setEpo(?EPOType $epo): void
     {
         $this->epo = $epo;
     }
 
     /**
-     * @return adresType
+     * @return adresType|null
      */
-    public function getAdresDlaZwrotu(): adresType
+    public function getAdresDlaZwrotu(): ?adresType
     {
         return $this->adresDlaZwrotu;
     }
 
     /**
-     * @param adresType $adresDlaZwrotu
+     * @param adresType|null $adresDlaZwrotu
      */
-    public function setAdresDlaZwrotu(adresType $adresDlaZwrotu): void
+    public function setAdresDlaZwrotu(?adresType $adresDlaZwrotu): void
     {
         $this->adresDlaZwrotu = $adresDlaZwrotu;
     }
@@ -369,49 +432,49 @@ final class PrzesylkaBiznesowaType extends przesylkaRejestrowanaType
     }
 
     /**
-     * @return PotwierdzenieOdbioruBiznesowaType
+     * @return PotwierdzenieOdbioruBiznesowaType|null
      */
-    public function getPotwierdzenieOdbioru(): PotwierdzenieOdbioruBiznesowaType
+    public function getPotwierdzenieOdbioru(): ?PotwierdzenieOdbioruBiznesowaType
     {
         return $this->potwierdzenieOdbioru;
     }
 
     /**
-     * @param PotwierdzenieOdbioruBiznesowaType $potwierdzenieOdbioru
+     * @param PotwierdzenieOdbioruBiznesowaType|null $potwierdzenieOdbioru
      */
-    public function setPotwierdzenieOdbioru(PotwierdzenieOdbioruBiznesowaType $potwierdzenieOdbioru): void
+    public function setPotwierdzenieOdbioru(?PotwierdzenieOdbioruBiznesowaType $potwierdzenieOdbioru): void
     {
         $this->potwierdzenieOdbioru = $potwierdzenieOdbioru;
     }
 
     /**
-     * @return PotwierdzenieOdbioruBiznesowaType
+     * @return PotwierdzenieOdbioruBiznesowaType|null
      */
-    public function getDoreczenie(): PotwierdzenieOdbioruBiznesowaType
+    public function getDoreczenie(): ?PotwierdzenieOdbioruBiznesowaType
     {
         return $this->doreczenie;
     }
 
     /**
-     * @param PotwierdzenieOdbioruBiznesowaType $doreczenie
+     * @param PotwierdzenieOdbioruBiznesowaType|null $doreczenie
      */
-    public function setDoreczenie(PotwierdzenieOdbioruBiznesowaType $doreczenie): void
+    public function setDoreczenie(?PotwierdzenieOdbioruBiznesowaType $doreczenie): void
     {
         $this->doreczenie = $doreczenie;
     }
 
     /**
-     * @return ZwrotDokumentowBiznesowaType
+     * @return ZwrotDokumentowBiznesowaType|null
      */
-    public function getZwrotDokumentow(): ZwrotDokumentowBiznesowaType
+    public function getZwrotDokumentow(): ?ZwrotDokumentowBiznesowaType
     {
         return $this->zwrotDokumentow;
     }
 
     /**
-     * @param ZwrotDokumentowBiznesowaType $zwrotDokumentow
+     * @param ZwrotDokumentowBiznesowaType|null $zwrotDokumentow
      */
-    public function setZwrotDokumentow(ZwrotDokumentowBiznesowaType $zwrotDokumentow): void
+    public function setZwrotDokumentow(?ZwrotDokumentowBiznesowaType $zwrotDokumentow): void
     {
         $this->zwrotDokumentow = $zwrotDokumentow;
     }
