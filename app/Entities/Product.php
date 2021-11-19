@@ -86,7 +86,8 @@ class Product extends Model implements Transformable
         'trade_group_name',
         'displayed_group_name',
         'stock_product',
-        'average_amount_of_product_in_package'
+        'average_amount_of_product_in_package',
+        'long_term'
     ];
 
     public $customColumnsVisibilities = [

@@ -523,6 +523,7 @@ class ImportCsvFileJob implements ShouldQueue
             'show_on_page' => $this->getShowOnPageParameter($line, $categoryColumn),
             'priority' => $this->getProductsOrder($line, $categoryColumn),
             'average_amount_of_product_in_package' => $line[244],
+            'long_term' => $line[13]
         ];
 
         foreach ($array as $key => $value) {
