@@ -601,7 +601,7 @@ class przesylkaZagranicznaType
     public $kraj; // string
 }
 
-class przesylkaRejestrowanaType extends przesylkaType
+class przesylkaRejestrowanaType
 {
     public $adres; // adresType
     public $nadawca; // adresType
@@ -616,19 +616,6 @@ class przesylkaNieRejestrowanaType
 class anonymous94
 {
 }
-
-//class przesylkaBiznesowaType
-//{
-//    protected $zasadySpecjalne;
-//    public $pobranie; // pobranieType
-//    public $urzadWydaniaEPrzesylki; // urzadWydaniaEPrzesylkiType
-//    public $subPrzesylka; // subPrzesylkaBiznesowaType
-//    public $ubezpieczenie; // ubezpieczenieType
-//    public $masa; // masaType
-//    public $gabaryt; // gabarytBiznesowaType
-//    public $wartosc; // wartoscType
-//    public $ostroznie; // boolean
-//}
 
 class gabarytBiznesowaType
 {
