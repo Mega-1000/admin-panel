@@ -4,7 +4,7 @@
 namespace App\Integrations\Pocztex;
 
 
-class PrzesylkaRejestrowanaType extends przesylkaType
+class PrzesylkaRejestrowanaType extends PrzesylkaType
 {
     /**
      * Numer nadania przesyłki. Należy podać tutaj właściwy numer nadania otrzymany
@@ -13,14 +13,14 @@ class PrzesylkaRejestrowanaType extends przesylkaType
      *
      * @var string|null
      */
-    protected ?string $numerNadania;
+    protected $numerNadania;
 
     /**
      * Element klasy adresType –zawiera informacje o odbiorcy przesyłki. Musi wystąpić dokładnie 1 raz.
      *
      * @var adresType
      */
-    protected adresType $adres;
+    protected $adres;
 
     /**
      * Atrybut opcjonalny, przeznaczony do uzupełniania dla Klientów nadających przesyłki na
@@ -28,7 +28,7 @@ class PrzesylkaRejestrowanaType extends przesylkaType
      *
      * @var string
      */
-    protected string $sygnatura;
+    protected $sygnatura;
 
     /**
      * Atrybut opcjonalny, przeznaczony do uzupełniania dla Klientów nadających przesyłki na
@@ -36,7 +36,7 @@ class PrzesylkaRejestrowanaType extends przesylkaType
      *
      * @var string|null
      */
-    protected ?string $terminType;
+    protected $terminType;
 
     /**
      * Atrybut opcjonalny, przeznaczony do uzupełniania dla Klientów nadających przesyłki na
@@ -44,5 +44,5 @@ class PrzesylkaRejestrowanaType extends przesylkaType
      *
      * @var string|null
      */
-    protected string $rodzaj;
+    protected $rodzaj;
 }

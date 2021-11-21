@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Entities\ConfirmPackages;
 use App\Entities\OrderPackage;
+use App\Enums\CourierName;
 use App\Integrations\Apaczka\ApaczkaGuzzleClient;
 use App\Integrations\Apaczka\ApaczkaOrder;
 use App\Integrations\DPD\DPDService;
@@ -144,10 +145,11 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                 $result = $this->createPackageForApaczka();
                 break;
             case 'POCZTEX':
-                $result = $this->createPackageForPocztex();
-                break;
-            case 'KURIER48':
-                $result = $this->createPackageForKurier48();
+                if (strpos($this->data['symbol'], CourierName::KURIER48) !== false) {
+                    $result = $this->createPackageForKurier48();
+                } else {
+                    $result = $this->createPackageForPocztex();
+                }
                 break;
             case 'JAS':
                 $result = $this->createPackageForJas();
@@ -540,7 +542,15 @@ class OrdersCourierJobs extends Job implements ShouldQueue
      */
     private function createPackageForKurier48(): array
     {
-        $integration = new ElektronicznyNadawca();
+
+        $integration = new ElektronicznyNadawca(
+            'https://e-nadawca.poczta-polska.pl/websrv/en.wsdl',
+            [
+                'login' => 'ephcelujwpunkt',
+                'password' => '!@12QWas',
+            ]
+        );
+
         $integration->clearEnvelope(new clearEnvelope());
         $shipment = new addShipment();
 
@@ -563,6 +573,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         $address->email = $this->data['delivery_address']['email'];
         $address->kraj = 'Polska';
         $address->osobaKontaktowa = $this->data['pickup_address']['firstname'] . ' ' . $this->data['pickup_address']['lastname'];
+
         $guid = $this->getGuid();
 
         $przesylkaBiznesowa = new PrzesylkaBiznesowaType(
@@ -572,6 +583,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
             $this->data['amount'] * 100,
             false,
             $address ?? null,
+            $this->data['pickup_address']['parcel_date'],
             null,
             null,
             $pobranie ?? null,
@@ -579,7 +591,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
             null,
             null,
             null,
-            new adresType() ?? null,
+            null,
             false,
             null,
             null,

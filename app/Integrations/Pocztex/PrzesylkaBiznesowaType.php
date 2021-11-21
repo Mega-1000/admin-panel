@@ -15,23 +15,23 @@ final class PrzesylkaBiznesowaType extends PrzesylkaRejestrowanaType
      * przesyłki na zasadach specjalnych.
      * Należy przekazać element zgodny z interfejsem zasadySpecjalneEnum
      *
-     * @var zasadySpecjalneEnum|null
+     * @var string|null
      */
-    protected ?zasadySpecjalneEnum $zasadySpecjalne;
+    protected $zasadySpecjalne;
 
     /**
      * Ciężar przesyłki w gramach.
      *
      * @var integer
      */
-    protected int $masa;
+    protected $masa;
 
     /**
      * Określa gabaryt przesyłki. Dopuszczalne wartości to: XS, S, M, L, XL, XXL.
      *
      * @var string
      */
-    protected string $gabaryt;
+    protected $gabaryt;
 
     /**
      * TRUE jeżeli przesyłka niestandardowa. Za przesyłkę niestandardową uważa się przesyłkę
@@ -44,7 +44,7 @@ final class PrzesylkaBiznesowaType extends PrzesylkaRejestrowanaType
      *
      * @var boolean
      */
-    protected bool $niestandardowa;
+    protected $niestandardowa;
 
     /**
      * Określenie wartości nadawanej przesyłki. Określenie wartości jest równoznacznie z chęcią skorzystania z usługi
@@ -52,21 +52,21 @@ final class PrzesylkaBiznesowaType extends PrzesylkaRejestrowanaType
      *
      * @var integer
      */
-    protected int $wartosc;
+    protected $wartosc;
 
     /**
      * Wartość logiczna określająca korzystanie z usługi ostrożnie
      *
      * @var bool
      */
-    protected bool $ostroznie;
+    protected $ostroznie;
 
     /**
      * Numer transakcji
      *
      * @var integer|null
      */
-    protected ?int $numerTransakcjiOdbioru;
+    protected $numerTransakcjiOdbioru;
 
     /**
      * Element typu pobranieType. Opisujący pobranie. Jedynym możliwym sposobem pobrania dla tego typu
@@ -74,7 +74,7 @@ final class PrzesylkaBiznesowaType extends PrzesylkaRejestrowanaType
      *
      * @var pobranieType|null
      */
-    protected ?pobranieType $pobranie;
+    protected $pobranie;
 
     /**
      * Określenie, w jakim urzędzie ma zostać odebrana przesyłka.
@@ -82,21 +82,21 @@ final class PrzesylkaBiznesowaType extends PrzesylkaRejestrowanaType
      *
      * @var placowkaPocztowaType|null
      */
-    protected ?placowkaPocztowaType $urzadWydaniaEPrzesylki;
+    protected $urzadWydaniaEPrzesylki;
 
     /**
      * Elementy typu subPrzesylkaBiznesowaType (minimalna ilość wystąpień 4).
      *
      * @var subPrzesylkaBiznesowaType[]|null
      */
-    protected ?array $subPrzesylka;
+    protected $subPrzesylka;
 
     /**
      * Element typu ubezpieczenieType określający rodzaj ubezpieczenia przesyłki.
      *
      * @var ubezpieczenieType|null
      */
-    protected ?ubezpieczenieType $ubezpieczenie;
+    protected $ubezpieczenie;
 
     /**
      * Określenie usługi komplementarnej EPO. Należy przekazać element zgodny z interfejsem EPOType,
@@ -105,42 +105,42 @@ final class PrzesylkaBiznesowaType extends PrzesylkaRejestrowanaType
      *
      * @var EPOType|null
      */
-    protected ?EPOType $epo;
+    protected $epo;
 
     /**
      * Element zawierający adres na który zostanie zwrócona przesyłka w przypadku nieodebrania przez adresata (zwrot przesyłki).
      *
      * @var adresType|null
      */
-    protected ?adresType $adresDlaZwrotu;
+    protected $adresDlaZwrotu;
 
     /**
      * Określa usługę komplementarną Sprawdzenie zawartości przez odbiorcę
      *
      * @var boolean
      */
-    protected bool $sprawdzenieZawartosciPrzesylkiPrzezOdbiorce;
+    protected $sprawdzenieZawartosciPrzesylkiPrzezOdbiorce;
 
     /**
      * Określa usługę komplementarną Potwierdzenie odbioru.
      *
      * @var PotwierdzenieOdbioruBiznesowaType|null
      */
-    protected ?PotwierdzenieOdbioruBiznesowaType $potwierdzenieOdbioru;
+    protected $potwierdzenieOdbioru;
 
     /**
      * Określa usługę komplementarne dotyczące doręczenia przesyłki
      *
      * @var PotwierdzenieOdbioruBiznesowaType|null
      */
-    protected ?PotwierdzenieOdbioruBiznesowaType $doreczenie;
+    protected $doreczenie;
 
     /**
      * Określa usługę komplementarną Dokumenty zwrotne
      *
      * @var ZwrotDokumentowBiznesowaType|null
      */
-    protected ?ZwrotDokumentowBiznesowaType $zwrotDokumentow;
+    protected $zwrotDokumentow;
 
     /**
      * PrzesylkaBiznesowaType constructor.
@@ -151,7 +151,8 @@ final class PrzesylkaBiznesowaType extends PrzesylkaRejestrowanaType
      * @param integer                                $wartosc
      * @param boolean                                $ostroznie
      * @param adresType                              $adresType
-     * @param zasadySpecjalneEnum|null               $zasadySpecjalne
+     * @param string                                 $planowanaDataNadania
+     * @param string|null                            $zasadySpecjalne
      * @param integer|null                           $numerTransakcjiOdbioru
      * @param pobranieType|null                      $pobranie
      * @param placowkaPocztowaType|null              $urzadWydaniaEPrzesylki
@@ -172,7 +173,8 @@ final class PrzesylkaBiznesowaType extends PrzesylkaRejestrowanaType
         int $wartosc,
         bool $ostroznie,
         adresType $adresType,
-        ?zasadySpecjalneEnum $zasadySpecjalne,
+        string $planowanaDataNadania,
+        ?string $zasadySpecjalne,
         ?int $numerTransakcjiOdbioru = null,
         ?pobranieType $pobranie = null,
         ?placowkaPocztowaType $urzadWydaniaEPrzesylki = null,
@@ -205,20 +207,22 @@ final class PrzesylkaBiznesowaType extends PrzesylkaRejestrowanaType
         $this->doreczenie = $doreczenie;
         $this->zwrotDokumentow = $zwrotDokumentow;
         $this->guid = $guid;
+        $this->adres = $adresType;
+        $this->planowanaDataNadania = $planowanaDataNadania;
     }
 
     /**
-     * @return zasadySpecjalneEnum|null
+     * @return string|null
      */
-    public function getZasadySpecjalne(): ?zasadySpecjalneEnum
+    public function getZasadySpecjalne(): ?string
     {
         return $this->zasadySpecjalne;
     }
 
     /**
-     * @param zasadySpecjalneEnum|null $zasadySpecjalne
+     * @param string|null $zasadySpecjalne
      */
-    public function setZasadySpecjalne(?zasadySpecjalneEnum $zasadySpecjalne): void
+    public function setZasadySpecjalne(?string $zasadySpecjalne): void
     {
         $this->zasadySpecjalne = $zasadySpecjalne;
     }

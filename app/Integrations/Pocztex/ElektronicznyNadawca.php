@@ -603,9 +603,9 @@ class przesylkaZagranicznaType
 
 class przesylkaRejestrowanaType extends przesylkaType
 {
-    protected adresType $adres; // adresType
-    public adresType $nadawca; // adresType
-    public adresType $numerNadania; // numerNadaniaType
+    public $adres; // adresType
+    public $nadawca; // adresType
+    public $numerNadania; // numerNadaniaType
 }
 
 class przesylkaNieRejestrowanaType
@@ -2629,6 +2629,15 @@ class ElektronicznyNadawca extends SoapClient {
         'alternatywnyNumerNadaniaType' => 'alternatywnyNumerNadaniaType',
         'setDomyslnyProfilNadawcy' => 'setDomyslnyProfilNadawcy',
         'setDomyslnyProfilNadawcyResponse' => 'setDomyslnyProfilNadawcyResponse',
+        'PrzesylkaType' => 'PrzesylkaType',
+        'PotwierdzenieOdbioruBiznesowaType' => 'PotwierdzenieOdbioruBiznesowaType',
+        'PrzesylkaBiznesowaType' => 'PrzesylkaBiznesowaType',
+        'PrzesylkaRejestrowanaType' => 'PrzesylkaRejestrowanaType',
+        'RelatedToAllegroType' => 'RelatedToAllegroType',
+        'SposobPrzekazaniaPotwierdzeniaBiznesowaType'=>'SposobPrzekazaniaPotwierdzeniaBiznesowaType',
+        'TerminSprawy' => 'TerminSprawy',
+        'TerminZwrotDokumentowBiznesowaType' => 'TerminZwrotDokumentowBiznesowaType',
+        'ZwrotDokumentowBiznesowaType' => 'ZwrotDokumentowBiznesowaType',
     );
 
     public function __construct($wsdl = "https://e-nadawca.poczta-polska.pl/websrv/en.wsdl", $options = array())
