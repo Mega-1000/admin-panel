@@ -22,9 +22,10 @@ class EmailTagHandlerHelper
     //[KONSULTANT/MAGAZYNIER]
     public function consultantOrStorekeeper()
     {
-        $employee = $this->order->employee;
-
-        return "ID: " . ($employee === null ? '' : $employee->id) . "<br/>" .  ($employee === null ? '' :  $employee->firstname)  . "<br/>" . "Telefon: " . ($employee === null ? '' : $employee->phone) . "<br/>" . "E-mail: " . ($employee === null ?  '' : $employee->email);
+        if (!empty($employee = $this->order->employee)) {
+            return 'Identyfikator: ' . $employee->name . '<br/>' . 'Imie i nazwisko: ' . $employee->firstname . ' ' .
+                $employee->lastname . '<br/>' . 'Telefon:' . $employee->phone . '<br/>' . 'Adres email: ' . $employee->email;
+        }
     }
 
     //[DANE-KUPUJACEGO]

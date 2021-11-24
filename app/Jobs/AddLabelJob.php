@@ -116,7 +116,7 @@ class AddLabelJob extends Job implements ShouldQueue
                 $this->setScheduledLabelsAfterAddition($this->order->id, $label, $orderLabelSchedulerRepository);
                 $this->loopPreventionArray['already-added'][] = $labelId;
 
-                if ($label->message !== null) {
+                if ($label->message !== null || $labelId !== 89) {
                     dispatch_now(new LabelAddNotificationJob($this->order->id, $label->id));
                 }
 

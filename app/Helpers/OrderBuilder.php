@@ -121,6 +121,7 @@ class OrderBuilder
 
         $order->getToken();
         $customer = $this->userSelector->getCustomer($order, $data);
+        $order->employee_id = $customer->orders->last()->employee_id;
         $order->customer_id = $customer->id;
 
         if (!$orderExists) {
@@ -231,6 +232,7 @@ class OrderBuilder
         $orderCustomerOpenExists = Order::where('customer_id', $customer->id)
             ->whereNotIn('status_id', [6, 8])
             ->whereNotNull('employee_id')
+            ->orderBy('id', 'desc')
             ->first();
 
         if (!empty($orderCustomerOpenExists)) {

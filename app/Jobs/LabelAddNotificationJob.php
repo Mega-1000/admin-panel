@@ -23,62 +23,61 @@ class LabelAddNotificationJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, IsMonitored;
 
     /**
-    * @var
-    */
-   protected $orderId;
+     * @var
+     */
+    protected $orderId;
 
-   /**
-    * @var
-    */
-   protected $labelId;
+    /**
+     * @var
+     */
+    protected $labelId;
 
-   /**
-    * Requires to pass id of Order that's status changed to ::dispatch()
-    *
-    * @param $orderId
-    */
-   public function __construct($orderId, $labelId)
-   {
-       $this->orderId = $orderId;
-       $this->labelId = $labelId;
-   }
+    /**
+     * Requires to pass id of Order that's status changed to ::dispatch()
+     *
+     * @param $orderId
+     */
+    public function __construct($orderId, $labelId)
+    {
+        $this->orderId = $orderId;
+        $this->labelId = $labelId;
+    }
 
-   /**
-    * Execute the job.
-    *
-    * @return void
-    */
-   public function handle(EmailTagHandlerHelper $emailTagHandler, OrderRepository $orderRepository, LabelRepository $labelRepository, TagRepository $tagRepository)
-   {
-       $order = $orderRepository->find($this->orderId);
-       $tags = $tagRepository->all();
-       $label = $labelRepository->find($this->labelId);
+    /**
+     * Execute the job.
+     *
+     * @return void
+     */
+    public function handle(EmailTagHandlerHelper $emailTagHandler, OrderRepository $orderRepository, LabelRepository $labelRepository, TagRepository $tagRepository)
+    {
+        $order = $orderRepository->find($this->orderId);
+        $tags = $tagRepository->all();
+        $label = $labelRepository->find($this->labelId);
 
-       if($label->message !== null){
-           $message = $label->message;
-       } else {
-           $message = '';
-       }
+        if ($label->message !== null) {
+            $message = $label->message;
+        } else {
+            $message = '';
+        }
 
-       $emailTagHandler->setOrder($order);
+        $emailTagHandler->setOrder($order);
 
-       foreach($tags as $tag) {
-           $method = $tag->handler;
-           $message = preg_replace("[" . preg_quote($tag->name) . "]", $emailTagHandler->$method(), $message);
-       }
-
-       $subject = "Mega1000 - zmieniono status zamówienia: " . $this->orderId . ' na status: ' . $label->name;
-       try {
-           if (strpos($order->customer->login, 'allegromail.pl')) {
-               return;
-           }
-           \Mailer::create()
-               ->to($order->customer->login)
-               ->send(new LabelAdd($subject, $message));
-       } catch (\Exception $exception) {
-           $message = $exception->getMessage();
-           Log::error("Problem with mailer: $message", ['class' => $exception->getFile(), 'line' => $exception->getLine(), 'stack' => $exception->getTraceAsString()]);
-
-       }
-   }
+        foreach ($tags as $tag) {
+            $method = $tag->handler;
+            $message = preg_replace("[" . preg_quote($tag->name) . "]", $emailTagHandler->$method(), $message);
+        }
+        $status = explode('-', $label->name)[0];
+        $subject = "Mega1000 - zmieniono status zamówienia: " . $this->orderId . ' na status: ' . str_replace('-', '', $status);
+        try {
+            if (strpos($order->customer->login, 'allegromail.pl') || empty($message) || $status === 'przekazano do obslugi konsultantowi') {
+                return;
+            }
+            \Mailer::create()
+                ->to($order->customer->login)
+                ->send(new LabelAdd($subject, $message));
+        } catch (\Exception $exception) {
+            $message = $exception->getMessage();
+            Log::error("Problem with mailer: $message", ['class' => $exception->getFile(), 'line' => $exception->getLine(), 'stack' => $exception->getTraceAsString()]);
+        }
+    }
 }
