@@ -121,7 +121,6 @@ class OrderBuilder
 
         $order->getToken();
         $customer = $this->userSelector->getCustomer($order, $data);
-        $order->employee_id = $customer->orders->last()->employee_id;
         $order->customer_id = $customer->id;
 
         if (!$orderExists) {
