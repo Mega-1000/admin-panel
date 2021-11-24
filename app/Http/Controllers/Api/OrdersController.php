@@ -152,8 +152,7 @@ class OrdersController extends Controller
                 ->setProductService($productService);
             if (empty($data['cart_token'])) {
                 $orderBuilder->setTotalTransportSumCalculator(new TransportSumCalculator)
-                    ->setUserSelector(new GetCustomerForNewOrder())
-                    ->setPostOrderActions(new SendCommunicationEmail());
+                    ->setUserSelector(new GetCustomerForNewOrder());
             } else {
                 $orderBuilder->setUserSelector(new GetCustomerForAdminEdit());
             }
@@ -164,8 +163,6 @@ class OrdersController extends Controller
 	        $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 2)->first();
 	        $order->firm_source_id = $firmSource ? $firmSource->id : null;
 	        $order->save();
-	
-	        dispatch(new CheckDeliveryAddressSendMailJob($order));
 	        
             return $this->createdResponse(['order_id' => $id, 'canPay' => $canPay, 'token' => $order->getToken()]);
         } catch (\Exception $e) {
