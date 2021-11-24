@@ -69,7 +69,7 @@ class LabelAddNotificationJob implements ShouldQueue
         $status = explode('-', $label->name)[0];
         $subject = "Mega1000 - zmieniono status zamówienia: " . $this->orderId . ' na status: ' . str_replace('-', '', $status);
         try {
-            if (strpos($order->customer->login, 'allegromail.pl') || empty($message) || $status === 'przekazano do obslugi konsultantowi') {
+            if (strpos($order->customer->login, 'allegromail.pl') || empty($message)) {
                 return;
             }
             \Mailer::create()
