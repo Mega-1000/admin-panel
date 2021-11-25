@@ -128,9 +128,9 @@ class AddLabelJob extends Job implements ShouldQueue
                     }
 
                 }
-                if ($labelId == 95) {
-                    dispatch_now(new StartCommunicationMailSenderJob($this->order->id, $this->order->customer->login));
-                }
+//                if ($labelId == 95) {
+//                    dispatch_now(new StartCommunicationMailSenderJob($this->order->id, $this->order->customer->login));
+//                }
 
                 if($labelId == Label::ORDER_ITEMS_CONSTRUCTED){
                 	dispatch(new SendItemsConstructedMailJob($this->order));
