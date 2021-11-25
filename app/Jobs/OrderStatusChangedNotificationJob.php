@@ -78,7 +78,7 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
 	    $pdf = "";
 	
 	    if (($order->status_id == 3 || $order->status_id == 4) && !$order->sello_id) {
-    		dispatch_now(new GenerateOrderProformJob($order));
+            dispatch_now(new GenerateOrderProformJob($order, true));
 		    $pdf = Storage::disk('local')->get($order->proformStoragePath);
 	    }
 
