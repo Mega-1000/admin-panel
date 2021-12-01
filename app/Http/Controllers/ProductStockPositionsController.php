@@ -150,7 +150,7 @@ class ProductStockPositionsController extends Controller
     {
         $collection = $this->prepareCollection($id);
 
-        return DataTables::collection($collection)->make(true);
+        return DataTables::collection($collection)->skipPaging()->make(true);
     }
 
     /**
