@@ -38,7 +38,7 @@ class TaskService
                     $query
                         ->where('labels.id', Label::BLUE_HAMMER_ID);
                 })->whereHas('dates', function ($query) {
-                    $query->orderBy('customer_shipment_date_to');
+                    $query->orderBy('consultant_shipment_date_to');
                 })
                     ->whereDoesntHave('labels', function ($query) {
                         $query->where('labels.id', Label::RED_HAMMER_ID)
@@ -57,7 +57,8 @@ class TaskService
     {
         $result = [];
         $dates = [
-            'inne' => []
+            'past' => [],
+            'future' => [],
         ];
         $today = Carbon::today();
         $lastShowedDate = Carbon::today()->addDays(3);
@@ -70,10 +71,12 @@ class TaskService
             foreach ($this->getTaskQuery($deliveryTypes)->get() as $task) {
                 $orderDate = Carbon::parse($task->order->dates->customer_shipment_date_to);
                 $key = $orderDate->toDateString();
-                if ($orderDate->isBetween($today, $lastShowedDate)) {
+                if ($orderDate->isBefore($today)) {
+                    $tasksByDay['past'][] = $task;
+                } elseif ($orderDate->isBetween($today, $lastShowedDate)) {
                     $tasksByDay[$key][] = $task;
                 } else {
-                    $tasksByDay['inne'][] = $task;
+                    $tasksByDay['future'][] = $task;
                 }
             }
             ksort($tasksByDay);
