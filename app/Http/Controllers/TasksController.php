@@ -757,7 +757,7 @@ class TasksController extends Controller
     {
         $response = null;
         if ($task->childs->count()) {
-            $task->childs->map(function ($child) {
+            $task->childs->map(function ($child) use(&$response) {
                 if ($child->order_id) {
                     $response = dispatch_now(new RemoveLabelJob($child->order_id,
                         [Label::ORDER_ITEMS_UNDER_CONSTRUCTION],
