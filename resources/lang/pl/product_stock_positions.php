@@ -23,6 +23,7 @@ return [
         'store' => 'Pozycja magazynowa została pomyślnie dodana',
         'delete' => 'Pozycja magazynowa została pomyślnie usunięta',
         'update' => 'Pozycja magazynowa została pomyślnie zaktualizowana',
-        'quantity_set' => 'Pozycja posiada stan różny od 0.'
+        'quantity_set' => 'Pozycja posiada stan różny od 0.',
+        'position_exist' => 'W tym miejscu znajduje się już towar.'
     ],
 ];
