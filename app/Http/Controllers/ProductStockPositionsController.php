@@ -205,10 +205,14 @@ class ProductStockPositionsController extends Controller
         $toPosition->update([
             'position_quantity' => $toPosition->position_quantity + $request->input('quantity__move')
         ]);
+
         if (Session::exists('removeLabelJobAfterProductStockMove')) {
-            $response = dispatch_now(Session::get('removeLabelJobAfterProductStockMove'));
-            if (!strlen((string) $response) > 0) {
-                Session::forget('removeLabelJobAfterProductStockMove');
+            $ordersToRefresh = Session::get('removeLabelJobAfterProductStockMove');
+            foreach ($ordersToRefresh as $order) {
+                $response = dispatch_now($order);
+                if (!strlen((string)$response) > 0) {
+                    Session::forget('removeLabelJobAfterProductStockMove');
+                }
             }
         }
     }
