@@ -33,15 +33,18 @@ class ProductStockPositionsController extends Controller
      */
     public function store(ProductStockPositionCreate $request)
     {
-        $existingRecord = ProductStockPosition::query()
-            ->where('lane', '=', $request->lane)
+        $existingRecord = ProductStockPosition::where('lane', '=', $request->lane)
             ->where('bookstand', '=', $request->bookstand)
             ->where('shelf', '=', $request->shelf)
-            ->where('position', '=', $request->position)->count();
+            ->where('position', '=', $request->position)
+            ->with(['stock' => function ($q) {
+                $q->with('product');
+            }])
+            ->first();
 
-        if ($existingRecord) {
+        if (!empty($existingRecord)) {
             return redirect()->back()->with([
-                'message' => __('product_stock_positions.message.position_exist'),
+                'message' => __('product_stock_positions.message.position_exist') . ' Symbol:' . $existingRecord->stock->product->symbol,
                 'alert-type' => 'error'
             ]);
         }
@@ -91,17 +94,26 @@ class ProductStockPositionsController extends Controller
             abort(404);
         }
 
-        $productStockPosition->fill($request->all());
+        $productStockPosition->fill([
+            'lane' => $request->lane,
+            'bookstand' => $request->bookstand,
+            'shelf' => $request->shelf,
+            'position' => $request->position
+        ]);
         if (array_intersect(['lane', 'bookstand', 'shelf', 'position'], array_keys($productStockPosition->getDirty()))) {
             $existingRecord = ProductStockPosition::query()
                 ->where('lane', '=', $request->lane)
                 ->where('bookstand', '=', $request->bookstand)
                 ->where('shelf', '=', $request->shelf)
-                ->where('position', '=', $request->position)->count();
+                ->where('position', '=', $request->position)
+                ->with(['stock' => function ($q) {
+                    $q->with('product');
+                }])
+                ->first();
 
             if ($existingRecord) {
                 return redirect()->back()->with([
-                    'message' => __('product_stock_positions.message.position_exist'),
+                    'message' => __('product_stock_positions.message.position_exist') . ' Symbol:' . $existingRecord->stock->product->symbol,
                     'alert-type' => 'error'
                 ]);
             }
