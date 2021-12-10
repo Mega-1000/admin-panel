@@ -54,6 +54,7 @@
 </template>
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import { ImportFileParams } from '@/types/TransactionsTypes'
 
 @Component({
   components: {}
@@ -66,18 +67,25 @@ export default class FileUploader extends Vue {
     errorMessage: ''
   }
 
-  private file = {
-    value: '',
-    error: false,
-    errorMessage: ''
+  private file: File = new File([''], '')
+
+  public async importFile (): Promise<void> {
+    if (this.kind.value === '') {
+      return
+    }
+
+    const params: ImportFileParams = {
+      file: this.file,
+      kind: this.kind.value
+    }
+
+    await this.$store.dispatch('TransactionsService/import', params)
+    // this.$emit('close')
   }
 
-  public async importFile () {
-    console.log('dasda')
-  }
-
-  public async previewFiles () {
-    // this.file = this.$refs.uploadFiles.files
+  public async previewFiles (event: any) {
+    this.file = event.target.files[0]
+    console.log(this.file)
   }
 }
 </script>

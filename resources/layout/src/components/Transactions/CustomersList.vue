@@ -49,7 +49,7 @@
         </div>
       </div>
     </div>
-    <div class="row">
+    <div class="row table-customers">
       <div class="col-md-12">
         <div class="table-responsive">
           <table class="table table-hover">
@@ -62,7 +62,7 @@
               <th scope="col">Nazwisko</th>
               <th scope="col">Nazwa firmy</th>
               <th scope="col">Numer telefonu</th>
-              <th scope="col">NIP</th>
+<!--              <th scope="col">NIP</th>-->
               <th scope="col">Adres</th>
               <th scope="col">Email</th>
               <th scope="col" class="text-center">Akcje</th>
@@ -77,7 +77,7 @@
               <td>{{ customer.lastName }}</td>
               <td>{{ customer.firmName }}</td>
               <td>{{ customer.phone }}</td>
-              <td>{{ customer.nip }}</td>
+<!--              <td>{{ customer.nip }}</td>-->
               <td>{{ customer.address }}</td>
               <td>{{ customer.email }}</td>
               <td class="text-center">

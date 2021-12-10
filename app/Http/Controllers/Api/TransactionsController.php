@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Api;
 use App\Entities\Customer;
 use App\Entities\Transaction;
 use App\Http\Controllers\Controller;
+use App\Jobs\ImportAllegroPayInJob;
 use App\Repositories\TransactionRepository;
+use hanneskod\classtools\Transformer\Reader;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Excel;
 
 class TransactionsController extends Controller
 {
@@ -43,7 +46,7 @@ class TransactionsController extends Controller
                 $query->where('type', 'STANDARD_ADDRESS');
             }])
                 ->with('orders:id,customer_id')
-                ->with('transactions')->has('transactions')->limit(25)->get();
+                ->with('transactions')->has('transactions')->get();
 
             if (!empty($result)) {
                 $response['status'] = 200;
@@ -107,7 +110,7 @@ class TransactionsController extends Controller
             ])->last())) {
                 $balance = $lastCustomerTransaction->balance;
             } else {
-                $balance = $operationValue;
+                $balance = 0;
             }
 
             $this->transactionRepository->create([
@@ -220,6 +223,14 @@ class TransactionsController extends Controller
             ];
         }
         return response()->json($response, $response['status']);
+    }
+
+    public function import(string $kind, Request $request)
+    {
+        switch ($kind) {
+            case 'allegroPayIn':
+                dispatch_now(new ImportAllegroPayInJob($request->file('file')));
+        }
     }
 
     /**

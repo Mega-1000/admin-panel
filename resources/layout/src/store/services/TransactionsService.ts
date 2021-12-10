@@ -3,7 +3,7 @@
 
 import {
   CreateTransactionParams,
-  Customer, Transaction,
+  Customer, ImportFileParams, Transaction,
   TransactionsStore
 } from '@/types/TransactionsTypes'
 
@@ -105,6 +105,22 @@ const actions = {
           commit(TRANSACTIONS_SET_ERROR, data.errorMessage)
         } else {
           commit(TRANSACTIONS_DELETE, transaction)
+        }
+        return data
+      })
+      .catch((error: any) => {
+        commit(TRANSACTIONS_SET_ERROR, error.errorMessage)
+      })
+  },
+  import ({ commit }: any, params: ImportFileParams) {
+    commit(TRANSACTIONS_SET_IS_LOADING, true)
+
+    return TransactionsRepository
+      .importTransaction(params)
+      .then((data: any) => {
+        commit(TRANSACTIONS_SET_IS_LOADING, false)
+        if (data.errorCode) {
+          commit(TRANSACTIONS_SET_ERROR, data.errorMessage)
         }
         return data
       })

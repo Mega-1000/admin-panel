@@ -68,4 +68,8 @@ export interface TransactionsStore {
     transaction: Transaction | null,
 }
 
+export interface ImportFileParams {
+    kind: string,
+    file: File
+}
 /* eslint-enabled camelcase */
