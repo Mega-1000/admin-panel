@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Entities\Order;
+use App\Entities\OrderPayment;
 use App\Entities\SelTransaction;
 use App\Entities\Transaction;
 use App\Helpers\PdfCharactersHelper;
@@ -65,7 +66,24 @@ class ImportAllegroPayInJob implements ShouldQueue
             $selTransaction = SelTransaction::where('tr_CheckoutFormPaymentId', '=', $payIn['identyfikator'])->first();
             try {
                 if (!empty($selTransaction->order)) {
-                    $this->saveTransaction($selTransaction->order, $payIn);
+                    $transactionId = $this->saveTransaction($selTransaction->order, $payIn);
+                    if ($selTransaction->order->payments->count()) {
+                        /** @var OrderPayment $payment */
+                        foreach ($selTransaction->order->payments as $payment) {
+                            $amount = preg_replace('/[^.\d]/', '', $payIn['kwota']);
+                            if ($payment->promise === '1' && $payment->amount == $amount) {
+                                $payment->delete();
+                                $selTransaction->order->payments()->create([
+                                    'transaction_id' => $transactionId,
+                                    'amount' => $amount,
+                                    'type' => 'CLIENT',
+                                    'promise' => '',
+                                ]);
+                            }
+                        }
+                    }
+                } else {
+
                 }
             } catch (\Exception $exception) {
                 dd($exception);
@@ -75,7 +93,7 @@ class ImportAllegroPayInJob implements ShouldQueue
 
     private function saveTransaction(Order $order, array $data)
     {
-        $this->transaction->create([
+        return $this->transaction->create([
             'customer_id' => $order->customer_id,
             'posted_in_system_date' => new \DateTime(),
             'posted_in_bank_date' => $data['data'],
@@ -87,7 +105,7 @@ class ImportAllegroPayInJob implements ShouldQueue
             'balance' => (float)$this->getCustomerBalance($order->customer_id, $data['kwota']) + (float)$data['kwota'],
             'accounting_notes' => '',
             'transaction_notes' => '',
-        ]);
+        ])->id;
     }
 
     private function getCustomerBalance($customerId, $operationValue)
