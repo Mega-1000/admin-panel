@@ -7,11 +7,9 @@ use App\Entities\Transaction;
 use App\Http\Controllers\Controller;
 use App\Jobs\ImportAllegroPayInJob;
 use App\Repositories\TransactionRepository;
-use hanneskod\classtools\Transformer\Reader;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Maatwebsite\Excel\Excel;
 
 class TransactionsController extends Controller
 {

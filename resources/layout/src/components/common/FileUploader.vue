@@ -80,7 +80,7 @@ export default class FileUploader extends Vue {
     }
 
     await this.$store.dispatch('TransactionsService/import', params)
-    // this.$emit('close')
+    this.$emit('close')
   }
 
   public async previewFiles (event: any) {
