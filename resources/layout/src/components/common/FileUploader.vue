@@ -86,7 +86,6 @@ export default class FileUploader extends Vue {
 
   public async previewFiles (event: any) {
     this.file = event.target.files[0]
-    console.log(this.file)
   }
 }
 </script>
