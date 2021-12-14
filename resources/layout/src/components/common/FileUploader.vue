@@ -38,6 +38,7 @@
                     <button class="btn btn-file">Dodaj plik<input id="file" ref="uploadFiles" @change="previewFiles"
                                                                   type="file" aria-describedby="file">
                     </button>
+                    <span>{{ file.name }}</span>
                   </div>
                 </div>
               </div>

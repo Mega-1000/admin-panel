@@ -14,7 +14,15 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
+/**
+ * Class ImportAllegroPayInJob
+ * @package App\Jobs
+ *
+ * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+ */
 class ImportAllegroPayInJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -28,7 +36,7 @@ class ImportAllegroPayInJob implements ShouldQueue
 
     /**
      * ImportAllegroPayInJob constructor.
-     * @param TransactionRepository $transaction
+     * @param UploadedFile $file
      */
     public function __construct(UploadedFile $file)
     {
@@ -42,6 +50,9 @@ class ImportAllegroPayInJob implements ShouldQueue
     public function handle(TransactionRepository $transaction)
     {
         $header = NULL;
+        $fileName = 'transactionWithoutOrder.csv';
+        $file = fopen($fileName, 'w');
+
         $this->transaction = $transaction;
         $data = array();
         $i = 0;
@@ -52,6 +63,7 @@ class ImportAllegroPayInJob implements ShouldQueue
                         $headerName = snake_case(PdfCharactersHelper::changePolishCharactersToNonAccented($headerName));
                     }
                     $header = $row;
+                    fputcsv($file, $row);
                 } else {
                     $data[] = array_combine($header, $row);
                     $i++;
@@ -83,15 +95,27 @@ class ImportAllegroPayInJob implements ShouldQueue
                         }
                     }
                 } else {
-
+                    fputcsv($file, $payIn);
                 }
             } catch (\Exception $exception) {
-                dd($exception);
+                Log::notice('Błąd podczas importu: ' . $exception->getMessage(), ['line' => __LINE__, 'file' => __FILE__]);
             }
         }
+        fclose($file);
+        Storage::disk('local')->put('public/transaction/TransactionWithoutOrders' . date('Y-m-d') . '.csv', file_get_contents($fileName));
+
     }
 
-    private function saveTransaction(Order $order, array $data)
+    /**
+     * Save new transaction
+     *
+     * @param Order $order Order object
+     * @param array $data Additional data
+     * @return int
+     *
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    private function saveTransaction(Order $order, array $data): int
     {
         return $this->transaction->create([
             'customer_id' => $order->customer_id,
@@ -102,13 +126,21 @@ class ImportAllegroPayInJob implements ShouldQueue
             'order_id' => $order->id,
             'operator' => $data['operator'],
             'operation_value' => $data['kwota'],
-            'balance' => (float)$this->getCustomerBalance($order->customer_id, $data['kwota']) + (float)$data['kwota'],
+            'balance' => (float)$this->getCustomerBalance($order->customer_id) + (float)$data['kwota'],
             'accounting_notes' => '',
             'transaction_notes' => '',
         ])->id;
     }
 
-    private function getCustomerBalance($customerId, $operationValue)
+    /**
+     * Calculate balance
+     *
+     * @param integer $customerId Customer id
+     * @return int
+     *
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    private function getCustomerBalance(int $customerId): int
     {
         if (!empty($lastCustomerTransaction = $this->transaction->findWhere([
             ['customer_id', '=', $customerId]

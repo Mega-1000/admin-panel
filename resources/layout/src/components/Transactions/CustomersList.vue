@@ -55,32 +55,28 @@
           <table class="table table-hover">
             <thead>
             <tr>
-              <th scope="col">Id</th>
-              <th scope="col">Login</th>
-              <th scope="col">Nick allegro</th>
-              <th scope="col">Imię</th>
-              <th scope="col">Nazwisko</th>
-              <th scope="col">Nazwa firmy</th>
-              <th scope="col">Numer telefonu</th>
-<!--              <th scope="col">NIP</th>-->
-              <th scope="col">Adres</th>
-              <th scope="col">Email</th>
-              <th scope="col" class="text-center">Akcje</th>
+              <th scope="col" style="width: 5%;">Id</th>
+              <th scope="col" style="width: 15%;">Login</th>
+              <th scope="col" style="width: 10%;">Nick allegro</th>
+              <th scope="col" style="width: 10%;">Imię</th>
+              <th scope="col" style="width: 10%;">Nazwisko</th>
+              <th scope="col" style="width: 15%;">Nazwa firmy</th>
+              <th scope="col" style="width: 10%;">Numer telefonu</th>
+              <th scope="col" style="width: 15%;">Adres</th>
+              <th scope="col" style="width: 10%;" class="text-center">Akcje</th>
             </tr>
             </thead>
             <tbody>
             <tr v-for="(customer,index) in customers" :key="index">
-              <th scope="col">{{ customer.id }}</th>
-              <td>{{ customer.login }}</td>
-              <td>{{ customer.nickAllegro }}</td>
-              <td>{{ customer.firstName }}</td>
-              <td>{{ customer.lastName }}</td>
-              <td>{{ customer.firmName }}</td>
-              <td>{{ customer.phone }}</td>
-<!--              <td>{{ customer.nip }}</td>-->
-              <td>{{ customer.address }}</td>
-              <td>{{ customer.email }}</td>
-              <td class="text-center">
+              <td style="width: 5%;">{{ customer.id }}</td>
+              <td style="width: 15%;">{{ customer.login }}</td>
+              <td style="width: 10%;">{{ customer.nickAllegro }}</td>
+              <td style="width: 10%;">{{ customer.firstName }}</td>
+              <td style="width: 10%;">{{ customer.lastName }}</td>
+              <td style="width: 15%;">{{ customer.firmName }}</td>
+              <td style="width: 10%;">{{ customer.phone }}</td>
+              <td style="width: 15%;">{{ customer.address }}</td>
+              <td class="text-center" style="width: 10%;">
                 <button class="btn btn-primary" @click="setCustomer(customer)">
                   <span>Transakcje</span>
                 </button>
@@ -157,4 +153,23 @@ export default class CustomersList extends Vue {
       margin: 0.25rem 0.125rem;
     }
   }
+
+  tr {
+    width: 100%;
+    display: inline-table;
+    table-layout: fixed;
+  }
+
+  table {
+    height: 550px; // <-- Select the height of the table
+    display: block;
+  }
+
+  tbody {
+    overflow-y: scroll;
+    height: 500px; //  <-- Select the height of the body
+    width: 98.3%;
+    position: absolute;
+  }
+
 </style>

@@ -223,12 +223,29 @@ class TransactionsController extends Controller
         return response()->json($response, $response['status']);
     }
 
+    /**
+     * Import transaction from file
+     *
+     * @param string  $kind
+     * @param Request $request
+     * @return JsonResponse
+     *
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
     public function import(string $kind, Request $request)
     {
         switch ($kind) {
             case 'allegroPayIn':
                 dispatch_now(new ImportAllegroPayInJob($request->file('file')));
+                $response = ['status' => true];
+                break;
+            default:
+                $response = [
+                    'errorCode' => 303,
+                    'errorMessage' => 'Wybrany format importu nie jest wspierany.'
+                ];
         }
+        return response()->json($response);
     }
 
     /**
