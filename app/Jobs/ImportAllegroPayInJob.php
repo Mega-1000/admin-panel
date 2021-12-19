@@ -74,15 +74,15 @@ class ImportAllegroPayInJob implements ShouldQueue
 
         $data = array_reverse($data);
         foreach ($data as $payIn) {
-            if ($payIn['operacja'] === 'zwrot') {
+            if ($payIn['operacja'] !== 'wpłata') {
                 continue;
             }
             /** @var SelTransaction $selTransaction */
-            $selTransaction = SelTransaction::where('tr_CheckoutFormPaymentId', '=', $payIn['identyfikator'])->first();
+            $selTransaction = SelTransaction::where('tr_CheckoutFormPaymentId', '=', $payIn['identyfikator'])->where('tr_Paid', '=', true)->first();
             try {
                 if (!empty($selTransaction->order)) {
                     $transaction = $this->saveTransaction($selTransaction->order, $payIn);
-                    if ($selTransaction->order->payments->count()) {
+                    if ($transaction !== null && $selTransaction->order->payments->count()) {
                         /** @var OrderPayment $payment */
                         foreach ($selTransaction->order->payments as $payment) {
                             $amount = preg_replace('/[^.\d]/', '', $payIn['kwota']);
@@ -116,12 +116,17 @@ class ImportAllegroPayInJob implements ShouldQueue
      *
      * @param Order $order Order object
      * @param array $data Additional data
-     * @return int
+     * @return Transaction
      *
+     * @throws \Exception
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    private function saveTransaction(Order $order, array $data): Transaction
+    private function saveTransaction(Order $order, array $data): ?Transaction
     {
+        $existingTransaction = $this->transaction->select()->where('payment_id', '=', $data['identyfikator'])->first();
+        if ($existingTransaction !== null) {
+            return null;
+        }
         return $this->transaction->create([
             'customer_id' => $order->customer_id,
             'posted_in_system_date' => new \DateTime(),

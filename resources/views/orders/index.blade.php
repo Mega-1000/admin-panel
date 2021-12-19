@@ -1955,7 +1955,7 @@
                             if (totalOfDeclaredPayments > 0) {
                                 return '<p>Z: ' + totalOfPayments + '</p><p>D: ' + totalOfDeclaredPayments + '</p>';
                             } else if (totalOfSettledPayments > 0) {
-                                return '<p>RD: ' + totalOfSettledPayments + '</p>';
+                                return '<p>Z: ' + totalOfSettledPayments + '</p><p>RD: ' + totalOfSettledPayments + '</p>';
                             } else {
                                 return '<p>Z: ' + totalOfPayments + '</p>';
                             }
