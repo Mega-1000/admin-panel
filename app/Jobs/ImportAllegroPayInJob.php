@@ -74,11 +74,14 @@ class ImportAllegroPayInJob implements ShouldQueue
 
         $data = array_reverse($data);
         foreach ($data as $payIn) {
+            if ($payIn['operacja'] === 'zwrot') {
+                continue;
+            }
             /** @var SelTransaction $selTransaction */
             $selTransaction = SelTransaction::where('tr_CheckoutFormPaymentId', '=', $payIn['identyfikator'])->first();
             try {
                 if (!empty($selTransaction->order)) {
-                    $transactionId = $this->saveTransaction($selTransaction->order, $payIn);
+                    $transaction = $this->saveTransaction($selTransaction->order, $payIn);
                     if ($selTransaction->order->payments->count()) {
                         /** @var OrderPayment $payment */
                         foreach ($selTransaction->order->payments as $payment) {
@@ -86,11 +89,13 @@ class ImportAllegroPayInJob implements ShouldQueue
                             if ($payment->promise === '1' && $payment->amount == $amount) {
                                 $payment->delete();
                                 $selTransaction->order->payments()->create([
-                                    'transaction_id' => $transactionId,
+                                    'transaction_id' => $transaction->id,
                                     'amount' => $amount,
                                     'type' => 'CLIENT',
                                     'promise' => '',
                                 ]);
+
+                                $this->saveTransfer($selTransaction->order, $transaction);
                             }
                         }
                     }
@@ -115,12 +120,12 @@ class ImportAllegroPayInJob implements ShouldQueue
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    private function saveTransaction(Order $order, array $data): int
+    private function saveTransaction(Order $order, array $data): Transaction
     {
         return $this->transaction->create([
             'customer_id' => $order->customer_id,
             'posted_in_system_date' => new \DateTime(),
-            'posted_in_bank_date' => $data['data'],
+            'posted_in_bank_date' => new \DateTime($data['data']),
             'payment_id' => $data['identyfikator'],
             'kind_of_operation' => $data['operacja'],
             'order_id' => $order->id,
@@ -129,18 +134,18 @@ class ImportAllegroPayInJob implements ShouldQueue
             'balance' => (float)$this->getCustomerBalance($order->customer_id) + (float)$data['kwota'],
             'accounting_notes' => '',
             'transaction_notes' => '',
-        ])->id;
+        ]);
     }
 
     /**
      * Calculate balance
      *
      * @param integer $customerId Customer id
-     * @return int
+     * @return float
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    private function getCustomerBalance(int $customerId): int
+    private function getCustomerBalance(int $customerId): float
     {
         if (!empty($lastCustomerTransaction = $this->transaction->findWhere([
             ['customer_id', '=', $customerId]
@@ -149,5 +154,30 @@ class ImportAllegroPayInJob implements ShouldQueue
         } else {
             return 0;
         }
+    }
+
+    /**
+     * Tworzy transakcje przeksięgowania
+     *
+     * @param Order       $order
+     * @param Transaction $transaction
+     * @return Transaction
+     *
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    private function saveTransfer(Order $order, Transaction $transaction): Transaction
+    {
+        return $this->transaction->create([
+            'customer_id' => $order->customer_id,
+            'posted_in_system_date' => new \DateTime(),
+            'payment_id' => 'p-' . $transaction->payment_id . '-' . $transaction->posted_in_system_date->format('Y-m-d H:i:s'),
+            'kind_of_operation' => 'przeksięgowanie',
+            'order_id' => $order->id,
+            'operator' => 'SYSTEM',
+            'operation_value' => $transaction->operation_value,
+            'balance' => (float)$this->getCustomerBalance($order->customer_id) - (float)$transaction->operation_value,
+            'accounting_notes' => '',
+            'transaction_notes' => '',
+        ]);
     }
 }

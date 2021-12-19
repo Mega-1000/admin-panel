@@ -11,7 +11,7 @@ import {
   TRANSACTIONS_SET_IS_LOADING,
   TRANSACTIONS_SET_ERROR,
   TRANSACTIONS_SET_ALL,
-  TRANSACTIONS_SET_CUSTOMER, TRANSACTIONS_DELETE, TRANSACTIONS_SET_TRANSACTION
+  TRANSACTIONS_SET_CUSTOMER, TRANSACTIONS_DELETE, TRANSACTIONS_SET_TRANSACTION, IMPORT_TRANSACTIONS_SET_IS_LOADING
 } from '@/store/mutation-types'
 
 import TransactionsRepository from '@/store/repositories/TransactionsRepository'
@@ -21,6 +21,7 @@ const namespaced = true
 const state: TransactionsStore = {
   error: '',
   isLoading: false,
+  importIsLoading: false,
   customers: [],
   customer: null,
   transaction: null
@@ -28,6 +29,7 @@ const state: TransactionsStore = {
 
 const getters = {
   isLoading: (state: TransactionsStore) => state.isLoading,
+  importIsLoading: (state: TransactionsStore) => state.importIsLoading,
   error: (state: TransactionsStore) => state.error,
   customers: (state: TransactionsStore) => state.customers,
   customer: (state: TransactionsStore) => state.customer,
@@ -113,19 +115,19 @@ const actions = {
       })
   },
   import ({ commit }: any, params: ImportFileParams) {
-    commit(TRANSACTIONS_SET_IS_LOADING, true)
+    commit(IMPORT_TRANSACTIONS_SET_IS_LOADING, true)
 
     return TransactionsRepository
       .importTransaction(params)
       .then((data: any) => {
-        commit(TRANSACTIONS_SET_IS_LOADING, false)
+        commit(IMPORT_TRANSACTIONS_SET_IS_LOADING, false)
         if (data.errorCode) {
           commit(TRANSACTIONS_SET_ERROR, data.errorMessage)
         }
         return data
       })
       .catch((error: any) => {
-        commit(TRANSACTIONS_SET_ERROR, error.errorMessage)
+        commit(IMPORT_TRANSACTIONS_SET_IS_LOADING, error.errorMessage)
       })
   }
 }
@@ -133,6 +135,9 @@ const actions = {
 const mutations = {
   [TRANSACTIONS_SET_IS_LOADING] (state: TransactionsStore, isLoading: boolean) {
     state.isLoading = isLoading
+  },
+  [IMPORT_TRANSACTIONS_SET_IS_LOADING] (state: TransactionsStore, importIsLoading: boolean) {
+    state.importIsLoading = importIsLoading
   },
   [TRANSACTIONS_SET_ERROR] (state: TransactionsStore, error: string) {
     state.error = error

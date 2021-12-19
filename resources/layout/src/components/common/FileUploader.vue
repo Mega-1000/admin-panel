@@ -10,7 +10,10 @@
             <span aria-hidden="true" @click="$emit('close')">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
+        <div v-if="importIsLoading" class="modal-body">
+          <div class="loader">Loading...</div>
+        </div>
+        <div v-else class="modal-body">
           <div class="row">
             <div class="col-md-12">
               <div class="form-group"
@@ -46,7 +49,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="submit" class="btn btn-success" @click="importFile">Importuj</button>
+          <button type="submit" class="btn btn-success" :class="{'disabled':importIsLoading}" @click="importFile">Importuj</button>
           <button type="button" class="btn btn-secondary" @click="$emit('close')">Zamknij</button>
         </div>
       </div>
@@ -71,7 +74,7 @@ export default class FileUploader extends Vue {
   private file: File = new File([''], '')
 
   public async importFile (): Promise<void> {
-    if (this.kind.value === '') {
+    if (this.importIsLoading || this.kind.value === '') {
       return
     }
 
@@ -86,6 +89,10 @@ export default class FileUploader extends Vue {
 
   public async previewFiles (event: any) {
     this.file = event.target.files[0]
+  }
+
+  public get importIsLoading (): string {
+    return this.$store?.getters['TransactionsService/importIsLoading']
   }
 }
 </script>
@@ -131,4 +138,81 @@ export default class FileUploader extends Vue {
       padding: 1rem;
     }
   }
+
+  .loader,
+  .loader::before,
+  .loader::after {
+    border-radius: 50%;
+  }
+
+  .loader {
+    color: $cl-whiteff;
+    font-size: 11px;
+    text-indent: -99999em;
+    margin: 55px auto;
+    position: relative;
+    width: 10em;
+    height: 10em;
+    box-shadow: inset 0 0 0 1em;
+    -webkit-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+
+  .loader::before,
+  .loader::after {
+    position: absolute;
+    content: '';
+  }
+
+  .loader::before {
+    width: 5.2em;
+    height: 10.2em;
+    background: $cl-blue2c;
+    border-radius: 10.2em 0 0 10.2em;
+    top: -0.1em;
+    left: -0.1em;
+    -webkit-transform-origin: 5.1em 5.1em;
+    transform-origin: 5.1em 5.1em;
+    -webkit-animation: load2 2s infinite ease 1.5s;
+    animation: load2 2s infinite ease 1.5s;
+  }
+
+  .loader::after {
+    width: 5.2em;
+    height: 10.2em;
+    background: $cl-blue2c;
+    border-radius: 0 10.2em 10.2em 0;
+    top: -0.1em;
+    left: 4.9em;
+    -webkit-transform-origin: 0.1em 5.1em;
+    transform-origin: 0.1em 5.1em;
+    -webkit-animation: load2 2s infinite ease;
+    animation: load2 2s infinite ease;
+  }
+
+  @-webkit-keyframes load2 {
+    0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+
+    100% {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes load2 {
+    0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+
+    100% {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+  }
+
 </style>
