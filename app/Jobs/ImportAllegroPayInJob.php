@@ -57,7 +57,7 @@ class ImportAllegroPayInJob implements ShouldQueue
         $data = array();
         $i = 0;
         if (($handle = fopen($this->file, 'r')) !== FALSE) {
-            while (($row = fgetcsv($handle, 1000, ',')) !== FALSE) {
+            while (($row = fgetcsv($handle, 3000, ',')) !== FALSE) {
                 if (!$header) {
                     foreach ($row as &$headerName) {
                         $headerName = snake_case(PdfCharactersHelper::changePolishCharactersToNonAccented($headerName));

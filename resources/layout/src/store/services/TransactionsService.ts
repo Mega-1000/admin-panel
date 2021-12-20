@@ -129,6 +129,11 @@ const actions = {
       .catch((error: any) => {
         commit(IMPORT_TRANSACTIONS_SET_IS_LOADING, error.errorMessage)
       })
+  },
+  setErrorMessage ({ commit }: any, errorMessage: string) {
+    commit(TRANSACTIONS_SET_IS_LOADING, true)
+    commit(TRANSACTIONS_SET_ERROR, errorMessage)
+    commit(TRANSACTIONS_SET_IS_LOADING, false)
   }
 }
 

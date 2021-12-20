@@ -14,6 +14,11 @@
           <div class="loader">Loading...</div>
         </div>
         <div v-else class="modal-body">
+          <div v-if="errors.length" class="row">
+            <div class="col-md-12">
+              <div class="alert alert-danger">{{ errors }}</div>
+            </div>
+          </div>
           <div class="row">
             <div class="col-md-12">
               <div class="form-group"
@@ -49,7 +54,9 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="submit" class="btn btn-success" :class="{'disabled':importIsLoading}" @click="importFile">Importuj</button>
+          <button type="submit" class="btn btn-success" :class="{'disabled':importIsLoading}" @click="importFile">
+            Importuj
+          </button>
           <button type="button" class="btn btn-secondary" @click="$emit('close')">Zamknij</button>
         </div>
       </div>
@@ -59,6 +66,7 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { ImportFileParams } from '@/types/TransactionsTypes'
+import { TRANSACTIONS_SET_ERROR } from '@/store/mutation-types'
 
 @Component({
   components: {}
@@ -74,9 +82,11 @@ export default class FileUploader extends Vue {
   private file: File = new File([''], '')
 
   public async importFile (): Promise<void> {
-    if (this.importIsLoading || this.kind.value === '') {
+    if (this.importIsLoading || this.kind.value === '' || this.file.name === '') {
+      await this.$store?.dispatch('TransactionsService/setErrorMessage', 'Proszę uzupełnić brakujące dane')
       return
     }
+    await this.$store?.dispatch('TransactionsService/setErrorMessage', '')
 
     const params: ImportFileParams = {
       file: this.file,
@@ -84,7 +94,10 @@ export default class FileUploader extends Vue {
     }
 
     await this.$store.dispatch('TransactionsService/import', params)
-    this.$emit('close')
+    if (this.errors.length === 0) {
+      window.location.replace('/admin/transactions?kind=' + this.kind.value)
+      this.$emit('close')
+    }
   }
 
   public async previewFiles (event: any) {
@@ -93,6 +106,10 @@ export default class FileUploader extends Vue {
 
   public get importIsLoading (): string {
     return this.$store?.getters['TransactionsService/importIsLoading']
+  }
+
+  public get errors (): string {
+    return this.$store?.getters['TransactionsService/error']
   }
 }
 </script>

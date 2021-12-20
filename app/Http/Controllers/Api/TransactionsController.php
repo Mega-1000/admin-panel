@@ -7,6 +7,7 @@ use App\Entities\Transaction;
 use App\Http\Controllers\Controller;
 use App\Jobs\ImportAllegroPayInJob;
 use App\Repositories\TransactionRepository;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -234,16 +235,26 @@ class TransactionsController extends Controller
      */
     public function import(string $kind, Request $request)
     {
+        $job = null;
         switch ($kind) {
             case 'allegroPayIn':
-                dispatch_now(new ImportAllegroPayInJob($request->file('file')));
-                $response = ['status' => true];
+                $job = new ImportAllegroPayInJob($request->file('file'));
                 break;
             default:
                 $response = [
                     'errorCode' => 303,
                     'errorMessage' => 'Wybrany format importu nie jest wspierany.'
                 ];
+        }
+        if ($job instanceof ShouldQueue) {
+            try {
+                $response = dispatch_now($job);
+            } catch (\Exception $exception) {
+                $response = [
+                    'errorCode' => 500,
+                    'errorMessage' => 'Błąd podczas wczytywania pliku'
+                ];
+            }
         }
         return response()->json($response);
     }

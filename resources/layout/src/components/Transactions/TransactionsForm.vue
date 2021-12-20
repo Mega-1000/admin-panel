@@ -194,7 +194,8 @@ export default class TransactionsForm extends Vue {
     paymentIn: 'wpłata',
     paymentOut: 'wypłata',
     charge: 'obciążenie',
-    credit: 'uznanie'
+    credit: 'uznanie',
+    transfer: 'przeksięgowanie'
   };
 
   private showCustomerSearcher = false
