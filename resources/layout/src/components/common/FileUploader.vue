@@ -10,7 +10,15 @@
             <span aria-hidden="true" @click="$emit('close')">&times;</span>
           </button>
         </div>
-        <div class="modal-body">
+        <div v-if="importIsLoading" class="modal-body">
+          <div class="loader">Loading...</div>
+        </div>
+        <div v-else class="modal-body">
+          <div v-if="errors.length" class="row">
+            <div class="col-md-12">
+              <div class="alert alert-danger">{{ errors }}</div>
+            </div>
+          </div>
           <div class="row">
             <div class="col-md-12">
               <div class="form-group"
@@ -38,6 +46,7 @@
                     <button class="btn btn-file">Dodaj plik<input id="file" ref="uploadFiles" @change="previewFiles"
                                                                   type="file" aria-describedby="file">
                     </button>
+                    <span>{{ file.name }}</span>
                   </div>
                 </div>
               </div>
@@ -45,7 +54,9 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="submit" class="btn btn-success" @click="importFile">Importuj</button>
+          <button type="submit" class="btn btn-success" :class="{'disabled':importIsLoading}" @click="importFile">
+            Importuj
+          </button>
           <button type="button" class="btn btn-secondary" @click="$emit('close')">Zamknij</button>
         </div>
       </div>
@@ -54,6 +65,8 @@
 </template>
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
+import { ImportFileParams } from '@/types/TransactionsTypes'
+import { TRANSACTIONS_SET_ERROR } from '@/store/mutation-types'
 
 @Component({
   components: {}
@@ -66,18 +79,37 @@ export default class FileUploader extends Vue {
     errorMessage: ''
   }
 
-  private file = {
-    value: '',
-    error: false,
-    errorMessage: ''
+  private file: File = new File([''], '')
+
+  public async importFile (): Promise<void> {
+    if (this.importIsLoading || this.kind.value === '' || this.file.name === '') {
+      await this.$store?.dispatch('TransactionsService/setErrorMessage', 'Proszę uzupełnić brakujące dane')
+      return
+    }
+    await this.$store?.dispatch('TransactionsService/setErrorMessage', '')
+
+    const params: ImportFileParams = {
+      file: this.file,
+      kind: this.kind.value
+    }
+
+    await this.$store.dispatch('TransactionsService/import', params)
+    if (this.errors.length === 0) {
+      window.location.replace('/admin/transactions?kind=' + this.kind.value)
+      this.$emit('close')
+    }
   }
 
-  public async importFile () {
-    console.log('dasda')
+  public async previewFiles (event: any) {
+    this.file = event.target.files[0]
   }
 
-  public async previewFiles () {
-    // this.file = this.$refs.uploadFiles.files
+  public get importIsLoading (): string {
+    return this.$store?.getters['TransactionsService/importIsLoading']
+  }
+
+  public get errors (): string {
+    return this.$store?.getters['TransactionsService/error']
   }
 }
 </script>
@@ -123,4 +155,81 @@ export default class FileUploader extends Vue {
       padding: 1rem;
     }
   }
+
+  .loader,
+  .loader::before,
+  .loader::after {
+    border-radius: 50%;
+  }
+
+  .loader {
+    color: $cl-whiteff;
+    font-size: 11px;
+    text-indent: -99999em;
+    margin: 55px auto;
+    position: relative;
+    width: 10em;
+    height: 10em;
+    box-shadow: inset 0 0 0 1em;
+    -webkit-transform: translateZ(0);
+    -ms-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+
+  .loader::before,
+  .loader::after {
+    position: absolute;
+    content: '';
+  }
+
+  .loader::before {
+    width: 5.2em;
+    height: 10.2em;
+    background: $cl-blue2c;
+    border-radius: 10.2em 0 0 10.2em;
+    top: -0.1em;
+    left: -0.1em;
+    -webkit-transform-origin: 5.1em 5.1em;
+    transform-origin: 5.1em 5.1em;
+    -webkit-animation: load2 2s infinite ease 1.5s;
+    animation: load2 2s infinite ease 1.5s;
+  }
+
+  .loader::after {
+    width: 5.2em;
+    height: 10.2em;
+    background: $cl-blue2c;
+    border-radius: 0 10.2em 10.2em 0;
+    top: -0.1em;
+    left: 4.9em;
+    -webkit-transform-origin: 0.1em 5.1em;
+    transform-origin: 0.1em 5.1em;
+    -webkit-animation: load2 2s infinite ease;
+    animation: load2 2s infinite ease;
+  }
+
+  @-webkit-keyframes load2 {
+    0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+
+    100% {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes load2 {
+    0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+
+    100% {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+  }
+
 </style>
