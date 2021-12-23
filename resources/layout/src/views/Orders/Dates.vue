@@ -7,17 +7,17 @@
       </div>
     </div>
     <dates-table
-      @modify="toggleShowModifyDatesModal"
-      @accept="saveAccept"
-      @acceptAsCustomer="acceptAsCustomer"
-      :user-type="getUserType()"
+            @modify="toggleShowModifyDatesModal"
+            @accept="saveAccept"
+            @acceptAsCustomer="acceptAsCustomer"
+            :user-type="getUserType()"
     ></dates-table>
     <modify-date-modal
-      v-if="showModal"
-      @close="toggleShowModifyDatesModal()"
-      :type="type"
-      :order-id="orderId"
-      @loadDates="loadDates()"></modify-date-modal>
+            v-if="showModal"
+            @close="toggleShowModifyDatesModal()"
+            :type="type"
+            :order-id="orderId"
+            @loadDates="loadDates()"></modify-date-modal>
     <debugger :keepAlive="true" :components="$children"></debugger>
   </div>
 </template>
@@ -89,10 +89,10 @@ export default class OrderDates extends Vue {
     return USER_TYPES[this.userType]
   }
 
-  public getMessage () {
+  public getMessage (): string {
     return 'Aby zaakceptować daty wybranej strony transakcji kliknij przycisk <strong>Akceptuj</strong> w odpowiedniej kolumnie<br/>' +
-      'Aby zaakceptować daty w imieniu klienta wybierz przycisk <strong>Akceptuj w imieniu klienta</strong><br/>' +
-      'W celu modyfikacji dat wybierz przycisk <strong>Modyfikuj</strong> a następnie wypełnij formularz. <br>' + this.acceptance.message
+            'Aby zaakceptować daty w imieniu klienta wybierz przycisk <strong>Akceptuj w imieniu klienta</strong><br/>' +
+            'W celu modyfikacji dat wybierz przycisk <strong>Modyfikuj</strong> a następnie wypełnij formularz. <br>' + this.acceptance.message
   }
 }
 </script>

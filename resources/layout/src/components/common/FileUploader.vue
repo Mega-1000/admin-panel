@@ -41,12 +41,12 @@
               <div class="form-group file-group"
                    :class="[{'has-error': file.error===true},{'has-success': file.error===false && file.value !== ''}]">
                 <label for="file" class="col-md-5 col-form-label">Plik Importu</label>
-                <div class="col-md-5">
+                <div class="col-md-7">
                   <div class="input-group-file">
                     <button class="btn btn-file">Dodaj plik<input id="file" ref="uploadFiles" @change="previewFiles"
                                                                   type="file" aria-describedby="file">
                     </button>
-                    <span>{{ file.name }}</span>
+                    <span class="file-label">{{ file.name }}</span>
                   </div>
                 </div>
               </div>
@@ -66,7 +66,6 @@
 <script lang="ts">
 import { Component, Prop, Vue } from 'vue-property-decorator'
 import { ImportFileParams } from '@/types/TransactionsTypes'
-import { TRANSACTIONS_SET_ERROR } from '@/store/mutation-types'
 
 @Component({
   components: {}
@@ -100,8 +99,9 @@ export default class FileUploader extends Vue {
     }
   }
 
-  public async previewFiles (event: any) {
-    this.file = event.target.files[0]
+  public async previewFiles (event: Event): Promise<void> {
+    const target = event.target as HTMLInputElement
+    this.file = (target.files as FileList)[0]
   }
 
   public get importIsLoading (): string {
@@ -230,6 +230,10 @@ export default class FileUploader extends Vue {
       -webkit-transform: rotate(360deg);
       transform: rotate(360deg);
     }
+  }
+
+  .file-label {
+    padding: 0.5rem;
   }
 
 </style>

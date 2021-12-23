@@ -121,15 +121,15 @@ export default class Searcher extends Vue {
     return this.$store.getters['CustomersService/isLoading']
   }
 
-  public get customers () {
+  public get customers (): [] {
     return this.$store?.getters['CustomersService/customers']
   }
 
-  public async mounted () {
+  public async mounted (): Promise<void> {
     await this.$store.dispatch('CustomersService/setCustomers', [])
   }
 
-  public async reset () {
+  public async reset (): Promise<void> {
     this.firstName = ''
     this.lastName = ''
     this.phone = ''
@@ -138,7 +138,7 @@ export default class Searcher extends Vue {
     await this.$store.dispatch('CustomersService/setError', '')
   }
 
-  public async loadCustomers () {
+  public async loadCustomers (): Promise<void> {
     const searchedCustomer: searchCustomerParams = {
       firstName: this.firstName,
       lastName: this.lastName,

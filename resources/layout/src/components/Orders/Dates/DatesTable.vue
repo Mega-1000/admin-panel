@@ -140,10 +140,12 @@ export default class DatesTable extends Vue {
     return Object.values(dates).some(date => (date !== null))
   }
 
-  public canAcceptAsCustomer () {
+  public canAcceptAsCustomer (): boolean {
     if (this.userType === 'consultant') {
       const dates = this.$store?.getters['OrdersService/consultantDates']
       return Object.values(dates).some(date => (date !== null))
+    } else {
+      return false
     }
   }
 }

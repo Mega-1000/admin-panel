@@ -175,7 +175,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue, Watch } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 import { CreateTransactionParams, Customer, Transaction } from '@/types/TransactionsTypes'
 import { Customer as SearchedCustomer } from '@/types/CustomersTypes'
 import DatePicker from 'vue2-datepicker'
@@ -282,7 +282,7 @@ export default class TransactionsForm extends Vue {
     }
   }
 
-  public async saveTransaction () {
+  public async saveTransaction (): Promise<void> {
     const params: CreateTransactionParams = {
       id: null,
       registrationInSystemDate: this.registrationInSystemDate.value,
@@ -317,7 +317,7 @@ export default class TransactionsForm extends Vue {
     }
   }
 
-  public async updateTransaction () {
+  public async updateTransaction (): Promise<void> {
     const params: CreateTransactionParams = {
       id: this.transaction.id,
       registrationInSystemDate: this.registrationInSystemDate.value,
@@ -353,7 +353,7 @@ export default class TransactionsForm extends Vue {
     }
   }
 
-  public async selectCustomer (customer: SearchedCustomer) {
+  public async selectCustomer (customer: SearchedCustomer): Promise<void> {
     this.customerId.value = customer.id.toString()
     this.orderIds = customer.ordersIds ?? []
     this.toggleShowModal()
@@ -363,7 +363,7 @@ export default class TransactionsForm extends Vue {
     this.showCustomerSearcher = !this.showCustomerSearcher
   }
 
-  public async mounted () {
+  public async mounted (): Promise<void> {
     if (this.transaction !== null) {
       this.accountingNotes.value = this.transaction.accountingNotes
       this.operationKind.value = this.transaction.operationKind
