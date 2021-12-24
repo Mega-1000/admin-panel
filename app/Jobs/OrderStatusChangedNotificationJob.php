@@ -70,18 +70,22 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
             $method = $tag->handler;
             $message = preg_replace("[" . preg_quote($tag->name) . "]", $emailTagHandler->$method(), $message);
         }
-
-        $subject = "Zmiana statusu - numer oferty: " . $this->orderId . " z: " . $oldStatus->name . " na: " . $order->status->name;
+        $status = explode('-', $order->status->name)[0];
+        $subject = "Zmiana statusu - numer oferty: " . $this->orderId . " z: " . str_replace('-', '', $oldStatus->name)
+            . " na: " . str_replace('-', '', $status);;
 
         $mail_to = $order->customer->login;
 	    $pdf = "";
 	
 	    if (($order->status_id == 3 || $order->status_id == 4) && !$order->sello_id) {
-    		dispatch_now(new GenerateOrderProformJob($order));
+            dispatch_now(new GenerateOrderProformJob($order, true));
 		    $pdf = Storage::disk('local')->get($order->proformStoragePath);
 	    }
-	    
+
         try {
+            if (empty($message) || $message === '<p>&nbsp;</p>') {
+                return;
+            }
             \Mailer::create()
                 ->to($mail_to)
                 ->send(new OrderStatusChanged($subject, $message, $pdf));

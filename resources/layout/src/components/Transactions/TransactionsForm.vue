@@ -191,10 +191,11 @@ import Searcher from '@/components/Customers/Searcher.vue'
 })
 export default class TransactionsForm extends Vue {
   private operations = {
-    paymentIn: 'Wpłata',
-    paymentOut: 'Wypłata',
-    charge: 'Obciążenie',
-    credit: 'Uznanie'
+    paymentIn: 'wpłata',
+    paymentOut: 'wypłata',
+    charge: 'obciążenie',
+    credit: 'uznanie',
+    transfer: 'przeksięgowanie'
   };
 
   private showCustomerSearcher = false

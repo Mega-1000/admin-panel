@@ -3,8 +3,10 @@
 namespace App\Providers;
 
 use App\Entities\TaskTime;
+use App\Jobs\ImportAllegroPayInJob;
 use App\Observers\Entities\TaskTimeObserver;
 use Carbon\Carbon;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Schema;
 

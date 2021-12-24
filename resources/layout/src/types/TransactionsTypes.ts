@@ -63,9 +63,14 @@ export interface Customer {
 export interface TransactionsStore {
     error: string,
     isLoading: boolean,
+    importIsLoading: boolean,
     customers: Customer[] | null,
     customer: Customer | null,
     transaction: Transaction | null,
 }
 
+export interface ImportFileParams {
+    kind: string,
+    file: File
+}
 /* eslint-enabled camelcase */

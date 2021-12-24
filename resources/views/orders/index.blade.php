@@ -1592,7 +1592,7 @@
                                                         </span>
                                                      </div>`;
                                             } else {
-                                                html += `<div data-toggle="label-tooltip" data-html="true" title="${tooltipContent + ' ' + (label[0].id === '66') ? row.production_date : row.created_at}" class="pointer" onclick="removeLabel(${row.orderId}, ${label[0].id}, ${label[0].manual_label_selection_to_add_after_removal}, '${label[0].added_type}', '${label[0].timed}');">
+                                                html += `<div data-toggle="label-tooltip" data-html="true" title="${tooltipContent + ' ' + ((label[0].id === '66') ? row.production_date : row.created_at)}" class="pointer" onclick="removeLabel(${row.orderId}, ${label[0].id}, ${label[0].manual_label_selection_to_add_after_removal}, '${label[0].added_type}', '${label[0].timed}');">
                                                         <span class="order-label" style="color: ${label[0].font_color}; display: block; margin-top: 5px; background-color: ${label[0].color}">
                                                             <i class="${label[0].icon_name}"></i>
                                                         </span>
@@ -1934,13 +1934,17 @@
                             let totalOfPayments = 0;
                             let totalOfDeclaredPayments = 0;
                             let totalofWarehousePayments = 0;
+                            let totalOfSettledPayments = 0;
                             var payments = row['payments'];
-
                             for (let index = 0; index < payments.length; index++) {
                                 if (payments[index].type === 'WAREHOUSE') {
                                     totalofWarehousePayments += parseFloat(payments[index].amount);
-                                } else if (payments[index].promise != "1") {
-                                    totalOfPayments += parseFloat(payments[index].amount);
+                                } else if (payments[index].promise !== "1") {
+                                    if (payments[index].transaction_id === null) {
+                                        totalOfPayments += parseFloat(payments[index].amount);
+                                    } else {
+                                        totalOfSettledPayments = parseFloat(payments[index].amount);
+                                    }
                                 } else {
                                     totalOfDeclaredPayments += parseFloat(payments[index].amount);
                                 }
@@ -1950,6 +1954,8 @@
                             }
                             if (totalOfDeclaredPayments > 0) {
                                 return '<p>Z: ' + totalOfPayments + '</p><p>D: ' + totalOfDeclaredPayments + '</p>';
+                            } else if (totalOfSettledPayments > 0) {
+                                return '<p>Z: ' + totalOfSettledPayments + '</p><p>RD: ' + totalOfSettledPayments + '</p>';
                             } else {
                                 return '<p>Z: ' + totalOfPayments + '</p>';
                             }

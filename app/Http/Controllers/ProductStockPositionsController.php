@@ -33,6 +33,22 @@ class ProductStockPositionsController extends Controller
      */
     public function store(ProductStockPositionCreate $request)
     {
+        $existingRecord = ProductStockPosition::where('lane', '=', $request->lane)
+            ->where('bookstand', '=', $request->bookstand)
+            ->where('shelf', '=', $request->shelf)
+            ->where('position', '=', $request->position)
+            ->with(['stock' => function ($q) {
+                $q->with('product');
+            }])
+            ->first();
+
+        if (!empty($existingRecord)) {
+            return redirect()->back()->with([
+                'message' => __('product_stock_positions.message.position_exist') . ' Symbol:' . $existingRecord->stock->product->symbol,
+                'alert-type' => 'error'
+            ]);
+        }
+
         $productStockPosition = ProductStockPosition::create(
             array_merge(['product_stock_id' => $request->id], $request->all())
         );
@@ -77,6 +93,32 @@ class ProductStockPositionsController extends Controller
         if (empty($productStockPosition)) {
             abort(404);
         }
+
+        $productStockPosition->fill([
+            'lane' => $request->lane,
+            'bookstand' => $request->bookstand,
+            'shelf' => $request->shelf,
+            'position' => $request->position
+        ]);
+        if (array_intersect(['lane', 'bookstand', 'shelf', 'position'], array_keys($productStockPosition->getDirty()))) {
+            $existingRecord = ProductStockPosition::query()
+                ->where('lane', '=', $request->lane)
+                ->where('bookstand', '=', $request->bookstand)
+                ->where('shelf', '=', $request->shelf)
+                ->where('position', '=', $request->position)
+                ->with(['stock' => function ($q) {
+                    $q->with('product');
+                }])
+                ->first();
+
+            if ($existingRecord) {
+                return redirect()->back()->with([
+                    'message' => __('product_stock_positions.message.position_exist') . ' Symbol:' . $existingRecord->stock->product->symbol,
+                    'alert-type' => 'error'
+                ]);
+            }
+        }
+
         $productStock = ProductStock::where(['product_id' => $id])->first();
 
 
@@ -150,7 +192,7 @@ class ProductStockPositionsController extends Controller
     {
         $collection = $this->prepareCollection($id);
 
-        return DataTables::collection($collection)->make(true);
+        return DataTables::collection($collection)->skipPaging()->make(true);
     }
 
     /**
@@ -175,10 +217,14 @@ class ProductStockPositionsController extends Controller
         $toPosition->update([
             'position_quantity' => $toPosition->position_quantity + $request->input('quantity__move')
         ]);
+
         if (Session::exists('removeLabelJobAfterProductStockMove')) {
-            $response = dispatch_now(Session::get('removeLabelJobAfterProductStockMove'));
-            if (!strlen((string) $response) > 0) {
-                Session::forget('removeLabelJobAfterProductStockMove');
+            $ordersToRefresh = Session::get('removeLabelJobAfterProductStockMove');
+            foreach ($ordersToRefresh as $order) {
+                $response = dispatch_now($order);
+                if (!strlen((string)$response) > 0) {
+                    Session::forget('removeLabelJobAfterProductStockMove');
+                }
             }
         }
     }

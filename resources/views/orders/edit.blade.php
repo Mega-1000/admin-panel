@@ -95,12 +95,12 @@
                            value="{{ $order->id }}" disabled>
                 </div>
                 <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                    <label for="employee">@lang('orders.form.employees')</label>
+                    <label for="employee">Konsultant obsługujący</label>
                     <select name="employee" id="employee" class="form-control">
                         @if($order->employee_id == null)
-                            <option value="none" selected>Brak pracownika</option>
+                            <option value="none" selected>Brak konsultanta</option>
                         @else
-                            <option value="none">Brak pracownika</option>
+                            <option value="none">Brak konsultanta</option>
                         @endif
                         @foreach($users as $user)
                             @if($user->id == $order->employee_id)
@@ -3511,14 +3511,15 @@
             ClassicEditor
                 .create(document.querySelector('.editor'))
                 .then(editor => {
-                    console.log(editor);
                     $('#status').on('change', function () {
                         $('#status option').each(function () {
                             if ($(this).is(':selected')) {
                                 $.ajax({
                                     url: '/admin/orders/status/' + this.value + '/message',
                                     success: function (result) {
-                                        editor.data.set(result);
+                                        if (result.length !== undefined) {
+                                            editor.data.set(result);
+                                        }
                                     }
                                 });
                             }
@@ -3529,7 +3530,9 @@
                             $.ajax({
                                 url: '/admin/orders/status/' + this.value + '/message',
                                 success: function (result) {
-                                    editor.data.set(result);
+                                    if (result.length !== undefined) {
+                                        editor.data.set(result);
+                                    }
                                 }
                             });
                         }

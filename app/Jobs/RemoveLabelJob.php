@@ -108,7 +108,7 @@ class RemoveLabelJob extends Job implements ShouldQueue
                     if ($item->id == 50) {
                         $response = dispatch_now(new ChangeWarehouseStockJob($this->order));
                         if (strlen((string) $response) > 0) {
-                            Session::put('removeLabelJobAfterProductStockMove', $this);
+                            Session::put('removeLabelJobAfterProductStockMove', array_merge([$this], Session::get('removeLabelJobAfterProductStockMove') ?? []));
                             return $response;
                         } else {
                             $this->order->labels()->detach($label);

@@ -34,16 +34,15 @@ class ProductStockPosition extends Model implements Transformable
      */
     public function stock()
     {
-        return $this->belongsTo(ProductStock::class);
+        return $this->belongsTo(ProductStock::class, 'product_stock_id', 'id');
     }
 
     public $customColumnsVisibilities = [
         'lane',
-        'bookstand' ,
-        'shelf' ,
-        'position' ,
+        'bookstand',
+        'shelf',
+        'position',
         'position_quantity',
-        'created_at' ,
-
-        ];
+        'created_at',
+    ];
 }

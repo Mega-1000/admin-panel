@@ -35,7 +35,7 @@ class ProductStock extends Model implements Transformable
      */
     public function product()
     {
-        return $this->belongsTo(Product::class)->withTrashed();
+        return $this->belongsTo(Product::class, 'product_id', 'id')->withTrashed();
     }
 
     /**
@@ -60,46 +60,46 @@ class ProductStock extends Model implements Transformable
     }
 
     public $customColumnsVisibilities = [
-        'name' ,
+        'name',
         'symbol',
-        'url' ,
+        'url',
         'status',
         'manufacturer',
-        'quantity' ,
+        'quantity',
         'min_quantity',
-        'unit' ,
-        'start_quantity' ,
+        'unit',
+        'start_quantity',
         'number_on_a_layer',
-        'created_at' ,
-        'net_purchase_price_commercial_unit' ,
-        'net_purchase_price_commercial_unit_after_discounts' ,
-        'net_special_price_commercial_unit' ,
-        'net_purchase_price_basic_unit' ,
+        'created_at',
+        'net_purchase_price_commercial_unit',
+        'net_purchase_price_commercial_unit_after_discounts',
+        'net_special_price_commercial_unit',
+        'net_purchase_price_basic_unit',
         'net_purchase_price_basic_unit_after_discounts',
-        'net_special_price_basic_unit' ,
+        'net_special_price_basic_unit',
         'net_purchase_price_calculated_unit',
         'net_purchase_price_calculated_unit_after_discounts',
-        'net_special_price_calculated_unit' ,
-        'gross_purchase_price_aggregate_unit' ,
+        'net_special_price_calculated_unit',
+        'gross_purchase_price_aggregate_unit',
         'gross_purchase_price_aggregate_unit_after_discounts',
         'gross_special_price_aggregate_unit',
-        'gross_purchase_price_the_largest_unit' ,
-        'gross_purchase_price_the_largest_unit_after_discounts' ,
-        'gross_special_price_the_largest_unit' ,
-        'net_selling_price_commercial_unit' ,
-        'net_selling_price_basic_unit' ,
+        'gross_purchase_price_the_largest_unit',
+        'gross_purchase_price_the_largest_unit_after_discounts',
+        'gross_special_price_the_largest_unit',
+        'net_selling_price_commercial_unit',
+        'net_selling_price_basic_unit',
         'net_selling_price_calculated_unit',
         'net_selling_price_aggregate_unit',
         'net_selling_price_the_largest_unit',
         'discount1',
         'discount2',
         'discount3',
-        'bonus1' ,
+        'bonus1',
         'bonus2',
         'bonus3',
-        'gross_price_of_packing' ,
+        'gross_price_of_packing',
         'table_price',
-        'vat' ,
+        'vat',
         'additional_payment_for_milling',
         'coating'
     ];

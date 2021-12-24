@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { getFullUrl } from '@/helpers/urls'
-import { CreateTransactionParams, Transaction } from '@/types/TransactionsTypes'
+import { CreateTransactionParams, ImportFileParams, Transaction } from '@/types/TransactionsTypes'
 
 export default {
   async getTransactions (): Promise<any> {
@@ -70,6 +70,23 @@ export default {
         'Content-Type': 'application/json; charset=utf-8',
         'X-Requested-Width': 'XMLHttpRequest'
       })
+    })
+      .then((response) => {
+        return response.json()
+      })
+  },
+  /**
+   * Import transakcji
+   *
+   * @param params:ImportFileParams
+   */
+  async importTransaction (params: ImportFileParams): Promise<any> {
+    const formData = new FormData()
+    formData.append('file', params.file)
+    return fetch(getFullUrl('api/transactions/import/' + params.kind), {
+      method: 'POST',
+      credentials: 'same-origin',
+      body: formData
     })
       .then((response) => {
         return response.json()

@@ -462,9 +462,15 @@
                         data-courierTasks="{{ json_encode($tasksInDay) }}">
                     {{ \App\Enums\CourierName::DELIVERY_TYPE_LABELS[$courierCode] }}
                     <div>
+                        <span class="badge"
+                              style=" color:#fff !important; background-color:#f96868 !important;">{{ count($tasksInDay['past']) }}</span>
                         @foreach($tasksInDay as $date => $tasks)
-                            <span class="badge badge-light">{{ count($tasks) }}</span>
+                            @if(preg_match('/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/', $date))
+                                <span class="badge badge-light">{{ count($tasks) }}</span>
+                            @endif
                         @endforeach
+                        <span class="badge"
+                              style=" color:#fff !important; background-color:#526069 !important;">{{ count($tasksInDay['future']) }}</span>
                     </div>
                 </button>
             </div>

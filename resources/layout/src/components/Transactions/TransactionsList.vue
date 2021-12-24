@@ -70,7 +70,11 @@
               <td>{{ transaction.posted_in_bank_date }}</td>
               <td>{{ transaction.payment_id }}</td>
               <td>{{ transaction.kind_of_operation }}</td>
-              <td>{{ transaction.order_id }}</td>
+              <td>
+                <a :href="getOrderLink(transaction.order_id)" target="_blank">
+                  <span>{{ transaction.order_id }}</span>
+                </a>
+              </td>
               <td>{{ transaction.operator }}</td>
               <td :class="[{'text-success': transaction.operation_value>0}, {'text-danger': transaction.operation_value<0}]">
                 {{ transaction.operation_value.toString().replace('-', '') }}
@@ -106,6 +110,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import { Customer, Transaction } from '@/types/TransactionsTypes'
+import { getFullUrl } from '@/helpers/urls'
 
 @Component({
   components: {}
@@ -136,6 +141,10 @@ export default class TransactionsList extends Vue {
     await this.$store?.dispatch('TransactionsService/setTransaction', editedTransaction)
     this.$emit('edit')
   }
+
+  public getOrderLink (orderID: string): string {
+    return getFullUrl('admin/orders/' + orderID + '/edit')
+  }
 }
 </script>
 
@@ -162,4 +171,91 @@ export default class TransactionsList extends Vue {
     max-height: 550px;
     overflow-y: auto;
   }
+
+  td {
+    margin: 1rem 2rem;
+
+    a {
+      --color: #646b8c;
+
+      position: relative;
+      text-decoration: none;
+      color: var(--color);
+      font-family: "Inter", sans-serif;
+      padding: 0.2rem 0;
+
+      &::before {
+        --line-width: 115%;
+        --line-height: 1px;
+        --line-easing: ease;
+        --line-transition-duration: 300ms;
+
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: var(--line-width);
+        height: var(--line-height);
+        transform-origin: right;
+        transform: scaleX(0);
+        background: var(--color);
+        transition: transform var(--line-transition-duration) var(--line-easing);
+        z-index: $index-addSetModalContent;
+      }
+
+      &:hover {
+        &::before {
+          transform-origin: left;
+          transform: scaleX(1);
+        }
+
+        span {
+          --deg: -45deg;
+
+          &::before {
+            transform: rotate(var(--deg));
+          }
+
+          &::after {
+            transform: translateX(-1px) rotate(var(--deg));
+          }
+        }
+      }
+
+      span {
+        --line-arrow-width: 1px;
+        --line-arrow-height: 6px;
+        --line-arrow-easing: cubic-bezier(0.3, 1.5, 0.5, 1);
+        --line-arrow-transition-duration: 200ms;
+        --line-arrow-transition-delay: 240ms;
+
+        &::before,
+        &::after {
+          content: "";
+          position: absolute;
+          right: -18%;
+          bottom: 0;
+          background: var(--color);
+          transition: transform var(--line-arrow-transition-duration) var(--line-arrow-easing);
+          transition-delay: var(--line-arrow-transition-delay);
+          z-index: $index-2;
+        }
+
+        &::before {
+          width: var(--line-arrow-width);
+          height: var(--line-arrow-height);
+          transform-origin: 0% 100%;
+          transform: rotate(-90deg);
+        }
+
+        &::after {
+          height: var(--line-arrow-width);
+          width: var(--line-arrow-height);
+          transform-origin: 100% 0%;
+          transform: translateX(-1px) rotate(0deg);
+        }
+      }
+    }
+  }
+
 </style>

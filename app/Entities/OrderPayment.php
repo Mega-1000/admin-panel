@@ -22,7 +22,17 @@ class OrderPayment extends Model implements Transformable
      * @var array
      */
     protected $fillable = [
-        'order_id', 'amount', 'notices', 'promise', 'promise_date', 'master_payment_id', 'created_at', 'type', 'status', 'token'
+        'order_id',
+        'amount',
+        'notices',
+        'promise',
+        'promise_date',
+        'master_payment_id',
+        'created_at',
+        'type',
+        'status',
+        'token',
+        'transaction_id',
     ];
 
     /**
@@ -35,12 +45,12 @@ class OrderPayment extends Model implements Transformable
 
     public $customColumnsVisibilities = [
         'order_id',
-        'amount' ,
+        'amount',
         'notices',
         'promise',
         'promise_date',
         'actions',
         'created_at',
         'change_status',
-        ];
+    ];
 }

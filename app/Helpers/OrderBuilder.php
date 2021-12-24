@@ -231,6 +231,7 @@ class OrderBuilder
         $orderCustomerOpenExists = Order::where('customer_id', $customer->id)
             ->whereNotIn('status_id', [6, 8])
             ->whereNotNull('employee_id')
+            ->orderBy('id', 'desc')
             ->first();
 
         if (!empty($orderCustomerOpenExists)) {

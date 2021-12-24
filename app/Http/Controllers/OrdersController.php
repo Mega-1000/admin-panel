@@ -1128,14 +1128,6 @@ class OrdersController extends Controller
             dispatch_now(new OrderStatusChangedNotificationJob($order->id, $request->input('mail_message'), $oldStatus));
         }
 
-        if ($request->input('status') != $order->status_id && $request->input('status') == 3) {      //mozliwa do realizacji
-            dispatch_now(new MissingDeliveryAddressSendMailJob($order));
-        }
-
-        if ($request->input('status') != $order->status_id && $request->input('status') == 4) {      //mozliwa do realizacji
-            dispatch_now(new MissingDeliveryAddressSendMailJob($order));
-        }
-
         if ($request->submit == 'updateAndStay') {
             return redirect()->route('orders.edit', ['order_id' => $order->id])->with([
                 'message' => __('orders.message.update'),
