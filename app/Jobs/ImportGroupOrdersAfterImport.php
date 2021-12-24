@@ -50,12 +50,12 @@ class ImportGroupOrdersAfterImport implements ShouldQueue
         foreach ($orders as $order) {
             // get all orders for customer
             $customerOrders = Order::where('customer_id', $order->customer_id)->get();
-            
+
             foreach ($customerOrders as $customerOrder) {
                 
                 $isLabel = $customerOrder->labels()->where('label_id', 47)->where('label_id', '!=', 50)->get()->count();
                 $products = $customerOrder->items()->get();
-
+                $email = $order->customer()->first()->login;
                 //var_dump($customerOrder->, ); die;
                 foreach ($products as $product) {
                     
@@ -85,7 +85,7 @@ class ImportGroupOrdersAfterImport implements ShouldQueue
                             
                             if ($isProductN) {
                                 //var_dump('IS N'); die;
-                                $this->createLabelsForN($customerOrder);
+                                $this->createLabelsForN($customerOrder, $email);
                                 
                             } else {
                                 //2. если нет , то проверяем товары с %-Y%
@@ -103,7 +103,7 @@ class ImportGroupOrdersAfterImport implements ShouldQueue
                                             $ordersToTaskNoLong[] = $customerOrder->id;
                                         }
                                     } else {
-                                        $this->createLabelsForN($customerOrder);
+                                        $this->createLabelsForN($customerOrder, $email);
                                     }
                                     
                                 } else {
@@ -188,7 +188,7 @@ class ImportGroupOrdersAfterImport implements ShouldQueue
         //die;
     }
     
-    private function createLabelsForN($customerOrder){
+    private function createLabelsForN($customerOrder, $email){
         //1. создается задание с задание с этикеткой 146
         $resultOrdersNoLong[] = $customerOrder->id;
         OrderLabel::create([
@@ -198,7 +198,7 @@ class ImportGroupOrdersAfterImport implements ShouldQueue
     
         //2. Высылаем email
         \Mailer::create()
-            ->to('xonzonex@gmail.com')
+            ->to($email)
             ->send(new GroupOrders());
     
         //3. Удаляем этикетку 47 добавляем 49 к заданию созданному выше
