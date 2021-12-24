@@ -37,6 +37,7 @@ class Task extends Model implements Transformable
         'color',
         'status',
         'rendering',
+        'is_import',
         'parent_id'
     ];
 

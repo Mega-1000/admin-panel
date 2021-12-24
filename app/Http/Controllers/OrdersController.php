@@ -40,6 +40,7 @@ use App\Http\Requests\OrderUpdateRequest;
 use App\Jobs\AddLabelJob;
 use App\Jobs\AllegroTrackingNumberUpdater;
 use App\Jobs\ImportOrdersFromSelloJob;
+use App\Jobs\ImportGroupOrdersAfterImport;
 use App\Jobs\Orders\MissingDeliveryAddressSendMailJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Jobs\RemoveFileLockJob;
@@ -2921,6 +2922,7 @@ class OrdersController extends Controller
     public function selloImport()
     {
         dispatch_now(new ImportOrdersFromSelloJob());
+        dispatch_now(new ImportGroupOrdersAfterImport());
         return redirect()->route('orders.index')->with([
             'message' => 'Rozpoczęto import z Sello',
             'alert-type' => 'success',
