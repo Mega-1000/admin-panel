@@ -4,7 +4,6 @@ namespace App\Jobs;
 
 use App\Entities\Order;
 use App\Entities\OrderPayment;
-use App\Entities\SelTransaction;
 use App\Entities\Transaction;
 use App\Helpers\PdfCharactersHelper;
 use App\Repositories\TransactionRepository;
@@ -40,7 +39,6 @@ class ImportBankPayIn implements ShouldQueue
         $this->file = $file;
     }
 
-
     /**
      * Execute the job.
      *
@@ -56,7 +54,7 @@ class ImportBankPayIn implements ShouldQueue
         $data = array();
         $i = 0;
         if (($handle = fopen($this->file, 'r')) !== FALSE) {
-            while (($row = fgetcsv($handle, 3000, ';')) !== FALSE) {
+            while (($row = fgetcsv($handle, 5000, ';')) !== FALSE) {
                 if (count($row) < 5) {
                     continue;
                 }
@@ -96,9 +94,6 @@ class ImportBankPayIn implements ShouldQueue
 
             try {
                 if (!empty($order)) {
-                    if ($order->id == 10528) {
-                        $tmp = $order;
-                    }
                     $payIn['kwota'] = (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $payIn['kwota']));
                     $transaction = $this->saveTransaction($order, $payIn);
                     $amount = $this->settleOrder($order, $payIn, $transaction);
@@ -131,6 +126,9 @@ class ImportBankPayIn implements ShouldQueue
             /** @var OrderPayment $payment */
             foreach ($order->payments as $payment) {
                 $paymentAmount = (float)$payment->amount;
+                if ($paymentAmount == 0) {
+                    continue;
+                }
                 if ($payment->promise === '1' && $amount >= $paymentAmount) {
                     $payment->delete();
                     $order->payments()->create([
@@ -184,7 +182,7 @@ class ImportBankPayIn implements ShouldQueue
      */
     private function saveTransaction(Order $order, array $data): ?Transaction
     {
-        $identyfikator = 'p' . strtotime($data['data_ksiegowania']) . '-' . $order->id;
+        $identyfikator = 'w-' . strtotime($data['data_ksiegowania']) . '-' . $order->id;
         $existingTransaction = $this->transactionRepository->select()->where('payment_id', '=', $identyfikator)->first();
         if ($existingTransaction !== null) {
             return null;
@@ -228,16 +226,20 @@ class ImportBankPayIn implements ShouldQueue
      *
      * @param Order       $order
      * @param Transaction $transaction
+     * @param float       $amount
+     * @param boolean     $back
      * @return Transaction
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    private function saveTransfer(Order $order, Transaction $transaction, $amount, $back = false): Transaction
+    private function saveTransfer(Order $order, Transaction $transaction, float $amount, bool $back = false): Transaction
     {
+        $identyfikator = 'p-' . strtotime($transaction->posted_in_bank_date->format('Y-m-d H:i:s')) . '-' . $order->id;
+
         return $this->transactionRepository->create([
             'customer_id' => $order->customer_id,
             'posted_in_system_date' => new \DateTime(),
-            'payment_id' => 'p-' . $transaction->payment_id . '-' . $transaction->posted_in_system_date->format('Y-m-d H:i:s'),
+            'payment_id' => $identyfikator,
             'kind_of_operation' => (!$back) ? 'przeksięgowanie' : 'przeksięgowanie wsteczne',
             'order_id' => $order->id,
             'operator' => 'SYSTEM',
