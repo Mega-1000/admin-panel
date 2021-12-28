@@ -55,7 +55,7 @@ class ImportBankPayIn implements ShouldQueue
         $i = 0;
         if (($handle = fopen($this->file, 'r')) !== FALSE) {
             while (($row = fgetcsv($handle, 5000, ';')) !== FALSE) {
-                if (count($row) < 5) {
+                if (count(array_filter($row)) < 5) {
                     continue;
                 }
 
@@ -121,6 +121,7 @@ class ImportBankPayIn implements ShouldQueue
 
     private function settleOrder($order, $payIn, $transaction)
     {
+        $amount = null;
         if ($transaction !== null && $order->payments->count()) {
             $amount = $payIn['kwota'];
             /** @var OrderPayment $payment */
