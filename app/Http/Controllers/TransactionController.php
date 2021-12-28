@@ -31,6 +31,9 @@ class TransactionController extends Controller
                 case 'allegroPayIn':
                     $filePath = 'public/transaction/TransactionWithoutOrders' . date('Y-m-d') . '.csv';
                     break;
+                case 'bankPayIn':
+                    $filePath = 'public/transaction/bankTransactionWithoutOrder' . date('Y-m-d') . '.csv';
+                    break;
                 default:
                     Log::warning('Nieobsługiwany typ transakcji.');
             }

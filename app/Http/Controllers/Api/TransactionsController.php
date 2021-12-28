@@ -66,6 +66,7 @@ class TransactionsController extends Controller
                         'orderIds' => $customer->orders->pluck('id')
                     ];
                 }
+                $response['customers'] = array_reverse($response['customers']);
             } else {
                 $response = [
                     'errorCode' => 424,
