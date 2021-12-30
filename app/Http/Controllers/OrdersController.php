@@ -2105,7 +2105,7 @@ class OrdersController extends Controller
             $row->allegro_commission = abs(\DB::table('order_allegro_commissions')->where('order_id', $row->orderId)->sum('amount'));
             $row->items = \DB::table('order_items')->where('order_id', $row->orderId)->get();
             $row->connected = \DB::table('orders')->where('master_order_id', $row->orderId)->get();
-            $row->payments = OrderPayment::where('order_id', $row->orderId)->get();
+            $row->payments = OrderPayment::withTrashed()->where('order_id', $row->orderId)->get();
 
             $row->packages = \DB::table('order_packages')->where('order_id', $row->orderId)->get();
             if ($row->packages) {

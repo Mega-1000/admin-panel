@@ -1934,17 +1934,18 @@
                             let totalOfPayments = 0;
                             let totalOfDeclaredPayments = 0;
                             let totalofWarehousePayments = 0;
-                            let totalOfSettledPayments = 0;
+                            let settledDeclared = 0;
                             var payments = row['payments'];
+
                             for (let index = 0; index < payments.length; index++) {
+                                if (payments[index].promise === '1' && payments[index].deleted_at !== null) {
+                                    settledDeclared = payments[index].amount;
+                                    continue
+                                }
                                 if (payments[index].type === 'WAREHOUSE') {
                                     totalofWarehousePayments += parseFloat(payments[index].amount);
                                 } else if (payments[index].promise !== "1") {
-                                    if (payments[index].transaction_id === null) {
-                                        totalOfPayments += parseFloat(payments[index].amount);
-                                    } else {
-                                        totalOfSettledPayments = parseFloat(payments[index].amount);
-                                    }
+                                    totalOfPayments += parseFloat(payments[index].amount);
                                 } else {
                                     totalOfDeclaredPayments += parseFloat(payments[index].amount);
                                 }
@@ -1954,10 +1955,8 @@
                             }
                             if (totalOfDeclaredPayments > 0) {
                                 return '<p>Z: ' + totalOfPayments + '</p><p>D: ' + totalOfDeclaredPayments + '</p>';
-                            } else if (totalOfSettledPayments > 0) {
-                                return '<p>Z: ' + totalOfSettledPayments + '</p><p>RD: ' + totalOfSettledPayments + '</p>';
                             } else {
-                                return '<p>Z: ' + totalOfPayments + '</p>';
+                                return '<p>Z: ' + totalOfPayments + '</p>' + ((settledDeclared > 0) ? '<p>RD: ' + totalOfPayments + '</p>' : '');
                             }
 
                         }
