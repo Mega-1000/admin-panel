@@ -3,12 +3,12 @@
 namespace App\Jobs;
 
 use App\Entities\Order;
-use App\Entities\OrderPayment;
 use App\Entities\SelTransaction;
 use App\Entities\Transaction;
 use App\Helpers\PdfCharactersHelper;
 use App\Repositories\TransactionRepository;
 use Illuminate\Bus\Queueable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -83,25 +83,15 @@ class ImportAllegroPayInJob implements ShouldQueue
             /** @var SelTransaction $selTransaction */
             $selTransaction = SelTransaction::where('tr_CheckoutFormPaymentId', '=', $payIn['identyfikator'])->where('tr_Paid', '=', true)->first();
             try {
-                if (!empty($selTransaction->order)) {
-                    $transaction = $this->saveTransaction($selTransaction->order, $payIn);
-                    if ($transaction !== null && $selTransaction->order->payments->count()) {
-                        /** @var OrderPayment $payment */
-                        foreach ($selTransaction->order->payments as $payment) {
-                            $amount = preg_replace('/[^.\d]/', '', $payIn['kwota']);
-                            if ($payment->promise === '1' && $payment->amount == $amount) {
-                                $payment->delete();
-                                $selTransaction->order->payments()->create([
-                                    'transaction_id' => $transaction->id,
-                                    'amount' => $amount,
-                                    'type' => 'CLIENT',
-                                    'promise' => '',
-                                ]);
-
-                                $this->saveTransfer($selTransaction->order, $transaction);
-                            }
-                        }
+                if (!empty($order = $selTransaction->order)) {
+                    $transaction = $this->saveTransaction($order, $payIn);
+                    if ($transaction === null) {
+                        continue;
                     }
+                    $this->settlePromisePayments($order, $payIn);
+                    $orders = $this->getRelatedOrders($order);
+
+                    $this->settleOrders($orders, $transaction);
                 } else {
                     fputcsv($file, $payIn);
                 }
@@ -111,7 +101,73 @@ class ImportAllegroPayInJob implements ShouldQueue
         }
         fclose($file);
         Storage::disk('local')->put('public/transaction/TransactionWithoutOrders' . date('Y-m-d') . '.csv', file_get_contents($fileName));
+    }
 
+    /**
+     * Return related Orders
+     *
+     * @param Order $order Order object.
+     * @return Collection
+     *
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    private function getRelatedOrders(Order $order): Collection
+    {
+        return Order::where('master_order_id', '=', $order->id)->orWhere('id', '=', $order->id)->get();
+    }
+
+    /**
+     * Settle orders.
+     *
+     * @param Collection  $orders Orders collection
+     * @param Transaction $transaction Transaction.
+     *
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    private function settleOrders(Collection $orders, Transaction $transaction): void
+    {
+        $amount = $transaction->operation_value;
+        foreach ($orders as $order) {
+            $orderBookedPaymentSum = $order->bookedPaymentsSum();
+            $amountOutstanding = $order->getSumOfGrossValues() - $orderBookedPaymentSum;
+            if ($amount == 0 || $amountOutstanding == 0) {
+                continue;
+            }
+            if ($amountOutstanding > 0) {
+                if (bccomp($amount, $amountOutstanding, 3) >= 0) {
+                    $paymentAmount = $amountOutstanding;
+                } else {
+                    $paymentAmount = $amount;
+                }
+                $transfer = $this->saveTransfer($order, $transaction, (float)$paymentAmount);
+                $order->payments()->create([
+                    'transaction_id' => $transfer->id,
+                    'amount' => $paymentAmount,
+                    'type' => 'CLIENT',
+                    'promise' => '',
+                ]);
+                $amount -= $paymentAmount;
+            }
+        }
+    }
+
+    /**
+     * Settle promise.
+     *
+     * @param Order $order Order object.
+     * @param array $payIn Pay in row.
+     *
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    private function settlePromisePayments(Order $order, array $payIn): void
+    {
+        foreach ($order->payments()->where('promise', '=', '1')->whereNull('deleted_at')->get() as $payment) {
+            if ($payIn['kwota'] === (float)$payment->amount) {
+                $payment->delete();
+            } else {
+                dispatch_now(new AddLabelJob($order->id, [128]));
+            }
+        }
     }
 
     /**
@@ -138,7 +194,7 @@ class ImportAllegroPayInJob implements ShouldQueue
             'kind_of_operation' => $data['operacja'],
             'order_id' => $order->id,
             'operator' => $data['operator'],
-            'operation_value' => $data['kwota'],
+            'operation_value' => preg_replace('/[^.\d]/', '', $data['kwota']),
             'balance' => (float)$this->getCustomerBalance($order->customer_id) + (float)$data['kwota'],
             'accounting_notes' => '',
             'transaction_notes' => '',
@@ -173,7 +229,7 @@ class ImportAllegroPayInJob implements ShouldQueue
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    private function saveTransfer(Order $order, Transaction $transaction): Transaction
+    private function saveTransfer(Order $order, Transaction $transaction, float $amount): Transaction
     {
         return $this->transactionRepository->create([
             'customer_id' => $order->customer_id,
@@ -182,8 +238,8 @@ class ImportAllegroPayInJob implements ShouldQueue
             'kind_of_operation' => 'przeksięgowanie',
             'order_id' => $order->id,
             'operator' => 'SYSTEM',
-            'operation_value' => $transaction->operation_value,
-            'balance' => (float)$this->getCustomerBalance($order->customer_id) - (float)$transaction->operation_value,
+            'operation_value' => $amount,
+            'balance' => (float)$this->getCustomerBalance($order->customer_id) - $amount,
             'accounting_notes' => '',
             'transaction_notes' => '',
         ]);

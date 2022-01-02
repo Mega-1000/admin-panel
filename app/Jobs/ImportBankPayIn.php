@@ -132,7 +132,6 @@ class ImportBankPayIn implements ShouldQueue
         }
     }
 
-
     /**
      * Return related Orders
      *
