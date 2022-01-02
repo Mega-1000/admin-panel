@@ -205,7 +205,7 @@ class ImportAllegroPayInJob implements ShouldQueue
             'customer_id' => $order->customer_id,
             'posted_in_system_date' => new \DateTime(),
             'posted_in_bank_date' => new \DateTime($data['data']),
-            'payment_id' => $data['identyfikator'],
+            'payment_id' => 'w-' . $data['identyfikator'],
             'kind_of_operation' => $data['operacja'],
             'order_id' => $order->id,
             'operator' => $data['operator'],
