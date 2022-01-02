@@ -27,6 +27,19 @@ class ImportAllegroPayInJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    const CHAR_TO_REMOVE = [
+        "\xEF\xBB\xBF" => '',
+        '"' => '',
+        'ę' => 'e',
+        'ć' => 'c',
+        'ą' => 'a',
+        'ń' => 'n',
+        'ł' => 'l',
+        'ś' => 's',
+        'Ł' => 'L',
+        'Ż' => 'Z',
+    ];
+
     /**
      * @var TransactionRepository
      */
@@ -63,7 +76,7 @@ class ImportAllegroPayInJob implements ShouldQueue
             while (($row = fgetcsv($handle, 3000, ',')) !== FALSE) {
                 if (!$header) {
                     foreach ($row as &$headerName) {
-                        $headerName = str_replace('"', '', snake_case(PdfCharactersHelper::changePolishCharactersToNonAccented($headerName)));
+                        $headerName = snake_case(strtr($headerName, self::CHAR_TO_REMOVE));
                     }
                     $header = $row;
                     fputcsv($file, $row);
@@ -98,7 +111,6 @@ class ImportAllegroPayInJob implements ShouldQueue
                     fputcsv($file, $payIn);
                 }
             } catch (\Exception $exception) {
-                $tmp = $exception;
                 Log::notice('Błąd podczas importu: ' . $exception->getMessage(), ['line' => __LINE__]);
             }
         }
