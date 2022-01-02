@@ -77,26 +77,28 @@ class ImportAllegroPayInJob implements ShouldQueue
 
         $data = array_reverse($data);
         foreach ($data as $payIn) {
-            if ($payIn['operacja'] !== 'wpłata') {
+            if ($payIn['operacja'] === 'wypłata środków') {
                 continue;
             }
             /** @var SelTransaction $selTransaction */
             $selTransaction = SelTransaction::where('tr_CheckoutFormPaymentId', '=', $payIn['identyfikator'])->where('tr_Paid', '=', true)->first();
             try {
-                if (!empty($order = $selTransaction->order)) {
+                if (!empty($selTransaction->order)) {
+                    $order = $selTransaction->order;
                     $transaction = $this->saveTransaction($order, $payIn);
                     if ($transaction === null) {
                         continue;
                     }
-                    $this->settlePromisePayments($order, $payIn);
-                    $orders = $this->getRelatedOrders($order);
-
-                    $this->settleOrders($orders, $transaction);
+                    if ($payIn['operacja'] === 'wpłata') {
+                        $this->settlePromisePayments($order, $payIn);
+                        $orders = $this->getRelatedOrders($order);
+                        $this->settleOrders($orders, $transaction);
+                    }
                 } else {
                     fputcsv($file, $payIn);
                 }
             } catch (\Exception $exception) {
-                Log::notice('Błąd podczas importu: ' . $exception->getMessage(), ['line' => __LINE__, 'file' => __FILE__]);
+                Log::notice('Błąd podczas importu: ' . $exception->getMessage(), ['line' => __LINE__]);
             }
         }
         fclose($file);
