@@ -63,7 +63,7 @@ class ImportAllegroPayInJob implements ShouldQueue
             while (($row = fgetcsv($handle, 3000, ',')) !== FALSE) {
                 if (!$header) {
                     foreach ($row as &$headerName) {
-                        $headerName = snake_case(PdfCharactersHelper::changePolishCharactersToNonAccented($headerName));
+                        $headerName = str_replace('"', '', snake_case(PdfCharactersHelper::changePolishCharactersToNonAccented($headerName)));
                     }
                     $header = $row;
                     fputcsv($file, $row);
@@ -98,6 +98,7 @@ class ImportAllegroPayInJob implements ShouldQueue
                     fputcsv($file, $payIn);
                 }
             } catch (\Exception $exception) {
+                $tmp = $exception;
                 Log::notice('Błąd podczas importu: ' . $exception->getMessage(), ['line' => __LINE__]);
             }
         }
