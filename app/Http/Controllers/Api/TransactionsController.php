@@ -6,6 +6,7 @@ use App\Entities\Customer;
 use App\Entities\Transaction;
 use App\Http\Controllers\Controller;
 use App\Jobs\ImportAllegroPayInJob;
+use App\Jobs\ImportBankPayIn;
 use App\Repositories\TransactionRepository;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Http\JsonResponse;
@@ -65,6 +66,7 @@ class TransactionsController extends Controller
                         'orderIds' => $customer->orders->pluck('id')
                     ];
                 }
+                $response['customers'] = array_reverse($response['customers']);
             } else {
                 $response = [
                     'errorCode' => 424,
@@ -239,6 +241,9 @@ class TransactionsController extends Controller
         switch ($kind) {
             case 'allegroPayIn':
                 $job = new ImportAllegroPayInJob($request->file('file'));
+                break;
+            case 'bankPayIn':
+                $job = new ImportBankPayIn($request->file('file'));
                 break;
             default:
                 $response = [

@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Entities\Order;
-use App\Entities\SelTransaction;
 use App\Entities\Transaction;
 use App\Helpers\PdfCharactersHelper;
 use App\Repositories\TransactionRepository;
@@ -17,31 +16,12 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
-/**
- * Class ImportAllegroPayInJob
- * @package App\Jobs
- *
- * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
- */
-class ImportAllegroPayInJob implements ShouldQueue
+class ImportBankPayIn implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    const CHAR_TO_REMOVE = [
-        "\xEF\xBB\xBF" => '',
-        '"' => '',
-        'ę' => 'e',
-        'ć' => 'c',
-        'ą' => 'a',
-        'ń' => 'n',
-        'ł' => 'l',
-        'ś' => 's',
-        'Ł' => 'L',
-        'Ż' => 'Z',
-    ];
-
     /**
-     * @var TransactionRepository
+     * @var Transaction
      */
     protected $transactionRepository;
 
@@ -51,7 +31,7 @@ class ImportAllegroPayInJob implements ShouldQueue
     protected $file;
 
     /**
-     * ImportAllegroPayInJob constructor.
+     * ImportBankPayIn constructor.
      * @param UploadedFile $file
      */
     public function __construct(UploadedFile $file)
@@ -60,27 +40,42 @@ class ImportAllegroPayInJob implements ShouldQueue
     }
 
     /**
+     * Execute the job.
      *
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     * @param TransactionRepository $transaction
+     * @return void
      */
-    public function handle(TransactionRepository $transaction)
+    public function handle(TransactionRepository $transaction): void
     {
         $header = NULL;
-        $fileName = 'transactionWithoutOrder.csv';
+        $fileName = 'bankTransactionWithoutOrder.csv';
         $file = fopen($fileName, 'w');
 
         $this->transactionRepository = $transaction;
         $data = array();
         $i = 0;
         if (($handle = fopen($this->file, 'r')) !== FALSE) {
-            while (($row = fgetcsv($handle, 3000, ',')) !== FALSE) {
+            while (($row = fgetcsv($handle, 5000, ';')) !== FALSE) {
+                if (count(array_filter($row)) < 5) {
+                    continue;
+                }
+
                 if (!$header) {
                     foreach ($row as &$headerName) {
-                        $headerName = snake_case(strtr($headerName, self::CHAR_TO_REMOVE));
+                        if (!empty($headerName)) {
+                            $headerName = str_replace('#', '', iconv('ISO-8859-2', 'UTF-8', $headerName));
+                            $headerName = snake_case(PdfCharactersHelper::changePolishCharactersToNonAccented($headerName));
+                        }
                     }
                     $header = $row;
                     fputcsv($file, $row);
                 } else {
+                    if (!str_contains($row[2], 'PRZYCHODZ')) {
+                        continue;
+                    }
+                    foreach ($row as &$text) {
+                        $text = iconv('ISO-8859-2', 'UTF-8', $text);
+                    }
                     $data[] = array_combine($header, $row);
                     $i++;
                 }
@@ -88,34 +83,53 @@ class ImportAllegroPayInJob implements ShouldQueue
             fclose($handle);
         }
 
-        $data = array_reverse($data);
         foreach ($data as $payIn) {
-            if ($payIn['operacja'] === 'wypłata środków') {
+            $orderId = $this->checkOrderNumberFromTitle($payIn['tytul']);
+            if ($orderId == null) {
                 continue;
             }
-            /** @var SelTransaction $selTransaction */
-            $selTransaction = SelTransaction::where('tr_CheckoutFormPaymentId', '=', $payIn['identyfikator'])->where('tr_Paid', '=', true)->first();
+            $order = Order::find($orderId);
+
             try {
-                if (!empty($selTransaction->order)) {
-                    $order = $selTransaction->order;
+                if (!empty($order)) {
+                    $payIn['kwota'] = (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $payIn['kwota']));
                     $transaction = $this->saveTransaction($order, $payIn);
                     if ($transaction === null) {
                         continue;
                     }
-                    if ($payIn['operacja'] === 'wpłata') {
-                        $this->settlePromisePayments($order, $payIn);
-                        $orders = $this->getRelatedOrders($order);
-                        $this->settleOrders($orders, $transaction);
-                    }
+                    $this->settlePromisePayments($order, $payIn);
+                    $orders = $this->getRelatedOrders($order);
+
+                    $this->settleOrders($orders, $transaction);
                 } else {
                     fputcsv($file, $payIn);
                 }
             } catch (\Exception $exception) {
-                Log::notice('Błąd podczas importu: ' . $exception->getMessage(), ['line' => __LINE__]);
+                Log::notice('Błąd podczas importu: ' . $exception->getMessage(), ['line' => __LINE__, 'file' => __FILE__]);
             }
         }
         fclose($file);
-        Storage::disk('local')->put('public/transaction/TransactionWithoutOrders' . date('Y-m-d') . '.csv', file_get_contents($fileName));
+        Storage::disk('local')->put('public/transaction/bankTransactionWithoutOrder' . date('Y-m-d') . '.csv', file_get_contents($fileName));
+
+    }
+
+    /**
+     * Settle promise.
+     *
+     * @param Order $order Order object.
+     * @param array $payIn Pay in row.
+     *
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    private function settlePromisePayments(Order $order, array $payIn): void
+    {
+        foreach ($order->payments()->where('promise', '=', '1')->whereNull('deleted_at')->get() as $payment) {
+            if ($payIn['kwota'] === (float)$payment->amount) {
+                $payment->delete();
+            } else {
+                dispatch_now(new AddLabelJob($order->id, [128]));
+            }
+        }
     }
 
     /**
@@ -154,7 +168,7 @@ class ImportAllegroPayInJob implements ShouldQueue
                 } else {
                     $paymentAmount = $amount;
                 }
-                $transfer = $this->saveTransfer($order, $transaction, (float)$paymentAmount);
+                $transfer = $this->saveTransfer($order, $transaction, $paymentAmount);
                 $order->payments()->create([
                     'transaction_id' => $transfer->id,
                     'amount' => $paymentAmount,
@@ -167,53 +181,69 @@ class ImportAllegroPayInJob implements ShouldQueue
     }
 
     /**
-     * Settle promise.
+     * Search order number.
      *
-     * @param Order $order Order object.
-     * @param array $payIn Pay in row.
+     * @param string $fileLine Line in csv file.
+     * @return integer|null
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    private function settlePromisePayments(Order $order, array $payIn): void
+    private function checkOrderNumberFromTitle(string $fileLine): ?int
     {
-        foreach ($order->payments()->where('promise', '=', '1')->whereNull('deleted_at')->get() as $payment) {
-            if ($payIn['kwota'] === (float)$payment->amount) {
-                $payment->delete();
+        $matches = $vatPregMatch = [];
+        $transactions = str_replace(' ', '', $fileLine);
+        preg_match('/[qQ][qQ](\d{3,5})[qQ][qQ]/', $transactions, $matches);
+        if (count($matches)) {
+            preg_match('/VAT/', $transactions, $vatPregMatch);
+            if (count($vatPregMatch) > 0) {
+                $orderId = null;
             } else {
-                dispatch_now(new AddLabelJob($order->id, [128]));
+                $orderId = $matches[1];
             }
+        } else {
+            $orderId = null;
         }
+
+        return $orderId;
     }
+
 
     /**
      * Save new transaction
      *
      * @param Order $order Order object
      * @param array $data Additional data
-     * @return Transaction
+     * @return ?Transaction
      *
      * @throws \Exception
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
     private function saveTransaction(Order $order, array $data): ?Transaction
     {
-        $existingTransaction = $this->transactionRepository->select()->where('payment_id', '=', $data['identyfikator'])->first();
+        $identifier = 'w-' . strtotime($data['data_ksiegowania']) . '-' . $order->id;
+        $existingTransaction = $this->transactionRepository->select()->where('payment_id', '=', $identifier)->first();
         if ($existingTransaction !== null) {
             return null;
         }
-        return $this->transactionRepository->create([
-            'customer_id' => $order->customer_id,
-            'posted_in_system_date' => new \DateTime(),
-            'posted_in_bank_date' => new \DateTime($data['data']),
-            'payment_id' => 'w-' . $data['identyfikator'],
-            'kind_of_operation' => $data['operacja'],
-            'order_id' => $order->id,
-            'operator' => $data['operator'],
-            'operation_value' => preg_replace('/[^.\d]/', '', $data['kwota']),
-            'balance' => (float)$this->getCustomerBalance($order->customer_id) + (float)$data['kwota'],
-            'accounting_notes' => '',
-            'transaction_notes' => '',
-        ]);
+
+        try {
+            return $this->transactionRepository->create([
+                'customer_id' => $order->customer_id,
+                'posted_in_system_date' => new \DateTime(),
+                'posted_in_bank_date' => new \DateTime($data['data_ksiegowania']),
+                'payment_id' => $identifier,
+                'kind_of_operation' => 'przelew przychodzący',
+                'order_id' => $order->id,
+                'operator' => 'BANK',
+                'operation_value' => $data['kwota'],
+                'balance' => (float)$this->getCustomerBalance($order->customer_id) + (float)$data['kwota'],
+                'accounting_notes' => '',
+                'transaction_notes' => '',
+            ]);
+        } catch (\Exception $exception) {
+            Log::notice('Błąd podczas zapisu transakcji: ' . $exception->getMessage(), ['line' => __LINE__, 'file' => __FILE__]);
+            return null;
+        }
     }
 
     /**
@@ -240,21 +270,28 @@ class ImportAllegroPayInJob implements ShouldQueue
      *
      * @param Order       $order
      * @param Transaction $transaction
+     * @param float       $amount
+     * @param boolean     $back
      * @return Transaction
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    private function saveTransfer(Order $order, Transaction $transaction, float $amount): Transaction
+    private function saveTransfer(Order $order, Transaction $transaction, float $amount, bool $back = false): ?Transaction
     {
+        $identifier = 'p-' . strtotime($transaction->posted_in_bank_date->format('Y-m-d H:i:s')) . '-' . $order->id;
+        $existingTransaction = $this->transactionRepository->select()->where('payment_id', '=', $identifier)->first();
+        if ($existingTransaction !== null) {
+            return null;
+        }
         return $this->transactionRepository->create([
             'customer_id' => $order->customer_id,
             'posted_in_system_date' => new \DateTime(),
-            'payment_id' => 'p-' . $transaction->payment_id . '-' . $transaction->posted_in_system_date->format('Y-m-d H:i:s'),
+            'payment_id' => $identifier,
             'kind_of_operation' => 'przeksięgowanie',
             'order_id' => $order->id,
             'operator' => 'SYSTEM',
             'operation_value' => $amount,
-            'balance' => (float)$this->getCustomerBalance($order->customer_id) - $amount,
+            'balance' => (float)$this->getCustomerBalance($order->customer_id) - (float)$amount,
             'accounting_notes' => '',
             'transaction_notes' => '',
         ]);

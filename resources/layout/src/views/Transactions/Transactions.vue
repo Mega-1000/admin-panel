@@ -27,7 +27,8 @@ import FileUploader from '@/components/common/FileUploader.vue'
 export default class Transactions extends Vue {
   public transactionForm = false
   private importKinds = {
-    allegroPayIn: 'Wpłaty allegro'
+    allegroPayIn: 'Wpłaty allegro',
+    bankPayIn: 'Wpłaty bankowe'
   }
 
   private showImportModal = false
