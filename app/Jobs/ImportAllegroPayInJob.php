@@ -197,7 +197,7 @@ class ImportAllegroPayInJob implements ShouldQueue
      */
     private function saveTransaction(Order $order, array $data): ?Transaction
     {
-        $existingTransaction = $this->transactionRepository->select()->where('payment_id', '=', $data['identyfikator'])->first();
+        $existingTransaction = $this->transactionRepository->select()->where('payment_id', '=', 'w-' . $data['identyfikator'])->first();
         if ($existingTransaction !== null) {
             return null;
         }
