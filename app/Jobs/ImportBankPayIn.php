@@ -70,6 +70,9 @@ class ImportBankPayIn implements ShouldQueue
                     $header = $row;
                     fputcsv($file, $row);
                 } else {
+                    if (!str_contains($row[2], 'PRZYCHODZ')) {
+                        continue;
+                    }
                     foreach ($row as &$text) {
                         $text = iconv('ISO-8859-2', 'UTF-8', $text);
                     }
@@ -80,13 +83,9 @@ class ImportBankPayIn implements ShouldQueue
             fclose($handle);
         }
 
-        $data = array_reverse($data);
         foreach ($data as $payIn) {
             $orderId = $this->checkOrderNumberFromTitle($payIn['tytul']);
             if ($orderId == null) {
-                if (str_contains($payIn['opis_operacji'], 'PRZYCHODZĄCY')) {
-                    fputcsv($file, $payIn);
-                }
                 continue;
             }
             $order = Order::find($orderId);
