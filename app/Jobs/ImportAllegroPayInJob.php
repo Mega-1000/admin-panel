@@ -90,7 +90,7 @@ class ImportAllegroPayInJob implements ShouldQueue
 
         $data = array_reverse($data);
         foreach ($data as $payIn) {
-            if ($payIn['operacja'] === 'wypłata środków') {
+            if ($payIn['operacja'] !== 'wpłata') {
                 continue;
             }
             /** @var SelTransaction $selTransaction */
@@ -249,7 +249,7 @@ class ImportAllegroPayInJob implements ShouldQueue
         return $this->transactionRepository->create([
             'customer_id' => $order->customer_id,
             'posted_in_system_date' => new \DateTime(),
-            'payment_id' => 'p-' . $transaction->payment_id . '-' . $transaction->posted_in_system_date->format('Y-m-d H:i:s'),
+            'payment_id' => str_replace('w-', 'p-', $transaction->payment_id) . '-' . $transaction->posted_in_system_date->format('Y-m-d H:i:s'),
             'kind_of_operation' => 'przeksięgowanie',
             'order_id' => $order->id,
             'operator' => 'SYSTEM',
