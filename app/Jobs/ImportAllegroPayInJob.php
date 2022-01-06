@@ -90,7 +90,7 @@ class ImportAllegroPayInJob implements ShouldQueue
 
         $data = array_reverse($data);
         foreach ($data as $payIn) {
-            if ($payIn['operacja'] !== 'wpłata') {
+            if (!in_array($payIn['operacja'], ['wpłata', 'zwrot'])) {
                 continue;
             }
             /** @var SelTransaction $selTransaction */
@@ -106,6 +106,13 @@ class ImportAllegroPayInJob implements ShouldQueue
                         $this->settlePromisePayments($order, $payIn);
                         $orders = $this->getRelatedOrders($order);
                         $this->settleOrders($orders, $transaction);
+                    } elseif ($payIn['operacja'] === 'zwrot') {
+                        $paymentsToReturn = $order->payments()->where('amount', '=', $payIn['kwota'])->whereNull('deleted_at')->first();
+                        if (!empty($paymentsToReturn)) {
+                            $paymentsToReturn->delete();
+                            $this->saveRefund($order, $transaction, (float)$paymentsToReturn);
+                        }
+
                     }
                 } else {
                     fputcsv($file, $payIn);
@@ -144,7 +151,7 @@ class ImportAllegroPayInJob implements ShouldQueue
         $amount = $transaction->operation_value;
         foreach ($orders as $order) {
             $orderBookedPaymentSum = $order->bookedPaymentsSum();
-            $amountOutstanding = $order->getSumOfGrossValues() - $orderBookedPaymentSum;
+            $amountOutstanding = $this->getTotalOrderValue($order) - $orderBookedPaymentSum;
             if ($amount == 0 || $amountOutstanding == 0) {
                 continue;
             }
@@ -164,6 +171,26 @@ class ImportAllegroPayInJob implements ShouldQueue
                 $amount -= $paymentAmount;
             }
         }
+    }
+
+    /**
+     * @param Order $order
+     * @return float
+     *
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    private function getTotalOrderValue(Order $order): float
+    {
+        $additional_service = $order->additional_service_cost ?? 0;
+        $additional_cod_cost = $order->additional_cash_on_delivery_cost ?? 0;
+        $shipment_price_client = $order->shipment_price_for_client ?? 0;
+        $totalProductPrice = 0;
+        foreach ($order->items as $item) {
+            $price = $item->gross_selling_price_commercial_unit ?: $item->net_selling_price_commercial_unit ?: 0;
+            $quantity = $item->quantity ?? 0;
+            $totalProductPrice += $price * $quantity;
+        }
+        return round($totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client, 2);
     }
 
     /**
@@ -255,6 +282,32 @@ class ImportAllegroPayInJob implements ShouldQueue
             'operator' => 'SYSTEM',
             'operation_value' => $amount,
             'balance' => (float)$this->getCustomerBalance($order->customer_id) - $amount,
+            'accounting_notes' => '',
+            'transaction_notes' => '',
+        ]);
+    }
+
+
+    /**
+     * Tworzy transakcje przeksięgowania
+     *
+     * @param Order       $order
+     * @param Transaction $transaction
+     * @return Transaction
+     *
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    private function saveRefund(Order $order, Transaction $transaction, float $amount): Transaction
+    {
+        return $this->transactionRepository->create([
+            'customer_id' => $order->customer_id,
+            'posted_in_system_date' => new \DateTime(),
+            'payment_id' => str_replace('w-', 'z-', $transaction->payment_id) . '-' . $transaction->posted_in_system_date->format('Y-m-d H:i:s'),
+            'kind_of_operation' => 'przeksięgowanie zwrotne',
+            'order_id' => $order->id,
+            'operator' => 'SYSTEM',
+            'operation_value' => $amount,
+            'balance' => (float)$this->getCustomerBalance($order->customer_id) + $amount,
             'accounting_notes' => '',
             'transaction_notes' => '',
         ]);
