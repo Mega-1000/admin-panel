@@ -106,13 +106,6 @@ class ImportAllegroPayInJob implements ShouldQueue
                         $this->settlePromisePayments($order, $payIn);
                         $orders = $this->getRelatedOrders($order);
                         $this->settleOrders($orders, $transaction);
-                    } elseif ($payIn['operacja'] === 'zwrot') {
-                        $paymentsToReturn = $order->payments()->where('amount', '=', $payIn['kwota'])->whereNull('deleted_at')->first();
-                        if (!empty($paymentsToReturn)) {
-                            $paymentsToReturn->delete();
-                            $this->saveRefund($order, $transaction, (float)$paymentsToReturn);
-                        }
-
                     }
                 } else {
                     fputcsv($file, $payIn);
@@ -226,13 +219,21 @@ class ImportAllegroPayInJob implements ShouldQueue
     {
         $existingTransaction = $this->transactionRepository->select()->where('payment_id', '=', 'w-' . $data['identyfikator'])->first();
         if ($existingTransaction !== null) {
-            return null;
+            if ($data['operacja'] == 'zwrot') {
+                $paymentsToReturn = $order->payments()->where('amount', '=', $data['kwota'])->whereNull('deleted_at')->first();
+                if (!empty($paymentsToReturn)) {
+                    $paymentsToReturn->delete();
+                }
+                $this->saveRefund($order, $existingTransaction, (float)$data['kwota']);
+            } else {
+                return null;
+            }
         }
         return $this->transactionRepository->create([
             'customer_id' => $order->customer_id,
             'posted_in_system_date' => new \DateTime(),
             'posted_in_bank_date' => new \DateTime($data['data']),
-            'payment_id' => 'w-' . $data['identyfikator'],
+            'payment_id' => (($data['operacja'] === 'zwrot') ? 'z' : 'w-') . $data['identyfikator'],
             'kind_of_operation' => $data['operacja'],
             'order_id' => $order->id,
             'operator' => $data['operator'],
@@ -302,12 +303,12 @@ class ImportAllegroPayInJob implements ShouldQueue
         return $this->transactionRepository->create([
             'customer_id' => $order->customer_id,
             'posted_in_system_date' => new \DateTime(),
-            'payment_id' => str_replace('w-', 'z-', $transaction->payment_id) . '-' . $transaction->posted_in_system_date->format('Y-m-d H:i:s'),
+            'payment_id' => str_replace('w-', 'z-', $transaction->payment_id) . '-' . $transaction->posted_in_system_date,
             'kind_of_operation' => 'przeksięgowanie zwrotne',
             'order_id' => $order->id,
             'operator' => 'SYSTEM',
-            'operation_value' => $amount,
-            'balance' => (float)$this->getCustomerBalance($order->customer_id) + $amount,
+            'operation_value' => abs($amount),
+            'balance' => (float)$this->getCustomerBalance($order->customer_id) + abs($amount),
             'accounting_notes' => '',
             'transaction_notes' => '',
         ]);
