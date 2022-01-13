@@ -241,6 +241,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('products/stocks', 'ProductStocksController@index')->name('product_stocks.index');
         Route::post('products/stocks/datatable', 'ProductStocksController@datatable')->name('product_stocks.datatable');
         Route::get('products/stocks/print', 'ProductStocksController@print')->name('product_stocks.print');
+        Route::get('products/stocks/printReport', 'ProductStocksController@printReport')->name('product_stocks.printReport');
         Route::get('products/stocks/{id}/edit', 'ProductStocksController@edit')->name('product_stocks.edit');
         Route::put('products/stocks/{id}/update', 'ProductStocksController@update')->name('product_stocks.update');
         Route::put('products/stocks/{id}/change-status',
