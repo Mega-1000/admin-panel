@@ -169,7 +169,6 @@ class ProductStocksController extends Controller
             ->orderBy('shelf','asc')
             ->orderBy('position','asc')
             ->whereNull('deleted_at');
-        $query->
 
         $query->whereRaw('product_stocks.quantity <> ?', [0]);
 
