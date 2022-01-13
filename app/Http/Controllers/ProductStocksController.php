@@ -162,6 +162,11 @@ class ProductStocksController extends Controller
             ->select('*', 'product_stocks.id as stockId')
             ->join('products', 'product_stocks.product_id', '=', 'products.id')
             ->join('product_packings', 'products.id', '=', 'product_packings.id')
+            ->join('product_stock_positions','product_stocks.id','=','product_stock_positions.product_stock_id')
+            ->orderBy('lane','asc')
+            ->orderBy('bookstand','asc')
+            ->orderBy('shelf','asc')
+            ->orderBy('position','asc')
             ->whereNull('deleted_at');
 
         $query->whereRaw('product_stocks.quantity <> ?', [0]);
