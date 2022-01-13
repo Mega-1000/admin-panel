@@ -9,6 +9,7 @@
 @section('table')
     <a href="{{ route('sets.index') }}" class="btn btn-success">@lang('sets.packet_list')</a>
     <a href="{{ route('product_stocks.print') }}" class="btn btn-success">Wydrukuj stany</a>
+    <a href="{{ route('product_stocks.printReport') }}" class="btn btn-success">Wydrukuj raport pozycji magazynowych</a>
     <div class="vue-components">
         <tracker :enabled="true" :user="{{ Auth::user()->id }}"/>
     </div>

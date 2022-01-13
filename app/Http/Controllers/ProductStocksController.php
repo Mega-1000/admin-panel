@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Entities\ColumnVisibility;
 use App\Entities\ProductStock;
 use App\Entities\ProductStockLog;
+use App\Entities\ProductStockPosition;
 use App\Http\Requests\ProductStockUpdateRequest;
 use App\Repositories\ProductRepository;
 use App\Repositories\ProductStockLogRepository;
@@ -162,11 +163,6 @@ class ProductStocksController extends Controller
             ->select('*', 'product_stocks.id as stockId')
             ->join('products', 'product_stocks.product_id', '=', 'products.id')
             ->join('product_packings', 'products.id', '=', 'product_packings.id')
-            ->join('product_stock_positions','product_stocks.id','=','product_stock_positions.product_stock_id')
-            ->orderBy('lane','asc')
-            ->orderBy('bookstand','asc')
-            ->orderBy('shelf','asc')
-            ->orderBy('position','asc')
             ->whereNull('deleted_at');
 
         $query->whereRaw('product_stocks.quantity <> ?', [0]);
@@ -179,6 +175,28 @@ class ProductStocksController extends Controller
 
         return View::make('product_stocks.print', [
             'products' => $collection,
+        ]);
+    }
+
+    /**
+     * Raport pozycji stanów magazynowych
+     */
+    public function printReport()
+    {
+        $result =  ProductStockPosition::whereHas('stock', function ($stockQuery) {
+            $stockQuery->where('quantity', '<>', '0');
+            $stockQuery->whereHas('product', function ($productQuery) {
+                $productQuery->whereNull('deleted_at');
+            });
+        })
+            ->orderBy('lane', 'asc')
+            ->orderBy('bookstand', 'asc')
+            ->orderBy('shelf', 'asc')
+            ->orderBy('position', 'asc')
+            ->get();
+
+        return View::make('product_stocks.printReport', [
+            'productsStockPositions' => $result,
         ]);
     }
 
