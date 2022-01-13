@@ -163,7 +163,6 @@ class ProductStocksController extends Controller
             ->join('products', 'product_stocks.product_id', '=', 'products.id')
             ->join('product_packings', 'products.id', '=', 'product_packings.id')
             ->join('product_stock_positions','product_stocks.id','=','product_stock_positions.product_stock_id')
-            ->whereNull('deleted_at')
             ->orderBy('lane','asc')
             ->orderBy('bookstand','asc')
             ->orderBy('shelf','asc')
