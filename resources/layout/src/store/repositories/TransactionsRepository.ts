@@ -3,11 +3,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { getFullUrl } from '@/helpers/urls'
-import { CreateTransactionParams, ImportFileParams, Transaction } from '@/types/TransactionsTypes'
+import {
+  CreateTransactionParams,
+  Customer,
+  ImportFileParams,
+  searchCustomersParams,
+  Transaction
+} from '@/types/TransactionsTypes'
 
 export default {
-  async getTransactions (): Promise<any> {
-    return fetch(getFullUrl('api/transactions'), {
+  async getTransactions (params: searchCustomersParams): Promise<any> {
+    const urlSearchParams = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter((v) => v[1] !== ''))
+    )
+    return fetch(getFullUrl('api/transactions?' + urlSearchParams.toString()), {
       method: 'GET',
       credentials: 'same-origin',
       headers: new Headers({
@@ -19,11 +28,25 @@ export default {
         return response.json()
       })
   },
+  async getCustomerTransactions (customer?: Customer): Promise<any> {
+    return fetch(getFullUrl('api/transactions/customer/' + customer?.id), {
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/json; charset=utf-8',
+        'X-Requested-Width': 'XMLHttpRequest'
+      })
+    })
+      .then((response) => {
+        console.log(response)
+        return response.json()
+      })
+  },
   /**
-     * Zapis transakcji
-     *
-     * @param params:CreateTransactionParams
-     */
+   * Zapis transakcji
+   *
+   * @param params:CreateTransactionParams
+   */
   async storeTransaction (params: CreateTransactionParams): Promise<any> {
     return fetch(getFullUrl('api/transactions'), {
       method: 'POST',
@@ -39,10 +62,10 @@ export default {
       })
   },
   /**
-     * Aktualizacja transakcji
-     *
-     * @param params:CreateTransactionParams
-     */
+   * Aktualizacja transakcji
+   *
+   * @param params:CreateTransactionParams
+   */
   async updateTransaction (params: CreateTransactionParams): Promise<any> {
     return fetch(getFullUrl('api/transactions/' + params.id), {
       method: 'PUT',
@@ -58,10 +81,10 @@ export default {
       })
   },
   /**
-     * Usunięcie transakcji
-     *
-     * @param transaction:Transaction
-     */
+   * Usunięcie transakcji
+   *
+   * @param transaction:Transaction
+   */
   async deleteTransaction (transaction: Transaction): Promise<any> {
     return fetch(getFullUrl('api/transactions/' + transaction.id), {
       method: 'DELETE',

@@ -63,8 +63,11 @@
               <th scope="col" class="text-center">Akcje</th>
             </tr>
             </thead>
-            <tbody>
-            <tr v-for="(transaction,index) in customer.transactions" :key="index">
+            <tbody v-if="isLoading">
+              <div class="loader">Loading...</div>
+            </tbody>
+            <tbody v-else>
+            <tr v-for="(transaction,index) in transactions" :key="index">
               <td class="text-black-50">{{ transaction.id }}</td>
               <td>{{ transaction.posted_in_system_date }}</td>
               <td>{{ transaction.posted_in_bank_date }}</td>
@@ -76,7 +79,8 @@
                 </a>
               </td>
               <td>{{ transaction.operator }}</td>
-              <td :class="[{'text-success': transaction.operation_value>0}, {'text-danger': transaction.operation_value<0}]">
+              <td
+                :class="[{'text-success': transaction.operation_value>0}, {'text-danger': transaction.operation_value<0}]">
                 {{ transaction.operation_value.toString().replace('-', '') }}
               </td>
               <td :class="[{'text-success': transaction.balance>0}, {'text-danger': transaction.balance<0}]">
@@ -120,6 +124,10 @@ export default class TransactionsList extends Vue {
     return this.$store?.getters['TransactionsService/customer']
   }
 
+  public get transactions (): Transaction[] {
+    return this.$store?.getters['TransactionsService/transactions']
+  }
+
   public async destroy (transaction: Transaction): Promise<void> {
     await this.$store?.dispatch('TransactionsService/delete', transaction)
   }
@@ -144,6 +152,14 @@ export default class TransactionsList extends Vue {
 
   public getOrderLink (orderID: string): string {
     return getFullUrl('admin/orders/' + orderID + '/edit')
+  }
+
+  public async mounted (): Promise<void> {
+    await this.$store?.dispatch('TransactionsService/loadCustomerTransactions')
+  }
+
+  public get isLoading (): boolean {
+    return this.$store?.getters['TransactionsService/isLoading']
   }
 }
 </script>
@@ -258,4 +274,60 @@ export default class TransactionsList extends Vue {
     }
   }
 
+  .loader,
+  .loader::before,
+  .loader::after {
+    position: absolute;
+    content: '';
+  }
+
+  .loader::before {
+    width: 5.2em;
+    height: 10.2em;
+    background: $cl-blue2c;
+    border-radius: 10.2em 0 0 10.2em;
+    top: -0.1em;
+    left: -0.1em;
+    -webkit-transform-origin: 5.1em 5.1em;
+    transform-origin: 5.1em 5.1em;
+    -webkit-animation: load2 2s infinite ease 1.5s;
+    animation: load2 2s infinite ease 1.5s;
+  }
+
+  .loader::after {
+    width: 5.2em;
+    height: 10.2em;
+    background: $cl-blue2c;
+    border-radius: 0 10.2em 10.2em 0;
+    top: -0.1em;
+    left: 4.9em;
+    -webkit-transform-origin: 0.1em 5.1em;
+    transform-origin: 0.1em 5.1em;
+    -webkit-animation: load2 2s infinite ease;
+    animation: load2 2s infinite ease;
+  }
+
+  @-webkit-keyframes load2 {
+    0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+
+    100% {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes load2 {
+    0% {
+      -webkit-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+
+    100% {
+      -webkit-transform: rotate(360deg);
+      transform: rotate(360deg);
+    }
+  }
 </style>

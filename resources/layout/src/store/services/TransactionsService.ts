@@ -3,7 +3,7 @@
 
 import {
   CreateTransactionParams,
-  Customer, ImportFileParams, Transaction,
+  Customer, ImportFileParams, searchCustomersParams, Transaction,
   TransactionsStore
 } from '@/types/TransactionsTypes'
 
@@ -11,7 +11,11 @@ import {
   TRANSACTIONS_SET_IS_LOADING,
   TRANSACTIONS_SET_ERROR,
   TRANSACTIONS_SET_ALL,
-  TRANSACTIONS_SET_CUSTOMER, TRANSACTIONS_DELETE, TRANSACTIONS_SET_TRANSACTION, IMPORT_TRANSACTIONS_SET_IS_LOADING
+  TRANSACTIONS_SET_CUSTOMER,
+  TRANSACTIONS_DELETE,
+  TRANSACTIONS_SET_TRANSACTION,
+  IMPORT_TRANSACTIONS_SET_IS_LOADING,
+  TRANSACTIONS_SET_TRANSACTIONS
 } from '@/store/mutation-types'
 
 import TransactionsRepository from '@/store/repositories/TransactionsRepository'
@@ -24,7 +28,10 @@ const state: TransactionsStore = {
   importIsLoading: false,
   customers: [],
   customer: null,
-  transaction: null
+  transaction: null,
+  transactions: [],
+  pageCount: null,
+  currentPage: 1
 }
 
 const getters = {
@@ -33,22 +40,44 @@ const getters = {
   error: (state: TransactionsStore) => state.error,
   customers: (state: TransactionsStore) => state.customers,
   customer: (state: TransactionsStore) => state.customer,
-  transaction: (state: TransactionsStore) => state.transaction
+  transaction: (state: TransactionsStore) => state.transaction,
+  transactions: (state: TransactionsStore) => state.transactions,
+  pageCount: (state: TransactionsStore) => state.pageCount,
+  currentPage: (state: TransactionsStore) => state.currentPage
 }
 
 const actions = {
-  loadTransactions ({ commit }: any) {
+  loadTransactions ({ commit }: any, params: searchCustomersParams) {
     commit(TRANSACTIONS_SET_IS_LOADING, true)
-
     return TransactionsRepository
-      .getTransactions()
+      .getTransactions(params)
       .then((data: any) => {
         commit(TRANSACTIONS_SET_IS_LOADING, false)
         if (data.errorCode) {
           commit(TRANSACTIONS_SET_ERROR, data.errorMessage)
         }
         commit(TRANSACTIONS_SET_ALL, data.customers)
+        state.currentPage = data.currentPage
+        state.pageCount = data.lastPage
         return data.customers
+      })
+      .catch((error: any) => {
+        commit(TRANSACTIONS_SET_ERROR, error.errorMessage)
+      })
+  },
+  loadCustomerTransactions ({ commit }: any) {
+    commit(TRANSACTIONS_SET_IS_LOADING, true)
+
+    return TransactionsRepository
+      .getCustomerTransactions(state.customer ?? undefined)
+      .then((data: any) => {
+        commit(TRANSACTIONS_SET_IS_LOADING, false)
+        if (data.errorCode) {
+          commit(TRANSACTIONS_SET_ERROR, data.errorMessage)
+        }
+        commit(TRANSACTIONS_SET_TRANSACTIONS, data.transactions)
+
+        return data.transactions
       })
       .catch((error: any) => {
         commit(TRANSACTIONS_SET_ERROR, error.errorMessage)
@@ -162,6 +191,9 @@ const mutations = {
   },
   [TRANSACTIONS_SET_TRANSACTION] (state: TransactionsStore, transaction: Transaction) {
     state.transaction = transaction
+  },
+  [TRANSACTIONS_SET_TRANSACTIONS] (state: TransactionsStore, transactions: Transaction[]) {
+    state.transactions = transactions
   }
 }
 

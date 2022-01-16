@@ -1,6 +1,7 @@
 <template>
   <div class="v-transactions">
-    <customers-list v-if="customer==null && !transactionForm" @add="transactionForm = true" @import="toggleShowModal"></customers-list>
+    <customers-list v-if="customer==null && !transactionForm" @add="transactionForm = true"
+                    @import="toggleShowModal"></customers-list>
     <transactions-list @back="back" @add="transactionForm = true" @edit="edit"
                        v-if="customer !== null && !transactionForm"></transactions-list>
     <transactions-form v-if="transactionForm" @transactionAdded="transactionAdded"
@@ -15,7 +16,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { Customer } from '@/types/TransactionsTypes'
+import { Customer, searchCustomersParams } from '@/types/TransactionsTypes'
 import CustomersList from '@/components/Transactions/CustomersList.vue'
 import TransactionsList from '@/components/Transactions/TransactionsList.vue'
 import TransactionsForm from '@/components/Transactions/TransactionsForm.vue'
@@ -74,7 +75,14 @@ export default class Transactions extends Vue {
       const customer = localStorage.getItem('customer')
       await this.$store?.dispatch('TransactionsService/setCustomer', JSON.parse(customer ?? ''))
     } else {
-      await this.$store?.dispatch('TransactionsService/loadTransactions')
+      const params: searchCustomersParams = {
+        page: '1',
+        nip: '',
+        nickAllegro: '',
+        email: '',
+        phone: ''
+      }
+      await this.$store?.dispatch('TransactionsService/loadTransactions', params)
     }
   }
 
