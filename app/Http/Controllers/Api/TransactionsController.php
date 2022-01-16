@@ -34,22 +34,42 @@ class TransactionsController extends Controller
     /**
      * Zwraca klientów z transakcjami
      *
+     * @param Request $request
+     *
      * @return JsonResponse
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
         $response = [];
+
         try {
-            $result = Customer::with(['addresses' => function ($query) {
+            $query = Customer::with(['addresses' => function ($query) {
                 $query->where('type', 'STANDARD_ADDRESS');
             }])
                 ->with('orders:id,customer_id')
-                ->with('transactions')->has('transactions')->get();
+                ->has('transactions')
+                ->orderBy('customers.id', 'desc');
+
+            if ($request->has('nip')) {
+                $query->where('nip', 'like', '%' . $request->get('nip') . '%');
+            }
+            if ($request->has('nickAllegro')) {
+                $query->where('nick_allegro', 'like', '%' . $request->get('nickAllegro') . '%');
+            }
+            if ($request->has('email')) {
+                $query->where('login', 'like', '%' . $request->get('email') . '%');
+            }
+            if ($request->has('phone')) {
+                $query->where('phone', 'like', '%' . $request->get('phone') . '%');
+            }
+            $result = $query->paginate(300);
 
             if (!empty($result)) {
                 $response['status'] = 200;
+                $response['currentPage'] = $result->currentPage();
+                $response['lastPage'] = $result->lastPage();
                 foreach ($result as $customer) {
                     $response['customers'][] = [
                         'id' => $customer->id,
@@ -62,11 +82,9 @@ class TransactionsController extends Controller
                         'phone' => $customer->addresses[0]->phone,
                         'address' => $customer->addresses[0]->city,
                         'email' => $customer->addresses[0]->email,
-                        'transactions' => $customer->getOrderedTransaction(),
                         'orderIds' => $customer->orders->pluck('id')
                     ];
                 }
-                $response['customers'] = array_reverse($response['customers']);
             } else {
                 $response = [
                     'errorCode' => 424,
@@ -143,7 +161,7 @@ class TransactionsController extends Controller
      * Aktualizacja transakcji
      *
      * @param Transaction $transaction Transakcja
-     * @param Request     $request Request
+     * @param Request $request Request
      * @return JsonResponse
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
@@ -229,7 +247,7 @@ class TransactionsController extends Controller
     /**
      * Import transaction from file
      *
-     * @param string  $kind
+     * @param string $kind
      * @param Request $request
      * @return JsonResponse
      *
@@ -305,5 +323,37 @@ class TransactionsController extends Controller
             'operator.required' => 'Pole operator jest wymagane.',
             'operationValue.required' => 'Pole wartość operacji jest wymagane',
         ];
+    }
+
+
+    /**
+     * Zwraca klientów z transakcjami
+     *
+     * @return JsonResponse
+     *
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    public function customer(int $id): JsonResponse
+    {
+        $response = [];
+
+        try {
+            $transactions = Transaction::where('customer_id', '=', $id)->get();
+
+            if (!empty($transactions)) {
+                $response['transactions'] = $transactions;
+            } else {
+                $response = [
+                    'errorCode' => 424,
+                    'errorMessage' => 'Brak transakcji'
+                ];
+            }
+        } catch (\Exception $exception) {
+            $response = [
+                'errorCode' => $exception->getCode(),
+                'errorMessage' => $exception->getMessage()
+            ];
+        }
+        return response()->json($response);
     }
 }
