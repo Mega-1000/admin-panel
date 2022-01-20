@@ -2,9 +2,13 @@
 
 namespace App\Jobs;
 
+use App\Domains\DelivererPackageImport\PriceFormatter;
 use App\Entities\Order;
+use App\Entities\OrderPackage;
 use App\Entities\Transaction;
 use App\Helpers\PdfCharactersHelper;
+use App\Repositories\DelivererRepositoryEloquent;
+use App\Repositories\OrderPackageRepositoryEloquent;
 use App\Repositories\TransactionRepository;
 use Illuminate\Bus\Queueable;
 use Illuminate\Database\Eloquent\Collection;
@@ -16,7 +20,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
-class ImportBankPayIn implements ShouldQueue
+class ImportShippingPayIn implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -24,6 +28,16 @@ class ImportBankPayIn implements ShouldQueue
      * @var Transaction
      */
     protected $transactionRepository;
+
+    /**
+     * @var OrderPackageRepositoryEloquent
+     */
+    protected $orderPackageRepositoryEloquent;
+
+    /**
+     * @var DelivererRepositoryEloquent
+     */
+    protected $delivererRepositoryEloquent;
 
     /**
      * @var UploadedFile
@@ -45,13 +59,20 @@ class ImportBankPayIn implements ShouldQueue
      * @param TransactionRepository $transaction
      * @return void
      */
-    public function handle(TransactionRepository $transaction): void
+    public function handle(
+        TransactionRepository          $transaction,
+        OrderPackageRepositoryEloquent $orderPackageRepositoryEloquent,
+        DelivererRepositoryEloquent    $delivererRepositoryEloquent
+    ): void
     {
+        $this->transactionRepository = $transaction;
+        $this->orderPackageRepositoryEloquent = $orderPackageRepositoryEloquent;
+        $this->delivererRepositoryEloquent = $delivererRepositoryEloquent;
+
         $header = NULL;
-        $fileName = 'bankTransactionWithoutOrder.csv';
+        $fileName = 'ShippingTransactionWithoutOrder.csv';
         $file = fopen($fileName, 'w');
 
-        $this->transactionRepository = $transaction;
         $data = array();
         $i = 0;
         if (($handle = fopen($this->file, 'r')) !== FALSE) {
@@ -63,19 +84,13 @@ class ImportBankPayIn implements ShouldQueue
                 if (!$header) {
                     foreach ($row as &$headerName) {
                         if (!empty($headerName)) {
-                            $headerName = str_replace('#', '', iconv('ISO-8859-2', 'UTF-8', $headerName));
+                            $headerName = iconv('ISO-8859-2', 'UTF-8', $headerName);
                             $headerName = snake_case(PdfCharactersHelper::changePolishCharactersToNonAccented($headerName));
                         }
                     }
                     $header = $row;
                     fputcsv($file, $row);
                 } else {
-                    if (!str_contains($row[2], 'PRZYCHODZ')) {
-                        continue;
-                    }
-                    foreach ($row as &$text) {
-                        $text = iconv('ISO-8859-2', 'UTF-8', $text);
-                    }
                     $data[] = array_combine($header, $row);
                     $i++;
                 }
@@ -84,22 +99,19 @@ class ImportBankPayIn implements ShouldQueue
         }
 
         foreach ($data as $payIn) {
-            $orderId = $this->checkOrderNumberFromTitle($payIn['tytul']);
-            if ($orderId == null) {
-                continue;
-            } else {
-                fputcsv($file, $payIn);
-            }
-            $order = Order::find($orderId);
-
             try {
-                if (!empty($order)) {
-                    $payIn['kwota'] = (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $payIn['kwota']));
+                $orderPackage = $this->findOrderByLetterNumber($payIn['numer_listu']);
+
+                if (!empty($orderPackage)) {
+                    $this->addRealCost($orderPackage, $payIn);
+                    $order = $orderPackage->order;
+                }
+                if (!empty($order) && $payIn['wartosc_pobrania'] > 0) {
+                    $payIn['rzeczywisty_koszt_transportu_brutto'] = (float)str_replace(',', '.', $payIn['rzeczywisty_koszt_transportu_brutto']);
                     $transaction = $this->saveTransaction($order, $payIn);
                     if ($transaction === null) {
                         continue;
                     }
-                    $this->settlePromisePayments($order, $payIn);
                     $orders = $this->getRelatedOrders($order);
 
                     $this->settleOrders($orders, $transaction);
@@ -112,6 +124,24 @@ class ImportBankPayIn implements ShouldQueue
         }
         fclose($file);
         Storage::disk('local')->put('public/transaction/bankTransactionWithoutOrder' . date('Y-m-d') . '.csv', file_get_contents($fileName));
+    }
+
+    private function addRealCost(OrderPackage $orderPackage, array $payIn)
+    {
+        $orderPackage->realCostsForCompany()->create([
+            'order_package_id' => $orderPackage->id,
+            'deliverer_id' => $this->delivererRepositoryEloquent->findByField('name', $payIn['symbol_spedytora'])->first()->id,
+            'cost' => PriceFormatter::asAbsolute(PriceFormatter::fromString($payIn['rzeczywisty_koszt_transportu_brutto']))
+        ]);
+    }
+
+    private function findOrderByLetterNumber(string $letterNumber): ?OrderPackage
+    {
+        $tmp = $this->orderPackageRepositoryEloquent->findWhere([
+            'letter_number' => $letterNumber,
+        ])->first();
+
+        return $tmp;
     }
 
     /**
@@ -149,7 +179,7 @@ class ImportBankPayIn implements ShouldQueue
     /**
      * Settle orders.
      *
-     * @param Collection  $orders Orders collection
+     * @param Collection $orders Orders collection
      * @param Transaction $transaction Transaction.
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
@@ -181,7 +211,7 @@ class ImportBankPayIn implements ShouldQueue
         }
     }
 
-    private function getTotalOrderValue(Order $order) : float
+    private function getTotalOrderValue(Order $order): float
     {
         $additional_service = $order->additional_service_cost ?? 0;
         $additional_cod_cost = $order->additional_cash_on_delivery_cost ?? 0;
@@ -235,7 +265,7 @@ class ImportBankPayIn implements ShouldQueue
      */
     private function saveTransaction(Order $order, array $data): ?Transaction
     {
-        $identifier = 'w-' . strtotime($data['data_ksiegowania']) . '-' . $order->id;
+        $identifier = 's-' . strtotime($data['data_nadania_otrzymania']) . '-' . $order->id;
         $existingTransaction = $this->transactionRepository->select()->where('payment_id', '=', $identifier)->first();
         if ($existingTransaction !== null) {
             return null;
@@ -244,14 +274,14 @@ class ImportBankPayIn implements ShouldQueue
         try {
             return $this->transactionRepository->create([
                 'customer_id' => $order->customer_id,
-                'posted_in_system_date' => new \DateTime(),
-                'posted_in_bank_date' => new \DateTime($data['data_ksiegowania']),
+                'posted_in_system_date' => new \DateTime($data['data_nadania_otrzymania']),
+                'posted_in_bank_date' => new \DateTime(),
                 'payment_id' => $identifier,
-                'kind_of_operation' => 'przelew przychodzący',
+                'kind_of_operation' => 'spedycja',
                 'order_id' => $order->id,
-                'operator' => 'BANK',
-                'operation_value' => $data['kwota'],
-                'balance' => (float)$this->getCustomerBalance($order->customer_id) + (float)$data['kwota'],
+                'operator' => 'SPEDYCJA',
+                'operation_value' => $data['rzeczywisty_koszt_transportu_brutto'],
+                'balance' => (float)$this->getCustomerBalance($order->customer_id) + (float)$data['rzeczywisty_koszt_transportu_brutto'],
                 'accounting_notes' => '',
                 'transaction_notes' => '',
             ]);
@@ -283,10 +313,10 @@ class ImportBankPayIn implements ShouldQueue
     /**
      * Tworzy transakcje przeksięgowania
      *
-     * @param Order       $order
+     * @param Order $order
      * @param Transaction $transaction
-     * @param float       $amount
-     * @param boolean     $back
+     * @param float $amount
+     * @param boolean $back
      * @return Transaction
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>

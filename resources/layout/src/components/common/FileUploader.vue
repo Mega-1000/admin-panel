@@ -93,10 +93,10 @@ export default class FileUploader extends Vue {
     }
 
     await this.$store.dispatch('TransactionsService/import', params)
-    if (this.errors.length === 0) {
-      window.location.replace('/admin/transactions?kind=' + this.kind.value)
-      this.$emit('close')
-    }
+    // if (this.errors.length === 0) {
+    //   window.location.replace('/admin/transactions?kind=' + this.kind.value)
+    //   this.$emit('close')
+    // }
   }
 
   public async previewFiles (event: Event): Promise<void> {
