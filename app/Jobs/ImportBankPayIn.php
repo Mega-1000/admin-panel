@@ -181,7 +181,7 @@ class ImportBankPayIn implements ShouldQueue
         }
     }
 
-    private function getTotalOrderValue(Order $order) : float
+    private function getTotalOrderValue(Order $order): float
     {
         $additional_service = $order->additional_service_cost ?? 0;
         $additional_cod_cost = $order->additional_cash_on_delivery_cost ?? 0;
@@ -209,12 +209,7 @@ class ImportBankPayIn implements ShouldQueue
         $transactions = str_replace(' ', '', $fileLine);
         preg_match('/[qQ][qQ](\d{3,5})[qQ][qQ]/', $transactions, $matches);
         if (count($matches)) {
-            preg_match('/VAT/', $transactions, $vatPregMatch);
-            if (count($vatPregMatch) > 0) {
-                $orderId = null;
-            } else {
-                $orderId = $matches[1];
-            }
+            $orderId = $matches[1];
         } else {
             $orderId = null;
         }
