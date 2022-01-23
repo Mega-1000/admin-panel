@@ -74,7 +74,7 @@
             </tr>
             </thead>
             <tbody v-if="isLoading">
-              <div class="loader">Loading...</div>
+            <div class="loader">Loading...</div>
             </tbody>
             <tbody v-else>
             <tr v-for="(customer,index) in customers" :key="index">
@@ -144,7 +144,9 @@ export default class CustomersList extends Vue {
 
   public get customers (): Customer[] {
     let customers: Customer[] = this.$store?.getters['TransactionsService/customers']
-
+    if (customers === undefined) {
+      return []
+    }
     if (this.searchedAllegroNick !== '') {
       customers = customers.filter((customer) => {
         return (customer.nickAllegro !== null && customer.nickAllegro.toLowerCase().search(this.searchedAllegroNick.toLowerCase()) > -1)
