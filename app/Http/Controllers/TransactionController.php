@@ -37,7 +37,9 @@ class TransactionController extends Controller
                 default:
                     Log::warning('Nieobsługiwany typ transakcji.');
             }
-            return Storage::download($filePath);
+            if (Storage::disk('local')->exists($filePath)) {
+                return Storage::download($filePath);
+            }
         }
 
         return view('transactions.index');
