@@ -54,6 +54,9 @@
         <button class="btn btn-primary" @click="search">
           Wyszukaj
         </button>
+        <button class="btn btn-secondary" @click="reset">
+          Wyczyść
+        </button>
       </div>
     </div>
     <div class="row table-customers">
@@ -171,6 +174,11 @@ export default class CustomersList extends Vue {
       })
     }
     return customers
+  }
+
+  private async reset (): Promise<void> {
+    this.searchedNIP = this.searchedAllegroNick = this.searchedEmail = this.searchedPhoneNumber = ''
+    await this.search()
   }
 
   private async search (): Promise<void> {
