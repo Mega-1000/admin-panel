@@ -7,6 +7,7 @@ use App\Entities\Transaction;
 use App\Http\Controllers\Controller;
 use App\Jobs\ImportAllegroPayInJob;
 use App\Jobs\ImportBankPayIn;
+use App\Jobs\ImportShippingPayIn;
 use App\Repositories\TransactionRepository;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Http\JsonResponse;
@@ -263,6 +264,9 @@ class TransactionsController extends Controller
             case 'bankPayIn':
                 $job = new ImportBankPayIn($request->file('file'));
                 break;
+            case 'shippingTransaction':
+                $job = new ImportShippingPayIn($request->file('file'));
+                break;
             default:
                 $response = [
                     'errorCode' => 303,
@@ -338,7 +342,7 @@ class TransactionsController extends Controller
         $response = [];
 
         try {
-            $transactions = Transaction::where('customer_id', '=', $id)->get();
+            $transactions = Transaction::where('customer_id', '=', $id)->orderBy('id', 'desc')->get();
 
             if (!empty($transactions)) {
                 $response['transactions'] = $transactions;

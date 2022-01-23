@@ -29,7 +29,8 @@ export default class Transactions extends Vue {
   public transactionForm = false
   private importKinds = {
     allegroPayIn: 'Wpłaty allegro',
-    bankPayIn: 'Wpłaty bankowe'
+    bankPayIn: 'Wpłaty bankowe',
+    shippingTransaction: 'Wpłaty spedycyjne'
   }
 
   private showImportModal = false

@@ -54,6 +54,9 @@
         <button class="btn btn-primary" @click="search">
           Wyszukaj
         </button>
+        <button class="btn btn-secondary" @click="reset">
+          Wyczyść
+        </button>
       </div>
     </div>
     <div class="row table-customers">
@@ -74,7 +77,7 @@
             </tr>
             </thead>
             <tbody v-if="isLoading">
-              <div class="loader">Loading...</div>
+            <div class="loader">Loading...</div>
             </tbody>
             <tbody v-else>
             <tr v-for="(customer,index) in customers" :key="index">
@@ -144,7 +147,9 @@ export default class CustomersList extends Vue {
 
   public get customers (): Customer[] {
     let customers: Customer[] = this.$store?.getters['TransactionsService/customers']
-
+    if (customers === undefined) {
+      return []
+    }
     if (this.searchedAllegroNick !== '') {
       customers = customers.filter((customer) => {
         return (customer.nickAllegro !== null && customer.nickAllegro.toLowerCase().search(this.searchedAllegroNick.toLowerCase()) > -1)
@@ -169,6 +174,11 @@ export default class CustomersList extends Vue {
       })
     }
     return customers
+  }
+
+  private async reset (): Promise<void> {
+    this.searchedNIP = this.searchedAllegroNick = this.searchedEmail = this.searchedPhoneNumber = ''
+    await this.search()
   }
 
   private async search (): Promise<void> {
