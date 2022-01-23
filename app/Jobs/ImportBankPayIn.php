@@ -86,10 +86,10 @@ class ImportBankPayIn implements ShouldQueue
         foreach ($data as $payIn) {
             $orderId = $this->checkOrderNumberFromTitle($payIn['tytul']);
             if ($orderId == null) {
-                continue;
-            } else {
                 fputcsv($file, $payIn);
+                continue;
             }
+
             $order = Order::find($orderId);
 
             try {
