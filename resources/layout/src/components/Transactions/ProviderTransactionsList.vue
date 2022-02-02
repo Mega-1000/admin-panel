@@ -110,8 +110,8 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
 import {
-  ProviderTransactions, searchCustomersParams,
-  searchProvidersTransactionsParams, Transaction
+  ProviderTransactions,
+  searchProvidersTransactionsParams
 } from '@/types/TransactionsTypes'
 import { getFullUrl } from '@/helpers/urls'
 
@@ -163,7 +163,7 @@ export default class ProviderTransactionsList extends Vue {
       page: String(pageNumber),
       provider: this.provider.value
     }
-    await this.$store?.dispatch('TransactionsService/loadTransactions', params)
+    await this.$store?.dispatch('TransactionsService/loadProvidersTransactions', params)
   }
 
   public getOrderLink (orderID: string): string {
