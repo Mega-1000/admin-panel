@@ -34,7 +34,7 @@ class Order extends Model implements Transformable
     const COMMENT_CONSULTANT_TYPE = 'consultant_comment';
     const COMMENT_FINANCIAL_TYPE = 'financial_comment';
     const VAT_VALUE = 1.23;
-	
+
     const PROFORM_DIR = 'public/proforma/';
 
     public $customColumnsVisibilities = [
@@ -305,7 +305,7 @@ class Order extends Model implements Transformable
     	if (!is_array($labelId)) {
 		    $labelId = [$labelId];
 	    }
-    	
+
         return $this->labels()->whereIn('label_id', $labelId)->count();
     }
 
@@ -316,12 +316,12 @@ class Order extends Model implements Transformable
     {
         return $this->belongsToMany(Label::class, 'order_labels')->withPivot('added_type');
     }
-	
+
 	public function orderLabels()
 	{
 		return $this->hasMany(OrderLabel::class);
 	}
-	
+
     public function promisePayments()
     {
         $promisePayments = $this->payments()->where('promise', 'like', '1')->get();
@@ -729,7 +729,7 @@ class Order extends Model implements Transformable
     {
         $this->hasOne(Chat::class);
     }
-	
+
 	/**
 	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
 	 */
@@ -737,7 +737,7 @@ class Order extends Model implements Transformable
 	{
 		return $this->belongsTo(FirmSource::class);
 	}
-	
+
     public function setDefaultDates()
     {
         $dateFrom = Carbon::parse($this->selloTransaction->tr_RemittanceDate);

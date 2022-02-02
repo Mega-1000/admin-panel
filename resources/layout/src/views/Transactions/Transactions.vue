@@ -1,11 +1,12 @@
 <template>
   <div class="v-transactions">
-    <customers-list v-if="customer==null && !transactionForm" @add="transactionForm = true"
-                    @import="toggleShowModal"></customers-list>
+    <customers-list v-if="customer==null && !transactionForm && !providerTransaction" @add="transactionForm = true"
+                    @import="toggleShowModal" @providerTransaction="providerTransaction=true"></customers-list>
     <transactions-list @back="back" @add="transactionForm = true" @edit="edit"
-                       v-if="customer !== null && !transactionForm"></transactions-list>
+                       v-if="customer !== null && !transactionForm && !providerTransaction"></transactions-list>
     <transactions-form v-if="transactionForm" @transactionAdded="transactionAdded"
                        @back="transactionForm=false"></transactions-form>
+    <provider-transactions-list v-if="providerTransaction" @back="providerTransaction=false"></provider-transactions-list>
     <file-uploader :kinds="importKinds" v-if="showImportModal"
                    @close="toggleShowModal()">
       <template v-slot:header>Import transakcji</template>
@@ -21,12 +22,15 @@ import CustomersList from '@/components/Transactions/CustomersList.vue'
 import TransactionsList from '@/components/Transactions/TransactionsList.vue'
 import TransactionsForm from '@/components/Transactions/TransactionsForm.vue'
 import FileUploader from '@/components/common/FileUploader.vue'
+import ProviderTransactionsList from '@/components/Transactions/ProviderTransactionsList.vue'
 
 @Component({
-  components: { FileUploader, TransactionsForm, TransactionsList, CustomersList }
+  components: { ProviderTransactionsList, FileUploader, TransactionsForm, TransactionsList, CustomersList }
 })
 export default class Transactions extends Vue {
   public transactionForm = false
+  public providerTransaction = false
+
   private importKinds = {
     allegroPayIn: 'Wpłaty allegro',
     bankPayIn: 'Wpłaty bankowe',

@@ -9,6 +9,7 @@ use App\Entities\Transaction;
 use App\Helpers\PdfCharactersHelper;
 use App\Repositories\DelivererRepositoryEloquent;
 use App\Repositories\OrderPackageRepositoryEloquent;
+use App\Repositories\ProviderTransactionRepositoryEloquent;
 use App\Repositories\TransactionRepository;
 use Illuminate\Bus\Queueable;
 use Illuminate\Database\Eloquent\Collection;
@@ -40,6 +41,11 @@ class ImportShippingPayIn implements ShouldQueue
     protected $delivererRepositoryEloquent;
 
     /**
+     * @var ProviderTransactionRepositoryEloquent
+     */
+    protected $providerTransactionRepositoryEloquent;
+
+    /**
      * @var UploadedFile
      */
     protected $file;
@@ -60,15 +66,16 @@ class ImportShippingPayIn implements ShouldQueue
      * @return void
      */
     public function handle(
-        TransactionRepository          $transaction,
-        OrderPackageRepositoryEloquent $orderPackageRepositoryEloquent,
-        DelivererRepositoryEloquent    $delivererRepositoryEloquent
+        TransactionRepository                 $transaction,
+        OrderPackageRepositoryEloquent        $orderPackageRepositoryEloquent,
+        DelivererRepositoryEloquent           $delivererRepositoryEloquent,
+        ProviderTransactionRepositoryEloquent $providerTransactionRepositoryEloquent
     ): void
     {
-        return;
         $this->transactionRepository = $transaction;
         $this->orderPackageRepositoryEloquent = $orderPackageRepositoryEloquent;
         $this->delivererRepositoryEloquent = $delivererRepositoryEloquent;
+        $this->providerTransactionRepositoryEloquent = $providerTransactionRepositoryEloquent;
 
         $header = NULL;
         $fileName = 'ShippingTransactionWithoutOrder.csv';
@@ -104,45 +111,86 @@ class ImportShippingPayIn implements ShouldQueue
                 $orderPackage = $this->findOrderByLetterNumber($payIn['numer_listu']);
 
                 if (!empty($orderPackage)) {
-                    $this->addRealCost($orderPackage, $payIn);
+                    $realCost = $this->addRealCost($orderPackage, $payIn);
+                    if (!$realCost) {
+                        continue;
+                    }
                     $order = $orderPackage->order;
+                } else {
+                    fputcsv($file, $payIn);
+                    continue;
                 }
-                if (!empty($order) && $payIn['wartosc_pobrania'] > 0) {
+                if (!empty($order)) {
+                    if (empty($payIn['wartosc_pobrania'])) {
+                        continue;
+                    }
                     $payIn['rzeczywisty_koszt_transportu_brutto'] = (float)str_replace(',', '.', $payIn['rzeczywisty_koszt_transportu_brutto']);
                     $transaction = $this->saveTransaction($order, $payIn);
                     if ($transaction === null) {
                         continue;
                     }
+                    $this->settlePromisePayments($order, $payIn);
                     $orders = $this->getRelatedOrders($order);
 
                     $this->settleOrders($orders, $transaction);
+                    $this->settleProvider($payIn, $transaction);
                 } else {
                     fputcsv($file, $payIn);
                 }
             } catch (\Exception $exception) {
-                Log::notice('Błąd podczas importu: ' . $exception->getMessage(), ['line' => __LINE__, 'file' => __FILE__]);
+                Log::notice('Błąd podczas importu: ' . $exception->getMessage() . ' w lini ' . $exception->getLine(), ['line' => __LINE__, 'file' => __FILE__]);
             }
         }
         fclose($file);
         Storage::disk('local')->put('public/transaction/bankTransactionWithoutOrder' . date('Y-m-d') . '.csv', file_get_contents($fileName));
     }
 
-    private function addRealCost(OrderPackage $orderPackage, array $payIn)
+    private function settleProvider($payIn, $transaction)
     {
-        $orderPackage->realCostsForCompany()->create([
-            'order_package_id' => $orderPackage->id,
-            'deliverer_id' => $this->delivererRepositoryEloquent->findByField('name', $payIn['symbol_spedytora'])->first()->id,
-            'cost' => PriceFormatter::asAbsolute(PriceFormatter::fromString($payIn['rzeczywisty_koszt_transportu_brutto']))
+        $providerBalance = $this->providerTransactionRepositoryEloquent->getBalance($payIn['symbol_spedytora']);
+        $providerBalanceOnInvoice = $this->providerTransactionRepositoryEloquent->getBalanceOnInvoice($payIn['symbol_spedytora'], $payIn['nr_faktury_do_ktorej_dany_lp_zostal_przydzielony']);
+        $this->providerTransactionRepositoryEloquent->create([
+            'provider' => $payIn['symbol_spedytora'],
+            'waybill_number' => $payIn['numer_listu'],
+            'invoice_number' => $payIn['nr_faktury_do_ktorej_dany_lp_zostal_przydzielony'],
+            'order_id' => $transaction->order_id,
+            'cash_on_delivery' => $payIn['wartosc_pobrania'],
+            'provider_balance' => $providerBalance + (float)$transaction->operation_value,
+            'provider_balance_on_invoice' => $providerBalanceOnInvoice + (float)$transaction->operation_value,
+            'transaction_id' => $transaction->id,
         ]);
+    }
+
+    private function addRealCost(OrderPackage $orderPackage, array $payIn): bool
+    {
+        $delivery = $this->delivererRepositoryEloquent->findByField('name', $payIn['symbol_spedytora'])->first();
+        if (empty($delivery)) {
+            return false;
+        }
+        $cost = PriceFormatter::asAbsolute(PriceFormatter::fromString($payIn['rzeczywisty_koszt_transportu_brutto']));
+        $orderPackageRealCost = $orderPackage->realCostsForCompany()
+            ->where('deliverer_id', '=', $delivery->id)
+            ->where('cost', '=', $cost)
+            ->where('order_package_id', '=', $orderPackage->id)
+            ->first();
+
+        if (empty($orderPackageRealCost)) {
+            $orderPackage->realCostsForCompany()->create([
+                'order_package_id' => $orderPackage->id,
+                'deliverer_id' => $delivery->id,
+                'cost' => PriceFormatter::asAbsolute(PriceFormatter::fromString($payIn['rzeczywisty_koszt_transportu_brutto']))
+            ]);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private function findOrderByLetterNumber(string $letterNumber): ?OrderPackage
     {
-        $tmp = $this->orderPackageRepositoryEloquent->findWhere([
+        return $this->orderPackageRepositoryEloquent->findWhere([
             'letter_number' => $letterNumber,
         ])->first();
-
-        return $tmp;
     }
 
     /**
@@ -155,7 +203,13 @@ class ImportShippingPayIn implements ShouldQueue
      */
     private function settlePromisePayments(Order $order, array $payIn): void
     {
-        foreach ($order->payments()->where('promise', '=', '1')->whereNull('deleted_at')->get() as $payment) {
+        $promisePayments = $order->payments()
+            ->where('promise', '=', '1')
+            ->where('notices', 'like', 'spedycja-pobranie')
+            ->whereNull('deleted_at')
+            ->get();
+
+        foreach ($promisePayments as $payment) {
             if ($payIn['kwota'] === (float)$payment->amount) {
                 $payment->delete();
             } else {
@@ -187,7 +241,7 @@ class ImportShippingPayIn implements ShouldQueue
      */
     private function settleOrders(Collection $orders, Transaction $transaction): void
     {
-        $amount = $transaction->operation_value;
+        $amount = PriceFormatter::asAbsolute(PriceFormatter::fromString($transaction->operation_value));
         foreach ($orders as $order) {
             $orderBookedPaymentSum = $order->bookedPaymentsSum();
             $amountOutstanding = $this->getTotalOrderValue($order) - $orderBookedPaymentSum;
@@ -227,34 +281,6 @@ class ImportShippingPayIn implements ShouldQueue
     }
 
     /**
-     * Search order number.
-     *
-     * @param string $fileLine Line in csv file.
-     * @return integer|null
-     *
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
-     */
-    private function checkOrderNumberFromTitle(string $fileLine): ?int
-    {
-        $matches = $vatPregMatch = [];
-        $transactions = str_replace(' ', '', $fileLine);
-        preg_match('/[qQ][qQ](\d{3,5})[qQ][qQ]/', $transactions, $matches);
-        if (count($matches)) {
-            preg_match('/VAT/', $transactions, $vatPregMatch);
-            if (count($vatPregMatch) > 0) {
-                $orderId = null;
-            } else {
-                $orderId = $matches[1];
-            }
-        } else {
-            $orderId = null;
-        }
-
-        return $orderId;
-    }
-
-
-    /**
      * Save new transaction
      *
      * @param Order $order Order object
@@ -278,13 +304,13 @@ class ImportShippingPayIn implements ShouldQueue
                 'posted_in_system_date' => new \DateTime($data['data_nadania_otrzymania']),
                 'posted_in_bank_date' => new \DateTime(),
                 'payment_id' => $identifier,
-                'kind_of_operation' => 'spedycja',
+                'kind_of_operation' => 'wpłata pobraniowa',
                 'order_id' => $order->id,
-                'operator' => 'SPEDYCJA',
-                'operation_value' => $data['rzeczywisty_koszt_transportu_brutto'],
-                'balance' => (float)$this->getCustomerBalance($order->customer_id) + (float)$data['rzeczywisty_koszt_transportu_brutto'],
+                'operator' => $data['symbol_spedytora'],
+                'operation_value' => $data['wartosc_pobrania'],
+                'balance' => (float)$this->getCustomerBalance($order->customer_id) + (float)$data['wartosc_pobrania'],
                 'accounting_notes' => '',
-                'transaction_notes' => '',
+                'transaction_notes' => 'Numer listu: ' . $data['numer_listu'] . ' Nr faktury:' . $data['nr_faktury_do_ktorej_dany_lp_zostal_przydzielony'],
             ]);
         } catch (\Exception $exception) {
             Log::notice('Błąd podczas zapisu transakcji: ' . $exception->getMessage(), ['line' => __LINE__, 'file' => __FILE__]);
@@ -324,7 +350,7 @@ class ImportShippingPayIn implements ShouldQueue
      */
     private function saveTransfer(Order $order, Transaction $transaction, float $amount, bool $back = false): ?Transaction
     {
-        $identifier = 'p-' . strtotime($transaction->posted_in_bank_date->format('Y-m-d H:i:s')) . '-' . $order->id;
+        $identifier = 'ps-' . strtotime($transaction->posted_in_bank_date->format('Y-m-d H:i:s')) . '-' . $order->id;
         $existingTransaction = $this->transactionRepository->select()->where('payment_id', '=', $identifier)->first();
         if ($existingTransaction !== null) {
             return null;
@@ -333,13 +359,13 @@ class ImportShippingPayIn implements ShouldQueue
             'customer_id' => $order->customer_id,
             'posted_in_system_date' => new \DateTime(),
             'payment_id' => $identifier,
-            'kind_of_operation' => 'przeksięgowanie',
+            'kind_of_operation' => 'przeksięgowanie wpłaty pobraniowej',
             'order_id' => $order->id,
             'operator' => 'SYSTEM',
             'operation_value' => $amount,
             'balance' => (float)$this->getCustomerBalance($order->customer_id) - (float)$amount,
             'accounting_notes' => '',
-            'transaction_notes' => '',
+            'transaction_notes' => $transaction->transaction_notes,
         ]);
     }
 }

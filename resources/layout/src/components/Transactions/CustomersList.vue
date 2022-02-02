@@ -5,11 +5,14 @@
         <h4>Formularz wyszukiwania</h4>
       </div>
       <div class="col-sm-7 buttons">
-        <button class="btn btn-success float-right ml-2" @click="$emit('add')"><i class="voyager-plus"></i> Dodaj
-          Transakcje
+        <button class="btn btn-success float-right ml-2" @click="$emit('add')"><i class="voyager-plus"></i>
+          Dodaj Transakcje
         </button>
         <button class="btn btn-secondary float-right" @click="$emit('import')"><i class="voyager-file-text"></i>
           Import
+        </button>
+        <button class="btn btn-info float-right" @click="$emit('providerTransaction')">
+          Transakcje spedycji
         </button>
       </div>
     </div>
