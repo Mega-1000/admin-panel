@@ -78,7 +78,7 @@ class ImportShippingPayIn implements ShouldQueue
         $this->providerTransactionRepositoryEloquent = $providerTransactionRepositoryEloquent;
 
         $header = NULL;
-        $fileName = 'ShippingTransactionWithoutOrder.csv';
+        $fileName = 'shippingTransactionWithoutOrder.csv';
         $file = fopen($fileName, 'w');
 
         $data = array();
@@ -142,7 +142,7 @@ class ImportShippingPayIn implements ShouldQueue
             }
         }
         fclose($file);
-        Storage::disk('local')->put('public/transaction/bankTransactionWithoutOrder' . date('Y-m-d') . '.csv', file_get_contents($fileName));
+        Storage::disk('local')->put('public/transaction/shippingTransactionWithoutOrder' . date('Y-m-d') . '.csv', file_get_contents($fileName));
     }
 
     private function settleProvider($payIn, $transaction)
