@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Jobs\ImportAllegroPayInJob;
 use App\Jobs\ImportBankPayIn;
 use App\Jobs\ImportShippingPayIn;
+use App\Repositories\ProviderTransactionRepository;
 use App\Repositories\TransactionRepository;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Http\JsonResponse;
@@ -21,15 +22,21 @@ class TransactionsController extends Controller
     /** @var TransactionRepository */
     protected $transactionRepository;
 
+    /** @var ProviderTransactionRepository */
+    protected $providersTransactionRepository;
+
     /**
      * TransactionRepository constructor.
      * @param TransactionRepository $transactionRepository
+     * @param ProviderTransactionRepository $providersTransactionRepository
      */
     public function __construct(
-        TransactionRepository $transactionRepository
+        TransactionRepository         $transactionRepository,
+        ProviderTransactionRepository $providersTransactionRepository
     )
     {
         $this->transactionRepository = $transactionRepository;
+        $this->providersTransactionRepository = $providersTransactionRepository;
     }
 
     /**
@@ -329,7 +336,6 @@ class TransactionsController extends Controller
         ];
     }
 
-
     /**
      * Zwraca klientów z transakcjami
      *
@@ -358,6 +364,50 @@ class TransactionsController extends Controller
                 'errorMessage' => $exception->getMessage()
             ];
         }
+        return response()->json($response);
+    }
+
+    public function providersTransactions(Request $request): JsonResponse
+    {
+        $response = [];
+        try {
+            $query = $this->providersTransactionRepository->select();
+            if ($request->has('provider')) {
+                $query->where('provider', 'like', '%' . $request->get('provider') . '%');
+            }
+
+            $result = $query->paginate(20);
+
+            if (!empty($result)) {
+                $response['status'] = 200;
+                $response['currentPage'] = $result->currentPage();
+                $response['lastPage'] = $result->lastPage();
+                foreach ($result as $transaction) {
+                    $response['transactions'][] = [
+                        'id' => $transaction->id,
+                        'provider' => $transaction->provider,
+                        'waybillNumber' => $transaction->waybill_number,
+                        'invoiceNumber' => $transaction->invoice_number,
+                        'orderId' => $transaction->order_id,
+                        'cashOnDelivery' => $transaction->cash_on_delivery,
+                        'providerBalance' => $transaction->provider_balance,
+                        'providerBalanceOnInvoice' => $transaction->provider_balance_on_invoice,
+                        'transactionId' => $transaction->transaction_id,
+                    ];
+                }
+            } else {
+                $response = [
+                    'errorCode' => 424,
+                    'errorMessage' => 'Brak transakcji'
+                ];
+            }
+        } catch (\Exception $exception) {
+            $response = [
+                'errorCode' => $exception->getCode(),
+                'errorMessage' => $exception->getMessage()
+            ];
+        }
+
         return response()->json($response);
     }
 }

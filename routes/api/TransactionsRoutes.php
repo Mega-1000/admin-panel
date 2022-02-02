@@ -6,3 +6,4 @@ Route::delete('/{transaction}',  ['as' => 'delete', 'uses' => 'Api\TransactionsC
 Route::put('/{transaction}',  ['as' => 'update', 'uses' => 'Api\TransactionsController@update']);
 Route::post('/import/{kind}',  ['as' => 'import', 'uses' => 'Api\TransactionsController@import']);
 Route::get('/customer/{id}',  ['as' => 'customer', 'uses' => 'Api\TransactionsController@customer']);
+Route::get('/providers',  ['as' => 'providers', 'uses' => 'Api\TransactionsController@providersTransactions']);

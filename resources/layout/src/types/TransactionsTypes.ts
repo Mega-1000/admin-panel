@@ -18,6 +18,21 @@ export interface Transaction {
 }
 
 /**
+ * Obiekt transakcji
+ */
+export interface ProviderTransactions {
+  id: number,
+  provider: string,
+  waybillNumber: string,
+  invoiceNumber: string,
+  orderId: number,
+  cashOnDelivery: number,
+  providerBalance: number,
+  providerBalanceOnInvoice: number,
+  transactionId: number
+}
+
+/**
  * Obiekt do utworzenia transakcji
  */
 export interface CreateTransactionParams {
@@ -68,6 +83,7 @@ export interface TransactionsStore {
   customer: Customer | null,
   transaction: Transaction | null,
   transactions: Transaction[] | null,
+  providersTransactions: ProviderTransactions[] | null,
   pageCount: number | null,
   currentPage: number | null
 }
@@ -83,6 +99,11 @@ export interface searchCustomersParams {
   phone: string | null,
   email: string | null,
   nip: string | null
+}
+
+export interface searchProvidersTransactionsParams {
+  page: string,
+  provider: string,
 }
 
 /* eslint-enabled camelcase */

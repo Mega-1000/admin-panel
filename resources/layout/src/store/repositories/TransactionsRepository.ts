@@ -7,7 +7,7 @@ import {
   CreateTransactionParams,
   Customer,
   ImportFileParams,
-  searchCustomersParams,
+  searchCustomersParams, searchProvidersTransactionsParams,
   Transaction
 } from '@/types/TransactionsTypes'
 
@@ -110,6 +110,22 @@ export default {
       method: 'POST',
       credentials: 'same-origin',
       body: formData
+    })
+      .then((response) => {
+        return response.json()
+      })
+  },
+  async getProvidersTransactions (params: searchProvidersTransactionsParams): Promise<any> {
+    const urlSearchParams = new URLSearchParams(
+      Object.fromEntries(Object.entries(params).filter((v) => v[1] !== ''))
+    )
+    return fetch(getFullUrl('api/transactions/providers?' + urlSearchParams.toString()), {
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/json; charset=utf-8',
+        'X-Requested-Width': 'XMLHttpRequest'
+      })
     })
       .then((response) => {
         return response.json()

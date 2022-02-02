@@ -3,7 +3,12 @@
 
 import {
   CreateTransactionParams,
-  Customer, ImportFileParams, searchCustomersParams, Transaction,
+  Customer,
+  ImportFileParams,
+  ProviderTransactions,
+  searchCustomersParams,
+  searchProvidersTransactionsParams,
+  Transaction,
   TransactionsStore
 } from '@/types/TransactionsTypes'
 
@@ -15,7 +20,7 @@ import {
   TRANSACTIONS_DELETE,
   TRANSACTIONS_SET_TRANSACTION,
   IMPORT_TRANSACTIONS_SET_IS_LOADING,
-  TRANSACTIONS_SET_TRANSACTIONS
+  TRANSACTIONS_SET_TRANSACTIONS, TRANSACTIONS_SET_PROVIDERS_TRANSACTIONS
 } from '@/store/mutation-types'
 
 import TransactionsRepository from '@/store/repositories/TransactionsRepository'
@@ -30,6 +35,7 @@ const state: TransactionsStore = {
   customer: null,
   transaction: null,
   transactions: [],
+  providersTransactions: [],
   pageCount: null,
   currentPage: 1
 }
@@ -42,6 +48,7 @@ const getters = {
   customer: (state: TransactionsStore) => state.customer,
   transaction: (state: TransactionsStore) => state.transaction,
   transactions: (state: TransactionsStore) => state.transactions,
+  providersTransactions: (state: TransactionsStore) => state.providersTransactions,
   pageCount: (state: TransactionsStore) => state.pageCount,
   currentPage: (state: TransactionsStore) => state.currentPage
 }
@@ -163,6 +170,25 @@ const actions = {
     commit(TRANSACTIONS_SET_IS_LOADING, true)
     commit(TRANSACTIONS_SET_ERROR, errorMessage)
     commit(TRANSACTIONS_SET_IS_LOADING, false)
+  },
+  loadProvidersTransactions ({ commit }: any, params: searchProvidersTransactionsParams) {
+    commit(TRANSACTIONS_SET_IS_LOADING, true)
+
+    return TransactionsRepository
+      .getProvidersTransactions(params)
+      .then((data: any) => {
+        commit(TRANSACTIONS_SET_IS_LOADING, false)
+        if (data.errorCode) {
+          commit(TRANSACTIONS_SET_ERROR, data.errorMessage)
+        }
+        commit(TRANSACTIONS_SET_PROVIDERS_TRANSACTIONS, data.transactions ?? [])
+        state.currentPage = data.currentPage
+        state.pageCount = data.lastPage
+        return data.transactions
+      })
+      .catch((error: any) => {
+        commit(TRANSACTIONS_SET_ERROR, error.errorMessage)
+      })
   }
 }
 
@@ -194,6 +220,9 @@ const mutations = {
   },
   [TRANSACTIONS_SET_TRANSACTIONS] (state: TransactionsStore, transactions: Transaction[]) {
     state.transactions = transactions
+  },
+  [TRANSACTIONS_SET_PROVIDERS_TRANSACTIONS] (state: TransactionsStore, transactions: ProviderTransactions[]) {
+    state.providersTransactions = transactions
   }
 }
 
