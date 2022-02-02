@@ -149,6 +149,15 @@ class ImportShippingPayIn implements ShouldQueue
     {
         $providerBalance = $this->providerTransactionRepositoryEloquent->getBalance($payIn['symbol_spedytora']);
         $providerBalanceOnInvoice = $this->providerTransactionRepositoryEloquent->getBalanceOnInvoice($payIn['symbol_spedytora'], $payIn['nr_faktury_do_ktorej_dany_lp_zostal_przydzielony']);
+        $existingTransaction = $this->providerTransactionRepositoryEloquent->select()
+            ->where('provider', '=', $payIn['symbol_spedytora'])
+            ->where('invoice_number', '=', $payIn['nr_faktury_do_ktorej_dany_lp_zostal_przydzielony'])
+            ->where('cash_on_delivery', '=', $payIn['wartosc_pobrania'])
+            ->first();
+        if ($existingTransaction !== null) {
+            return null;
+        }
+
         $this->providerTransactionRepositoryEloquent->create([
             'provider' => $payIn['symbol_spedytora'],
             'waybill_number' => $payIn['numer_listu'],
