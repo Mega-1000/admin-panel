@@ -25,6 +25,7 @@ class TransactionController extends Controller
      */
     public function index(Request $request)
     {
+        $email = $request->get('email');
         if ($request->has('kind')) {
             $filePath = null;
             switch ($request->kind) {
@@ -45,6 +46,6 @@ class TransactionController extends Controller
             }
         }
 
-        return view('transactions.index');
+        return view('transactions.index',compact('email'));
     }
 }

@@ -10,7 +10,7 @@
 @section('app-content')
     <div class="panel">
         <div class="vue-components panel-body">
-            <transactions/>
+            <transactions email="{{$email}}"></transactions>
         </div>
     </div>
 @endsection

@@ -35,7 +35,11 @@ const state: TransactionsStore = {
   customer: null,
   transaction: null,
   transactions: [],
-  providersTransactions: [],
+  providers: {
+    transactions: [],
+    pageCount: null,
+    currentPage: 1
+  },
   pageCount: null,
   currentPage: 1
 }
@@ -48,7 +52,7 @@ const getters = {
   customer: (state: TransactionsStore) => state.customer,
   transaction: (state: TransactionsStore) => state.transaction,
   transactions: (state: TransactionsStore) => state.transactions,
-  providersTransactions: (state: TransactionsStore) => state.providersTransactions,
+  providers: (state: TransactionsStore) => state.providers,
   pageCount: (state: TransactionsStore) => state.pageCount,
   currentPage: (state: TransactionsStore) => state.currentPage
 }
@@ -182,8 +186,8 @@ const actions = {
           commit(TRANSACTIONS_SET_ERROR, data.errorMessage)
         }
         commit(TRANSACTIONS_SET_PROVIDERS_TRANSACTIONS, data.transactions ?? [])
-        state.currentPage = data.currentPage
-        state.pageCount = data.lastPage
+        state.providers.currentPage = data.currentPage
+        state.providers.pageCount = data.lastPage
         return data.transactions
       })
       .catch((error: any) => {
@@ -222,7 +226,7 @@ const mutations = {
     state.transactions = transactions
   },
   [TRANSACTIONS_SET_PROVIDERS_TRANSACTIONS] (state: TransactionsStore, transactions: ProviderTransactions[]) {
-    state.providersTransactions = transactions
+    state.providers.transactions = transactions
   }
 }
 

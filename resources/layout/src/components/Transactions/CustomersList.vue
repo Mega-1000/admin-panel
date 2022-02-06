@@ -128,18 +128,20 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Customer, searchCustomersParams } from '@/types/TransactionsTypes'
 
 @Component({
   components: {}
 })
 export default class CustomersList extends Vue {
+  @Prop() private email!: string
+
   public searchedAllegroNick = ''
 
   public searchedPhoneNumber = ''
 
-  public searchedEmail = ''
+  public searchedEmail = this.email ?? ''
 
   public searchedNIP = ''
 
