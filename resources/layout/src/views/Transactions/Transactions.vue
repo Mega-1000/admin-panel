@@ -1,7 +1,7 @@
 <template>
   <div class="v-transactions">
     <customers-list v-if="customer==null && !transactionForm && !providerTransaction" @add="transactionForm = true"
-                    @import="toggleShowModal" @providerTransaction="providerTransaction=true"></customers-list>
+                    @import="toggleShowModal" :email="email" @providerTransaction="providerTransaction=true"></customers-list>
     <transactions-list @back="back" @add="transactionForm = true" @edit="edit"
                        v-if="customer !== null && !transactionForm && !providerTransaction"></transactions-list>
     <transactions-form v-if="transactionForm" @transactionAdded="transactionAdded"
@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 import { Customer, searchCustomersParams } from '@/types/TransactionsTypes'
 import CustomersList from '@/components/Transactions/CustomersList.vue'
 import TransactionsList from '@/components/Transactions/TransactionsList.vue'
@@ -28,6 +28,7 @@ import ProviderTransactionsList from '@/components/Transactions/ProviderTransact
   components: { ProviderTransactionsList, FileUploader, TransactionsForm, TransactionsList, CustomersList }
 })
 export default class Transactions extends Vue {
+  @Prop() private email!: string
   public transactionForm = false
   public providerTransaction = false
 

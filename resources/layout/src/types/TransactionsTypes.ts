@@ -83,7 +83,11 @@ export interface TransactionsStore {
   customer: Customer | null,
   transaction: Transaction | null,
   transactions: Transaction[] | null,
-  providersTransactions: ProviderTransactions[] | null,
+  providers: {
+    transactions: ProviderTransactions[] | null,
+    pageCount: number | null,
+    currentPage: number | null
+  },
   pageCount: number | null,
   currentPage: number | null
 }

@@ -3074,6 +3074,8 @@
                         html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
                         html += '</a>';
 
+                        html += '<a href="{{ route('transactions.index') }}?email=' + '{{ $order->customer->login }}' + '" class="btn edit btn-sm btn-success">Transakcje</a>';
+
                         html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecordOrderPayments(' + id + ')">';
                         html += '<i class="voyager-trash"></i>';
                         html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';

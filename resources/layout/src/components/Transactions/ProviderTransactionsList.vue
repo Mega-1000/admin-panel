@@ -142,7 +142,7 @@ export default class ProviderTransactionsList extends Vue {
   }
 
   public get transactions (): ProviderTransactions[] {
-    return this.$store?.getters['TransactionsService/providersTransactions']
+    return this.$store?.getters['TransactionsService/providers'].transactions
   }
 
   public get balance (): number {
@@ -154,7 +154,7 @@ export default class ProviderTransactionsList extends Vue {
   }
 
   public get pages (): number[] {
-    return Array(this.$store?.getters['TransactionsService/pageCount']).fill(0).map((e, i) => i + 1)
+    return Array(this.$store?.getters['TransactionsService/providers'].pageCount).fill(0).map((e, i) => i + 1)
   }
 
   private async changePage (pageNumber: number): Promise<void> {

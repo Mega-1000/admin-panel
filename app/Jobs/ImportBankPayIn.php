@@ -91,7 +91,10 @@ class ImportBankPayIn implements ShouldQueue
             }
 
             $order = Order::find($orderId);
-
+            if ($order == null) {
+                fputcsv($file, $payIn);
+                continue;
+            }
             try {
                 if (!empty($order)) {
                     $payIn['kwota'] = (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $payIn['kwota']));
@@ -149,7 +152,7 @@ class ImportBankPayIn implements ShouldQueue
     /**
      * Settle orders.
      *
-     * @param Collection  $orders Orders collection
+     * @param Collection $orders Orders collection
      * @param Transaction $transaction Transaction.
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
@@ -205,7 +208,7 @@ class ImportBankPayIn implements ShouldQueue
      */
     private function checkOrderNumberFromTitle(string $fileLine): ?int
     {
-        $matches = $vatPregMatch = [];
+        $matches = [];
         $transactions = str_replace(' ', '', $fileLine);
         preg_match('/[qQ][qQ](\d{3,5})[qQ][qQ]/', $transactions, $matches);
         if (count($matches)) {
@@ -278,10 +281,10 @@ class ImportBankPayIn implements ShouldQueue
     /**
      * Tworzy transakcje przeksięgowania
      *
-     * @param Order       $order
+     * @param Order $order
      * @param Transaction $transaction
-     * @param float       $amount
-     * @param boolean     $back
+     * @param float $amount
+     * @param boolean $back
      * @return Transaction
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>

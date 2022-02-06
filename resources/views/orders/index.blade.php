@@ -1289,6 +1289,16 @@
                                     }
                                     html += '<p style="margin: 8px 8px 0px 8px;">' + name + '</p> </div> '
                                     html += value.sumOfCosts ? value.sumOfCosts.sum + ' zł' : '';
+                                    if (value.sumOfCosts !== null) {
+                                        let balance = value.sumOfCosts.sum - value.cost_for_company;
+                                        let color = '';
+                                        if (balance >= 0) {
+                                            color = 'green';
+                                        } else if (balance < 0) {
+                                            color = 'red';
+                                        }
+                                        html += '<p style="color:' + color + '">Bilans: ' + balance.toFixed(2) + '</p>'
+                                    }
                                     if (value.letter_number === null) {
                                         html += '<a href="javascript:void()"><p>Brak listu przewozowego</p></a>';
                                     } else {
@@ -1681,7 +1691,7 @@
                         data: 'orderId',
                         name: 'actions',
                         orderable: false,
-                        render: function (id) {
+                        render: function (id,row, data) {
                             let html = '';
                             html += '<button id="moveButton-' + id + '" class="btn btn-sm btn-warning edit" onclick="moveData(' + id + ')">Przenieś</button>';
                             html += '<button id="moveButtonAjax-' + id + '" class="btn btn-sm btn-success btn-move edit hidden" onclick="moveDataAjax(' + id + ')">Przenieś dane tutaj</button>';
@@ -1696,6 +1706,7 @@
                             html += '</button>'
                             html += '<button data-order="'+id+'"';
                             html += ' class="btn penalty btn-danger btn-sm edit"><i class="fas fa-minus"></i> Potrącenie</button>';
+                            html += '<a href="{{ route('transactions.index') }}?email=' + data.email + '" class="btn edit btn-sm btn-success">Transakcje</a>';
                             @endif
 
                                 return html;
