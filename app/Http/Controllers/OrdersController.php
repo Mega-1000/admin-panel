@@ -413,7 +413,7 @@ class OrdersController extends Controller
             "order_id" => $order->id,
             'type' => 'INVOICE_ADDRESS',
         ])->first();
-	
+
         $orderDeliveryAddress = $this->orderAddressRepository->findWhere([
             "order_id" => $order->id,
             'type' => 'DELIVERY_ADDRESS',
@@ -422,15 +422,15 @@ class OrdersController extends Controller
             "customer_id" => $order->customer->id,
             'type' => 'DELIVERY_ADDRESS',
         ])->first();
-	
+
 	    $orderAddressService = new OrderAddressService();
-	
+
 	    $orderAddressService->addressIsValid($orderInvoiceAddress);
 	    $orderInvoiceAddressErrors = $orderAddressService->errors();
-	    
+
 	    $orderAddressService->addressIsValid($orderDeliveryAddress);
 	    $orderDeliveryAddressErrors = $orderAddressService->errors();
-	    
+
 	    $messages = $this->orderMessageRepository->orderBy('type')->findWhere(["order_id" => $order->id]);
         $emails = DB::table('emails_messages')->where('order_id', $orderId)->get();
         $orderItems = $order->items;
@@ -521,7 +521,7 @@ class OrdersController extends Controller
         $subiektInvoices = $order->subiektInvoices ?? [];
         $orderHasSentLP = $order->hasOrderSentLP();
         $packets = ProductStockPacket::with('items')->get();
-	    
+
         if ($order->customer_id == 4128) {
             return view('orders.edit_self',
                 compact('visibilitiesTask', 'visibilitiesPackage', 'visibilitiesPayments', 'warehouses', 'order',
@@ -2033,11 +2033,25 @@ class OrdersController extends Controller
                             ->whereRaw("order_labels.order_id = orders.id and order_labels.label_id = {$column['search']['value']}");
                     });
                 } elseif ($column['name'] == "packages_sent" && !empty($column['search']['value'])) {
-                    $query->whereExists(function ($innerQuery) use ($column) {
-                        $innerQuery->select("*")
-                            ->from('order_packages')
-                            ->whereRaw("order_packages.order_id = orders.id AND order_packages.delivery_courier_name LIKE '{$column['search']['value']}' AND order_packages.status IN ('SENDING', 'DELIVERED')");
-                    });
+                    if ($column['search']['value'] === 'plus') {
+                        $query->whereExists(function ($innerQuery) use ($column) {
+                            $innerQuery->select("*")
+                                ->from('order_packages')
+                                ->whereRaw("order_packages.order_id = orders.id AND order_packages.delivery_cost_balance > 0 AND order_packages.status IN ('SENDING', 'DELIVERED')");
+                        });
+                    } else if ($column['search']['value'] === 'minus') {
+                        $query->whereExists(function ($innerQuery) use ($column) {
+                            $innerQuery->select("*")
+                                ->from('order_packages')
+                                ->whereRaw("order_packages.order_id = orders.id AND order_packages.delivery_cost_balance < 0 AND order_packages.status IN ('SENDING', 'DELIVERED')");
+                        });
+                    } else {
+                        $query->whereExists(function ($innerQuery) use ($column) {
+                            $innerQuery->select("*")
+                                ->from('order_packages')
+                                ->whereRaw("order_packages.order_id = orders.id AND order_packages.delivery_courier_name LIKE '{$column['search']['value']}' AND order_packages.status IN ('SENDING', 'DELIVERED')");
+                        });
+                    }
                 } elseif ($column['name'] == "packages_not_sent" && !empty($column['search']['value'])) {
                     $query->whereExists(function ($innerQuery) use ($column) {
                         $innerQuery->select("*")
