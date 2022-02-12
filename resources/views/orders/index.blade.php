@@ -686,6 +686,11 @@
             <th>@lang('orders.table.spedition_exchange_invoiced_selector')</th>
             <th>
                 <div><span>@lang('orders.table.packages_sent')</span></div>
+                <div class="d-flex" style="height: 20px">
+                    <button class="badge badge-success positive-balance">+</button>
+                    <button class="badge badge-danger negative-balance">-</button>
+                    <button class="badge badge-primary clear-balance">All</button>
+                </div>
                 <div class="input_div">
                     <select class="columnSearchSelect" id="columnSearch-packages_sent">
                         <option value="">Wszystkie</option>
@@ -1289,15 +1294,14 @@
                                     }
                                     html += '<p style="margin: 8px 8px 0px 8px;">' + name + '</p> </div> '
                                     html += value.sumOfCosts ? value.sumOfCosts.sum + ' zł' : '';
-                                    if (value.sumOfCosts !== null) {
-                                        let balance = value.sumOfCosts.sum - value.cost_for_company;
+                                    if (value.delivery_cost_balance !== 0) {
                                         let color = '';
-                                        if (balance >= 0) {
+                                        if (value.delivery_cost_balance >= 0) {
                                             color = 'green';
-                                        } else if (balance < 0) {
+                                        } else if (value.delivery_cost_balance < 0) {
                                             color = 'red';
                                         }
-                                        html += '<p style="color:' + color + '">Bilans: ' + balance.toFixed(2) + '</p>'
+                                        html += '<p style="color:' + color + '">Bilans: ' + value.delivery_cost_balance + '</p>'
                                     }
                                     if (value.letter_number === null) {
                                         html += '<a href="javascript:void()"><p>Brak listu przewozowego</p></a>';
@@ -2349,6 +2353,27 @@
                     }
                 }
             });
+        });
+
+        $('.positive-balance').click(function (e) {
+            table
+                .column('packages_sent:name')
+                .search('plus')
+                .draw();
+        });
+
+        $('.negative-balance').click(function (e) {
+            table
+                .column('packages_sent:name')
+                .search('minus')
+                .draw();
+        });
+
+        $('.clear-balance').click(function (e) {
+            table
+                .column('packages_sent:name')
+                .search('')
+                .draw();
         });
 
         $("#columnSearch-packages_sent")
