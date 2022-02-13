@@ -685,7 +685,11 @@
             <th></th>
             <th>@lang('orders.table.spedition_exchange_invoiced_selector')</th>
             <th>
-                <div><span>@lang('orders.table.packages_sent')</span></div>
+                <div style="height: 20px"><span>@lang('orders.table.packages_sent')</span></div>
+                <div style="height: 40px">
+                    <input type="text" class="delivery_cost_balance form-control"
+                           style="margin-bottom: 5px; margin-top: 5px">
+                </div>
                 <div class="d-flex" style="height: 20px">
                     <button class="badge badge-success positive-balance">+</button>
                     <button class="badge badge-danger negative-balance">-</button>
@@ -2358,18 +2362,19 @@
         $('.positive-balance').click(function (e) {
             table
                 .column('packages_sent:name')
-                .search('plus')
+                .search('plus ' + $('.delivery_cost_balance')[0].value)
                 .draw();
         });
 
         $('.negative-balance').click(function (e) {
             table
                 .column('packages_sent:name')
-                .search('minus')
+                .search('minus ' + $('.delivery_cost_balance')[0].value)
                 .draw();
         });
 
         $('.clear-balance').click(function (e) {
+            $('.delivery_cost_balance')[0].value = '';
             table
                 .column('packages_sent:name')
                 .search('')

@@ -2033,17 +2033,18 @@ class OrdersController extends Controller
                             ->whereRaw("order_labels.order_id = orders.id and order_labels.label_id = {$column['search']['value']}");
                     });
                 } elseif ($column['name'] == "packages_sent" && !empty($column['search']['value'])) {
-                    if ($column['search']['value'] === 'plus') {
-                        $query->whereExists(function ($innerQuery) use ($column) {
+                   $searched = explode(' ',$column['search']['value']);
+                    if ($searched[0] === 'plus') {
+                        $query->whereExists(function ($innerQuery) use ($column, $searched) {
                             $innerQuery->select("*")
                                 ->from('order_packages')
-                                ->whereRaw("order_packages.order_id = orders.id AND order_packages.delivery_cost_balance > 0 AND order_packages.status IN ('SENDING', 'DELIVERED')");
+                                ->whereRaw("order_packages.order_id = orders.id AND order_packages.delivery_cost_balance > " . $searched[1] . " AND order_packages.status IN ('SENDING', 'DELIVERED')");
                         });
-                    } else if ($column['search']['value'] === 'minus') {
-                        $query->whereExists(function ($innerQuery) use ($column) {
+                    } else if ($searched[0] === 'minus') {
+                        $query->whereExists(function ($innerQuery) use ($column, $searched) {
                             $innerQuery->select("*")
                                 ->from('order_packages')
-                                ->whereRaw("order_packages.order_id = orders.id AND order_packages.delivery_cost_balance < 0 AND order_packages.status IN ('SENDING', 'DELIVERED')");
+                                ->whereRaw("order_packages.order_id = orders.id AND order_packages.delivery_cost_balance < -" . $searched[1] . " AND order_packages.status IN ('SENDING', 'DELIVERED')");
                         });
                     } else {
                         $query->whereExists(function ($innerQuery) use ($column) {
