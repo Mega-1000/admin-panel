@@ -31,4 +31,14 @@ class Transaction extends Model
     {
         return $this->belongsTo(Customer::class);
     }
+
+    public function payment()
+    {
+        return $this->hasOne(OrderPayment::class);
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
 }

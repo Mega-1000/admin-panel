@@ -125,10 +125,11 @@ class TransactionsController extends Controller
         );
 
         if ($validator->passes()) {
-            $operationValue = ((in_array($request->get('operationKind'),
+            $operationKind = $request->get('operationKind');
+            $operationValue = ((in_array($operationKind,
                     [
-                        'Wpłata',
-                        'Uznanie'
+                        'wpłata',
+                        'uznanie',
                     ]
                 ) ? '+' : '-')) . $request->get('operationValue');
 
@@ -140,7 +141,7 @@ class TransactionsController extends Controller
                 $balance = 0;
             }
 
-            $this->transactionRepository->create([
+            $transaction = $this->transactionRepository->create([
                 'customer_id' => $request->get('customerId'),
                 'posted_in_system_date' => $request->get('registrationInSystemDate'),
                 'posted_in_bank_date' => $request->get('registrationInBankDate'),
@@ -149,10 +150,20 @@ class TransactionsController extends Controller
                 'order_id' => ($request->get('orderId') === '0') ? null : $request->get('orderId'),
                 'operator' => $request->get('operator'),
                 'operation_value' => $operationValue,
-                'balance' => (int)$balance + (int)$operationValue,
+                'balance' => (float)$balance + (float)$operationValue,
                 'accounting_notes' => $request->get('accountingNotes'),
                 'transaction_notes' => $request->get('transactionNotes'),
             ]);
+
+            if ($operationKind === 'przeksięgowanie') {
+                $transaction->payments()->create([
+                    'transaction_id' => $transaction->id,
+                    'amount' => $operationValue,
+                    'type' => 'CLIENT',
+                    'promise' => '',
+                ]);
+            }
+
             return response()->json(['success' => 'Transakcja została zapisana.']);
         } else {
             return response()->json(
