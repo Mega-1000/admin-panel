@@ -156,7 +156,7 @@ class TransactionsController extends Controller
             ]);
 
             if ($operationKind === 'przeksięgowanie') {
-                $transaction->payments()->create([
+                $transaction->order->payments()->create([
                     'transaction_id' => $transaction->id,
                     'amount' => $operationValue,
                     'type' => 'CLIENT',
