@@ -20,7 +20,7 @@ class CreateTransactionsTable extends Migration
             $table->dateTime('posted_in_bank_date')->nullable(true)->comment('Data zaksięgowania w banku');
             $table->text('payment_id')->nullable(true)->comment('Identyfikator płatności z sello');
             $table->string('kind_of_operation')->nullable(true)->comment('Rodzaj operacji');
-            $table->string('order_id')->nullable(true)->comment('Identyfikator zamówienia');
+            $table->bigInteger('order_id')->nullable(true)->comment('Identyfikator zamówienia');
             $table->string('operator')->nullable(true)->comment('Operator płatności');
             $table->float('operation_value')->nullable(true)->comment('Wartość operacji');
             $table->float('balance')->nullable(true)->comment('Saldo');

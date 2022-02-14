@@ -371,7 +371,7 @@ class ImportShippingPayIn implements ShouldQueue
             'kind_of_operation' => 'przeksięgowanie wpłaty pobraniowej',
             'order_id' => $order->id,
             'operator' => 'SYSTEM',
-            'operation_value' => $amount,
+            'operation_value' => -$amount,
             'balance' => (float)$this->getCustomerBalance($order->customer_id) - (float)$amount,
             'accounting_notes' => '',
             'transaction_notes' => $transaction->transaction_notes,

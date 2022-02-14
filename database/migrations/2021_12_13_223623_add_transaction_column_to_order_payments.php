@@ -15,7 +15,7 @@ class AddTransactionColumnToOrderPayments extends Migration
     {
         Schema::table('order_payments', function (Blueprint $table) {
             $table->integer('transaction_id')->unsigned()->nullable();
-            $table->foreign('transaction_id')->references('id')->on('transactions');
+            $table->foreign('transaction_id')->references('id')->on('transactions')->onDelete('cascade');
         });
     }
 
