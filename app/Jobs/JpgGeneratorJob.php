@@ -52,6 +52,15 @@ class JpgGeneratorJob implements ShouldQueue
                 'rows' => $fileData['rows']
             ])->setPaper('a4');
 
+            $path = storage_path('app/public/products/' . $fileName . '.pdf');
+            $pdf->save($path);
+
+            $pdf = PDF::loadView('jpg.products', [
+                'hasSubcolumns' => $fileData['hasSubcolumns'],
+                'cols' => $fileData['cols'],
+                'rows' => $fileData['rows']
+            ])->setPaper('a4');
+
             $path = storage_path('app/public/products/' . $fileName . 'r.pdf');
             $pdf->save($path);
         }
