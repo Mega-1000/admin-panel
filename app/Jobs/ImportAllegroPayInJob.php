@@ -3,9 +3,11 @@
 namespace App\Jobs;
 
 use App\Entities\Order;
+use App\Entities\OrderPayment;
 use App\Entities\SelTransaction;
 use App\Entities\Transaction;
 use App\Helpers\PdfCharactersHelper;
+use App\Http\Controllers\OrdersPaymentsController;
 use App\Repositories\TransactionRepository;
 use Illuminate\Bus\Queueable;
 use Illuminate\Database\Eloquent\Collection;
@@ -134,7 +136,7 @@ class ImportAllegroPayInJob implements ShouldQueue
     /**
      * Settle orders.
      *
-     * @param Collection  $orders Orders collection
+     * @param Collection $orders Orders collection
      * @param Transaction $transaction Transaction.
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
@@ -155,12 +157,17 @@ class ImportAllegroPayInJob implements ShouldQueue
                     $paymentAmount = $amount;
                 }
                 $transfer = $this->saveTransfer($order, $transaction, (float)$paymentAmount);
-                $order->payments()->create([
+                $payment = $order->payments()->create([
                     'transaction_id' => $transfer->id,
                     'amount' => $paymentAmount,
                     'type' => 'CLIENT',
                     'promise' => '',
                 ]);
+
+                if ($payment instanceof OrderPayment) {
+                    OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
+                }
+
                 $amount -= $paymentAmount;
             }
         }
@@ -266,7 +273,7 @@ class ImportAllegroPayInJob implements ShouldQueue
     /**
      * Tworzy transakcje przeksięgowania
      *
-     * @param Order       $order
+     * @param Order $order
      * @param Transaction $transaction
      * @return Transaction
      *
@@ -292,7 +299,7 @@ class ImportAllegroPayInJob implements ShouldQueue
     /**
      * Tworzy transakcje przeksięgowania
      *
-     * @param Order       $order
+     * @param Order $order
      * @param Transaction $transaction
      * @return Transaction
      *
