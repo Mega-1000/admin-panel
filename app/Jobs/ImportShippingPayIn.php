@@ -5,8 +5,10 @@ namespace App\Jobs;
 use App\Domains\DelivererPackageImport\PriceFormatter;
 use App\Entities\Order;
 use App\Entities\OrderPackage;
+use App\Entities\OrderPayment;
 use App\Entities\Transaction;
 use App\Helpers\PdfCharactersHelper;
+use App\Http\Controllers\OrdersPaymentsController;
 use App\Repositories\DelivererRepositoryEloquent;
 use App\Repositories\OrderPackageRepositoryEloquent;
 use App\Repositories\ProviderTransactionRepositoryEloquent;
@@ -264,12 +266,17 @@ class ImportShippingPayIn implements ShouldQueue
                     $paymentAmount = $amount;
                 }
                 $transfer = $this->saveTransfer($order, $transaction, $paymentAmount);
-                $order->payments()->create([
+                $payment = $order->payments()->create([
                     'transaction_id' => $transfer->id,
                     'amount' => $paymentAmount,
                     'type' => 'CLIENT',
                     'promise' => '',
                 ]);
+
+                if ($payment instanceof OrderPayment) {
+                    OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
+                }
+
                 $amount -= $paymentAmount;
             }
         }
