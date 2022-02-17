@@ -46,11 +46,19 @@ class JpgGeneratorJob implements ShouldQueue
         foreach ($data as $fileName => $fileData) {
             $fileData['hasSubcolumns'] = $this->hasSubcolumns($fileData['cols']);
 
+            $colsCount = count($fileData['cols'], COUNT_RECURSIVE);
+
+            if ($colsCount < 30) {
+                $size = 'a4';
+            } else {
+                $size = 'a2';
+            }
+
             $pdf = PDF::loadView('jpg.table', [
                 'hasSubcolumns' => $fileData['hasSubcolumns'],
                 'cols' => $fileData['cols'],
                 'rows' => $fileData['rows']
-            ])->setPaper('a4');
+            ])->setPaper($size, 'landscape');
 
             $path = storage_path('app/public/products/' . $fileName . '.pdf');
             $pdf->save($path);
