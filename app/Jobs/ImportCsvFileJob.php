@@ -47,7 +47,7 @@ class ImportCsvFileJob implements ShouldQueue
             return;
         }
 
-        $this->log('Import start: '.Carbon::now());
+        $this->log('Import start: ' . Carbon::now());
 
         $handle = fopen($path, 'rb');
         if (!$handle) {
@@ -87,26 +87,26 @@ class ImportCsvFileJob implements ShouldQueue
                     if ($media) {
                         $this->createProductMedia($media, $product);
                     }
-	
-	                if ($line[500]) {
-	                	$productAnalyze = new Entities\ProductAnalyzer();
-		                $productAnalyze->product_id = $product->id;
-		                $productAnalyze->parse_service = 'allegro';
-		                $productAnalyze->parse_url = $line[500];
-	                }
-	                
+
+                    if ($line[500]) {
+                        $productAnalyze = new Entities\ProductAnalyzer();
+                        $productAnalyze->product_id = $product->id;
+                        $productAnalyze->parse_service = 'allegro';
+                        $productAnalyze->parse_url = $line[500];
+                    }
+
                     $this->setProductTradeGroups($line, $product);
                     if (!empty($multiCalcBase)) {
-                        $this->productsRelated[$categoryColumn.'-'.$multiCalcBase] = $product->id;
-                    } elseif (!empty($multiCalcCurrent) && !empty($this->productsRelated[$categoryColumn.'-'.$multiCalcCurrent])) {
-                        $product->parent_id = $this->productsRelated[$categoryColumn.'-'.$multiCalcCurrent];
+                        $this->productsRelated[$categoryColumn . '-' . $multiCalcBase] = $product->id;
+                    } elseif (!empty($multiCalcCurrent) && !empty($this->productsRelated[$categoryColumn . '-' . $multiCalcCurrent])) {
+                        $product->parent_id = $this->productsRelated[$categoryColumn . '-' . $multiCalcCurrent];
                         $product->category_id = Entities\Product::find($product->parent_id)->category_id;
                         $product->save();
                     }
                 }
-                $this->generateJpgData($line, $categoryColumn);
+                $this->generateJpgData($line, $categoryColumn, $product);
             } catch (\Exception $e) {
-                $this->log("Row $i EXCEPTION: " . $e->getMessage().", File: ".$e->getFile().", Line: ".$e->getLine());
+                $this->log("Row $i EXCEPTION: " . $e->getMessage() . ", File: " . $e->getFile() . ", Line: " . $e->getLine());
             }
         }
         $this->saveJpgData();
@@ -614,7 +614,7 @@ class ImportCsvFileJob implements ShouldQueue
             $newMedia->save();
         }
     }
-    
+
     private function setProductTradeGroups(array $line, Entities\Product $product)
     {
         $this->getTradeGroupParams(379, 'price', $line, $product);
@@ -654,7 +654,7 @@ class ImportCsvFileJob implements ShouldQueue
         $tradeGroup->save();
     }
 
-    private function generateJpgData($line, $categoryColumn)
+    private function generateJpgData($line, $categoryColumn, Entities\Product $product)
     {
         $columns = [9 => 10, 11 => 13];
         foreach ($columns as $fileNameColumn => $orderColumn) {
@@ -672,7 +672,7 @@ class ImportCsvFileJob implements ShouldQueue
                 continue;
             }
             $this->jpgData[$fileName][$line[1]][$line[2]][$line[3]] = [
-                'price' => $price,
+                'price' => ($product->price !== null) ? $product->price->gross_selling_price_basic_unit : $price,
                 'order' => $order,
                 'name' => $line[4],
                 'image' => $this->getUrl($line[303])
@@ -709,7 +709,7 @@ class ImportCsvFileJob implements ShouldQueue
     private function log($text)
     {
         Log::channel('import')->info($text);
-        echo $text."\n";
+        echo $text . "\n";
     }
 
     private function getDateOrNull($date)
@@ -742,7 +742,7 @@ class ImportCsvFileJob implements ShouldQueue
         for ($i = 98; $i >= 0; $i--) {
             $iStr = $i < 10 ? "0$i" : $i;
             $oldName = "baza_backup_$iStr";
-            $iStr = ($i + 1) < 10 ? "0".($i + 1) : $i + 1;
+            $iStr = ($i + 1) < 10 ? "0" . ($i + 1) : $i + 1;
             $newName = "baza_backup_$iStr";
             $this->replaceFile($oldName, $newName);
         }
