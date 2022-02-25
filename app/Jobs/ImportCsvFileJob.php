@@ -104,7 +104,7 @@ class ImportCsvFileJob implements ShouldQueue
                         $product->save();
                     }
                 }
-                $this->generateJpgData($line, $categoryColumn, $product);
+                $this->generateJpgData($line, $categoryColumn, $product ?? null);
             } catch (\Exception $e) {
                 $this->log("Row $i EXCEPTION: " . $e->getMessage() . ", File: " . $e->getFile() . ", Line: " . $e->getLine());
             }
@@ -654,7 +654,7 @@ class ImportCsvFileJob implements ShouldQueue
         $tradeGroup->save();
     }
 
-    private function generateJpgData($line, $categoryColumn, Entities\Product $product)
+    private function generateJpgData($line, $categoryColumn, ?Entities\Product $product = null)
     {
         $columns = [9 => 10, 11 => 13];
         foreach ($columns as $fileNameColumn => $orderColumn) {
@@ -672,7 +672,7 @@ class ImportCsvFileJob implements ShouldQueue
                 continue;
             }
             $this->jpgData[$fileName][$line[1]][$line[2]][$line[3]] = [
-                'price' => ($product->price !== null) ? $product->price->gross_selling_price_basic_unit : $price,
+                'price' => (isset($product) && $product->price !== null) ? $product->price->gross_selling_price_basic_unit : $price,
                 'order' => $order,
                 'name' => $line[4],
                 'image' => $this->getUrl($line[303])
