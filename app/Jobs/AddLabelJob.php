@@ -78,6 +78,12 @@ class AddLabelJob extends Job implements ShouldQueue
                 $labelId = $labelId->id;
             }
 
+            if ($labelId=== 45) {
+                if (count(array_intersect($this->order->labels()->pluck('labels.id')->toArray(), Label::NOT_ADD_LABEL_CHECK_CORRECT)) > 0) {
+                    continue;
+                }
+            }
+
             if (!empty($this->loopPreventionArray['already-added']) && in_array($labelId,
                     $this->loopPreventionArray['already-added'])) {
                 continue;
@@ -111,7 +117,6 @@ class AddLabelJob extends Job implements ShouldQueue
             }
 
             if (count($alreadyHasLabel) == 0) {
-
                 $this->order->labels()->attach($this->order->id, ['label_id' => $label->id, 'added_type' => $this->options['added_type'], 'created_at' => Carbon::now()]);
                 $this->setScheduledLabelsAfterAddition($this->order->id, $label, $orderLabelSchedulerRepository);
                 $this->loopPreventionArray['already-added'][] = $labelId;
