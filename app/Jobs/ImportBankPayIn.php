@@ -72,7 +72,7 @@ class ImportBankPayIn implements ShouldQueue
                     $header = $row;
                     fputcsv($file, $row);
                 } else {
-                    if (!str_contains($row[2], 'PRZYCHODZ')) {
+                    if (!str_contains($row[2], 'PRZYCH')) {
                         continue;
                     }
                     foreach ($row as &$text) {
