@@ -240,7 +240,7 @@ class ProductsController extends Controller
 
         $products = json_decode($products, true, JSON_PRETTY_PRINT);
         foreach ($products['data'] as $productKey => $productValue) {
-            $products['data'][$productKey]['id'] = $productValue['id'];
+            $products['data'][$productKey]['id'] = $productValue['product_id'];
             if (!empty($productValue['url_for_website']) && !File::exists(public_path($productValue['url_for_website']))) {
                 $products['data'][$productKey]['url_for_website'] = null;
             }
