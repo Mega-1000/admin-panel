@@ -194,7 +194,9 @@
                     </td>
                     <td>
 
-                        @if(strstr($variation['different'], '-') != false)
+                        @if($variation['different'] === null)
+                            <span>-</span>
+                        @elseif(strstr($variation['different'], '-') != false)
                             <span style="color:red;">{{(float)$variation['different']}}</span>
                         @else
                             <span style="color:green;">+{{(float)$variation['different']}}</span>
