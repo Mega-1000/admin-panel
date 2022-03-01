@@ -596,11 +596,15 @@ class OrdersController extends Controller
                 ) {
                     continue;
                 }
-                if ($prod->id == $product->product->id) {
+
+                if ($unitData == 0) {
+                    $diff = null;
+                } else if ($prod->id == $product->product->id) {
                     $diff = 0.0;
                 } else {
-                    $diff = $product->price - number_format($unitData, 2, '.', '');
+                    $diff = number_format((($product->gross_selling_price_commercial_unit * $product->quantity) - number_format($unitData, 2, '.', '')), 2, '.', '');
                 }
+
                 $array = [
                     'id' => $prod->id,
                     'name' => $prod->name,
