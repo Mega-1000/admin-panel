@@ -163,6 +163,7 @@ class ProductsController extends Controller
     {
         $products = Product
             ::with(['children' => function ($q) {
+                $q->select('product_prices.*','product_packings.*','products.*');
                 $q->join('product_prices', 'products.id', '=', 'product_prices.product_id');
                 $q->join('product_packings', 'products.id', '=', 'product_packings.product_id');
                 $q->orderBy('priority');
@@ -229,6 +230,7 @@ class ProductsController extends Controller
 
         $products = $category
             ->products()
+            ->select('product_prices.*', 'product_packings.*','products.*')
             ->where('products.show_on_page', '=', 1)
             ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
             ->with('media')
@@ -240,7 +242,6 @@ class ProductsController extends Controller
 
         $products = json_decode($products, true, JSON_PRETTY_PRINT);
         foreach ($products['data'] as $productKey => $productValue) {
-            $products['data'][$productKey]['id'] = $productValue['product_id'];
             if (!empty($productValue['url_for_website']) && !File::exists(public_path($productValue['url_for_website']))) {
                 $products['data'][$productKey]['url_for_website'] = null;
             }
