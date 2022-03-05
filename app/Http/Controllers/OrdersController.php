@@ -554,21 +554,34 @@ class OrdersController extends Controller
             }
             $productVar = $this->productRepository->findByField('product_group', $product->product->product_group);
             foreach ($productVar as $prod) {
+                $deliveryAddressLatLon = DB::table('postal_code_lat_lon')->where('postal_code', $orderDeliveryAddress->postal_code)->get()->first();
                 $firm = $this->firmRepository->findByField('symbol', $prod->product_name_supplier);
+                $radius = 0;
+
                 if ($firm->isEmpty() || $firm->first->id->warehouses->isEmpty()) {
                     continue;
                 }
-                $radius = 0;
-                $warehousePostalCode = $firm->first->id->warehouses->first->id->address->postal_code;
-                $firmLatLon = DB::table('postal_code_lat_lon')->where('postal_code', $warehousePostalCode)->get()->first();
-                $deliveryAddressLatLon = DB::table('postal_code_lat_lon')->where('postal_code', $orderDeliveryAddress->postal_code)->get()->first();
 
-                if ($firmLatLon != null && $deliveryAddressLatLon != null) {
-                    $radius = 73 * sqrt(
-                            pow($firmLatLon->latitude - $deliveryAddressLatLon->latitude, 2) +
-                            pow($firmLatLon->longitude - $deliveryAddressLatLon->longitude, 2)
-                        );
+                if ($deliveryAddressLatLon != null) {
+                    $raw = DB::selectOne('SELECT w.id, pc.latitude, pc.longitude, SQRT(
+                        POW(69.1 * (pc.latitude - :latitude), 2) +
+                        POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
+                        FROM postal_code_lat_lon pc
+                             JOIN warehouse_addresses wa on pc.postal_code = wa.postal_code
+                             JOIN warehouses w on wa.warehouse_id = w.id
+                        WHERE w.firm_id = :firmId AND w.status = \'ACTIVE\'
+                        ORDER BY distance
+                    limit 1',
+                        [
+                            'latitude' => $deliveryAddressLatLon->latitude,
+                            'longitude' => $deliveryAddressLatLon->longitude,
+                            'firmId' => $firm->first->id->id
+                        ]);
+                    if (!empty($raw)) {
+                        $radius = $raw->distance;
+                    }
                 }
+
                 switch ($prod->variation_unit) {
                     case 'UB':
                         $unitData = $prod->price->gross_selling_price_basic_unit * $product->quantity * $prod->packing->numbers_of_basic_commercial_units_in_pack;
@@ -589,7 +602,7 @@ class OrdersController extends Controller
                         );
                 }
 
-                if ($radius > $firm->first->id->warehouses->first->id->radius ||
+                if ($radius > $this->warehouseRepository->find($raw->id)->radius ||
                     $prod->price->gross_selling_price_commercial_unit === null ||
                     $prod->price->gross_selling_price_basic_unit === null ||
                     $prod->price->gross_selling_price_calculated_unit === null
