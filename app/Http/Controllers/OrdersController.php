@@ -563,7 +563,7 @@ class OrdersController extends Controller
                 }
 
                 if ($deliveryAddressLatLon != null) {
-                    $raw = DB::selectOne('SELECT w.id, pc.latitude, pc.longitude, SQRT(
+                    $raw = DB::selectOne('SELECT w.id, pc.latitude, pc.longitude, 1.609344 * SQRT(
                         POW(69.1 * (pc.latitude - :latitude), 2) +
                         POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
                         FROM postal_code_lat_lon pc
