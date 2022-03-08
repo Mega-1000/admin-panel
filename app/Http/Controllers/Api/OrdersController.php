@@ -6,6 +6,7 @@ use App\Entities\FirmSource;
 use App\Entities\Label;
 use App\Entities\OrderAddress;
 use App\Entities\OrderDates;
+use App\Entities\WorkingEvents;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\ChatHelper;
 use App\Helpers\GetCustomerForAdminEdit;
@@ -158,12 +159,12 @@ class OrdersController extends Controller
             }
             ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($data);
             DB::commit();
-            
+
             $order = Order::find($id);
 	        $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 2)->first();
 	        $order->firm_source_id = $firmSource ? $firmSource->id : null;
 	        $order->save();
-	        
+
             return $this->createdResponse(['order_id' => $id, 'canPay' => $canPay, 'token' => $order->getToken()]);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -302,7 +303,7 @@ class OrdersController extends Controller
     )
     {
 	    $message = [];
-	    
+
         try {
             $order = $this->orderRepository->find($orderId);
             list($isDeliveryChangeLocked, $isInvoiceChangeLocked) = $this->getLocks($order);
@@ -356,7 +357,7 @@ class OrdersController extends Controller
             if ($deliveryAddress->wasChanged() || $invoiceAddress->wasChanged()) {
 	            dispatch(new OrderProformSendMailJob($order, setting('allegro.address_changed_msg')));
             }
-            
+
             if ($request->get('remember_delivery_address')) {
                 $data = array_merge($request->get('DELIVERY_ADDRESS'), ['type' => 'DELIVERY_ADDRESS']);
                 $order->customer->addresses()->updateOrCreate(["type" => "DELIVERY_ADDRESS"], $data);
@@ -365,7 +366,7 @@ class OrdersController extends Controller
                 $data = array_merge($request->get('INVOICE_ADDRESS'), ['type' => 'INVOICE_ADDRESS']);
                 $order->customer->addresses()->updateOrCreate(["type" => "INVOICE_ADDRESS"], $data);
             }
-	
+
 	        return response()->json(implode(" ", $message), 200, [], JSON_UNESCAPED_UNICODE);
         } catch (\Exception $e) {
             Log::error('Problem with update customer invoice and delivery address.',
@@ -581,6 +582,7 @@ class OrdersController extends Controller
     public function acceptDates(Order $order, Request $request)
     {
         $result = null;
+        WorkingEvents::createEvent(WorkingEvents::ACCEPT_DATES_EVENT, $order->id);
         if ($request->has('type') && $request->has('userType')) {
         /** @var OrderDates $dates */
         $dates = $order->dates;
@@ -620,6 +622,7 @@ class OrdersController extends Controller
     public function updateDates(Order $order, Request $request)
     {
         $result = null;
+        WorkingEvents::createEvent(WorkingEvents::UPDATE_DATES_EVENT, $order->id);
         if ($request->has('type')) {
             $order->dates->resetAcceptance();
             $result = $order->dates()->update([
@@ -702,7 +705,7 @@ class OrdersController extends Controller
             'error_message' => __('order_dates.messages.error')
         ]), 500);
     }
-	
+
 	public function declineProform(
 		DeclineProformRequest $request,
 		$orderId
@@ -711,32 +714,32 @@ class OrdersController extends Controller
 		if (!($order = $this->orderRepository->find($orderId))) {
 			return [];
 		}
-		
+
 		$order->labels_log .= Order::formatMessage(Auth::user(), $request->description);
 		$order->save();
-		
+
 		dispatch(new AddLabelJob($order->id, [Label::FINAL_CONFIRMATION_DECLINED, Label::MASTER_MARK]));
-		
+
 		return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
 	}
-	
+
 	public function acceptDeliveryInvoiceData($orderId)
 	{
 		if (!($order = $this->orderRepository->find($orderId))) {
 			return [];
 		}
-		
+
 		dispatch(new AddLabelJob($order->id, [116, 137]));
-		
+
 		return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
 	}
-	
+
 	public function acceptReceivingOrder(AcceptReceivingOrderRequest $request, $orderId)
 	{
 		if (!($order = $this->orderRepository->find($orderId))) {
 			return [];
 		}
-		
+
 		switch($request->invoice_day) {
 			case 'standard':
 				dispatch(new AddLabelJob($order->id, [Label::ORDER_RECEIVED_INVOICE_STANDARD]));
@@ -745,7 +748,7 @@ class OrdersController extends Controller
 				dispatch(new AddLabelJob($order->id, [Label::ORDER_RECEIVED_INVOICE_TODAY]));
 				break;
 		}
-		
+
 		return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
 	}
 }

@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Entities\Label;
 use App\Entities\Order;
+use App\Entities\WorkingEvents;
 use App\Jobs\WarehouseStocks\ChangeWarehouseStockJob;
 use App\Mail\ConfirmData;
 use App\Mail\DifferentCustomerData;
@@ -54,6 +55,7 @@ class RemoveLabelJob extends Job implements ShouldQueue
         if (!($this->order instanceof Order)) {
             $this->order = $orderRepository->find($this->order);
         }
+        WorkingEvents::createEvent(WorkingEvents::LABEL_REMOVE_EVENT, $this->order->id);
 
         if (count($this->labelIdsToRemove) < 1) {
             return;

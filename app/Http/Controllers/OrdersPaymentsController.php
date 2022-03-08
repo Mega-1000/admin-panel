@@ -10,6 +10,7 @@ use App\Entities\OrderPayment;
 use App\Entities\Payment;
 use App\Entities\UserSurplusPayment;
 use App\Entities\UserSurplusPaymentHistory;
+use App\Entities\WorkingEvents;
 use App\Enums\OrderPaymentLogTypeEnum;
 use App\Helpers\AllegroPaymentImporter;
 use App\Helpers\PriceHelper;
@@ -75,6 +76,7 @@ class OrdersPaymentsController extends Controller
      */
     public function create($id)
     {
+        WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_CREATE_EVENT, $id);
         return view('orderPayments.create', compact('id'));
     }
 
@@ -127,6 +129,7 @@ class OrdersPaymentsController extends Controller
      */
     public function edit($id)
     {
+        WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_EDIT_EVENT, $id);
         $orderPayment = $this->repository->find($id);
         $customerOrders = $orderPayment->order->customer->orders;
         return view('orderPayments.edit', compact('orderPayment', 'id', 'customerOrders'));
@@ -139,6 +142,7 @@ class OrdersPaymentsController extends Controller
      */
     public function update(OrderPaymentUpdateRequest $request, $id)
     {
+        WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_UPDATE_EVENT, $id);
         $orderPayment = $this->repository->find($id);
         $oldOrderId = $orderPayment->order_id;
 
@@ -178,6 +182,7 @@ class OrdersPaymentsController extends Controller
     public function store(OrderPaymentCreateRequest $request)
     {
         $order_id = $request->input('order_id');
+        WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_STORE_EVENT, $id);
         $chooseOrder = $request->input('chooseOrder');
         $masterPaymentId = $request->input('masterPaymentId');
 
