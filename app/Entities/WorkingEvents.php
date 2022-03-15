@@ -45,6 +45,36 @@ class WorkingEvents extends Model
         Order::COMMENT_FINANCIAL_TYPE => self::SAVE_FINANCIAL_COMMENT_EVENT,
     ];
 
+    const EVENT_LABEL_MAPPING = [
+        self::ORDER_LIST_EVENT => 'Lista zamówień',
+        self::ORDER_EDIT_EVENT => 'Edycja zamówienia',
+        self::ORDER_UPDATE_EVENT => 'Aktualizacja zamówienia',
+        self::ORDER_STORE_EVENT => 'Zapis zamówienia',
+
+        self::ORDER_PAYMENT_EDIT_EVENT => 'Edycja płatności',
+        self::ORDER_PAYMENT_CREATE_EVENT => 'Dodawanie płatności',
+        self::ORDER_PAYMENT_STORE_EVENT => 'Zapis płatności',
+        self::ORDER_PAYMENT_UPDATE_EVENT => 'Aktualizacjia płatności',
+
+        self::ORDER_PACKAGES_EDIT_EVENT => 'Edycja przesyłki',
+        self::ORDER_PACKAGES_CREATE_EVENT => 'Dodanie przesyłki',
+        self::ORDER_PACKAGES_STORE_EVENT => 'Zapis przesyłki',
+        self::ORDER_PACKAGES_UPDATE_EVENT => 'Aktualizacja przesyłki',
+
+        self::LABEL_ADD_EVENT => 'Dodanie etykiety',
+        self::LABEL_REMOVE_EVENT => 'Usunięcie etykiety',
+
+        self::CHAT_MESSAGE_ADD_EVENT => 'Wysłanie wiadomości',
+
+        self::ACCEPT_DATES_EVENT => 'Akceptacja daty',
+        self::UPDATE_DATES_EVENT => 'Aktualizacja dat',
+
+        self::SAVE_SHIPPING_COMMENT_EVENT => 'Zapis komentarza dostawcy',
+        self::SAVE_WAREHOUSE_COMMENT_EVENT => 'Zapis komentarza magazynu',
+        self::SAVE_CONSULTANT_COMMENT_EVENT => 'Zapis komentarza konsultanta',
+        self::SAVE_FINANCIAL_COMMENT_EVENT => 'Zapis komentarza ksiegowości',
+    ];
+
     protected $table = 'working_events';
 
     /**
@@ -65,5 +95,20 @@ class WorkingEvents extends Model
             'event' => $event,
             'order_id' => $orderId
         ]);
+    }
+
+    public function getTitle(): string
+    {
+        return self::EVENT_LABEL_MAPPING[$this->event];
+    }
+
+    public function getContent(): string
+    {
+        $content = self::EVENT_LABEL_MAPPING[$this->event];
+        $content .= ' Data: ' . $this->created_at . ' ';
+        if (empty($this->order_id)) {
+            $content .= 'W ramach obsługi zamówienia ' . $this->order_id;
+        }
+        return $content;
     }
 }
