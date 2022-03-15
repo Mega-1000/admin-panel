@@ -15,9 +15,11 @@
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
     "vue-cookies-reactive": "^2.0.6",
+    "vue-horizontal-timeline": "^0.12.0",
     "vue-property-decorator": "^9.1.2",
     "vue-router": "^3.5.1",
     "vue2-datepicker": "^3.9.0",
+    "vue3-timeline": "^1.1.2",
     "vuex": "^3.4.0"
   },
   "devDependencies": {
@@ -49,6 +51,7 @@
     "stylelint-declaration-use-variable": "^1.7.2",
     "stylelint-webpack-plugin": "^2.1.1",
     "typescript": "~4.1.5",
+    "vue-cute-timeline": "^1.2.10",
     "vue-template-compiler": "^2.6.11"
   },
   "eslintConfig": {

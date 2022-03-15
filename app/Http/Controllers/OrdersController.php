@@ -22,6 +22,7 @@ use App\Entities\Task;
 use App\Entities\UserSurplusPayment;
 use App\Entities\UserSurplusPaymentHistory;
 use App\Entities\Warehouse;
+use App\Entities\WorkingEvents;
 use App\Enums\LabelStatusEnum;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
@@ -301,6 +302,7 @@ class OrdersController extends Controller
      */
     public function index(Request $request)
     {
+        WorkingEvents::createEvent(WorkingEvents::ORDER_LIST_EVENT);
         $labelGroups = $this->labelGroupRepository->get()->sortBy('order');
         $labels = $this->labelRepository->where('status', 'ACTIVE')->orderBy('order')->get();
         $couriers = \DB::table('order_packages')->distinct()->select('delivery_courier_name')->get();
@@ -404,6 +406,7 @@ class OrdersController extends Controller
     {
         $order = $this->orderRepository->with(['customer', 'items', 'labels', 'subiektInvoices', 'sellInvoices'])->find($id);
         $orderId = $id;
+        WorkingEvents::createEvent(WorkingEvents::ORDER_EDIT_EVENT, $id);
 
         $customerInfo = $this->customerAddressRepository->findWhere([
             "customer_id" => $order->customer->id,
@@ -821,6 +824,7 @@ class OrdersController extends Controller
             return response(['errors' => ['message' => "Użytkownik nie jest zalogowany"]], 400);
         }
         $order = Order::find($request->order_id);
+        WorkingEvents::createEvent(WorkingEvents::NOTICE_MAPPER[$request->type], $order->id);
         switch ($request->type) {
             case Order::COMMENT_SHIPPING_TYPE:
                 $order->spedition_comment .= Order::formatMessage($user, $request->message);
@@ -855,7 +859,7 @@ class OrdersController extends Controller
                 $this->store($request->all());
                 break;
         }
-
+        WorkingEvents::createEvent(WorkingEvents::ORDER_UPDATE_EVENT);
 
         $order = $this->orderRepository->find($id);
         if (empty($order)) {
@@ -1260,6 +1264,7 @@ class OrdersController extends Controller
             'city' => $data['order_invoice_address_city'],
             'phone' => $data['order_invoice_address_phone'],
         ]);
+        WorkingEvents::createEvent(WorkingEvents::ORDER_STORE_EVENT, $order->id);
 
         return redirect()->route('orders.index')->with([
             'message' => __('orders.message.store'),
@@ -1282,7 +1287,6 @@ class OrdersController extends Controller
         }
         $sum += $order->additional_service_cost + $order->additional_cash_on_delivery_cost + $order->shipment_price_for_client;
         $sum = round($sum, 2);
-//        dd($sum, $order->additional_service_cost,$order->additional_cash_on_delivery_cost,$order->shipment_price_for_client);
         if ($order->bookedPaymentsSum() - $order->promisePaymentsSum() < -5) {
             $sumOfPayments = $order->promisePaymentsSum() - $order->bookedPaymentsSum();
         } else if ($order->bookedPaymentsSum() - $order->promisePaymentsSum() > 5) {

@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Entities\Label;
 use App\Entities\Order;
+use App\Entities\WorkingEvents;
 use App\Jobs\Orders\SendItemsConstructedMailJob;
 use App\Jobs\Orders\SendItemsRedeemedMailJob;
 use App\Repositories\LabelRepository;
@@ -67,6 +68,7 @@ class AddLabelJob extends Job implements ShouldQueue
             $this->order = $orderRepository->find($this->order);
         }
 
+        WorkingEvents::createEvent(WorkingEvents::LABEL_ADD_EVENT, $this->order->id);
         if (count($this->labelIdsToAdd) < 1) {
             return;
         }
