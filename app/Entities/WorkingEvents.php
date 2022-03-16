@@ -88,8 +88,11 @@ class WorkingEvents extends Model
         'user_id',
     ];
 
-    public static function createEvent(string $event, int $orderId = null)
+    public static function createEvent(string $event,int $orderId = null)
     {
+        if(empty(Auth::user()) || !(Auth::user() instanceof User)) {
+            return true;
+        }
         return self::create([
             'user_id' => Auth::user()->id,
             'event' => $event,

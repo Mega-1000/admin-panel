@@ -87,7 +87,6 @@ class OrdersPackagesController extends Controller
         if ($request['package_id']) {
             $cod = OrderPackage::find($request['package_id'])->cash_on_delivery;
         }
-        WorkingEvents::createEvent(WorkingEvents::ORDER_PACKAGES_CREATE_EVENT, $id);
 
         $contentTypes = ContentType::all();
         $packingTypes = PackingType::all();
@@ -104,6 +103,7 @@ class OrdersPackagesController extends Controller
         $promisedPayments = [];
         $payments = [];
         $isAllegro = !empty($order->sello_id);
+        WorkingEvents::createEvent(WorkingEvents::ORDER_PACKAGES_CREATE_EVENT, $order->id);
 
         $cashOnDeliverySum = 0;
 
@@ -285,7 +285,6 @@ class OrdersPackagesController extends Controller
     public function store(OrderPackageCreateRequest $request)
     {
         $order_id = $request->input('order_id');
-        WorkingEvents::createEvent(WorkingEvents::ORDER_PACKAGES_STORE_EVENT, $order_id);
 
         $data = $request->validated();
         $toCheck = (float)$request->input('toCheck');
@@ -317,6 +316,7 @@ class OrdersPackagesController extends Controller
         }
 
         $order = $this->orderRepository->find($order_id);
+        WorkingEvents::createEvent(WorkingEvents::ORDER_PACKAGES_STORE_EVENT, $order->id);
         if (empty($packageNumber)) {
             $isAdditionalDKPExists = false;
             $connectedOrders = $this->orderRepository->findWhere(['master_order_id' => $order->id]);

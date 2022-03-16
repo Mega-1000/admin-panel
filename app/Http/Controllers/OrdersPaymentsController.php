@@ -182,7 +182,6 @@ class OrdersPaymentsController extends Controller
     public function store(OrderPaymentCreateRequest $request)
     {
         $order_id = $request->input('order_id');
-        WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_STORE_EVENT, $id);
         $chooseOrder = $request->input('chooseOrder');
         $masterPaymentId = $request->input('masterPaymentId');
 
@@ -192,6 +191,7 @@ class OrdersPaymentsController extends Controller
             $orderId = $order_id;
         }
 
+        WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_STORE_EVENT, $order_id);
         $promise = $request->input('promise');
 
         if ($promise == 'on') {
