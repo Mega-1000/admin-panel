@@ -551,13 +551,18 @@ class OrdersController extends Controller
             'type' => 'DELIVERY_ADDRESS',
         ])->first();
 
+        $deliveryAddressLatLon = DB::table('postal_code_lat_lon')->where('postal_code', $orderDeliveryAddress->postal_code)->get()->first();
+        if ($deliveryAddressLatLon === null) {
+            Session::flash('message', 'Nie znaleziono kodu pocztowego w bazie!');
+            return [];
+        }
+
         foreach ($order->items as $product) {
             if ($product->product->product_group == null) {
                 continue;
             }
             $productVar = $this->productRepository->findByField('product_group', $product->product->product_group);
             foreach ($productVar as $prod) {
-                $deliveryAddressLatLon = DB::table('postal_code_lat_lon')->where('postal_code', $orderDeliveryAddress->postal_code)->get()->first();
                 $firm = $this->firmRepository->findByField('symbol', $prod->product_name_supplier);
                 $radius = 0;
 
