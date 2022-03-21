@@ -64,13 +64,15 @@
                         E-mail ogólny : {{$firm->email}} <br/>
                         @else
 
-                        ELEKTRONICZNA PLATFORMA HANDLOWA WOJCIECH WEISSBROT<br/>
-                        IWASZKIEWICZA 15A<br/>
-                        55-200 OLAWA<br/>
-                        NIP: 9121027907<br/>
-                        Nr konta: {{ env('ACCOUNT_PROFORMA') }}<br/>
-                        Telefony: {{ env('FRONT_URL') }}kontakt<br/>
-                        E-mail ogólny : {{'info@' . env('DOMAIN_NAME') }}<br/>
+                        !!!!!!!!!!  ZMIANA NUMERU KONTA OD 2022-03-20 !!!!!!!!!!!!!<br/>
+                        ELETKRONICZNA PLATFORMA HANDLOWA SPOLKA Z O O <br/>
+                        JARACZA 22/12 <br/>
+                        50-305 WROCŁAW <br/>
+                        NIP 8982272269 <br/>
+                        numer konta 28 1140 2004 0000 3802 8205 1023 mBank S A<br/><br/>
+                        Telefony: www.ephpolska.pl w zakładce <b>kontakt</b><br/>
+                        E-mail ogólny: info@ephpolska.pl<br/>
+                        Sklep: www.ephpolska.pl<br/>
                         @endif
                     </p>
                 </td>

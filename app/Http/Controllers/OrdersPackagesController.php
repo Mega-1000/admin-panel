@@ -14,6 +14,7 @@ use App\Entities\PackageTemplate;
 use App\Entities\PackingType;
 use App\Entities\SelAddress;
 use App\Entities\SelTransaction;
+use App\Entities\WorkingEvents;
 use App\Helpers\DateHelper;
 use App\Helpers\OrderPackagesDataHelper;
 use App\Helpers\PdfCharactersHelper;
@@ -86,6 +87,7 @@ class OrdersPackagesController extends Controller
         if ($request['package_id']) {
             $cod = OrderPackage::find($request['package_id'])->cash_on_delivery;
         }
+
         $contentTypes = ContentType::all();
         $packingTypes = PackingType::all();
         $containerTypes = ContainerType::all();
@@ -101,6 +103,7 @@ class OrdersPackagesController extends Controller
         $promisedPayments = [];
         $payments = [];
         $isAllegro = !empty($order->sello_id);
+        WorkingEvents::createEvent(WorkingEvents::ORDER_PACKAGES_CREATE_EVENT, $order->id);
 
         $cashOnDeliverySum = 0;
 
@@ -188,6 +191,7 @@ class OrdersPackagesController extends Controller
     public function edit($id)
     {
         $orderPackage = OrderPackage::find($id);
+        WorkingEvents::createEvent(WorkingEvents::ORDER_PACKAGES_EDIT_EVENT, $id);
         $order = Order::find($orderPackage->order_id);
         $isAllegro = !empty($order->sello_id);
 
@@ -210,6 +214,7 @@ class OrdersPackagesController extends Controller
     public function update(OrderPackageUpdateRequest $request, $id)
     {
         $orderPackage = OrderPackage::find($id);
+        WorkingEvents::createEvent(WorkingEvents::ORDER_PACKAGES_UPDATE_EVENT, $id);
 
         if (empty($orderPackage)) {
             abort(404);
@@ -280,6 +285,7 @@ class OrdersPackagesController extends Controller
     public function store(OrderPackageCreateRequest $request)
     {
         $order_id = $request->input('order_id');
+
         $data = $request->validated();
         $toCheck = (float)$request->input('toCheck');
         $data['delivery_date'] = new \DateTime($data['delivery_date']);
@@ -310,6 +316,7 @@ class OrdersPackagesController extends Controller
         }
 
         $order = $this->orderRepository->find($order_id);
+        WorkingEvents::createEvent(WorkingEvents::ORDER_PACKAGES_STORE_EVENT, $order->id);
         if (empty($packageNumber)) {
             $isAdditionalDKPExists = false;
             $connectedOrders = $this->orderRepository->findWhere(['master_order_id' => $order->id]);

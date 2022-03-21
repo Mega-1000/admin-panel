@@ -22,6 +22,7 @@ use App\Entities\Task;
 use App\Entities\UserSurplusPayment;
 use App\Entities\UserSurplusPaymentHistory;
 use App\Entities\Warehouse;
+use App\Entities\WorkingEvents;
 use App\Enums\LabelStatusEnum;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
@@ -301,6 +302,7 @@ class OrdersController extends Controller
      */
     public function index(Request $request)
     {
+        WorkingEvents::createEvent(WorkingEvents::ORDER_LIST_EVENT);
         $labelGroups = $this->labelGroupRepository->get()->sortBy('order');
         $labels = $this->labelRepository->where('status', 'ACTIVE')->orderBy('order')->get();
         $couriers = \DB::table('order_packages')->distinct()->select('delivery_courier_name')->get();
@@ -404,6 +406,7 @@ class OrdersController extends Controller
     {
         $order = $this->orderRepository->with(['customer', 'items', 'labels', 'subiektInvoices', 'sellInvoices'])->find($id);
         $orderId = $id;
+        WorkingEvents::createEvent(WorkingEvents::ORDER_EDIT_EVENT, $id);
 
         $customerInfo = $this->customerAddressRepository->findWhere([
             "customer_id" => $order->customer->id,
@@ -548,6 +551,12 @@ class OrdersController extends Controller
             'type' => 'DELIVERY_ADDRESS',
         ])->first();
 
+        $deliveryAddressLatLon = DB::table('postal_code_lat_lon')->where('postal_code', $orderDeliveryAddress->postal_code)->get()->first();
+        if ($deliveryAddressLatLon === null) {
+            Session::flash('message', 'Nie znaleziono kodu pocztowego w bazie!');
+            return [];
+        }
+
         foreach ($order->items as $product) {
             if ($product->product->product_group == null) {
                 continue;
@@ -555,20 +564,32 @@ class OrdersController extends Controller
             $productVar = $this->productRepository->findByField('product_group', $product->product->product_group);
             foreach ($productVar as $prod) {
                 $firm = $this->firmRepository->findByField('symbol', $prod->product_name_supplier);
+                $radius = 0;
+
                 if ($firm->isEmpty() || $firm->first->id->warehouses->isEmpty()) {
                     continue;
                 }
-                $radius = 0;
-                $warehousePostalCode = $firm->first->id->warehouses->first->id->address->postal_code;
-                $firmLatLon = DB::table('postal_code_lat_lon')->where('postal_code', $warehousePostalCode)->get()->first();
-                $deliveryAddressLatLon = DB::table('postal_code_lat_lon')->where('postal_code', $orderDeliveryAddress->postal_code)->get()->first();
 
-                if ($firmLatLon != null && $deliveryAddressLatLon != null) {
-                    $radius = 73 * sqrt(
-                            pow($firmLatLon->latitude - $deliveryAddressLatLon->latitude, 2) +
-                            pow($firmLatLon->longitude - $deliveryAddressLatLon->longitude, 2)
-                        );
+                if ($deliveryAddressLatLon != null) {
+                    $raw = DB::selectOne('SELECT w.id, pc.latitude, pc.longitude, 1.609344 * SQRT(
+                        POW(69.1 * (pc.latitude - :latitude), 2) +
+                        POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
+                        FROM postal_code_lat_lon pc
+                             JOIN warehouse_addresses wa on pc.postal_code = wa.postal_code
+                             JOIN warehouses w on wa.warehouse_id = w.id
+                        WHERE w.firm_id = :firmId AND w.status = \'ACTIVE\'
+                        ORDER BY distance
+                    limit 1',
+                        [
+                            'latitude' => $deliveryAddressLatLon->latitude,
+                            'longitude' => $deliveryAddressLatLon->longitude,
+                            'firmId' => $firm->first->id->id
+                        ]);
+                    if (!empty($raw)) {
+                        $radius = $raw->distance;
+                    }
                 }
+
                 switch ($prod->variation_unit) {
                     case 'UB':
                         $unitData = $prod->price->gross_selling_price_basic_unit * $product->quantity * $prod->packing->numbers_of_basic_commercial_units_in_pack;
@@ -589,18 +610,22 @@ class OrdersController extends Controller
                         );
                 }
 
-                if ($radius > $firm->first->id->warehouses->first->id->radius ||
+                if ($radius > $this->warehouseRepository->find($raw->id)->radius ||
                     $prod->price->gross_selling_price_commercial_unit === null ||
                     $prod->price->gross_selling_price_basic_unit === null ||
                     $prod->price->gross_selling_price_calculated_unit === null
                 ) {
                     continue;
                 }
-                if ($prod->id == $product->product->id) {
+
+                if ($unitData == 0) {
+                    $diff = null;
+                } else if ($prod->id == $product->product->id) {
                     $diff = 0.0;
                 } else {
-                    $diff = $product->price - number_format($unitData, 2, '.', '');
+                    $diff = number_format((($product->gross_selling_price_commercial_unit * $product->quantity) - number_format($unitData, 2, '.', '')), 2, '.', '');
                 }
+
                 $array = [
                     'id' => $prod->id,
                     'name' => $prod->name,
@@ -804,6 +829,7 @@ class OrdersController extends Controller
             return response(['errors' => ['message' => "Użytkownik nie jest zalogowany"]], 400);
         }
         $order = Order::find($request->order_id);
+        WorkingEvents::createEvent(WorkingEvents::NOTICE_MAPPER[$request->type], $order->id);
         switch ($request->type) {
             case Order::COMMENT_SHIPPING_TYPE:
                 $order->spedition_comment .= Order::formatMessage($user, $request->message);
@@ -838,7 +864,7 @@ class OrdersController extends Controller
                 $this->store($request->all());
                 break;
         }
-
+        WorkingEvents::createEvent(WorkingEvents::ORDER_UPDATE_EVENT);
 
         $order = $this->orderRepository->find($id);
         if (empty($order)) {
@@ -1243,6 +1269,7 @@ class OrdersController extends Controller
             'city' => $data['order_invoice_address_city'],
             'phone' => $data['order_invoice_address_phone'],
         ]);
+        WorkingEvents::createEvent(WorkingEvents::ORDER_STORE_EVENT, $order->id);
 
         return redirect()->route('orders.index')->with([
             'message' => __('orders.message.store'),
@@ -1265,7 +1292,6 @@ class OrdersController extends Controller
         }
         $sum += $order->additional_service_cost + $order->additional_cash_on_delivery_cost + $order->shipment_price_for_client;
         $sum = round($sum, 2);
-//        dd($sum, $order->additional_service_cost,$order->additional_cash_on_delivery_cost,$order->shipment_price_for_client);
         if ($order->bookedPaymentsSum() - $order->promisePaymentsSum() < -5) {
             $sumOfPayments = $order->promisePaymentsSum() - $order->bookedPaymentsSum();
         } else if ($order->bookedPaymentsSum() - $order->promisePaymentsSum() > 5) {

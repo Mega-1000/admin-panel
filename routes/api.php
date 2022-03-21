@@ -103,6 +103,7 @@ Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/api/Tracke
 Route::group(['prefix' => 'orders', 'as' => 'orders.'], __DIR__ . '/api/OrdersRoutes.php');
 Route::group(['prefix' => 'transactions', 'as' => 'transactions.'], __DIR__ . '/api/TransactionsRoutes.php');
 Route::group(['prefix' => 'customers', 'as' => 'customers.'], __DIR__ . '/api/CustomersRoutes.php');
+Route::group(['prefix' => 'working-events', 'as' => 'workingEvents.'], __DIR__ . '/api/WorkingEventsRoutes.php');
 
 Route::post('/faqs', 'Api\FaqController@store')->name('api.faq.save');
 Route::get('/faqs/categories', 'Api\FaqController@getCategories')->name('api.faq.categories');

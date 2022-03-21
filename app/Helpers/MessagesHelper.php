@@ -7,6 +7,7 @@ use App\Entities\CustomerAddress;
 use App\Entities\Label;
 use App\Entities\Product;
 use App\Entities\Order;
+use App\Entities\WorkingEvents;
 use App\Jobs\AddLabelJob;
 use App\Jobs\ChatNotificationJob;
 use App\Jobs\RemoveLabelJob;
@@ -290,6 +291,8 @@ class MessagesHelper
                 dispatch_now(new RemoveLabelJob($chat->order, [self::MESSAGE_YELLOW_LABEL_ID]));
             }
         }
+        WorkingEvents::createEvent(WorkingEvents::CHAT_MESSAGE_ADD_EVENT, $chat->order->id);
+
         //\App\Jobs\ChatNotificationJob::dispatch($chat->id)->delay(now()->addSeconds(self::NOTIFICATION_TIME + 5));
         // @TODO this should use queue, but at this point (08.05.2021) queue is bugged
         $email = null;

@@ -5,6 +5,7 @@ import OrdersService from '@/store/services/OrdersService'
 import LogsTrackerService from '@/store/services/LogsTrackerService'
 import TransactionsService from '@/store/services/TransactionsService'
 import CustomersService from '@/store/services/CustomersService'
+import WorkingEventsService from '@/store/services/WorkingEventsService'
 
 Vue.use(Vuex)
 
@@ -14,6 +15,7 @@ export default new Vuex.Store({
     LogsTrackerService,
     OrdersService,
     TransactionsService,
-    CustomersService
+    CustomersService,
+    WorkingEventsService
   }
 })

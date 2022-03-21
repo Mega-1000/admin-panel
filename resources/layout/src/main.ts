@@ -11,6 +11,7 @@ import LogsTrackerList from '@/views/LogsTracker/LogsTrackerList.vue'
 import OrderDates from '@/views/Orders/Dates.vue'
 import ProductsSets from '@/components/Sets/ProductsSets.vue'
 import Transactions from '@/views/Transactions/Transactions.vue'
+import WorkingEventsPresentation from '@/views/WorkingEvents/WorkingEventsPresentation.vue'
 
 Vue.config.productionTip = false
 Vue.use(require('electron-vue-debugger'))
@@ -22,7 +23,8 @@ const components = {
   tracker: ActionTrackers,
   orderDates: OrderDates,
   productsSets: ProductsSets,
-  transactions: Transactions
+  transactions: Transactions,
+  workingEventsPresentation: WorkingEventsPresentation
 }
 
 RenderComponent.startRender()
