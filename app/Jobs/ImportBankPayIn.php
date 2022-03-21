@@ -2,12 +2,16 @@
 
 namespace App\Jobs;
 
+use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\OrderPayment;
 use App\Entities\Transaction;
+use App\Enums\LabelEventName;
 use App\Helpers\PdfCharactersHelper;
 use App\Http\Controllers\OrdersPaymentsController;
 use App\Repositories\TransactionRepository;
+use App\Services\LabelService;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\UploadedFile;
@@ -18,6 +22,9 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ *
+ */
 class ImportBankPayIn implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -26,6 +33,11 @@ class ImportBankPayIn implements ShouldQueue
      * @var Transaction
      */
     protected $transactionRepository;
+
+    /**
+     * @var LabelService
+     */
+    protected $labelService;
 
     /**
      * @var UploadedFile
@@ -45,14 +57,16 @@ class ImportBankPayIn implements ShouldQueue
      * Execute the job.
      *
      * @param TransactionRepository $transaction
+     * @param LabelService $labelService
      * @return void
      */
-    public function handle(TransactionRepository $transaction): void
+    public function handle(TransactionRepository $transaction, LabelService $labelService): void
     {
         $header = NULL;
         $fileName = 'bankTransactionWithoutOrder.csv';
         $file = fopen($fileName, 'w');
 
+        $this->labelService = $labelService;
         $this->transactionRepository = $transaction;
         $data = array();
         $i = 0;
@@ -111,7 +125,7 @@ class ImportBankPayIn implements ShouldQueue
                 } else {
                     fputcsv($file, $payIn);
                 }
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 Log::notice('Błąd podczas importu: ' . $exception->getMessage(), ['line' => __LINE__, 'file' => __FILE__]);
             }
         }
@@ -175,6 +189,11 @@ class ImportBankPayIn implements ShouldQueue
                     $paymentAmount = $amount;
                 }
                 $transfer = $this->saveTransfer($order, $transaction, $paymentAmount);
+                if ($order->payments->count() == 0) {
+                    $this->labelService->dispatchLabelEventByNameJob($order->id, LabelEventName::PAYMENT_RECEIVED);
+                    $this->labelService->removeLabel($order->id, [Label::ORDER_FOR_REALISATION]);
+                }
+
                 $payment = $order->payments()->create([
                     'transaction_id' => $transfer->id,
                     'amount' => $paymentAmount,
@@ -191,6 +210,10 @@ class ImportBankPayIn implements ShouldQueue
         }
     }
 
+    /**
+     * @param Order $order
+     * @return float
+     */
     private function getTotalOrderValue(Order $order): float
     {
         $additional_service = $order->additional_service_cost ?? 0;
@@ -235,7 +258,7 @@ class ImportBankPayIn implements ShouldQueue
      * @param array $data Additional data
      * @return ?Transaction
      *
-     * @throws \Exception
+     * @throws Exception
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
     private function saveTransaction(Order $order, array $data): ?Transaction
@@ -260,7 +283,7 @@ class ImportBankPayIn implements ShouldQueue
                 'accounting_notes' => '',
                 'transaction_notes' => '',
             ]);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             Log::notice('Błąd podczas zapisu transakcji: ' . $exception->getMessage(), ['line' => __LINE__, 'file' => __FILE__]);
             return null;
         }
