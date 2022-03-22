@@ -406,7 +406,7 @@ class OrdersController extends Controller
     {
         $order = $this->orderRepository->with(['customer', 'items', 'labels', 'subiektInvoices', 'sellInvoices'])->find($id);
         $orderId = $id;
-        WorkingEvents::createEvent(WorkingEvents::ORDER_EDIT_EVENT, $id);
+        WorkingEvents::createEvent(WorkingEvents::ORDER_EDIT_EVENT, $order->id);
 
         $customerInfo = $this->customerAddressRepository->findWhere([
             "customer_id" => $order->customer->id,
@@ -587,6 +587,8 @@ class OrdersController extends Controller
                         ]);
                     if (!empty($raw)) {
                         $radius = $raw->distance;
+                    } else {
+                        continue;
                     }
                 }
 
@@ -2791,6 +2793,9 @@ class OrdersController extends Controller
                 } else {
                     $sum = $item['sum'];
                     $count = 1;
+                }
+                if( $count < $tempVariationCounter[$item['variation_group']] || $sum == 0){
+                    continue;
                 }
 
                 $arr = [

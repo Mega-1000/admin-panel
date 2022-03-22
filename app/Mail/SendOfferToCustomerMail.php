@@ -60,6 +60,6 @@ class SendOfferToCustomerMail extends Mailable
      */
     public function build()
     {
-        return $this->view('emails.send-offer-to-customer');
+        return $this->view('emails.send-offer-to-customer')->attach(storage_path('app/public/products/320-01.pdf'));
     }
 }

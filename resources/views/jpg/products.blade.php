@@ -1,82 +1,84 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <style>
-            table {
-                border-collapse: collapse;
-                width: 780px;
-                background-color: #6ec6ff;
-                color: #0069c0;
-            }
 
-            * {
-                box-sizing: border-box;
-            }
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <style>
+        table {
+            width: 100%;
+            color: #0069c0;
+        }
 
-            td {
-                padding: 20px;
-                border: 2px dotted #333;
-                width: 350px;
-            }
+        * {
+            box-sizing: border-box;
+        }
 
-            .image {
-                float: left;
-                width: 150px;
-                min-height: 100px;
-            }
+        td {
+            padding: 10px;
+            border: 2px dotted #333;
+            height: 150px;
+            width: 50%;
+        }
 
-            img {
-                width: 150px;
-            }
+        .left {
+            float: left;
+            margin: 5px;
+            width: 50%;
+            min-height: 100px;
+        }
 
-            .right {
-                float: left;
-                padding-left: 10px;
-                width: 190px;
-            }
+        img {
+            width: 120px;
+        }
 
-            .info {
-                font-size: 24px;
-                text-align: center;
-            }
+        .right {
+            float: right;
+            width: 50%;
+        }
 
-            .title {
-                font-size: 20px;
-            }
+        .info {
+            font-size: 24px;
+            text-align: center;
+        }
 
-            .price {
-                padding-top: 20px;
-                font-size: 22px;
-                font-weight: bold;
-            }
-        </style>
-    </head>
-    <body>
-        <table cellpadding="0" cellspacing="0">
-            <tr><td colspan="2" class="info">Na innych naszych aukcjach można zakupić poniższe towary:</td></tr>
-            @php ($i = 0)
-            @foreach ($rows as $row => $rowCols)
-                @foreach ($rowCols as $subcols)
-                    @foreach ($subcols as $data)
-                        @if (!file_exists(public_path($data['image'])))
-                            @continue
-                        @endif
-                        {!! $i % 2 == 0 ? '<tr>' : '' !!}
-                            <td>
-                                <div class="image">
-                                    <img src="{{ env('APP_URL') }}{{ $data['image'] }}">
-                                </div>
-                                <div class='right'>
-                                    <div class='title'>{{ $data['name'] }}</div>
-                                    <div class='price'>{{ $data['price'] }} zł</div>
-                                </div>
-                            </td>
-                        {!! $i % 2 == 1 ? '</tr>' : '' !!}
-                        @php ($i++)
-                    @endforeach
-                @endforeach
+        .title {
+            font-size: 20px;
+        }
+
+        .price {
+            font-size: 22px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<table cellpadding="0" cellspacing="0" align="right">
+    <tr>
+        <td colspan="2" class="info">Na innych naszych aukcjach można zakupić poniższe towary:</td>
+    </tr>
+    @php ($i = 0)
+    @foreach ($rows as $row => $rowCols)
+        @foreach ($rowCols as $subcols)
+            @foreach ($subcols as $data)
+                @if (!file_exists(public_path($data['image'])))
+                    @continue
+                @endif
+                {!! $i % 2 == 0 ? '<tr>' : '' !!}
+                <td>
+                    <div class="left">
+                        <img src="{{ public_path($data['image']) }}">
+                    </div>
+                    <div class="right">
+                        <div class="title">{{ $data['name'] }}</div>
+                        <div class="price">{{ $data['price'] }} zł</div>
+                    </div>
+                </td>
+                {!! $i % 2 == 1 ? '</tr>' : '' !!}
+                @php ($i++)
             @endforeach
-            {!! $i % 2 == 1 && $i > 1 ? '<td></td>' : '' !!}
-            {!! $i % 2 == 1 ? '</tr>' : '' !!}
-        </table>
-    </body>
+        @endforeach
+    @endforeach
+    {!! $i % 2 == 1 && $i > 1 ? '<td></td>' : '' !!}
+    {!! $i % 2 == 1 ? '</tr>' : '' !!}
+</table>
+</body>
 </html>
