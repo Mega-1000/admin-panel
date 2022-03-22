@@ -191,8 +191,8 @@ class OrdersPackagesController extends Controller
     public function edit($id)
     {
         $orderPackage = OrderPackage::find($id);
-        WorkingEvents::createEvent(WorkingEvents::ORDER_PACKAGES_EDIT_EVENT, $id);
         $order = Order::find($orderPackage->order_id);
+        WorkingEvents::createEvent(WorkingEvents::ORDER_PACKAGES_EDIT_EVENT, $order->id);
         $isAllegro = !empty($order->sello_id);
 
         $contentTypes = ContentType::all();
@@ -214,13 +214,13 @@ class OrdersPackagesController extends Controller
     public function update(OrderPackageUpdateRequest $request, $id)
     {
         $orderPackage = OrderPackage::find($id);
-        WorkingEvents::createEvent(WorkingEvents::ORDER_PACKAGES_UPDATE_EVENT, $id);
 
         if (empty($orderPackage)) {
             abort(404);
         }
 
         $orderId = $orderPackage->order_id;
+        WorkingEvents::createEvent(WorkingEvents::ORDER_PACKAGES_UPDATE_EVENT, $orderId);
         $data = $request->validated();
         $data['packing_type'] = $request->input('packing_type');
         $data['delivery_date'] = new \DateTime($data['delivery_date']);

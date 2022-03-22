@@ -4,7 +4,7 @@
     <strong>Poniżej znajduje się oferta nr: {{$order->id}}</strong>
 </p>
 
-<table id="productsTable" class="table table1 table-venice-blue productsTableEdit" style="border-collapse: collapse;">
+<table id="productsTable" border="1" class="table table1 table-venice-blue productsTableEdit" style="border-collapse: collapse;">
     <tbody id="products-tbody">
     @php
         $gross_purchase_sum = 0;
@@ -148,52 +148,43 @@
                     <td colspan="5">
                 @else
                     <td colspan="4">
-                @endif
-                    Ceny dla poszczególnych fabryk
-                </td>
-                <td style="width: 5%;">
-
-                    Wartość danego asortymentu
-                </td>
-                <td style="width: 5%;">
-
-                    Różnica
-                </td>
-                <td style="width: 5%;">
-                    Akcje
-                </td>
+                        @endif
+                        Ceny dla poszczególnych fabryk
+                    </td>
+                    <td style="width: 5%;">
+                        Wartość danego asortymentu
+                    </td>
+                    <td style="width: 5%;">
+                        Różnica
+                    </td>
+                    <td style="width: 5%;">
+                        Akcje
+                    </td>
             </tr>
             <hr>
             @foreach($productsVariation[$item->product->id] as $variation)
                 <tr class="price-keeper row-{{$variation['id']}}">
                     <td>
-
                         {{$variation['name']}}
                     </td>
                     <td>
-
                         {{$variation['gross_selling_price_commercial_unit']}}
                     </td>
                     <td>
-
                         {{$variation['gross_selling_price_basic_unit']}}
                     </td>
                     <td>
-
                         {{$variation['gross_selling_price_calculated_unit']}}
                     </td>
                     @if(!empty($item->product->packing->number_of_sale_units_in_the_pack) &&  $item->product->packing->number_of_sale_units_in_the_pack != 0)
                         <td>
-
                             {{$variation['gross_selling_price_aggregate_unit'] ?? 0}}
                         </td>
                     @endif
                     <td>
-
                         {{$variation['sum']}}
                     </td>
                     <td>
-
                         @if($variation['different'] === null)
                             <span>-</span>
                         @elseif(strstr($variation['different'], '-') != false)
@@ -226,10 +217,10 @@
                     </td>
                 </tr>
                 @if($variation['comments'])
-                <tr>
-                    Uwagi: {{$variation['comments']}}
-                </tr>
-                <hr>
+                    <tr>
+                        Uwagi: {{$variation['comments']}}
+                    </tr>
+                    <hr>
                 @endif
             @endforeach
         @endif
@@ -250,7 +241,12 @@
 </div>
 @if(!empty($allProductsFromSupplier))
     <h3>Suma wszystkich towarów dla danych producentów</h3>
-    <table class="table table1 table-venice-blue productsTableEdit">
+    <p>Ponizsza tabela zawiera wartosci po zsumowaniu wszyskich produkutow dla poszczegolnych producentow.<br/>
+        W przypadku braku ktoregokolwiek gatunku styropianu w powyzej wycenie dla danego producenta system nie podpial
+        go do tej tabeli. <br/>
+        W tym przypadku mozna tylko prownac niektore gatunki styropianu na liscie powyzej gdzie takie tabele wystepuje
+        dla kazdego produktu odzielnie</p>
+    <table border="1" class="table table1 table-venice-blue productsTableEdit">
         <thead>
         <tr class="price-keeper">
             <td>Symbol dostawcy</td>
@@ -259,19 +255,15 @@
             <td>Odległość od magazynu</td>
             <td>Telefon do konsultanta</td>
             <td>
-
                 Recenzja
             </td>
             <td>
-
                 Jakość
             </td>
             <td>
-
                 Jakość do ceny
             </td>
             <td>
-
                 Przybliżona wartość towarów danego magazynu do darmowej przesyłki
             </td>
         </tr>
@@ -302,10 +294,10 @@
                     <td>{{$productSupplier['value_of_the_order_for_free_transport']}}</td>
                 </tr>
                 @if($productSupplier['comments'])
-                <tr>
-                    {{$productSupplier['comments']}}
-                </tr>
-                <hr>
+                    <tr>
+                        {{$productSupplier['comments']}}
+                    </tr>
+                    <hr>
                 @endif
             @endforeach
         @endforeach
@@ -314,7 +306,7 @@
 @endif
 <p>
     *U tego dostawcy brakuje jednego lub więcej produktów. Z tego
-powodu do obliczeń przyjeliśmy wartość z naszego magazynu
+    powodu do obliczeń przyjeliśmy wartość z naszego magazynu
 </p>
 <p>
     Z pozdrowieniami
