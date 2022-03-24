@@ -241,11 +241,7 @@
 </div>
 @if(!empty($allProductsFromSupplier))
     <h3>Suma wszystkich towarów dla danych producentów</h3>
-    <p>Ponizsza tabela zawiera wartosci po zsumowaniu wszyskich produkutow dla poszczegolnych producentow.<br/>
-        W przypadku braku ktoregokolwiek gatunku styropianu w powyzej wycenie dla danego producenta system nie podpial
-        go do tej tabeli. <br/>
-        W tym przypadku mozna tylko prownac niektore gatunki styropianu na liscie powyzej gdzie takie tabele wystepuje
-        dla kazdego produktu odzielnie</p>
+    <p>{{ setting('mail.offer_notice') }}</p>
     <table border="1" class="table table1 table-venice-blue productsTableEdit">
         <thead>
         <tr class="price-keeper">
@@ -253,19 +249,20 @@
             <td>Wartość sumaryczna</td>
             <td>Różnica wartości do wskazanego producenta w zamówieniu</td>
             <td>Odległość od magazynu</td>
-            <td>Telefon do konsultanta</td>
-            <td>
-                Recenzja
-            </td>
-            <td>
-                Jakość
-            </td>
-            <td>
-                Jakość do ceny
-            </td>
-            <td>
-                Przybliżona wartość towarów danego magazynu do darmowej przesyłki
-            </td>
+            <td>Uwagi</td>
+{{--            <td>Telefon do konsultanta</td>--}}
+{{--            <td>--}}
+{{--                Recenzja--}}
+{{--            </td>--}}
+{{--            <td>--}}
+{{--                Jakość--}}
+{{--            </td>--}}
+{{--            <td>--}}
+{{--                Jakość do ceny--}}
+{{--            </td>--}}
+{{--            <td>--}}
+{{--                Przybliżona wartość towarów danego magazynu do darmowej przesyłki--}}
+{{--            </td>--}}
         </tr>
         <hr>
         </thead>
@@ -287,11 +284,12 @@
                         @endif
                     </td>
                     <td>{{(int)$productSupplier['radius']}} km</td>
-                    <td>{{$productSupplier['phone']}}</td>
-                    <td>{{$productSupplier['review']}}</td>
-                    <td>{{$productSupplier['quality']}}</td>
-                    <td>{{$productSupplier['quality_to_price']}}</td>
-                    <td>{{$productSupplier['value_of_the_order_for_free_transport']}}</td>
+                    <td>{{$productSupplier['warehouse_property']}}</td>
+{{--                    <td>{{$productSupplier['phone']}}</td>--}}
+{{--                    <td>{{$productSupplier['review']}}</td>--}}
+{{--                    <td>{{$productSupplier['quality']}}</td>--}}
+{{--                    <td>{{$productSupplier['quality_to_price']}}</td>--}}
+{{--                    <td>{{$productSupplier['value_of_the_order_for_free_transport']}}</td>--}}
                 </tr>
                 @if($productSupplier['comments'])
                     <tr>

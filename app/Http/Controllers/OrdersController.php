@@ -611,8 +611,8 @@ class OrdersController extends Controller
                             ['product_id' => $prod->id, 'class' => get_class($this), 'line' => __LINE__]
                         );
                 }
-
-                if ($radius > $this->warehouseRepository->find($raw->id)->radius ||
+                $warehouse = $this->warehouseRepository->find($raw->id);
+                if ($radius > $warehouse->radius ||
                     $prod->price->gross_selling_price_commercial_unit === null ||
                     $prod->price->gross_selling_price_basic_unit === null ||
                     $prod->price->gross_selling_price_calculated_unit === null
@@ -644,7 +644,8 @@ class OrdersController extends Controller
                     'quality_to_price' => $prod->quality_to_price,
                     'comments' => $prod->comments,
                     'variation_group' => $prod->variation_group,
-                    'value_of_the_order_for_free_transport' => $prod->value_of_the_order_for_free_transport
+                    'value_of_the_order_for_free_transport' => $prod->value_of_the_order_for_free_transport,
+                    'warehouse_property' => $warehouse->property->comments
                 ];
                 $productsVariation[$product->product->id][] = $array;
             }
@@ -2810,6 +2811,7 @@ class OrdersController extends Controller
                     'quality' => $item['quality'],
                     'quality_to_price' => $item['quality_to_price'],
                     'comments' => $item['comments'],
+                    'warehouse_property'=> $item['warehouse_property'],
                     'value_of_the_order_for_free_transport' => number_format((float)$item['value_of_the_order_for_free_transport'] - $order->total_price,
                         2, '.', '') <= 0 ? 'Darmowy transport!' : number_format((float)$item['value_of_the_order_for_free_transport'] - $order->total_price,
                         2, '.', '')
