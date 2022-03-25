@@ -4,6 +4,8 @@
     <strong>Poniżej znajduje się oferta nr: {{$order->id}}</strong>
 </p>
 
+<p>{!! setting('mail.offer_notice') !!}</p>
+
 <table id="productsTable" border="1" class="table table1 table-venice-blue productsTableEdit" style="border-collapse: collapse;">
     <tbody id="products-tbody">
     @php
@@ -241,7 +243,7 @@
 </div>
 @if(!empty($allProductsFromSupplier))
     <h3>Suma wszystkich towarów dla danych producentów</h3>
-    <p>{{ setting('mail.offer_notice') }}</p>
+    <p>{!! setting('mail.offer_summary_notice') !!}</p>
     <table border="1" class="table table1 table-venice-blue productsTableEdit">
         <thead>
         <tr class="price-keeper">
@@ -269,7 +271,6 @@
         <tbody>
         @foreach($allProductsFromSupplier as $productsGroup)
             @foreach($productsGroup as $groupName => $productSupplier)
-                <tr style="text-transform: uppercase;">{{$groupName}}</tr>
                 <tr class="price-keeper">
                     <td>{{$productSupplier['product_name_supplier']}}</td>
                     <td>{{$productSupplier['sum']}}</td>
