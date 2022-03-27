@@ -28,6 +28,7 @@ class Transaction extends Model
         'balance',
         'accounting_notes',
         'transaction_notes',
+        'company_name',
     ];
 
     public function customer()
