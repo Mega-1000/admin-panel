@@ -327,6 +327,7 @@ class ImportShippingPayIn implements ShouldQueue
                 'balance' => (float)$this->getCustomerBalance($order->customer_id) + (float)$data['wartosc_pobrania'],
                 'accounting_notes' => '',
                 'transaction_notes' => 'Numer listu: ' . $data['numer_listu'] . ' Nr faktury:' . $data['nr_faktury_do_ktorej_dany_lp_zostal_przydzielony'],
+                'company_name' => Transaction::NEW_COMPANY_NAME_SYMBOL,
             ]);
         } catch (\Exception $exception) {
             Log::notice('Błąd podczas zapisu transakcji: ' . $exception->getMessage(), ['line' => __LINE__, 'file' => __FILE__]);
@@ -382,6 +383,7 @@ class ImportShippingPayIn implements ShouldQueue
             'balance' => (float)$this->getCustomerBalance($order->customer_id) - (float)$amount,
             'accounting_notes' => '',
             'transaction_notes' => $transaction->transaction_notes,
+            'company_name' => Transaction::NEW_COMPANY_NAME_SYMBOL,
         ]);
     }
 }

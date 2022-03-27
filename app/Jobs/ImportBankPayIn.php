@@ -282,6 +282,7 @@ class ImportBankPayIn implements ShouldQueue
                 'balance' => (float)$this->getCustomerBalance($order->customer_id) + (float)$data['kwota'],
                 'accounting_notes' => '',
                 'transaction_notes' => '',
+                'company_name' => Transaction::NEW_COMPANY_NAME_SYMBOL,
             ]);
         } catch (Exception $exception) {
             Log::notice('Błąd podczas zapisu transakcji: ' . $exception->getMessage(), ['line' => __LINE__, 'file' => __FILE__]);
@@ -337,6 +338,7 @@ class ImportBankPayIn implements ShouldQueue
             'balance' => (float)$this->getCustomerBalance($order->customer_id) - (float)$amount,
             'accounting_notes' => '',
             'transaction_notes' => '',
+            'company_name' => Transaction::NEW_COMPANY_NAME_SYMBOL,
         ]);
     }
 }

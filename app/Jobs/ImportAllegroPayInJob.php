@@ -248,6 +248,7 @@ class ImportAllegroPayInJob implements ShouldQueue
             'balance' => (float)$this->getCustomerBalance($order->customer_id) + (float)$data['kwota'],
             'accounting_notes' => '',
             'transaction_notes' => '',
+            'company_name' => Transaction::NEW_COMPANY_NAME_SYMBOL
         ]);
     }
 
@@ -292,6 +293,7 @@ class ImportAllegroPayInJob implements ShouldQueue
             'balance' => (float)$this->getCustomerBalance($order->customer_id) - $amount,
             'accounting_notes' => '',
             'transaction_notes' => '',
+            'company_name' => Transaction::NEW_COMPANY_NAME_SYMBOL,
         ]);
     }
 
@@ -318,6 +320,7 @@ class ImportAllegroPayInJob implements ShouldQueue
             'balance' => (float)$this->getCustomerBalance($order->customer_id) + abs($amount),
             'accounting_notes' => '',
             'transaction_notes' => '',
+            'company_name' => Transaction::NEW_COMPANY_NAME_SYMBOL,
         ]);
     }
 }
