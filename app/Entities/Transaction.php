@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class Transaction extends Model
 {
+    const OLD_COMPANY_NAME_SYMBOL = 'EPHWW';
+    const NEW_COMPANY_NAME_SYMBOL = 'EPH';
+
     protected $table = 'transactions';
 
     /**
@@ -25,6 +28,7 @@ class Transaction extends Model
         'balance',
         'accounting_notes',
         'transaction_notes',
+        'company_name',
     ];
 
     public function customer()

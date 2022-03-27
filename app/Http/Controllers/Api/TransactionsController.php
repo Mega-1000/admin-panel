@@ -57,7 +57,9 @@ class TransactionsController extends Controller
                 $query->where('type', 'STANDARD_ADDRESS');
             }])
                 ->with('orders:id,customer_id')
-                ->has('transactions')
+                ->whereHas('transactions', function ($q) {
+                    $q->where('company_name', '=', 'EPH');
+                })
                 ->orderBy('customers.id', 'desc');
 
             if ($request->has('nip')) {
@@ -153,6 +155,7 @@ class TransactionsController extends Controller
                 'balance' => (float)$balance + (float)$operationValue,
                 'accounting_notes' => $request->get('accountingNotes'),
                 'transaction_notes' => $request->get('transactionNotes'),
+                'company_name' => Transaction::NEW_COMPANY_NAME_SYMBOL
             ]);
 
             if ($operationKind === 'przeksięgowanie') {
@@ -359,7 +362,7 @@ class TransactionsController extends Controller
         $response = [];
 
         try {
-            $transactions = Transaction::where('customer_id', '=', $id)->orderBy('id', 'desc')->get();
+            $transactions = Transaction::where('customer_id', '=', $id)->where('company_name', '=', Transaction::NEW_COMPANY_NAME_SYMBOL)->orderBy('id', 'desc')->get();
 
             if (!empty($transactions)) {
                 $response['transactions'] = $transactions;
