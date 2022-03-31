@@ -50,7 +50,8 @@
             <p>Zakończenie pracy: {{ workingInfo.workingTo }}</p>
             <p>Czas pracy bez odliczeń: {{ convertTime(workingInfo.uptimeInMinutes) }}</p>
             <p>Czas bezczynności: {{ convertTime(workingInfo.idleTimeInMinutes) }}</p>
-            <p>Czas bezczynności po odliczeniu: {{ convertTime(workingInfo.uptimeInMinutes - workingInfo.idleTimeInMinutes) }}</p>
+            <p>Czas pracy po odliczeniu bezczynności:
+              {{ convertTime(workingInfo.uptimeInMinutes - workingInfo.idleTimeInMinutes) }}</p>
           </div>
         </div>
       </div>
@@ -103,7 +104,7 @@ import { VueHorizontalTimeline } from 'vue-horizontal-timeline'
 import DatePicker from 'vue2-datepicker'
 import 'vue2-datepicker/index.css'
 import 'vue2-datepicker/locale/pl'
-import { Inactivity, searchWorkingEventsParams, User, WorkInfo } from '@/types/WorkingEventsTypes'
+import { Event, Inactivity, searchWorkingEventsParams, User, WorkInfo } from '@/types/WorkingEventsTypes'
 
 @Component({
   components: {
@@ -147,7 +148,10 @@ export default class WorkingEventsPresentation extends Vue {
   public get items (): Event[] {
     const events = this.$store?.getters['WorkingEventsService/events']
     const inactivity = this.$store?.getters['WorkingEventsService/inactivity']
-    return events.concat(inactivity)
+
+    return (events.concat(inactivity)).sort(
+      (objA: Event | Inactivity, objB: Event | Inactivity) => objB.date - objA.date
+    )
   }
 
   public get inactivityList (): Inactivity[] {
@@ -164,12 +168,25 @@ export default class WorkingEventsPresentation extends Vue {
 
   private async markInactivity (inactivity: Inactivity): Promise<void> {
     await this.$store?.dispatch('WorkingEventsService/markInactivity', inactivity)
+    const params: searchWorkingEventsParams = {
+      userId: parseInt(this.user.value),
+      date: this.date.value
+    }
+    await this.$store?.dispatch('WorkingEventsService/loadInactivity', params)
   }
 
   private convertTime (timeInMinutes: number) {
+    let hoursString = '00'
+    let minutesString = '00'
     const hours = Math.trunc(timeInMinutes / 60)
+    if (hours < 10) {
+      hoursString = '0' + hours
+    }
     const minutes = timeInMinutes % 60
-    return hours + ':' + minutes
+    if (minutes < 10) {
+      minutesString = '0' + hours
+    }
+    return hoursString + ':' + minutesString
   }
 }
 </script>
