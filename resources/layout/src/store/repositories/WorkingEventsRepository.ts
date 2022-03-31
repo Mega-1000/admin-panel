@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { getFullUrl } from '@/helpers/urls'
-import { searchWorkingEventsParams } from '@/types/WorkingEventsTypes'
+import { Inactivity, searchWorkingEventsParams } from '@/types/WorkingEventsTypes'
 
 export default {
   async getWorkingEvents (params: searchWorkingEventsParams): Promise<any> {
@@ -41,6 +41,24 @@ export default {
   async getWorkers (): Promise<any> {
     return fetch(getFullUrl('api/working-events/workers'), {
       method: 'GET',
+      credentials: 'same-origin',
+      headers: new Headers({
+        'Content-Type': 'application/json; charset=utf-8',
+        'X-Requested-Width': 'XMLHttpRequest'
+      })
+    })
+      .then((response) => {
+        return response.json()
+      })
+  },
+  /**
+   * Mark inactivity as work
+   *
+   * @param inactivity:Inactivity
+   */
+  async markInactivity (inactivity: Inactivity): Promise<any> {
+    return fetch(getFullUrl('api/working-events/' + inactivity.id), {
+      method: 'DELETE',
       credentials: 'same-origin',
       headers: new Headers({
         'Content-Type': 'application/json; charset=utf-8',

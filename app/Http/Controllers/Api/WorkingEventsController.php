@@ -60,10 +60,15 @@ class WorkingEventsController extends Controller
             }
             $result = $this->workingEventRepository->findWhere($criteria);
 
-            if (!empty($result)) {
-                $response['status'] = 200;
+            if ($result->isNotEmpty()) {
                 $response['workingEvents'] = [];
-
+                $response['status'] = 200;
+                $interval = $result->first()->created_at->diff($result->last()->created_at);
+                $response['workInfo'] = [
+                    'workingFrom' => $result->first()->created_at->format('Y-m-d H:i:s'),
+                    'workingTo' => $result->last()->created_at->format('Y-m-d H:i:s'),
+                    'uptimeInMinutes' => $interval->h * 60 + $interval->i
+                ];
                 foreach ($result as $item) {
                     $response['workingEvents'][] = [
                         'title' => $item->getTitle(),
@@ -113,14 +118,20 @@ class WorkingEventsController extends Controller
                 $query->where('created_at', 'like', $date->format('Y-m-d') . '%');
             }
             $result = $query->get();
-            if (!empty($result)) {
+            if ($result->isNotEmpty()) {
                 $response['status'] = 200;
                 $response['inactivity'] = [];
+                $response['workInfo']['idleTimeSummaryInMinutes'] = 0;
                 foreach ($result as $item) {
+                    $response['workInfo']['idleTimeSummaryInMinutes'] += $item->time;
                     $response['inactivity'][] = [
+                        'id' => $item->id,
                         'title' => $item->getTitle(),
                         'content' => $item->getContent(),
-                        'date' => $item->created_at,
+                        'description' => $item->description,
+                        'time' => $item->time,
+                        'page' => $item->page,
+                        'date' => $item->created_at->format('Y-m-d H:i:s'),
                         'userId' => $item->user_id,
                     ];
                 }
@@ -167,5 +178,32 @@ class WorkingEventsController extends Controller
             ];
         }
         return response()->json($response);
+    }
+
+    /**
+     * Usunięcie bezczynności
+     *
+     * @param TrackerLogs $trackerLogs Transakcja
+     *
+     * @return JsonResponse
+     *
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    public function destroy(TrackerLogs $trackerLogs): JsonResponse
+    {
+        $response = [];
+        try {
+            $result = TrackerLogs::delete($trackerLogs->id);
+            if ($result) {
+                $response['status'] = 200;
+            }
+        } catch (\Exception $exception) {
+            $response = [
+                'status' => 424,
+                'errorCode' => $exception->getCode(),
+                'errorMessage' => $exception->getMessage()
+            ];
+        }
+        return response()->json($response, $response['status']);
     }
 }

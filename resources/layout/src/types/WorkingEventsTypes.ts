@@ -14,10 +14,21 @@ export interface Event {
   content: string,
 }
 
+export interface WorkInfo {
+  workingFrom: string,
+  workingTo: string,
+  uptimeInMinutes: number,
+  idleTimeInMinutes: number
+}
+
 export interface Inactivity {
+  id: number,
   title: string,
   date: string,
   content: string,
+  description: string,
+  page: string,
+  time: number,
   userId: number,
   orderId: number | null,
 }
@@ -35,7 +46,8 @@ export interface WorkingEventsStore {
   isLoading: boolean,
   users: User[] | null,
   events: Event[] | null,
-  inactivity: Inactivity[] | null
+  inactivity: Inactivity[] | null,
+  workingInfo: WorkInfo | null
 }
 
 /* eslint-enabled camelcase */

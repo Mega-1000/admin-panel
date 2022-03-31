@@ -1,12 +1,13 @@
 <template>
-  <div class="c-actionTracker" v-if="enabled" @click="checkTime()">
+  <div class="c-actionTracker" v-if="enabled">
     <!--
     IMPORTANT !!!
     tracker modal was disabled by changing <div id="actionTracker"></div> to <div id="disabled-actionTracker"></div>
     to related views
     -->
     <div class="c-actionTracker">
-      <ModalActionTrackers v-if="showModal && time >= finalTime" @close="toggleShowModal()" :time="time"></ModalActionTrackers>
+      <ModalActionTrackers v-if="showModal && time >= finalTime" @close="toggleShowModal()"
+                           :time="time"></ModalActionTrackers>
     </div>
   </div>
 </template>
@@ -35,10 +36,9 @@ export default class ActionTrackers extends Vue {
   }
 
   public mounted (): void {
-    this.$cookies.remove('tracker')
-    this.$cookies.set('tracker-refresh', true)
-    this.$cookies.set('tracker', 0)
-    this.$cookies.refresh()
+    localStorage.removeItem('tracker')
+    localStorage.setItem('tracker-refresh', 'true')
+    localStorage.setItem('tracker', '0')
     this.time = 0
     this.intervalId = this.runTimer()
     this.trackClick()
@@ -46,16 +46,13 @@ export default class ActionTrackers extends Vue {
   }
 
   public get trackTime (): number {
-    this.$cookies.refresh()
-    return this.$cookies.get('tracker')
+    return parseInt(localStorage.getItem('tracker') ?? '')
   }
 
   private runTimer (): number {
     return setInterval(async () => {
       this.time++
-      this.$cookies.refresh()
       this.incrementTrackerCookie()
-      console.log(this.trackTime)
       if ((this.time >= this.finalTime) && (this.time % this.finalTime === 0)) {
         this.setLog()
         this.showModal = true
@@ -64,10 +61,8 @@ export default class ActionTrackers extends Vue {
   }
 
   public resetTimer (): void {
-    this.$cookies.refresh()
-    this.$cookies.set('tracker-refresh', true)
+    localStorage.setItem('tracker-refresh', 'true')
     this.setCookieTracker()
-    this.$cookies.refresh()
   }
 
   private trackClick (): void {
@@ -90,7 +85,7 @@ export default class ActionTrackers extends Vue {
     })
   }
 
-  public toggleShowModal ():void {
+  public toggleShowModal (): void {
     this.setLog()
     this.resetTimer()
     this.showModal = !this.showModal
@@ -114,20 +109,18 @@ export default class ActionTrackers extends Vue {
   }
 
   private setCookieTracker (time = 0): void {
-    this.$cookies.refresh()
-    this.$cookies.set('tracker', time)
-    this.$cookies.refresh()
+    localStorage.setItem('tracker', time.toString())
   }
 
   private incrementTrackerCookie (): void {
-    if (this.$cookies.get('tracker-refresh')) {
+    if (localStorage.getItem('tracker-refresh') === 'true') {
       this.setCookieTracker()
       this.time = 0
       clearInterval(this.intervalId)
       this.intervalId = this.runTimer()
-      this.$cookies.set('tracker-refresh', false)
+      localStorage.setItem('tracker-refresh', 'false')
     } else {
-      this.setCookieTracker(Number(this.$cookies.get('tracker')) + 1)
+      this.setCookieTracker(Number(localStorage.getItem('tracker')) + 1)
       this.time = this.trackTime
       clearInterval(this.intervalId)
       this.intervalId = this.runTimer()
