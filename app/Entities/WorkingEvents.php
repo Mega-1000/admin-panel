@@ -6,38 +6,124 @@ use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * Working events class.
+ */
 class WorkingEvents extends Model
 {
+    /**
+     * Login
+     */
     const LOGIN = 'LOGIN';
 
+    /**
+     * Order list event
+     */
     const ORDER_LIST_EVENT = 'ORDER_LIST';
+
+    /**
+     * Order edit event
+     */
     const ORDER_EDIT_EVENT = 'ORDER_EDIT';
+
+    /**
+     * Order update event
+     */
     const ORDER_UPDATE_EVENT = 'ORDER_UPDATE';
+
+    /**
+     * Order store event
+     */
     const ORDER_STORE_EVENT = 'ORDER_STORE';
 
+    /**
+     * Order payment edit event
+     */
     const ORDER_PAYMENT_EDIT_EVENT = 'ORDER_PAYMENT_EDIT';
+
+    /**
+     * Order payment create event
+     */
     const ORDER_PAYMENT_CREATE_EVENT = 'ORDER_PAYMENT_CREATE';
+
+    /**
+     * Order payment store event
+     */
     const ORDER_PAYMENT_STORE_EVENT = 'ORDER_PAYMENT_STORE';
+
+    /**
+     * Order payment update event
+     */
     const ORDER_PAYMENT_UPDATE_EVENT = 'ORDER_PAYMENT_UPDATE';
 
+    /**
+     * Order package edit event
+     */
     const ORDER_PACKAGES_EDIT_EVENT = 'ORDER_PACKAGES_EDIT';
+
+    /**
+     * Order package create event
+     */
     const ORDER_PACKAGES_CREATE_EVENT = 'ORDER_PACKAGES_CREATE';
+
+    /**
+     * Order package store event
+     */
     const ORDER_PACKAGES_STORE_EVENT = 'ORDER_PACKAGES_STORE';
+
+    /**
+     * Order package update event
+     */
     const ORDER_PACKAGES_UPDATE_EVENT = 'ORDER_PACKAGES_UPDATE';
 
+    /**
+     * Label add event
+     */
     const LABEL_ADD_EVENT = 'LABEL_ADD';
+
+    /**
+     * Label remove event
+     */
     const LABEL_REMOVE_EVENT = 'LABEL_REMOVE';
 
+    /**
+     * Chat message event
+     */
     const CHAT_MESSAGE_ADD_EVENT = 'LABEL_ADD';
 
+    /**
+     * Accept dates event
+     */
     const ACCEPT_DATES_EVENT = 'ACCEPT_DATES';
+
+    /**
+     * Update dates event
+     */
     const UPDATE_DATES_EVENT = 'UPDATE_DATES';
 
+    /**
+     * Save shipping comment event
+     */
     const SAVE_SHIPPING_COMMENT_EVENT = 'SAVE_SHIPPING_COMMENT';
+
+    /**
+     * Save warehouse comment event
+     */
     const SAVE_WAREHOUSE_COMMENT_EVENT = 'SAVE_WAREHOUSE_COMMENT';
+
+    /**
+     * Save consultant comment event
+     */
     const SAVE_CONSULTANT_COMMENT_EVENT = 'SAVE_CONSULTANT_COMMENT';
+
+    /**
+     * Save financial comment
+     */
     const SAVE_FINANCIAL_COMMENT_EVENT = 'SAVE_FINANCIAL_COMMENT';
 
+    /**
+     * Notice mapper
+     */
     const NOTICE_MAPPER = [
         Order::COMMENT_SHIPPING_TYPE => self::SAVE_SHIPPING_COMMENT_EVENT,
         Order::COMMENT_WAREHOUSE_TYPE => self::SAVE_WAREHOUSE_COMMENT_EVENT,
@@ -45,6 +131,9 @@ class WorkingEvents extends Model
         Order::COMMENT_FINANCIAL_TYPE => self::SAVE_FINANCIAL_COMMENT_EVENT,
     ];
 
+    /**
+     * Event label mapping
+     */
     const EVENT_LABEL_MAPPING = [
         self::ORDER_LIST_EVENT => 'Lista zamówień',
         self::ORDER_EDIT_EVENT => 'Edycja zamówienia',
@@ -75,6 +164,9 @@ class WorkingEvents extends Model
         self::SAVE_FINANCIAL_COMMENT_EVENT => 'Zapis komentarza ksiegowości',
     ];
 
+    /**
+     * @var string
+     */
     protected $table = 'working_events';
 
     /**
@@ -88,11 +180,26 @@ class WorkingEvents extends Model
         'user_id',
     ];
 
-    public static function createEvent(string $event,int $orderId = null)
+    /**
+     * Create event.
+     *
+     * @param string $event
+     * @param int|null $orderId
+     * @return WorkingEvents|null
+     */
+    public static function createEvent(string $event, int $orderId = null): ?WorkingEvents
     {
-        if(empty(Auth::user()) || !(Auth::user() instanceof User)) {
-            return true;
+        $now = new \DateTime();
+        if (empty(Auth::user()) || !(Auth::user() instanceof User)) {
+            return null;
         }
+
+        $latest = WorkingEvents::latest()->first();
+
+        if ($now->diff($latest->created_at)->i < 2 && $latest->event == $event) {
+            return null;
+        }
+
         return self::create([
             'user_id' => Auth::user()->id,
             'event' => $event,
@@ -100,11 +207,21 @@ class WorkingEvents extends Model
         ]);
     }
 
+    /**
+     * Return event title.
+     *
+     * @return string
+     */
     public function getTitle(): string
     {
         return self::EVENT_LABEL_MAPPING[$this->event];
     }
 
+    /**
+     * Get event content.
+     *
+     * @return string
+     */
     public function getContent(): string
     {
         $content = self::EVENT_LABEL_MAPPING[$this->event];
@@ -112,6 +229,7 @@ class WorkingEvents extends Model
         if (!empty($this->order_id)) {
             $content .= 'W ramach obsługi zamówienia ' . $this->order_id;
         }
+
         return $content;
     }
 }
