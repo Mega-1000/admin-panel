@@ -145,13 +145,17 @@ export default class WorkingEventsPresentation extends Vue {
     return this.$store?.getters['WorkingEventsService/users']
   }
 
-  public get items (): Event[] {
+  public get items (): Event[] | Inactivity[] {
     const events = this.$store?.getters['WorkingEventsService/events']
     const inactivity = this.$store?.getters['WorkingEventsService/inactivity']
-
-    return (events.concat(inactivity)).sort(
-      (objA: Event | Inactivity, objB: Event | Inactivity) => objB.date - objA.date
-    )
+    const items = [...events, ...inactivity]
+    items.sort(
+      function (a, b) {
+        const dateA = new Date(a.date)
+        const dateB = new Date(b.date)
+        return dateA.getTime() - dateB.getTime()
+      })
+    return items
   }
 
   public get inactivityList (): Inactivity[] {

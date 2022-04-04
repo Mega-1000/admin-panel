@@ -8,7 +8,7 @@ export interface User {
 
 export interface Event {
   title: string,
-  date: Date,
+  date: string,
   orderId: number,
   userId: number,
   content: string,
@@ -24,7 +24,7 @@ export interface WorkInfo {
 export interface Inactivity {
   id: number,
   title: string,
-  date: Date,
+  date: string,
   content: string,
   description: string,
   page: string,
