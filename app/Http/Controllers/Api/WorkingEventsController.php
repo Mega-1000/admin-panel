@@ -73,7 +73,7 @@ class WorkingEventsController extends Controller
                     $response['workingEvents'][] = [
                         'title' => $item->getTitle(),
                         'content' => $item->getContent(),
-                        'date' => $item->created_at,
+                        'date' => $item->created_at->format('Y-m-d H:i:s'),
                         'orderId' => $item->order_id,
                         'userId' => $item->user_id,
                     ];

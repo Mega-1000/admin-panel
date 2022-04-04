@@ -46,7 +46,7 @@ export default class ActionTrackers extends Vue {
   }
 
   public get trackTime (): number {
-    return parseInt(localStorage.getItem('tracker') ?? '')
+    return Number(localStorage.getItem('tracker'))
   }
 
   private runTimer (): number {
@@ -54,7 +54,7 @@ export default class ActionTrackers extends Vue {
       this.time++
       this.incrementTrackerCookie()
       if ((this.time >= this.finalTime) && (this.time % this.finalTime === 0)) {
-        this.setLog()
+        await this.setLog()
         this.showModal = true
       }
     }, this.timeInterval)
@@ -121,7 +121,7 @@ export default class ActionTrackers extends Vue {
       localStorage.setItem('tracker-refresh', 'false')
     } else {
       this.setCookieTracker(Number(localStorage.getItem('tracker')) + 1)
-      this.time = this.trackTime
+      // this.time = this.trackTime
       clearInterval(this.intervalId)
       this.intervalId = this.runTimer()
     }
