@@ -867,7 +867,7 @@ class OrdersController extends Controller
                 $this->store($request->all());
                 break;
         }
-        WorkingEvents::createEvent(WorkingEvents::ORDER_UPDATE_EVENT);
+        WorkingEvents::createEvent(WorkingEvents::ORDER_UPDATE_EVENT, $id);
 
         $order = $this->orderRepository->find($id);
         if (empty($order)) {
