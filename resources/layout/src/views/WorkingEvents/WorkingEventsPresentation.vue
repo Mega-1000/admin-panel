@@ -56,7 +56,7 @@
         </div>
       </div>
     </div>
-    <vue-horizontal-timeline v-if="items.length > 0" :items="items" :title-substr="30"/>
+    <vue-horizontal-timeline v-if="items.length > 0" :items="items" :title-substr="30" :clickable="true" @click="toggleShowModal"/>
     <div class="row" v-if="inactivityList.length > 0">
       <div class="col-md-12">
         <div class="table-responsive">
@@ -92,30 +92,32 @@
         </div>
       </div>
     </div>
+    <working-event-card v-if="showModal" :card="mainCard" @close="toggleShowModal"></working-event-card>
     <debugger :keepAlive="true" :components="$children"></debugger>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator'
-import { Timeline, TimelineTitle, TimelineItem } from 'vue-cute-timeline'
+import FileUploader from '@/components/common/FileUploader.vue'
+import WorkingEventCard from '@/components/WorkingEvents/WorkingEventCard.vue'
 import 'vue-cute-timeline/dist/index.css'
 import { VueHorizontalTimeline } from 'vue-horizontal-timeline'
 import DatePicker from 'vue2-datepicker'
 import 'vue2-datepicker/index.css'
 import 'vue2-datepicker/locale/pl'
-import { Event, Inactivity, searchWorkingEventsParams, User, WorkInfo } from '@/types/WorkingEventsTypes'
+import { Card, Inactivity, searchWorkingEventsParams, User, WorkInfo } from '@/types/WorkingEventsTypes'
 
 @Component({
   components: {
-    Timeline,
-    TimelineTitle,
-    TimelineItem,
     VueHorizontalTimeline,
+    FileUploader,
+    WorkingEventCard,
     DatePicker
   }
 })
 export default class WorkingEventsPresentation extends Vue {
+  public showModal = false
   private user = {
     value: '',
     error: false,
@@ -126,6 +128,13 @@ export default class WorkingEventsPresentation extends Vue {
     value: (new Date()).toISOString(),
     error: false,
     errorMessage: ''
+  }
+
+  public mainCard: Card = {
+    title: '',
+    content: '',
+    orderId: 0,
+    description: []
   }
 
   public async loadActivity (): Promise<void> {
@@ -145,17 +154,53 @@ export default class WorkingEventsPresentation extends Vue {
     return this.$store?.getters['WorkingEventsService/users']
   }
 
-  public get items (): Event[] | Inactivity[] {
+  public get items (): Card[] {
     const events = this.$store?.getters['WorkingEventsService/events']
     const inactivity = this.$store?.getters['WorkingEventsService/inactivity']
     const items = [...events, ...inactivity]
+    const tmp: Card[] = []
     items.sort(
       function (a, b) {
         const dateA = new Date(a.date)
         const dateB = new Date(b.date)
         return dateA.getTime() - dateB.getTime()
       })
-    return items
+    items.forEach(function (elem) {
+      if (tmp.length > 0 && tmp[tmp.length - 1].orderId === elem.orderId && !('time' in elem)) {
+        tmp[tmp.length - 1].description.push(elem.content)
+      } else {
+        if (elem.orderId !== null && 'orderId' in elem) {
+          tmp.push({
+            title: 'Obsługa zamówienia ' + elem.orderId,
+            content: 'Działania w ramach obsługi zlecenia nr ' + elem.orderId + ' Data: ' + elem.date,
+            orderId: elem.orderId,
+            description: [elem.content]
+          })
+        } else {
+          if ('time' in elem) {
+            tmp.push({
+              title: 'Brak aktywności w ciągu ' + elem.time + ' minut',
+              content: 'Brak aktywności od ' + elem.date,
+              orderId: null,
+              description: [elem.content]
+            })
+          } else {
+            tmp.push({
+              title: elem.title,
+              content: elem.content,
+              orderId: null,
+              description: [elem.content]
+            })
+          }
+        }
+      }
+    })
+    return tmp
+  }
+
+  public toggleShowModal (card : Card): void {
+    this.mainCard = card
+    this.showModal = !this.showModal
   }
 
   public get inactivityList (): Inactivity[] {
