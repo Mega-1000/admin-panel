@@ -80,8 +80,8 @@ class WorkingEventsController extends Controller
                 }
             } else {
                 $response = [
-                    'errorCode' => 424,
-                    'errorMessage' => 'Brak transakcji'
+                    'workingEvents' => [],
+                    'workInfo' => []
                 ];
             }
         } catch (\Exception $exception) {
@@ -136,10 +136,7 @@ class WorkingEventsController extends Controller
                     ];
                 }
             } else {
-                $response = [
-                    'errorCode' => 424,
-                    'errorMessage' => 'Brak transakcji'
-                ];
+                $response['inactivity'] = [];
             }
         } catch (\Exception $exception) {
             $response = [
@@ -193,7 +190,7 @@ class WorkingEventsController extends Controller
     {
         $response = [];
         try {
-            $result = TrackerLogs::delete($trackerLogs->id);
+            $result = TrackerLogs::find($trackerLogs->id)->delete();
             if ($result) {
                 $response['status'] = 200;
             }

@@ -20,8 +20,8 @@ class TrackerLogs extends Model
 
     public function getContent(): string
     {
-        $content = 'Brak aktywności na stronie ' . $this->page . ' ';
-        $content .= 'Data ' . $this->created_at . ' ';
+        $content = 'Brak aktywności na stronie ' . $this->page . '<br/> ';
+        $content .= 'Data ' . $this->created_at . '<br/>';
         if ($this->description !== '') {
             $content .= 'Powód bezczynności: ' . $this->description . ' ';
         }else{

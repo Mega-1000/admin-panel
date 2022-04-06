@@ -6,6 +6,13 @@ export interface User {
   lastname: string,
 }
 
+export interface Card {
+  title: string,
+  content: string,
+  orderId: number | null,
+  description: string[]
+}
+
 export interface Event {
   title: string,
   date: string,

@@ -226,9 +226,6 @@ class WorkingEvents extends Model
     {
         $content = self::EVENT_LABEL_MAPPING[$this->event];
         $content .= ' Data: ' . $this->created_at . ' ';
-        if (!empty($this->order_id)) {
-            $content .= 'W ramach obsługi zamówienia ' . $this->order_id;
-        }
 
         return $content;
     }
