@@ -44,7 +44,7 @@
       </div>
       <div class="col-md-6">
         <div class="row">
-          <div class="col-md-12" v-if="workingInfo !== null">
+          <div class="col-md-12" v-if="items.length > 0">
             <h4>Podsumowanie pracy</h4>
             <p>Rozpoczęcie pracy: {{ workingInfo.workingFrom }}</p>
             <p>Zakończenie pracy: {{ workingInfo.workingTo }}</p>
@@ -56,7 +56,8 @@
         </div>
       </div>
     </div>
-    <vue-horizontal-timeline v-if="items.length > 0" :items="items" :title-substr="30" :clickable="true" @click="toggleShowModal"/>
+    <vue-horizontal-timeline v-if="items.length > 0" :items="items" :title-substr="30" :clickable="true"
+                             @click="toggleShowModal"/>
     <div class="row" v-if="inactivityList.length > 0">
       <div class="col-md-12">
         <div class="table-responsive">
@@ -198,7 +199,7 @@ export default class WorkingEventsPresentation extends Vue {
     return tmp
   }
 
-  public toggleShowModal (card : Card): void {
+  public toggleShowModal (card: Card): void {
     this.mainCard = card
     this.showModal = !this.showModal
   }
@@ -230,10 +231,14 @@ export default class WorkingEventsPresentation extends Vue {
     const hours = Math.trunc(timeInMinutes / 60)
     if (hours < 10) {
       hoursString = '0' + hours
+    } else {
+      hoursString = hours.toString()
     }
     const minutes = timeInMinutes % 60
     if (minutes < 10) {
-      minutesString = '0' + hours
+      minutesString = '0' + minutes
+    } else {
+      minutesString = minutes.toString()
     }
     return hoursString + ':' + minutesString
   }
