@@ -159,7 +159,7 @@ export default class WorkingEventsPresentation extends Vue {
     const events = this.$store?.getters['WorkingEventsService/events']
     const inactivity = this.$store?.getters['WorkingEventsService/inactivity']
     const items = [...events, ...inactivity]
-    const tmp: Card[] = []
+    const groupedItems: Card[] = []
     items.sort(
       function (a, b) {
         const dateA = new Date(a.date)
@@ -167,11 +167,11 @@ export default class WorkingEventsPresentation extends Vue {
         return dateA.getTime() - dateB.getTime()
       })
     items.forEach(function (elem) {
-      if (tmp.length > 0 && tmp[tmp.length - 1].orderId === elem.orderId && !('time' in elem)) {
-        tmp[tmp.length - 1].description.push(elem.content)
+      if (groupedItems.length > 0 && groupedItems[groupedItems.length - 1].orderId === elem.orderId && groupedItems[groupedItems.length - 1].orderId !== null && !('time' in elem)) {
+        groupedItems[groupedItems.length - 1].description.push(elem.content)
       } else {
         if (elem.orderId !== null && 'orderId' in elem) {
-          tmp.push({
+          groupedItems.push({
             title: 'Obsługa zamówienia ' + elem.orderId,
             content: 'Działania w ramach obsługi zlecenia nr ' + elem.orderId + ' Data: ' + elem.date,
             orderId: elem.orderId,
@@ -179,14 +179,14 @@ export default class WorkingEventsPresentation extends Vue {
           })
         } else {
           if ('time' in elem) {
-            tmp.push({
+            groupedItems.push({
               title: 'Brak aktywności w ciągu ' + elem.time + ' minut',
               content: 'Brak aktywności od ' + elem.date,
               orderId: null,
               description: [elem.content]
             })
           } else {
-            tmp.push({
+            groupedItems.push({
               title: elem.title,
               content: elem.content,
               orderId: null,
@@ -196,7 +196,7 @@ export default class WorkingEventsPresentation extends Vue {
         }
       }
     })
-    return tmp
+    return groupedItems
   }
 
   public toggleShowModal (card: Card): void {
