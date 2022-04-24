@@ -8,6 +8,10 @@
             color: #0069c0;
         }
 
+        body {
+            font-family: DejaVu Sans;
+        }
+
         * {
             box-sizing: border-box;
         }
@@ -15,15 +19,8 @@
         td {
             padding: 10px;
             border: 2px dotted #333;
-            height: 150px;
+            height: 200px;
             width: 50%;
-        }
-
-        .left {
-            float: left;
-            margin: 5px;
-            width: 50%;
-            min-height: 100px;
         }
 
         img {
@@ -41,11 +38,11 @@
         }
 
         .title {
-            font-size: 20px;
+            font-size: 16px;
         }
 
         .price {
-            font-size: 22px;
+            font-size: 12px;
             font-weight: bold;
         }
     </style>
@@ -64,12 +61,14 @@
                 @endif
                 {!! $i % 2 == 0 ? '<tr>' : '' !!}
                 <td>
-                    <div class="left">
-                        <img src="{{ public_path($data['image']) }}">
-                    </div>
+                    <img src="{{ public_path($data['image']) }}">
                     <div class="right">
-                        <div class="title">{{ $data['name'] }}</div>
-                        <div class="price">{{ $data['price'] }} zł</div>
+                        <div style="height: 80px">
+                            <p class="title">{{ $data['name'] }}</p>
+                        </div>
+                        <div style="height: 80px">
+                            <p style="position: relative; bottom: 0" class="price">{{ $data['price'] }} zł</p>
+                        </div>
                     </div>
                 </td>
                 {!! $i % 2 == 1 ? '</tr>' : '' !!}
