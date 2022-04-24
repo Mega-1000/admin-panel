@@ -69,7 +69,7 @@ class JpgGeneratorJob implements ShouldQueue
                 'rows' => $fileData['rows']
             ])->setPaper('a4');
 
-            $path = storage_path('app/public/products/' . $fileName . 'r.pdf');
+            $path = storage_path('app/public/products/' . $fileName . '-related-offers.pdf');
             $pdf->save($path);
         }
     }
