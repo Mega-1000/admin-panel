@@ -385,7 +385,10 @@ class TransactionsController extends Controller
     {
         $response = [];
         try {
-            $query = $this->providersTransactionRepository->select();
+            $query = $this->providersTransactionRepository->select()
+                ->whereHas('transactions', function ($q) {
+                    $q->where('company_name', '=', 'EPH');
+                });
             if ($request->has('provider')) {
                 $query->where('provider', 'like', '%' . $request->get('provider') . '%');
             }
