@@ -739,7 +739,7 @@ class OrdersPackagesController extends Controller
                 'allegro_transaction_id' => $order->allegro_transaction_id,
                 'package_type' => $package->container_type,
                 'packing_type' => $package->packing_type,
-                'allegro_mail' => $addressAllegro->adr_Email ?? null,
+                'allegro_mail' => $addressAllegro->adr_Email ?? $deliveryAddress->email,
             ],
             'delivery_address' => [
                 'firstname' => $deliveryAddress->firstname,
