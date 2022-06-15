@@ -26,21 +26,21 @@ class AllegroOrderService extends AllegroApiService
     public function findNewOrders($today = true)
     {
         $params = [
-	        'offset' => 0,
-	        'limit' => '100',
-	        'status' => self::READY_FOR_PROCESSING
+            'offset' => 0,
+            'limit' => '100',
+            'status' => self::READY_FOR_PROCESSING
         ];
-        
+
         if ($today) {
-	        $params['updatedAt.gte'] = (new Carbon())->startOfDay()->toIso8601ZuluString();
+            $params['updatedAt.gte'] = (new Carbon())->startOfDay()->toIso8601ZuluString();
         }
-        
+
         $url = $this->getRestUrl("/order/checkout-forms?" . http_build_query($params));
-        
+
         if (!($orders = $this->request('GET', $url, []))) {
-        	return;
+            return;
         }
-	    
+
         foreach ($orders['checkoutForms'] as $order) {
             $orderModel = AllegroOrder::firstOrNew(['order_id' => $order['id']]);
             $orderModel->order_id = $order['id'];
@@ -76,7 +76,7 @@ class AllegroOrderService extends AllegroApiService
         foreach ($orders as $order) {
             try {
                 $deliveryAddressChanged = $this->fixDeliveryAddress($order);
-	            $invoiceAddressChanged = $this->fixInvoiceAddress($order);
+                $invoiceAddressChanged = $this->fixInvoiceAddress($order);
             } catch (SplittingException $e) {
                 //
             }
@@ -100,7 +100,7 @@ class AllegroOrderService extends AllegroApiService
         $address = $order->deliveryAddress;
 
         if (!($allegroData = $this->getOrderDetailsFromApi($order))) {
-        	return false;
+            return false;
         }
         $allegroAddress = $allegroData['delivery']['address'];
         $phone = preg_replace('/[^0-9]/', '', $allegroAddress['phoneNumber']);
@@ -121,24 +121,24 @@ class AllegroOrderService extends AllegroApiService
             $city = $allegroData['delivery']['pickupPoint']['address']['city'];
             $postal_code = $allegroData['delivery']['pickupPoint']['address']['zipCode'];
         }
-        
-	    $flat = '';
-        
+
+        $flat = '';
+
         try {
-	        $splittedAddress = AddressSplitter::splitAddress($street);
-	        $street = $splittedAddress['streetName'];
-	        $flat = $splittedAddress['houseNumber'];
+            $splittedAddress = AddressSplitter::splitAddress($street);
+            $street = $splittedAddress['streetName'];
+            $flat = $splittedAddress['houseNumber'];
         } catch (\Exception $e) {
-        
+
         }
-        
-	    $address->firstname = $firstname;
-	    $address->lastname = $lastname;
-	    $address->address = $street;
-	    $address->flat_number = $flat;
-	    $address->city = $city;
-	    $address->postal_code = $postal_code;
-	    
+
+        $address->firstname = $firstname;
+        $address->lastname = $lastname;
+        $address->address = $street;
+        $address->flat_number = $flat;
+        $address->city = $city;
+        $address->postal_code = $postal_code;
+
         $address->firmname = $allegroAddress['companyName'];
         $address->email = $allegroData['buyer']['email'];
         $address->phone = $phone;
@@ -146,72 +146,73 @@ class AllegroOrderService extends AllegroApiService
 
         $order->data_verified_by_allegro_api = true;
         $order->save();
-        
+
         return $address->wasChanged();
     }
 
     private function fixInvoiceAddress(Order $order): bool
     {
         if (!($allegroData = $this->getOrderDetailsFromApi($order))) {
-        	return false;
+            return false;
         }
 
         return $this->fixInvoiceAddressInvoice($order, $allegroData['invoice']['required']);
     }
-	
-	private function fixInvoiceAddressInvoice(Order $order, $required): bool {
-		$address = $order->getInvoiceAddress();
-		if (!($allegroData = $this->getOrderDetailsFromApi($order))) {
-			return false;
-		}
-		
-		$allegroAddress = $required
-			? $allegroData['invoice']['address']
-			: $allegroData['buyer']['address'];
-		
-		$rawPhone = $allegroAddress['phoneNumber'] ?? $allegroData['buyer']['phoneNumber'] ?? '';
-		$phone = preg_replace('/[^0-9]/', '', $rawPhone);
-		$phone = substr($phone, -9);
-		$street = $allegroAddress['street'];
-		$flat = '';
-		
-		try {
-			$splittedAddress = AddressSplitter::splitAddress($street);
-			$street = $splittedAddress['streetName'];
-			$flat = $splittedAddress['houseNumber'];
-		} catch (\Exception $e) {
-		
-		}
-		
-		$address->firstname = $required
-			? ($allegroAddress['company'] == null ? $allegroAddress['naturalPerson']['firstName'] : null)
-			: $allegroData['buyer']['firstName'];
-		
-		$address->lastname = $required
-			? ($allegroAddress['company'] == null ? $allegroAddress['naturalPerson']['lastName'] : null)
-			: $allegroData['buyer']['lastName'];
-		
-		$address->email = $allegroData['buyer']['email'];
-		$address->firmname = $required
-			? $allegroAddress['company']['name']
-			: null;
-		$address->nip = $required
-			? $allegroAddress['company']['taxId']
-			: null;
-		$address->address = $street;
-		$address->flat_number = $flat;
-		$address->city = $allegroAddress['city'];
-		$address->postal_code = $required
-			? $allegroAddress['zipCode']
-			: $allegroAddress['postCode'];
-		$address->phone = $phone;
-		$address->save();
-		
-		$order->data_verified_by_allegro_api = true;
-		$order->save();
-		
-		return $address->wasChanged();
-	}
+
+    private function fixInvoiceAddressInvoice(Order $order, $required): bool
+    {
+        $address = $order->getInvoiceAddress();
+        if (!($allegroData = $this->getOrderDetailsFromApi($order))) {
+            return false;
+        }
+
+        $allegroAddress = $required
+            ? $allegroData['invoice']['address']
+            : $allegroData['buyer']['address'];
+
+        $rawPhone = $allegroAddress['phoneNumber'] ?? $allegroData['buyer']['phoneNumber'] ?? '';
+        $phone = preg_replace('/[^0-9]/', '', $rawPhone);
+        $phone = substr($phone, -9);
+        $street = $allegroAddress['street'];
+        $flat = '';
+
+        try {
+            $splittedAddress = AddressSplitter::splitAddress($street);
+            $street = $splittedAddress['streetName'];
+            $flat = $splittedAddress['houseNumber'];
+        } catch (\Exception $e) {
+
+        }
+
+        $address->firstname = $required
+            ? ($allegroAddress['company'] == null ? $allegroAddress['naturalPerson']['firstName'] : null)
+            : $allegroData['buyer']['firstName'];
+
+        $address->lastname = $required
+            ? ($allegroAddress['company'] == null ? $allegroAddress['naturalPerson']['lastName'] : null)
+            : $allegroData['buyer']['lastName'];
+
+        $address->email = $allegroData['buyer']['email'];
+        $address->firmname = $required
+            ? $allegroAddress['company']['name']
+            : null;
+        $address->nip = $required
+            ? $allegroAddress['company']['taxId']
+            : null;
+        $address->address = $street;
+        $address->flat_number = $flat;
+        $address->city = $allegroAddress['city'];
+        $address->postal_code = $required
+            ? $allegroAddress['zipCode']
+            : $allegroAddress['postCode'];
+        $address->phone = $phone;
+        $address->save();
+
+        $order->data_verified_by_allegro_api = true;
+        $order->save();
+
+        return $address->wasChanged();
+    }
 
     private function findNotValidatedOrdersWithInvalidData()
     {
@@ -219,5 +220,27 @@ class AllegroOrderService extends AllegroApiService
         return Order::where('data_verified_by_allegro_api', '=', false)
             ->whereNotNull('sello_id')
             ->where('created_at', '>=', $yesterday)->get();
+    }
+
+    /**
+     * @return array
+     */
+    public function getPendingOrders(): array
+    {
+        $params = [
+            'offset' => 0,
+            'limit' => 2,
+	        'status' => 'READY_FOR_PROCESSING',
+//            'fulfillment'=>[
+//                'status'=>'SUSPENDED'
+//            ]
+//            'buyer' => [
+//                'login' => 'kazkoz42'
+//            ]
+        ];
+
+        $url = $this->getRestUrl("/order/checkout-forms");
+        $response = $this->request('GET', $url, $params);
+        dd($response);
     }
 }

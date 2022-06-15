@@ -25,8 +25,6 @@ class CustomerRepositoryEloquent extends BaseRepository implements CustomerRepos
         return Customer::class;
     }
 
-    
-
     /**
      * Boot up the repository, pushing criteria
      */
@@ -34,5 +32,10 @@ class CustomerRepositoryEloquent extends BaseRepository implements CustomerRepos
     {
         $this->pushCriteria(app(RequestCriteria::class));
     }
-    
+
+    public function findOrCreate(array $buyer) : Customer
+    {
+        $customer = $this->findWhere(['login',$buyer['login']]);
+        dd($customer);
+    }
 }
