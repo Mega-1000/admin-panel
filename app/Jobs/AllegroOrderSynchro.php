@@ -3,22 +3,24 @@
 namespace App\Jobs;
 
 use App\Entities\Customer;
+use App\Entities\CustomerAddress;
+use App\Entities\FirmSource;
 use App\Entities\Order;
+use App\Entities\OrderAddress;
 use App\Entities\OrderItem;
 use App\Entities\Product;
-use App\Helpers\interfaces\iOrderPriceOverrider;
-use App\Helpers\interfaces\iOrderTotalPriceCalculator;
+use App\Entities\Warehouse;
 use App\Helpers\MessagesHelper;
 use App\Helpers\OrderBuilder;
-use App\Helpers\OrderPriceCalculator;
-use App\Helpers\OrderPriceOverrider;
+use App\Helpers\PackageDivider;
 use App\Repositories\CustomerRepository;
-use App\Repositories\CustomerRepositoryEloquent;
 use App\Repositories\ProductRepository;
-use App\Services\AllegroApiService;
 use App\Services\AllegroOrderService;
 use App\Services\ProductService;
+use App\User;
+use Exception;
 use Illuminate\Bus\Queueable;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -73,18 +75,19 @@ class AllegroOrderSynchro implements ShouldQueue
      * Execute the job.
      *
      * @return void
+     * @throws Exception
      */
-    public function handle()
+    public function handle(): void
     {
         $allegroOrders = $this->allegroOrderService->getPendingOrders()['checkoutForms'];
-        $allegroOrders = [$allegroOrders[54]];
+        $allegroOrders = [$allegroOrders[2]];
+//        dump($allegroOrders);
+//        exit;
         foreach ($allegroOrders as $allegroOrder) {
-            dump($allegroOrder);
             $order = new Order();
             $customer = $this->findOrCreateCustomer($allegroOrder['buyer']);
             $order->customer_id = $customer->id;
             $order->status_id = 1;
-//            $order->totalPrice = $allegroOrder['summary']['totalToPay']['amount'];
             $order->save();
 
             if ($allegroOrder['messageToSeller'] !== null) {
@@ -93,38 +96,75 @@ class AllegroOrderSynchro implements ShouldQueue
             }
             $orderItems = $this->mapItems($allegroOrder['lineItems']);
             $this->saveOrderItems($orderItems, $order);
-            $order->total_price = $allegroOrder['summary']['totalToPay']['amount'];
-            $order->save();
 
-            exit;
+            $this->createOrUpdateOrderAddress($order, $allegroOrder['delivery']['address']);
+            $this->createOrUpdateOrderAddress($order, $allegroOrder['invoice']['address'] ?? $allegroOrder['delivery']['address'], OrderAddress::TYPE_INVOICE);
+            $this->createOrUpdateCustomerAddress($customer, $allegroOrder['buyer']);
+            $this->createOrUpdateCustomerAddress($customer, $allegroOrder['invoice']['address'] ?? $allegroOrder['buyer'], CustomerAddress::ADDRESS_TYPE_INVOICE);
+
+            $packageDivider = new PackageDivider();
+            $packageDivider->setItems(new Collection($orderItems));
+            $packageDivider->divide();
+//            try {
+//                $canPay = $this->packageGenerator->divide($data['order_items'], $order);
+//            } catch (Exception $exception) {
+//                $message = $exception->getMessage();
+//                Log::error("Problem with package dividing: $message", ['class' => $exception->getFile(), 'line' => $exception->getLine()]);
+//            }
+//            if ($this->totalTransportSumCalculator) {
+//                $order->shipment_price_for_client = $this->totalTransportSumCalculator->getSum($order);
+//            }
+//            $order->save();
+
+            $order->total_price = $allegroOrder['summary']['totalToPay']['amount'];
+            $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 1)->first();
+            $order->firm_source_id = $firmSource ? $firmSource->id : null;
+
+            $user = User::where('name', '001')->first();
+            $order->employee()->associate($user);
+            $withWarehouse = (new Collection($orderItems))->filter(function ($prod) {
+                return !empty($prod->packing->warehouse_physical);
+            });
+            $warehouseSymbol = $withWarehouse->first()->packing->warehouse_physical ?? self::DEFAULT_WAREHOUSE;
+            $warehouse = Warehouse::where('symbol', $warehouseSymbol)->first();
+            $order->warehouse()->associate($warehouse);
+//            $order->setDefaultDates();
+
+            $order->save();
         }
-        exit;
     }
 
+    /**
+     * Map items
+     *
+     * @param array $items
+     * @return array
+     */
     private function mapItems(array $items): array
     {
         $products = [];
         try {
-
             foreach ($items as $item) {
-                $symbol = explode('-', $item['offer']['external']['id']);
+                if ($item['offer']['external'] !== null) {
+                    $symbol = explode('-', $item['offer']['external']['id']);
 
-                if (strpos(end($symbol), 'Q') !== false) {
-                    $quantity = (int)(explode('Q', end($symbol))[1]);
-                } elseif (strpos(end($symbol), 'Y') !== false) {
-                    $quantity = (int)(explode('Y', end($symbol))[1]);
-                } elseif (strpos(end($symbol), 'Z') !== false) {
-                    $quantity = (int)(explode('Z', end($symbol))[1]);
-                } elseif (strpos(end($symbol), 'N') !== false) {
-                    $quantity = (int)(explode('N', end($symbol))[1]);
-                } else {
-                    $quantity = false;
+                    if (strpos(end($symbol), 'Q') !== false) {
+                        $quantity = (int)(explode('Q', end($symbol))[1]);
+                    } elseif (strpos(end($symbol), 'Y') !== false) {
+                        $quantity = (int)(explode('Y', end($symbol))[1]);
+                    } elseif (strpos(end($symbol), 'Z') !== false) {
+                        $quantity = (int)(explode('Z', end($symbol))[1]);
+                    } elseif (strpos(end($symbol), 'N') !== false) {
+                        $quantity = (int)(explode('N', end($symbol))[1]);
+                    } else {
+                        $quantity = false;
+                    }
+
+                    $newSymbol = [$symbol[0], $symbol[1], '0'];
+                    $newSymbol = join('-', $newSymbol);
+
+                    $product = $this->productRepository->findWhere(['symbol' => $newSymbol])->first();
                 }
-
-                $newSymbol = [$symbol[0], $symbol[1], '0'];
-                $newSymbol = join('-', $newSymbol);
-                $product = $this->productRepository->findWhere(['symbol' => $newSymbol])->first();
-
                 if (empty($product)) {
                     $product = Product::getDefaultProduct();
                 }
@@ -147,25 +187,26 @@ class AllegroOrderSynchro implements ShouldQueue
                 $products[] = $product;
             }
         } catch (\Throwable $ex) {
-            dd($ex, $product, $item);
+            dd($ex, $item, $symbol);
         }
         return $products;
     }
 
-    private function saveOrderItems(array $products, Order $order): void
+    private function saveOrderItems(array $allegroOrderItems, Order $order): void
     {
         $weight = 0;
-        foreach ($products as $product) {
-            $price = $product->price;
-            if (!$product || !$price) {
+        foreach ($allegroOrderItems as $allegroOrderItem) {
+            $price = $allegroOrderItem->price;
+            if (!$allegroOrderItem || !$price) {
                 throw new Exception('wrong_product_id');
             }
-            $getStockProduct = $this->productService->getStockProduct($product->id);
+            $getStockProduct = $this->productService->getStockProduct($allegroOrderItem->id);
+
             $orderItem = new OrderItem();
-            $orderItem->quantity = $product->tt_quantity;
-            $orderItem->product_id = $getStockProduct ? $getStockProduct->id : $product->id;
-            if (!empty($product->weight_trade_unit)) {
-                $weight += $product->weight_trade_unit * $orderItem->quantity;
+            $orderItem->quantity = $allegroOrderItem->tt_quantity;
+            $orderItem->product_id = $getStockProduct ? $getStockProduct->id : $allegroOrderItem->id;
+            if (!empty($allegroOrderItem->weight_trade_unit)) {
+                $weight += $allegroOrderItem->weight_trade_unit * $orderItem->quantity;
             }
 
             foreach (OrderBuilder::getPriceColumns() as $column) {
@@ -175,7 +216,7 @@ class AllegroOrderSynchro implements ShouldQueue
                     $orderItem->$column = $price->$column;
                 }
             }
-
+            unset($orderItem->type);
             $order->items()->save($orderItem);
         }
         $order->weight = round($weight, 2);
@@ -214,5 +255,48 @@ class AllegroOrderSynchro implements ShouldQueue
         } catch (\Throwable $ex) {
             Log::error($ex->getMessage());
         }
+    }
+
+    private function createOrUpdateOrderAddress(Order $order, array $address, string $type = OrderAddress::TYPE_DELIVERY)
+    {
+        list($street, $flatNo) = explode(' ', $address['street'], 2);
+        $customer = $order->customer;
+        OrderAddress::query()->firstOrCreate(
+            [
+                'type' => $type,
+                'firstname' => $address['firstName'] ?? $address['naturalPerson']['firstName'],
+                'lastname' => $address['lastName'] ?? $address['naturalPerson']['lastName'],
+                'address' => $street,
+                'flat_number' => $flatNo,
+                'city' => $address['city'],
+                'firmname' => $address['companyName'] ?? $address['company']['name'] ?? null,
+                'nip' => $address['company']['taxId'] ?? null,
+                'postal_code' => $address['zipCode'],
+                'phone' => $customer->phone,
+                'order_id' => $order->id,
+                'email' => explode('+', $customer->login)[1]
+            ]
+        );
+    }
+
+    private function createOrUpdateCustomerAddress(Customer $customer, array $data, string $type = CustomerAddress::ADDRESS_TYPE_STANDARD)
+    {
+        list($street, $flatNo) = explode(' ', $data['address']['street'] ?? $data['street'], 2);
+        CustomerAddress::query()->firstOrCreate(
+            [
+                'type' => $type,
+                'firstname' => $data['firstName'] ?? $data['naturalPerson']['firstName'] ?? null,
+                'lastname' => $data['lastName'] ?? $data['naturalPerson']['lastName'] ?? null,
+                'address' => $street,
+                'flat_number' => $flatNo,
+                'city' => $data['address']['city'] ?? $data['city'],
+                'firmname' => $data['companyName'] ?? $data['company']['name'] ?? null,
+                'nip' => $data['company']['taxId'] ?? null,
+                'postal_code' => $data['address']['postCode'] ?? $data['zipCode'],
+                'phone' => $customer->phone,
+                'customer_id' => $customer->id,
+                'email' => explode('+', $customer->login)[1]
+            ]
+        );
     }
 }

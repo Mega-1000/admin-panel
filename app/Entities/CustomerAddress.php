@@ -16,6 +16,7 @@ class CustomerAddress extends Model implements Transformable
     use TransformableTrait;
 
     const ADDRESS_TYPE_STANDARD = 'STANDARD_ADDRESS';
+    const ADDRESS_TYPE_INVOICE = 'INVOICE_ADDRESS';
     /**
      * The attributes that are mass assignable.
      *

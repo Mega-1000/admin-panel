@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Jobs\AllegroOrderSynchro;
-use App\Jobs\GetNewAllegroDisputesJob;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -20,9 +18,6 @@ class ImportController extends Controller
     {
         $import = Import::find(1);
         $importDone = Import::find(2);
-
-//        dispatch_now(new GetNewAllegroDisputesJob());
-        dispatch_now(new AllegroOrderSynchro());
 
         return view('import.index', compact('import', 'importDone'));
     }

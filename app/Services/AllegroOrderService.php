@@ -229,18 +229,11 @@ class AllegroOrderService extends AllegroApiService
     {
         $params = [
             'offset' => 0,
-            'limit' => 2,
-	        'status' => 'READY_FOR_PROCESSING',
-//            'fulfillment'=>[
-//                'status'=>'SUSPENDED'
-//            ]
-//            'buyer' => [
-//                'login' => 'kazkoz42'
-//            ]
+            'limit' => 100,
+            'status' => 'READY_FOR_PROCESSING',
         ];
 
-        $url = $this->getRestUrl("/order/checkout-forms");
-        $response = $this->request('GET', $url, $params);
-        dd($response);
+        $url = $this->getRestUrl('/order/checkout-forms?' . http_build_query($params));
+        return $this->request('GET', $url, $params);
     }
 }
