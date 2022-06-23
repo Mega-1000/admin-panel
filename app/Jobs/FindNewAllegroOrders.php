@@ -22,6 +22,6 @@ class FindNewAllegroOrders implements ShouldQueue
     public function handle()
     {
         $service = app(AllegroOrderService::class);
-        $service->findNewOrders();
+        $service->synchronizeOrders();
     }
 }
