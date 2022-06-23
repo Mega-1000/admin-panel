@@ -30,3 +30,5 @@ admin-panel.iml
 /public/js/vue-scripts.js
 /public/js/vue-chunk.js
 /public/css/vue/styles.css
+
+.env.local
