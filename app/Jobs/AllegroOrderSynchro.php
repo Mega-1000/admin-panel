@@ -8,12 +8,15 @@ use App\Entities\FirmSource;
 use App\Entities\Order;
 use App\Entities\OrderAddress;
 use App\Entities\OrderItem;
+use App\Entities\OrderPayment;
 use App\Entities\Product;
+use App\Entities\Transaction;
 use App\Entities\Warehouse;
 use App\Helpers\MessagesHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\PackageDivider;
 use App\Repositories\CustomerRepository;
+use App\Repositories\OrderRepository;
 use App\Repositories\ProductRepository;
 use App\Services\AllegroOrderService;
 use App\Services\ProductService;
@@ -28,6 +31,9 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Allegro order synchro
+ */
 class AllegroOrderSynchro implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -53,6 +59,11 @@ class AllegroOrderSynchro implements ShouldQueue
     private $productService;
 
     /**
+     * @var OrderRepository
+     */
+    private $orderRepository;
+
+    /**
      * @var float
      */
     private $tax;
@@ -68,6 +79,7 @@ class AllegroOrderSynchro implements ShouldQueue
         $this->allegroOrderService = app(AllegroOrderService::class);
         $this->productRepository = app(ProductRepository::class);
         $this->productService = app(ProductService::class);
+        $this->orderRepository = app(OrderRepository::class);
         $this->tax = (float)(1 + env('VAT'));
     }
 
@@ -80,13 +92,16 @@ class AllegroOrderSynchro implements ShouldQueue
     public function handle(): void
     {
         $allegroOrders = $this->allegroOrderService->getPendingOrders()['checkoutForms'];
-        $allegroOrders = [$allegroOrders[2]];
-//        dump($allegroOrders);
-//        exit;
+
         foreach ($allegroOrders as $allegroOrder) {
+            $existingOrder = $this->orderRepository->findByField('allegro_form_id', $allegroOrder['id']);
+            if ($existingOrder instanceof Order) {
+                continue;
+            }
             $order = new Order();
             $customer = $this->findOrCreateCustomer($allegroOrder['buyer']);
             $order->customer_id = $customer->id;
+            $order->allegro_form_id = $allegroOrder['id'];
             $order->status_id = 1;
             $order->save();
 
@@ -96,6 +111,7 @@ class AllegroOrderSynchro implements ShouldQueue
             }
             $orderItems = $this->mapItems($allegroOrder['lineItems']);
             $this->saveOrderItems($orderItems, $order);
+            $this->savePayments($order, $allegroOrder['payment']);
 
             $this->createOrUpdateOrderAddress($order, $allegroOrder['delivery']['address']);
             $this->createOrUpdateOrderAddress($order, $allegroOrder['invoice']['address'] ?? $allegroOrder['delivery']['address'], OrderAddress::TYPE_INVOICE);
@@ -125,7 +141,7 @@ class AllegroOrderSynchro implements ShouldQueue
             $withWarehouse = (new Collection($orderItems))->filter(function ($prod) {
                 return !empty($prod->packing->warehouse_physical);
             });
-            $warehouseSymbol = $withWarehouse->first()->packing->warehouse_physical ?? self::DEFAULT_WAREHOUSE;
+            $warehouseSymbol = $withWarehouse->first()->packing->warehouse_physical ?? ImportOrdersFromSelloJob::DEFAULT_WAREHOUSE;
             $warehouse = Warehouse::where('symbol', $warehouseSymbol)->first();
             $order->warehouse()->associate($warehouse);
 //            $order->setDefaultDates();
@@ -135,9 +151,27 @@ class AllegroOrderSynchro implements ShouldQueue
     }
 
     /**
+     * @param Order $order
+     * @param array $allegroPayment
+     *
+     * @return void
+     */
+    private function savePayments(Order $order, array $allegroPayment)
+    {
+        OrderPayment::create([
+            'amount' => $allegroPayment['paidAmount']['amount'],
+            'master_payment_id' => null,
+            'order_id' => $order->id,
+            'promise' => true,
+            'promise_date' => $allegroPayment['finishedAt'],
+        ]);
+    }
+
+    /**
      * Map items
      *
      * @param array $items
+     *
      * @return array
      */
     private function mapItems(array $items): array
@@ -192,6 +226,15 @@ class AllegroOrderSynchro implements ShouldQueue
         return $products;
     }
 
+    /**
+     * Save order items.
+     *
+     * @param array $allegroOrderItems
+     * @param Order $order
+     *
+     * @return void
+     * @throws Exception
+     */
     private function saveOrderItems(array $allegroOrderItems, Order $order): void
     {
         $weight = 0;
@@ -223,7 +266,15 @@ class AllegroOrderSynchro implements ShouldQueue
         $order->save();
     }
 
-    private function findOrCreateCustomer($buyer): Customer
+    /**
+     * Find customer by buyer
+     *
+     * @param array $buyer
+     *
+     * @return Customer
+     * @throws Exception
+     */
+    private function findOrCreateCustomer(array $buyer): Customer
     {
         $customer = $this->customerRepository->findWhere(['login' => $buyer['email']])->first();
         $customerPhone = str_replace('+48', '', $buyer['phoneNumber']);
@@ -243,6 +294,15 @@ class AllegroOrderSynchro implements ShouldQueue
         return $customer;
     }
 
+    /**
+     * Create chat
+     *
+     * @param int    $orderId
+     * @param int    $customerId
+     * @param string $customerNotices
+     *
+     * @return void
+     */
     private function createChat(int $orderId, int $customerId, string $customerNotices): void
     {
         $helper = new MessagesHelper();
@@ -257,6 +317,15 @@ class AllegroOrderSynchro implements ShouldQueue
         }
     }
 
+    /**
+     * Create or update order address.
+     *
+     * @param Order  $order
+     * @param array  $address
+     * @param string $type
+     *
+     * @return void
+     */
     private function createOrUpdateOrderAddress(Order $order, array $address, string $type = OrderAddress::TYPE_DELIVERY)
     {
         list($street, $flatNo) = explode(' ', $address['street'], 2);
@@ -274,11 +343,20 @@ class AllegroOrderSynchro implements ShouldQueue
                 'postal_code' => $address['zipCode'],
                 'phone' => $customer->phone,
                 'order_id' => $order->id,
-                'email' => explode('+', $customer->login)[1]
+                'email' => $customer->login
             ]
         );
     }
 
+    /**
+     * Create or update customer address.
+     *
+     * @param Customer $customer
+     * @param array    $data
+     * @param string   $type
+     *
+     * @return void
+     */
     private function createOrUpdateCustomerAddress(Customer $customer, array $data, string $type = CustomerAddress::ADDRESS_TYPE_STANDARD)
     {
         list($street, $flatNo) = explode(' ', $data['address']['street'] ?? $data['street'], 2);
@@ -295,7 +373,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 'postal_code' => $data['address']['postCode'] ?? $data['zipCode'],
                 'phone' => $customer->phone,
                 'customer_id' => $customer->id,
-                'email' => explode('+', $customer->login)[1]
+                'email' => $customer->login
             ]
         );
     }
