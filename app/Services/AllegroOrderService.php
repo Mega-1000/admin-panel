@@ -10,6 +10,7 @@ use VIISON\AddressSplitter\Exceptions\SplittingException;
 
 /**
  * Class AllegroOrderService
+ *
  * @package App\Services
  *
  */
@@ -228,12 +229,14 @@ class AllegroOrderService extends AllegroApiService
     public function getPendingOrders(): array
     {
         $params = [
-            'offset' => 0,
+            'offset' => 240,
             'limit' => 100,
             'status' => 'READY_FOR_PROCESSING',
         ];
 
         $url = $this->getRestUrl('/order/checkout-forms?' . http_build_query($params));
-        return $this->request('GET', $url, $params);
+        $response = $this->request('GET', $url, $params);
+
+        return $response;
     }
 }

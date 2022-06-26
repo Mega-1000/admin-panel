@@ -8,12 +8,15 @@ use App\Entities\FirmSource;
 use App\Entities\Order;
 use App\Entities\OrderAddress;
 use App\Entities\OrderItem;
+use App\Entities\OrderPayment;
 use App\Entities\Product;
+use App\Entities\Transaction;
 use App\Entities\Warehouse;
 use App\Helpers\MessagesHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\PackageDivider;
 use App\Repositories\CustomerRepository;
+use App\Repositories\OrderRepository;
 use App\Repositories\ProductRepository;
 use App\Services\AllegroOrderService;
 use App\Services\ProductService;
@@ -56,6 +59,11 @@ class AllegroOrderSynchro implements ShouldQueue
     private $productService;
 
     /**
+     * @var OrderRepository
+     */
+    private $orderRepository;
+
+    /**
      * @var float
      */
     private $tax;
@@ -71,6 +79,7 @@ class AllegroOrderSynchro implements ShouldQueue
         $this->allegroOrderService = app(AllegroOrderService::class);
         $this->productRepository = app(ProductRepository::class);
         $this->productService = app(ProductService::class);
+        $this->orderRepository = app(OrderRepository::class);
         $this->tax = (float)(1 + env('VAT'));
     }
 
@@ -83,12 +92,16 @@ class AllegroOrderSynchro implements ShouldQueue
     public function handle(): void
     {
         $allegroOrders = $this->allegroOrderService->getPendingOrders()['checkoutForms'];
-        $allegroOrders = [$allegroOrders[2]];
 
         foreach ($allegroOrders as $allegroOrder) {
+            $existingOrder = $this->orderRepository->findByField('allegro_form_id', $allegroOrder['id']);
+            if ($existingOrder instanceof Order) {
+                continue;
+            }
             $order = new Order();
             $customer = $this->findOrCreateCustomer($allegroOrder['buyer']);
             $order->customer_id = $customer->id;
+            $order->allegro_form_id = $allegroOrder['id'];
             $order->status_id = 1;
             $order->save();
 
@@ -98,6 +111,7 @@ class AllegroOrderSynchro implements ShouldQueue
             }
             $orderItems = $this->mapItems($allegroOrder['lineItems']);
             $this->saveOrderItems($orderItems, $order);
+            $this->savePayments($order, $allegroOrder['payment']);
 
             $this->createOrUpdateOrderAddress($order, $allegroOrder['delivery']['address']);
             $this->createOrUpdateOrderAddress($order, $allegroOrder['invoice']['address'] ?? $allegroOrder['delivery']['address'], OrderAddress::TYPE_INVOICE);
@@ -134,6 +148,23 @@ class AllegroOrderSynchro implements ShouldQueue
 
             $order->save();
         }
+    }
+
+    /**
+     * @param Order $order
+     * @param array $allegroPayment
+     *
+     * @return void
+     */
+    private function savePayments(Order $order, array $allegroPayment)
+    {
+        OrderPayment::create([
+            'amount' => $allegroPayment['paidAmount']['amount'],
+            'master_payment_id' => null,
+            'order_id' => $order->id,
+            'promise' => true,
+            'promise_date' => $allegroPayment['finishedAt'],
+        ]);
     }
 
     /**
