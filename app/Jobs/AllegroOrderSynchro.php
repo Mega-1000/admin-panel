@@ -146,7 +146,7 @@ class AllegroOrderSynchro implements ShouldQueue
             $warehouseSymbol = $withWarehouse->first()->packing->warehouse_physical ?? ImportOrdersFromSelloJob::DEFAULT_WAREHOUSE;
             $warehouse = Warehouse::where('symbol', $warehouseSymbol)->first();
             $order->warehouse()->associate($warehouse);
-//            $order->setDefaultDates();
+            $order->setDefaultDates('allegro');
 
             $order->save();
         }

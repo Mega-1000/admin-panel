@@ -738,10 +738,16 @@ class Order extends Model implements Transformable
 		return $this->belongsTo(FirmSource::class);
 	}
 
-    public function setDefaultDates()
+    public function setDefaultDates($serviceName = 'sello')
     {
-        $dateFrom = Carbon::parse($this->selloTransaction->tr_RemittanceDate);
-        $dateTo = (Carbon::parse($this->selloTransaction->tr_RemittanceDate))->addWeekdays(2);
+        if ($serviceName == 'sello') {
+            $dateFrom = Carbon::parse($this->selloTransaction->tr_RemittanceDate);
+            $dateTo = (Carbon::parse($this->selloTransaction->tr_RemittanceDate))->addWeekdays(2);
+        } else {
+            $dateFrom = Carbon::createFromTimestamp($this->created_at);
+            $dateTo = (Carbon::createFromTimestamp($this->created_at))->addWeekdays(2);
+        }
+        
         $this->dates()->updateOrCreate(['order_id' => $this->id], [
             'customer_shipment_date_from' => $dateFrom,
             'customer_shipment_date_to' => $dateTo,
