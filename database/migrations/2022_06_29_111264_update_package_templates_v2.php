@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class UpdatePackageTemplates extends Migration
+class UpdatePackageTemplatesV2 extends Migration
 {
     /**
      * Run the migrations.
@@ -14,20 +14,25 @@ class UpdatePackageTemplates extends Migration
     public function up()
     {
         Schema::table('package_templates', function (Blueprint $table) {
-            $table->string('allegro_delivery_method', 50)->nullable();
+            $table->dropColumn(['allegro_delivery_method']);
         });
+    
+        Schema::table('package_templates', function (Blueprint $table) {
+            $table->json('allegro_delivery_method');
+        });
+        
         
         // inpost smart c 55
         \App\Entities\PackageTemplate::where('id', 55)
-            ->update(['allegro_delivery_method' => '2488f7b7-5d1c-4d65-b85c-4cbcf253fd93']);
+            ->update(['allegro_delivery_method' => '["2488f7b7-5d1c-4d65-b85c-4cbcf253fd93"]']);
     
         // GLS
         \App\Entities\PackageTemplate::where('id', 56)
-            ->update(['allegro_delivery_method' => '059c0d58-6cdb-4955-ab79-9031518f80f3']);
+            ->update(['allegro_delivery_method' => '["059c0d58-6cdb-4955-ab79-9031518f80f3","7203cb90-864c-4cda-bf08-dc883f0c78ad"]']);
     
         // dpd courier
         \App\Entities\PackageTemplate::where('id', 45)
-            ->update(['allegro_delivery_method' => 'c3066682-97a3-42fe-9eb5-3beeccab840c']);
+            ->update(['allegro_delivery_method' => '["c3066682-97a3-42fe-9eb5-3beeccab840c"]']);
     }
 
     /**
@@ -39,6 +44,10 @@ class UpdatePackageTemplates extends Migration
     {
         Schema::table('package_templates', function (Blueprint $table) {
             $table->dropColumn(['allegro_delivery_method']);
+        });
+    
+        Schema::table('package_templates', function (Blueprint $table) {
+            $table->string('allegro_delivery_method', 50)->nullable();
         });
     }
 }

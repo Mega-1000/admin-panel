@@ -176,7 +176,7 @@ class AllegroOrderSynchro implements ShouldQueue
      */
     private function addOrderPackage($order, $allegroDelivery) {
         $deliveryMethod = $allegroDelivery['method']['id'];
-        if (!($packageTemplate = PackageTemplate::where('allegro_delivery_method', $deliveryMethod)->first())) {
+        if (!($packageTemplate = PackageTemplate::AllegroDeliveryMethod($deliveryMethod)->first())) {
             return null;
         }
         
