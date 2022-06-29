@@ -105,6 +105,10 @@ class ChatHelper
         $orderButtons = [];
         foreach ($order->items as $item) {
             $product = $item->product;
+            if (!$product->product_name_supplier) {
+                continue;
+            }
+            
             $firm = Firm::where('symbol', 'like', $product->product_name_supplier)->first();
             if (empty($firm)) {
                 continue;
