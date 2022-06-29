@@ -378,25 +378,7 @@ class OrdersPackagesController extends Controller
     public function generateSticker($data)
     {
         $order = $this->orderRepository->find($data['order_id']);
-        if (!file_exists(storage_path('app/public/' . strtolower($data['delivery_courier_name']) . '/stickers/'))) {
-            mkdir(storage_path('app/public/' . strtolower($data['delivery_courier_name'])));
-            mkdir(storage_path('app/public/' . strtolower($data['delivery_courier_name']) . '/stickers/'));
-        }
-
-        do {
-            $data['letter_number'] = $data['order_id'] . rand(1000000, 9999999);
-            $path = storage_path('app/public/' . strtolower($data['delivery_courier_name']) . '/stickers/sticker' . $data['letter_number'] . '.pdf');
-        } while (file_exists($path));
-
-        $data['sending_number'] = $data['order_id'] . rand(1000000, 9999999);
-        $data['shipment_date'] = $data['shipment_date']->format('Y-m-d');
-        $data['delivery_date'] = $data['delivery_date']->format('Y-m-d');
-        $pdf = PDF::loadView('pdf.sticker', [
-            'order' => $order,
-            'package' => $data
-        ])->setPaper('a5');
-
-        $pdf->save($path);
+        $this->orderPackagesDataHelper->generateSticker($order, $data);
 
         return $data;
     }

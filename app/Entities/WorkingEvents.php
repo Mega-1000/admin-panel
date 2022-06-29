@@ -194,7 +194,9 @@ class WorkingEvents extends Model
             return null;
         }
 
-        $latest = WorkingEvents::latest()->first();
+        if (!($latest = WorkingEvents::latest()->first())) {
+            return null;
+        }
 
         if ($now->diff($latest->created_at)->i < 2 && $latest->event == $event) {
             return null;
