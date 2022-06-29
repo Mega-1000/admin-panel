@@ -146,7 +146,7 @@ class AllegroOrderSynchro implements ShouldQueue
             $warehouseSymbol = $withWarehouse->first()->packing->warehouse_physical ?? ImportOrdersFromSelloJob::DEFAULT_WAREHOUSE;
             $warehouse = Warehouse::where('symbol', $warehouseSymbol)->first();
             $order->warehouse()->associate($warehouse);
-//            $order->setDefaultDates();
+            $order->setDefaultDates('allegro');
 
             $order->save();
         }
@@ -176,7 +176,7 @@ class AllegroOrderSynchro implements ShouldQueue
      */
     private function addOrderPackage($order, $allegroDelivery) {
         $deliveryMethod = $allegroDelivery['method']['id'];
-        if (!($packageTemplate = PackageTemplate::where('allegro_delivery_method', $deliveryMethod)->first())) {
+        if (!($packageTemplate = PackageTemplate::AllegroDeliveryMethod($deliveryMethod)->first())) {
             return null;
         }
         
