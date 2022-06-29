@@ -229,7 +229,7 @@ class AllegroOrderService extends AllegroApiService
     public function getPendingOrders(): array
     {
         $params = [
-            //'offset' => 240,
+            'offset' => 240,
             'limit' => 100,
             'status' => 'READY_FOR_PROCESSING',
         ];
