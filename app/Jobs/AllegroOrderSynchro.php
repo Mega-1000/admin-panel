@@ -65,12 +65,12 @@ class AllegroOrderSynchro implements ShouldQueue
      * @var OrderRepository
      */
     private $orderRepository;
-    
+
     /**
      * @var OrderPackagesDataHelper
      */
     private $orderPackagesDataHelper;
-    
+
     /**
      * @var float
      */
@@ -89,7 +89,7 @@ class AllegroOrderSynchro implements ShouldQueue
         $this->productService = app(ProductService::class);
         $this->orderRepository = app(OrderRepository::class);
         $this->orderPackagesDataHelper = app(OrderPackagesDataHelper::class);
-        
+
         $this->tax = (float)(1 + env('VAT'));
     }
 
@@ -108,7 +108,7 @@ class AllegroOrderSynchro implements ShouldQueue
             if (Order::where('allegro_form_id', $allegroOrder['id'])->count() > 0) {
                 continue;
             }
-            
+
             $order = new Order();
             $customer = $this->findOrCreateCustomer($allegroOrder['buyer']);
             $order->customer_id = $customer->id;
@@ -120,17 +120,21 @@ class AllegroOrderSynchro implements ShouldQueue
                 $this->createChat($order->id, $customer->id, $allegroOrder['messageToSeller']);
                 $order->labels()->attach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
             }
-            
+
             $orderItems = $this->mapItems($allegroOrder['lineItems']);
             $this->saveOrderItems($orderItems, $order);
-            
+
             $this->savePayments($order, $allegroOrder['payment']);
-
-            $this->createOrUpdateOrderAddress($order, $allegroOrder['buyer'], $allegroOrder['delivery']['address']);
-            $this->createOrUpdateOrderAddress($order, $allegroOrder['buyer'], $allegroOrder['invoice']['address'] ?? $allegroOrder['delivery']['address'], OrderAddress::TYPE_INVOICE);
+    
+            $invoiceAddress = $allegroOrder['invoice']['address'] ?? $allegroOrder['buyer'];
+            if (empty($invoiceAddress['phoneNumber'])) {
+                $invoiceAddress['phoneNumber'] = $allegroOrder['buyer']['phoneNumber'];
+            }
             $this->createOrUpdateCustomerAddress($customer, $allegroOrder['buyer']);
-            $this->createOrUpdateCustomerAddress($customer, $allegroOrder['invoice']['address'] ?? $allegroOrder['buyer'], CustomerAddress::ADDRESS_TYPE_INVOICE);
-
+            $this->createOrUpdateCustomerAddress($customer, $invoiceAddress, CustomerAddress::ADDRESS_TYPE_INVOICE);
+            $this->createOrUpdateOrderAddress($order, $allegroOrder['buyer'], $allegroOrder['delivery']['address']);
+            $this->createOrUpdateOrderAddress($order, $allegroOrder['buyer'], $invoiceAddress, OrderAddress::TYPE_INVOICE);
+    
             // order package
             $this->addOrderPackage($order, $allegroOrder['delivery']);
             $order->shipment_price_for_client = $allegroOrder['delivery']['cost']['amount'];
@@ -169,33 +173,34 @@ class AllegroOrderSynchro implements ShouldQueue
             'promise_date' => $allegroPayment['finishedAt'],
         ]);
     }
-    
+
     /**
      * @param array $allegroDelivery
      *
      * @return void
      */
-    private function addOrderPackage($order, $allegroDelivery) {
+    private function addOrderPackage($order, $allegroDelivery)
+    {
         $deliveryMethod = $allegroDelivery['method']['id'];
         if (!($packageTemplate = PackageTemplate::AllegroDeliveryMethod($deliveryMethod)->first())) {
             return null;
         }
-        
+
         $packageNumber = OrderPackage::where('order_id', $order->id)->max('number');
         $totalPackages = $allegroDelivery['calculatedNumberOfPackages'];
         while ($allegroDelivery['calculatedNumberOfPackages']) {
             $packageNumber++;
-            
+
             $package = $this->createPackage($packageTemplate, $order, $packageNumber);
             foreach ($order->items as $item) {
                 $product = $item->product;
                 $package->packedProducts()->attach($product->id, ['quantity' => $item->quantity / $totalPackages]);
             }
-            
+
             $allegroDelivery['calculatedNumberOfPackages']--;
         }
     }
-    
+
     public function createPackage($packTemplate, $order, $packageNumber)
     {
         $orderId = $order->id;
@@ -215,7 +220,7 @@ class AllegroOrderSynchro implements ShouldQueue
         $pack->notices = $orderId . '/' . $packageNumber;
         $pack->symbol = $packTemplate->symbol;
         $helper = new OrderPackagesDataHelper();
-        
+
         if (file_exists(storage_path('app/public/protocols/day-close-protocol-' . $packTemplate->delivery_courier_name . '-' . Carbon::today()->toDateString() . '.pdf'))) {
             $date = Carbon::today()->addWeekday();
         } else if ($packTemplate->accept_time) {
@@ -233,6 +238,7 @@ class AllegroOrderSynchro implements ShouldQueue
         $pack->save();
         return $pack;
     }
+
     /**
      * Map items
      *
@@ -268,7 +274,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 if (empty($product)) {
                     $product = Product::getDefaultProduct();
                 }
-                
+
                 if (!$product->stock()->count()) {
                     ProductStock::create([
                         'product_id' => $product->id,
@@ -279,7 +285,7 @@ class AllegroOrderSynchro implements ShouldQueue
                         'number_on_a_layer' => null
                     ]);
                 }
-                
+
                 if (!empty($quantity)) {
                     $product->type = 'multiple';
                     $product->tt_quantity = $quantity * $item['quantity'];
@@ -296,7 +302,7 @@ class AllegroOrderSynchro implements ShouldQueue
                         2
                     )
                 ];
-                
+
                 $products[] = $product;
             }
         } catch (\Throwable $ex) {
@@ -339,9 +345,9 @@ class AllegroOrderSynchro implements ShouldQueue
                 } else {
                     $orderItem->$column = $price->$column;
                 }
-                
+
             }
-            
+
             unset($orderItem->type);
             $order->items()->save($orderItem);
         }
@@ -417,12 +423,16 @@ class AllegroOrderSynchro implements ShouldQueue
      */
     private function createOrUpdateOrderAddress(Order $order, array $buyer, array $address, string $type = OrderAddress::TYPE_DELIVERY)
     {
+        if (isset($address['address'])) {
+            $address = array_merge($address, $address['address']);
+        }
         $locationAddress = explode(' ', $address['street'], 2);
+        $customerPhone = str_replace('+48', '', $address['phoneNumber']);
         if (count($locationAddress) < 2) {
             $locationAddress[] = '';
         }
         list($street, $flatNo) = $locationAddress;
-        
+
         $customer = $order->customer;
         OrderAddress::query()->firstOrCreate(
             [
@@ -434,8 +444,8 @@ class AllegroOrderSynchro implements ShouldQueue
                 'city' => $address['city'],
                 'firmname' => $address['companyName'] ?? $address['company']['name'] ?? null,
                 'nip' => $address['company']['taxId'] ?? null,
-                'postal_code' => $address['zipCode'],
-                'phone' => $customer->phone,
+                'postal_code' => $address['zipCode'] ?? $address['postCode'],
+                'phone' => $customerPhone,
                 'order_id' => $order->id,
                 'email' => $buyer['email']
             ]
@@ -451,14 +461,17 @@ class AllegroOrderSynchro implements ShouldQueue
      *
      * @return void
      */
-    private function createOrUpdateCustomerAddress(Customer $customer, array $data = [], string $type = CustomerAddress::ADDRESS_TYPE_STANDARD)
+    private function createOrUpdateCustomerAddress(Customer $customer, array $data, string $type = CustomerAddress::ADDRESS_TYPE_STANDARD)
     {
         $locationAddress = explode(' ', $data['address']['street'] ?? $data['street'], 2);
+
+        $customerPhone = str_replace('+48', '', $data['phoneNumber']);
+
         if (count($locationAddress) < 2) {
             $locationAddress[] = '';
         }
         list($street, $flatNo) = $locationAddress;
-        
+
         CustomerAddress::query()->firstOrCreate(
             [
                 'type' => $type,
@@ -470,7 +483,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 'firmname' => $data['companyName'] ?? $data['company']['name'] ?? null,
                 'nip' => $data['company']['taxId'] ?? null,
                 'postal_code' => $data['address']['postCode'] ?? $data['zipCode'],
-                'phone' => $customer->phone,
+                'phone' => $customerPhone,
                 'customer_id' => $customer->id,
                 'email' => $customer->login
             ]
