@@ -203,7 +203,7 @@ class AllegroOrderService extends AllegroApiService
     public function getPendingOrders($addParams = []): array
     {
         $params = [
-            'offset' => config('app.env') != 'development' ? 240 : 0,
+            'offset' => 0,
             'limit' => 100,
             'status' => 'READY_FOR_PROCESSING',
             'fulfillment.status' => 'NEW'
