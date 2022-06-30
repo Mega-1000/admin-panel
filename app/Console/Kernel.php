@@ -52,15 +52,14 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\ConfirmSentPackagesJob::class)->dailyAt("23:34");
         $schedule->job(Jobs\AutomaticallyFinishOrdersJob::class)->everyFifteenMinutes();
 //        $schedule->job(Jobs\ChangeDdpShipmentDatePackagesJob::class)->dailyAt("12:01");
-
-        $schedule->job(Jobs\FindNewAllegroOrders::class)->everyFifteenMinutes();
+        
         $schedule->job(Jobs\SendMessagesOnNewAllegroOrders::class)->everyFifteenMinutes();
         $schedule->job(Jobs\UpdateAllegroDisputes::class)->everyFifteenMinutes();
         $schedule->job(Jobs\GetNewAllegroDisputesJob::class)->everyFifteenMinutes();
 
 	    $schedule->job(Jobs\Cron\SendOrderInvoiceMsgMailsJob::class)->dailyAt("09:00");
 	    $schedule->job(Jobs\Cron\SendInvoicesMailsJob::class)->dailyAt("23:45");
-	    $schedule->job(Jobs\AllegroOrderSynchro::class)->dailyAt("22:10");
+	    $schedule->job(Jobs\AllegroOrderSynchro::class)->everyTenMinutes();
     }
 
     /**

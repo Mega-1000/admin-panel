@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Entities\AllegroOrder;
 use App\Entities\Customer;
 use App\Entities\CustomerAddress;
 use App\Entities\FirmSource;
@@ -101,10 +102,14 @@ class AllegroOrderSynchro implements ShouldQueue
      */
     public function handle(): void
     {
-        $allegroOrders = $this->allegroOrderService->getPendingOrders()['checkoutForms'];
+        $allegroOrders = $this->allegroOrderService->getPendingOrders();
         
-        Log::info('AllegroOrders', $allegroOrders);
         foreach ($allegroOrders as $allegroOrder) {
+            $orderModel = AllegroOrder::firstOrNew(['order_id' => $allegroOrder['id']]);
+            $orderModel->order_id = $allegroOrder['id'];
+            $orderModel->buyer_email = $allegroOrder['buyer']['email'];
+            $orderModel->save();
+            
             if (Order::where('allegro_form_id', $allegroOrder['id'])->count() > 0) {
                 continue;
             }
