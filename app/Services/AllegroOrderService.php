@@ -24,32 +24,6 @@ class AllegroOrderService extends AllegroApiService
         parent::__construct();
     }
 
-    public function findNewOrders($today = true)
-    {
-        $params = [
-            'offset' => 0,
-            'limit' => '100',
-            'status' => self::READY_FOR_PROCESSING
-        ];
-
-        if ($today) {
-            $params['updatedAt.gte'] = (new Carbon())->startOfDay()->toIso8601ZuluString();
-        }
-
-        $url = $this->getRestUrl("/order/checkout-forms?" . http_build_query($params));
-
-        if (!($orders = $this->request('GET', $url, []))) {
-            return;
-        }
-
-        foreach ($orders['checkoutForms'] as $order) {
-            $orderModel = AllegroOrder::firstOrNew(['order_id' => $order['id']]);
-            $orderModel->order_id = $order['id'];
-            $orderModel->buyer_email = $order['buyer']['email'];
-            $orderModel->save();
-        }
-    }
-
     public function sendNewOrderMessagesToClients(): void
     {
         $orders = AllegroOrder::where('new_order_message_sent', '=', false)->get();
@@ -226,7 +200,7 @@ class AllegroOrderService extends AllegroApiService
     /**
      * @return array
      */
-    public function getPendingOrders(): array
+    public function getPendingOrders($addParams = []): array
     {
         $params = [
             'offset' => config('app.env') != 'development' ? 240 : 0,
@@ -234,10 +208,10 @@ class AllegroOrderService extends AllegroApiService
             'status' => 'READY_FOR_PROCESSING',
             'fulfillment.status' => 'NEW'
         ];
-
+        $params = $params + $addParams;
         $url = $this->getRestUrl('/order/checkout-forms?' . http_build_query($params));
         $response = $this->request('GET', $url, $params);
 
-        return $response;
+        return $response && is_array($response) && array_key_exists('checkoutForms', $response) ? $response['checkoutForms'] : [];
     }
 }
