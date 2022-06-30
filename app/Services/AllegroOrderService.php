@@ -229,9 +229,10 @@ class AllegroOrderService extends AllegroApiService
     public function getPendingOrders(): array
     {
         $params = [
-            'offset' => 240,
+            'offset' => config('app.env') != 'development' ? 240 : 0,
             'limit' => 100,
             'status' => 'READY_FOR_PROCESSING',
+            'fulfillment.status' => 'NEW'
         ];
 
         $url = $this->getRestUrl('/order/checkout-forms?' . http_build_query($params));
