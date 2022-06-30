@@ -744,8 +744,8 @@ class Order extends Model implements Transformable
             $dateFrom = Carbon::parse($this->selloTransaction->tr_RemittanceDate);
             $dateTo = (Carbon::parse($this->selloTransaction->tr_RemittanceDate))->addWeekdays(2);
         } else {
-            $dateFrom = Carbon::createFromTimestamp($this->created_at);
-            $dateTo = (Carbon::createFromTimestamp($this->created_at))->addWeekdays(2);
+            $dateFrom = now();
+            $dateTo = now()->addWeekdays(2);
         }
         
         $this->dates()->updateOrCreate(['order_id' => $this->id], [

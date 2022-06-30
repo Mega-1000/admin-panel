@@ -102,6 +102,7 @@ class AllegroOrderSynchro implements ShouldQueue
     public function handle(): void
     {
         $allegroOrders = $this->allegroOrderService->getPendingOrders()['checkoutForms'];
+        
         Log::info('AllegroOrders', $allegroOrders);
         foreach ($allegroOrders as $allegroOrder) {
             if (Order::where('allegro_form_id', $allegroOrder['id'])->count() > 0) {
@@ -125,8 +126,8 @@ class AllegroOrderSynchro implements ShouldQueue
             
             $this->savePayments($order, $allegroOrder['payment']);
 
-            $this->createOrUpdateOrderAddress($order, $allegroOrder['delivery']['address']);
-            $this->createOrUpdateOrderAddress($order, $allegroOrder['invoice']['address'] ?? $allegroOrder['delivery']['address'], OrderAddress::TYPE_INVOICE);
+            $this->createOrUpdateOrderAddress($order, $allegroOrder['buyer'], $allegroOrder['delivery']['address']);
+            $this->createOrUpdateOrderAddress($order, $allegroOrder['buyer'], $allegroOrder['invoice']['address'] ?? $allegroOrder['delivery']['address'], OrderAddress::TYPE_INVOICE);
             $this->createOrUpdateCustomerAddress($customer, $allegroOrder['buyer']);
             $this->createOrUpdateCustomerAddress($customer, $allegroOrder['invoice']['address'] ?? $allegroOrder['buyer'], CustomerAddress::ADDRESS_TYPE_INVOICE);
 
@@ -358,11 +359,17 @@ class AllegroOrderSynchro implements ShouldQueue
      */
     private function findOrCreateCustomer(array $buyer): Customer
     {
-        $customer = $this->customerRepository->findWhere(['login' => $buyer['email']])->first();
+        $buyerEmail = $buyer['email'];
+        
+        if (preg_match('/\+([a-zA-Z0-9]+)@/', $buyer['email'], $matches)) {
+            $buyerEmail = str_replace('+' . $matches[1], '', $buyer['email']);
+        }
+        
+        $customer = $this->customerRepository->findWhere(['login' => $buyerEmail])->first();
         $customerPhone = str_replace('+48', '', $buyer['phoneNumber']);
         if ($customer === null) {
             $customer = new Customer();
-            $customer->login = $buyer['email'];
+            $customer->login = $buyerEmail;
             $customer->nick_allegro = $buyer['login'];
             $customer->password = $customer->generatePassword($customerPhone);
             $customer->save();
@@ -408,7 +415,7 @@ class AllegroOrderSynchro implements ShouldQueue
      *
      * @return void
      */
-    private function createOrUpdateOrderAddress(Order $order, array $address, string $type = OrderAddress::TYPE_DELIVERY)
+    private function createOrUpdateOrderAddress(Order $order, array $buyer, array $address, string $type = OrderAddress::TYPE_DELIVERY)
     {
         $locationAddress = explode(' ', $address['street'], 2);
         if (count($locationAddress) < 2) {
@@ -430,7 +437,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 'postal_code' => $address['zipCode'],
                 'phone' => $customer->phone,
                 'order_id' => $order->id,
-                'email' => $customer->login
+                'email' => $buyer['email']
             ]
         );
     }
@@ -444,7 +451,7 @@ class AllegroOrderSynchro implements ShouldQueue
      *
      * @return void
      */
-    private function createOrUpdateCustomerAddress(Customer $customer, array $data, string $type = CustomerAddress::ADDRESS_TYPE_STANDARD)
+    private function createOrUpdateCustomerAddress(Customer $customer, array $data = [], string $type = CustomerAddress::ADDRESS_TYPE_STANDARD)
     {
         $locationAddress = explode(' ', $data['address']['street'] ?? $data['street'], 2);
         if (count($locationAddress) < 2) {

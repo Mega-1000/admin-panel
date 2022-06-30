@@ -2235,7 +2235,7 @@ class OrdersController extends Controller
         $query = \DB::table('orders')
             ->distinct()
             ->select('*', 'orders.created_at as orderDate', 'orders.id as orderId',
-                'customer_addresses.email as clientEmail', 'statuses.name as statusName',
+                'customers.login as clientEmail', 'statuses.name as statusName',
                 'customer_addresses.firstname as clientFirstname', 'customer_addresses.lastname as clientLastname',
                 'customer_addresses.phone as clientPhone', 'sel_tr__transaction.tr_CheckoutFormPaymentId as sello_payment',
                 'sel_tr__transaction.tr_CheckoutFormId as sello_form',
