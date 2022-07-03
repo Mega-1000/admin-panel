@@ -435,7 +435,11 @@ class AllegroOrderSynchro implements ShouldQueue
         }
         list($street, $flatNo) = $this->getAddress($address['street']);
 
-        OrderAddress::query()->firstOrCreate(
+        OrderAddress::updateOrCreate(
+            [
+                'type' => $type,
+                'order_id' => $order->id,
+            ],
             [
                 'type' => $type,
                 'firstname' => $address['firstName'] ?? $address['naturalPerson']['firstName'],
@@ -466,7 +470,11 @@ class AllegroOrderSynchro implements ShouldQueue
     {
         list($street, $flatNo) = $this->getAddress($data['address']['street'] ?? $data['street']);
 
-        CustomerAddress::query()->firstOrCreate(
+        CustomerAddress::updateOrCreate(
+            [
+                'type' => $type,
+                'customer_id' => $customer->id,
+            ],
             [
                 'type' => $type,
                 'firstname' => $data['firstName'] ?? $data['naturalPerson']['firstName'] ?? null,
