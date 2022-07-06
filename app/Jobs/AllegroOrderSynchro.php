@@ -6,6 +6,7 @@ use App\Entities\AllegroOrder;
 use App\Entities\Customer;
 use App\Entities\CustomerAddress;
 use App\Entities\FirmSource;
+use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\OrderAddress;
 use App\Entities\OrderItem;
@@ -120,6 +121,10 @@ class AllegroOrderSynchro implements ShouldQueue
             $order->customer_id = $customer->id;
             $order->allegro_form_id = $allegroOrder['id'];
             $order->status_id = 1;
+            $order->allegro_operation_date = $allegroOrder['lineItems'][0]['boughtAt'];
+            $order->allegro_additional_service = $allegroOrder['delivery']['method']['name'];
+            $order->payment_channel = $allegroOrder['payment']['provider'];
+            $order->return_payment_id = $allegroOrder['payment']['id'];
             $order->save();
 
             if ($allegroOrder['messageToSeller'] !== null) {
@@ -127,7 +132,13 @@ class AllegroOrderSynchro implements ShouldQueue
                 $order->labels()->attach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
             }
 
-            $orderItems = $this->mapItems($allegroOrder['lineItems']);
+            list($orderItems, $undefinedProductSymbol) = $this->mapItems($allegroOrder['lineItems']);
+
+            if ($undefinedProductSymbol) {
+                $order->consultant_notices = 'Nie znaleziono produktu o symbolu ' . $undefinedProductSymbol;
+                dispatch_now(new AddLabelJob($order, [Label::WAREHOUSE_MARK, []]));
+            }
+
             $this->saveOrderItems($orderItems, $order);
 
             $this->savePayments($order, $allegroOrder['payment']);
@@ -255,6 +266,7 @@ class AllegroOrderSynchro implements ShouldQueue
     private function mapItems(array $items): array
     {
         $products = [];
+        $undefinedProductSymbol = null;
         try {
             foreach ($items as $item) {
                 if ($item['offer']['external'] !== null) {
@@ -279,6 +291,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 }
                 if (empty($product)) {
                     $product = Product::getDefaultProduct();
+                    $undefinedProductSymbol = $item['offer']['external'];
                 }
 
                 if (!$product->stock()->count()) {
@@ -312,9 +325,9 @@ class AllegroOrderSynchro implements ShouldQueue
                 $products[] = $product;
             }
         } catch (\Throwable $ex) {
-            dd($ex, $item, $symbol);
+            Log::error($ex->getMessage());
         }
-        return $products;
+        return [$products, $undefinedProductSymbol];
     }
 
     /**
