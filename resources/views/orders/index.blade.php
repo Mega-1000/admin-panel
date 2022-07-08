@@ -1655,7 +1655,7 @@
                         render: function (orderId, row, data) {
                             let html = '';
                             if (data.master_order_id == null) {
-                                if (data.sello_id) {
+                                if (data.allegro_form_id) {
                                     html += ' (A)'
                                 }
                                 for (let i = 0; i < data.connected.length; i++) {

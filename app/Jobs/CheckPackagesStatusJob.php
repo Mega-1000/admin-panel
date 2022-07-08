@@ -73,7 +73,7 @@ class CheckPackagesStatusJob
                         $this->checkStatusInApaczkaPackages($package);
                         break;
                     case CourierName::POCZTEX:
-                        $this->checkStatusInPocztexPackages($package);
+//                        $this->checkStatusInPocztexPackages($package);
                         break;
                     case CourierName::JAS:
                         $this->checkStatusInJasPackages($package);
