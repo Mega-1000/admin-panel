@@ -88,6 +88,17 @@ class Helper
         }
     }
     
+    public static function phoneIsCorrect($number)
+    {
+        $len = strlen($number);
+    
+        if ($number[0] == '+') {
+            $len++;
+        }
+        
+        return $len >= 9;
+    }
+    
     /**
      * @param $number
      * @return array
@@ -117,9 +128,9 @@ class Helper
         return [$code, $phone];
     }
     
-    public static function clearSpecialChars($string, $removeDeigits = true) {
-        $string = preg_replace('/[^\w$\x{0080}-\x{FFFF}]+/u','', $string);
-        if ($removeDeigits) {
+    public static function clearSpecialChars($string, $removeDigits = true) {
+        $string = preg_replace('/[^\ \w$\x{0080}-\x{FFFF}]+/u','', $string);
+        if ($removeDigits) {
             $string = preg_replace('/[0-9]+/', '', $string);
         }
         return $string;

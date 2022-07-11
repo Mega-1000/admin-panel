@@ -12,7 +12,7 @@ class DebugController extends Controller
     		return;
 	    }
     
-     
+        echo preg_replace('/[^0-9\+]+/', '', '+-$sdf45345');
    //     dispatch_now(new ImportOrdersFromSelloJob());
     	
     	$res = dispatch_now(new AllegroOrderSynchro());
