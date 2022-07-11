@@ -13,10 +13,23 @@ class UpdateOrderAddressTable extends Migration
      */
     public function up()
     {
+        Schema::create('countries', function (Blueprint $table) {
+            $table->mediumIncrements('id');
+            $table->string('name');
+        });
+        
         Schema::table('order_addresses', function (Blueprint $table) {
             $table->string('phone_code', 15)->after('nip')->nullable();
-            $table->string('country', 50);
+            $table->mediumInteger('country_id', false, true)
+                ->nullable();
+            $table->foreign('country_id')
+                ->references('id')
+                ->on('countries')
+                ->onUpdate('cascade')
+                ->onDelete('set null');
         });
+        
+        \App\Entities\Country::insert(['name' => 'Polska']);
     }
 
     /**
@@ -27,7 +40,10 @@ class UpdateOrderAddressTable extends Migration
     public function down()
     {
         Schema::table('order_addresses', function (Blueprint $table) {
-            $table->dropColumn(['phone_code', 'country']);
+            $table->dropForeign(['country_id']);
+            $table->dropColumn(['phone_code', 'country_id']);
         });
+        
+        Schema::dropIfExists('countries');
     }
 }

@@ -70,10 +70,11 @@ class Helper
             \Log::error('Mail::send', ['message' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
         }
     }
-
+    
     /**
      * @param $number
      * @return false|string|string[]|null
+     *
      */
     public static function preparePhone($number)
     {
@@ -85,5 +86,42 @@ class Helper
         if (strlen($phone) > 7) {
             return $phone;
         }
+    }
+    
+    /**
+     * @param $number
+     * @return array
+     *
+     * Numer telefonu - numbers, clear all other symbols. Check symbol count (plus - is 2 symbols).
+     * >= 13, then 10 from right is Numer telefonu
+     * < 13, then 9 from right is Numer telefonu
+     * left symbols are Numer telefonu kierunkowy from righ (old-new).
+     * Numer telefonu < 9 including `+` - error.
+     */
+    public static function prepareCodeAndPhone($number)
+    {
+        $phone = (string) preg_replace('~[^0-9+]+~','', $number);
+        $len = strlen($phone);
+        
+        $hasPlus = $phone[0] == '+';
+        $len += ($hasPlus ? 1 : 0);
+        $code = '';
+        
+        if ($len >= 13) {
+            $code = substr($phone, 0, strlen($phone) - 10);
+            $phone = substr($phone, strlen($phone) - 10);
+        } elseif ($len >= 9) {
+            $code = substr($phone, 0, strlen($phone) - 9);
+            $phone = substr($phone, strlen($phone) - 9);
+        }
+        return [$code, $phone];
+    }
+    
+    public static function clearSpecialChars($string, $removeDeigits = true) {
+        $string = preg_replace('/[^\w$\x{0080}-\x{FFFF}]+/u','', $string);
+        if ($removeDeigits) {
+            $string = preg_replace('/[0-9]+/', '', $string);
+        }
+        return $string;
     }
 }
