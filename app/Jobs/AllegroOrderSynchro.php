@@ -199,6 +199,8 @@ class AllegroOrderSynchro implements ShouldQueue
             $order->setDefaultDates('allegro');
 
             $order->save();
+    
+            $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
         }
     }
 

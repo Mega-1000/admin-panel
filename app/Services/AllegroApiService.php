@@ -172,7 +172,10 @@ class AllegroApiService
 		}
 
 		if ($response->getStatusCode() != 200) {
-			return $this->cantGetAlert();
+		    if ($response->getStatusCode() != 204) {
+                return $this->cantGetAlert();
+            }
+		    return true;
 		}
 
 		return json_decode((string)$response->getBody(), true);

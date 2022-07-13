@@ -58,6 +58,7 @@ class CheckPackagesStatusJob
                 if ($package->status == PackageStatus::DELIVERED ||
                     $package->status == PackageStatus::WAITING_FOR_CANCELLED ||
                     $package->status == PackageStatus::CANCELLED ||
+                    $package->status == PackageStatus::REJECT_CANCELLED ||
                     empty($package->letter_number)) {
                     continue;
                 }
@@ -110,13 +111,13 @@ class CheckPackagesStatusJob
             $packageStatus = $result['items'][0]['status'];
             switch(true) {
                 case in_array($packageStatus, InpostPackageStatus::DELIVERED):
-                    $package->status = OrderPackage::DELIVERED;
+                    $package->status = PackageStatus::DELIVERED;
                     break;
                 case in_array($packageStatus, InpostPackageStatus::SENDING):
-                    $package->status = OrderPackage::SENDING;
+                    $package->status = PackageStatus::SENDING;
                     break;
                 case in_array($packageStatus, InpostPackageStatus::WAITING_FOR_SENDING):
-                    $package->status = OrderPackage::WAITING_FOR_SENDING;
+                    $package->status = PackageStatus::WAITING_FOR_SENDING;
                     break;
             }
             $package->save();
@@ -143,13 +144,13 @@ class CheckPackagesStatusJob
         if (!empty($matches)) {
             switch ($matches[0]) {
                 case DpdPackageStatus::getDescription(DpdPackageStatus::DELIVERED):
-                    $package->status = OrderPackage::DELIVERED;
+                    $package->status = PackageStatus::DELIVERED;
                     break;
                 case DpdPackageStatus::getDescription(DpdPackageStatus::SENDING):
-                    $package->status = OrderPackage::SENDING;
+                    $package->status = PackageStatus::SENDING;
                     break;
                 case DpdPackageStatus::getDescription(DpdPackageStatus::WAITING_FOR_SENDING):
-                    $package->status = OrderPackage::WAITING_FOR_SENDING;
+                    $package->status = PackageStatus::WAITING_FOR_SENDING;
                     break;
             }
 
@@ -177,10 +178,10 @@ class CheckPackagesStatusJob
 
         switch ($status->envelopeStatus) {
             case envelopeStatusType::PRZYJETY:
-                $package->status = OrderPackage::DELIVERED;
+                $package->status = PackageStatus::DELIVERED;
                 break;
             case envelopeStatusType::WYSLANY:
-                $package->status = OrderPackage::SENDING;
+                $package->status = PackageStatus::SENDING;
                 break;
         }
         if ($package->isDirty()) {

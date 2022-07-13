@@ -24,7 +24,7 @@ class PackageObjectBuilder
         $oPackage->consign_prep_data->rcity = $address->city;
         $oPackage->consign_prep_data->rstreet = $address->address . ' ' . $address->flat_number;
 
-        $oPackage->consign_prep_data->rphone = $address->phone;
+        $oPackage->consign_prep_data->rphone = $address->phone_code . $address->phone;
         $oPackage->consign_prep_data->rcontact = $address->email;
 
         $oPackage->consign_prep_data->date = $package->shipment_date;

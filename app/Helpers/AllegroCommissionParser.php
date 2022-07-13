@@ -8,6 +8,7 @@ use App\Entities\OrderAllegroCommission;
 use App\Entities\OrderPackage;
 use App\Entities\Product;
 use App\Entities\SelTransaction;
+use App\Enums\PackageStatus;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -29,7 +30,7 @@ class AllegroCommissionParser
             'real_cost_for_company' => $cost,
             'letter_number' => $letterNumber,
             'sending_number' => '',
-            'status' => OrderPackage::SENDING,
+            'status' => PackageStatus::SENDING,
             'symbol' => $courierName . '(?)',
             'quantity' => 1,
             'delivery_courier_name' => $courierName,

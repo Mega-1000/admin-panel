@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Entities\ConfirmPackages;
 use App\Entities\OrderPackage;
+use App\Enums\PackageStatus;
 use App\Integrations\Apaczka\ApaczkaGuzzleClient;
 use App\Integrations\Apaczka\ApaczkaOrder;
 use App\Integrations\DPD\DPDService;
@@ -163,7 +164,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         $this->orderPackageRepository->update([
             'sending_number' => $result['sending_number'],
             'letter_number' => $result['letter_number'],
-            'status' => OrderPackage::WAITING_FOR_SENDING
+            'status' => PackageStatus::WAITING_FOR_SENDING
         ], $this->data['additional_data']['order_package_id']);
         $package = $this->orderPackageRepository->find($this->data['additional_data']['order_package_id']);
 

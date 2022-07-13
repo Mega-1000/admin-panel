@@ -27,7 +27,9 @@ class GLSClient
         if (empty($login) || empty($password)) {
             throw new \Exception('Brak danych logowania API ' . __class__);
         }
-        $this->client = new SoapClient($url);
+        $options = [];
+        
+        $this->client = new SoapClient($url, $options);
         try {
             $oCredentials = new stdClass();
             $oCredentials->user_name = $login;
