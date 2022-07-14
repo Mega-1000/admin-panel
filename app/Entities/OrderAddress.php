@@ -51,4 +51,7 @@ class OrderAddress extends Model implements Transformable
         return $this->belongsTo(Order::class);
     }
 
+    public function getPhoneFullAttribute() {
+        return  $this->phone_code . $this->phone;
+    }
 }
