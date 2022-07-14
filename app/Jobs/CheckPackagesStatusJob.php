@@ -182,8 +182,8 @@ class CheckPackagesStatusJob
         $request = new getEnvelopeContentShort();
         $request->idEnvelope = $package->sending_number;
         $status = $integration->getEnvelopeContentShort($request);
-
-        if ($status->przesylka->status !== statusType::POTWIERDZONA) {
+        
+        if (!$status || $status->przesylka->status !== statusType::POTWIERDZONA) {
             return;
         }
 
