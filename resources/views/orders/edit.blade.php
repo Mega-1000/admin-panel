@@ -435,59 +435,83 @@
                 </div>
             @endif
 
-            <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                <label for="order_delivery_address_firstname">@lang('customers.form.delivery_firstname')</label>
-                <input type="text" class="form-control" id="order_delivery_address_firstname"
-                       name="order_delivery_address_firstname"
-                       value="{{ $orderDeliveryAddress->firstname ?? ''}}">
+            <div class="row">
+                <div class="form-group" style="width: 11%; float: left; padding: 5px;">
+                    <label for="order_delivery_address_firstname">@lang('customers.form.delivery_firstname')</label>
+                    <input type="text" class="form-control" id="order_delivery_address_firstname"
+                           name="order_delivery_address_firstname"
+                           value="{{ $orderDeliveryAddress->firstname ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 11%; float: left; padding: 5px;">
+                    <label for="order_delivery_address_lastname">@lang('customers.form.delivery_lastname')</label>
+                    <input type="text" class="form-control" id="order_delivery_address_lastname"
+                           name="order_delivery_address_lastname"
+                           value="{{ $orderDeliveryAddress->lastname ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 25%; float: left; padding: 5px;">
+                    <label for="order_delivery_address_email">@lang('customers.form.delivery_email')</label>
+                    <input type="email" class="form-control" id="order_delivery_address_email"
+                           name="order_delivery_address_email"
+                           value="{{ $orderDeliveryAddress->email ?? $order->customer->login }}">
+                </div>
+                <div class="form-group" style="width: 11%; float: left; padding: 5px;">
+                    <label for="order_delivery_address_firmname">@lang('customers.form.delivery_firmname')</label>
+                    <input type="text" class="form-control" id="order_delivery_address_firmname"
+                           name="order_delivery_address_firmname"
+                           value="{{ $orderDeliveryAddress->firmname ?? ''}}">
+                </div>
+
+                <div class="form-group" style="width: 18%; float: left; padding: 5px;">
+                    <label for="order_delivery_address_phone_code">@lang('customers.form.delivery_phone_code')</label>
+                    <input type="text" class="form-control" id="order_delivery_address_phone_code"
+                           name="order_delivery_address_phone_code"
+                           value="{{ $orderDeliveryAddress->phone_code ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 11%; float: left; padding: 5px;">
+                    <label for="order_delivery_address_phone">@lang('customers.form.delivery_phone')</label>
+                    <input type="text" class="form-control" id="order_delivery_address_phone"
+                           name="order_delivery_address_phone"
+                           value="{{ $orderDeliveryAddress->phone ?? ''}}">
+                </div>
             </div>
-            <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                <label for="order_delivery_address_lastname">@lang('customers.form.delivery_lastname')</label>
-                <input type="text" class="form-control" id="order_delivery_address_lastname"
-                       name="order_delivery_address_lastname"
-                       value="{{ $orderDeliveryAddress->lastname ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                <label for="order_delivery_address_email">@lang('customers.form.delivery_email')</label>
-                <input type="email" class="form-control" id="order_delivery_address_email"
-                       name="order_delivery_address_email"
-                       value="{{ $orderDeliveryAddress->email ?? $order->customer->login }}">
-            </div>
-            <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                <label for="order_delivery_address_firmname">@lang('customers.form.delivery_firmname')</label>
-                <input type="text" class="form-control" id="order_delivery_address_firmname"
-                       name="order_delivery_address_firmname"
-                       value="{{ $orderDeliveryAddress->firmname ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                <label for="order_delivery_address_address">@lang('customers.form.delivery_address')</label>
-                <input type="text" class="form-control" id="order_delivery_address_address"
-                       name="order_delivery_address_address"
-                       value="{{ $orderDeliveryAddress->address ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                <label for="order_delivery_address_flat_number">@lang('customers.form.delivery_flat_number')</label>
-                <input type="text" class="form-control" id="order_delivery_address_flat_number"
-                       name="order_delivery_address_flat_number"
-                       value="{{ $orderDeliveryAddress->flat_number ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                <label for="order_delivery_address_city">@lang('customers.form.delivery_city')</label>
-                <input type="text" class="form-control" id="order_delivery_address_city"
-                       name="order_delivery_address_city"
-                       value="{{ $orderDeliveryAddress->city ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                <label for="order_delivery_address_postal_code">@lang('customers.form.delivery_postal_code')</label>
-                <input type="text" class="form-control" id="order_delivery_address_postal_code"
-                       name="order_delivery_address_postal_code"
-                       value="{{ $orderDeliveryAddress->postal_code ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                <label for="order_delivery_address_phone">@lang('customers.form.delivery_phone')</label>
-                <input type="text" class="form-control" id="order_delivery_address_phone"
-                       name="order_delivery_address_phone"
-                       value="{{ $orderDeliveryAddress->phone ?? ''}}">
+
+            <div class="row">
+                <div class="form-group" style="width: 11%; float: left; padding: 5px;">
+                    <label for="order_delivery_address_city">@lang('customers.form.delivery_city')</label>
+                    <select class="form-control" id="order_delivery_address_country_id"
+                            name="order_delivery_address_country_id">
+                        @foreach($countries as $country)
+                            <option value="{{$country->id}}" @if ($country->id == $orderDeliveryAddress->country_id) selected @endif>{{$country->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group" style="width: 11%; float: left; padding: 5px;">
+                    <label for="order_delivery_address_postal_code">@lang('customers.form.delivery_postal_code')</label>
+                    <input type="text" class="form-control" id="order_delivery_address_postal_code"
+                           name="order_delivery_address_postal_code"
+                           value="{{ $orderDeliveryAddress->postal_code ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 11%; float: left; padding: 5px;">
+                    <label for="order_delivery_address_address">@lang('customers.form.delivery_address')</label>
+                    <input type="text" class="form-control" id="order_delivery_address_address"
+                           name="order_delivery_address_address"
+                           value="{{ $orderDeliveryAddress->address ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 11%; float: left; padding: 5px;">
+                    <label for="order_delivery_address_city">@lang('customers.form.delivery_city')</label>
+                    <input type="text" class="form-control" id="order_delivery_address_city"
+                           name="order_delivery_address_city"
+                           value="{{ $orderDeliveryAddress->city ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 11%; float: left; padding: 5px;">
+                    <label for="order_delivery_address_flat_number">@lang('customers.form.delivery_flat_number')</label>
+                    <input type="text" class="form-control" id="order_delivery_address_flat_number"
+                           name="order_delivery_address_flat_number"
+                           value="{{ $orderDeliveryAddress->flat_number ?? ''}}">
+                </div>
+
+
+
             </div>
 
             <h3 style="float: left; width: 100%;">Dane do faktury</h3>
@@ -496,65 +520,86 @@
                 {!! implode(' ', $orderInvoiceAddressErrors->all(':message')) !!}
                 </div>
             @endif
-            <div class="form-group" style="width: 10%; float: left; padding: 5px;">
-                <label for="order_invoice_address_firstname">@lang('customers.form.invoice_firstname')</label>
-                <input type="text" class="form-control" id="order_invoice_address_firstname"
-                       name="order_invoice_address_firstname"
-                       value="{{ $orderInvoiceAddress->firstname ?? ''}}">
+            <div class="row">
+                <div class="form-group" style="width: 10%; float: left; padding: 5px;">
+                    <label for="order_invoice_address_firstname">@lang('customers.form.invoice_firstname')</label>
+                    <input type="text" class="form-control" id="order_invoice_address_firstname"
+                           name="order_invoice_address_firstname"
+                           value="{{ $orderInvoiceAddress->firstname ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 10%; float: left; padding: 5px;">
+                    <label for="order_invoice_address_lastname">@lang('customers.form.invoice_lastname')</label>
+                    <input type="text" class="form-control" id="order_invoice_address_lastname"
+                           name="order_invoice_address_lastname"
+                           value="{{ $orderInvoiceAddress->lastname ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
+                    <label for="order_invoice_address_email">@lang('customers.form.invoice_email')</label>
+                    <input type="email" class="form-control" id="order_invoice_address_email"
+                           name="order_invoice_address_email"
+                           value="{{ $orderInvoiceAddress->email ?? $order->customer->login }}">
+                </div>
+                <div class="form-group" style="width: 10%; float: left; padding: 5px;">
+                    <label for="order_invoice_address_firmname">@lang('customers.form.invoice_firmname')</label>
+                    <input type="text" class="form-control" id="order_invoice_address_firmname"
+                           name="order_invoice_address_firmname"
+                           value="{{ $orderInvoiceAddress->firmname ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 18%; float: left; padding: 5px;">
+                    <label for="order_invoice_address_phone_code">@lang('customers.form.invoice_phone_code')</label>
+                    <input type="text" class="form-control" id="order_invoice_address_phone_code"
+                           name="order_invoice_address_phone_code"
+                           value="{{ $orderInvoiceAddress->phone_code ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 10%; float: left; padding: 5px;">
+                    <label for="order_invoice_address_phone">@lang('customers.form.invoice_phone')</label>
+                    <input type="text" class="form-control" id="order_invoice_address_phone"
+                           name="order_invoice_address_phone"
+                           value="{{ $orderInvoiceAddress->phone ?? ''}}">
+                </div>
             </div>
-            <div class="form-group" style="width: 10%; float: left; padding: 5px;">
-                <label for="order_invoice_address_lastname">@lang('customers.form.invoice_lastname')</label>
-                <input type="text" class="form-control" id="order_invoice_address_lastname"
-                       name="order_invoice_address_lastname"
-                       value="{{ $orderInvoiceAddress->lastname ?? ''}}">
+            <div class="row">
+                <div class="form-group" style="width: 10%; float: left; padding: 5px;">
+                    <label for="order_invoice_address_address">@lang('customers.form.invoice_address')</label>
+                    <input type="text" class="form-control" id="order_invoice_address_address"
+                           name="order_invoice_address_address"
+                           value="{{ $orderInvoiceAddress->address ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 10%; float: left; padding: 5px;">
+                    <label for="order_invoice_address_flat_number">@lang('customers.form.invoice_flat_number')</label>
+                    <input type="text" class="form-control" id="order_invoice_address_flat_number"
+                           name="order_invoice_address_flat_number"
+                           value="{{ $orderInvoiceAddress->flat_number ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 11%; float: left; padding: 5px;">
+                    <label for="order_delivery_address_city">@lang('customers.form.delivery_city')</label>
+                    <select class="form-control" id="order_delivery_address_country_id"
+                            name="order_delivery_address_country_id">
+                        @foreach($countries as $country)
+                            <option value="{{$country->id}}" @if ($country->id == $orderInvoiceAddress->country_id) selected @endif>{{$country->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="form-group" style="width: 10%; float: left; padding: 5px;">
+                    <label for="order_invoice_address_city">@lang('customers.form.invoice_city')</label>
+                    <input type="text" class="form-control" id="order_invoice_address_city"
+                           name="order_invoice_address_city"
+                           value="{{ $orderInvoiceAddress->city ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 10%; float: left; padding: 5px;">
+                    <label for="order_invoice_address_postal_code">@lang('customers.form.invoice_postal_code')</label>
+                    <input type="text" class="form-control" id="order_invoice_address_postal_code"
+                           name="order_invoice_address_postal_code"
+                           value="{{ $orderInvoiceAddress->postal_code ?? ''}}">
+                </div>
+
+                <div class="form-group" style="width: 10%; float: left; padding: 5px;">
+                    <label for="order_invoice_address_nip">@lang('customers.form.invoice_nip')</label>
+                    <input type="text" class="form-control" id="order_invoice_address_nip" name="order_invoice_address_nip"
+                           value="{{ $orderInvoiceAddress->nip ?? ''}}">
+                </div>
             </div>
-            <div class="form-group" style="width: 10%; float: left; padding: 5px;">
-                <label for="order_invoice_address_email">@lang('customers.form.invoice_email')</label>
-                <input type="email" class="form-control" id="order_invoice_address_email"
-                       name="order_invoice_address_email"
-                       value="{{ $orderInvoiceAddress->email ?? $order->customer->login }}">
-            </div>
-            <div class="form-group" style="width: 10%; float: left; padding: 5px;">
-                <label for="order_invoice_address_firmname">@lang('customers.form.invoice_firmname')</label>
-                <input type="text" class="form-control" id="order_invoice_address_firmname"
-                       name="order_invoice_address_firmname"
-                       value="{{ $orderInvoiceAddress->firmname ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 10%; float: left; padding: 5px;">
-                <label for="order_invoice_address_address">@lang('customers.form.invoice_address')</label>
-                <input type="text" class="form-control" id="order_invoice_address_address"
-                       name="order_invoice_address_address"
-                       value="{{ $orderInvoiceAddress->address ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 10%; float: left; padding: 5px;">
-                <label for="order_invoice_address_flat_number">@lang('customers.form.invoice_flat_number')</label>
-                <input type="text" class="form-control" id="order_invoice_address_flat_number"
-                       name="order_invoice_address_flat_number"
-                       value="{{ $orderInvoiceAddress->flat_number ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 10%; float: left; padding: 5px;">
-                <label for="order_invoice_address_city">@lang('customers.form.invoice_city')</label>
-                <input type="text" class="form-control" id="order_invoice_address_city"
-                       name="order_invoice_address_city"
-                       value="{{ $orderInvoiceAddress->city ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 10%; float: left; padding: 5px;">
-                <label for="order_invoice_address_postal_code">@lang('customers.form.invoice_postal_code')</label>
-                <input type="text" class="form-control" id="order_invoice_address_postal_code"
-                       name="order_invoice_address_postal_code"
-                       value="{{ $orderInvoiceAddress->postal_code ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 10%; float: left; padding: 5px;">
-                <label for="order_invoice_address_phone">@lang('customers.form.invoice_phone')</label>
-                <input type="text" class="form-control" id="order_invoice_address_phone"
-                       name="order_invoice_address_phone"
-                       value="{{ $orderInvoiceAddress->phone ?? ''}}">
-            </div>
-            <div class="form-group" style="width: 10%; float: left; padding: 5px;">
-                <label for="order_invoice_address_nip">@lang('customers.form.invoice_nip')</label>
-                <input type="text" class="form-control" id="order_invoice_address_nip" name="order_invoice_address_nip"
-                       value="{{ $orderInvoiceAddress->nip ?? ''}}">
-            </div>
+
             <input type="hidden" value="{{ $order->customer->id }}" name="customer_id">
             <div class="form-group" style="widht: 100%; float: left;">
                 <a target="_blank" href="{{ route('orders.goToBasket', ['id' => $order->id]) }}"

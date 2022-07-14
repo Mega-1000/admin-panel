@@ -1,7 +1,12 @@
 <?php namespace App\Services;
 
+use App\Entities\Label;
+use App\Entities\Order;
 use App\Entities\OrderAddress;
+use App\Helpers\Helper;
+use App\Jobs\AddLabelJob;
 use App\Rules\ValidNIP;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class OrderAddressService
@@ -38,24 +43,50 @@ class OrderAddressService
 		}
 		$this->reformatPhoneNumber($address);
 		$this->reformatPostalCode($address);
+        $this->reformatNIP($address);
+        $address->firstname = Helper::clearSpecialChars($address->firstname);
+        $address->lastname = Helper::clearSpecialChars($address->lastname, false);
 	}
-	
+    
+    /**
+     * @param OrderAddress $address
+     *
+     */
 	protected function reformatPhoneNumber(OrderAddress $address)
 	{
-		$phoneString = (string)$address->phone;
-		if ($phoneString && $phoneString[0] == 0) {
-			$address->phone = substr($phoneString, 1);
-		}
+        list($code, $phone) = Helper::prepareCodeAndPhone((string)$address->phone);
+        
+        $address->phone_code = $address->phone_code . ($code ? '-' . $code : '');
+        $address->phone_code = preg_replace('/[^0-9\+\-]+/', '', $address->phone_code);
+        $address->phone = $phone;
 	}
-	
+    
+    /**
+     * @param OrderAddress $address
+     *
+     */
 	protected function reformatPostalCode(OrderAddress $address)
 	{
-		$postalCodeString = (string)$address->postal_code;
-		if (preg_match('/^[0-9]{5}$/', $postalCodeString)) {
-			$address->postal_code = substr_replace($postalCodeString, '-', 2, 0);
-		}
+        $postalCodeString = (string)$address->postal_code;
+	    
+        if ($address->country_id == 1 && preg_match('/^[0-9]{5}$/', $postalCodeString)) {
+            $address->postal_code = substr_replace($postalCodeString, '-', 2, 0);
+        }
+        
+        $address->postal_code = $postalCodeString;
 	}
-	
+    
+    protected function reformatNIP(OrderAddress $address)
+    {
+        $nipString = (string)$address->nip;
+        
+        if ($address->country_id == 1) {
+            $nipString = preg_replace('/[^0-9]+/', '', $nipString);
+        }
+        
+        $address->nip = $nipString;
+    }
+    
 	protected function getRules(OrderAddress $address): array
 	{
 		$rules = [
@@ -63,21 +94,21 @@ class OrderAddressService
 			'address' => ['required'],
 			'flat_number' => ['required', 'string', 'max:10'],
 			'city' => ['required'],
-			'postal_code' => ['required', 'regex:/^[0-9]{2}-?[0-9]{3}$\b/'],
-			'phone' => ['required', 'regex:/^[0-9]{9}$\b/']
+			'postal_code' => ['required'],
+			'phone' => ['required']
 		];
 		
 		if ($address->type == OrderAddress::TYPE_DELIVERY) {
 			$rules['firstname'] = ['required'];
 			$rules['lastname'] = ['required'];
-			$rules['firmname'] = ['nullable', 'string'];
+			$rules['firmname'] = ['sometimes', 'nullable', 'string'];
 		} elseif ($address->type == OrderAddress::TYPE_INVOICE) {
 			$rules['firstname'] = ['required_without_all:firmname'];
 			$rules['lastname'] = ['required_without_all:firmname'];
 			$rules['firmname'] = ['required_with_all:nip', 'required_without:firstname,lastname'];
 			$rules['nip'] = ['required_with_all:firmname', 'required_without:firstname,lastname'];
 			if ($address->firmname || $address->nip) {
-				$rules['nip'][] = new ValidNIP();
+				$rules['nip'][] = new ValidNIP($address->country_id == 1);
 			}
 		}
 		

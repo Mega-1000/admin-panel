@@ -26,7 +26,10 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->job(Jobs\CheckStatusInpostPackagesJob::class)->everyFiveMinutes();
-        $schedule->job(Jobs\CheckPackagesStatusJob::class)->everyFifteenMinutes();
+    
+        $schedule->job(Jobs\CheckPackagesStatusJob::class)->everyFiveMinutes()->between('13:00', '16:00');
+        $schedule->job(Jobs\CheckPackagesStatusJob::class)->everyFifteenMinutes()->unlessBetween('16:00', '13:00');
+        
         $schedule->job(Jobs\ChangeShipmentDatePackagesJob::class)->dailyAt("00:30");
         $schedule->job(Jobs\AllegroTrackingNumberUpdater::class)->dailyAt("02:00");
         $schedule->job(Jobs\SendLPWithReminderSendingToWarehouseJob::class)->dailyAt("05:00");

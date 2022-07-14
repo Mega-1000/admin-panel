@@ -85,7 +85,7 @@
             {{$order->addresses->first->id->firstname}} {{$order->addresses->first->id->lastname}} <br>
             Ul: {{$order->addresses->first->id->address}} {{$order->addresses->first->id->flat_number}}<br>
             {{$order->addresses->first->id->postal_code}} {{$order->addresses->first->id->city}}<br>
-            Email: {{$order->addresses->first->id->email}} Nr. tel: {{$order->addresses->first->id->phone}}<br>
+            Email: {{$order->addresses->first->id->email}} Nr. tel: {{$order->addresses->first->id->phone_full}}<br>
         </td>
         <td><strong>Uwagi:</strong><br>
             {{$package['notices']}}</td>

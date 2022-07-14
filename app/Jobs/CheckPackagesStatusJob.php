@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Jobs;
 
+use App\Entities\Label;
 use App\Entities\Order;
 use App\Enums\CourierName;
 use App\Enums\CourierStatus\DpdPackageStatus;
@@ -43,24 +44,31 @@ class CheckPackagesStatusJob
 
     protected $httpClient;
 
-    public function __construct(Client $httpClient)
+    public function __construct()
     {
         $this->config = config('integrations');
-        $this->httpClient = $httpClient;
+        $options = [];
+        if (config('app.env') == 'local') {
+            $options['proxy'] = 'http://localhost:2180';
+        }
+        $this->httpClient = new Client($options);
     }
 
     public function handle(): void
     {
-        $orders = Order::whereDate('shipment_date', '>', Carbon::today()->subDays(7)->toDateString())->get();
+        $orders = Order::whereDate('shipment_date', '>', Carbon::today()->subDays(30)->toDateString())
+            ->get();
 
         foreach($orders as $order) {
             foreach ($order->packages as $package) {
                 if ($package->status == PackageStatus::DELIVERED ||
                     $package->status == PackageStatus::WAITING_FOR_CANCELLED ||
                     $package->status == PackageStatus::CANCELLED ||
+                    $package->status == PackageStatus::REJECT_CANCELLED ||
                     empty($package->letter_number)) {
                     continue;
                 }
+                
                 switch ($package->service_courier_name) {
                     case CourierName::INPOST :
                     case CourierName::ALLEGRO_INPOST :
@@ -73,7 +81,7 @@ class CheckPackagesStatusJob
                         $this->checkStatusInApaczkaPackages($package);
                         break;
                     case CourierName::POCZTEX:
-//                        $this->checkStatusInPocztexPackages($package);
+                        $this->checkStatusInPocztexPackages($package);
                         break;
                     case CourierName::JAS:
                         $this->checkStatusInJasPackages($package);
@@ -84,6 +92,10 @@ class CheckPackagesStatusJob
                     default:
                         break;
                 }
+            }
+            
+            if (!$order->packages()->where('status', PackageStatus::SENDING)->count()) {
+                dispatch_now(new RemoveLabelJob($order, [Label::BLUE_BATTERY_LABEL_ID]));
             }
         }
     }
@@ -110,13 +122,13 @@ class CheckPackagesStatusJob
             $packageStatus = $result['items'][0]['status'];
             switch(true) {
                 case in_array($packageStatus, InpostPackageStatus::DELIVERED):
-                    $package->status = OrderPackage::DELIVERED;
+                    $package->status = PackageStatus::DELIVERED;
                     break;
                 case in_array($packageStatus, InpostPackageStatus::SENDING):
-                    $package->status = OrderPackage::SENDING;
+                    $package->status = PackageStatus::SENDING;
                     break;
                 case in_array($packageStatus, InpostPackageStatus::WAITING_FOR_SENDING):
-                    $package->status = OrderPackage::WAITING_FOR_SENDING;
+                    $package->status = PackageStatus::WAITING_FOR_SENDING;
                     break;
             }
             $package->save();
@@ -136,6 +148,8 @@ class CheckPackagesStatusJob
 
         $packageStatusRegex = '/(' . DpdPackageStatus::getDescription(DpdPackageStatus::DELIVERED)
             .')|(' . DpdPackageStatus::getDescription(DpdPackageStatus::SENDING)
+            .')|(' . DpdPackageStatus::getDescription(DpdPackageStatus::INDELIVERY)
+            .')|(' . DpdPackageStatus::getDescription(DpdPackageStatus::INWAREHOUSE)
             .')|(' . DpdPackageStatus::getDescription(DpdPackageStatus::WAITING_FOR_SENDING) . ')/';
 
         preg_match($packageStatusRegex, $response, $matches);
@@ -143,13 +157,15 @@ class CheckPackagesStatusJob
         if (!empty($matches)) {
             switch ($matches[0]) {
                 case DpdPackageStatus::getDescription(DpdPackageStatus::DELIVERED):
-                    $package->status = OrderPackage::DELIVERED;
+                    $package->status = PackageStatus::DELIVERED;
                     break;
                 case DpdPackageStatus::getDescription(DpdPackageStatus::SENDING):
-                    $package->status = OrderPackage::SENDING;
+                case DpdPackageStatus::getDescription(DpdPackageStatus::INDELIVERY):
+                case DpdPackageStatus::getDescription(DpdPackageStatus::INWAREHOUSE):
+                    $package->status = PackageStatus::SENDING;
                     break;
                 case DpdPackageStatus::getDescription(DpdPackageStatus::WAITING_FOR_SENDING):
-                    $package->status = OrderPackage::WAITING_FOR_SENDING;
+                    $package->status = PackageStatus::WAITING_FOR_SENDING;
                     break;
             }
 
@@ -166,8 +182,8 @@ class CheckPackagesStatusJob
         $request = new getEnvelopeContentShort();
         $request->idEnvelope = $package->sending_number;
         $status = $integration->getEnvelopeContentShort($request);
-
-        if ($status->przesylka->status !== statusType::POTWIERDZONA) {
+        
+        if (!$status || $status->przesylka->status !== statusType::POTWIERDZONA) {
             return;
         }
 
@@ -177,10 +193,10 @@ class CheckPackagesStatusJob
 
         switch ($status->envelopeStatus) {
             case envelopeStatusType::PRZYJETY:
-                $package->status = OrderPackage::DELIVERED;
+                $package->status = PackageStatus::DELIVERED;
                 break;
             case envelopeStatusType::WYSLANY:
-                $package->status = OrderPackage::SENDING;
+                $package->status = PackageStatus::SENDING;
                 break;
         }
         if ($package->isDirty()) {

@@ -26,6 +26,9 @@ return [
         DpdPackageStatus::DELIVERED => 'Przesyłka doręczona',
         DpdPackageStatus::SENDING => 'Przesyłka odebrana przez Kuriera',
         DpdPackageStatus::WAITING_FOR_SENDING => 'Zarejestrowano dane przesyłki',
+        DpdPackageStatus::INWAREHOUSE => 'Przyjęcie przesyłki w oddziale DPD',
+        DpdPackageStatus::INDELIVERY => 'Wydanie przesyłki do doręczenia',
+
     ],
     OrderHeaders::class => [
         OrderHeaders::ORDER_ID => 'ID zlecenia - (numer zlecenia)',

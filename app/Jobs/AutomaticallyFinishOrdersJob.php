@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\OrderPackage;
+use App\Enums\PackageStatus;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Builder;
@@ -35,10 +36,10 @@ class AutomaticallyFinishOrdersJob implements ShouldQueue
     {
         $orders = Order
             ::whereHas('packages', function (Builder $query) {
-                $query->whereIn('status', [OrderPackage::DELIVERED, OrderPackage::SENDING]);
+                $query->whereIn('status', [PackageStatus::DELIVERED, PackageStatus::SENDING]);
             })
             ->whereDoesntHave('packages', function (Builder $query) {
-                $query->whereNotIn('status', [OrderPackage::DELIVERED, OrderPackage::SENDING, OrderPackage::CANCELLED]);
+                $query->whereNotIn('status', [PackageStatus::DELIVERED, PackageStatus::SENDING, PackageStatus::CANCELLED]);
             })
             ->whereHas('labels', function (Builder $query) {
                 $query->where('labels.id', Label::ORDER_ITEMS_CONSTRUCTED);

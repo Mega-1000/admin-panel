@@ -5,6 +5,16 @@ namespace App\Enums\CourierStatus;
 
 use BenSampo\Enum\Enum;
 
+/**
+ * Class InpostPackageStatus
+ * @package App\Enums\CourierStatus
+ *
+Odebrana od klienta. - collected_from_sender
+Przyjęta w oddziale InPost. - adopted_at_source_branch
+W trasie. - sent_from_source_branch
+Przekazano do doręczenia. - out_for_delivery
+Umieszczona w Paczkomacie (odbiorczym). - ready_to_pickup
+ */
 final class InpostPackageStatus extends Enum
 {
     const WAITING_FOR_SENDING = ['dispatched_by_sender'];

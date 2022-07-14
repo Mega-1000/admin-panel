@@ -415,7 +415,7 @@ class Order extends Model implements Transformable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function orderAllegro()
+    public function allegroOrder()
     {
         return $this->belongsTo(AllegroOrder::class);
     }
@@ -761,5 +761,9 @@ class Order extends Model implements Transformable
 
     public function getProformStoragePathAttribute() {
 		return self::PROFORM_DIR . $this->proforma_filename;
+    }
+    
+    public function getIsAllegroOrderAttribute() {
+	    return $this->allegro_form_id != null;
     }
 }

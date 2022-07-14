@@ -190,6 +190,15 @@ class Inpost
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json', 'Authorization: Bearer ' . $this->authorization));
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        if (config('app.env') == 'local') {
+            $PROXY_HOST = "127.0.0.1";
+            $PROXY_PORT = "2180";
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_PROXY_SSL_VERIFYPEER, 0);
+            curl_setopt($ch, CURLOPT_PROXY, $PROXY_HOST);
+            curl_setopt($ch, CURLOPT_PROXYPORT, $PROXY_PORT);
+        }
         $output = curl_exec($ch);
 
         $curl_error = curl_error($ch);

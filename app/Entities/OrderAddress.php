@@ -32,13 +32,16 @@ class OrderAddress extends Model implements Transformable
         'lastname',
         'firmname',
         'nip',
+        'phone_code',
         'phone',
         'address',
         'flat_number',
         'city',
         'postal_code',
-        'email'
+        'email',
+        'country_id'
     ];
+
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -48,4 +51,7 @@ class OrderAddress extends Model implements Transformable
         return $this->belongsTo(Order::class);
     }
 
+    public function getPhoneFullAttribute() {
+        return  $this->phone_code . $this->phone;
+    }
 }

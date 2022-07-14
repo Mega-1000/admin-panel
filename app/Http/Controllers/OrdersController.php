@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Entities\Auth_code;
 use App\Entities\ColumnVisibility;
+use App\Entities\Country;
 use App\Entities\Customer;
 use App\Entities\Deliverer;
 use App\Entities\InvoiceRequest;
@@ -524,21 +525,21 @@ class OrdersController extends Controller
         $subiektInvoices = $order->subiektInvoices ?? [];
         $orderHasSentLP = $order->hasOrderSentLP();
         $packets = ProductStockPacket::with('items')->get();
-
+        $countries = Country::all();
         if ($order->customer_id == 4128) {
             return view('orders.edit_self',
                 compact('visibilitiesTask', 'visibilitiesPackage', 'visibilitiesPayments', 'warehouses', 'order',
                     'users', 'customerInfo', 'orderInvoiceAddress', 'orderInvoiceAddressErrors', 'selInvoices', 'subiektInvoices',
                     'orderDeliveryAddress', 'orderDeliveryAddressErrors', 'orderItems', 'warehouse', 'statuses', 'messages', 'productPacking',
                     'customerDeliveryAddress', 'firms', 'productsVariation', 'allProductsFromSupplier', 'orderId',
-                    'customerOrdersToPay', 'clientTotalCost', 'ourTotalCost', 'labelsButtons'));
+                    'customerOrdersToPay', 'clientTotalCost', 'ourTotalCost', 'labelsButtons', 'countries'));
         } else {
             return view('orders.edit',
                 compact('visibilitiesTask', 'visibilitiesPackage', 'visibilitiesPayments', 'warehouses', 'order',
                     'users', 'customerInfo', 'orderInvoiceAddress', 'orderInvoiceAddressErrors', 'selInvoices', 'subiektInvoices',
                     'orderDeliveryAddress', 'orderDeliveryAddressErrors', 'orderItems', 'warehouse', 'statuses', 'messages', 'productPacking',
                     'customerDeliveryAddress', 'firms', 'productsVariation', 'allProductsFromSupplier', 'orderId',
-                    'customerOrdersToPay', 'orderHasSentLP', 'emails', 'clientTotalCost', 'ourTotalCost', 'labelsButtons', 'packets'));
+                    'customerOrdersToPay', 'orderHasSentLP', 'emails', 'clientTotalCost', 'ourTotalCost', 'labelsButtons', 'packets', 'countries'));
         }
     }
 
@@ -1060,11 +1061,13 @@ class OrdersController extends Controller
                     'flat_number' => $request->input('order_delivery_address_flat_number'),
                     'postal_code' => $request->input('order_delivery_address_postal_code'),
                     'city' => $request->input('order_delivery_address_city'),
+                    'phone_code' => $request->input('order_delivery_address_phone_code'),
                     'phone' => $request->input('order_delivery_address_phone'),
                     'firstname' => $request->input('order_delivery_address_firstname'),
                     'lastname' => $request->input('order_delivery_address_lastname'),
                     'firmname' => $request->input('order_delivery_address_firmname'),
                     'email' => $request->input('order_delivery_address_email'),
+                    'country_id' => $request->input('order_delivery_address_country_id')
                 ]
             );
         } else {
@@ -1076,11 +1079,13 @@ class OrdersController extends Controller
                     'flat_number' => $request->input('order_delivery_address_flat_number'),
                     'postal_code' => $request->input('order_delivery_address_postal_code'),
                     'city' => $request->input('order_delivery_address_city'),
+                    'phone_code' => $request->input('order_delivery_address_phone_code'),
                     'phone' => $request->input('order_delivery_address_phone'),
                     'firstname' => $request->input('order_delivery_address_firstname'),
                     'lastname' => $request->input('order_delivery_address_lastname'),
                     'firmname' => $request->input('order_delivery_address_firmname'),
                     'email' => $request->input('order_delivery_address_email'),
+                    'country_id' => $request->input('order_delivery_address_country_id')
                 ]
             );
         }
@@ -1098,12 +1103,14 @@ class OrdersController extends Controller
                     'flat_number' => $request->input('order_invoice_address_flat_number'),
                     'postal_code' => $request->input('order_invoice_address_postal_code'),
                     'city' => $request->input('order_invoice_address_city'),
+                    'phone_code' => $request->input('order_invoice_address_phone_code'),
                     'phone' => $request->input('order_invoice_address_phone'),
                     'firstname' => $request->input('order_invoice_address_firstname'),
                     'lastname' => $request->input('order_invoice_address_lastname'),
                     'firmname' => $request->input('order_invoice_address_firmname'),
                     'email' => $request->input('order_invoice_address_email'),
                     'nip' => $request->input('order_invoice_address_nip'),
+                    'country_id' => $request->input('order_invoice_address_country_id'),
                 ]
             );
         } else {
@@ -1115,12 +1122,14 @@ class OrdersController extends Controller
                     'flat_number' => $request->input('order_invoice_address_flat_number'),
                     'postal_code' => $request->input('order_invoice_address_postal_code'),
                     'city' => $request->input('order_invoice_address_city'),
+                    'phone_code' => $request->input('order_invoice_address_phone_code'),
                     'phone' => $request->input('order_invoice_address_phone'),
                     'firstname' => $request->input('order_invoice_address_firstname'),
                     'lastname' => $request->input('order_invoice_address_lastname'),
                     'firmname' => $request->input('order_invoice_address_firmname'),
                     'email' => $request->input('order_invoice_address_email'),
                     'nip' => $request->input('order_invoice_address_nip'),
+                    'country_id' => $request->input('order_invoice_address_country_id'),
                 ]
             );
         }
