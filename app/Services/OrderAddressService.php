@@ -43,6 +43,7 @@ class OrderAddressService
 		}
 		$this->reformatPhoneNumber($address);
 		$this->reformatPostalCode($address);
+        $this->reformatNIP($address);
         $address->firstname = Helper::clearSpecialChars($address->firstname);
         $address->lastname = Helper::clearSpecialChars($address->lastname, false);
 	}
@@ -74,7 +75,18 @@ class OrderAddressService
         
         $address->postal_code = $postalCodeString;
 	}
-	
+    
+    protected function reformatNIP(OrderAddress $address)
+    {
+        $nipString = (string)$address->nip;
+        
+        if ($address->country_id == 1) {
+            $nipString = preg_replace('/[^0-9]+/', '', $nipString);
+        }
+        
+        $address->nip = $nipString;
+    }
+    
 	protected function getRules(OrderAddress $address): array
 	{
 		$rules = [
@@ -96,7 +108,7 @@ class OrderAddressService
 			$rules['firmname'] = ['required_with_all:nip', 'required_without:firstname,lastname'];
 			$rules['nip'] = ['required_with_all:firmname', 'required_without:firstname,lastname'];
 			if ($address->firmname || $address->nip) {
-				$rules['nip'][] = new ValidNIP();
+				$rules['nip'][] = new ValidNIP($address->country_id == 1);
 			}
 		}
 		

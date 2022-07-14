@@ -6,14 +6,15 @@ use Illuminate\Contracts\Validation\Rule;
 
 class ValidNIP implements Rule
 {
+    protected $isAbroad = false;
 	/**
 	 * Create a new rule instance.
 	 *
 	 * @return void
 	 */
-	public function __construct()
+	public function __construct($isAbroad = false)
 	{
-	
+        $this->isAbroad = $isAbroad;
 	}
 	
 	/**
@@ -25,6 +26,10 @@ class ValidNIP implements Rule
 	 */
 	public function passes($attribute, $value)
 	{
+	    if ($this->isAbroad) {
+	        return strlen($value) > 0;
+        }
+	    
 		$nipWithoutDashes = preg_replace("/-/", "", $value);
 		$reg = '/^[0-9]{10}$/';
 		
