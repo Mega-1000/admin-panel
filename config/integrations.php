@@ -29,7 +29,10 @@ return [
         'tracking_url' => 'https://tracktrace.dpd.com.pl/findPackage'
     ],
     'pocztex' => [
-        'tracking_url' => 'http://mobilna.poczta-polska.pl/MobiPost/getpackage?action=getPackageData&search='
+        'login' => env('POCZTEX_LOGIN'),
+        'password' => env('POCZTEX_PASSWORD'),
+        'trace' => env('POCZTEX_TRACE'),
+        'tracking_url' => env('POCZTEX_URL')
     ],
     'jas' => [
         'testing_url' => 'http://webservice2.jasfbg.com.pl/Service.asmx?WSDL',

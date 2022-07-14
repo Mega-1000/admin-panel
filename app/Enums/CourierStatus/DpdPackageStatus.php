@@ -11,4 +11,6 @@ final class DpdPackageStatus extends Enum implements LocalizedEnum
     public const DELIVERED = 'delivered';
     public const SENDING = 'sending';
     public const WAITING_FOR_SENDING = 'waiting_for_sending';
+    public const INWAREHOUSE = 'inwarehouse';
+    public const INDELIVERY = 'indelivery';
 }

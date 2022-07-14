@@ -2632,15 +2632,14 @@ class ElektronicznyNadawca extends SoapClient {
 
     public function __construct($wsdl = "https://e-nadawca.poczta-polska.pl/websrv/en.wsdl", $options = array())
     {
-
         foreach (self::$classmap as $key => $value) {
             if (!isset($options['classmap'][$key])) {
                 $options['classmap'][$key] = '\App\Integrations\Pocztex'.'\\'.$value;
             }
         }
-        $options["login"] = 'ebudownictwo@wp.pl';
-        $options["password"] = 'Mega201909';
-        $options["trace"] = 1;
+        $options["login"] = config('integrations.pocztex.login');
+        $options["password"] = config('integrations.pocztex.password');
+        $options["trace"] = config('integrations.pocztex.trace') ? 1 : 0;
 
         parent::__construct($wsdl, $options);
     }
