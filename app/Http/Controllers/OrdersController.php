@@ -413,27 +413,7 @@ class OrdersController extends Controller
             "customer_id" => $order->customer->id,
             'type' => 'STANDARD_ADDRESS',
         ])->first();
-        $orderInvoiceAddress = $this->orderAddressRepository->findWhere([
-            "order_id" => $order->id,
-            'type' => 'INVOICE_ADDRESS',
-        ])->first();
-
-        $orderDeliveryAddress = $this->orderAddressRepository->findWhere([
-            "order_id" => $order->id,
-            'type' => 'DELIVERY_ADDRESS',
-        ])->first();
-        $customerDeliveryAddress = $this->customerAddressRepository->findWhere([
-            "customer_id" => $order->customer->id,
-            'type' => 'DELIVERY_ADDRESS',
-        ])->first();
-
-	    $orderAddressService = new OrderAddressService();
-    
-        $orderInvoiceAddressErrors = false;
-	    if ($orderInvoiceAddress) {
-            $orderAddressService->addressIsValid($orderInvoiceAddress);
-            $orderInvoiceAddressErrors = $orderAddressService->errors();
-        } else {
+        if (!($orderInvoiceAddress = $orderInvoiceAddress = $order->getInvoiceAddress())) {
             $this->orderAddressRepository->create([
                 'order_id' => $order->id,
                 'type' => 'INVOICE_ADDRESS',
@@ -443,15 +423,11 @@ class OrdersController extends Controller
                 'city' => 'Oława',
                 'phone' => '111111111',
             ]);
-            
-	        Log::info('Order invoice address not found: order: ' . $order->id);
+            $orderInvoiceAddress = $order->getInvoiceAddress();
+            Log::info('Order invoice address not found: order: ' . $order->id);
         }
-    
-        $orderDeliveryAddressErrors = false;
-	    if ($orderDeliveryAddress) {
-            $orderAddressService->addressIsValid($orderDeliveryAddress);
-            $orderDeliveryAddressErrors = $orderAddressService->errors();
-        } else {
+
+        if (!($orderDeliveryAddress = $orderDeliveryAddress = $order->getDeliveryAddress())) {
             $this->orderAddressRepository->create([
                 'order_id' => $order->id,
                 'type' => 'DELIVERY_ADDRESS',
@@ -461,8 +437,21 @@ class OrdersController extends Controller
                 'city' => 'Oława',
                 'phone' => '111111111',
             ]);
+            $orderDeliveryAddress = $order->getDeliveryAddress();
             Log::info('Order delivery address not found: order: ' . $order->id);
         }
+        $customerDeliveryAddress = $this->customerAddressRepository->findWhere([
+            "customer_id" => $order->customer->id,
+            'type' => 'DELIVERY_ADDRESS',
+        ])->first();
+
+	    $orderAddressService = new OrderAddressService();
+    
+        $orderAddressService->addressIsValid($orderInvoiceAddress);
+        $orderInvoiceAddressErrors = $orderAddressService->errors();
+    
+        $orderAddressService->addressIsValid($orderDeliveryAddress);
+        $orderDeliveryAddressErrors = $orderAddressService->errors();
 	    
 	    $messages = $this->orderMessageRepository->orderBy('type')->findWhere(["order_id" => $order->id]);
         $emails = DB::table('emails_messages')->where('order_id', $orderId)->get();
