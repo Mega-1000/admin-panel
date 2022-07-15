@@ -421,6 +421,7 @@ class OrdersController extends Controller
                 'flat_number' => '---',
                 'postal_code' => '55-200',
                 'city' => 'Oława',
+                'country_id' => 1,
                 'phone' => '111111111',
             ]);
             $orderInvoiceAddress = $order->getInvoiceAddress();
@@ -435,6 +436,7 @@ class OrdersController extends Controller
                 'flat_number' => '---',
                 'postal_code' => '55-200',
                 'city' => 'Oława',
+                'country_id' => 1,
                 'phone' => '111111111',
             ]);
             $orderDeliveryAddress = $order->getDeliveryAddress();

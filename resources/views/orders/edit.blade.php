@@ -427,7 +427,11 @@
                 </button>
 
             </div>
-            <h3 style="float: left; width: 100%;">Dane do wysyłki</h3>
+            <h3 style="float: left; width: 100%;">Dane do wysyłki
+                @if ($orderDeliveryAddress->country_id != 1)
+                    (wysyłka za granice)
+                @endif
+            </h3>
 
             @if($orderDeliveryAddressErrors->any())
                 <div class="form-group is-empty-info" style="float: left; width: 100%;">
