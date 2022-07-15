@@ -31,7 +31,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\CheckPackagesStatusJob::class)->everyFifteenMinutes()->unlessBetween('16:00', '13:00');
         
         $schedule->job(Jobs\ChangeShipmentDatePackagesJob::class)->dailyAt("00:30");
-        $schedule->job(Jobs\AllegroTrackingNumberUpdater::class)->dailyAt("02:00");
+        //$schedule->job(Jobs\AllegroTrackingNumberUpdater::class)->dailyAt("02:00");
         $schedule->job(Jobs\SendLPWithReminderSendingToWarehouseJob::class)->dailyAt("05:00");
         $schedule->job(Jobs\CheckPriceChangesInProductsJob::class)->dailyAt("04:00");
         $schedule->job(Jobs\CheckDateOfProductNewPriceJob::class)->dailyAt("04:30");

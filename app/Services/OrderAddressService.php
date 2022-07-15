@@ -44,9 +44,22 @@ class OrderAddressService
 		$this->reformatPhoneNumber($address);
 		$this->reformatPostalCode($address);
         $this->reformatNIP($address);
+        $this->reformatFirstLastName($address);
+	}
+    
+    /**
+     * @param OrderAddress $address
+     *
+     */
+    protected function reformatFirstLastName(OrderAddress $address)
+    {
+        if ($address->firstname == 'Paczkomat') {
+            return;
+        }
+        
         $address->firstname = Helper::clearSpecialChars($address->firstname);
         $address->lastname = Helper::clearSpecialChars($address->lastname, false);
-	}
+    }
     
     /**
      * @param OrderAddress $address

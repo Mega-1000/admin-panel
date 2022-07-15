@@ -152,9 +152,13 @@ class AllegroOrderSynchro implements ShouldQueue
             $this->createOrUpdateCustomerAddress($customer, $allegroOrder['buyer']);
             $this->createOrUpdateCustomerAddress($customer, $invoiceAddress, CustomerAddress::ADDRESS_TYPE_INVOICE);
             if (array_key_exists('pickupPoint', $allegroOrder['delivery'])) {
-                $allegroOrder['delivery']['address']['firstName'] = $allegroOrder['delivery']['pickupPoint']['name'];
+                $allegroOrder['delivery']['address']['firstName'] = 'Paczkomat';
                 $allegroOrder['delivery']['address']['lastName'] = $allegroOrder['delivery']['pickupPoint']['id'];
-                $allegroOrder['delivery']['address'] = array_merge($allegroOrder['delivery']['address'], $allegroOrder['delivery']['pickupPoint']['address']);
+                if (!array_key_exists('address', $allegroOrder['delivery']['pickupPoint'])) {
+                    Log::info('PickupPoint address error: order: '. $order->id .', AllId' . $allegroOrder['id'] , $allegroOrder['delivery']);
+                } else {
+                    $allegroOrder['delivery']['address'] = array_merge($allegroOrder['delivery']['address'], $allegroOrder['delivery']['pickupPoint']['address']);
+                }
             }
             $this->createOrUpdateOrderAddress($order, $allegroOrder['buyer'], $allegroOrder['delivery']['address']);
             

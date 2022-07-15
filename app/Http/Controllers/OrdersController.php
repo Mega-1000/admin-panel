@@ -428,13 +428,23 @@ class OrdersController extends Controller
         ])->first();
 
 	    $orderAddressService = new OrderAddressService();
-
-	    $orderAddressService->addressIsValid($orderInvoiceAddress);
-	    $orderInvoiceAddressErrors = $orderAddressService->errors();
-
-	    $orderAddressService->addressIsValid($orderDeliveryAddress);
-	    $orderDeliveryAddressErrors = $orderAddressService->errors();
-
+    
+        $orderInvoiceAddressErrors = false;
+	    if ($orderInvoiceAddress) {
+            $orderAddressService->addressIsValid($orderInvoiceAddress);
+            $orderInvoiceAddressErrors = $orderAddressService->errors();
+        } else {
+	        Log::info('Order invoice address not found: order: ' . $order->id);
+        }
+    
+        $orderDeliveryAddressErrors = false;
+	    if ($orderDeliveryAddress) {
+            $orderAddressService->addressIsValid($orderDeliveryAddress);
+            $orderDeliveryAddressErrors = $orderAddressService->errors();
+        } else {
+            Log::info('Order delivery address not found: order: ' . $order->id);
+        }
+	    
 	    $messages = $this->orderMessageRepository->orderBy('type')->findWhere(["order_id" => $order->id]);
         $emails = DB::table('emails_messages')->where('order_id', $orderId)->get();
         $orderItems = $order->items;
