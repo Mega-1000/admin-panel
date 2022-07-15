@@ -13,6 +13,14 @@ use VIISON\AddressSplitter\Exceptions\SplittingException;
  *
  * @package App\Services
  *
+NEW  => nowe">nowe
+PROCESSING  => w realizacji
+SUSPENDED  => wstrzymane
+READY_FOR_SHIPMENT  => do wysłania
+READY_FOR_PICKUP  => do odbioru
+SENT  => wysłane
+PICKED_UP  => odebrane
+CANCELLED  => anulowane
  */
 class AllegroOrderService extends AllegroApiService
 {
@@ -20,7 +28,7 @@ class AllegroOrderService extends AllegroApiService
     const STATUS_NEW = "NEW";
     const STATUS_PROCESSING = "PROCESSING";
     const STATUS_READY_FOR_SHIPMENT = "READY_FOR_SHIPMENT";
-    const STATUS_READY_FOR_PICKUP = "READY_FOR_PICKUP";
+    const STATUS_READY_FOR_PICKUP = "READY_FOR_PICKUP"; //
     const STATUS_SENT = "SENT";
     const STATUS_PICKED_UP = "PICKED_UP";
     const STATUS_CANCELLED = "CANCELLED";

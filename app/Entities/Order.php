@@ -289,12 +289,18 @@ class Order extends Model implements Transformable
             empty($invoiceAddress->postal_code)
         ));
     }
-
+    
+    /**
+     * @return OrderAddress
+     */
     public function getDeliveryAddress()
     {
         return $this->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first();
     }
-
+    
+    /**
+     * @return OrderAddress
+     */
     public function getInvoiceAddress()
     {
         return $this->addresses()->where('type', '=', 'INVOICE_ADDRESS')->first();

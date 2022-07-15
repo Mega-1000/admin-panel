@@ -151,7 +151,7 @@ class AllegroOrderSynchro implements ShouldQueue
             }
             $this->createOrUpdateCustomerAddress($customer, $allegroOrder['buyer']);
             $this->createOrUpdateCustomerAddress($customer, $invoiceAddress, CustomerAddress::ADDRESS_TYPE_INVOICE);
-            if (array_key_exists('pickupPoint', $allegroOrder['delivery'])) {
+            if (array_key_exists('pickupPoint', $allegroOrder['delivery']) && isset($allegroOrder['delivery']['pickupPoint'])) {
                 $allegroOrder['delivery']['address']['firstName'] = 'Paczkomat';
                 $allegroOrder['delivery']['address']['lastName'] = $allegroOrder['delivery']['pickupPoint']['id'];
                 if (!array_key_exists('address', $allegroOrder['delivery']['pickupPoint'])) {
@@ -204,7 +204,21 @@ class AllegroOrderSynchro implements ShouldQueue
 
             $order->save();
     
-            $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
+            if (($orderInvoiceAddress = $order->getInvoiceAddress())
+            && ($orderDeliveryAddress = $orderDeliveryAddress = $order->getDeliveryAddress())) {
+                $orderAddressService = new OrderAddressService();
+    
+                $orderAddressService->addressIsValid($orderInvoiceAddress);
+                $orderInvoiceAddressErrors = $orderAddressService->errors();
+    
+                $orderAddressService->addressIsValid($orderDeliveryAddress);
+                $orderDeliveryAddressErrors = $orderAddressService->errors();
+                if (!$orderInvoiceAddressErrors->any() && !$orderDeliveryAddressErrors->any()) {
+                    dispatch_now(new AddLabelJob($order->id, [39, 133, Label::BLUE_HAMMER_ID, 69]));
+                }
+            }
+            
+            $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_READY_FOR_PICKUP);
         }
     }
 
@@ -223,6 +237,7 @@ class AllegroOrderSynchro implements ShouldQueue
             'promise' => true,
             'promise_date' => $allegroPayment['finishedAt'],
         ]);
+        dispatch(new AddLabelJob($order->id, [Label::BOOKED_FIRST_PAYMENT]));
     }
 
     /**
@@ -504,7 +519,8 @@ class AllegroOrderSynchro implements ShouldQueue
             'phone' => $phone,
             'order_id' => $order->id,
             'email' => $buyer['email'],
-            'country_Id' => $country->id
+            'country_Id' => $country->id,
+            'isAbroad' => $country->id != 1
         ];
         $orderAddress->fill($addressData);
         $orderAddress->save();

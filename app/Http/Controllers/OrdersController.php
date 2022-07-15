@@ -413,7 +413,7 @@ class OrdersController extends Controller
             "customer_id" => $order->customer->id,
             'type' => 'STANDARD_ADDRESS',
         ])->first();
-        if (!($orderInvoiceAddress = $orderInvoiceAddress = $order->getInvoiceAddress())) {
+        if (!($orderInvoiceAddress = $order->getInvoiceAddress())) {
             $this->orderAddressRepository->create([
                 'order_id' => $order->id,
                 'type' => 'INVOICE_ADDRESS',
@@ -428,7 +428,7 @@ class OrdersController extends Controller
             Log::info('Order invoice address not found: order: ' . $order->id);
         }
 
-        if (!($orderDeliveryAddress = $orderDeliveryAddress = $order->getDeliveryAddress())) {
+        if (!($orderDeliveryAddress = $order->getDeliveryAddress())) {
             $this->orderAddressRepository->create([
                 'order_id' => $order->id,
                 'type' => 'DELIVERY_ADDRESS',
@@ -1087,7 +1087,8 @@ class OrdersController extends Controller
                     'lastname' => $request->input('order_delivery_address_lastname'),
                     'firmname' => $request->input('order_delivery_address_firmname'),
                     'email' => $request->input('order_delivery_address_email'),
-                    'country_id' => $request->input('order_delivery_address_country_id')
+                    'country_id' => $request->input('order_delivery_address_country_id'),
+                    'isAbroad' => $request->has('order_delivery_address_isAbroad')
                 ]
             );
         } else {
@@ -1105,7 +1106,8 @@ class OrdersController extends Controller
                     'lastname' => $request->input('order_delivery_address_lastname'),
                     'firmname' => $request->input('order_delivery_address_firmname'),
                     'email' => $request->input('order_delivery_address_email'),
-                    'country_id' => $request->input('order_delivery_address_country_id')
+                    'country_id' => $request->input('order_delivery_address_country_id'),
+                    'isAbroad' => $request->has('order_delivery_address_isAbroad')
                 ]
             );
         }
