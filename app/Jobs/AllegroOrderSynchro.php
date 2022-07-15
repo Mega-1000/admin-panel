@@ -488,6 +488,8 @@ class AllegroOrderSynchro implements ShouldQueue
                 'order_id' => $order->id,
             ]);
         
+        list($code, $phone) = Helper::prepareCodeAndPhone($address['phoneNumber']);
+        
         $addressData = [
             'type' => $type,
             'firstname' => $address['firstName'] ?? $address['naturalPerson']['firstName'],
@@ -498,7 +500,8 @@ class AllegroOrderSynchro implements ShouldQueue
             'firmname' => $address['companyName'] ?? $address['company']['name'] ?? null,
             'nip' => $address['company']['taxId'] ?? null,
             'postal_code' => $address['zipCode'] ?? $address['postCode'],
-            'phone' => $address['phoneNumber'],
+            'phone_code' => $code,
+            'phone' => $phone,
             'order_id' => $order->id,
             'email' => $buyer['email'],
             'country_Id' => $country->id

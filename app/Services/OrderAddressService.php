@@ -31,6 +31,8 @@ class OrderAddressService
 	
 	public function preSaveCleanup(OrderAddress $address)
 	{
+	    $address->address = preg_replace('/ul\./i', '', $address->address);
+	    
 		foreach ($address->getFillable() as $field) {
 			$address->$field = is_null($address->$field) ? $address->$field : trim($address->$field);
 			
@@ -41,7 +43,7 @@ class OrderAddressService
 				}
 			}
 		}
-		$this->reformatPhoneNumber($address);
+		//$this->reformatPhoneNumber($address);
 		$this->reformatPostalCode($address);
         $this->reformatNIP($address);
         $this->reformatFirstLastName($address);
