@@ -434,6 +434,16 @@ class OrdersController extends Controller
             $orderAddressService->addressIsValid($orderInvoiceAddress);
             $orderInvoiceAddressErrors = $orderAddressService->errors();
         } else {
+            $this->orderAddressRepository->create([
+                'order_id' => $order->id,
+                'type' => 'INVOICE_ADDRESS',
+                'address' => '---',
+                'flat_number' => '---',
+                'postal_code' => '55-200',
+                'city' => 'Oława',
+                'phone' => '111111111',
+            ]);
+            
 	        Log::info('Order invoice address not found: order: ' . $order->id);
         }
     
@@ -442,6 +452,15 @@ class OrdersController extends Controller
             $orderAddressService->addressIsValid($orderDeliveryAddress);
             $orderDeliveryAddressErrors = $orderAddressService->errors();
         } else {
+            $this->orderAddressRepository->create([
+                'order_id' => $order->id,
+                'type' => 'DELIVERY_ADDRESS',
+                'address' => '---',
+                'flat_number' => '---',
+                'postal_code' => '55-200',
+                'city' => 'Oława',
+                'phone' => '111111111',
+            ]);
             Log::info('Order delivery address not found: order: ' . $order->id);
         }
 	    
