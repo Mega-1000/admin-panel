@@ -51,6 +51,11 @@ class LabelAddNotificationJob implements ShouldQueue
     public function handle(EmailTagHandlerHelper $emailTagHandler, OrderRepository $orderRepository, LabelRepository $labelRepository, TagRepository $tagRepository)
     {
         $order = $orderRepository->find($this->orderId);
+        $tmpDate = new \DateTime('2022-07-01');
+        if ($order->created_at < $tmpDate) {
+            return;
+        }
+
         $tags = $tagRepository->all();
         $label = $labelRepository->find($this->labelId);
 
