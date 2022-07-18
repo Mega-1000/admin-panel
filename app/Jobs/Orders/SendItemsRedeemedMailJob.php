@@ -29,22 +29,27 @@ class SendItemsRedeemedMailJob extends Job implements ShouldQueue
 
 	public function handle(EmailTagHandlerHelper $emailTagHandler, TagRepository $tagRepository)
 	{
-		$tags = $tagRepository->all();
+        $tmpDate = new \DateTime('2022-07-01');
+        if ($this->order->created_at < $tmpDate) {
+            return;
+        }
+
+        $tags = $tagRepository->all();
 		if ($this->order->sello_id) {
 			$message = setting('allegro.order_items_redeemed_msg');
 		} else {
 			$message = setting('site.order_items_redeemed_msg');
 		}
-		
+
 		$subject = "Państwa towar został odebrany przez kuriera";
-		
+
 		$emailTagHandler->setOrder($this->order);
-		
+
 		foreach ($tags as $tag) {
 			$method = $tag->handler;
 			$message = preg_replace("[" . preg_quote($tag->name) . "]", $emailTagHandler->$method(), $message);
 		}
-		
+
 		\Mailer::create()
 			->to($this->order->customer->login)
 			->send(new OrderMessageMail($subject, $message));

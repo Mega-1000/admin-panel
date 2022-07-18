@@ -150,8 +150,9 @@ class AllegroOrderSynchro implements ShouldQueue
                 $invoiceAddress['phoneNumber'] = $allegroOrder['buyer']['phoneNumber'];
             }
             $this->createOrUpdateCustomerAddress($customer, $allegroOrder['buyer']);
+
             $this->createOrUpdateCustomerAddress($customer, $invoiceAddress, CustomerAddress::ADDRESS_TYPE_INVOICE);
-            if (array_key_exists('pickupPoint', $allegroOrder['delivery']) && isset($allegroOrder['delivery']['pickupPoint'])) {
+            if (array_key_exists('pickupPoint', $allegroOrder['delivery']) && $allegroOrder['delivery']['pickupPoint'] !== null) {
                 $allegroOrder['delivery']['address']['firstName'] = 'Paczkomat';
                 $allegroOrder['delivery']['address']['lastName'] = $allegroOrder['delivery']['pickupPoint']['id'];
                 if (!array_key_exists('address', $allegroOrder['delivery']['pickupPoint'])) {
@@ -161,29 +162,29 @@ class AllegroOrderSynchro implements ShouldQueue
                 }
             }
             $this->createOrUpdateOrderAddress($order, $allegroOrder['buyer'], $allegroOrder['delivery']['address']);
-            
+
             $this->createOrUpdateOrderAddress($order, $allegroOrder['buyer'], $invoiceAddress, OrderAddress::TYPE_INVOICE);
-    
+
             $orderDeliveryAddress = OrderAddress::where("order_id", $order->id)
                 ->where('type', 'DELIVERY_ADDRESS')
                 ->first();
-    
+
             $orderAddressService = new OrderAddressService();
             $orderAddressService->addressIsValid($orderDeliveryAddress);
             $orderDeliveryAddressErrors = $orderAddressService->errors();
-            
+
             if ($orderDeliveryAddressErrors->any()) {
                 $order->labels_log .= Order::formatMessage(null, implode(' ', $orderDeliveryAddressErrors->all(':message')));
                 $order->save();
-                
+
             }
-            
+
             if (!Helper::phoneIsCorrect($orderDeliveryAddress->phone)) {
                 $order->labels_log .= Order::formatMessage(null, 'ebudownictwo@wp.pl 691801594 55-200');
                 $order->save();
                 dispatch_now(new AddLabelJob($orderDeliveryAddress->order_id, [176]));
             }
-            
+
             // order package
             $this->addOrderPackage($order, $allegroOrder['delivery']);
             $order->shipment_price_for_client = $allegroOrder['delivery']['cost']['amount'];
@@ -497,7 +498,7 @@ class AllegroOrderSynchro implements ShouldQueue
         }
         list($street, $flatNo) = $this->getAddress($address['street']);
         $country = Country::firstOrCreate(['iso2' => $address['countryCode']], ['name' => $address['countryCode']]);
-        
+
         $orderAddress = OrderAddress::firstOrNew([
                 'type' => $type,
                 'order_id' => $order->id,
@@ -538,27 +539,27 @@ class AllegroOrderSynchro implements ShouldQueue
     private function createOrUpdateCustomerAddress(Customer $customer, array $data, string $type = CustomerAddress::ADDRESS_TYPE_STANDARD)
     {
         list($street, $flatNo) = $this->getAddress($data['address']['street'] ?? $data['street']);
-    
+
         $customerAddress = CustomerAddress::firstOrNew([
-                'type' => $type,
-                'customer_id' => $customer->id,
-            ]);
-        
+            'type' => $type,
+            'customer_id' => $customer->id,
+        ]);
+
         $phoneAndCode = Helper::prepareCodeAndPhone($data['phoneNumber']);
         $customerAddressData = [
-                'type' => $type,
-                'firstname' => $data['firstName'] ?? $data['naturalPerson']['firstName'] ?? null,
-                'lastname' => $data['lastName'] ?? $data['naturalPerson']['lastName'] ?? null,
-                'address' => $street,
-                'flat_number' => $flatNo,
-                'city' => $data['address']['city'] ?? $data['city'],
-                'firmname' => $data['companyName'] ?? $data['company']['name'] ?? null,
-                'nip' => $data['company']['taxId'] ?? null,
-                'postal_code' => $data['address']['postCode'] ?? $data['zipCode'],
-                'phone' => implode('', $phoneAndCode),
-                'customer_id' => $customer->id,
-                'email' => $customer->login
-            ];
+            'type' => $type,
+            'firstname' => $data['firstName'] ?? $data['naturalPerson']['firstName'] ?? null,
+            'lastname' => $data['lastName'] ?? $data['naturalPerson']['lastName'] ?? null,
+            'address' => $street,
+            'flat_number' => $flatNo,
+            'city' => $data['address']['city'] ?? $data['city'],
+            'firmname' => $data['companyName'] ?? $data['company']['name'] ?? null,
+            'nip' => $data['company']['taxId'] ?? null,
+            'postal_code' => $data['address']['postCode'] ?? $data['zipCode'],
+            'phone' => implode('', $phoneAndCode),
+            'customer_id' => $customer->id,
+            'email' => $customer->login
+        ];
         $customerAddress->fill($customerAddressData);
         $customerAddress->save();
     }
