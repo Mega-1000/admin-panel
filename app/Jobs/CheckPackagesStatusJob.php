@@ -57,9 +57,8 @@ class CheckPackagesStatusJob
 
     public function handle(): void
     {
-        $orders = Order::whereDate('shipment_date', '>', Carbon::today()->subDays(30)->toDateString())
-            ->whereHas('packages', function ($query) {
-                $query->whereIn('status', ['SENDING']);
+        $orders = Order::whereHas('packages', function ($query) {
+                $query->whereIn('status', ['SENDING', 'WAITING_FOR_SENDING'])->whereDate('shipment_date', '>', Carbon::today()->subDays(30)->toDateString());
             })
             ->get();
 
