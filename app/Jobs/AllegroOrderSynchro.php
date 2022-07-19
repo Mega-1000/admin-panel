@@ -176,13 +176,13 @@ class AllegroOrderSynchro implements ShouldQueue
 
             if ($orderDeliveryAddressErrors->any()) {
                 $order->labels_log .= Order::formatMessage(null, implode(' ', $orderDeliveryAddressErrors->all(':message')));
-                $order->save();
+                $order->saveQuietly();
 
             }
 
             if (!Helper::phoneIsCorrect($orderDeliveryAddress->phone)) {
                 $order->labels_log .= Order::formatMessage(null, 'ebudownictwo@wp.pl 691801594 55-200');
-                $order->save();
+                $order->saveQuietly();
                 $lpa = [];
                 dispatch_now(new AddLabelJob($orderDeliveryAddress->order_id, [176], $lpa, [], null, false, true));
             }
@@ -205,7 +205,7 @@ class AllegroOrderSynchro implements ShouldQueue
             $order->warehouse()->associate($warehouse);
             $order->setDefaultDates('allegro');
 
-            $order->save();
+            $order->saveQuietly();
 
             if (($orderInvoiceAddress = $order->getInvoiceAddress())
             && ($orderDeliveryAddress = $orderDeliveryAddress = $order->getDeliveryAddress())) {
@@ -424,7 +424,7 @@ class AllegroOrderSynchro implements ShouldQueue
             $order->items()->save($orderItem);
         }
         $order->weight = round($weight, 2);
-        $order->save();
+        $order->saveQuietly();
     }
 
     /**
