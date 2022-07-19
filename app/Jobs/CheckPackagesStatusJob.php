@@ -31,6 +31,7 @@ use Psr\Http\Message\ResponseInterface;
 
 /**
  * Class CheckPackagesStatusJob
+ *
  * @package App\Jobs
  */
 class CheckPackagesStatusJob
@@ -57,9 +58,12 @@ class CheckPackagesStatusJob
     public function handle(): void
     {
         $orders = Order::whereDate('shipment_date', '>', Carbon::today()->subDays(30)->toDateString())
+            ->whereHas('packages', function ($query) {
+                $query->whereIn('status', ['SENDING']);
+            })
             ->get();
 
-        foreach($orders as $order) {
+        foreach ($orders as $order) {
             foreach ($order->packages as $package) {
                 if ($package->status == PackageStatus::DELIVERED ||
                     $package->status == PackageStatus::WAITING_FOR_CANCELLED ||
@@ -68,7 +72,7 @@ class CheckPackagesStatusJob
                     empty($package->letter_number)) {
                     continue;
                 }
-                
+
                 switch ($package->service_courier_name) {
                     case CourierName::INPOST :
                     case CourierName::ALLEGRO_INPOST :
@@ -93,7 +97,7 @@ class CheckPackagesStatusJob
                         break;
                 }
             }
-            
+
             if (!$order->packages()->where('status', PackageStatus::SENDING)->count()) {
                 dispatch_now(new RemoveLabelJob($order, [Label::BLUE_BATTERY_LABEL_ID]));
             }
@@ -120,7 +124,7 @@ class CheckPackagesStatusJob
 
         try {
             $packageStatus = $result['items'][0]['status'];
-            switch(true) {
+            switch (true) {
                 case in_array($packageStatus, InpostPackageStatus::DELIVERED):
                     $package->status = PackageStatus::DELIVERED;
                     break;
@@ -132,7 +136,7 @@ class CheckPackagesStatusJob
                     break;
             }
             $package->save();
-        } catch(OutOfRangeException $e) {
+        } catch (OutOfRangeException $e) {
             Log::info('Something went wrong with package:', ['order_id' => $package->order_id, 'package_id' => $package->id]);
         }
     }
@@ -147,10 +151,10 @@ class CheckPackagesStatusJob
         $response = $this->prepareConnectionForTrackingStatus($this->config['dpd']['tracking_url'], Request::METHOD_POST, $options)->getBody()->getContents();
 
         $packageStatusRegex = '/(' . DpdPackageStatus::getDescription(DpdPackageStatus::DELIVERED)
-            .')|(' . DpdPackageStatus::getDescription(DpdPackageStatus::SENDING)
-            .')|(' . DpdPackageStatus::getDescription(DpdPackageStatus::INDELIVERY)
-            .')|(' . DpdPackageStatus::getDescription(DpdPackageStatus::INWAREHOUSE)
-            .')|(' . DpdPackageStatus::getDescription(DpdPackageStatus::WAITING_FOR_SENDING) . ')/';
+            . ')|(' . DpdPackageStatus::getDescription(DpdPackageStatus::SENDING)
+            . ')|(' . DpdPackageStatus::getDescription(DpdPackageStatus::INDELIVERY)
+            . ')|(' . DpdPackageStatus::getDescription(DpdPackageStatus::INWAREHOUSE)
+            . ')|(' . DpdPackageStatus::getDescription(DpdPackageStatus::WAITING_FOR_SENDING) . ')/';
 
         preg_match($packageStatusRegex, $response, $matches);
 
@@ -182,7 +186,7 @@ class CheckPackagesStatusJob
         $request = new getEnvelopeContentShort();
         $request->idEnvelope = $package->sending_number;
         $status = $integration->getEnvelopeContentShort($request);
-        
+
         if (!$status || $status->przesylka->status !== statusType::POTWIERDZONA) {
             return;
         }
@@ -248,7 +252,7 @@ class CheckPackagesStatusJob
 
             $packageStatus = $response->tuStatus[0]->progressBar->statusInfo;
 
-            switch($packageStatus) {
+            switch ($packageStatus) {
                 case GlsPackageStatus::DELIVERED:
                     $package->status = PackageStatus::DELIVERED;
                     break;
