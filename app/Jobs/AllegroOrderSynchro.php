@@ -127,7 +127,7 @@ class AllegroOrderSynchro implements ShouldQueue
             $order->allegro_additional_service = $allegroOrder['delivery']['method']['name'];
             $order->payment_channel = $allegroOrder['payment']['provider'];
             $order->return_payment_id = $allegroOrder['payment']['id'];
-            $order->save();
+            $order->saveQuietly();
 
             if ($allegroOrder['messageToSeller'] !== null) {
                 $this->createChat($order->id, $customer->id, $allegroOrder['messageToSeller']);
@@ -138,7 +138,8 @@ class AllegroOrderSynchro implements ShouldQueue
 
             if ($undefinedProductSymbol) {
                 $order->consultant_notices = 'Nie znaleziono produktu o symbolu ' . $undefinedProductSymbol['id'];
-                dispatch_now(new AddLabelJob($order, [Label::WAREHOUSE_MARK]));
+                $lpa = [];
+                dispatch_now(new AddLabelJob($order, [Label::WAREHOUSE_MARK], $lpa, [], null, false, true));
             }
 
             $this->saveOrderItems($orderItems, $order);
@@ -182,7 +183,8 @@ class AllegroOrderSynchro implements ShouldQueue
             if (!Helper::phoneIsCorrect($orderDeliveryAddress->phone)) {
                 $order->labels_log .= Order::formatMessage(null, 'ebudownictwo@wp.pl 691801594 55-200');
                 $order->save();
-                dispatch_now(new AddLabelJob($orderDeliveryAddress->order_id, [176]));
+                $lpa = [];
+                dispatch_now(new AddLabelJob($orderDeliveryAddress->order_id, [176], $lpa, [], null, false, true));
             }
 
             // order package
@@ -204,21 +206,22 @@ class AllegroOrderSynchro implements ShouldQueue
             $order->setDefaultDates('allegro');
 
             $order->save();
-    
+
             if (($orderInvoiceAddress = $order->getInvoiceAddress())
             && ($orderDeliveryAddress = $orderDeliveryAddress = $order->getDeliveryAddress())) {
                 $orderAddressService = new OrderAddressService();
-    
+
                 $orderAddressService->addressIsValid($orderInvoiceAddress);
                 $orderInvoiceAddressErrors = $orderAddressService->errors();
-    
+
                 $orderAddressService->addressIsValid($orderDeliveryAddress);
                 $orderDeliveryAddressErrors = $orderAddressService->errors();
                 if (!$orderInvoiceAddressErrors->any() && !$orderDeliveryAddressErrors->any()) {
-                    dispatch_now(new AddLabelJob($order->id, [39, 133, Label::BLUE_HAMMER_ID, 69]));
+                    $lpa = [];
+                    dispatch_now(new AddLabelJob($order->id, [39, 133, Label::BLUE_HAMMER_ID, 69], $lpa, [], null, false, true));
                 }
             }
-            
+
             $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_READY_FOR_PICKUP);
         }
     }
@@ -503,9 +506,9 @@ class AllegroOrderSynchro implements ShouldQueue
                 'type' => $type,
                 'order_id' => $order->id,
             ]);
-        
+
         list($code, $phone) = Helper::prepareCodeAndPhone($address['phoneNumber']);
-        
+
         $addressData = [
             'type' => $type,
             'firstname' => $address['firstName'] ?? $address['naturalPerson']['firstName'],
