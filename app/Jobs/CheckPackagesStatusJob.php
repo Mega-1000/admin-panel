@@ -97,7 +97,7 @@ class CheckPackagesStatusJob
                 }
             }
 
-            if (!$order->packages()->where('status', PackageStatus::SENDING)->count()) {
+            if (!$order->packages()->whereIn('status', [PackageStatus::SENDING, PackageStatus::WAITING_FOR_SENDING])->count()) {
                 dispatch_now(new RemoveLabelJob($order, [Label::BLUE_BATTERY_LABEL_ID]));
             }
         }
