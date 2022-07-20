@@ -28,12 +28,12 @@ class AllegroOrderService extends AllegroApiService
     const STATUS_NEW = "NEW";
     const STATUS_PROCESSING = "PROCESSING";
     const STATUS_READY_FOR_SHIPMENT = "READY_FOR_SHIPMENT";
-    const STATUS_READY_FOR_PICKUP = "READY_FOR_PICKUP"; //
+    const STATUS_READY_FOR_PICKUP = "READY_FOR_PICKUP";
     const STATUS_SENT = "SENT";
     const STATUS_PICKED_UP = "PICKED_UP";
     const STATUS_CANCELLED = "CANCELLED";
     const STATUS_SUSPENDED = "SUSPENDED";
-    
+
     const READY_FOR_PROCESSING = 'READY_FOR_PROCESSING';
 
     public function __construct()
@@ -231,7 +231,7 @@ class AllegroOrderService extends AllegroApiService
 
         return $response && is_array($response) && array_key_exists('checkoutForms', $response) ? $response['checkoutForms'] : [];
     }
-    
+
     /**
      * @return array|bool
      */
@@ -242,7 +242,7 @@ class AllegroOrderService extends AllegroApiService
         ];
         $url = $this->getRestUrl("/order/checkout-forms/{$formId}/fulfillment");
         $response = $this->request('PUT', $url, $params);
-        
+
         return $response;
     }
 }

@@ -218,7 +218,10 @@ class AllegroOrderSynchro implements ShouldQueue
                 $orderDeliveryAddressErrors = $orderAddressService->errors();
                 if (!$orderInvoiceAddressErrors->any() && !$orderDeliveryAddressErrors->any()) {
                     $lpa = [];
-                    dispatch_now(new AddLabelJob($order->id, [39, 133, Label::BLUE_HAMMER_ID, 69], $lpa, [], null, false, true));
+                    $order->labels()->attach(39);
+                    $order->labels()->attach(133);
+                    $order->labels()->attach(Label::BLUE_HAMMER_ID);
+                    $order->labels()->attach(69);
                 }
             }
 
@@ -241,7 +244,7 @@ class AllegroOrderSynchro implements ShouldQueue
             'promise' => true,
             'promise_date' => $allegroPayment['finishedAt'],
         ]);
-        dispatch(new AddLabelJob($order->id, [Label::BOOKED_FIRST_PAYMENT]));
+        $order->labels()->attach(Label::BOOKED_FIRST_PAYMENT);
     }
 
     /**

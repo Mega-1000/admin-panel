@@ -28,7 +28,6 @@ class AddLabelJob extends Job implements ShouldQueue
     protected $options;
     protected $self;
     protected $time;
-    protected $disableNotifications = false;
 
     protected $awaitRepository;
 
@@ -41,7 +40,7 @@ class AddLabelJob extends Job implements ShouldQueue
      * @param $self
      * @param $time
      */
-    public function __construct($order, $labelIdsToAdd, &$loopPreventionArray = [], $options = [], $self = null, $time = false, $disableNotifications = false)
+    public function __construct($order, $labelIdsToAdd, &$loopPreventionArray = [], $options = [], $self = null, $time = false)
     {
         $this->order = $order;
         $this->labelIdsToAdd = $labelIdsToAdd;
@@ -51,7 +50,6 @@ class AddLabelJob extends Job implements ShouldQueue
         ], $options);
         $this->self = $self;
         $this->time = $time;
-        $this->disableNotifications = $disableNotifications;
     }
 
     /**
@@ -108,15 +106,15 @@ class AddLabelJob extends Job implements ShouldQueue
                 $now = Carbon::now();
                 $targetDatetime = Carbon::parse($this->time);
                 $delay = $now->diffInSeconds($targetDatetime);
-                $loopPreventionArray = [];
+
                 if($labelsAfterTime->count() > 0) {
                     $removeLabelJob = dispatch(new RemoveLabelJob($this->order->id, [$labelId]))->delay($delay);
                     foreach($labelsAfterTime as $labelAfterTime) {
-                        $addLabelJob = dispatch(new AddLabelJob($this->order->id, [$labelAfterTime->label_to_add_id], $loopPreventionArray, [], null, false, $this->disableNotifications))->delay($delay);
+                        $addLabelJob = dispatch(new AddLabelJob($this->order->id, [$labelAfterTime->label_to_add_id]))->delay($delay);
                     }
                 } else {
                     $removeLabelJob = dispatch(new RemoveLabelJob($this->order->id, [$labelId]))->delay($delay);
-                    $addLabelJob = dispatch(new AddLabelJob($this->order->id, [Label::URGENT_INTERVENTION], $loopPreventionArray, [], null, false, $this->disableNotifications))->delay($delay);
+                    $addLabelJob = dispatch(new AddLabelJob($this->order->id, [Label::URGENT_INTERVENTION]))->delay($delay);
                 }
             }
 
@@ -125,11 +123,11 @@ class AddLabelJob extends Job implements ShouldQueue
                 $this->setScheduledLabelsAfterAddition($this->order->id, $label, $orderLabelSchedulerRepository);
                 $this->loopPreventionArray['already-added'][] = $labelId;
 
-                if (!$this->disableNotifications && $label->message !== null && $labelId !== 89) {
+                if ($label->message !== null && $labelId !== 89) {
                     dispatch_now(new LabelAddNotificationJob($this->order->id, $label->id));
                 }
 
-                if (!$this->disableNotifications && $label->id == 52) {  //wyslana do awizacji
+                if ($label->id == 52) {  //wyslana do awizacji
                     if($this->order->customer->id == 4128) {
                         dispatch_now(new OrderStatusChangedToDispatchNotificationJob($this->order->id, true));
                     } else {
@@ -142,9 +140,7 @@ class AddLabelJob extends Job implements ShouldQueue
 //                }
 
                 if($labelId == Label::ORDER_ITEMS_CONSTRUCTED){
-                    if (!$this->disableNotifications) {
-                        dispatch(new SendItemsConstructedMailJob($this->order));
-                    }
+                	dispatch(new SendItemsConstructedMailJob($this->order));
 
                     $tasks = $taskRepository->findByField('order_id',$this->order->id)->all();
                     if(count($tasks) != 0) {
@@ -158,9 +154,7 @@ class AddLabelJob extends Job implements ShouldQueue
                 }
 
                 if($labelId == Label::ORDER_ITEMS_REDEEMED_LABEL){
-                    if (!$this->disableNotifications) {
-                        dispatch(new SendItemsRedeemedMailJob($this->order));
-                    }
+	                dispatch(new SendItemsRedeemedMailJob($this->order));
 
                     $tasks = $taskRepository->findByField('order_id',$this->order->id)->all();
 
@@ -181,7 +175,7 @@ class AddLabelJob extends Job implements ShouldQueue
                 foreach ($label->labelsToAddAfterAddition as $item) {
                     $labelIdsToAttach[] = $item->id;
                 }
-                dispatch_now(new AddLabelJob($this->order, $labelIdsToAttach, $this->loopPreventionArray, [], null, false, $this->disableNotifications));
+                dispatch_now(new AddLabelJob($this->order, $labelIdsToAttach, $this->loopPreventionArray));
             }
 
             //detaching labels to remove after addition
