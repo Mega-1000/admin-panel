@@ -141,6 +141,7 @@ class Order extends Model implements Transformable
         'allegro_deposit_value',
         'allegro_operation_date',
         'allegro_additional_service',
+        'allegro_payment_id',
     ];
 
     /**
@@ -762,7 +763,7 @@ class Order extends Model implements Transformable
     public function getProformStoragePathAttribute() {
 		return self::PROFORM_DIR . $this->proforma_filename;
     }
-    
+
     public function getIsAllegroOrderAttribute() {
 	    return $this->allegro_form_id != null;
     }

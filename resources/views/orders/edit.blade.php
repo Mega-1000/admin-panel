@@ -360,10 +360,10 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group row">
-                                <label class="col-md-6" for="return_payment_id">Identyfikator płatności allegro</label>
+                                <label class="col-md-6" for="allegro_payment_id">Identyfikator płatności allegro</label>
                                 <div class="col-md-4">
-                                    <input type="text" class="form-control" id="return_payment_id"
-                                           name="return_payment_id" value="{{ $order->return_payment_id ?? '' }}">
+                                    <input type="text" class="form-control" id="allegro_payment_id"
+                                           name="allegro_payment_id" value="{{ $order->allegro_payment_id }}">
                                 </div>
                             </div>
                         </div>

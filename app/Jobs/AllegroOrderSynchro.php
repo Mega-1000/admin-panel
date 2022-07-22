@@ -126,7 +126,7 @@ class AllegroOrderSynchro implements ShouldQueue
             $order->allegro_operation_date = $allegroOrder['lineItems'][0]['boughtAt'];
             $order->allegro_additional_service = $allegroOrder['delivery']['method']['name'];
             $order->payment_channel = $allegroOrder['payment']['provider'];
-            $order->return_payment_id = $allegroOrder['payment']['id'];
+            $order->allegro_payment_id = $allegroOrder['payment']['id'];
             $order->save();
 
             if ($allegroOrder['messageToSeller'] !== null) {

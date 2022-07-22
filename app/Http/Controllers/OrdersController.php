@@ -929,6 +929,9 @@ class OrdersController extends Controller
             'refunded' => $request->input('refunded'),
             'warehouse_value' => $request->input('warehouse_value'),
             'production_date' => $request->input('production_date'),
+            'allegro_operation_date' => $request->input('allegro_operation_date'),
+            'allegro_form_id' => $request->input('allegro_form_id'),
+            'allegro_payment_id' => $request->input('allegro_payment_id'),
         ], $id);
 
         $orderObj = Order::find($id);
