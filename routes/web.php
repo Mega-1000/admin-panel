@@ -235,6 +235,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('packingTypes/{id}/update', 'PackingTypesController@update')->name('packing_type.update');
         Route::delete('packingTypes/{id}/delete', 'PackingTypesController@destroy')->name('packing_type.destroy');
 
+        Route::get('generate-fs', 'OrdersController@generateFS')->name('orders.fs');
         Route::get('sello-import', 'OrdersController@selloImport')->name('orders.sello_import');
         Route::get('send_tracking_numbers', 'OrdersController@sendTrackingNumbers')->name('orders.send_tracking_numbers');
 

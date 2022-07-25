@@ -195,6 +195,10 @@
                 numery</a>
         </div>
         <div class="form-group">
+            <label for="fs_generator">Generator faktur sprzedaży </label>
+            <a name="fs_generator" class="btn btn-success" href="{{ route('orders.fs') }}">Generuj</a>
+        </div>
+        <div class="form-group">
             <label for="print_courier">Drukuj naklejki: </label>
             @foreach($couriers as $courier)
                 <a name="print_courier" class="btn btn-success"

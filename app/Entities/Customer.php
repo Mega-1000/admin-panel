@@ -44,6 +44,13 @@ class Customer extends Authenticatable implements Transformable
         return $standardAddress;
     }
 
+    public function invoiceAddress()
+    {
+        $invoiceAddress = $this->addresses()->where('type', '=', CustomerAddress::ADDRESS_TYPE_INVOICE)->first();
+
+        return $invoiceAddress;
+    }
+
     public function orders()
     {
         return $this->hasMany(Order::class);
