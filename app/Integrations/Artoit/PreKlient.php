@@ -2,175 +2,230 @@
 
 namespace App\Integrations\Artoit;
 
+/**
+ * PreKlient klass,
+ */
 class PreKlient
 {
-
+    /**
+     * @var string
+     */
     public $typ;
 
+    /**
+     * @var string
+     */
     public $symbol;
+
+    /**
+     * @var string
+     */
     public $nazwa;
+
+    /**
+     * @var string
+     */
     public $nazwaPelna;
+
+    /**
+     * @var string
+     */
     public $osobaImie;
+
+    /**
+     * @var string
+     */
     public $osobaNazwisko;
+
+    /**
+     * @var string
+     */
     public $NIP;
+
+    /**
+     * @var string
+     */
     public $NIPUE;
+
+    /**
+     * @var string
+     */
     public $email;
+
+    /**
+     * @var string
+     */
     public $telefon;
+
+    /**
+     * @var string
+     */
     public $rodzajNaDok;
+
+    /**
+     * @var  string
+     */
     public $nrRachunku;
+
+    /**
+     * @var boolean
+     */
     public $chceFV;
+
+    /**
+     * @var PreAdres
+     */
     public $adresGlowny;
 
     /**
-     * @param EPreKlientTyp|string|null $typ
+     * @param string $typ
      *
-     * return self
+     * @return PreKlient
      */
-    public function setTyp($typ): self
+    public function setTyp(string $typ): PreKlient
     {
         $this->typ = $typ;
         return $this;
     }
 
     /**
-     * @param string|null $symbol
+     * @param string $symbol
      *
-     * return self
+     * @return PreKlient
      */
-    public function setSymbol(?string $symbol): self
+    public function setSymbol(string $symbol): PreKlient
     {
-        $rawSymbol = explode('-', $symbol);
-        $this->symbol = $rawSymbol[0];
+        $this->symbol = $symbol;
         return $this;
     }
 
     /**
-     * @param string|null $nazwa
+     * @param string $nazwa
      *
-     * return self
+     * @return PreKlient
      */
-    public function setNazwa(?string $nazwa): self
+    public function setNazwa(string $nazwa): PreKlient
     {
         $this->nazwa = $nazwa;
         return $this;
     }
 
     /**
-     * @param string|null $nazwaPelna
+     * @param string $nazwaPelna
      *
-     * return self
+     * @return PreKlient
      */
-    public function setNazwaPelna(?string $nazwaPelna): self
+    public function setNazwaPelna(string $nazwaPelna): PreKlient
     {
         $this->nazwaPelna = $nazwaPelna;
         return $this;
     }
 
     /**
-     * @param string|null $osobaImie
+     * @param string $osobaImie
      *
-     * return self
+     * @return PreKlient
      */
-    public function setOsobaImie(?string $osobaImie): self
+    public function setOsobaImie(string $osobaImie): PreKlient
     {
         $this->osobaImie = $osobaImie;
         return $this;
     }
 
     /**
-     * @param string|null $osobaNazwisko
+     * @param string $osobaNazwisko
      *
-     * return self
+     * @return PreKlient
      */
-    public function setOsobaNazwisko(?string $osobaNazwisko): self
+    public function setOsobaNazwisko(string $osobaNazwisko): PreKlient
     {
         $this->osobaNazwisko = $osobaNazwisko;
         return $this;
     }
 
     /**
-     * @param string|null $NIP
+     * @param string $NIP
      *
-     * return self
+     * @return PreKlient
      */
-    public function setNIP(?string $NIP): self
+    public function setNIP(?string $NIP): PreKlient
     {
         $this->NIP = $NIP;
         return $this;
     }
 
     /**
-     * @param string|null $NIPUE
+     * @param string $NIPUE
      *
-     * return self
+     * @return PreKlient
      */
-    public function setNIPUE(?string $NIPUE): self
+    public function setNIPUE(?string $NIPUE): PreKlient
     {
         $this->NIPUE = $NIPUE;
         return $this;
     }
 
     /**
-     * @param string|null $email
+     * @param string $email
      *
-     * return self
+     * @return PreKlient
      */
-    public function setEmail(?string $email): self
+    public function setEmail(string $email): PreKlient
     {
         $this->email = $email;
         return $this;
     }
 
     /**
-     * @param string|null $telefon
+     * @param string $telefon
      *
-     * return self
+     * @return PreKlient
      */
-    public function setTelefon(?string $telefon): self
+    public function setTelefon(string $telefon): PreKlient
     {
         $this->telefon = $telefon;
         return $this;
     }
 
     /**
-     * @param EPreKlientRodzajNaDok|string|null $rodzajNaDok
+     * @param string $rodzajNaDok
      *
-     * return self
+     * @return PreKlient
      */
-    public function setRodzajNaDok($rodzajNaDok): self
+    public function setRodzajNaDok(string $rodzajNaDok): PreKlient
     {
         $this->rodzajNaDok = $rodzajNaDok;
         return $this;
     }
 
     /**
-     * @param string|null $nrRachunku
+     * @param string $nrRachunku
      *
-     * return self
+     * @return PreKlient
      */
-    public function setNrRachunku(?string $nrRachunku): self
+    public function setNrRachunku(?string $nrRachunku): PreKlient
     {
         $this->nrRachunku = $nrRachunku;
         return $this;
     }
 
     /**
-     * @param string|null $chceFV
+     * @param bool $chceFV
      *
-     * return self
+     * @return PreKlient
      */
-    public function setChceFV(?string $chceFV): self
+    public function setChceFV(bool $chceFV): PreKlient
     {
         $this->chceFV = $chceFV;
         return $this;
     }
 
     /**
-     * @param PreAdres|null $adresGlowny
+     * @param PreAdres $adresGlowny
      *
-     * return self
+     * @return PreKlient
      */
-    public function setAdresGlowny(?PreAdres $adresGlowny): self
+    public function setAdresGlowny(PreAdres $adresGlowny): PreKlient
     {
         $this->adresGlowny = $adresGlowny;
         return $this;
