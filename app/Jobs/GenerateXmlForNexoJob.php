@@ -198,7 +198,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
                 if (is_numeric($key)) {
                     $key = $node_name;
                 }
-                if (!empty($value) || $value === 0) {
+                if (!empty($value) || $value === 0 || $value === '0' || $value === 0.0) {
                     $xml .= '<' . ucfirst($key) . '>' . self::generateXmlFromArray($value, $node_name) . '</' . ucfirst($key) . '>';
                 } else {
                     $xml .= '<' . ucfirst($key) . '/>';
