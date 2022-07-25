@@ -116,7 +116,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
                         ->setSymbol($item->product->getSimpleSymbol())
                         ->setCenaKartotekowaNetto(0)
                         ->setCenaNetto($item->net_purchase_price_commercial_unit)
-                        ->setJM($item->product->packing->calculation_unit)
+                        ->setJM($item->product->packing->unit_commercial)
                         ->setVat($item->product->price->vat ?? 23)
                         ->setWysokosc(0)
                         ->setSzerokosc(0)
@@ -198,7 +198,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
                 if (is_numeric($key)) {
                     $key = $node_name;
                 }
-                if (!empty($value) || $value === 0) {
+                if (!empty($value) || $value === 0 || $value === '0' || $value === 0.0) {
                     $xml .= '<' . ucfirst($key) . '>' . self::generateXmlFromArray($value, $node_name) . '</' . ucfirst($key) . '>';
                 } else {
                     $xml .= '<' . ucfirst($key) . '/>';

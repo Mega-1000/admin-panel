@@ -199,7 +199,7 @@ class PreKlient
     }
 
     /**
-     * @param string $nrRachunku
+     * @param string|null $nrRachunku
      *
      * @return PreKlient
      */
@@ -210,11 +210,11 @@ class PreKlient
     }
 
     /**
-     * @param bool $chceFV
+     * @param string $chceFV
      *
      * @return PreKlient
      */
-    public function setChceFV(bool $chceFV): PreKlient
+    public function setChceFV(string $chceFV): PreKlient
     {
         $this->chceFV = $chceFV;
         return $this;
