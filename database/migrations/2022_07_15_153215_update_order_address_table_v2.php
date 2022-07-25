@@ -14,7 +14,7 @@ class UpdateOrderAddressTableV2 extends Migration
     public function up()
     {
         Schema::table('order_addresses', function (Blueprint $table) {
-            $table->boolean('isAbroad', 15)->nullable()->default(false);
+            $table->boolean('isAbroad')->nullable()->default(false);
         });
     }
 
