@@ -116,7 +116,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
                         ->setSymbol($item->product->getSimpleSymbol())
                         ->setCenaKartotekowaNetto(0)
                         ->setCenaNetto($item->net_purchase_price_commercial_unit)
-                        ->setJM($item->product->packing->calculation_unit)
+                        ->setJM($item->product->packing->unit_commercial)
                         ->setVat($item->product->price->vat ?? 23)
                         ->setWysokosc(0)
                         ->setSzerokosc(0)
