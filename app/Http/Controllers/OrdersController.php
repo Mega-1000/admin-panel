@@ -41,6 +41,7 @@ use App\Http\Requests\OrdersFindPackageRequest;
 use App\Http\Requests\OrderUpdateRequest;
 use App\Jobs\AddLabelJob;
 use App\Jobs\AllegroTrackingNumberUpdater;
+use App\Jobs\GenerateXmlForNexoJob;
 use App\Jobs\ImportOrdersFromSelloJob;
 use App\Jobs\Orders\MissingDeliveryAddressSendMailJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
@@ -2972,6 +2973,15 @@ class OrdersController extends Controller
         dispatch_now(new ImportOrdersFromSelloJob());
         return redirect()->route('orders.index')->with([
             'message' => 'Rozpoczęto import z Sello',
+            'alert-type' => 'success',
+        ]);
+    }
+
+    public function generateFs()
+    {
+        dispatch_now(new GenerateXmlForNexoJob());
+        return redirect()->route('orders.index')->with([
+            'message' => 'Rozpoczęto generowanie faktur sprzedaży',
             'alert-type' => 'success',
         ]);
     }

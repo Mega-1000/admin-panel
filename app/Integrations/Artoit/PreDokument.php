@@ -4,218 +4,409 @@ namespace App\Integrations\Artoit;
 
 use DateTime;
 
+/**
+ * PreDokument klas.
+ */
 class PreDokument
 {
-    private $adresDostawy;
-    private $klient;
-    private $uslugaTransportu;
-    private $uslugaTransportuCenaNetto;
-    private $uslugaTransportuCenaBrutto;
-    private $numer;
-    private $numerPelny;
-    private $numerZewnetrzny;
-    private $numerZewnetrzny2;
-    private $dataUtworzenia;
-    private $dataDostawy;
-    /// Data platnosci dokumentu
-    private $terminPlatnosci;
-    private $produkty;
-
-    private $uwagi;
-    private $rodzajPlatnosci;
-    private $waluta;
-    private $wartoscPoRabacieNetto;
-    private $wartoscPoRabacieBrutto;
-    private $wartoscNetto;
-    private $wartoscBrutto;
-    private $wartoscWplacona;
-    private $typDokumentu;
-    private $statusDokumentuWERP;
-
-    private $kategoria;
-    private $magazyn;
-    /// Do obsługi MM
-    private $magazynDo;
+    /**
+     * @var PreKlient
+     */
+    public $klient;
 
     /**
-     * @param PreAdres                $adresDostawy
-     * @param PreKlient               $klient
-     * @param string|null             $uslugaTransportu
-     * @param float|null              $uslugaTransportuCenaNetto
-     * @param float|null              $uslugaTransportuCenaBrutto
-     * @param int|null                $numer
-     * @param string|null             $numerPelny
-     * @param string|null             $numerZewnetrzny
-     * @param string|null             $numerZewnetrzny2
-     * @param DateTime|null          $dataUtworzenia
-     * @param DateTime|null          $dataDostawy
-     * @param DateTime|null          $terminPlatnosci
-     * @param array                   $produkty
-     * @param string|null             $uwagi
-     * @param string|null             $rodzajPlatnosci
-     * @param string|null             $waluta
-     * @param float|null              $wartoscPoRabacieNetto
-     * @param float|null              $wartoscPoRabacieBrutto
-     * @param float|null              $wartoscNetto
-     * @param float|null              $wartoscBrutto
-     * @param float|null              $wartoscWplacona
-     * @param ETypDokumentu_HandloMag $typDokumentu
-     * @param string|null             $statusDokumentuWERP
-     * @param string|null             $kategoria
-     * @param string|null             $magazyn
-     * @param string|null             $magazynDo
+     * @var string
      */
-    public function __construct(
-        PreAdres                $adresDostawy,
-        PreKlient               $klient,
-        ?string                 $uslugaTransportu,
-        ?float                  $uslugaTransportuCenaNetto,
-        ?float                  $uslugaTransportuCenaBrutto,
-        ?int                    $numer,
-        ?string                 $numerPelny,
-        ?string                 $numerZewnetrzny,
-        ?string                 $numerZewnetrzny2,
-        ?DateTime               $dataUtworzenia,
-        ?DateTime               $dataDostawy,
-        ?DateTime               $terminPlatnosci,
-        array                   $produkty,
-        ?string                 $uwagi,
-        ?string                 $rodzajPlatnosci,
-        ?string                 $waluta,
-        ?float                  $wartoscPoRabacieNetto,
-        ?float                  $wartoscPoRabacieBrutto,
-        ?float                  $wartoscNetto,
-        ?float                  $wartoscBrutto,
-        ?float                  $wartoscWplacona,
-        ETypDokumentu_HandloMag $typDokumentu,
-        ?string                 $statusDokumentuWERP,
-        ?string                 $kategoria,
-        ?string                 $magazyn,
-        ?string                 $magazynDo
-    )
+    public $uslugaTransportu;
+
+    /**
+     * @var float
+     */
+    public $uslugaTransportuCenaNetto;
+
+    /**
+     * @var float
+     */
+    public $uslugaTransportuCenaBrutto;
+
+    /**
+     * @var int
+     */
+    public $numer;
+
+    /**
+     * @var string
+     */
+    public $numerPelny;
+
+    /**
+     * @var string
+     */
+    public $numerZewnetrzny;
+
+    /**
+     * @var string
+     */
+    public $numerZewnetrzny2;
+
+    /**
+     * @var DateTime
+     */
+    public $dataUtworzenia;
+
+    /**
+     * @var DateTime
+     */
+    public $dataDostawy;
+
+    /**
+     * @var DateTime
+     */
+    public $terminPlatnosci;
+
+    /**
+     * @var array
+     */
+    public $produkty;
+
+    /**
+     * @var string
+     */
+    public $uwagi;
+
+    /**
+     * @var string
+     */
+    public $rodzajPlatnosci;
+
+    /**
+     * @var string
+     */
+    public $waluta;
+
+    /**
+     * @var float
+     */
+    public $wartoscPoRabacieNetto;
+
+    /**
+     * @var float
+     */
+    public $wartoscPoRabacieBrutto;
+
+    /**
+     * @var float
+     */
+    public $wartoscNetto;
+
+    /**
+     * @var float
+     */
+    public $wartoscBrutto;
+
+    /**
+     * @var float
+     */
+    public $wartoscWplacona;
+
+    /**
+     * @var ETypDokumentu_HandloMag
+     */
+    public $typDokumentu;
+
+    /**
+     * @var string
+     */
+    public $statusDokumentuWERP;
+
+    /**
+     * @var string
+     */
+    public $kategoria;
+
+    /**
+     * @var string
+     */
+    public $magazyn;
+
+    /**
+     * @var string
+     */
+    public $magazynDo;
+
+    /**
+     * @param mixed $klient
+     *
+     * @return PreDokument
+     */
+    public function setKlient(PreKlient $klient)
     {
-        $this->adresDostawy = $adresDostawy;
         $this->klient = $klient;
+        return $this;
+    }
+
+    /**
+     * @param string $uslugaTransportu
+     *
+     * @return PreDokument
+     */
+    public function setUslugaTransportu(string $uslugaTransportu)
+    {
         $this->uslugaTransportu = $uslugaTransportu;
+        return $this;
+    }
+
+    /**
+     * @param float $uslugaTransportuCenaNetto
+     *
+     * @return PreDokument
+     */
+    public function setUslugaTransportuCenaNetto(float $uslugaTransportuCenaNetto)
+    {
         $this->uslugaTransportuCenaNetto = $uslugaTransportuCenaNetto;
+        return $this;
+    }
+
+    /**
+     * @param float $uslugaTransportuCenaBrutto
+     *
+     * @return PreDokument
+     */
+    public function setUslugaTransportuCenaBrutto(float $uslugaTransportuCenaBrutto)
+    {
         $this->uslugaTransportuCenaBrutto = $uslugaTransportuCenaBrutto;
+        return $this;
+    }
+
+    /**
+     * @param string $numer
+     *
+     * @return PreDokument
+     */
+    public function setNumer(string $numer)
+    {
         $this->numer = $numer;
+        return $this;
+    }
+
+    /**
+     * @param string $numerPelny
+     *
+     * @return PreDokument
+     */
+    public function setNumerPelny(string $numerPelny)
+    {
         $this->numerPelny = $numerPelny;
+        return $this;
+    }
+
+    /**
+     * @param string $numerZewnetrzny
+     *
+     * @return PreDokument
+     */
+    public function setNumerZewnetrzny(string $numerZewnetrzny)
+    {
         $this->numerZewnetrzny = $numerZewnetrzny;
+        return $this;
+    }
+
+    /**
+     * @param string $numerZewnetrzny2
+     *
+     * @return PreDokument
+     */
+    public function setNumerZewnetrzny2(string $numerZewnetrzny2)
+    {
         $this->numerZewnetrzny2 = $numerZewnetrzny2;
+        return $this;
+    }
+
+    /**
+     * @param string $dataUtworzenia
+     *
+     * @return PreDokument
+     */
+    public function setDataUtworzenia(string $dataUtworzenia)
+    {
         $this->dataUtworzenia = $dataUtworzenia;
+        return $this;
+    }
+
+    /**
+     * @param string $dataDostawy
+     *
+     * @return PreDokument
+     */
+    public function setDataDostawy(string $dataDostawy)
+    {
         $this->dataDostawy = $dataDostawy;
+        return $this;
+    }
+
+    /**
+     * @param string $terminPlatnosci
+     *
+     * @return PreDokument
+     */
+    public function setTerminPlatnosci(string $terminPlatnosci)
+    {
         $this->terminPlatnosci = $terminPlatnosci;
+        return $this;
+    }
+
+    /**
+     * @param array $produkty
+     *
+     * @return PreDokument
+     */
+    public function setProdukty(array $produkty)
+    {
         $this->produkty = $produkty;
+        return $this;
+    }
+
+    /**
+     * @param string $uwagi
+     *
+     * @return PreDokument
+     */
+    public function setUwagi(string $uwagi)
+    {
         $this->uwagi = $uwagi;
+        return $this;
+    }
+
+    /**
+     * @param string $rodzajPlatnosci
+     *
+     * @return PreDokument
+     */
+    public function setRodzajPlatnosci(string $rodzajPlatnosci)
+    {
         $this->rodzajPlatnosci = $rodzajPlatnosci;
+        return $this;
+    }
+
+    /**
+     * @param string $waluta
+     *
+     * @return PreDokument
+     */
+    public function setWaluta(string $waluta)
+    {
         $this->waluta = $waluta;
+        return $this;
+    }
+
+    /**
+     * @param float $wartoscPoRabacieNetto
+     *
+     * @return PreDokument
+     */
+    public function setWartoscPoRabacieNetto(float $wartoscPoRabacieNetto)
+    {
         $this->wartoscPoRabacieNetto = $wartoscPoRabacieNetto;
+        return $this;
+    }
+
+    /**
+     * @param float $wartoscPoRabacieBrutto
+     *
+     * @return PreDokument
+     */
+    public function setWartoscPoRabacieBrutto(float $wartoscPoRabacieBrutto)
+    {
         $this->wartoscPoRabacieBrutto = $wartoscPoRabacieBrutto;
+        return $this;
+    }
+
+    /**
+     * @param float $wartoscNetto
+     *
+     * @return PreDokument
+     */
+    public function setWartoscNetto(float $wartoscNetto)
+    {
         $this->wartoscNetto = $wartoscNetto;
+        return $this;
+    }
+
+    /**
+     * @param float $wartoscBrutto
+     *
+     * @return PreDokument
+     */
+    public function setWartoscBrutto(float $wartoscBrutto)
+    {
         $this->wartoscBrutto = $wartoscBrutto;
+        return $this;
+    }
+
+    /**
+     * @param float $wartoscWplacona
+     *
+     * @return PreDokument
+     */
+    public function setWartoscWplacona(float $wartoscWplacona)
+    {
         $this->wartoscWplacona = $wartoscWplacona;
+        return $this;
+    }
+
+    /**
+     * @param string $typDokumentu
+     *
+     * @return PreDokument
+     */
+    public function setTypDokumentu(string $typDokumentu)
+    {
         $this->typDokumentu = $typDokumentu;
+        return $this;
+    }
+
+    /**
+     * @param string $statusDokumentuWERP
+     *
+     * @return PreDokument
+     */
+    public function setStatusDokumentuWERP(string $statusDokumentuWERP)
+    {
         $this->statusDokumentuWERP = $statusDokumentuWERP;
+        return $this;
+    }
+
+    /**
+     * @param string $kategoria
+     *
+     * @return PreDokument
+     */
+    public function setKategoria(string $kategoria)
+    {
         $this->kategoria = $kategoria;
+        return $this;
+    }
+
+    /**
+     * @param string $magazyn
+     *
+     * @return PreDokument
+     */
+    public function setMagazyn(string $magazyn)
+    {
         $this->magazyn = $magazyn;
+        return $this;
+    }
+
+    /**
+     * @param string $magazynDo
+     *
+     * @return PreDokument
+     */
+    public function setMagazynDo(string $magazynDo)
+    {
         $this->magazynDo = $magazynDo;
-    }
-
-    /**
-     * @return PreAdres
-     */
-    public function getAdresDostawy(): PreAdres
-    {
-        return $this->adresDostawy;
-    }
-
-    /**
-     * @return PreKlient
-     */
-    public function getKlient(): PreKlient
-    {
-        return $this->klient;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getUslugaTransportu(): ?string
-    {
-        return $this->uslugaTransportu;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getUslugaTransportuCenaNetto(): ?float
-    {
-        return $this->uslugaTransportuCenaNetto;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getUslugaTransportuCenaBrutto(): ?float
-    {
-        return $this->uslugaTransportuCenaBrutto;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getNumer(): ?int
-    {
-        return $this->numer;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getNumerPelny(): ?string
-    {
-        return $this->numerPelny;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getNumerZewnetrzny(): ?string
-    {
-        return $this->numerZewnetrzny;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getNumerZewnetrzny2(): ?string
-    {
-        return $this->numerZewnetrzny2;
-    }
-
-    /**
-     * @return DateTime|null
-     */
-    public function getDataUtworzenia(): ?DateTime
-    {
-        return $this->dataUtworzenia;
-    }
-
-    /**
-     * @return DateTime|null
-     */
-    public function getDataDostawy(): ?DateTime
-    {
-        return $this->dataDostawy;
-    }
-
-    /**
-     * @return DateTime|null
-     */
-    public function getTerminPlatnosci(): ?DateTime
-    {
-        return $this->terminPlatnosci;
+        return $this;
     }
 
     /**
@@ -223,110 +414,6 @@ class PreDokument
      */
     public function getProdukty(): array
     {
-        return $this->produkty;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getUwagi(): ?string
-    {
-        return $this->uwagi;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getRodzajPlatnosci(): ?string
-    {
-        return $this->rodzajPlatnosci;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getWaluta(): ?string
-    {
-        return $this->waluta;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getWartoscPoRabacieNetto(): ?float
-    {
-        return $this->wartoscPoRabacieNetto;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getWartoscPoRabacieBrutto(): ?float
-    {
-        return $this->wartoscPoRabacieBrutto;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getWartoscNetto(): ?float
-    {
-        return $this->wartoscNetto;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getWartoscBrutto(): ?float
-    {
-        return $this->wartoscBrutto;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getWartoscWplacona(): ?float
-    {
-        return $this->wartoscWplacona;
-    }
-
-    /**
-     * @return ETypDokumentu_HandloMag
-     */
-    public function getTypDokumentu(): ETypDokumentu_HandloMag
-    {
-        return $this->typDokumentu;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getStatusDokumentuWERP(): ?string
-    {
-        return $this->statusDokumentuWERP;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getKategoria(): ?string
-    {
-        return $this->kategoria;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getMagazyn(): ?string
-    {
-        return $this->magazyn;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getMagazynDo(): ?string
-    {
-        return $this->magazynDo;
+        return $this->produkty ?? [];
     }
 }

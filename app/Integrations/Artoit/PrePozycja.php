@@ -2,181 +2,232 @@
 
 namespace App\Integrations\Artoit;
 
+/**
+ *
+ */
 class PrePozycja
 {
-    private $towar;
-    private $rabatProcent;
-    private $cenaNettoPrzedRabatem;
-    private $cenaNettoPoRabacie;
-    private $cenaBruttoPrzedRabatem;
-    private $cenaBruttoPoRabacie;
-    private $ilosc;
-    private $vat;
-    private $opisPozycji;
-    private $kodDostawy;
-    private $wartoscCalejPozycjiNettoZRabatem;
-    private $wartoscCalejPozycjiBruttoZRabatem;
-    private $wartoscCalejPozycjiNetto;
-    private $wartoscCalejPozycjiBrutto;
+    /**
+     * @var PreTowar
+     */
+    public $towar;
 
     /**
-     * @param PreTowar    $towar
-     * @param float|null  $rabatProcent
-     * @param float|null  $cenaNettoPrzedRabatem
-     * @param float|null  $cenaNettoPoRabacie
-     * @param float|null  $cenaBruttoPrzedRabatem
-     * @param float|null  $cenaBruttoPoRabacie
-     * @param float|null  $ilosc
-     * @param float|null  $vat
-     * @param string|null $opisPozycji
-     * @param string|null $kodDostawy
-     * @param float|null  $wartoscCalejPozycjiNettoZRabatem
-     * @param float|null  $wartoscCalejPozycjiBruttoZRabatem
-     * @param float|null  $wartoscCalejPozycjiNetto
-     * @param float|null  $wartoscCalejPozycjiBrutto
+     * @var float
      */
-    public function __construct(
-        PreTowar $towar,
-        ?float   $rabatProcent,
-        ?float   $cenaNettoPrzedRabatem,
-        ?float   $cenaNettoPoRabacie,
-        ?float   $cenaBruttoPrzedRabatem,
-        ?float   $cenaBruttoPoRabacie,
-        ?float   $ilosc,
-        ?float   $vat,
-        ?string  $opisPozycji,
-        ?string  $kodDostawy,
-        ?float   $wartoscCalejPozycjiNettoZRabatem,
-        ?float   $wartoscCalejPozycjiBruttoZRabatem,
-        ?float   $wartoscCalejPozycjiNetto,
-        ?float   $wartoscCalejPozycjiBrutto
-    )
+    public $rabatProcent;
+
+    /**
+     * @var float
+     */
+    public $cenaNettoPrzedRabatem;
+
+    /**
+     * @var float
+     */
+    public $cenaNettoPoRabacie;
+
+    /**
+     * @var float
+     */
+    public $cenaBruttoPrzedRabatem;
+
+    /**
+     * @var float
+     */
+    public $cenaBruttoPoRabacie;
+
+    /**
+     * @var int
+     */
+    public $ilosc;
+
+    /**
+     * @var float
+     */
+    public $vat;
+
+    /**
+     * @var string
+     */
+    public $opisPozycji;
+
+    /**
+     * @var string
+     */
+    public $kodDostawy;
+
+    /**
+     * @var float
+     */
+    public $wartoscCalejPozycjiNettoZRabatem;
+
+    /**
+     * @var float
+     */
+    public $wartoscCalejPozycjiBruttoZRabatem;
+
+    /**
+     * @var float
+     */
+    public $wartoscCalejPozycjiNetto;
+
+    /**
+     * @var float
+     */
+    public $wartoscCalejPozycjiBrutto;
+
+    /**
+     * @param PreTowar $towar
+     *
+     * @return PrePozycja
+     */
+    public function setTowar(PreTowar $towar): PrePozycja
     {
         $this->towar = $towar;
+        return $this;
+    }
+
+    /**
+     * @param float $rabatProcent
+     *
+     * @return PrePozycja
+     */
+    public function setRabatProcent(float $rabatProcent): PrePozycja
+    {
         $this->rabatProcent = $rabatProcent;
+        return $this;
+    }
+
+    /**
+     * @param float $cenaNettoPrzedRabatem
+     *
+     * @return PrePozycja
+     */
+    public function setCenaNettoPrzedRabatem(float $cenaNettoPrzedRabatem): PrePozycja
+    {
         $this->cenaNettoPrzedRabatem = $cenaNettoPrzedRabatem;
+        return $this;
+    }
+
+    /**
+     * @param float $cenaNettoPoRabacie
+     *
+     * @return PrePozycja
+     */
+    public function setCenaNettoPoRabacie(float $cenaNettoPoRabacie): PrePozycja
+    {
         $this->cenaNettoPoRabacie = $cenaNettoPoRabacie;
+        return $this;
+    }
+
+    /**
+     * @param float $cenaBruttoPrzedRabatem
+     *
+     * @return PrePozycja
+     */
+    public function setCenaBruttoPrzedRabatem(float $cenaBruttoPrzedRabatem): PrePozycja
+    {
         $this->cenaBruttoPrzedRabatem = $cenaBruttoPrzedRabatem;
+        return $this;
+    }
+
+    /**
+     * @param float $cenaBruttoPoRabacie
+     *
+     * @return PrePozycja
+     */
+    public function setCenaBruttoPoRabacie(float $cenaBruttoPoRabacie): PrePozycja
+    {
         $this->cenaBruttoPoRabacie = $cenaBruttoPoRabacie;
+        return $this;
+    }
+
+    /**
+     * @param int $ilosc
+     *
+     * @return PrePozycja
+     */
+    public function setIlosc(int $ilosc): PrePozycja
+    {
         $this->ilosc = $ilosc;
+        return $this;
+    }
+
+    /**
+     * @param float $vat
+     *
+     * @return PrePozycja
+     */
+    public function setVat(float $vat): PrePozycja
+    {
         $this->vat = $vat;
+        return $this;
+    }
+
+    /**
+     * @param string $opisPozycji
+     *
+     * @return PrePozycja
+     */
+    public function setOpisPozycji(string $opisPozycji): PrePozycja
+    {
         $this->opisPozycji = $opisPozycji;
+        return $this;
+    }
+
+    /**
+     * @param string $kodDostawy
+     *
+     * @return PrePozycja
+     */
+    public function setKodDostawy(string $kodDostawy): PrePozycja
+    {
         $this->kodDostawy = $kodDostawy;
+        return $this;
+    }
+
+    /**
+     * @param float $wartoscCalejPozycjiNettoZRabatem
+     *
+     * @return PrePozycja
+     */
+    public function setWartoscCalejPozycjiNettoZRabatem(float $wartoscCalejPozycjiNettoZRabatem): PrePozycja
+    {
         $this->wartoscCalejPozycjiNettoZRabatem = $wartoscCalejPozycjiNettoZRabatem;
+        return $this;
+    }
+
+    /**
+     * @param float $wartoscCalejPozycjiBruttoZRabatem
+     *
+     * @return PrePozycja
+     */
+    public function setWartoscCalejPozycjiBruttoZRabatem(float $wartoscCalejPozycjiBruttoZRabatem): PrePozycja
+    {
         $this->wartoscCalejPozycjiBruttoZRabatem = $wartoscCalejPozycjiBruttoZRabatem;
+        return $this;
+    }
+
+    /**
+     * @param float $wartoscCalejPozycjiNetto
+     *
+     * @return PrePozycja
+     */
+    public function setWartoscCalejPozycjiNetto(float $wartoscCalejPozycjiNetto): PrePozycja
+    {
         $this->wartoscCalejPozycjiNetto = $wartoscCalejPozycjiNetto;
+        return $this;
+    }
+
+    /**
+     * @param float $wartoscCalejPozycjiBrutto
+     *
+     * @return PrePozycja
+     */
+    public function setWartoscCalejPozycjiBrutto(float $wartoscCalejPozycjiBrutto): PrePozycja
+    {
         $this->wartoscCalejPozycjiBrutto = $wartoscCalejPozycjiBrutto;
-    }
-
-    /**
-     * @return PreTowar
-     */
-    public function getTowar(): PreTowar
-    {
-        return $this->towar;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getRabatProcent(): ?float
-    {
-        return $this->rabatProcent;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getCenaNettoPrzedRabatem(): ?float
-    {
-        return $this->cenaNettoPrzedRabatem;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getCenaNettoPoRabacie(): ?float
-    {
-        return $this->cenaNettoPoRabacie;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getCenaBruttoPrzedRabatem(): ?float
-    {
-        return $this->cenaBruttoPrzedRabatem;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getCenaBruttoPoRabacie(): ?float
-    {
-        return $this->cenaBruttoPoRabacie;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getIlosc(): ?float
-    {
-        return $this->ilosc;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getVat(): ?float
-    {
-        return $this->vat;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getOpisPozycji(): ?string
-    {
-        return $this->opisPozycji;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getKodDostawy(): ?string
-    {
-        return $this->kodDostawy;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getWartoscCalejPozycjiNettoZRabatem(): ?float
-    {
-        return $this->wartoscCalejPozycjiNettoZRabatem;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getWartoscCalejPozycjiBruttoZRabatem(): ?float
-    {
-        return $this->wartoscCalejPozycjiBruttoZRabatem;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getWartoscCalejPozycjiNetto(): ?float
-    {
-        return $this->wartoscCalejPozycjiNetto;
-    }
-
-    /**
-     * @return float|null
-     */
-    public function getWartoscCalejPozycjiBrutto(): ?float
-    {
-        return $this->wartoscCalejPozycjiBrutto;
+        return $this;
     }
 }

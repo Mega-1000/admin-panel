@@ -5,192 +5,174 @@ namespace App\Integrations\Artoit;
 class PreKlient
 {
 
-    private $typ;
+    public $typ;
 
-    private $symbol;
-    private $nazwa;
-    private $nazwaPelna;
-    private $osobaImie;
-    private $sobaNazwisko;
-    private $NIP;
-    private $NIPUE;
-    private $email;
-    private $telefon;
-    private $rodzajNaDok;
-    private $nrRachunku;
-    private $chceFV;
-    private $adresGlowny;
-    private $adresKoresp;
+    public $symbol;
+    public $nazwa;
+    public $nazwaPelna;
+    public $osobaImie;
+    public $osobaNazwisko;
+    public $NIP;
+    public $NIPUE;
+    public $email;
+    public $telefon;
+    public $rodzajNaDok;
+    public $nrRachunku;
+    public $chceFV;
+    public $adresGlowny;
 
     /**
-     * @param EPreKlientTyp         $typ
-     * @param string|null           $symbol
-     * @param string|null           $nazwa
-     * @param string|null           $nazwaPelna
-     * @param string|null           $osobaImie
-     * @param string|null           $sobaNazwisko
-     * @param string|null           $NIP
-     * @param string|null           $NIPUE
-     * @param string|null           $email
-     * @param string|null           $telefon
-     * @param EPreKlientRodzajNaDok $rodzajNaDok
-     * @param string|null           $nrRachunku
-     * @param string|null           $chceFV
-     * @param PreAdres              $adresGlowny
-     * @param PreAdres              $adresKoresp
+     * @param EPreKlientTyp|string|null $typ
+     *
+     * return self
      */
-    public function __construct(
-        EPreKlientTyp         $typ,
-        ?string               $symbol,
-        ?string               $nazwa,
-        ?string               $nazwaPelna,
-        ?string               $osobaImie,
-        ?string               $sobaNazwisko,
-        ?string               $NIP,
-        ?string               $NIPUE,
-        ?string               $email,
-        ?string               $telefon,
-        EPreKlientRodzajNaDok $rodzajNaDok,
-        ?string               $nrRachunku,
-        ?string               $chceFV,
-        PreAdres              $adresGlowny,
-        PreAdres              $adresKoresp
-    )
+    public function setTyp($typ): self
     {
         $this->typ = $typ;
-        $this->symbol = $symbol;
+        return $this;
+    }
+
+    /**
+     * @param string|null $symbol
+     *
+     * return self
+     */
+    public function setSymbol(?string $symbol): self
+    {
+        $rawSymbol = explode('-', $symbol);
+        $this->symbol = $rawSymbol[0];
+        return $this;
+    }
+
+    /**
+     * @param string|null $nazwa
+     *
+     * return self
+     */
+    public function setNazwa(?string $nazwa): self
+    {
         $this->nazwa = $nazwa;
+        return $this;
+    }
+
+    /**
+     * @param string|null $nazwaPelna
+     *
+     * return self
+     */
+    public function setNazwaPelna(?string $nazwaPelna): self
+    {
         $this->nazwaPelna = $nazwaPelna;
+        return $this;
+    }
+
+    /**
+     * @param string|null $osobaImie
+     *
+     * return self
+     */
+    public function setOsobaImie(?string $osobaImie): self
+    {
         $this->osobaImie = $osobaImie;
-        $this->sobaNazwisko = $sobaNazwisko;
+        return $this;
+    }
+
+    /**
+     * @param string|null $osobaNazwisko
+     *
+     * return self
+     */
+    public function setOsobaNazwisko(?string $osobaNazwisko): self
+    {
+        $this->osobaNazwisko = $osobaNazwisko;
+        return $this;
+    }
+
+    /**
+     * @param string|null $NIP
+     *
+     * return self
+     */
+    public function setNIP(?string $NIP): self
+    {
         $this->NIP = $NIP;
+        return $this;
+    }
+
+    /**
+     * @param string|null $NIPUE
+     *
+     * return self
+     */
+    public function setNIPUE(?string $NIPUE): self
+    {
         $this->NIPUE = $NIPUE;
+        return $this;
+    }
+
+    /**
+     * @param string|null $email
+     *
+     * return self
+     */
+    public function setEmail(?string $email): self
+    {
         $this->email = $email;
+        return $this;
+    }
+
+    /**
+     * @param string|null $telefon
+     *
+     * return self
+     */
+    public function setTelefon(?string $telefon): self
+    {
         $this->telefon = $telefon;
+        return $this;
+    }
+
+    /**
+     * @param EPreKlientRodzajNaDok|string|null $rodzajNaDok
+     *
+     * return self
+     */
+    public function setRodzajNaDok($rodzajNaDok): self
+    {
         $this->rodzajNaDok = $rodzajNaDok;
+        return $this;
+    }
+
+    /**
+     * @param string|null $nrRachunku
+     *
+     * return self
+     */
+    public function setNrRachunku(?string $nrRachunku): self
+    {
         $this->nrRachunku = $nrRachunku;
+        return $this;
+    }
+
+    /**
+     * @param string|null $chceFV
+     *
+     * return self
+     */
+    public function setChceFV(?string $chceFV): self
+    {
         $this->chceFV = $chceFV;
+        return $this;
+    }
+
+    /**
+     * @param PreAdres|null $adresGlowny
+     *
+     * return self
+     */
+    public function setAdresGlowny(?PreAdres $adresGlowny): self
+    {
         $this->adresGlowny = $adresGlowny;
-        $this->adresKoresp = $adresKoresp;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getTyp(): ?string
-    {
-        return $this->typ;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getSymbol(): ?string
-    {
-        return $this->symbol;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getNazwa(): ?string
-    {
-        return $this->nazwa;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getNazwaPelna(): ?string
-    {
-        return $this->nazwaPelna;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getOsobaImie(): ?string
-    {
-        return $this->osobaImie;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getSobaNazwisko(): ?string
-    {
-        return $this->sobaNazwisko;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getNIP(): ?string
-    {
-        return $this->NIP;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getNIPUE(): ?string
-    {
-        return $this->NIPUE;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getEmail(): ?string
-    {
-        return $this->email;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getTelefon(): ?string
-    {
-        return $this->telefon;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getRodzajNaDok(): ?string
-    {
-        return $this->rodzajNaDok;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getNrRachunku(): ?string
-    {
-        return $this->nrRachunku;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getChceFV(): ?string
-    {
-        return $this->chceFV;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getAdresGlowny(): ?string
-    {
-        return $this->adresGlowny;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getAdresKoresp(): ?string
-    {
-        return $this->adresKoresp;
+        return $this;
     }
 }

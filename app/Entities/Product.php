@@ -234,7 +234,7 @@ class Product extends Model implements Transformable
     {
         return $this->belongsTo(Firm::class, 'product_name_supplier', 'symbol');
     }
-	
+
 	/**
 	 * @return \Illuminate\Database\Eloquent\Relations\HasMany
 	 */
@@ -242,7 +242,7 @@ class Product extends Model implements Transformable
 	{
 		return $this->hasMany(ProductAnalyzer::class);
 	}
-	
+
     public function isInTransportGroup()
     {
         return $this->tradeGroups()->count() > 0;
@@ -271,5 +271,11 @@ class Product extends Model implements Transformable
     public function getPositions()
     {
         return $this->stock->position;
+    }
+
+    public function getSimpleSymbol()
+    {
+        $rawSymbol = explode('-', $this->symbol);
+        return $rawSymbol[0];
     }
 }
