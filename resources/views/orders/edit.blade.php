@@ -557,9 +557,17 @@
                            name="order_delivery_address_flat_number"
                            value="{{ $orderDeliveryAddress->flat_number ?? ''}}">
                 </div>
-
-
-
+                <div class="form-group" style="width: 15%; float: left; padding: 5px;">
+                    <label for="order_delivery_address_isAbroad">
+                        Wysyłka za granice
+                    </label>
+                    <input type="checkbox" id="order_delivery_address_isAbroad"
+                           name="order_delivery_address_isAbroad" value="1"
+                           @if ($orderDeliveryAddress->isAbroad)
+                           checked
+                            @endif
+                    >
+                </div>
             </div>
 
             <h3 style="float: left; width: 100%;">Dane do faktury</h3>
@@ -620,9 +628,9 @@
                            value="{{ $orderInvoiceAddress->flat_number ?? ''}}">
                 </div>
                 <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                    <label for="order_delivery_address_city">@lang('customers.form.delivery_city')</label>
+                    <label for="order_invoice_address_city">@lang('customers.form.delivery_city')</label>
                     <select class="form-control" id="order_delivery_address_country_id"
-                            name="order_delivery_address_country_id">
+                            name="order_invoice_address_country_id">
                         @foreach($countries as $country)
                             <option value="{{$country->id}}" @if ($country->id == $orderInvoiceAddress->country_id) selected @endif>{{$country->name}}</option>
                         @endforeach

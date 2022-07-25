@@ -127,7 +127,7 @@ class AllegroOrderSynchro implements ShouldQueue
             $order->allegro_additional_service = $allegroOrder['delivery']['method']['name'];
             $order->payment_channel = $allegroOrder['payment']['provider'];
             $order->allegro_payment_id = $allegroOrder['payment']['id'];
-            $order->save();
+            $order->saveQuietly();
 
             if ($allegroOrder['messageToSeller'] !== null) {
                 $this->createChat($order->id, $customer->id, $allegroOrder['messageToSeller']);
@@ -153,9 +153,13 @@ class AllegroOrderSynchro implements ShouldQueue
 
             $this->createOrUpdateCustomerAddress($customer, $invoiceAddress, CustomerAddress::ADDRESS_TYPE_INVOICE);
             if (array_key_exists('pickupPoint', $allegroOrder['delivery']) && $allegroOrder['delivery']['pickupPoint'] !== null) {
-                $allegroOrder['delivery']['address']['firstName'] = $allegroOrder['delivery']['pickupPoint']['name'];
+                $allegroOrder['delivery']['address']['firstName'] = 'Paczkomat';
                 $allegroOrder['delivery']['address']['lastName'] = $allegroOrder['delivery']['pickupPoint']['id'];
-                $allegroOrder['delivery']['address'] = array_merge($allegroOrder['delivery']['address'], $allegroOrder['delivery']['pickupPoint']['address']);
+                if (!array_key_exists('address', $allegroOrder['delivery']['pickupPoint'])) {
+                    Log::info('PickupPoint address error: order: '. $order->id .', AllId' . $allegroOrder['id'] , $allegroOrder['delivery']);
+                } else {
+                    $allegroOrder['delivery']['address'] = array_merge($allegroOrder['delivery']['address'], $allegroOrder['delivery']['pickupPoint']['address']);
+                }
             }
             $this->createOrUpdateOrderAddress($order, $allegroOrder['buyer'], $allegroOrder['delivery']['address']);
 
@@ -171,14 +175,14 @@ class AllegroOrderSynchro implements ShouldQueue
 
             if ($orderDeliveryAddressErrors->any()) {
                 $order->labels_log .= Order::formatMessage(null, implode(' ', $orderDeliveryAddressErrors->all(':message')));
-                $order->save();
+                $order->saveQuietly();
 
             }
 
             if (!Helper::phoneIsCorrect($orderDeliveryAddress->phone)) {
                 $order->labels_log .= Order::formatMessage(null, 'ebudownictwo@wp.pl 691801594 55-200');
-                $order->save();
-                dispatch_now(new AddLabelJob($orderDeliveryAddress->order_id, [176]));
+                $order->labels()->attach(176);
+                $order->saveQuietly();
             }
 
             // order package
@@ -199,7 +203,24 @@ class AllegroOrderSynchro implements ShouldQueue
             $order->warehouse()->associate($warehouse);
             $order->setDefaultDates('allegro');
 
-            $order->save();
+            $order->saveQuietly();
+
+            if (($orderInvoiceAddress = $order->getInvoiceAddress())
+                && ($orderDeliveryAddress = $order->getDeliveryAddress())) {
+                $orderAddressService = new OrderAddressService();
+
+                $orderAddressService->addressIsValid($orderInvoiceAddress);
+                $orderInvoiceAddressErrors = $orderAddressService->errors();
+
+                $orderAddressService->addressIsValid($orderDeliveryAddress);
+                $orderDeliveryAddressErrors = $orderAddressService->errors();
+                if (!$orderInvoiceAddressErrors->any() && !$orderDeliveryAddressErrors->any()) {
+                    $order->labels()->attach(39);
+                    $order->labels()->attach(133);
+                    $order->labels()->attach(Label::BLUE_HAMMER_ID);
+                    $order->labels()->attach(69);
+                }
+            }
 
             $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
         }
@@ -220,6 +241,7 @@ class AllegroOrderSynchro implements ShouldQueue
             'promise' => true,
             'promise_date' => $allegroPayment['finishedAt'],
         ]);
+        $order->labels()->attach(Label::BOOKED_FIRST_PAYMENT);
     }
 
     /**
@@ -402,7 +424,7 @@ class AllegroOrderSynchro implements ShouldQueue
             $order->items()->save($orderItem);
         }
         $order->weight = round($weight, 2);
-        $order->save();
+        $order->saveQuietly();
     }
 
     /**
@@ -485,6 +507,8 @@ class AllegroOrderSynchro implements ShouldQueue
             'order_id' => $order->id,
         ]);
 
+        list($code, $phone) = Helper::prepareCodeAndPhone($address['phoneNumber']);
+
         $addressData = [
             'type' => $type,
             'firstname' => $address['firstName'] ?? $address['naturalPerson']['firstName'],
@@ -495,10 +519,12 @@ class AllegroOrderSynchro implements ShouldQueue
             'firmname' => $address['companyName'] ?? $address['company']['name'] ?? null,
             'nip' => $address['company']['taxId'] ?? null,
             'postal_code' => $address['zipCode'] ?? $address['postCode'],
-            'phone' => $address['phoneNumber'],
+            'phone_code' => $code,
+            'phone' => $phone,
             'order_id' => $order->id,
             'email' => $buyer['email'],
-            'country_Id' => $country->id
+            'country_Id' => $country->id,
+            'isAbroad' => $country->id != 1
         ];
         $orderAddress->fill($addressData);
         $orderAddress->save();

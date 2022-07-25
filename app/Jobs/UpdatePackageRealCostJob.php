@@ -20,7 +20,7 @@ class UpdatePackageRealCostJob implements ShouldQueue {
     use IsMonitored;
 
     public function __construct() {
-        $this->orderPackageRepository = OrderPackage::all();
+    
     }
 
     public function handle() {
@@ -80,7 +80,8 @@ class UpdatePackageRealCostJob implements ShouldQueue {
         $inpostPackages = array();
         $pocztexPackages = array();
         $dpdPackages = array();
-        foreach ($this->orderPackageRepository as $package) {
+        $packages = OrderPackage::all();
+        foreach ($packages as $package) {
             switch ($package->service_courier_name) {
                 case "INPOST":
                     $inpostPackages[] = $package;

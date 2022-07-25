@@ -26,12 +26,12 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->job(Jobs\CheckStatusInpostPackagesJob::class)->everyFiveMinutes();
-    
+
         $schedule->job(Jobs\CheckPackagesStatusJob::class)->everyFiveMinutes()->between('13:00', '16:00');
         $schedule->job(Jobs\CheckPackagesStatusJob::class)->everyFifteenMinutes()->unlessBetween('16:00', '13:00');
-        
+
         $schedule->job(Jobs\ChangeShipmentDatePackagesJob::class)->dailyAt("00:30");
-        $schedule->job(Jobs\AllegroTrackingNumberUpdater::class)->dailyAt("02:00");
+        //$schedule->job(Jobs\AllegroTrackingNumberUpdater::class)->dailyAt("02:00");
         $schedule->job(Jobs\SendLPWithReminderSendingToWarehouseJob::class)->dailyAt("05:00");
         $schedule->job(Jobs\CheckPriceChangesInProductsJob::class)->dailyAt("04:00");
         $schedule->job(Jobs\CheckDateOfProductNewPriceJob::class)->dailyAt("04:30");
@@ -55,8 +55,8 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\ConfirmSentPackagesJob::class)->dailyAt("23:34");
         $schedule->job(Jobs\AutomaticallyFinishOrdersJob::class)->everyFifteenMinutes();
 //        $schedule->job(Jobs\ChangeDdpShipmentDatePackagesJob::class)->dailyAt("12:01");
-        
-        $schedule->job(Jobs\SendMessagesOnNewAllegroOrders::class)->everyFifteenMinutes();
+
+        //$schedule->job(Jobs\SendMessagesOnNewAllegroOrders::class)->everyFifteenMinutes();
         $schedule->job(Jobs\UpdateAllegroDisputes::class)->everyFifteenMinutes();
         $schedule->job(Jobs\GetNewAllegroDisputesJob::class)->everyFifteenMinutes();
 

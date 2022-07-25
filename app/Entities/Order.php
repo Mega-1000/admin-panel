@@ -6,6 +6,7 @@ namespace App\Entities;
 
 use App\Enums\PackageStatus;
 use App\Helpers\TaskTimeHelper;
+use App\Traits\SaveQuietlyTrait;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -26,6 +27,7 @@ use Prettus\Repository\Traits\TransformableTrait;
 class Order extends Model implements Transformable
 {
     use TransformableTrait;
+    use SaveQuietlyTrait;
 
     const STATUS_WITHOUT_REALIZATION = 8;
     const STATUS_ORDER_FINISHED = 6;
@@ -291,11 +293,17 @@ class Order extends Model implements Transformable
         ));
     }
 
+    /**
+     * @return OrderAddress
+     */
     public function getDeliveryAddress()
     {
         return $this->addresses()->where('type', '=', 'DELIVERY_ADDRESS')->first();
     }
 
+    /**
+     * @return OrderAddress
+     */
     public function getInvoiceAddress()
     {
         return $this->addresses()->where('type', '=', 'INVOICE_ADDRESS')->first();
