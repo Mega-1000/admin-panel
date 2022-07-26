@@ -172,7 +172,6 @@ class AllegroOrderSynchro implements ShouldQueue
             if ($orderDeliveryAddressErrors->any()) {
                 $order->labels_log .= Order::formatMessage(null, implode(' ', $orderDeliveryAddressErrors->all(':message')));
                 $order->save();
-
             }
 
             if (!Helper::phoneIsCorrect($orderDeliveryAddress->phone)) {
@@ -200,6 +199,8 @@ class AllegroOrderSynchro implements ShouldQueue
             $order->setDefaultDates('allegro');
 
             $order->save();
+
+            dispatch_now(new AddLabelJob($order, [177]));
 
             $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
         }
@@ -395,7 +396,6 @@ class AllegroOrderSynchro implements ShouldQueue
                 } else {
                     $orderItem->$column = $price->$column;
                 }
-
             }
 
             unset($orderItem->type);

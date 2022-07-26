@@ -111,7 +111,7 @@ class Helper
      */
     public static function prepareCodeAndPhone($number)
     {
-        $phone = (string) preg_replace('~[^0-9+]+~','', $number);
+        $phone = (string) preg_replace('/^\+?1|\|1|\D/','', $number);
         $len = strlen($phone);
         
         $hasPlus = $phone[0] == '+';
