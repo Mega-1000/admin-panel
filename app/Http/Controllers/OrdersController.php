@@ -430,11 +430,11 @@ class OrdersController extends Controller
 
 	    $orderAddressService = new OrderAddressService();
 
-	    $orderAddressService->addressIsValid($orderInvoiceAddress);
-	    $orderInvoiceAddressErrors = $orderAddressService->errors();
+        $orderAddressService->addressIsValid($orderInvoiceAddress);
+        $orderInvoiceAddressErrors = $orderAddressService->errors();
 
-	    $orderAddressService->addressIsValid($orderDeliveryAddress);
-	    $orderDeliveryAddressErrors = $orderAddressService->errors();
+        $orderAddressService->addressIsValid($orderDeliveryAddress);
+        $orderDeliveryAddressErrors = $orderAddressService->errors();
 
 	    $messages = $this->orderMessageRepository->orderBy('type')->findWhere(["order_id" => $order->id]);
         $emails = DB::table('emails_messages')->where('order_id', $orderId)->get();
@@ -930,6 +930,9 @@ class OrdersController extends Controller
             'refunded' => $request->input('refunded'),
             'warehouse_value' => $request->input('warehouse_value'),
             'production_date' => $request->input('production_date'),
+            'allegro_operation_date' => $request->input('allegro_operation_date'),
+            'allegro_form_id' => $request->input('allegro_form_id'),
+            'allegro_payment_id' => $request->input('allegro_payment_id'),
         ], $id);
 
         $orderObj = Order::find($id);
@@ -1068,7 +1071,8 @@ class OrdersController extends Controller
                     'lastname' => $request->input('order_delivery_address_lastname'),
                     'firmname' => $request->input('order_delivery_address_firmname'),
                     'email' => $request->input('order_delivery_address_email'),
-                    'country_id' => $request->input('order_delivery_address_country_id')
+                    'country_id' => $request->input('order_delivery_address_country_id'),
+                    'isAbroad' => $request->has('order_delivery_address_isAbroad')
                 ]
             );
         } else {
@@ -1086,7 +1090,8 @@ class OrdersController extends Controller
                     'lastname' => $request->input('order_delivery_address_lastname'),
                     'firmname' => $request->input('order_delivery_address_firmname'),
                     'email' => $request->input('order_delivery_address_email'),
-                    'country_id' => $request->input('order_delivery_address_country_id')
+                    'country_id' => $request->input('order_delivery_address_country_id'),
+                    'isAbroad' => $request->has('order_delivery_address_isAbroad')
                 ]
             );
         }

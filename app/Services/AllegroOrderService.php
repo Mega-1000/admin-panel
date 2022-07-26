@@ -13,6 +13,14 @@ use VIISON\AddressSplitter\Exceptions\SplittingException;
  *
  * @package App\Services
  *
+NEW  => nowe">nowe
+PROCESSING  => w realizacji
+SUSPENDED  => wstrzymane
+READY_FOR_SHIPMENT  => do wysłania
+READY_FOR_PICKUP  => do odbioru
+SENT  => wysłane
+PICKED_UP  => odebrane
+CANCELLED  => anulowane
  */
 class AllegroOrderService extends AllegroApiService
 {
@@ -25,7 +33,7 @@ class AllegroOrderService extends AllegroApiService
     const STATUS_PICKED_UP = "PICKED_UP";
     const STATUS_CANCELLED = "CANCELLED";
     const STATUS_SUSPENDED = "SUSPENDED";
-    
+
     const READY_FOR_PROCESSING = 'READY_FOR_PROCESSING';
 
     public function __construct()
@@ -223,7 +231,7 @@ class AllegroOrderService extends AllegroApiService
 
         return $response && is_array($response) && array_key_exists('checkoutForms', $response) ? $response['checkoutForms'] : [];
     }
-    
+
     /**
      * @return array|bool
      */
@@ -234,7 +242,7 @@ class AllegroOrderService extends AllegroApiService
         ];
         $url = $this->getRestUrl("/order/checkout-forms/{$formId}/fulfillment");
         $response = $this->request('PUT', $url, $params);
-        
+
         return $response;
     }
 }

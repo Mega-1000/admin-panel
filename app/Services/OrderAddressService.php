@@ -12,28 +12,30 @@ use Illuminate\Support\Facades\Validator;
 class OrderAddressService
 {
 	protected $errors = false;
-	
+
 	public function errors() {
 		return $this->errors;
 	}
-	
+
 	public function addressIsValid(OrderAddress $address): bool
 	{
 		$addressArray = $address->toArray();
 		$rules = $this->getRules($address);
-		
+
 		$validator = Validator::make($addressArray, $rules);
-		
+
 		$this->errors = $validator->errors();
-		
+
 		return !$validator->fails();
 	}
-	
+
 	public function preSaveCleanup(OrderAddress $address)
 	{
+	    $address->address = preg_replace('/ul\./i', '', $address->address);
+
 		foreach ($address->getFillable() as $field) {
 			$address->$field = is_null($address->$field) ? $address->$field : trim($address->$field);
-			
+
 			if ($address->type == OrderAddress::TYPE_INVOICE) {
 				if ($field == 'firmname' && $address->$field) {
 					$address->firstname = '';
@@ -41,13 +43,26 @@ class OrderAddressService
 				}
 			}
 		}
-		$this->reformatPhoneNumber($address);
+
 		$this->reformatPostalCode($address);
         $this->reformatNIP($address);
+        $this->reformatFirstLastName($address);
+	}
+
+    /**
+     * @param OrderAddress $address
+     *
+     */
+    protected function reformatFirstLastName(OrderAddress $address)
+    {
+        if ($address->firstname == 'Paczkomat') {
+            return;
+        }
+
         $address->firstname = Helper::clearSpecialChars($address->firstname);
         $address->lastname = Helper::clearSpecialChars($address->lastname, false);
-	}
-    
+    }
+
     /**
      * @param OrderAddress $address
      *
@@ -55,12 +70,12 @@ class OrderAddressService
 	protected function reformatPhoneNumber(OrderAddress $address)
 	{
         list($code, $phone) = Helper::prepareCodeAndPhone((string)$address->phone);
-        
+
         $address->phone_code = $address->phone_code . ($code ? '-' . $code : '');
         $address->phone_code = preg_replace('/[^0-9\+\-]+/', '', $address->phone_code);
         $address->phone = $phone;
 	}
-    
+
     /**
      * @param OrderAddress $address
      *
@@ -68,25 +83,25 @@ class OrderAddressService
 	protected function reformatPostalCode(OrderAddress $address)
 	{
         $postalCodeString = (string)$address->postal_code;
-	    
+
         if ($address->country_id == 1 && preg_match('/^[0-9]{5}$/', $postalCodeString)) {
             $address->postal_code = substr_replace($postalCodeString, '-', 2, 0);
         }
-        
+
         $address->postal_code = $postalCodeString;
 	}
-    
+
     protected function reformatNIP(OrderAddress $address)
     {
         $nipString = (string)$address->nip;
-        
+
         if ($address->country_id == 1) {
             $nipString = preg_replace('/[^0-9]+/', '', $nipString);
         }
-        
+
         $address->nip = $nipString;
     }
-    
+
 	protected function getRules(OrderAddress $address): array
 	{
 		$rules = [
@@ -97,7 +112,7 @@ class OrderAddressService
 			'postal_code' => ['required'],
 			'phone' => ['required']
 		];
-		
+
 		if ($address->type == OrderAddress::TYPE_DELIVERY) {
 			$rules['firstname'] = ['required'];
 			$rules['lastname'] = ['required'];
@@ -111,7 +126,7 @@ class OrderAddressService
 				$rules['nip'][] = new ValidNIP($address->country_id == 1);
 			}
 		}
-		
+
 		return $rules;
 	}
 }

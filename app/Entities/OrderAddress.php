@@ -39,7 +39,8 @@ class OrderAddress extends Model implements Transformable
         'city',
         'postal_code',
         'email',
-        'country_id'
+        'country_id',
+        'isAbroad'
     ];
 
 

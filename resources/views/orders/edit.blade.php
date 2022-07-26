@@ -273,11 +273,6 @@
                     <input type="text" class="form-control default-date-picker-now" id="shipment_date" name="shipment_date"
                            value="{{ $order->shipment_date }}">
                 </div>
-                <div class="form-group" style="width: 15%; float: left; padding: 5px;">
-                    <label for="allegro_transaction_id">@lang('orders.form.allegro_transaction_id')</label>
-                    <input type="text" class="form-control" id="allegro_transaction_id" name="allegro_transaction_id"
-                           value="{{ $order->allegro_transaction_id ?? '' }}">
-                </div>
                 @if($order->cash_on_dalivery_amount > 0)
                     <div class="form-group" style="width: 15%; float: left; padding: 5px;">
                         <label for="packing_warehouse_cost">@lang('orders.form.cash_on_delivery')</label>
@@ -291,11 +286,6 @@
                                value="@lang('orders.form.false')" disabled>
                     </div>
                 @endif
-                <div class="form-group" style="width: 15%; float: left; padding: 5px;">
-                    <label for="customer.nick_allegro">@lang('orders.form.nick_allegro')</label>
-                    <input type="text" class="form-control" id="customer.nick_allegro" name="customer.nick_allegro"
-                           value="{{ $order->customer->nick_allegro ?? ''}}" disabled>
-                </div>
                 <div class="form-group" style="width: 25%; float: left; padding: 5px;">
                     <label for="warehouse_value">@lang('orders.form.warehouse_value')</label>
                     <input type="number" class="form-control" id="warehouse_value" name="warehouse_value"
@@ -320,6 +310,64 @@
                     <label for="refunded">@lang('orders.form.refunded')</label>
                     <input step="0.01" type="number" class="form-control" id="refunded" name="refunded"
                            value="{{ $order->refunded ?? ''}}">
+                </div>
+            </div>
+            <div class="row">
+                <div class="panel panel-info panel-collapse">
+                    <div class="panel-heading text-center" style="padding: 5px;">
+                        Dane konfiguracyjne zamówienia z allegro
+                    </div>
+                    <div class="panel-body" style="padding:1em">
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="col-md-6" for="allegro_form_id">Identyfikator zamówienia w allegro</label>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" id="allegro_form_id" name="allegro_form_id"
+                                           value="{{ $order->allegro_form_id ?? '' }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="col-md-6"
+                                       for="customer.nick_allegro">@lang('orders.form.nick_allegro')</label>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" id="customer.nick_allegro"
+                                           name="customer.nick_allegro"
+                                           value="{{ $order->customer->nick_allegro ?? ''}}" disabled readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="col-md-6"
+                                       for="allegro_transaction_id">@lang('orders.form.allegro_transaction_id')</label>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" id="allegro_transaction_id"
+                                           name="allegro_transaction_id"
+                                           value="{{ $order->allegro_transaction_id ?? '' }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="col-md-6" for="allegro_operation_date">Data operacji w allegro</label>
+                                <div class="col-md-4">
+                                    <input type="date" class="form-control" id="allegro_operation_date"
+                                           name="allegro_operation_date" value="{{  \Carbon\Carbon::parse($order->allegro_operation_date)->format('Y-m-d') ?? '' }}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group row">
+                                <label class="col-md-6" for="allegro_payment_id">Identyfikator płatności allegro</label>
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" id="allegro_payment_id"
+                                           name="allegro_payment_id" value="{{ $order->allegro_payment_id }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="vue-components">
@@ -509,9 +557,17 @@
                            name="order_delivery_address_flat_number"
                            value="{{ $orderDeliveryAddress->flat_number ?? ''}}">
                 </div>
-
-
-
+                <div class="form-group" style="width: 15%; float: left; padding: 5px;">
+                    <label for="order_delivery_address_isAbroad">
+                        Wysyłka za granice
+                    </label>
+                    <input type="checkbox" id="order_delivery_address_isAbroad"
+                           name="order_delivery_address_isAbroad" value="1"
+                           @if ($orderDeliveryAddress->isAbroad)
+                           checked
+                            @endif
+                    >
+                </div>
             </div>
 
             <h3 style="float: left; width: 100%;">Dane do faktury</h3>
@@ -572,9 +628,9 @@
                            value="{{ $orderInvoiceAddress->flat_number ?? ''}}">
                 </div>
                 <div class="form-group" style="width: 11%; float: left; padding: 5px;">
-                    <label for="order_delivery_address_city">@lang('customers.form.delivery_city')</label>
+                    <label for="order_invoice_address_city">@lang('customers.form.delivery_city')</label>
                     <select class="form-control" id="order_delivery_address_country_id"
-                            name="order_delivery_address_country_id">
+                            name="order_invoice_address_country_id">
                         @foreach($countries as $country)
                             <option value="{{$country->id}}" @if ($country->id == $orderInvoiceAddress->country_id) selected @endif>{{$country->name}}</option>
                         @endforeach

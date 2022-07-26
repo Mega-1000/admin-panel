@@ -2184,7 +2184,7 @@
                     {
                         data: null,
                         name: 'sello_payment',
-                        render: (data, type, row) => (data.sello_payment ?? data.return_payment_id)
+                        render: (data, type, row) => (row.allegro_payment_id ?? data.sello_payment)
                     },
                     {
                         data: 'allegro_deposit_value',
