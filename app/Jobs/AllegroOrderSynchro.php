@@ -222,6 +222,8 @@ class AllegroOrderSynchro implements ShouldQueue
                 }
             }
 
+            dispatch_now(new AddLabelJob($order, [177]));
+
             $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
         }
     }
@@ -417,7 +419,6 @@ class AllegroOrderSynchro implements ShouldQueue
                 } else {
                     $orderItem->$column = $price->$column;
                 }
-
             }
 
             unset($orderItem->type);

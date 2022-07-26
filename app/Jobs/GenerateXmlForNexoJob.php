@@ -65,7 +65,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
         foreach ($orders as $order) {
             try {
                 $preDokument = new PreDokument();
-                $address = $order->getDeliveryAddress();
+                $address = $order->getInvoiceAddress();
                 $preAddress = new PreAdres();
                 $preAddress
                     ->setUlica($address->address . ' ' . $address->flat_number)
@@ -145,7 +145,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
                 $xml = self::generateValidXmlFromObj($preDokument);
                 Storage::disk('local')->put('public/XMLFS/' . $order->id . '_FS_' . Carbon::now()->format('d-m-Y') . '.xml', mb_convert_encoding($xml, "UTF-8", "auto"));
                 dispatch_now(new AddLabelJob($order, [Label::XML_INVOICE_GENERATED]));
-            } catch (\Throwable $ex) {dd($ex);
+            } catch (\Throwable $ex) {
                 Log::error($ex->getMessage());
                 \Session::flash('flash-message', ['type' => 'error', 'message' => $ex->getMessage()]);
             }

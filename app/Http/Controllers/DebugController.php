@@ -13,7 +13,7 @@ class DebugController extends Controller
     		return;
 	    }
     
-        CheckPackagesStatusJob::dispatchNow();
+        // CheckPackagesStatusJob::dispatchNow();
    //     dispatch_now(new ImportOrdersFromSelloJob());
     	$res = dispatch_now(new AllegroOrderSynchro());
     }
