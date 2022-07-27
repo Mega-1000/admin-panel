@@ -115,7 +115,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
                         ->setRodzaj(ERodzajTowaru::TOWAR)
                         ->setSymbol($item->product->getSimpleSymbol())
                         ->setCenaKartotekowaNetto(0)
-                        ->setCenaNetto($item->net_purchase_price_commercial_unit)
+                        ->setCenaNetto($item->net_purchase_price_commercial_unit ?? 0)
                         ->setJM($item->product->packing->unit_commercial)
                         ->setVat($item->product->price->vat ?? 23)
                         ->setWysokosc(0)
@@ -146,7 +146,11 @@ class GenerateXmlForNexoJob implements ShouldQueue
                 Storage::disk('local')->put('public/XMLFS/' . $order->id . '_FS_' . Carbon::now()->format('d-m-Y') . '.xml', mb_convert_encoding($xml, "UTF-8", "auto"));
                 dispatch_now(new AddLabelJob($order, [Label::XML_INVOICE_GENERATED]));
             } catch (\Throwable $ex) {
-                Log::error($ex->getMessage());
+                Log::error($ex->getMessage(), [
+                    'productId' => $item->product->id,
+                    'orderItemId' => $item->id,
+                    'orderId' => $order->id,
+                ]);
                 \Session::flash('flash-message', ['type' => 'error', 'message' => $ex->getMessage()]);
             }
         }
