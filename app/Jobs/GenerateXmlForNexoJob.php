@@ -60,7 +60,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
             $query->where('label_id', Label::ORDER_ITEMS_REDEEMED_LABEL);
         })->whereDoesntHave('labels', function ($query) {
             $query->where('label_id', Label::XML_INVOICE_GENERATED);
-        })->limit(5)->get();
+        })->get();
 
         foreach ($orders as $order) {
             try {
@@ -147,11 +147,11 @@ class GenerateXmlForNexoJob implements ShouldQueue
                 dispatch_now(new AddLabelJob($order, [Label::XML_INVOICE_GENERATED]));
             } catch (\Throwable $ex) {
                 Log::error($ex->getMessage(), [
-                    'productId' => $item->product->id,
-                    'orderItemId' => $item->id,
+                    'productId' => (isset($item)) ? $item->product->id : null,
+                    'orderItemId' => (isset($item)) ? $item->id : null,
                     'orderId' => $order->id,
                 ]);
-                \Session::flash('flash-message', ['type' => 'error', 'message' => $ex->getMessage()]);
+                continue;
             }
         }
     }
