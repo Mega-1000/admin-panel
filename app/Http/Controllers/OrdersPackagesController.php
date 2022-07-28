@@ -730,7 +730,7 @@ class OrdersPackagesController extends Controller
                 'flat_number' => $deliveryAddress->flat_number,
                 'city' => $deliveryAddress->city,
                 'email' => $deliveryAddress->email,
-                'phone' => $deliveryAddress->phone_full,
+                'phone' => $deliveryAddress->phone,
                 'firmname' => $deliveryAddress->firmname,
                 'nip' => $deliveryAddress->nip,
                 'postal_code' => $deliveryAddress->postal_code,

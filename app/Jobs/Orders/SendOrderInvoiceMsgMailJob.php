@@ -33,24 +33,24 @@ class SendOrderInvoiceMsgMailJob extends Job implements ShouldQueue
 	public function handle(EmailTagHandlerHelper $emailTagHandler, TagRepository $tagRepository)
 	{
 		dispatch_now(new GenerateOrderProformJob($this->order));
-		
+
 		$tags = $tagRepository->all();
 		$message = setting('allegro.order_invoice_msg');
-		
+
 		$subject = "Faktura za zakupy dokonane na allegro";
-		
+
 		$emailTagHandler->setOrder($this->order);
-		
+
 		foreach ($tags as $tag) {
 			$method = $tag->handler;
 			$message = preg_replace("[" . preg_quote($tag->name) . "]", $emailTagHandler->$method(), $message);
 		}
-		
+
 		$pdf = Storage::disk('local')->get($this->order->proformStoragePath);
-		
+
 		\Mailer::create()
 			->to($this->order->customer->login)
 			->send(new OrderMessageMail($subject, $message, $pdf));
-		dispatch_now(new AddLabelJob($this->order->id, [Label::ORDER_INVOICE_MSG_SENDED]));
+//		dispatch_now(new AddLabelJob($this->order->id, [Label::ORDER_INVOICE_MSG_SENDED]));
 	}
 }
