@@ -1486,6 +1486,10 @@ class OrdersController extends Controller
         foreach ($order->packages as $package) {
             $package->delete();
         }
+        foreach ($order->paymentsTransactions as $paymentLog) {
+            $paymentLog->delete();
+        }
+
         $deleted = $this->orderRepository->delete($id);
 
         if (empty($deleted)) {
