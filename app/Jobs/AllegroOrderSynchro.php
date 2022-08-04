@@ -120,7 +120,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 }
 
                 $order = new Order();
-                $customer = $this->findOrCreateCustomer($allegroOrder['buyer']);
+                $customer = $this->findOrCreateCustomer($allegroOrder['buyer'], $allegroOrder['delivery']['address']);
                 $order->customer_id = $customer->id;
                 $order->allegro_form_id = $allegroOrder['id'];
                 $order->status_id = 1;
@@ -440,11 +440,12 @@ class AllegroOrderSynchro implements ShouldQueue
      * Find customer by buyer
      *
      * @param array $buyer
+     * @param array $deliveryAddress
      *
      * @return Customer
      * @throws Exception
      */
-    private function findOrCreateCustomer(array $buyer): Customer
+    private function findOrCreateCustomer(array $buyer, array $deliveryAddress = []): Customer
     {
         $buyerEmail = $buyer['email'];
 
@@ -453,6 +454,9 @@ class AllegroOrderSynchro implements ShouldQueue
         }
 
         $customer = $this->customerRepository->findWhere(['login' => $buyerEmail])->first();
+        if (empty($buyer['phoneNumber']) || $buyer['phoneNumber'] == 'brak') {
+            $buyer['phoneNumber'] = $deliveryAddress['phoneNumber'];
+        }
         $customerPhone = str_replace('+48', '', $buyer['phoneNumber']);
         if ($customer === null) {
             $customer = new Customer();
