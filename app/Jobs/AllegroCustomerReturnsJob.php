@@ -69,12 +69,12 @@ class AllegroCustomerReturnsJob implements ShouldQueue
      */
     public function handle()
     {
-        Log::info('Start allegro events synchonization');
+        Log::info('Start allegro events synchronization');
         $this->synchronizeAllPaymentId();
         $this->customerReturns();
         $this->paymentsReturns();
         $this->buyerCancellation();
-        Log::info('End allegro events synchonization');
+        Log::info('End allegro events synchronization');
     }
 
     /**

@@ -19,6 +19,6 @@ class DebugController extends Controller
         // CheckPackagesStatusJob::dispatchNow();
    //     dispatch_now(new ImportOrdersFromSelloJob());
 //    	$res = dispatch_now(new AllegroCustomerReturnsJob());
-    	$res = dispatch_now(new GenerateXmlForNexoJob());
+    	$res = dispatch_now(new AllegroOrderSynchro());
     }
 }
