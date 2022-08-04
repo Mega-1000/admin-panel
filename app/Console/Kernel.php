@@ -63,6 +63,9 @@ class Kernel extends ConsoleKernel
 	    $schedule->job(Jobs\Cron\SendOrderInvoiceMsgMailsJob::class)->dailyAt("09:00");
 	    $schedule->job(Jobs\Cron\SendInvoicesMailsJob::class)->dailyAt("23:45");
 	    $schedule->command('import:allegro')->everyTenMinutes();
+
+
+        $schedule->job(Jobs\AllegroCustomerReturnsJob::class)->everyFifteenMinutes();
     }
 
     /**

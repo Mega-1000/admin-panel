@@ -13,14 +13,14 @@ use VIISON\AddressSplitter\Exceptions\SplittingException;
  *
  * @package App\Services
  *
-NEW  => nowe">nowe
-PROCESSING  => w realizacji
-SUSPENDED  => wstrzymane
-READY_FOR_SHIPMENT  => do wysłania
-READY_FOR_PICKUP  => do odbioru
-SENT  => wysłane
-PICKED_UP  => odebrane
-CANCELLED  => anulowane
+ * NEW  => nowe">nowe
+ * PROCESSING  => w realizacji
+ * SUSPENDED  => wstrzymane
+ * READY_FOR_SHIPMENT  => do wysłania
+ * READY_FOR_PICKUP  => do odbioru
+ * SENT  => wysłane
+ * PICKED_UP  => odebrane
+ * CANCELLED  => anulowane
  */
 class AllegroOrderService extends AllegroApiService
 {
@@ -33,6 +33,8 @@ class AllegroOrderService extends AllegroApiService
     const STATUS_PICKED_UP = "PICKED_UP";
     const STATUS_CANCELLED = "CANCELLED";
     const STATUS_SUSPENDED = "SUSPENDED";
+
+    const TYPE_BUYER_CANCELLED = "BUYER_CANCELLED ";
 
     const READY_FOR_PROCESSING = 'READY_FOR_PROCESSING';
 
@@ -215,6 +217,8 @@ class AllegroOrderService extends AllegroApiService
     }
 
     /**
+     * @param array $addParams
+     *
      * @return array
      */
     public function getPendingOrders($addParams = []): array
@@ -230,6 +234,70 @@ class AllegroOrderService extends AllegroApiService
         $response = $this->request('GET', $url, $params);
 
         return $response && is_array($response) && array_key_exists('checkoutForms', $response) ? $response['checkoutForms'] : [];
+    }
+
+    /**
+     * @param int $limit
+     * @param int $offset
+     *
+     * @return array
+     */
+    public function getAllOrders(int $limit, int $offset): array
+    {
+        $params = [
+            'offset' => $offset,
+            'limit' => $limit,
+        ];
+        $url = $this->getRestUrl('/order/checkout-forms?' . http_build_query($params));
+        return $this->request('GET', $url, $params) ?? [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getBuyerCancelled(): array
+    {
+        $params = [
+            'type' => self::TYPE_BUYER_CANCELLED,
+        ];
+        $url = $this->getRestUrl('/order/events?' . http_build_query($params));
+
+        $response = $this->request('GET', $url, []);
+
+        return $response && is_array($response) && array_key_exists('events', $response) ? $response['events'] : [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getCustomerReturns(): array
+    {
+        $params = [
+            'offset' => 0,
+            'limit' => 100,
+            'status' => self::READY_FOR_PROCESSING,
+            'fulfillment.status' => 'NEW'
+        ];
+        $url = $this->getRestUrl('/order/customer-returns');
+        $response = $this->request('GET', $url, []);
+
+        return $response && is_array($response) && array_key_exists('customerReturns', $response) ? $response['customerReturns'] : [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getPaymentsRefunds(): array
+    {
+        $params = [
+            'offset' => 0,
+            'limit' => 100,
+            'status' => 'SUCCESS',
+        ];
+        $url = $this->getRestUrl('/payments/refunds?' . http_build_query($params));
+        $response = $this->request('GET', $url, []);
+
+        return $response && is_array($response) && array_key_exists('refunds', $response) ? $response['refunds'] : [];
     }
 
     /**

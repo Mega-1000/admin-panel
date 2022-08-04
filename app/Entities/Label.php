@@ -61,6 +61,11 @@ class Label extends Model implements Transformable
 	const ORDER_RECEIVED_INVOICE_STANDARD = 198;
 
 	const FINAL_CONFIRMATION_DECLINED = 196;
+	const RETURN_ALLEGRO_PAYMENTS = 179;
+	const RETURN_ALLEGRO_ITEMS = 182;
+	const CUSTOMER_CANCELLATION = 201;
+	const HOLD_SHIPMENT = 146;
+
 
     public $customColumnsVisibilities = [
         'name',
