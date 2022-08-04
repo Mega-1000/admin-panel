@@ -106,126 +106,133 @@ class AllegroOrderSynchro implements ShouldQueue
      */
     public function handle(): void
     {
-        $allegroOrders = $this->allegroOrderService->getBuyerCancelled();
         $allegroOrders = $this->allegroOrderService->getPendingOrders();
 
         foreach ($allegroOrders as $allegroOrder) {
-            $orderModel = AllegroOrder::firstOrNew(['order_id' => $allegroOrder['id']]);
-            $orderModel->order_id = $allegroOrder['id'];
-            $orderModel->buyer_email = $allegroOrder['buyer']['email'];
-            $orderModel->save();
+            try {
+                $orderModel = AllegroOrder::firstOrNew(['order_id' => $allegroOrder['id']]);
+                $orderModel->order_id = $allegroOrder['id'];
+                $orderModel->buyer_email = $allegroOrder['buyer']['email'];
+                $orderModel->save();
 
-            if (Order::where('allegro_form_id', $allegroOrder['id'])->count() > 0) {
-                continue;
-            }
-
-            $order = new Order();
-            $customer = $this->findOrCreateCustomer($allegroOrder['buyer']);
-            $order->customer_id = $customer->id;
-            $order->allegro_form_id = $allegroOrder['id'];
-            $order->status_id = 1;
-            $order->allegro_operation_date = $allegroOrder['lineItems'][0]['boughtAt'];
-            $order->allegro_additional_service = $allegroOrder['delivery']['method']['name'];
-            $order->payment_channel = $allegroOrder['payment']['provider'];
-            $order->allegro_payment_id = $allegroOrder['payment']['id'];
-            $order->saveQuietly();
-
-            if ($allegroOrder['messageToSeller'] !== null) {
-                $this->createChat($order->id, $customer->id, $allegroOrder['messageToSeller']);
-                $order->labels()->attach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
-            }
-
-            list($orderItems, $undefinedProductSymbol) = $this->mapItems($allegroOrder['lineItems']);
-
-            if ($undefinedProductSymbol) {
-                $order->consultant_notices = 'Nie znaleziono produktu o symbolu ' . $undefinedProductSymbol['id'];
-                dispatch_now(new AddLabelJob($order, [Label::WAREHOUSE_MARK]));
-            }
-
-            $this->saveOrderItems($orderItems, $order);
-
-            $this->savePayments($order, $allegroOrder['payment']);
-
-            $invoiceAddress = $allegroOrder['invoice']['address'] ?? $allegroOrder['buyer'];
-            if (empty($invoiceAddress['phoneNumber'])) {
-                $invoiceAddress['phoneNumber'] = $allegroOrder['buyer']['phoneNumber'];
-            }
-            $this->createOrUpdateCustomerAddress($customer, $allegroOrder['buyer']);
-
-            $this->createOrUpdateCustomerAddress($customer, $invoiceAddress, CustomerAddress::ADDRESS_TYPE_INVOICE);
-            if (array_key_exists('pickupPoint', $allegroOrder['delivery']) && $allegroOrder['delivery']['pickupPoint'] !== null) {
-                $allegroOrder['delivery']['address']['firstName'] = 'Paczkomat';
-                $allegroOrder['delivery']['address']['lastName'] = $allegroOrder['delivery']['pickupPoint']['id'];
-                if (!array_key_exists('address', $allegroOrder['delivery']['pickupPoint'])) {
-                    Log::info('PickupPoint address error: order: ' . $order->id . ', AllId' . $allegroOrder['id'], $allegroOrder['delivery']);
-                } else {
-                    $allegroOrder['delivery']['address'] = array_merge($allegroOrder['delivery']['address'], $allegroOrder['delivery']['pickupPoint']['address']);
+                if (Order::where('allegro_form_id', $allegroOrder['id'])->count() > 0) {
+                    continue;
                 }
-            }
-            $this->createOrUpdateOrderAddress($order, $allegroOrder['buyer'], $allegroOrder['delivery']['address']);
 
-            $this->createOrUpdateOrderAddress($order, $allegroOrder['buyer'], $invoiceAddress, OrderAddress::TYPE_INVOICE);
-
-            $orderDeliveryAddress = OrderAddress::where("order_id", $order->id)
-                ->where('type', 'DELIVERY_ADDRESS')
-                ->first();
-
-            $orderAddressService = new OrderAddressService();
-            $orderAddressService->addressIsValid($orderDeliveryAddress);
-            $orderDeliveryAddressErrors = $orderAddressService->errors();
-
-            if ($orderDeliveryAddressErrors->any()) {
-                $order->labels_log .= Order::formatMessage(null, implode(' ', $orderDeliveryAddressErrors->all(':message')));
+                $order = new Order();
+                $customer = $this->findOrCreateCustomer($allegroOrder['buyer']);
+                $order->customer_id = $customer->id;
+                $order->allegro_form_id = $allegroOrder['id'];
+                $order->status_id = 1;
+                $order->allegro_operation_date = $allegroOrder['lineItems'][0]['boughtAt'];
+                $order->allegro_additional_service = $allegroOrder['delivery']['method']['name'];
+                $order->payment_channel = $allegroOrder['payment']['provider'];
+                $order->allegro_payment_id = $allegroOrder['payment']['id'];
                 $order->saveQuietly();
 
-            }
+                if ($allegroOrder['messageToSeller'] !== null) {
+                    $this->createChat($order->id, $customer->id, $allegroOrder['messageToSeller']);
+                    $order->labels()->attach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
+                }
 
-            if (!Helper::phoneIsCorrect($orderDeliveryAddress->phone)) {
-                $order->labels_log .= Order::formatMessage(null, 'ebudownictwo@wp.pl 691801594 55-200');
-                $order->labels()->attach(176);
-                $order->saveQuietly();
-            }
+                list($orderItems, $undefinedProductSymbol) = $this->mapItems($allegroOrder['lineItems']);
 
-            // order package
-            $this->addOrderPackage($order, $allegroOrder['delivery']);
-            $order->shipment_price_for_client = $allegroOrder['delivery']['cost']['amount'];
+                if ($undefinedProductSymbol) {
+                    $order->consultant_notices = 'Nie znaleziono produktu o symbolu ' . $undefinedProductSymbol['id'];
+                    dispatch_now(new AddLabelJob($order, [Label::WAREHOUSE_MARK]));
+                }
 
-            $order->total_price = $allegroOrder['summary']['totalToPay']['amount'];
-            $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 1)->first();
-            $order->firm_source_id = $firmSource ? $firmSource->id : null;
+                $this->saveOrderItems($orderItems, $order);
 
-            $user = User::where('name', '001')->first();
-            $order->employee()->associate($user);
-            $withWarehouse = (new Collection($orderItems))->filter(function ($prod) {
-                return !empty($prod->packing->warehouse_physical);
-            });
-            $warehouseSymbol = $withWarehouse->first()->packing->warehouse_physical ?? ImportOrdersFromSelloJob::DEFAULT_WAREHOUSE;
-            $warehouse = Warehouse::where('symbol', $warehouseSymbol)->first();
-            $order->warehouse()->associate($warehouse);
-            $order->setDefaultDates('allegro');
+                $this->savePayments($order, $allegroOrder['payment']);
 
-            $order->saveQuietly();
+                $invoiceAddress = $allegroOrder['invoice']['address'] ?? $allegroOrder['buyer'];
+                if (empty($invoiceAddress['phoneNumber'])) {
+                    $invoiceAddress['phoneNumber'] = $allegroOrder['buyer']['phoneNumber'];
+                }
+                $this->createOrUpdateCustomerAddress($customer, $allegroOrder['buyer']);
 
-            if (($orderInvoiceAddress = $order->getInvoiceAddress())
-                && ($orderDeliveryAddress = $order->getDeliveryAddress())) {
+                $this->createOrUpdateCustomerAddress($customer, $invoiceAddress, CustomerAddress::ADDRESS_TYPE_INVOICE);
+                if (array_key_exists('pickupPoint', $allegroOrder['delivery']) && $allegroOrder['delivery']['pickupPoint'] !== null) {
+                    $allegroOrder['delivery']['address']['firstName'] = 'Paczkomat';
+                    $allegroOrder['delivery']['address']['lastName'] = $allegroOrder['delivery']['pickupPoint']['id'];
+                    if (!array_key_exists('address', $allegroOrder['delivery']['pickupPoint'])) {
+                        Log::info('PickupPoint address error: order: ' . $order->id . ', AllId' . $allegroOrder['id'], $allegroOrder['delivery']);
+                    } else {
+                        $allegroOrder['delivery']['address'] = array_merge($allegroOrder['delivery']['address'], $allegroOrder['delivery']['pickupPoint']['address']);
+                    }
+                }
+                $this->createOrUpdateOrderAddress($order, $allegroOrder['buyer'], $allegroOrder['delivery']['address']);
+
+                $this->createOrUpdateOrderAddress($order, $allegroOrder['buyer'], $invoiceAddress, OrderAddress::TYPE_INVOICE);
+
+                $orderDeliveryAddress = OrderAddress::where("order_id", $order->id)
+                    ->where('type', 'DELIVERY_ADDRESS')
+                    ->first();
+
                 $orderAddressService = new OrderAddressService();
-
-                $orderAddressService->addressIsValid($orderInvoiceAddress);
-                $orderInvoiceAddressErrors = $orderAddressService->errors();
-
                 $orderAddressService->addressIsValid($orderDeliveryAddress);
                 $orderDeliveryAddressErrors = $orderAddressService->errors();
-                if (!$orderInvoiceAddressErrors->any() && !$orderDeliveryAddressErrors->any()) {
-                    $order->labels()->attach(39);
-                    $order->labels()->attach(133);
-                    $order->labels()->attach(Label::BLUE_HAMMER_ID);
-                    $order->labels()->attach(69);
+
+                if ($orderDeliveryAddressErrors->any()) {
+                    $order->labels_log .= Order::formatMessage(null, implode(' ', $orderDeliveryAddressErrors->all(':message')));
+                    $order->saveQuietly();
+
                 }
+
+                if (!Helper::phoneIsCorrect($orderDeliveryAddress->phone)) {
+                    $order->labels_log .= Order::formatMessage(null, 'ebudownictwo@wp.pl 691801594 55-200');
+                    $order->labels()->attach(176);
+                    $order->saveQuietly();
+                }
+
+                // order package
+                $this->addOrderPackage($order, $allegroOrder['delivery']);
+                $order->shipment_price_for_client = $allegroOrder['delivery']['cost']['amount'];
+
+                $order->total_price = $allegroOrder['summary']['totalToPay']['amount'];
+                $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 1)->first();
+                $order->firm_source_id = $firmSource ? $firmSource->id : null;
+
+                $user = User::where('name', '001')->first();
+                $order->employee()->associate($user);
+                $withWarehouse = (new Collection($orderItems))->filter(function ($prod) {
+                    return !empty($prod->packing->warehouse_physical);
+                });
+                $warehouseSymbol = $withWarehouse->first()->packing->warehouse_physical ?? ImportOrdersFromSelloJob::DEFAULT_WAREHOUSE;
+                $warehouse = Warehouse::where('symbol', $warehouseSymbol)->first();
+                $order->warehouse()->associate($warehouse);
+                $order->setDefaultDates('allegro');
+
+                $order->saveQuietly();
+
+                if (($orderInvoiceAddress = $order->getInvoiceAddress())
+                    && ($orderDeliveryAddress = $order->getDeliveryAddress())) {
+                    $orderAddressService = new OrderAddressService();
+
+                    $orderAddressService->addressIsValid($orderInvoiceAddress);
+                    $orderInvoiceAddressErrors = $orderAddressService->errors();
+
+                    $orderAddressService->addressIsValid($orderDeliveryAddress);
+                    $orderDeliveryAddressErrors = $orderAddressService->errors();
+                    if (!$orderInvoiceAddressErrors->any() && !$orderDeliveryAddressErrors->any()) {
+                        $order->labels()->attach(39);
+                        $order->labels()->attach(133);
+                        $order->labels()->attach(Label::BLUE_HAMMER_ID);
+                        $order->labels()->attach(69);
+                    }
+                }
+
+                dispatch_now(new AddLabelJob($order, [177]));
+
+                $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
+            } catch (\Throwable $ex) {
+                Log::error($ex->getMessage(), [
+                    'file' => $ex->getFile(),
+                    'line' => $ex->getLine(),
+                    'orderId' => (isset($order)) ? $order->id : $allegroOrder['id']
+                ]);
             }
-
-            dispatch_now(new AddLabelJob($order, [177]));
-
-            $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
         }
     }
 
