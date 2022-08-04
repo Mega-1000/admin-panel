@@ -178,7 +178,6 @@ class GenerateXmlForNexoJob implements ShouldQueue
         }
     }
 
-
     /**
      * @param $obj
      * @param $node_block

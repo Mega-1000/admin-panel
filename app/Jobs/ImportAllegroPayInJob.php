@@ -93,7 +93,7 @@ class ImportAllegroPayInJob implements ShouldQueue
             if (!in_array($payIn['operacja'], ['wpłata', 'zwrot'])) {
                 continue;
             }
-            $order = Order::where('allegro_form_id', '=', $payIn['identyfikator'])->first();
+            $order = Order::where('allegro_payment_id', '=', $payIn['identyfikator'])->first();
             try {
                 if (!empty($order)) {
                     $transaction = $this->saveTransaction($order, $payIn);

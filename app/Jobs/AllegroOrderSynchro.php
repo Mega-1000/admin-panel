@@ -225,9 +225,7 @@ class AllegroOrderSynchro implements ShouldQueue
 
             dispatch_now(new AddLabelJob($order, [177]));
 
-            if (env('APP_ENV') == 'production') {
-                $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
-            }
+            $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
         }
     }
 
