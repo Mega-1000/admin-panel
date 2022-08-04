@@ -106,6 +106,7 @@ class AllegroOrderSynchro implements ShouldQueue
      */
     public function handle(): void
     {
+        $allegroOrders = $this->allegroOrderService->getBuyerCancelled();
         $allegroOrders = $this->allegroOrderService->getPendingOrders();
 
         foreach ($allegroOrders as $allegroOrder) {
@@ -156,7 +157,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 $allegroOrder['delivery']['address']['firstName'] = 'Paczkomat';
                 $allegroOrder['delivery']['address']['lastName'] = $allegroOrder['delivery']['pickupPoint']['id'];
                 if (!array_key_exists('address', $allegroOrder['delivery']['pickupPoint'])) {
-                    Log::info('PickupPoint address error: order: '. $order->id .', AllId' . $allegroOrder['id'] , $allegroOrder['delivery']);
+                    Log::info('PickupPoint address error: order: ' . $order->id . ', AllId' . $allegroOrder['id'], $allegroOrder['delivery']);
                 } else {
                     $allegroOrder['delivery']['address'] = array_merge($allegroOrder['delivery']['address'], $allegroOrder['delivery']['pickupPoint']['address']);
                 }

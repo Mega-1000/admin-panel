@@ -4,9 +4,7 @@ namespace App\Jobs;
 
 use App\Entities\Order;
 use App\Entities\OrderPayment;
-use App\Entities\SelTransaction;
 use App\Entities\Transaction;
-use App\Helpers\PdfCharactersHelper;
 use App\Http\Controllers\OrdersPaymentsController;
 use App\Repositories\TransactionRepository;
 use Illuminate\Bus\Queueable;
@@ -95,11 +93,9 @@ class ImportAllegroPayInJob implements ShouldQueue
             if (!in_array($payIn['operacja'], ['wpłata', 'zwrot'])) {
                 continue;
             }
-            /** @var SelTransaction $selTransaction */
-            $selTransaction = SelTransaction::where('tr_CheckoutFormPaymentId', '=', $payIn['identyfikator'])->where('tr_Paid', '=', true)->first();
+            $order = Order::where('allegro_payment_id', '=', $payIn['identyfikator'])->first();
             try {
-                if (!empty($selTransaction->order)) {
-                    $order = $selTransaction->order;
+                if (!empty($order)) {
                     $transaction = $this->saveTransaction($order, $payIn);
                     if ($transaction === null) {
                         continue;

@@ -39,7 +39,7 @@ class Label extends Model implements Transformable
     const ORDER_FOR_REALISATION = 44;
     const BOOKED_FIRST_PAYMENT = 5;
     const WAREHOUSE_REMINDER = 77;
-	const INVOICE_ISSUED_WITH_EXERTED_EFFECT = 42;
+    const INVOICE_ISSUED_WITH_EXERTED_EFFECT = 42;
 
     const CHAT_TYPE = 'chat';
     const BONUS_TYPE = 'bonus';
@@ -58,9 +58,13 @@ class Label extends Model implements Transformable
     const ORDER_INVOICE_MSG_SENDED = 194;
 
     const ORDER_RECEIVED_INVOICE_TODAY = 195;
-	const ORDER_RECEIVED_INVOICE_STANDARD = 198;
+    const ORDER_RECEIVED_INVOICE_STANDARD = 198;
 
-	const FINAL_CONFIRMATION_DECLINED = 196;
+    const FINAL_CONFIRMATION_DECLINED = 196;
+    const RETURN_ALLEGRO_PAYMENTS = 179;
+    const RETURN_ALLEGRO_ITEMS = 182;
+    const CUSTOMER_CANCELLATION = 201;
+    const HOLD_SHIPMENT = 146;
 
     public $customColumnsVisibilities = [
         'name',

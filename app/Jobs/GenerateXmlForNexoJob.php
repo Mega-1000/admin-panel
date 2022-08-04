@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Entities\Label;
+use App\Entities\Order;
 use App\Helpers\PdfCharactersHelper;
 use App\Integrations\Artoit\EPreKlientRodzajNaDok;
 use App\Integrations\Artoit\EPreKlientTyp;
@@ -97,9 +98,9 @@ class GenerateXmlForNexoJob implements ShouldQueue
                     ->setKategoria('Sprzedaż')
                     ->setUslugaTransportuCenaBrutto(0)
                     ->setUslugaTransportuCenaNetto(0)
-                    ->setDataDostawy(Carbon::now()->toDateTimeLocalString())
-                    ->setDataUtworzenia(Carbon::now()->toDateTimeLocalString())
-                    ->setTerminPlatnosci(Carbon::now()->toDateTimeLocalString())
+                    ->setDataDostawy($this->getOrderDate($order))
+                    ->setDataUtworzenia($this->getOrderDate($order))
+                    ->setTerminPlatnosci($this->getOrderDate($order))
                     ->setWartoscPoRabacieNetto(0)
                     ->setWartoscPoRabacieBrutto(0)
                     ->setWartoscNetto(0)
@@ -152,6 +153,27 @@ class GenerateXmlForNexoJob implements ShouldQueue
                     'orderId' => $order->id,
                 ]);
                 continue;
+            }
+        }
+    }
+
+    /**
+     *
+     * @param Order $order
+     *
+     * @return string
+     */
+    private function getOrderDate(Order $order): string
+    {
+        $now = Carbon::now();
+        if (empty($order->allegro_operation_date)) {
+            return Carbon::now()->toDateTimeLocalString();
+        } else {
+            $operationDate = Carbon::parse($order->allegro_operation_date);
+            if ($operationDate->lessThan($now->firstOfMonth())) {
+                return $operationDate->lastOfMonth()->toDateTimeLocalString();
+            } else {
+                return Carbon::now()->toDateTimeLocalString();
             }
         }
     }

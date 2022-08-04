@@ -20,7 +20,8 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule $schedule
+     * @param \Illuminate\Console\Scheduling\Schedule $schedule
+     *
      * @return void
      */
     protected function schedule(Schedule $schedule)
@@ -60,9 +61,11 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\UpdateAllegroDisputes::class)->everyFifteenMinutes();
         $schedule->job(Jobs\GetNewAllegroDisputesJob::class)->everyFifteenMinutes();
 
-	    $schedule->job(Jobs\Cron\SendOrderInvoiceMsgMailsJob::class)->dailyAt("09:00");
-	    $schedule->job(Jobs\Cron\SendInvoicesMailsJob::class)->dailyAt("23:45");
-	    $schedule->command('import:allegro')->everyTenMinutes();
+        $schedule->job(Jobs\Cron\SendOrderInvoiceMsgMailsJob::class)->dailyAt("09:00");
+        $schedule->job(Jobs\Cron\SendInvoicesMailsJob::class)->dailyAt("23:45");
+        $schedule->command('import:allegro')->everyTenMinutes();
+
+        $schedule->job(Jobs\AllegroCustomerReturnsJob::class)->everyFifteenMinutes();
     }
 
     /**
