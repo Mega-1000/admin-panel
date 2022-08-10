@@ -47,7 +47,7 @@ use Throwable;
 /**
  * Allegro order synchro
  */
-class AllegroOrderSynchro implements ShouldQueue
+class AllegroOrderSynchro extends Job implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, IsMonitored;
 
