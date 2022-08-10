@@ -41,6 +41,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use romanzipp\QueueMonitor\Traits\IsMonitored;
 use Throwable;
 
 /**
@@ -48,7 +49,7 @@ use Throwable;
  */
 class AllegroOrderSynchro implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, IsMonitored;
 
     /**
      * @var CustomerRepository
@@ -225,7 +226,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 }
 
                 dispatch_now(new AddLabelJob($order, [177]));
-                $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
+//                $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
             } catch (Throwable $ex) {
                 Log::error($ex->getMessage(), [
                     'file' => $ex->getFile(),
