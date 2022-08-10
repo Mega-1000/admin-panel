@@ -8,6 +8,7 @@ use App\Repositories\OrderRepository;
 use App\Repositories\ProductRepository;
 use App\Services\AllegroOrderService;
 use App\Services\ProductService;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -71,7 +72,10 @@ class AllegroCustomerReturnsJob implements ShouldQueue
         $this->orderRepository = app(OrderRepository::class);
 
         Log::info('Start allegro events synchronization');
-        $this->synchronizeAllPaymentId();
+        $current_time = Carbon::now();
+        if ($current_time->timestamp > strtotime('00:00am') && $current_time->timestamp < strtotime('01:00am')) {
+            $this->synchronizeAllPaymentId();
+        }
         $this->customerReturns();
         $this->paymentsReturns();
         $this->buyerCancellation();
