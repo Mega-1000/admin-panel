@@ -16,8 +16,11 @@ use App\Entities\OrderPayment;
 use App\Entities\PackageTemplate;
 use App\Entities\Product;
 use App\Entities\ProductStock;
+use App\Entities\Task;
+use App\Entities\TaskSalaryDetails;
 use App\Entities\Warehouse;
 use App\Helpers\Helper;
+use App\Helpers\LabelsHelper;
 use App\Helpers\MessagesHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPackagesDataHelper;
@@ -38,6 +41,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * Allegro order synchro
@@ -82,11 +86,12 @@ class AllegroOrderSynchro implements ShouldQueue
     private $tax;
 
     /**
-     * Create a new job instance.
+     * Execute the job.
      *
      * @return void
+     * @throws Exception
      */
-    public function __construct()
+    public function handle(): void
     {
         $this->customerRepository = app(CustomerRepository::class);
         $this->allegroOrderService = app(AllegroOrderService::class);
@@ -96,18 +101,8 @@ class AllegroOrderSynchro implements ShouldQueue
         $this->orderPackagesDataHelper = app(OrderPackagesDataHelper::class);
 
         $this->tax = (float)(1 + env('VAT'));
-    }
 
-    /**
-     * Execute the job.
-     *
-     * @return void
-     * @throws Exception
-     */
-    public function handle(): void
-    {
         $allegroOrders = $this->allegroOrderService->getPendingOrders();
-
         foreach ($allegroOrders as $allegroOrder) {
             try {
                 $orderModel = AllegroOrder::firstOrNew(['order_id' => $allegroOrder['id']]);
@@ -148,8 +143,13 @@ class AllegroOrderSynchro implements ShouldQueue
 
                 $invoiceAddress = $allegroOrder['invoice']['address'] ?? $allegroOrder['buyer'];
                 if (empty($invoiceAddress['phoneNumber'])) {
-                    $invoiceAddress['phoneNumber'] = $allegroOrder['buyer']['phoneNumber'];
+                    $invoiceAddress['phoneNumber'] = $allegroOrder['buyer']['phoneNumber'] ?? $allegroOrder['delivery']['address']['phoneNumber'];
                 }
+
+                if (empty($allegroOrder['buyer']['address']['phoneNumber'])) {
+                    $allegroOrder['buyer']['address']['phoneNumber'] = $invoiceAddress['phoneNumber'];
+                }
+
                 $this->createOrUpdateCustomerAddress($customer, $allegroOrder['buyer']);
 
                 $this->createOrUpdateCustomerAddress($customer, $invoiceAddress, CustomerAddress::ADDRESS_TYPE_INVOICE);
@@ -205,6 +205,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 $order->setDefaultDates('allegro');
 
                 $order->saveQuietly();
+                $this->addLabels($order);
 
                 if (($orderInvoiceAddress = $order->getInvoiceAddress())
                     && ($orderDeliveryAddress = $order->getDeliveryAddress())) {
@@ -224,9 +225,8 @@ class AllegroOrderSynchro implements ShouldQueue
                 }
 
                 dispatch_now(new AddLabelJob($order, [177]));
-
-                $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
-            } catch (\Throwable $ex) {
+//                $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
+            } catch (Throwable $ex) {
                 Log::error($ex->getMessage(), [
                     'file' => $ex->getFile(),
                     'line' => $ex->getLine(),
@@ -281,6 +281,13 @@ class AllegroOrderSynchro implements ShouldQueue
         }
     }
 
+    /**
+     * @param $packTemplate
+     * @param $order
+     * @param $packageNumber
+     *
+     * @return OrderPackage
+     */
     public function createPackage($packTemplate, $order, $packageNumber)
     {
         $orderId = $order->id;
@@ -387,7 +394,7 @@ class AllegroOrderSynchro implements ShouldQueue
 
                 $products[] = $product;
             }
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Log::error($ex->getMessage());
         }
         return [$products, $undefinedProductSymbol];
@@ -492,7 +499,7 @@ class AllegroOrderSynchro implements ShouldQueue
         try {
             $helper->createNewChat();
             $helper->addMessage($customerNotices);
-        } catch (\Throwable $ex) {
+        } catch (Throwable $ex) {
             Log::error($ex->getMessage());
         }
     }
@@ -507,7 +514,7 @@ class AllegroOrderSynchro implements ShouldQueue
      *
      * @return void
      */
-    private function createOrUpdateOrderAddress(Order $order, array $buyer, array $address, string $type = OrderAddress::TYPE_DELIVERY)
+    private function createOrUpdateOrderAddress(Order $order, array $buyer, array $address, string $type = OrderAddress::TYPE_DELIVERY): void
     {
         if (isset($address['address'])) {
             $address = array_merge($address, $address['address']);
@@ -580,6 +587,11 @@ class AllegroOrderSynchro implements ShouldQueue
         $customerAddress->save();
     }
 
+    /**
+     * @param $address
+     *
+     * @return array
+     */
     private function getAddress($address): array
     {
         $addressArray = explode(' ', $address);
@@ -588,5 +600,45 @@ class AllegroOrderSynchro implements ShouldQueue
         unset($addressArray[$lastKey]);
         $street = implode(' ', $addressArray);
         return [$street, $flatNo];
+    }
+
+    /**
+     * @return void
+     */
+    private function generateTask(): void
+    {
+        $date = Carbon::now();
+        $taskPrimal = Task::create([
+            'warehouse_id' => Warehouse::OLAWA_WAREHOUSE_ID,
+            'user_id' => User::OLAWA_USER_ID,
+            'created_by' => 1,
+            'name' => 'Grupa zadań - ' . $date->format('d-m'),
+            'color' => Task::DEFAULT_COLOR,
+            'status' => Task::WAITING_FOR_ACCEPT
+        ]);
+        TaskSalaryDetails::create([
+            'task_id' => $taskPrimal->id,
+            'consultant_value' => 0,
+            'warehouse_value' => 0
+        ]);
+    }
+
+    /**
+     * @param Order $order
+     *
+     * @return void
+     */
+    private function addLabels(Order $order): void
+    {
+        $preventionArray = [];
+        dispatch_now(new RemoveLabelJob($order, [LabelsHelper::FINISH_LOGISTIC_LABEL_ID], $preventionArray, LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID));
+        dispatch_now(new RemoveLabelJob($order, [LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID], $preventionArray, []));
+        dispatch_now(new RemoveLabelJob($order, [LabelsHelper::WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID], $preventionArray, []));
+        if ($order->warehouse->id == Warehouse::OLAWA_WAREHOUSE_ID) {
+            dispatch_now(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::WAIT_FOR_WAREHOUSE_TO_ACCEPT]));
+            $order->createNewTask(5, $this->taskPrimal->id);
+        } else {
+            dispatch_now(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::SEND_TO_WAREHOUSE_FOR_VALIDATION]));
+        }
     }
 }
