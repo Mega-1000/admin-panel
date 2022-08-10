@@ -55,11 +55,6 @@ class AllegroCustomerReturnsJob implements ShouldQueue
      */
     public function __construct()
     {
-        $this->customerRepository = app(CustomerRepository::class);
-        $this->allegroOrderService = app(AllegroOrderService::class);
-        $this->productRepository = app(ProductRepository::class);
-        $this->productService = app(ProductService::class);
-        $this->orderRepository = app(OrderRepository::class);
     }
 
     /**
@@ -69,6 +64,12 @@ class AllegroCustomerReturnsJob implements ShouldQueue
      */
     public function handle()
     {
+        $this->customerRepository = app(CustomerRepository::class);
+        $this->allegroOrderService = app(AllegroOrderService::class);
+        $this->productRepository = app(ProductRepository::class);
+        $this->productService = app(ProductService::class);
+        $this->orderRepository = app(OrderRepository::class);
+
         Log::info('Start allegro events synchronization');
         $this->synchronizeAllPaymentId();
         $this->customerReturns();
