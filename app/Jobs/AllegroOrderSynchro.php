@@ -47,7 +47,7 @@ use Throwable;
 /**
  * Allegro order synchro
  */
-class AllegroOrderSynchro extends Job implements ShouldQueue
+class AllegroOrderSynchro implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, IsMonitored;
 
@@ -85,6 +85,15 @@ class AllegroOrderSynchro extends Job implements ShouldQueue
      * @var float
      */
     private $tax;
+
+    /**
+     * Create a new job instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+    }
 
     /**
      * Execute the job.
