@@ -22,6 +22,7 @@ use Prettus\Repository\Traits\TransformableTrait;
 /**
  * Class Order.
  *
+ * @property mixed $warehouse
  * @package namespace App\Entities;
  */
 class Order extends Model implements Transformable
@@ -648,7 +649,7 @@ class Order extends Model implements Transformable
 
     /**
      */
-    public function createNewTask($duration, $parentId): void
+    public function createNewTask($duration, $parentId = null): void
     {
         $date = Carbon::now();
         $task = Task::create([

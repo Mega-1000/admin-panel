@@ -636,7 +636,7 @@ class AllegroOrderSynchro implements ShouldQueue
         dispatch_now(new RemoveLabelJob($order, [LabelsHelper::WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID], $preventionArray, []));
         if ($order->warehouse->id == Warehouse::OLAWA_WAREHOUSE_ID) {
             dispatch_now(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::WAIT_FOR_WAREHOUSE_TO_ACCEPT]));
-            $order->createNewTask(5, $this->taskPrimal->id);
+            $order->createNewTask(5);
         } else {
             dispatch_now(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::SEND_TO_WAREHOUSE_FOR_VALIDATION]));
         }
