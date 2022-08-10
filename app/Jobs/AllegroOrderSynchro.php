@@ -225,7 +225,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 }
 
                 dispatch_now(new AddLabelJob($order, [177]));
-//                $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
+                $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
             } catch (Throwable $ex) {
                 Log::error($ex->getMessage(), [
                     'file' => $ex->getFile(),
