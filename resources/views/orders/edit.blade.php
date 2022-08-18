@@ -354,7 +354,8 @@
                                 <label class="col-md-6" for="allegro_operation_date">Data operacji w allegro</label>
                                 <div class="col-md-4">
                                     <input type="date" class="form-control" id="allegro_operation_date"
-                                           name="allegro_operation_date" value="{{  \Carbon\Carbon::parse($order->allegro_operation_date)->format('Y-m-d') ?? '' }}">
+                                           name="allegro_operation_date"
+                                           value="{{ (isset($order->allegro_operation_date)) ? \Carbon\Carbon::parse($order->allegro_operation_date)->format('Y-m-d') : null }}">
                                 </div>
                             </div>
                         </div>

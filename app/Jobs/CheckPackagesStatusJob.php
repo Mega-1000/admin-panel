@@ -58,8 +58,8 @@ class CheckPackagesStatusJob
     public function handle(): void
     {
         $orders = Order::whereHas('packages', function ($query) {
-                $query->whereIn('status', ['SENDING', 'WAITING_FOR_SENDING'])->whereDate('shipment_date', '>', Carbon::today()->subDays(30)->toDateString());
-            })
+            $query->whereIn('status', ['SENDING', 'WAITING_FOR_SENDING'])->whereDate('shipment_date', '>', Carbon::today()->subDays(30)->toDateString());
+        })
             ->get();
 
         foreach ($orders as $order) {
@@ -186,7 +186,8 @@ class CheckPackagesStatusJob
         $request->idEnvelope = $package->sending_number;
         $status = $integration->getEnvelopeContentShort($request);
 
-        if (!$status || $status->przesylka->status !== statusType::POTWIERDZONA) {
+        if (!$status || isset($status->przesylka) || $status->przesylka->status !== statusType::POTWIERDZONA) {
+            Log::notice('Błąd ze statusem przesyłki' . $status->przesylka);
             return;
         }
 
