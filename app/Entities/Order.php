@@ -228,6 +228,14 @@ class Order extends Model implements Transformable
     }
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function paymentsWithTrash()
+    {
+        return $this->hasMany(OrderPayment::class)->withTrashed();
+    }
+
+    /**
      * @return bool
      */
     public function isPaymentRegulated()

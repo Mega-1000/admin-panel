@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Entities\Label;
 use App\Entities\Order;
+use App\Entities\OrderPayment;
 use App\Helpers\PdfCharactersHelper;
 use App\Integrations\Artoit\EPreKlientRodzajNaDok;
 use App\Integrations\Artoit\EPreKlientTyp;
@@ -108,7 +109,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
                     ->setWartoscWplacona(0)
                     ->setNumer(0)
                     ->setNumerPelny(0)
-                    ->setMagazyn(($order->warehouse->id === 16) ? 'STA' : 'MAG');
+                    ->setMagazyn((isset($order->warehouse) && $order->warehouse->id === 16) ? 'STA' : 'MAG');
 
                 foreach ($order->items as $item) {
                     $towar = new PreTowar();
@@ -122,8 +123,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
                         ->setWysokosc(0)
                         ->setSzerokosc(0)
                         ->setDlugosc(0)
-                        ->setWaga(0)
-                        ->setWaga($item->product->weight_trade_unit);
+                        ->setWaga($item->product->weight_trade_unit ?? 0);
                     $prePozycja = new PrePozycja();
                     $prePozycja
                         ->setTowar($towar)
@@ -142,6 +142,12 @@ class GenerateXmlForNexoJob implements ShouldQueue
                     $preDokument
                         ->setProdukty(array_merge($preDokument->getProdukty(), [$prePozycja]));
                 }
+
+                $preDokument->setProdukty(array_merge($preDokument->getProdukty(), [
+                    $this->getDKOPosition($order),
+                    $this->getDKPPosition($order),
+                    $this->getUTPosition($order)
+                ]));
 
                 $xml = self::generateValidXmlFromObj($preDokument);
                 Storage::disk('local')->put('public/XMLFS/' . $order->id . '_FS_' . Carbon::now()->format('d-m-Y') . '.xml', mb_convert_encoding($xml, "UTF-8", "auto"));
@@ -166,15 +172,22 @@ class GenerateXmlForNexoJob implements ShouldQueue
     private function getOrderDate(Order $order): string
     {
         $now = Carbon::now();
-        if (empty($order->allegro_operation_date)) {
-            return Carbon::now()->toDateTimeLocalString();
-        } else {
+        $settledAdvanceDeclared = $order->paymentsWithTrash->filter(function (OrderPayment $payment) {
+            return $payment->deleted_at !== null;
+        })->last();
+
+        if (!empty($order->allegro_operation_date)) {
             $operationDate = Carbon::parse($order->allegro_operation_date);
             if ($operationDate->lessThan($now->firstOfMonth())) {
                 return $operationDate->lastOfMonth()->toDateTimeLocalString();
             } else {
                 return Carbon::now()->toDateTimeLocalString();
             }
+        } elseif (isset($settledAdvanceDeclared->deleted_at)) {
+            $operationDate = Carbon::parse($settledAdvanceDeclared->deleted_at);
+            return $operationDate->lastOfMonth()->toDateTimeLocalString();
+        } else {
+            return Carbon::now()->toDateTimeLocalString();
         }
     }
 
@@ -235,5 +248,113 @@ class GenerateXmlForNexoJob implements ShouldQueue
         }
 
         return $xml;
+    }
+
+    /**
+     * @param $order
+     *
+     * @return PrePozycja
+     */
+    private function getDKOPosition($order): PrePozycja
+    {
+        $towar = new PreTowar();
+        $towar
+            ->setRodzaj(ERodzajTowaru::USLUGA)
+            ->setSymbol('DKO')
+            ->setCenaKartotekowaNetto(0)
+            ->setCenaNetto(0)
+            ->setJM('szt')
+            ->setVat(23)
+            ->setWysokosc(0)
+            ->setSzerokosc(0)
+            ->setDlugosc(0)
+            ->setWaga(0);
+        $prePozycja = new PrePozycja();
+        $prePozycja
+            ->setTowar($towar)
+            ->setIlosc(1)
+            ->setRabatProcent(0)
+            ->setVat(23)
+            ->setCenaNettoPrzedRabatem(0)
+            ->setCenaNettoPoRabacie(0)
+            ->setCenaBruttoPrzedRabatem(0)
+            ->setCenaBruttoPoRabacie(0)
+            ->setWartoscCalejPozycjiNetto(0)
+            ->setWartoscCalejPozycjiBrutto(0)
+            ->setWartoscCalejPozycjiNettoZRabatem($order->additional_service_cost ?? 0)
+            ->setWartoscCalejPozycjiBruttoZRabatem(0);
+        return $prePozycja;
+    }
+
+    /**
+     * @param $order
+     *
+     * @return PrePozycja
+     */
+    private function getDKPPosition($order): PrePozycja
+    {
+        $towar = new PreTowar();
+        $towar
+            ->setRodzaj(ERodzajTowaru::USLUGA)
+            ->setSymbol('DKP')
+            ->setCenaKartotekowaNetto(0)
+            ->setCenaNetto(0)
+            ->setJM('szt')
+            ->setVat(23)
+            ->setWysokosc(0)
+            ->setSzerokosc(0)
+            ->setDlugosc(0)
+            ->setWaga(0);
+        $prePozycja = new PrePozycja();
+        $prePozycja
+            ->setTowar($towar)
+            ->setIlosc(1)
+            ->setRabatProcent(0)
+            ->setVat(23)
+            ->setCenaNettoPrzedRabatem(0)
+            ->setCenaNettoPoRabacie(0)
+            ->setCenaBruttoPrzedRabatem(0)
+            ->setCenaBruttoPoRabacie(0)
+            ->setWartoscCalejPozycjiNetto(0)
+            ->setWartoscCalejPozycjiBrutto(0)
+            ->setWartoscCalejPozycjiNettoZRabatem($order->additional_cash_on_delivery_cost ?? 0)
+            ->setWartoscCalejPozycjiBruttoZRabatem(0);
+        return $prePozycja;
+    }
+
+    /**
+     * @param $order
+     *
+     * @return PrePozycja
+     */
+    private function getUTPosition($order): PrePozycja
+    {
+        $towar = new PreTowar();
+        $towar
+            ->setRodzaj(ERodzajTowaru::USLUGA)
+            ->setSymbol('UT')
+            ->setCenaKartotekowaNetto(0)
+            ->setCenaNetto(0)
+            ->setJM('szt')
+            ->setVat(23)
+            ->setWysokosc(0)
+            ->setSzerokosc(0)
+            ->setDlugosc(0)
+            ->setWaga(0);
+        $prePozycja = new PrePozycja();
+        $prePozycja
+            ->setTowar($towar)
+            ->setIlosc(1)
+            ->setRabatProcent(0)
+            ->setVat(23)
+            ->setCenaNettoPrzedRabatem(0)
+            ->setCenaNettoPoRabacie(0)
+            ->setCenaBruttoPrzedRabatem(0)
+            ->setCenaBruttoPoRabacie(0)
+            ->setWartoscCalejPozycjiNetto(0)
+            ->setWartoscCalejPozycjiBrutto(0)
+            ->setWartoscCalejPozycjiNettoZRabatem($order->shipment_price_for_client ?? 0)
+            ->setWartoscCalejPozycjiBruttoZRabatem(0);
+        return $prePozycja;
     }
 }
