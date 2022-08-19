@@ -259,7 +259,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
     {
         $towar = new PreTowar();
         $towar
-            ->setRodzaj(ERodzajTowaru::TOWAR)
+            ->setRodzaj(ERodzajTowaru::USLUGA)
             ->setSymbol('DKO')
             ->setCenaKartotekowaNetto(0)
             ->setCenaNetto(0)
@@ -278,10 +278,10 @@ class GenerateXmlForNexoJob implements ShouldQueue
             ->setCenaNettoPrzedRabatem(0)
             ->setCenaNettoPoRabacie(0)
             ->setCenaBruttoPrzedRabatem(0)
-            ->setCenaBruttoPoRabacie($order->additional_service_cost ?? 0)
+            ->setCenaBruttoPoRabacie(0)
             ->setWartoscCalejPozycjiNetto(0)
             ->setWartoscCalejPozycjiBrutto(0)
-            ->setWartoscCalejPozycjiNettoZRabatem(0)
+            ->setWartoscCalejPozycjiNettoZRabatem($order->additional_service_cost ?? 0)
             ->setWartoscCalejPozycjiBruttoZRabatem(0);
         return $prePozycja;
     }
@@ -295,7 +295,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
     {
         $towar = new PreTowar();
         $towar
-            ->setRodzaj(ERodzajTowaru::TOWAR)
+            ->setRodzaj(ERodzajTowaru::USLUGA)
             ->setSymbol('DKP')
             ->setCenaKartotekowaNetto(0)
             ->setCenaNetto(0)
@@ -314,10 +314,10 @@ class GenerateXmlForNexoJob implements ShouldQueue
             ->setCenaNettoPrzedRabatem(0)
             ->setCenaNettoPoRabacie(0)
             ->setCenaBruttoPrzedRabatem(0)
-            ->setCenaBruttoPoRabacie($order->additional_cash_on_delivery_cost ?? 0)
+            ->setCenaBruttoPoRabacie(0)
             ->setWartoscCalejPozycjiNetto(0)
             ->setWartoscCalejPozycjiBrutto(0)
-            ->setWartoscCalejPozycjiNettoZRabatem(0)
+            ->setWartoscCalejPozycjiNettoZRabatem($order->additional_cash_on_delivery_cost ?? 0)
             ->setWartoscCalejPozycjiBruttoZRabatem(0);
         return $prePozycja;
     }
@@ -331,7 +331,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
     {
         $towar = new PreTowar();
         $towar
-            ->setRodzaj(ERodzajTowaru::TOWAR)
+            ->setRodzaj(ERodzajTowaru::USLUGA)
             ->setSymbol('UT')
             ->setCenaKartotekowaNetto(0)
             ->setCenaNetto(0)
@@ -350,10 +350,10 @@ class GenerateXmlForNexoJob implements ShouldQueue
             ->setCenaNettoPrzedRabatem(0)
             ->setCenaNettoPoRabacie(0)
             ->setCenaBruttoPrzedRabatem(0)
-            ->setCenaBruttoPoRabacie($order->shipment_price_for_client ?? 0)
+            ->setCenaBruttoPoRabacie(0)
             ->setWartoscCalejPozycjiNetto(0)
             ->setWartoscCalejPozycjiBrutto(0)
-            ->setWartoscCalejPozycjiNettoZRabatem(0)
+            ->setWartoscCalejPozycjiNettoZRabatem($order->shipment_price_for_client ?? 0)
             ->setWartoscCalejPozycjiBruttoZRabatem(0);
         return $prePozycja;
     }
