@@ -84,7 +84,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
                     ->setOsobaImie($address->firstname)
                     ->setOsobaNazwisko($address->lastname)
                     ->setNIP($address->nip)
-                    ->setEmail($address->email)
+                    ->setEmail($address->getAllegroEmailAddress())
                     ->setTelefon($address->phone)
                     ->setRodzajNaDok(EPreKlientRodzajNaDok::NABYWCA)
                     ->setAdresGlowny($preAddress)
@@ -281,7 +281,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
             ->setCenaBruttoPoRabacie(0)
             ->setWartoscCalejPozycjiNetto(0)
             ->setWartoscCalejPozycjiBrutto(0)
-            ->setWartoscCalejPozycjiNettoZRabatem($order->additional_service_cost ?? 0)
+            ->setWartoscCalejPozycjiNettoZRabatem(isset($order->additional_service_cost) ? round($order->additional_service_cost / 1.23, 2) : 0)
             ->setWartoscCalejPozycjiBruttoZRabatem(0);
         return $prePozycja;
     }
@@ -317,7 +317,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
             ->setCenaBruttoPoRabacie(0)
             ->setWartoscCalejPozycjiNetto(0)
             ->setWartoscCalejPozycjiBrutto(0)
-            ->setWartoscCalejPozycjiNettoZRabatem($order->additional_cash_on_delivery_cost ?? 0)
+            ->setWartoscCalejPozycjiNettoZRabatem(isset($order->additional_cash_on_delivery_cost) ? round($order->additional_cash_on_delivery_cost / 1.23, 2) : 0)
             ->setWartoscCalejPozycjiBruttoZRabatem(0);
         return $prePozycja;
     }
@@ -353,7 +353,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
             ->setCenaBruttoPoRabacie(0)
             ->setWartoscCalejPozycjiNetto(0)
             ->setWartoscCalejPozycjiBrutto(0)
-            ->setWartoscCalejPozycjiNettoZRabatem($order->shipment_price_for_client ?? 0)
+            ->setWartoscCalejPozycjiNettoZRabatem(isset($order->shipment_price_for_client) ? round($order->shipment_price_for_client / 1.23, 2) : 0)
             ->setWartoscCalejPozycjiBruttoZRabatem(0);
         return $prePozycja;
     }
