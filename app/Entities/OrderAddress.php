@@ -15,11 +15,11 @@ class OrderAddress extends Model implements Transformable
 {
     use TransformableTrait;
 
-	const TYPE_GENERAL = 'GENERAL';
-	const TYPE_STANDARD = 'STANDARD_ADDRESS';
-	const TYPE_DELIVERY = 'DELIVERY_ADDRESS';
-	const TYPE_INVOICE = 'INVOICE_ADDRESS';
-	
+    const TYPE_GENERAL = 'GENERAL';
+    const TYPE_STANDARD = 'STANDARD_ADDRESS';
+    const TYPE_DELIVERY = 'DELIVERY_ADDRESS';
+    const TYPE_INVOICE = 'INVOICE_ADDRESS';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -52,7 +52,17 @@ class OrderAddress extends Model implements Transformable
         return $this->belongsTo(Order::class);
     }
 
-    public function getPhoneFullAttribute() {
-        return  $this->phone_code . $this->phone;
+    public function getPhoneFullAttribute()
+    {
+        return $this->phone_code . $this->phone;
+    }
+
+    /**
+     * @return mixed|string
+     */
+    public function getAllegroEmailAddress(): string
+    {
+        $emailRaw = explode('+', $this->email, 2);
+        return $emailRaw[1];
     }
 }
