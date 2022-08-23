@@ -229,8 +229,6 @@ class AllegroOrderSynchro implements ShouldQueue
                     if (!$orderInvoiceAddressErrors->any() && !$orderDeliveryAddressErrors->any()) {
                         $order->labels()->attach(39);
                         $order->labels()->attach(133);
-                        $order->labels()->attach(Label::BLUE_HAMMER_ID);
-                        $order->labels()->attach(69);
                     }
                 }
 
