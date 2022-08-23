@@ -320,7 +320,7 @@ class AllegroOrderSynchro implements ShouldQueue
         $pack->symbol = $packTemplate->symbol;
         $helper = new OrderPackagesDataHelper();
 
-        if (file_exists(storage_path('app/public/protocols/day-close-protocol-' . $packTemplate->delivery_courier_name . '-' . Carbon::today()->toDateString() . '.pdf'))) {
+        if (!file_exists(storage_path('app/public/protocols/day-close-protocol-' . $packTemplate->delivery_courier_name . '-' . Carbon::today()->toDateString() . '.pdf'))) {
             $date = Carbon::today()->addWeekday();
         } else if ($packTemplate->accept_time) {
             $date = $helper->calculateShipmentDate($packTemplate->accept_time, $packTemplate->accept_time);
