@@ -39,6 +39,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
@@ -115,14 +116,15 @@ class AllegroOrderSynchro implements ShouldQueue
         $allegroOrders = $this->allegroOrderService->getPendingOrders();
         foreach ($allegroOrders as $allegroOrder) {
             try {
+                if (Order::where('allegro_form_id', $allegroOrder['id'])->count() > 0) {
+                    continue;
+                }
+
+                DB::beginTransaction();
                 $orderModel = AllegroOrder::firstOrNew(['order_id' => $allegroOrder['id']]);
                 $orderModel->order_id = $allegroOrder['id'];
                 $orderModel->buyer_email = $allegroOrder['buyer']['email'];
                 $orderModel->save();
-
-                if (Order::where('allegro_form_id', $allegroOrder['id'])->count() > 0) {
-                    continue;
-                }
 
                 $order = new Order();
                 $customer = $this->findOrCreateCustomer($allegroOrder['buyer'], $allegroOrder['delivery']['address']);
@@ -234,7 +236,9 @@ class AllegroOrderSynchro implements ShouldQueue
 
                 dispatch_now(new AddLabelJob($order, [177]));
                 $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
+                DB::commit();
             } catch (Throwable $ex) {
+                DB::rollBack();
                 Log::error($ex->getMessage(), [
                     'file' => $ex->getFile(),
                     'line' => $ex->getLine(),
@@ -539,8 +543,8 @@ class AllegroOrderSynchro implements ShouldQueue
 
         $addressData = [
             'type' => $type,
-            'firstname' => $address['firstName'] ?? $address['naturalPerson']['firstName'],
-            'lastname' => $address['lastName'] ?? $address['naturalPerson']['lastName'],
+            'firstname' => $address['firstName'] ?? $address['naturalPerson']['firstName'] ?? null,
+            'lastname' => $address['lastName'] ?? $address['naturalPerson']['lastName'] ?? null,
             'address' => $street,
             'flat_number' => $flatNo,
             'city' => $address['city'],
