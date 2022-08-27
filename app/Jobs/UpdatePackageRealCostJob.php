@@ -12,18 +12,20 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Entities\OrderPackage;
 use Illuminate\Support\Facades\Storage;
-use Carbon\Carbon;
-use romanzipp\QueueMonitor\Traits\IsMonitored;
 
-class UpdatePackageRealCostJob implements ShouldQueue {
+class UpdatePackageRealCostJob implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    use IsMonitored;
+    private $orderPackageRepository;
 
-    public function __construct() {
-    
+    public function __construct()
+    {
     }
 
-    public function handle() {
+    public function handle()
+    {
+        $this->orderPackageRepository = app(OrderPackageRepository::class);
         $sortedPackages = $this->sortPackages();
         $inpostPackages = $sortedPackages['INPOST'];
         $pocztexPackages = $sortedPackages['POCZTEX'];
@@ -31,7 +33,8 @@ class UpdatePackageRealCostJob implements ShouldQueue {
         $this->updateCost($inpostPackages, $pocztexPackages, $dpdPackages);
     }
 
-    public function updateCost($inpostPackages, $pocztexPackages, $dpdPackages) {
+    public function updateCost($inpostPackages, $pocztexPackages, $dpdPackages)
+    {
         $pathInpost = Storage::path('user-files/costs/INPOST.csv');
         if (!empty($inpostPackages) && file_exists($pathInpost)) {
             $spec = fopen($pathInpost, 'r');
@@ -69,18 +72,19 @@ class UpdatePackageRealCostJob implements ShouldQueue {
                         $dpdPackage->status = "DELIVERED";
                         $dpdPackage->save();
 
-                        $this->saveOrderPackageRealCostForCompany($dpdPackage, $csvLine[14]*1.23);
+                        $this->saveOrderPackageRealCostForCompany($dpdPackage, $csvLine[14] * 1.23);
                     }
                 }
             }
         }
     }
 
-    public function sortPackages() {
+    public function sortPackages()
+    {
         $inpostPackages = array();
         $pocztexPackages = array();
         $dpdPackages = array();
-        $packages = OrderPackage::all();
+        $packages = $this->orderPackageRepository->whereDoesntHave('realCostsForCompany')->get();
         foreach ($packages as $package) {
             switch ($package->service_courier_name) {
                 case "INPOST":

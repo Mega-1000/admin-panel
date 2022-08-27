@@ -187,7 +187,7 @@ class CheckPackagesStatusJob
         $status = $integration->getEnvelopeContentShort($request);
 
         if (!$status || !isset($status->przesylka) || $status->przesylka->status !== statusType::POTWIERDZONA) {
-            Log::notice('Błąd ze statusem przesyłki',
+            Log::notice('Błąd ze statusem przesyłki '. $package->order_id,
                 (array)$status->przesylka
             );
             return;

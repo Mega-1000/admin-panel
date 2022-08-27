@@ -3,10 +3,8 @@
 namespace App\Jobs;
 
 use App\Entities\Order;
-use App\Entities\OrderPackage;
+use App\Entities\PackageTemplate;
 use App\Helpers\OrderPackagesDataHelper;
-use App\Repositories\OrderPackageRepository;
-use App\Repositories\OrderRepository;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\SerializesModels;
@@ -37,12 +35,21 @@ class ChangeShipmentDatePackagesJob implements ShouldQueue
      */
     public function handle()
     {
-        $orders = Order::whereDate('shipment_date', '<', Carbon::today())->get();
+        $orders = Order::whereDate('shipment_date', '<', Carbon::today())
+            ->whereDoesntHave('labels', function ($query) {
+                $query->where('label_id', 66);
+            })->whereHas('packages', function ($query) {
+                $query->whereNotIn('status',
+                    [
+                        PackageTemplate::WAITING_FOR_CANCELLED,
+                        PackageTemplate::SENDING,
+                        PackageTemplate::DELIVERED,
+                        PackageTemplate::CANCELLED
+                    ]
+                );
+            })->get();
         foreach ($orders as $order) {
             $date = new Carbon($order->shipment_date);
-            if ($order->hasLabel(66)) {
-                continue;
-            }
             if ($order->packages->isEmpty()) {
                 if ($date->toDateString() < Carbon::today()->toDateString()) {
                     $shipmentDate = Carbon::today();
@@ -58,11 +65,7 @@ class ChangeShipmentDatePackagesJob implements ShouldQueue
                 }
             } else {
                 foreach ($order->packages as $package) {
-                    if ($package->status != 'NEW') {
-                        continue;
-                    }
-
-                    if ($date->toDateString() >= Carbon::today()->toDateString()) {
+                    if ($package->status != 'NEW' || $date->toDateString() >= Carbon::today()->toDateString()) {
                         continue;
                     }
 
