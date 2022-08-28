@@ -59,8 +59,7 @@ class CheckPackagesStatusJob
     {
         $orders = Order::whereHas('packages', function ($query) {
             $query->whereIn('status', ['SENDING', 'WAITING_FOR_SENDING'])->whereDate('shipment_date', '>', Carbon::today()->subDays(30)->toDateString());
-        })
-            ->get();
+        })->get();
 
         foreach ($orders as $order) {
             foreach ($order->packages as $package) {
@@ -187,7 +186,7 @@ class CheckPackagesStatusJob
         $status = $integration->getEnvelopeContentShort($request);
 
         if (!$status || !isset($status->przesylka) || $status->przesylka->status !== statusType::POTWIERDZONA) {
-            Log::notice('Błąd ze statusem przesyłki '. $package->order_id,
+            Log::notice('Błąd ze statusem przesyłki ' . $package->order_id,
                 (array)$status->przesylka
             );
             return;
@@ -251,6 +250,11 @@ class CheckPackagesStatusJob
         $url = $this->config['gls']['tracking_url'] . $package->letter_number;
         try {
             $response = json_decode($this->prepareConnectionForTrackingStatus($url, Request::METHOD_GET, [])->getBody()->getContents());
+
+            if (empty($response->tuStatus)) {
+                Log::notice('Wystąpił problem przy sprawdzaniu statusu paczki: ' . $package->letter_number);
+                return;
+            }
 
             $packageStatus = $response->tuStatus[0]->progressBar->statusInfo;
 
