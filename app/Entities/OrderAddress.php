@@ -62,7 +62,8 @@ class OrderAddress extends Model implements Transformable
      */
     public function getAllegroEmailAddress(): string
     {
-        $emailRaw = explode('+', $this->email, 2);
-        return $emailRaw[1];
+        $emailRaw = explode('@', $this->email, 2);
+        $emailFirstPart = explode('+', $emailRaw[0], 2);
+        return $emailFirstPart[0] . '@' . $emailRaw[1];
     }
 }

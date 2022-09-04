@@ -143,11 +143,11 @@ class GenerateXmlForNexoJob implements ShouldQueue
                         ->setProdukty(array_merge($preDokument->getProdukty(), [$prePozycja]));
                 }
 
-                $preDokument->setProdukty(array_merge($preDokument->getProdukty(), [
-                    $this->getDKOPosition($order),
-                    $this->getDKPPosition($order),
-                    $this->getUTPosition($order)
-                ]));
+                $preDokument->setProdukty(array_filter(array_merge($preDokument->getProdukty(), [
+                    ($order->additional_service_cost > 0) ? $this->getDKOPosition($order) : null,
+                    ($order->additional_cash_on_delivery_cost > 0) ? $this->getDKPPosition($order) : null,
+                    ($order->shipment_price_for_client > 0) ? $this->getUTPosition($order) : null
+                ])));
 
                 $xml = self::generateValidXmlFromObj($preDokument);
                 Storage::disk('local')->put('public/XMLFS/' . $order->id . '_FS_' . Carbon::now()->format('d-m-Y') . '.xml', mb_convert_encoding($xml, "UTF-8", "auto"));
