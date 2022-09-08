@@ -329,9 +329,16 @@ class OrdersController extends Controller
         );
     }
 
+    /**
+     * Undocumented function
+     *
+     * @param UpdateOrderDeliveryAndInvoiceAddressesRequest $request
+     * @param int $orderId
+     * @return void
+     */
     public function updateOrderDeliveryAndInvoiceAddresses(
         UpdateOrderDeliveryAndInvoiceAddressesRequest $request,
-        $orderId
+        int $orderId
     ) {
         $message = [];
 
@@ -387,15 +394,6 @@ class OrdersController extends Controller
 
             if ($deliveryAddress->wasChanged() || $invoiceAddress->wasChanged()) {
                 dispatch(new OrderProformSendMailJob($order, setting('allegro.address_changed_msg')));
-            }
-
-            if ($request->get('remember_delivery_address')) {
-                $data = array_merge($request->get('DELIVERY_ADDRESS'), ['type' => 'DELIVERY_ADDRESS']);
-                $order->customer->addresses()->updateOrCreate(["type" => "DELIVERY_ADDRESS"], $data);
-            }
-            if ($request->get('remember_invoice_address')) {
-                $data = array_merge($request->get('INVOICE_ADDRESS'), ['type' => 'INVOICE_ADDRESS']);
-                $order->customer->addresses()->updateOrCreate(["type" => "INVOICE_ADDRESS"], $data);
             }
 
             return response()->json(implode(" ", $message), 200, [], JSON_UNESCAPED_UNICODE);
