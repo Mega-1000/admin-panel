@@ -39,7 +39,10 @@ Route::middleware('client')->group(function () {
 Route::get('company-info/by-nip/{nip}', 'Api\CompanyInfoController@byNip')
         ->name('api.company-info.by-nip');
 
+Route::post('customers/{orderId}/update-delivery-address', 'Api\CustomersController@updateCustomerDeliveryAddress')->name('api.orders.update-customer-delivery-addresses');
+Route::post('customers/{orderId}/update-invoice-address', 'Api\CustomersController@updateCustomerInvoiceAddress')->name('api.orders.update-customer-invoice-addresses');
 Route::get('orders/{orderId}/customer-delivery-address', 'Api\OrdersController@getCustomerDeliveryAddress')->name('api.orders.get-customer-delivery-address');
+Route::get('orders/{orderId}/customer-invoice-address', 'Api\OrdersController@getCustomerInvoiceAddress')->name('api.orders.get-customer-invoice-address');
 Route::get('orders/{orderId}/customer-standard-address', 'Api\OrdersController@getCustomerStandardAddress')->name('api.orders.get-customer-standard-address');
 Route::get('orders/{orderId}/ready-to-ship-form-autocomplete-data', 'Api\OrdersController@getReadyToShipFormAutocompleteData')->name('api.orders.get-ready-to-ship-form-autocomplete-data');
 Route::post('orders/{orderId}/update-order-delivery-and-invoice-addresses', 'Api\OrdersController@updateOrderDeliveryAndInvoiceAddresses')->name('api.orders.update-order-delivery-and-invoice-addresses');
@@ -104,6 +107,7 @@ Route::group(['prefix' => 'orders', 'as' => 'orders.'], __DIR__ . '/api/OrdersRo
 Route::group(['prefix' => 'transactions', 'as' => 'transactions.'], __DIR__ . '/api/TransactionsRoutes.php');
 Route::group(['prefix' => 'customers', 'as' => 'customers.'], __DIR__ . '/api/CustomersRoutes.php');
 Route::group(['prefix' => 'working-events', 'as' => 'workingEvents.'], __DIR__ . '/api/WorkingEventsRoutes.php');
+Route::group(['prefix' => 'countries', 'as' => 'countries.'], __DIR__ . '/api/CountriesRoutes.php');
 
 Route::post('/faqs', 'Api\FaqController@store')->name('api.faq.save');
 Route::get('/faqs/categories', 'Api\FaqController@getCategories')->name('api.faq.categories');
