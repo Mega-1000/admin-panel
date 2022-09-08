@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Entities\Order;
+use App\Helpers\OrderBuilder;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use App\Http\Requests\Api\Customers\StoreCustomerRequest;
@@ -9,6 +11,8 @@ use App\Http\Controllers\Controller;
 use App\Repositories\CustomerAddressRepository;
 use App\Repositories\CustomerRepository;
 use Illuminate\Support\Facades\Log;
+use App\Http\Requests\Api\Customers\StoreCustomerAddressRequest;
+use Throwable;
 
 class CustomersController extends Controller
 {
@@ -28,8 +32,7 @@ class CustomersController extends Controller
     public function __construct(
         CustomerRepository $customerRepository,
         CustomerAddressRepository $customerAddressRepository
-    )
-    {
+    ) {
         $this->customerRepository = $customerRepository;
         $this->customerAddressRepository = $customerAddressRepository;
     }
@@ -93,7 +96,8 @@ class CustomersController extends Controller
 
             return $this->createdResponse();
         } catch (\Exception $e) {
-            Log::error('Problem with create new customer.',
+            Log::error(
+                'Problem with create new customer.',
                 ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
             );
             die();
@@ -164,7 +168,7 @@ class CustomersController extends Controller
             if (!empty($request->get('email'))) {
                 $query->where('login', 'like', $request->get('email') . '%');
             }
-//dump($query->toSql());exit;
+
             $result = $query->get();
 
             if (!empty($result->all())) {
@@ -200,6 +204,68 @@ class CustomersController extends Controller
             $response = [
                 'errorCode' => $exception->getCode(),
                 'errorMessage' => $exception->getMessage()
+            ];
+        }
+        return response()->json($response);
+    }
+
+    /**
+     * Update customer delivery address.
+     */
+    public function updateCustomerDeliveryAddress(StoreCustomerAddressRequest $request, $orderId)
+    {
+        $order = Order::find($orderId);
+        $data = $request->validated();
+        try {
+            $this->customerAddressRepository->updateOrCreate(
+                [
+                    'customer_id' => $order->customer->id,
+                    'type' => 'DELIVERY_ADDRESS',
+                ],
+                array_merge(
+                    [
+                        'customer_id' => $order->customer->id,
+                        'type' => 'DELIVERY_ADDRESS',
+                    ],
+                    $data
+                )
+            );
+            $response['status'] = true;
+        } catch (Throwable $ex) {
+            $response = [
+                'errorCode' => $ex->getCode(),
+                'errorMessage' => $ex->getMessage()
+            ];
+        }
+        return response()->json($response);
+    }
+
+    /**
+     * Update customer invoice address.
+     */
+    public function updateCustomerInvoiceAddress(StoreCustomerAddressRequest $request, $orderId)
+    {
+        $order = Order::find($orderId);
+        $data = $request->validated();
+        try {
+            $this->customerAddressRepository->updateOrCreate(
+                [
+                    'customer_id' => $order->customer->id,
+                    'type' => 'INVOICE_ADDRESS',
+                ],
+                array_merge(
+                    [
+                        'customer_id' => $order->customer->id,
+                        'type' => 'INVOICE_ADDRESS',
+                    ],
+                    $data
+                )
+            );
+            $response['status'] = true;
+        } catch (Throwable $ex) {
+            $response = [
+                'errorCode' => $ex->getCode(),
+                'errorMessage' => $ex->getMessage()
             ];
         }
         return response()->json($response);

@@ -579,6 +579,7 @@ class AllegroOrderSynchro implements ShouldQueue
             'type' => $type,
             'customer_id' => $customer->id,
         ]);
+        $country = Country::firstOrCreate(['iso2' => $data['countryCode']], ['name' => $data['countryCode']]);
 
         $phoneAndCode = Helper::prepareCodeAndPhone($data['phoneNumber']);
         $customerAddressData = [
@@ -593,7 +594,9 @@ class AllegroOrderSynchro implements ShouldQueue
             'postal_code' => $data['address']['postCode'] ?? $data['zipCode'],
             'phone' => implode('', $phoneAndCode),
             'customer_id' => $customer->id,
-            'email' => $customer->login
+            'email' => $customer->login,
+            'country_Id' => $country->id,
+            'isAbroad' => $country->id != 1
         ];
         $customerAddress->fill($customerAddressData);
         $customerAddress->save();

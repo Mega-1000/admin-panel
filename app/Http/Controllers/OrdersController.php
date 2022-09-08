@@ -319,7 +319,7 @@ class OrdersController extends Controller
 
         $groupedLabels = [];
         foreach ($labelGroups as $labelGroup) {
-                $groupedLabels[$labelGroup->name] = $labelGroup->activeLabels;
+            $groupedLabels[$labelGroup->name] = $labelGroup->activeLabels;
         }
 
         $groupedLabels['bez grupy'] = $this->labelRepository->where('label_group_id', null)->where('status', LabelStatusEnum::Active)->get();
@@ -428,7 +428,7 @@ class OrdersController extends Controller
             'type' => 'DELIVERY_ADDRESS',
         ])->first();
 
-	    $orderAddressService = new OrderAddressService();
+        $orderAddressService = new OrderAddressService();
 
         $orderAddressService->addressIsValid($orderInvoiceAddress);
         $orderInvoiceAddressErrors = $orderAddressService->errors();
@@ -436,7 +436,7 @@ class OrdersController extends Controller
         $orderAddressService->addressIsValid($orderDeliveryAddress);
         $orderDeliveryAddressErrors = $orderAddressService->errors();
 
-	    $messages = $this->orderMessageRepository->orderBy('type')->findWhere(["order_id" => $order->id]);
+        $messages = $this->orderMessageRepository->orderBy('type')->findWhere(["order_id" => $order->id]);
         $emails = DB::table('emails_messages')->where('order_id', $orderId)->get();
         $orderItems = $order->items;
         $productsArray = [];
@@ -528,19 +528,76 @@ class OrdersController extends Controller
         $packets = ProductStockPacket::with('items')->get();
         $countries = Country::all();
         if ($order->customer_id == 4128) {
-            return view('orders.edit_self',
-                compact('visibilitiesTask', 'visibilitiesPackage', 'visibilitiesPayments', 'warehouses', 'order',
-                    'users', 'customerInfo', 'orderInvoiceAddress', 'orderInvoiceAddressErrors', 'selInvoices', 'subiektInvoices',
-                    'orderDeliveryAddress', 'orderDeliveryAddressErrors', 'orderItems', 'warehouse', 'statuses', 'messages', 'productPacking',
-                    'customerDeliveryAddress', 'firms', 'productsVariation', 'allProductsFromSupplier', 'orderId',
-                    'customerOrdersToPay', 'clientTotalCost', 'ourTotalCost', 'labelsButtons', 'countries'));
+            return view(
+                'orders.edit_self',
+                compact(
+                    'visibilitiesTask',
+                    'visibilitiesPackage',
+                    'visibilitiesPayments',
+                    'warehouses',
+                    'order',
+                    'users',
+                    'customerInfo',
+                    'orderInvoiceAddress',
+                    'orderInvoiceAddressErrors',
+                    'selInvoices',
+                    'subiektInvoices',
+                    'orderDeliveryAddress',
+                    'orderDeliveryAddressErrors',
+                    'orderItems',
+                    'warehouse',
+                    'statuses',
+                    'messages',
+                    'productPacking',
+                    'customerDeliveryAddress',
+                    'firms',
+                    'productsVariation',
+                    'allProductsFromSupplier',
+                    'orderId',
+                    'customerOrdersToPay',
+                    'clientTotalCost',
+                    'ourTotalCost',
+                    'labelsButtons',
+                    'countries'
+                )
+            );
         } else {
-            return view('orders.edit',
-                compact('visibilitiesTask', 'visibilitiesPackage', 'visibilitiesPayments', 'warehouses', 'order',
-                    'users', 'customerInfo', 'orderInvoiceAddress', 'orderInvoiceAddressErrors', 'selInvoices', 'subiektInvoices',
-                    'orderDeliveryAddress', 'orderDeliveryAddressErrors', 'orderItems', 'warehouse', 'statuses', 'messages', 'productPacking',
-                    'customerDeliveryAddress', 'firms', 'productsVariation', 'allProductsFromSupplier', 'orderId',
-                    'customerOrdersToPay', 'orderHasSentLP', 'emails', 'clientTotalCost', 'ourTotalCost', 'labelsButtons', 'packets', 'countries'));
+            return view(
+                'orders.edit',
+                compact(
+                    'visibilitiesTask',
+                    'visibilitiesPackage',
+                    'visibilitiesPayments',
+                    'warehouses',
+                    'order',
+                    'users',
+                    'customerInfo',
+                    'orderInvoiceAddress',
+                    'orderInvoiceAddressErrors',
+                    'selInvoices',
+                    'subiektInvoices',
+                    'orderDeliveryAddress',
+                    'orderDeliveryAddressErrors',
+                    'orderItems',
+                    'warehouse',
+                    'statuses',
+                    'messages',
+                    'productPacking',
+                    'customerDeliveryAddress',
+                    'firms',
+                    'productsVariation',
+                    'allProductsFromSupplier',
+                    'orderId',
+                    'customerOrdersToPay',
+                    'orderHasSentLP',
+                    'emails',
+                    'clientTotalCost',
+                    'ourTotalCost',
+                    'labelsButtons',
+                    'packets',
+                    'countries'
+                )
+            );
         }
     }
 
@@ -573,7 +630,8 @@ class OrdersController extends Controller
                 }
 
                 if ($deliveryAddressLatLon != null) {
-                    $raw = DB::selectOne('SELECT w.id, pc.latitude, pc.longitude, 1.609344 * SQRT(
+                    $raw = DB::selectOne(
+                        'SELECT w.id, pc.latitude, pc.longitude, 1.609344 * SQRT(
                         POW(69.1 * (pc.latitude - :latitude), 2) +
                         POW(69.1 * (:longitude - pc.longitude) * COS(pc.latitude / 57.3), 2)) AS distance
                         FROM postal_code_lat_lon pc
@@ -586,7 +644,8 @@ class OrdersController extends Controller
                             'latitude' => $deliveryAddressLatLon->latitude,
                             'longitude' => $deliveryAddressLatLon->longitude,
                             'firmId' => $firm->first->id->id
-                        ]);
+                        ]
+                    );
                     if (!empty($raw)) {
                         $radius = $raw->distance;
                     } else {
@@ -614,7 +673,8 @@ class OrdersController extends Controller
                         );
                 }
                 $warehouse = $this->warehouseRepository->find($raw->id);
-                if ($radius > $warehouse->radius ||
+                if (
+                    $radius > $warehouse->radius ||
                     $prod->price->gross_selling_price_commercial_unit === null ||
                     $prod->price->gross_selling_price_basic_unit === null ||
                     $prod->price->gross_selling_price_calculated_unit === null
@@ -966,13 +1026,16 @@ class OrdersController extends Controller
                     PackageTemplate::WAITING_FOR_CANCELLED,
                     PackageTemplate::SENDING,
                     PackageTemplate::DELIVERED,
-                    PackageTemplate::CANCELLED];
+                    PackageTemplate::CANCELLED
+                ];
                 if (in_array($package->status, $cannotCancel)) {
                     return;
                 }
-                if ($package->status == PackageTemplate::STATUS_NEW
+                if (
+                    $package->status == PackageTemplate::STATUS_NEW
                     && $package->delivery_courier_name != 'POCZTEX'
-                    && $package->service_courier_name != 'POCZTEX') {
+                    && $package->service_courier_name != 'POCZTEX'
+                ) {
                     $package->delete();
                 } else {
                     dispatch_now(new SendRequestForCancelledPackageJob($package->id));
@@ -1408,7 +1471,6 @@ class OrdersController extends Controller
         $totalPrice = 0;
         foreach ($request->input('id') as $productId) {
             $totalPrice += (float)$request->input('gross_selling_price_commercial_unit')[$productId] * (int)$request->input('quantity_commercial')[$productId];
-
         }
         $warehouse = $this->warehouseRepository->findWhere(["symbol" => $request->input('delivery_warehouse')])->first();
 
@@ -1519,9 +1581,11 @@ class OrdersController extends Controller
         if (!empty($request->input('manuallyChosen'))) {
             $labelsToAddAfterRemoval = $request->input('labelsToAddIds');
         }
-        if ($labelId == LabelsHelper::VALIDATE_ORDER
+        if (
+            $labelId == LabelsHelper::VALIDATE_ORDER
             && in_array(LabelsHelper::SEND_TO_WAREHOUSE_FOR_VALIDATION, $labelsToAddAfterRemoval)
-            && empty($order->warehouse)) {
+            && empty($order->warehouse)
+        ) {
             return response('warehouse not found', 400);
         }
 
@@ -1706,7 +1770,6 @@ class OrdersController extends Controller
                 $item->save();
                 $productsWeightSum += (float)$data['modal_weight'][$id] * $quantity;
                 $productsSum += (float)$data['gross_selling_price_commercial_unit'][$id] * $quantity;
-
             }
         }
 
@@ -1730,8 +1793,10 @@ class OrdersController extends Controller
                     'order_id' => $request->input('orderId'),
                 ])->first();
 
-                $productStock = $this->productStockRepository->findByField('product_id',
-                    $orderItem->product_id)->first();
+                $productStock = $this->productStockRepository->findByField(
+                    'product_id',
+                    $orderItem->product_id
+                )->first();
 
                 $productStockPositionExist = $this->productStockPositionRepository->findWhere(
                     [
@@ -1789,8 +1854,10 @@ class OrdersController extends Controller
                     'id' => $id,
                     'order_id' => $request->input('orderId'),
                 ])->first();
-                $productStock = $this->productStockRepository->findByField('product_id',
-                    $orderItem->product_id)->first();
+                $productStock = $this->productStockRepository->findByField(
+                    'product_id',
+                    $orderItem->product_id
+                )->first();
 
                 $productStockPositionExist = $this->productStockPositionRepository->findWhere(
                     [
@@ -1848,8 +1915,10 @@ class OrdersController extends Controller
                     'order_id' => $request->input('orderId'),
                 ])->first();
 
-                $productStock = $this->productStockRepository->findByField('product_id',
-                    $orderItem->product_id)->first();
+                $productStock = $this->productStockRepository->findByField(
+                    'product_id',
+                    $orderItem->product_id
+                )->first();
 
                 $productStockPositionExist = $this->productStockPositionRepository->findWhere(
                     [
@@ -1904,7 +1973,6 @@ class OrdersController extends Controller
             'message' => __('orders.message.delete'),
             'alert-type' => 'success',
         ]);
-
     }
 
     /**
@@ -1920,8 +1988,10 @@ class OrdersController extends Controller
                     'order_id' => $request->input('orderId'),
                 ])->first();
 
-                $productStock = $this->productStockRepository->findByField('product_id',
-                    $orderItem->product_id)->first();
+                $productStock = $this->productStockRepository->findByField(
+                    'product_id',
+                    $orderItem->product_id
+                )->first();
 
                 $productStockPosition = $this->productStockPositionRepository->update([
                     'product_stock_id' => $productStock->id,
@@ -1952,7 +2022,6 @@ class OrdersController extends Controller
             'message' => __('orders.message.delete'),
             'alert-type' => 'success',
         ]);
-
     }
 
     /**
@@ -2015,9 +2084,7 @@ class OrdersController extends Controller
         $query = $this->getQueryForDataTables()->orderBy($sortingColumn, $sortingColumnDirection);
 
 
-        $notSearchable = [
-
-        ];
+        $notSearchable = [];
 
         foreach ($data['columns'] as $column) {
             if ($column['searchable'] == 'true' && !empty($column['search']['value'])) {
@@ -2081,7 +2148,7 @@ class OrdersController extends Controller
                             ->whereRaw("order_labels.order_id = orders.id and order_labels.label_id = {$column['search']['value']}");
                     });
                 } elseif ($column['name'] == "packages_sent" && !empty($column['search']['value'])) {
-                   $searched = explode(' ',$column['search']['value']);
+                    $searched = explode(' ', $column['search']['value']);
                     if ($searched[0] === 'plus') {
                         $query->whereExists(function ($innerQuery) use ($column, $searched) {
                             $innerQuery->select("*")
@@ -2141,13 +2208,13 @@ class OrdersController extends Controller
             $query->where($sortingColumns[14], '>', $minId);
         }
 
-        if(isset($data['same'])) {
+        if (isset($data['same'])) {
             $query->whereRaw("date({$data["dateColumn"]}) = '{$data['dateFrom']}'");
         } else {
-            if(isset($data['dateFrom'])) {
+            if (isset($data['dateFrom'])) {
                 $query->whereRaw("date({$data["dateColumn"]}) >= '{$data['dateFrom']}'");
             }
-            if(isset($data['dateTo'])) {
+            if (isset($data['dateTo'])) {
                 $query->whereRaw("date({$data["dateColumn"]}) <= '{$data['dateTo']}'");
             }
         }
@@ -2172,7 +2239,7 @@ class OrdersController extends Controller
 
             $row->packages = \DB::table('order_packages')->where('order_id', $row->orderId)->get();
             if ($row->packages) {
-                $row->packages->map(function($item) {
+                $row->packages->map(function ($item) {
                     $item->sumOfCosts = DB::table('order_packages_real_cost_for_company')
                         ->select(DB::raw('SUM(cost) as sum'))
                         ->where('order_package_id', $item->id)
@@ -2189,9 +2256,9 @@ class OrdersController extends Controller
             $row->left_to_pay = 0;
             $row->history = $row->history->reduce(function ($acu, $current) {
                 $insert = ['id' => $current->id, 'labels' => $current->labels];
-                $acu []= $insert;
+                $acu[] = $insert;
                 return $acu;
-            },[]);
+            }, []);
             $invoices = \DB::table('order_order_invoices')->where('order_id', $row->orderId)->get(['invoice_id']);
             $arrInvoice = [];
             foreach ($invoices as $invoice) {
@@ -2210,8 +2277,10 @@ class OrdersController extends Controller
                 foreach ($labels as $label) {
                     if (isset($label[0])) {
                         if (!empty($label[0]->label_group_id)) {
-                            $label[0]->label_group = \DB::table('label_groups')->where('id',
-                                $label[0]->label_group_id)->get();
+                            $label[0]->label_group = \DB::table('label_groups')->where(
+                                'id',
+                                $label[0]->label_group_id
+                            )->get();
                         }
 
                         foreach ($labelsIds as $labelId) {
@@ -2253,13 +2322,21 @@ class OrdersController extends Controller
     {
         $query = \DB::table('orders')
             ->distinct()
-            ->select('*', 'orders.created_at as orderDate', 'orders.id as orderId',
-                'customers.login as clientEmail', 'statuses.name as statusName',
-                'customer_addresses.firstname as clientFirstname', 'customer_addresses.lastname as clientLastname',
-                'customer_addresses.phone as clientPhone', 'sel_tr__transaction.tr_CheckoutFormPaymentId as sello_payment',
+            ->select(
+                '*',
+                'orders.created_at as orderDate',
+                'orders.id as orderId',
+                'customers.login as clientEmail',
+                'statuses.name as statusName',
+                'customer_addresses.firstname as clientFirstname',
+                'customer_addresses.lastname as clientLastname',
+                'customer_addresses.phone as clientPhone',
+                'sel_tr__transaction.tr_CheckoutFormPaymentId as sello_payment',
                 'sel_tr__transaction.tr_CheckoutFormId as sello_form',
-                'task_times.date_start as production_date', 'taskUser.firstname as taskUserFirstName',
-                'taskUser.lastname as taskUserLastName')
+                'task_times.date_start as production_date',
+                'taskUser.firstname as taskUserFirstName',
+                'taskUser.lastname as taskUserLastName'
+            )
             //poniższe left joiny mają na celu wyświetlenie czasów oraz wykonwaców zadań z tabeli tasks na "gridzie"
             ->leftJoin('tasks', 'orders.id', '=', 'tasks.order_id')
             ->leftJoin('tasks as parentTask', 'parentTask.id', '=', 'tasks.parent_id')
@@ -2375,11 +2452,11 @@ class OrdersController extends Controller
             try {
                 [$message, $messages] = app(OrdersPackagesController::class)->sendPackage($package, $messages);
                 if (!empty($message)) {
-                    $messages [] = $message;
+                    $messages[] = $message;
                 }
             } catch (\Exception $e) {
                 \Log::error('błąd przy nadawaniu hurtowym paczki', ['error' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
-                $messages [] = $e->getMessage();
+                $messages[] = $e->getMessage();
             }
         }
         return $messages;
@@ -2683,7 +2760,6 @@ class OrdersController extends Controller
                     'postal_code' => $orderInvoiceAddresses->postal_code === null ? $orderDeliveryAddresses->postal_code : $orderInvoiceAddresses->postal_code,
                     'email' => $orderInvoiceAddresses->email,
                 ], $curAddressInvoice->id);
-
             }
 
             return redirect()->back()->with([
@@ -2814,7 +2890,7 @@ class OrdersController extends Controller
                     $sum = $item['sum'];
                     $count = 1;
                 }
-                if( $count < $tempVariationCounter[$item['variation_group']] || $sum == 0){
+                if ($count < $tempVariationCounter[$item['variation_group']] || $sum == 0) {
                     continue;
                 }
 
@@ -2830,10 +2906,18 @@ class OrdersController extends Controller
                     'quality' => $item['quality'],
                     'quality_to_price' => $item['quality_to_price'],
                     'comments' => $item['comments'],
-                    'warehouse_property'=> $item['warehouse_property'],
-                    'value_of_the_order_for_free_transport' => number_format((float)$item['value_of_the_order_for_free_transport'] - $order->total_price,
-                        2, '.', '') <= 0 ? 'Darmowy transport!' : number_format((float)$item['value_of_the_order_for_free_transport'] - $order->total_price,
-                        2, '.', '')
+                    'warehouse_property' => $item['warehouse_property'],
+                    'value_of_the_order_for_free_transport' => number_format(
+                        (float)$item['value_of_the_order_for_free_transport'] - $order->total_price,
+                        2,
+                        '.',
+                        ''
+                    ) <= 0 ? 'Darmowy transport!' : number_format(
+                        (float)$item['value_of_the_order_for_free_transport'] - $order->total_price,
+                        2,
+                        '.',
+                        ''
+                    )
 
                 ];
                 $allProductsFromSupplier[$item['product_name_supplier']][$item['variation_group']] = $arr;
@@ -2850,8 +2934,13 @@ class OrdersController extends Controller
         if (!strpos($order->customer->login, 'allegromail.pl')) {
             Mailer::create()
                 ->to($order->customer->login)
-                ->send(new SendOfferToCustomerMail('Oferta nr: ' . $order->id, $order, $productsVariation,
-                    $allProductsFromSupplier, $productPacking));
+                ->send(new SendOfferToCustomerMail(
+                    'Oferta nr: ' . $order->id,
+                    $order,
+                    $productsVariation,
+                    $allProductsFromSupplier,
+                    $productPacking
+                ));
         }
 
         return redirect()->route('orders.edit', ['order_id' => $order->id])->with([

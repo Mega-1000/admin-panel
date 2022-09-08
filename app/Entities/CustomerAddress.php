@@ -23,7 +23,19 @@ class CustomerAddress extends Model implements Transformable
      * @var array
      */
     protected $fillable = [
-        'customer_id', 'type', 'firstname', 'lastname', 'firmname', 'nip', 'phone', 'address', 'flat_number', 'city', 'postal_code', 'email'
+        'customer_id',
+        'type',
+        'firstname',
+        'lastname',
+        'firmname',
+        'nip',
+        'phone',
+        'address',
+        'flat_number',
+        'city',
+        'postal_code',
+        'email',
+        'country_id',
     ];
 
     /**

@@ -66,4 +66,9 @@ class OrderAddress extends Model implements Transformable
         $emailFirstPart = explode('+', $emailRaw[0], 2);
         return $emailFirstPart[0] . '@' . $emailRaw[1];
     }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
 }

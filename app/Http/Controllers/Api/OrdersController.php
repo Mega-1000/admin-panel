@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Entities\Country;
 use App\Entities\FirmSource;
 use App\Entities\Label;
 use App\Entities\OrderAddress;
@@ -47,6 +48,7 @@ use App\Entities\Order;
 
 /**
  * Class OrdersController
+ *
  * @package App\Http\Controllers\Api
  */
 class OrdersController extends Controller
@@ -100,30 +102,30 @@ class OrdersController extends Controller
 
     /**
      * OrdersController constructor.
-     * @param OrderRepository $orderRepository
-     * @param CustomerRepository $customerRepository
-     * @param OrderItemRepository $orderItemRepository
-     * @param ProductRepository $productRepository
-     * @param OrderAddressRepository $orderAddressRepository
-     * @param OrderMessageRepository $orderMessageRepository
-     * @param CustomerAddressRepository $customerAddressRepository
-     * @param ProductPriceRepository $productPriceRepository
+     *
+     * @param OrderRepository                  $orderRepository
+     * @param CustomerRepository               $customerRepository
+     * @param OrderItemRepository              $orderItemRepository
+     * @param ProductRepository                $productRepository
+     * @param OrderAddressRepository           $orderAddressRepository
+     * @param OrderMessageRepository           $orderMessageRepository
+     * @param CustomerAddressRepository        $customerAddressRepository
+     * @param ProductPriceRepository           $productPriceRepository
      * @param OrderMessageAttachmentRepository $orderMessageAttachmentRepository
-     * @param OrderPackageRepository $orderPackageRepository
+     * @param OrderPackageRepository           $orderPackageRepository
      */
     public function __construct(
-        OrderRepository $orderRepository,
-        CustomerRepository $customerRepository,
-        OrderItemRepository $orderItemRepository,
-        ProductRepository $productRepository,
-        OrderAddressRepository $orderAddressRepository,
-        OrderMessageRepository $orderMessageRepository,
-        CustomerAddressRepository $customerAddressRepository,
-        ProductPriceRepository $productPriceRepository,
+        OrderRepository                  $orderRepository,
+        CustomerRepository               $customerRepository,
+        OrderItemRepository              $orderItemRepository,
+        ProductRepository                $productRepository,
+        OrderAddressRepository           $orderAddressRepository,
+        OrderMessageRepository           $orderMessageRepository,
+        CustomerAddressRepository        $customerAddressRepository,
+        ProductPriceRepository           $productPriceRepository,
         OrderMessageAttachmentRepository $orderMessageAttachmentRepository,
-        OrderPackageRepository $orderPackageRepository
-    )
-    {
+        OrderPackageRepository           $orderPackageRepository
+    ) {
         $this->orderRepository = $orderRepository;
         $this->customerRepository = $customerRepository;
         $this->orderItemRepository = $orderItemRepository;
@@ -161,9 +163,9 @@ class OrdersController extends Controller
             DB::commit();
 
             $order = Order::find($id);
-	        $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 2)->first();
-	        $order->firm_source_id = $firmSource ? $firmSource->id : null;
-	        $order->save();
+            $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 2)->first();
+            $order->firm_source_id = $firmSource ? $firmSource->id : null;
+            $order->save();
 
             return $this->createdResponse(['order_id' => $id, 'canPay' => $canPay, 'token' => $order->getToken()]);
         } catch (\Exception $e) {
@@ -172,7 +174,8 @@ class OrdersController extends Controller
                 $this->error_code = $e->getMessage();
             }
             $message = $this->errors[$this->error_code] ?? $e->getMessage();
-            Log::error("Problem with create new order: [{$this->error_code}] $message",
+            Log::error(
+                "Problem with create new order: [{$this->error_code}] $message",
                 ['request' => $data, 'class' => $e->getFile(), 'line' => $e->getLine()]
             );
             $message = $this->errors[$this->error_code] ?? $this->defaultError;
@@ -200,8 +203,10 @@ class OrdersController extends Controller
             $orderMessage = $this->orderMessageRepository->create($data);
             if ($request->get('files')) {
                 foreach ($request->get('files') as $file) {
-                    Storage::disk('public')->put("attachments/{$orderMessage->order_id}/{$orderMessage->id}/{$file['attachment_name']}",
-                        base64_decode($file['attachment']));
+                    Storage::disk('public')->put(
+                        "attachments/{$orderMessage->order_id}/{$orderMessage->id}/{$file['attachment_name']}",
+                        base64_decode($file['attachment'])
+                    );
                     $this->orderMessageAttachmentRepository->create([
                         'file' => $file['attachment_name'],
                         'order_message_id' => $orderMessage->id,
@@ -260,16 +265,43 @@ class OrdersController extends Controller
         return $groupedMessages;
     }
 
-    public function getCustomerDeliveryAddress($orderId)
+    /**
+     * Get customer delivery address
+     * 
+     * @param int $orderId
+     * 
+     * @return CustomerAddress
+     */
+    public function getCustomerDeliveryAddress(int $orderId)
     {
-        return $this->orderRepository->find($orderId)->customer->addresses->where('type', '=',
-            'DELIVERY_ADDRESS')->first();
+        return $this->orderRepository->find($orderId)->customer->addresses->where(
+            'type',
+            '=',
+            'DELIVERY_ADDRESS'
+        )->first();
+    }
+
+    /**
+     * Get customer invoice address.
+     * 
+     * @param int $orderId
+     */
+    public function getCustomerInvoiceAddress(int $orderId)
+    {
+        return $this->orderRepository->find($orderId)->customer->addresses->where(
+            'type',
+            '=',
+            'INVOICE_ADDRESS'
+        )->first();
     }
 
     public function getCustomerStandardAddress($orderId)
     {
-        return $this->orderRepository->find($orderId)->customer->addresses->where('type', '=',
-            'STANDARD_ADDRESS')->first();
+        return $this->orderRepository->find($orderId)->customer->addresses->where(
+            'type',
+            '=',
+            'STANDARD_ADDRESS'
+        )->first();
     }
 
     public function getReadyToShipFormAutocompleteData($orderId)
@@ -288,7 +320,7 @@ class OrdersController extends Controller
 
         return array_merge(
             [
-                "DELIVERY_ADDRESS" => $order->addresses->where('type', '=', 'DELIVERY_ADDRESS')->first(),
+                "DELIVERY_ADDRESS" => $order->addresses()->with('country')->where('type', '=', 'DELIVERY_ADDRESS')->first(),
                 "INVOICE_ADDRESS" => $order->addresses->where('type', '=', 'INVOICE_ADDRESS')->first(),
                 "DELIVERY_LOCK" => $isDeliveryChangeLocked,
                 "INVOICE_LOCK" => $isInvoiceChangeLocked,
@@ -300,9 +332,8 @@ class OrdersController extends Controller
     public function updateOrderDeliveryAndInvoiceAddresses(
         UpdateOrderDeliveryAndInvoiceAddressesRequest $request,
         $orderId
-    )
-    {
-	    $message = [];
+    ) {
+        $message = [];
 
         try {
             $order = $this->orderRepository->find($orderId);
@@ -342,20 +373,20 @@ class OrdersController extends Controller
                 } else {
                     $deliveryMail = $request->get('DELIVERY_ADDRESS')['email'];
                 }
-	            $message[] = __('orders.message.delivery_address_changed');
+                $message[] = __('orders.message.delivery_address_changed');
             } else {
-            	$message[] = __('orders.message.delivery_address_change_failure');
+                $message[] = __('orders.message.delivery_address_change_failure');
             }
 
             if (!$isInvoiceChangeLocked) {
                 $invoiceAddress->update($request->get('INVOICE_ADDRESS'));
-	            $message[] = __('orders.message.invoice_address_changed');
+                $message[] = __('orders.message.invoice_address_changed');
             } else {
-	            $message[] = __('orders.message.invoice_address_change_failure');
+                $message[] = __('orders.message.invoice_address_change_failure');
             }
 
             if ($deliveryAddress->wasChanged() || $invoiceAddress->wasChanged()) {
-	            dispatch(new OrderProformSendMailJob($order, setting('allegro.address_changed_msg')));
+                dispatch(new OrderProformSendMailJob($order, setting('allegro.address_changed_msg')));
             }
 
             if ($request->get('remember_delivery_address')) {
@@ -367,9 +398,10 @@ class OrdersController extends Controller
                 $order->customer->addresses()->updateOrCreate(["type" => "INVOICE_ADDRESS"], $data);
             }
 
-	        return response()->json(implode(" ", $message), 200, [], JSON_UNESCAPED_UNICODE);
+            return response()->json(implode(" ", $message), 200, [], JSON_UNESCAPED_UNICODE);
         } catch (\Exception $e) {
-            Log::error('Problem with update customer invoice and delivery address.',
+            Log::error(
+                'Problem with update customer invoice and delivery address.',
                 ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
             );
             die();
@@ -401,7 +433,8 @@ class OrdersController extends Controller
             $orderPackage = $this->orderPackageRepository->find($id);
 
             if (empty($orderPackage)) {
-                Log::info('Problem with find orderPackage item with id =' . $id,
+                Log::info(
+                    'Problem with find orderPackage item with id =' . $id,
                     ['class' => get_class($this), 'line' => __LINE__]
                 );
                 abort(404);
@@ -419,7 +452,8 @@ class OrdersController extends Controller
 
             return response()->json($message, 200, [], JSON_UNESCAPED_UNICODE);
         } catch (\Exception $e) {
-            Log::error('Problem with cancelled packages.',
+            Log::error(
+                'Problem with cancelled packages.',
                 ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
             );
             die();
@@ -486,11 +520,11 @@ class OrdersController extends Controller
             $vat = 1 + $item->product->vat / 100;
 
             foreach ([
-                         'selling_price_calculated_unit',
-                         'selling_price_basic_uni',
-                         'selling_price_aggregate_unit',
-                         'selling_price_the_largest_unit'
-                     ] as $column) {
+                'selling_price_calculated_unit',
+                'selling_price_basic_uni',
+                'selling_price_aggregate_unit',
+                'selling_price_the_largest_unit'
+            ] as $column) {
                 $kGross = "gross_$column";
                 $kNet = "net_$column";
                 $item->product->$kGross = round($item->$kNet * $vat, 2);
@@ -515,28 +549,28 @@ class OrdersController extends Controller
         return ['total_price' => $order->total_price, 'transport_price' => $order->getTransportPrice(), 'id' => $order->id];
     }
 
-    private function getLocks( $order): array
+    private function getLocks($order): array
     {
-        $deliveryLock [] = config('labels-map')['list']['produkt w przygotowaniu-po wyprodukowaniu magazyn kasuje etykiete'];
-        $deliveryLock [] = config('labels-map')['list']['wyprodukowana'];
-	    $deliveryLock [] = config('labels-map')['list']['wyprodukowano czesciowo'];
-        $deliveryLock [] = config('labels-map')['list']['wyslana do awizacji'];
-        $deliveryLock [] = config('labels-map')['list']['awizacja przyjeta'];
-        $deliveryLock [] = config('labels-map')['list']['awizacja odrzucona'];
-        $deliveryLock [] = config('labels-map')['list']['awizacja brak odpowiedzi'];
+        $deliveryLock[] = config('labels-map')['list']['produkt w przygotowaniu-po wyprodukowaniu magazyn kasuje etykiete'];
+        $deliveryLock[] = config('labels-map')['list']['wyprodukowana'];
+        $deliveryLock[] = config('labels-map')['list']['wyprodukowano czesciowo'];
+        $deliveryLock[] = config('labels-map')['list']['wyslana do awizacji'];
+        $deliveryLock[] = config('labels-map')['list']['awizacja przyjeta'];
+        $deliveryLock[] = config('labels-map')['list']['awizacja odrzucona'];
+        $deliveryLock[] = config('labels-map')['list']['awizacja brak odpowiedzi'];
 
-        $invoiceLock [] = config('labels-map')['list']['faktura wystawiona'];
-        $invoiceLock [] = config('labels-map')['list']['faktura wystawiona z odlozonym skutkiem magazynowym'];
+        $invoiceLock[] = config('labels-map')['list']['faktura wystawiona'];
+        $invoiceLock[] = config('labels-map')['list']['faktura wystawiona z odlozonym skutkiem magazynowym'];
         $isDeliveryChangeLocked = $order->labels
-                ->filter(function ($label) use ($deliveryLock) {
-                    return in_array($label->id, $deliveryLock);
-                })
-                ->count() > 0;
+            ->filter(function ($label) use ($deliveryLock) {
+                return in_array($label->id, $deliveryLock);
+            })
+            ->count() > 0;
         $isInvoiceChangeLocked = $order->labels
-                ->filter(function ($label) use ($invoiceLock) {
-                    return in_array($label->id, $invoiceLock);
-                })
-                ->count() > 0;
+            ->filter(function ($label) use ($invoiceLock) {
+                return in_array($label->id, $invoiceLock);
+            })
+            ->count() > 0;
         return array($isDeliveryChangeLocked, $isInvoiceChangeLocked);
     }
 
@@ -544,7 +578,7 @@ class OrdersController extends Controller
     {
         /** @var OrderDates $dates */
         $dates = $order->dates;
-        if(empty($dates)){
+        if (empty($dates)) {
             $order->dates()->create([
                 'message' => 'Proszę o uzupełnienie dat'
             ]);
@@ -584,8 +618,8 @@ class OrdersController extends Controller
         $result = null;
         WorkingEvents::createEvent(WorkingEvents::ACCEPT_DATES_EVENT, $order->id);
         if ($request->has('type') && $request->has('userType')) {
-        /** @var OrderDates $dates */
-        $dates = $order->dates;
+            /** @var OrderDates $dates */
+            $dates = $order->dates;
             $result = $order->dates()->update([
                 $request->userType . '_delivery_date_from' => $dates->getDateAttribute($request->type . '_delivery_date_from'),
                 $request->userType . '_delivery_date_to' => $dates->getDateAttribute($request->type . '_delivery_date_to'),
@@ -605,7 +639,7 @@ class OrdersController extends Controller
                     'warehouse' => $order->dates->warehouse_acceptance,
                     'message' => $order->dates->message,
                 ],
-                $request->userType =>[
+                $request->userType => [
                     'delivery_date_from' => $dates->getDateAttribute($request->type . '_delivery_date_from'),
                     'delivery_date_to' => $dates->getDateAttribute($request->type . '_delivery_date_to'),
                     'shipment_date_from' => $dates->getDateAttribute($request->type . '_shipment_date_from'),
@@ -639,8 +673,8 @@ class OrdersController extends Controller
             $order->dates->refresh();
             return response(json_encode([
                 $request->type => [
-                    'shipment_date_from' =>  $request->shipmentDateFrom,
-                    'shipment_date_to' =>$request->shipmentDateTo,
+                    'shipment_date_from' => $request->shipmentDateFrom,
+                    'shipment_date_to' => $request->shipmentDateTo,
                     'delivery_date_from' => $request->deliveryDateFrom,
                     'delivery_date_to' => $request->deliveryDateTo,
                 ],
@@ -706,49 +740,56 @@ class OrdersController extends Controller
         ]), 500);
     }
 
-	public function declineProform(
-		DeclineProformRequest $request,
-		$orderId
-	)
-	{
-		if (!($order = $this->orderRepository->find($orderId))) {
-			return [];
-		}
+    public function declineProform(
+        DeclineProformRequest $request,
+        $orderId
+    ) {
+        if (!($order = $this->orderRepository->find($orderId))) {
+            return [];
+        }
 
-		$order->labels_log .= Order::formatMessage(Auth::user(), $request->description);
-		$order->save();
+        $order->labels_log .= Order::formatMessage(Auth::user(), $request->description);
+        $order->save();
 
-		dispatch(new AddLabelJob($order->id, [Label::FINAL_CONFIRMATION_DECLINED, Label::MASTER_MARK]));
+        dispatch(new AddLabelJob($order->id, [Label::FINAL_CONFIRMATION_DECLINED, Label::MASTER_MARK]));
 
-		return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
-	}
+        return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
+    }
 
-	public function acceptDeliveryInvoiceData($orderId)
-	{
-		if (!($order = $this->orderRepository->find($orderId))) {
-			return [];
-		}
+    public function acceptDeliveryInvoiceData($orderId)
+    {
+        if (!($order = $this->orderRepository->find($orderId))) {
+            return [];
+        }
 
-		dispatch(new AddLabelJob($order->id, [116, 137]));
+        dispatch(new AddLabelJob($order->id, [116, 137]));
 
-		return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
-	}
+        return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
+    }
 
-	public function acceptReceivingOrder(AcceptReceivingOrderRequest $request, $orderId)
-	{
-		if (!($order = $this->orderRepository->find($orderId))) {
-			return [];
-		}
+    public function acceptReceivingOrder(AcceptReceivingOrderRequest $request, $orderId)
+    {
+        if (!($order = $this->orderRepository->find($orderId))) {
+            return [];
+        }
 
-		switch($request->invoice_day) {
-			case 'standard':
-				dispatch(new AddLabelJob($order->id, [Label::ORDER_RECEIVED_INVOICE_STANDARD]));
-				break;
-			case 'today':
-				dispatch(new AddLabelJob($order->id, [Label::ORDER_RECEIVED_INVOICE_TODAY]));
-				break;
-		}
+        switch ($request->invoice_day) {
+            case 'standard':
+                dispatch(new AddLabelJob($order->id, [Label::ORDER_RECEIVED_INVOICE_STANDARD]));
+                break;
+            case 'today':
+                dispatch(new AddLabelJob($order->id, [Label::ORDER_RECEIVED_INVOICE_TODAY]));
+                break;
+        }
 
-		return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
-	}
+        return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * Return countries.
+     */
+    public function countries()
+    {
+        return response()->json(Country::all());
+    }
 }
