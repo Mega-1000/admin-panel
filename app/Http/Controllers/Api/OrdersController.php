@@ -154,7 +154,7 @@ class OrdersController extends Controller
                 ->setPriceCalculator(new OrderPriceCalculator())
                 ->setProductService($productService);
             if (empty($data['cart_token'])) {
-                $orderBuilder->setTotalTransportSumCalculator(new TransportSumCalculator)
+                $orderBuilder->setTotalTransportSumCalculator(new TransportSumCalculator())
                     ->setUserSelector(new GetCustomerForNewOrder());
             } else {
                 $orderBuilder->setUserSelector(new GetCustomerForAdminEdit());
@@ -267,32 +267,47 @@ class OrdersController extends Controller
 
     /**
      * Get customer delivery address
-     * 
+     *
      * @param int $orderId
-     * 
+     *
      * @return CustomerAddress
      */
     public function getCustomerDeliveryAddress(int $orderId)
     {
-        return $this->orderRepository->find($orderId)->customer->addresses->where(
+        $customerDeliveryAddress = $this->orderRepository->find($orderId)->customer->addresses->where(
             'type',
             '=',
             'DELIVERY_ADDRESS'
         )->first();
+        if ($customerDeliveryAddress === null) {
+            return response()->json([
+                'status'=> false,
+                'error' => 'Brak adresu dostawy klienta'
+            ], 422);
+        }
+        return response()->json($customerDeliveryAddress);
     }
 
     /**
      * Get customer invoice address.
-     * 
+     *
      * @param int $orderId
      */
     public function getCustomerInvoiceAddress(int $orderId)
     {
-        return $this->orderRepository->find($orderId)->customer->addresses->where(
+        $customerInvoiceAddress = $this->orderRepository->find($orderId)->customer->addresses->where(
             'type',
             '=',
             'INVOICE_ADDRESS'
         )->first();
+
+        if ($customerInvoiceAddress === null) {
+            return response()->json([
+                'status'=> false,
+                'error' => 'Brak adresu do faktury klienta'
+            ], 422);
+        }
+        return response()->json($customerInvoiceAddress);
     }
 
     public function getCustomerStandardAddress($orderId)
@@ -495,8 +510,7 @@ class OrdersController extends Controller
         if (empty($token)) {
             return response("Missing token", 400);
         }
-        $order = Order
-            ::where('token', $token)
+        $order = Order::where('token', $token)
             ->with(['items' => function ($q) {
                 $q->with(['product' => function ($q) {
                     $q->join('product_packings', 'products.id', '=', 'product_packings.product_id')
