@@ -443,6 +443,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('import', 'ImportController@index')->name('import.index');
         Route::post('products/stocks/changes', 'ProductStocksController@productsStocksChanges')->name('productsStocks.changes');
         Route::post('import/store', 'ImportController@store')->name('import.store');
+        Route::post('import/store-csv', 'ImportController@storeCSV')->name('import.storeCsv');
         Route::get('store/import/{id}/{amount}', 'OrdersPaymentsController@storeFromImport');
 
         Route::get('logs', '\Rap2hpoutre\LaravelLogViewer\LogViewerController@index');

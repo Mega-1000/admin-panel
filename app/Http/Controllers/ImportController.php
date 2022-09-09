@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use App\Entities\Import;
+use App\Jobs\ImportNexoLabelsControllerJob;
 
 /**
  * Class ImportController
@@ -32,6 +33,15 @@ class ImportController extends Controller
             Storage::disk()->put('/user-files/baza/baza.csv', fopen($file, 'r+'));
             \Session::flash('flash-message', ['type' => 'success', 'message' => 'Plik został zapisany, import zostanie wykonany w ciągu kilku minut']);
         }
+
+        return redirect(route('import.index'));
+    }
+
+
+    public function storeCsv(Request $request)
+    {
+        $file = $request->file('importFile');
+        dispatch_now(new ImportNexoLabelsControllerJob($file));
 
         return redirect(route('import.index'));
     }

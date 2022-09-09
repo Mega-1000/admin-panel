@@ -346,7 +346,7 @@ class OrdersPackagesController extends Controller
                 'alert-type' => 'success'
             ]);
         }
-        $token = md5(uniqid(rand(), true));
+        $token = md5(uniqid((string)rand(), true));
         $multi = [
             'token' => $token,
             'template' => [
@@ -734,7 +734,7 @@ class OrdersPackagesController extends Controller
                 'firmname' => $deliveryAddress->firmname,
                 'nip' => $deliveryAddress->nip,
                 'postal_code' => $deliveryAddress->postal_code,
-                'country' => $deliveryAddress->country !== null ? $deliveryAddress->country : 'Polska',
+                'country' => $deliveryAddress->country !== null ? $deliveryAddress->country->name : 'Polska',
                 'delivery_date' => $package->delivery_date !== null ? $package->delivery_date : null,
             ],
         ];
