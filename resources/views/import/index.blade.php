@@ -62,11 +62,11 @@
             <div class="panel panel-bordered">
                 <div class="panel-heading">
                     <div class="panel-title">
-                        Wczytywanie czegoś dla Pana Wojtka
+                        Wczytywanie pliku kontrolnego dla NEXO
                     </div>
                 </div>
                 <div class="panel-body">
-                    <form action="{{ route('import.storeCsv') }}" enctype="multipart/form-data" method="POST">
+                    <form action="{{ route('import.storeNexoController') }}" enctype="multipart/form-data" method="POST">
                         {{ csrf_field() }}
                         <div class="col-md-12">
                             <div class="input-group-file">

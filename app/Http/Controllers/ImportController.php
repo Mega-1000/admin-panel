@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use App\Entities\Import;
 use App\Jobs\ImportNexoLabelsControllerJob;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 /**
  * Class ImportController
@@ -37,11 +39,27 @@ class ImportController extends Controller
         return redirect(route('import.index'));
     }
 
-
-    public function storeCsv(Request $request)
+    /**
+     * Store nexo controller
+     *
+     * @param Request $request
+     * @return void
+     */
+    public function storeNexoController(Request $request)
     {
         $file = $request->file('importFile');
-        dispatch_now(new ImportNexoLabelsControllerJob($file));
+        try {
+            if (File::exists(Storage::path('user-files/nexo-controller.csv'))) {
+                \Session::flash('flash-message', ['type' => 'info', 'message' => 'Plik kontrolny nexo już istnieje. Prosimy poczekać, aż zostanie przetworzony.']);
+            } else {
+                Storage::disk()->put('user-files/nexo-controller.csv', fopen($file, 'r+'));
+                \Session::flash('flash-message', ['type' => 'success', 'message' => 'Plik kontrolny nexo został zapisany, import zostanie wykonany w ciągu kilku minut']);
+                dispatch(new ImportNexoLabelsControllerJob());
+            }
+        } catch (Throwable $ex) {
+            Log::error($ex->getMessage());
+            \Session::flash('flash-message', ['type' => 'danger', 'message' => 'Błąd przy wczytywaniu pliku kontrolnego nexo.']);
+        }
 
         return redirect(route('import.index'));
     }
