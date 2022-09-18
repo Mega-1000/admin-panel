@@ -92,7 +92,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
 
                 $preDokument
                     ->setKlient($preKlient)
-                    ->setUwagi($order->id . '_' . ((empty($order->allegro_payment_id)) ? '' : $order->allegro_payment_id))
+                    ->setUwagi($order->id . ((empty($order->allegro_payment_id)) ? '' : '_' . $order->allegro_payment_id))
                     ->setRodzajPlatnosci('Przelew')
                     ->setWaluta('PLN')
                     ->setTypDokumentu(ETypDokumentu_HandloMag::FS)
