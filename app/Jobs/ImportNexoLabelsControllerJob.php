@@ -67,7 +67,7 @@ class ImportNexoLabelsControllerJob implements ShouldQueue
                                 $labelsToAdd[] = 206;
                             }
 
-                            if ($order->hasLabel(66)) {
+                            if ($order->hasLabel(66) && !$order->hasLabel(137)) {
                                 $labelsToAdd[] = 207;
                             }
 
