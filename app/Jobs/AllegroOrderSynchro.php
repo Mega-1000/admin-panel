@@ -579,7 +579,8 @@ class AllegroOrderSynchro implements ShouldQueue
             'type' => $type,
             'customer_id' => $customer->id,
         ]);
-        $country = Country::firstOrCreate(['iso2' => $data['address']['countryCode']], ['name' => $data['address']['countryCode']]);
+
+        $country = Country::firstOrCreate(['iso2' => $data['address']['countryCode'] ?? $data['countryCode']], ['name' => $data['address']['countryCode'] ?? $data['countryCode']]);
 
         $phoneAndCode = Helper::prepareCodeAndPhone($data['phoneNumber']);
         $customerAddressData = [

@@ -14,17 +14,17 @@ class DebugController extends Controller
 {
     public function index()
     {
-    	if (env('APP_ENV') == 'production') {
-    		return;
-	    }
+        if (env('APP_ENV') == 'production') {
+            return;
+        }
 
         // CheckPackagesStatusJob::dispatchNow();
-   //     dispatch_now(new ImportOrdersFromSelloJob());
-//    	$res = dispatch_now(new AllegroCustomerReturnsJob());
-//    	$res = dispatch_now(new CheckPackagesStatusJob());
-//    	$res = dispatch_now(new CheckPackagesStatusJob());
-//    	$res = dispatch_now(new ChangeShipmentDatePackagesJob());
-   	// $res = dispatch_now(new AllegroOrderSynchro());
-    	$res = dispatch_now(new GenerateXmlForNexoJob());
+        //     dispatch_now(new ImportOrdersFromSelloJob());
+        //    	$res = dispatch_now(new AllegroCustomerReturnsJob());
+        //    	$res = dispatch_now(new CheckPackagesStatusJob());
+        //    	$res = dispatch_now(new CheckPackagesStatusJob());
+        //    	$res = dispatch_now(new ChangeShipmentDatePackagesJob());
+        // $res = dispatch_now(new AllegroOrderSynchro());
+        $res = dispatch_now(new GenerateXmlForNexoJob());
     }
 }

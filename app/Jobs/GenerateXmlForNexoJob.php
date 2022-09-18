@@ -63,7 +63,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
         })->whereDoesntHave('labels', function ($query) {
             $query->where('label_id', Label::XML_INVOICE_GENERATED);
         })->get();
-        $orders = [Order::find(29311)];
+
         foreach ($orders as $order) {
             try {
                 $preDokument = new PreDokument();
