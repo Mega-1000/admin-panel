@@ -34,7 +34,7 @@ class ImportNexoLabelsControllerJob implements ShouldQueue
         $this->file = Storage::path('user-files/nexo-controller.csv');
 
         $orders = $this->orderRepository
-            ->where([["created_at", ">", '2021-06-01']])
+            ->where([["created_at", ">", '2022-06-01']])
             ->whereHas('labels', function ($query) {
                 $query->where('label_id', 137);
             })->orWhereHas('labels', function ($query) {
@@ -58,7 +58,7 @@ class ImportNexoLabelsControllerJob implements ShouldQueue
                         if (is_numeric($row[0])) {
                             $order = $this->orderRepository->find($row[0]);
 
-                            if ($order === null) {
+                            if ($order === null || $order->created_at < '2022-06-01') {
                                 continue;
                             }
 

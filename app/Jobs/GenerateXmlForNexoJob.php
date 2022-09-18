@@ -63,7 +63,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
         })->whereDoesntHave('labels', function ($query) {
             $query->where('label_id', Label::XML_INVOICE_GENERATED);
         })->get();
-
+        $orders = [Order::find(29311)];
         foreach ($orders as $order) {
             try {
                 $preDokument = new PreDokument();
@@ -92,7 +92,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
 
                 $preDokument
                     ->setKlient($preKlient)
-                    ->setUwagi($order->id)
+                    ->setUwagi($order->id . '_' . ((empty($order->allegro_payment_id)) ? '' : $order->allegro_payment_id))
                     ->setRodzajPlatnosci('Przelew')
                     ->setWaluta('PLN')
                     ->setTypDokumentu(ETypDokumentu_HandloMag::FS)
