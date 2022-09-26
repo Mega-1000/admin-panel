@@ -394,14 +394,8 @@ class AllegroOrderSynchro implements ShouldQueue
                     $product->tt_quantity = $item['quantity'];
                 }
                 $product->price_override = [
-                    'gross_selling_price_commercial_unit' => round(
-                        ($item['quantity'] * (float)$item['price']['amount']) / $product->tt_quantity,
-                        2
-                    ),
-                    'net_selling_price_commercial_unit' => round(
-                        ($item['quantity'] * (float)$item['price']['amount']) / $product->tt_quantity / $this->tax,
-                        2
-                    )
+                    'gross_selling_price_commercial_unit' => (float)$item['price']['amount'],
+                    'net_selling_price_commercial_unit' => round((float)$item['price']['amount'] / $this->tax, 2)
                 ];
 
                 $products[] = $product;
