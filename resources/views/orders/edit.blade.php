@@ -3653,7 +3653,6 @@
                 var net_purchase_price_sum = 0;
                 var gross_selling_price_sum = 0;
                 var net_selling_price_sum = 0;
-                console.log('ppp');
                 $('.productsTableEdit .gross_purchase_price_commercial_unit').each(function () {
                     var quantity = parseFloat($('[name="quantity_commercial[' + $(this).data('item-id') + ']"').val());
                     var gross_selling_price = $('.gross_selling_price_commercial_unit[data-item-id="' + $(this).data('item-id') + '"]').val();
@@ -3726,7 +3725,6 @@
             });
 
             $(document).on('change', 'input.price', function () {
-                    console.log('x');
                     commaReplace('.priceChange');
 
                     var itemId = $(this).data('item-id');
@@ -4108,7 +4106,8 @@
             update('net_purchase_price_basic_unit', 'gross_purchase_price_basic_unit', '{{$item->id}}');
             update('net_purchase_price_calculated_unit', 'gross_purchase_price_calculated_unit', '{{$item->id}}');
             update('net_purchase_price_aggregate_unit', 'gross_purchase_price_aggregate_unit', '{{$item->id}}');
-            calculateNettoFromGross('net_selling_price_commercial_unit', 'gross_selling_price_commercial_unit', '{{$item->id}}');
+            //Błąd z przeliczaniem przy ładowaniu strony
+            {{--calculateNettoFromGross('net_selling_price_commercial_unit', 'gross_selling_price_commercial_unit', '{{$item->id}}');--}}
             calculateNettoFromGross('net_selling_price_basic_unit', 'gross_selling_price_basic_unit', '{{$item->id}}', 4);
             calculateNettoFromGross('net_selling_price_calculated_unit', 'gross_selling_price_calculated_unit', '{{$item->id}}', 4);
             calculateNettoFromGross('net_selling_price_aggregate_unit', 'gross_selling_price_aggregate_unit', '{{$item->id}}', 4);
@@ -4707,7 +4706,6 @@
             if (Math.sign(surplusValue) === -1) {
                 let paymentMoveAmount;
                 surplusValue = Math.abs(surplusValue)
-                console.log(surplusValue, 'xxasdsa')
                 $('#surplus__order--id').val(id);
                 $('#surplus__amount').val(surplusValue)
                 $('#payment_move_surplus').modal('show');
@@ -4718,7 +4716,6 @@
 
         $('#payment-move-surplus-ok').on('click', function () {
             let orderId = $('#order_id').val();
-            console.log(orderId);
             let surplusAmount = $('#surplus__amount').val();
             $.ajax({
                 method: 'POST',
