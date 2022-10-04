@@ -64,6 +64,8 @@ class AddLabelJob extends Job implements ShouldQueue
         OrderLabelSchedulerAwaitRepository $awaitRepository,
         TaskRepository $taskRepository
     ) {
+        $now = Carbon::now();
+
         if (!($this->order instanceof Order)) {
             $this->order = $orderRepository->find($this->order);
         }
@@ -103,7 +105,6 @@ class AddLabelJob extends Job implements ShouldQueue
                     'is_executed' => false
                 ]);
                 $labelsAfterTime = DB::table('label_labels_to_add_after_timed_label')->where('main_label_id', $labelId)->get();
-                $now = Carbon::now();
                 $targetDatetime = Carbon::parse($this->time);
                 $delay = $now->diffInSeconds($targetDatetime);
 
@@ -153,12 +154,12 @@ class AddLabelJob extends Job implements ShouldQueue
                     }
                 }
 
-                if($labelId == Label::ORDER_ITEMS_REDEEMED_LABEL){
-	                dispatch(new SendItemsRedeemedMailJob($this->order));
+                if ($labelId == Label::ORDER_ITEMS_REDEEMED_LABEL) {
+                    dispatch(new SendItemsRedeemedMailJob($this->order));
+                    $this->order->preferred_invoice_date = $now;
+                    $tasks = $taskRepository->findByField('order_id', $this->order->id)->all();
 
-                    $tasks = $taskRepository->findByField('order_id',$this->order->id)->all();
-
-                    if(count($tasks) != 0) {
+                    if (count($tasks) != 0) {
                         foreach ($tasks as $task) {
                             $task->update([
                                 'color' => '008000',
