@@ -313,58 +313,99 @@
                 </div>
             </div>
             <div class="row">
-                <div class="panel panel-info panel-collapse">
-                    <div class="panel-heading text-center" style="padding: 5px;">
-                        Dane konfiguracyjne zamówienia z allegro
+                <div class="col-md-6">
+                    <div class="panel panel-success" data-toggle="collapse">
+                        <div class="panel-heading text-center" style="padding: 5px;">
+                            <h5 class="panel-title"
+                                data-toggle="collapse"
+                                data-target="#collapseInvoice">
+                                Informacje o fakturze
+                            </h5>
+                        </div>
+                        <div class="panel-collapse collapse" id="collapseInvoice">
+                            <div class="panel-body" style="padding:1em">
+                                <div class="col-md-12">
+                                    <div class="form-group row">
+                                        <label class="col-md-6" for="preferred_invoice_date">Preferowana data
+                                            wystawienia
+                                            faktury</label>
+                                        <div class="col-md-4">
+                                            <input type="date" class="form-control" id="preferred_invoice_date"
+                                                   name="preferred_invoice_date"
+                                                   value="{{ (isset($order->allegro_operation_date)) ? \Carbon\Carbon::parse($order->preferred_invoice_date)->format('Y-m-d') : null }}">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="panel-body" style="padding:1em">
-                        <div class="col-md-6">
-                            <div class="form-group row">
-                                <label class="col-md-6" for="allegro_form_id">Identyfikator zamówienia w allegro</label>
-                                <div class="col-md-4">
-                                    <input type="text" class="form-control" id="allegro_form_id" name="allegro_form_id"
-                                           value="{{ $order->allegro_form_id ?? '' }}">
-                                </div>
-                            </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-info panel-collapse">
+                        <div class="panel-heading text-center text-white" style="padding: 5px; color:white;">
+                            <h5 class="panel-title"
+                                data-toggle="collapse"
+                                data-target="#collapseAllegro">
+                                Dane konfiguracyjne zamówienia z allegro
+                            </h5>
                         </div>
-                        <div class="col-md-6">
-                            <div class="form-group row">
-                                <label class="col-md-6"
-                                       for="customer.nick_allegro">@lang('orders.form.nick_allegro')</label>
-                                <div class="col-md-4">
-                                    <input type="text" class="form-control" id="customer.nick_allegro"
-                                           name="customer.nick_allegro"
-                                           value="{{ $order->customer->nick_allegro ?? ''}}" disabled readonly>
+                        <div class="panel-collapse collapse" id="collapseAllegro">
+                            <div class="panel-body" style="padding:1em">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-md-6" for="allegro_form_id">Identyfikator zamówienia w
+                                            allegro</label>
+                                        <div class="col-md-4">
+                                            <input type="text" class="form-control" id="allegro_form_id"
+                                                   name="allegro_form_id"
+                                                   value="{{ $order->allegro_form_id ?? '' }}">
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group row">
-                                <label class="col-md-6"
-                                       for="allegro_transaction_id">@lang('orders.form.allegro_transaction_id')</label>
-                                <div class="col-md-4">
-                                    <input type="text" class="form-control" id="allegro_transaction_id"
-                                           name="allegro_transaction_id"
-                                           value="{{ $order->allegro_transaction_id ?? '' }}">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-md-6"
+                                               for="customer.nick_allegro">@lang('orders.form.nick_allegro')</label>
+                                        <div class="col-md-4">
+                                            <input type="text" class="form-control" id="customer.nick_allegro"
+                                                   name="customer.nick_allegro"
+                                                   value="{{ $order->customer->nick_allegro ?? ''}}" disabled readonly>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group row">
-                                <label class="col-md-6" for="allegro_operation_date">Data operacji w allegro</label>
-                                <div class="col-md-4">
-                                    <input type="date" class="form-control" id="allegro_operation_date"
-                                           name="allegro_operation_date"
-                                           value="{{ (isset($order->allegro_operation_date)) ? \Carbon\Carbon::parse($order->allegro_operation_date)->format('Y-m-d') : null }}">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-md-6"
+                                               for="allegro_transaction_id">@lang('orders.form.allegro_transaction_id')</label>
+                                        <div class="col-md-4">
+                                            <input type="text" class="form-control" id="allegro_transaction_id"
+                                                   name="allegro_transaction_id"
+                                                   value="{{ $order->allegro_transaction_id ?? '' }}">
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group row">
-                                <label class="col-md-6" for="allegro_payment_id">Identyfikator płatności allegro</label>
-                                <div class="col-md-4">
-                                    <input type="text" class="form-control" id="allegro_payment_id"
-                                           name="allegro_payment_id" value="{{ $order->allegro_payment_id }}">
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-md-6" for="allegro_operation_date">Data operacji w
+                                            allegro</label>
+                                        <div class="col-md-4">
+                                            <input type="date" class="form-control" id="allegro_operation_date"
+                                                   name="allegro_operation_date"
+                                                   value="{{ (isset($order->allegro_operation_date)) ? \Carbon\Carbon::parse($order->allegro_operation_date)->format('Y-m-d') : null }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group row">
+                                        <label class="col-md-6" for="allegro_payment_id">Identyfikator płatności
+                                            allegro</label>
+                                        <div class="col-md-4">
+                                            <input type="text" class="form-control" id="allegro_payment_id"
+                                                   name="allegro_payment_id" value="{{ $order->allegro_payment_id }}">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
