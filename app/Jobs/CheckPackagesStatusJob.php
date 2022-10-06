@@ -62,42 +62,47 @@ class CheckPackagesStatusJob
         })->get();
 
         foreach ($orders as $order) {
-            foreach ($order->packages as $package) {
-                if ($package->status == PackageStatus::DELIVERED ||
-                    $package->status == PackageStatus::WAITING_FOR_CANCELLED ||
-                    $package->status == PackageStatus::CANCELLED ||
-                    $package->status == PackageStatus::REJECT_CANCELLED ||
-                    empty($package->letter_number)) {
-                    continue;
+            try {
+                foreach ($order->packages as $package) {
+                    if ($package->status == PackageStatus::DELIVERED ||
+                        $package->status == PackageStatus::WAITING_FOR_CANCELLED ||
+                        $package->status == PackageStatus::CANCELLED ||
+                        $package->status == PackageStatus::REJECT_CANCELLED ||
+                        empty($package->letter_number)) {
+                        continue;
+                    }
+
+                    switch ($package->service_courier_name) {
+                        case CourierName::INPOST :
+                        case CourierName::ALLEGRO_INPOST :
+                            $this->checkStatusInInpostPackages($package);
+                            break;
+                        case CourierName::DPD:
+                            $this->checkStatusInDpdPackages($package);
+                            break;
+                        case CourierName::APACZKA:
+                            $this->checkStatusInApaczkaPackages($package);
+                            break;
+                        case CourierName::POCZTEX:
+                            $this->checkStatusInPocztexPackages($package);
+                            break;
+                        case CourierName::JAS:
+                            $this->checkStatusInJasPackages($package);
+                            break;
+                        case CourierName::GLS:
+                            $this->checkStatusInGlsPackages($package);
+                            break;
+                        default:
+                            break;
+                    }
                 }
 
-                switch ($package->service_courier_name) {
-                    case CourierName::INPOST :
-                    case CourierName::ALLEGRO_INPOST :
-                        $this->checkStatusInInpostPackages($package);
-                        break;
-                    case CourierName::DPD:
-                        $this->checkStatusInDpdPackages($package);
-                        break;
-                    case CourierName::APACZKA:
-                        $this->checkStatusInApaczkaPackages($package);
-                        break;
-                    case CourierName::POCZTEX:
-                        $this->checkStatusInPocztexPackages($package);
-                        break;
-                    case CourierName::JAS:
-                        $this->checkStatusInJasPackages($package);
-                        break;
-                    case CourierName::GLS:
-                        $this->checkStatusInGlsPackages($package);
-                        break;
-                    default:
-                        break;
+                if (!$order->packages()->whereIn('status', [PackageStatus::SENDING, PackageStatus::WAITING_FOR_SENDING])->count()) {
+                    dispatch_now(new RemoveLabelJob($order, [Label::BLUE_BATTERY_LABEL_ID]));
                 }
-            }
-
-            if (!$order->packages()->whereIn('status', [PackageStatus::SENDING, PackageStatus::WAITING_FOR_SENDING])->count()) {
-                dispatch_now(new RemoveLabelJob($order, [Label::BLUE_BATTERY_LABEL_ID]));
+            } catch (\Throwable $ex) {
+                Log::error($ex->getMessage());
+                continue;
             }
         }
     }
