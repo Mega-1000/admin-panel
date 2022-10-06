@@ -147,6 +147,7 @@ class Order extends Model implements Transformable
         'allegro_additional_service',
         'allegro_payment_id',
         'labels_log',
+        'preferred_invoice_date',
     ];
 
     /**
@@ -748,6 +749,11 @@ class Order extends Model implements Transformable
     public function chat()
     {
         $this->hasOne(Chat::class);
+    }
+
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
     }
 
 	/**

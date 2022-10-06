@@ -314,7 +314,7 @@
             </div>
             <div class="row">
                 <div class="col-md-6">
-                    <div class="panel panel-success" data-toggle="collapse">
+                    <div class="panel panel-success panel-collapses">
                         <div class="panel-heading text-center" style="padding: 5px;">
                             <h5 class="panel-title"
                                 data-toggle="collapse"
@@ -327,12 +327,11 @@
                                 <div class="col-md-12">
                                     <div class="form-group row">
                                         <label class="col-md-6" for="preferred_invoice_date">Preferowana data
-                                            wystawienia
-                                            faktury</label>
+                                            wystawienia faktury</label>
                                         <div class="col-md-4">
                                             <input type="date" class="form-control" id="preferred_invoice_date"
                                                    name="preferred_invoice_date"
-                                                   value="{{ (isset($order->allegro_operation_date)) ? \Carbon\Carbon::parse($order->preferred_invoice_date)->format('Y-m-d') : null }}">
+                                                   value="{{ ($order->preferred_invoice_date !== null) ? \Carbon\Carbon::parse($order->preferred_invoice_date)->format('Y-m-d') : null }}">
                                         </div>
                                     </div>
                                 </div>

@@ -65,6 +65,7 @@ class Label extends Model implements Transformable
     const RETURN_ALLEGRO_ITEMS = 182;
     const CUSTOMER_CANCELLATION = 201;
     const HOLD_SHIPMENT = 146;
+    const ISSUE_ADVANCE_INVOICE = 211;
 
     public $customColumnsVisibilities = [
         'name',

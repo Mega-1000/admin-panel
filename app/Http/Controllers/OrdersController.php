@@ -993,6 +993,7 @@ class OrdersController extends Controller
             'allegro_operation_date' => $request->input('allegro_operation_date'),
             'allegro_form_id' => $request->input('allegro_form_id'),
             'allegro_payment_id' => $request->input('allegro_payment_id'),
+            'preferred_invoice_date' => $request->input('preferred_invoice_date'),
         ], $id);
 
         $orderObj = Order::find($id);
