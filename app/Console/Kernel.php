@@ -66,6 +66,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('import:allegro')->everyTenMinutes();
 
         $schedule->job(Jobs\AllegroCustomerReturnsJob::class)->everyFiveMinutes();
+        $schedule->job(Jobs\PreferredInvoiceDateFillJob::class)->monthlyOn();
     }
 
     /**
