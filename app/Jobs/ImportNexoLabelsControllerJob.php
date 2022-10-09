@@ -84,11 +84,7 @@ class ImportNexoLabelsControllerJob implements ShouldQueue
                                     $labelsToAdd[] = 208;
                                 }
                             }
-                            $diff = (new DateTime())->diff($orderDate);
 
-                            if ($order->hasLabel(182) && $diff->days > 7 && !$order->hasLabel(179)) {
-                                $labelsToAdd[] = 209;
-                            }
                             $verificatedOrders[$order->id] = $labelsToAdd;
                         }
                     }
