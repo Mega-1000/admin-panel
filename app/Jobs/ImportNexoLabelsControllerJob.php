@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use Carbon\Carbon;
 use DateTime;
 use Throwable;
 use Illuminate\Bus\Queueable;
@@ -71,12 +72,10 @@ class ImportNexoLabelsControllerJob implements ShouldQueue
                                 $labelsToAdd[] = 207;
                             }
 
-                            $bookedPaymentDate = (!$order->bookedPayments()->isEmpty()) ? $order->bookedPayments()->first()->created_at : null;
+                            $orderDate = new Carbon($order->preferred_invoice_date);
+                            $date = new Carbon($row[2]);
 
-                            $orderDate = new DateTime($order->allegro_operation_date ?? $bookedPaymentDate);
-                            $date = new DateTime($row[2]);
-
-                            if (($order->allegro_operation_date || $bookedPaymentDate) && $orderDate->format('Y-m') !== $date->format('Y-m')) {
+                            if ($orderDate->format('Y-m') !== $date->format('Y-m')) {
                                 $labelsToAdd[] = 210;
                             }
 
