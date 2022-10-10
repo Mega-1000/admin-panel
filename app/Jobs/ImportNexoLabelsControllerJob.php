@@ -2,11 +2,10 @@
 
 namespace App\Jobs;
 
+use App\Entities\Label;
 use Carbon\Carbon;
-use DateTime;
 use Throwable;
 use Illuminate\Bus\Queueable;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
 use App\Repositories\OrderRepository;
 use Illuminate\Queue\SerializesModels;
@@ -15,13 +14,12 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
+/**
+ * Controller nexo
+ */
 class ImportNexoLabelsControllerJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    private $file;
-
-    private $orderRepository;
 
     /**
      * Execute the job.
@@ -30,71 +28,71 @@ class ImportNexoLabelsControllerJob implements ShouldQueue
      */
     public function handle()
     {
-        $header = $verificatedOrders = [];
-        $this->orderRepository = app(OrderRepository::class);
-        $this->file = Storage::path('user-files/nexo-controller.csv');
+        $header = $ordersVerified = $data = [];
+        $orderRepository = app(OrderRepository::class);
+        $file = Storage::path('user-files/nexo-controller.csv');
 
-        $orders = $this->orderRepository
+        $orders = $orderRepository
             ->where([["created_at", ">", '2022-06-01']])
             ->whereHas('labels', function ($query) {
-                $query->where('label_id', 137);
+                $query->where('label_id', Label::INVOICE_OCCURS_IN_NEXO);
             })->orWhereHas('labels', function ($query) {
-                $query->where('label_id', 206);
+                $query->where('label_id', Label::GROSS_VALUE_DIFFERS_FROM_INVOICES_IN_NEXO);
             })->orWhereHas('labels', function ($query) {
-                $query->where('label_id', 207);
+                $query->where('label_id', Label::FAILURE_TO_INVOICE_DESPITE_DEPARTURE_OF_GOODS);
             })
             ->get();
 
         try {
-            if (($handle = fopen($this->file, 'r')) !== false) {
+            if (($handle = fopen($file, 'r')) !== false) {
                 while (($row = fgetcsv($handle, 3000, ';')) !== false) {
                     $row = explode(',', $row[0], 3);
-                    $labelsToAdd = [];
                     if (!$header) {
-                        foreach ($row as &$headerName) {
-                            $headerName = $headerName;
-                        }
                         $header = $row;
                     } else {
                         if (is_numeric($row[0])) {
-                            $order = $this->orderRepository->find($row[0]);
-
-                            if ($order === null || $order->created_at < '2022-06-01') {
-                                continue;
-                            }
-
-                            $labelsToAdd[] = 137;
-                            if ($order->getSumOfGrossValues() !==  (float)str_replace(',', '.', $row[1])) {
-                                $labelsToAdd[] = 206;
-                            }
-
-                            if ($order->hasLabel(66) && !$order->hasLabel(137)) {
-                                $labelsToAdd[] = 207;
-                            }
-
-                            $orderDate = new Carbon($order->preferred_invoice_date);
-                            $date = new Carbon($row[2]);
-
-                            if ($orderDate->format('Y-m') !== $date->format('Y-m')) {
-                                $labelsToAdd[] = 210;
-                            }
-
-                            if ($order->hasLabel(177) || !empty($order->allegro_form_id)) {
-                                if (empty($order->allegro_payment_id) || empty($order->allegro_form_id) || $order->sum_of_gross_values === 0) {
-                                    $labelsToAdd[] = 208;
-                                }
-                            }
-                            $diff = (new DateTime())->diff($orderDate);
-
-                            if ($order->hasLabel(182) && $diff->days > 7 && !$order->hasLabel(179)) {
-                                $labelsToAdd[] = 209;
-                            }
-                            $verificatedOrders[$order->id] = $labelsToAdd;
+                            $data[$row[0]][] = array_combine($header, $row);
                         }
                     }
                 }
 
                 fclose($handle);
+            }
+
+            foreach ($data as $key => $rawData) {
+                $labelsToAdd = [];
+                $order = $orderRepository->find($key);
+
+                if ($order === null || $order->created_at < '2022-06-01') {
+                    continue;
+                }
+
+                $labelsToAdd[] = Label::INVOICE_OCCURS_IN_NEXO;
+                if ($order->getSumOfGrossValues() !== $this->countTheValueOfInvoices($rawData)) {
+                    $labelsToAdd[] = Label::GROSS_VALUE_DIFFERS_FROM_INVOICES_IN_NEXO;
+                } else {
+                    $labelsToAdd[] = Label::GROSS_VALUE_AGREES_FROM_INVOICES_IN_NEXO;
+
+                }
+
+                if ($order->hasLabel(Label::ORDER_ITEMS_REDEEMED_LABEL) && !$order->hasLabel(Label::INVOICE_OCCURS_IN_NEXO)) {
+                    $labelsToAdd[] = Label::FAILURE_TO_INVOICE_DESPITE_DEPARTURE_OF_GOODS;
+                }
+
+                $orderDate = new Carbon($order->preferred_invoice_date);
+                $date = new Carbon(end($rawData)['data']);
+
+                if ($orderDate->format('Y-m') !== $date->format('Y-m')) {
+                    $labelsToAdd[] = Label::INVOICE_DATE_AND_PREFERRED_DATE_HAVE_DIFFERENT_MONTHS;
+                }
+
+                if ($order->hasLabel(Label::ALLEGRO_OFFERS) || !empty($order->allegro_form_id)) {
+                    if (empty($order->allegro_payment_id) || empty($order->allegro_form_id) || $order->sum_of_gross_values === 0) {
+                        $labelsToAdd[] = Label::OFFER_FROM_ALLEGRO_DOES_NOT_HAVE_THE_REQUIRED_PARAMS;
+                    }
+                }
+
+                $ordersVerified[$order->id] = $labelsToAdd;
             }
         } catch (Throwable $ex) {
             Log::error(
@@ -102,19 +100,43 @@ class ImportNexoLabelsControllerJob implements ShouldQueue
                 [
                     'class' => $ex->getFile(),
                     'line' => $ex->getLine(),
-                    'orderId' => $row[0]
+                    'orderId' => $key
                 ]
             );
         }
 
         foreach ($orders as $order) {
-            dispatch(new RemoveLabelJob($order, [137, 206, 207, 208, 209, 210]));
+            dispatch(new RemoveLabelJob($order, [
+                    Label::INVOICE_OCCURS_IN_NEXO,
+                    Label::GROSS_VALUE_DIFFERS_FROM_INVOICES_IN_NEXO,
+                    Label::FAILURE_TO_INVOICE_DESPITE_DEPARTURE_OF_GOODS,
+                    Label::OFFER_FROM_ALLEGRO_DOES_NOT_HAVE_THE_REQUIRED_PARAMS,
+                    Label::INVOICE_DATE_AND_PREFERRED_DATE_HAVE_DIFFERENT_MONTHS,
+                    Label::GROSS_VALUE_AGREES_FROM_INVOICES_IN_NEXO
+                ]
+            ));
         }
 
-        foreach ($verificatedOrders as $orderId => $labelsToAdd) {
-            dispatch(new AddLabelJob($this->orderRepository->find($orderId), $labelsToAdd));
+        foreach ($ordersVerified as $orderId => $labelsToAdd) {
+            dispatch(new AddLabelJob($orderRepository->find($orderId), $labelsToAdd));
         }
 
         Storage::disk()->delete('user-files/nexo-controller.csv');
+    }
+
+    /**
+     * Count sum of invoice
+     *
+     * @param array $invoices
+     *
+     * @return float
+     */
+    private function countTheValueOfInvoices(array $invoices): float
+    {
+        $sum = 0;
+        foreach ($invoices as $invoice) {
+            $sum += (float)$invoice['Brutto'];
+        }
+        return $sum;
     }
 }

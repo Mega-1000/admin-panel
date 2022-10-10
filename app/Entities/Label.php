@@ -67,6 +67,15 @@ class Label extends Model implements Transformable
     const HOLD_SHIPMENT = 146;
     const ISSUE_ADVANCE_INVOICE = 211;
 
+    public const INVOICE_OCCURS_IN_NEXO = 137;
+    public const ALLEGRO_OFFERS = 177;
+    public const GROSS_VALUE_DIFFERS_FROM_INVOICES_IN_NEXO = 206;
+    public const FAILURE_TO_INVOICE_DESPITE_DEPARTURE_OF_GOODS = 207;
+    public const OFFER_FROM_ALLEGRO_DOES_NOT_HAVE_THE_REQUIRED_PARAMS = 208;
+    public const CUSTOMER_HAS_FILED_A_RETURN_AND_MORE_THAN_7_HAVE_PASSED = 209;
+    public const INVOICE_DATE_AND_PREFERRED_DATE_HAVE_DIFFERENT_MONTHS = 210;
+    public const GROSS_VALUE_AGREES_FROM_INVOICES_IN_NEXO = 218;
+
     public $customColumnsVisibilities = [
         'name',
         'group',
