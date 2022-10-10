@@ -70,26 +70,26 @@ class RemoveLabelJob extends Job implements ShouldQueue
                 continue;
             }
 
-            if ($labelId == 41 && !strpos($this->order->customer->login, 'allegromail.pl')) {
-                $noData = DB::table('gt_invoices')->where('order_id', $this->order->id)->where('gt_invoice_status_id', '13')->first();
-                if (!empty($noData)) {
-                    try {
-                        \Mailer::create()
-                            ->to($this->order->customer->login)
-                            ->send(new DifferentCustomerData('Wybór danych do wystawienia faktury - zlecenie ' . $this->order->id, $this->order->id, $noData->id));
-                    } catch (\Swift_TransportException $e) {
-
-                    }
-                } else {
-                    try {
-                        \Mailer::create()
-                            ->to($this->order->customer->login)
-                            ->send(new ConfirmData('Wybór danych do wystawienia faktury  - zlecenie ' . $this->order->id, $this->order->id));
-                    } catch (\Swift_TransportException $e) {
-
-                    }
-                }
-            }
+//            if ($labelId == 41 && !strpos($this->order->customer->login, 'allegromail.pl')) {
+//                $noData = DB::table('gt_invoices')->where('order_id', $this->order->id)->where('gt_invoice_status_id', '13')->first();
+//                if (!empty($noData)) {
+//                    try {
+//                        \Mailer::create()
+//                            ->to($this->order->customer->login)
+//                            ->send(new DifferentCustomerData('Wybór danych do wystawienia faktury - zlecenie ' . $this->order->id, $this->order->id, $noData->id));
+//                    } catch (\Swift_TransportException $e) {
+//
+//                    }
+//                } else {
+//                    try {
+//                        \Mailer::create()
+//                            ->to($this->order->customer->login)
+//                            ->send(new ConfirmData('Wybór danych do wystawienia faktury  - zlecenie ' . $this->order->id, $this->order->id));
+//                    } catch (\Swift_TransportException $e) {
+//
+//                    }
+//                }
+//            }
 
             if($labelId == Label::PACKAGE_NOTIFICATION_SENT_LABEL) {
                 $orderWarehouseNotificationService->removeNotifications($this->order->id);
