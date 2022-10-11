@@ -477,6 +477,7 @@ class OrdersPackagesController extends Controller
                 ->where('order_packages.status', '!=', 'REJECT_CANCELLED')
                 ->where('order_packages.letter_number', '!=', null)
                 ->select('order_packages.*')
+                ->orderBy('order_packages.order_id')
                 ->get();
         } else {
             $courierName = 'wszystkie';
@@ -488,6 +489,7 @@ class OrdersPackagesController extends Controller
                 ->where('order_packages.status', '!=', 'REJECT_CANCELLED')
                 ->where('order_packages.letter_number', '!=', null)
                 ->select('order_packages.*')
+                ->orderBy('order_packages.order_id')
                 ->get();
         }
 
