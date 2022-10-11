@@ -60,26 +60,25 @@ class OrderPackagesDataHelper extends DateHelper
         if (file_exists(storage_path('app/public/protocols/day-close-protocol-' . $orderPackage->delivery_courier_name . '-' . Carbon::today()->toDateString() . '.pdf'))) {
             if ($customerShipmentDateFrom > $shipmentDate) {
                 $orderPackage->shipment_date = $customerShipmentDateFrom->format("Y-m-d");
-            } else {
-                $orderPackage->shipment_date = $shipmentDate->addWeekday()->format("Y-m-d");;
+                $orderPackage->delivery_date = $customerShipmentDateFrom->addWeekday()->format("Y-m-d");
             }
         }
 
         return $orderPackage;
     }
-    
+
     public function generateSticker($order, $data)
     {
         if (!file_exists(storage_path('app/public/' . strtolower($data['delivery_courier_name']) . '/stickers/'))) {
             mkdir(storage_path('app/public/' . strtolower($data['delivery_courier_name'])));
             mkdir(storage_path('app/public/' . strtolower($data['delivery_courier_name']) . '/stickers/'));
         }
-        
+
         do {
             $data['letter_number'] = $data['order_id'] . rand(1000000, 9999999);
             $path = storage_path('app/public/' . strtolower($data['delivery_courier_name']) . '/stickers/sticker' . $data['letter_number'] . '.pdf');
         } while (file_exists($path));
-        
+
         $data['sending_number'] = $data['order_id'] . rand(1000000, 9999999);
         $data['shipment_date'] = $data['shipment_date']->format('Y-m-d');
         $data['delivery_date'] = $data['delivery_date']->format('Y-m-d');
@@ -87,9 +86,9 @@ class OrderPackagesDataHelper extends DateHelper
             'order' => $order,
             'package' => $data
         ])->setPaper('a5');
-        
+
         $pdf->save($path);
-        
+
         return $data;
     }
 }
