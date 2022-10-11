@@ -992,6 +992,7 @@ class OrdersPackagesController extends Controller
 
         try {
             foreach ($packages as $package) {
+                Log::notice('Przy zamykaniu protokołu zamówienia ' . $package->order->id . ' shipment_date zmieniamy na ' . $today->copy()->addWeekday());
                 $package->update(
                     [
                         'shipment_date' => $today->copy()->addWeekday(),
