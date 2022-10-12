@@ -71,7 +71,7 @@ class CheckPackagesStatusJob
                         empty($package->letter_number)) {
                         continue;
                     }
-
+                    Log::notice('Paczka ' . $package->id . ' przed sprawdzeniem ma date ' . $package->shipment_date);
                     switch ($package->service_courier_name) {
                         case CourierName::INPOST :
                         case CourierName::ALLEGRO_INPOST :

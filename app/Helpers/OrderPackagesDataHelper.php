@@ -11,6 +11,7 @@ use App\Entities\OrderPackage;
 use Barryvdh\DomPDF\Facade as PDF;
 use Illuminate\Support\Carbon;
 use App\Entities\PackageTemplate;
+use Illuminate\Support\Facades\Log;
 
 class OrderPackagesDataHelper extends DateHelper
 {
@@ -63,6 +64,7 @@ class OrderPackagesDataHelper extends DateHelper
                 $orderPackage->delivery_date = $customerShipmentDateFrom->addWeekday()->format("Y-m-d");
             }
         }
+        Log::notice('Find Free shipment date for' . $orderPackage->id .' at '. $orderPackage->shipment_date);
 
         return $orderPackage;
     }

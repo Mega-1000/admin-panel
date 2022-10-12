@@ -48,7 +48,7 @@ class Kernel extends ConsoleKernel
         // $schedule->job(Jobs\ChangeOrderInvoiceData::class)->dailyAt("07:00");
         // $schedule->job(Jobs\JpgGeneratorJob::class)->dailyAt("01:00");
         $schedule->job(Jobs\ImportCsvFileJob::class)->everyFiveMinutes();
-        $schedule->job(Jobs\ImportOrdersFromSelloJob::class)->cron('0 6,11,17,22 * * *');
+//        $schedule->job(Jobs\ImportOrdersFromSelloJob::class)->cron('0 6,11,17,22 * * *');
         $schedule->job(Jobs\UpdatePackageRealCostJob::class)->dailyAt("00:30");
         // $schedule->job(Jobs\CheckIfInvoicesExistInOrders::class)->dailyAt("07:00");
         // $schedule->job(Jobs\UrgentInvoiceRequest::class)->everyFifteenMinutes()->between('9:00', '17:00');
