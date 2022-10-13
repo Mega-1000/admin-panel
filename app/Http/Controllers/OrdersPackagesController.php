@@ -269,7 +269,7 @@ class OrdersPackagesController extends Controller
         }
         $this->orderPackagesDataHelper->findFreeShipmentDate($orderPackage);
         $orderPackage->save();
-        Log::notice('Save Order package' . $orderPackage->id .' at '. $orderPackage->shipment_date);
+        Log::notice('Save Order package' . $orderPackage->id .' at '. $orderPackage->shipment_date->format('Y-m-d H:i:s'));
 
         if (!empty($data['real_cost_for_company'])) {
             $orderPackage->realCostsForCompany()->create([
@@ -993,7 +993,7 @@ class OrdersPackagesController extends Controller
 
         try {
             foreach ($packages as $package) {
-                Log::notice('Przy zamykaniu protokołu zamówienia ' . $package->order->id . ' shipment_date zmieniamy na ' . $today->copy()->addWeekday());
+                Log::notice('Przy zamykaniu protokołu zamówienia ' . $package->order->id . ' shipment_date zmieniamy na ');
                 $package->update(
                     [
                         'shipment_date' => $today->copy()->addWeekday(),

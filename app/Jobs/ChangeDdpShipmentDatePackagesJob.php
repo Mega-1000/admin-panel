@@ -45,7 +45,7 @@ class ChangeDdpShipmentDatePackagesJob implements ShouldQueue
         $packages = OrderPackage::whereDate('shipment_date', '<=', Carbon::today())->where('service_courier_name', Package::DPD_COURIER)->where('status', PackageTemplate::STATUS_NEW)->get();
         $packages->map(function ($pack) {
             $shipmentDate = Carbon::tomorrow();
-            Log::notice('Tutaj zmieniamy date paczek ale tylko dpd ' . $pack->shipment_date);
+            Log::notice('Tutaj zmieniamy date paczek ale tylko dpd ' . $pack->shipment_date->format('Y-m-d H:i:s'));
 
             $pack->shipment_date = $shipmentDate;
             $pack->delivery_date = $this->orderPackagesDataHelper->calculateDeliveryDate($shipmentDate);
