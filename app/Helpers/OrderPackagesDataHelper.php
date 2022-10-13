@@ -64,7 +64,7 @@ class OrderPackagesDataHelper extends DateHelper
                 $orderPackage->delivery_date = $customerShipmentDateFrom->addWeekday()->format("Y-m-d");
             }
         }
-        Log::notice('Find Free shipment date for' . $orderPackage->id .' at '. $orderPackage->shipment_date->format('Y-m-d H:i:s'));
+        Log::notice('Find Free shipment date for' . $orderPackage->id .' at '. $orderPackage->shipment_date);
 
         return $orderPackage;
     }
