@@ -269,8 +269,17 @@ class OrdersPackagesController extends Controller
         }
         $this->orderPackagesDataHelper->findFreeShipmentDate($orderPackage);
         $orderPackage->save();
-        Log::notice('Save Order package' . $orderPackage->id .' at '. $orderPackage->shipment_date);
+        try {
 
+            if ($orderPackage->shipment_date instanceof \DateTime) {
+                Log::notice('Find Free shipment date for ' . $orderPackage->id . ' at ' . $orderPackage->shipment_date->format("Y-m-d"));
+            } else {
+                Log::notice('Find Free shipment date for ' . $orderPackage->id . ' at ' . $orderPackage->shipment_date);
+
+            }
+        } catch (\Throwable $ex) {
+            Log::error($ex->getMessage());
+        }
         if (!empty($data['real_cost_for_company'])) {
             $orderPackage->realCostsForCompany()->create([
                 'order_package_id' => $orderPackage->id,

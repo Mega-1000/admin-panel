@@ -67,9 +67,9 @@ class OrderPackagesDataHelper extends DateHelper
         try {
 
             if ($orderPackage->shipment_date instanceof \DateTime) {
-                Log::notice('Find Free shipment date for' . $orderPackage->id . ' at ' . $orderPackage->shipment_date->format("Y-m-d"));
+                Log::notice('Find Free shipment date for ' . $orderPackage->id . ' at ' . $orderPackage->shipment_date->format("Y-m-d"));
             } else {
-                Log::notice('Find Free shipment date for' . $orderPackage->id . ' at ' . $orderPackage->shipment_date);
+                Log::notice('Find Free shipment date for ' . $orderPackage->id . ' at ' . $orderPackage->shipment_date);
 
             }
         } catch (\Throwable $ex) {
