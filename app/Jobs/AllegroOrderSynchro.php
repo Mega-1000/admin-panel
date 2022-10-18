@@ -321,12 +321,15 @@ class AllegroOrderSynchro implements ShouldQueue
         $helper = new OrderPackagesDataHelper();
         Log::notice('Może to przy tworzeniu');
         if (!file_exists(storage_path('app/public/protocols/day-close-protocol-' . $packTemplate->delivery_courier_name . '-' . Carbon::today()->toDateString() . '.pdf'))) {
-            $date = Carbon::today()->addWeekday();
-        } else if ($packTemplate->accept_time) {
-            $date = $helper->calculateShipmentDate($packTemplate->accept_time, $packTemplate->accept_time);
+            $date = Carbon::today();
         } else {
-            $date = $helper->calculateShipmentDate(9, 9);
+            $date = Carbon::today()->addWeekday();
         }
+//        else if ($packTemplate->accept_time) {
+//            $date = $helper->calculateShipmentDate($packTemplate->accept_time, $packTemplate->accept_time);
+//        } else {
+//            $date = $helper->calculateShipmentDate(9, 9);
+//        }
         $pack->shipment_date = $date;
         $pack->cost_for_client = $packTemplate->approx_cost_client;
         $pack->quantity = 1;
