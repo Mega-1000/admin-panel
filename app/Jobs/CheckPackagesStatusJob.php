@@ -71,17 +71,7 @@ class CheckPackagesStatusJob
                         empty($package->letter_number)) {
                         continue;
                     }
-                    try {
 
-                        if ($package->shipment_date instanceof \DateTime) {
-                            Log::notice('Find Free shipment date for ' . $package->id . ' at ' . $package->shipment_date->format("Y-m-d"));
-                        } else {
-                            Log::notice('Paczka ' . $package->id . ' przed sprawdzeniem ma date '  . $package->shipment_date);
-
-                        }
-                    } catch (\Throwable $ex) {
-                        Log::error($ex->getMessage());
-                    }
                     switch ($package->service_courier_name) {
                         case CourierName::INPOST :
                         case CourierName::ALLEGRO_INPOST :

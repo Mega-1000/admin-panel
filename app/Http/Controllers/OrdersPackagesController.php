@@ -269,17 +269,7 @@ class OrdersPackagesController extends Controller
         }
         $this->orderPackagesDataHelper->findFreeShipmentDate($orderPackage);
         $orderPackage->save();
-        try {
 
-            if ($orderPackage->shipment_date instanceof \DateTime) {
-                Log::notice('Find Free shipment date for ' . $orderPackage->id . ' at ' . $orderPackage->shipment_date->format("Y-m-d"));
-            } else {
-                Log::notice('Find Free shipment date for ' . $orderPackage->id . ' at ' . $orderPackage->shipment_date);
-
-            }
-        } catch (\Throwable $ex) {
-            Log::error($ex->getMessage());
-        }
         if (!empty($data['real_cost_for_company'])) {
             $orderPackage->realCostsForCompany()->create([
                 'order_package_id' => $orderPackage->id,
@@ -1002,7 +992,6 @@ class OrdersPackagesController extends Controller
 
         try {
             foreach ($packages as $package) {
-                Log::notice('Przy zamykaniu protokołu zamówienia ' . $package->order->id . ' shipment_date zmieniamy na ');
                 $package->update(
                     [
                         'shipment_date' => $today->copy()->addWeekday(),

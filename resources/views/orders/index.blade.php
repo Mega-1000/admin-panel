@@ -1015,6 +1015,17 @@
         $('#create-new-task-button').click(event => {
             $('#add-custom-task').modal('show');
         })
+        $('form#print-package-form').on('submit', function (event) {
+            let optionLabel = $('#print-package-group').find('[name="task_id"] option:selected').text();
+            let orderId = optionLabel.split(' - ').shift();
+            $('#columnSearch-orderId').val(orderId);
+            $('#columnSearch-orderId').change();
+            setTimeout(function () {
+                let ofButton = $('tr#id' + '-' + orderId).find('button:contains("OF")');
+                ofButton.trigger('click');
+                $('#print-package-group').modal('hide');
+            }, 5000);
+        });
         $('.print-group').click(event => {
             $('#print-package-type').val(event.currentTarget.name);
             let opt = $(event.currentTarget).data('couriertasks');

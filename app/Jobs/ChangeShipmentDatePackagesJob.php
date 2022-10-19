@@ -69,7 +69,6 @@ class ChangeShipmentDatePackagesJob implements ShouldQueue
                     if ($package->status != 'NEW' || $date->toDateString() >= Carbon::today()->toDateString()) {
                         continue;
                     }
-                    Log::notice('Tutaj zmieniamy date wszystkich paczek min Ale również na order ' . $package->id);
 
                     $shipmentDate = Carbon::today();
                     $order->shipment_date = $shipmentDate;
