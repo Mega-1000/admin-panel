@@ -318,8 +318,6 @@ class AllegroOrderSynchro implements ShouldQueue
         $pack->content = $packTemplate->content ?? '';
         $pack->notices = $orderId . '/' . $packageNumber;
         $pack->symbol = $packTemplate->symbol;
-        $helper = new OrderPackagesDataHelper();
-        Log::notice('Może to przy tworzeniu');
         if (!file_exists(storage_path('app/public/protocols/day-close-protocol-' . $packTemplate->delivery_courier_name . '-' . Carbon::today()->toDateString() . '.pdf'))) {
             $date = Carbon::today();
         } else {
