@@ -80,6 +80,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(\App\Repositories\FaqRepository::class, \App\Repositories\FaqRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\OrderAllegroRepository::class, \App\Repositories\OrderAllegroRepositoryEloquent::class);
         $this->app->bind(\App\Repositories\WorkingEventRepository::class, \App\Repositories\WorkingEventRepositoryEloquent::class);
+        $this->app->bind(\App\Repositories\ShipmentGroupRepository::class, \App\Repositories\ShipmentGroupRepositoryEloquent::class);
         //:end-bindings:
     }
 }
