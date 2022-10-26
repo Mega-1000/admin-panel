@@ -31,6 +31,7 @@ use App\Repositories\FirmRepository;
 use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PackageTemplateRepository;
+use App\Repositories\ShipmentGroupRepository;
 use Barryvdh\DomPDF\Facade as PDF;
 use Carbon\Carbon;
 use iio\libmergepdf\Merger;
@@ -62,13 +63,19 @@ class OrdersPackagesController extends Controller
 
     protected $packageTemplateRepository;
 
+    /**
+     * @var ShipmentGroupRepository
+     */
+    private $shipmentGroupRepository;
+
 
     public function __construct(
-        OrderPackageRepository $repository,
-        OrderRepository $orderRepository,
-        OrderPackagesDataHelper $orderPackagesDataHelper,
-        FirmRepository $firmRepository,
-        PackageTemplateRepository $packageTemplateRepository
+        OrderPackageRepository    $repository,
+        OrderRepository           $orderRepository,
+        OrderPackagesDataHelper   $orderPackagesDataHelper,
+        FirmRepository            $firmRepository,
+        PackageTemplateRepository $packageTemplateRepository,
+        ShipmentGroupRepository   $shipmentGroupRepository
     )
     {
         $this->repository = $repository;
@@ -76,6 +83,7 @@ class OrdersPackagesController extends Controller
         $this->orderPackagesDataHelper = $orderPackagesDataHelper;
         $this->firmRepository = $firmRepository;
         $this->packageTemplateRepository = $packageTemplateRepository;
+        $this->shipmentGroupRepository = $shipmentGroupRepository;
     }
 
 
@@ -208,7 +216,8 @@ class OrdersPackagesController extends Controller
 
     /**
      * @param OrderPackageUpdateRequest $request
-     * @param $id
+     * @param                           $id
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(OrderPackageUpdateRequest $request, $id)
@@ -470,8 +479,8 @@ class OrdersPackagesController extends Controller
         if ($courierName !== 'WSZYSTKIE') {
             $packages = OrderPackage::where('delivery_courier_name', '=', $courierName)
                 ->leftJoin('orders', 'order_packages.order_id', '=', 'orders.id')
-                ->where('order_packages.shipment_date', '<=', Carbon::createFromFormat('d/m/Y',$request->date_to)->format('Y/m/d H:i:s'))
-                ->where('order_packages.shipment_date', '>=', Carbon::createFromFormat('d/m/Y',$request->date_from)->subDays(1)->format('Y/m/d H:i:s'))
+                ->where('order_packages.shipment_date', '<=', Carbon::createFromFormat('d/m/Y', $request->date_to)->format('Y/m/d H:i:s'))
+                ->where('order_packages.shipment_date', '>=', Carbon::createFromFormat('d/m/Y', $request->date_from)->subDays(1)->format('Y/m/d H:i:s'))
                 ->where('order_packages.status', '!=', 'CANCELLED')
                 ->where('order_packages.status', '!=', 'WAITING_FOR_CANCELLED')
                 ->where('order_packages.status', '!=', 'REJECT_CANCELLED')
@@ -481,9 +490,9 @@ class OrdersPackagesController extends Controller
                 ->get();
         } else {
             $courierName = 'wszystkie';
-                $packages = OrderPackage::leftJoin('orders', 'order_packages.order_id', '=', 'orders.id')
-                ->where('order_packages.shipment_date', '<=', Carbon::createFromFormat('d/m/Y',$request->date_to)->format('Y/m/d H:i:s'))
-                ->where('order_packages.shipment_date', '>=', Carbon::createFromFormat('d/m/Y',$request->date_from)->subDays(1)->format('Y/m/d H:i:s'))
+            $packages = OrderPackage::leftJoin('orders', 'order_packages.order_id', '=', 'orders.id')
+                ->where('order_packages.shipment_date', '<=', Carbon::createFromFormat('d/m/Y', $request->date_to)->format('Y/m/d H:i:s'))
+                ->where('order_packages.shipment_date', '>=', Carbon::createFromFormat('d/m/Y', $request->date_from)->subDays(1)->format('Y/m/d H:i:s'))
                 ->where('order_packages.status', '!=', 'CANCELLED')
                 ->where('order_packages.status', '!=', 'WAITING_FOR_CANCELLED')
                 ->where('order_packages.status', '!=', 'REJECT_CANCELLED')
@@ -493,7 +502,7 @@ class OrdersPackagesController extends Controller
                 ->get();
         }
 
-        if ($packages->count() > 0){
+        if ($packages->count() > 0) {
             $packagesArray = [];
             foreach ($packages as $package) {
                 if ($package->order->warehouse !== null) {
@@ -627,8 +636,8 @@ class OrdersPackagesController extends Controller
 
     public function prepareGroupPackageToSend($courierName)
     {
-        ini_set('max_execution_time', 600);
-        if ($courierName == 'APACZKA' || $courierName == 'INPOST' || $courierName == 'DPD' || $courierName == 'POCZTEX' || $courierName == 'JAS' ||  $courierName == 'GLS' || $courierName == 'ALL') {
+        ini_set('max_execution_time', '600');
+        if ($courierName == 'APACZKA' || $courierName == 'INPOST' || $courierName == 'DPD' || $courierName == 'POCZTEX' || $courierName == 'JAS' || $courierName == 'GLS' || $courierName == 'ALL') {
             if ($courierName !== 'ALL') {
                 $packages = $this->repository->findWhere([
                     ['status', '=', 'NEW'],
@@ -892,8 +901,9 @@ class OrdersPackagesController extends Controller
     }
 
     /**
-     * @param $package
+     * @param       $package
      * @param array $messages
+     *
      * @return array
      */
     public function sendPackage($package, array $messages): array
@@ -915,6 +925,7 @@ class OrdersPackagesController extends Controller
 
     /**
      * @param $courier_name
+     *
      * @return mixed
      */
     protected function getPackagesToSent($courier_name)
@@ -934,6 +945,7 @@ class OrdersPackagesController extends Controller
 
     /**
      * @param $package
+     *
      * @throws FileNotFoundException
      */
     protected function getStickerForGls($package)
@@ -1013,6 +1025,38 @@ class OrdersPackagesController extends Controller
             }
             $path = storage_path('app/public/protocols/' . $pdfFilename);
             $pdf->save($path);
+        } catch (\Exception $e) {
+            return redirect()->back()->with([
+                'message' => __('order_packages.message.close_day_protocol_error'),
+                'alert-type' => 'error'
+            ]);
+        }
+        return $pdf->download($pdfFilename);
+    }
+
+    public function closeGroup(Request $request)
+    {
+        $shipmentGroupId = $request->get('shipment_group');
+        $shipmentGroup = $this->shipmentGroupRepository->find($shipmentGroupId);
+
+        try {
+
+            $pdfFilename = 'group-close-protocol-' . $shipmentGroup->getLabel() . '-' . Carbon::today()->toDateString() . '.pdf';
+
+            $pdf = PDF::loadView('pdf.close-group-protocol', [
+                'packages' => $shipmentGroup->packages,
+                'date' => Carbon::today(),
+                'shipmentGroup' => $shipmentGroup,
+                'groupName' => strtoupper($shipmentGroup->getLabel()),
+                'mode' => 'utf-8'
+            ])->setPaper('a4', 'landscape');
+            if (!file_exists(storage_path('app/public/protocols'))) {
+                mkdir(storage_path('app/public/protocols'));
+            }
+            $path = storage_path('app/public/protocols/' . $pdfFilename);
+            $pdf->save($path);
+            $shipmentGroup->closed = true;
+            $shipmentGroup->save();
         } catch (\Exception $e) {
             return redirect()->back()->with([
                 'message' => __('order_packages.message.close_day_protocol_error'),
