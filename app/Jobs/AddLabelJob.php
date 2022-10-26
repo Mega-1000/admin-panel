@@ -167,6 +167,7 @@ class AddLabelJob extends Job implements ShouldQueue
                             ]);
                         }
                     }
+                    dispatch_now(new SavePackageGroupJob($this->order));
                 }
             }
 

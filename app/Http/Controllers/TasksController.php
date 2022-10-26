@@ -52,11 +52,11 @@ class TasksController extends Controller
     protected $taskTimeRepository;
 
     public function __construct(
-        TaskRepository $repository,
-        UserRepository $userRepository,
-        OrderRepository $orderRepository,
+        TaskRepository      $repository,
+        UserRepository      $userRepository,
+        OrderRepository     $orderRepository,
         WarehouseRepository $warehouseRepository,
-        TaskTimeRepository $taskTimeRepository
+        TaskTimeRepository  $taskTimeRepository
     )
     {
         $this->repository = $repository;
@@ -171,8 +171,9 @@ class TasksController extends Controller
     }
 
     /**
-     * @param $item
+     * @param       $item
      * @param float $profit
+     *
      * @return float
      */
     private function calculateProfit($item, float $profit): float
@@ -399,7 +400,7 @@ class TasksController extends Controller
             ->get();
 
         $laziness = TrackerLogs::whereDate('created_at', '>=', $request->start)
-                ->whereDate('updated_at', '<=', $request->end)->get();
+            ->whereDate('updated_at', '<=', $request->end)->get();
 
 
         $array = [];
@@ -726,7 +727,7 @@ class TasksController extends Controller
             $task->TaskTime->save();
 
             $response = $this->markTaskAsProduced($task);
-            if(!empty($response)) {
+            if (!empty($response)) {
                 return redirect()->back()->with([
                     'message' => __('tasks.messages.stocks_invalid'),
                     'alert-type' => 'error',
@@ -769,7 +770,6 @@ class TasksController extends Controller
                 [Label::ORDER_ITEMS_UNDER_CONSTRUCTION],
                 $prev));
         }
-
         return $response;
     }
 
@@ -1024,8 +1024,9 @@ class TasksController extends Controller
     }
 
     /**
-     * @param $id
+     * @param         $id
      * @param Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     private function onlyUpdateTask($id, Request $request): \Illuminate\Http\RedirectResponse
@@ -1157,8 +1158,9 @@ class TasksController extends Controller
     }
 
     /**
-     * @param $id
+     * @param         $id
      * @param Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     private function deleteTask($id, Request $request): \Illuminate\Http\RedirectResponse

@@ -161,6 +161,29 @@
                     </div>
                 </div>
             </form>
+            <form method="POST" action="{{ route('order_packages.closeGroup') }}">
+                {{csrf_field()}}
+                <div class="form-group col-md-6" style="margin-bottom: 5px">
+                    <label for="shipment_group" class="col-md-5" style="margin-top: 10px; padding-left: 0">Wybierz Grupę
+                        przesyłek do zamknięcia</label>
+                    <div class="col-md-4" style="margin-top: 5px">
+                        <select class="form-control" name="shipment_group" required>
+                            <option disabled selected value="">Grupa przesyłek</option>
+                            @foreach(\App\Entities\ShipmentGroup::getOpenGroups() as $group)
+                                <option
+                                    value="{{ $group->id }}">{{ $group->getLabel()}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <button name="close_shipment_group" class="btn btn-info" data-toggle="tooltip"
+                                data-placement="right"
+                                title="Spowoduje zamknięcie obecnej grupy przesyłek"
+                                id="close_shipment_group">Zamknij grupę
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
         <div id="packages_errors" class="form-group">
         </div>

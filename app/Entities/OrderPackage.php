@@ -16,7 +16,7 @@ use Prettus\Repository\Traits\TransformableTrait;
 class OrderPackage extends Model implements Transformable
 {
     use TransformableTrait;
-    
+
     public $customColumnsVisibilities = [
         'number',
         'size_a',
@@ -97,6 +97,10 @@ class OrderPackage extends Model implements Transformable
     public function packedProducts()
     {
         return $this->belongsToMany('App\Entities\Product')->withPivot('quantity');
+    }
+
+    public function shipmentGroup(){
+        return $this->belongsTo(ShipmentGroup::class);
     }
 
     public function getPathToSticker()
