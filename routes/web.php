@@ -398,6 +398,8 @@ Route::group(['prefix' => 'admin'], function () {
             'OrdersPackagesController@getProtocols')->name('order_packages.getProtocols');
         Route::post('orderPackages/closeDay',
             'OrdersPackagesController@closeDay')->name('order_packages.closeDay');
+        Route::post('orderPackages/closeGroup',
+            'OrdersPackagesController@closeGroup')->name('order_packages.closeGroup');
         Route::get('orderPackages/{courier_name}/letters',
             'OrdersPackagesController@letters')->name('order_packages.letters');
         Route::get('orderPackages/{package_id}/send',
