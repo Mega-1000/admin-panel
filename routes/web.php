@@ -591,3 +591,15 @@ Route::post('/payment/confirmation/{token}', 'OrdersPaymentsController@warehouse
 Route::get('/chat/{token}', 'MessagesController@show')->name('chat.show');
 Route::get('/chat-show-or-new/{orderId}/{userId}', 'MessagesController@showOrNew')->name('chat.show-or-new');
 Route::get('/chat/getUrl/{mediaId}/{postCode}/{email}/{phone}', 'MessagesController@getUrl')->name('messages.get-url');
+
+Route::get('shipment-groups', 'ShipmentGroupController@index')->name('shipment-groups.index');
+Route::get('shipment-groups/datatable/', 'ShipmentGroupController@datatable')->name('shipment-groups.datatable');
+Route::get('shipment-groups/create/', 'ShipmentGroupController@create')->name('shipment-groups.create');
+Route::post('shipment-groups/store/', 'ShipmentGroupController@store')->name('shipment-groups.store');
+Route::get('shipment-groups/{id}/edit', 'ShipmentGroupController@edit')->name('shipment-groups.edit');
+Route::put('shipment-groups/{id}/update', [
+    'uses' => 'ShipmentGroupController@update',
+])->name('shipment-groups.update');
+Route::delete('shipment/{id}/', [
+    'uses' => 'ShipmentGroupController@destroy',
+])->name('shipment-groups.destroy');
