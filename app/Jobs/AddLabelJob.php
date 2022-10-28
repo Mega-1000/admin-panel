@@ -142,6 +142,7 @@ class AddLabelJob extends Job implements ShouldQueue
 
                 if($labelId == Label::ORDER_ITEMS_CONSTRUCTED){
                 	dispatch(new SendItemsConstructedMailJob($this->order));
+                    dispatch_now(new SavePackageGroupJob($this->order));
 
                     $tasks = $taskRepository->findByField('order_id',$this->order->id)->all();
                     if(count($tasks) != 0) {
@@ -167,7 +168,6 @@ class AddLabelJob extends Job implements ShouldQueue
                             ]);
                         }
                     }
-                    dispatch_now(new SavePackageGroupJob($this->order));
                 }
             }
 

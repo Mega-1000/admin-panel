@@ -70,7 +70,7 @@ class SavePackageGroupJob implements ShouldQueue
                     $searchCriteria['package_type'] = 'POCZTEX';
                 }
             }
-
+//jeśli ze wczoraja nie jest
             $shipmentGroups = $this->shipmentGroupRepository->findWhere($searchCriteria);
             $shipmentGroup = $shipmentGroups->filter(function (ShipmentGroup $shipmentGroup) {
                 return $shipmentGroup->closed == false;
