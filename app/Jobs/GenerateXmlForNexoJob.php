@@ -99,9 +99,9 @@ class GenerateXmlForNexoJob implements ShouldQueue
                     ->setKategoria('Sprzedaż')
                     ->setUslugaTransportuCenaBrutto(0)
                     ->setUslugaTransportuCenaNetto(0)
-                    ->setDataDostawy($this->getOrderDate($order))
-                    ->setDataUtworzenia($this->getOrderDate($order))
-                    ->setTerminPlatnosci($this->getOrderDate($order))
+                    ->setDataDostawy($this->getOrderInvoiceDate($order))
+                    ->setDataUtworzenia($this->getOrderInvoiceDate($order))
+                    ->setTerminPlatnosci($this->getOrderInvoiceDate($order))
                     ->setWartoscPoRabacieNetto(0)
                     ->setWartoscPoRabacieBrutto(0)
                     ->setWartoscNetto(0)
@@ -188,6 +188,23 @@ class GenerateXmlForNexoJob implements ShouldQueue
             return $operationDate->lastOfMonth()->toDateTimeLocalString();
         } else {
             return Carbon::now()->toDateTimeLocalString();
+        }
+    }
+
+    /**
+     *
+     * @param Order $order
+     *
+     * @return string
+     */
+    private function getOrderInvoiceDate(Order $order): string
+    {
+        $now = Carbon::now();
+        $preferredInvoiceDate = new Carbon($order->preferred_invoice_date);
+        if ($now->isSameMonth($preferredInvoiceDate)) {
+            return $now->toDateString();
+        } else {
+            return $preferredInvoiceDate->lastOfMonth()->toDateTimeLocalString();
         }
     }
 
