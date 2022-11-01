@@ -9,6 +9,7 @@ use App\Jobs\ChangeShipmentDatePackagesJob;
 use App\Jobs\CheckPackagesStatusJob;
 use App\Jobs\GenerateXmlForNexoJob;
 use App\Jobs\PreferredInvoiceDateFillJob;
+use App\Jobs\SavePackageGroupJob;
 use App\Jobs\UpdatePackageRealCostJob;
 
 class DebugController extends Controller
@@ -26,6 +27,8 @@ class DebugController extends Controller
         //    	$res = dispatch_now(new CheckPackagesStatusJob());
         //    	$res = dispatch_now(new ChangeShipmentDatePackagesJob());
         // $res = dispatch_now(new AllegroOrderSynchro());
+//        $res = dispatch_now(new PreferredInvoiceDateFillJob());
+//        $order = Order::find(31650);
         $res = dispatch_now(new PreferredInvoiceDateFillJob());
     }
 }

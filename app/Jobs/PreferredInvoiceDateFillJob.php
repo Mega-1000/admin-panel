@@ -3,9 +3,11 @@
 namespace App\Jobs;
 
 use App\Entities\Label;
+use App\Entities\Order;
 use App\Repositories\OrderRepository;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -56,7 +58,7 @@ class PreferredInvoiceDateFillJob implements ShouldQueue
                     $order->save();
                 }
             } catch (\Throwable $th) {
-                Log::error($th->getMessage(), [
+                Log::error('Błąd podczas przypisywania preferowanej daty wystawienia faktury: ' . $th->getMessage(), [
                     'orderId' => $order->id,
                 ]);
                 continue;
