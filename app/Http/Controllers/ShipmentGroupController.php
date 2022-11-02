@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Entities\ColumnVisibility;
 use App\Repositories\LabelRepository;
+use App\Repositories\OrderPackageRepository;
 use App\Repositories\ShipmentGroupRepository;
 use App\Repositories\StatusRepository;
 use App\Repositories\TagRepository;
@@ -20,6 +21,11 @@ class ShipmentGroupController extends Controller
     protected $repository;
 
     /**
+     * @var OrderPackageRepository
+     */
+    protected $orderPackageRepository;
+
+    /**
      * @var TagRepository
      */
     protected $tagRepository;
@@ -32,11 +38,17 @@ class ShipmentGroupController extends Controller
      * @param TagRepository           $tagRepository
      * @param LabelRepository         $labelRepository
      */
-    public function __construct(ShipmentGroupRepository $repository, TagRepository $tagRepository, LabelRepository $labelRepository)
+    public function __construct(
+        ShipmentGroupRepository $repository,
+        TagRepository           $tagRepository,
+        LabelRepository         $labelRepository,
+        OrderPackageRepository  $orderPackageRepository
+    )
     {
         $this->repository = $repository;
         $this->tagRepository = $tagRepository;
         $this->labelRepository = $labelRepository;
+        $this->orderPackageRepository = $orderPackageRepository;
     }
 
     /**
@@ -89,11 +101,18 @@ class ShipmentGroupController extends Controller
      *
      * @param \App\ShipmentGroup $shipmentGroup
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Foundation\Application|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function show(ShipmentGroup $shipmentGroup)
+    public function show(Request $request, int $id)
     {
-        //
+        $shipmentGroup = $this->repository->find($id);
+
+        $visibilities = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('order_packages'));
+        foreach ($visibilities as $key => $row) {
+            $visibilities[$key]->show = json_decode($row->show, true);
+            $visibilities[$key]->hidden = json_decode($row->hidden, true);
+        }
+        return view('shipment_groups.show', compact('shipmentGroup', 'visibilities'));
     }
 
     /**
@@ -151,5 +170,25 @@ class ShipmentGroupController extends Controller
         $collection = $this->repository->all();
 
         return $collection;
+    }
+
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function packageDatatable(Request $request, int $id)
+    {
+        $collection = $this->orderPackageRepository->findWhere(['shipment_group_id' => $id]);
+
+        return DataTables::collection($collection)->make(true);
+    }
+
+    public function removePackage(Request $request, int $id, int $packageId)
+    {
+        $this->orderPackageRepository->find($packageId)->update(
+            [
+                'shipment_group_id' => null
+            ]
+        );
     }
 }

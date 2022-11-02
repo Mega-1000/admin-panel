@@ -51,7 +51,7 @@ class ShipmentGroup extends Model implements Transformable
 
     public function getLabel(): string
     {
-        return $this->courier_name . '-' . ($this->packing_type ? $this->packing_type . '-' : '') . $this->lp;
+        return $this->courier_name . '-' . ($this->package_type !== null ? $this->package_type . '-' : '') . $this->lp;
     }
 
     public function getNextLabel(): string

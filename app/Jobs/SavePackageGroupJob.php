@@ -53,21 +53,17 @@ class SavePackageGroupJob implements ShouldQueue
                 continue;
             }
             $searchCriteria = [
-                'courier_name' => $package->service_courier_name,
+                'courier_name' => $package->delivery_courier_name,
                 'shipment_date' => Carbon::now()->format('Y-m-d'),
             ];
 
             if ($package->service_courier_name === 'DPD') {
                 if ($package->symbol === 'DPD_D_smart' || $package->symbol === 'DPD_d') {
-                    $searchCriteria['package_type'] = 'DPD_D';
-                } else {
-                    $searchCriteria['package_type'] = 'DPD';
+                    $searchCriteria['package_type'] = 'Dłużyca';
                 }
             } elseif ($package->service_courier_name === 'POCZTEX') {
                 if (strpos($package->symbol, 'P_')) {
-                    $searchCriteria['package_type'] = 'POCZTEX_P';
-                } else {
-                    $searchCriteria['package_type'] = 'POCZTEX';
+                    $searchCriteria['package_type'] = 'Paleta';
                 }
             }
 //jeśli ze wczoraja nie jest

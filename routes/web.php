@@ -594,6 +594,9 @@ Route::get('/chat/getUrl/{mediaId}/{postCode}/{email}/{phone}', 'MessagesControl
 
 Route::get('shipment-groups', 'ShipmentGroupController@index')->name('shipment-groups.index');
 Route::get('shipment-groups/datatable/', 'ShipmentGroupController@datatable')->name('shipment-groups.datatable');
+Route::get('shipment-groups/{id}/package-datatable/', 'ShipmentGroupController@packageDatatable')->name('shipment-groups.packageDatatable');
+Route::get('shipment-groups/{id}/remove-package/{packageId}', 'ShipmentGroupController@removePackage')->name('shipment-groups.removePackage');
+Route::get('shipment-groups/{id}/show/', 'ShipmentGroupController@show')->name('shipment-groups.show');
 Route::get('shipment-groups/create/', 'ShipmentGroupController@create')->name('shipment-groups.create');
 Route::post('shipment-groups/store/', 'ShipmentGroupController@store')->name('shipment-groups.store');
 Route::get('shipment-groups/{id}/edit', 'ShipmentGroupController@edit')->name('shipment-groups.edit');
