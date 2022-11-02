@@ -541,7 +541,7 @@
                     <label for="order_delivery_address_email">@lang('customers.form.delivery_email')</label>
                     <input type="email" class="form-control" id="order_delivery_address_email"
                            name="order_delivery_address_email"
-                           value="{{ $orderDeliveryAddress->email ?? $order->customer->login }}">
+                           value="{{ $orderDeliveryAddress->email }}">
                 </div>
                 <div class="form-group" style="width: 11%; float: left; padding: 5px;">
                     <label for="order_delivery_address_firmname">@lang('customers.form.delivery_firmname')</label>
@@ -634,7 +634,7 @@
                     <label for="order_invoice_address_email">@lang('customers.form.invoice_email')</label>
                     <input type="email" class="form-control" id="order_invoice_address_email"
                            name="order_invoice_address_email"
-                           value="{{ $orderInvoiceAddress->email ?? $order->customer->login }}">
+                           value="{{ $orderInvoiceAddress->email }}">
                 </div>
                 <div class="form-group" style="width: 10%; float: left; padding: 5px;">
                     <label for="order_invoice_address_firmname">@lang('customers.form.invoice_firmname')</label>
