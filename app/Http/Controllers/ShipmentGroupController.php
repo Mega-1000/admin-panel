@@ -9,6 +9,8 @@ use App\Repositories\ShipmentGroupRepository;
 use App\Repositories\StatusRepository;
 use App\Repositories\TagRepository;
 use App\ShipmentGroup;
+use Barryvdh\DomPDF\Facade as PDF;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -178,17 +180,76 @@ class ShipmentGroupController extends Controller
      */
     public function packageDatatable(Request $request, int $id)
     {
-        $collection = $this->orderPackageRepository->findWhere(['shipment_group_id' => $id]);
+        $collection = $this->orderPackageRepository->findWhere(
+            [
+                'shipment_group_id' => $id,
+                ['order_packages.status', '!=', 'CANCELLED'],
+                ['order_packages.status', '!=', 'WAITING_FOR_CANCELLED'],
+                ['order_packages.status', '!=', 'REJECT_CANCELLED'],
+                ['order_packages.letter_number', '!=', null]
+            ]
+        );
 
         return DataTables::collection($collection)->make(true);
     }
 
+    /**
+     * @param Request $request
+     * @param int     $id
+     * @param int     $packageId
+     *
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function removePackage(Request $request, int $id, int $packageId)
     {
-        $this->orderPackageRepository->find($packageId)->update(
+        $orderPackage = $this->orderPackageRepository->find($packageId);
+        $orderPackage->shipment_group_id = null;
+        $orderPackage->save();
+        return redirect()->route('shipment-groups.show',
             [
-                'shipment_group_id' => null
+                'id' => $id,
+            ]
+        )->with(
+            [
+                'message' => 'Paczka została usunięta z grupy przesyłek',
+                'alert-type' => 'info'
             ]
         );
+    }
+
+    public function print(int $id)
+    {
+        $shipmentGroup = $this->repository->find($id);
+        $collection = $this->orderPackageRepository->findWhere(
+            [
+                'shipment_group_id' => $id,
+                ['order_packages.status', '!=', 'CANCELLED'],
+                ['order_packages.status', '!=', 'WAITING_FOR_CANCELLED'],
+                ['order_packages.status', '!=', 'REJECT_CANCELLED'],
+                ['order_packages.letter_number', '!=', null]
+            ]
+        );
+        try {
+            $pdfFilename = 'group-close-protocol-' . $shipmentGroup->getLabel() . '-' . Carbon::today()->toDateString() . '.pdf';
+
+            $pdf = PDF::loadView('pdf.close-group-protocol', [
+                'packages' => $collection,
+                'date' => Carbon::today(),
+                'shipmentGroup' => $shipmentGroup,
+                'groupName' => strtoupper($shipmentGroup->getLabel()),
+                'mode' => 'utf-8'
+            ])->setPaper('a4', 'landscape');
+            if (!file_exists(storage_path('app/public/protocols'))) {
+                mkdir(storage_path('app/public/protocols'));
+            }
+            $path = storage_path('app/public/protocols/' . $pdfFilename);
+            $pdf->save($path);
+        } catch (\Exception $e) {
+            return redirect()->back()->with([
+                'message' => $e->getMessage(),
+                'alert-type' => 'error'
+            ]);
+        }
+        return $pdf->download($pdfFilename);
     }
 }

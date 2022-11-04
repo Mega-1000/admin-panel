@@ -2,20 +2,84 @@
 
 @section('app-header')
     <h1 class="page-title">
-        <i class="voyager-tag"></i> @lang('statuses.title')
+        <i class="voyager-tag"></i> Grupa przesyłek
         <a href="{!! route('shipment-groups.create') !!}" class="btn btn-success btn-add-new">
-            <i class="voyager-plus"></i> <span>@lang('statuses.create')</span>
+            <i class="voyager-plus"></i> <span>Dodaj przesyłkę do grupy</span>
         </a>
     </h1>
 @endsection
 
 @section('table')
+    <div class="row">
+        <div class="col-md-12">
+            <h4>Szczegóły przesyłki</h4>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-4 col-md-offset-2">
+                    Nazwa kuriera
+                </div>
+                <div class="col-md-3 text-center" style="border-bottom: 0.15em dotted black">
+                    {{ $shipmentGroup->courier_name }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 col-md-offset-2">
+                    Typ paczki
+                </div>
+                <div class="col-md-3 text-center" style="border-bottom: 0.15em dotted black">
+                    {{ $shipmentGroup->package_type ?? 'Standard' }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 col-md-offset-2">
+                    Lp
+                </div>
+                <div class="col-md-3 text-center" style="border-bottom: 0.15em dotted black">
+                    {{ $shipmentGroup->lp }}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-4 col-md-offset-2">
+                    Data wysyłki
+                </div>
+                <div class="col-md-3 text-center" style="border-bottom: 0.15em dotted black">
+                    {{ $shipmentGroup->shipment_date->format('Y-m-d') }}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 col-md-offset-2">
+                    Wysłanie
+                </div>
+                <div class="col-md-3 text-center" style="border-bottom: 0.15em dotted black">
+                    {{ $shipmentGroup->sent  ? 'Wysłane' : 'Nie wysłane'}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4 col-md-offset-2">
+                    Zamknięcie
+                </div>
+                <div class="col-md-3 text-center" style="border-bottom: 0.15em dotted black">
+                    {{ $shipmentGroup->closed ? 'Zamknięta' : 'Otwarta'}}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <form action="{{ route('shipment-groups.print',['id'=>$shipmentGroup->id]) }}">
+                <button class="btn btn-success" type="submit">Drukuj spis</button>
+            </form>
+        </div>
+    </div>
+
     <div class="order-packages" id="order-packages">
         <table style="width: 100%" id="dataTableOrderPackages" class="table table-hover">
             <thead>
             <tr>
                 <th>ID</th>
-                <th>@lang('order_packages.table.number')</th>
                 <th>@lang('order_packages.table.status')</th>
                 <th>@lang('order_packages.table.letter_number')</th>
                 <th>@lang('order_packages.table.delivery_courier_name')</th>
@@ -28,13 +92,35 @@
             </thead>
         </table>
     </div>
+
+    <div class="modal fade" tabindex="-1" id="add_bonus_modal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">Dodaj potrącenie</h4>
+                </div>
+                <div class="modal-body">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" form="add_new_bonus_form" class="btn btn-success pull-right">Utwórz
+                    </button>
+                    <button type="button" class="btn btn-default pull-right"
+                            data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 
 @section('datatable-scripts')
     <script>
         const deleteRecordOrderPackages = (id) => {
-            $('#delete_form')[0].action = "/admin/shipment-groups/" + {!! $shipmentGroup->id !!} + "/remove-package/" + id;
+            $('#delete_form')[0].action = '/shipment-groups/' + {!! $shipmentGroup->id !!} + '/remove-package/' + id;
             $('#delete_modal').modal('show');
         };
         $.fn.dataTable.ext.errMode = 'throw';
@@ -55,11 +141,10 @@
             columns: [
                 {
                     data: 'id',
-                    name: 'id'
-                },
-                {
-                    data: 'number',
-                    name: 'number'
+                    name: 'id',
+                    render: function (id, data, row) {
+                        return row.order_id + '/' + row.number;
+                    }
                 },
                 {
                     data: 'status',
@@ -113,16 +198,6 @@
                     name: 'id',
                     render: function (id, data, row) {
                         let html = '';
-                        if (row.status !== 'SENDING' && row.status !== 'WAITING_FOR_SENDING' && row.status !== 'CANCELLED' && row.status !== 'WAITING_FOR_CANCELLED' && row.status !== 'DELIVERED' && row.service_courier_name !== 'GIELDA' && row.service_courier_name !== 'ODBIOR_OSOBISTY' && row.delivery_courier_name !== 'GIELDA' && row.delivery_courier_name !== 'ODBIOR_OSOBISTY') {
-                            html += '<button class="btn btn-sm btn-success edit" onclick="sendPackage(' + id + ',' + row.order_id + ')">';
-                            html += '<i class="voyager-mail"></i>';
-                            html += '<span class="hidden-xs hidden-sm"> Wyślij</span>';
-                            html += '</button>';
-                        }
-                        html += '<a href="/admin/orderPackages/' + id + '/edit" class="btn btn-sm btn-primary edit">';
-                        html += '<i class="voyager-edit"></i>';
-                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
-                        html += '</a>';
                         html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecordOrderPackages(' + id + ')">';
                         html += '<i class="voyager-trash"></i>';
                         html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
@@ -177,5 +252,7 @@
                 }
             });
         });
+        // $('#add_bonus_modal').modal('show');
+
     </script>
 @endsection

@@ -2,9 +2,9 @@
 
 @section('app-header')
     <h1 class="page-title">
-        <i class="voyager-tag"></i> @lang('statuses.title')
+        <i class="voyager-tag"></i> Grupy przesyłek
         <a href="{!! route('shipment-groups.create') !!}" class="btn btn-success btn-add-new">
-            <i class="voyager-plus"></i> <span>@lang('statuses.create')</span>
+            <i class="voyager-plus"></i> <span>Dodaj nową grupe przesyłek</span>
         </a>
     </h1>
 @endsection
@@ -82,7 +82,7 @@
                         if (closed === '1') {
                             return '<span style="color: green;">Zamknięte</span>';
                         } else {
-                            return '<span style="color: red;">Nie zamknięte</span>';
+                            return '<span style="color: red;">Otwarta</span>';
                         }
                     }
                 },
@@ -155,10 +155,21 @@
                 $(this).html('<span id="columnSearch' + i + '">Akcje</span>');
             }
             $('input', this).on('keyup change', function () {
-                if (table.column(i).search() !== this.value) {
+                let value = this.value;
+                console.log(this.value, title)
+                if (title === 'Zamknięta') {
+                    if (title.indexOf(this.value) !== -1) {
+                        value = 1;
+                    }
+                } else if (title === 'Wysłana') {
+                    if (title.indexOf(this.value) !== -1) {
+                        value = 1;
+                    }
+                }
+                if (table.column(i).search() !== value) {
                     table
                         .column(i)
-                        .search(this.value)
+                        .search(value)
                         .draw();
                 }
             });
