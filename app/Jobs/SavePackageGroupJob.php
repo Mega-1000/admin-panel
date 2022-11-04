@@ -60,10 +60,14 @@ class SavePackageGroupJob implements ShouldQueue
             if ($package->service_courier_name === 'DPD') {
                 if ($package->symbol === 'DPD_D_smart' || $package->symbol === 'DPD_d') {
                     $searchCriteria['package_type'] = 'Dłużyca';
+                } else {
+                    $searchCriteria['package_type'] = 'Standard';
                 }
             } elseif ($package->service_courier_name === 'POCZTEX') {
                 if (strpos($package->symbol, 'P_')) {
                     $searchCriteria['package_type'] = 'Paleta';
+                } else {
+                    $searchCriteria['package_type'] = 'Standard';
                 }
             }
 //jeśli ze wczoraja nie jest
