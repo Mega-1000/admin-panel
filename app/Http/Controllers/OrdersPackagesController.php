@@ -1039,12 +1039,22 @@ class OrdersPackagesController extends Controller
         $shipmentGroupId = $request->get('shipment_group');
         $shipmentGroup = $this->shipmentGroupRepository->find($shipmentGroupId);
 
+        $collection = $this->repository->findWhere(
+            [
+                'shipment_group_id' => $shipmentGroupId,
+                ['order_packages.status', '!=', 'CANCELLED'],
+                ['order_packages.status', '!=', 'WAITING_FOR_CANCELLED'],
+                ['order_packages.status', '!=', 'REJECT_CANCELLED'],
+                ['order_packages.letter_number', '!=', null]
+            ]
+        );
+
         try {
 
             $pdfFilename = 'group-close-protocol-' . $shipmentGroup->getLabel() . '-' . Carbon::today()->toDateString() . '.pdf';
 
             $pdf = PDF::loadView('pdf.close-group-protocol', [
-                'packages' => $shipmentGroup->packages,
+                'packages' => $collection,
                 'date' => Carbon::today(),
                 'shipmentGroup' => $shipmentGroup,
                 'groupName' => strtoupper($shipmentGroup->getLabel()),
