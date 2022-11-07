@@ -24,9 +24,9 @@ class Helper
     {
         $currentUser = Auth::user()->role_id;
         $roleName = self::USER_ROLE[$currentUser];
-        if($roleName !== 'super_admin' && $roleName !== 'admin') {
+        if ($roleName !== 'super_admin' && $roleName !== 'admin') {
             $config = config('permissions.' . $roleName . '.' . $module . '.' . $field);
-            if($config) {
+            if ($config) {
                 return "true";
             } else {
                 return "false";
@@ -70,9 +70,10 @@ class Helper
             \Log::error('Mail::send', ['message' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
         }
     }
-    
+
     /**
      * @param $number
+     *
      * @return false|string|string[]|null
      *
      */
@@ -87,20 +88,20 @@ class Helper
             return $phone;
         }
     }
-    
+
     public static function phoneIsCorrect($number)
     {
+        $number = str_replace(' ', '', $number);
+        $number = str_replace('+48', '', $number);
+
         $len = strlen($number);
-    
-        if ($number[0] == '+') {
-            $len++;
-        }
-        
+
         return $len >= 9;
     }
-    
+
     /**
      * @param $number
+     *
      * @return array
      *
      * Numer telefonu - numbers, clear all other symbols. Check symbol count (plus - is 2 symbols).
@@ -111,13 +112,13 @@ class Helper
      */
     public static function prepareCodeAndPhone($number)
     {
-        $phone = (string) preg_replace('/^\+?1|\|1|\D/','', $number);
+        $phone = (string)preg_replace('/^\+?1|\|1|\D/', '', $number);
         $len = strlen($phone);
-        
+
         $hasPlus = $phone[0] == '+';
         $len += ($hasPlus ? 1 : 0);
         $code = '';
-        
+
         if ($len >= 13) {
             $code = substr($phone, 0, strlen($phone) - 10);
             $phone = substr($phone, strlen($phone) - 10);
@@ -127,9 +128,10 @@ class Helper
         }
         return [$code, $phone];
     }
-    
-    public static function clearSpecialChars($string, $removeDigits = true) {
-        $string = preg_replace('/[^\ \w$\x{0080}-\x{FFFF}]+/u','', $string);
+
+    public static function clearSpecialChars($string, $removeDigits = true)
+    {
+        $string = preg_replace('/[^\ \w$\x{0080}-\x{FFFF}]+/u', '', $string);
         if ($removeDigits) {
             $string = preg_replace('/[0-9]+/', '', $string);
         }

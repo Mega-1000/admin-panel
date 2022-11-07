@@ -127,7 +127,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 $orderModel->save();
 
                 $order = new Order();
-                $customer = $this->findOrCreateCustomer($allegroOrder['buyer'], $allegroOrder['delivery']['address']);
+                $customer = $this->findOrCreateCustomer($allegroOrder);
                 $order->customer_id = $customer->id;
                 $order->allegro_form_id = $allegroOrder['id'];
                 $order->status_id = 1;
@@ -465,8 +465,10 @@ class AllegroOrderSynchro implements ShouldQueue
      * @return Customer
      * @throws Exception
      */
-    private function findOrCreateCustomer(array $buyer, array $deliveryAddress = []): Customer
+    private function findOrCreateCustomer(array $allegroOrder): Customer
     {
+        $buyer = $allegroOrder['buyer'];
+        $deliveryAddress = $allegroOrder['delivery']['address'];
         $buyerEmail = $buyer['email'];
 
         if (preg_match('/\+([a-zA-Z0-9]+)@/', $buyer['email'], $matches)) {
@@ -474,10 +476,15 @@ class AllegroOrderSynchro implements ShouldQueue
         }
 
         $customer = $this->customerRepository->findWhere(['login' => $buyerEmail])->first();
-        if (empty($buyer['phoneNumber']) || $buyer['phoneNumber'] == 'brak') {
-            $buyer['phoneNumber'] = $deliveryAddress['phoneNumber'];
+        if ($buyer['phoneNumber'] !== null && $buyer['phoneNumber'] !== 'brak' && Helper::phoneIsCorrect($buyer['phoneNumber'])) {
+            $customerPhone = $buyer['phoneNumber'];
+        } elseif ($deliveryAddress['phoneNumber'] !== null && Helper::phoneIsCorrect($deliveryAddress['phoneNumber'])) {
+            $customerPhone = $deliveryAddress['phoneNumber'];
+        } else {
+            throw new \Exception('wrong_phone');
         }
-        $customerPhone = str_replace('+48', '', $buyer['phoneNumber']);
+
+        $customerPhone = str_replace('+48', '', $customerPhone);
         if ($customer === null) {
             $customer = new Customer();
             $customer->login = $buyerEmail;
@@ -583,7 +590,7 @@ class AllegroOrderSynchro implements ShouldQueue
 
         $country = Country::firstOrCreate(['iso2' => $data['address']['countryCode'] ?? $data['countryCode']], ['name' => $data['address']['countryCode'] ?? $data['countryCode']]);
 
-        $phoneAndCode = Helper::prepareCodeAndPhone($data['phoneNumber']);
+        $phoneAndCode = Helper::prepareCodeAndPhone($data['phoneNumber'] ?? $data['address']['phoneNumber']);
         $customerAddressData = [
             'type' => $type,
             'firstname' => $data['firstName'] ?? $data['naturalPerson']['firstName'] ?? null,
