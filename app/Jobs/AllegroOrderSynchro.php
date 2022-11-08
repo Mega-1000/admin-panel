@@ -133,6 +133,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 $order->status_id = 1;
                 $order->allegro_operation_date = $allegroOrder['lineItems'][0]['boughtAt'];
                 $order->allegro_additional_service = $allegroOrder['delivery']['method']['name'];
+                $order->preferred_invoice_date = Carbon::now();
                 $order->payment_channel = $allegroOrder['payment']['provider'];
                 $order->allegro_payment_id = $allegroOrder['payment']['id'];
                 $order->saveQuietly();
