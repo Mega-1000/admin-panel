@@ -88,12 +88,18 @@ class AllegroOrderSynchro implements ShouldQueue
     private $tax;
 
     /**
+     * @var boolean
+     */
+    private $synchronizeAll;
+
+    /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(bool $synchronizeAll = false)
     {
+        $this->synchronizeAll = $synchronizeAll;
     }
 
     /**
@@ -112,8 +118,11 @@ class AllegroOrderSynchro implements ShouldQueue
         $this->orderPackagesDataHelper = app(OrderPackagesDataHelper::class);
 
         $this->tax = (float)(1 + env('VAT'));
-
-        $allegroOrders = $this->allegroOrderService->getPendingOrders();
+        if ($this->synchronizeAll) {
+            $allegroOrders = $this->allegroOrderService->getOrdersOutsideSystem();
+        } else {
+            $allegroOrders = $this->allegroOrderService->getPendingOrders();
+        }
         foreach ($allegroOrders as $allegroOrder) {
             try {
                 if (Order::where('allegro_form_id', $allegroOrder['id'])->count() > 0) {
@@ -356,14 +365,11 @@ class AllegroOrderSynchro implements ShouldQueue
                 if ($item['offer']['external'] !== null) {
                     $symbol = explode('-', $item['offer']['external']['id']);
 
-                    if (strpos(end($symbol), 'Q') !== false) {
-                        $quantity = (int)(explode('Q', end($symbol))[1]);
-                    } elseif (strpos(end($symbol), 'Y') !== false) {
-                        $quantity = (int)(explode('Y', end($symbol))[1]);
-                    } elseif (strpos(end($symbol), 'Z') !== false) {
-                        $quantity = (int)(explode('Z', end($symbol))[1]);
-                    } elseif (strpos(end($symbol), 'N') !== false) {
-                        $quantity = (int)(explode('N', end($symbol))[1]);
+                    preg_match('/[A-Z]/', end($symbol), $match);
+                    $quantityPrefix = (empty($match)) ? false : $match[0];
+
+                    if ($quantityPrefix && strpos(end($symbol), $quantityPrefix) !== false) {
+                        $quantity = (int)(explode($quantityPrefix, end($symbol))[1]);
                     } else {
                         $quantity = false;
                     }

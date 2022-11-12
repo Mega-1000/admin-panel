@@ -217,6 +217,37 @@ class AllegroOrderService extends AllegroApiService
     }
 
     /**
+     * Funkcja pobiera opłacone zamówienia których nie ma w systemie
+     *
+     * @return array
+     */
+    public function getOrdersOutsideSystem(): array
+    {
+        $ordersFromOutsideTheSystem = [];
+        $offset = $totalCount = 0;
+
+        while ($offset <= $totalCount) {
+            $params = [
+                'offset' => $offset,
+                'limit' => 100,
+            ];
+            $url = $this->getRestUrl('/order/checkout-forms?' . http_build_query($params));
+            $response = $this->request('GET', $url, $params);
+            foreach ($response['checkoutForms'] as $order) {
+                if (isset($order['payment']) && $order['payment']['paidAmount'] !== null) {
+                    if (Order::where('allegro_form_id', $order['id'])->count() === 0) {
+                        $ordersFromOutsideTheSystem[] = $order;
+                    }
+                }
+            }
+            $totalCount = $response['totalCount'];
+            $offset += 100;
+        }
+
+        return $ordersFromOutsideTheSystem;
+    }
+
+    /**
      * @param array $addParams
      *
      * @return array
