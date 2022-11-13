@@ -217,7 +217,7 @@ class AllegroOrderService extends AllegroApiService
     }
 
     /**
-     * Funkcja pobiera opłacone zamówienia których nie ma w systemie
+     * Funkcja pobiera opłacone zamówienia, których nie ma w systemie
      *
      * @return array
      */
@@ -235,7 +235,9 @@ class AllegroOrderService extends AllegroApiService
             $response = $this->request('GET', $url, $params);
             foreach ($response['checkoutForms'] as $order) {
                 if (isset($order['payment']) && $order['payment']['paidAmount'] !== null) {
-                    if (Order::where('allegro_form_id', $order['id'])->count() === 0) {
+                    $existingOrdersCount = Order::where('allegro_form_id', 'like', '%' . $order['id'] . '%')
+                        ->orWhere('allegro_payment_id', 'like', '%' . $order['payment']['id'] . '%')->count();
+                    if ($existingOrdersCount === 0) {
                         $ordersFromOutsideTheSystem[] = $order;
                     }
                 }
