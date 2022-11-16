@@ -163,14 +163,14 @@ class AllegroOrderSynchro implements ShouldQueue
 
                 $this->savePayments($order, $allegroOrder['payment']);
 
+                if (!Helper::phoneIsCorrect($allegroOrder['buyer']['phoneNumber'])) {
+                    if (!Helper::phoneIsCorrect($allegroOrder['buyer']['address']['phoneNumber'] ?? null)) {
+                        $allegroOrder['buyer']['address']['phoneNumber'] = $allegroOrder['delivery']['address']['phoneNumber'];
+                        $allegroOrder['invoice']['address']['phoneNumber'] = $allegroOrder['delivery']['address']['phoneNumber'];
+                    }
+                    $allegroOrder['buyer']['phoneNumber'] = $allegroOrder['buyer']['address']['phoneNumber'];
+                }
                 $invoiceAddress = $allegroOrder['invoice']['address'] ?? $allegroOrder['buyer'];
-                if (empty($invoiceAddress['phoneNumber'])) {
-                    $invoiceAddress['phoneNumber'] = $allegroOrder['buyer']['phoneNumber'] ?? $allegroOrder['delivery']['address']['phoneNumber'];
-                }
-
-                if (empty($allegroOrder['buyer']['address']['phoneNumber'])) {
-                    $allegroOrder['buyer']['address']['phoneNumber'] = $invoiceAddress['phoneNumber'];
-                }
 
                 $this->createOrUpdateCustomerAddress($customer, $allegroOrder['buyer']);
 
@@ -245,7 +245,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 }
 
                 dispatch_now(new AddLabelJob($order, [177]));
-                $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
+//                $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
                 DB::commit();
             } catch (Throwable $ex) {
                 DB::rollBack();
