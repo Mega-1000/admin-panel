@@ -170,8 +170,8 @@ class AllegroOrderSynchro implements ShouldQueue
                     }
                     $allegroOrder['buyer']['phoneNumber'] = $allegroOrder['buyer']['address']['phoneNumber'];
                 }
-                $invoiceAddress = $allegroOrder['invoice']['address'] ?? $allegroOrder['buyer'];
-
+                $invoiceAddress = $allegroOrder['invoice'] ?? $allegroOrder['buyer'];
+                $invoiceAddress['address']['phoneNumber'] = $allegroOrder['buyer']['phoneNumber'];
                 $this->createOrUpdateCustomerAddress($customer, $allegroOrder['buyer']);
 
                 $this->createOrUpdateCustomerAddress($customer, $invoiceAddress, CustomerAddress::ADDRESS_TYPE_INVOICE);
@@ -600,14 +600,14 @@ class AllegroOrderSynchro implements ShouldQueue
         $phoneAndCode = Helper::prepareCodeAndPhone($data['phoneNumber'] ?? $data['address']['phoneNumber']);
         $customerAddressData = [
             'type' => $type,
-            'firstname' => $data['firstName'] ?? $data['naturalPerson']['firstName'] ?? null,
-            'lastname' => $data['lastName'] ?? $data['naturalPerson']['lastName'] ?? null,
+            'firstname' => $data['firstName'] ?? $data['address']['naturalPerson']['firstName'] ?? null,
+            'lastname' => $data['lastName'] ?? $data['address']['naturalPerson']['lastName'] ?? null,
             'address' => $street,
             'flat_number' => $flatNo,
-            'city' => $data['address']['city'] ?? $data['city'],
-            'firmname' => $data['companyName'] ?? $data['company']['name'] ?? null,
+            'city' => $data['address']['city'] ?? $data['address']['city'],
+            'firmname' => $data['companyName'] ?? $data['address']['company']['name'] ?? null,
             'nip' => $data['company']['taxId'] ?? null,
-            'postal_code' => $data['address']['postCode'] ?? $data['zipCode'],
+            'postal_code' => $data['address']['postCode'] ?? $data['address']['zipCode'],
             'phone' => implode('', $phoneAndCode),
             'customer_id' => $customer->id,
             'email' => $customer->login,
