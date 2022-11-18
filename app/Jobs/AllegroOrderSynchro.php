@@ -166,7 +166,6 @@ class AllegroOrderSynchro implements ShouldQueue
                 if (!Helper::phoneIsCorrect($allegroOrder['buyer']['phoneNumber'])) {
                     if (!Helper::phoneIsCorrect($allegroOrder['buyer']['address']['phoneNumber'] ?? null)) {
                         $allegroOrder['buyer']['address']['phoneNumber'] = $allegroOrder['delivery']['address']['phoneNumber'];
-                        $allegroOrder['invoice']['address']['phoneNumber'] = $allegroOrder['delivery']['address']['phoneNumber'];
                     }
                     $allegroOrder['buyer']['phoneNumber'] = $allegroOrder['buyer']['address']['phoneNumber'];
                 }
