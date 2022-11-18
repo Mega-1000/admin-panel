@@ -245,7 +245,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 }
 
                 dispatch_now(new AddLabelJob($order, [177]));
-                $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
+//                $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
                 DB::commit();
             } catch (Throwable $ex) {
                 DB::rollBack();
@@ -494,17 +494,17 @@ class AllegroOrderSynchro implements ShouldQueue
         $customerPhone = str_replace('+48', '', $customerPhone);
         if ($customer === null) {
             $customer = new Customer();
-            $customer->login = $buyerEmail;
-            $customer->nick_allegro = $buyer['login'];
             $customer->password = $customer->generatePassword($customerPhone);
-            $customer->save();
         } else {
             if (!Hash::check($customerPhone, $customer->password)) {
                 $customer->password = $customer->generatePassword($customerPhone);
                 $customer->save();
             }
         }
-
+        $customer->login = $buyerEmail;
+        $customer->nick_allegro = $buyer['login'];
+        $customer->password = $customer->generatePassword($customerPhone);
+        $customer->save();
         return $customer;
     }
 

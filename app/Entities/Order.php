@@ -152,14 +152,15 @@ class Order extends Model implements Transformable
 
     /**
      * @param Authenticatable|null $user
-     * @param String $message
+     * @param String               $message
+     *
      * @return string
      */
     public static function formatMessage(?Authenticatable $user, string $message): string
     {
         return PHP_EOL . Carbon::now()->toDateTimeString()
-	        . ($user ? ' ' . $user->name . ' ' . $user->firstname . ' ' . $user->lastname : '')
-	        . ': ' . $message;
+            . ($user ? ' ' . $user->name . ' ' . $user->firstname . ' ' . $user->lastname : '')
+            . ': ' . $message;
     }
 
     public function getPackagesCashOnSum()
@@ -323,9 +324,9 @@ class Order extends Model implements Transformable
 
     public function hasLabel($labelId)
     {
-    	if (!is_array($labelId)) {
-		    $labelId = [$labelId];
-	    }
+        if (!is_array($labelId)) {
+            $labelId = [$labelId];
+        }
 
         return $this->labels()->whereIn('label_id', $labelId)->count();
     }
@@ -338,10 +339,10 @@ class Order extends Model implements Transformable
         return $this->belongsToMany(Label::class, 'order_labels')->withPivot('added_type');
     }
 
-	public function orderLabels()
-	{
-		return $this->hasMany(OrderLabel::class);
-	}
+    public function orderLabels()
+    {
+        return $this->hasMany(OrderLabel::class);
+    }
 
     public function promisePayments()
     {
@@ -708,7 +709,7 @@ class Order extends Model implements Transformable
 
     public function getPreviousOrderId($orderId): int
     {
-    	$order = Order::where('id', '<', $orderId)->orderBy('id', 'desc')->first();
+        $order = Order::where('id', '<', $orderId)->orderBy('id', 'desc')->first();
         return $order ? $order->id : 0;
     }
 
@@ -756,13 +757,13 @@ class Order extends Model implements Transformable
         return $this->hasMany(Transaction::class);
     }
 
-	/**
-	 * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-	 */
-	public function firmSource()
-	{
-		return $this->belongsTo(FirmSource::class);
-	}
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function firmSource()
+    {
+        return $this->belongsTo(FirmSource::class);
+    }
 
     public function setDefaultDates($serviceName = 'sello')
     {
@@ -785,11 +786,13 @@ class Order extends Model implements Transformable
         ]);
     }
 
-    public function getProformStoragePathAttribute() {
-		return self::PROFORM_DIR . $this->proforma_filename;
+    public function getProformStoragePathAttribute()
+    {
+        return self::PROFORM_DIR . $this->proforma_filename;
     }
 
-    public function getIsAllegroOrderAttribute() {
-	    return $this->allegro_form_id != null;
+    public function getIsAllegroOrderAttribute()
+    {
+        return $this->allegro_form_id != null;
     }
 }
