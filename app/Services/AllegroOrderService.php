@@ -237,25 +237,20 @@ class AllegroOrderService extends AllegroApiService
                 if (isset($order['payment']) && $order['payment']['paidAmount'] !== null) {
                     $existingOrders = Order::where('allegro_form_id', 'like', '%' . $order['id'] . '%')
                         ->orWhere('allegro_payment_id', 'like', '%' . $order['payment']['id'] . '%')->get();
-                    if ($existingOrders === 0) {
+                    if ($existingOrders->count() === 0) {
                         $ordersFromOutsideTheSystem[] = $order;
                     } else {
                         $existingOrder = $existingOrders->first();
-                        if (empty($existingOrder->customer->nick_allegro)){
-                            $existingOrder->customer->nick_allegro = $order['buyer']['login'];
-                            $existingOrder->customer-save();
-                        }
 
-                        if (empty($existingOrder->allegro_operation_date)){
+                        if (empty($existingOrder->allegro_operation_date)) {
                             $existingOrder->allegro_operation_date = $order['updatedAt'];
                         }
 
-                        if (empty($existingOrder->allegro_operation_date)){
-                            $existingOrder->allegro_operation_date = $order['updatedAt'];
-                        }
-                        //uzupełnić login z allegro, i date operacji w allegro i przerzucić do preferowane jady wystawienia faktury,
-                        //identyfikator zamówienia z allegro
-                        //
+                        $existingOrder->customer->nick_allegro = $order['buyer']['login'];
+                        $existingOrder->preferred_invoice_date = $order['payment']['finishedAt'];
+                        $existingOrder->allegro_form_id = $order['id'];
+                        $existingOrder->customer->save();
+                        $existingOrder->save();
                     }
                 }
             }
