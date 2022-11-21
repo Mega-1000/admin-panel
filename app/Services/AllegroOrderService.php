@@ -235,10 +235,22 @@ class AllegroOrderService extends AllegroApiService
             $response = $this->request('GET', $url, $params);
             foreach ($response['checkoutForms'] as $order) {
                 if (isset($order['payment']) && $order['payment']['paidAmount'] !== null) {
-                    $existingOrdersCount = Order::where('allegro_form_id', 'like', '%' . $order['id'] . '%')
-                        ->orWhere('allegro_payment_id', 'like', '%' . $order['payment']['id'] . '%')->count();
-                    if ($existingOrdersCount === 0) {
+                    $existingOrders = Order::where('allegro_form_id', 'like', '%' . $order['id'] . '%')
+                        ->orWhere('allegro_payment_id', 'like', '%' . $order['payment']['id'] . '%')->get();
+                    if ($existingOrders->count() === 0) {
                         $ordersFromOutsideTheSystem[] = $order;
+                    } else {
+                        $existingOrder = $existingOrders->first();
+
+                        if (empty($existingOrder->allegro_operation_date)) {
+                            $existingOrder->allegro_operation_date = $order['updatedAt'];
+                        }
+
+                        $existingOrder->customer->nick_allegro = $order['buyer']['login'];
+                        $existingOrder->preferred_invoice_date = $order['payment']['finishedAt'];
+                        $existingOrder->allegro_form_id = $order['id'];
+                        $existingOrder->customer->save();
+                        $existingOrder->save();
                     }
                 }
             }

@@ -26,7 +26,7 @@ class DebugController extends Controller
         //    	$res = dispatch_now(new CheckPackagesStatusJob());
         //    	$res = dispatch_now(new CheckPackagesStatusJob());
         //    	$res = dispatch_now(new ChangeShipmentDatePackagesJob());
-         $res = dispatch_now(new AllegroOrderSynchro());
+         $res = dispatch_now(new AllegroOrderSynchro(true));
 //        $res = dispatch_now(new PreferredInvoiceDateFillJob());
 //        $order = Order::find(31650);
 //        $res = dispatch_now(new PreferredInvoiceDateFillJob());

@@ -493,17 +493,17 @@ class AllegroOrderSynchro implements ShouldQueue
         $customerPhone = str_replace('+48', '', $customerPhone);
         if ($customer === null) {
             $customer = new Customer();
-            $customer->login = $buyerEmail;
-            $customer->nick_allegro = $buyer['login'];
             $customer->password = $customer->generatePassword($customerPhone);
-            $customer->save();
         } else {
             if (!Hash::check($customerPhone, $customer->password)) {
                 $customer->password = $customer->generatePassword($customerPhone);
                 $customer->save();
             }
         }
-
+        $customer->login = $buyerEmail;
+        $customer->nick_allegro = $buyer['login'];
+        $customer->password = $customer->generatePassword($customerPhone);
+        $customer->save();
         return $customer;
     }
 
