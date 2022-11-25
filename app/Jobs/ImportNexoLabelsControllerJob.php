@@ -82,7 +82,7 @@ class ImportNexoLabelsControllerJob implements ShouldQueue
                 $orderDate = new Carbon($order->preferred_invoice_date);
                 $date = new Carbon(end($rawData)['data']);
 
-                if ($orderDate->format('Y-m') !== $date->format('Y-m')) {
+                if ($orderDate->format('Y-m') !== $date->format('Y-m') && $order->created_at > '2022-11-01') {
                     $labelsToAdd[] = Label::INVOICE_DATE_AND_PREFERRED_DATE_HAVE_DIFFERENT_MONTHS;
                 }
 
