@@ -2100,9 +2100,11 @@ class OrdersController extends Controller
                     } else {
                         if ($column['name'] == 'sello_payment') {
                             $columnName = $this->replaceSearch[$column['name']] ?? $column['name'];
-                            $query->where(function ($query) use ($column, $columnName) {
-                                $query->where($columnName, 'LIKE', "%{$column['search']['value']}%");
-                                $query->orWhere('orders.return_payment_id', 'LIKE', "%{$column['search']['value']}%");
+                            $searchValue = trim($column['search']['value']);
+                            $query->where(function ($query) use ($column, $columnName, $searchValue) {
+                                $query->orWhere($columnName, 'LIKE', "%{$searchValue}%");
+                                $query->orWhere('orders.return_payment_id', 'LIKE', "%{$searchValue}%");
+                                $query->orWhere('orders.allegro_payment_id', 'LIKE', "%{$searchValue}%");
                             });
                         } else {
                             $columnName = $this->replaceSearch[$column['name']] ?? $column['name'];
@@ -2421,7 +2423,7 @@ class OrdersController extends Controller
                 'additional_cash_on_delivery_cost' => $order->additional_cash_on_delivery_cost ?? 0,
                 'additional_service_cost' => $order->additional_service_cost ?? 0
             );
-            $order->sello_payment = $order->sello_payment ?? $order->return_payment_id;
+            $order->sello_payment = $order->allegro_payment_id ?? $order->sello_payment;
             $order->sello_form = $order->sello_form ?? $order->allegro_form_id;
         }
         return $collection;
