@@ -129,7 +129,7 @@ class AllegroCustomerReturnsJob implements ShouldQueue
         foreach ($returns as $return) {
             try {
                 $order = $this->orderRepository->findWhere(['allegro_form_id' => $return['orderId']])->first();
-                if (!empty($order) && (empty($order->refund_id) || empty($order->to_refund))) {
+                if (!empty($order) && ((empty($order->refund_id) || empty($order->to_refund)))) {
                     $order->refund_id = $return['id'];
                     $order->to_refund = $this->countRefund($return['items']);
                     $order->save();

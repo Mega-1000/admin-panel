@@ -318,14 +318,10 @@ class AllegroOrderService extends AllegroApiService
     public function getCustomerReturns(): array
     {
         $params = [
-            'offset' => 0,
-            'limit' => 100,
-            'status' => self::READY_FOR_PROCESSING,
-            'fulfillment.status' => 'NEW'
+            'createdAt.gte' => Carbon::now()->addDays('-60')->toISOString(),
         ];
-        $url = $this->getRestUrl('/order/customer-returns');
-        $response = $this->request('GET', $url, []);
-
+        $url = $this->getRestUrl('/order/customer-returns?'. http_build_query($params));
+        $response = $this->request('GET', $url, $params);
         return $response && is_array($response) && array_key_exists('customerReturns', $response) ? $response['customerReturns'] : [];
     }
 
