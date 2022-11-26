@@ -55,14 +55,12 @@ class GenerateXmlForNexoJob implements ShouldQueue
     public function handle()
     {
         $orders = $this->orderRepository->whereHas('labels', function ($query) {
-            $query->whereIn('label_id',
-                [
-                    Label::INVOICE_TO_ISSUE,
-                    Label::ORDER_RECEIVED_INVOICE_TODAY,
-                    Label::RETURN_ALLEGRO_PAYMENTS,
-                    Label::ORDER_ITEMS_REDEEMED_LABEL
-                ]
-            );
+            $query->where('label_id', Label::INVOICE_TO_ISSUE);
+        })->whereHas('labels', function ($query) {
+            $query->where('label_id', Label::ORDER_RECEIVED_INVOICE_TODAY);
+        })->whereHas('labels', function ($query) {
+            $query->where('label_id', Label::ORDER_ITEMS_REDEEMED_LABEL)
+            ->orWhere('label_id', Label::ORDER_ITEMS_REDEEMED_LABEL);
         })->whereDoesntHave('labels', function ($query) {
             $query->where('label_id', Label::XML_INVOICE_GENERATED);
         })->get();
