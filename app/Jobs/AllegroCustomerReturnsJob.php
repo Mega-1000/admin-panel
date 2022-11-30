@@ -130,7 +130,7 @@ class AllegroCustomerReturnsJob implements ShouldQueue
             try {
                 $order = $this->orderRepository->findWhere(['allegro_form_id' => $return['orderId']])->first();
                 if (!empty($order) && ((empty($order->refund_id) || empty($order->to_refund)))) {
-                    $order->refund_id = $return['id'];
+                    $order->refund_id = $return['referenceNumber'];
                     $order->to_refund = $this->countRefund($return['items']);
                     $order->save();
                     dispatch_now(new AddLabelJob($order, [Label::RETURN_ALLEGRO_ITEMS]));

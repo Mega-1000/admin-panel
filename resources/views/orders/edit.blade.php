@@ -268,11 +268,6 @@
                            name="production_date"
                            value="{{ $order->taskSchedule->first()->taskTime->date_start ?? '' }}">
                 </div>
-                <div class="form-group" style="width: 20%; float: left; padding: 5px;">
-                    <label for="initial_sending_date_consultant">@lang('orders.form.initial_sending_date_consultant')</label>
-                    <input type="text" class="form-control default-date-picker-now" id="shipment_date" name="shipment_date"
-                           value="{{ $order->shipment_date }}">
-                </div>
                 @if($order->cash_on_dalivery_amount > 0)
                     <div class="form-group" style="width: 15%; float: left; padding: 5px;">
                         <label for="packing_warehouse_cost">@lang('orders.form.cash_on_delivery')</label>
@@ -295,21 +290,6 @@
                     <label for="consultant_value">@lang('orders.form.consultant_value')</label>
                     <input type="number" class="form-control" id="consultant_value" name="consultant_value"
                            value="{{ $order->consultant_value ?? ''}}">
-                </div>
-                <div class="form-group" style="width: 25%; float: left; padding: 5px;">
-                    <label for="refund_id">@lang('orders.form.refund_number')</label>
-                    <input type="text" class="form-control" id="refund_id" name="refund_id"
-                           value="{{ $order->refund_id ?? ''}}">
-                </div>
-                <div class="form-group" style="width: 25%; float: left; padding: 5px;">
-                    <label for="to_refund">@lang('orders.form.to_refund')</label>
-                    <input disabled type="number" class="form-control" id="to_refund" name="to_refund"
-                           value="{{ $order->to_refund ?? ''}}">
-                </div>
-                <div class="form-group" style="width: 25%; float: left; padding: 5px;">
-                    <label for="refunded">@lang('orders.form.refunded')</label>
-                    <input step="0.01" type="number" class="form-control" id="refunded" name="refunded"
-                           value="{{ $order->refunded ?? ''}}">
                 </div>
             </div>
             <div class="row">
@@ -356,7 +336,7 @@
                                     <div class="form-group row">
                                         <label class="col-md-6" for="allegro_form_id">Identyfikator zamówienia w
                                             allegro</label>
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <input type="text" class="form-control" id="allegro_form_id"
                                                    name="allegro_form_id"
                                                    value="{{ $order->allegro_form_id ?? '' }}">
@@ -400,9 +380,52 @@
                                     <div class="form-group row">
                                         <label class="col-md-6" for="allegro_payment_id">Identyfikator płatności
                                             allegro</label>
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <input type="text" class="form-control" id="allegro_payment_id"
                                                    name="allegro_payment_id" value="{{ $order->allegro_payment_id }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <h3>Zwroty produktów</h3>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group row">
+                                        <label class="col-md-5" for="refund_id">Numer zwrotu</label>
+                                        <div class="col-md-7">
+                                            <input type="text" class="form-control" id="refund_id"
+                                                   name="to_refund" value="{{ $order->refund_id }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group row">
+                                        <label class="col-md-6" for="to_refund">Wartość zwrotu</label>
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" id="to_refund"
+                                                   name="to_refund" value="{{ $order->to_refund }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group row">
+                                        <label class="col-md-6" for="refunded">Zwrócono</label>
+                                        <div class="col-md-6">
+                                            <input type="text" class="form-control" id="refunded"
+                                                   name="refunded" value="{{ $order->refunded }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <h3>Zwroty płatności</h3>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group row">
+                                        <label class="col-md-5" for="return_payment_id">Identyfikator zwrotu
+                                            płatności</label>
+                                        <div class="col-md-7">
+                                            <input type="text" class="form-control" id="return_payment_id"
+                                                   name="return_payment_id" value="{{ $order->return_payment_id }}">
                                         </div>
                                     </div>
                                 </div>
@@ -411,9 +434,40 @@
                     </div>
                 </div>
             </div>
-            <div class="vue-components">
-                <div class="col-sm-8 col-sm-offset-2">
-                    <order-dates order-id="{{ $order->id }}"></order-dates>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-dark panel-collapse">
+                        <div class="panel-heading text-center text-white" style="padding: 5px; color:white;">
+                            <h5 class="panel-title"
+                                data-toggle="collapse"
+                                data-target="#collapseDates">
+                                Preferowane daty wysyłki
+                            </h5>
+                        </div>
+                        <div class="panel-collapse collapse" id="collapseDates">
+                            <div class="panel-body" style="padding:1em">
+                                <div class="col-sm-8">
+                                    <div class="vue-components">
+                                        <order-dates order-id="{{ $order->id }}"></order-dates>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="col-md-12">
+                                        <div class="form-group row">
+                                            <label class="col-md-8"
+                                                   for="initial_sending_date_consultant">@lang('orders.form.initial_sending_date_consultant')</label>
+                                            <div class="col-md-4">
+                                                <input type="text" class="form-control default-date-picker-now"
+                                                       id="initial_sending_date_consultant"
+                                                       name="initial_sending_date_consultant"
+                                                       value="{{ $order->shipment_date }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="container-fluid">
