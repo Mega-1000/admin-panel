@@ -317,12 +317,20 @@ class AllegroOrderService extends AllegroApiService
      */
     public function getCustomerReturns(): array
     {
-        $params = [
-            'createdAt.gte' => Carbon::now()->addDays('-60')->toISOString(),
-        ];
-        $url = $this->getRestUrl('/order/customer-returns?'. http_build_query($params));
-        $response = $this->request('GET', $url, $params);
-        return $response && is_array($response) && array_key_exists('customerReturns', $response) ? $response['customerReturns'] : [];
+        $returns = [];
+        $offset = 0;
+        do {
+            $params = [
+                'offset' => $offset,
+                'createdAt.gte' => Carbon::now()->addDays('-180')->toISOString(),
+            ];
+            $url = $this->getRestUrl('/order/customer-returns?' . http_build_query($params));
+            $response = $this->request('GET', $url, $params);
+            $totalCount = ($response && is_array($response)) ? $response['count'] : 0;
+            $returns = array_merge($response && is_array($response) && array_key_exists('customerReturns', $response) ? $response['customerReturns'] : [], $returns);
+            $offset += 100;
+        } while ($offset < $totalCount);
+        return $returns;
     }
 
     /**
@@ -330,15 +338,21 @@ class AllegroOrderService extends AllegroApiService
      */
     public function getPaymentsRefunds(): array
     {
-        $params = [
-            'offset' => 0,
-            'limit' => 100,
-            'status' => 'SUCCESS',
-        ];
-        $url = $this->getRestUrl('/payments/refunds?' . http_build_query($params));
-        $response = $this->request('GET', $url, []);
-
-        return $response && is_array($response) && array_key_exists('refunds', $response) ? $response['refunds'] : [];
+        $refunds = [];
+        $offset = 0;
+        do {
+            $params = [
+                'offset' => $offset,
+                'occurredAt.gte' => Carbon::now()->addDays('-180')->toISOString(),
+                'status' => 'SUCCESS',
+            ];
+            $url = $this->getRestUrl('/payments/refunds?' . http_build_query($params));
+            $response = $this->request('GET', $url, $params);
+            $totalCount = ($response && is_array($response)) ? $response['count'] : 0;
+            $refunds = array_merge($response && is_array($response) && array_key_exists('refunds', $response) ? $response['refunds'] : [], $refunds);
+            $offset += 100;
+        } while ($offset < $totalCount);
+        return $refunds;
     }
 
     /**
