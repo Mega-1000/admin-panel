@@ -322,7 +322,7 @@ class AllegroOrderService extends AllegroApiService
         do {
             $params = [
                 'offset' => $offset,
-                'createdAt.gte' => Carbon::now()->addDays('-180')->toISOString(),
+                'createdAt.gte' => Carbon::now()->addDays('-200')->toISOString(),
             ];
             $url = $this->getRestUrl('/order/customer-returns?' . http_build_query($params));
             $response = $this->request('GET', $url, $params);
@@ -343,14 +343,16 @@ class AllegroOrderService extends AllegroApiService
         do {
             $params = [
                 'offset' => $offset,
-                'occurredAt.gte' => Carbon::now()->addDays('-180')->toISOString(),
+                'occurredAt.gte' => Carbon::now()->addDays('-200')->toISOString(),
                 'status' => 'SUCCESS',
             ];
             $url = $this->getRestUrl('/payments/refunds?' . http_build_query($params));
             $response = $this->request('GET', $url, $params);
-            $totalCount = ($response && is_array($response)) ? $response['count'] : 0;
-            $refunds = array_merge($response && is_array($response) && array_key_exists('refunds', $response) ? $response['refunds'] : [], $refunds);
-            $offset += 100;
+            $totalCount = ($response && is_array($response)) ? $response['totalCount'] : 0;
+            if ($response && is_array($response) && array_key_exists('refunds', $response)) {
+                $refunds = array_merge($refunds, $response['refunds']);
+            }
+            $offset += 50;
         } while ($offset < $totalCount);
         return $refunds;
     }
