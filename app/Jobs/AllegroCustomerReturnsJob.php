@@ -97,7 +97,7 @@ class AllegroCustomerReturnsJob implements ShouldQueue
 
             foreach ($response['checkoutForms'] as $form) {
                 try {
-                    $order = $this->orderRepository->findWhere(['allegro_form_id' => $form['id']])->first();
+                    $order = $this->orderRepository->findWhere([['allegro_form_id', 'like', '%' . $form['id'] . '%']])->first();
                     if (!empty($order) && (empty($order->allegro_payment_id) || empty($order->allegro_operation_date))) {
                         $order->allegro_operation_date = $form['lineItems'][0]['boughtAt'];
                         $order->allegro_additional_service = $form['delivery']['method']['name'];
@@ -128,7 +128,7 @@ class AllegroCustomerReturnsJob implements ShouldQueue
         $returns = $this->allegroOrderService->getCustomerReturns();
         foreach ($returns as $return) {
             try {
-                $order = $this->orderRepository->findWhere(['allegro_form_id' => $return['orderId']])->first();
+                $order = $this->orderRepository->findWhere([['allegro_form_id', 'like', '%' . $return['orderId'] . '%']])->first();
                 if (!empty($order) && ((empty($order->refund_id) || empty($order->to_refund)))) {
                     $order->refund_id = $return['referenceNumber'];
                     $order->to_refund = $this->countRefund($return['items']);
@@ -156,7 +156,7 @@ class AllegroCustomerReturnsJob implements ShouldQueue
 
         foreach ($cancellations as $cancellation) {
             try {
-                $order = $this->orderRepository->findWhere(['allegro_form_id' => $cancellation['order']['checkoutForm']['id']])->first();
+                $order = $this->orderRepository->findWhere([['allegro_form_id', 'like', '%' . $cancellation['order']['checkoutForm']['id'] . '%']])->first();
                 if (!empty($order) && !$order->hasLabel(Label::CUSTOMER_CANCELLATION)) {
                     dispatch_now(new AddLabelJob($order, [Label::CUSTOMER_CANCELLATION]));
                     if ($order->hasLabel(Label::ORDER_ITEMS_REDEEMED_LABEL)) {
