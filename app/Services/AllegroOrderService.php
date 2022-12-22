@@ -230,6 +230,7 @@ class AllegroOrderService extends AllegroApiService
             $params = [
                 'offset' => $offset,
                 'limit' => 100,
+                'lineItems.boughtAt.lte' => Carbon::now()->addDays('-180')->toISOString(),
             ];
             $url = $this->getRestUrl('/order/checkout-forms?' . http_build_query($params));
             $response = $this->request('GET', $url, $params);
