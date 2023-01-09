@@ -19,7 +19,7 @@
 </p>
 <p style="color:red">
     Jeżeli awizacja jest pozytywna pod różnymi warunkami np zapłacenie proformy to prosimy zatwierdzić
-    ją a w polu uwagi wpisać zatwierdzona pod warunkiem opłacenia faktury proformy do dnia , itp.itd.
+    ją a w polu uwagi wpisać zatwierdzona pod warunkiem opłacenia faktury proformy do dnia, itp. itd.
 </p>
 <p>W przypadku odrzucenia awizacji należy podać koniecznie przyczyne.</p>
 <p>
@@ -54,7 +54,7 @@
 
 <p>
     W uwagach na dole można dokonać opisu miedzy innymi wiadomości powiązanych z tematami poniżej
-    Jeżeli awizacja jest pozytywna pod różnymi warunkami np zapłacenie proformy to prosimy zatwierdzić ją a w polu uwagi wpisać zatwierdzona pod warunkiem opłacenia faktury proformy do dnia , itp.itd.
+    Jeżeli awizacja jest pozytywna pod różnymi warunkami np. zapłacenie proformy to prosimy zatwierdzić ją a w polu uwagi wpisać zatwierdzona pod warunkiem opłacenia faktury proformy do dnia , itp.itd.
     W przypadku odrzucenia awizacji należy podać koniecznie przyczyne w uwagach na dole.
 </p>
 
@@ -62,10 +62,10 @@
 <p>od (WDOO): ;</p>
 <p>do (WDOD): ;</p>
 <br>
-<p>Prosimy poniżej we wszytkich miejscach między dwukropkiem a średnikiem precyzyjnie uzupełnić dane.</p>
+<p>Prosimy poniżej we wszystkich miejscach między dwukropkiem a średnikiem precyzyjnie uzupełnić dane.</p>
 <strong>1C) DATY DOSTAWY OD DO KONIECZNIE W FORMACIE 2022-10-15</strong>
-<p>od daty (WDOO): ;</p>
-<p>do daty (WDOD): ;</p>
+<p>od daty (DOOF): ;</p>
+<p>do daty (DODF): ;</p>
 <br>
 <strong>1D) OSOBA ODPOWIEDZIALNA ZA OBSŁUGĘ </strong>
 <p>Imię i Nazwisko (OOZO): ;</p>
@@ -86,11 +86,11 @@
     (AWDK): ;
 </p>
 <p>
-    Wiadomość ta należy wpisac do chata znajdującego sie w danej ofercie z uczestnikami klient, my czyli konsultanci EPH oraz magazyn obsługujący
+    Wiadomość tą należy wpisać do chatu znajdującego się w danej ofercie z uczestnikami klient, my czyli konsultanci EPH oraz magazyn obsługujący
 </p>
 <br>
 <strong>2A) INFORMACJA W MOMENCIE WYDANIA TOWARU</strong>
-<p>Po wydanu towaru prosimy takżę o informacje zwrotną że towar został wydany -
+<p>Po wydaniu towaru prosimy także o informacje zwrotną że towar został wydany -
     należy tego dokonać poprzez wpisanie między znakiem dwukropka a średnika cyfrę 1
 </p>
 <p>Towar zostały wydany (TZW): ;</p>
@@ -107,7 +107,7 @@ Prosimy koniecznie na każdym dokumencie powiązanym z tą ofertą wpisywać num
     Nr oferty: {{$order->id}}
 </p>
 <p>
-    Prosimy wpisywac nr oferty na wszystkich dokumentach poniewaz tylko po nim identyfikujemy zlecenia.
+    Prosimy wpisywać nr oferty na wszystkich dokumentach ponieważ tylko po nim identyfikujemy zlecenia.
 </p>
 @isset($order->employee)
     {{$order->employee->firstname . ' ' . $order->employee->lastname}}<br/>
@@ -184,9 +184,9 @@ Prosimy koniecznie na każdym dokumencie powiązanym z tą ofertą wpisywać num
     Jezeli ceny naszego zamowienia sa nizsze od cen ktore bedziecie panstwo wystawiac na fakturze to prosimy wstrzymac
     wypisywanie i,wyslac info na e-maila i skontaktowc sie 691801594
     Faktury prosimy wyslac bezzwlocznie na adres zwrotny.
-    Jezeli faktura po wydrukowaniu bedzie wygladala jak oryginal to mozna nie wysylac jej w formie papierkowej (dlatego
-    nie moga byc podpisy albo pieczatki albo skan ktory zostawia smugi)
-    Jezeli natomiast faktura bedzie wysylana poczta to na adres MEGA1000 Baczynskiego 32A 55-200 OLAWA
+    Jeżeli faktura po wydrukowaniu będzie wygladała jak oryginał to można nie wysyłać jej w formie papierkowej (dlatego
+    nie mogą byc podpisy albo pieczątki albo skan ktory zostawia smugi)
+    Jeżeli natomiast faktura bedzie wysyłana pocztą to na adres MEGA1000 Baczyńskiego 32A 55-200 OLAWA
 
 </p>
 <p>

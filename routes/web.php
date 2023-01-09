@@ -11,6 +11,9 @@
 |
  */
 
+use Illuminate\Http\Request;
+use App\Http\Controllers\Api\OrderWarehouseNotificationController;
+
 Route::redirect('/', '/admin');
 
 Route::group(['prefix' => 'admin'], function () {
@@ -142,7 +145,121 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('employees/{id}/change-status', [
             'uses' => 'EmployeesController@changeStatus',
         ])->name('employees.change.status');
+            
+        Route::get('test', function() {
+            $host = '{s104.linuxpl.com:993/imap/ssl}INBOX';
+            $user = 'awizacje@ephpolska.pl';
+            $password = '1!Qaa2@Wss';
+            $conn = imap_open($host, $user, $password)
+                    or die('unable to connect Gmail: ' . imap_last_error());
+            // $mails = imap_search($conn, 'UNSEEN');
+            $mails = imap_search($conn, 'ALL');
+            if ($mails) {
+                $mailOutput = '';
+                $mailOutput.= '<table><tr><th>Subject </th><th> From  </th>
+                            <th> Date Time </th> <th> Content </th></tr>';
 
+                rsort($mails);
+
+                foreach ($mails as $email_number) {
+                    $headers = imap_fetch_overview($conn, $email_number, 0);
+                    $subject = quoted_printable_decode($headers[0]->subject);
+
+                    // after number can be _ or \s then number
+                    $isOrderId = preg_match("/nr\._?\s?(\d+)/", $subject, $matches);
+                    // get plain text
+                    $body = imap_fetchbody($conn, $email_number, 1.1);
+                    // check if is correct length min. 100 char.
+                    if( strlen($body) < 100 ) {
+                        // get rest of text
+                        $body = imap_fetchbody($conn, $email_number, 1);
+                        if (strlen($body) < 100) continue;
+                    }
+                    $msg = trim(quoted_printable_decode($body));
+                    // no order ID in subject
+                    if(!$isOrderId) $isOrderId = preg_match("/Nr\soferty:\s?(\d+)/mi", $msg, $matches);
+                    if(!$isOrderId) continue;
+
+                    $emailElements = [
+                        'AAZPP' => [
+                            'name' => 'accept',
+                            'value' => null,
+                        ],
+                        'OAZPP' => [
+                            'name' => 'cancel',
+                            'value' => null,
+                        ],
+                        'WDOO' => [
+                            'name' => 'initiallyFrom',
+                            'value' => null,
+                        ],
+                        'WDOD' => [
+                            'name' => 'initiallyTo',
+                            'value' => null,
+                        ],
+                        'DOOF' => [
+                            'name' => 'from',
+                            'value' => null,
+                        ],
+                        'DODF' => [
+                            'name' => 'to',
+                            'value' => null,
+                        ],
+                        'OOZO' => [
+                            'name' => 'name',
+                            'value' => null,
+                        ],
+                        'NTOOZO' => [
+                            'name' => 'phone',
+                            'value' => null,
+                        ],
+                        'NTDK' => [
+                            'name' => 'phoneToDriver',
+                            'value' => null,
+                        ],
+                        'U' => [
+                            'name' => 'comments',
+                            'value' => null,
+                        ],
+                        'TZW' => [
+                            'name' => 'released',
+                            'value' => null,
+                        ],
+                    ];
+                    $emailElementsNumber = count($emailElements);
+                    $pattern = "/";
+                    foreach($emailElements as $code => $element) {
+                        // search by given prefix that means (WDOO): is mandatory, and ; at the end is mandatory too
+                        $pattern .= "\({$code}\):\s?(.*);|";
+                    }
+                    $pattern = rtrim($pattern, '|');
+                    $pattern .= "/mi";
+                    $numberOfMatches = preg_match_all($pattern, $msg, $matches);
+
+                    // all elements should exist
+                    if($numberOfMatches < $emailElementsNumber) continue;
+
+                    $i = 0;
+                    foreach($emailElements as $code => &$element) {
+                        // +1 means that index of matches start from 1, then get first occurrence in second array, that has indexed pattern
+                        $element['value'] = $matches[$i + 1][$i];
+                        $i++;
+                    }
+                    echo '<pre>' , print_r($emailElements) , '</pre>';
+
+                }
+                // make request with given $params
+                // $request = new Request();
+                // $request->setMethod('POST');
+                // $request->request->add($params);
+                // $orderWarehouseNotification = new OrderWarehouseNotificationController();
+                // $orderWarehouseNotification->accept();
+                // $orderWarehouseNotification->deny();
+
+            }
+            imap_close($conn);
+        });
+        
         Route::get('statuses', 'StatusesController@index')->name('statuses.index');
         Route::get('statuses/datatable/', 'StatusesController@datatable')->name('statuses.datatable');
         Route::get('statuses/create/', 'StatusesController@create')->name('statuses.create');
