@@ -1,35 +1,106 @@
 <body>
 
-<strong>Poniżej znajduje się zamówienie wraz z wszelkimi ustaleniami</strong>
+<p>
+    Prosimy nie odpisywać informacji poprzez napisanie e maila jako tekst w dowolnym miejscu ponieważ nikt tego nie odczyta.
+    Pierwszym sposobem jest odpowiedź poprzez użycie poniżej wysłanych linków.
+    Drugim jest przesłanie informacji jako e mail aczkolwiek aby informacja przesłana została odczytana przez nas poprawnie należy wpisać tekst w odpowiednim miejscu przez nas poniżej wskazanym i dac odpowiedz nadawcy.
+    Można także stworzyć włanego emaila aczkolwiek wtedy należy skopiować dokładnie tekst poniżej zawarty i go uzupełnić i wysłać na awizacje@ephpolska.pl
+    Szybszym o prostszym sposobem jest odpowiedź poprzez użycie linków aczkolwiek wybór pozostawiamy państwu.
+    Brak odpowiedzi do 2 godzin na tego emaila powoduje wysyłanie go co 15 minut jako przypomnienie.
+</p>
+
+
+<strong>SPOSÓB NR I - poprzez uzycie linków awizacyjnych</strong>
+
+<p>Prosimy zapoznać się z pełną treścią tego maila a następnie następnie:</p>
 
 <p>
-    Prosimy zapoznać się z pełną treścią tego maila a następnie:
+    Potwierdzić lub zanegować kliknając na link: <a href="{{ $formLink }}">FORMULARZ POTWIERDZANIA AWIZACJI</a>
 </p>
-<ul>
-    <li>Potwierdzić lub zanegować kliknając na link: <a href="{{ $formLink }}">FORMULARZ POTWIERDZANIA AWIZACJI</a></li>
-</ul>
-<p>
-    W przypadku gdy awizazja nie zostanie potwierdzona bądź odrzucona, system będzie wysyłał informację z prośbą o
-    wykonanie tej czynności.
+<p style="color:red">
+    Jeżeli awizacja jest pozytywna pod różnymi warunkami np zapłacenie proformy to prosimy zatwierdzić
+    ją a w polu uwagi wpisać zatwierdzona pod warunkiem opłacenia faktury proformy do dnia , itp.itd.
 </p>
-<p style="color:red">Jeśli awizacja jest pozytywna pod różnymi warunkami np. zapłacenie proformy prosimy o ZATWIERDZENIE
-    oraz wpisanie informacji o tym warunku w polu UWAGI.</p>
+<p>W przypadku odrzucenia awizacji należy podać koniecznie przyczyne.</p>
 <p>
     Także prosimy pozostawić tego maila do mometnu wydania towaru który neleży potwierdzić przyciskiem <a
         href="{{$sendFormInvoice}}">TOWAR ZOSTAL WYDANY</a> w dniu wydania zlecenia.
 </p>
 <p>
-    Jednoczesnie prosimy zalączyc fakturę a dokonać tego można po uzyciu przycisku <a
-        href="{{$sendFormInvoice}}">ZALACZ FAKTURE</a>.
+    Jednoczesnie prosimy załączyc fakturę a dokonać tego można po użyciu przycisku
+    <a href="{{$sendFormInvoice}}">ZALACZ FAKTURE</a>.
 </p>
 <p>
-    Faktura powinna byc bez pieczatek i podpisow i po wydrukowaniu powinna wygladac jak oryginal. (Prosimy nie wysylac
-    poczta tradycyjna bo i tak nie dotrze do ksiegowosci).
+    Faktura powinna byc bez pieczątek i podpisów i po wydrukowaniu powinna wyglądać jak oryginał. (Prosimy nie wysyłać pocztą tradycyjną bo i tak nie dotrze do księgowości).
 </p>
 <p>
-    Prosimy pamietac iz respektuejmy tylko i wyłącznie faktury w ten sposób zalaczone a wyslane poczta tradycyjna nie
-    zobowiazuja nas do zadnych czynności na co wyrazacie państwo zgode poprzez zatwierdzenie awizacji.
+    Prosimy pamietać iż respektujemy tylko i wyłącznie faktury w ten sposób załączone a wysłane pocztą tradycyjną nie zobowiazują nas do żadnych czynności na co wyrażacie
+    Państwo zgodę poprzez zatwierdzenie awizacji.
 </p>
+<p>
+    !!! W przypadku gdybyście chcieli poinformować klienta lub ustalić dowolne informacje to
+     prosimy wpisać wiadomość/zapytanie na chacie który można uruchomić po kliknieciu na linka
+     [ link do chata klienta ktory uruchomi go przy danej ofercie oraz z uczestnikami klient , my czyli konsultanci EPH oraz magazyn obsługujący )
+</p>
+
+<strong>SPOSOB NR II - bardziej skomplikowany aczkolwiek nie wymaga użycia linków</strong>
+
+<strong>1A) POTWIERZENIE LUB ODRZUCENIA AWIZACJI</strong>
+
+<p>Poniżej dwukropkiem a średnikiem należy wpisać cyfrę 1 dla prawidłowego wyboru:</p>
+
+<p>Akceptuję awizacje z podanymi parametrami (AAZPP): ;</p>
+<p>Odrzucam awizacje z podanymi parametrami (OAZPP): ;</p>
+
+<p>
+    W uwagach na dole można dokonać opisu miedzy innymi wiadomości powiązanych z tematami poniżej
+    Jeżeli awizacja jest pozytywna pod różnymi warunkami np zapłacenie proformy to prosimy zatwierdzić ją a w polu uwagi wpisać zatwierdzona pod warunkiem opłacenia faktury proformy do dnia , itp.itd.
+    W przypadku odrzucenia awizacji należy podać koniecznie przyczyne w uwagach na dole.
+</p>
+
+<strong>1B) Wstępne zaproponowane daty możliwości odbioru towaru przez klienta podajemy tylko informacyjnie</strong>
+<p>od (WDOO): ;</p>
+<p>do (WDOD): ;</p>
+<br>
+<p>Prosimy poniżej we wszytkich miejscach między dwukropkiem a średnikiem precyzyjnie uzupełnić dane.</p>
+<strong>1C) DATY DOSTAWY OD DO KONIECZNIE W FORMACIE 2022-10-15</strong>
+<p>od daty (WDOO): ;</p>
+<p>do daty (WDOD): ;</p>
+<br>
+<strong>1D) OSOBA ODPOWIEDZIALNA ZA OBSŁUGĘ </strong>
+<p>Imię i Nazwisko (OOZO): ;</p>
+<p>Nr telefonu (NTOOZO): ;</p>
+<br>
+<strong>1E) KONTAKT DO KIEROWCY</strong>
+<p>
+    Jeżeli na ten moment dane dostawcy/kierowcy nie są znane, to prosimy je uzupełnić w późniejszym czasie jeżeli to będzie możliwe.
+</p>
+<p>Numer telefonu do kierowcy (NTDK): ;</p>
+<br>
+<strong>1E) UWAGI</strong>
+<p>Uwagi (U): ;</p>
+<br>
+<strong>1F) KOMUNIKACJA Z KLIENTEM</strong>
+<p>
+    W przypadku gdybyście chcieli poinformować klienta lub ustalić dowolne informacje to prosimy wpisać wiadomość/zapytanie
+    (AWDK): ;
+</p>
+<p>
+    Wiadomość ta należy wpisac do chata znajdującego sie w danej ofercie z uczestnikami klient, my czyli konsultanci EPH oraz magazyn obsługujący
+</p>
+<br>
+<strong>2A) INFORMACJA W MOMENCIE WYDANIA TOWARU</strong>
+<p>Po wydanu towaru prosimy takżę o informacje zwrotną że towar został wydany -
+    należy tego dokonać poprzez wpisanie między znakiem dwukropka a średnika cyfrę 1
+</p>
+<p>Towar zostały wydany (TZW): ;</p>
+<br>
+<strong>3A) PODŁĄCZENIA DOKUMENTÓW</strong>
+<p>
+    Faktury oraz inne dokumenty można załączyć poprzez dodanie jako załączniki
+    do tego e-maila dowolną ich ilość która zostanie automatycznie podpięta do tego zamówienia
+</p>
+Prosimy koniecznie na każdym dokumencie powiązanym z tą ofertą wpisywać numer oferty czyli: {{$order->id}}
 <hr>
 <hr>
 <p>
@@ -47,10 +118,10 @@
 
 <p>
     Od<br>
-    ELEKTRONICZNA PLATFORMA HANDLOWA WOJCIECH WEISSBROT<br/>
-    IWASZKIEWICZA 15A<br/>
-    55-200 OLAWA<br/>
-    NIP: 9121027907<br/>
+    ELEKTRONICZNA PLATFORMA HANDLOWA SP. Z O.O.<br/>
+    JARACZA 22/12<br/>
+    50-305 WROCAŁAW<br/>
+    NIP: 8982272269<br/>
 </p>
 <p>
     Dane do dostawy: <br/>
@@ -123,3 +194,4 @@
     ZESPOL MEGA1000
 </p>
 </body>
+    
