@@ -11,8 +11,13 @@
 |
  */
 
-use Illuminate\Http\Request;
+use App\Entities\Label;
+use App\Entities\Order;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Validator;
+use App\Entities\OrderWarehouseNotification;
 use App\Http\Controllers\Api\OrderWarehouseNotificationController;
+use App\Http\Requests\Api\OrderWarehouseNotification\AcceptShipmentRequest;
 
 Route::redirect('/', '/admin');
 
@@ -179,83 +184,107 @@ Route::group(['prefix' => 'admin'], function () {
                     // no order ID in subject
                     if(!$isOrderId) $isOrderId = preg_match("/Nr\soferty:\s?(\d+)/mi", $msg, $matches);
                     if(!$isOrderId) continue;
-
+                    
+                    $orderId = $matches[1];
                     $emailElements = [
-                        'AAZPP' => [
-                            'name' => 'accept',
+                        'accept' => [
+                            'code' => 'AAZPP',
                             'value' => null,
                         ],
-                        'OAZPP' => [
-                            'name' => 'cancel',
+                        'cancel' => [
+                            'code' => 'OAZPP',
                             'value' => null,
                         ],
-                        'WDOO' => [
-                            'name' => 'initiallyFrom',
+                        'initiallyFrom' => [
+                            'code' => 'WDOO',
                             'value' => null,
                         ],
-                        'WDOD' => [
-                            'name' => 'initiallyTo',
+                        'initiallyTo' => [
+                            'code' => 'WDOD',
                             'value' => null,
                         ],
-                        'DOOF' => [
-                            'name' => 'from',
+                        'from' => [
+                            'code' => 'DOOF',
                             'value' => null,
                         ],
-                        'DODF' => [
-                            'name' => 'to',
+                        'to' => [
+                            'code' => 'DODF',
                             'value' => null,
                         ],
-                        'OOZO' => [
-                            'name' => 'name',
+                        'name' => [
+                            'code' => 'OOZO',
                             'value' => null,
                         ],
-                        'NTOOZO' => [
-                            'name' => 'phone',
+                        'phone' => [
+                            'code' => 'NTOOZO',
                             'value' => null,
                         ],
-                        'NTDK' => [
-                            'name' => 'phoneToDriver',
+                        'phoneToDriver' => [
+                            'code' => 'NTDK',
                             'value' => null,
                         ],
-                        'U' => [
-                            'name' => 'comments',
+                        'comments' => [
+                            'code' => 'U',
                             'value' => null,
                         ],
-                        'TZW' => [
-                            'name' => 'released',
+                        'released' => [
+                            'code' => 'TZW',
                             'value' => null,
                         ],
                     ];
                     $emailElementsNumber = count($emailElements);
                     $pattern = "/";
-                    foreach($emailElements as $code => $element) {
+                    foreach($emailElements as $element) {
                         // search by given prefix that means (WDOO): is mandatory, and ; at the end is mandatory too
-                        $pattern .= "\({$code}\):\s?(.*);|";
+                        $pattern .= "\({$element['code']}\):\s?(.*);|";
                     }
                     $pattern = rtrim($pattern, '|');
                     $pattern .= "/mi";
-                    $numberOfMatches = preg_match_all($pattern, $msg, $matches);
+                    $numberOfMatches = preg_match_all($pattern, $msg, $elementsMatches);
 
                     // all elements should exist
                     if($numberOfMatches < $emailElementsNumber) continue;
 
                     $i = 0;
-                    foreach($emailElements as $code => &$element) {
+                    foreach($emailElements as &$element) {
                         // +1 means that index of matches start from 1, then get first occurrence in second array, that has indexed pattern
-                        $element['value'] = $matches[$i + 1][$i];
+                        $element['value'] = $elementsMatches[$i + 1][$i];
                         $i++;
                     }
-                    echo '<pre>' , print_r($emailElements) , '</pre>';
+                    $order = Order::findOrFail($orderId);
+
+                    // get notification ID or create one
+                    $dataArray = [
+                        'order_id' => $orderId,
+                        'warehouse_id' => $order->warehouse_id,
+                        'waiting_for_response' => true,
+                    ];
+                    $notification = OrderWarehouseNotification::where($dataArray)->first();
+                    
+                    if (!$notification && !$order->isOrderHasLabel(Label::WAREHOUSE_REMINDER)) {
+                        $subject = "Prośba o potwierdzenie awizacji dla zamówienia nr. " . $orderId;
+                        $notification = OrderWarehouseNotification::create($dataArray);
+                    }
+
+                    // make params and handle form accept / deny
+                    $params = [
+                        'order_id' => $orderId,
+                        'warehouse_id' => $order->warehouse_id,
+                        'realization_date_from' => $emailElements['from']['value'],
+                        'realization_date_to' => $emailElements['to']['value'],
+                        'contact_person' => $emailElements['name']['value'],
+                        'contact_person_phone' => $emailElements['phone']['value'],
+                        'driver_contact' => $emailElements['phoneToDriver']['value'],
+                        'customer_notices' => $emailElements['comments']['value'],
+                    ];
+                    // make request with given $params
+                    $request = new AcceptShipmentRequest($params);
+                    $orderWarehouseNotification = App::make(OrderWarehouseNotificationController::class);
+                    $orderWarehouseNotification->accept($request, $notification->id, true);
+                    if($emailElements['accept'] == 1) $orderWarehouseNotification->accept($request, $notification->id);
+                    else $orderWarehouseNotification->deny($request, $notification->id);
 
                 }
-                // make request with given $params
-                // $request = new Request();
-                // $request->setMethod('POST');
-                // $request->request->add($params);
-                // $orderWarehouseNotification = new OrderWarehouseNotificationController();
-                // $orderWarehouseNotification->accept();
-                // $orderWarehouseNotification->deny();
-
             }
             imap_close($conn);
         });

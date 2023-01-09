@@ -51,10 +51,10 @@ class OrderWarehouseNotificationController extends Controller
         return $this->orderWarehouseNotificationRepository->find($notificationId);
     }
 
-    public function deny(DenyShipmentRequest $request, $notificationId)
+    public function deny(DenyShipmentRequest $request, $notificationId, $omitValidation = false)
     {
         try {
-            $data = $request->validated();
+            $data = $omitValidation ? $request->all() : $request->validated();
             $data['waiting_for_response'] = false;
             $notification = $this->orderWarehouseNotificationRepository->update($data, $notificationId);
 
@@ -71,10 +71,10 @@ class OrderWarehouseNotificationController extends Controller
         }
     }
 
-    public function accept(AcceptShipmentRequest $request, $notificationId)
+    public function accept(AcceptShipmentRequest $request, $notificationId, $omitValidation = false)
     {
         try {
-            $data = $request->validated();
+            $data = $omitValidation ? $request->all() : $request->validated();
             $data['waiting_for_response'] = false;
 
             $data['realization_date'] = $data['realization_date_from'];
