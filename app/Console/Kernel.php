@@ -41,6 +41,7 @@ class Kernel extends ConsoleKernel
 //        $schedule->job(Jobs\AddNewWorkHourForUsers::class)->dailyAt("00:01");
         $schedule->job(Jobs\CheckTasksFromYesterdayJob::class)->dailyAt("00:01");
         $schedule->job(Jobs\WarehouseDispatchPendingReminderJob::class)->everyThirtyMinutes()->between('9:00', '17:00');
+        $schedule->job(Jobs\CheckNotificationsMailbox::class)->everyFifteenMinutes()->between('9:00', '17:00');
         $schedule->job(Jobs\CheckPromisePaymentsDates::class)->everyThirtyMinutes(); // @TODO this task is very slow, for now
         // i am changing it from everyMinute to everyThirtyMinutes as rewriting would take some time, this should solve
         // queue overload issues

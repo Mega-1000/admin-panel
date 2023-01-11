@@ -9,7 +9,6 @@
     Brak odpowiedzi do 2 godzin na tego emaila powoduje wysyłanie go co 15 minut jako przypomnienie.
 </p>
 
-
 <strong>SPOSÓB NR I - poprzez uzycie linków awizacyjnych</strong>
 
 <p>Prosimy zapoznać się z pełną treścią tego maila a następnie następnie:</p>
@@ -58,9 +57,9 @@
     W przypadku odrzucenia awizacji należy podać koniecznie przyczyne w uwagach na dole.
 </p>
 
-<strong>1B) Wstępne zaproponowane daty możliwości odbioru towaru przez klienta podajemy tylko informacyjnie</strong>
-<p>od (WDOO): ;</p>
-<p>do (WDOD): ;</p>
+<strong>1B) Wstępne zaproponowane daty możliwości odbioru towaru przez klienta (podajemy tylko informacyjnie)</strong>
+<p>od: {{ $customerShipmentDateFrom }}</p>
+<p>do: {{ $customerShipmentDateTo }}</p>
 <br>
 <p>Prosimy poniżej we wszystkich miejscach między dwukropkiem a średnikiem precyzyjnie uzupełnić dane.</p>
 <strong>1C) DATY DOSTAWY OD DO KONIECZNIE W FORMACIE 2022-10-15</strong>
@@ -100,7 +99,12 @@
     Faktury oraz inne dokumenty można załączyć poprzez dodanie jako załączniki
     do tego e-maila dowolną ich ilość która zostanie automatycznie podpięta do tego zamówienia
 </p>
-Prosimy koniecznie na każdym dokumencie powiązanym z tą ofertą wpisywać numer oferty czyli: {{$order->id}}
+<p>
+    Prosimy koniecznie na każdym dokumencie powiązanym z tą ofertą wpisywać numer oferty czyli: {{$order->id}}
+</p>
+<strong>3B) WIDOCZNOŚĆ FAKTURY</strong>
+<p>Czy faktura ma być widoczna dla klienta? Jeżeli tak należy wpisać między znakiem dwukropka a średnika cyfrę 1</p>
+<p>Widoczność faktury (WF): ;</p>
 <hr>
 <hr>
 <p>

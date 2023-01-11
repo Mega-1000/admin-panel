@@ -26,6 +26,10 @@ class OrderStatusChangedToDispatchMail extends Mailable
 
     public $pathSecond;
 
+    public $customerShipmentDateFrom;
+
+    public $customerShipmentDateTo;
+
     /**
      * OrderStatusChangedToDispatchMail constructor.
      * @param $subject
@@ -45,6 +49,8 @@ class OrderStatusChangedToDispatchMail extends Mailable
         $this->path = $path;
         $this->packageNumber = $packageNumber;
         $this->pathSecond = $pathSecond;
+        $this->customerShipmentDateFrom = $order->dates->getDateAttribute('customer_shipment_date_from');
+        $this->customerShipmentDateTo = $order->dates->getDateAttribute('customer_shipment_date_to');
     }
 
     /**

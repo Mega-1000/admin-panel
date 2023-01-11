@@ -1,5 +1,7 @@
 <?php
 
+use App\Jobs\CheckNotificationsMailbox;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -10,14 +12,6 @@
 | contains the "web" middleware group. Now create something great!
 |
  */
-
-use App\Entities\Label;
-use App\Entities\Order;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Validator;
-use App\Entities\OrderWarehouseNotification;
-use App\Http\Controllers\Api\OrderWarehouseNotificationController;
-use App\Http\Requests\Api\OrderWarehouseNotification\AcceptShipmentRequest;
 
 Route::redirect('/', '/admin');
 
@@ -152,141 +146,7 @@ Route::group(['prefix' => 'admin'], function () {
         ])->name('employees.change.status');
             
         Route::get('test', function() {
-            $host = '{s104.linuxpl.com:993/imap/ssl}INBOX';
-            $user = 'awizacje@ephpolska.pl';
-            $password = '1!Qaa2@Wss';
-            $conn = imap_open($host, $user, $password)
-                    or die('unable to connect Gmail: ' . imap_last_error());
-            // $mails = imap_search($conn, 'UNSEEN');
-            $mails = imap_search($conn, 'ALL');
-            if ($mails) {
-                $mailOutput = '';
-                $mailOutput.= '<table><tr><th>Subject </th><th> From  </th>
-                            <th> Date Time </th> <th> Content </th></tr>';
-
-                rsort($mails);
-
-                foreach ($mails as $email_number) {
-                    $headers = imap_fetch_overview($conn, $email_number, 0);
-                    $subject = quoted_printable_decode($headers[0]->subject);
-
-                    // after number can be _ or \s then number
-                    $isOrderId = preg_match("/nr\._?\s?(\d+)/", $subject, $matches);
-                    // get plain text
-                    $body = imap_fetchbody($conn, $email_number, 1.1);
-                    // check if is correct length min. 100 char.
-                    if( strlen($body) < 100 ) {
-                        // get rest of text
-                        $body = imap_fetchbody($conn, $email_number, 1);
-                        if (strlen($body) < 100) continue;
-                    }
-                    $msg = trim(quoted_printable_decode($body));
-                    // no order ID in subject
-                    if(!$isOrderId) $isOrderId = preg_match("/Nr\soferty:\s?(\d+)/mi", $msg, $matches);
-                    if(!$isOrderId) continue;
-                    
-                    $orderId = $matches[1];
-                    $emailElements = [
-                        'accept' => [
-                            'code' => 'AAZPP',
-                            'value' => null,
-                        ],
-                        'cancel' => [
-                            'code' => 'OAZPP',
-                            'value' => null,
-                        ],
-                        'initiallyFrom' => [
-                            'code' => 'WDOO',
-                            'value' => null,
-                        ],
-                        'initiallyTo' => [
-                            'code' => 'WDOD',
-                            'value' => null,
-                        ],
-                        'from' => [
-                            'code' => 'DOOF',
-                            'value' => null,
-                        ],
-                        'to' => [
-                            'code' => 'DODF',
-                            'value' => null,
-                        ],
-                        'name' => [
-                            'code' => 'OOZO',
-                            'value' => null,
-                        ],
-                        'phone' => [
-                            'code' => 'NTOOZO',
-                            'value' => null,
-                        ],
-                        'phoneToDriver' => [
-                            'code' => 'NTDK',
-                            'value' => null,
-                        ],
-                        'comments' => [
-                            'code' => 'U',
-                            'value' => null,
-                        ],
-                        'released' => [
-                            'code' => 'TZW',
-                            'value' => null,
-                        ],
-                    ];
-                    $emailElementsNumber = count($emailElements);
-                    $pattern = "/";
-                    foreach($emailElements as $element) {
-                        // search by given prefix that means (WDOO): is mandatory, and ; at the end is mandatory too
-                        $pattern .= "\({$element['code']}\):\s?(.*);|";
-                    }
-                    $pattern = rtrim($pattern, '|');
-                    $pattern .= "/mi";
-                    $numberOfMatches = preg_match_all($pattern, $msg, $elementsMatches);
-
-                    // all elements should exist
-                    if($numberOfMatches < $emailElementsNumber) continue;
-
-                    $i = 0;
-                    foreach($emailElements as &$element) {
-                        // +1 means that index of matches start from 1, then get first occurrence in second array, that has indexed pattern
-                        $element['value'] = $elementsMatches[$i + 1][$i];
-                        $i++;
-                    }
-                    $order = Order::findOrFail($orderId);
-
-                    // get notification ID or create one
-                    $dataArray = [
-                        'order_id' => $orderId,
-                        'warehouse_id' => $order->warehouse_id,
-                        'waiting_for_response' => true,
-                    ];
-                    $notification = OrderWarehouseNotification::where($dataArray)->first();
-                    
-                    if (!$notification && !$order->isOrderHasLabel(Label::WAREHOUSE_REMINDER)) {
-                        $subject = "Prośba o potwierdzenie awizacji dla zamówienia nr. " . $orderId;
-                        $notification = OrderWarehouseNotification::create($dataArray);
-                    }
-
-                    // make params and handle form accept / deny
-                    $params = [
-                        'order_id' => $orderId,
-                        'warehouse_id' => $order->warehouse_id,
-                        'realization_date_from' => $emailElements['from']['value'],
-                        'realization_date_to' => $emailElements['to']['value'],
-                        'contact_person' => $emailElements['name']['value'],
-                        'contact_person_phone' => $emailElements['phone']['value'],
-                        'driver_contact' => $emailElements['phoneToDriver']['value'],
-                        'customer_notices' => $emailElements['comments']['value'],
-                    ];
-                    // make request with given $params
-                    $request = new AcceptShipmentRequest($params);
-                    $orderWarehouseNotification = App::make(OrderWarehouseNotificationController::class);
-                    $orderWarehouseNotification->accept($request, $notification->id, true);
-                    if($emailElements['accept'] == 1) $orderWarehouseNotification->accept($request, $notification->id);
-                    else $orderWarehouseNotification->deny($request, $notification->id);
-
-                }
-            }
-            imap_close($conn);
+            dispatch_now(new CheckNotificationsMailbox);
         });
         
         Route::get('statuses', 'StatusesController@index')->name('statuses.index');
