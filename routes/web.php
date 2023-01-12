@@ -1,7 +1,5 @@
 <?php
 
-use App\Jobs\CheckNotificationsMailbox;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -144,7 +142,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('employees/{id}/change-status', [
             'uses' => 'EmployeesController@changeStatus',
         ])->name('employees.change.status');
-        
+
         Route::get('statuses', 'StatusesController@index')->name('statuses.index');
         Route::get('statuses/datatable/', 'StatusesController@datatable')->name('statuses.datatable');
         Route::get('statuses/create/', 'StatusesController@create')->name('statuses.create');
