@@ -2,18 +2,20 @@
 
 namespace App\Jobs;
 
-use App\Entities\Label;
 use App\Entities\Order;
+use App\Helpers\FileHelper;
 use Illuminate\Http\Request;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderManualNotification;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Entities\OrderWarehouseNotification;
-use App\Helpers\FileHelper;
 use App\Http\Controllers\Api\OrderWarehouseNotificationController;
 use App\Http\Requests\Api\OrderWarehouseNotification\AcceptShipmentRequest;
 
@@ -75,8 +77,14 @@ class CheckNotificationsMailbox implements ShouldQueue {
      * @return void
      */
     public function __construct() {
-        $this->imap = imap_open($this->host, $this->user, $this->password)
-            or die('unable to connect: ' . imap_last_error());
+        try {
+            $this->imap = imap_open($this->host, $this->user, $this->password);
+        } catch (\Exception $e){
+            Log::error('Problem with imap_open',
+                ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
+            );
+            die();
+        }
     }
 
     /**
@@ -86,19 +94,18 @@ class CheckNotificationsMailbox implements ShouldQueue {
      */
     public function handle() {
 
-        // $mails = imap_search($this->imap, 'UNSEEN');
-        $mails = imap_search($this->imap, 'ALL');
+        $mails = imap_search($this->imap, 'UNSEEN');
 
         if ($mails) {
-            rsort($mails);
 
             foreach ($mails as $mailNumber) {
                 $headers = imap_fetch_overview($this->imap, $mailNumber, 0);
                 $subject = quoted_printable_decode($headers[0]->subject);
                 $header = imap_headerinfo($this->imap, $mailNumber);
                 $from = $header->from[0]->mailbox . "@" . $header->from[0]->host;
-                // after number can be _ or \s then number
-                $isOrderId = preg_match("/nr\._?\s?(\d+)/", $subject, $matches);
+
+                // any number between 3 and 20 length
+                $isOrderId = preg_match("/(\d{3,20})/", $subject, $matches);
                 // get plain text
                 $body = imap_fetchbody($this->imap, $mailNumber, 1.1);
                 // check if is correct length min. 100 char.
@@ -109,48 +116,65 @@ class CheckNotificationsMailbox implements ShouldQueue {
                 }
                 $msg = trim(quoted_printable_decode($body));
                 // no order ID in subject
-                // if (!$isOrderId) $isOrderId = preg_match("/Nr\soferty:\s?(\d+)/mi", $msg, $matches);
-                // if (!$isOrderId) continue;
+                if (!$isOrderId) $isOrderId = preg_match("/Nr\soferty:\s?(\d+)/mi", $msg, $matches);
+                if (!$isOrderId) continue;
 
-                // $orderId = $matches[1];
-                $orderId = 39096;
+                $orderId = $matches[1];
 
+                // build pattern
                 $pattern = "/";
                 foreach ($this->emailElements as $element) {
-                    // search by given prefix that means (WDOO): is mandatory, and ; at the end is mandatory too
+                    // search by given prefix that means (DOOF): is mandatory, and ; at the end is mandatory too
                     $pattern .= "\({$element['code']}\):\s?(.*);|";
                 }
                 $pattern = rtrim($pattern, '|');
                 $pattern .= "/mi";
-                $numberOfMatches = preg_match_all($pattern, $msg, $elementsMatches);
+                preg_match_all($pattern, $msg, $elementsMatches);
 
                 $i = 0;
                 foreach ($this->emailElements as &$element) {
-                    // +1 means that index of matches start from 1, then get first occurrence in second array, that has indexed pattern
-                    $element['value'] = $elementsMatches[$i + 1][$i];
+                    if( !isset($elementsMatches[$i + 1]) ) break;
+                    // get first value ignores empty values, first value is the newest value of matches
+                    $filteredMatches = array_filter($elementsMatches[$i + 1]);
+                    $element['value'] = reset($filteredMatches);
                     $i++;
                 }
+
                 $order = Order::findOrFail($orderId);
+
+                $orderWarehouseNotification = App::make(OrderWarehouseNotificationController::class);
+
                 // order start shipment
-                if($order->shipment_start_days_variation) {
-                    $attachments = $this->getAttachments($mailNumber);
-                    if( !empty($attachments) ) {
-                        $params = [
-                            'orderId' => $orderId,
-                            'isVisibleForClient' => $this->emailElements['isVisibleForClient']['value'],
-                        ];
-                        // get base64 code from main (first) attachment
-                        $mainAttachment = reset($attachments)['attachment'];
-                        $uploadedFile = FileHelper::createUploadedFileFromBase64($mainAttachment);
-                        $request = new Request($params);
-                        $request->files->set('file', $uploadedFile);
-                        $orderWarehouseNotification = App::make(OrderWarehouseNotificationController::class);
-                        $orderWarehouseNotification->sendInvoice($request);
+                $attachments = $this->getAttachments($mailNumber);
+                if( !empty($attachments) ) {
+                    $params = [
+                        'orderId' => $orderId,
+                        'isVisibleForClient' => $this->emailElements['isVisibleForClient']['value'],
+                    ];
+                    // get base64 code from main (first) attachment
+                    $mainAttachment = reset($attachments)['attachment'];
+                    $uploadedFile = FileHelper::createUploadedFileFromBase64($mainAttachment);
+                    $request = new Request($params);
+                    $request->files->set('file', $uploadedFile);
+                    $res = $orderWarehouseNotification->sendInvoice($request);
+                    if($res->getStatusCode() == 200) {
+                        $subject = 'Faktura została pomyślnie wysłana dla oferty nr: '.$orderId;
+                        $email = new OrderManualNotification($subject, $subject, '');
+                        Mail::to($from)->send($email);
                     }
                 }
-                exit;
-
-                // get notification ID or create one
+                if($this->emailElements['released']['value'] == 1) {
+                    $params = [
+                        'orderId' => $orderId,
+                    ];
+                    $request = new Request($params);
+                    $res = $orderWarehouseNotification->changeStatus($request);
+                    if($res->getStatusCode() == 200) {
+                        $subject = 'Status został pomyślnie zmieniony jako wydany towar dla oferty nr: '.$orderId;
+                        $email = new OrderManualNotification($subject, $subject, '');
+                        Mail::to($from)->send($email);
+                    }
+                }
                 $dataArray = [
                     'order_id' => $orderId,
                     'warehouse_id' => $order->warehouse_id,
@@ -170,25 +194,34 @@ class CheckNotificationsMailbox implements ShouldQueue {
                     'driver_contact' => $this->emailElements['phoneToDriver']['value'],
                     'customer_notices' => $this->emailElements['comments']['value'],
                 ];
+
                 // make request with given $params and validator
                 $request = new AcceptShipmentRequest($params);
-                $validator = Validator::make($request->all(), $request->rules());
+                $validator = Validator::make($request->all(), $request->rules(), [], $request->attributes());
                 $request->setValidator($validator);
 
                 if ($validator->fails()) {
-                    $errMsgTemplate = '<body><h3>Proszę poprawić następujące błędy:</h3>';
+                    $subject = 'Wykryto błędy w Pańskim formularzu dot. oferty nr: '.$orderId;
+                    $msgHeader = 'Proszę poprawić następujące błędy, oraz ponownie wysłać w pełni uzupełniony formularz:';
+                    $errMsgTemplate = '';
                     $validationErrors = $validator->errors();
                     foreach ($validationErrors->all() as $error) {
                         $errMsgTemplate .= "<p>$error</p>";
                     }
-                    $errMsgTemplate .= '</body>';
-                    $subject = 'Wykryto błędy w Pańskim formularzu:';
-                    imap_mail($from, $subject, $errMsgTemplate);
+                    $email = new OrderManualNotification($subject, $msgHeader, $errMsgTemplate);
+                    Mail::to($from)->send($email);
                 } else {
-                    $orderWarehouseNotification = App::make(OrderWarehouseNotificationController::class);
-
-                    if ($this->emailElements['accept']['value'] == 1) $orderWarehouseNotification->accept($request, $notification->id);
-                    else $orderWarehouseNotification->deny($request, $notification->id);
+                    if ($this->emailElements['accept']['value'] == 1) {
+                        $res = $orderWarehouseNotification->accept($request, $notification->id);
+                        $subject = 'Formularz został zaakceptowany do realizacji dla oferty nr: '.$orderId;
+                    } else {
+                        $res = $orderWarehouseNotification->deny($request, $notification->id);
+                        $subject = 'Formularz został odrzucony do realizacji dla oferty nr: '.$orderId;
+                    }
+                    if($res->getStatusCode() == 200) {
+                        $email = new OrderManualNotification($subject, $subject, '');
+                        Mail::to($from)->send($email);
+                    }
                 }
             }
         }
@@ -231,23 +264,5 @@ class CheckNotificationsMailbox implements ShouldQueue {
             }
         }
         return $attachments;
-        // foreach($attachments as $attachment)
-        // {
-        //     if($attachment['is_attachment'] == 1)
-        //     {
-        //         $filename = $attachment['name'];
-        //         if(empty($filename)) $filename = $attachment['filename'];
-
-        //         if(empty($filename)) $filename = time() . ".dat";
-        //         $folder = "attachment";
-        //         if(!is_dir($folder))
-        //         {
-        //                 mkdir($folder);
-        //         }
-        //         $fp = fopen("./". $folder ."/". $mailNumber . "-" . $filename, "w+");
-        //         fwrite($fp, $attachment['attachment']);
-        //         fclose($fp);
-        //     }
-        // }
     }
 }

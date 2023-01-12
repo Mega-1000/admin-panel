@@ -142,7 +142,6 @@ class OrderWarehouseNotificationController extends Controller
             die();
         }
     }
-
     public function changeStatus(Request $request)
     {
         try {

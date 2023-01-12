@@ -144,10 +144,6 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('employees/{id}/change-status', [
             'uses' => 'EmployeesController@changeStatus',
         ])->name('employees.change.status');
-            
-        Route::get('test', function() {
-            dispatch_now(new CheckNotificationsMailbox);
-        });
         
         Route::get('statuses', 'StatusesController@index')->name('statuses.index');
         Route::get('statuses/datatable/', 'StatusesController@datatable')->name('statuses.datatable');
