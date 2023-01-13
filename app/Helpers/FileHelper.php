@@ -8,7 +8,7 @@ use Illuminate\Http\UploadedFile;
 
 class FileHelper {
     
-    public static function createUploadedFileFromBase64($base64) {
+    public static function createUploadedFileFromBase64(string $base64) {
         $fileData = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $base64));
         $tmpFilePath = sys_get_temp_dir() . '/' . Str::uuid()->toString();
         file_put_contents($tmpFilePath, $fileData);

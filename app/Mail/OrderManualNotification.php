@@ -24,7 +24,7 @@ class OrderManualNotification extends Mailable
      *
      * @return void
      */
-    public function __construct($subject, $msgHeader, $msg)
+    public function __construct(string $subject, string $msgHeader, string $msg)
     {
         config([
             'mail.driver'       => 'smtp',

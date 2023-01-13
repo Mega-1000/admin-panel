@@ -227,7 +227,7 @@ class CheckNotificationsMailbox implements ShouldQueue {
         }
         imap_close($this->imap);
     }
-    public function getAttachments($mailNumber) {
+    public function getAttachments(int $mailNumber) {
 
         $structure = imap_fetchstructure($this->imap, $mailNumber);
         $attachments = array();
