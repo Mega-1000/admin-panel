@@ -117,3 +117,5 @@ Route::get('/faqs/{id}', 'Api\FaqController@show')->name('api.faq.show');
 Route::put('/faqs/{id}', 'Api\FaqController@update')->name('api.faq.update');
 Route::delete('/faqs/{id}', 'Api\FaqController@destroy')->name('api.faq.destroy');
 Route::post('/faqs/ask', 'Api\FaqController@askQuestion')->name('api.faq.ask');
+
+Route::get('/orders/{id}/sendOfferToCustomer', 'Api\OrdersController@sendOfferToCustomer')->name('api.orders.sendOfferToCustomer');
