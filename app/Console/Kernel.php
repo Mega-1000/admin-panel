@@ -2,9 +2,10 @@
 
 namespace App\Console;
 
+use App\Console\Commands\TestSchenkerConnectionCommand;
+use App\Jobs;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use App\Jobs;
 
 class Kernel extends ConsoleKernel
 {
@@ -15,12 +16,13 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         //
+        TestSchenkerConnectionCommand::class,
     ];
 
     /**
      * Define the application's command schedule.
      *
-     * @param \Illuminate\Console\Scheduling\Schedule $schedule
+     * @param Schedule $schedule
      *
      * @return void
      */

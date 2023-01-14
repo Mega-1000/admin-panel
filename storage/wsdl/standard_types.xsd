@@ -1,0 +1,141 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns="http://api.schenker.pl/StandardTypes/" targetNamespace="http://api.schenker.pl/StandardTypes/">
+<xs:complexType name="UnhandledFault">
+<xs:sequence>
+<xs:element name="errNumber" type="xs:int"/>
+<xs:element name="errMessage" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:simpleType name="Product">
+<xs:restriction base="xs:string">
+<xs:maxLength value="255"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="ClientReferenceNumber">
+<xs:restriction base="xs:string">
+<xs:minLength value="1"/>
+<xs:maxLength value="20"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="WaybillNumber">
+<xs:restriction base="xs:string">
+<xs:pattern value="[1-9][0-9]{9}"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="LabelNumber">
+<xs:restriction base="xs:string">
+<xs:pattern value="[0-9]{17}"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="CommentType">
+<xs:restriction base="xs:string">
+<xs:minLength value="0"/>
+<xs:maxLength value="100"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="DeliveryInstructions">
+<xs:restriction base="xs:string">
+<xs:minLength value="0"/>
+<xs:maxLength value="128"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="ClientId">
+<xs:restriction base="xs:string">
+<xs:pattern value="[0-9]{7}"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="Iln">
+<xs:restriction base="xs:string">
+<xs:pattern value="[0-9]{13}"> </xs:pattern>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="LongName">
+<xs:restriction base="xs:string">
+<xs:minLength value="1"/>
+<xs:maxLength value="60"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="Country">
+<xs:restriction base="xs:string">
+<xs:pattern value="[A-Z]{2}"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="PostCode">
+<xs:restriction base="xs:string"/>
+</xs:simpleType>
+<xs:simpleType name="City">
+<xs:restriction base="xs:string">
+<xs:minLength value="1"/>
+<xs:maxLength value="35"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="PhoneNumber">
+<xs:restriction base="xs:string">
+<xs:minLength value="0"/>
+<xs:maxLength value="35"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="Nip">
+<xs:restriction base="xs:string">
+<xs:minLength value="0"/>
+<xs:maxLength value="32"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="ContactPerson">
+<xs:restriction base="xs:string">
+<xs:minLength value="1"/>
+<xs:maxLength value="60"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="Email">
+<xs:restriction base="xs:string">
+<xs:minLength value="0"/>
+<xs:maxLength value="60"/>
+<xs:pattern value="[a-zA-Z0-9+-_]{1,64}@[a-zA-Z0-9.-]+[.][a-zA-Z]+"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="PaletteId">
+<xs:restriction base="xs:string">
+<xs:pattern value="[0-9]{7}"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="Weight">
+<xs:restriction base="xs:decimal">
+<xs:fractionDigits value="0"/>
+<xs:minExclusive value="0"/>
+<xs:maxInclusive value="2500000"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:complexType name="SchenkerAPIError">
+<xs:sequence>
+<xs:element name="errNumber" type="xs:int"/>
+<xs:element name="errMessage" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="SchenkerAPIErrors">
+<xs:sequence>
+<xs:element maxOccurs="unbounded" minOccurs="1" name="error" type="SchenkerAPIError"/>
+</xs:sequence>
+</xs:complexType>
+<xs:simpleType name="ReferenceType">
+<xs:restriction base="xs:string">
+<xs:enumeration value="SHP"/>
+<xs:enumeration value="PKG"/>
+<xs:enumeration value="CGN"/>
+<xs:enumeration value="DWB"/>
+<xs:enumeration value="COR"/>
+<xs:enumeration value="FF"/>
+<xs:enumeration value="ZDNNO"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:simpleType name="InvoiceNoType">
+<xs:restriction base="xs:integer">
+<xs:pattern value="[0-9]{9}"/>
+</xs:restriction>
+</xs:simpleType>
+<xs:complexType name="ServiceTemporaryUnavailable"/>
+<xs:complexType name="SchemaValidationError">
+<xs:sequence>
+<xs:element maxOccurs="1" minOccurs="1" name="details" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:schema>

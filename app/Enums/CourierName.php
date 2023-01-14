@@ -17,6 +17,7 @@ final class CourierName extends Enum
     const GLS = 'GLS';
     const ODBIOR_OSOBISTY = 'ODBIOR_OSOBISTY';
     const GIELDA = 'GIELDA';
+    const DB_SCHENKER = 'DB';
 
     /**
      * Delivery types labels
@@ -31,6 +32,7 @@ final class CourierName extends Enum
         self::GLS => 'Gls',
         self::ODBIOR_OSOBISTY => 'Odbiór osobisty',
         self::GIELDA => 'Giełda',
+        self::DB_SCHENKER => 'DB Schenker',
     ];
 
     /**
@@ -43,6 +45,7 @@ final class CourierName extends Enum
         self::INPOST => [self::INPOST, self::ALLEGRO_INPOST],
         self::ODBIOR_OSOBISTY => [self::ODBIOR_OSOBISTY],
         self::GIELDA => [self::GIELDA],
+        self::DB_SCHENKER => [self::DB_SCHENKER],
     ];
 
     /**
@@ -56,6 +59,7 @@ final class CourierName extends Enum
         self::JAS => 'Jas',
         self::GLS => 'Gls',
         self::GIELDA => 'Giełda',
+        self::DB_SCHENKER => 'DB Schenker',
         'all' => 'Wszystkie',
     ];
 }
