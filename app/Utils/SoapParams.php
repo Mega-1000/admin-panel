@@ -2,6 +2,7 @@
 
 namespace App\Utils;
 
+use App\DTO\BaseDTO;
 use App\Exceptions\SoapParamsException;
 
 class SoapParams
@@ -12,9 +13,13 @@ class SoapParams
     /**
      * @throws SoapParamsException
      */
-    public function setParamDTOObject(string $paramName, BaseDTO $dtoObject): self
+    public function setParamDTOObject(string $paramName, ?BaseDTO $dtoObject): self
     {
         if (!array_key_exists($paramName, $this->params)) {
+            if ($dtoObject === null) {
+                $this->params[$paramName] = null;
+                return $this;
+            }
             $this->params[$paramName] = json_decode(json_encode($dtoObject), true);
 
             return $this;

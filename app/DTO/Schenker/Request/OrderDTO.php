@@ -1,8 +1,16 @@
 <?php
 
-namespace App\DTO\Schenker;
+namespace App\DTO\Schenker\Request;
 
 use App\DTO\BaseDTO;
+use App\DTO\Schenker\DangerProductDTO;
+use App\DTO\Schenker\PackageDTO;
+use App\DTO\Schenker\PayerDTO;
+use App\DTO\Schenker\RecipientDTO;
+use App\DTO\Schenker\ReferenceDTO;
+use App\DTO\Schenker\SenderDTO;
+use App\DTO\Schenker\ServiceDTO;
+use App\DTO\Schenker\SsccDTO;
 use App\Enums\Schenker\ProductType;
 use Carbon\Carbon;
 use JsonSerializable;
@@ -32,22 +40,7 @@ class OrderDTO extends BaseDTO implements JsonSerializable
     private $references;
 
     /**
-     * @param string $clientId
-     * @param ?string $installId
-     * @param ?string $dataOrigin
-     * @param ?string $waybillNo
-     * @param string $product
-     * @param Carbon $pickupFrom
-     * @param Carbon $pickupTo
-     * @param ?Carbon $deliveryFrom
-     * @param ?Carbon $deliveryTo
-     * @param ?string $comment
-     * @param ?string $deliveryInstructions
-     * @param SenderDTO $senderDTO
-     * @param RecipientDTO $recipientDTO
-     * @param PayerDTO $payerDTO
      * @param PackageDTO[] $packagesDTOs
-     * @param bool $ssccMatching
      * @param ?SsccDTO[] $sscc
      * @param ?DangerProductDTO[] $dangerProductDTOs
      * @param ?ServiceDTO[] $services
@@ -104,15 +97,22 @@ class OrderDTO extends BaseDTO implements JsonSerializable
         $orderData = [
             'clientId' => $this->clientId,
             'product' => ProductType::checkProductTypeExists($this->product) ? $this->product : ProductType::getDefaultType(),
-            'pickupFrom' => $this->pickupFrom->format(config('shippings.providers.schenker.default_date_time_format', 'Y-m-dTH:i:s')),
-            'pickupTo' => $this->pickupTo->format(config('shippings.providers.schenker.default_date_time_format', 'Y-m-dTH:i:s')),
-            'comment' => substr($this->comment ?? '', 0, 100),
-            'deliveryInstructions' => substr($this->deliveryInstructions ?? '', 0, 128),
+            'pickupFrom' => $this->convertDate($this->pickupFrom),
+            'pickupTo' => $this->convertDate($this->pickupTo),
+            'comment' => $this->substrText($this->comment ?? '', 100),
             'sender' => $this->senderDTO,
             'recipient' => $this->recipientDTO,
             'payer' => $this->payerDTO,
             'packages' => $this->packagesDTOs,
         ];
+
+        $this->deliveryInstructions = $this->substrText($this->deliveryInstructions ?? '', 128);
+        $this->installId = $this->substrText($this->installId, 7);
+        $this->waybillNo = $this->substrText($this->getOnlyNumbers($this->waybillNo ?? ''), 10);
+        $this->deliveryFrom = $this->convertDate($this->deliveryFrom);
+        $this->deliveryTo = $this->convertDate($this->deliveryTo);
+
+
         $this->optionalFields = [
             'installId' => 'installId',
             'dataOrigin' => 'dataOrigin',
@@ -124,6 +124,7 @@ class OrderDTO extends BaseDTO implements JsonSerializable
             'adrs' => 'dangerProductDTOs',
             'services' => 'services',
             'references' => 'references',
+            'deliveryInstructions' => 'deliveryInstructions',
         ];
 
         return array_merge($orderData, $this->getOptionalFilledFields());

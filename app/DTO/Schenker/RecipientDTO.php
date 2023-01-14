@@ -2,7 +2,7 @@
 
 namespace App\DTO\Schenker;
 
-class RecipientDTO
+class RecipientDTO extends AddressDTO
 {
 
 }

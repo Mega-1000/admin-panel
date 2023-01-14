@@ -22,21 +22,6 @@ class PackageDTO extends BaseDTO implements JsonSerializable
     private $notStandard;
     private $notStandardComment;
 
-    /**
-     * @param ?string $packageId
-     * @param string $name
-     * @param string $packageCode
-     * @param float $quantity
-     * @param string $protection
-     * @param float $weight
-     * @param float $volume
-     * @param float $width
-     * @param float $length
-     * @param float $height
-     * @param ?bool $stack
-     * @param ?bool $notStandard
-     * @param ?string $notStandardComment
-     */
     public function __construct(
         ?string $packageId,
         string  $name,
@@ -71,15 +56,15 @@ class PackageDTO extends BaseDTO implements JsonSerializable
     public function jsonSerialize(): array
     {
         $packageData = [
-            'name' => substr($this->name, 0, 20),
-            'packCode' => substr($this->packageCode, 0, 20),
+            'name' => $this->substrText($this->name, 20),
+            'packCode' => $this->substrText($this->packageCode, 20),
             'quantity' => $this->quantity,
-            'protection' => substr($this->protection, 0, 30),
-            'weight' => round($this->weight * 100),
-            'volume' => round($this->volume * 100),
-            'width' => round($this->volume * 100),
-            'length' => round($this->length * 100),
-            'height' => rund($this->height * 100)
+            'protection' => $this->substrText($this->protection, 30),
+            'weight' => $this->floatToInt($this->weight),
+            'volume' => $this->floatToInt($this->volume),
+            'width' => $this->floatToInt($this->volume),
+            'length' => $this->floatToInt($this->length),
+            'height' => $this->floatToInt($this->height)
         ];
 
         $this->optionalFields = [

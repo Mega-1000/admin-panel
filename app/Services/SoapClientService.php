@@ -14,16 +14,16 @@ class SoapClientService
     private $user;
     private $password;
 
-    public function __construct()
+    public final function __construct()
     {
-        $this->user = config('shippings.providers.schenker.user_name');
-        $this->password = config('shippings.providers.schenker.user_password');
+        $this->user = config('integrations.schenker.user_name');
+        $this->password = config('integrations.schenker.user_password');
     }
 
     /**
      * @throws SapException
      */
-    public static function sendRequest(string $wsdlFile, string $action, SoapParams $soapParams): array
+    public static final function sendRequest(string $wsdlFile, string $action, SoapParams $soapParams): array
     {
         try {
             $soapClient = new self();
@@ -38,7 +38,7 @@ class SoapClientService
     /**
      * @throws SoapFault
      */
-    public function setWsdl(string $wsdlFileFullPath): void
+    public final function setWsdl(string $wsdlFileFullPath): void
     {
         $needRecreateSoapClient = $this->wsdlFile != $wsdlFileFullPath;
         $this->wsdlFile = $wsdlFileFullPath;
@@ -65,7 +65,7 @@ class SoapClientService
     /**
      * @throws SoapFault
      */
-    public function makeRequest(string $action, SoapParams $params): array
+    public final function makeRequest(string $action, SoapParams $params): array
     {
         $client = $this->getSoapClient();
 

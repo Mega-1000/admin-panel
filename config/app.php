@@ -1,5 +1,11 @@
 <?php
 
+use App\Providers\Entities\OrderAddressModelProvider;
+use App\Providers\Entities\OrderMessageModelServiceProvider;
+use App\Providers\Entities\OrderModelServiceProvider;
+use App\Providers\Entities\OrderPaymentModelServiceProvider;
+use App\Providers\Schenker\SchenkerServiceProvider;
+
 return [
 
     /*
@@ -161,8 +167,8 @@ return [
         Illuminate\Translation\TranslationServiceProvider::class,
         Illuminate\Validation\ValidationServiceProvider::class,
         Illuminate\View\ViewServiceProvider::class,
-	    Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
-	    
+        Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
+
         /*
          * Package Service Providers...
          */
@@ -182,12 +188,14 @@ return [
         /*
          * Model Observers Service Providers....
          */
-        \App\Providers\Entities\OrderModelServiceProvider::class,
-        \App\Providers\Entities\OrderMessageModelServiceProvider::class,
-        \App\Providers\Entities\OrderAddressModelProvider::class,
-        \App\Providers\Entities\OrderPaymentModelServiceProvider::class,
+        OrderModelServiceProvider::class,
+        OrderMessageModelServiceProvider::class,
+        OrderAddressModelProvider::class,
+        OrderPaymentModelServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
         Lord\Laroute\LarouteServiceProvider::class,
+
+        SchenkerServiceProvider::class,
     ],
 
     /*
@@ -246,7 +254,7 @@ return [
         'Label' => App\Entities\Label::class,
         'User' => App\User::class,
         'Payment' => App\Entities\Payment::class,
-        'Order' => App\Entities\Order::class
+        'Order' => App\Entities\Order::class,
     ],
 
 ];

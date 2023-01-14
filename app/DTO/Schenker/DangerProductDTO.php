@@ -19,16 +19,6 @@ class DangerProductDTO extends BaseDTO implements JsonSerializable
     private $comment;
     private $technicalName;
 
-    /**
-     * @param string $uniqueNumber
-     * @param ?string $riskLevel
-     * @param float $weight
-     * @param float $packagesQuantity
-     * @param float $packageType
-     * @param bool $excluded
-     * @param ?string $comment
-     * @param ?string $technicalName
-     */
     public function __construct(
         string  $uniqueNumber,
         ?string $riskLevel,
@@ -53,9 +43,11 @@ class DangerProductDTO extends BaseDTO implements JsonSerializable
     public function jsonSerialize()
     {
         $dangerProductData = [
-            'adrUn' => substr($this->uniqueNumber, 0, 4),
-            'adrWeight' => round($this->weight * 100),
+            'adrUn' => $this->substrText($this->uniqueNumber, 4),
+            'adrWeight' => $this->floatToInt($this->weight),
             'adrColli' => $this->packagesQuantity,
+            'adrLq' => $this->excluded,
+            'adrNotes' => $this->substrText($this->comment, 150),
         ];
 
         if (!DangerProductPackageType::checkIfTypeExists($this->packageType)) {
@@ -63,6 +55,9 @@ class DangerProductDTO extends BaseDTO implements JsonSerializable
         }
 
         $dangerProductData['adrPack'] = $this->packageType;
+
+        $this->comment = $this->substrText($this->comment ?? '', 150);
+        $this->technicalName = $this->substrText($this->technicalName ?? '', 255);
 
         $this->optionalFields = [
             'adrNotes' => 'comment',

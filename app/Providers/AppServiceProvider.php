@@ -2,13 +2,11 @@
 
 namespace App\Providers;
 
-use App\Entities\TaskTime;
-use App\Jobs\ImportAllegroPayInJob;
-use App\Observers\Entities\TaskTimeObserver;
 use Carbon\Carbon;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\ServiceProvider;
+use DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\ServiceProvider;
+use URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,7 +18,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         if (env('DEBUG_QUERY', false)) {
-            \DB::listen(function($sql) {
+            DB::listen(function ($sql) {
                 error_log($sql->sql);
             });
         }
@@ -28,7 +26,7 @@ class AppServiceProvider extends ServiceProvider
         $forceHttpsEnvs = ['production', 'test'];
 
         if (in_array($this->app->environment(), $forceHttpsEnvs)) {
-            \URL::forceScheme('https');
+            URL::forceScheme('https');
         }
         Carbon::setWeekendDays([Carbon::SUNDAY, Carbon::SATURDAY]);
 //        TaskTime::observe(TaskTimeObserver::class);

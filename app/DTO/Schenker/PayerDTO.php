@@ -2,7 +2,7 @@
 
 namespace App\DTO\Schenker;
 
-class PayerDTO
+class PayerDTO extends AddressDTO
 {
 
 }
