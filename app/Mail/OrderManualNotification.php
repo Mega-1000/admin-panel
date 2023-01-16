@@ -26,16 +26,9 @@ class OrderManualNotification extends Mailable
      */
     public function __construct(string $subject, string $msgHeader, string $msg)
     {
-        config([
-            'mail.driver'       => 'smtp',
-            'mail.host'         => 's104.linuxpl.com',
-            'mail.username'     => 'awizacje@ephpolska.pl',
-            'mail.password'     => '1!Qaa2@Wss',
-            'mail.port'         => 587,
-            'mail.encryption'   => 'tls',
-            'mail.from.address' => 'awizacje@ephpolska.pl',
-            'mail.from.name'    => 'Awizacje',
-        ]);
+        // change config on the fly
+        $notificationMailboxCfg = config('notification_mailbox');
+        config($notificationMailboxCfg);
         (new MailServiceProvider(app()))->register();
 
         $this->subject = $subject;

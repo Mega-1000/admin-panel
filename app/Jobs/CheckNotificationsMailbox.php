@@ -61,12 +61,12 @@ class CheckNotificationsMailbox implements ShouldQueue {
             'code' => 'U',
             'value' => null,
         ],
-        'released' => [
-            'code' => 'TZW',
+        'chat' => [
+            'code' => 'AWDK',
             'value' => null,
         ],
-        'isVisibleForClient' => [
-            'code' => 'WF',
+        'released' => [
+            'code' => 'TZW',
             'value' => null,
         ],
     ];
@@ -125,8 +125,9 @@ class CheckNotificationsMailbox implements ShouldQueue {
                 $pattern = "/";
                 foreach ($this->emailElements as $element) {
                     // search by given prefix that means (DOOF): is mandatory, and ; at the end is mandatory too
-                    $pattern .= "\({$element['code']}\):\s?(.*);|";
+                    $pattern .= "\({$element['code']}\):\s?(.*)|";
                 }
+                $t = "/\(DOOF\):\s?(.*)/mi";
                 $pattern = rtrim($pattern, '|');
                 $pattern .= "/mi";
                 preg_match_all($pattern, $msg, $elementsMatches);
@@ -136,7 +137,7 @@ class CheckNotificationsMailbox implements ShouldQueue {
                     if( !isset($elementsMatches[$i + 1]) ) break;
                     // get first value ignores empty values, first value is the newest value of matches
                     $filteredMatches = array_filter($elementsMatches[$i + 1]);
-                    $element['value'] = reset($filteredMatches);
+                    $element['value'] = trim( reset($filteredMatches) );
                     $i++;
                 }
 
@@ -149,7 +150,7 @@ class CheckNotificationsMailbox implements ShouldQueue {
                 if( !empty($attachments) ) {
                     $params = [
                         'orderId' => $orderId,
-                        'isVisibleForClient' => $this->emailElements['isVisibleForClient']['value'],
+                        'isVisibleForClient' => 0,
                     ];
                     // get base64 code from main (first) attachment
                     $mainAttachment = reset($attachments)['attachment'];
