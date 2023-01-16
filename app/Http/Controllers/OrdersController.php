@@ -3013,6 +3013,17 @@ class OrdersController extends Controller
         return OrderFiles::where('order_id', $id)->get();
     }
 
+    public function getWarehouseFirmEmail(int $orderId): string
+    {
+        $order = Order::findOrFail($orderId);
+        $warehouse = $order->warehouse;
+        if ($warehouse && $warehouse->firm) {
+            $warehouseMail = $warehouse->firm->email;
+        }
+
+        return $warehouseMail;
+    }
+
     public function getUserInfo(int $id)
     {
         $user = $this->userRepository->find($id);

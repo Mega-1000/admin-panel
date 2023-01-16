@@ -2547,7 +2547,13 @@
                 })
                 return;
             }
-            let removeLabelRequest = function () {
+            let removeLabelRequest = async function () {
+
+                await $.ajax({
+                    url: "/admin/orders/get-warehouse/" + orderId,
+                    method: "POST"
+                }).done(res => console.log(res));
+
                 $.ajax({
                     url: "/admin/orders/label-removal/" + orderId + "/" + labelId,
                     method: "POST"

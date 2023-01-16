@@ -2,49 +2,51 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Entities\Country;
-use App\Entities\FirmSource;
+use Carbon\Carbon;
 use App\Entities\Label;
-use App\Entities\OrderAddress;
-use App\Entities\OrderDates;
-use App\Entities\WorkingEvents;
-use App\Helpers\BackPackPackageDivider;
+use App\Entities\Order;
+use App\Entities\Country;
+use App\Jobs\AddLabelJob;
 use App\Helpers\ChatHelper;
-use App\Helpers\GetCustomerForAdminEdit;
-use App\Helpers\GetCustomerForNewOrder;
-use App\Helpers\MessagesHelper;
+use App\Entities\FirmSource;
+use App\Entities\OrderDates;
+use App\Jobs\RemoveLabelJob;
+use Illuminate\Http\Request;
 use App\Helpers\OrderBuilder;
+use App\Entities\OrderAddress;
+use App\Entities\WorkingEvents;
+use App\Helpers\MessagesHelper;
+use App\Services\ProductService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Helpers\OrderPriceCalculator;
+use App\Jobs\OrderProformSendMailJob;
+use App\Repositories\OrderRepository;
+use App\Helpers\BackPackPackageDivider;
+use App\Helpers\GetCustomerForNewOrder;
 use App\Helpers\SendCommunicationEmail;
 use App\Helpers\TransportSumCalculator;
-use App\Http\Requests\Api\Orders\AcceptReceivingOrderRequest;
+use App\Repositories\ProductRepository;
+use Illuminate\Support\Facades\Storage;
+use App\Helpers\GetCustomerForAdminEdit;
+use App\Repositories\CustomerRepository;
+use App\Repositories\OrderItemRepository;
+use App\Http\Controllers\OrdersController as OrdersControllerApp;
+use App\Repositories\OrderAddressRepository;
+use App\Repositories\OrderMessageRepository;
+use App\Repositories\OrderPackageRepository;
+use App\Repositories\ProductPriceRepository;
+use App\Repositories\CustomerAddressRepository;
+use App\Http\Requests\Api\Orders\StoreOrderRequest;
+use App\Jobs\Orders\CheckDeliveryAddressSendMailJob;
+use App\Repositories\OrderMessageAttachmentRepository;
 use App\Http\Requests\Api\Orders\DeclineProformRequest;
 use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
-use App\Http\Requests\Api\Orders\StoreOrderRequest;
+use App\Http\Requests\Api\Orders\AcceptReceivingOrderRequest;
 use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
-use App\Jobs\AddLabelJob;
-use App\Jobs\OrderProformSendMailJob;
-use App\Jobs\Orders\CheckDeliveryAddressSendMailJob;
-use App\Jobs\RemoveLabelJob;
-use App\Repositories\CustomerRepository;
-use App\Repositories\OrderAddressRepository;
-use App\Repositories\OrderItemRepository;
-use App\Repositories\OrderMessageAttachmentRepository;
-use App\Repositories\OrderMessageRepository;
-use App\Repositories\CustomerAddressRepository;
-use App\Repositories\OrderPackageRepository;
-use App\Repositories\OrderRepository;
-use App\Http\Controllers\Controller;
-use App\Repositories\ProductRepository;
-use App\Repositories\ProductPriceRepository;
-use App\Services\ProductService;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
-use App\Entities\Order;
 
 /**
  * Class OrdersController
@@ -803,5 +805,12 @@ class OrdersController extends Controller
     public function countries()
     {
         return response()->json(Country::all());
+    }
+
+    public function uploadProofOfPayment(Request $request)
+    {
+        $ordersController = App::make(OrdersControllerApp::class);
+        $ordersController->addFile($request, $request->id);
+        return response()->json($request);
     }
 }
