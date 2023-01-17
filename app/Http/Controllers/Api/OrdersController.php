@@ -491,6 +491,8 @@ class OrdersController extends Controller
             ->with('addresses')
             ->with('invoices')
             ->with('employee')
+            ->with('files')
+            ->with('dates')
             ->with('factoryDelivery')
             ->orderBy('id', 'desc')
             ->get();
@@ -809,8 +811,13 @@ class OrdersController extends Controller
 
     public function uploadProofOfPayment(Request $request)
     {
+        $orderId = $request->id;
+        $order = Order::find($orderId);
+        if(!$order) return response(['errorMessage' => 'Nie można znaleźć zamówienia'], 400);
+        if($order->customer_id != $request->user()->id) return response(['errorMessage' => 'Nie twoje zamówienie'], 400);
         $ordersController = App::make(OrdersControllerApp::class);
-        $ordersController->addFile($request, $request->id);
-        return response()->json($request);
+        $ordersController->addFile($request, $orderId);
+        dispatch(new AddLabelJob($orderId, [Label::PROOF_OF_PAYMENT_UPLOADED]));
+        return response('success', 200);
     }
 }
