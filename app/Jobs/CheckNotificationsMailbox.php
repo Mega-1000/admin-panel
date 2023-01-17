@@ -11,12 +11,14 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderManualNotification;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\MailServiceProvider;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Entities\OrderWarehouseNotification;
 use App\Http\Controllers\Api\OrderWarehouseNotificationController;
+use App\Http\Requests\Api\OrderWarehouseNotification\DenyShipmentRequest;
 use App\Http\Requests\Api\OrderWarehouseNotification\AcceptShipmentRequest;
 
 class CheckNotificationsMailbox implements ShouldQueue {
@@ -127,7 +129,6 @@ class CheckNotificationsMailbox implements ShouldQueue {
                     // search by given prefix that means (DOOF): is mandatory, and ; at the end is mandatory too
                     $pattern .= "\({$element['code']}\):\s?(.*)|";
                 }
-                $t = "/\(DOOF\):\s?(.*)/mi";
                 $pattern = rtrim($pattern, '|');
                 $pattern .= "/mi";
                 preg_match_all($pattern, $msg, $elementsMatches);
@@ -137,7 +138,7 @@ class CheckNotificationsMailbox implements ShouldQueue {
                     if( !isset($elementsMatches[$i + 1]) ) break;
                     // get first value ignores empty values, first value is the newest value of matches
                     $filteredMatches = array_filter($elementsMatches[$i + 1]);
-                    $element['value'] = trim( reset($filteredMatches) );
+                    $element['value'] = trim( reset($filteredMatches), " \t\n\r\0\x0B*" );
                     $i++;
                 }
 
@@ -195,7 +196,6 @@ class CheckNotificationsMailbox implements ShouldQueue {
                     'driver_contact' => $this->emailElements['phoneToDriver']['value'],
                     'customer_notices' => $this->emailElements['comments']['value'],
                 ];
-
                 // make request with given $params and validator
                 $request = new AcceptShipmentRequest($params);
                 $validator = Validator::make($request->all(), $request->rules(), [], $request->attributes());
@@ -216,10 +216,24 @@ class CheckNotificationsMailbox implements ShouldQueue {
                         $res = $orderWarehouseNotification->accept($request, $notification->id);
                         $subject = 'Formularz został zaakceptowany do realizacji dla oferty nr: '.$orderId;
                     } else {
+
+                        $params = [
+                            'order_id' => $orderId,
+                            'warehouse_id' => $order->warehouse_id,
+                            'customer_notices' => $this->emailElements['comments']['value'],
+                        ];
+                        
+                        $request = new DenyShipmentRequest($params);
+                        $validator = Validator::make($request->all(), $request->rules(), [], $request->attributes());
+                        $request->setValidator($validator);
                         $res = $orderWarehouseNotification->deny($request, $notification->id);
                         $subject = 'Formularz został odrzucony do realizacji dla oferty nr: '.$orderId;
                     }
                     if($res->getStatusCode() == 200) {
+                        $notificationMailboxCfg = config('notification_mailbox');
+                        config($notificationMailboxCfg);
+                        (new MailServiceProvider(app()))->register();
+                        
                         $email = new OrderManualNotification($subject, $subject, '');
                         Mail::to($from)->send($email);
                     }

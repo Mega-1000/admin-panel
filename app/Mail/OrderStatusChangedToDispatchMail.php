@@ -47,7 +47,6 @@ class OrderStatusChangedToDispatchMail extends Mailable
     {
         ini_set('max_execution_time', 60);
 
-
         // change config on the fly
         $notificationMailboxCfg = config('notification_mailbox');
         config($notificationMailboxCfg);
@@ -70,7 +69,8 @@ class OrderStatusChangedToDispatchMail extends Mailable
         $helper->currentUserId = Auth::user()->id;
         $helper->currentUserType = MessagesHelper::TYPE_USER;
         $userToken = $helper->encrypt();
-        $this->chatLink = '/chat/'.$userToken;
+        // $this->chatLink = 'https://'.$_SERVER['HTTP_HOST'].'/chat/'.$userToken;
+        $this->chatLink = '';
     }
 
     /**
@@ -89,6 +89,5 @@ class OrderStatusChangedToDispatchMail extends Mailable
                 return $this->view('emails.reminder-order-status-changed-to-dispatch')->attach($this->path)->attach($this->pathSecond);
             }
         }
-
     }
 }

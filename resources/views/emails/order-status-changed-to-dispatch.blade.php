@@ -1,5 +1,7 @@
 <body>
-<p>FORMULARZ AWIZACYJNY</p><br>
+<p>
+    <strong>FORMULARZ AWIZACYJNY</strong>
+</p>
 <p>
     Prosimy nie odpisywać na tego e maila poprzez odpowiedź nadawcy i wpisując tekst w dowolne miejsce ponieważ nikt tego nie odczyta.
 </p>
@@ -14,7 +16,7 @@ Drugim jest przesłanie informacji jako e-mail zwrotny aczkolwiek aby informacja
 </p>
 <br>
 <p>
-    SPOSÓB NR I
+    <strong>SPOSÓB NR I</strong>
 </p>
 <p>
     poprzez uzycie linków awizacyjnych
@@ -46,13 +48,14 @@ Drugim jest przesłanie informacji jako e-mail zwrotny aczkolwiek aby informacja
     <a href="{{ $chatLink }}">Link do chatu</a>
 </p>
 <br><br>
-<p>SPOSÓB NR II</p>
-<p>bardziej skomplikowany aczkolwiek nie wymaga użycia linków</p>
 <p>
+    <strong>SPOSÓB NR II</strong>
+</p>
+<p>bardziej skomplikowany aczkolwiek nie wymaga użycia linków</p>
+<br><p>
     <strong>1A) POTWIERZENIE LUB ODRZUCENIA AWIZACJI</strong>
 </p>
 <p>Poniżej po dwukropku należy wpisać cyfrę 1 dla prawidłowego wyboru:</p>
-<br>
 <p>Akceptuję awizacje z podanymi parametrami (AAZPP): </p>
 <p>Odrzucam awizacje z podanymi parametrami (OAZPP): </p>
 <p>
@@ -60,14 +63,14 @@ Drugim jest przesłanie informacji jako e-mail zwrotny aczkolwiek aby informacja
     Jeżeli awizacja jest pozytywna pod różnymi warunkami np. zapłacenie proformy to prosimy zatwierdzić ją a w polu uwagi wpisać zatwierdzona pod warunkiem opłacenia faktury proformy do dnia , itp.itd.<br>
     W przypadku odrzucenia awizacji należy podać koniecznie przyczyne w uwagach na dole.<br>
 </p>
-<p>
+<br><p>
     <strong>1B) Wstępne zaproponowane daty możliwości odbioru towaru przez klienta (podajemy tylko informacyjnie)</strong>
-</p><br>
+</p>
 <p>od: {{ $customerShipmentDateFrom }}</p>
 <p>do: {{ $customerShipmentDateTo }}</p>
 <br>
-<p>Prosimy poniżej we wszystkich miejscach po dwukrokpu precyzyjnie uzupełnić dane.</p>
-<p><strong>1C) DATY DOSTAWY OD DO KONIECZNIE W FORMACIE 2022-10-15</strong></p>
+<p>Prosimy poniżej we wszystkich miejscach po dwukropku precyzyjnie uzupełnić dane:</p>
+<br><p><strong>1C) DATY DOSTAWY OD DO KONIECZNIE W FORMACIE 2022-10-15</strong></p>
 <p>od daty (DOOF): </p>
 <p>do daty (DODF): </p>
 <br>
