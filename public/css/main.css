@@ -158,3 +158,6 @@
     margin-bottom: 5px !important;
 }
 
+.z-index-max {
+    z-index: 1000000;
+}

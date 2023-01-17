@@ -432,7 +432,7 @@ Route::group(['prefix' => 'admin'], function () {
             'LabelsController@detachLabelFromOrder')->name('orders.detachLabel');
 
         Route::post('orders/get-warehouse/{orderId}',
-            'OrdersController@getWarehouseFirmEmail')->name('orders.getFirmEmail');
+            'OrdersController@getWarehouse')->name('orders.getFirmEmail');
         Route::post('orders/label-removal/{orderId}/{labelId}',
             'OrdersController@swapLabelsAfterLabelRemoval')->name('orders.label-removal');
         Route::post('orders/payment-deadline', 'OrdersController@setPaymentDeadline')->name('orders.payment-deadline');
