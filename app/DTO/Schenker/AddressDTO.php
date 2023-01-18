@@ -6,19 +6,19 @@ use App\DTO\BaseDTO;
 
 class AddressDTO extends BaseDTO implements JsonSerializable
 {
-    private $clientId;
-    private $clientLocalizationNumber;
-    private $name;
-    private $postCode;
-    private $city;
-    private $street;
-    private $houseNumber;
-    private $localNumber;
-    private $phone;
-    private $nip;
-    private $contactPerson;
-    private $email;
-    private $palletId;
+    protected $clientId;
+    protected $clientLocalizationNumber;
+    protected $name;
+    protected $postCode;
+    protected $city;
+    protected $street;
+    protected $houseNumber;
+    protected $localNumber;
+    protected $phone;
+    protected $nip;
+    protected $contactPerson;
+    protected $email;
+    protected $palletId;
 
     public function __construct(
         string  $clientId,

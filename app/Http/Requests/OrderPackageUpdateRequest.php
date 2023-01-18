@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\CourierName;
 use Illuminate\Foundation\Http\FormRequest;
 
 class OrderPackageUpdateRequest extends FormRequest
@@ -29,8 +30,8 @@ class OrderPackageUpdateRequest extends FormRequest
             'size_c' => 'nullable|numeric',
             'shipment_date' => 'required|date',
             'delivery_date' => 'nullable|date',
-            'delivery_courier_name' => 'required|in:DPD,INPOST,APACZKA,JAS,POCZTEX,GIELDA,ODBIOR_OSOBISTY,PACZKOMAT,ALLEGRO-INPOST,GLS',
-            'service_courier_name' => 'nullable|in:DPD,INPOST,APACZKA,JAS,POCZTEX,GIELDA,ODBIOR_OSOBISTY,PACZKOMAT,ALLEGRO-INPOST,GLS',
+            'delivery_courier_name' => 'required|in:' . implode(',', array_keys(CourierName::DELIVERY_TYPE_LABELS)),
+            'service_courier_name' => 'nullable|in:' . implode(',', array_keys(CourierName::DELIVERY_TYPE_LABELS)),
             'weight' => 'required|regex:/^\d*(\.\d{1,2})?$/',
             'quantity' => 'nullable|numeric',
             'container_type' => 'nullable',
@@ -43,7 +44,9 @@ class OrderPackageUpdateRequest extends FormRequest
             'cost_for_client' => 'nullable|regex:/^\d*(\.\d{2})?$/',
             'cost_for_company' => 'nullable|regex:/^\d*(\.\d{2})?$/',
             'real_cost_for_company' => 'nullable|regex:/^\d*(\.\d{2})?$/',
-            'content' => 'required'
+            'content' => 'required',
+            'protection_method' => 'required|max:20',
+            'services' => 'nullable',
         ];
     }
 }

@@ -13,7 +13,7 @@ class ServiceParameterDTO extends BaseDTO
     /**
      * @param string|float $mainParameter
      */
-    public function __construct($mainParameter, string $documentType, string $documentNumber)
+    public function __construct($mainParameter, string $documentType = '', string $documentNumber = '')
     {
         $this->mainParameter = $mainParameter;
         $this->documentType = $documentType;

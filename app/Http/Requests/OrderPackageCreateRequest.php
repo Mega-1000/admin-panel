@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\CourierName;
 use Illuminate\Foundation\Http\FormRequest;
 
 class OrderPackageCreateRequest extends FormRequest
@@ -30,8 +31,8 @@ class OrderPackageCreateRequest extends FormRequest
             'size_c' => 'nullable|numeric',
             'shipment_date' => 'required|date|date_format:"Y-m-d"',
             'delivery_date' => 'nullable|date|date_format:"Y-m-d"',
-            'delivery_courier_name' => 'required|in:DPD,INPOST,APACZKA,JAS,POCZTEX,GIELDA,ODBIOR_OSOBISTY,PACZKOMAT,ALLEGRO-INPOST,GLS',
-            'service_courier_name' => 'nullable|in:DPD,INPOST,APACZKA,JAS,POCZTEX,GIELDA,ODBIOR_OSOBISTY,PACZKOMAT,ALLEGRO-INPOST,GLS',
+            'delivery_courier_name' => 'required|in:' . implode(',', array_keys(CourierName::DELIVERY_TYPE_LABELS)),
+            'service_courier_name' => 'nullable|in:' . implode(',', array_keys(CourierName::DELIVERY_TYPE_LABELS)),
             'weight' => 'required|regex:/^\d*(\.\d{1,2})?$/',
             'quantity' => 'nullable|numeric',
             'container_type' => 'nullable',
@@ -47,6 +48,8 @@ class OrderPackageCreateRequest extends FormRequest
             'chosen_data_template' => 'nullable',
             'content' => 'required',
             'toCheck' => 'nullable',
+            'protection_method' => 'required|max:20',
+            'services' => 'nullable',
         ];
     }
 }

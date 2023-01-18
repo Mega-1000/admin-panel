@@ -3,13 +3,15 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Entities\ContainerType;
+use App\Entities\ContentType;
+use App\Entities\PackageTemplate;
+use App\Entities\PackingType;
+use App\Enums\Schenker\SupportedService;
 use App\Repositories\PackageTemplateRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Entities\PackageTemplate;
-use App\Entities\ContentType;
-use App\Entities\PackingType;
-use App\Entities\ContainerType;
+use Illuminate\Http\Response;
 
 class PackageTemplatesController extends Controller
 {
@@ -23,36 +25,38 @@ class PackageTemplatesController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index()
     {
         $templatesUnsorted = PackageTemplate::all();
         $templates = $templatesUnsorted->sortBy('list_order');
-        return view('package_templates.index',compact('templates'))
-        ->withpackageTemplates($templates);
+        return view('package_templates.index', compact('templates'))
+            ->withpackageTemplates($templates);
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function create() {
+    public function create()
+    {
         $contentTypes = ContentType::all();
         $packingTypes = PackingType::all();
         $containerTypes = ContainerType::all();
-        return view('package_templates.create')
-                        ->withcontentTypes($contentTypes)
-                        ->withpackingTypes($packingTypes)
-                        ->withcontainerTypes($containerTypes);
+        $supportedServices = SupportedService::getDictionary();
+        return view('package_templates.create', ['supportedServices' => $supportedServices])
+            ->withcontentTypes($contentTypes)
+            ->withpackingTypes($packingTypes)
+            ->withcontainerTypes($containerTypes);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return Response
      */
     public function store(Request $request)
     {
@@ -60,34 +64,17 @@ class PackageTemplatesController extends Controller
         return redirect()->route('package_templates.index');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-
-    public function edit($id)
-    {
-        $packageTemplate = PackageTemplate::find($id);
-        $contentTypes = ContentType::all();
-        $packingTypes = PackingType::all();
-        $containerTypes = ContainerType::all();
-        return view('package_templates.edit')->withOld($packageTemplate)
-                        ->withcontentTypes($contentTypes)
-                        ->withpackingTypes($packingTypes)
-                        ->withcontainerTypes($containerTypes);
-    }
-
     private function saveTemplate($request, $id = null)
     {
         $this->validate($request, array(
-            'name'=>'required|max:255',
-            'notice_max_lenght'=>'integer|required',
+            'name' => 'required|max:255',
+            'notice_max_lenght' => 'integer|required',
             'symbol' => 'required',
             'max_weight' => 'numeric|required',
             'volume' => 'integer|required',
-            'list_order'=>'required'
+            'list_order' => 'required',
+            'protection_method' => 'required|max:20',
+            'services' => 'nullable',
         ));
         if (!empty($request->accept_time)) {
             $this->validate($request, array(
@@ -132,16 +119,41 @@ class PackageTemplatesController extends Controller
         $template->displayed_name = $request->displayed_name;
         $template->packing_type = $request->packing_type;
         $template->cod_cost_for_us = $request->cod_cost_for_us;
+        $template->protection_method = $request->protection_method;
+        $template->services = $request->services ?? '';
+        $template->allegro_delivery_method = '[]';
 
         $template->save();
     }
 
     /**
+     * Display the specified resource.
+     *
+     * @param int $id
+     * @return Response
+     */
+
+    public function edit($id)
+    {
+        $packageTemplate = PackageTemplate::find($id);
+        $contentTypes = ContentType::all();
+        $packingTypes = PackingType::all();
+        $containerTypes = ContainerType::all();
+        $supportedServices = SupportedService::getDictionary();
+        return view('package_templates.edit',
+            ['supportedServices' => $supportedServices])
+            ->withOld($packageTemplate)
+            ->withcontentTypes($contentTypes)
+            ->withpackingTypes($packingTypes)
+            ->withcontainerTypes($containerTypes);
+    }
+
+    /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param int $id
+     * @return Response
      */
     public function update(Request $request, $id)
     {
@@ -152,8 +164,8 @@ class PackageTemplatesController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return Response
      */
     public function destroy($id)
     {

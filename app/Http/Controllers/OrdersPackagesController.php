@@ -15,6 +15,7 @@ use App\Entities\PackingType;
 use App\Entities\SelAddress;
 use App\Entities\SelTransaction;
 use App\Entities\WorkingEvents;
+use App\Enums\Schenker\SupportedService;
 use App\Helpers\DateHelper;
 use App\Helpers\OrderPackagesDataHelper;
 use App\Helpers\PdfCharactersHelper;
@@ -34,16 +35,22 @@ use App\Repositories\PackageTemplateRepository;
 use App\Repositories\ShipmentGroupRepository;
 use Barryvdh\DomPDF\Facade as PDF;
 use Carbon\Carbon;
+use DateTime;
+use Exception;
 use iio\libmergepdf\Merger;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\View\View;
+use Mailer;
 use Yajra\DataTables\Facades\DataTables;
 
 /**
@@ -86,9 +93,95 @@ class OrdersPackagesController extends Controller
         $this->shipmentGroupRepository = $shipmentGroupRepository;
     }
 
+    public function changeValue(Request $request)
+    {
+        $this->repository->update([
+            'cash_on_delivery' => $request->input('modalPackageValue')
+        ], $request->input('packageId'));
+        return redirect()->back()->with('template-id', $request->input('template-id'));
+    }
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @param OrderPackageUpdateRequest $request
+     * @param                           $id
+     *
+     * @return RedirectResponse
+     */
+    public function update(OrderPackageUpdateRequest $request, $id)
+    {
+        $orderPackage = OrderPackage::find($id);
+
+        if (empty($orderPackage)) {
+            abort(404);
+        }
+
+        $orderId = $orderPackage->order_id;
+        WorkingEvents::createEvent(WorkingEvents::ORDER_PACKAGES_UPDATE_EVENT, $orderId);
+        $data = $request->validated();
+        $data['packing_type'] = $request->input('packing_type');
+        $data['delivery_date'] = new DateTime($data['delivery_date']);
+        $data['shipment_date'] = new DateTime($data['shipment_date']);
+
+        $this->saveOrderPackage($data, $id);
+
+        return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
+            'message' => __('order_packages.message.update'),
+            'alert-type' => 'success'
+        ]);
+    }
+
+    private function saveOrderPackage($data, $id = null)
+    {
+        if (is_null($id)) {
+            $orderPackage = new OrderPackage;
+        } else {
+            $orderPackage = OrderPackage::find($id);
+        }
+        $orderPackage->size_a = $data['size_a'];
+        $orderPackage->size_b = $data['size_b'];
+        $orderPackage->size_c = $data['size_c'];
+        $orderPackage->shipment_date = $data['shipment_date'];
+        $orderPackage->delivery_date = $data['delivery_date'];
+        $orderPackage->delivery_courier_name = $data['delivery_courier_name'];
+        $orderPackage->service_courier_name = $data['service_courier_name'];
+        $orderPackage->weight = $data['weight'];
+        $orderPackage->quantity = 1;
+        $orderPackage->container_type = $data['container_type'];
+        $orderPackage->notices = $data['notices'];
+        $orderPackage->shape = $data['shape'];
+        $orderPackage->sending_number = $data['sending_number'];
+        $orderPackage->letter_number = $data['letter_number'];
+        $orderPackage->cash_on_delivery = $data['cash_on_delivery'];
+        $orderPackage->status = $data['status'];
+        $orderPackage->cost_for_client = $data['cost_for_client'];
+        $orderPackage->cost_for_company = $data['cost_for_company'];
+        $orderPackage->content = $data['content'];
+        $orderPackage->packing_type = $data['packing_type'];
+        if (is_null($id)) {
+            $orderPackage->order_id = $data['order_id'];
+            $orderPackage->number = $data['number'];
+            $orderPackage->symbol = $data['symbol'];
+            $orderPackage->chosen_data_template = $data['chosen_data_template'];
+        }
+        $orderPackage->protection_method = $data['protection_method'] ?? '';
+        $orderPackage->services = $data['services'] ?? '';
+        $this->orderPackagesDataHelper->findFreeShipmentDate($orderPackage);
+        $orderPackage->save();
+
+        if (!empty($data['real_cost_for_company'])) {
+            $orderPackage->realCostsForCompany()->create([
+                'order_package_id' => $orderPackage->id,
+                'cost' => PriceFormatter::asAbsolute(
+                    PriceFormatter::fromString($data['real_cost_for_company'])
+                ),
+            ]);
+        }
+
+        return $orderPackage;
+    }
+
+    /**
+     * @return Factory|View
      */
     public function create(Request $request, $id, $multi = null)
     {
@@ -173,28 +266,35 @@ class OrdersPackagesController extends Controller
             }
         }
 
-        return view('orderPackages.create', compact('id', 'templateData', 'orderData', 'order', 'payments', 'promisedPayments', 'connectedOrders', 'cashOnDeliverySum', 'isAdditionalDKPExists', 'allOrdersSum', 'multiData'))
+        $supportedServices = SupportedService::getDictionary();
+
+        return view('orderPackages.create',
+            compact(
+                'id',
+                'templateData',
+                'orderData',
+                'order',
+                'payments',
+                'promisedPayments',
+                'connectedOrders',
+                'cashOnDeliverySum',
+                'isAdditionalDKPExists',
+                'allOrdersSum',
+                'multiData',
+                'supportedServices'
+            ))
             ->withcontentTypes($contentTypes)
             ->withpackingTypes($packingTypes)
             ->withcontainerTypes($containerTypes)
             ->withisAllegro($isAllegro);
     }
 
-    public function changeValue(Request $request)
-    {
-        $this->repository->update([
-            'cash_on_delivery' => $request->input('modalPackageValue')
-        ], $request->input('packageId'));
-        return redirect()->back()->with('template-id', $request->input('template-id'));
-    }
-
-
     /**
      * Show the form for editing the specified resource.
      *
      * @param int $id
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit($id)
     {
@@ -207,88 +307,13 @@ class OrdersPackagesController extends Controller
         $packingTypes = PackingType::all();
         $containerTypes = ContainerType::all();
 
-        return view('orderPackages.edit', compact('orderPackage', 'id'))
+        $supportedServices = SupportedService::getDictionary();
+
+        return view('orderPackages.edit', compact('orderPackage', 'id', 'supportedServices'))
             ->withcontentTypes($contentTypes)
             ->withpackingTypes($packingTypes)
             ->withcontainerTypes($containerTypes)
             ->withisAllegro($isAllegro);
-    }
-
-    /**
-     * @param OrderPackageUpdateRequest $request
-     * @param                           $id
-     *
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function update(OrderPackageUpdateRequest $request, $id)
-    {
-        $orderPackage = OrderPackage::find($id);
-
-        if (empty($orderPackage)) {
-            abort(404);
-        }
-
-        $orderId = $orderPackage->order_id;
-        WorkingEvents::createEvent(WorkingEvents::ORDER_PACKAGES_UPDATE_EVENT, $orderId);
-        $data = $request->validated();
-        $data['packing_type'] = $request->input('packing_type');
-        $data['delivery_date'] = new \DateTime($data['delivery_date']);
-        $data['shipment_date'] = new \DateTime($data['shipment_date']);
-
-        $this->saveOrderPackage($data, $id);
-
-        return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
-            'message' => __('order_packages.message.update'),
-            'alert-type' => 'success'
-        ]);
-    }
-
-    private function saveOrderPackage($data, $id = null)
-    {
-        if (is_null($id)) {
-            $orderPackage = new OrderPackage;
-        } else {
-            $orderPackage = OrderPackage::find($id);
-        }
-        $orderPackage->size_a = $data['size_a'];
-        $orderPackage->size_b = $data['size_b'];
-        $orderPackage->size_c = $data['size_c'];
-        $orderPackage->shipment_date = $data['shipment_date'];
-        $orderPackage->delivery_date = $data['delivery_date'];
-        $orderPackage->delivery_courier_name = $data['delivery_courier_name'];
-        $orderPackage->service_courier_name = $data['service_courier_name'];
-        $orderPackage->weight = $data['weight'];
-        $orderPackage->quantity = 1;
-        $orderPackage->container_type = $data['container_type'];
-        $orderPackage->notices = $data['notices'];
-        $orderPackage->shape = $data['shape'];
-        $orderPackage->sending_number = $data['sending_number'];
-        $orderPackage->letter_number = $data['letter_number'];
-        $orderPackage->cash_on_delivery = $data['cash_on_delivery'];
-        $orderPackage->status = $data['status'];
-        $orderPackage->cost_for_client = $data['cost_for_client'];
-        $orderPackage->cost_for_company = $data['cost_for_company'];
-        $orderPackage->content = $data['content'];
-        $orderPackage->packing_type = $data['packing_type'];
-        if (is_null($id)) {
-            $orderPackage->order_id = $data['order_id'];
-            $orderPackage->number = $data['number'];
-            $orderPackage->symbol = $data['symbol'];
-            $orderPackage->chosen_data_template = $data['chosen_data_template'];
-        }
-        $this->orderPackagesDataHelper->findFreeShipmentDate($orderPackage);
-        $orderPackage->save();
-
-        if (!empty($data['real_cost_for_company'])) {
-            $orderPackage->realCostsForCompany()->create([
-                'order_package_id' => $orderPackage->id,
-                'cost' => PriceFormatter::asAbsolute(
-                    PriceFormatter::fromString($data['real_cost_for_company'])
-                ),
-            ]);
-        }
-
-        return $orderPackage;
     }
 
     public function store(OrderPackageCreateRequest $request)
@@ -297,10 +322,10 @@ class OrdersPackagesController extends Controller
 
         $data = $request->validated();
         $toCheck = (float)$request->input('toCheck');
-        $data['delivery_date'] = new \DateTime($data['delivery_date']);
-        $data['shipment_date'] = new \DateTime($data['shipment_date']);
+        $data['delivery_date'] = new DateTime($data['delivery_date']);
+        $data['shipment_date'] = new DateTime($data['shipment_date']);
         if (!empty($request->input('template_accept_hour')) || !empty($request->input('template_max_hour'))) {
-            $today = new \DateTime;
+            $today = new DateTime;
             $daydate = $data['shipment_date'];
             $daytoday = $today;
             $daydate->setTime(0, 0, 0);
@@ -308,8 +333,8 @@ class OrdersPackagesController extends Controller
             if ($daydate->diff($daytoday)->days == 0 && empty($request->input('force_shipment'))) {
                 $shipdate = $this->orderPackagesDataHelper->calculateShipmentDate($request->input('template_accept_hour'), $request->input('template_max_hour'));
                 $delidate = $this->orderPackagesDataHelper->calculateDeliveryDate($shipdate);
-                $data['shipment_date'] = new \DateTime($shipdate);
-                $data['delivery_date'] = new \DateTime($delidate);
+                $data['shipment_date'] = new DateTime($shipdate);
+                $data['delivery_date'] = new DateTime($delidate);
             }
         }
 
@@ -397,7 +422,7 @@ class OrdersPackagesController extends Controller
      *
      * @param int $id
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy(Request $request, $id)
     {
@@ -448,7 +473,7 @@ class OrdersPackagesController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function datatable($id)
     {
@@ -542,7 +567,7 @@ class OrdersPackagesController extends Controller
             $pdf->save($path);
             try {
                 $this->sendProtocolToDeliveryFirm(strtoupper($courierName), $path);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 \Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);
             }
             return $pdf->download($pdfFilename);
@@ -581,7 +606,7 @@ class OrdersPackagesController extends Controller
                 return;
         }
 
-        \Mailer::create()
+        Mailer::create()
             ->to($email)
             ->send(new SendDailyProtocolToDeliveryFirmMail("Protokół odbioru z dnia: " . Carbon::today()->toDateString(),
                 $path));
@@ -604,6 +629,29 @@ class OrdersPackagesController extends Controller
         }
         $this->getStickerForGls($package);
         return Storage::disk('private')->download('labels/gls/' . $package->sending_number . '.pdf');
+    }
+
+    /**
+     * @param $package
+     *
+     * @throws FileNotFoundException
+     */
+    protected function getStickerForGls($package)
+    {
+        try {
+            $file = Storage::disk('private')->get('labels/gls/' . $package->sending_number . '.pdf');
+        } catch (FileNotFoundException $e) {
+            $gls = new GLSClient();
+            $gls->auth();
+            $gls->getLetterForPackage($package->sending_number);
+            $number = $gls->getPackageNumer($package->sending_number);
+            $package->letter_number = $number;
+            $package->save();
+            $gls->logout();
+            ConfirmPackages::create(['package_id' => $package->id]);
+            $file = Storage::disk('private')->get('labels/gls/' . $package->sending_number . '.pdf');
+        }
+        return $file;
     }
 
     public function letters($courier_name)
@@ -634,6 +682,26 @@ class OrdersPackagesController extends Controller
         ]);
     }
 
+    /**
+     * @param $courier_name
+     *
+     * @return mixed
+     */
+    protected function getPackagesToSent($courier_name)
+    {
+        return OrderPackage::where('delivery_courier_name', 'like', $courier_name)
+            ->whereNotNull('letter_number')
+            ->whereNotIn('status', [
+                PackageTemplate::WAITING_FOR_CANCELLED,
+                PackageTemplate::SENDING,
+                PackageTemplate::DELIVERED,
+                PackageTemplate::CANCELLED])
+            ->whereHas('order', function ($query) {
+                $query->where('status_id', '<>', Order::STATUS_WITHOUT_REALIZATION);
+            })
+            ->get();
+    }
+
     public function prepareGroupPackageToSend($courierName)
     {
         ini_set('max_execution_time', '600');
@@ -658,7 +726,7 @@ class OrdersPackagesController extends Controller
                 foreach ($packages as $package) {
                     try {
                         list($message, $messages) = $this->sendPackage($package, $messages);
-                    } catch (\Exception $e) {
+                    } catch (Exception $e) {
                         \Log::error('błąd przy nadawaniu hurtowym paczki', ['error' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
                     }
                 }
@@ -685,6 +753,29 @@ class OrdersPackagesController extends Controller
             ]);
 
         }
+    }
+
+    /**
+     * @param       $package
+     * @param array $messages
+     *
+     * @return array
+     */
+    public function sendPackage($package, array $messages): array
+    {
+        $result = $this->preparePackageToSend($package->order->id, $package->id);
+        $resArr = $result->getData();
+        $itemMessage = 'ID Zamówienia ' . $package->order->id . ' | Numer paczki: ' . $package->id;
+        if ($resArr->message != null) {
+            foreach ($resArr->message as $msg) {
+                $itemMessage .= ' ' . $msg;
+            }
+            $message = [
+                'message' => $itemMessage
+            ];
+            array_push($messages, $message);
+        }
+        return array($message, $messages);
     }
 
     public function preparePackageToSend($orderId, $packageId)
@@ -843,7 +934,7 @@ class OrdersPackagesController extends Controller
         try {
             $template = PackageTemplate::findOrFail($request->templateList);
             $package = OrderPackage::findOrFail($packageId);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()->back()->with([
                 'message' => __('order_packages.message.package_error'),
                 'alert-type' => 'error'
@@ -898,72 +989,6 @@ class OrdersPackagesController extends Controller
             'message' => __('order_packages.message.store'),
             'alert-type' => 'success'
         ]);
-    }
-
-    /**
-     * @param       $package
-     * @param array $messages
-     *
-     * @return array
-     */
-    public function sendPackage($package, array $messages): array
-    {
-        $result = $this->preparePackageToSend($package->order->id, $package->id);
-        $resArr = $result->getData();
-        $itemMessage = 'ID Zamówienia ' . $package->order->id . ' | Numer paczki: ' . $package->id;
-        if ($resArr->message != null) {
-            foreach ($resArr->message as $msg) {
-                $itemMessage .= ' ' . $msg;
-            }
-            $message = [
-                'message' => $itemMessage
-            ];
-            array_push($messages, $message);
-        }
-        return array($message, $messages);
-    }
-
-    /**
-     * @param $courier_name
-     *
-     * @return mixed
-     */
-    protected function getPackagesToSent($courier_name)
-    {
-        return OrderPackage::where('delivery_courier_name', 'like', $courier_name)
-            ->whereNotNull('letter_number')
-            ->whereNotIn('status', [
-                PackageTemplate::WAITING_FOR_CANCELLED,
-                PackageTemplate::SENDING,
-                PackageTemplate::DELIVERED,
-                PackageTemplate::CANCELLED])
-            ->whereHas('order', function ($query) {
-                $query->where('status_id', '<>', Order::STATUS_WITHOUT_REALIZATION);
-            })
-            ->get();
-    }
-
-    /**
-     * @param $package
-     *
-     * @throws FileNotFoundException
-     */
-    protected function getStickerForGls($package)
-    {
-        try {
-            $file = Storage::disk('private')->get('labels/gls/' . $package->sending_number . '.pdf');
-        } catch (FileNotFoundException $e) {
-            $gls = new GLSClient();
-            $gls->auth();
-            $gls->getLetterForPackage($package->sending_number);
-            $number = $gls->getPackageNumer($package->sending_number);
-            $package->letter_number = $number;
-            $package->save();
-            $gls->logout();
-            ConfirmPackages::create(['package_id' => $package->id]);
-            $file = Storage::disk('private')->get('labels/gls/' . $package->sending_number . '.pdf');
-        }
-        return $file;
     }
 
     public function changePackageCost(OrderPackageCostsUpdateRequest $request): RedirectResponse
@@ -1025,7 +1050,7 @@ class OrdersPackagesController extends Controller
             }
             $path = storage_path('app/public/protocols/' . $pdfFilename);
             $pdf->save($path);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()->back()->with([
                 'message' => __('order_packages.message.close_day_protocol_error'),
                 'alert-type' => 'error'
@@ -1067,7 +1092,7 @@ class OrdersPackagesController extends Controller
             $pdf->save($path);
             $shipmentGroup->closed = true;
             $shipmentGroup->save();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()->back()->with([
                 'message' => __('order_packages.message.close_day_protocol_error'),
                 'alert-type' => 'error'

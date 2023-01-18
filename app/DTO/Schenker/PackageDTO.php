@@ -19,7 +19,6 @@ class PackageDTO extends BaseDTO implements JsonSerializable
     private $length;
     private $height;
     private $stack;
-    private $notStandard;
     private $notStandardComment;
 
     public function __construct(
@@ -34,7 +33,6 @@ class PackageDTO extends BaseDTO implements JsonSerializable
         float   $length,
         float   $height,
         ?bool   $stack,
-        ?bool   $notStandard,
         ?string $notStandardComment
     )
     {
@@ -49,7 +47,6 @@ class PackageDTO extends BaseDTO implements JsonSerializable
         $this->length = $length;
         $this->height = $height;
         $this->stack = $stack;
-        $this->notStandard = $notStandard;
         $this->notStandardComment = $notStandardComment;
     }
 
@@ -70,7 +67,6 @@ class PackageDTO extends BaseDTO implements JsonSerializable
         $this->optionalFields = [
             'colliId' => 'packageId',
             'stack' => 'stack',
-            'notStandard' => 'notStandard',
         ];
 
         if ($this->notStandard === true) {

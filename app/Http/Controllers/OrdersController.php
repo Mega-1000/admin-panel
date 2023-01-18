@@ -43,7 +43,6 @@ use App\Jobs\AddLabelJob;
 use App\Jobs\AllegroTrackingNumberUpdater;
 use App\Jobs\GenerateXmlForNexoJob;
 use App\Jobs\ImportOrdersFromSelloJob;
-use App\Jobs\Orders\MissingDeliveryAddressSendMailJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Jobs\RemoveFileLockJob;
 use App\Jobs\RemoveLabelJob;
@@ -84,6 +83,7 @@ use Exception;
 use iio\libmergepdf\Merger;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -96,7 +96,6 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
-use Maatwebsite\Excel\Facades\Excel;
 use Mailer;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Yajra\DataTables\Facades\DataTables;
@@ -222,7 +221,7 @@ class OrdersController extends Controller
 
     protected $orderExcelService;
 
-    /** @var TaskService  */
+    /** @var TaskService */
     protected $taskService;
 
     protected $productStockPacketRepository;
@@ -242,34 +241,35 @@ class OrdersController extends Controller
     ];
 
     public function __construct(
-        FirmRepository $repository,
-        WarehouseRepository $warehouseRepository,
-        OrderRepository $orderRepository,
-        CustomerRepository $customerRepository,
-        EmployeeRepository $employeeRepository,
-        OrderPaymentRepository $orderPaymentRepository,
-        CustomerAddressRepository $customerAddressRepository,
-        OrderItemRepository $orderItemRepository,
-        StatusRepository $statusRepository,
-        OrderMessageRepository $orderMessageRepository,
-        OrderAddressRepository $orderAddressRepository,
-        UserRepository $userRepository,
-        ProductPackingRepository $productPackingRepository,
-        LabelGroupRepository $labelGroupRepository,
-        LabelRepository $labelRepository,
-        ProductStockRepository $productStockRepository,
+        FirmRepository                 $repository,
+        WarehouseRepository            $warehouseRepository,
+        OrderRepository                $orderRepository,
+        CustomerRepository             $customerRepository,
+        EmployeeRepository             $employeeRepository,
+        OrderPaymentRepository         $orderPaymentRepository,
+        CustomerAddressRepository      $customerAddressRepository,
+        OrderItemRepository            $orderItemRepository,
+        StatusRepository               $statusRepository,
+        OrderMessageRepository         $orderMessageRepository,
+        OrderAddressRepository         $orderAddressRepository,
+        UserRepository                 $userRepository,
+        ProductPackingRepository       $productPackingRepository,
+        LabelGroupRepository           $labelGroupRepository,
+        LabelRepository                $labelRepository,
+        ProductStockRepository         $productStockRepository,
         ProductStockPositionRepository $productStockPositionRepository,
-        ProductStockLogRepository $productStockLogRepository,
-        FirmRepository $firmRepository,
-        ProductRepository $productRepository,
-        SpeditionExchangeRepository $speditionExchangeRepository,
-        OrderPackageRepository $orderPackageRepository,
-        TaskRepository $taskRepository,
-        OrderInvoiceService $orderInvoiceService,
-        OrderExcelService $orderExcelService,
-        ProductStockPacketRepository $productStockPacketRepository,
-        TaskService $taskService
-    ) {
+        ProductStockLogRepository      $productStockLogRepository,
+        FirmRepository                 $firmRepository,
+        ProductRepository              $productRepository,
+        SpeditionExchangeRepository    $speditionExchangeRepository,
+        OrderPackageRepository         $orderPackageRepository,
+        TaskRepository                 $taskRepository,
+        OrderInvoiceService            $orderInvoiceService,
+        OrderExcelService              $orderExcelService,
+        ProductStockPacketRepository   $productStockPacketRepository,
+        TaskService                    $taskService
+    )
+    {
         $this->repository = $repository;
         $this->warehouseRepository = $warehouseRepository;
         $this->orderRepository = $orderRepository;
@@ -372,8 +372,15 @@ class OrdersController extends Controller
         $deliverers = Deliverer::all();
         $couriersTasks = $this->taskService->groupTaskByShipmentDate();
 
-        return view('orders.index', compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses'))
-            ->withOuts($out)
+        return view('orders.index',
+            compact(
+                'customColumnLabels',
+                'groupedLabels',
+                'visibilities',
+                'couriers',
+                'warehouses'
+            )
+        )->withOuts($out)
             ->withLabIds($labIds)
             ->withLabels($labels)
             ->withDeliverers($deliverers)
@@ -381,14 +388,6 @@ class OrdersController extends Controller
             ->withUsers($storekeepers)
             ->withCouriersTasks($couriersTasks)
             ->withAllWarehouses($allWarehouses);
-    }
-
-    /**
-     * @return Factory|\Illuminate\View\View
-     */
-    public function create()
-    {
-        return view('orders.create');
     }
 
     public function editPackages($id)
@@ -886,6 +885,44 @@ class OrdersController extends Controller
         return $views;
     }
 
+    public function addFile(Request $request, $id)
+    {
+        $order = Order::find($id);
+        if (empty($order)) {
+            return redirect()->back()->with([
+                'message' => __('orders.order_not_found'),
+                'alert-type' => 'error'
+            ]);
+        }
+        $file = $request->file('file');
+        $extension = explode('.', $file->getClientOriginalName());
+        $extension = end($extension);
+        if (!in_array($extension, OrderBuilder::VALID_EXTENSIONS)) {
+            return redirect()->back()->with([
+                'message' => __('orders.files.wrong_type_error'),
+                'alert-type' => 'error'
+            ]);
+        }
+        $random = Str::random(40);
+        Storage::disk('private')->put('files/' . $order->id . '/' . $random . '.' . $extension, $file->get());
+        $order->files()->create([
+            'file_name' => $file->getClientOriginalName(),
+            'hash' => $random . '.' . $extension
+        ]);
+        return redirect()->back()->with([
+            'message' => __('voyager.media.success_uploaded_file'),
+            'alert-type' => 'success'
+        ]);
+    }
+
+    /**
+     * @return Factory|\Illuminate\View\View
+     */
+    public function create()
+    {
+        return view('orders.create');
+    }
+
     public function updateNotices(NoticesRequest $request)
     {
         $request->validated();
@@ -913,6 +950,163 @@ class OrdersController extends Controller
         }
         $order->save();
         return \response('success');
+    }
+
+    public function createQuickOrder()
+    {
+        $users = $this->userRepository->orderBy('name')->findWhereNotIn('role_id', [1])->all();
+
+        return view('orders.quick_order', [
+            'users' => $users
+        ]);
+    }
+
+    public function storeQuickOrder(Request $request)
+    {
+        $custom = new Customer();
+        $custom->save();
+
+        $order = $this->orderRepository->create([
+            'customer_id' => $custom->id,
+            'status_id' => 1,
+            'consultant_notices' => $request->get('content'),
+            'employee_id' => $request->get('employee')
+        ]);
+        $this->orderAddressRepository->create([
+            'order_id' => $order->id,
+            'type' => 'DELIVERY_ADDRESS',
+            'address' => '---',
+            'flat_number' => '---',
+            'postal_code' => '55-200',
+            'city' => 'Oława',
+            'phone' => '111111111',
+        ]);
+        $this->orderAddressRepository->create([
+            'order_id' => $order->id,
+            'type' => 'INVOICE_ADDRESS',
+            'address' => '---',
+            'flat_number' => '---',
+            'postal_code' => '55-200',
+            'city' => 'Oława',
+            'phone' => '111111111',
+        ]);
+
+        if ($request->get('accountant', false)) {
+            dispatch_now(new AddLabelJob($order, ['153']));
+        }
+        if ($request->get('warehouse', false)) {
+            dispatch_now(new AddLabelJob($order, ['151']));
+        }
+        if ($request->get('master', false)) {
+            dispatch_now(new AddLabelJob($order, ['91']));
+        }
+        if ($request->get('consultant', false)) {
+            dispatch_now(new AddLabelJob($order, ['152']));
+        }
+
+        return redirect('/admin/orders');
+    }
+
+    public function setWarehouseAndLabels(Request $request)
+    {
+        $orderId = $request->order_id;
+        $warehouseId = $request->warehouse_id;
+        if (empty($orderId)) {
+            return response('Błędne zamówienie', 404);
+        }
+        if (empty($warehouseId)) {
+            return response('Błędny magazyn', 404);
+        }
+        $order = Order::find($orderId);
+        $warehouse = Warehouse::find($warehouseId);
+        if (empty($order)) {
+            return response('Błędne zamówienie', 404);
+        }
+        if (empty($warehouse)) {
+            return response('Błędny magazyn', 404);
+        }
+        $order->warehouse()->associate($warehouse);
+        $order->save();
+        $loop = [];
+
+        return dispatch_now(new RemoveLabelJob($order, [$request->label], $loop, $request->labelsToAddIds));
+    }
+
+    /**
+     * @param Request $request
+     * @param $id
+     * @return RedirectResponse
+     */
+    public function updateSelf(Request $request, $id)
+    {
+
+        $order = $this->orderRepository->find($id);
+        if (empty($order)) {
+            abort(404);
+        }
+
+
+        $totalPrice = 0;
+        foreach ($request->input('id') as $productId) {
+            $totalPrice += (float)$request->input('gross_selling_price_commercial_unit')[$productId] * (int)$request->input('quantity_commercial')[$productId];
+        }
+        $warehouse = $this->warehouseRepository->findWhere(["symbol" => $request->input('delivery_warehouse')])->first();
+
+
+        $this->orderRepository->update([
+            'total_price' => $totalPrice,
+            'weight' => $request->input('weight'),
+            'warehouse_id' => $warehouse ? $warehouse->id : null,
+            'status_id' => $request->input('status'),
+            'additional_info' => $request->input('additional_info'),
+            'document_number' => $request->input('document_number'),
+            'invoice_number' => $request->input('invoice_number'),
+        ], $id);
+
+
+        $orderItems = $order->items;
+        $itemsArray = [];
+        foreach ($orderItems as $item) {
+            $itemsArray[] = $item->product_id;
+        }
+        foreach ($request->input('product_id') as $key => $value) {
+            if (!in_array($value, $itemsArray)) {
+                $this->orderItemRepository->create([
+                    'net_purchase_price_commercial_unit' => (float)$request->input('net_purchase_price_commercial_unit')[$key],
+                    'net_purchase_price_basic_unit' => (float)$request->input('net_purchase_price_basic_unit')[$key],
+                    'net_purchase_price_calculated_unit' => (float)$request->input('net_purchase_price_calculated_unit')[$key],
+                    'net_purchase_price_aggregate_unit' => (float)$request->input('net_purchase_price_aggregate_unit')[$key],
+                    'quantity' => (int)$request->input('quantity_commercial')[$key],
+                    'price' => (float)$request->input('net_purchase_price_commercial_unit')[$key] * (int)$request->input('quantity_commercial')[$key] * 1.23,
+                    'order_id' => $order->id,
+                    'product_id' => $value,
+                ]);
+            }
+        }
+
+        if (!empty($request->input('id'))) {
+            foreach ($request->input('id') as $id) {
+                if ($request->input('quantity_commercial')[$id] > 0) {
+                    $this->orderItemRepository->update([
+                        'net_purchase_price_commercial_unit' => (float)$request->input('net_purchase_price_commercial_unit')[$id],
+                        'net_purchase_price_basic_unit' => (float)$request->input('net_purchase_price_basic_unit')[$id],
+                        'net_purchase_price_calculated_unit' => (float)$request->input('net_purchase_price_calculated_unit')[$id],
+                        'net_purchase_price_aggregate_unit' => (float)$request->input('net_purchase_price_aggregate_unit')[$id],
+                        'quantity' => (int)$request->input('quantity_commercial')[$id],
+                        'price' => (float)$request->input('net_purchase_price_commercial_unit')[$id] * (int)$request->input('quantity_commercial')[$id] * 1.23,
+                    ], $id);
+                } else {
+                    $orderItem = $this->orderItemRepository->find($id);
+                    $orderItem->delete();
+                }
+            }
+        }
+
+
+        return redirect()->route('orders.index', ['order_id' => $order->id])->with([
+            'message' => __('orders.message.update'),
+            'alert-type' => 'success',
+        ]);
     }
 
     /**
@@ -1247,61 +1441,6 @@ class OrdersController extends Controller
         ]);
     }
 
-    public function createQuickOrder()
-    {
-        $users = $this->userRepository->orderBy('name')->findWhereNotIn('role_id', [1])->all();
-
-        return view('orders.quick_order', [
-            'users' => $users
-        ]);
-    }
-
-    public function storeQuickOrder(Request $request)
-    {
-        $custom = new Customer();
-        $custom->save();
-
-        $order = $this->orderRepository->create([
-            'customer_id' => $custom->id,
-            'status_id' => 1,
-            'consultant_notices' => $request->get('content'),
-            'employee_id' => $request->get('employee')
-        ]);
-        $this->orderAddressRepository->create([
-            'order_id' => $order->id,
-            'type' => 'DELIVERY_ADDRESS',
-            'address' => '---',
-            'flat_number' => '---',
-            'postal_code' => '55-200',
-            'city' => 'Oława',
-            'phone' => '111111111',
-        ]);
-        $this->orderAddressRepository->create([
-            'order_id' => $order->id,
-            'type' => 'INVOICE_ADDRESS',
-            'address' => '---',
-            'flat_number' => '---',
-            'postal_code' => '55-200',
-            'city' => 'Oława',
-            'phone' => '111111111',
-        ]);
-
-        if ($request->get('accountant', false)) {
-            dispatch_now(new AddLabelJob($order, ['153']));
-        }
-        if ($request->get('warehouse', false)) {
-            dispatch_now(new AddLabelJob($order, ['151']));
-        }
-        if ($request->get('master', false)) {
-            dispatch_now(new AddLabelJob($order, ['91']));
-        }
-        if ($request->get('consultant', false)) {
-            dispatch_now(new AddLabelJob($order, ['152']));
-        }
-
-        return redirect('/admin/orders');
-    }
-
     /**
      * @param $data
      * @return RedirectResponse
@@ -1428,108 +1567,6 @@ class OrdersController extends Controller
         }
 
         return [$sumToCheck, $ids];
-    }
-
-    public function setWarehouseAndLabels(Request $request)
-    {
-        $orderId = $request->order_id;
-        $warehouseId = $request->warehouse_id;
-        if (empty($orderId)) {
-            return response('Błędne zamówienie', 404);
-        }
-        if (empty($warehouseId)) {
-            return response('Błędny magazyn', 404);
-        }
-        $order = Order::find($orderId);
-        $warehouse = Warehouse::find($warehouseId);
-        if (empty($order)) {
-            return response('Błędne zamówienie', 404);
-        }
-        if (empty($warehouse)) {
-            return response('Błędny magazyn', 404);
-        }
-        $order->warehouse()->associate($warehouse);
-        $order->save();
-        $loop = [];
-
-        return dispatch_now(new RemoveLabelJob($order, [$request->label], $loop, $request->labelsToAddIds));
-    }
-
-    /**
-     * @param Request $request
-     * @param $id
-     * @return RedirectResponse
-     */
-    public function updateSelf(Request $request, $id)
-    {
-
-        $order = $this->orderRepository->find($id);
-        if (empty($order)) {
-            abort(404);
-        }
-
-
-        $totalPrice = 0;
-        foreach ($request->input('id') as $productId) {
-            $totalPrice += (float)$request->input('gross_selling_price_commercial_unit')[$productId] * (int)$request->input('quantity_commercial')[$productId];
-        }
-        $warehouse = $this->warehouseRepository->findWhere(["symbol" => $request->input('delivery_warehouse')])->first();
-
-
-        $this->orderRepository->update([
-            'total_price' => $totalPrice,
-            'weight' => $request->input('weight'),
-            'warehouse_id' => $warehouse ? $warehouse->id : null,
-            'status_id' => $request->input('status'),
-            'additional_info' => $request->input('additional_info'),
-            'document_number' => $request->input('document_number'),
-            'invoice_number' => $request->input('invoice_number'),
-        ], $id);
-
-
-        $orderItems = $order->items;
-        $itemsArray = [];
-        foreach ($orderItems as $item) {
-            $itemsArray[] = $item->product_id;
-        }
-        foreach ($request->input('product_id') as $key => $value) {
-            if (!in_array($value, $itemsArray)) {
-                $this->orderItemRepository->create([
-                    'net_purchase_price_commercial_unit' => (float)$request->input('net_purchase_price_commercial_unit')[$key],
-                    'net_purchase_price_basic_unit' => (float)$request->input('net_purchase_price_basic_unit')[$key],
-                    'net_purchase_price_calculated_unit' => (float)$request->input('net_purchase_price_calculated_unit')[$key],
-                    'net_purchase_price_aggregate_unit' => (float)$request->input('net_purchase_price_aggregate_unit')[$key],
-                    'quantity' => (int)$request->input('quantity_commercial')[$key],
-                    'price' => (float)$request->input('net_purchase_price_commercial_unit')[$key] * (int)$request->input('quantity_commercial')[$key] * 1.23,
-                    'order_id' => $order->id,
-                    'product_id' => $value,
-                ]);
-            }
-        }
-
-        if (!empty($request->input('id'))) {
-            foreach ($request->input('id') as $id) {
-                if ($request->input('quantity_commercial')[$id] > 0) {
-                    $this->orderItemRepository->update([
-                        'net_purchase_price_commercial_unit' => (float)$request->input('net_purchase_price_commercial_unit')[$id],
-                        'net_purchase_price_basic_unit' => (float)$request->input('net_purchase_price_basic_unit')[$id],
-                        'net_purchase_price_calculated_unit' => (float)$request->input('net_purchase_price_calculated_unit')[$id],
-                        'net_purchase_price_aggregate_unit' => (float)$request->input('net_purchase_price_aggregate_unit')[$id],
-                        'quantity' => (int)$request->input('quantity_commercial')[$id],
-                        'price' => (float)$request->input('net_purchase_price_commercial_unit')[$id] * (int)$request->input('quantity_commercial')[$id] * 1.23,
-                    ], $id);
-                } else {
-                    $orderItem = $this->orderItemRepository->find($id);
-                    $orderItem->delete();
-                }
-            }
-        }
-
-
-        return redirect()->route('orders.index', ['order_id' => $order->id])->with([
-            'message' => __('orders.message.update'),
-            'alert-type' => 'success',
-        ]);
     }
 
     /**
@@ -2041,18 +2078,21 @@ class OrdersController extends Controller
         ]);
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function datatable(Request $request)
+    public function sendVisibleCouriers(Request $request)
     {
         $data = $request->all();
         [$collection, $countFiltred] = $this->prepareCollection($data);
-        $count = $this->orderRepository->all();
-        $count = count($count);
-        $collection = $this->prepareAdditionalOrderData($collection);
-
-        return DataTables::of($collection)->with(['recordsFiltered' => $countFiltred])->skipPaging()->setTotalRecords($count)->make(true);
+        if (!$countFiltred) {
+            return \response("Brak zamówień");
+        }
+        $messages = [];
+        foreach ($collection as $ord) {
+            $message = $this->sendPackagesForOrder($ord);
+            if (!empty($message)) {
+                $messages = array_merge($messages, $message);
+            }
+        }
+        return \response(['errors' => $messages], 200);
     }
 
     /**
@@ -2083,7 +2123,6 @@ class OrdersController extends Controller
             $sortingColumn = 'orders.id';
         }
         $query = $this->getQueryForDataTables()->orderBy($sortingColumn, $sortingColumnDirection);
-
 
         $notSearchable = [];
 
@@ -2222,6 +2261,9 @@ class OrdersController extends Controller
             }
         }
 
+        //$query->whereRaw('COALESCE(last_status_update_date, orders.created_at) < DATE_ADD(NOW(), INTERVAL -30 DAY)');
+
+
         $count = $query->count();
 
         if ($withoutPagination) {
@@ -2319,11 +2361,11 @@ class OrdersController extends Controller
     }
 
     /**
-     * @return mixed
+     * @return Builder
      */
-    private function getQueryForDataTables()
+    private function getQueryForDataTables(): Builder
     {
-        $query = \DB::table('orders')
+        return \DB::table('orders')
             ->distinct()
             ->select(
                 '*',
@@ -2360,7 +2402,6 @@ class OrdersController extends Controller
                     $query->where('orders.employee_id', '=', Auth::user()->id);
                 }
             });
-        return $query;
     }
 
     /**
@@ -2402,50 +2443,6 @@ class OrdersController extends Controller
         return implode(' ----------- ', $messages);
     }
 
-    public function prepareAdditionalOrderData($collection)
-    {
-        foreach ($collection as $order) {
-            $additional_service = $order->additional_service_cost ?? 0;
-            $additional_cod_cost = $order->additional_cash_on_delivery_cost ?? 0;
-            $shipment_price_client = $order->shipment_price_for_client ?? 0;
-            $totalProductPrice = 0;
-            foreach ($order->items as $item) {
-                $price = $item->gross_selling_price_commercial_unit ?: $item->net_selling_price_commercial_unit ?: 0;
-                $quantity = $item->quantity ?? 0;
-                $totalProductPrice += $price * $quantity;
-            }
-            $products_value_gross = round($totalProductPrice, 2);
-            $sum_of_gross_values = round($totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client, 2);
-            $order->values_data = array(
-                'sum_of_gross_values' => $sum_of_gross_values,
-                'products_value_gross' => $products_value_gross,
-                'shipment_price_for_client' => $order->shipment_price_for_client ?? 0,
-                'additional_cash_on_delivery_cost' => $order->additional_cash_on_delivery_cost ?? 0,
-                'additional_service_cost' => $order->additional_service_cost ?? 0
-            );
-            $order->sello_payment = $order->allegro_payment_id ?? $order->sello_payment;
-            $order->sello_form = $order->sello_form ?? $order->allegro_form_id;
-        }
-        return $collection;
-    }
-
-    public function sendVisibleCouriers(Request $request)
-    {
-        $data = $request->all();
-        [$collection, $countFiltred] = $this->prepareCollection($data);
-        if (!$countFiltred) {
-            return \response("Brak zamówień");
-        }
-        $messages = [];
-        foreach ($collection as $ord) {
-            $message = $this->sendPackagesForOrder($ord);
-            if (!empty($message)) {
-                $messages = array_merge($messages, $message);
-            }
-        }
-        return \response(['errors' => $messages], 200);
-    }
-
     private function sendPackagesForOrder($ord)
     {
         $order = Order::find($ord->orderId);
@@ -2457,7 +2454,7 @@ class OrdersController extends Controller
                 if (!empty($message)) {
                     $messages[] = $message;
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 \Log::error('błąd przy nadawaniu hurtowym paczki', ['error' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
                 $messages[] = $e->getMessage();
             }
@@ -2963,36 +2960,6 @@ class OrdersController extends Controller
         return response()->json($warehouse->users, 200);
     }
 
-    public function addFile(Request $request, $id)
-    {
-        $order = Order::find($id);
-        if (empty($order)) {
-            return redirect()->back()->with([
-                'message' => __('orders.order_not_found'),
-                'alert-type' => 'error'
-            ]);
-        }
-        $file = $request->file('file');
-        $extension = explode('.', $file->getClientOriginalName());
-        $extension = end($extension);
-        if (!in_array($extension, OrderBuilder::VALID_EXTENSIONS)) {
-            return redirect()->back()->with([
-                'message' => __('orders.files.wrong_type_error'),
-                'alert-type' => 'error'
-            ]);
-        }
-        $random = Str::random(40);
-        Storage::disk('private')->put('files/' . $order->id . '/' . $random . '.' . $extension, $file->get());
-        $order->files()->create([
-            'file_name' => $file->getClientOriginalName(),
-            'hash' => $random . '.' . $extension
-        ]);
-        return redirect()->back()->with([
-            'message' => __('voyager.media.success_uploaded_file'),
-            'alert-type' => 'success'
-        ]);
-    }
-
     public function getFile(int $id, string $file_id)
     {
         $type = ["Content-Type" => Storage::disk('private')->mimeType('files/' . $id . '/' . $file_id)];
@@ -3098,6 +3065,47 @@ class OrdersController extends Controller
         return $this->datatable($request);
     }
 
+    /**
+     * @return JsonResponse
+     */
+    public function datatable(Request $request)
+    {
+        $data = $request->all();
+        [$collection, $countFiltred] = $this->prepareCollection($data);
+        $count = $this->orderRepository->all();
+        $count = count($count);
+        $collection = $this->prepareAdditionalOrderData($collection);
+
+        return DataTables::of($collection)->with(['recordsFiltered' => $countFiltred])->skipPaging()->setTotalRecords($count)->make(true);
+    }
+
+    public function prepareAdditionalOrderData($collection)
+    {
+        foreach ($collection as $order) {
+            $additional_service = $order->additional_service_cost ?? 0;
+            $additional_cod_cost = $order->additional_cash_on_delivery_cost ?? 0;
+            $shipment_price_client = $order->shipment_price_for_client ?? 0;
+            $totalProductPrice = 0;
+            foreach ($order->items as $item) {
+                $price = $item->gross_selling_price_commercial_unit ?: $item->net_selling_price_commercial_unit ?: 0;
+                $quantity = $item->quantity ?? 0;
+                $totalProductPrice += $price * $quantity;
+            }
+            $products_value_gross = round($totalProductPrice, 2);
+            $sum_of_gross_values = round($totalProductPrice + $additional_service + $additional_cod_cost + $shipment_price_client, 2);
+            $order->values_data = array(
+                'sum_of_gross_values' => $sum_of_gross_values,
+                'products_value_gross' => $products_value_gross,
+                'shipment_price_for_client' => $order->shipment_price_for_client ?? 0,
+                'additional_cash_on_delivery_cost' => $order->additional_cash_on_delivery_cost ?? 0,
+                'additional_service_cost' => $order->additional_service_cost ?? 0
+            );
+            $order->sello_payment = $order->allegro_payment_id ?? $order->sello_payment;
+            $order->sello_form = $order->sello_form ?? $order->allegro_form_id;
+        }
+        return $collection;
+    }
+
     public function sendTrackingNumbers()
     {
         dispatch_now(new AllegroTrackingNumberUpdater());
@@ -3197,6 +3205,19 @@ class OrdersController extends Controller
         ]);
     }
 
+    public function downloadAllegroPaymentsExcel(Request $request): BinaryFileResponse
+    {
+        return $this->orderExcelService->generateAllegroPaymentsExcel($request->input('allegro_from'), $request->input('allegro_to'));
+    }
+
+    public function usePacket($orderId, $packetId)
+    {
+        $order = $this->orderRepository->find($orderId);
+        $packet = $this->productStockPacketRepository->find($packetId);
+
+        return view('product_stocks.packets.assign', compact('order', 'packet'));
+    }
+
     /**
      * @param $order
      * @param $item
@@ -3250,18 +3271,5 @@ class OrdersController extends Controller
             }, 0);
             return $acu + $totalAmountForPack;
         }, 0);
-    }
-
-    public function downloadAllegroPaymentsExcel(Request $request): BinaryFileResponse
-    {
-        return $this->orderExcelService->generateAllegroPaymentsExcel($request->input('allegro_from'), $request->input('allegro_to'));
-    }
-
-    public function usePacket($orderId, $packetId)
-    {
-        $order = $this->orderRepository->find($orderId);
-        $packet = $this->productStockPacketRepository->find($packetId);
-
-        return view('product_stocks.packets.assign', compact('order', 'packet'));
     }
 }

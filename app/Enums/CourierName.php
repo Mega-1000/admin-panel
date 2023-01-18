@@ -24,7 +24,7 @@ final class CourierName extends Enum
      */
     const DELIVERY_TYPE_LABELS = [
         self::INPOST => 'Paczkomat',
-        self::ALLEGRO_INPOST => 'Paczkomat',
+        self::ALLEGRO_INPOST => 'Paczkomat(A)',
         self::DPD => 'Dpd',
         self::APACZKA => 'Apaczka',
         self::POCZTEX => 'Pocztex',

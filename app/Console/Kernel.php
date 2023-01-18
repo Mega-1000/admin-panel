@@ -2,7 +2,7 @@
 
 namespace App\Console;
 
-use App\Console\Commands\TestSchenkerConnectionCommand;
+use App\Console\Commands\GetSchenkerPackageDictionaryCommand;
 use App\Jobs;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -16,7 +16,7 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         //
-        TestSchenkerConnectionCommand::class,
+        GetSchenkerPackageDictionaryCommand::class,
     ];
 
     /**
