@@ -88,7 +88,8 @@ class AllegroApiService
 					'Content-type' => 'application/x-www-form-urlencoded'
 				],
 				'form_params' => [
-					'code' => $authorization_code
+					'code' => $authorization_code,
+					'redirect_uri' => url()->current(),
 				]
 			]);
 		} catch (\Exception $e) {
