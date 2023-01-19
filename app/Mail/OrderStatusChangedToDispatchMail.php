@@ -47,11 +47,6 @@ class OrderStatusChangedToDispatchMail extends Mailable
     {
         ini_set('max_execution_time', 60);
 
-        // change config on the fly
-        $notificationMailboxCfg = config('notification_mailbox');
-        config($notificationMailboxCfg);
-        (new MailServiceProvider(app()))->register();
-
         $this->formLink = $formLink;
         $this->sendFormInvoice = $sendFormInvoice;
         $this->subject = $subject;

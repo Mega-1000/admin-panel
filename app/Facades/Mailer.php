@@ -7,10 +7,10 @@
 
 namespace App\Facades;
 
-use App\Repositories\UserRepository;
 use App\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use App\Repositories\UserRepository;
+use Illuminate\Support\Facades\Auth;
 
 class Mailer
 {
@@ -24,6 +24,19 @@ class Mailer
     public function __construct(UserRepository $userRepository)
     {
         $this->userRepository = $userRepository;
+    }
+
+    public static function notification() {
+        $mailer = app(\Illuminate\Mail\Mailer::class);
+        $notificationsCfg = config('notifications');
+
+        $transport = (new \Swift_SmtpTransport($notificationsCfg['host'], $notificationsCfg['port'], $notificationsCfg['encryption']))
+        ->setUsername($notificationsCfg['username'])
+        ->setPassword($notificationsCfg['password']);
+        $mailer->setSwiftMailer(new \Swift_Mailer($transport));
+        $mailer->alwaysFrom($notificationsCfg['from']);
+
+        return $mailer;
     }
 
     public function create(User $user = null)

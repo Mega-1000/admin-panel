@@ -4,8 +4,8 @@ namespace App\Jobs;
 
 use App\Entities\Label;
 use App\Entities\Order;
+use App\Facades\Mailer;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Entities\OrderWarehouseNotification;
 use App\Mail\OrderStatusChangedToDispatchMail;
@@ -101,11 +101,11 @@ class OrderStatusChangedToDispatchNotificationJob extends Job implements ShouldQ
         if(!!filter_var($warehouseMail, FILTER_VALIDATE_EMAIL)) {
             if ($this->path === null) {
                 $email = new OrderStatusChangedToDispatchMail($subject, $acceptanceFormLink, $sendFormInvoice, $order, $this->self);
-                Mail::to($warehouseMail)->send($email);
+                Mailer::notification()->to($warehouseMail)->send($email);
                 Log::notice('Wysłano email awizacyjny na mail: ' . $warehouseMail . ' dla zamówienia: ' . $order->id, ['line' => __LINE__, 'file' => __FILE__]);
             } else {
                 $email = new OrderStatusChangedToDispatchMail($subject, $acceptanceFormLink, $sendFormInvoice, $order, $this->self, $this->path, $this->packageNumber, $this->pathSecond);
-                Mail::to($warehouseMail)->send($email);
+                Mailer::notification()->to($warehouseMail)->send($email);
             }
         }
     }

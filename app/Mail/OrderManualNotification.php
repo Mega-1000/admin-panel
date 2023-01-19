@@ -26,11 +26,6 @@ class OrderManualNotification extends Mailable
      */
     public function __construct(string $subject, string $msgHeader, string $msg)
     {
-        // change config on the fly
-        $notificationMailboxCfg = config('notification_mailbox');
-        config($notificationMailboxCfg);
-        (new MailServiceProvider(app()))->register();
-
         $this->subject = $subject;
         $this->msgHeader = $msgHeader;
         $this->msg = $msg;

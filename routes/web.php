@@ -11,7 +11,9 @@
 |
  */
 
+use App\Facades\Mailer;
 use App\Entities\Customer;
+use App\Mail\OrderManualNotification;
 use App\Jobs\CheckNotificationsMailbox;
 use App\Jobs\OrderStatusChangedToDispatchNotificationJob;
 
@@ -30,6 +32,13 @@ Route::group(['prefix' => 'admin'], function () {
         Route::group(['prefix' => 'products'], function () {
             Route::group(['prefix' => 'sets', 'as' => 'sets.'], __DIR__ . '/web/ProductsSetsRoutes.php');
         });
+
+        Route::get('/test', function() {
+            $subject = 'test';
+            $email = new OrderManualNotification($subject, $subject, '');
+            Mailer::notification()->to('sebex142@gmail.com')->send($email);
+        });
+
 
         Route::get('/disputes', 'AllegroDisputeController@list');
         Route::get('/disputes/view/{id}', 'AllegroDisputeController@view');

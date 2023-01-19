@@ -8,15 +8,14 @@ use Illuminate\Http\Request;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderManualNotification;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Mail\MailServiceProvider;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Entities\OrderWarehouseNotification;
+use App\Facades\Mailer;
 use App\Http\Controllers\Api\OrderWarehouseNotificationController;
 use App\Http\Requests\Api\OrderWarehouseNotification\DenyShipmentRequest;
 use App\Http\Requests\Api\OrderWarehouseNotification\AcceptShipmentRequest;
@@ -162,7 +161,7 @@ class CheckNotificationsMailbox implements ShouldQueue {
                     if($res->getStatusCode() == 200) {
                         $subject = 'Faktura została pomyślnie wysłana dla oferty nr: '.$orderId;
                         $email = new OrderManualNotification($subject, $subject, '');
-                        Mail::to($from)->send($email);
+                        Mailer::notification()->to($from)->send($email);
                     }
                 }
                 if($this->emailElements['released']['value'] == 1) {
@@ -174,7 +173,7 @@ class CheckNotificationsMailbox implements ShouldQueue {
                     if($res->getStatusCode() == 200) {
                         $subject = 'Status został pomyślnie zmieniony jako wydany towar dla oferty nr: '.$orderId;
                         $email = new OrderManualNotification($subject, $subject, '');
-                        Mail::to($from)->send($email);
+                        Mailer::notification()->to($from)->send($email);
                     }
                 }
                 $dataArray = [
@@ -210,7 +209,7 @@ class CheckNotificationsMailbox implements ShouldQueue {
                         $errMsgTemplate .= "<p>$error</p>";
                     }
                     $email = new OrderManualNotification($subject, $msgHeader, $errMsgTemplate);
-                    Mail::to($from)->send($email);
+                    Mailer::notification()->to($from)->send($email);
                 } else {
                     if ($this->emailElements['accept']['value'] == 1) {
                         $res = $orderWarehouseNotification->accept($request, $notification->id);
@@ -230,12 +229,8 @@ class CheckNotificationsMailbox implements ShouldQueue {
                         $subject = 'Formularz został odrzucony do realizacji dla oferty nr: '.$orderId;
                     }
                     if($res->getStatusCode() == 200) {
-                        $notificationMailboxCfg = config('notification_mailbox');
-                        config($notificationMailboxCfg);
-                        (new MailServiceProvider(app()))->register();
-                        
                         $email = new OrderManualNotification($subject, $subject, '');
-                        Mail::to($from)->send($email);
+                        Mailer::notification()->to($from)->send($email);
                     }
                 }
             }
