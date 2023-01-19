@@ -531,19 +531,13 @@ class OrdersController extends Controller
                         ->with('price');
                 }]);
             }])
-            ->with('packages')
-            ->with('payments')
-            ->with('labels')
-            ->with('addresses')
-            ->with('invoices')
-            ->with('employee')
-            ->with('files')
-            ->with('dates')
-            ->with('factoryDelivery')
+            ->with('packages', 'payments', 'labels', 'addresses', 'invoices', 'employee', 'files', 'dates', 'factoryDelivery')
             ->orderBy('id', 'desc')
             ->get();
+            
 
         foreach ($orders as $order) {
+            $order->proforma_invoice = asset(Storage::url($order->getProformStoragePathAttribute()));
             $order->total_sum = $order->getSumOfGrossValues();
             $order->bookedPaymentsSum = $order->bookedPaymentsSum();
             $userId = $request->user()->id;
