@@ -524,12 +524,22 @@ class OrdersController extends Controller
     public function getAll(Request $request)
     {
         $orders = $request->user()->orders()
-            ->with([
-                'status', 'items.product.packing.price',
-                'packages', 'payments', 'labels',
-                'addresses', 'invoices', 'employee',
-                'files', 'dates', 'factoryDelivery'
-            ])
+            ->with('status')
+            ->with(['items' => function ($q) {
+                $q->with(['product' => function ($w) {
+                    $w->with('packing')
+                        ->with('price');
+                }]);
+            }])
+            ->with('packages')
+            ->with('payments')
+            ->with('labels')
+            ->with('addresses')
+            ->with('invoices')
+            ->with('employee')
+            ->with('files')
+            ->with('dates')
+            ->with('factoryDelivery')
             ->orderBy('id', 'desc')
             ->get();
 
