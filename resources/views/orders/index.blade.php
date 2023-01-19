@@ -923,9 +923,7 @@
 
         var available = [
             @php
-                foreach($allWarehouses as $item){
-                     echo '"'.$item->symbol.'",';
-                     }
+                echo $allWarehousesString;
             @endphp
         ];
 
