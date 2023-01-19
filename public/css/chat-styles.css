@@ -1,0 +1,22 @@
+.allegro-chat-icon-wrapper {
+    position: absolute;
+    right: 100px;
+    top: 11px;
+    font-size: 30px;
+    cursor: pointer;
+}
+.allegro-chat-icon-counter {
+    background: #fa2a00;
+    color: #fff;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    font-size: 12px;
+    text-align: center;
+    font-weight: 700;
+    position: absolute;
+    right: -15px;
+    top: -5px;
+    left: -4px;
+}
