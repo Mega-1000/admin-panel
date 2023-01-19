@@ -11,8 +11,6 @@
 |
  */
 
-use App\Services\AllegroChatService;
-
 Route::redirect('/', '/admin');
 
 Route::group(['prefix' => 'admin'], function () {
@@ -27,10 +25,6 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::group(['prefix' => 'products'], function () {
             Route::group(['prefix' => 'sets', 'as' => 'sets.'], __DIR__ . '/web/ProductsSetsRoutes.php');
-        });
-        Route::get('/test', function() {
-            $chatService = new AllegroChatService();
-            $chatService->listUserThreads();
         });
 
         Route::get('/disputes', 'AllegroDisputeController@list');

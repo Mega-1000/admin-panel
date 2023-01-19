@@ -81,6 +81,8 @@ Route::get('products/chimney', 'Api\ProductsController@getProductsForChimney')->
 Route::get('products/{id}', 'Api\ProductsController@getProduct')->name('api.get-product');
 Route::get('products/', 'Api\ProductsController@getProducts')->name('api.get-products');
 
+Route::post('allegro/listUserThreads', 'Api\AllegroController@listUserThreads')->name('api.allegro.list-user-threads');
+
 Route::post('firms/updateData/{firm_id}', 'Api\FirmsController@updateData')->name('api.update-data');
 
 Route::post('spedition-exchange/generate-link', 'Api\SpeditionExchangeController@generateLink')->name('api.spedition-exchange.generate-link');
