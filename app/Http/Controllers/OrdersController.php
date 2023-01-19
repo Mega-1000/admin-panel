@@ -311,6 +311,10 @@ class OrdersController extends Controller
         $warehouses = $this->warehouseRepository->findByField('symbol', 'MEGA-OLAWA');
         $storekeepers = User::where('role_id', User::ROLE_STOREKEEPER)->get();
         $allWarehouses = Warehouse::all();
+        $allWarehousesString = '';
+        foreach ($allWarehouses as $warehouse) {
+            $allWarehousesString .= '"'.$warehouse->symbol.'",';
+        }
 
         $customColumnLabels = [];
         foreach ($labelGroups as $labelGroup) {
@@ -372,15 +376,14 @@ class OrdersController extends Controller
         $deliverers = Deliverer::all();
         $couriersTasks = $this->taskService->groupTaskByShipmentDate();
 
-        return view('orders.index', compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses'))
+        return view('orders.index', compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses', 'allWarehousesString'))
             ->withOuts($out)
             ->withLabIds($labIds)
             ->withLabels($labels)
             ->withDeliverers($deliverers)
             ->withTemplateData($templateData)
             ->withUsers($storekeepers)
-            ->withCouriersTasks($couriersTasks)
-            ->withAllWarehouses($allWarehouses);
+            ->withCouriersTasks($couriersTasks);
     }
 
     /**
@@ -3011,6 +3014,14 @@ class OrdersController extends Controller
     public function getFiles(int $id)
     {
         return OrderFiles::where('order_id', $id)->get();
+    }
+
+    public function getWarehouse(int $orderId): string
+    {
+        $order = Order::findOrFail($orderId);
+        $warehouse = $order->warehouse;
+
+        return $warehouse;
     }
 
     public function getUserInfo(int $id)

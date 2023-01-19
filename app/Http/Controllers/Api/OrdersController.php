@@ -2,12 +2,20 @@
 
 namespace App\Http\Controllers\Api;
 
+
+use Carbon\Carbon;
+use App\Entities\Label;
+use App\Entities\Order;
 use App\Domains\DelivererPackageImport\Exceptions\OrderNotFoundException;
 use App\Entities\Country;
+use App\Jobs\AddLabelJob;
+use App\Helpers\ChatHelper;
 use App\Entities\FirmSource;
-use App\Entities\Label;
-use App\Entities\OrderAddress;
 use App\Entities\OrderDates;
+use App\Jobs\RemoveLabelJob;
+use Illuminate\Http\Request;
+use App\Helpers\OrderBuilder;
+use App\Entities\OrderAddress;
 use App\Entities\WorkingEvents;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Foundation\Application;
@@ -19,10 +27,22 @@ use App\Helpers\ChatHelper;
 use App\Helpers\GetCustomerForAdminEdit;
 use App\Helpers\GetCustomerForNewOrder;
 use App\Helpers\MessagesHelper;
-use App\Helpers\OrderBuilder;
+use App\Services\ProductService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Helpers\OrderPriceCalculator;
+use App\Jobs\OrderProformSendMailJob;
+use App\Repositories\OrderRepository;
+use App\Helpers\BackPackPackageDivider;
+use App\Helpers\GetCustomerForNewOrder;
 use App\Helpers\SendCommunicationEmail;
 use App\Helpers\TransportSumCalculator;
+use App\Repositories\ProductRepository;
+use Illuminate\Support\Facades\Storage;
+use App\Helpers\GetCustomerForAdminEdit;
 use App\Http\Requests\Api\Orders\AcceptReceivingOrderRequest;
 use App\Http\Requests\Api\Orders\DeclineProformRequest;
 use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
@@ -34,12 +54,20 @@ use App\Jobs\Orders\CheckDeliveryAddressSendMailJob;
 use App\Jobs\RemoveLabelJob;
 use App\Mail\SendOfferToCustomerMail;
 use App\Repositories\CustomerRepository;
-use App\Repositories\OrderAddressRepository;
 use App\Repositories\OrderItemRepository;
-use App\Repositories\OrderMessageAttachmentRepository;
+use App\Http\Controllers\OrdersController as OrdersControllerApp;
+use App\Repositories\OrderAddressRepository;
 use App\Repositories\OrderMessageRepository;
-use App\Repositories\CustomerAddressRepository;
 use App\Repositories\OrderPackageRepository;
+use App\Repositories\ProductPriceRepository;
+use App\Repositories\CustomerAddressRepository;
+use App\Http\Requests\Api\Orders\StoreOrderRequest;
+use App\Jobs\Orders\CheckDeliveryAddressSendMailJob;
+use App\Repositories\OrderMessageAttachmentRepository;
+use App\Http\Requests\Api\Orders\DeclineProformRequest;
+use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
+use App\Http\Requests\Api\Orders\AcceptReceivingOrderRequest;
+use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
 use App\Repositories\OrderRepository;
 use App\Http\Controllers\Controller;
 use App\Repositories\ProductPackingRepository;
@@ -515,6 +543,8 @@ class OrdersController extends Controller
             ->with('addresses')
             ->with('invoices')
             ->with('employee')
+            ->with('files')
+            ->with('dates')
             ->with('factoryDelivery')
             ->orderBy('id', 'desc')
             ->get();
@@ -831,6 +861,18 @@ class OrdersController extends Controller
         return response()->json(Country::all());
     }
 
+    public function uploadProofOfPayment(Request $request)
+    {
+        $orderId = $request->id;
+        $order = Order::find($orderId);
+        if(!$order) return response(['errorMessage' => 'Nie można znaleźć zamówienia'], 400);
+        if($order->customer_id != $request->user()->id) return response(['errorMessage' => 'Nie twoje zamówienie'], 400);
+        $ordersController = App::make(OrdersControllerApp::class);
+        $ordersController->addFile($request, $orderId);
+        dispatch(new AddLabelJob($orderId, [Label::PROOF_OF_PAYMENT_UPLOADED]));
+        return response('success', 200);
+    }
+
     /**
      * Send offer to customer api service
      *
@@ -936,5 +978,4 @@ class OrdersController extends Controller
         }
         return response()->json('Oferta została wysłana', 200, [], JSON_UNESCAPED_UNICODE);
     }
-
 }

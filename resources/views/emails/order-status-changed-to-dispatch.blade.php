@@ -1,33 +1,40 @@
 <body>
+<p>
+    <strong>FORMULARZ AWIZACYJNY</strong>
+</p>
+<p>
+    Prosimy nie odpisywać na tego e maila poprzez odpowiedź nadawcy i wpisując tekst w dowolne miejsce ponieważ nikt tego nie odczyta.
+</p>
+<p>
+    Prosimy o zatwierdzenie lub zanegowanie wysłanej awizacji, a dokonać tego można na 2 sposoby.
+</p>
+<p>Pierwszym sposobem jest odpowiedź poprzez użycie poniżej wysłanych linków.<br>
+Drugim jest przesłanie informacji jako e-mail zwrotny aczkolwiek aby informacja przesłana została odczytana przez nas poprawnie należy wpisać tekst w odpowiednim miejscu przez nas poniżej wskazanym.</p>
+<p>
+    Szybszym i prostszym sposobem jest odpowiedź poprzez użycie linków aczkolwiek wybór pozostawiamy państwu.<br>
+    Brak odpowiedzi do 2 godzin na tego e-maila powoduje wysyłanie go co 15 minut jako przypomnienie.
+</p>
+<br>
+<p>
+    <strong>SPOSÓB NR I</strong>
+</p>
+<p>
+    poprzez uzycie linków awizacyjnych
+</p>
+<p>Prosimy zapoznać się z pełną treścią tego maila a następnie:</p>
 
 <p>
-    Prosimy nie odpisywać informacji poprzez napisanie e maila jako tekst w dowolnym miejscu ponieważ nikt tego nie odczyta.
-    Pierwszym sposobem jest odpowiedź poprzez użycie poniżej wysłanych linków.
-    Drugim jest przesłanie informacji jako e mail aczkolwiek aby informacja przesłana została odczytana przez nas poprawnie należy wpisać tekst w odpowiednim miejscu przez nas poniżej wskazanym i dac odpowiedz nadawcy.
-    Można także stworzyć włanego emaila aczkolwiek wtedy należy skopiować dokładnie tekst poniżej zawarty i go uzupełnić i wysłać na awizacje@ephpolska.pl
-    Szybszym o prostszym sposobem jest odpowiedź poprzez użycie linków aczkolwiek wybór pozostawiamy państwu.
-    Brak odpowiedzi do 2 godzin na tego emaila powoduje wysyłanie go co 15 minut jako przypomnienie.
+    Potwierdzić lub zanegować klikając na link: <a href="{{ $formLink }}">FORMULARZ POTWIERDZANIA AWIZACJI</a>
 </p>
-
-<strong>SPOSÓB NR I - poprzez uzycie linków awizacyjnych</strong>
-
-<p>Prosimy zapoznać się z pełną treścią tego maila a następnie następnie:</p>
-
 <p>
-    Potwierdzić lub zanegować kliknając na link: <a href="{{ $formLink }}">FORMULARZ POTWIERDZANIA AWIZACJI</a>
-</p>
-<p style="color:red">
-    Jeżeli awizacja jest pozytywna pod różnymi warunkami np zapłacenie proformy to prosimy zatwierdzić
-    ją a w polu uwagi wpisać zatwierdzona pod warunkiem opłacenia faktury proformy do dnia, itp. itd.
+    Jeżeli awizacja jest pozytywna pod różnymi warunkami np zapłacenie proformy to prosimy zatwierdzić ją a w polu uwagi wpisać zatwierdzona pod warunkiem opłacenia faktury proformy do dnia , itp.itd.
 </p>
 <p>W przypadku odrzucenia awizacji należy podać koniecznie przyczyne.</p>
 <p>
-    Także prosimy pozostawić tego maila do mometnu wydania towaru który neleży potwierdzić przyciskiem <a
-        href="{{$sendFormInvoice}}">TOWAR ZOSTAL WYDANY</a> w dniu wydania zlecenia.
+    Także prosimy pozostawić tego maila do mometnu wydania towaru który neleży potwierdzić przyciskiem <a href="{{$sendFormInvoice}}">TOWAR ZOSTAL WYDANY</a> w dniu wydania zlecenia.
 </p>
 <p>
-    Jednoczesnie prosimy załączyc fakturę a dokonać tego można po użyciu przycisku
-    <a href="{{$sendFormInvoice}}">ZALACZ FAKTURE</a>.
+    Jednoczesnie prosimy załączyć fakturę, a dokonać tego można po użyciu przycisku <a href="{{$sendFormInvoice}}">ZAŁĄCZ FAKTURĘ</a>.
 </p>
 <p>
     Faktura powinna byc bez pieczątek i podpisów i po wydrukowaniu powinna wyglądać jak oryginał. (Prosimy nie wysyłać pocztą tradycyjną bo i tak nie dotrze do księgowości).
@@ -37,76 +44,79 @@
     Państwo zgodę poprzez zatwierdzenie awizacji.
 </p>
 <p>
-    !!! W przypadku gdybyście chcieli poinformować klienta lub ustalić dowolne informacje to
-     prosimy wpisać wiadomość/zapytanie na chacie który można uruchomić po kliknieciu na linka
-     [ link do chata klienta ktory uruchomi go przy danej ofercie oraz z uczestnikami klient , my czyli konsultanci EPH oraz magazyn obsługujący )
+    !!! W przypadku gdybyście chcieli poinformować klienta lub ustalić dowolne informacje to prosimy wpisać wiadomość/zapytanie na chacie który można uruchomić po kliknieciu na linka<br>
+    <a href="{{ $chatLink }}">Link do chatu</a>
 </p>
-
-<strong>SPOSOB NR II - bardziej skomplikowany aczkolwiek nie wymaga użycia linków</strong>
-
-<strong>1A) POTWIERZENIE LUB ODRZUCENIA AWIZACJI</strong>
-
-<p>Poniżej dwukropkiem a średnikiem należy wpisać cyfrę 1 dla prawidłowego wyboru:</p>
-
-<p>Akceptuję awizacje z podanymi parametrami (AAZPP): ;</p>
-<p>Odrzucam awizacje z podanymi parametrami (OAZPP): ;</p>
-
+<br><br>
 <p>
-    W uwagach na dole można dokonać opisu miedzy innymi wiadomości powiązanych z tematami poniżej
-    Jeżeli awizacja jest pozytywna pod różnymi warunkami np. zapłacenie proformy to prosimy zatwierdzić ją a w polu uwagi wpisać zatwierdzona pod warunkiem opłacenia faktury proformy do dnia , itp.itd.
-    W przypadku odrzucenia awizacji należy podać koniecznie przyczyne w uwagach na dole.
+    <strong>SPOSÓB NR II</strong>
 </p>
-
-<strong>1B) Wstępne zaproponowane daty możliwości odbioru towaru przez klienta (podajemy tylko informacyjnie)</strong>
+<p>bardziej skomplikowany aczkolwiek nie wymaga użycia linków</p>
+<br><p>
+    <strong>1A) POTWIERZENIE LUB ODRZUCENIA AWIZACJI</strong>
+</p>
+<p>Poniżej po dwukropku należy wpisać cyfrę 1 dla prawidłowego wyboru:</p>
+<p>Akceptuję awizacje z podanymi parametrami (AAZPP): </p>
+<p>Odrzucam awizacje z podanymi parametrami (OAZPP): </p>
+<p>
+    W uwagach na dole można dokonać opisu miedzy innymi wiadomości powiązanych z tematami poniżej.<br>
+    Jeżeli awizacja jest pozytywna pod różnymi warunkami np. zapłacenie proformy to prosimy zatwierdzić ją a w polu uwagi wpisać zatwierdzona pod warunkiem opłacenia faktury proformy do dnia , itp.itd.<br>
+    W przypadku odrzucenia awizacji należy podać koniecznie przyczyne w uwagach na dole.<br>
+</p>
+<br><p>
+    <strong>1B) Wstępne zaproponowane daty możliwości odbioru towaru przez klienta (podajemy tylko informacyjnie)</strong>
+</p>
 <p>od: {{ $customerShipmentDateFrom }}</p>
 <p>do: {{ $customerShipmentDateTo }}</p>
 <br>
-<p>Prosimy poniżej we wszystkich miejscach między dwukropkiem a średnikiem precyzyjnie uzupełnić dane.</p>
-<strong>1C) DATY DOSTAWY OD DO KONIECZNIE W FORMACIE 2022-10-15</strong>
-<p>od daty (DOOF): ;</p>
-<p>do daty (DODF): ;</p>
+<p>Prosimy poniżej we wszystkich miejscach po dwukropku precyzyjnie uzupełnić dane:</p>
+<br><p><strong>1C) DATY DOSTAWY OD DO KONIECZNIE W FORMACIE 2022-10-15</strong></p>
+<p>od daty (DOOF): </p>
+<p>do daty (DODF): </p>
 <br>
-<strong>1D) OSOBA ODPOWIEDZIALNA ZA OBSŁUGĘ </strong>
-<p>Imię i Nazwisko (OOZO): ;</p>
-<p>Nr telefonu (NTOOZO): ;</p>
+<p><strong>1D) OSOBA ODPOWIEDZIALNA ZA OBSŁUGĘ</strong></p>
+<p>Imię i Nazwisko (OOZO): </p>
+<p>Nr telefonu (NTOOZO): </p>
 <br>
-<strong>1E) KONTAKT DO KIEROWCY</strong>
+<p><strong>1E) KONTAKT DO KIEROWCY</strong></p>
 <p>
     Jeżeli na ten moment dane dostawcy/kierowcy nie są znane, to prosimy je uzupełnić w późniejszym czasie jeżeli to będzie możliwe.
 </p>
-<p>Numer telefonu do kierowcy (NTDK): ;</p>
+<p>Numer telefonu do kierowcy (NTDK): </p>
 <br>
-<strong>1E) UWAGI</strong>
-<p>Uwagi (U): ;</p>
+<p>
+    <strong>1E) UWAGI</strong>
+</p>
+<p>Uwagi (U): </p>
 <br>
-<strong>1F) KOMUNIKACJA Z KLIENTEM</strong>
+<p>
+    <strong>1F) KOMUNIKACJA Z KLIENTEM</strong>
+</p>
 <p>
     W przypadku gdybyście chcieli poinformować klienta lub ustalić dowolne informacje to prosimy wpisać wiadomość/zapytanie
-    (AWDK): ;
+</p>
+<p>(AWDK): </p>
+<br>
+<p>
+    <strong>2A) INFORMACJA W MOMENCIE WYDANIA TOWARU</strong>
+</p>
+<p>Po wydaniu towaru prosimy także o informacje zwrotną że towar został wydany,
+    należy tego dokonać poprzez wpisanie między znakiem dwukropka cyfry 1
+</p>
+<p>Towar został wydany (TZW): </p>
+<br>
+<p>
+    <strong>3A) PODŁĄCZENIA DOKUMENTÓW</strong>
 </p>
 <p>
-    Wiadomość tą należy wpisać do chatu znajdującego się w danej ofercie z uczestnikami klient, my czyli konsultanci EPH oraz magazyn obsługujący
-</p>
-<br>
-<strong>2A) INFORMACJA W MOMENCIE WYDANIA TOWARU</strong>
-<p>Po wydaniu towaru prosimy także o informacje zwrotną że towar został wydany -
-    należy tego dokonać poprzez wpisanie między znakiem dwukropka a średnika cyfrę 1
-</p>
-<p>Towar zostały wydany (TZW): ;</p>
-<br>
-<strong>3A) PODŁĄCZENIA DOKUMENTÓW</strong>
-<p>
-    Faktury oraz inne dokumenty można załączyć poprzez dodanie jako załączniki
-    do tego e-maila dowolną ich ilość która zostanie automatycznie podpięta do tego zamówienia
+    Faktury oraz inne dokumenty można załączyć poprzez dodanie jako załączniki do tego e-maila dowolną ich ilość, która zostanie automatycznie podpięta do tego zamówienia
 </p>
 <p>
     Prosimy koniecznie na każdym dokumencie powiązanym z tą ofertą wpisywać numer oferty czyli: {{$order->id}}
 </p>
-<strong>3B) WIDOCZNOŚĆ FAKTURY</strong>
-<p>Czy faktura ma być widoczna dla klienta? Jeżeli tak należy wpisać między znakiem dwukropka a średnika cyfrę 1</p>
-<p>Widoczność faktury (WF): ;</p>
 <hr>
 <hr>
+<p>PARAMETRY ZAMÓWIENIA</p>
 <p>
     Nr oferty: {{$order->id}}
 </p>
@@ -118,7 +128,6 @@
     {{$order->employee->email . ' ' . $order->employee->phone}}<br/>
     {{'Numer konsultanta:' . $order->employee->name}}<br/>
 @endisset
-
 
 <p>
     Od<br>
@@ -146,6 +155,13 @@
         {{$order->consultant_notices}}
     @endif
 </p>
+
+<p>Z naszej strony kontakt z klientem się kończy pozostały proces informacji pozostawiamy po waszej stronie</p>
+<p>
+    Jeżeli ceny naszego zamówienia sa niższe od cen które będziecie Państwo wystawiać na fakturze to prosimy o odrzucenie potwierdzenia i opisanie tego w uwagach.
+</p>
+<br><br>
+<p>ZAWARTOŚĆ ZAMÓWIENIA WRAZ Z PODSUMOWANIEM WARTOŚCI</p>
 @foreach($order->items as $item)
     <p>
         Nazwa: {{$item->product->name}} Symbol: {{$item->product->symbol}} <br/>
@@ -176,26 +192,16 @@
     $toPay = $orderValue - $paymentsValue - $paymentsPromise;
 @endphp
 <p>
-    @lang('orders.form.shipment_price_for_us'): {{$order->shipment_price_for_us}}<br>
+    Koszt transportu dla nas brutto: {{$order->shipment_price_for_us}}<br>
     @if($toPay > 2)
         Kwota ktora zobowiazujecie sie pobrac przed rozladunkiem i nam
         przekazac: {{$toPay}} zł<br>
     @endif
     Data rozpoczęcia nadawania przesyłki: {{$order->shipment_date}}
 </p>
-<p>
-    Z naszej strony kontakt z klientem sie konczy pozostaly proces informacji pozostawiamy po waszej stronie
-    Jezeli ceny naszego zamowienia sa nizsze od cen ktore bedziecie panstwo wystawiac na fakturze to prosimy wstrzymac
-    wypisywanie i,wyslac info na e-maila i skontaktowc sie 691801594
-    Faktury prosimy wyslac bezzwlocznie na adres zwrotny.
-    Jeżeli faktura po wydrukowaniu będzie wygladała jak oryginał to można nie wysyłać jej w formie papierkowej (dlatego
-    nie mogą byc podpisy albo pieczątki albo skan ktory zostawia smugi)
-    Jeżeli natomiast faktura bedzie wysyłana pocztą to na adres MEGA1000 Baczyńskiego 32A 55-200 OLAWA
-
-</p>
+<br>
 <p>
     Z pozdrowieniami
     ZESPOL MEGA1000
 </p>
 </body>
-    

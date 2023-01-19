@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderManualNotification;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -16,7 +15,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use App\Entities\OrderWarehouseNotification;
+use App\Facades\Mailer;
 use App\Http\Controllers\Api\OrderWarehouseNotificationController;
+use App\Http\Requests\Api\OrderWarehouseNotification\DenyShipmentRequest;
 use App\Http\Requests\Api\OrderWarehouseNotification\AcceptShipmentRequest;
 
 class CheckNotificationsMailbox implements ShouldQueue {
@@ -61,12 +62,12 @@ class CheckNotificationsMailbox implements ShouldQueue {
             'code' => 'U',
             'value' => null,
         ],
-        'released' => [
-            'code' => 'TZW',
+        'chat' => [
+            'code' => 'AWDK',
             'value' => null,
         ],
-        'isVisibleForClient' => [
-            'code' => 'WF',
+        'released' => [
+            'code' => 'TZW',
             'value' => null,
         ],
     ];
@@ -125,7 +126,7 @@ class CheckNotificationsMailbox implements ShouldQueue {
                 $pattern = "/";
                 foreach ($this->emailElements as $element) {
                     // search by given prefix that means (DOOF): is mandatory, and ; at the end is mandatory too
-                    $pattern .= "\({$element['code']}\):\s?(.*);|";
+                    $pattern .= "\({$element['code']}\):\s?(.*)|";
                 }
                 $pattern = rtrim($pattern, '|');
                 $pattern .= "/mi";
@@ -136,7 +137,7 @@ class CheckNotificationsMailbox implements ShouldQueue {
                     if( !isset($elementsMatches[$i + 1]) ) break;
                     // get first value ignores empty values, first value is the newest value of matches
                     $filteredMatches = array_filter($elementsMatches[$i + 1]);
-                    $element['value'] = reset($filteredMatches);
+                    $element['value'] = trim( reset($filteredMatches), " \t\n\r\0\x0B*" );
                     $i++;
                 }
 
@@ -149,7 +150,7 @@ class CheckNotificationsMailbox implements ShouldQueue {
                 if( !empty($attachments) ) {
                     $params = [
                         'orderId' => $orderId,
-                        'isVisibleForClient' => $this->emailElements['isVisibleForClient']['value'],
+                        'isVisibleForClient' => 0,
                     ];
                     // get base64 code from main (first) attachment
                     $mainAttachment = reset($attachments)['attachment'];
@@ -160,7 +161,7 @@ class CheckNotificationsMailbox implements ShouldQueue {
                     if($res->getStatusCode() == 200) {
                         $subject = 'Faktura została pomyślnie wysłana dla oferty nr: '.$orderId;
                         $email = new OrderManualNotification($subject, $subject, '');
-                        Mail::to($from)->send($email);
+                        Mailer::notification()->to($from)->send($email);
                     }
                 }
                 if($this->emailElements['released']['value'] == 1) {
@@ -172,7 +173,7 @@ class CheckNotificationsMailbox implements ShouldQueue {
                     if($res->getStatusCode() == 200) {
                         $subject = 'Status został pomyślnie zmieniony jako wydany towar dla oferty nr: '.$orderId;
                         $email = new OrderManualNotification($subject, $subject, '');
-                        Mail::to($from)->send($email);
+                        Mailer::notification()->to($from)->send($email);
                     }
                 }
                 $dataArray = [
@@ -194,7 +195,6 @@ class CheckNotificationsMailbox implements ShouldQueue {
                     'driver_contact' => $this->emailElements['phoneToDriver']['value'],
                     'customer_notices' => $this->emailElements['comments']['value'],
                 ];
-
                 // make request with given $params and validator
                 $request = new AcceptShipmentRequest($params);
                 $validator = Validator::make($request->all(), $request->rules(), [], $request->attributes());
@@ -209,18 +209,28 @@ class CheckNotificationsMailbox implements ShouldQueue {
                         $errMsgTemplate .= "<p>$error</p>";
                     }
                     $email = new OrderManualNotification($subject, $msgHeader, $errMsgTemplate);
-                    Mail::to($from)->send($email);
+                    Mailer::notification()->to($from)->send($email);
                 } else {
                     if ($this->emailElements['accept']['value'] == 1) {
                         $res = $orderWarehouseNotification->accept($request, $notification->id);
                         $subject = 'Formularz został zaakceptowany do realizacji dla oferty nr: '.$orderId;
                     } else {
+
+                        $params = [
+                            'order_id' => $orderId,
+                            'warehouse_id' => $order->warehouse_id,
+                            'customer_notices' => $this->emailElements['comments']['value'],
+                        ];
+                        
+                        $request = new DenyShipmentRequest($params);
+                        $validator = Validator::make($request->all(), $request->rules(), [], $request->attributes());
+                        $request->setValidator($validator);
                         $res = $orderWarehouseNotification->deny($request, $notification->id);
                         $subject = 'Formularz został odrzucony do realizacji dla oferty nr: '.$orderId;
                     }
                     if($res->getStatusCode() == 200) {
                         $email = new OrderManualNotification($subject, $subject, '');
-                        Mail::to($from)->send($email);
+                        Mailer::notification()->to($from)->send($email);
                     }
                 }
             }

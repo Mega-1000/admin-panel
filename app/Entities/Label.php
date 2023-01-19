@@ -40,6 +40,8 @@ class Label extends Model implements Transformable
     const BOOKED_FIRST_PAYMENT = 5;
     const WAREHOUSE_REMINDER = 77;
     const INVOICE_ISSUED_WITH_EXERTED_EFFECT = 42;
+    const NO_DELIVERY_OR_INVOICE_SETTINGS = 184;
+    const PROOF_OF_PAYMENT_UPLOADED = 220;
 
     const CHAT_TYPE = 'chat';
     const BONUS_TYPE = 'bonus';

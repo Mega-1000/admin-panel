@@ -4,9 +4,12 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use App\Helpers\MessagesHelper;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Mail\MailServiceProvider;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 class OrderStatusChangedToDispatchMail extends Mailable
 {
@@ -30,6 +33,8 @@ class OrderStatusChangedToDispatchMail extends Mailable
 
     public $customerShipmentDateTo;
 
+    public $chatLink;
+
     /**
      * OrderStatusChangedToDispatchMail constructor.
      * @param $subject
@@ -41,6 +46,7 @@ class OrderStatusChangedToDispatchMail extends Mailable
     public function __construct($subject, $formLink, $sendFormInvoice, $order, $self = null, $path = null, $packageNumber = null, $pathSecond = null)
     {
         ini_set('max_execution_time', 60);
+
         $this->formLink = $formLink;
         $this->sendFormInvoice = $sendFormInvoice;
         $this->subject = $subject;
@@ -51,6 +57,15 @@ class OrderStatusChangedToDispatchMail extends Mailable
         $this->pathSecond = $pathSecond;
         $this->customerShipmentDateFrom = $order->dates->getDateAttribute('customer_shipment_date_from');
         $this->customerShipmentDateTo = $order->dates->getDateAttribute('customer_shipment_date_to');
+
+        // create new Chat
+        $helper = new MessagesHelper();
+        $helper->orderId = $order->id;
+        $helper->currentUserId = Auth::user()->id;
+        $helper->currentUserType = MessagesHelper::TYPE_USER;
+        $userToken = $helper->encrypt();
+        // $this->chatLink = 'https://'.$_SERVER['HTTP_HOST'].'/chat/'.$userToken;
+        $this->chatLink = '';
     }
 
     /**
@@ -69,6 +84,5 @@ class OrderStatusChangedToDispatchMail extends Mailable
                 return $this->view('emails.reminder-order-status-changed-to-dispatch')->attach($this->path)->attach($this->pathSecond);
             }
         }
-
     }
 }

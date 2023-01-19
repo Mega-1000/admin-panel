@@ -11,6 +11,12 @@
 |
  */
 
+use App\Facades\Mailer;
+use App\Entities\Customer;
+use App\Mail\OrderManualNotification;
+use App\Jobs\CheckNotificationsMailbox;
+use App\Jobs\OrderStatusChangedToDispatchNotificationJob;
+
 Route::redirect('/', '/admin');
 
 Route::group(['prefix' => 'admin'], function () {
@@ -429,6 +435,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('orders/detach-label',
             'LabelsController@detachLabelFromOrder')->name('orders.detachLabel');
 
+        Route::post('orders/get-warehouse/{orderId}',
+            'OrdersController@getWarehouse')->name('orders.getFirmEmail');
         Route::post('orders/label-removal/{orderId}/{labelId}',
             'OrdersController@swapLabelsAfterLabelRemoval')->name('orders.label-removal');
         Route::post('orders/payment-deadline', 'OrdersController@setPaymentDeadline')->name('orders.payment-deadline');
@@ -568,6 +576,7 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get('/edit-allegro-terms', 'AllegroController@editTerms')->name('allegro.edit-terms');
         Route::post('/edit-allegro-terms', 'AllegroController@saveTerms')->name('allegro.edit-terms');
+
     });
     Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/web/TrackerLogsRoutes.php');
     Route::group(['as' => 'transactions.'], __DIR__ . '/web/TransactionsRoutes.php');

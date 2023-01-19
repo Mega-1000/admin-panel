@@ -50,8 +50,8 @@ class AcceptShipmentRequest extends FormRequest
             'realization_date_to' => 'required|date',
             'file' => 'nullable|min:5',
             'contact_person' => 'required|min:3',
-            'contact_person_phone' => 'required|min:7|max:12|numeric',
-            'driver_contact' => 'nullable|min:7|max:12|numeric',
+            'contact_person_phone' => 'required|digits_between:7,12|numeric',
+            'driver_contact' => 'nullable|digits_between:7,12|numeric',
             'customer_notices' => 'nullable',
         ];
     }

@@ -921,6 +921,12 @@
             return false;
         };
 
+        var available = [
+            @php
+                echo $allWarehousesString;
+            @endphp
+        ];
+
         $(document).ready(()=>{
             let nof = getUrlParameter('nof');
             if (nof) {
@@ -1073,17 +1079,9 @@
         });
 
         $('.protocol_datepicker').datepicker({dateFormat: "dd/mm/yy"});
-        $(() => {
-            var available = [
-                @php
-                    foreach($allWarehouses as $item){
-                         echo '"'.$item->symbol.'",';
-                         }
-                @endphp
-            ];
-            $("#delivery_warehouse").autocomplete({
-                source: available
-            });
+
+        $("#delivery_warehouse").autocomplete({
+            source: available
         });
         $(function () {
             if (localStorage.getItem("filter") != null) {
@@ -2629,7 +2627,17 @@
             if (manualLabelSelectionToAdd) {
                 $.ajax({
                     url: "/admin/labels/" + labelId + "/associated-labels-to-add-after-removal"
-                }).done(function (data) {
+                }).done(async function (data) {
+
+                    let warehouse = false;
+                    await $.ajax({
+                        url: "/admin/orders/get-warehouse/" + orderId,
+                        method: "POST"
+                    }).done(res => {
+                        console.log(res);
+                        warehouse = res;
+                    });
+
                     let modal = $('#manual_label_selection_to_add_modal');
                     let input = modal.find("#labels_to_add_after_removal_modal");
                     input.empty();
@@ -2641,7 +2649,32 @@
                         }));
                     });
                     $('#manual_label_selection_to_add_modal').modal('show');
+                    $('.warehouse-template').remove();
+                    let warehouseTemplate = ``;
+                    if(warehouse) {
+                        warehouseTemplate = `
+                        <div class="warehouse-template">
+                        <p>Magazyn nie został przypisany, przypisz magazyn przed wysłaniem</p>
+                        <div class="form-group" style="width: 15%; padding: 5px;">
+                            <label for="delivery_warehouse2">Magazyn</label>
+                            <input type="text" class="form-control" id="delivery_warehouse2" name="delivery_warehouse2" value="">
+                        </div><br>
+                        </div>`;
 
+                        const modalBody = modal.find('.modal-body');
+                        const modalOk = modal.find('#labels_to_add_after_removal_modal_ok');
+                        modalOk.attr('disabled', 'disabled');
+                        modalBody.prepend(warehouseTemplate);
+                        $("#delivery_warehouse2").autocomplete({
+                            source: available,
+                            classes: {
+                                'ui-autocomplete': 'z-index-max',
+                            },
+                            select: () => {
+                                modalOk.removeAttr('disabled');
+                            },
+                        });
+                    }
                     modal.find("#labels_to_add_after_removal_modal_ok").off().on('click', function () {
                         let ids = input.val();
                         removeMultiLabel(orderId, labelId, ids);
