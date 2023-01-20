@@ -3,55 +3,58 @@
 namespace App\Http\Controllers\Api;
 
 
-use Mailer;
-use Carbon\Carbon;
+use App\Domains\DelivererPackageImport\Exceptions\OrderNotFoundException;
+use App\Entities\Country;
+use App\Entities\FirmSource;
 use App\Entities\Label;
 use App\Entities\Order;
-use App\Entities\Country;
-use App\Jobs\AddLabelJob;
-use App\Helpers\ChatHelper;
-use App\Entities\FirmSource;
+use App\Entities\OrderAddress;
 use App\Entities\OrderDates;
-use Illuminate\Http\Request;
-use App\Helpers\OrderBuilder;
-use Illuminate\Http\Response;
 use App\Entities\WorkingEvents;
-use App\Helpers\MessagesHelper;
-use App\Services\ProductService;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use App\Helpers\OrderPriceCalculator;
-use App\Jobs\OrderProformSendMailJob;
-use App\Mail\SendOfferToCustomerMail;
-use App\Repositories\OrderRepository;
-use Illuminate\Foundation\Application;
 use App\Helpers\BackPackPackageDivider;
-use App\Helpers\GetCustomerForNewOrder;
-use App\Helpers\TransportSumCalculator;
-use App\Repositories\ProductRepository;
-use Illuminate\Support\Facades\Storage;
+use App\Helpers\ChatHelper;
 use App\Helpers\GetCustomerForAdminEdit;
-use App\Repositories\CustomerRepository;
-use App\Repositories\OrderItemRepository;
-use App\Repositories\OrderAddressRepository;
-use App\Repositories\OrderMessageRepository;
-use App\Repositories\OrderPackageRepository;
-use App\Repositories\ProductPriceRepository;
-use App\Repositories\ProductPackingRepository;
-use App\Repositories\CustomerAddressRepository;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use App\Http\Requests\Api\Orders\StoreOrderRequest;
-use App\Repositories\OrderMessageAttachmentRepository;
+use App\Helpers\GetCustomerForNewOrder;
+use App\Helpers\MessagesHelper;
+use App\Helpers\OrderBuilder;
+use App\Helpers\OrderPriceCalculator;
+use App\Helpers\TransportSumCalculator;
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\OrdersController as OrdersControllerApp;
+use App\Http\Requests\Api\Orders\AcceptReceivingOrderRequest;
 use App\Http\Requests\Api\Orders\DeclineProformRequest;
 use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
-use App\Http\Requests\Api\Orders\AcceptReceivingOrderRequest;
-use App\Http\Controllers\OrdersController as OrdersControllerApp;
-use App\Domains\DelivererPackageImport\Exceptions\OrderNotFoundException;
+use App\Http\Requests\Api\Orders\StoreOrderRequest;
 use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
+use App\Jobs\AddLabelJob;
+use App\Jobs\OrderProformSendMailJob;
+use App\Mail\SendOfferToCustomerMail;
+use App\Repositories\CustomerAddressRepository;
+use App\Repositories\CustomerRepository;
+use App\Repositories\OrderAddressRepository;
+use App\Repositories\OrderItemRepository;
+use App\Repositories\OrderMessageAttachmentRepository;
+use App\Repositories\OrderMessageRepository;
+use App\Repositories\OrderPackageRepository;
+use App\Repositories\OrderRepository;
+use App\Repositories\ProductPackingRepository;
+use App\Repositories\ProductPriceRepository;
+use App\Repositories\ProductRepository;
+use App\Services\ProductService;
+use Carbon\Carbon;
+use Exception;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Foundation\Application;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Mailer;
+use Throwable;
 
 /**
  * Class OrdersController
@@ -294,7 +297,7 @@ class OrdersController extends Controller
      *
      * @param int $orderId
      *
-     * @return CustomerAddress
+     * @return JsonResponse
      */
     public function getCustomerDeliveryAddress(int $orderId)
     {
@@ -398,7 +401,7 @@ class OrdersController extends Controller
      *
      * @param UpdateOrderDeliveryAndInvoiceAddressesRequest $request
      * @param int $orderId
-     * @return void
+     * @return JsonResponse
      */
     public function updateOrderDeliveryAndInvoiceAddresses(
         UpdateOrderDeliveryAndInvoiceAddressesRequest $request,
