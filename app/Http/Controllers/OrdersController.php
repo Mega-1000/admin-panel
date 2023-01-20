@@ -1458,6 +1458,20 @@ class OrdersController extends Controller
         return dispatch_now(new RemoveLabelJob($order, [$request->label], $loop, $request->labelsToAddIds));
     }
 
+    public function setWarehouse(int $orderId, Request $request): string
+    {
+        $order = Order::find($orderId);
+        if (!$order) return response(['errorMessage' => 'Nie można znaleźć zamówienia'], 400);
+
+        $warehouse = Warehouse::where('symbol', trim($request->warehouse))->first();
+        if(!$warehouse) return response(['errorMessage' => 'Nie można znaleźć magazynu'], 400);
+
+        $order->warehouse()->associate($warehouse->id);
+        $order->save();
+
+        die(true);
+    }
+
     /**
      * @param Request $request
      * @param $id
@@ -3014,14 +3028,6 @@ class OrdersController extends Controller
     public function getFiles(int $id)
     {
         return OrderFiles::where('order_id', $id)->get();
-    }
-
-    public function getWarehouse(int $orderId): string
-    {
-        $order = Order::findOrFail($orderId);
-        $warehouse = $order->warehouse;
-
-        return $warehouse;
     }
 
     public function getUserInfo(int $id)
