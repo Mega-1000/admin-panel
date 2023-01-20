@@ -85,9 +85,11 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
 	    }
         
         if ($order->status_id === 3) {
-            $quotattion = Quotation::where('order_id', $order->id)->where('text', nl2br(Status::find(18)->message))->firstOrNew();
-            $quotattion->text = nl2br(Status::find(18)->message);
-            $quotattion->save();
+            $quotationMessage = Status::find(18)->message;
+
+            $quotation = Quotation::firstOrNew(['order_id' => $order->id, 'message' => $quotationMessage]);
+            $quotation->message = $quotationMessage;
+            $quotation->save();
         }
 
         try {

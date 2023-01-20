@@ -93,8 +93,9 @@
         </tbody>
     </table>
     <div class="h3">
-        UWAGA przy dokonwyaniu przelewu bankowego tej oferty trzeba koniecznie wpisać ciąg znaków QQ{{ $order->id }}QQ
+        UWAGA przy dokonwyaniu przelewu bankowego tej oferty trzeba koniecznie wpisać ciąg znaków QQ{{ $order->id }}QQ 
     </div>
+    Gdy chcesz realizować ofertę to koniecznie wejdź na naszą stronę <a href="https://www.ephpolska.pl"> www.ephpolska.pl </a> i sprawdź/skoryguj dane do dostawy.
     <table class="table table-striped" style="table-layout:fixed; width: 100%;">
         <thead>
         <tr style="height:20px;">

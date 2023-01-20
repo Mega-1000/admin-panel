@@ -10,9 +10,7 @@ class Quotation extends Model
 
     public function order()
     {
-        return $this->belongsTo('App\Order');
+        return $this->belongsTo(Order::class);
     }
-
-    // change [] tags to real variables values in text
     
 }

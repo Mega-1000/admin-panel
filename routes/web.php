@@ -583,6 +583,8 @@ Route::group(['prefix' => 'admin'], function () {
     Route::group(['as' => 'workingEvents.'], __DIR__ . '/web/WorkingEventsRoutes.php');
 });
 
+Route::get('/order-offer-pdf/{id}', 'QuotationsController@getPdf');
+Route::get('/order-proform-pdf/{id}', 'QuotationsController@getProform');
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
 
 Route::get('/debug', 'DebugController@index');
