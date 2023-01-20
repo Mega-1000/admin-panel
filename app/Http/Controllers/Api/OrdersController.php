@@ -531,7 +531,7 @@ class OrdersController extends Controller
                         ->with('price');
                 }]);
             }])
-            ->with('packages', 'payments', 'labels', 'addresses', 'invoices', 'employee', 'files', 'dates', 'factoryDelivery')
+            ->with('packages', 'payments', 'labels', 'addresses', 'invoices', 'employee', 'files', 'dates', 'factoryDelivery', 'quotation')
             ->orderBy('id', 'desc')
             ->get();
             

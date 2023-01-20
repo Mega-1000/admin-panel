@@ -8,6 +8,8 @@ use App\Mail\OrderStatusChanged;
 use App\Repositories\OrderRepository;
 use App\Repositories\StatusRepository;
 use App\Repositories\TagRepository;
+use App\Entities\Quotation;
+use App\Entities\Status;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Storage;
@@ -72,7 +74,7 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
         }
         $status = explode('-', $order->status->name)[0];
         $subject = "Zmiana statusu - numer oferty: " . $this->orderId . " z: " . str_replace('-', '', $oldStatus->name)
-            . " na: " . str_replace('-', '', $status);;
+            . " na: " . str_replace('-', '', $status);
 
         $mail_to = $order->customer->login;
 	    $pdf = "";
@@ -81,6 +83,12 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
             dispatch_now(new GenerateOrderProformJob($order, true));
 		    $pdf = Storage::disk('local')->get($order->proformStoragePath);
 	    }
+        
+        if ($order->status_id === 3) {
+            $quotattion = Quotation::where('order_id', $order->id)->where('text', nl2br(Status::find(18)->message))->firstOrNew();
+            $quotattion->text = nl2br(Status::find(18)->message);
+            $quotattion->save();
+        }
 
         try {
             if (empty($message) || $message === '<p>&nbsp;</p>') {

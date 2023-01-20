@@ -795,4 +795,9 @@ class Order extends Model implements Transformable
     {
         return $this->allegro_form_id != null;
     }
+
+    public function quotation()
+    {
+        return $this->hasOne(Quotation::class);
+    }
 }
