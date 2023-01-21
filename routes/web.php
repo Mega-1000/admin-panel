@@ -1,5 +1,7 @@
 <?php
 
+use App\Jobs\AllegroSaveUnreadedChatThreads;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -25,6 +27,10 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::group(['prefix' => 'products'], function () {
             Route::group(['prefix' => 'sets', 'as' => 'sets.'], __DIR__ . '/web/ProductsSetsRoutes.php');
+        });
+
+        Route::get('/test', function() {
+            dispatch_now(new AllegroSaveUnreadedChatThreads());
         });
 
         Route::get('/disputes', 'AllegroDisputeController@list');
@@ -554,8 +560,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('users/workHours/', 'UserWorksController@addWorkHours')->name('users.addWorkHours');
         Route::get('actualizationPrice', 'ActualizationController@sendActualization')->name('actualizationPrice');
 
-        Route::get('/dispatch-job/recalculate-prices', 'DispatchJobController@recalculatePrices')->name('job.recalculatePrices');
-        Route::get('/dispatch-job/generate-jpgs', 'DispatchJobController@generateJpgs')->name('job.generateJpgs');
+        Route::get('/dispatch_now-job/recalculate-prices', 'DispatchJobController@recalculatePrices')->name('job.recalculatePrices');
+        Route::get('/dispatch_now-job/generate-jpgs', 'DispatchJobController@generateJpgs')->name('job.generateJpgs');
         Route::get('/chat/{all?}/{orderId?}', 'MessagesController@index')->name('chat.index');
 
         Route::get('/transport', 'DelivererController@list')->name('transportPayment.list');
@@ -587,7 +593,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::group(['as' => 'workingEvents.'], __DIR__ . '/web/WorkingEventsRoutes.php');
 });
 
-Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
+Route::get('/dispatch_now-job/order-status-change', 'DispatchJobController@orderStatusChange');
 
 Route::get('/debug', 'DebugController@index');
 Route::get('/communication/{warehouseId}/{orderId}', 'OrdersMessagesController@communication');

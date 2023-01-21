@@ -10,9 +10,14 @@ class AllegroChatService extends AllegroApiService {
     public function __construct() {
         parent::__construct();
     }
-    public function listThreads() {
+    public function listThreads(int $offset = 0) {
         $url = $this->getRestUrl('/messaging/threads');
-        $response = $this->request('GET', $url, []);
+
+        $data = [
+            'offset' => $offset
+        ];
+
+        $response = $this->request('GET', $url, $data);
 
         return $response;
     }
