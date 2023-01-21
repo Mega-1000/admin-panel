@@ -165,6 +165,9 @@ class OrdersController extends Controller
         $this->productPackingRepository = $productPackingRepository;
     }
 
+    /**
+     * @throws Exception
+     */
     public function store(StoreOrderRequest $request)
     {
         throw new Exception("Method deprecated");
@@ -296,7 +299,6 @@ class OrdersController extends Controller
      * Get customer delivery address
      *
      * @param int $orderId
-     *
      * @return JsonResponse
      */
     public function getCustomerDeliveryAddress(int $orderId)
@@ -319,6 +321,7 @@ class OrdersController extends Controller
      * Get customer invoice address.
      *
      * @param int $orderId
+     * @return JsonResponse
      */
     public function getCustomerInvoiceAddress(int $orderId)
     {
@@ -401,7 +404,7 @@ class OrdersController extends Controller
      *
      * @param UpdateOrderDeliveryAndInvoiceAddressesRequest $request
      * @param int $orderId
-     * @return JsonResponse
+     * @return JsonResponse|void
      */
     public function updateOrderDeliveryAndInvoiceAddresses(
         UpdateOrderDeliveryAndInvoiceAddressesRequest $request,
@@ -536,19 +539,12 @@ class OrdersController extends Controller
                         ->with('price');
                 }]);
             }])
-            ->with('packages')
-            ->with('payments')
-            ->with('labels')
-            ->with('addresses')
-            ->with('invoices')
-            ->with('employee')
-            ->with('files')
-            ->with('dates')
-            ->with('factoryDelivery')
+            ->with('packages', 'payments', 'labels', 'addresses', 'invoices', 'employee', 'files', 'dates', 'factoryDelivery', 'orderOffers')
             ->orderBy('id', 'desc')
             ->get();
 
         foreach ($orders as $order) {
+            $order->proforma_invoice = asset(Storage::url($order->getProformStoragePathAttribute()));
             $order->total_sum = $order->getSumOfGrossValues();
             $order->bookedPaymentsSum = $order->bookedPaymentsSum();
             $userId = $request->user()->id;
