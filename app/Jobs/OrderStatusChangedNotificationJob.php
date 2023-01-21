@@ -91,6 +91,7 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
             $orderOfferMessage = Status::find(18)->message;
 
             $orderOffer = OrderOffer::firstOrNew(['order_id' => $order->id, 'message' => $orderOfferMessage]);
+            $orderOffer->message = $orderOfferMessage;
             $orderOffer->save();
         }
 

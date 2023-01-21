@@ -28,6 +28,7 @@ class OrderOfferController extends Controller
 
         $name = 'Oferta dla: ' . $order->customer()->first()->login . '_' . $order->id . '_' . date('Y-m-d_H-i-s') . '.html';
         Storage::disk('local')->put('/archive-files/' . $name, $message);
+
         return view('pdf.order_offer', compact('message', 'order'));
     }
 
