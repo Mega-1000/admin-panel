@@ -429,11 +429,12 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('orders/detach-label',
             'LabelsController@detachLabelFromOrder')->name('orders.detachLabel');
 
-        Route::post('orders/get-warehouse/{orderId}',
-            'OrdersController@getWarehouse')->name('orders.getFirmEmail');
         Route::post('orders/label-removal/{orderId}/{labelId}',
             'OrdersController@swapLabelsAfterLabelRemoval')->name('orders.label-removal');
         Route::post('orders/payment-deadline', 'OrdersController@setPaymentDeadline')->name('orders.payment-deadline');
+        
+        Route::post('orders/set-warehouse/{orderId}', 'OrdersController@setWarehouse')->name('orders.setWarehouse');
+
         Route::post('orders/label-addition/{labelId}',
             'OrdersController@swapLabelsAfterLabelAddition')->name('orders.label-addition');
         Route::get('orders/products/autocomplete',
