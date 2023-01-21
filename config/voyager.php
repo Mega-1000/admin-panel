@@ -212,6 +212,7 @@ return [
 
     'additional_js' => [
         'js/chat.js',
+        'js/helpers/helpers.js',
     ],
 
     'googlemaps' => [

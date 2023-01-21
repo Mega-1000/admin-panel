@@ -571,6 +571,16 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/edit-allegro-terms', 'AllegroController@editTerms')->name('allegro.edit-terms');
         Route::post('/edit-allegro-terms', 'AllegroController@saveTerms')->name('allegro.edit-terms');
 
+        Route::prefix('allegro')->as('allegro.')->group(function () {
+            Route::post('/listThreads', 'AllegroController@listThreads')->name('listThreads');
+            Route::post('/listMessages/{threadId}', 'AllegroController@listMessages')->name('listMessages');
+            Route::post('/downloadAttachment/{attachmentId}', 'AllegroController@downloadAttachment')->name('downloadAttachment');
+            Route::post('/newMessage', 'AllegroController@newMessage')->name('newMessage');
+            Route::post('/newAttachmentDeclaration', 'AllegroController@newAttachmentDeclaration')->name('newAttachmentDeclaration');
+            Route::post('/changeReadFlagOnThread/{threadId}', 'AllegroController@changeReadFlagOnThread')->name('changeReadFlagOnThread');
+            Route::post('/uploadAttachment/{attachmentId}', 'AllegroController@uploadAttachment')->name('uploadAttachment');
+        });
+
     });
     Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/web/TrackerLogsRoutes.php');
     Route::group(['as' => 'transactions.'], __DIR__ . '/web/TransactionsRoutes.php');

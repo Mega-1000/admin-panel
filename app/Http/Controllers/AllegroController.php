@@ -2,14 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use TCG\Voyager\Models\Setting;
+use App\Services\AllegroChatService;
+use Illuminate\Support\Facades\Storage;
 use App\Helpers\AllegroCommissionParser;
 use App\Http\Requests\AllegroSetCommission;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use TCG\Voyager\Models\Setting;
 
 class AllegroController extends Controller
 {
+    protected $allegroChatService;
+
+    public function __construct(AllegroChatService $allegroChatService) {
+        $this->allegroChatService = $allegroChatService;
+    }
 
     public function setCommission(AllegroSetCommission $request)
     {
@@ -92,4 +98,64 @@ class AllegroController extends Controller
             'alert-type' => 'success']);
     }
 
+    // CHAT
+    // https://developer.allegro.pl/documentation#tag/Message-Center
+    
+    // get chat threads
+    public function listThreads() {
+        $res = $this->allegroChatService->listThreads();
+
+        return response()->json($res);
+    }
+    // get messages from specified thread
+    public function listMessages(string $threadId) {
+        $res = $this->allegroChatService->listMessages($threadId);
+
+        return response()->json($res);
+    }
+    // get messages from specified thread
+    public function downloadAttachment(string $attachmentId) {
+        $res = $this->allegroChatService->downloadAttachment($attachmentId);
+
+        return response()->json($res);
+    }
+    // post new message
+    public function newMessage(array $data = []) {
+
+        $data = [
+            'recipient' => [
+                'login' => 'sebex142',
+            ],
+            'text' => 'Testowa odpowiedź',
+        ];
+
+        $res = $this->allegroChatService->newMessage($data);
+
+        return response()->json($res);
+    }
+    // post attachment declaration (preparation before upload)
+    public function newAttachmentDeclaration(array $data = []) {
+
+        $res = $this->allegroChatService->newAttachmentDeclaration($data);
+
+        return response()->json($res);
+    }
+    // put read flag on thread
+    public function changeReadFlagOnThread(string $threadId) {
+
+        $data = [
+            'read' => true
+        ];
+
+        $res = $this->allegroChatService->changeReadFlagOnThread($threadId, $data);
+
+        return response()->json($res);
+    }
+    // mark particular thread as read
+    public function uploadAttachment(string $attachmentId, string $contentsFile) {
+
+        $res = $this->allegroChatService->uploadAttachment($attachmentId, $contentsFile);
+
+        return response()->json($res);
+    }
 }
