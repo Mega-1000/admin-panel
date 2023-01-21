@@ -46,6 +46,7 @@ class OrderOfferController extends Controller
 
         Storage::disk('local')->put('/archive-files/' . $name, $pdf->output());
 
-        return $pdf->download('proforma.pdf');
+        $file = Storage::disk('local')->get('/archive-files/' . $name);
+        return response($file, 200)->header('Content-Type', 'application/pdf');
     }
 }

@@ -7,7 +7,6 @@
 
         p {
             font-size: 0.8em;
-            margin: 0;
         }
         h4 {
             font-size: 1em;
