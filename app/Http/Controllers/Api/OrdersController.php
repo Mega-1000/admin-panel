@@ -6,7 +6,9 @@ namespace App\Http\Controllers\Api;
 use App\Domains\DelivererPackageImport\Exceptions\OrderNotFoundException;
 use App\Entities\Country;
 use App\Entities\FirmSource;
+use App\Entities\Label;
 use App\Entities\Order;
+use App\Entities\OrderAddress;
 use App\Entities\OrderDates;
 use App\Entities\WorkingEvents;
 use App\Helpers\BackPackPackageDivider;
@@ -14,6 +16,7 @@ use App\Helpers\ChatHelper;
 use App\Helpers\GetCustomerForAdminEdit;
 use App\Helpers\GetCustomerForNewOrder;
 use App\Helpers\MessagesHelper;
+use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceCalculator;
 use App\Helpers\TransportSumCalculator;
 use App\Http\Controllers\Controller;
@@ -39,6 +42,7 @@ use App\Repositories\ProductPriceRepository;
 use App\Repositories\ProductRepository;
 use App\Services\ProductService;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
@@ -50,6 +54,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Mailer;
+use Throwable;
 
 /**
  * Class OrdersController
@@ -160,6 +165,9 @@ class OrdersController extends Controller
         $this->productPackingRepository = $productPackingRepository;
     }
 
+    /**
+     * @throws Exception
+     */
     public function store(StoreOrderRequest $request)
     {
         throw new Exception("Method deprecated");
@@ -291,8 +299,7 @@ class OrdersController extends Controller
      * Get customer delivery address
      *
      * @param int $orderId
-     *
-     * @return CustomerAddress
+     * @return JsonResponse
      */
     public function getCustomerDeliveryAddress(int $orderId)
     {
@@ -314,6 +321,7 @@ class OrdersController extends Controller
      * Get customer invoice address.
      *
      * @param int $orderId
+     * @return JsonResponse
      */
     public function getCustomerInvoiceAddress(int $orderId)
     {
@@ -396,7 +404,7 @@ class OrdersController extends Controller
      *
      * @param UpdateOrderDeliveryAndInvoiceAddressesRequest $request
      * @param int $orderId
-     * @return void
+     * @return JsonResponse|void
      */
     public function updateOrderDeliveryAndInvoiceAddresses(
         UpdateOrderDeliveryAndInvoiceAddressesRequest $request,
@@ -531,10 +539,9 @@ class OrdersController extends Controller
                         ->with('price');
                 }]);
             }])
-            ->with('packages', 'payments', 'labels', 'addresses', 'invoices', 'employee', 'files', 'dates', 'factoryDelivery', 'quotation')
+            ->with('packages', 'payments', 'labels', 'addresses', 'invoices', 'employee', 'files', 'dates', 'factoryDelivery', 'orderOffers')
             ->orderBy('id', 'desc')
             ->get();
-            
 
         foreach ($orders as $order) {
             $order->proforma_invoice = asset(Storage::url($order->getProformStoragePathAttribute()));
