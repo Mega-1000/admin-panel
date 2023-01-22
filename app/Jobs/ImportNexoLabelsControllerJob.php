@@ -71,7 +71,7 @@ class ImportNexoLabelsControllerJob implements ShouldQueue
                 $orderValueFromNexo = $this->countTheValueOfInvoices($rawData);
 
                 $labelsToAdd[] = Label::INVOICE_OCCURS_IN_NEXO;
-                if (!(abs(($orderValueFromSystem - $orderValueFromNexo) / $orderValueFromNexo) < 0.00001)) {
+                if (!(abs($orderValueFromSystem - $orderValueFromNexo) < 0.00001)) {
                     $labelsToAdd[] = Label::GROSS_VALUE_DIFFERS_FROM_INVOICES_IN_NEXO;
                 } else {
                     $labelsToAdd[] = Label::GROSS_VALUE_AGREES_FROM_INVOICES_IN_NEXO;
