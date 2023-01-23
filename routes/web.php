@@ -578,6 +578,10 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/edit-allegro-terms', 'AllegroController@saveTerms')->name('allegro.edit-terms');
 
         Route::prefix('allegro')->as('allegro.')->group(function () {
+            Route::post('/checkUnreadedThreads', 'AllegroChatController@checkUnreadedThreads')->name('checkUnreadedThreads');
+            Route::post('/bookThread', 'AllegroChatController@bookThread')->name('bookThread');
+            Route::post('/getMessages/{threadId}', 'AllegroChatController@getMessages')->name('getMessages');
+            
             Route::post('/listThreads', 'AllegroController@listThreads')->name('listThreads');
             Route::post('/listMessages/{threadId}', 'AllegroController@listMessages')->name('listMessages');
             Route::post('/downloadAttachment/{attachmentId}', 'AllegroController@downloadAttachment')->name('downloadAttachment');
