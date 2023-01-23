@@ -69,7 +69,7 @@ class AllegroChatController extends Controller
         ];
         $this->allegroChatService->changeReadFlagOnThread($threadId, $data);
 
-        $allegroPrevMessages = AllegroChatThread::where('allegro_thread_id', $threadId)->where('type', '!=', 'PENDING')->get();
+        $allegroPrevMessages = AllegroChatThread::where('allegro_thread_id', $threadId)->where('type', '!=', 'PENDING')->with('user')->get();
         
         if($allegroPrevMessages->isEmpty()) {
             $res = $this->allegroChatService->listMessages($threadId);
@@ -103,6 +103,14 @@ class AllegroChatController extends Controller
         $successInsert = AllegroChatThread::insert($newMessages);
 
         if(!$successInsert) return response(null, 500);
+
+        // add missing informations about user
+        foreach ($newMessages as &$newMessage) {
+            $newMessage['user'] = [
+                'name'  => $user->name,
+                'email' => $user->email,
+            ];
+        }
 
         $messagesCollection = collect($newMessages);
 

@@ -44,12 +44,47 @@ class AllegroChat {
         }
         this.openChatWindow();
     }
+    
+    makeSingleMessageTemplate(msg) {
+
+        const type = msg.is_outgoing ? 'outgoing' : 'incoming';
+        const attachments = JSON.parse(msg.attachments);
+
+        const attachmentsTemplate = attachments && attachments.map(attachment => `
+            <div class="allegro-attachments-list">
+                <a href="${attachment.url}">${attachment.fileName}</a>
+            </div>
+        `).join('') || '';
+
+        return `
+            <div class="allegro-msg-wrapper ${type}">
+                <div class="allegro-msg-header">
+                    <div class="allegro-msg-date">[${msg.original_allegro_date}]</div>
+                    <div class="allegro-msg-consultant">
+                        <strong>${msg.user.name}</strong> \<${msg.user.email}\>
+                    </div>
+                    <div class="allegro-msg-subject">
+                        <strong>${msg.subject}</strong>
+                    </div>
+                </div>
+                <div class="allegro-msg-content">
+                    ${msg.content}
+                </div>
+                <div class="allegro-msg-footer">
+                    ${ msg.allegro_offer_id ? `<div class="allegro-msg-offer-id">${msg.allegro_offer_id}</div>` : `` }
+                    ${ msg.allegro_order_id ? `<div class="allegro-msg-order-id">${msg.allegro_order_id}</div>` : `` }
+                    ${attachmentsTemplate}
+                    <div class="allegro-msg-id">Id wiadomości na Allegro: ${msg.allegro_msg_id}</div>
+                </div>
+            </div>
+        `;
+    }
 
     async openChatWindow() {
         const url = 'admin/allegro/getMessages/'+this.currentThreadId;
-        const res = await ajaxPost({}, url);
+        const messages = await ajaxPost({}, url);
         
-        if(!res.messages) {
+        if(!messages) {
             toastr.error('Coś poszło nie tak, prosimy spróbować raz jeszcze');
             return false;
         }
@@ -57,10 +92,28 @@ class AllegroChat {
         let params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,
         width=600,height=300,left=100,top=100`;
 
+
+        let allegroClient = '';
+
+        const messagesTemplate = messages.map(msg => {
+
+            if(!msg.is_outgoing) allegroClient = msg.allegro_user_login;
+
+            return this.makeSingleMessageTemplate(msg);
+        }).join('');
+
+        const chatTemplate = `
+        <div class="allegro-chat-wrapper">
+            <h2>Czat Allegro</h2>
+            <h3>Dotyczy użytkownika Allegro: ${allegroClient}</h3>
+            <h3>ID czatu na Allegro: ${this.currentThreadId}</h3>
+            <div class="allegro-msg-wrapper">${messagesTemplate}</div>
+        </div>
+        `;
+
         const chatWindow = open('about:blank', 'allegroChat', params);
 
-        let html = `<div style="font-size:30px">Welcome!</div>`;
-        chatWindow.document.body.insertAdjacentHTML('afterbegin', html);
+        chatWindow.document.body.insertAdjacentHTML('afterbegin', chatTemplate);
     }
 }
 

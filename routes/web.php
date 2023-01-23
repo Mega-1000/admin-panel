@@ -36,7 +36,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/test', function() {
             // $a = new AllegroChatController(new AllegroChatService);
             // $a->getMessages('sIXfgnBFrqZMyO8w47eebiVMWIKrM7S0CHYSko2Jq8H');
-        
+            $allegroPrevMessages = AllegroChatThread::where('allegro_thread_id', 'sIXfgnBFrqZMyO8w47eebiVMWIKrM7S0CHYSko2Jq8H')->where('type', '!=', 'PENDING')->with('user')->get();
+            echo '<pre>' , print_r($allegroPrevMessages->toArray()) , '</pre>';
         });
 
         Route::get('/disputes', 'AllegroDisputeController@list');
