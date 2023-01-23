@@ -74,6 +74,14 @@
                     <option value="PENDING">@lang('statuses.form.pending')</option>
                 </select>
             </div>
+            <div class="form-group">
+                <label for="labels_to_remove">Generuj ofertę</label>
+                <!-- generate_order_offer -->
+                <select class="form-control text-uppercase" name="generate_order_offer" track-click>
+                    <option value="0" selected="{{ $status->generate_order_offer }}">Nie</option>
+                    <option value="1" selected="{{ $status->generate_order_offer }}">Tak</option>
+                </select>
+            </div>
         </div>
         <button type="submit" class="btn btn-primary" track-click>@lang('voyager.generic.save')</button>
     </form>

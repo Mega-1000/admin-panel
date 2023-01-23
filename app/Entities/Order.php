@@ -512,7 +512,7 @@ class Order extends Model implements Transformable
      */
     public function invoices()
     {
-        return $this->belongsToMany(OrderInvoice::class, 'order_order_invoices', 'order_id', 'invoice_id');
+        return $this->belongsToMany(OrderInvoice::class, 'order_order_invoices', 'order_id', 'invoice_id')->orderBy('created_at', 'desc');
     }
 
     /**
