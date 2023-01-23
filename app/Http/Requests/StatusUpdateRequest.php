@@ -28,6 +28,7 @@ class StatusUpdateRequest extends FormRequest
             'color' => 'required|string|size:6',
             'status' => 'in:ACTIVE,PENDING',
             'labels_to_add.*' => 'nullable|numeric',
+            'generate_order_offer' => 'required|boolean'
         ];
     }
 }

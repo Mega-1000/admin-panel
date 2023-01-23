@@ -796,6 +796,6 @@ class Order extends Model implements Transformable
 
     public function orderOffers(): HasMany
     {
-        return $this->hasMany(OrderOffer::class);
+        return $this->hasMany(OrderOffer::class)->orderBy('created_at', 'desc');;
     }
 }

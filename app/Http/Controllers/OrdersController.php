@@ -44,6 +44,7 @@ use App\Jobs\AllegroTrackingNumberUpdater;
 use App\Jobs\GenerateXmlForNexoJob;
 use App\Jobs\ImportOrdersFromSelloJob;
 use App\Jobs\Orders\MissingDeliveryAddressSendMailJob;
+use App\Jobs\Orders\ChangeOrderStatusJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Jobs\RemoveFileLockJob;
 use App\Jobs\RemoveLabelJob;
@@ -1233,6 +1234,8 @@ class OrdersController extends Controller
             $order->shipment_date = null;
             $order->save();
         }
+
+        dispatch_now(new ChangeOrderStatusJob($order));
 
         if ($request->input('status') != $order->status_id && $request->input('shouldBeSent') == 'on') {
             dispatch_now(new OrderStatusChangedNotificationJob($order->id, $request->input('mail_message'), $oldStatus));

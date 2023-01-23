@@ -21,7 +21,7 @@ class Status extends Model implements Transformable
      * @var array
      */
     protected $fillable = [
-        'name', 'color', 'status', 'message'
+        'name', 'color', 'status', 'message', 'generate_order_offer'
     ];
 
     /**
