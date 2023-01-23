@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Carbon;
+
 class AllegroChatService extends AllegroApiService {
 
     // https://developer.allegro.pl/documentation#tag/Message-Center
@@ -21,9 +23,18 @@ class AllegroChatService extends AllegroApiService {
 
         return $response;
     }
-    public function listMessages(string $threadId) {
+    public function listMessages(string $threadId, $after = null) {
+
+        $data = [];
+        if($after) {
+            $carbon = new Carbon($after);
+
+            $data = [
+                'after' => $carbon->toISOString(),
+            ];
+        }
         $url = $this->getRestUrl("/messaging/threads/{$threadId}/messages");
-        $response = $this->request('GET', $url, []);
+        $response = $this->request('GET', $url, $data);
 
         return $response;
     }

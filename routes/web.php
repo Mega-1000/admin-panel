@@ -1,6 +1,10 @@
 <?php
 
+use Illuminate\Support\Carbon;
+use App\Entities\AllegroChatThread;
+use App\Services\AllegroChatService;
 use App\Jobs\AllegroSaveUnreadedChatThreads;
+use App\Http\Controllers\AllegroChatController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,7 +34,9 @@ Route::group(['prefix' => 'admin'], function () {
         });
 
         Route::get('/test', function() {
-            dispatch_now(new AllegroSaveUnreadedChatThreads());
+            // $a = new AllegroChatController(new AllegroChatService);
+            // $a->getMessages('sIXfgnBFrqZMyO8w47eebiVMWIKrM7S0CHYSko2Jq8H');
+        
         });
 
         Route::get('/disputes', 'AllegroDisputeController@list');

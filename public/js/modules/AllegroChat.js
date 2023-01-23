@@ -24,6 +24,8 @@ class AllegroChat {
 
         this.numberOfUnreadedMsgs = this.unreadedThreads?.length || 0;
 
+        this.numberOfUnreadedMsgs > 0 ? this.iconCounter.removeClass('hidden') : this.iconCounter.addClass('hidden');
+
         this.iconCounter.text(this.numberOfUnreadedMsgs);
     }
 
@@ -36,7 +38,7 @@ class AllegroChat {
         this.currentThreadId = await ajaxPost(data, url);
         this.iconWrapper.removeClass('loader-2');
 
-        if(this.currentThreadId == 'empty') {
+        if(!this.currentThreadId) {
             toastr.error('Wiadomości zostały przypisane do innych użytkowników. Proszę spróbować później');
             return false;
         }
@@ -44,13 +46,16 @@ class AllegroChat {
     }
 
     async openChatWindow() {
-        let params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,
-        width=600,height=300,left=100,top=100`;
-
         const url = 'admin/allegro/getMessages/'+this.currentThreadId;
         const res = await ajaxPost({}, url);
         
-        if(!res.messages) return false;
+        if(!res.messages) {
+            toastr.error('Coś poszło nie tak, prosimy spróbować raz jeszcze');
+            return false;
+        }
+
+        let params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,
+        width=600,height=300,left=100,top=100`;
 
         const chatWindow = open('about:blank', 'allegroChat', params);
 

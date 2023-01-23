@@ -34,7 +34,7 @@
         </div>
         <div class="allegro-chat-icon-wrapper">
             <span class="icon voyager-chat"></span>
-            <strong class="allegro-chat-icon-counter">0</strong>
+            <strong class="allegro-chat-icon-counter hidden">0</strong>
         </div>
         <ul class="nav navbar-nav @if (__('voyager::generic.is_rtl') == 'true') navbar-left @else navbar-right @endif">
             <li class="dropdown profile">
