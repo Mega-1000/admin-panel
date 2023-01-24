@@ -1,7 +1,7 @@
 
 
 class AllegroChat {
-
+    
     constructor() {
         this.iconWrapper = $('.allegro-chat-icon-wrapper');
         this.iconCounter = $('.allegro-chat-icon-counter');
@@ -36,13 +36,28 @@ class AllegroChat {
             unreadedThreads: this.unreadedThreads,
         };
         this.currentThreadId = await ajaxPost(data, url);
-        this.iconWrapper.removeClass('loader-2');
 
         if(!this.currentThreadId) {
             toastr.error('Wiadomości zostały przypisane do innych użytkowników. Proszę spróbować później');
+            this.iconWrapper.removeClass('loader-2');
             return false;
         }
         this.openChatWindow();
+    }
+
+    async downloadAttachment(e) {
+      const attachmentId = $(e.target).data('id');
+      const attachmentName = $(e.target).text();
+      const msgFooter = $(e.target).parent().parent();
+      msgFooter.addClass('loader-2');
+
+      const url = 'admin/allegro/downloadAttachment/'+attachmentId;
+      const fileData = await ajaxPost({}, url);
+
+      msgFooter.removeClass('loader-2');
+
+      if(!fileData.content || !fileData.contentType) return false;
+      saveFileAs(attachmentName, fileData.content, fileData.contentType);
     }
     
     makeSingleMessageTemplate(msg) {
@@ -50,11 +65,15 @@ class AllegroChat {
         const type = msg.is_outgoing ? 'outgoing' : 'incoming';
         const attachments = JSON.parse(msg.attachments);
 
-        const attachmentsTemplate = attachments && attachments.map(attachment => `
-            <div class="allegro-attachments-list">
-                <a href="${attachment.url}">${attachment.fileName}</a>
-            </div>
-        `).join('') || '';
+        const attachmentsTemplate = attachments && attachments.map(attachment => {
+            if(attachment.status == 'UNSAFE' || attachment.status == 'EXPIRED') return ``;
+            const attachmentId = attachment.url.split('/').pop();
+            return `
+                <div class="allegro-attachments-list">
+                    <a class="allegro-attachments-item" href="javascript:;" data-id="${attachmentId}">${attachment.fileName}</a>
+                </div>
+            `;
+        }).join('') || '';
 
         return `
             <div class="allegro-msg-wrapper ${type}">
@@ -71,8 +90,8 @@ class AllegroChat {
                     ${msg.content}
                 </div>
                 <div class="allegro-msg-footer">
-                    ${ msg.allegro_offer_id ? `<div class="allegro-msg-offer-id">${msg.allegro_offer_id}</div>` : `` }
-                    ${ msg.allegro_order_id ? `<div class="allegro-msg-order-id">${msg.allegro_order_id}</div>` : `` }
+                    ${ msg.allegro_offer_id ? `<a href="https://allegro.pl/oferta/${msg.allegro_offer_id}" class="allegro-msg-offer-id">Przejdź do oferty</a>` : `` }
+                    ${ msg.allegro_order_id ? `<a href="https://allegro.pl/moje-allegro/sprzedaz/zamowienia/${msg.allegro_order_id}" class="allegro-msg-order-id">Przejdź do zamówienia</a>` : `` }
                     ${attachmentsTemplate}
                     <div class="allegro-msg-id">Id wiadomości na Allegro: ${msg.allegro_msg_id}</div>
                 </div>
@@ -82,8 +101,9 @@ class AllegroChat {
 
     async openChatWindow() {
         const url = 'admin/allegro/getMessages/'+this.currentThreadId;
-        const messages = await ajaxPost({}, url);
-        
+        let messages = await ajaxPost({}, url);
+        messages = messages.reverse();
+
         if(!messages) {
             toastr.error('Coś poszło nie tak, prosimy spróbować raz jeszcze');
             return false;
@@ -91,7 +111,6 @@ class AllegroChat {
 
         let params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,
         width=600,height=300,left=100,top=100`;
-
 
         let allegroClient = '';
 
@@ -111,9 +130,17 @@ class AllegroChat {
         </div>
         `;
 
-        const chatWindow = open('about:blank', 'allegroChat', params);
+        this.iconWrapper.removeClass('loader-2');
 
+         const chatWindow = open('about:blank', 'allegro_chat_'+this.currentThreadId, params);
+         window.xd = chatWindow;
         chatWindow.document.body.insertAdjacentHTML('afterbegin', chatTemplate);
+
+        // add Listeners
+        $(chatWindow.document.body).on('click', '.allegro-attachments-item', e => {
+            this.downloadAttachment(e);
+        });
+
     }
 }
 

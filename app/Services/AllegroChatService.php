@@ -40,12 +40,10 @@ class AllegroChatService extends AllegroApiService {
     }
     public function downloadAttachment(string $attachmentId) {
         $url = $this->getRestUrl("/messaging/message-attachments/{$attachmentId}");
-        $response = $this->request('GET', $url, []);
+        $path = sys_get_temp_dir() . '/' . base64_encode($url);
+        $response = $this->request('GET', $url, ['sink' => $path]);
 
-        $path = sys_get_temp_dir().'/'.base64_encode($url);
-        file_put_contents($path, (string) $response->getBody());
-
-        return $path;
+        return ['content' => base64_encode($response->getBody()->getContents()), 'contentType' => $response->getHeader('Content-Type')];
     }
     public function newMessage(array $data) {
         $url = $this->getRestUrl("/messaging/messages");

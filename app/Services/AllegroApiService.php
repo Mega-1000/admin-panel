@@ -150,6 +150,10 @@ class AllegroApiService
 					'headers' => $headers,
 					'json' => $params
 				];
+			// save to link for files
+			if( isset($params['sink']) ) {
+				$data['sink'] = $params['sink'];
+			}
 			if($attachment){
 				$data['multipart'] = [$attachment];
 			}
@@ -158,6 +162,7 @@ class AllegroApiService
 				$url,
 				$data
 			);
+
 		} catch (\Exception $e) {
 			if ($e->getCode() == 401 && $first) {
 				if ($this->getRefreshToken()) {
@@ -171,12 +176,14 @@ class AllegroApiService
 				return $this->cantGetAlert();
 			}
 		}
-
 		if ($response->getStatusCode() != 200) {
 		    if ($response->getStatusCode() != 204) {
                 return $this->cantGetAlert();
             }
 		    return true;
+		}
+		if( isset($params['sink']) ) {
+			return $response;
 		}
 
 		return json_decode((string)$response->getBody(), true);

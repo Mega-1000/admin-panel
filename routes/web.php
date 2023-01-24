@@ -34,10 +34,9 @@ Route::group(['prefix' => 'admin'], function () {
         });
 
         Route::get('/test', function() {
-            // $a = new AllegroChatController(new AllegroChatService);
-            // $a->getMessages('sIXfgnBFrqZMyO8w47eebiVMWIKrM7S0CHYSko2Jq8H');
-            $allegroPrevMessages = AllegroChatThread::where('allegro_thread_id', 'sIXfgnBFrqZMyO8w47eebiVMWIKrM7S0CHYSko2Jq8H')->where('type', '!=', 'PENDING')->with('user')->get();
-            echo '<pre>' , print_r($allegroPrevMessages->toArray()) , '</pre>';
+            $a = new AllegroChatService();
+            $t = $a->downloadAttachment('8874f3ab-635f-4817-95b2-a7d9a77d8738');
+            echo '<pre>' , print_r($t) , '</pre>';
         });
 
         Route::get('/disputes', 'AllegroDisputeController@list');
@@ -588,10 +587,10 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('/checkUnreadedThreads', 'AllegroChatController@checkUnreadedThreads')->name('checkUnreadedThreads');
             Route::post('/bookThread', 'AllegroChatController@bookThread')->name('bookThread');
             Route::post('/getMessages/{threadId}', 'AllegroChatController@getMessages')->name('getMessages');
-            
+            Route::post('/downloadAttachment/{attachmentId}', 'AllegroChatController@downloadAttachment')->name('downloadAttachment');
+
             Route::post('/listThreads', 'AllegroController@listThreads')->name('listThreads');
             Route::post('/listMessages/{threadId}', 'AllegroController@listMessages')->name('listMessages');
-            Route::post('/downloadAttachment/{attachmentId}', 'AllegroController@downloadAttachment')->name('downloadAttachment');
             Route::post('/newMessage', 'AllegroController@newMessage')->name('newMessage');
             Route::post('/newAttachmentDeclaration', 'AllegroController@newAttachmentDeclaration')->name('newAttachmentDeclaration');
             Route::post('/changeReadFlagOnThread/{threadId}', 'AllegroController@changeReadFlagOnThread')->name('changeReadFlagOnThread');

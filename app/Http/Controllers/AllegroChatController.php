@@ -31,7 +31,7 @@ class AllegroChatController extends Controller
 
         $alreadyOpenedThreads = AllegroChatThread::where([
             'allegro_thread_id' => $unreadedThreadsIds,
-            'status'            => 'open',
+            'type'              => 'PENDING',
         ])->pluck('allegro_thread_id')->toArray();
 
         $alreadyOpenedThreads = array_flip($alreadyOpenedThreads);
@@ -41,7 +41,6 @@ class AllegroChatController extends Controller
 
         foreach($unreadedThreadsIds as $uThreadId) {
             // check if thread is already booked
-
             if(isset($alreadyOpenedThreads[ $uThreadId ])) continue;
 
             // prepare temp Allegro Thread for User
@@ -50,7 +49,6 @@ class AllegroChatController extends Controller
                 'allegro_msg_id'        => 'temp_for_'.$user->id,
                 'user_id'               => $user->id,
                 'allegro_user_login'    => 'unknown',
-                'status'                => 'open',
                 'content'               => '',
                 'is_outgoing'           => false,
                 'type'                  => 'PENDING',
@@ -89,7 +87,6 @@ class AllegroChatController extends Controller
                 'allegro_msg_id'        => $msg['id'],
                 'user_id'               => $user->id,
                 'allegro_user_login'    => $msg['author']['login'],
-                'status'                => 'open',
                 'subject'               => $msg['subject'],
                 'content'               => $msg['text'],
                 'is_outgoing'           => !$msg['author']['isInterlocutor'],
@@ -117,5 +114,10 @@ class AllegroChatController extends Controller
         if(!$allegroPrevMessages->isEmpty()) $messagesCollection = $allegroPrevMessages->concat($messagesCollection);
 
         return response($messagesCollection);
+    }
+    public function downloadAttachment(string $attachmentId) {
+        $res = $this->allegroChatService->downloadAttachment($attachmentId);
+
+        return response()->json($res);
     }
 }
