@@ -86,46 +86,31 @@ class AllegroChatController extends Controller
         }
         if($allegroPrevMessages->isEmpty() && !$res['messages']) return response(null, 500);
         
-        $messages = array_reverse($res['messages']);
-
-        $newMessages = [];
-        $user = auth()->user();
-
-        foreach($messages as $msg) {
-            $carbon = new Carbon($msg['createdAt']);
-            
-            $newMessages[] = [
-                'allegro_thread_id'     => $msg['thread']['id'],
-                'allegro_msg_id'        => $msg['id'],
-                'user_id'               => $user->id,
-                'allegro_user_login'    => $msg['author']['login'],
-                'subject'               => $msg['subject'],
-                'content'               => $msg['text'],
-                'is_outgoing'           => !$msg['author']['isInterlocutor'],
-                'attachments'           => json_encode($msg['attachments']),
-                'type'                  => $msg['type'],
-                'allegro_offer_id'      => $msg['relatesTo']['offer'],
-                'allegro_order_id'      => $msg['relatesTo']['order'],
-                'original_allegro_date' => $carbon->toDateTimeString(),
-            ];
-        }
-        $successInsert = AllegroChatThread::insert($newMessages);
-
-        if(!$successInsert) return response(null, 500);
-
-        // add missing informations about user
-        foreach ($newMessages as &$newMessage) {
-            $newMessage['user'] = [
-                'name'  => $user->name,
-                'email' => $user->email,
-            ];
-        }
+        $newMessages = $this->insertMsgsToDB($res['messages']);
 
         $messagesCollection = collect($newMessages);
 
         if(!$allegroPrevMessages->isEmpty()) $messagesCollection = $allegroPrevMessages->concat($messagesCollection);
 
         return response($messagesCollection);
+    }
+
+    public function getNewMessages(Request $data) {
+
+        $threadId = $data->input('threadId');
+        $lastDate = $data->input('lastDate');
+        // mark thread as read
+        $this->allegroChatService->changeReadFlagOnThread($threadId, [
+            'read' => true,
+        ]);
+
+        $res = $this->allegroChatService->listMessages($threadId, $lastDate);
+
+        if(!$res['messages']) return response('null', 200);
+        
+        $newMessages = collect( $this->insertMsgsToDB($res['messages']) );
+
+        return response($newMessages);
     }
     
     public function downloadAttachment(string $attachmentId) {
@@ -161,5 +146,42 @@ class AllegroChatController extends Controller
         $nextPageUrl = route('pages.getAllChats', ['currentPage' => ($currentPage + 1)]);
 
         return view('allegro.all-chats', compact('threadsList', 'numberOfPages', 'currentPage', 'prevPageUrl', 'nextPageUrl'));
+    }
+
+    private function insertMsgsToDB(array $msgs): array {
+        $messages = array_reverse($msgs);
+
+        $newMessages = [];
+        $user = auth()->user();
+
+        foreach($messages as $msg) {
+            $carbon = new Carbon($msg['createdAt']);
+
+            $newMessages[] = [
+                'allegro_thread_id'     => $msg['thread']['id'],
+                'allegro_msg_id'        => $msg['id'],
+                'user_id'               => $user->id,
+                'allegro_user_login'    => $msg['author']['login'],
+                'subject'               => $msg['subject'],
+                'content'               => $msg['text'],
+                'is_outgoing'           => !$msg['author']['isInterlocutor'],
+                'attachments'           => json_encode($msg['attachments']),
+                'type'                  => $msg['type'],
+                'allegro_offer_id'      => $msg['relatesTo']['offer'],
+                'allegro_order_id'      => $msg['relatesTo']['order'],
+                'original_allegro_date' => $carbon->toDateTimeString(),
+            ];
+        }
+        AllegroChatThread::insert($newMessages);
+
+        // add missing informations about user
+        foreach ($newMessages as &$newMessage) {
+            $newMessage['user'] = [
+                'name'  => $user->name,
+                'email' => $user->email,
+            ];
+        }
+
+        return $newMessages;
     }
 }

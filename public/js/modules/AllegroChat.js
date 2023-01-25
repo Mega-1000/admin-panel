@@ -18,6 +18,10 @@ class AllegroChat {
             this.allegroChatCheckUnreadedThreads();
         }, 60000);
 
+        setInterval(() => {
+            this.getNewMessages();
+        }, 15000);
+
         this.initListeners();
     }
 
@@ -131,7 +135,7 @@ class AllegroChat {
 
         const type = msg.is_outgoing ? 'outgoing' : 'incoming';
         const attachments = JSON.parse(msg.attachments);
-
+        const date = msg.original_allegro_date;
         const attachmentsTemplate = attachments && attachments.map(attachment => {
             if(attachment.status == 'UNSAFE' || attachment.status == 'EXPIRED') return ``;
             const attachmentId = attachment.url.split('/').pop();
@@ -145,7 +149,7 @@ class AllegroChat {
         return `
             <div class="allegro-msg-wrapper ${type}">
                 <div class="allegro-msg-header">
-                    <div class="allegro-msg-date">[${msg.original_allegro_date}]</div>
+                    <div class="allegro-msg-date" data-date="${date}">[${date}]</div>
                     <div class="allegro-msg-consultant">
                         Konsultant: <strong>${msg.user.name}</strong>
                     </div>
@@ -200,6 +204,25 @@ class AllegroChat {
         }, 150);
     }
 
+    async getNewMessages() {
+        if(!this.currentThreadId || !this.chatWindow?.document) return false;
+        const lastDate = $(this.chatWindow.document).find('.allegro-msg-wrapper:last-child .allegro-msg-date').data('date');
+        if(!lastDate) return false;
+
+        const data = {
+            threadId: this.currentThreadId,
+            lastDate,
+        }
+        const url = this.ajaxPath + 'allegro/getNewMessages/'+this.currentThreadId;
+        let messages = await ajaxPost(data, url);
+        if(messages == 'null') return false;
+
+        const messagesTemplate = messages.map(msg => this.makeSingleMessageTemplate(msg)).join('');
+
+        $(this.chatWindow.document).find('.allegro-msgs-wrapper').append(messagesTemplate);
+        this.chatScrollDown();
+    }
+
     async openChatWindow() {
         const url = this.ajaxPath + 'allegro/getMessages/'+this.currentThreadId;
         let messages = await ajaxPost({}, url);
@@ -242,7 +265,6 @@ class AllegroChat {
         window.cw = this.chatWindow = open(this.ajaxPath+'allegro-chat', 'allegro_chat_'+this.currentThreadId, params);
 
         $(this.chatWindow).on('load', () => {
-            this.isChatWindowOpen = true;
             this.chatWindow.document.body.innerHTML = chatTemplate;
             
             this.chatScrollDown();

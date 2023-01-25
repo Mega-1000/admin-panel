@@ -595,6 +595,7 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('/checkUnreadedThreads', 'AllegroChatController@checkUnreadedThreads')->name('checkUnreadedThreads');
             Route::post('/bookThread', 'AllegroChatController@bookThread')->name('bookThread');
             Route::post('/getMessages/{threadId}', 'AllegroChatController@getMessages')->name('getMessages');
+            Route::post('/getNewMessages/{threadId}', 'AllegroChatController@getNewMessages')->name('getNewMessages');
             Route::post('/downloadAttachment/{attachmentId}', 'AllegroChatController@downloadAttachment')->name('downloadAttachment');
             Route::post('/exitChat/{threadId}', 'AllegroChatController@exitChat')->name('exitChat');
             Route::post('/messagesPreview/{threadId}', 'AllegroChatController@messagesPreview')->name('messagesPreview');
