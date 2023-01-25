@@ -2,9 +2,13 @@
 
 class AllegroChat {
     
+    chatWindow = null;
+    isChatWindowOpen = false;
+
     constructor() {
         this.iconWrapper = $('.allegro-chat-icon-wrapper');
         this.iconCounter = $('.allegro-chat-icon-counter');
+        this.ajaxPath = window.location.pathname == '/admin' ? 'admin/' : './';
         this.allegroChatCheckUnreadedThreads();
 
         setInterval(() => {
@@ -19,7 +23,7 @@ class AllegroChat {
     }
 
     async allegroChatCheckUnreadedThreads() {
-        const url = 'admin/allegro/checkUnreadedThreads';
+        const url = this.ajaxPath + 'allegro/checkUnreadedThreads';
         this.unreadedThreads = await ajaxPost({}, url, true);
 
         this.numberOfUnreadedMsgs = this.unreadedThreads?.length || 0;
@@ -30,18 +34,34 @@ class AllegroChat {
     }
 
     async bookThread() {
+
+        if(this.isChatWindowOpen) {
+            toastr.error('Czat aktualnie otwarty, prosimy zamknąć aktualny Czat.');
+            return false;
+        }
+
         this.iconWrapper.addClass('loader-2');
-        const url = 'admin/allegro/bookThread';
+        const url = this.ajaxPath + 'allegro/bookThread';
         const data = {
             unreadedThreads: this.unreadedThreads,
         };
-        this.currentThreadId = await ajaxPost(data, url);
-
-        if(!this.currentThreadId) {
+        const currentThread = await ajaxPost(data, url);
+        if(!currentThread.id) {
             toastr.error('Wiadomości zostały przypisane do innych użytkowników. Proszę spróbować później');
             this.iconWrapper.removeClass('loader-2');
             return false;
         }
+        this.currentThreadId = currentThread.id;
+
+        // handle open new window with order
+        let dtOrders = window.localStorage.getItem('DataTables_dataTable_/admin/orders');
+        if(dtOrders) {
+            dtOrders = JSON.parse(dtOrders);
+            dtOrders.columns[26].search.search = currentThread.interlocutor.login;
+            window.localStorage.setItem('DataTables_dataTable_/admin/orders', JSON.stringify(dtOrders))
+        }
+        open(this.ajaxPath + 'orders', 'orders_'+this.currentThreadId);
+
         this.openChatWindow();
     }
 
@@ -51,7 +71,7 @@ class AllegroChat {
       const msgFooter = $(e.target).parent().parent();
       msgFooter.addClass('loader-2');
 
-      const url = 'admin/allegro/downloadAttachment/'+attachmentId;
+      const url = this.ajaxPath + 'allegro/downloadAttachment/'+attachmentId;
       const fileData = await ajaxPost({}, url);
 
       msgFooter.removeClass('loader-2');
@@ -98,9 +118,15 @@ class AllegroChat {
             </div>
         `;
     }
+    
+    async closeChat() {
+        const url = this.ajaxPath + 'allegro/exitChat/'+this.currentThreadId;
+        await ajaxPost({}, url);
+        this.chatWindow.close();
+    }
 
     async openChatWindow() {
-        const url = 'admin/allegro/getMessages/'+this.currentThreadId;
+        const url = this.ajaxPath + 'allegro/getMessages/'+this.currentThreadId;
         let messages = await ajaxPost({}, url);
         messages = messages.reverse();
 
@@ -110,7 +136,7 @@ class AllegroChat {
         }
 
         let params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,
-        width=600,height=300,left=100,top=100`;
+        width=700,height=700,left=100,top=100`;
 
         let allegroClient = '';
 
@@ -122,25 +148,35 @@ class AllegroChat {
         }).join('');
 
         const chatTemplate = `
+        <link rel="stylesheet" type="text/css" href="http://www.admin.mega1000.localhost/css/chat-styles.css">
         <div class="allegro-chat-wrapper">
             <h2>Czat Allegro</h2>
             <h3>Dotyczy użytkownika Allegro: ${allegroClient}</h3>
             <h3>ID czatu na Allegro: ${this.currentThreadId}</h3>
             <div class="allegro-msg-wrapper">${messagesTemplate}</div>
+            <hr>
+            <textarea class="allegro-textarea"></textarea>
+            <div class="allegro-send">Wyślij wiadomość</div>
+            <div class="allegro-close-conversation">Zamknij konwersację</div>
         </div>
         `;
 
         this.iconWrapper.removeClass('loader-2');
 
-         const chatWindow = open('about:blank', 'allegro_chat_'+this.currentThreadId, params);
-         window.xd = chatWindow;
-        chatWindow.document.body.insertAdjacentHTML('afterbegin', chatTemplate);
+        this.chatWindow = open('about:blank', 'allegro_chat_'+this.currentThreadId, params);
+        this.isChatWindowOpen = true;
+        this.chatWindow.document.body.insertAdjacentHTML('afterbegin', chatTemplate);
 
-        // add Listeners
-        $(chatWindow.document.body).on('click', '.allegro-attachments-item', e => {
+        // add Chat Window Listeners
+        $(this.chatWindow.document.body).on('click', '.allegro-attachments-item', e => {
             this.downloadAttachment(e);
         });
-
+        $(this.chatWindow.document.body).on('click', '.allegro-close-conversation', () => {
+            this.closeChat();
+        });
+        $(this.chatWindow).on('beforeunload', () => {
+            this.closeChat();
+        });
     }
 }
 

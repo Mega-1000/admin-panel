@@ -36,16 +36,16 @@ class AllegroChatController extends Controller
 
         $alreadyOpenedThreads = array_flip($alreadyOpenedThreads);
 
-        $currentThreadId = null;
+        $currentThread = null;
         $user = auth()->user();
 
-        foreach($unreadedThreadsIds as $uThreadId) {
+        foreach($unreadedThreads as $uThread) {
             // check if thread is already booked
-            if(isset($alreadyOpenedThreads[ $uThreadId ])) continue;
+            if(isset($alreadyOpenedThreads[ $uThread['id'] ])) continue;
 
             // prepare temp Allegro Thread for User
             AllegroChatThread::insert([
-                'allegro_thread_id'     => $uThreadId,
+                'allegro_thread_id'     => $uThread['id'],
                 'allegro_msg_id'        => 'temp_for_'.$user->id,
                 'user_id'               => $user->id,
                 'allegro_user_login'    => 'unknown',
@@ -54,11 +54,11 @@ class AllegroChatController extends Controller
                 'type'                  => 'PENDING',
                 'original_allegro_date' => '2023-01-01 14:00:00',
             ]);
-            $currentThreadId = $uThreadId;
+            $currentThread = $uThread;
             break;
         }
 
-        return response($currentThreadId);
+        return response()->json($currentThread);
     }
     public function getMessages(string $threadId) {
         // mark thread as read
@@ -115,9 +115,16 @@ class AllegroChatController extends Controller
 
         return response($messagesCollection);
     }
+    
     public function downloadAttachment(string $attachmentId) {
         $res = $this->allegroChatService->downloadAttachment($attachmentId);
 
         return response()->json($res);
+    }
+
+    public function exitChat(string $threadId) {
+        AllegroChatThread::where('allegro_thread_id', $threadId)->where('type', 'PENDING')->delete();
+
+        return response()->json(['success' => true]);
     }
 }

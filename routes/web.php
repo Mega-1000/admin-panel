@@ -35,7 +35,8 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get('/test', function() {
             $a = new AllegroChatService();
-            $t = $a->downloadAttachment('8874f3ab-635f-4817-95b2-a7d9a77d8738');
+            $t = $a->listMessages('sIXfgnBFrqZMyO8w47eebiVMWIKrM7S0CHYSko2Jq8H', '2021-01-23 09:07:59');
+
             echo '<pre>' , print_r($t) , '</pre>';
         });
 
@@ -588,6 +589,7 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('/bookThread', 'AllegroChatController@bookThread')->name('bookThread');
             Route::post('/getMessages/{threadId}', 'AllegroChatController@getMessages')->name('getMessages');
             Route::post('/downloadAttachment/{attachmentId}', 'AllegroChatController@downloadAttachment')->name('downloadAttachment');
+            Route::post('/exitChat/{threadId}', 'AllegroChatController@exitChat')->name('exitChat');
 
             Route::post('/listThreads', 'AllegroController@listThreads')->name('listThreads');
             Route::post('/listMessages/{threadId}', 'AllegroController@listMessages')->name('listMessages');

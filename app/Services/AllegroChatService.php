@@ -13,17 +13,17 @@ class AllegroChatService extends AllegroApiService {
         parent::__construct();
     }
     public function listThreads(int $offset = 0) {
-        $url = $this->getRestUrl('/messaging/threads');
 
         $data = [
             'offset' => $offset
         ];
 
-        $response = $this->request('GET', $url, $data);
+        $url = $this->getRestUrl('/messaging/threads?' . http_build_query($data));
+        $response = $this->request('GET', $url, []);
 
         return $response;
     }
-    public function listMessages(string $threadId, $after = null) {
+    public function listMessages(string $threadId, string $after = null) {
 
         $data = [];
         if($after) {
@@ -33,8 +33,9 @@ class AllegroChatService extends AllegroApiService {
                 'after' => $carbon->toISOString(),
             ];
         }
-        $url = $this->getRestUrl("/messaging/threads/{$threadId}/messages");
-        $response = $this->request('GET', $url, $data);
+
+        $url = $this->getRestUrl("/messaging/threads/{$threadId}/messages?" . http_build_query($data));
+        $response = $this->request('GET', $url, []);
 
         return $response;
     }
