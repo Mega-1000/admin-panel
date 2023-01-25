@@ -8,10 +8,13 @@ class AllegroChat {
     constructor() {
         this.iconWrapper = $('.allegro-chat-icon-wrapper');
         this.iconCounter = $('.allegro-chat-icon-counter');
-        this.ajaxPath = window.location.pathname == '/admin' ? 'admin/' : './';
+        this.ajaxPath = window.location.pathname == '/admin' ? '/admin/' : '/admin/';
+        this.currentThreadId = window.localStorage.getItem('allegroChatThreadId');
+        this.nickname = window.localStorage.getItem('allegroChatNickname');
         this.allegroChatCheckUnreadedThreads();
 
         setInterval(() => {
+            if(this.currentThreadId) return false;
             this.allegroChatCheckUnreadedThreads();
         }, 60000);
 
@@ -20,6 +23,49 @@ class AllegroChat {
 
     initListeners() {
         this.iconWrapper.on('click', () => this.bookThread());
+        $('.allegro-thread').on('click', e => this.messagesPreview(e));
+    }
+
+    async messagesPreview(e) {
+        $(e.currentTarget).addClass('loader-2');
+        const allegroThreadId = $(e.currentTarget).find('.allegro-thread-id').text();
+        const url = this.ajaxPath + 'allegro/messagesPreview/'+allegroThreadId;
+        const messages = await ajaxPost({}, url);
+
+        $(e.currentTarget).removeClass('loader-2');
+
+        if(!messages) {
+            toastr.error('Coś poszło nie tak, prosimy spróbować raz jeszcze');
+            return false;
+        }
+
+        let allegroClient = '';
+        const messagesTemplate = messages.map(msg => {
+
+            if(!msg.is_outgoing) allegroClient = msg.allegro_user_login;
+
+            return this.makeSingleMessageTemplate(msg);
+        }).join('');
+
+        const chatTemplate = `
+        <div class="allegro-chat-wrapper allegro-chat-wrapper-preview">
+            <h2>Czat Allegro</h2>
+            <h3>Dotyczy użytkownika Allegro: ${allegroClient}</h3>
+            <h3>ID czatu na Allegro: ${allegroThreadId}</h3>
+            <div class="allegro-msgs-wrapper">${messagesTemplate}</div>
+        </div>
+        `;
+
+        const previewChatWindow = open(this.ajaxPath+'allegro-chat', 'allegro_chat_'+allegroThreadId);
+
+        $(previewChatWindow).on('load', () => {
+            previewChatWindow.document.body.innerHTML = chatTemplate;
+            this.chatScrollDown();
+
+            $(previewChatWindow.document.body).on('click', '.allegro-attachments-item', e => {
+                this.downloadAttachment(e);
+            });
+        })
     }
 
     async allegroChatCheckUnreadedThreads() {
@@ -36,23 +82,29 @@ class AllegroChat {
     async bookThread() {
 
         this.iconWrapper.addClass('loader-2');
-        const url = this.ajaxPath + 'allegro/bookThread';
-        const data = {
-            unreadedThreads: this.unreadedThreads,
-        };
-        const currentThread = await ajaxPost(data, url);
-        if(!currentThread.id) {
-            toastr.error('Wiadomości zostały przypisane do innych użytkowników. Proszę spróbować później');
-            this.iconWrapper.removeClass('loader-2');
-            return false;
+
+        if(!this.currentThreadId) {
+            const url = this.ajaxPath + 'allegro/bookThread';
+            const data = {
+                unreadedThreads: this.unreadedThreads,
+            };
+            const currentThread = await ajaxPost(data, url);
+            if(!currentThread.id) {
+                toastr.error('Wiadomości zostały przypisane do innych użytkowników. Proszę spróbować później');
+                this.iconWrapper.removeClass('loader-2');
+                return false;
+            }
+            this.currentThreadId = currentThread.id;
+            this.nickname = currentThread.interlocutor.login;
+            window.localStorage.setItem('allegroChatThreadId', this.currentThreadId);
+            window.localStorage.setItem('allegroChatNickname', this.nickname);
         }
-        this.currentThreadId = currentThread.id;
 
         // handle open new window with order
         let dtOrders = window.localStorage.getItem('DataTables_dataTable_/admin/orders');
         if(dtOrders) {
             dtOrders = JSON.parse(dtOrders);
-            dtOrders.columns[26].search.search = currentThread.interlocutor.login;
+            dtOrders.columns[26].search.search = this.nickname;
             window.localStorage.setItem('DataTables_dataTable_/admin/orders', JSON.stringify(dtOrders))
         }
         open(this.ajaxPath + 'orders', 'orders_'+this.currentThreadId);
@@ -121,6 +173,11 @@ class AllegroChat {
     async closeChat() {
         const url = this.ajaxPath + 'allegro/exitChat/'+this.currentThreadId;
         await ajaxPost({}, url);
+        window.localStorage.removeItem('allegroChatThreadId');
+        window.localStorage.removeItem('allegroChatNickname');
+
+        this.currentThreadId = false;
+        this.nickname = false;
         this.chatWindow.close();
     }
 
@@ -131,9 +188,6 @@ class AllegroChat {
             this.downloadAttachment(e);
         });
         $(this.chatWindow.document.body).on('click', '.allegro-close-conversation', () => {
-            this.closeChat();
-        });
-        $(this.chatWindow).on('beforeunload', () => {
             this.closeChat();
         });
     }
@@ -149,7 +203,6 @@ class AllegroChat {
     async openChatWindow() {
         const url = this.ajaxPath + 'allegro/getMessages/'+this.currentThreadId;
         let messages = await ajaxPost({}, url);
-        messages = messages.reverse();
 
         if(!messages) {
             toastr.error('Coś poszło nie tak, prosimy spróbować raz jeszcze');

@@ -425,6 +425,12 @@ class MenuItemsTableSeeder extends Seeder
             'url' => '',
             'route' => 'pages.index'
         ]);
+        $menuItem = MenuItem::firstOrNew([
+            'menu_id' => $menu->id,
+            'title' => 'Sprawdź wszystkie czaty',
+            'url' => '',
+            'route' => 'pages.getAllChats'
+        ]);
         if (!$menuItem->exists) {
             $menuItem->fill([
                 'target' => '_self',

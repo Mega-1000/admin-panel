@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use App\Entities\AllegroChatThread;
 use App\Services\AllegroChatService;
@@ -35,8 +36,10 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get('/test', function() {
           
-
-            return view('allegro.edit-terms');
+            $cs = new AllegroChatService();
+            $a = new AllegroChatController($cs);
+            $url = route('pages.getAllChats', ['currentPage' => 2]);
+            echo '<pre>' , print_r($url) , '</pre>';
         });
 
         Route::get('/disputes', 'AllegroDisputeController@list');
@@ -66,6 +69,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/pages/{id}/delete', 'PagesGeneratorController@delete')->name('pages.delete');
         Route::get('/pages/{id}', 'PagesGeneratorController@edit')->name('pages.edit');
         Route::get('/pages', 'PagesGeneratorController@getPages')->name('pages.index');
+        Route::get('/getAllChats/{currentPage?}', 'AllegroChatController@getAllChats')->name('pages.getAllChats');
 
         Route::get('/getDelivererImportLog/{id}', 'DelivererController@getDelivererImportLog')->name('deliverer.getImportLog');
 
@@ -586,12 +590,14 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/allegro-chat', function() {
             return view('allegro.chat-window');
         })->name('allegro.chat');
+
         Route::prefix('allegro')->as('allegro.')->group(function () {
             Route::post('/checkUnreadedThreads', 'AllegroChatController@checkUnreadedThreads')->name('checkUnreadedThreads');
             Route::post('/bookThread', 'AllegroChatController@bookThread')->name('bookThread');
             Route::post('/getMessages/{threadId}', 'AllegroChatController@getMessages')->name('getMessages');
             Route::post('/downloadAttachment/{attachmentId}', 'AllegroChatController@downloadAttachment')->name('downloadAttachment');
             Route::post('/exitChat/{threadId}', 'AllegroChatController@exitChat')->name('exitChat');
+            Route::post('/messagesPreview/{threadId}', 'AllegroChatController@messagesPreview')->name('messagesPreview');
 
             Route::post('/listThreads', 'AllegroController@listThreads')->name('listThreads');
             Route::post('/listMessages/{threadId}', 'AllegroController@listMessages')->name('listMessages');

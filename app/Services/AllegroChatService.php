@@ -27,13 +27,11 @@ class AllegroChatService extends AllegroApiService {
 
         $data = [];
         if($after) {
-            $carbon = new Carbon($after);
-
+            $carbon = new Carbon($after, 'UTC');
             $data = [
-                'after' => $carbon->toISOString(),
+                'after' => $carbon->addSecond()->toISOString(),
             ];
         }
-        
         $url = $this->getRestUrl("/messaging/threads/{$threadId}/messages?" . http_build_query($data));
         $response = $this->request('GET', $url, []);
 

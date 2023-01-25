@@ -27,6 +27,7 @@
             }
         </style>
         <link href="{{ asset('css/chat-styles.css') }}" rel="stylesheet" type="text/css" />
+        <link href="{{ asset('css/main.css') }}" rel="stylesheet" type="text/css" />
     </head>
     <body>
         
