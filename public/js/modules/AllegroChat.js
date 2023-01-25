@@ -35,11 +35,6 @@ class AllegroChat {
 
     async bookThread() {
 
-        if(this.isChatWindowOpen) {
-            toastr.error('Czat aktualnie otwarty, prosimy zamknąć aktualny Czat.');
-            return false;
-        }
-
         this.iconWrapper.addClass('loader-2');
         const url = this.ajaxPath + 'allegro/bookThread';
         const data = {
@@ -100,18 +95,22 @@ class AllegroChat {
                 <div class="allegro-msg-header">
                     <div class="allegro-msg-date">[${msg.original_allegro_date}]</div>
                     <div class="allegro-msg-consultant">
-                        <strong>${msg.user.name}</strong> \<${msg.user.email}\>
+                        Konsultant: <strong>${msg.user.name}</strong>
                     </div>
-                    <div class="allegro-msg-subject">
-                        <strong>${msg.subject}</strong>
-                    </div>
+                    ${msg.subject ? `<div class="allegro-msg-subject">
+                        <strong>Temat: ${msg.subject}</strong>
+                    </div>` : ``}
                 </div>
                 <div class="allegro-msg-content">
                     ${msg.content}
                 </div>
                 <div class="allegro-msg-footer">
-                    ${ msg.allegro_offer_id ? `<a href="https://allegro.pl/oferta/${msg.allegro_offer_id}" class="allegro-msg-offer-id">Przejdź do oferty</a>` : `` }
-                    ${ msg.allegro_order_id ? `<a href="https://allegro.pl/moje-allegro/sprzedaz/zamowienia/${msg.allegro_order_id}" class="allegro-msg-order-id">Przejdź do zamówienia</a>` : `` }
+                    ${ msg.allegro_offer_id ? `<div>
+                    <a href="https://allegro.pl/oferta/${msg.allegro_offer_id}" target="_blank" class="btn allegro-msg-offer-id">Przejdź do oferty</a></div>`
+                     : `` }
+                    ${ msg.allegro_order_id ? `<div>
+                    <a href="https://allegro.pl/moje-allegro/sprzedaz/zamowienia/${msg.allegro_order_id}" target="_blank" class="btn allegro-msg-order-id">Przejdź do zamówienia</a></div>`
+                     : `` }
                     ${attachmentsTemplate}
                     <div class="allegro-msg-id">Id wiadomości na Allegro: ${msg.allegro_msg_id}</div>
                 </div>
@@ -123,6 +122,28 @@ class AllegroChat {
         const url = this.ajaxPath + 'allegro/exitChat/'+this.currentThreadId;
         await ajaxPost({}, url);
         this.chatWindow.close();
+    }
+
+    initChatWindowListeners() {
+
+        // add Chat Window Listeners
+        $(this.chatWindow.document.body).on('click', '.allegro-attachments-item', e => {
+            this.downloadAttachment(e);
+        });
+        $(this.chatWindow.document.body).on('click', '.allegro-close-conversation', () => {
+            this.closeChat();
+        });
+        $(this.chatWindow).on('beforeunload', () => {
+            this.closeChat();
+        });
+    }
+
+    chatScrollDown() {
+        setTimeout(() => {
+            const msgsWrapper = $(this.chatWindow.document).find('.allegro-msgs-wrapper');
+            msgsWrapper.trigger('focus');
+            msgsWrapper.scrollTop(msgsWrapper[0].scrollHeight);
+        }, 150);
     }
 
     async openChatWindow() {
@@ -148,35 +169,32 @@ class AllegroChat {
         }).join('');
 
         const chatTemplate = `
-        <link rel="stylesheet" type="text/css" href="http://www.admin.mega1000.localhost/css/chat-styles.css">
         <div class="allegro-chat-wrapper">
             <h2>Czat Allegro</h2>
             <h3>Dotyczy użytkownika Allegro: ${allegroClient}</h3>
             <h3>ID czatu na Allegro: ${this.currentThreadId}</h3>
-            <div class="allegro-msg-wrapper">${messagesTemplate}</div>
+            <div class="allegro-msgs-wrapper">${messagesTemplate}</div>
             <hr>
             <textarea class="allegro-textarea"></textarea>
-            <div class="allegro-send">Wyślij wiadomość</div>
-            <div class="allegro-close-conversation">Zamknij konwersację</div>
+            <div>
+                <input type="file" value="Dodaj załącznik" />
+            </div>
+            <div class="btn allegro-send">Wyślij wiadomość</div>
+            <div class="btn allegro-close-conversation">Zamknij konwersację</div>
         </div>
         `;
 
         this.iconWrapper.removeClass('loader-2');
 
-        this.chatWindow = open('about:blank', 'allegro_chat_'+this.currentThreadId, params);
-        this.isChatWindowOpen = true;
-        this.chatWindow.document.body.insertAdjacentHTML('afterbegin', chatTemplate);
+        window.cw = this.chatWindow = open(this.ajaxPath+'allegro-chat', 'allegro_chat_'+this.currentThreadId, params);
 
-        // add Chat Window Listeners
-        $(this.chatWindow.document.body).on('click', '.allegro-attachments-item', e => {
-            this.downloadAttachment(e);
-        });
-        $(this.chatWindow.document.body).on('click', '.allegro-close-conversation', () => {
-            this.closeChat();
-        });
-        $(this.chatWindow).on('beforeunload', () => {
-            this.closeChat();
-        });
+        $(this.chatWindow).on('load', () => {
+            this.isChatWindowOpen = true;
+            this.chatWindow.document.body.innerHTML = chatTemplate;
+            
+            this.chatScrollDown();
+            this.initChatWindowListeners();
+        })
     }
 }
 

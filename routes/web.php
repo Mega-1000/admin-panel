@@ -34,10 +34,9 @@ Route::group(['prefix' => 'admin'], function () {
         });
 
         Route::get('/test', function() {
-            $a = new AllegroChatService();
-            $t = $a->listMessages('sIXfgnBFrqZMyO8w47eebiVMWIKrM7S0CHYSko2Jq8H', '2021-01-23 09:07:59');
+          
 
-            echo '<pre>' , print_r($t) , '</pre>';
+            return view('allegro.edit-terms');
         });
 
         Route::get('/disputes', 'AllegroDisputeController@list');
@@ -584,6 +583,9 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/edit-allegro-terms', 'AllegroController@editTerms')->name('allegro.edit-terms');
         Route::post('/edit-allegro-terms', 'AllegroController@saveTerms')->name('allegro.edit-terms');
 
+        Route::get('/allegro-chat', function() {
+            return view('allegro.chat-window');
+        })->name('allegro.chat');
         Route::prefix('allegro')->as('allegro.')->group(function () {
             Route::post('/checkUnreadedThreads', 'AllegroChatController@checkUnreadedThreads')->name('checkUnreadedThreads');
             Route::post('/bookThread', 'AllegroChatController@bookThread')->name('bookThread');

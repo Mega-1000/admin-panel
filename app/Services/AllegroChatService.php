@@ -33,7 +33,7 @@ class AllegroChatService extends AllegroApiService {
                 'after' => $carbon->toISOString(),
             ];
         }
-
+        
         $url = $this->getRestUrl("/messaging/threads/{$threadId}/messages?" . http_build_query($data));
         $response = $this->request('GET', $url, []);
 
