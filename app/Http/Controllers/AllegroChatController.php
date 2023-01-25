@@ -112,6 +112,29 @@ class AllegroChatController extends Controller
 
         return response($newMessages);
     }
+
+    public function writeNewMessage(Request $data) {
+
+        $content = $data->input('content');
+        $threadId = $data->input('threadId');
+
+        $userLogin = AllegroChatThread::where('allegro_thread_id', $threadId)->where('is_outgoing', '!=', 1)->pluck('allegro_user_login')->first();
+
+        $data = [
+            'recipient' => [
+                'login' => $userLogin
+            ],
+            'text' => $content,
+        ];
+
+        $res = $this->allegroChatService->newMessage($data);
+
+        if(!$res['id']) return response('null', 200);
+        
+        $newMessages = collect( $this->insertMsgsToDB([ $res ]) );
+
+        return response($newMessages);
+    }
     
     public function downloadAttachment(string $attachmentId) {
         $res = $this->allegroChatService->downloadAttachment($attachmentId);

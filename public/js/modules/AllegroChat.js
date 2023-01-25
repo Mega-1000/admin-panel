@@ -188,6 +188,9 @@ class AllegroChat {
     initChatWindowListeners() {
 
         // add Chat Window Listeners
+        $(this.chatWindow.document.body).on('click', '.allegro-send', () => {
+            this.sendMessage();
+        });
         $(this.chatWindow.document.body).on('click', '.allegro-attachments-item', e => {
             this.downloadAttachment(e);
         });
@@ -223,6 +226,34 @@ class AllegroChat {
         this.chatScrollDown();
     }
 
+    async sendMessage() {
+        const allegroTextarea = $(this.chatWindow.document).find('.allegro-textarea');
+        const content = allegroTextarea.val();
+
+        $('.allegro-chat-footer').addClass('loader-2');
+        const data = {
+            threadId: this.currentThreadId,
+            content,
+        }
+        const url = this.ajaxPath + 'allegro/writeNewMessage';
+        let message = await ajaxPost(data, url);
+
+        $('.allegro-chat-footer').removeClass('loader-2');
+
+        if(message == 'null') {
+            toastr.error('Nie udało się wysłać wiadomości.');
+            return false;
+        }
+
+        allegroTextarea.val('');
+
+        const messagesTemplate = this.makeSingleMessageTemplate(message);
+
+        $(this.chatWindow.document).find('.allegro-msgs-wrapper').append(messagesTemplate);
+        this.chatScrollDown();
+
+    }
+
     async openChatWindow() {
         const url = this.ajaxPath + 'allegro/getMessages/'+this.currentThreadId;
         let messages = await ajaxPost({}, url);
@@ -251,12 +282,14 @@ class AllegroChat {
             <h3>ID czatu na Allegro: ${this.currentThreadId}</h3>
             <div class="allegro-msgs-wrapper">${messagesTemplate}</div>
             <hr>
-            <textarea class="allegro-textarea"></textarea>
-            <div>
-                <input type="file" value="Dodaj załącznik" />
+            <div class="allegro-chat-footer">
+                <textarea class="allegro-textarea"></textarea>
+                <div>
+                    <input type="file" value="Dodaj załącznik" />
+                </div>
+                <div class="btn allegro-send">Wyślij wiadomość</div>
+                <div class="btn allegro-close-conversation">Zamknij konwersację</div>
             </div>
-            <div class="btn allegro-send">Wyślij wiadomość</div>
-            <div class="btn allegro-close-conversation">Zamknij konwersację</div>
         </div>
         `;
 

@@ -38,8 +38,9 @@ Route::group(['prefix' => 'admin'], function () {
           
             $cs = new AllegroChatService();
             $a = new AllegroChatController($cs);
-            $url = route('pages.getAllChats', ['currentPage' => 2]);
-            echo '<pre>' , print_r($url) , '</pre>';
+            $threadId = 'sIXfgnBFrqZMyO8w47eebiVMWIKrM7S0CHYSko2Jq8H';
+            $userLogin = AllegroChatThread::where('allegro_thread_id', $threadId)->where('is_outgoing', '!=', 1)->pluck('allegro_user_login')->first();
+            echo '<pre>' , print_r($userLogin) , '</pre>';
         });
 
         Route::get('/disputes', 'AllegroDisputeController@list');
@@ -596,6 +597,7 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('/bookThread', 'AllegroChatController@bookThread')->name('bookThread');
             Route::post('/getMessages/{threadId}', 'AllegroChatController@getMessages')->name('getMessages');
             Route::post('/getNewMessages/{threadId}', 'AllegroChatController@getNewMessages')->name('getNewMessages');
+            Route::post('/writeNewMessage', 'AllegroChatController@writeNewMessage')->name('writeNewMessage');
             Route::post('/downloadAttachment/{attachmentId}', 'AllegroChatController@downloadAttachment')->name('downloadAttachment');
             Route::post('/exitChat/{threadId}', 'AllegroChatController@exitChat')->name('exitChat');
             Route::post('/messagesPreview/{threadId}', 'AllegroChatController@messagesPreview')->name('messagesPreview');
