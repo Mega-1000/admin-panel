@@ -5,6 +5,14 @@ namespace App\Entities;
 use App\User;
 use Illuminate\Database\Eloquent\Model;
 
+/**
+* Class Order.
+*
+* @property string $allegro_offer_id
+* @property string $allegro_order_id
+* @package namespace App\Entities;
+*/
+
 class AllegroChatThread extends Model
 {
 

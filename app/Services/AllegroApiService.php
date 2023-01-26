@@ -139,45 +139,36 @@ class AllegroApiService
 		}
 
 		try {
+			$headers = [
+				'Authorization' => "Bearer " . $this->getAccessToken(),
+				'Content-Type' => 'application/vnd.allegro.public.v1+json',
+			];
+			$data = [
+				'headers' => $headers,
+				'json' => $params
+			];
 
 			// save to link for files
-			if($attachment) {
-				$headers = [
-					'Authorization' => "Bearer " . $this->getAccessToken(),
-					'Accept' => 'application/vnd.allegro.public.v1+json',
-					'Content-Type' => $attachment['mimeType'],
-				];
+			if($attachment !== null) {
+
+				$headers['Accept'] = 'application/vnd.allegro.public.v1+json';
+				$headers['Content-Type'] = $attachment['mimeType'];
+				
 				$data = [
 					'headers' => $headers,
 					'body' => $attachment['contents'],
 				];
-				$response = $this->client->request(
-					$method,
-					$url,
-					$data
-				);
-			} else {
-
-				$headers = [
-					'Authorization' => "Bearer " . $this->getAccessToken(),
-					'Content-Type' => 'application/vnd.allegro.public.v1+json',
-				];
-
-				$data = [
-					'headers' => $headers,
-					'json' => $params
-				];
-
-				if( isset($params['sink']) ) {
-					$data['sink'] = $params['sink'];
-				}
-
-				$response = $this->client->request(
-					$method,
-					$url,
-					$data
-				);
 			}
+
+			if( isset($params['sink']) ) {
+				$data['sink'] = $params['sink'];
+			}
+
+			$response = $this->client->request(
+				$method,
+				$url,
+				$data
+			);
 		} catch (\Exception $e) {
 			if ($e->getCode() == 401 && $first) {
 				if ($this->getRefreshToken()) {

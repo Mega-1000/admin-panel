@@ -50,6 +50,7 @@ class AllegroDisputeService extends AllegroApiService
             $disputeModel->unseen_changes = false;
         }
         $order = Order::where('allegro_form_id', '=', $disputeModel->form_id)->first();
+        
         if(!$order) return;
 
         $disputeModel->hash = $this->disputeHash($dispute);

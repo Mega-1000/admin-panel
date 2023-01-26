@@ -18,7 +18,7 @@ class CreateAllegroChatsTable extends Migration
             $table->string('allegro_thread_id');
             $table->string('allegro_msg_id');
             $table->unsignedInteger('user_id');
-            $table->boolean('allegro_user_login');
+            $table->string('allegro_user_login');
             $table->string('subject')->nullable();
             $table->text('content');
             $table->boolean('is_outgoing');

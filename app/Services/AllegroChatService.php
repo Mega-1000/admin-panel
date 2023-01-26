@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use Illuminate\Support\Carbon;
+use App\Entities\AllegroChatThread;
 
 class AllegroChatService extends AllegroApiService {
 
@@ -74,5 +75,76 @@ class AllegroChatService extends AllegroApiService {
         $response = $this->request('PUT', $url, [], $attachment, true);
 
         return $response;
+    }
+    public function getCurrentThread(array $unreadedThreads): array {
+
+        $unreadedThreadsIds = array_column($unreadedThreads, 'id');
+
+        $alreadyOpenedThreads = AllegroChatThread::where([
+            'allegro_thread_id' => $unreadedThreadsIds,
+            'type'              => 'PENDING',
+        ])->pluck('allegro_thread_id')->toArray();
+
+        $alreadyOpenedThreads = array_flip($alreadyOpenedThreads);
+
+        $currentThread = null;
+        $user = auth()->user();
+
+        foreach($unreadedThreads as $uThread) {
+            // check if thread is already booked
+            if(isset($alreadyOpenedThreads[ $uThread['id'] ])) continue;
+
+            // prepare temp Allegro Thread for User
+            AllegroChatThread::insert([
+                'allegro_thread_id'     => $uThread['id'],
+                'allegro_msg_id'        => 'temp_for_'.$user->id,
+                'user_id'               => $user->id,
+                'allegro_user_login'    => 'unknown',
+                'content'               => '',
+                'is_outgoing'           => false,
+                'type'                  => 'PENDING',
+                'original_allegro_date' => '2023-01-01 14:00:00',
+            ]);
+            $currentThread = $uThread;
+            break;
+        }
+
+        return $currentThread;
+    }
+    public function insertMsgsToDB(array $msgs): array {
+        $messages = array_reverse($msgs);
+
+        $newMessages = [];
+        $user = auth()->user();
+
+        foreach($messages as $msg) {
+            $createdAt = new Carbon($msg['createdAt']);
+
+            $newMessages[] = [
+                'allegro_thread_id'     => $msg['thread']['id'],
+                'allegro_msg_id'        => $msg['id'],
+                'user_id'               => $user->id,
+                'allegro_user_login'    => $msg['author']['login'],
+                'subject'               => $msg['subject'],
+                'content'               => $msg['text'],
+                'is_outgoing'           => !$msg['author']['isInterlocutor'],
+                'attachments'           => json_encode($msg['attachments']),
+                'type'                  => $msg['type'],
+                'allegro_offer_id'      => $msg['relatesTo']['offer'],
+                'allegro_order_id'      => $msg['relatesTo']['order'],
+                'original_allegro_date' => $createdAt->toDateTimeString(),
+            ];
+        }
+        AllegroChatThread::insert($newMessages);
+
+        // add missing informations about user
+        foreach ($newMessages as &$newMessage) {
+            $newMessage['user'] = [
+                'name'  => $user->name,
+                'email' => $user->email,
+            ];
+        }
+
+        return $newMessages;
     }
 }

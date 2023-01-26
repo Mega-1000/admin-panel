@@ -26,7 +26,6 @@ Route::group(['prefix' => 'admin'], function () {
         Route::group(['prefix' => 'products'], function () {
             Route::group(['prefix' => 'sets', 'as' => 'sets.'], __DIR__ . '/web/ProductsSetsRoutes.php');
         });
-Route::get('/test', 'AllegroDisputeController@list');
 
         Route::get('/disputes', 'AllegroDisputeController@list');
         Route::get('/disputes/view/{id}', 'AllegroDisputeController@view');
