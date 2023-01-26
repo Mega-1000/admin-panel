@@ -7,7 +7,7 @@ use App\Jobs\RemoveLabelJob;
 
 class AllegroDisputeService extends AllegroApiService
 {
-    protected $auth_record_id = 3;
+    protected $auth_record_id = 2;
     
     const STATUS_ONGOING = 'ONGOING';
     const STATUS_CLOSED = 'CLOSED';
