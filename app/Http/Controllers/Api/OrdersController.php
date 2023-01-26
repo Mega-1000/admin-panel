@@ -3,46 +3,24 @@
 namespace App\Http\Controllers\Api;
 
 
-use Carbon\Carbon;
-use App\Entities\Label;
-use App\Entities\Order;
 use App\Domains\DelivererPackageImport\Exceptions\OrderNotFoundException;
 use App\Entities\Country;
-use App\Jobs\AddLabelJob;
-use App\Helpers\ChatHelper;
 use App\Entities\FirmSource;
-use App\Entities\OrderDates;
-use App\Jobs\RemoveLabelJob;
-use Illuminate\Http\Request;
-use App\Helpers\OrderBuilder;
+use App\Entities\Label;
+use App\Entities\Order;
 use App\Entities\OrderAddress;
+use App\Entities\OrderDates;
 use App\Entities\WorkingEvents;
-use Illuminate\Contracts\Routing\ResponseFactory;
-use Illuminate\Foundation\Application;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Response;
-use Mailer;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\ChatHelper;
 use App\Helpers\GetCustomerForAdminEdit;
 use App\Helpers\GetCustomerForNewOrder;
 use App\Helpers\MessagesHelper;
-use App\Services\ProductService;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Log;
-use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
+use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceCalculator;
-use App\Jobs\OrderProformSendMailJob;
-use App\Repositories\OrderRepository;
-use App\Helpers\BackPackPackageDivider;
-use App\Helpers\GetCustomerForNewOrder;
-use App\Helpers\SendCommunicationEmail;
 use App\Helpers\TransportSumCalculator;
-use App\Repositories\ProductRepository;
-use Illuminate\Support\Facades\Storage;
-use App\Helpers\GetCustomerForAdminEdit;
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\OrdersController as OrdersControllerApp;
 use App\Http\Requests\Api\Orders\AcceptReceivingOrderRequest;
 use App\Http\Requests\Api\Orders\DeclineProformRequest;
 use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
@@ -50,38 +28,33 @@ use App\Http\Requests\Api\Orders\StoreOrderRequest;
 use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
 use App\Jobs\AddLabelJob;
 use App\Jobs\OrderProformSendMailJob;
-use App\Jobs\Orders\CheckDeliveryAddressSendMailJob;
-use App\Jobs\RemoveLabelJob;
 use App\Mail\SendOfferToCustomerMail;
+use App\Repositories\CustomerAddressRepository;
 use App\Repositories\CustomerRepository;
-use App\Repositories\OrderItemRepository;
-use App\Http\Controllers\OrdersController as OrdersControllerApp;
 use App\Repositories\OrderAddressRepository;
+use App\Repositories\OrderItemRepository;
+use App\Repositories\OrderMessageAttachmentRepository;
 use App\Repositories\OrderMessageRepository;
 use App\Repositories\OrderPackageRepository;
-use App\Repositories\ProductPriceRepository;
-use App\Repositories\CustomerAddressRepository;
-use App\Http\Requests\Api\Orders\StoreOrderRequest;
-use App\Jobs\Orders\CheckDeliveryAddressSendMailJob;
-use App\Repositories\OrderMessageAttachmentRepository;
-use App\Http\Requests\Api\Orders\DeclineProformRequest;
-use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
-use App\Http\Requests\Api\Orders\AcceptReceivingOrderRequest;
-use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
 use App\Repositories\OrderRepository;
-use App\Http\Controllers\Controller;
 use App\Repositories\ProductPackingRepository;
-use App\Repositories\ProductRepository;
 use App\Repositories\ProductPriceRepository;
+use App\Repositories\ProductRepository;
 use App\Services\ProductService;
 use Carbon\Carbon;
+use Exception;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Foundation\Application;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use App\Entities\Order;
+use Illuminate\Support\Facades\Storage;
+use Mailer;
+use Throwable;
 
 /**
  * Class OrdersController
@@ -150,18 +123,18 @@ class OrdersController extends Controller
     /**
      * OrdersController constructor.
      *
-     * @param OrderRepository                  $orderRepository
-     * @param CustomerRepository               $customerRepository
-     * @param OrderItemRepository              $orderItemRepository
-     * @param ProductRepository                $productRepository
-     * @param OrderAddressRepository           $orderAddressRepository
-     * @param OrderMessageRepository           $orderMessageRepository
-     * @param CustomerAddressRepository        $customerAddressRepository
-     * @param ProductPriceRepository           $productPriceRepository
+     * @param OrderRepository $orderRepository
+     * @param CustomerRepository $customerRepository
+     * @param OrderItemRepository $orderItemRepository
+     * @param ProductRepository $productRepository
+     * @param OrderAddressRepository $orderAddressRepository
+     * @param OrderMessageRepository $orderMessageRepository
+     * @param CustomerAddressRepository $customerAddressRepository
+     * @param ProductPriceRepository $productPriceRepository
      * @param OrderMessageAttachmentRepository $orderMessageAttachmentRepository
-     * @param OrderPackageRepository           $orderPackageRepository
-     * @param ProductService                   $productService
-     * @param ProductPackingRepository         $productPackingRepository
+     * @param OrderPackageRepository $orderPackageRepository
+     * @param ProductService $productService
+     * @param ProductPackingRepository $productPackingRepository
      */
     public function __construct(
         OrderRepository                  $orderRepository,
@@ -192,9 +165,12 @@ class OrdersController extends Controller
         $this->productPackingRepository = $productPackingRepository;
     }
 
+    /**
+     * @throws Exception
+     */
     public function store(StoreOrderRequest $request)
     {
-        throw new \Exception("Method deprecated");
+        throw new Exception("Method deprecated");
     }
 
     public function newOrder(StoreOrderRequest $request, ProductService $productService)
@@ -222,7 +198,7 @@ class OrdersController extends Controller
             $order->save();
 
             return $this->createdResponse(['order_id' => $id, 'canPay' => $canPay, 'token' => $order->getToken()]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             if (empty($this->error_code)) {
                 $this->error_code = $e->getMessage();
@@ -269,7 +245,7 @@ class OrdersController extends Controller
             }
 
             return $this->createdResponse();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $message = $e->getMessage();
             Log::error("Problem with store order message: $message", ['class' => $e->getFile(), 'line' => $e->getLine()]);
             die();
@@ -323,8 +299,7 @@ class OrdersController extends Controller
      * Get customer delivery address
      *
      * @param int $orderId
-     *
-     * @return CustomerAddress
+     * @return JsonResponse
      */
     public function getCustomerDeliveryAddress(int $orderId)
     {
@@ -335,7 +310,7 @@ class OrdersController extends Controller
         )->first();
         if ($customerDeliveryAddress === null) {
             return response()->json([
-                'status'=> false,
+                'status' => false,
                 'error' => 'Brak adresu dostawy klienta'
             ], 422);
         }
@@ -346,6 +321,7 @@ class OrdersController extends Controller
      * Get customer invoice address.
      *
      * @param int $orderId
+     * @return JsonResponse
      */
     public function getCustomerInvoiceAddress(int $orderId)
     {
@@ -357,7 +333,7 @@ class OrdersController extends Controller
 
         if ($customerInvoiceAddress === null) {
             return response()->json([
-                'status'=> false,
+                'status' => false,
                 'error' => 'Brak adresu do faktury klienta'
             ], 422);
         }
@@ -398,17 +374,43 @@ class OrdersController extends Controller
         );
     }
 
+    private function getLocks($order): array
+    {
+        $deliveryLock[] = config('labels-map')['list']['produkt w przygotowaniu-po wyprodukowaniu magazyn kasuje etykiete'];
+        $deliveryLock[] = config('labels-map')['list']['wyprodukowana'];
+        $deliveryLock[] = config('labels-map')['list']['wyprodukowano czesciowo'];
+        $deliveryLock[] = config('labels-map')['list']['wyslana do awizacji'];
+        $deliveryLock[] = config('labels-map')['list']['awizacja przyjeta'];
+        $deliveryLock[] = config('labels-map')['list']['awizacja odrzucona'];
+        $deliveryLock[] = config('labels-map')['list']['awizacja brak odpowiedzi'];
+
+        $invoiceLock[] = config('labels-map')['list']['faktura wystawiona'];
+        $invoiceLock[] = config('labels-map')['list']['faktura wystawiona z odlozonym skutkiem magazynowym'];
+        $isDeliveryChangeLocked = $order->labels
+                ->filter(function ($label) use ($deliveryLock) {
+                    return in_array($label->id, $deliveryLock);
+                })
+                ->count() > 0;
+        $isInvoiceChangeLocked = $order->labels
+                ->filter(function ($label) use ($invoiceLock) {
+                    return in_array($label->id, $invoiceLock);
+                })
+                ->count() > 0;
+        return array($isDeliveryChangeLocked, $isInvoiceChangeLocked);
+    }
+
     /**
      * Undocumented function
      *
      * @param UpdateOrderDeliveryAndInvoiceAddressesRequest $request
      * @param int $orderId
-     * @return void
+     * @return JsonResponse|void
      */
     public function updateOrderDeliveryAndInvoiceAddresses(
         UpdateOrderDeliveryAndInvoiceAddressesRequest $request,
-        int $orderId
-    ) {
+        int                                           $orderId
+    )
+    {
         $message = [];
 
         try {
@@ -466,7 +468,7 @@ class OrdersController extends Controller
             }
 
             return response()->json(implode(" ", $message), 200, [], JSON_UNESCAPED_UNICODE);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error(
                 'Problem with update customer invoice and delivery address.',
                 ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
@@ -518,7 +520,7 @@ class OrdersController extends Controller
             $orderPackage->update();
 
             return response()->json($message, 200, [], JSON_UNESCAPED_UNICODE);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error(
                 'Problem with cancelled packages.',
                 ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
@@ -537,19 +539,12 @@ class OrdersController extends Controller
                         ->with('price');
                 }]);
             }])
-            ->with('packages')
-            ->with('payments')
-            ->with('labels')
-            ->with('addresses')
-            ->with('invoices')
-            ->with('employee')
-            ->with('files')
-            ->with('dates')
-            ->with('factoryDelivery')
+            ->with('packages', 'payments', 'labels', 'addresses', 'invoices', 'employee', 'files', 'dates', 'factoryDelivery', 'orderOffers')
             ->orderBy('id', 'desc')
             ->get();
 
         foreach ($orders as $order) {
+            $order->proforma_invoice = asset(Storage::url($order->getProformStoragePathAttribute()));
             $order->total_sum = $order->getSumOfGrossValues();
             $order->bookedPaymentsSum = $order->bookedPaymentsSum();
             $userId = $request->user()->id;
@@ -588,11 +583,11 @@ class OrdersController extends Controller
             $vat = 1 + $item->product->vat / 100;
 
             foreach ([
-                'selling_price_calculated_unit',
-                'selling_price_basic_uni',
-                'selling_price_aggregate_unit',
-                'selling_price_the_largest_unit'
-            ] as $column) {
+                         'selling_price_calculated_unit',
+                         'selling_price_basic_uni',
+                         'selling_price_aggregate_unit',
+                         'selling_price_the_largest_unit'
+                     ] as $column) {
                 $kGross = "gross_$column";
                 $kNet = "net_$column";
                 $item->product->$kGross = round($item->$kNet * $vat, 2);
@@ -615,31 +610,6 @@ class OrdersController extends Controller
 
         $order = Order::where('token', $token)->first();
         return ['total_price' => $order->total_price, 'transport_price' => $order->getTransportPrice(), 'id' => $order->id];
-    }
-
-    private function getLocks($order): array
-    {
-        $deliveryLock[] = config('labels-map')['list']['produkt w przygotowaniu-po wyprodukowaniu magazyn kasuje etykiete'];
-        $deliveryLock[] = config('labels-map')['list']['wyprodukowana'];
-        $deliveryLock[] = config('labels-map')['list']['wyprodukowano czesciowo'];
-        $deliveryLock[] = config('labels-map')['list']['wyslana do awizacji'];
-        $deliveryLock[] = config('labels-map')['list']['awizacja przyjeta'];
-        $deliveryLock[] = config('labels-map')['list']['awizacja odrzucona'];
-        $deliveryLock[] = config('labels-map')['list']['awizacja brak odpowiedzi'];
-
-        $invoiceLock[] = config('labels-map')['list']['faktura wystawiona'];
-        $invoiceLock[] = config('labels-map')['list']['faktura wystawiona z odlozonym skutkiem magazynowym'];
-        $isDeliveryChangeLocked = $order->labels
-            ->filter(function ($label) use ($deliveryLock) {
-                return in_array($label->id, $deliveryLock);
-            })
-            ->count() > 0;
-        $isInvoiceChangeLocked = $order->labels
-                ->filter(function ($label) use ($invoiceLock) {
-                    return in_array($label->id, $invoiceLock);
-                })
-                ->count() > 0;
-        return array($isDeliveryChangeLocked, $isInvoiceChangeLocked);
     }
 
     public function getDates(Order $order)
@@ -810,8 +780,9 @@ class OrdersController extends Controller
 
     public function declineProform(
         DeclineProformRequest $request,
-        $orderId
-    ) {
+                              $orderId
+    )
+    {
         if (!($order = $this->orderRepository->find($orderId))) {
             return [];
         }
@@ -865,8 +836,8 @@ class OrdersController extends Controller
     {
         $orderId = $request->id;
         $order = Order::find($orderId);
-        if(!$order) return response(['errorMessage' => 'Nie można znaleźć zamówienia'], 400);
-        if($order->customer_id != $request->user()->id) return response(['errorMessage' => 'Nie twoje zamówienie'], 400);
+        if (!$order) return response(['errorMessage' => 'Nie można znaleźć zamówienia'], 400);
+        if ($order->customer_id != $request->user()->id) return response(['errorMessage' => 'Nie twoje zamówienie'], 400);
         $ordersController = App::make(OrdersControllerApp::class);
         $ordersController->addFile($request, $orderId);
         dispatch(new AddLabelJob($orderId, [Label::PROOF_OF_PAYMENT_UPLOADED]));
@@ -969,7 +940,7 @@ class OrdersController extends Controller
                         $productPacking
                     ));
             }
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             return response(json_encode([
                 'status' => false,
                 'error_code' => 500,

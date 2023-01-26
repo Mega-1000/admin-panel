@@ -44,6 +44,7 @@ use App\Jobs\AllegroTrackingNumberUpdater;
 use App\Jobs\GenerateXmlForNexoJob;
 use App\Jobs\ImportOrdersFromSelloJob;
 use App\Jobs\Orders\MissingDeliveryAddressSendMailJob;
+use App\Jobs\Orders\ChangeOrderStatusJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Jobs\RemoveFileLockJob;
 use App\Jobs\RemoveLabelJob;
@@ -1234,6 +1235,8 @@ class OrdersController extends Controller
             $order->save();
         }
 
+        dispatch_now(new ChangeOrderStatusJob($order));
+
         if ($request->input('status') != $order->status_id && $request->input('shouldBeSent') == 'on') {
             dispatch_now(new OrderStatusChangedNotificationJob($order->id, $request->input('mail_message'), $oldStatus));
         }
@@ -1456,6 +1459,20 @@ class OrdersController extends Controller
         $loop = [];
 
         return dispatch_now(new RemoveLabelJob($order, [$request->label], $loop, $request->labelsToAddIds));
+    }
+
+    public function setWarehouse(int $orderId, Request $request): string
+    {
+        $order = Order::find($orderId);
+        if (!$order) return response(['errorMessage' => 'Nie można znaleźć zamówienia'], 400);
+
+        $warehouse = Warehouse::where('symbol', trim($request->warehouse))->first();
+        if(!$warehouse) return response(['errorMessage' => 'Nie można znaleźć magazynu'], 400);
+
+        $order->warehouse()->associate($warehouse->id);
+        $order->save();
+
+        die(true);
     }
 
     /**
@@ -3014,14 +3031,6 @@ class OrdersController extends Controller
     public function getFiles(int $id)
     {
         return OrderFiles::where('order_id', $id)->get();
-    }
-
-    public function getWarehouse(int $orderId): string
-    {
-        $order = Order::findOrFail($orderId);
-        $warehouse = $order->warehouse;
-
-        return $warehouse;
     }
 
     public function getUserInfo(int $id)
