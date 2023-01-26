@@ -136,8 +136,8 @@ class AllegroChat {
         const type = msg.is_outgoing ? 'outgoing' : 'incoming';
         const attachments = JSON.parse(msg.attachments);
         const date = msg.original_allegro_date;
-        const attachmentsTemplate = attachments && attachments.map(attachment => {
-            if(attachment.status == 'UNSAFE' || attachment.status == 'EXPIRED') return ``;
+        const attachmentsTemplate = attachments.length > 0 && attachments.map(attachment => {
+            if(attachment.status == 'UNSAFE' || attachment.status == 'EXPIRED' || !attachment.url) return ``;
             const attachmentId = attachment.url.split('/').pop();
             return `
                 <div class="allegro-attachments-list">
