@@ -7,7 +7,7 @@ use Illuminate\Support\Carbon;
 class AllegroChatService extends AllegroApiService {
 
     // https://developer.allegro.pl/documentation#tag/Message-Center
-    protected $auth_record_id = 3;
+    protected $auth_record_id = 2;
 
     public function __construct() {
         parent::__construct();
