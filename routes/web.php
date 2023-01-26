@@ -597,6 +597,10 @@ Route::group(['prefix' => 'admin'], function () {
 
 Route::get('/dispatch_now-job/order-status-change', 'DispatchJobController@orderStatusChange');
 
+Route::get('/order-offer-pdf/{id}', 'OrderOfferController@getPdf');
+Route::get('/order-proform-pdf/{id}', 'OrderOfferController@getProform');
+Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
+
 Route::get('/debug', 'DebugController@index');
 Route::get('/communication/{warehouseId}/{orderId}', 'OrdersMessagesController@communication');
 Route::get('/communication/{orderId}', 'OrdersMessagesController@userCommunication');
