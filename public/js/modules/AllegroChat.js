@@ -175,10 +175,14 @@ class AllegroChat {
     }
     
     async closeChat() {
+        $('.allegro-chat-wrapper').addClass('loader-2');
+
         const url = this.ajaxPath + 'allegro/exitChat/'+this.currentThreadId;
         await ajaxPost({}, url);
         window.localStorage.removeItem('allegroChatThreadId');
         window.localStorage.removeItem('allegroChatNickname');
+
+        $('.allegro-chat-wrapper').removeClass('loader-2');
 
         this.currentThreadId = false;
         this.nickname = false;
@@ -227,14 +231,46 @@ class AllegroChat {
     }
 
     async sendMessage() {
-        const allegroTextarea = $(this.chatWindow.document).find('.allegro-textarea');
-        const content = allegroTextarea.val();
+        const textarea = $(this.chatWindow.document).find('.allegro-textarea');
+        const attachmentInput = $(this.chatWindow.document).find('.allegro-add-attachment')[0];
+        const content = textarea.val();
+        let attachmentId = null;
 
+        if(attachmentInput.files.length > 0) {
+            const file = attachmentInput.files[0];
+            const filename = file.name;
+            
+            const data = {
+                filename,
+                size: file.size,
+            };
+            let url = this.ajaxPath + 'allegro/newAttachmentDeclaration';
+            attachmentId = await ajaxPost(data, url);
+
+            if(attachmentId == 'null') {
+                toastr.error('Nie udało się wysłać wiadomości.');
+                return false;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            url = this.ajaxPath + 'allegro/uploadAttachment/' + attachmentId;
+            attachmentId = await ajaxFormData(formData, url);
+            
+            if(attachmentId == 'null') {
+                toastr.error('Nie udało się wysłać wiadomości.');
+                return false;
+            }
+        }
+        
         $('.allegro-chat-footer').addClass('loader-2');
         const data = {
             threadId: this.currentThreadId,
             content,
+            attachmentId,
         }
+
         const url = this.ajaxPath + 'allegro/writeNewMessage';
         let message = await ajaxPost(data, url);
 
@@ -245,7 +281,7 @@ class AllegroChat {
             return false;
         }
 
-        allegroTextarea.val('');
+        textarea.val('');
 
         const messagesTemplate = this.makeSingleMessageTemplate(message);
 
@@ -285,7 +321,7 @@ class AllegroChat {
             <div class="allegro-chat-footer">
                 <textarea class="allegro-textarea"></textarea>
                 <div>
-                    <input type="file" value="Dodaj załącznik" />
+                    <input class="allegro-add-attachment" type="file" value="Dodaj załącznik" />
                 </div>
                 <div class="btn allegro-send">Wyślij wiadomość</div>
                 <div class="btn allegro-close-conversation">Zamknij konwersację</div>

@@ -26,6 +26,7 @@
     left: -4px;
 }
 .allegro-chat-wrapper {
+    position: relative;
     padding: 15px;
 }
 .allegro-chat-wrapper h2 {

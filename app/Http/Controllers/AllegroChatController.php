@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use App\Helpers\PaginationHelper;
 use App\Entities\AllegroChatThread;
 use App\Services\AllegroChatService;
+use Illuminate\Support\Facades\Storage;
 
 class AllegroChatController extends Controller
 {
@@ -113,27 +115,63 @@ class AllegroChatController extends Controller
         return response($newMessages);
     }
 
-    public function writeNewMessage(Request $data) {
+    public function writeNewMessage(Request $request) {
 
-        $content = $data->input('content');
-        $threadId = $data->input('threadId');
+        $content = $request->input('content');
+        $threadId = $request->input('threadId');
+        $attachmentId = $request->input('attachmentId');
 
-        $userLogin = AllegroChatThread::where('allegro_thread_id', $threadId)->where('is_outgoing', '!=', 1)->pluck('allegro_user_login')->first();
+        // $userLogin = AllegroChatThread::where('allegro_thread_id', $threadId)->where('is_outgoing', '!=', 1)->pluck('allegro_user_login')->first();
 
         $data = [
-            'recipient' => [
-                'login' => $userLogin
-            ],
             'text' => $content,
         ];
 
-        $res = $this->allegroChatService->newMessage($data);
+        if($attachmentId) {
+            $data['attachments'] = [
+                [
+                    'id' => $attachmentId,
+                ]
+            ];
+        }
+
+        $res = $this->allegroChatService->newMessage($threadId, $data);
 
         if(!$res['id']) return response('null', 200);
         
         $newMessages = collect( $this->insertMsgsToDB([ $res ]) );
 
         return response($newMessages);
+    }
+
+    public function newAttachmentDeclaration(Request $request) {
+
+        $filename = $request->input('filename');
+        $size = $request->input('size');
+
+        $data = [
+            'filename' => $filename,
+            'size'     => $size,
+        ];
+
+        $res = $this->allegroChatService->newAttachmentDeclaration($data);
+
+        if(!$res['id']) return response('null', 200);
+
+        return response($res['id']);
+    }
+
+    public function uploadAttachment(string $attachmentId, Request $request) {
+
+        $file = $request->file('file');
+        $mimeType = $file->getClientMimeType();
+        $contents = file_get_contents($file);
+
+        $res = $this->allegroChatService->uploadAttachment($attachmentId, $contents, $mimeType);
+
+        if(!$res['id']) return response('null', 200);
+
+        return response($res['id']);
     }
     
     public function downloadAttachment(string $attachmentId) {

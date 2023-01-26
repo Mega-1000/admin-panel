@@ -12,6 +12,26 @@ const ajaxPost = async (data, url = './', isJson = false) => {
     return resData;
 }
 
+const ajaxFormData = async (formData, url = './', isJson = false) => {
+
+    let resData = null;
+
+    await $.ajax({
+        url: url,
+        type: 'POST',
+        contentType: false,
+        processData: false,
+        data: formData
+    }).done(res => resData = isJson ? JSON.parse(res) : res)
+    .fail(err => {
+        console.log(err?.responseJSON?.message || 'Something wrong');
+        $('.loader-2').removeClass('loader-2');
+        toastr.error('Błąd systemowy, spróbuj później.');
+    });
+
+    return resData;
+}
+
 function b64toBlob(b64Data, contentType) {
     contentType = contentType || '';
     const sliceSize = 512;

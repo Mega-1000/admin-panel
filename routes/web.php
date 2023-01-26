@@ -1,12 +1,5 @@
 <?php
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
-use App\Entities\AllegroChatThread;
-use App\Services\AllegroChatService;
-use App\Jobs\AllegroSaveUnreadedChatThreads;
-use App\Http\Controllers\AllegroChatController;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -32,15 +25,6 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::group(['prefix' => 'products'], function () {
             Route::group(['prefix' => 'sets', 'as' => 'sets.'], __DIR__ . '/web/ProductsSetsRoutes.php');
-        });
-
-        Route::get('/test', function() {
-          
-            $cs = new AllegroChatService();
-            $a = new AllegroChatController($cs);
-            $threadId = 'sIXfgnBFrqZMyO8w47eebiVMWIKrM7S0CHYSko2Jq8H';
-            $userLogin = AllegroChatThread::where('allegro_thread_id', $threadId)->where('is_outgoing', '!=', 1)->pluck('allegro_user_login')->first();
-            echo '<pre>' , print_r($userLogin) , '</pre>';
         });
 
         Route::get('/disputes', 'AllegroDisputeController@list');
@@ -601,13 +585,8 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('/downloadAttachment/{attachmentId}', 'AllegroChatController@downloadAttachment')->name('downloadAttachment');
             Route::post('/exitChat/{threadId}', 'AllegroChatController@exitChat')->name('exitChat');
             Route::post('/messagesPreview/{threadId}', 'AllegroChatController@messagesPreview')->name('messagesPreview');
-
-            Route::post('/listThreads', 'AllegroController@listThreads')->name('listThreads');
-            Route::post('/listMessages/{threadId}', 'AllegroController@listMessages')->name('listMessages');
-            Route::post('/newMessage', 'AllegroController@newMessage')->name('newMessage');
-            Route::post('/newAttachmentDeclaration', 'AllegroController@newAttachmentDeclaration')->name('newAttachmentDeclaration');
-            Route::post('/changeReadFlagOnThread/{threadId}', 'AllegroController@changeReadFlagOnThread')->name('changeReadFlagOnThread');
-            Route::post('/uploadAttachment/{attachmentId}', 'AllegroController@uploadAttachment')->name('uploadAttachment');
+            Route::post('/newAttachmentDeclaration', 'AllegroChatController@newAttachmentDeclaration')->name('newAttachmentDeclaration');
+            Route::post('/uploadAttachment/{attachmentId}', 'AllegroChatController@uploadAttachment')->name('uploadAttachment');
         });
 
     });

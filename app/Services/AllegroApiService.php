@@ -131,38 +131,53 @@ class AllegroApiService
 		$this->authModel->save();
 	}
 
-	protected function request(string $method, string $url, array $params, $attachment = null, $first = true)
+	protected function request(string $method, string $url, array $params, array $attachment = null, bool $first = true)
 	{
 		if (!$this->getAccessToken()) {
 			Log::error('AllegroApiService: acces token not found');
 			return false;
 		}
 
-		$headers = [
-			// 'Accept' => 'application/vnd.allegro.public.v1+json',
-			'Authorization' => "Bearer " . $this->getAccessToken(),
-			'Content-Type' => 'application/vnd.allegro.public.v1+json'
-		];
-
 		try {
-			$data =
-				[
+
+			// save to link for files
+			if($attachment) {
+				$headers = [
+					'Authorization' => "Bearer " . $this->getAccessToken(),
+					'Accept' => 'application/vnd.allegro.public.v1+json',
+					'Content-Type' => $attachment['mimeType'],
+				];
+				$data = [
+					'headers' => $headers,
+					'body' => $attachment['contents'],
+				];
+				$response = $this->client->request(
+					$method,
+					$url,
+					$data
+				);
+			} else {
+
+				$headers = [
+					'Authorization' => "Bearer " . $this->getAccessToken(),
+					'Content-Type' => 'application/vnd.allegro.public.v1+json',
+				];
+
+				$data = [
 					'headers' => $headers,
 					'json' => $params
 				];
-			// save to link for files
-			if( isset($params['sink']) ) {
-				$data['sink'] = $params['sink'];
-			}
-			if($attachment){
-				$data['multipart'] = [$attachment];
-			}
-			$response = $this->client->request(
-				$method,
-				$url,
-				$data
-			);
 
+				if( isset($params['sink']) ) {
+					$data['sink'] = $params['sink'];
+				}
+
+				$response = $this->client->request(
+					$method,
+					$url,
+					$data
+				);
+			}
 		} catch (\Exception $e) {
 			if ($e->getCode() == 401 && $first) {
 				if ($this->getRefreshToken()) {
@@ -176,7 +191,7 @@ class AllegroApiService
 				return $this->cantGetAlert();
 			}
 		}
-		if ($response->getStatusCode() != 200) {
+		if ($response->getStatusCode() != 200 && $response->getStatusCode() != 201) {
 		    if ($response->getStatusCode() != 204) {
                 return $this->cantGetAlert();
             }
@@ -185,7 +200,6 @@ class AllegroApiService
 		if( isset($params['sink']) ) {
 			return $response;
 		}
-
 		return json_decode((string)$response->getBody(), true);
 	}
 

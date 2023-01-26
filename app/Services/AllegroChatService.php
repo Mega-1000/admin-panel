@@ -44,8 +44,8 @@ class AllegroChatService extends AllegroApiService {
 
         return ['content' => base64_encode($response->getBody()->getContents()), 'contentType' => $response->getHeader('Content-Type')];
     }
-    public function newMessage(array $data) {
-        $url = $this->getRestUrl("/messaging/messages");
+    public function newMessage(string $threadId, array $data) {
+        $url = $this->getRestUrl("/messaging/threads/$threadId/messages");
         $response = $this->request('POST', $url, $data);
 
         return $response;
@@ -56,22 +56,22 @@ class AllegroChatService extends AllegroApiService {
 
         return $response;
     }
+
     public function changeReadFlagOnThread(string $threadId, array $data) {
         $url = $this->getRestUrl("/messaging/threads/{$threadId}/read");
         $response = $this->request('PUT', $url, $data);
 
         return $response;
     }
-    public function uploadAttachment(string $attachmentId, string $contentsFile) {
+    public function uploadAttachment(string $attachmentId, string $contents, string $mimeType) {
 
         $attachment = [
-            'name' => 'file',
-            'contents' => ($contentsFile),
-            'filename' => $attachmentId
+            'contents' => $contents,
+            'mimeType' => $mimeType,
         ];
 
         $url = $this->getRestUrl("/messaging/message-attachments/{$attachmentId}");
-        $response = $this->request('PUT', $url, [], $attachment);
+        $response = $this->request('PUT', $url, [], $attachment, true);
 
         return $response;
     }
