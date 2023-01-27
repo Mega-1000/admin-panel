@@ -32,7 +32,7 @@ class AllegroChatController extends Controller
 
         $unreadedThreads = $request->input('unreadedThreads');
 
-        if(!$unreadedThreads || empty($unreadedThreads)) response(null, 500);
+        if(!$unreadedThreads || empty($unreadedThreads)) return response(null, 500);
 
         $currentThread = $this->allegroChatService->getCurrentThread($unreadedThreads);
 

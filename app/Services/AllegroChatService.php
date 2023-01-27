@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Carbon;
 use App\Entities\AllegroChatThread;
+use Illuminate\Support\Facades\Log;
 
 class AllegroChatService extends AllegroApiService {
 
@@ -89,6 +90,8 @@ class AllegroChatService extends AllegroApiService {
 
         $currentThread = null;
         $user = auth()->user();
+        Log::info("Opened threads: ".json_encode($alreadyOpenedThreads));
+        Log::info("Unreaded Threads: ".json_encode($unreadedThreads));
 
         foreach($unreadedThreads as $uThread) {
             // check if thread is already booked
