@@ -826,7 +826,7 @@
             <th>
                 <div><span>@lang('orders.table.nick_allegro')</span></div>
                 <div class="input_div">
-                    <input type="text" id="columnSearch-nick_allegro"/>
+                    <input type="text" id="columnSearch-nick_allegro" />
                 </div>
             </th>
             <th>

@@ -54,6 +54,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/pages/{id}/delete', 'PagesGeneratorController@delete')->name('pages.delete');
         Route::get('/pages/{id}', 'PagesGeneratorController@edit')->name('pages.edit');
         Route::get('/pages', 'PagesGeneratorController@getPages')->name('pages.index');
+        Route::get('/getAllChats/{currentPage?}', 'AllegroChatController@getAllChats')->name('pages.getAllChats');
 
         Route::get('/getDelivererImportLog/{id}', 'DelivererController@getDelivererImportLog')->name('deliverer.getImportLog');
 
@@ -572,15 +573,35 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/edit-allegro-terms', 'AllegroController@editTerms')->name('allegro.edit-terms');
         Route::post('/edit-allegro-terms', 'AllegroController@saveTerms')->name('allegro.edit-terms');
 
+        Route::get('/allegro-chat', function() {
+            return view('allegro.chat-window');
+        })->name('allegro.chat');
+
+        Route::prefix('allegro')->as('allegro.')->group(function () {
+            Route::post('/checkUnreadedThreads', 'AllegroChatController@checkUnreadedThreads')->name('checkUnreadedThreads');
+            Route::post('/bookThread', 'AllegroChatController@bookThread')->name('bookThread');
+            Route::post('/getMessages/{threadId}', 'AllegroChatController@getMessages')->name('getMessages');
+            Route::post('/getNewMessages/{threadId}', 'AllegroChatController@getNewMessages')->name('getNewMessages');
+            Route::post('/writeNewMessage', 'AllegroChatController@writeNewMessage')->name('writeNewMessage');
+            Route::post('/downloadAttachment/{attachmentId}', 'AllegroChatController@downloadAttachment')->name('downloadAttachment');
+            Route::post('/exitChat/{threadId}', 'AllegroChatController@exitChat')->name('exitChat');
+            Route::post('/messagesPreview/{threadId}', 'AllegroChatController@messagesPreview')->name('messagesPreview');
+            Route::post('/newAttachmentDeclaration', 'AllegroChatController@newAttachmentDeclaration')->name('newAttachmentDeclaration');
+            Route::post('/uploadAttachment/{attachmentId}', 'AllegroChatController@uploadAttachment')->name('uploadAttachment');
+        });
+
     });
     Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/web/TrackerLogsRoutes.php');
     Route::group(['as' => 'transactions.'], __DIR__ . '/web/TransactionsRoutes.php');
     Route::group(['as' => 'workingEvents.'], __DIR__ . '/web/WorkingEventsRoutes.php');
 });
 
+Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
+
 Route::get('/order-offer-pdf/{id}', 'OrderOfferController@getPdf');
 Route::get('/order-proform-pdf/{id}', 'OrderOfferController@getProform');
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
+
 
 Route::get('/debug', 'DebugController@index');
 Route::get('/communication/{warehouseId}/{orderId}', 'OrdersMessagesController@communication');

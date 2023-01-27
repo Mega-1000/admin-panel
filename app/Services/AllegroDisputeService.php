@@ -2,7 +2,6 @@
 
 use App\Entities\AllegroDispute;
 use App\Entities\Order;
-use App\Entities\SelTransaction;
 use App\Jobs\AddLabelJob;
 use App\Jobs\RemoveLabelJob;
 
@@ -50,6 +49,9 @@ class AllegroDisputeService extends AllegroApiService
         } else {
             $disputeModel->unseen_changes = false;
         }
+        $order = Order::where('allegro_form_id', '=', $disputeModel->form_id)->first();
+        
+        if(!$order) return;
 
         $disputeModel->hash = $this->disputeHash($dispute);
         $disputeModel->dispute_id = $dispute['id'];
@@ -59,7 +61,8 @@ class AllegroDisputeService extends AllegroApiService
         $disputeModel->buyer_login = $dispute['buyer']['login'];
         $disputeModel->form_id = $dispute['checkoutForm']['id'];
         $disputeModel->ordered_date = $dispute['checkoutForm']['createdAt'];
-        $disputeModel->order_id = $this->findOrderId($disputeModel);
+        $disputeModel->order_id = $order->id;
+
         $disputeModel->save();
 
         $this->updateLabels($disputeModel);
@@ -162,21 +165,6 @@ class AllegroDisputeService extends AllegroApiService
             dispatch_now(new RemoveLabelJob($dispute->order->id, [186]));
             dispatch_now(new RemoveLabelJob($dispute->order->id, [185]));
             dispatch_now(new AddLabelJob($dispute->order->id, [187]));
-        }
-    }
-
-    private function findOrderId(AllegroDispute $dispute): ?int
-    {
-        $transactionsIds = SelTransaction::where('tr_CheckoutFormId', '=', $dispute->form_id)->pluck('id');
-        if (count($transactionsIds)) {
-            $order = Order::whereIn('sello_id', $transactionsIds)->first();
-        } else {
-            $order = null;
-        }
-        if ($order) {
-            return $order->id;
-        } else {
-            return null;
         }
     }
 
