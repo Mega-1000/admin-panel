@@ -19,6 +19,10 @@ class AllegroChatController extends Controller
         $this->allegroChatService = $allegroChatService;
     }
 
+    public function chatWindow() {
+        return view('allegro.chat-window');
+    }
+
     public function checkUnreadedThreads() {
         $unreadedThreads = setting('allegro.unreaded_chat_threads');
 

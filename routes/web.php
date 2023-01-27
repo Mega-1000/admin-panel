@@ -573,9 +573,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/edit-allegro-terms', 'AllegroController@editTerms')->name('allegro.edit-terms');
         Route::post('/edit-allegro-terms', 'AllegroController@saveTerms')->name('allegro.edit-terms');
 
-        Route::get('/allegro-chat', function() {
-            return view('allegro.chat-window');
-        })->name('allegro.chat');
+        Route::post('/allegro-chat', 'AllegroChatController@chatWindow')->name('allegro.chat-window');
 
         Route::prefix('allegro')->as('allegro.')->group(function () {
             Route::post('/checkUnreadedThreads', 'AllegroChatController@checkUnreadedThreads')->name('checkUnreadedThreads');
