@@ -23,9 +23,9 @@ use App\Http\Requests\Api\OrderWarehouseNotification\AcceptShipmentRequest;
 class CheckNotificationsMailbox implements ShouldQueue {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $host = '{s104.linuxpl.com:993/imap/ssl}INBOX';
-    private $user = 'awizacje@ephpolska.pl';
-    private $password = '1!Qaa2@Wss';
+    private $host;
+    private $user;
+    private $password;
     private $imap;
 
     // order should be same as in order-status-changed-to-dispatch.blade.php
@@ -78,6 +78,10 @@ class CheckNotificationsMailbox implements ShouldQueue {
      * @return void
      */
     public function __construct() {
+        $this->host = '{'.config('notifications.host').':993/imap/ssl}INBOX';
+        $this->user = config('notifications.username');
+        $this->password = config('notifications.password');
+        
         try {
             $this->imap = imap_open($this->host, $this->user, $this->password);
         } catch (\Exception $e){
