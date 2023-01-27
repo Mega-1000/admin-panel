@@ -55,8 +55,8 @@ class OrderStatusChangedToDispatchMail extends Mailable
         $this->path = $path;
         $this->packageNumber = $packageNumber;
         $this->pathSecond = $pathSecond;
-        $this->customerShipmentDateFrom = $order->dates->getDateAttribute('customer_shipment_date_from');
-        $this->customerShipmentDateTo = $order->dates->getDateAttribute('customer_shipment_date_to');
+        $this->customerShipmentDateFrom = $order->dates === null ? '' : $order->dates->getDateAttribute('customer_shipment_date_from');
+        $this->customerShipmentDateTo = $order->dates === null ? '' : $order->dates->getDateAttribute('customer_shipment_date_to');
 
         // create new Chat
         $helper = new MessagesHelper();
