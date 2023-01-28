@@ -88,7 +88,7 @@ class AllegroChatService extends AllegroApiService {
 
         $alreadyOpenedThreads = array_flip($alreadyOpenedThreads);
 
-        $currentThread = null;
+        $currentThread = [];
         $user = auth()->user();
         Log::info("Opened threads: ".json_encode($alreadyOpenedThreads));
         Log::info("Unreaded Threads: ".json_encode($unreadedThreads));
@@ -104,6 +104,7 @@ class AllegroChatService extends AllegroApiService {
                 'user_id'               => $user->id,
                 'allegro_user_login'    => 'unknown',
                 'content'               => '',
+                'subject'               => '',
                 'is_outgoing'           => false,
                 'type'                  => 'PENDING',
                 'original_allegro_date' => '2023-01-01 14:00:00',

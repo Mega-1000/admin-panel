@@ -35,6 +35,8 @@ class AllegroChatController extends Controller
         if(!$unreadedThreads || empty($unreadedThreads)) return response(null, 500);
 
         $currentThread = $this->allegroChatService->getCurrentThread($unreadedThreads);
+        
+        if(empty($unreadedThreads)) return response(null, 500);
 
         return response()->json($currentThread);
     }
