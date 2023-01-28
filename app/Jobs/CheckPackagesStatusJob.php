@@ -5,29 +5,33 @@ namespace App\Jobs;
 
 use App\Entities\Label;
 use App\Entities\Order;
+use App\Entities\OrderPackage;
 use App\Enums\CourierName;
 use App\Enums\CourierStatus\DpdPackageStatus;
 use App\Enums\CourierStatus\GlsPackageStatus;
 use App\Enums\CourierStatus\InpostPackageStatus;
 use App\Enums\PackageStatus;
+use App\Exceptions\SoapException;
+use App\Exceptions\SoapParamsException;
+use App\Integrations\Jas\Jas;
 use App\Integrations\Pocztex\ElektronicznyNadawca;
 use App\Integrations\Pocztex\envelopeStatusType;
 use App\Integrations\Pocztex\getEnvelopeContentShort;
 use App\Integrations\Pocztex\getEnvelopeStatus;
 use App\Integrations\Pocztex\statusType;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Queueable;
+use Illuminate\Config\Repository;
+use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Http\Request;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
-use App\Integrations\Jas\Jas;
-use App\Entities\OrderPackage;
 use OutOfRangeException;
 use Psr\Http\Message\ResponseInterface;
+use Throwable;
 
 /**
  * Class CheckPackagesStatusJob
@@ -39,7 +43,7 @@ class CheckPackagesStatusJob
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
-     * @var \Illuminate\Config\Repository|mixed
+     * @var Repository|mixed
      */
     protected $config;
 
@@ -92,6 +96,9 @@ class CheckPackagesStatusJob
                         case CourierName::GLS:
                             $this->checkStatusInGlsPackages($package);
                             break;
+                        case CourierName::DB_SCHENKER:
+                            $this->checkStatusInSchenkerPackages($package);
+                            break;
                         default:
                             break;
                     }
@@ -100,7 +107,7 @@ class CheckPackagesStatusJob
                 if (!$order->packages()->whereIn('status', [PackageStatus::SENDING, PackageStatus::WAITING_FOR_SENDING])->count()) {
                     dispatch_now(new RemoveLabelJob($order, [Label::BLUE_BATTERY_LABEL_ID]));
                 }
-            } catch (\Throwable $ex) {
+            } catch (Throwable $ex) {
                 Log::error($ex->getMessage());
                 continue;
             }
@@ -144,6 +151,17 @@ class CheckPackagesStatusJob
         }
     }
 
+    private function prepareConnectionForTrackingStatus(string $url, string $method, array $params): ResponseInterface
+    {
+        $curlSettings = ['curl' => [
+            CURLOPT_SSL_CIPHER_LIST => 'DEFAULT@SECLEVEL=1',
+            CURLOPT_USERAGENT => 'Mozilla Chrome Safari'
+        ]];
+        $params = array_merge($params, $curlSettings);
+
+        return $this->httpClient->request($method, $url, $params);
+    }
+
     protected function checkStatusInDpdPackages(OrderPackage $package): void
     {
         $params = [
@@ -180,6 +198,16 @@ class CheckPackagesStatusJob
         }
     }
 
+    //@todo apaczka checking status
+
+    /**
+     * @param $package
+     */
+    protected function checkStatusInApaczkaPackages($package)
+    {
+
+    }
+
     /**
      * @param $package
      */
@@ -212,16 +240,6 @@ class CheckPackagesStatusJob
         if ($package->isDirty()) {
             $package->save();
         }
-    }
-
-    //@todo apaczka checking status
-
-    /**
-     * @param $package
-     */
-    protected function checkStatusInApaczkaPackages($package)
-    {
-
     }
 
     /**
@@ -283,14 +301,16 @@ class CheckPackagesStatusJob
         }
     }
 
-    private function prepareConnectionForTrackingStatus(string $url, string $method, array $params): ResponseInterface
+    /**
+     * @throws SoapParamsException
+     * @throws SoapException
+     */
+    private function checkStatusInSchenkerPackages(OrderPackage $orderPackage)
     {
-        $curlSettings = ['curl' => [
-            CURLOPT_SSL_CIPHER_LIST => 'DEFAULT@SECLEVEL=1',
-            CURLOPT_USERAGENT => 'Mozilla Chrome Safari'
-        ]];
-        $params = array_merge($params, $curlSettings);
+//        if ($orderPackage->status !== PackageStatus::WAITING_FOR_SENDING) {
+////            $trackingInformationRequest = new GetTrackingRequestDTO($orderPackage->letter_number);
+////            $getTrackingInformationResponse = SchenkerService::getGetTrackingInformation($trackingInformationRequest);
+//        }
 
-        return $this->httpClient->request($method, $url, $params);
     }
 }

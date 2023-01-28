@@ -18,26 +18,26 @@ use JsonSerializable;
 class OrderRequestDTO extends BaseDTO implements JsonSerializable
 {
 
-    private $clientId;
-    private $installId;
-    private $dataOrigin;
-    private $waybillNo;
-    private $product;
-    private $pickupFrom;
-    private $pickupTo;
-    private $deliveryFrom;
-    private $deliveryTo;
-    private $comment;
-    private $deliveryInstructions;
-    private $senderDTO;
-    private $recipientDTO;
-    private $payerDTO;
-    private $packagesDTOs;
-    private $ssccMatching;
-    private $sscc;
-    private $dangerProductDTOs;
-    private $services;
-    private $references;
+    protected $clientId;
+    protected $installId;
+    protected $dataOrigin;
+    protected $waybillNo;
+    protected $product;
+    protected $pickupFrom;
+    protected $pickupTo;
+    protected $deliveryFrom;
+    protected $deliveryTo;
+    protected $comment;
+    protected $deliveryInstructions;
+    protected $senderDTO;
+    protected $recipientDTO;
+    protected $payerDTO;
+    protected $packagesDTOs;
+    protected $ssccMatching;
+    protected $sscc;
+    protected $dangerProductDTOs;
+    protected $services;
+    protected $references;
 
     /**
      * @param PackageDTO[] $packagesDTOs
@@ -107,7 +107,7 @@ class OrderRequestDTO extends BaseDTO implements JsonSerializable
         ];
 
         $this->deliveryInstructions = $this->substrText($this->deliveryInstructions ?? '', 128);
-        $this->installId = $this->substrText($this->installId, 7);
+        $this->installId = $this->substrText($this->installId ?? '', 7);
         $this->waybillNo = $this->substrText($this->getOnlyNumbers($this->waybillNo ?? ''), 10);
         $this->deliveryFrom = $this->convertDate($this->deliveryFrom);
         $this->deliveryTo = $this->convertDate($this->deliveryTo);

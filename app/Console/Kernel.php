@@ -2,7 +2,6 @@
 
 namespace App\Console;
 
-use App\Console\Commands\GetSchenkerPackageDictionaryCommand;
 use App\Jobs;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
@@ -16,7 +15,6 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         //
-        GetSchenkerPackageDictionaryCommand::class,
     ];
 
     /**
@@ -69,6 +67,8 @@ class Kernel extends ConsoleKernel
 
         $schedule->job(Jobs\AllegroCustomerReturnsJob::class)->everyFiveMinutes();
         $schedule->job(Jobs\PreferredInvoiceDateFillJob::class)->monthlyOn();
+
+        $schedule->command('schenker:pull_package_dictionary')->daily();
     }
 
     /**

@@ -1,3 +1,5 @@
+@php use Carbon\Carbon; @endphp
+@php use App\Enums\UserRole; @endphp
 @extends('layouts.datatable')
 @section('app-header')
     <link rel="stylesheet" href="{{ URL::asset('css/views/orders/edit.css') }}">
@@ -53,12 +55,12 @@
                 name="change-button-form" id="button-messages"
                 value="messages">@lang('orders.form.buttons.messages')</button>
         @if($order->dispute)
-        <a href="/admin/disputes/view/{{$order->dispute->id}}" class="btn btn-primary">
-            @if($order->dispute->unseen_changes)
-                <i class="fas fa-exclamation-cirle"></i>
-            @endif
-            Dyskusja allegro
-        </a>
+            <a href="/admin/disputes/view/{{$order->dispute->id}}" class="btn btn-primary">
+                @if($order->dispute->unseen_changes)
+                    <i class="fas fa-exclamation-cirle"></i>
+                @endif
+                Dyskusja allegro
+            </a>
         @endif
         <button class="btn btn-primary"
                 name="change-button-form" id="button-packages"
@@ -121,7 +123,8 @@
                 </div>
                 <div class="form-group" style="width: 11%; float: left; padding: 5px;">
                     <label for="customer_address.lastname">@lang('customers.table.lastname')</label>
-                    <input type="text" class="form-control" id="customer_address.firstname" name="customer_address.lastname"
+                    <input type="text" class="form-control" id="customer_address.firstname"
+                           name="customer_address.lastname"
                            value="{{ $customerInfo->lastname ?? '' }}" disabled>
                 </div>
                 <div class="form-group" style="width: 11%; float: left; padding: 5px;">
@@ -132,7 +135,8 @@
                 @foreach($selInvoices as $selInvoice)
                     <div class="form-group" style="width: 11%; float: left; padding: 5px;">
                         <label for="document_number">@lang('orders.form.document_number_sell')
-                            <a target="_blank" href="{{ route('invoices.getInvoice', ['id' => $selInvoice->id]) }}">plik</a>
+                            <a target="_blank"
+                               href="{{ route('invoices.getInvoice', ['id' => $selInvoice->id]) }}">plik</a>
                         </label>
                         <input disabled class="form-control" id="document_number_sell"
                                value="{{$selInvoice->invoice_name}}">
@@ -141,7 +145,8 @@
                 @foreach($subiektInvoices as $subInvoice)
                     <div class="form-group" style="width: 11%; float: left; padding: 5px;">
                         <label for="document_number">@lang('orders.form.document_number_sell_subiekt')
-                            <a target="_blank" href="{{ route('invoices.subiektInvoices', ['id' => $subInvoice->id]) }}">plik</a>
+                            <a target="_blank"
+                               href="{{ route('invoices.subiektInvoices', ['id' => $subInvoice->id]) }}">plik</a>
                         </label>
                         <input disabled class="form-control" id="document_number_sell"
                                value="{{$subInvoice->gt_invoice_number}}">
@@ -311,7 +316,7 @@
                                         <div class="col-md-4">
                                             <input type="date" class="form-control" id="preferred_invoice_date"
                                                    name="preferred_invoice_date"
-                                                   value="{{ ($order->preferred_invoice_date !== null) ? \Carbon\Carbon::parse($order->preferred_invoice_date)->format('Y-m-d') : null }}">
+                                                   value="{{ ($order->preferred_invoice_date !== null) ? Carbon::parse($order->preferred_invoice_date)->format('Y-m-d') : null }}">
                                         </div>
                                     </div>
                                 </div>
@@ -372,7 +377,7 @@
                                         <div class="col-md-4">
                                             <input type="date" class="form-control" id="allegro_operation_date"
                                                    name="allegro_operation_date"
-                                                   value="{{ (isset($order->allegro_operation_date)) ? \Carbon\Carbon::parse($order->allegro_operation_date)->format('Y-m-d') : null }}">
+                                                   value="{{ (isset($order->allegro_operation_date)) ? Carbon::parse($order->allegro_operation_date)->format('Y-m-d') : null }}">
                                         </div>
                                     </div>
                                 </div>
@@ -475,15 +480,19 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <div>
-                                @include('orders.labels', ['title' => __('orders.form.warehouse_notice'), 'user_type' => \App\Enums\UserRole::Storekeeper])
+                                @include('orders.labels', ['title' => __('orders.form.warehouse_notice'), 'user_type' => UserRole::Storekeeper])
                                 <textarea rows="5" cols="40" class="form-control" id="warehouse_notice"
-                                          name="warehouse_notice" disabled>{{ $order->warehouse_notice ?? ''}}</textarea>
+                                          name="warehouse_notice"
+                                          disabled>{{ $order->warehouse_notice ?? ''}}</textarea>
                                 <div class="flex-input">
-                                    <input type="text" class="form-control scrollable-notice" placeholder="@lang('orders.form.warehouse_notice')"
-                                           id="{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}" name="warehouse_notice"/>
+                                    <input type="text" class="form-control scrollable-notice"
+                                           placeholder="@lang('orders.form.warehouse_notice')"
+                                           id="{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}"
+                                           name="warehouse_notice"/>
                                     <div class="input-group-append">
-                                        <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}')"
-                                                class="btn btn-success" type="button">wyślij
+                                        <button
+                                            onclick="sendComment('{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}')"
+                                            class="btn btn-success" type="button">wyślij
                                         </button>
                                     </div>
                                 </div>
@@ -493,14 +502,18 @@
                     <div class="col-md-4">
                         <div class="form-group">
                             <div>
-                                @include('orders.labels', ['title' => 'Informacje dla spedycji', 'user_type' => \App\Enums\UserRole::SuperAdministrator])
-                                <textarea id="shipping_notice" class="form-control" rows="5" disabled>{{ $order->spedition_comment ?? ''}}</textarea>
+                                @include('orders.labels', ['title' => 'Informacje dla spedycji', 'user_type' => UserRole::SuperAdministrator])
+                                <textarea id="shipping_notice" class="form-control" rows="5"
+                                          disabled>{{ $order->spedition_comment ?? ''}}</textarea>
                                 <div class="flex-input">
-                                    <input type="text" class="form-control scrollable-notice" placeholder="Informacje dla spedycji"
-                                           id="{{ \App\Entities\Order::COMMENT_SHIPPING_TYPE }}" name="spedition_comment"/>
+                                    <input type="text" class="form-control scrollable-notice"
+                                           placeholder="Informacje dla spedycji"
+                                           id="{{ \App\Entities\Order::COMMENT_SHIPPING_TYPE }}"
+                                           name="spedition_comment"/>
                                     <div class="input-group-append">
-                                        <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_SHIPPING_TYPE }}')"
-                                                class="btn btn-success" type="button">wyślij
+                                        <button
+                                            onclick="sendComment('{{ \App\Entities\Order::COMMENT_SHIPPING_TYPE }}')"
+                                            class="btn btn-success" type="button">wyślij
                                         </button>
                                     </div>
                                 </div>
@@ -509,19 +522,23 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            @include('orders.labels', ['title' =>  __('orders.form.consultant_notices'), 'user_type' => \App\Enums\UserRole::Consultant])
-                            <textarea id="consultant_notice" disabled class="form-control" name="consultant_notices" id="consultant_notices"
+                            @include('orders.labels', ['title' =>  __('orders.form.consultant_notices'), 'user_type' => UserRole::Consultant])
+                            <textarea id="consultant_notice" disabled class="form-control" name="consultant_notices"
+                                      id="consultant_notices"
                                       rows="5">{{ $order->consultant_notices ?? ''}}</textarea>
-                            <h5>Zlecenie numer {{ $order->id }} - {{ $orderInvoiceAddress->nip ? 'Klient firmowy' : 'Klient prywatny' }}</h5>
+                            <h5>Zlecenie numer {{ $order->id }}
+                                - {{ $orderInvoiceAddress->nip ? 'Klient firmowy' : 'Klient prywatny' }}</h5>
                             <div class="flex-input">
-                                <input type="text" class="form-control scrollable-notice" placeholder="@lang('orders.form.consultant_notices')"
-                                       id="{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}" name="consultant_notices"/>
+                                <input type="text" class="form-control scrollable-notice"
+                                       placeholder="@lang('orders.form.consultant_notices')"
+                                       id="{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}"
+                                       name="consultant_notices"/>
                                 <div class="input-group-append">
                                     <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}')"
                                             class="btn btn-success consultant__button--send" type="button">wyślij
                                     </button>
                                     <h5 onclick="sendComment('{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}')"
-                                            class="consultant__button--send" type="button">wyślij
+                                        class="consultant__button--send" type="button">wyślij
                                     </h5>
                                 </div>
                             </div>
@@ -531,12 +548,15 @@
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
-                            @include('orders.labels', ['title' =>  __('orders.form.financial_notices'), 'user_type' => \App\Enums\UserRole::Accountant])
-                            <textarea id="financial_notice" disabled class="form-control scrollable-notice" name="financial_comment" id="financial_notices"
+                            @include('orders.labels', ['title' =>  __('orders.form.financial_notices'), 'user_type' => UserRole::Accountant])
+                            <textarea id="financial_notice" disabled class="form-control scrollable-notice"
+                                      name="financial_comment" id="financial_notices"
                                       rows="5">{{ $order->financial_comment ?? ''}}</textarea>
                             <div class="flex-input">
-                                <input type="text" class="form-control" placeholder="@lang('orders.form.financial_notices')"
-                                       id="{{ \App\Entities\Order::COMMENT_FINANCIAL_TYPE }}" name="consultant_notices"/>
+                                <input type="text" class="form-control"
+                                       placeholder="@lang('orders.form.financial_notices')"
+                                       id="{{ \App\Entities\Order::COMMENT_FINANCIAL_TYPE }}"
+                                       name="consultant_notices"/>
                                 <div class="input-group-append">
                                     <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_FINANCIAL_TYPE }}')"
                                             class="btn btn-success" type="button">wyślij
@@ -550,7 +570,8 @@
             <div class="col-md-12">
                 <div class="form-group">
                     <label>@lang('orders.form.labels_log')</label>
-                    <textarea id="labels_log" disabled class="form-control scrollable-notice" name="financial_comment" id="labels_log"
+                    <textarea id="labels_log" disabled class="form-control scrollable-notice" name="financial_comment"
+                              id="labels_log"
                               rows="5">{{ $order->labels_log ?? ''}}</textarea>
                 </div>
             </div>
@@ -574,7 +595,7 @@
 
             @if($orderDeliveryAddressErrors->any())
                 <div class="form-group is-empty-info" style="float: left; width: 100%;">
-                {!! implode(' ', $orderDeliveryAddressErrors->all(':message')) !!}
+                    {!! implode(' ', $orderDeliveryAddressErrors->all(':message')) !!}
                 </div>
             @endif
 
@@ -624,7 +645,8 @@
                     <select class="form-control" id="order_delivery_address_country_id"
                             name="order_delivery_address_country_id">
                         @foreach($countries as $country)
-                            <option value="{{$country->id}}" @if ($country->id == $orderDeliveryAddress->country_id) selected @endif>{{$country->name}}</option>
+                            <option value="{{$country->id}}"
+                                    @if ($country->id == $orderDeliveryAddress->country_id) selected @endif>{{$country->name}}</option>
                         @endforeach
                     </select>
                 </div>
@@ -659,8 +681,8 @@
                     <input type="checkbox" id="order_delivery_address_isAbroad"
                            name="order_delivery_address_isAbroad" value="1"
                            @if ($orderDeliveryAddress->isAbroad)
-                           checked
-                            @endif
+                               checked
+                        @endif
                     >
                 </div>
             </div>
@@ -668,7 +690,7 @@
             <h3 style="float: left; width: 100%;">Dane do faktury</h3>
             @if($orderInvoiceAddressErrors->any())
                 <div class="form-group is-empty-info" style="float: left; width: 100%;">
-                {!! implode(' ', $orderInvoiceAddressErrors->all(':message')) !!}
+                    {!! implode(' ', $orderInvoiceAddressErrors->all(':message')) !!}
                 </div>
             @endif
             <div class="row">
@@ -727,7 +749,8 @@
                     <select class="form-control" id="order_delivery_address_country_id"
                             name="order_invoice_address_country_id">
                         @foreach($countries as $country)
-                            <option value="{{$country->id}}" @if ($country->id == $orderInvoiceAddress->country_id) selected @endif>{{$country->name}}</option>
+                            <option value="{{$country->id}}"
+                                    @if ($country->id == $orderInvoiceAddress->country_id) selected @endif>{{$country->name}}</option>
                         @endforeach
                     </select>
                 </div>
@@ -746,7 +769,8 @@
 
                 <div class="form-group" style="width: 10%; float: left; padding: 5px;">
                     <label for="order_invoice_address_nip">@lang('customers.form.invoice_nip')</label>
-                    <input type="text" class="form-control" id="order_invoice_address_nip" name="order_invoice_address_nip"
+                    <input type="text" class="form-control" id="order_invoice_address_nip"
+                           name="order_invoice_address_nip"
                            value="{{ $orderInvoiceAddress->nip ?? ''}}">
                 </div>
             </div>
@@ -842,7 +866,11 @@
                             <br> 1 {{$item->product->packing->unit_of_collective}}
                             = {{$item->product->packing->number_of_sale_units_in_the_pack}}
                             ({{$item->product->packing->unit_commercial}})
-                            = @if(is_numeric($item->product->packing->number_of_sale_units_in_the_pack) && is_numeric($item->product->packing->unit_consumption)){{$item->product->packing->number_of_sale_units_in_the_pack / $item->product->packing->unit_consumption}} @else {{0}} @endif ({{$item->product->packing->calculation_unit}} / {{$item->product->packing->unit_of_collective}})
+                            = @if(is_numeric($item->product->packing->number_of_sale_units_in_the_pack) && is_numeric($item->product->packing->unit_consumption))
+                                {{$item->product->packing->number_of_sale_units_in_the_pack / $item->product->packing->unit_consumption}}
+                            @else
+                                {{0}}
+                            @endif ({{$item->product->packing->calculation_unit}} / {{$item->product->packing->unit_of_collective}})
                         </td>
                     </tr>
                     <tr>
@@ -1305,7 +1333,8 @@
             </tr>
             </thead>
         </table>
-        <button class="btn btn-success" id="show-transaction-history">@lang('order_payments.show_transaction_history')</button>
+        <button class="btn btn-success"
+                id="show-transaction-history">@lang('order_payments.show_transaction_history')</button>
         <h1>Rozrachunki z kontrahentem: {{ $order->customer->login }}
             @if(Auth::user()->role_id == 3 || Auth::user()->role_id == 2 || Auth::user()->role_id == 1)
                 <a id="create-button-orderPayments" style="float:right;margin-right: 15px;"
@@ -2006,7 +2035,11 @@
                                         <br> 1 {{$item->product->packing->unit_of_collective}}
                                         = {{$item->product->packing->number_of_sale_units_in_the_pack}}
                                         ({{$item->product->packing->unit_commercial}})
-                                        = @if(is_numeric($item->product->packing->number_of_sale_units_in_the_pack) && is_numeric($item->product->packing->unit_consumption)){{$item->product->packing->number_of_sale_units_in_the_pack / $item->product->packing->unit_consumption}} @else {{0}} @endif ({{$item->product->packing->calculation_unit}} / {{$item->product->packing->unit_of_collective}})
+                                        = @if(is_numeric($item->product->packing->number_of_sale_units_in_the_pack) && is_numeric($item->product->packing->unit_consumption))
+                                            {{$item->product->packing->number_of_sale_units_in_the_pack / $item->product->packing->unit_consumption}}
+                                        @else
+                                            {{0}}
+                                        @endif ({{$item->product->packing->calculation_unit}} / {{$item->product->packing->unit_of_collective}})
                                     </td>
                                 </tr>
                                 <tr class="row-{{$item->id}}">
@@ -2648,25 +2681,26 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="{{ __('voyager::generic.close') }}"><span
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
                             aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
                     <table id="paymentsTable" class="table table-hover">
                         <thead>
-                            <tr>
-                                <th>Numer transakcji</th>
-                                <th>Data utworzenia</th>
-                                <th>Data zaksięgowania</th>
-                                <th>Opis</th>
-                                <th>Pracownik</th>
-                                <th>Klient</th>
-                                <th>Zlecenie</th>
-                                <th>Typ</th>
-                                <th>Kwota</th>
-                                <th>Wartość przed wpłatą</th>
-                                <th>Wartość po wpłacie</th>
-                            </tr>
+                        <tr>
+                            <th>Numer transakcji</th>
+                            <th>Data utworzenia</th>
+                            <th>Data zaksięgowania</th>
+                            <th>Opis</th>
+                            <th>Pracownik</th>
+                            <th>Klient</th>
+                            <th>Zlecenie</th>
+                            <th>Typ</th>
+                            <th>Kwota</th>
+                            <th>Wartość przed wpłatą</th>
+                            <th>Wartość po wpłacie</th>
+                        </tr>
                         </thead>
                         <tbody>
                         @foreach($order->paymentsTransactions as $orderPaymentsTransaction)
@@ -2688,7 +2722,8 @@
                     </table>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default pull-right" data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
+                    <button type="button" class="btn btn-default pull-right"
+                            data-dismiss="modal">{{ __('voyager::generic.cancel') }}</button>
                 </div>
             </div>
         </div>
@@ -2704,7 +2739,7 @@
 @endsection
 @section('datatable-scripts')
     <script type="application/javascript">
-        $(document).ready(function(){
+        $(document).ready(function () {
             document.getElementById("consultant_comment").focus();
             $('#warehouse_notice').scrollTop(1E10);
             $('#shipping_notice').scrollTop(1E10);
@@ -3379,9 +3414,9 @@
                     name: 'status',
                     render: function (status) {
                         if (status === 'OPEN') {
-                            return '<span>' + {!! json_encode(__('order_tasks.table.open'), true) !!} +'</span>';
+                            return '<span>' + {!! json_encode(__('order_tasks.table.open'), true) !!} + '</span>';
                         } else {
-                            return '<span>' + {!! json_encode(__('order_tasks.table.closed'), true) !!} +'</span>';
+                            return '<span>' + {!! json_encode(__('order_tasks.table.closed'), true) !!} + '</span>';
                         }
                     }
                 },
@@ -3515,18 +3550,18 @@
                     name: 'status',
                     render: function (status) {
                         if (status === 'DELIVERED') {
-                            return '<span style="color: green;">' + {!! json_encode(__('order_packages.table.delivered'), true) !!} +'</span>';
+                            return '<span style="color: green;">' + {!! json_encode(__('order_packages.table.delivered'), true) !!} + '</span>';
                         } else if (status === 'CANCELLED') {
-                            return '<span style="color: red;">' + {!! json_encode(__('order_packages.table.cancelled'), true) !!} +'</span>';
+                            return '<span style="color: red;">' + {!! json_encode(__('order_packages.table.cancelled'), true) !!} + '</span>';
                         } else if (status === 'NEW') {
-                            return '<span style="color: blue;">' + {!! json_encode(__('order_packages.table.new'), true) !!} +'</span>';
+                            return '<span style="color: blue;">' + {!! json_encode(__('order_packages.table.new'), true) !!} + '</span>';
                         } else if (status === 'SENDING') {
-                            return '<span style="color: orange;">' + {!! json_encode(__('order_packages.table.sending'), true) !!} +'</span>';
+                            return '<span style="color: orange;">' + {!! json_encode(__('order_packages.table.sending'), true) !!} + '</span>';
                         } else if (status === 'WAITING_FOR_SENDING') {
-                            return '<span style="color: orange;">' + {!! json_encode(__('order_packages.table.waiting_for_sending'), true) !!} +'</span>';
+                            return '<span style="color: orange;">' + {!! json_encode(__('order_packages.table.waiting_for_sending'), true) !!} + '</span>';
                         } else if (status === 'WAITING_FOR_CANCELLED') {
 
-                            return '<span style="color: orange;">' + {!! json_encode(__('order_packages.table.waiting_for_cancelled'), true) !!} +'</span>';
+                            return '<span style="color: orange;">' + {!! json_encode(__('order_packages.table.waiting_for_cancelled'), true) !!} + '</span>';
                         } else if (status === 'REJECT_CANCELLED') {
 
                             return '<span style="color: red;">Anulacja odrzucona</span>';
@@ -3600,7 +3635,7 @@
                 {
                     data: 'real_costs_for_company',
                     name: 'real_costs_for_company',
-                    render: function(real_costs_for_company) {
+                    render: function (real_costs_for_company) {
                         if (real_costs_for_company) {
                             let value = [];
 
@@ -3685,7 +3720,7 @@
                     $('#order_courier > div > div > div.modal-header > h4').append('<span>Kurier zostanie zamówiony w przeciągu kilku minut</span>');
                 } else {
                     $('#order_courier > div > div > div.modal-header > h4').append('<span>Jedno z wymaganych pól nie zostało zdefiniowane:</span>');
-                    $('#order_courier > div > div > div.modal-header').append('<span style="color:red;">' + data.message + '</span><br>');
+                    $('#order_courier > div > div > div.modal-header').append('<span style="color:red;">' + data.message.message + '</span><br>');
                 }
                 $('#success-ok').on('click', function () {
                     window.location.href = '/admin/orders/' + orderId + '/edit';
@@ -4865,7 +4900,10 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 method: 'POST',
-                url: laroute.route('product_stock_packets.assign', { packetId: $('#packets').val(), orderItemId: $('#assignPacketSubmit').attr('data-orderItemId') }),
+                url: laroute.route('product_stock_packets.assign', {
+                    packetId: $('#packets').val(),
+                    orderItemId: $('#assignPacketSubmit').attr('data-orderItemId')
+                }),
             }).done((data) => {
                 document.getElementById('packet__modal--title').innerText = 'Pomyślnie przypisano pakiet ' + data.packet_name + ' do produktu ' + data.order_item_name;
                 $('#packet__modal').modal('show');
@@ -4878,7 +4916,7 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
                 method: 'POST',
-                url: laroute.route('product_stock_packets.retain', { orderItemId: $('#retainPacketSubmit').attr('data-orderItemId') })
+                url: laroute.route('product_stock_packets.retain', {orderItemId: $('#retainPacketSubmit').attr('data-orderItemId')})
             }).done((data) => {
                 document.getElementById('packet__modal--title').innerText = 'Pomyślnie odłączono pakiet ' + data.packet_name + ' do produktu ' + data.order_item_name;
                 $('#packet__modal').modal('show');
@@ -4888,7 +4926,7 @@
         function goToNextOrder() {
             let lastOrderId = {{ $order->getLastOrder() }};
             let currentOrderId = {{ $order->id }};
-            if(lastOrderId > currentOrderId) {
+            if (lastOrderId > currentOrderId) {
                 let nextOrderUrl = '{{ route('orders.edit', ['id' => $order->id + 1]) }}';
                 window.location.href = nextOrderUrl;
             } else {

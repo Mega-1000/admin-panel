@@ -48,6 +48,17 @@ final class CourierName extends Enum
         self::DB_SCHENKER => [self::DB_SCHENKER],
     ];
 
+    const DELIVERY_TYPE_TO_SEND_PACKAGE = [
+        self::INPOST,
+        self::APACZKA,
+        self::DPD,
+        self::POCZTEX,
+        self::JAS,
+        self::ALLEGRO_INPOST,
+        self::GLS,
+        self::DB_SCHENKER,
+    ];
+
     /**
      * Delivery types labels
      */

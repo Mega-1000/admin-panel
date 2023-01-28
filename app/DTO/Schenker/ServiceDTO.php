@@ -10,7 +10,7 @@ use JsonSerializable;
 class ServiceDTO extends BaseDTO implements JsonSerializable
 {
 
-    private $serviceCode;
+    protected $serviceCode;
 
     /**
      * Parametr 1 jest wymagany tylko dla wybranych usług.
@@ -20,7 +20,7 @@ class ServiceDTO extends BaseDTO implements JsonSerializable
      * Dla usług 27,28,29 w polu tym powinna znajdować się liczba sztuk (nie stron) dokumentów, które są fizycznie
      * dołączone do przesyłki.
      */
-    private $mainParameter;
+    protected $mainParameter;
 
     /**
      * Wymagany dla usług 27 i 28 – typ dokumentów zwrotnych. Dokumenty spięte zszywaczem są traktowane jako jeden.
@@ -32,7 +32,7 @@ class ServiceDTO extends BaseDTO implements JsonSerializable
      * „LP+WZ” – (list przewozowy + wydanie magazynowe)
      * „PROT.PAL” – protokół paletowy
      */
-    private $documentType;
+    protected $documentType;
 
     /**
      * Parametr wymagany dla usług 27 i 28 – nr/opis dokumentów zwrotnych. Nr faktury (FV), Nr WZ itp.
@@ -41,7 +41,7 @@ class ServiceDTO extends BaseDTO implements JsonSerializable
      * WZ/0151/441/09
      * 10/2011
      */
-    private $documentNumber;
+    protected $documentNumber;
 
     /**
      * @param string|int|null $mainParameter

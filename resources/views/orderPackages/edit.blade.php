@@ -123,9 +123,10 @@
                     @foreach($containerTypes as $containerType)
                         @if ($containerType->name == $orderPackage->container_type)
                             <option value="{{$orderPackage->container_type}}"
-                                    selected="selected">{{$orderPackage->container_type}}</option>
+                                    selected="selected">{{($containerType->shipping_provider === '' ? '' : '[' . $containerType->shipping_provider . '] ')}}{{$orderPackage->container_type}}</option>
                         @else
-                            <option value="{{ $containerType->name }}">{{ $containerType->name }}</option>
+                            <option
+                                value="{{ $containerType->name }}">{{($containerType->shipping_provider === '' ? '' : '[' . $containerType->shipping_provider . '] ')}}{{ $containerType->name }}</option>
                         @endif
                     @endforeach
                 </select>
@@ -251,7 +252,7 @@
                 <label for="services">@lang('order_packages.form.services_db')</label>
                 <input type="text" class="form-control" id="services" name="services"
                        value="{{ $orderPackage->services }}">
-                <p><b>Dostępne usługi do wpisania</b><br/>
+                <p><b>Dostępne usługi do wpisania (automatyczne są analizowane na podstawie danych paczki i wysyłki)</b><br/>
                     @foreach($supportedServices as $serviceNumber => $serviceName)
                         <b>{{$serviceNumber}}</b> - {{ $serviceName }}<br/>
                     @endforeach

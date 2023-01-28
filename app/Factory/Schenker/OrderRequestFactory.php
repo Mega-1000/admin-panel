@@ -38,10 +38,10 @@ class OrderRequestFactory
             DataSource::API,
             null,
             ProductType::SYSTEM,
-            $this->orderPackage->delivery_date,
-            $this->orderPackage->delivery_date->endOfDay(),
-            $this->orderPackage->shipment_date,
-            $this->orderPackage->shipment_date->endOfDay(),
+            $this->orderPackage->shipment_date->setTime(8, 0),
+            $this->orderPackage->shipment_date->setTime(16, 0),
+            $this->orderPackage->delivery_date->setTime(8, 0),
+            $this->orderPackage->delivery_date->setTime(16, 0),
             $this->orderPackage->notices,
             $this->orderPackage->notices,
             $this->prepareSenderData(),
@@ -121,21 +121,24 @@ class OrderRequestFactory
      */
     private function preparePackageData(): array
     {
-        return [
-            new PackageDTO(
-                null,
-                $this->orderPackage->id,
-                $this->orderPackage->container_type,
-                $this->orderPackage->quantity,
-                '',
-                $this->orderPackage->weight,
-                $this->orderPackage->size_a * $this->orderPackage->size_b * $this->orderPackage->size_c,
-                $this->orderPackage->size_a,
-                $this->orderPackage->size_b,
-                $this->orderPackage->size_c,
-                '',
-                $this->orderPackage->shape !== 'standard' ? $this->orderPackage->notices : ''
-            ),
+        return ['colli' =>
+            [
+                new PackageDTO(
+                    null,
+                    $this->orderPackage->id,
+                    $this->orderPackage->container_type,
+                    $this->orderPackage->quantity,
+                    $this->orderPackage->protection_method,
+                    $this->orderPackage->weight,
+                    $this->orderPackage->size_a * $this->orderPackage->size_b * $this->orderPackage->size_c,
+                    $this->orderPackage->size_a,
+                    $this->orderPackage->size_b,
+                    $this->orderPackage->size_c,
+                    '',
+                    $this->orderPackage->shape !== 'standard',
+                    $this->orderPackage->shape !== 'standard' ? $this->orderPackage->notices : ''
+                ),
+            ]
         ];
     }
 
@@ -144,11 +147,7 @@ class OrderRequestFactory
      */
     private function prepareServicesData(): array
     {
-        $services = [];
-
         $servicesParams = $this->generateAllServices();
-
-        $order = $this->orderPackage->order;
         return ServiceFactory::getServicesFromString($this->orderPackage->services, $servicesParams);
     }
 
@@ -157,7 +156,9 @@ class OrderRequestFactory
      */
     private function generateAllServices(): array
     {
-        $serviceParam = [];
+        $serviceParam = [
+            SupportedService::TYPE_UNLOADING_OF_CARGO => null,
+        ];
         $order = $this->orderPackage->order;
         if (($order->deliveryAddress->email ?? '') !== '') {
             $serviceParam[SupportedService::TYPE_EMAIL_NOTIFICATIONS] = new ServiceParameterDTO($order->deliveryAddress->email);

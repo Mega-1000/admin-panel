@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Exceptions\SapException;
+use App\Exceptions\SoapException;
 use App\Utils\SoapParams;
 use SoapClient;
 use SoapFault;
@@ -21,7 +21,7 @@ class SoapClientService
     }
 
     /**
-     * @throws SapException
+     * @throws SoapException
      */
     public static final function sendRequest(string $wsdlFile, string $action, SoapParams $soapParams): array
     {
@@ -31,7 +31,7 @@ class SoapClientService
 
             return $soapClient->makeRequest($action, $soapParams);
         } catch (SoapFault $exception) {
-            throw new SapException('Soap client error: ' . $exception->getMessage() . PHP_EOL, $exception->getCode(), $soapParams, $wsdlFile, $exception->getPrevious());
+            throw new SoapException($exception, 'Soap client error: ' . $exception->getMessage() . PHP_EOL, $exception->getCode(), $soapParams, $wsdlFile, $exception->getPrevious());
         }
     }
 
@@ -72,6 +72,10 @@ class SoapClientService
         $paramsData = $params->getParams();
         $response = $client->$action($paramsData);
 
+        $document = $response->document ?? null;
+        if ($document !== null) {
+            return ['document' => $document];
+        }
         return json_decode(json_encode($response ?? []), true);
     }
 }

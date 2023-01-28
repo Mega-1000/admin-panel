@@ -11,6 +11,9 @@ class GetOrderDocumentRequestDTO extends BaseDTO implements JsonSerializable
     const DEFAULT_REFERENCE_TYPE = "DWB";
     const DEFAULT_RETURN_DOCUMENT_TYPE = "LP";
 
+    const RETURN_TYPE_LP = "LP";
+    const RETURN_TYPE_LABEL = 'LABEL';
+
     private $clientId;
     private $referenceType;
     private $referenceNumber;
@@ -20,7 +23,7 @@ class GetOrderDocumentRequestDTO extends BaseDTO implements JsonSerializable
         string $clientId,
         string $referenceNumber,
         string $referenceType = self::DEFAULT_REFERENCE_TYPE,
-        string $type = self::DEFAULT_RETURN_DOCUMENT_TYPE
+        string $type = self::RETURN_TYPE_LABEL
     )
     {
         $this->clientId = $clientId;

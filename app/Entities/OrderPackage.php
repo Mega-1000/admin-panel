@@ -50,6 +50,12 @@ class OrderPackage extends Model implements Transformable
         'protection_method',
         'services',
     ];
+
+    protected $dates = [
+        'shipment_date',
+        'delivery_date',
+    ];
+
     /**
      * The attributes that are mass assignable.
      *

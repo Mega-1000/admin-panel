@@ -1382,9 +1382,17 @@
                                             html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; padding: 5px; margin-top: 5px;margin-left: 5px; background-color:' + color + '" href="https://gls-group.eu/PL/pl/sledzenie-paczek?match=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
                                             html += '</p></a>';
                                             html += '</div>';
+                                        } else if (value.delivery_courier_name === 'DB') {
+                                            html += '<a target="_blank" href="/storage/db_schenker/protocols/protocol' + value.sending_number + '.pdf"><p>LP: ' + value.sending_number + '</p></a>';
+                                            html += '<a target="_blank" href="/storage/db_schenker/stickers/sticker' + value.sending_number + '.pdf"><p>KP: ' + value.sending_number + '</p></a>';
                                         }
+
                                     }
                                     html += `<button class="btn btn-primary" onclick="showPackageCostModal('${value.id}', '${value.chosen_data_template}', '${value.cost_for_client}', '${value.cost_for_company}')">@lang('order_packages.form.buttons.changePackageCost')</button>`;
+                                    html += '</div>';
+                                } else if (value.delivery_courier_name === 'DB' && value.status !== 'NEW') {
+                                    html += '<a target="_blank" href="/storage/db_schenker/protocols/protocol' + value.sending_number + '.pdf"><p>LP: ' + value.sending_number + '</p></a>';
+                                    html += '<a target="_blank" href="/storage/db_schenker/stickers/sticker' + value.sending_number + '.pdf"><p>KP: ' + value.sending_number + '</p></a>';
                                     html += '</div>';
                                 }
                                 if (isProblem) {

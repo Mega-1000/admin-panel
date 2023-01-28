@@ -30,18 +30,21 @@ class ServiceFactory
      */
     public static function getServicesFromString(string $servicesSeparatedByComma, array $servicesParameters): array
     {
-        $servicesString = preg_replace('/[^\d\,]+/', '');
+        $servicesString = preg_replace('/[^\d\,]+/', '', $servicesSeparatedByComma);
         $servicesArray = explode(',', $servicesString);
         $filteredEmptyServices = array_filter($servicesArray);
-        $uniqueServices = array_values(array_unique($filteredEmptyServices));
+        
+        $defaultServices = SupportedService::getDefaultServices();
 
-        $servicesDTOs = [];
+        $uniqueServices = array_values(array_unique(array_merge($filteredEmptyServices, $defaultServices)));
+
+        $servicesDTOs = ['service' => []];
 
         if (count($uniqueServices) > 0) {
             foreach ($uniqueServices as $uniqueService) {
                 $serviceDTO = self::getServiceDTO($uniqueService, array_key_exists($uniqueService, $servicesParameters) ? $servicesParameters[$uniqueService] : null);
                 if ($serviceDTO !== null) {
-                    $servicesDTOs[] = $serviceDTO;
+                    $servicesDTOs['service'][] = $serviceDTO;
                 }
             }
         }
@@ -76,27 +79,30 @@ class ServiceFactory
         ]);
     }
 
-    private static function createPaymentOnDeliveryServiceDTO(?ServiceParameterDTO $serviceParameterDTO): ServiceDTO
+    private static function createPaymentOnDeliveryServiceDTO(?ServiceParameterDTO $serviceParameterDTO): ?ServiceDTO
     {
+        if ($serviceParameterDTO === null) {
+            return null;
+        }
         return App::make(SchenkerServiceProvider::DTO_SERVICE, [
             'code' => SupportedService::TYPE_PAYMENT_ON_DELIVERY,
             'mainParameter' => $serviceParameterDTO->getMainParameterFromFloatToInt(),
         ]);
     }
 
-    private static function createPhoneNotificationServiceDTO(?ServiceParameterDTO $serviceParameterDTO): ServiceDTO
+    private static function createPhoneNotificationServiceDTO(?ServiceParameterDTO $serviceParameterDTO): ?ServiceDTO
     {
         return App::make(SchenkerServiceProvider::DTO_SERVICE, [
             'code' => SupportedService::TYPE_PHONE_NOTIFICATIONS,
-            'mainParameter' => $serviceParameterDTO->getMainParameterAsString(),
+            'mainParameter' => $serviceParameterDTO === null ? null : $serviceParameterDTO->getMainParameterAsString(),
         ]);
     }
 
-    private static function createEmailNotificationServiceDTO(?ServiceParameterDTO $serviceParameterDTO): ServiceDTO
+    private static function createEmailNotificationServiceDTO(?ServiceParameterDTO $serviceParameterDTO): ?ServiceDTO
     {
         return App::make(SchenkerServiceProvider::DTO_SERVICE, [
             'code' => SupportedService::TYPE_EMAIL_NOTIFICATIONS,
-            'mainParameter' => $serviceParameterDTO->getMainParameterAsString(),
+            'mainParameter' => $serviceParameterDTO === null ? null : $serviceParameterDTO->getMainParameterAsString(),
         ]);
     }
 

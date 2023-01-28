@@ -3,23 +3,25 @@
 namespace App\DTO\Schenker;
 
 use App\DTO\BaseDTO;
+use App\Services\SchenkerService;
 use JsonSerializable;
 
 class PackageDTO extends BaseDTO implements JsonSerializable
 {
 
-    private $packageId;
-    private $name;
-    private $packageCode;
-    private $quantity;
-    private $protection;
-    private $weight;
-    private $volume;
-    private $width;
-    private $length;
-    private $height;
-    private $stack;
-    private $notStandardComment;
+    protected $packageId;
+    protected $name;
+    protected $packageCode;
+    protected $quantity;
+    protected $protection;
+    protected $weight;
+    protected $volume;
+    protected $width;
+    protected $length;
+    protected $height;
+    protected $stack;
+    protected $notStandard;
+    protected $notStandardComment;
 
     public function __construct(
         ?string $packageId,
@@ -33,6 +35,7 @@ class PackageDTO extends BaseDTO implements JsonSerializable
         float   $length,
         float   $height,
         ?bool   $stack,
+        bool    $notStandard,
         ?string $notStandardComment
     )
     {
@@ -47,6 +50,7 @@ class PackageDTO extends BaseDTO implements JsonSerializable
         $this->length = $length;
         $this->height = $height;
         $this->stack = $stack;
+        $this->notStandard = $notStandard;
         $this->notStandardComment = $notStandardComment;
     }
 
@@ -54,7 +58,7 @@ class PackageDTO extends BaseDTO implements JsonSerializable
     {
         $packageData = [
             'name' => $this->substrText($this->name, 20),
-            'packCode' => $this->substrText($this->packageCode, 20),
+            'packCode' => SchenkerService::searchPackageCode($this->packageCode),
             'quantity' => $this->quantity,
             'protection' => $this->substrText($this->protection, 30),
             'weight' => $this->floatToInt($this->weight),

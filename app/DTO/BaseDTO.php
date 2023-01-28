@@ -48,7 +48,7 @@ class BaseDTO
 
     protected function getOnlyNumbers(string $text): string
     {
-        return preg_replace('/[\d]+/', '', $text);
+        return preg_replace('/[^\d]+/', '', $text);
     }
 
     protected function floatToInt(float $floatValue): int

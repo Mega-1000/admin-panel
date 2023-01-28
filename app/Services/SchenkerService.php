@@ -5,6 +5,7 @@ namespace App\Services;
 use App\DTO\Schenker\Request\CancelOrderRequestDTO;
 use App\DTO\Schenker\Request\GetOrderDocumentDTO;
 use App\DTO\Schenker\Request\GetOrderDocumentRequestDTO;
+use App\DTO\Schenker\Request\GetOrderStatusRequestDTO;
 use App\DTO\Schenker\Request\GetTrackingRequestDTO;
 use App\DTO\Schenker\Request\OrderRequestDTO;
 use App\DTO\Schenker\Response\CancelOrderResponseDTO;
@@ -12,7 +13,9 @@ use App\DTO\Schenker\Response\CreateOrderResponseDTO;
 use App\DTO\Schenker\Response\GetOrderDocumentResponseDTO;
 use App\DTO\Schenker\Response\GetOrderStatusResponseDTO;
 use App\DTO\Schenker\Response\GetTrackingResponseDTO;
-use App\Exceptions\SapException;
+use App\Entities\ContainerType;
+use App\Enums\CourierName;
+use App\Exceptions\SoapException;
 use App\Exceptions\SoapParamsException;
 use App\Utils\SoapParams;
 use Illuminate\Support\Facades\Storage;
@@ -23,7 +26,7 @@ class SchenkerService extends SoapClientService
 
     /**
      * @throws SoapParamsException
-     * @throws SapException
+     * @throws SoapException
      */
     public static function getPackageDictionary(): array
     {
@@ -36,7 +39,7 @@ class SchenkerService extends SoapClientService
 
     /**
      * @throws SoapParamsException
-     * @throws SapException
+     * @throws SoapException
      */
     private static function prepareAndSendRequest(string $paramName, ?JsonSerializable $dataObject, string $action): array
     {
@@ -50,12 +53,12 @@ class SchenkerService extends SoapClientService
     }
 
     /**
-     * @throws SoapParamsException|SapException
+     * @throws SoapParamsException|SoapException
      */
     public static function createNewOrder(OrderRequestDTO $schenkerOrderDTO): CreateOrderResponseDTO
     {
         $response = self::prepareAndSendRequest(
-            'createOrderRequest',
+            '',
             $schenkerOrderDTO,
             'createOrder'
         );
@@ -68,12 +71,12 @@ class SchenkerService extends SoapClientService
 
     /**
      * @throws SoapParamsException
-     * @throws SapException
+     * @throws SoapException
      */
-    public static function getOrderStatus(GetOrderStatusResponseDTO $getOrderStatusResponseDTO): GetOrderStatusResponseDTO
+    public static function getOrderStatus(GetOrderStatusRequestDTO $getOrderStatusResponseDTO): GetOrderStatusResponseDTO
     {
         $response = self::prepareAndSendRequest(
-            'getOrderStatusRequest',
+            '',
             $getOrderStatusResponseDTO,
             'getOrderStatus'
         );
@@ -89,18 +92,19 @@ class SchenkerService extends SoapClientService
 
     /**
      * @return GetTrackingResponseDTO[]
-     * @throws SapException
+     * @throws SoapException
      *
      * @throws SoapParamsException
      */
     public static function getGetTrackingInformation(GetTrackingRequestDTO $getTrackingRequestDTO): array
     {
         $response = self::prepareAndSendRequest(
-            'getTrackingRequest',
+            '',
             $getTrackingRequestDTO,
             'getTracking'
         );
 
+        dd($response);
         $trackingResponseDTO = [];
         if (array_key_exists('consignment', $response) && $response['consignment'] !== null) {
             foreach (($response['consignment']['eventList'] ?? []) as $event) {
@@ -120,31 +124,39 @@ class SchenkerService extends SoapClientService
     public static function cancelOrder(CancelOrderRequestDTO $cancelOrderRequestDTO): CancelOrderResponseDTO
     {
         $response = self::prepareAndSendRequest(
-            'cancelOrderRequest',
+            '',
             $cancelOrderRequestDTO,
             'cancelOrder'
         );
 
         return new CancelOrderResponseDTO(
-            $response['result'],
-            $response['iError'],
-            $response['cError']
+            $response['result'] ?? '',
+            $response['iError'] ?? 0,
+            $response['cError'] ?? ''
         );
     }
 
     /**
      * @throws SoapParamsException
-     * @throws SapException
+     * @throws SoapException
      */
     public static function getDocument(GetOrderDocumentRequestDTO $getOrderDocumentRequestDTO): GetOrderDocumentResponseDTO
     {
         $response = self::prepareAndSendRequest(
-            'getDocumentsRequest',
+            '',
             $getOrderDocumentRequestDTO,
             'getDocuments'
         );
 
         return new GetOrderDocumentResponseDTO($response['document'] ?? '');
+    }
+
+    public static function searchPackageCode(string $packageTypeName)
+    {
+        $packageType = ContainerType::where('name', 'like', $packageTypeName)
+            ->where('shipping_provider', CourierName::DB_SCHENKER)
+            ->firstOrFail();
+        return $packageType->symbol;
     }
 
 }

@@ -10,14 +10,14 @@ use JsonSerializable;
 class DangerProductDTO extends BaseDTO implements JsonSerializable
 {
 
-    private $uniqueNumber;
-    private $riskLevel;
-    private $weight;
-    private $packagesQuantity;
-    private $packageType;
-    private $excluded;
-    private $comment;
-    private $technicalName;
+    protected $uniqueNumber;
+    protected $riskLevel;
+    protected $weight;
+    protected $packagesQuantity;
+    protected $packageType;
+    protected $excluded;
+    protected $comment;
+    protected $technicalName;
 
     public function __construct(
         string  $uniqueNumber,

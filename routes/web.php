@@ -20,8 +20,8 @@ Route::group(['prefix' => 'admin'], function () {
     });
 
     Route::group(['middleware' => 'admin'], function () {
-	    Route::get('/allegro-api/auth/device/{code?}', 'AllegroApiController@auth_device');
-	    Route::get('/allegro-api/auth/oauth2', 'AllegroApiController@auth_oauth2');
+        Route::get('/allegro-api/auth/device/{code?}', 'AllegroApiController@auth_device');
+        Route::get('/allegro-api/auth/oauth2', 'AllegroApiController@auth_oauth2');
 
         Route::group(['prefix' => 'products'], function () {
             Route::group(['prefix' => 'sets', 'as' => 'sets.'], __DIR__ . '/web/ProductsSetsRoutes.php');
@@ -285,10 +285,10 @@ Route::group(['prefix' => 'admin'], function () {
             'ProductStockPacketsController@update')->name('product_stock_packets.update');
         Route::post('positions/{from}/{to}/quantity/move',
             'ProductStockPositionsController@quantityMove')->name('product_stocks.quantity_move');
-	    Route::get('products/analyzer', 'ProductAnalyzerController@index')->name('product_analyzer.index');
-	    Route::post('products/analyzer/datatable', 'ProductAnalyzerController@datatable')->name('product_analyzer.datatable');
+        Route::get('products/analyzer', 'ProductAnalyzerController@index')->name('product_analyzer.index');
+        Route::post('products/analyzer/datatable', 'ProductAnalyzerController@datatable')->name('product_analyzer.datatable');
 
-	    Route::get('orders', 'OrdersController@index')->name('orders.index');
+        Route::get('orders', 'OrdersController@index')->name('orders.index');
         Route::post('orders/update-notices', 'OrdersController@updateNotices')->name('orders.updateNotice');
         Route::post('orders/returnItemsFromStock',
             'OrdersController@returnItemsFromStock')->name('orders.returnItemsFromStock');
@@ -392,7 +392,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::delete('orderPackages/{id}/', [
             'uses' => 'OrdersPackagesController@destroy',
         ])->name('order_packages.destroy');
-        Route::get('orderPackages/{id}/sendRequestForCancelled',
+        Route::get('orderPackages/{orderPackage}/sendRequestForCancelled',
             'OrdersPackagesController@sendRequestForCancelled')->name('order_packages.sendRequestForCancelled');
         Route::post('orderPackages/protocols',
             'OrdersPackagesController@getProtocols')->name('order_packages.getProtocols');

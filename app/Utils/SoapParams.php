@@ -15,9 +15,14 @@ class SoapParams
      */
     public function setParamDTOObject(string $paramName, ?BaseDTO $dtoObject): self
     {
-        if (!array_key_exists($paramName, $this->params)) {
+        if ($paramName === '' || !array_key_exists($paramName, $this->params)) {
             if ($dtoObject === null) {
                 $this->params[$paramName] = null;
+                return $this;
+            }
+            if ($paramName === '') {
+                $this->params = json_decode(json_encode($dtoObject), true);
+
                 return $this;
             }
             $this->params[$paramName] = json_decode(json_encode($dtoObject), true);

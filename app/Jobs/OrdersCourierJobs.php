@@ -7,7 +7,7 @@ use App\DTO\Schenker\Response\CreateOrderResponseDTO;
 use App\Entities\OrderPackage;
 use App\Enums\CourierName;
 use App\Enums\PackageStatus;
-use App\Exceptions\SapException;
+use App\Exceptions\SoapException;
 use App\Exceptions\SoapParamsException;
 use App\Factory\Schenker\OrderRequestFactory;
 use App\Helpers\Helper;
@@ -849,7 +849,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
 
     /**
      * @throws SoapParamsException
-     * @throws SapException
+     * @throws SoapException
      */
     private function createPackageForDB(): array
     {
@@ -875,8 +875,8 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         $getLabelResponseDTO = SchenkerService::getDocument(new GetOrderDocumentRequestDTO(
             config('integrations.schenker.client_id'),
             $createOrderResponseDTO->getOrderId(),
-            GetOrderDocumentRequestDTO::DEFAULT_RETURN_DOCUMENT_TYPE,
-            'LABEL'
+            GetOrderDocumentRequestDTO::DEFAULT_REFERENCE_TYPE,
+            GetOrderDocumentRequestDTO::RETURN_TYPE_LABEL
         ));
 
         if ($getLabelResponseDTO->getBase64DocumentContent() !== '') {
@@ -885,11 +885,13 @@ class OrdersCourierJobs extends Job implements ShouldQueue
 
         $getWaybillResponseDTO = SchenkerService::getDocument(new GetOrderDocumentRequestDTO(
             config('integrations.schenker.client_id'),
-            $createOrderResponseDTO->getOrderId()
+            $createOrderResponseDTO->getOrderId(),
+            GetOrderDocumentRequestDTO::DEFAULT_REFERENCE_TYPE,
+            GetOrderDocumentRequestDTO::RETURN_TYPE_LP
         ));
 
-        if ($getWaybillResponseDTO) {
-            Storage::disk('local')->put('public/db_schenker/protocols/protocol' . $createOrderResponseDTO->getOrderId() . '.pdf', $getLabelResponseDTO->getBase64DocumentContent());
+        if ($getWaybillResponseDTO->getBase64DocumentContent() !== '') {
+            Storage::disk('local')->put('public/db_schenker/protocols/protocol' . $createOrderResponseDTO->getOrderId() . '.pdf', $getWaybillResponseDTO->getBase64DocumentContent());
         }
 
         return ['sending_number' => $createOrderResponseDTO->getOrderId(), 'letter_number' => ''];

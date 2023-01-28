@@ -4,6 +4,7 @@ return [
 
     'sender' => [
         'name' => env('SENDER_NAME'),
+        'contact_person' => env('SENDER_CONTACT_PERSON'),
         'tax_number' => env('SENDER_TAX_NUMBER'),
         'post_code' => env('SENDER_POST_CODE'),
         'city' => env('SENDER_CITY'),
@@ -16,6 +17,7 @@ return [
 
     'payer' => [
         'name' => env('PAYER_NAME'),
+        'contact_person' => env('SENDER_CONTACT_PERSON'),
         'tax_number' => env('PAYER_TAX_NUMBER'),
         'post_code' => env('PAYER_POST_CODE'),
         'city' => env('PAYER_CITY'),

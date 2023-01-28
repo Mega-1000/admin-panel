@@ -3,6 +3,7 @@
 namespace App\DTO\Schenker;
 
 use App\DTO\BaseDTO;
+use JsonSerializable;
 
 class AddressDTO extends BaseDTO implements JsonSerializable
 {
@@ -61,7 +62,7 @@ class AddressDTO extends BaseDTO implements JsonSerializable
             'postCode' => $this->getOnlyNumbers($this->postCode),
             'city' => $this->substrText($this->city, 35),
             'street' => $this->substrText($this->street . ' ' . $localAndHouseNumber),
-            'nip' => $this->getOnlyNumbers($this->postCode),
+            'nip' => $this->getOnlyNumbers($this->nip),
             'contactPerson' => $this->substrText($this->contactPerson),
         ];
         if (strlen($this->name) > 60) {

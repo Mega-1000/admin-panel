@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Entities\ContainerType;
 use App\Enums\CourierName;
-use App\Exceptions\SapException;
+use App\Exceptions\SoapException;
 use App\Exceptions\SoapParamsException;
 use App\Services\SchenkerService;
 use Exception;
@@ -17,7 +17,7 @@ class GetSchenkerPackageDictionaryCommand extends Command
     protected $description = 'Pulling package dictionary from Schenker API';
 
     /**
-     * @throws SapException
+     * @throws SoapException
      * @throws SoapParamsException
      * @throws Exception
      */

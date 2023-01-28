@@ -15,6 +15,7 @@ use App\Entities\PackingType;
 use App\Entities\SelAddress;
 use App\Entities\SelTransaction;
 use App\Entities\WorkingEvents;
+use App\Enums\CourierName;
 use App\Enums\Schenker\SupportedService;
 use App\Helpers\DateHelper;
 use App\Helpers\OrderPackagesDataHelper;
@@ -33,6 +34,7 @@ use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PackageTemplateRepository;
 use App\Repositories\ShipmentGroupRepository;
+use App\Services\OrderPackageService;
 use Barryvdh\DomPDF\Facade as PDF;
 use Carbon\Carbon;
 use DateTime;
@@ -486,9 +488,17 @@ class OrdersPackagesController extends Controller
         return $this->repository->with(['realCostsForCompany'])->findByField('order_id', $id);
     }
 
-    public function sendRequestForCancelled($id)
+    public function sendRequestForCancelled(OrderPackage $orderPackage)
     {
-        $this->repository->update(['status' => 'CANCELLED'], $id);
+
+        $response = OrderPackageService::setPackageAsCancelled($orderPackage);
+
+        if ($response !== OrderPackageService::RESPONSE_OK) {
+            return redirect()->back()->with([
+                'message' => $response,
+                'alert-type' => 'error'
+            ]);
+        }
 
         return redirect()->back()->with([
             'message' => __('order_packages.message.request_for_cancelled_package'),
@@ -884,7 +894,7 @@ class OrdersPackagesController extends Controller
     protected function validatePackage($data)
     {
         $validator = Validator::make($data, [
-            'courier_name' => 'required|min:3|in:INPOST,APACZKA,DPD,POCZTEX,JAS,ALLEGRO-INPOST,GLS',
+            'courier_name' => 'required|min:2|in:' . implode(',', CourierName::DELIVERY_TYPE_TO_SEND_PACKAGE),
             'courier_type' => 'nullable',
             'weight' => 'required|numeric',
             'length' => 'required|numeric',
