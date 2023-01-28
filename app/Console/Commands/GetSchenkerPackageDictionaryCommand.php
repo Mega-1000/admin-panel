@@ -21,7 +21,7 @@ class GetSchenkerPackageDictionaryCommand extends Command
      * @throws SoapParamsException
      * @throws Exception
      */
-    public function handle()
+    public function handle(): bool
     {
         $response = SchenkerService::getPackageDictionary();
         if (array_key_exists('packageDictionary', $response) && count($response['packageDictionary'])) {

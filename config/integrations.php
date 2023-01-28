@@ -47,9 +47,9 @@ return [
     ],
 
     'schenker' => [
-        'client_id' => env('SCHENKER_CLIENT_ID'),
-        'user_name' => env('SCHENKER_USER_NAME'),
-        'user_password' => env('SCHENKER_USER_PASSWORD'),
+        'client_id' => env('SCHENKER_CLIENT_ID', '2779439'),
+        'user_name' => env('SCHENKER_USER_NAME', 'EPH_PROD'),
+        'user_password' => env('SCHENKER_USER_PASSWORD', '7WHBLagc3P'),
         'default_date_time_format' => env('SCHENKER_DATES_FORMAT', 'Y-m-dTH:i:s'),
     ]
 ];
