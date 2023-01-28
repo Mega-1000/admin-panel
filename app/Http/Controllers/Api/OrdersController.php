@@ -950,8 +950,7 @@ class OrdersController extends Controller
         return response()->json('Oferta została wysłana', 200, [], JSON_UNESCAPED_UNICODE);
     }
 
-    public function getLatestDeliveryInfo($orderId) {
-        $order = Order::findorfail($orderId);
+    public function getLatestDeliveryInfo(Order $order) {
         $deliveryInfos = $order->customer->orders()->get();
         foreach ($deliveryInfos as $deliveryInfo) {
             $deliveryInfo->adress = $deliveryInfo->getDeliveryAddress();
@@ -960,8 +959,7 @@ class OrdersController extends Controller
         return response()->json($deliveryInfos, 200, [], JSON_UNESCAPED_UNICODE);
     }
 
-    public function getLatestInvoiceInfo($orderId) {
-        $order = Order::findorfail($orderId);
+    public function getLatestInvoiceInfo(Order $order) {
         $invoiceInfos = $order->customer->orders()->get();
         foreach ($invoiceInfos as $invoiceInfo) {
             $invoiceInfo->adress = $invoiceInfo->getInvoiceAddress();
