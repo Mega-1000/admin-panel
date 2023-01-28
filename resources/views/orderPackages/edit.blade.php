@@ -1,3 +1,4 @@
+@php use App\Enums\CourierName; @endphp
 @extends('layouts.datatable')
 @section('app-header')
     <h1 class="page-title">
@@ -71,72 +72,38 @@
             <div class="form-group">
                 <label for="service_courier_name">@lang('order_packages.form.service_courier_name')</label>
                 <select class="form-control" id="service_courier_name" name="service_courier_name">
-                    <option {{ $orderPackage->service_courier_name === 'INPOST' ? 'selected="selected"' : '' }} value="INPOST">
-                        INPOST
-                    </option>
-                    <option {{ $orderPackage->service_courier_name === 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">
-                        POCZTEX
-                    </option>
-                    <option {{ $orderPackage->service_courier_name === 'DPD' ? 'selected="selected"' : '' }} value="DPD">
-                        DPD
-                    </option>
-                    <option {{ $orderPackage->service_courier_name === 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
-                        APACZKA
-                    </option>
-                    <option {{ $orderPackage->service_courier_name === 'JAS' ? 'selected="selected"' : '' }} value="JAS">
-                        JAS
-                    </option>
-                    <option {{ $orderPackage->service_courier_name === 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
-                        GIELDA
-                    </option>
-                    <option {{ $orderPackage->service_courier_name === 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
-                        ODBIÓR OSOBISTY
-                    </option>
-                    <option {{ $orderPackage->service_courier_name == 'GLS' ? 'selected="selected"' : '' }} value="GLS">GLS</option>
-                    <option {{ $orderPackage->service_courier_name == 'UPS' ? 'selected="selected"' : '' }} value="UPS">UPS</option>
-                    <option {{ old('delivery_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
-                        PACZKOMAT
-                    </option>
+                    @foreach(CourierName::DELIVERY_TYPE_LABELS as $providerCode => $providerName)
+                        @if(CourierName::ALLEGRO_INPOST !== $providerCode)
+                            <option value="{{$providerCode}}"
+                                {{ $providerCode === $orderPackage->service_courier_name ? "selected='selected" : '' }}>
+                                {{ $providerName }}
+                            </option>
+                        @endif
+                    @endforeach
                     @if ($isAllegro)
-                     <option {{ $orderPackage->service_courier_name === 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
-                        ALLEGRO-INPOST
-                    </option>
+                        <option
+                            {{ $orderPackage->service_courier_name == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
+                            ALLEGRO-INPOST
+                        </option>
                     @endif
                 </select>
             </div>
             <div class="form-group">
                 <label for="delivery_courier_name">@lang('order_packages.form.delivery_courier_name')</label>
                 <select class="form-control" id="delivery_courier_name" name="delivery_courier_name">
-                    <option {{ $orderPackage->delivery_courier_name === 'INPOST' ? 'selected="selected"' : '' }} value="INPOST">
-                        INPOST
-                    </option>
-                    <option {{ $orderPackage->delivery_courier_name === 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">
-                        POCZTEX
-                    </option>
-                    <option {{ $orderPackage->delivery_courier_name === 'DPD' ? 'selected="selected"' : '' }} value="DPD">
-                        DPD
-                    </option>
-                    <option {{ $orderPackage->delivery_courier_name === 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
-                        APACZKA
-                    </option>
-                    <option {{ $orderPackage->delivery_courier_name === 'JAS' ? 'selected="selected"' : '' }} value="JAS">
-                        JAS
-                    </option>
-                    <option {{ $orderPackage->delivery_courier_name === 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
-                        GIELDA
-                    </option>
-                    <option {{ $orderPackage->service_courier_name == 'GLS' ? 'selected="selected"' : '' }} value="GLS">GLS</option>
-                    <option {{ $orderPackage->service_courier_name == 'UPS' ? 'selected="selected"' : '' }} value="UPS">UPS</option>
-                    <option {{ $orderPackage->delivery_courier_name === 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
-                        ODBIÓR OSOBISTY
-                    </option>
-                    <option {{ $orderPackage->delivery_courier_name === 'PACZKOMAT' ? 'selected="selected"' : '' }} value="PACZKOMAT">
-                        PACZKOMAT
-                    </option>
-                    @if ($isAllegro))
-                     <option {{ $orderPackage->delivery_courier_name === 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
-                        ALLEGRO-INPOST
-                    </option>
+                    @foreach(CourierName::DELIVERY_TYPE_LABELS as $providerCode => $providerName)
+                        @if(CourierName::ALLEGRO_INPOST !== $providerCode)
+                            <option value="{{$providerCode}}"
+                                {{ $providerCode === $orderPackage->delivery_courier_name ? "selected='selected" : '' }}>
+                                {{ $providerName }}
+                            </option>
+                        @endif
+                    @endforeach
+                    @if ($isAllegro)
+                        <option
+                            {{ $orderPackage->delivery_courier_name == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
+                            ALLEGRO-INPOST
+                        </option>
                     @endif
                 </select>
             </div>
@@ -154,11 +121,13 @@
                 <label for="container_type">@lang('order_packages.form.container_type')</label><br/>
                 <select class="form-control" id="container_type" name="container_type">
                     @foreach($containerTypes as $containerType)
-                    @if ($containerType->name == $orderPackage->container_type)
-                    <option value="{{$orderPackage->container_type}}" selected="selected">{{$orderPackage->container_type}}</option>
-                    @else
-                    <option value="{{ $containerType->name }}">{{ $containerType->name }}</option>
-                    @endif
+                        @if ($containerType->name == $orderPackage->container_type)
+                            <option value="{{$orderPackage->container_type}}"
+                                    selected="selected">{{($containerType->shipping_provider === '' ? '' : '[' . $containerType->shipping_provider . '] ')}}{{$orderPackage->container_type}}</option>
+                        @else
+                            <option
+                                value="{{ $containerType->name }}">{{($containerType->shipping_provider === '' ? '' : '[' . $containerType->shipping_provider . '] ')}}{{ $containerType->name }}</option>
+                        @endif
                     @endforeach
                 </select>
             </div>
@@ -166,11 +135,12 @@
                 <label for="packing_type">@lang('order_packages.form.packing_type')</label><br/>
                 <select class="form-control" id="packing_type" name="packing_type">
                     @foreach($packingTypes as $packingType)
-                    @if ($packingType->name == $orderPackage->container_type)
-                    <option value="{{$orderPackage->container_type}}" selected="selected">{{$orderPackage->container_type}}</option>
-                    @else
-                    <option value="{{ $packingType->name }}">{{ $packingType->name }}</option>
-                    @endif
+                        @if ($packingType->name == $orderPackage->container_type)
+                            <option value="{{$orderPackage->container_type}}"
+                                    selected="selected">{{$orderPackage->container_type}}</option>
+                        @else
+                            <option value="{{ $packingType->name }}">{{ $packingType->name }}</option>
+                        @endif
                     @endforeach
                 </select>
             </div>
@@ -215,19 +185,22 @@
                         <option value="WAITING_FOR_SENDING"
                                 selected>@lang('order_packages.form.status_type.waiting_for_sending')</option>
                     @else
-                        <option value="WAITING_FOR_SENDING">@lang('order_packages.form.status_type.waiting_for_sending')</option>
+                        <option
+                            value="WAITING_FOR_SENDING">@lang('order_packages.form.status_type.waiting_for_sending')</option>
                     @endif
                     @if($orderPackage->status == 'WAITING_FOR_CANCELLED')
                         <option value="WAITING_FOR_CANCELLED"
                                 selected>@lang('order_packages.form.status_type.waiting_for_cancelled')</option>
                     @else
-                        <option value="WAITING_FOR_CANCELLED">@lang('order_packages.form.status_type.waiting_for_cancelled')</option>
+                        <option
+                            value="WAITING_FOR_CANCELLED">@lang('order_packages.form.status_type.waiting_for_cancelled')</option>
                     @endif
                     @if($orderPackage->status == 'REJECT_CANCELLED')
                         <option value="REJECT_CANCELLED"
                                 selected>@lang('order_packages.form.status_type.reject_cancelled')</option>
                     @else
-                        <option value="REJECT_CANCELLED">@lang('order_packages.form.status_type.reject_cancelled')</option>
+                        <option
+                            value="REJECT_CANCELLED">@lang('order_packages.form.status_type.reject_cancelled')</option>
                     @endif
                 </select>
             </div>
@@ -235,11 +208,12 @@
                 <label for="content">@lang('order_packages.form.content')</label>
                 <select class="form-control text-uppercase" id="content" name="content">
                     @foreach($contentTypes as $contentType)
-                    @if ($contentType->name == $orderPackage->content)
-                    <option value="{{$orderPackage->content}}" selected="selected">{{$orderPackage->content}}</option>
-                    @else
-                    <option value="{{ $contentType->name }}">{{ $contentType->name }}</option>
-                    @endif
+                        @if ($contentType->name == $orderPackage->content)
+                            <option value="{{$orderPackage->content}}"
+                                    selected="selected">{{$orderPackage->content}}</option>
+                        @else
+                            <option value="{{ $contentType->name }}">{{ $contentType->name }}</option>
+                        @endif
                     @endforeach
                 </select>
             </div>
@@ -269,6 +243,21 @@
                        name="real_cost_for_company"
                        value="{{ $orderPackage->real_cost_for_company }}">
             </div>
+            <div class="form-group">
+                <label for="protection_method">@lang('order_packages.form.protection')</label>
+                <input type="text" class="form-control" id="protection_method" name="protection_method" maxlength="20"
+                       value="{{ $orderPackage->protection_method }}">
+            </div>
+            <div class="form-group">
+                <label for="services">@lang('order_packages.form.services_db')</label>
+                <input type="text" class="form-control" id="services" name="services"
+                       value="{{ $orderPackage->services }}">
+                <p><b>Dostępne usługi do wpisania (automatyczne są analizowane na podstawie danych paczki i wysyłki)</b><br/>
+                    @foreach($supportedServices as $serviceNumber => $serviceName)
+                        <b>{{$serviceNumber}}</b> - {{ $serviceName }}<br/>
+                    @endforeach
+                </p>
+            </div>
             <input type="hidden" value="{{ $id }}" name="order_id">
         </div>
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
@@ -281,37 +270,37 @@
 @section('scripts')
     <script src="{{URL::asset('js/jscolor.js')}}"></script>
     <script>
-      var breadcrumb = $('.breadcrumb:nth-child(2)');
+        var breadcrumb = $('.breadcrumb:nth-child(2)');
 
-      breadcrumb.children().remove();
-      breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");
-      breadcrumb.append("<li class='active'><a href='/admin/orders/{{$orderPackage->order_id}}/edit'>Przesyłki</a></li>");
-      breadcrumb.append("<li class='disable'><a href='javascript:void()'>Edytuj</a></li>");
+        breadcrumb.children().remove();
+        breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");
+        breadcrumb.append("<li class='active'><a href='/admin/orders/{{$orderPackage->order_id}}/edit'>Przesyłki</a></li>");
+        breadcrumb.append("<li class='disable'><a href='javascript:void()'>Edytuj</a></li>");
 
-      function commaReplace(cssClass) {
-        document.querySelectorAll(cssClass).forEach(function (input) {
-          input.value = input.value.replace(/,/g, '.');
-        });
-      }
-
-      $(document).ready(function () {
-        commaReplace('.priceChange');
-      });
-
-      $("#shipment_date").on('dp.change', function () {
-        var shipmentDate = new Date($("#shipment_date").val());
-        var deliveryDate = "", noOfDaysToAdd = 1, count = 0;
-
-        while (count < noOfDaysToAdd) {
-          deliveryDate = new Date(shipmentDate.setDate(shipmentDate.getDate() + 1));
-          if (deliveryDate.getDay() != 0 && deliveryDate.getDay() != 6) {
-            //Date.getDay() gives weekday starting from 0(Sunday) to 6(Saturday)
-            count++;
-          }
+        function commaReplace(cssClass) {
+            document.querySelectorAll(cssClass).forEach(function (input) {
+                input.value = input.value.replace(/,/g, '.');
+            });
         }
 
-        $("#delivery_date").val(moment(deliveryDate).format('YYYY-MM-DD'));
+        $(document).ready(function () {
+            commaReplace('.priceChange');
+        });
 
-      });
+        $("#shipment_date").on('dp.change', function () {
+            var shipmentDate = new Date($("#shipment_date").val());
+            var deliveryDate = "", noOfDaysToAdd = 1, count = 0;
+
+            while (count < noOfDaysToAdd) {
+                deliveryDate = new Date(shipmentDate.setDate(shipmentDate.getDate() + 1));
+                if (deliveryDate.getDay() != 0 && deliveryDate.getDay() != 6) {
+                    //Date.getDay() gives weekday starting from 0(Sunday) to 6(Saturday)
+                    count++;
+                }
+            }
+
+            $("#delivery_date").val(moment(deliveryDate).format('YYYY-MM-DD'));
+
+        });
     </script>
 @endsection

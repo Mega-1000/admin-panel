@@ -1,3 +1,5 @@
+@php use App\Entities\Warehouse; @endphp
+@php use App\Enums\ProductStockError; @endphp
 @extends('layouts.datatable')
 
 @section('app-header')
@@ -79,7 +81,7 @@
                             <input class="form-control" required name="name" id="task-name" type="text">
                         </div>
                         <input type="hidden" name="warehouse_id"
-                               value="{{ \App\Entities\Warehouse::OLAWA_WAREHOUSE_ID }}">
+                               value="{{ Warehouse::OLAWA_WAREHOUSE_ID }}">
                         <input type="hidden" name="quickTask" value="1">
                         <input type="hidden" name="color" value="008000">
                     </form>
@@ -927,7 +929,7 @@
             @endphp
         ];
 
-        $(document).ready(()=>{
+        $(document).ready(() => {
             let nof = getUrlParameter('nof');
             if (nof) {
                 filterByPhone(nof);
@@ -935,27 +937,27 @@
         });
 
         @can('create-bonus')
-            $(document).on('click', '.penalty', (e)=>{
-                let orderId = $(e.target).attr('data-order');
-                $('#add_bonus_modal').modal('show');
-                $('#order_id').val(orderId);
-                $('#consultant-name').html('<i class="fas fa-spinner fa-spin  fa-fw"></i>');
-                $('#select-consultant').attr('disabled',true);
-                $('#warehouse-name').html('<i class="fas fa-spinner fa-spin  fa-fw"></i>');
-                $('#select-warehouse').attr('disabled',true);
+        $(document).on('click', '.penalty', (e) => {
+            let orderId = $(e.target).attr('data-order');
+            $('#add_bonus_modal').modal('show');
+            $('#order_id').val(orderId);
+            $('#consultant-name').html('<i class="fas fa-spinner fa-spin  fa-fw"></i>');
+            $('#select-consultant').attr('disabled', true);
+            $('#warehouse-name').html('<i class="fas fa-spinner fa-spin  fa-fw"></i>');
+            $('#select-warehouse').attr('disabled', true);
 
-                $.get('{{ route('bonus.users') }}/'+orderId, (data)=>{
-                    $('#consultant-name').html(data['consultant']);
-                    $('#warehouse-name').html(data['warehouse']);
+            $.get('{{ route('bonus.users') }}/' + orderId, (data) => {
+                $('#consultant-name').html(data['consultant']);
+                $('#warehouse-name').html(data['warehouse']);
 
-                    if(data['consultant'] != 'BRAK') {
-                        $('#select-consultant').removeAttr('disabled');
-                    }
-                    if(data['warehouse'] != 'BRAK'){
-                        $('#select-warehouse').removeAttr('disabled');
-                    }
-                });
+                if (data['consultant'] != 'BRAK') {
+                    $('#select-consultant').removeAttr('disabled');
+                }
+                if (data['warehouse'] != 'BRAK') {
+                    $('#select-warehouse').removeAttr('disabled');
+                }
             });
+        });
         @endcan
 
         @if (session('stock-response'))
@@ -964,13 +966,13 @@
         $('#quantity__errors').empty();
         $('#exists__errors').empty();
         stockResponse.forEach((error) => {
-            if (error.error == '{{ \App\Enums\ProductStockError::POSITION }}') {
+            if (error.error == '{{ ProductStockError::POSITION }}') {
                 $('#position__errors').append(`<h5>{{ __('product_stocks.form.missing_position_for_product') }} <span class="modal__product">${error.productName}</span>. {{ __('product_stocks.form.go_to_create_position') }} <a href="/admin/products/stocks/${error.product}/positions/create" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
             }
-            if (error.error == '{{ \App\Enums\ProductStockError::QUANTITY }}') {
+            if (error.error == '{{ ProductStockError::QUANTITY }}') {
                 $('#quantity__errors').append(`<h5>{{ __('product_stocks.form.missing_product_quantity') }} <span class="modal__position">${error.position.position_quantity}</span>. {{ __('product_stocks.form.go_to_move_between_positions') }}<a href="/admin/products/stocks/${error.product}/edit?tab=positions" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
             }
-            if (error.error == '{{ \App\Enums\ProductStockError::EXISTS }}') {
+            if (error.error == '{{ ProductStockError::EXISTS }}') {
                 $('#exists__errors').append(`<h5>{{ __('product_stocks.form.for_product') }} <span class="modal__product">${error.productName}</span> {{ __('product_stocks.form.stock_already_performed') }} {{ __('product_stocks.form.go_to_order') }} <a href="/admin/orders/${error.order_id}/edit" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
             }
         })
@@ -1378,9 +1380,17 @@
                                             html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; padding: 5px; margin-top: 5px;margin-left: 5px; background-color:' + color + '" href="https://gls-group.eu/PL/pl/sledzenie-paczek?match=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
                                             html += '</p></a>';
                                             html += '</div>';
+                                        } else if (value.delivery_courier_name === 'DB') {
+                                            html += '<a target="_blank" href="/storage/db_schenker/protocols/protocol' + value.sending_number + '.pdf"><p>LP: ' + value.sending_number + '</p></a>';
+                                            html += '<a target="_blank" href="/storage/db_schenker/stickers/sticker' + value.sending_number + '.pdf"><p>KP: ' + value.sending_number + '</p></a>';
                                         }
+
                                     }
                                     html += `<button class="btn btn-primary" onclick="showPackageCostModal('${value.id}', '${value.chosen_data_template}', '${value.cost_for_client}', '${value.cost_for_company}')">@lang('order_packages.form.buttons.changePackageCost')</button>`;
+                                    html += '</div>';
+                                } else if (value.delivery_courier_name === 'DB' && value.status !== 'NEW') {
+                                    html += '<a target="_blank" href="/storage/db_schenker/protocols/protocol' + value.sending_number + '.pdf"><p>LP: ' + value.sending_number + '</p></a>';
+                                    html += '<a target="_blank" href="/storage/db_schenker/stickers/sticker' + value.sending_number + '.pdf"><p>KP: ' + value.sending_number + '</p></a>';
                                     html += '</div>';
                                 }
                                 if (isProblem) {
@@ -1491,6 +1501,9 @@
                                             html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; padding: 5px; margin-top: 5px;margin-left: 5px; background-color:' + color + '" href="https://gls-group.eu/PL/pl/sledzenie-paczek?match=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
                                             html += '</p></a>';
                                             html += '</div>';
+                                        }  else if (value.delivery_courier_name === 'DB') {
+                                            html += '<a target="_blank" href="/storage/db_schenker/protocols/protocol' + value.sending_number + '.pdf"><p>LP: ' + value.sending_number + '</p></a>';
+                                            html += '<a target="_blank" href="/storage/db_schenker/stickers/sticker' + value.sending_number + '.pdf"><p>KP: ' + value.sending_number + '</p></a>';
                                         }
                                         html += '<div style="display: flex;">'
                                         html += '<button class="btn btn-danger" onclick="cancelPackage(' + value.id + ', ' + value.order_id + ')">Anuluj</button>'
@@ -1708,7 +1721,7 @@
                         data: 'orderId',
                         name: 'actions',
                         orderable: false,
-                        render: function (id,row, data) {
+                        render: function (id, row, data) {
                             let html = '';
                             html += '<button id="moveButton-' + id + '" class="btn btn-sm btn-warning edit" onclick="moveData(' + id + ')">Przenieś</button>';
                             html += '<button id="moveButtonAjax-' + id + '" class="btn btn-sm btn-success btn-move edit hidden" onclick="moveDataAjax(' + id + ')">Przenieś dane tutaj</button>';
@@ -1721,7 +1734,7 @@
                             html += '<i class="voyager-trash"></i>';
                             html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
                             html += '</button>'
-                            html += '<button data-order="'+id+'"';
+                            html += '<button data-order="' + id + '"';
                             html += ' class="btn penalty btn-danger btn-sm edit"><i class="fas fa-minus"></i> Potrącenie</button>';
                             html += '<a href="{{ route('transactions.index') }}?email=' + data.email + '" class="btn edit btn-sm btn-success">Transakcje</a>';
                             @endif
@@ -1858,7 +1871,7 @@
                             if (data) {
                                 html += '<button class="btn btn-default btn-xs" onclick="filterByPhone(' + data + ')">F</button><button class="btn btn-default btn-xs" onclick="clearAndfilterByPhone(' + data + ')">OF</button>';
                             }
-                            html += "<a style='width:100%' target='_blank' href='/admin/orders?nof="+data+"' class='btn btn-success'>NOF</a>";
+                            html += "<a style='width:100%' target='_blank' href='/admin/orders?nof=" + data + "' class='btn btn-success'>NOF</a>";
 
                             html += '<p data-toggle="tooltip" data-html="true" title="' + tooltipTitle + '">' + phone + '</p>';
 
@@ -2554,13 +2567,13 @@
                     $('#quantity__errors').empty();
                     $('#exists__errors').empty();
                     res.forEach((error) => {
-                        if (error.error == '{{ \App\Enums\ProductStockError::POSITION }}') {
+                        if (error.error == '{{ ProductStockError::POSITION }}') {
                             $('#position__errors').append(`<h5>{{ __('product_stocks.form.missing_position_for_product') }} <span class="modal__product">${error.productName}</span>. {{ __('product_stocks.form.go_to_create_position') }} <a href="/admin/products/stocks/${error.product}/positions/create" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
                         }
-                        if (error.error == '{{ \App\Enums\ProductStockError::QUANTITY }}') {
+                        if (error.error == '{{ ProductStockError::QUANTITY }}') {
                             $('#quantity__errors').append(`<h5>{{ __('product_stocks.form.missing_product_quantity') }} <span class="modal__position">${error.position.position_quantity}</span>. {{ __('product_stocks.form.go_to_move_between_positions') }}<a href="/admin/products/stocks/${error.product}/edit?tab=positions" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
                         }
-                        if (error.error == '{{ \App\Enums\ProductStockError::EXISTS }}') {
+                        if (error.error == '{{ ProductStockError::EXISTS }}') {
                             $('#exists__errors').append(`<h5>{{ __('product_stocks.form.for_product') }} <span class="modal__product">${error.productName}</span> {{ __('product_stocks.form.stock_already_performed') }} {{ __('product_stocks.form.go_to_order') }} <a href="/admin/orders/${error.order_id}/edit" target="_blank">{{ __('product_stocks.form.click_here') }}</a>`)
                         }
                     })
@@ -2685,7 +2698,7 @@
                         }));
                     });
                     $('#manual_label_selection_to_add_modal').modal('show');
-                    
+
                     if(labelId == 45) showSelectWarehouseTemplate(modal, orderId);
 
                     modal.find("#labels_to_add_after_removal_modal_ok").off().on('click', function () {

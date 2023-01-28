@@ -36,7 +36,8 @@
         "tcg/voyager": "^1.1",
         "vaibhavpandeyvpz/phemail": "^1.0",
         "viison/address-splitter": "^0.3.4",
-        "yajra/laravel-datatables-oracle": "~8.0"
+        "yajra/laravel-datatables-oracle": "~8.0",
+        "ext-soap": "*"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.2",

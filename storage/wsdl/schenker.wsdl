@@ -1,0 +1,867 @@
+<wsdl:definitions xmlns:xsd1="http://api.schenker.pl/TransportOrders/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:std="http://api.schenker.pl/StandardTypes/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+                  xmlns="http://api.schenker.pl/TransportOrders/" name="TransportOrders"
+                  targetNamespace="http://api.schenker.pl/TransportOrders/">
+    <wsdl:types>
+        <xsd:schema xmlns:xsd1="http://api.schenker.pl/TransportOrders/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:std="http://api.schenker.pl/StandardTypes/"
+                    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+                    xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns="http://api.schenker.pl/TransportOrders/"
+                    targetNamespace="http://api.schenker.pl/TransportOrders/">
+            <xsd:include schemaLocation="https://api2.schenker.pl/services/TransportOrders?xsd=TransportOrders.xsd"/>
+            <xsd:import namespace="http://api.schenker.pl/StandardTypes/"
+                        schemaLocation="https://api2.schenker.pl/services/TransportOrders?xsd=StandardTypes.xsd"/>
+            <xsd:element name="wrongClientId" type="xsd1:WrongClientId"/>
+            <xsd:element name="postalCodeNotFound" type="xsd1:PostalCodeNotFound"/>
+            <xsd:element name="distanceNotDefined" type="xsd1:DistanceNotDefined"/>
+            <xsd:element name="dictionaryNotFound" type="xsd1:DictionaryNotFound"/>
+            <xsd:element name="clientInactive" type="xsd1:ClientInactive"/>
+            <xsd:element name="eTollFactorNotDefined" type="xsd1:ETollFactorNotDefined"/>
+            <xsd:element name="fuelFactorNotDefined" type="xsd1:FuelFactorNotDefined"/>
+            <xsd:element name="clientNotFoundFault" type="xsd1:ClientNotFoundFault"/>
+            <xsd:element name="validationErrors" type="xsd1:ValidationErrors"/>
+            <xsd:element name="orderParamsMissing" type="xsd1:OrderParamsMissing"/>
+            <xsd:element name="orderNumberMissing" type="xsd1:OrderNumberMissing"/>
+            <xsd:element name="referenceMissing" type="xsd1:ReferenceMissing"/>
+            <xsd:element name="orderDataMissing" type="xsd1:OrderDataMissing"/>
+            <xsd:element name="trackingFault" type="xsd1:TrackingFault"/>
+            <xsd:element name="wrongNipNumber" type="xsd1:WrongNipNumber"/>
+            <xsd:element name="transportOrderFaultList" type="xsd1:TransportOrderFaultList"/>
+            <xsd:element name="generateDocumentsError" type="xsd1:GenerateDocumentsError"/>
+            <xsd:element name="documentNotFound" type="xsd1:DocumentNotFound"/>
+            <xsd:element name="serviceTemporaryUnavailableException" type="std:ServiceTemporaryUnavailable"/>
+            <xsd:element name="orderNotFound" type="xsd1:OrderNotFound"/>
+            <xsd:element name="statusNotKnown" type="xsd1:StatusNotKnown"/>
+            <xsd:element name="cancelOrderRequest" type="xsd1:cancelOrderRequest"/>
+            <xsd:element name="cancelOrderResponse" type="xsd1:cancelOrderResponse"/>
+            <xsd:element name="createManifestRequest" type="xsd1:createManifestRequest"/>
+            <xsd:element name="createManifestResponse" type="xsd1:createManifestResponse"/>
+            <xsd:element name="createOrderRequest" type="xsd1:orderRequest"/>
+            <xsd:element name="createOrderResponse" type="xsd1:orderResponse"/>
+            <xsd:element name="forecastOrderRequest" type="xsd1:forecastOrderRequest"/>
+            <xsd:element name="forecastOrderResponse" type="xsd1:forecastOrderResponse"/>
+            <xsd:element name="getAdrDictionaryRequest" type="xsd1:getAdrDictionaryRequest"/>
+            <xsd:element name="getAdrDictionaryResponse" type="xsd1:getAdrDictionaryResponse"/>
+            <xsd:element name="getAvailableServicesRequest" type="xsd1:getAvailableServicesRequest"/>
+            <xsd:element name="getAvailableServicesResponse" type="xsd1:getAvailableServicesResponse"/>
+            <xsd:element name="getDictionaryRequest" type="xsd1:getDictionaryRequest"/>
+            <xsd:element name="getDictionaryResponse" type="xsd1:getDictionaryResponse"/>
+            <xsd:element name="getDistanceRequest" type="xsd1:GetDistanceRequest"/>
+            <xsd:element name="getDistanceResponse" type="xsd1:GetDistanceResponse"/>
+            <xsd:element name="getDocumentsRequest" type="xsd1:GetDocumentsRequest"/>
+            <xsd:element name="getDocumentsResponse" type="xsd1:GetDocumentsResponse"/>
+            <xsd:element name="getXmlDocumentsRequest" type="xsd1:GetXmlDocumentsRequest"/>
+            <xsd:element name="getXmlDocumentsResponse" type="xsd1:GetXmlDocumentsResponse"/>
+            <xsd:element name="getETollFactorRequest" type="xsd1:getETollFactorRequest"/>
+            <xsd:element name="getETollFactorResponse" type="xsd1:getETollFactorResponse"/>
+            <xsd:element name="getFuelFactorRequest" type="xsd1:getFuelFactorRequest"/>
+            <xsd:element name="getFuelFactorResponse" type="xsd1:getFuelFactorResponse"/>
+            <xsd:element name="getMartsRequest" type="xsd1:getMartsRequest"/>
+            <xsd:element name="getMartsResponse" type="xsd1:getMartsResponse"/>
+            <xsd:element name="getOrderStatusRequest" type="xsd1:getOrderStatusRequest"/>
+            <xsd:element name="getOrderStatusResponse" type="xsd1:getOrderStatusResponse"/>
+            <xsd:element name="getPackageDictionaryRequest" type="xsd1:getPackageDictionaryRequest"/>
+            <xsd:element name="getPackageDictionaryResponse" type="xsd1:getPackageDictionaryResponse"/>
+            <xsd:element name="getPalletNoRequest" type="xsd1:getPalletNoRequest"/>
+            <xsd:element name="getPalletNoResponse" type="xsd1:getPalletNoResponse"/>
+            <xsd:element name="getPostCodeInfoRequest" type="xsd1:getPostCodeInfoRequest"/>
+            <xsd:element name="getPostCodeInfoResponse" type="xsd1:getPostCodeInfoResponse"/>
+            <xsd:element name="getTrackingRequest" type="xsd1:getTrackingRequest"/>
+            <xsd:element name="getTrackingResponse" type="xsd1:getTrackingResponse"/>
+            <xsd:element name="modifyTransportOrderRequest" type="xsd1:orderRequest"/>
+            <xsd:element name="modifyTransportOrderResponse" type="xsd1:orderResponse"/>
+            <xsd:element name="schenkerAPIFault" type="std:SchenkerAPIErrors"/>
+            <xsd:element name="schemaValidationError" type="std:SchemaValidationError"/>
+            <xsd:element name="unhandledFaultException" type="std:UnhandledFault"/>
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message name="getPalletNoRequest">
+        <wsdl:part element="getPalletNoRequest" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="statusNotKnown">
+        <wsdl:part element="statusNotKnown" name="error"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="eTollFactorNotDefined">
+        <wsdl:part element="eTollFactorNotDefined" name="error"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAvailableServicesRequest">
+        <wsdl:part element="getAvailableServicesRequest" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getOrderStatusResponse">
+        <wsdl:part element="getOrderStatusResponse" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="orderParamsMissing">
+        <wsdl:part element="orderParamsMissing" name="error"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="schemaValidationError">
+        <wsdl:part element="schemaValidationError" name="error"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="serviceTemporaryUnavailableException">
+        <wsdl:part element="serviceTemporaryUnavailableException" name="error"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="clientNotFoundFault">
+        <wsdl:part element="clientNotFoundFault" name="error"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getPostCodeInfoRequest">
+        <wsdl:part element="getPostCodeInfoRequest" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getXmlDocumentsResponse">
+        <wsdl:part element="getXmlDocumentsResponse" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="referenceMissing">
+        <wsdl:part element="referenceMissing" name="error"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getDocumentsResponse">
+        <wsdl:part element="getDocumentsResponse" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="orderNumberMissing">
+        <wsdl:part element="orderNumberMissing" name="error"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="transportOrderFaultList">
+        <wsdl:part element="transportOrderFaultList" name="error"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getPalletNoResponse">
+        <wsdl:part element="getPalletNoResponse" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getTrackingResponse">
+        <wsdl:part element="getTrackingResponse" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="trackingFault">
+        <wsdl:part element="trackingFault" name="error"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAvailableServicesResponse">
+        <wsdl:part element="getAvailableServicesResponse" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="dictionaryNotFound">
+        <wsdl:part element="dictionaryNotFound" name="error"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAdrDictionaryRequest">
+        <wsdl:part element="getAdrDictionaryRequest" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="validationErrors">
+        <wsdl:part element="validationErrors" name="validationErrors"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getDocumentsRequest">
+        <wsdl:part element="getDocumentsRequest" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getDistanceResponse">
+        <wsdl:part element="getDistanceResponse" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="createManifestRequest">
+        <wsdl:part element="createManifestRequest" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getTrackingRequest">
+        <wsdl:part element="getTrackingRequest" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getAdrDictionaryResponse">
+        <wsdl:part element="getAdrDictionaryResponse" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getETollFactorRequest">
+        <wsdl:part element="getETollFactorRequest" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="documentNotFound">
+        <wsdl:part element="documentNotFound" name="documentNotFound"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="unhandledFaultException">
+        <wsdl:part element="unhandledFaultException" name="unhandledFaultException"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="forecastOrderResponse">
+        <wsdl:part element="forecastOrderResponse" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="schenkerAPIFault">
+        <wsdl:part element="schenkerAPIFault" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="orderNotFound">
+        <wsdl:part element="orderNotFound" name="error"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="forecastOrderRequest">
+        <wsdl:part element="forecastOrderRequest" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="generateDocumentsError">
+        <wsdl:part element="generateDocumentsError" name="generateDocumentsError"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getOrderStatusRequest">
+        <wsdl:part element="getOrderStatusRequest" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getFuelFactorRequest">
+        <wsdl:part element="getFuelFactorRequest" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getMartsResponse">
+        <wsdl:part element="getMartsResponse" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="orderDataMissing">
+        <wsdl:part element="orderDataMissing" name="error"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="createOrderRequest">
+        <wsdl:part element="createOrderRequest" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getDictionaryRequest">
+        <wsdl:part element="getDictionaryRequest" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="createOrderResponse">
+        <wsdl:part element="createOrderResponse" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="wrongNipNumber">
+        <wsdl:part element="wrongNipNumber" name="error"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getPackageDictionaryResponse">
+        <wsdl:part element="getPackageDictionaryResponse" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="postalCodeNotFound">
+        <wsdl:part element="postalCodeNotFound" name="error"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getPostCodeInfoResponse">
+        <wsdl:part element="getPostCodeInfoResponse" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getPackageDictionaryRequest">
+        <wsdl:part element="getPackageDictionaryRequest" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="modifyTransportOrderRequest">
+        <wsdl:part element="modifyTransportOrderRequest" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="wrongClientId">
+        <wsdl:part element="wrongClientId" name="error"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getETollFactorResponse">
+        <wsdl:part element="getETollFactorResponse" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="clientInactive">
+        <wsdl:part element="clientInactive" name="error"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="createManifestResponse">
+        <wsdl:part element="createManifestResponse" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getDictionaryResponse">
+        <wsdl:part element="getDictionaryResponse" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getDistanceRequest">
+        <wsdl:part element="getDistanceRequest" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getMartsRequest">
+        <wsdl:part element="getMartsRequest" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="distanceNotDefined">
+        <wsdl:part element="distanceNotDefined" name="error"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="cancelOrderRequest">
+        <wsdl:part element="cancelOrderRequest" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="fuelFactorNotDefined">
+        <wsdl:part element="fuelFactorNotDefined" name="error"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="modifyTransportOrderResponse">
+        <wsdl:part element="modifyTransportOrderResponse" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="cancelOrderResponse">
+        <wsdl:part element="cancelOrderResponse" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getXmlDocumentsRequest">
+        <wsdl:part element="getXmlDocumentsRequest" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="getFuelFactorResponse">
+        <wsdl:part element="getFuelFactorResponse" name="parameters"></wsdl:part>
+    </wsdl:message>
+    <wsdl:portType name="TransportOrders">
+        <wsdl:operation name="cancelOrder">
+            <wsdl:input message="cancelOrderRequest"></wsdl:input>
+            <wsdl:output message="cancelOrderResponse"></wsdl:output>
+            <wsdl:fault message="schemaValidationError" name="schemaValidationError"></wsdl:fault>
+            <wsdl:fault message="unhandledFaultException" name="unhandledFaultException"></wsdl:fault>
+            <wsdl:fault message="wrongClientId" name="wrongClientId"></wsdl:fault>
+            <wsdl:fault message="orderDataMissing" name="orderDataMissing"></wsdl:fault>
+            <wsdl:fault message="serviceTemporaryUnavailableException"
+                        name="serviceTemporaryUnavailableException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="createManifest">
+            <wsdl:input message="createManifestRequest"></wsdl:input>
+            <wsdl:output message="createManifestResponse"></wsdl:output>
+            <wsdl:fault message="schemaValidationError" name="schemaValidationError"></wsdl:fault>
+            <wsdl:fault message="unhandledFaultException" name="unhandledFaultException"></wsdl:fault>
+            <wsdl:fault message="validationErrors" name="validationErrors"></wsdl:fault>
+            <wsdl:fault message="schenkerAPIFault" name="errors"></wsdl:fault>
+            <wsdl:fault message="serviceTemporaryUnavailableException"
+                        name="serviceTemporaryUnavailableException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="createOrder">
+            <wsdl:input message="createOrderRequest"></wsdl:input>
+            <wsdl:output message="createOrderResponse"></wsdl:output>
+            <wsdl:fault message="transportOrderFaultList" name="transportOrderFaultList"></wsdl:fault>
+            <wsdl:fault message="schemaValidationError" name="schemaValidationError"></wsdl:fault>
+            <wsdl:fault message="unhandledFaultException" name="unhandledFaultException"></wsdl:fault>
+            <wsdl:fault message="serviceTemporaryUnavailableException"
+                        name="serviceTemporaryUnavailableException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="forecastOrder">
+            <wsdl:input message="forecastOrderRequest"></wsdl:input>
+            <wsdl:output message="forecastOrderResponse"></wsdl:output>
+            <wsdl:fault message="transportOrderFaultList" name="transportOrderFaultList"></wsdl:fault>
+            <wsdl:fault message="schemaValidationError" name="schemaValidationError"></wsdl:fault>
+            <wsdl:fault message="unhandledFaultException" name="unhandledFaultException"></wsdl:fault>
+            <wsdl:fault message="serviceTemporaryUnavailableException"
+                        name="serviceTemporaryUnavailableException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getAdrDictionary">
+            <wsdl:input message="getAdrDictionaryRequest"></wsdl:input>
+            <wsdl:output message="getAdrDictionaryResponse"></wsdl:output>
+            <wsdl:fault message="schemaValidationError" name="schemaValidationError"></wsdl:fault>
+            <wsdl:fault message="unhandledFaultException" name="unhandledFaultException"></wsdl:fault>
+            <wsdl:fault message="serviceTemporaryUnavailableException"
+                        name="serviceTemporaryUnavailableException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getAvailableServices">
+            <wsdl:input message="getAvailableServicesRequest"></wsdl:input>
+            <wsdl:output message="getAvailableServicesResponse"></wsdl:output>
+            <wsdl:fault message="schemaValidationError" name="schemaValidationError"></wsdl:fault>
+            <wsdl:fault message="postalCodeNotFound" name="postalCodeNotFound"></wsdl:fault>
+            <wsdl:fault message="unhandledFaultException" name="unhandledFaultException"></wsdl:fault>
+            <wsdl:fault message="serviceTemporaryUnavailableException"
+                        name="serviceTemporaryUnavailableException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getDictionary">
+            <wsdl:input message="getDictionaryRequest"></wsdl:input>
+            <wsdl:output message="getDictionaryResponse"></wsdl:output>
+            <wsdl:fault message="schemaValidationError" name="schemaValidationError"></wsdl:fault>
+            <wsdl:fault message="unhandledFaultException" name="unhandledFaultException"></wsdl:fault>
+            <wsdl:fault message="dictionaryNotFound" name="dictionaryNotFound"></wsdl:fault>
+            <wsdl:fault message="serviceTemporaryUnavailableException"
+                        name="serviceTemporaryUnavailableException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getDistance">
+            <wsdl:input message="getDistanceRequest"></wsdl:input>
+            <wsdl:output message="getDistanceResponse"></wsdl:output>
+            <wsdl:fault message="schemaValidationError" name="schemaValidationError"></wsdl:fault>
+            <wsdl:fault message="postalCodeNotFound" name="postalCodeNotFound"></wsdl:fault>
+            <wsdl:fault message="unhandledFaultException" name="unhandledFaultException"></wsdl:fault>
+            <wsdl:fault message="distanceNotDefined" name="distanceNotDefined"></wsdl:fault>
+            <wsdl:fault message="serviceTemporaryUnavailableException"
+                        name="serviceTemporaryUnavailableException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getDocuments">
+            <wsdl:input message="getDocumentsRequest"></wsdl:input>
+            <wsdl:output message="getDocumentsResponse"></wsdl:output>
+            <wsdl:fault message="schemaValidationError" name="schemaValidationError"></wsdl:fault>
+            <wsdl:fault message="generateDocumentsError" name="generateDocumentsError"></wsdl:fault>
+            <wsdl:fault message="unhandledFaultException" name="unhandledFaultException"></wsdl:fault>
+            <wsdl:fault message="documentNotFound" name="documentNotFound"></wsdl:fault>
+            <wsdl:fault message="serviceTemporaryUnavailableException"
+                        name="serviceTemporaryUnavailableException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getXmlDocuments">
+            <wsdl:input message="getXmlDocumentsRequest"></wsdl:input>
+            <wsdl:output message="getXmlDocumentsResponse"></wsdl:output>
+            <wsdl:fault message="schemaValidationError" name="schemaValidationError"></wsdl:fault>
+            <wsdl:fault message="generateDocumentsError" name="generateDocumentsError"></wsdl:fault>
+            <wsdl:fault message="unhandledFaultException" name="unhandledFaultException"></wsdl:fault>
+            <wsdl:fault message="documentNotFound" name="documentNotFound"></wsdl:fault>
+            <wsdl:fault message="serviceTemporaryUnavailableException"
+                        name="serviceTemporaryUnavailableException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getETollFactor">
+            <wsdl:input message="getETollFactorRequest"></wsdl:input>
+            <wsdl:output message="getETollFactorResponse"></wsdl:output>
+            <wsdl:fault message="clientInactive" name="clientInactive"></wsdl:fault>
+            <wsdl:fault message="eTollFactorNotDefined" name="eTollFactorNotDefined"></wsdl:fault>
+            <wsdl:fault message="schemaValidationError" name="schemaValidationError"></wsdl:fault>
+            <wsdl:fault message="unhandledFaultException" name="unhandledFaultException"></wsdl:fault>
+            <wsdl:fault message="wrongClientId" name="wrongClientId"></wsdl:fault>
+            <wsdl:fault message="serviceTemporaryUnavailableException"
+                        name="serviceTemporaryUnavailableException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getFuelFactor">
+            <wsdl:input message="getFuelFactorRequest"></wsdl:input>
+            <wsdl:output message="getFuelFactorResponse"></wsdl:output>
+            <wsdl:fault message="clientInactive" name="clientInactive"></wsdl:fault>
+            <wsdl:fault message="schemaValidationError" name="schemaValidationError"></wsdl:fault>
+            <wsdl:fault message="fuelFactorNotDefined" name="fuelFactorNotDefined"></wsdl:fault>
+            <wsdl:fault message="unhandledFaultException" name="unhandledFaultException"></wsdl:fault>
+            <wsdl:fault message="wrongClientId" name="wrongClientId"></wsdl:fault>
+            <wsdl:fault message="serviceTemporaryUnavailableException"
+                        name="serviceTemporaryUnavailableException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getMarts">
+            <wsdl:input message="getMartsRequest"></wsdl:input>
+            <wsdl:output message="getMartsResponse"></wsdl:output>
+            <wsdl:fault message="schemaValidationError" name="schemaValidationError"></wsdl:fault>
+            <wsdl:fault message="unhandledFaultException" name="unhandledFaultException"></wsdl:fault>
+            <wsdl:fault message="serviceTemporaryUnavailableException"
+                        name="serviceTemporaryUnavailableException"></wsdl:fault>
+            <wsdl:fault message="clientNotFoundFault" name="clientNotFoundFault"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getOrderStatus">
+            <wsdl:input message="getOrderStatusRequest"></wsdl:input>
+            <wsdl:output message="getOrderStatusResponse"></wsdl:output>
+            <wsdl:fault message="schemaValidationError" name="schemaValidationError"></wsdl:fault>
+            <wsdl:fault message="unhandledFaultException" name="unhandledFaultException"></wsdl:fault>
+            <wsdl:fault message="statusNotKnown" name="statusNotKnown"></wsdl:fault>
+            <wsdl:fault message="orderNotFound" name="orderNotFound"></wsdl:fault>
+            <wsdl:fault message="serviceTemporaryUnavailableException"
+                        name="serviceTemporaryUnavailableException"></wsdl:fault>
+            <wsdl:fault message="clientNotFoundFault" name="clientNotFoundFault"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getPackageDictionary">
+            <wsdl:input message="getPackageDictionaryRequest"></wsdl:input>
+            <wsdl:output message="getPackageDictionaryResponse"></wsdl:output>
+            <wsdl:fault message="schemaValidationError" name="schemaValidationError"></wsdl:fault>
+            <wsdl:fault message="unhandledFaultException" name="unhandledFaultException"></wsdl:fault>
+            <wsdl:fault message="serviceTemporaryUnavailableException"
+                        name="serviceTemporaryUnavailableException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getPalletNo">
+            <wsdl:input message="getPalletNoRequest"></wsdl:input>
+            <wsdl:output message="getPalletNoResponse"></wsdl:output>
+            <wsdl:fault message="schemaValidationError" name="schemaValidationError"></wsdl:fault>
+            <wsdl:fault message="postalCodeNotFound" name="postalCodeNotFound"></wsdl:fault>
+            <wsdl:fault message="unhandledFaultException" name="unhandledFaultException"></wsdl:fault>
+            <wsdl:fault message="wrongNipNumber" name="wrongNipNumber"></wsdl:fault>
+            <wsdl:fault message="serviceTemporaryUnavailableException"
+                        name="serviceTemporaryUnavailableException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getPostCodeInfo">
+            <wsdl:input message="getPostCodeInfoRequest"></wsdl:input>
+            <wsdl:output message="getPostCodeInfoResponse"></wsdl:output>
+            <wsdl:fault message="schemaValidationError" name="schemaValidationError"></wsdl:fault>
+            <wsdl:fault message="postalCodeNotFound" name="postalCodeNotFound"></wsdl:fault>
+            <wsdl:fault message="unhandledFaultException" name="unhandledFaultException"></wsdl:fault>
+            <wsdl:fault message="serviceTemporaryUnavailableException"
+                        name="serviceTemporaryUnavailableException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getTracking">
+            <wsdl:input message="getTrackingRequest"></wsdl:input>
+            <wsdl:output message="getTrackingResponse"></wsdl:output>
+            <wsdl:fault message="schemaValidationError" name="schemaValidationError"></wsdl:fault>
+            <wsdl:fault message="unhandledFaultException" name="unhandledFaultException"></wsdl:fault>
+            <wsdl:fault message="trackingFault" name="trackingFault"></wsdl:fault>
+            <wsdl:fault message="serviceTemporaryUnavailableException"
+                        name="serviceTemporaryUnavailableException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="modifyTransportOrder">
+            <wsdl:input message="modifyTransportOrderRequest"></wsdl:input>
+            <wsdl:output message="modifyTransportOrderResponse"></wsdl:output>
+            <wsdl:fault message="transportOrderFaultList" name="transportOrderFaultList"></wsdl:fault>
+            <wsdl:fault message="schemaValidationError" name="schemaValidationError"></wsdl:fault>
+            <wsdl:fault message="unhandledFaultException" name="unhandledFaultException"></wsdl:fault>
+            <wsdl:fault message="serviceTemporaryUnavailableException"
+                        name="serviceTemporaryUnavailableException"></wsdl:fault>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="TransportOrdersBinding" type="TransportOrders">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="cancelOrder">
+            <soap:operation soapAction="http://api.schenker.pl/TransportOrders/cancelOrder"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="schemaValidationError">
+                <soap:fault name="schemaValidationError" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="unhandledFaultException">
+                <soap:fault name="unhandledFaultException" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="wrongClientId">
+                <soap:fault name="wrongClientId" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="orderDataMissing">
+                <soap:fault name="orderDataMissing" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="serviceTemporaryUnavailableException">
+                <soap:fault name="serviceTemporaryUnavailableException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="createManifest">
+            <soap:operation soapAction="http://api.schenker.pl/TransportOrders/createManifest"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="schemaValidationError">
+                <soap:fault name="schemaValidationError" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="unhandledFaultException">
+                <soap:fault name="unhandledFaultException" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="validationErrors">
+                <soap:fault name="validationErrors" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="serviceTemporaryUnavailableException">
+                <soap:fault name="serviceTemporaryUnavailableException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="createOrder">
+            <soap:operation soapAction="http://api.schenker.pl/TransportOrders/createOrder"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="transportOrderFaultList">
+                <soap:fault name="transportOrderFaultList" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="schemaValidationError">
+                <soap:fault name="schemaValidationError" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="unhandledFaultException">
+                <soap:fault name="unhandledFaultException" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="serviceTemporaryUnavailableException">
+                <soap:fault name="serviceTemporaryUnavailableException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="forecastOrder">
+            <soap:operation soapAction="http://api.schenker.pl/TransportOrders/forecastOrder"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="transportOrderFaultList">
+                <soap:fault name="transportOrderFaultList" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="schemaValidationError">
+                <soap:fault name="schemaValidationError" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="unhandledFaultException">
+                <soap:fault name="unhandledFaultException" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="serviceTemporaryUnavailableException">
+                <soap:fault name="serviceTemporaryUnavailableException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getAdrDictionary">
+            <soap:operation soapAction="http://api.schenker.pl/TransportOrders/getAdrDictionary"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="schemaValidationError">
+                <soap:fault name="schemaValidationError" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="unhandledFaultException">
+                <soap:fault name="unhandledFaultException" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="serviceTemporaryUnavailableException">
+                <soap:fault name="serviceTemporaryUnavailableException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getAvailableServices">
+            <soap:operation soapAction="http://api.schenker.pl/TransportOrders/getAvailableServices"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="schemaValidationError">
+                <soap:fault name="schemaValidationError" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="postalCodeNotFound">
+                <soap:fault name="postalCodeNotFound" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="unhandledFaultException">
+                <soap:fault name="unhandledFaultException" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="serviceTemporaryUnavailableException">
+                <soap:fault name="serviceTemporaryUnavailableException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getDictionary">
+            <soap:operation soapAction="http://api.schenker.pl/TransportOrders/getDictionary"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="schemaValidationError">
+                <soap:fault name="schemaValidationError" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="unhandledFaultException">
+                <soap:fault name="unhandledFaultException" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="serviceTemporaryUnavailableException">
+                <soap:fault name="serviceTemporaryUnavailableException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getDistance">
+            <soap:operation soapAction="http://api.schenker.pl/TransportOrders/getDistance"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="schemaValidationError">
+                <soap:fault name="schemaValidationError" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="unhandledFaultException">
+                <soap:fault name="unhandledFaultException" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="serviceTemporaryUnavailableException">
+                <soap:fault name="serviceTemporaryUnavailableException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getDocuments">
+            <soap:operation soapAction="http://api.schenker.pl/TransportOrders/getDocuments"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="schemaValidationError">
+                <soap:fault name="schemaValidationError" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="unhandledFaultException">
+                <soap:fault name="unhandledFaultException" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="documentNotFound">
+                <soap:fault name="documentNotFound" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="serviceTemporaryUnavailableException">
+                <soap:fault name="serviceTemporaryUnavailableException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getXmlDocuments">
+            <soap:operation soapAction="http://api.schenker.pl/TransportOrders/getDocuments"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="schemaValidationError">
+                <soap:fault name="schemaValidationError" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="unhandledFaultException">
+                <soap:fault name="unhandledFaultException" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="documentNotFound">
+                <soap:fault name="documentNotFound" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="serviceTemporaryUnavailableException">
+                <soap:fault name="serviceTemporaryUnavailableException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getETollFactor">
+            <soap:operation soapAction="http://api.schenker.pl/TransportOrders/getETollFactor"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="clientInactive">
+                <soap:fault name="clientInactive" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="eTollFactorNotDefined">
+                <soap:fault name="eTollFactorNotDefined" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="schemaValidationError">
+                <soap:fault name="schemaValidationError" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="unhandledFaultException">
+                <soap:fault name="unhandledFaultException" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="wrongClientId">
+                <soap:fault name="wrongClientId" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="serviceTemporaryUnavailableException">
+                <soap:fault name="serviceTemporaryUnavailableException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getFuelFactor">
+            <soap:operation soapAction="http://api.schenker.pl/TransportOrders/getFuelFactor"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="clientInactive">
+                <soap:fault name="clientInactive" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="schemaValidationError">
+                <soap:fault name="schemaValidationError" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="fuelFactorNotDefined">
+                <soap:fault name="fuelFactorNotDefined" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="unhandledFaultException">
+                <soap:fault name="unhandledFaultException" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="wrongClientId">
+                <soap:fault name="wrongClientId" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="serviceTemporaryUnavailableException">
+                <soap:fault name="serviceTemporaryUnavailableException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getMarts">
+            <soap:operation soapAction="http://api.schenker.pl/TransportOrders/getMarts"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="schemaValidationError">
+                <soap:fault name="schemaValidationError" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="unhandledFaultException">
+                <soap:fault name="unhandledFaultException" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="serviceTemporaryUnavailableException">
+                <soap:fault name="serviceTemporaryUnavailableException" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="clientNotFoundFault">
+                <soap:fault name="clientNotFoundFault" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getOrderStatus">
+            <soap:operation soapAction="http://api.schenker.pl/TransportOrders/getOrderStatus"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="schemaValidationError">
+                <soap:fault name="schemaValidationError" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="unhandledFaultException">
+                <soap:fault name="unhandledFaultException" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="statusNotKnown">
+                <soap:fault name="statusNotKnown" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="orderNotFound">
+                <soap:fault name="orderNotFound" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="serviceTemporaryUnavailableException">
+                <soap:fault name="serviceTemporaryUnavailableException" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="clientNotFoundFault">
+                <soap:fault name="clientNotFoundFault" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getPackageDictionary">
+            <soap:operation soapAction="http://api.schenker.pl/TransportOrders/getPackageDictionary"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="schemaValidationError">
+                <soap:fault name="schemaValidationError" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="unhandledFaultException">
+                <soap:fault name="unhandledFaultException" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="serviceTemporaryUnavailableException">
+                <soap:fault name="serviceTemporaryUnavailableException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getPalletNo">
+            <soap:operation soapAction="http://api.schenker.pl/TransportOrders/getPalletNo"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="schemaValidationError">
+                <soap:fault name="schemaValidationError" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="postalCodeNotFound">
+                <soap:fault name="postalCodeNotFound" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="unhandledFaultException">
+                <soap:fault name="unhandledFaultException" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="wrongNipNumber">
+                <soap:fault name="wrongNipNumber" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="serviceTemporaryUnavailableException">
+                <soap:fault name="serviceTemporaryUnavailableException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getPostCodeInfo">
+            <soap:operation soapAction="http://api.schenker.pl/TransportOrders/getPostCodeInfo"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="schemaValidationError">
+                <soap:fault name="schemaValidationError" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="postalCodeNotFound">
+                <soap:fault name="postalCodeNotFound" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="unhandledFaultException">
+                <soap:fault name="unhandledFaultException" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="serviceTemporaryUnavailableException">
+                <soap:fault name="serviceTemporaryUnavailableException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getTracking">
+            <soap:operation soapAction="http://api.schenker.pl/TransportOrders/getTracking"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="schemaValidationError">
+                <soap:fault name="schemaValidationError" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="unhandledFaultException">
+                <soap:fault name="unhandledFaultException" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="trackingFault">
+                <soap:fault name="trackingFault" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="serviceTemporaryUnavailableException">
+                <soap:fault name="serviceTemporaryUnavailableException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="modifyTransportOrder">
+            <soap:operation soapAction="http://api.schenker.pl/TransportOrders/modifyTransportOrder"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+            <wsdl:fault name="transportOrderFaultList">
+                <soap:fault name="transportOrderFaultList" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="schemaValidationError">
+                <soap:fault name="schemaValidationError" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="unhandledFaultException">
+                <soap:fault name="unhandledFaultException" use="literal"/>
+            </wsdl:fault>
+            <wsdl:fault name="serviceTemporaryUnavailableException">
+                <soap:fault name="serviceTemporaryUnavailableException" use="literal"/>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="TransportOrdersService">
+        <wsdl:port binding="TransportOrdersBinding" name="TransportOrdersPort">
+            <soap:address location="https://api2.schenker.pl/services/TransportOrders"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

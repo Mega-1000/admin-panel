@@ -2,9 +2,9 @@
 
 namespace App\Console;
 
+use App\Jobs;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use App\Jobs;
 
 class Kernel extends ConsoleKernel
 {
@@ -20,7 +20,7 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      *
-     * @param \Illuminate\Console\Scheduling\Schedule $schedule
+     * @param Schedule $schedule
      *
      * @return void
      */
@@ -74,6 +74,8 @@ class Kernel extends ConsoleKernel
 
         $schedule->job(Jobs\AllegroCustomerReturnsJob::class)->everyFiveMinutes();
         $schedule->job(Jobs\PreferredInvoiceDateFillJob::class)->monthlyOn();
+
+        $schedule->command('schenker:pull_package_dictionary')->daily();
     }
 
     /**

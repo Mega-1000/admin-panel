@@ -3,8 +3,8 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Collection;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
@@ -47,7 +47,15 @@ class OrderPackage extends Model implements Transformable
         'actions',
         'waiting_for_cancelled',
         'reject_cancelled',
+        'protection_method',
+        'services',
     ];
+
+    protected $dates = [
+        'shipment_date',
+        'delivery_date',
+    ];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -79,10 +87,12 @@ class OrderPackage extends Model implements Transformable
         'content',
         'send_protocol',
         'symbol',
+        'protection_method',
+        'services',
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function order()
     {
@@ -99,7 +109,8 @@ class OrderPackage extends Model implements Transformable
         return $this->belongsToMany('App\Entities\Product')->withPivot('quantity');
     }
 
-    public function shipmentGroup(){
+    public function shipmentGroup()
+    {
         return $this->belongsTo(ShipmentGroup::class);
     }
 

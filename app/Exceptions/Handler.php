@@ -4,9 +4,14 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use League\OAuth2\Server\Exception\OAuthServerException;
 
 class Handler extends ExceptionHandler
 {
+    const ERROR_ACCESS_DENIED = 9;
     /**
      * A list of the exception types that are not reported.
      *
@@ -15,7 +20,6 @@ class Handler extends ExceptionHandler
     protected $dontReport = [
         //
     ];
-
     /**
      * A list of the inputs that are never flashed for validation exceptions.
      *
@@ -26,17 +30,15 @@ class Handler extends ExceptionHandler
         'password_confirmation',
     ];
 
-    const ERROR_ACCESS_DENIED = 9;
-
     /**
      * Report or log an exception.
      *
-     * @param  \Exception  $exception
+     * @param Exception $exception
      * @return void
      */
     public function report(Exception $exception)
     {
-        if ($exception instanceof \League\OAuth2\Server\Exception\OAuthServerException && $exception->getCode() == self::ERROR_ACCESS_DENIED) {
+        if ($exception instanceof OAuthServerException && $exception->getCode() == self::ERROR_ACCESS_DENIED) {
             return;
         }
         parent::report($exception);
@@ -45,12 +47,23 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception into an HTTP response.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $exception
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @param Exception $exception
+     * @return Response|JsonResponse
      */
     public function render($request, Exception $exception)
     {
+        if ($exception instanceof SoapException && $exception->errorToReturn !== '') {
+            return response()->json([
+                'status' => 422,
+                'message' => ['status' => 422,
+                    'message' => [
+                        $exception->errorToReturn,
+                    ],
+                ],
+            ]);
+        }
+
         return parent::render($request, $exception);
     }
 }

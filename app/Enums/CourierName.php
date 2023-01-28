@@ -17,13 +17,14 @@ final class CourierName extends Enum
     const GLS = 'GLS';
     const ODBIOR_OSOBISTY = 'ODBIOR_OSOBISTY';
     const GIELDA = 'GIELDA';
+    const DB_SCHENKER = 'DB';
 
     /**
      * Delivery types labels
      */
     const DELIVERY_TYPE_LABELS = [
         self::INPOST => 'Paczkomat',
-        self::ALLEGRO_INPOST => 'Paczkomat',
+        self::ALLEGRO_INPOST => 'Paczkomat(A)',
         self::DPD => 'Dpd',
         self::APACZKA => 'Apaczka',
         self::POCZTEX => 'Pocztex',
@@ -31,6 +32,7 @@ final class CourierName extends Enum
         self::GLS => 'Gls',
         self::ODBIOR_OSOBISTY => 'Odbiór osobisty',
         self::GIELDA => 'Giełda',
+        self::DB_SCHENKER => 'DB Schenker',
     ];
 
     /**
@@ -43,6 +45,18 @@ final class CourierName extends Enum
         self::INPOST => [self::INPOST, self::ALLEGRO_INPOST],
         self::ODBIOR_OSOBISTY => [self::ODBIOR_OSOBISTY],
         self::GIELDA => [self::GIELDA],
+        self::DB_SCHENKER => [self::DB_SCHENKER],
+    ];
+
+    const DELIVERY_TYPE_TO_SEND_PACKAGE = [
+        self::INPOST,
+        self::APACZKA,
+        self::DPD,
+        self::POCZTEX,
+        self::JAS,
+        self::ALLEGRO_INPOST,
+        self::GLS,
+        self::DB_SCHENKER,
     ];
 
     /**
@@ -56,6 +70,7 @@ final class CourierName extends Enum
         self::JAS => 'Jas',
         self::GLS => 'Gls',
         self::GIELDA => 'Giełda',
+        self::DB_SCHENKER => 'DB Schenker',
         'all' => 'Wszystkie',
     ];
 }

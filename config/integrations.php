@@ -12,7 +12,7 @@ return [
     'inpost' => [
         'url' => env('INPOST_URL'),
         'authorization' => env('INPOST_AUTHORIZATION_KEY'),
-        'tracking_url' => env('INPOST_URL').'/v1/organizations/'.env('INPOST_ORG_ID').'/shipments?tracking_number=',
+        'tracking_url' => env('INPOST_URL') . '/v1/organizations/' . env('INPOST_ORG_ID') . '/shipments?tracking_number=',
         'org_id' => env('INPOST_ORG_ID'),
     ],
     'dpd' => [
@@ -45,4 +45,11 @@ return [
     'gls' => [
         'tracking_url' => 'https://gls-group.eu/app/service/open/rest/PL/pl/rstt001?match=',
     ],
+
+    'schenker' => [
+        'client_id' => env('SCHENKER_CLIENT_ID', '2779439'),
+        'user_name' => env('SCHENKER_USER_NAME', 'EPH_PROD'),
+        'user_password' => env('SCHENKER_USER_PASSWORD', '7WHBLagc3P'),
+        'default_date_time_format' => env('SCHENKER_DATES_FORMAT', 'Y-m-dTH:i:s'),
+    ]
 ];

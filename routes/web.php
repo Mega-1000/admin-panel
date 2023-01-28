@@ -393,7 +393,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::delete('orderPackages/{id}/', [
             'uses' => 'OrdersPackagesController@destroy',
         ])->name('order_packages.destroy');
-        Route::get('orderPackages/{id}/sendRequestForCancelled',
+        Route::get('orderPackages/{orderPackage}/sendRequestForCancelled',
             'OrdersPackagesController@sendRequestForCancelled')->name('order_packages.sendRequestForCancelled');
         Route::post('orderPackages/protocols',
             'OrdersPackagesController@getProtocols')->name('order_packages.getProtocols');

@@ -2,9 +2,15 @@
 
 namespace App\Jobs;
 
-use App\Entities\ConfirmPackages;
+use App\DTO\Schenker\Request\GetOrderDocumentRequestDTO;
+use App\DTO\Schenker\Response\CreateOrderResponseDTO;
 use App\Entities\OrderPackage;
+use App\Enums\CourierName;
 use App\Enums\PackageStatus;
+use App\Exceptions\SoapException;
+use App\Exceptions\SoapParamsException;
+use App\Factory\Schenker\OrderRequestFactory;
+use App\Helpers\Helper;
 use App\Integrations\Apaczka\ApaczkaGuzzleClient;
 use App\Integrations\Apaczka\ApaczkaOrder;
 use App\Integrations\DPD\DPDService;
@@ -15,15 +21,23 @@ use App\Integrations\Pocztex\addShipment;
 use App\Integrations\Pocztex\adresType;
 use App\Integrations\Pocztex\clearEnvelope;
 use App\Integrations\Pocztex\ElektronicznyNadawca;
+use App\Integrations\Pocztex\getAddresLabelCompact;
 use App\Integrations\Pocztex\sendEnvelope;
 use App\Mail\SendLPToTheWarehouseAfterOrderCourierMail;
 use App\Repositories\OrderPackageRepository;
+use App\Services\SchenkerService;
 use Carbon\Carbon;
+use DOMDocument;
+use Illuminate\Config\Repository;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
+use Log;
+use Mailer;
 use Mockery\Exception;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
+use Smalot\PdfParser\Parser;
+use SoapVar;
 
 /**
  * Class OrdersCourierJobs
@@ -54,7 +68,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
     protected $data;
 
     /**
-     * @var \Illuminate\Config\Repository|mixed
+     * @var Repository|mixed
      */
     protected $config;
 
@@ -80,13 +94,13 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         $this->courierName = $this->data['courier_name'];
     }
 
-    public static function generateValidXmlFromObj($obj, $node_block = 'nodes', $node_name = 'node')
+    public static function generateValidXmlFromObj($obj, $node_block = 'nodes', $node_name = 'node'): string
     {
         $arr = get_object_vars($obj);
         return self::generateValidXmlFromArray($arr, $node_block, $node_name);
     }
 
-    public static function generateValidXmlFromArray($array, $node_block = 'nodes', $node_name = 'node')
+    public static function generateValidXmlFromArray($array, $node_block = 'nodes', $node_name = 'node'): string
     {
         $xml = '<?xml version="1.0" encoding="UTF-8" ?>';
 
@@ -97,7 +111,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         return $xml;
     }
 
-    private static function generateXmlFromArray($array, $node_name)
+    private static function generateXmlFromArray($array, $node_name): string
     {
         $xml = '';
 
@@ -128,29 +142,32 @@ class OrdersCourierJobs extends Job implements ShouldQueue
             $this->data['delivery_address']['email'] = $this->orderPackageRepository->order->customer->login;
         }
         switch ($this->courierName) {
-            case 'DPD':
+            case CourierName::DPD:
                 $result = $this->createPackageForDpd();
                 break;
-            case 'INPOST':
+            case CourierName::INPOST:
                 $result = $this->createPackageForInpost();
                 break;
-            case 'ALLEGRO-INPOST':
+            case CourierName::ALLEGRO_INPOST:
                 $result = $this->createPackageForInpost(1);
                 break;
-            case 'APACZKA':
+            case CourierName::APACZKA:
                 $result = $this->createPackageForApaczka();
                 break;
-            case 'POCZTEX':
+            case CourierName::POCZTEX:
                 $result = $this->createPackageForPocztex();
                 break;
-            case 'JAS':
+            case CourierName::JAS:
                 $result = $this->createPackageForJas();
                 break;
-            case 'GLS':
+            case CourierName::GLS:
                 $result = $this->createPackageForGLS();
                 break;
+            case CourierName::DB_SCHENKER:
+                $result = $this->createPackageForDB();
+                break;
             default:
-                \Log::notice(
+                Log::notice(
                     'Wrong courier',
                     ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
                 );
@@ -181,12 +198,12 @@ class OrdersCourierJobs extends Job implements ShouldQueue
 
             if (!empty($path)) {
                 try {
-                    \Mailer::create()
+                    Mailer::create()
                         ->to($package->order->warehouse->firm->email)
                         ->send(new SendLPToTheWarehouseAfterOrderCourierMail("List przewozowy przesyłki nr: " . $package->order->id . '/' . $package->number,
                             $path, $package->order->id . '/' . $package->number));
                 } catch (\Exception $e) {
-                    \Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);
+                    Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);
                 }
             }
         }
@@ -250,7 +267,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
 
             if ($result->success == false) {
                 Session::put('message', $result);
-                \Log::info(
+                Log::info(
                     'Problem with send package in DPD',
                     [
                         'courier' => $this->courierName,
@@ -295,7 +312,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                 'email' => $this->data['pickup_address']['email'],
             ];
 
-            if($this->data['warehouse'] != 'MEGA-OLAWA') {
+            if ($this->data['warehouse'] != 'MEGA-OLAWA') {
                 $response = $dpd->pickupRequest([$protocol->documentId], $pickupDate, $pickupTimeFrom, $pickupTimeTo, $contactInfo, $pickupAddress, $parcels, $receiver);
 
                 return [
@@ -314,7 +331,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
             ];
 
         } catch (Exception $exception) {
-            \Log::info(
+            Log::info(
                 'Problem in DPD integration',
                 ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
             );
@@ -338,7 +355,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
             return $this->callInpostForPackage($integration);
         } catch (Exception $exception) {
             Session::put('message', $exception->getMessage());
-            \Log::info(
+            Log::info(
                 'Problem in INPOST integration',
                 ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
             );
@@ -353,7 +370,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         $simplePackage = $integration->createSimplePackage($json);
         if ($simplePackage->status == '400') {
             Session::put('message', $simplePackage);
-            \Log::info(
+            Log::info(
                 'Problem in INPOST integration with validation', ['courier' => $simplePackage, 'class' => get_class($this), 'line' => __LINE__]
             );
             return;
@@ -446,7 +463,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                     $carrierID = ApaczkaGuzzleClient::POCZTEX_EXPRESS_24;
                     break;
                 default:
-                    \Log::notice(
+                    Log::notice(
                         'Wrong courier', ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
                     );
                     return ['status' => '500', 'error_code' => self::ERRORS['INVALID_FORWARDING_DELIVERY']];
@@ -498,7 +515,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
             if ($result->status !== 400 && $result->response->order) {
                 $orderId = $result->response->order->id;
             } else {
-                \Log::notice($result->message, ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]);
+                Log::notice($result->message, ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]);
                 return ['status' => '500', 'error_code' => self::ERRORS['PROBLEM_IN_PLACE_ORDER']];
             }
             $waybilljson = $apaczka->getWaybillDocument($orderId)->getBody();
@@ -506,7 +523,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
             if ($waybill->status == 200) {
                 Storage::disk('local')->put('public/apaczka/stickers/sticker' . $orderId . '.pdf', base64_decode($waybill->response->waybill));
             } else {
-                \Log::notice(
+                Log::notice(
                     $waybill->message, ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
                 );
                 return ['status' => '500', 'error_code' => self::ERRORS['PROBLEM_WITH_DOWNLOAD_WAYBILL']];
@@ -522,7 +539,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                 'letter_number' => $result->response->order->waybill_number
             ];
         } catch (Exception $exception) {
-            \Log::info('Problem in Apaczka integration', ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]);
+            Log::info('Problem in Apaczka integration', ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]);
             return ['status' => '500', 'error_code' => self::ERRORS['PROBLEM_WITH_APACZKA_INTEGRATION']];
         }
     }
@@ -557,7 +574,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         }
         $xml .= '/>';
         $xml .= '</przesylki>';
-        $soapXML = new \SoapVar($xml, XSD_STRING);
+        $soapXML = new SoapVar($xml, XSD_STRING);
         //   $integration->__call('addShipment', $soapXML);
         //     Log::debug($integration->__getLastRequest());
 
@@ -578,7 +595,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         $tag['guid'] = $this->getGuid();
         $tag['_'] = '';
 
-        $dom = new \DOMDocument("1.0", "utf-8");
+        $dom = new DOMDocument("1.0", "utf-8");
         $dom->preserveWhiteSpace = false;
         $dom->formatOutput = true;
         $param = $dom->createElement('przesylki');
@@ -733,19 +750,19 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         $param->appendChild($paletaElement);
         $param->appendChild($platnik);
         $dom->appendChild($param);
-        $shipment->przesylki[] = new \SoapVar($dom->saveXML($dom->documentElement), XSD_ANYXML);
+        $shipment->przesylki[] = new SoapVar($dom->saveXML($dom->documentElement), XSD_ANYXML);
         $sendingNumber = $integration->addShipment($shipment);
 
         $eSender = new ElektronicznyNadawca();
         $send = new sendEnvelope();
         $idSend = $eSender->sendEnvelope($send);
-        $param = new \App\Integrations\Pocztex\getAddresLabelCompact();
+        $param = new getAddresLabelCompact();
         $param->idEnvelope = $idSend->idEnvelope;
         $retval = $eSender->getAddresLabelCompact($param);
         if ($idSend->idEnvelope !== false) {
             Storage::disk('local')->put('public/pocztex/protocols/protocol' . $idSend->idEnvelope . '.pdf',
                 $retval->pdfContent);
-            $parser = new \Smalot\PdfParser\Parser();
+            $parser = new Parser();
             $pdf = $parser->parseFile(storage_path() . '/app/public/pocztex/protocols/protocol' . $idSend->idEnvelope . '.pdf');
             $text = $pdf->getText();
             preg_match('/(?:(?<!\d)\d{20}(?!\d))/', $text, $matches);
@@ -753,7 +770,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         } else {
             Session::put('message', $idSend);
             Session::put('message', $retval);
-            \Log::info(
+            Log::info(
                 'Problem in Pocztex integration',
                 ['courier' => $this->courierName, 'class' => get_class($this), 'line' => __LINE__]
             );
@@ -807,14 +824,14 @@ class OrdersCourierJobs extends Job implements ShouldQueue
     {
         $pack = OrderPackage::find($this->data['additional_data']['order_package_id']);
         if (empty($pack)) {
-            \Log::error('Nie istnieje paczka GLS o id: ' . $this->data['additional_data']['order_package_id']);
+            Log::error('Nie istnieje paczka GLS o id: ' . $this->data['additional_data']['order_package_id']);
         }
         $client = new GLSClient();
         $client->auth();
         list('error' => $isError, 'content' => $id) = $client->createNewPackage($pack);
 
         if ($isError) {
-            \App\Helpers\Helper::sendEmail(
+            Helper::sendEmail(
                 auth()->user()->email,
                 'send-log',
                 'Błąd zamiawiania paczki ' . env('APP_NAME'),
@@ -828,5 +845,55 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         $client->logout();
 
         return ['sending_number' => $id, 'letter_number' => ''];
+    }
+
+    /**
+     * @throws SoapParamsException
+     * @throws SoapException
+     */
+    private function createPackageForDB(): array
+    {
+        $orderPackage = OrderPackage::find($this->data['additional_data']['order_package_id']);
+        $orderRequestFactory = new OrderRequestFactory($orderPackage);
+        $orderRequestDTO = $orderRequestFactory();
+
+        $createOrderResponseDTO = SchenkerService::createNewOrder($orderRequestDTO);
+
+        if ($createOrderResponseDTO->getStatusCode() !== CreateOrderResponseDTO::STATUS_CODE_OK) {
+            Helper::sendEmail(
+                auth()->user()->email,
+                'send-log',
+                'Błąd zamiawiania paczki ' . env('APP_NAME'),
+                [
+                    'date' => now(),
+                    'logMessage' => $createOrderResponseDTO->getOrderId()
+                ]
+            );
+            return ['is_error' => true];
+        }
+
+        $getLabelResponseDTO = SchenkerService::getDocument(new GetOrderDocumentRequestDTO(
+            config('integrations.schenker.client_id'),
+            $createOrderResponseDTO->getOrderId(),
+            GetOrderDocumentRequestDTO::DEFAULT_REFERENCE_TYPE,
+            GetOrderDocumentRequestDTO::RETURN_TYPE_LABEL
+        ));
+
+        if ($getLabelResponseDTO->getBase64DocumentContent() !== '') {
+            Storage::disk('local')->put('public/db_schenker/stickers/sticker' . $createOrderResponseDTO->getOrderId() . '.pdf', $getLabelResponseDTO->getBase64DocumentContent());
+        }
+
+        $getWaybillResponseDTO = SchenkerService::getDocument(new GetOrderDocumentRequestDTO(
+            config('integrations.schenker.client_id'),
+            $createOrderResponseDTO->getOrderId(),
+            GetOrderDocumentRequestDTO::DEFAULT_REFERENCE_TYPE,
+            GetOrderDocumentRequestDTO::RETURN_TYPE_LP
+        ));
+
+        if ($getWaybillResponseDTO->getBase64DocumentContent() !== '') {
+            Storage::disk('local')->put('public/db_schenker/protocols/protocol' . $createOrderResponseDTO->getOrderId() . '.pdf', $getWaybillResponseDTO->getBase64DocumentContent());
+        }
+
+        return ['sending_number' => $createOrderResponseDTO->getOrderId(), 'letter_number' => ''];
     }
 }

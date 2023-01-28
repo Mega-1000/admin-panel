@@ -11,6 +11,7 @@ use App\Entities\Order;
 use App\Entities\OrderAddress;
 use App\Entities\OrderDates;
 use App\Entities\WorkingEvents;
+use App\Enums\PackageStatus;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\ChatHelper;
 use App\Helpers\GetCustomerForAdminEdit;
@@ -27,7 +28,6 @@ use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
 use App\Http\Requests\Api\Orders\StoreOrderRequest;
 use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
 use App\Jobs\AddLabelJob;
-use App\Jobs\OrderProformSendMailJob;
 use App\Mail\SendOfferToCustomerMail;
 use App\Repositories\CustomerAddressRepository;
 use App\Repositories\CustomerRepository;
@@ -40,6 +40,7 @@ use App\Repositories\OrderRepository;
 use App\Repositories\ProductPackingRepository;
 use App\Repositories\ProductPriceRepository;
 use App\Repositories\ProductRepository;
+use App\Services\OrderPackageService;
 use App\Services\ProductService;
 use Carbon\Carbon;
 use Exception;
@@ -135,6 +136,7 @@ class OrdersController extends Controller
      * @param OrderPackageRepository $orderPackageRepository
      * @param ProductService $productService
      * @param ProductPackingRepository $productPackingRepository
+     * @param OrderPackageRepository $orderPackageRepository
      */
     public function __construct(
         OrderRepository                  $orderRepository,
@@ -510,10 +512,10 @@ class OrdersController extends Controller
             }
 
             if ($request->cancelled == 'true') {
-                $orderPackage->status = 'CANCELLED';
-                $message = 'Przyjęto anulację paczki.';
+                $response = OrderPackageService::setPackageAsCancelled($orderPackage);
+                $message = $response === OrderPackageService::RESPONSE_OK ? 'Przyjęto anulację paczki.' : 'Anulowanie paczki nie powiodła się. Proszę spróbować ponownie za chwilę.';
             } else {
-                $orderPackage->status = 'REJECT_CANCELLED';
+                $orderPackage->status = PackageStatus::REJECT_CANCELLED;
                 $message = 'Odrzucono anulację paczki.';
             }
 
@@ -950,22 +952,24 @@ class OrdersController extends Controller
         return response()->json('Oferta została wysłana', 200, [], JSON_UNESCAPED_UNICODE);
     }
 
-    public function getLatestDeliveryInfo(Order $order) {
+    public function getLatestDeliveryInfo(Order $order)
+    {
         $deliveryInfos = $order->customer->orders()->get();
         foreach ($deliveryInfos as $deliveryInfo) {
             $deliveryInfo->adress = $deliveryInfo->getDeliveryAddress();
         }
-        
+
         return response()->json($deliveryInfos, 200, [], JSON_UNESCAPED_UNICODE);
     }
 
-    public function getLatestInvoiceInfo(Order $order) {
+    public function getLatestInvoiceInfo(Order $order)
+    {
         $invoiceInfos = $order->customer->orders()->get();
         foreach ($invoiceInfos as $invoiceInfo) {
             $invoiceInfo->adress = $invoiceInfo->getInvoiceAddress();
         }
-        
+
         return response()->json($invoiceInfos, 200, [], JSON_UNESCAPED_UNICODE);
-        
+
     }
 }
