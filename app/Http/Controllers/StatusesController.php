@@ -133,7 +133,8 @@ class StatusesController extends Controller
             'name' => $request->input('name'),
             'color' => '#' . $request->input('color'),
             'status' => $request->input('status'),
-            'message' => $request->input('message')
+            'message' => $request->input('message'),
+            'generate_order_offer' => $request->input('generate_order_offer'),
         ], $id);
 
         $status->labelsToAddOnChange()->sync($request->input('labels_to_add'));

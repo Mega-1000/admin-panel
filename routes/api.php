@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->group(function() {
     Route::get('/user', 'Api\CustomersController@getDetails')->name('api.customers.getdetails');
     Route::get('orders/getAll', 'Api\OrdersController@getAll')->name('api.orders.getall');
+    Route::post('orders/uploadProofOfPayment', 'Api\OrdersController@uploadProofOfPayment')->name('api.orders.proof-of-payment');
     Route::post('orders/update-order-address/{orderId}', 'Api\OrdersController@updateOrderAddressEndpoint')->name('api.orders.update-order-addresses');
     Route::get('orders/get-payments-for-order/{token}', 'Api\OrdersController@getPaymentDetailsForOrder')->name('api.orders.getPayments');
     Route::get('chat/getHistory', 'Api\MessagesController@getHistory')->name('api.messages.get-history');
@@ -49,6 +50,8 @@ Route::post('orders/{orderId}/update-order-delivery-and-invoice-addresses', 'Api
 Route::post('orders/{orderId}/decline-proform', 'Api\OrdersController@declineProform')->name('api.orders.decline-proform');
 Route::post('orders/{orderId}/accept-delivery-invoice-data', 'Api\OrdersController@acceptDeliveryInvoiceData')->name('api.orders.accept-delivery-invoice-data');
 Route::post('orders/{orderId}/accept-receiving', 'Api\OrdersController@acceptReceivingOrder')->name('api.orders.accept-receiving');
+Route::get('orders/{order}/latests-orders-delivery-info', 'Api\OrdersController@getLatestDeliveryInfo')->name('api.orders.get-latest-delivery-info');
+Route::get('orders/{order}/latests-orders-invoice-info', 'Api\OrdersController@getLatestInvoiceInfo')->name('api.orders.get-latest-invoice-info');
 
 Route::get('orders/getByToken/{token}', 'Api\OrdersController@getByToken');
 
@@ -117,3 +120,5 @@ Route::get('/faqs/{id}', 'Api\FaqController@show')->name('api.faq.show');
 Route::put('/faqs/{id}', 'Api\FaqController@update')->name('api.faq.update');
 Route::delete('/faqs/{id}', 'Api\FaqController@destroy')->name('api.faq.destroy');
 Route::post('/faqs/ask', 'Api\FaqController@askQuestion')->name('api.faq.ask');
+
+Route::get('/orders/{id}/sendOfferToCustomer', 'Api\OrdersController@sendOfferToCustomer')->name('api.orders.sendOfferToCustomer');

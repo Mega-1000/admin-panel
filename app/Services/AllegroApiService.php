@@ -88,7 +88,8 @@ class AllegroApiService
 					'Content-type' => 'application/x-www-form-urlencoded'
 				],
 				'form_params' => [
-					'code' => $authorization_code
+					'code' => $authorization_code,
+					'redirect_uri' => url()->current(),
 				]
 			]);
 		} catch (\Exception $e) {
@@ -130,28 +131,39 @@ class AllegroApiService
 		$this->authModel->save();
 	}
 
-	protected function request(string $method, string $url, array $params, $attachment = null, $first = true)
+	protected function request(string $method, string $url, array $params, array $attachment = null, bool $first = true)
 	{
 		if (!$this->getAccessToken()) {
 			Log::error('AllegroApiService: acces token not found');
 			return false;
 		}
 
-		$headers = [
-			// 'Accept' => 'application/vnd.allegro.public.v1+json',
-			'Authorization' => "Bearer " . $this->getAccessToken(),
-			'Content-Type' => 'application/vnd.allegro.public.v1+json'
-		];
-
 		try {
-			$data =
-				[
+			$headers = [
+				'Authorization' => "Bearer " . $this->getAccessToken(),
+				'Content-Type' => 'application/vnd.allegro.public.v1+json',
+			];
+			$data = [
+				'headers' => $headers,
+				'json' => $params
+			];
+
+			// save to link for files
+			if($attachment !== null) {
+
+				$headers['Accept'] = 'application/vnd.allegro.public.v1+json';
+				$headers['Content-Type'] = $attachment['mimeType'];
+				
+				$data = [
 					'headers' => $headers,
-					'json' => $params
+					'body' => $attachment['contents'],
 				];
-			if($attachment){
-				$data['multipart'] = [$attachment];
 			}
+
+			if( isset($params['sink']) ) {
+				$data['sink'] = $params['sink'];
+			}
+
 			$response = $this->client->request(
 				$method,
 				$url,
@@ -170,14 +182,15 @@ class AllegroApiService
 				return $this->cantGetAlert();
 			}
 		}
-
-		if ($response->getStatusCode() != 200) {
+		if ($response->getStatusCode() != 200 && $response->getStatusCode() != 201) {
 		    if ($response->getStatusCode() != 204) {
                 return $this->cantGetAlert();
             }
 		    return true;
 		}
-
+		if( isset($params['sink']) ) {
+			return $response;
+		}
 		return json_decode((string)$response->getBody(), true);
 	}
 

@@ -118,7 +118,7 @@ class OrderWarehouseNotificationController extends Controller
 
             $file = $request->file('file');
             $filename = $file->getClientOriginalName();
-
+            
             Storage::disk('local')->put('public/invoices/' . $filename, file_get_contents($file));
             $invoice = $order->invoices()->create([
                 'invoice_type' => 'buy',
@@ -142,7 +142,6 @@ class OrderWarehouseNotificationController extends Controller
             die();
         }
     }
-
     public function changeStatus(Request $request)
     {
         try {

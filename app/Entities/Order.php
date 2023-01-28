@@ -11,10 +11,11 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
@@ -152,7 +153,7 @@ class Order extends Model implements Transformable
 
     /**
      * @param Authenticatable|null $user
-     * @param String               $message
+     * @param String $message
      *
      * @return string
      */
@@ -202,11 +203,6 @@ class Order extends Model implements Transformable
         return $this->hasMany(OrderPackage::class);
     }
 
-    public function dispute(): HasOne
-    {
-        return $this->hasOne(AllegroDispute::class);
-    }
-
     /**
      * @return float
      */
@@ -224,15 +220,20 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function payments()
     {
         return $this->hasMany(OrderPayment::class);
     }
 
+    public function dispute(): HasOne
+    {
+        return $this->hasOne(AllegroDispute::class);
+    }
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function paymentsWithTrash()
     {
@@ -285,7 +286,7 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function addresses()
     {
@@ -332,7 +333,7 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function labels()
     {
@@ -427,7 +428,7 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function customer()
     {
@@ -435,7 +436,7 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function allegroOrder()
     {
@@ -443,7 +444,7 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function status()
     {
@@ -451,7 +452,7 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function employee()
     {
@@ -459,7 +460,7 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function warehouse()
     {
@@ -467,7 +468,7 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function items()
     {
@@ -475,7 +476,7 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function messages()
     {
@@ -483,7 +484,7 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return HasOne
      */
     public function monitorNote()
     {
@@ -491,7 +492,7 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return HasOne
      */
     public function task()
     {
@@ -499,7 +500,7 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return HasOne
      */
     public function deliveryAddress()
     {
@@ -507,7 +508,7 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function invoices()
     {
@@ -515,7 +516,7 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function buyInvoices()
     {
@@ -523,17 +524,14 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function sellInvoices()
     {
         return $this->belongsToMany(OrderInvoice::class, 'order_order_invoices', 'order_id', 'invoice_id')->where('invoice_type', 'sell');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function files()
+    public function files(): HasMany
     {
         return $this->hasMany(OrderFiles::class);
     }
@@ -687,14 +685,14 @@ class Order extends Model implements Transformable
         ]);
     }
 
-    public function detailedCommissions()
-    {
-        return $this->hasMany(OrderAllegroCommission::class);
-    }
-
     public function commission(): float
     {
         return $this->detailedCommissions()->sum('amount');
+    }
+
+    public function detailedCommissions()
+    {
+        return $this->hasMany(OrderAllegroCommission::class);
     }
 
     public function paymentsTransactions(): HasMany
@@ -742,11 +740,6 @@ class Order extends Model implements Transformable
         return round($orderProfit, 2);
     }
 
-    public function dates()
-    {
-        return $this->hasOne(OrderDates::class);
-    }
-
     public function chat()
     {
         $this->hasOne(Chat::class);
@@ -758,7 +751,7 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function firmSource()
     {
@@ -786,6 +779,11 @@ class Order extends Model implements Transformable
         ]);
     }
 
+    public function dates()
+    {
+        return $this->hasOne(OrderDates::class);
+    }
+
     public function getProformStoragePathAttribute()
     {
         return self::PROFORM_DIR . $this->proforma_filename;
@@ -794,5 +792,10 @@ class Order extends Model implements Transformable
     public function getIsAllegroOrderAttribute()
     {
         return $this->allegro_form_id != null;
+    }
+
+    public function orderOffers(): HasMany
+    {
+        return $this->hasMany(OrderOffer::class)->orderBy('created_at', 'desc');;
     }
 }

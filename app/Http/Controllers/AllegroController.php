@@ -2,14 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use TCG\Voyager\Models\Setting;
+use App\Services\AllegroChatService;
+use Illuminate\Support\Facades\Storage;
 use App\Helpers\AllegroCommissionParser;
 use App\Http\Requests\AllegroSetCommission;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
-use TCG\Voyager\Models\Setting;
 
 class AllegroController extends Controller
 {
+    protected $allegroChatService;
+
+    public function __construct(AllegroChatService $allegroChatService) {
+        $this->allegroChatService = $allegroChatService;
+    }
 
     public function setCommission(AllegroSetCommission $request)
     {
@@ -91,5 +97,4 @@ class AllegroController extends Controller
         return redirect()->route('orders.index')->with(['message' => __('voyager.generic.successfully_updated'),
             'alert-type' => 'success']);
     }
-
 }

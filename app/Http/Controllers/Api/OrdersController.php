@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Api;
 
+
+use App\Domains\DelivererPackageImport\Exceptions\OrderNotFoundException;
 use App\Entities\Country;
 use App\Entities\FirmSource;
 use App\Entities\Label;
@@ -19,13 +21,14 @@ use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceCalculator;
 use App\Helpers\TransportSumCalculator;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\OrdersController as OrdersControllerApp;
 use App\Http\Requests\Api\Orders\AcceptReceivingOrderRequest;
 use App\Http\Requests\Api\Orders\DeclineProformRequest;
 use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
 use App\Http\Requests\Api\Orders\StoreOrderRequest;
 use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
 use App\Jobs\AddLabelJob;
-use App\Jobs\OrderProformSendMailJob;
+use App\Mail\SendOfferToCustomerMail;
 use App\Repositories\CustomerAddressRepository;
 use App\Repositories\CustomerRepository;
 use App\Repositories\OrderAddressRepository;
@@ -34,17 +37,25 @@ use App\Repositories\OrderMessageAttachmentRepository;
 use App\Repositories\OrderMessageRepository;
 use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderRepository;
+use App\Repositories\ProductPackingRepository;
 use App\Repositories\ProductPriceRepository;
 use App\Repositories\ProductRepository;
 use App\Services\OrderPackageService;
 use App\Services\ProductService;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Foundation\Application;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Mailer;
+use Throwable;
 
 /**
  * Class OrdersController
@@ -101,6 +112,16 @@ class OrdersController extends Controller
     private $defaultError = 'Wystąpił wewnętrzny błąd systemu przy składaniu zamówienia. Dział techniczny został o tym poinformowany.';
 
     /**
+     * @var ProductService
+     */
+    private $productService;
+
+    /**
+     * @var ProductPackingRepository
+     */
+    private $productPackingRepository;
+
+    /**
      * OrdersController constructor.
      *
      * @param OrderRepository $orderRepository
@@ -113,6 +134,9 @@ class OrdersController extends Controller
      * @param ProductPriceRepository $productPriceRepository
      * @param OrderMessageAttachmentRepository $orderMessageAttachmentRepository
      * @param OrderPackageRepository $orderPackageRepository
+     * @param ProductService $productService
+     * @param ProductPackingRepository $productPackingRepository
+     * @param OrderPackageRepository $orderPackageRepository
      */
     public function __construct(
         OrderRepository                  $orderRepository,
@@ -124,7 +148,9 @@ class OrdersController extends Controller
         CustomerAddressRepository        $customerAddressRepository,
         ProductPriceRepository           $productPriceRepository,
         OrderMessageAttachmentRepository $orderMessageAttachmentRepository,
-        OrderPackageRepository           $orderPackageRepository
+        OrderPackageRepository           $orderPackageRepository,
+        ProductService                   $productService,
+        ProductPackingRepository         $productPackingRepository
     )
     {
         $this->orderRepository = $orderRepository;
@@ -137,8 +163,13 @@ class OrdersController extends Controller
         $this->productPriceRepository = $productPriceRepository;
         $this->orderMessageAttachmentRepository = $orderMessageAttachmentRepository;
         $this->orderPackageRepository = $orderPackageRepository;
+        $this->productService = $productService;
+        $this->productPackingRepository = $productPackingRepository;
     }
 
+    /**
+     * @throws Exception
+     */
     public function store(StoreOrderRequest $request)
     {
         throw new Exception("Method deprecated");
@@ -270,8 +301,7 @@ class OrdersController extends Controller
      * Get customer delivery address
      *
      * @param int $orderId
-     *
-     * @return CustomerAddress
+     * @return JsonResponse
      */
     public function getCustomerDeliveryAddress(int $orderId)
     {
@@ -293,6 +323,7 @@ class OrdersController extends Controller
      * Get customer invoice address.
      *
      * @param int $orderId
+     * @return JsonResponse
      */
     public function getCustomerInvoiceAddress(int $orderId)
     {
@@ -375,7 +406,7 @@ class OrdersController extends Controller
      *
      * @param UpdateOrderDeliveryAndInvoiceAddressesRequest $request
      * @param int $orderId
-     * @return void
+     * @return JsonResponse|void
      */
     public function updateOrderDeliveryAndInvoiceAddresses(
         UpdateOrderDeliveryAndInvoiceAddressesRequest $request,
@@ -435,7 +466,7 @@ class OrdersController extends Controller
             }
 
             if ($deliveryAddress->wasChanged() || $invoiceAddress->wasChanged()) {
-                dispatch(new OrderProformSendMailJob($order, setting('allegro.address_changed_msg')));
+                // dispatch(new OrderProformSendMailJob($order, setting('allegro.address_changed_msg')));
             }
 
             return response()->json(implode(" ", $message), 200, [], JSON_UNESCAPED_UNICODE);
@@ -510,17 +541,12 @@ class OrdersController extends Controller
                         ->with('price');
                 }]);
             }])
-            ->with('packages')
-            ->with('payments')
-            ->with('labels')
-            ->with('addresses')
-            ->with('invoices')
-            ->with('employee')
-            ->with('factoryDelivery')
+            ->with('packages', 'payments', 'labels', 'addresses', 'invoices', 'employee', 'files', 'dates', 'factoryDelivery', 'orderOffers')
             ->orderBy('id', 'desc')
             ->get();
 
         foreach ($orders as $order) {
+            $order->proforma_invoice = asset(Storage::url($order->getProformStoragePathAttribute()));
             $order->total_sum = $order->getSumOfGrossValues();
             $order->bookedPaymentsSum = $order->bookedPaymentsSum();
             $userId = $request->user()->id;
@@ -806,5 +832,144 @@ class OrdersController extends Controller
     public function countries()
     {
         return response()->json(Country::all());
+    }
+
+    public function uploadProofOfPayment(Request $request)
+    {
+        $orderId = $request->id;
+        $order = Order::find($orderId);
+        if (!$order) return response(['errorMessage' => 'Nie można znaleźć zamówienia'], 400);
+        if ($order->customer_id != $request->user()->id) return response(['errorMessage' => 'Nie twoje zamówienie'], 400);
+        $ordersController = App::make(OrdersControllerApp::class);
+        $ordersController->addFile($request, $orderId);
+        dispatch(new AddLabelJob($orderId, [Label::PROOF_OF_PAYMENT_UPLOADED]));
+        return response('success', 200);
+    }
+
+    /**
+     * Send offer to customer api service
+     *
+     * @param int $id
+     *
+     * @return ResponseFactory|Application|JsonResponse|Response
+     */
+    public function sendOfferToCustomer(int $id)
+    {
+        $order = $this->orderRepository->with(['customer', 'items', 'labels'])->find($id);
+        try {
+            if (empty($order)) {
+                throw new OrderNotFoundException();
+            }
+
+            $productsArray = [];
+            foreach ($order->items as $item) {
+                $productsArray[] = $item->product_id;
+            }
+
+            $productsVariation = $this->productService->getVariations($order);
+            $allProductsFromSupplier = [];
+            $tempVariationCounter = [];
+            foreach ($productsVariation as $key => $variation) {
+                $variations = current($variation);
+                if (isset($tempVariationCounter[current($variations)['variation_group']])) {
+                    $tempVariationCounter[current($variations)['variation_group']] += 1;
+                } else {
+                    $tempVariationCounter[current($variations)['variation_group']] = 1;
+                }
+
+                foreach ($variation as $item) {
+                    if ($item['variation_group'] == null) {
+                        continue;
+                    }
+                    if (isset($allProductsFromSupplier[$item['product_name_supplier']])) {
+                        $sum = (float)$allProductsFromSupplier[$item['product_name_supplier']][$item['variation_group']]['sum'];
+                        $count = (float)$allProductsFromSupplier[$item['product_name_supplier']][$item['variation_group']]['count'];
+                        $sum += $item['sum'];
+                        $count += 1;
+                    } else {
+                        $sum = $item['sum'];
+                        $count = 1;
+                    }
+                    if ($count < $tempVariationCounter[$item['variation_group']] || $sum == 0) {
+                        continue;
+                    }
+
+                    $arr = [
+                        'missed_product' => $count < $tempVariationCounter[$item['variation_group']],
+                        'count' => $count,
+                        'sum' => $sum,
+                        'different' => number_format($order->total_price - $sum, 2, '.', ''),
+                        'radius' => $item['radius'],
+                        'phone' => $item['phone'],
+                        'product_name_supplier' => $item['product_name_supplier'],
+                        'review' => $item['review'],
+                        'quality' => $item['quality'],
+                        'quality_to_price' => $item['quality_to_price'],
+                        'comments' => $item['comments'],
+                        'warehouse_property' => $item['warehouse_property'],
+                        'value_of_the_order_for_free_transport' => number_format(
+                            (float)$item['value_of_the_order_for_free_transport'] - $order->total_price,
+                            2,
+                            '.',
+                            ''
+                        ) <= 0 ? 'Darmowy transport!' : number_format(
+                            (float)$item['value_of_the_order_for_free_transport'] - $order->total_price,
+                            2,
+                            '.',
+                            ''
+                        )
+
+                    ];
+                    $allProductsFromSupplier[$item['product_name_supplier']][$item['variation_group']] = $arr;
+                }
+            }
+
+            if (!empty($allProductsFromSupplier)) {
+                $allProductsFromSupplier = collect($allProductsFromSupplier)->sortBy('different', 1, true);
+            } else {
+                $allProductsFromSupplier = null;
+            }
+            $productPacking = $this->productPackingRepository->findWhereIn('product_id', $productsArray);
+
+            if (!strpos($order->customer->login, 'allegromail.pl')) {
+                Mailer::create()
+                    ->to($order->customer->login)
+                    ->send(new SendOfferToCustomerMail(
+                        'Oferta nr: ' . $order->id,
+                        $order,
+                        $productsVariation,
+                        $allProductsFromSupplier,
+                        $productPacking
+                    ));
+            }
+        } catch (Throwable $exception) {
+            return response(json_encode([
+                'status' => false,
+                'error_code' => 500,
+                'error_message' => $exception->getMessage()
+            ]), 500);
+        }
+        return response()->json('Oferta została wysłana', 200, [], JSON_UNESCAPED_UNICODE);
+    }
+
+    public function getLatestDeliveryInfo(Order $order)
+    {
+        $deliveryInfos = $order->customer->orders()->get();
+        foreach ($deliveryInfos as $deliveryInfo) {
+            $deliveryInfo->adress = $deliveryInfo->getDeliveryAddress();
+        }
+
+        return response()->json($deliveryInfos, 200, [], JSON_UNESCAPED_UNICODE);
+    }
+
+    public function getLatestInvoiceInfo(Order $order)
+    {
+        $invoiceInfos = $order->customer->orders()->get();
+        foreach ($invoiceInfos as $invoiceInfo) {
+            $invoiceInfo->adress = $invoiceInfo->getInvoiceAddress();
+        }
+
+        return response()->json($invoiceInfos, 200, [], JSON_UNESCAPED_UNICODE);
+
     }
 }

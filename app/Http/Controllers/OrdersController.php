@@ -43,6 +43,7 @@ use App\Jobs\AddLabelJob;
 use App\Jobs\AllegroTrackingNumberUpdater;
 use App\Jobs\GenerateXmlForNexoJob;
 use App\Jobs\ImportOrdersFromSelloJob;
+use App\Jobs\Orders\ChangeOrderStatusJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Jobs\RemoveFileLockJob;
 use App\Jobs\RemoveLabelJob;
@@ -83,7 +84,6 @@ use Exception;
 use iio\libmergepdf\Merger;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -311,6 +311,10 @@ class OrdersController extends Controller
         $warehouses = $this->warehouseRepository->findByField('symbol', 'MEGA-OLAWA');
         $storekeepers = User::where('role_id', User::ROLE_STOREKEEPER)->get();
         $allWarehouses = Warehouse::all();
+        $allWarehousesString = '';
+        foreach ($allWarehouses as $warehouse) {
+            $allWarehousesString .= '"' . $warehouse->symbol . '",';
+        }
 
         $customColumnLabels = [];
         foreach ($labelGroups as $labelGroup) {
@@ -372,22 +376,14 @@ class OrdersController extends Controller
         $deliverers = Deliverer::all();
         $couriersTasks = $this->taskService->groupTaskByShipmentDate();
 
-        return view('orders.index',
-            compact(
-                'customColumnLabels',
-                'groupedLabels',
-                'visibilities',
-                'couriers',
-                'warehouses'
-            )
-        )->withOuts($out)
+        return view('orders.index', compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses', 'allWarehousesString'))
+            ->withOuts($out)
             ->withLabIds($labIds)
             ->withLabels($labels)
             ->withDeliverers($deliverers)
             ->withTemplateData($templateData)
             ->withUsers($storekeepers)
-            ->withCouriersTasks($couriersTasks)
-            ->withAllWarehouses($allWarehouses);
+            ->withCouriersTasks($couriersTasks);
     }
 
     public function editPackages($id)
@@ -1032,6 +1028,20 @@ class OrdersController extends Controller
         return dispatch_now(new RemoveLabelJob($order, [$request->label], $loop, $request->labelsToAddIds));
     }
 
+    public function setWarehouse(int $orderId, Request $request): string
+    {
+        $order = Order::find($orderId);
+        if (!$order) return response(['errorMessage' => 'Nie można znaleźć zamówienia'], 400);
+
+        $warehouse = Warehouse::where('symbol', trim($request->warehouse))->first();
+        if (!$warehouse) return response(['errorMessage' => 'Nie można znaleźć magazynu'], 400);
+
+        $order->warehouse()->associate($warehouse->id);
+        $order->save();
+
+        die(true);
+    }
+
     /**
      * @param Request $request
      * @param $id
@@ -1424,6 +1434,8 @@ class OrdersController extends Controller
             $order->shipment_date = null;
             $order->save();
         }
+
+        dispatch_now(new ChangeOrderStatusJob($order));
 
         if ($request->input('status') != $order->status_id && $request->input('shouldBeSent') == 'on') {
             dispatch_now(new OrderStatusChangedNotificationJob($order->id, $request->input('mail_message'), $oldStatus));
@@ -2262,7 +2274,6 @@ class OrdersController extends Controller
         }
 
         //$query->whereRaw('COALESCE(last_status_update_date, orders.created_at) < DATE_ADD(NOW(), INTERVAL -30 DAY)');
-
 
         $count = $query->count();
 

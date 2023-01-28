@@ -4,10 +4,11 @@ namespace App\Jobs;
 
 use App\Entities\Label;
 use App\Entities\Order;
+use App\Facades\Mailer;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Entities\OrderWarehouseNotification;
 use App\Mail\OrderStatusChangedToDispatchMail;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Class OrderStatusChangedToDispatchNotificationJob
@@ -62,7 +63,6 @@ class OrderStatusChangedToDispatchNotificationJob extends Job implements ShouldQ
             Log::error($exception->getMessage(), ['line' => $exception->getLine(), 'file' => $exception->getFile(), 'comment' => 'Nie znaleziono zamówienia o numerze: ' . $this->orderId . ' podczas wysyłania awizacji.']);
             return;
         }
-
         $warehouse = $order->warehouse;
         if ($warehouse && $warehouse->firm) {
             $warehouseMail = $warehouse->firm->email;
@@ -81,7 +81,6 @@ class OrderStatusChangedToDispatchNotificationJob extends Job implements ShouldQ
         ];
 
         $notification = OrderWarehouseNotification::where($dataArray)->first();
-
         if(!empty($notification) && (!$order->isOrderHasLabel(Label::PACKAGE_NOTIFICATION_SENT_LABEL) || $order->isOrderHasLabel(Label::PACKAGE_NOTIFICATION_LABEL))) {
             $notification->update([
                 'order_id' => $this->orderId,
@@ -91,7 +90,6 @@ class OrderStatusChangedToDispatchNotificationJob extends Job implements ShouldQ
             Log::notice('Znaleziono etykietę Awizacja przyjęta w zamówieniu. Status wysyłania notyfikacji został zmieniony na przyjęty.', ['line' => __LINE__, 'file' => __FILE__, 'order' => $order->id]);
             return;
         }
-
         if (!$notification && !$order->isOrderHasLabel(Label::WAREHOUSE_REMINDER)) {
             $subject = "Prośba o potwierdzenie awizacji dla zamówienia nr. " . $this->orderId;
             $notification = OrderWarehouseNotification::create($dataArray);
@@ -102,17 +100,12 @@ class OrderStatusChangedToDispatchNotificationJob extends Job implements ShouldQ
 
         if(!!filter_var($warehouseMail, FILTER_VALIDATE_EMAIL)) {
             if ($this->path === null) {
-                \Mailer::create()
-                    ->to($warehouseMail)
-                    ->send(new OrderStatusChangedToDispatchMail($subject, $acceptanceFormLink,
-                        $sendFormInvoice, $order, $this->self));
+                $email = new OrderStatusChangedToDispatchMail($subject, $acceptanceFormLink, $sendFormInvoice, $order, $this->self);
+                Mailer::notification()->to($warehouseMail)->send($email);
                 Log::notice('Wysłano email awizacyjny na mail: ' . $warehouseMail . ' dla zamówienia: ' . $order->id, ['line' => __LINE__, 'file' => __FILE__]);
             } else {
-                \Mailer::create()
-                    ->to($warehouseMail)
-                    ->send(new OrderStatusChangedToDispatchMail($subject,
-                        $acceptanceFormLink,
-                        $sendFormInvoice, $order, $this->self, $this->path, $this->packageNumber, $this->pathSecond));
+                $email = new OrderStatusChangedToDispatchMail($subject, $acceptanceFormLink, $sendFormInvoice, $order, $this->self, $this->path, $this->packageNumber, $this->pathSecond);
+                Mailer::notification()->to($warehouseMail)->send($email);
             }
         }
     }

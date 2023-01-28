@@ -207,11 +207,13 @@ return [
 
     // Here you can specify additional assets you would like to be included in the master.blade
     'additional_css' => [
-        //'css/custom.css',
+        'css/chat-styles.css',
+        'css/main.css',
     ],
 
     'additional_js' => [
-        //'js/custom.js',
+        'js/modules/AllegroChat.js',
+        'js/helpers/helpers.js',
     ],
 
     'googlemaps' => [

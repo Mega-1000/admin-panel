@@ -828,7 +828,7 @@
             <th>
                 <div><span>@lang('orders.table.nick_allegro')</span></div>
                 <div class="input_div">
-                    <input type="text" id="columnSearch-nick_allegro"/>
+                    <input type="text" id="columnSearch-nick_allegro" />
                 </div>
             </th>
             <th>
@@ -922,6 +922,12 @@
             }
             return false;
         };
+
+        var available = [
+            @php
+                echo $allWarehousesString;
+            @endphp
+        ];
 
         $(document).ready(() => {
             let nof = getUrlParameter('nof');
@@ -1075,17 +1081,9 @@
         });
 
         $('.protocol_datepicker').datepicker({dateFormat: "dd/mm/yy"});
-        $(() => {
-            var available = [
-                @php
-                    foreach($allWarehouses as $item){
-                         echo '"'.$item->symbol.'",';
-                         }
-                @endphp
-            ];
-            $("#delivery_warehouse").autocomplete({
-                source: available
-            });
+
+        $("#delivery_warehouse").autocomplete({
+            source: available
         });
         $(function () {
             if (localStorage.getItem("filter") != null) {
@@ -1503,8 +1501,9 @@
                                             html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; padding: 5px; margin-top: 5px;margin-left: 5px; background-color:' + color + '" href="https://gls-group.eu/PL/pl/sledzenie-paczek?match=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
                                             html += '</p></a>';
                                             html += '</div>';
-                                        } else if (value) {
-
+                                        }  else if (value.delivery_courier_name === 'DB') {
+                                            html += '<a target="_blank" href="/storage/db_schenker/protocols/protocol' + value.sending_number + '.pdf"><p>LP: ' + value.sending_number + '</p></a>';
+                                            html += '<a target="_blank" href="/storage/db_schenker/stickers/sticker' + value.sending_number + '.pdf"><p>KP: ' + value.sending_number + '</p></a>';
                                         }
                                         html += '<div style="display: flex;">'
                                         html += '<button class="btn btn-danger" onclick="cancelPackage(' + value.id + ', ' + value.order_id + ')">Anuluj</button>'
@@ -1801,7 +1800,7 @@
                         render: function (data) {
                             var warehouse = '';
                             if (data !== null) {
-                                warehouse = '<a href="/admin/warehouses/' + data + '/editBySymbol">' + data + '</a>';
+                                warehouse = '<a class="warehouse-symbol" href="/admin/warehouses/' + data + '/editBySymbol">' + data + '</a>';
                             } else {
                                 warehouse = '';
                             }
@@ -2638,10 +2637,56 @@
                 });
             };
 
+            const showSelectWarehouseTemplate = (modal, orderId) => {
+                const row = $('#id-'+orderId);
+                const warehouseEl = row.find('.warehouse-symbol');
+                const warehouse = warehouseEl.text();
+
+                $('.warehouse-template').remove();
+
+                let warehouseTemplate = `
+                <div class="warehouse-template">
+                <p>Magazyn nie został przypisany, przypisz magazyn przed wysłaniem</p>
+                <div class="form-group" style="width: 15%; padding: 5px;">
+                    <label for="delivery_warehouse2">Magazyn</label>
+                    <input type="text" class="form-control" id="delivery_warehouse2" name="delivery_warehouse2" value="${warehouse}">
+                </div><br>
+                </div>`;
+
+                const modalBody = modal.find('.modal-body');
+                const modalOk = modal.find('#labels_to_add_after_removal_modal_ok');
+
+                if(!warehouse) modalOk.attr('disabled', 'disabled');
+
+                modalBody.prepend(warehouseTemplate);
+                $("#delivery_warehouse2").autocomplete({
+                    source: available,
+                    classes: {
+                        'ui-autocomplete': 'z-index-max',
+                    },
+                    select: async (e, ui) => {
+                        modalOk.attr('disabled', 'disabled');
+                        await $.ajax({
+                            url: "/admin/orders/set-warehouse/" + orderId,
+                            method: "POST",
+                            data: {
+                                warehouse: ui.item.value
+                            }
+                        }).done(res => {
+                            if(res) {
+                                warehouseEl.text(ui.item.value);
+                                modalOk.removeAttr('disabled');
+                            }
+                        });
+                    },
+                });
+            }
+
             if (manualLabelSelectionToAdd) {
                 $.ajax({
                     url: "/admin/labels/" + labelId + "/associated-labels-to-add-after-removal"
-                }).done(function (data) {
+                }).done(async function (data) {
+
                     let modal = $('#manual_label_selection_to_add_modal');
                     let input = modal.find("#labels_to_add_after_removal_modal");
                     input.empty();
@@ -2653,6 +2698,8 @@
                         }));
                     });
                     $('#manual_label_selection_to_add_modal').modal('show');
+
+                    if(labelId == 45) showSelectWarehouseTemplate(modal, orderId);
 
                     modal.find("#labels_to_add_after_removal_modal_ok").off().on('click', function () {
                         let ids = input.val();
