@@ -464,7 +464,7 @@ class OrdersController extends Controller
             }
 
             if ($deliveryAddress->wasChanged() || $invoiceAddress->wasChanged()) {
-                dispatch(new OrderProformSendMailJob($order, setting('allegro.address_changed_msg')));
+                // dispatch(new OrderProformSendMailJob($order, setting('allegro.address_changed_msg')));
             }
 
             return response()->json(implode(" ", $message), 200, [], JSON_UNESCAPED_UNICODE);
@@ -948,5 +948,24 @@ class OrdersController extends Controller
             ]), 500);
         }
         return response()->json('Oferta została wysłana', 200, [], JSON_UNESCAPED_UNICODE);
+    }
+
+    public function getLatestDeliveryInfo(Order $order) {
+        $deliveryInfos = $order->customer->orders()->get();
+        foreach ($deliveryInfos as $deliveryInfo) {
+            $deliveryInfo->adress = $deliveryInfo->getDeliveryAddress();
+        }
+        
+        return response()->json($deliveryInfos, 200, [], JSON_UNESCAPED_UNICODE);
+    }
+
+    public function getLatestInvoiceInfo(Order $order) {
+        $invoiceInfos = $order->customer->orders()->get();
+        foreach ($invoiceInfos as $invoiceInfo) {
+            $invoiceInfo->adress = $invoiceInfo->getInvoiceAddress();
+        }
+        
+        return response()->json($invoiceInfos, 200, [], JSON_UNESCAPED_UNICODE);
+        
     }
 }
