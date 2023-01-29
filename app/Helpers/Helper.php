@@ -8,7 +8,11 @@
 
 namespace App\Helpers;
 
+use App\Facades\Mailer;
+use Exception;
+use Illuminate\Mail\SentMessage;
 use Illuminate\Support\Facades\Auth;
+use Log;
 
 class Helper
 {
@@ -36,60 +40,46 @@ class Helper
         }
     }
 
-    public static function setColumnVisibilityGroup($module, $groupName, $method)
-    {
-        $currentUser = Auth::user()->role_id;
-        $roleName = self::USER_ROLE[$currentUser];
-
-        $config = config('column_visibilities.' . $module . '.' . $groupName . '.' . $roleName . '.' . $method);
-
-        $columns = [];
-        foreach ($config as $item) {
-            array_push($columns, $item);
-        }
-
-        return $columns;
-    }
-
-    public static function sendEmail($email, $template, $subject, $additionalData = [])
+    public static function sendEmail($email, $template, $subject, $additionalData = []): ?SentMessage
     {
         if (strpos($email, 'allegromail.pl')) {
-            return;
+            return null;
         }
         try {
-            return \Mailer::create()->send(
+            return Mailer::create()->send(
                 "emails/$template",
                 array_merge(['email' => $email], $additionalData),
                 function ($m) use ($email, $subject) {
+                    // TODO Change to configurations
                     $to = env('MAIL_DEV_ADDRESS', $email);
                     $name = env('MAIL_DEV_NAME', $email);
                     $m->to($to, $name)->subject($subject);
                 }
             );
-        } catch (\Exception $e) {
-            \Log::error('Mail::send', ['message' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
+        } catch (Exception $e) {
+            Log::error('Mail::send', ['message' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
         }
+
+        return null;
     }
 
     /**
      * @param $number
      *
-     * @return false|string|string[]|null
-     *
+     * @return string
      */
-    public static function preparePhone($number)
+    public static function preparePhone($number): string
     {
         $phone = preg_replace('/[^0-9]/', '', $number);
         $pos = strpos($phone, '48');
         if ($pos === 0) {
             $phone = substr($phone, 2);
         }
-        if (strlen($phone) > 7) {
-            return $phone;
-        }
+
+        return strlen($phone) > 7 ? $phone : '';
     }
 
-    public static function phoneIsCorrect($number)
+    public static function phoneIsCorrect($number): bool
     {
         $number = str_replace(' ', '', $number);
         $number = str_replace('+48', '', $number);
@@ -129,9 +119,9 @@ class Helper
         return [$code, $phone];
     }
 
-    public static function clearSpecialChars($string, $removeDigits = true)
+    public static function clearSpecialChars($string, $removeDigits = true): array|string|null
     {
-        $string = preg_replace('/[^\ \w$\x{0080}-\x{FFFF}]+/u', '', $string);
+        $string = preg_replace('/[^\s\w$\x{0080}-\x{FFFF}]+/u', '', $string);
         if ($removeDigits) {
             $string = preg_replace('/[0-9]+/', '', $string);
         }

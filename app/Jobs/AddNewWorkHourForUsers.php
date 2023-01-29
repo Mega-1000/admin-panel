@@ -8,10 +8,10 @@ use App\Repositories\UserRepository;
 use App\Repositories\UserWorkRepository;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class AddNewWorkHourForUsers implements ShouldQueue
@@ -33,10 +33,11 @@ class AddNewWorkHourForUsers implements ShouldQueue
      * @return void
      */
     public function handle(
-        UserRepository $repository,
+        UserRepository     $repository,
         UserWorkRepository $userWorkRepository,
-        TaskRepository $taskRepository
-    ) {
+        TaskRepository     $taskRepository
+    )
+    {
         $users = $repository->findWhere([['warehouse_id', '!=', null]]);
         if (count($users) > 0) {
             foreach ($users as $user) {
@@ -144,7 +145,7 @@ class AddNewWorkHourForUsers implements ShouldQueue
                         if (count($userWork) == 0) {
                             $userWorkToday = $userWorkRepository->create([
                                 'user_id' => $user->id,
-                                'date_of_work' => $j == 0 ? $today->toDateString() : $today->toDateString(),
+                                'date_of_work' => $today->toDateString(),
                                 'start' => '08:00',
                                 'end' => '16:00'
                             ]);

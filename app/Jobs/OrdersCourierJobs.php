@@ -9,6 +9,7 @@ use App\Enums\CourierName;
 use App\Enums\PackageStatus;
 use App\Exceptions\SoapException;
 use App\Exceptions\SoapParamsException;
+use App\Facades\Mailer;
 use App\Factory\Schenker\OrderRequestFactory;
 use App\Helpers\Helper;
 use App\Integrations\Apaczka\ApaczkaGuzzleClient;
@@ -28,12 +29,12 @@ use App\Repositories\OrderPackageRepository;
 use App\Services\SchenkerService;
 use Carbon\Carbon;
 use DOMDocument;
+use DOMException;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Log;
-use Mailer;
 use Mockery\Exception;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 use Smalot\PdfParser\Parser;
@@ -265,7 +266,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
 
             $result = $dpd->sendPackage($parcels, $receiver, 'SENDER', $services, $this->data['notices']);
 
-            if ($result->success == false) {
+            if (!$result->success) {
                 Session::put('message', $result);
                 Log::info(
                     'Problem with send package in DPD',
@@ -364,7 +365,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
 
     }
 
-    public function callInpostForPackage($integration)
+    public function callInpostForPackage($integration): ?array
     {
         $json = $integration->prepareJsonForInpost();
         $simplePackage = $integration->createSimplePackage($json);
@@ -373,7 +374,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
             Log::info(
                 'Problem in INPOST integration with validation', ['courier' => $simplePackage, 'class' => get_class($this), 'line' => __LINE__]
             );
-            return;
+            return null;
         }
         $package = OrderPackage::where('id', '=', $this->data['additional_data']['order_package_id'])->first();
         $package->update([
@@ -386,15 +387,15 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         $package->letter_number = $href->tracking_number;
         $package->save();
         if ($href->status !== 'confirmed') {
-            return;
+            return null;
         }
         $integration->getLabel($href->id, $href->tracking_number);
-        if ($package->send_protocol == true) {
-            return;
+        if ($package->send_protocol) {
+            return null;
         }
         $path = storage_path('app/public/inpost/stickers/sticker' . $package->letter_number . '.pdf');
         if (is_null($path)) {
-            return;
+            return null;
         }
 
         return [
@@ -546,8 +547,9 @@ class OrdersCourierJobs extends Job implements ShouldQueue
 
     /**
      * @return array
+     * @throws DOMException
      */
-    public function createPackageForPocztex()
+    public function createPackageForPocztex(): array
     {
 
         $xml = '<tns:addShipment xmlns:tns="http://e-nadawca.poczta-polska.pl">';
@@ -570,7 +572,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         $address->osobaKontaktowa = $this->data['delivery_address']['firstname'] . ' ' . $this->data['delivery_address']['lastname'];
         $xml .= '<adres';
         foreach ($address as $key => $value) {
-            $xml .= ' ' . $key . ' = "' . $value . '';
+            $xml .= ' ' . $key . ' = "' . $value;
         }
         $xml .= '/>';
         $xml .= '</przesylki>';
@@ -579,18 +581,6 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         //     Log::debug($integration->__getLastRequest());
 
         //      $package->miejsceDoreczenia = $address;
-        $pickupAddress = new adresType();
-
-        $pickupAddress->nazwa = $this->data['pickup_address']['firstname'];
-        $pickupAddress->nazwa2 = $this->data['pickup_address']['lastname'];
-        $pickupAddress->ulica = $this->data['pickup_address']['address'];
-        $pickupAddress->numerDomu = $this->data['pickup_address']['flat_number'];
-        $pickupAddress->miejscowosc = $this->data['pickup_address']['city'];
-        $pickupAddress->kodPocztowy = $this->data['pickup_address']['postal_code'];
-        $pickupAddress->telefon = $this->data['pickup_address']['phone'];
-        $pickupAddress->email = $this->data['pickup_address']['email'];
-        $pickupAddress->kraj = 'Polska';
-        $pickupAddress->osobaKontaktowa = $this->data['pickup_address']['firstname'] . ' ' . $this->data['pickup_address']['lastname'];
 
         $tag['guid'] = $this->getGuid();
         $tag['_'] = '';
@@ -631,7 +621,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         $platnik = $dom->createElement('platnik');
         $uiszczaOplate = $dom->createAttribute('uiszczaOplate');
         $uiszczaOplate->value = "NADAWCA";
-        if ($this->data['cash_on_delivery'] == true) {
+        if ($this->data['cash_on_delivery']) {
             $pobranie = $dom->createElement('pobranie');
             $kwotaPobrania = $dom->createAttribute('kwotaPobrania');
             $kwotaPobrania->value = $this->data['price_for_cash_on_delivery'] * 100;
@@ -792,7 +782,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
         return $retval;
     }
 
-    public function createPackageForJas()
+    public function createPackageForJas(): ?array
     {
         $integration = new Jas($this->config['jas'], $this->data);
 
@@ -818,6 +808,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                 'letter_number' => $letterNumber,
             ];
         }
+        return null;
     }
 
     private function createPackageForGLS()
@@ -834,6 +825,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
             Helper::sendEmail(
                 auth()->user()->email,
                 'send-log',
+                // TODO Change to configuration
                 'Błąd zamiawiania paczki ' . env('APP_NAME'),
                 [
                     'date' => now(),
@@ -863,6 +855,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
             Helper::sendEmail(
                 auth()->user()->email,
                 'send-log',
+                // TODO Change to configuration
                 'Błąd zamiawiania paczki ' . env('APP_NAME'),
                 [
                     'date' => now(),

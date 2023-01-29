@@ -6,13 +6,21 @@ use App\Entities\ColumnVisibility;
 use App\Repositories\LabelRepository;
 use App\Repositories\OrderPackageRepository;
 use App\Repositories\ShipmentGroupRepository;
-use App\Repositories\StatusRepository;
 use App\Repositories\TagRepository;
 use App\ShipmentGroup;
-use Barryvdh\DomPDF\Facade as PDF;
 use Carbon\Carbon;
+use Exception;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Foundation\Application;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\View\View;
+use PDF;
 use Yajra\DataTables\Facades\DataTables;
+
+// TODO Upoerząkować temat z PDFami
 
 class ShipmentGroupController extends Controller
 {
@@ -37,8 +45,8 @@ class ShipmentGroupController extends Controller
 
     /**
      * @param ShipmentGroupRepository $repository
-     * @param TagRepository           $tagRepository
-     * @param LabelRepository         $labelRepository
+     * @param TagRepository $tagRepository
+     * @param LabelRepository $labelRepository
      */
     public function __construct(
         ShipmentGroupRepository $repository,
@@ -56,39 +64,29 @@ class ShipmentGroupController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Factory|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\View
      */
     public function index()
     {
         $visibilities = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('shipment_groups'));
         foreach ($visibilities as $key => $row) {
-            $visibilities[$key]->show = json_decode($row->show, true);
-            $visibilities[$key]->hidden = json_decode($row->hidden, true);
+            $row->show = json_decode($row->show, true);
+            $row->hidden = json_decode($row->hidden, true);
         }
 
         return view('shipment_groups.index', compact('visibilities'));
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Foundation\Application|\Illuminate\Http\Response|\Illuminate\View\View
-     */
-    public function create()
-    {
-        return view('shipment_groups.create');
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param Request $request
      *
-     * @return \Illuminate\Http\Response
+     * @return RedirectResponse
      */
     public function store(Request $request)
     {
-        $shipmentGroup = $this->repository->create([
+        $this->repository->create([
             'name' => $request->input('name'),
             'color' => '#' . $request->input('color'),
             'status' => $request->input('status'),
@@ -99,11 +97,21 @@ class ShipmentGroupController extends Controller
     }
 
     /**
+     * Show the form for creating a new resource.
+     *
+     * @return Factory|Application|Response|View
+     */
+    public function create()
+    {
+        return view('shipment_groups.create');
+    }
+
+    /**
      * Display the specified resource.
      *
-     * @param \App\ShipmentGroup $shipmentGroup
-     *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Foundation\Application|\Illuminate\Http\Response|\Illuminate\View\View
+     * @param Request $request
+     * @param int $id
+     * @return Factory|\Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\View
      */
     public function show(Request $request, int $id)
     {
@@ -111,8 +119,8 @@ class ShipmentGroupController extends Controller
 
         $visibilities = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('order_packages'));
         foreach ($visibilities as $key => $row) {
-            $visibilities[$key]->show = json_decode($row->show, true);
-            $visibilities[$key]->hidden = json_decode($row->hidden, true);
+            $row->show = json_decode($row->show, true);
+            $row->hidden = json_decode($row->hidden, true);
         }
         return view('shipment_groups.show', compact('shipmentGroup', 'visibilities'));
     }
@@ -120,9 +128,9 @@ class ShipmentGroupController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param \App\ShipmentGroup $shipmentGroup
+     * @param ShipmentGroup $shipmentGroup
      *
-     * @return \Illuminate\Http\Response
+     * @return void
      */
     public function edit(ShipmentGroup $shipmentGroup)
     {
@@ -132,10 +140,10 @@ class ShipmentGroupController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \App\ShipmentGroup       $shipmentGroup
+     * @param Request $request
+     * @param ShipmentGroup $shipmentGroup
      *
-     * @return \Illuminate\Http\Response
+     * @return void
      */
     public function update(Request $request, ShipmentGroup $shipmentGroup)
     {
@@ -145,9 +153,9 @@ class ShipmentGroupController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param \App\ShipmentGroup $shipmentGroup
+     * @param ShipmentGroup $shipmentGroup
      *
-     * @return \Illuminate\Http\Response
+     * @return void
      */
     public function destroy(ShipmentGroup $shipmentGroup)
     {
@@ -155,7 +163,7 @@ class ShipmentGroupController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function datatable()
     {
@@ -176,7 +184,7 @@ class ShipmentGroupController extends Controller
 
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function packageDatatable(Request $request, int $id)
     {
@@ -195,10 +203,10 @@ class ShipmentGroupController extends Controller
 
     /**
      * @param Request $request
-     * @param int     $id
-     * @param int     $packageId
+     * @param int $id
+     * @param int $packageId
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function removePackage(Request $request, int $id, int $packageId)
     {
@@ -244,7 +252,7 @@ class ShipmentGroupController extends Controller
             }
             $path = storage_path('app/public/protocols/' . $pdfFilename);
             $pdf->save($path);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()->back()->with([
                 'message' => $e->getMessage(),
                 'alert-type' => 'error'

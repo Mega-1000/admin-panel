@@ -1,5 +1,5 @@
-@php use App\Entities\Warehouse; @endphp
-@php use App\Enums\ProductStockError; @endphp
+@php use App\Entities\Label;use App\Entities\Warehouse; @endphp
+@php use App\Enums\ProductStockError;use App\User; @endphp
 @extends('layouts.datatable')
 
 @section('app-header')
@@ -828,7 +828,7 @@
             <th>
                 <div><span>@lang('orders.table.nick_allegro')</span></div>
                 <div class="input_div">
-                    <input type="text" id="columnSearch-nick_allegro" />
+                    <input type="text" id="columnSearch-nick_allegro"/>
                 </div>
             </th>
             <th>
@@ -1116,7 +1116,7 @@
 
         function cancelPackage(id, orderId) {
             if (confirm('Potwierdź anulację paczki')) {
-                url = '{{route('order_packages.sendRequestForCancelled', ['id' => '%id'])}}';
+                url = '{{route('order_packages.sendRequestForCancelled', ['orderPackage' => '%id'])}}';
                 $.ajax({
                     url: url.replace('%id', id),
                 }).done(function (data) {
@@ -1370,7 +1370,7 @@
                                         } else if (value.delivery_courier_name === 'ODBIOR_OSOBISTY') {
                                             html += '<a target="_blank" href="/storage/odbior_osobisty/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                         } else if (value.delivery_courier_name === 'GLS') {
-                                            let url = "{{ route('orders.package.getSticker', ['id' => '%%'])}}"
+                                            let url = "{{ route('orders.package.getSticker', ['package_id' => '%%'])}}"
                                             html += '<a target="_blank" href="' + url.replace('%%', value.id) + '"><p style="margin-bottom: 0px;">';
                                             html += value.letter_number ? value.letter_number : 'wygeneruj naklejkę';
                                             html += '<div>';
@@ -1490,7 +1490,7 @@
                                         } else if (value.delivery_courier_name === 'ODBIOR_OSOBISTY') {
                                             html += '<a target="_blank" href="/storage/odbior_osobisty/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                         } else if (value.delivery_courier_name === 'GLS') {
-                                            let url = "{{ route('orders.package.getSticker', ['id' => '%%'])}}"
+                                            let url = "{{ route('orders.package.getSticker', ['package_id' => '%%'])}}"
                                             html += '<a target="_blank" href="' + url.replace('%%', value.id) + '"><p>';
                                             html += value.letter_number ? value.letter_number : 'wygeneruj naklejkę';
                                             html += '</p></a>';
@@ -1501,7 +1501,7 @@
                                             html += '<a target="_blank" style="color: green; font-weight: bold;color: #FFFFFF; display: inline-block; padding: 5px; margin-top: 5px;margin-left: 5px; background-color:' + color + '" href="https://gls-group.eu/PL/pl/sledzenie-paczek?match=' + value.letter_number + '"><i class="fas fa-shipping-fast"></i></a>';
                                             html += '</p></a>';
                                             html += '</div>';
-                                        }  else if (value.delivery_courier_name === 'DB') {
+                                        } else if (value.delivery_courier_name === 'DB') {
                                             html += '<a target="_blank" href="/storage/db_schenker/protocols/protocol' + value.sending_number + '.pdf"><p>LP: ' + value.sending_number + '</p></a>';
                                             html += '<a target="_blank" href="/storage/db_schenker/stickers/sticker' + value.sending_number + '.pdf"><p>KP: ' + value.sending_number + '</p></a>';
                                         }
@@ -1687,8 +1687,8 @@
                             } else {
                                 html = '<a target="_blank" href="/admin/planning/timetable?id=taskOrder-' + orderId + '">(P)' + orderId + '</a><span style="display: block;">(G)' + data.master_order_id + '</span>';
                             }
-                            let array = {{ json_encode(\App\Entities\Label::NOT_SENT_YET_LABELS_IDS) }};
-                            let batteryId = {{ \App\Entities\Label::ORDER_ITEMS_REDEEMED_LABEL }};
+                            let array = {{ json_encode(Label::NOT_SENT_YET_LABELS_IDS) }};
+                            let batteryId = {{ Label::ORDER_ITEMS_REDEEMED_LABEL }};
                             let hasHammerOrBagLabel = data.labels.filter(label => {
                                 return array.includes(parseInt(label[0].id));
                             }).length > 0;
@@ -1729,7 +1729,7 @@
                             html += '<i class="voyager-edit"></i>';
                             html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
                             html += '</a>';
-                            @if((Auth::user()->role_id == 1 || Auth::user()->role_id == 2) && Auth::user()->id === \App\User::ORDER_DELETE_USER)
+                            @if((Auth::user()->role_id == 1 || Auth::user()->role_id == 2) && Auth::user()->id === User::ORDER_DELETE_USER)
                                 html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecord(' + id + ')">';
                             html += '<i class="voyager-trash"></i>';
                             html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
@@ -2638,7 +2638,7 @@
             };
 
             const showSelectWarehouseTemplate = (modal, orderId) => {
-                const row = $('#id-'+orderId);
+                const row = $('#id-' + orderId);
                 const warehouseEl = row.find('.warehouse-symbol');
                 const warehouse = warehouseEl.text();
 
@@ -2656,7 +2656,7 @@
                 const modalBody = modal.find('.modal-body');
                 const modalOk = modal.find('#labels_to_add_after_removal_modal_ok');
 
-                if(!warehouse) modalOk.attr('disabled', 'disabled');
+                if (!warehouse) modalOk.attr('disabled', 'disabled');
 
                 modalBody.prepend(warehouseTemplate);
                 $("#delivery_warehouse2").autocomplete({
@@ -2673,7 +2673,7 @@
                                 warehouse: ui.item.value
                             }
                         }).done(res => {
-                            if(res) {
+                            if (res) {
                                 warehouseEl.text(ui.item.value);
                                 modalOk.removeAttr('disabled');
                             }
@@ -2699,7 +2699,7 @@
                     });
                     $('#manual_label_selection_to_add_modal').modal('show');
 
-                    if(labelId == 45) showSelectWarehouseTemplate(modal, orderId);
+                    if (labelId == 45) showSelectWarehouseTemplate(modal, orderId);
 
                     modal.find("#labels_to_add_after_removal_modal_ok").off().on('click', function () {
                         let ids = input.val();
@@ -2743,12 +2743,12 @@
                         });
                     });
                     return;
-                } else if (addedType == "{{ \App\Entities\Label::CHAT_TYPE }}") {
+                } else if (addedType == "{{ Label::CHAT_TYPE }}") {
                     var url = '{{ route("chat.index", ["all" => 1, "id" => ":id"]) }}';
                     url = url.replace(':id', orderId);
                     window.location.href = url
                     return
-                } else if (addedType == "{{ \App\Entities\Label::BONUS_TYPE }}") {
+                } else if (addedType == "{{ Label::BONUS_TYPE }}") {
                     let url = '{{ route("bonus.order-chat", ['id' => ":id"]) }}';
                     url = url.replace(':id', orderId);
                     window.location.href = url
@@ -3002,7 +3002,7 @@
 
         $('#remove-selected-file').on('click', () => {
             let fileId = $('#files__list option:selected').val();
-            let url = "{{ route('orders.fileDelete', ['id' => '%%']) }}"
+            let url = "{{ route('orders.fileDelete', ['file_id' => '%%']) }}"
             $.ajax({
                 url: url.replace('%%', fileId)
             }).done(function (data) {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Requests\Api\Firms\FirmUpdateRequest;
 use App\Repositories\FirmRepository;
+use Exception;
 use Illuminate\Support\Facades\Log;
 
 class FirmsController
@@ -23,7 +24,7 @@ class FirmsController
             $request->validated();
             $firm = $this->repository->find($id);
 
-            if ($firm->send_request_to_update_data != false) {
+            if ($firm->send_request_to_update_data) {
                 $dataToStore = $request->all();
 
                 if (empty($firm)) {
@@ -42,7 +43,7 @@ class FirmsController
             } else {
                 return $this->notFoundResponse();
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Problem with update firms data.',
                 ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
             );

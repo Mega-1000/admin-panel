@@ -26,6 +26,7 @@ use App\Services\OrderPaymentService;
 use App\Services\ProductService;
 use App\User;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -86,14 +87,14 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             }
             try {
                 $transactionArray = $this->createAddressArray($transaction);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 \Log::error('sello adress creation', ['message' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
                 return $count;
             }
             $tax = 1 + env('VAT');
             try {
                 $products = $this->prepareProducts($transactionGroup, $tax);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 \Log::error('sello product preparation', ['message' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
                 return $count;
             }
@@ -110,11 +111,11 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             try {
                 DB::beginTransaction();
                 $order = $this->buildOrder($transaction, $transactionArray, $products, $transactionGroup, $taskPrimal->id, $productService, $orderPaymentService);
-	            dispatch(new CheckDeliveryAddressSendMailJob($order));
-	
+                dispatch(new CheckDeliveryAddressSendMailJob($order));
+
                 $count++;
                 DB::commit();
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 DB::rollBack();
                 $message = $exception->getMessage();
                 Log::error("Problem with sello import: $message", ['class' => $exception->getFile(), 'line' => $exception->getLine(), 'stack' => $exception->getTraceAsString()]);
@@ -158,7 +159,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         if (strpos($transactionArray['invoice_address']['email'], '+') === false) {
             $transactionArray['invoice_address']['email'] = $transactionArray['delivery_address']['email'];
         }
-        if(!empty($transaction->customer->phone)){
+        if (!empty($transaction->customer->phone)) {
             $phone = Helper::preparePhone($transaction->customer->phone->cp_Phone);
         }
         if (empty($phone)) {
@@ -217,7 +218,6 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $addressArray['flat_number'] = $flatNr;
         $addressArray['address'] = $streetName;
         $addressArray['email'] = $address->adr_Email ?: $customer->email->ce_email;
-        $addressArray['nip'] = $address->adr_NIP ?: $customer->cs_NIP ?: '';
         $addressArray['postal_code'] = $address->adr_ZipCode;
         $addressArray['nip'] = $address->adr_NIP;
         $addressArray['firmname'] = $address->adr_Company ?: $customer->cs_Company ?: '';
@@ -330,11 +330,12 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
         $order = Order::find($id);
         $order->sello_id = $transaction->id;
-	    /**
-	     * @TODO create determining source by params when there will be more info about sources
-	     * maybe move to cron or something else
-	     */
-	    $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 1)->first();
+        /**
+         * @TODO create determining source by params when there will be more info about sources
+         * TODO REMOVE ENV AND ADD CONFIG
+         * maybe move to cron or something else
+         */
+        $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 1)->first();
         $order->firm_source_id = $firmSource ? $firmSource->id : null;
 
         $user = User::where('name', '001')->first();
@@ -361,7 +362,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
         $amount = $transaction->tr_Payment;
         $orderPaymentService->payOrder($order->id, $amount,
             null, 1,
-            null, Carbon::today()->addDay(7)->toDateTimeString());
+            null, Carbon::today()->addDays(7)->toDateTimeString());
     }
 
     private function setLabels($order, $taskPrimalId)

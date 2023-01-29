@@ -25,6 +25,7 @@ use App\Entities\UserSurplusPaymentHistory;
 use App\Entities\Warehouse;
 use App\Entities\WorkingEvents;
 use App\Enums\LabelStatusEnum;
+use App\Facades\Mailer;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Helpers\GetCustomerForNewOrder;
@@ -84,10 +85,10 @@ use Exception;
 use iio\libmergepdf\Merger;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -96,9 +97,9 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
-use Mailer;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Yajra\DataTables\Facades\DataTables;
+use function response;
 
 /**
  * Class OrderController.
@@ -369,8 +370,8 @@ class OrdersController extends Controller
         //pobieramy widzialności dla danego moduły oraz użytkownika
         $visibilities = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('orders'));
         foreach ($visibilities as $key => $row) {
-            $visibilities[$key]->show = json_decode($row->show, true);
-            $visibilities[$key]->hidden = json_decode($row->hidden, true);
+            $row->show = json_decode($row->show, true);
+            $row->hidden = json_decode($row->hidden, true);
         }
         $templateData = PackageTemplate::orderBy('list_order', 'asc')->get();
         $deliverers = Deliverer::all();
@@ -397,9 +398,9 @@ class OrdersController extends Controller
      *
      * @param int $id
      *
-     * @return Response
+     * @return \Illuminate\Contracts\View\View
      */
-    public function edit($id)
+    public function edit(int $id)
     {
         $order = $this->orderRepository->with(['customer', 'items', 'labels', 'subiektInvoices', 'sellInvoices'])->find($id);
         $orderId = $id;
@@ -489,18 +490,18 @@ class OrdersController extends Controller
         //pobieramy widzialności dla danego moduły oraz użytkownika
         $visibilitiesPayments = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('order_payments'));
         foreach ($visibilitiesPayments as $key => $row) {
-            $visibilitiesPayments[$key]->show = json_decode($row->show, true);
-            $visibilitiesPayments[$key]->hidden = json_decode($row->hidden, true);
+            $row->show = json_decode($row->show, true);
+            $row->hidden = json_decode($row->hidden, true);
         }
         $visibilitiesPackage = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('order_packages'));
         foreach ($visibilitiesPackage as $key => $row) {
-            $visibilitiesPackage[$key]->show = json_decode($row->show, true);
-            $visibilitiesPackage[$key]->hidden = json_decode($row->hidden, true);
+            $row->show = json_decode($row->show, true);
+            $row->hidden = json_decode($row->hidden, true);
         }
         $visibilitiesTask = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('order_tasks'));
         foreach ($visibilitiesTask as $key => $row) {
-            $visibilitiesTask[$key]->show = json_decode($row->show, true);
-            $visibilitiesTask[$key]->hidden = json_decode($row->hidden, true);
+            $row->show = json_decode($row->show, true);
+            $row->hidden = json_decode($row->hidden, true);
         }
         $firms = $this->firmRepository->all();
 
@@ -556,44 +557,44 @@ class OrdersController extends Controller
                     'countries'
                 )
             );
-        } else {
-            return view(
-                'orders.edit',
-                compact(
-                    'visibilitiesTask',
-                    'visibilitiesPackage',
-                    'visibilitiesPayments',
-                    'warehouses',
-                    'order',
-                    'users',
-                    'customerInfo',
-                    'orderInvoiceAddress',
-                    'orderInvoiceAddressErrors',
-                    'selInvoices',
-                    'subiektInvoices',
-                    'orderDeliveryAddress',
-                    'orderDeliveryAddressErrors',
-                    'orderItems',
-                    'warehouse',
-                    'statuses',
-                    'messages',
-                    'productPacking',
-                    'customerDeliveryAddress',
-                    'firms',
-                    'productsVariation',
-                    'allProductsFromSupplier',
-                    'orderId',
-                    'customerOrdersToPay',
-                    'orderHasSentLP',
-                    'emails',
-                    'clientTotalCost',
-                    'ourTotalCost',
-                    'labelsButtons',
-                    'packets',
-                    'countries'
-                )
-            );
         }
+        return view(
+            'orders.edit',
+            compact(
+                'visibilitiesTask',
+                'visibilitiesPackage',
+                'visibilitiesPayments',
+                'warehouses',
+                'order',
+                'users',
+                'customerInfo',
+                'orderInvoiceAddress',
+                'orderInvoiceAddressErrors',
+                'selInvoices',
+                'subiektInvoices',
+                'orderDeliveryAddress',
+                'orderDeliveryAddressErrors',
+                'orderItems',
+                'warehouse',
+                'statuses',
+                'messages',
+                'productPacking',
+                'customerDeliveryAddress',
+                'firms',
+                'productsVariation',
+                'allProductsFromSupplier',
+                'orderId',
+                'customerOrdersToPay',
+                'orderHasSentLP',
+                'emails',
+                'clientTotalCost',
+                'ourTotalCost',
+                'labelsButtons',
+                'packets',
+                'countries'
+            )
+        );
+
     }
 
     private function getVariations($order)
@@ -757,7 +758,8 @@ class OrdersController extends Controller
             $finishTime = new Carbon($time->date_start);
             $startTime = new Carbon($time->date_end);
             $totalDuration = $finishTime->diffInMinutes($startTime);
-            return $prev + $totalDuration;
+            // TODO WTF here?
+            // return $prev + $totalDuration;
         }, 0);
         $dt = Carbon::now();
         $dt->second = 0;
@@ -793,7 +795,7 @@ class OrdersController extends Controller
         $data = $request->validated();
         $skip = $data['skip'] ?? 0;
         dispatch((new RemoveFileLockJob($lockName))->delay(360));
-        if (File::exists(public_path($lockName)) == true) {
+        if (File::exists(public_path($lockName)) === true) {
             return response(['error' => 'file_exist']);
         }
         file_put_contents($lockName, '');
@@ -912,11 +914,12 @@ class OrdersController extends Controller
     }
 
     /**
-     * @return Factory|\Illuminate\View\View
+     * @return void
      */
-    public function create()
+    public function create(): void
     {
-        return view('orders.create');
+        // TODO Not found view
+        //return view('orders.create');
     }
 
     public function updateNotices(NoticesRequest $request)
@@ -945,7 +948,7 @@ class OrdersController extends Controller
                 return response(['errors' => ['message' => "Zły typ komentarza"]], 400);
         }
         $order->save();
-        return \response('success');
+        return response('success');
     }
 
     public function createQuickOrder()
@@ -1586,7 +1589,7 @@ class OrdersController extends Controller
      *
      * @param int $id
      *
-     * @return Response
+     * @return RedirectResponse
      */
     public function destroy($id)
     {
@@ -2095,7 +2098,7 @@ class OrdersController extends Controller
         $data = $request->all();
         [$collection, $countFiltred] = $this->prepareCollection($data);
         if (!$countFiltred) {
-            return \response("Brak zamówień");
+            return response("Brak zamówień");
         }
         $messages = [];
         foreach ($collection as $ord) {
@@ -2104,7 +2107,7 @@ class OrdersController extends Controller
                 $messages = array_merge($messages, $message);
             }
         }
-        return \response(['errors' => $messages], 200);
+        return response(['errors' => $messages], 200);
     }
 
     /**
@@ -2136,14 +2139,11 @@ class OrdersController extends Controller
         }
         $query = $this->getQueryForDataTables()->orderBy($sortingColumn, $sortingColumnDirection);
 
-        $notSearchable = [];
-
         foreach ($data['columns'] as $column) {
             if ($column['searchable'] == 'true' && !empty($column['search']['value'])) {
-                if (array_key_exists($column['name'], $notSearchable) || $column['name'] == "shipment_date") {
-                } else {
+                if ($column['name'] != "shipment_date") {
                     if (array_key_exists($column['name'], $this->dtColumns)) {
-                        if ($column['name'] == 'statusName' && $column['search']['regex'] == true) {
+                        if ($column['name'] == 'statusName' && $column['search']['regex']) {
                             $query->whereRaw($this->dtColumns[$column['name']] . ' REGEXP ' . "'{$column['search']['value']}'");
                         } else {
                             $query->where($this->dtColumns[$column['name']], 'LIKE', "%{$column['search']['value']}%");
@@ -2170,18 +2170,18 @@ class OrdersController extends Controller
                     switch ($column['search']['value']) {
                         case "yesterday":
                             $query->where("orders.shipment_date", '<', $now->toDateString());
-                            $query->where("orders.shipment_date", '>=', $now->subDay(1)->toDateString());
+                            $query->where("orders.shipment_date", '>=', $now->subDay()->toDateString());
                             break;
                         case "today":
                             $query->where("orders.shipment_date", '>=', $now->toDateString());
-                            $query->where("orders.shipment_date", '<', $now->addDay(1)->toDateString());
+                            $query->where("orders.shipment_date", '<', $now->addDay()->toDateString());
                             break;
                         case "tomorrow":
-                            $query->where("orders.shipment_date", '>=', $now->addDay(1)->toDateString());
-                            $query->where("orders.shipment_date", '<', $now->addDay(1)->toDateString());
+                            $query->where("orders.shipment_date", '>=', $now->addDay()->toDateString());
+                            $query->where("orders.shipment_date", '<', $now->addDay()->toDateString());
                             break;
                         case "from_tomorrow":
-                            $query->where("orders.shipment_date", '>=', $now->addDay(1)->toDateString());
+                            $query->where("orders.shipment_date", '>=', $now->addDay()->toDateString());
                             break;
                         case "all":
                         default:
@@ -2247,7 +2247,7 @@ class OrdersController extends Controller
                         , 0)
                     , 0)
                     ';
-                    if ($data['differenceMode'] == true) {
+                    if ($data['differenceMode']) {
                         $differenceUp = (float)($column['search']['value'] + 2);
                         $differenceDown = (float)($column['search']['value'] - 2);
                         $query->whereRaw($sumQuery . ' < ' . "{$differenceUp}" . ' AND ' . $sumQuery . ' > ' . $differenceDown);
@@ -2318,7 +2318,7 @@ class OrdersController extends Controller
             $invoices = \DB::table('order_order_invoices')->where('order_id', $row->orderId)->get(['invoice_id']);
             $arrInvoice = [];
             foreach ($invoices as $invoice) {
-                array_push($arrInvoice, $invoice->invoice_id);
+                $arrInvoice[] = $invoice->invoice_id;
             }
             if (count($arrInvoice) > 0) {
                 $row->invoices = \DB::table('order_invoices')->whereIn('id', $arrInvoice)->get();
@@ -2983,7 +2983,7 @@ class OrdersController extends Controller
         $file = OrderFiles::find($id);
         Storage::disk('private')->delete('files/' . $file->order_id . '/' . $file->hash);
         $file->delete();
-        return \response('success');
+        return response('success');
     }
 
     public function getFiles(int $id)
@@ -3147,7 +3147,7 @@ class OrdersController extends Controller
                 'cart_token' => $order->getToken(),
                 'user_code' => $code
             ]);
-
+            // TODO Change to configuration
             $frontUrl = env('FRONT_URL') . '/koszyk.html?' . $query;
             return redirect($frontUrl);
         } catch (Exception $exception) {

@@ -6,6 +6,11 @@ use App\Entities\ProductStock;
 use App\Entities\ProductStockPosition;
 use App\Http\Requests\ProductStockPositionCreate;
 use App\Http\Requests\ProductStockPositionUpdate;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Yajra\DataTables\Facades\DataTables;
@@ -18,18 +23,8 @@ class ProductStockPositionsController extends Controller
 {
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create($id)
-    {
-        return view('product_stocks.positions.create', compact('id'));
-    }
-
-    /**
      * @param ProductStockPositionCreate $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function store(ProductStockPositionCreate $request)
     {
@@ -59,7 +54,7 @@ class ProductStockPositionsController extends Controller
         }
         $quantity = $productStock->quantity + $positionQuantity;
         $productStock->update(['quantity' => $quantity]);
-        $this->createLog('+' . $request->position_quantity, $productStock->id, $productStockPosition->id, $quantity);
+        $this->createLog('+' . $request->position_quantity, $productStock->id, $productStockPosition->id);
 
         return redirect()->route('product_stocks.edit', ['id' => $request->id, 'tab' => 'positions'])->with([
             'message' => __('product_stock_positions.message.store'),
@@ -68,23 +63,20 @@ class ProductStockPositionsController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for creating a new resource.
      *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @return Application|Factory|View
      */
-    public function edit($id, $position_id)
+    public function create($id)
     {
-        $productStockPosition = ProductStockPosition::find($position_id);
-
-        return view('product_stocks.positions.edit', compact('id', 'productStockPosition'));
+        return view('product_stocks.positions.create', compact('id'));
     }
 
     /**
      * @param ProductStockPositionUpdate $request
      * @param $id
      * @param $position_id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function update(ProductStockPositionUpdate $request, $id, $position_id)
     {
@@ -123,24 +115,22 @@ class ProductStockPositionsController extends Controller
 
 
         if ($request->different !== null) {
-            if (strstr($request->different, '+') == true) {
+            if (str_contains($request->different, '+') === true) {
                 $val = explode('+', $request->different);
                 $calc = $productStock->quantity + (int)$val[1];
-            } else {
-                if (strstr($request->different, '-') == true) {
-                    $val = explode('-', $request->different);
-                    if ($val[1] > $productStockPosition->position_quantity) {
-                        return redirect()->back()->with([
-                            'message' => __('product_stocks.message.error_quantity'),
-                            'alert-type' => 'error'
-                        ]);
-                    } else {
-                        $calc = $productStock->quantity - (int)$val[1];
-                    }
+            } else if (str_contains($request->different, '-') === true) {
+                $val = explode('-', $request->different);
+                if ($val[1] > $productStockPosition->position_quantity) {
+                    return redirect()->back()->with([
+                        'message' => __('product_stocks.message.error_quantity'),
+                        'alert-type' => 'error'
+                    ]);
                 }
+                $calc = $productStock->quantity - (int)$val[1];
             }
+
             $productStock->update(['quantity' => $calc]);
-            $this->createLog($request->different, $productStock->id, $productStockPosition->id, $calc);
+            $this->createLog($request->different, $productStock->id, $productStockPosition->id);
         }
         $productStockPosition->update($request->all());
 
@@ -152,15 +142,29 @@ class ProductStockPositionsController extends Controller
     }
 
     /**
+     * Show the form for editing the specified resource.
+     *
+     * @param int $id
+     * @param $position_id
+     * @return Application|Factory|View
+     */
+    public function edit(int $id, $position_id)
+    {
+        $productStockPosition = ProductStockPosition::find($position_id);
+
+        return view('product_stocks.positions.edit', compact('id', 'productStockPosition'));
+    }
+
+    /**
      * @param $id
      * @param $position_id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function destroy($id, $position_id)
     {
         $productStockPosition = ProductStockPosition::find($position_id);
 
-        if($productStockPosition->position_quantity != 0) {
+        if ($productStockPosition->position_quantity != 0) {
             return redirect()->route('product_stocks.edit', ['id' => $id, 'tab' => 'positions'])->with([
                 'message' => __('product_stock_positions.message.quantity_set'),
                 'alert-type' => 'error'
@@ -178,7 +182,7 @@ class ProductStockPositionsController extends Controller
         $quantity = $productStock->quantity - $positionQuantity;
         $productStock->update(['quantity' => $quantity]);
         $productStockPosition->delete();
-        $this->createLog('-' . $positionQuantity, $productStock->id, $productStockPosition->id, $quantity);
+        $this->createLog('-' . $positionQuantity, $productStock->id, $productStockPosition->id);
         return redirect()->route('product_stocks.edit', ['id' => $id, 'tab' => 'positions'])->with([
             'message' => __('product_stock_positions.message.delete'),
             'alert-type' => 'info'
@@ -186,7 +190,7 @@ class ProductStockPositionsController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function datatable($id)
     {

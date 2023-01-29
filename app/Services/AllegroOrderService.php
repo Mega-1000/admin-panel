@@ -2,8 +2,11 @@
 
 use App\Entities\AllegroOrder;
 use App\Entities\Order;
+use App\Facades\Mailer;
 use App\Mail\AllegroNewOrderEmail;
 use Carbon\Carbon;
+use Exception;
+use Illuminate\Database\Eloquent\Collection;
 use VIISON\AddressSplitter\AddressSplitter;
 use VIISON\AddressSplitter\Exceptions\SplittingException;
 
@@ -24,7 +27,6 @@ use VIISON\AddressSplitter\Exceptions\SplittingException;
  */
 class AllegroOrderService extends AllegroApiService
 {
-    protected $auth_record_id = 2;
     const STATUS_NEW = "NEW";
     const STATUS_PROCESSING = "PROCESSING";
     const STATUS_READY_FOR_SHIPMENT = "READY_FOR_SHIPMENT";
@@ -33,10 +35,9 @@ class AllegroOrderService extends AllegroApiService
     const STATUS_PICKED_UP = "PICKED_UP";
     const STATUS_CANCELLED = "CANCELLED";
     const STATUS_SUSPENDED = "SUSPENDED";
-
     const TYPE_BUYER_CANCELLED = "BUYER_CANCELLED ";
-
     const READY_FOR_PROCESSING = 'READY_FOR_PROCESSING';
+    protected $auth_record_id = 2;
 
     public function __construct()
     {
@@ -58,7 +59,7 @@ class AllegroOrderService extends AllegroApiService
         $orderModel->new_order_message_sent = true;
         $orderModel->save();
 
-        \Mailer::create()
+        Mailer::create()
             ->to($orderModel->buyer_email)
             ->send(new AllegroNewOrderEmail());
     }
@@ -77,16 +78,17 @@ class AllegroOrderService extends AllegroApiService
         }
     }
 
-    public function getOrderDetailsFromApi(Order $order)
+    /**
+     * @return ?Collection<Order>
+     */
+    private function findNotValidatedOrdersWithInvalidData(): ?Collection
     {
-        if (!$order->sello_id) {
-            return false;
-        }
-        $id = $order->selloTransaction->tr_CheckoutFormId;
-        $url = $this->getRestUrl(
-            "/order/checkout-forms/{$id}"
-        );
-        return $this->request('GET', $url, []);
+        $yesterday = (new Carbon())->startOfDay()->subDay();
+        /** @var ?Collection<Order> $order */
+        $order = Order::where('data_verified_by_allegro_api', '=', false)
+            ->whereNotNull('sello_id')
+            ->where('created_at', '>=', $yesterday)->get();
+        return $order;
     }
 
     private function fixDeliveryAddress(Order $order): bool
@@ -122,7 +124,7 @@ class AllegroOrderService extends AllegroApiService
             $splittedAddress = AddressSplitter::splitAddress($street);
             $street = $splittedAddress['streetName'];
             $flat = $splittedAddress['houseNumber'];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
         }
 
@@ -142,6 +144,18 @@ class AllegroOrderService extends AllegroApiService
         $order->save();
 
         return $address->wasChanged();
+    }
+
+    public function getOrderDetailsFromApi(Order $order)
+    {
+        if (!$order->sello_id) {
+            return false;
+        }
+        $id = $order->selloTransaction->tr_CheckoutFormId;
+        $url = $this->getRestUrl(
+            "/order/checkout-forms/{$id}"
+        );
+        return $this->request('GET', $url, []);
     }
 
     private function fixInvoiceAddress(Order $order): bool
@@ -174,7 +188,7 @@ class AllegroOrderService extends AllegroApiService
             $splittedAddress = AddressSplitter::splitAddress($street);
             $street = $splittedAddress['streetName'];
             $flat = $splittedAddress['houseNumber'];
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
 
         }
 
@@ -206,14 +220,6 @@ class AllegroOrderService extends AllegroApiService
         $order->save();
 
         return $address->wasChanged();
-    }
-
-    private function findNotValidatedOrdersWithInvalidData()
-    {
-        $yesterday = (new Carbon())->startOfDay()->subDay(1);
-        return Order::where('data_verified_by_allegro_api', '=', false)
-            ->whereNotNull('sello_id')
-            ->where('created_at', '>=', $yesterday)->get();
     }
 
     /**

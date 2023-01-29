@@ -12,9 +12,12 @@ class ServiceFactory
 {
 
     /**
-     * @param string|int $mainParameter
+     * @param int|string $mainParameter
+     * @param string $documentType
+     * @param string $documentNumber
+     * @return ServiceParameterDTO
      */
-    public static function getServiceParameters($mainParameter, string $documentType = '', string $documentNumber = ''): ServiceParameterDTO
+    public static function getServiceParameters(int|string $mainParameter, string $documentType = '', string $documentNumber = ''): ServiceParameterDTO
     {
         return App::make(SchenkerServiceProvider::DTO_SERVICE_PARAMETERS, [
             'mainParameter' => $mainParameter,
@@ -24,8 +27,9 @@ class ServiceFactory
     }
 
     /**
+     * TODO CLASS NOT EXISTING ServiceParameters
      * @param string $servicesSeparatedByComma - services separated by comma, example: "1, 2, 92" (chars other than "," and numbers are filtered from string)
-     * @param ServiceParameters[] $servicesParameters - generated from getServiceParameter method with key as service number
+     * @param ServiceParameterDTO[] $servicesParameters - generated from getServiceParameter method with key as service number
      * @return ServiceDTO[]
      */
     public static function getServicesFromString(string $servicesSeparatedByComma, array $servicesParameters): array
@@ -33,7 +37,7 @@ class ServiceFactory
         $servicesString = preg_replace('/[^\d\,]+/', '', $servicesSeparatedByComma);
         $servicesArray = explode(',', $servicesString);
         $filteredEmptyServices = array_filter($servicesArray);
-        
+
         $defaultServices = SupportedService::getDefaultServices();
 
         $uniqueServices = array_values(array_unique(array_merge($filteredEmptyServices, $defaultServices)));

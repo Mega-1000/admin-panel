@@ -5,7 +5,7 @@ namespace App\Factory\Schenker;
 use App\DTO\Schenker\PackageDTO;
 use App\DTO\Schenker\PayerDTO;
 use App\DTO\Schenker\RecipientDTO;
-use App\DTO\Schenker\Request\OrderRequestDTO;
+use App\DTO\Schenker\Request\GetOrderRequestDTO;
 use App\DTO\Schenker\SenderDTO;
 use App\DTO\Schenker\ServiceDTO;
 use App\DTO\Schenker\ServiceParameterDTO;
@@ -30,9 +30,9 @@ class OrderRequestFactory
      * b - długość
      * c - wysokość
      */
-    public function __invoke(): OrderRequestDTO
+    public function __invoke(): GetOrderRequestDTO
     {
-        return new OrderRequestDTO(
+        return new GetOrderRequestDTO(
             $this->clientId,
             null,
             DataSource::API,
@@ -147,8 +147,7 @@ class OrderRequestFactory
      */
     private function prepareServicesData(): array
     {
-        $servicesParams = $this->generateAllServices();
-        return ServiceFactory::getServicesFromString($this->orderPackage->services, $servicesParams);
+        return ServiceFactory::getServicesFromString($this->orderPackage->services, $this->generateAllServices());
     }
 
     /**

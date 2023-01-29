@@ -2,14 +2,11 @@
 
 namespace App\Mail;
 
+use App\Helpers\MessagesHelper;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
-use App\Helpers\MessagesHelper;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Mail\MailServiceProvider;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Auth;
 
 class OrderStatusChangedToDispatchMail extends Mailable
 {
@@ -41,7 +38,10 @@ class OrderStatusChangedToDispatchMail extends Mailable
      * @param $formLink
      * @param $sendFormInvoice
      * @param $order
-     * @param $self
+     * @param null $self
+     * @param null $path
+     * @param null $packageNumber
+     * @param null $pathSecond
      */
     public function __construct($subject, $formLink, $sendFormInvoice, $order, $self = null, $path = null, $packageNumber = null, $pathSecond = null)
     {
@@ -75,14 +75,13 @@ class OrderStatusChangedToDispatchMail extends Mailable
      */
     public function build()
     {
-        if ($this->self == true) {
+        if ($this->self) {
             return $this->view('emails.order-status-changed-to-dispatch-self');
-        } else {
-            if ($this->path == null) {
-                return $this->view('emails.order-status-changed-to-dispatch');
-            } else {
-                return $this->view('emails.reminder-order-status-changed-to-dispatch')->attach($this->path)->attach($this->pathSecond);
-            }
         }
+        if ($this->path == null) {
+            return $this->view('emails.order-status-changed-to-dispatch');
+        }
+
+        return $this->view('emails.reminder-order-status-changed-to-dispatch')->attach($this->path)->attach($this->pathSecond);
     }
 }

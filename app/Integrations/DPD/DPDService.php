@@ -2,11 +2,12 @@
 
 namespace App\Integrations\DPD;
 
-use StdClass;
-use SoapClient;
 use Exception;
+use Log;
+use SoapClient;
 use SoapFault;
-use Illuminate\Support\Facades\Log;
+use StdClass;
+
 class DPDService extends SoapClient
 {
     const PKG_NUMS_GEN_ERR_POLICY = "ALL_OR_NOTHING"; //STOP_ON_FIRST_ERROR, IGNORE_ERRORS
@@ -21,7 +22,7 @@ class DPDService extends SoapClient
 
     public function __construct($fid = null, $username = null, $password = null, $wsdl = null, $lang = null)
     {
-        $config_file = __DIR__ .'/../config.php';
+        $config_file = __DIR__ . '/../config.php';
         $this->config = (file_exists($config_file)) ? include $config_file : new StdClass();
 
         // set default timezone
@@ -48,22 +49,11 @@ class DPDService extends SoapClient
 
     }
 
-    public function setConfig($key, $value)
-    {
-        $this->config->{$key} = $value;
-        return $this->config->{$key};
-    }
-
-    public function getConfig($key)
-    {
-        return (isset($this->config->{$key})) ? $this->config->{$key} : null;
-    }
-
     /**
      * Check configuration
-     * @return type
+     * @throws Exception
      */
-    private function _checkConfiguration()
+    private function _checkConfiguration(): void
     {
         // required
         if (!isset($this->config->fid) || empty($this->config->fid))
@@ -88,26 +78,148 @@ class DPDService extends SoapClient
         if (!isset($this->config->debug) || empty($this->config->debug)) $this->config->debug = false;
     }
 
-    /**
-     * Get auth data
-     * @return array
-     */
-    private function _authData()
+    public function getConfig($key)
     {
-        return [
-            'masterFid' => $this->config->fid,
-            'login' => $this->config->username,
-            'password' => $this->config->password,
-        ];
+        return (isset($this->config->{$key})) ? $this->config->{$key} : null;
+    }
+
+    public function setConfig($key, $value)
+    {
+        $this->config->{$key} = $value;
+        return $this->config->{$key};
     }
 
     /**
-     * Set sender data
-     * @param array $sender
+     * Get session id
+     * @return string
      */
-    public function setSender(array $sender)
+    public function getSessionId()
     {
-        $this->sender = $sender;
+        return $this->sessionId;
+    }
+
+    /**
+     * Send package
+     * @param array $parcels
+     * @param array $receiver
+     * @param string $payer
+     * @param array $services
+     * @param string $ref
+     * @return StdClass|null
+     * @throws Exception
+     */
+    public function sendPackage(array $parcels, array $receiver, string $payer = 'SENDER', array $services = [], string $ref = ''): ?StdClass
+    {
+
+        $params = [
+            'openUMLFeV3' => [
+                'packages' => $this->createPackage($parcels, $receiver, $payer, $services, $ref),
+            ],
+            'pkgNumsGenerationPolicyV1' => self::PKG_NUMS_GEN_ERR_POLICY,
+            'authDataV1' => $this->_authData(),
+            'langCode' => $this->config->lang_code
+        ];
+
+        $obj = new StdClass;
+        $obj->method = 'generatePackagesNumbersV' . $this->apiVersion;
+        try {
+
+            // api method call
+            $result = $this->__soapCall('generatePackagesNumbersV' . $this->apiVersion, [$params]);
+
+            // debug results
+            if (isset($this->config->debug) && $this->config->debug)
+                var_dump($result);
+
+            // get status
+            $status = ($this->apiVersion > 1) ? $result->return->Status : $result->return->status;
+
+            // check status
+            if ($status == 'OK') {
+
+                $this->sessionId = ($this->apiVersion > 1) ? $result->return->SessionId : $result->return->sessionId;
+
+                $obj->success = true;
+                $obj->sender = $this->getSender();
+                $obj->packageId = ($this->apiVersion > 1) ? $result->return->Packages->Package[0]->PackageId : $result->return->packages[0]->packageId;
+                $obj->parcels = ($this->apiVersion > 1) ? $result->return->Packages->Package[0]->Parcels->Parcel : $result->return->packages[0]->parcels;
+
+            } else {
+                Log::error('Failed pickup request: ', [$result]);
+                $obj->success = false;
+            }
+
+            return $obj;
+
+        } catch (SoapFault $e) {
+            echo 'Caught exception: ', $e->getMessage(), "\n";
+            $this->log($this->__getLastRequest());
+        }
+
+        return null;
+    }
+
+    /**
+     * Prepare package
+     * @param array $parcels
+     * @param array $receiver
+     * @param string $payer
+     * @param array $services
+     * @param string $ref
+     * @return array
+     * @throws Exception
+     */
+    public function createPackage(array $parcels, array $receiver, string $payer = 'SENDER', array $services = [], string $ref = ''): array
+    {
+        //validate
+        if (count($parcels) == 0)
+            throw new Exception('Parcel data are missing', 101);
+
+        if (count($receiver) == 0)
+            throw new Exception('Receiver data are missing', 102);
+
+        if (is_null($this->sender) || !is_array($this->sender) || count($this->sender) == 0)
+            throw new Exception('Sender data are required', 103);
+
+        if (strlen($ref) > 27)
+            throw new Exception('REF field exceeds 27 chars', 104);
+        else
+            $ref = str_split($ref, 9);
+
+        if (strtoupper($payer) != 'SENDER' && strtoupper($payer) != 'RECEIVER')
+            throw new Exception('Wrong payer type (SENDER or RECEIVER)', 105);
+
+        $package = [
+            'sender' => $this->_arrayCopy($this->getSender()),
+            'payerType' => strtoupper($payer),
+            'receiver' => $this->_arrayCopy($receiver),
+            'parcels' => $this->_arrayCopy($parcels),
+            'services' => $this->_arrayCopy($services),
+            'ref1' => ($ref[0] ?? ''),
+            'ref2' => ($ref[1] ?? ''),
+            'ref3' => ($ref[2] ?? ''),
+        ];
+
+        $this->validatePackage($package);
+
+        // return validated data
+        return $package;
+    }
+
+    /**
+     * Copies the arrays
+     * @param array $array
+     * @return array
+     */
+    private function _arrayCopy(array $array)
+    {
+        $result = array();
+
+        foreach ($array as $key => $value) {
+            $result[$key] = (is_array($value) ? $this->_arrayCopy($value) : $value);
+        }
+
+        return $result;
     }
 
     /**
@@ -120,12 +232,12 @@ class DPDService extends SoapClient
     }
 
     /**
-     * Get session id
-     * @return string
+     * Set sender data
+     * @param array $sender
      */
-    public function getSessionId()
+    public function setSender(array $sender)
     {
-        return $this->sessionId;
+        $this->sender = $sender;
     }
 
     /**
@@ -161,8 +273,7 @@ class DPDService extends SoapClient
 
         $parcelReq = ['weight'];
 
-        foreach($package['parcels'] as $parcel)
-        {
+        foreach ($package['parcels'] as $parcel) {
             if (count(array_intersect_key(array_flip($parcelReq), $parcel)) !== count($parcelReq))
                 throw new Exception('Package validation error - Parcel requires the fields: ' . implode(',', $parcelReq), 102);
         }
@@ -171,159 +282,60 @@ class DPDService extends SoapClient
     }
 
     /**
-     * Copies the arrays
-     * @param array $array
+     * Get auth data
      * @return array
      */
-    private function _arrayCopy(array $array)
+    private function _authData()
     {
-        $result = array();
-
-        foreach($array as $key => $value)
-        {
-            $result[$key] = (is_array($value) ? $this->_arrayCopy($value) : $value);
-        }
-
-        return $result;
+        return [
+            'masterFid' => $this->config->fid,
+            'login' => $this->config->username,
+            'password' => $this->config->password,
+        ];
     }
 
     /**
-     * Prepare package
-     * @param array $parcels
-     * @param array $receiver
-     * @param string $payer
-     * @param array $services
-     * @param string $ref
-     * @return object
+     * Log error data to file
+     * @param ?string $logData
      */
-    public function createPackage(array $parcels, array $receiver, $payer = 'SENDER', array $services = [], $ref = '')
+    public function log(?string $logData)
     {
-        //validate
-        if (count($parcels) == 0)
-            throw new Exception('Parcel data are missing', 101);
+        if (isset($this->config->log_errors) && $this->config->log_errors) {
+            if (!is_dir($this->config->log_path)) @mkdir($this->config->log_path, 0777, true);
+            $log_file = $this->config->log_path . DIRECTORY_SEPARATOR . date('Y-m-d') . '.log';
 
-        if (count($receiver) == 0)
-            throw new Exception('Receiver data are missing', 102);
-
-        if (is_null($this->sender) || !is_array($this->sender) || count($this->sender) == 0)
-            throw new Exception('Sender data are required', 103);
-
-        if (strlen($ref) > 27)
-            throw new Exception('REF field exceeds 27 chars', 104);
-        else
-            $ref = str_split($ref, 9);
-
-        if (strtoupper($payer) != 'SENDER' && strtoupper($payer) != 'RECEIVER')
-            throw new Exception('Wrong payer type (SENDER or RECEIVER)', 105);
-
-        $package = [
-            'sender' => $this->_arrayCopy($this->getSender()),
-            'payerType' => strtoupper($payer),
-            'receiver' => $this->_arrayCopy($receiver),
-            'parcels' => $this->_arrayCopy($parcels),
-            'services' => $this->_arrayCopy($services),
-            'ref1' => (isset($ref[0]) ? $ref[0] : ''),
-            'ref2' => (isset($ref[1]) ? $ref[1] : ''),
-            'ref3' => (isset($ref[2]) ? $ref[2] : ''),
-        ];
-
-        $this->validatePackage($package);
-
-        // return validated data
-        return $package;
-    }
-
-    /**
-     * Send package
-     * @param array $parcels
-     * @param array $receiver
-     * @param string $payer
-     * @param array $services
-     * @param string $ref
-     * @return object
-     */
-    public function sendPackage(array $parcels, array $receiver, $payer = 'SENDER', array $services = [], $ref = '')
-    {
-
-        $params = [
-            'openUMLFeV3' => [
-                'packages' => $this->createPackage($parcels, $receiver, $payer, $services, $ref),
-            ],
-            'pkgNumsGenerationPolicyV1' => self::PKG_NUMS_GEN_ERR_POLICY,
-            'authDataV1' => $this->_authData(),
-            'langCode'  => $this->config->lang_code
-        ];
-
-        $obj = new StdClass;
-        $obj->method = 'generatePackagesNumbersV'. $this->apiVersion;
-        try
-        {
-
-            // api method call
-            $result = $this->__soapCall('generatePackagesNumbersV'. $this->apiVersion, [$params]);
-
-            // debug results
-            if (isset($this->config->debug) && $this->config->debug)
-                var_dump($result);
-
-            // get status
-            $status = ($this->apiVersion > 1) ? $result->return->Status : $result->return->status;
-
-            // check status
-            if ($status == 'OK')
-            {
-
-                $this->sessionId = ($this->apiVersion > 1) ? $result->return->SessionId : $result->return->sessionId;
-
-                $obj->success = true;
-                $obj->sender = $this->getSender();
-                $obj->packageId = ($this->apiVersion > 1) ? $result->return->Packages->Package[0]->PackageId : $result->return->packages[0]->packageId;
-                $obj->parcels = ($this->apiVersion > 1) ? $result->return->Packages->Package[0]->Parcels->Parcel : $result->return->packages[0]->parcels;
-
-            } else {
-                \Log::error('Failed pickup request: ', [$result]);
-                $obj->success = false;
-            }
-
-            return $obj;
-
+            file_put_contents($log_file, "--- " . date('Y-m-d H:i:s') . "\r\n" . ($logData ?? '') . "\r\n\r\n", FILE_APPEND);
         }
-        catch(SoapFault $e)
-        {
-            echo 'Caught exception: ',  $e->getMessage(), "\n";
-            $this->log($this->__getLastRequest());
-        }
-
     }
 
     /**
      * Send packages
      * @param array $packages
-     * @return object
+     * @return StdClass
+     * @throws Exception
      */
-    public function sendPackages(array $packages)
+    public function sendPackages(array $packages): StdClass
     {
 
         if (count($packages) == 0)
-            throw new \Exception('`packages` argument is empty', 101);
+            throw new Exception('`packages` argument is empty', 101);
 
-        $params=[
+        $params = [
             'openUMLV1' => [
                 'packages' => $packages,
             ],
             'pkgNumsGenerationPolicyV1' => self::PKG_NUMS_GEN_ERR_POLICY,
             'authDataV1' => $this->_authData(),
-            'langCode'  => $this->config->lang_code
+            'langCode' => $this->config->lang_code
         ];
 
-        $obj = new \StdClass;
-        $obj->method = 'generatePackagesNumbersV'. $this->apiVersion;
+        $obj = new StdClass;
+        $obj->method = 'generatePackagesNumbersV' . $this->apiVersion;
 
-        try
-        {
+        try {
 
             // api method call
-            $result = $this->__soapCall('generatePackagesNumbersV'. $this->apiVersion, array($params));
+            $result = $this->__soapCall('generatePackagesNumbersV' . $this->apiVersion, array($params));
 
             // debug results
             if (isset($this->config->debug) && $this->config->debug)
@@ -333,8 +345,7 @@ class DPDService extends SoapClient
             $status = ($this->apiVersion > 1) ? $result->return->Status : $result->return->status;
 
             // check status
-            if ($status == 'OK')
-            {
+            if ($status == 'OK') {
                 $this->sessionId = ($this->apiVersion > 1) ? $result->return->SessionId : $result->return->sessionId;
 
                 $packages = ($this->apiVersion > 1) ? $result->return->Packages->Package : $result->return->packages;
@@ -342,8 +353,7 @@ class DPDService extends SoapClient
                 $obj->sender = $this->getSender();
 
                 $obj->packages = [];
-                foreach($packages as $package)
-                {
+                foreach ($packages as $package) {
                     $obj->packages[] = $package;
                 }
 
@@ -351,9 +361,7 @@ class DPDService extends SoapClient
 
             return $obj;
 
-        }
-        catch(SoapFault $e)
-        {
+        } catch (SoapFault $e) {
             $this->log($this->__getLastRequest());
             throw new Exception($e->getMessage(), 300);
         }
@@ -364,9 +372,10 @@ class DPDService extends SoapClient
      * Add parcels to existing package
      * @param string $packageId
      * @param array $parcels
-     * @return object
+     * @return ?stdClass
+     * @throws Exception
      */
-    public function addParcelsToPackage($packageId, array $parcels)
+    public function addParcelsToPackage($packageId, array $parcels): ?StdClass
     {
 
         if (is_null($packageId) || (int)$packageId == 0) throw new Exception('`packageId` value must be an integer > 0', 101);
@@ -386,8 +395,7 @@ class DPDService extends SoapClient
         $obj = new StdClass;
         $obj->method = 'appendParcelsToPackageV1';
 
-        try
-        {
+        try {
 
             // api method call
             $result = $this->__soapCall('appendParcelsToPackageV1', [$params]);
@@ -406,13 +414,11 @@ class DPDService extends SoapClient
 
             return $obj;
 
-        }
-        catch(SoapFault $e)
-        {
-            echo 'Caught exception: ',  $e->getMessage(), "\n";
+        } catch (SoapFault $e) {
+            echo 'Caught exception: ', $e->getMessage(), "\n";
             $this->log($this->__getLastRequest());
         }
-
+        return null;
     }
 
     /**
@@ -424,6 +430,7 @@ class DPDService extends SoapClient
      * @param string $pageFormat
      * @param string $labelType
      * @return object
+     * @throws Exception
      */
     public function generateSpeedLabelsByPackageIds(array $ids, array $pickupAddress, $shippingType = 'DOMESTIC', $fileFormat = 'PDF', $pageFormat = 'A4', $labelType = 'BIC3')
     {
@@ -435,8 +442,7 @@ class DPDService extends SoapClient
 
         $packages = [];
 
-        foreach($ids as $id)
-        {
+        foreach ($ids as $id) {
             $packages[] = [
                 'packageId' => $id,
             ];
@@ -450,33 +456,6 @@ class DPDService extends SoapClient
         return $this->generateSpeedLabels($refs, $pickupAddress, $fileFormat, $pageFormat, $labelType);
     }
 
-
-    /**
-     * Generate speedlabels by session id
-     * @param string $id
-     * @param array $pickupAddress
-     * @param string $shippingType
-     * @param string $fileFormat
-     * @param string $pageFormat
-     * @param string $labelType
-     * @return object
-     */
-    public function generateSpeedLabelsBySessionId($id, array $pickupAddress, $shippingType = 'DOMESTIC', $fileFormat = 'PDF', $pageFormat = 'A4', $labelType = 'BIC3')
-    {
-
-        $shippingType = strtoupper($shippingType);
-
-        if (!in_array($shippingType, ['DOMESTIC', 'INTERNATIONAL']))
-            throw new Exception('Wrong shipping type, should be DOMESTIC or INTERNATIONAL', 101);
-
-        $refs = [
-            'sessionId' => $id,
-            'sessionType' => $shippingType
-        ];
-
-        return $this->generateSpeedLabels($refs, $pickupAddress, $fileFormat, $pageFormat, $labelType);
-    }
-
     /**
      * Generate speedlabels by refs array
      * @param array $refs
@@ -484,9 +463,10 @@ class DPDService extends SoapClient
      * @param string $fileFormat
      * @param string $pageFormat
      * @param string $labelType
-     * @return object
+     * @return StdClass|null
+     * @throws Exception
      */
-    public function generateSpeedLabels(array $refs, array $pickupAddress, $fileFormat = 'PDF', $pageFormat = 'A4', $labelType = 'BIC3')
+    public function generateSpeedLabels(array $refs, array $pickupAddress, string $fileFormat = 'PDF', string $pageFormat = 'A4', string $labelType = 'BIC3'): ?StdClass
     {
         if (count($refs) == 0)
             throw new Exception("Reference ids are required", 101);
@@ -524,37 +504,68 @@ class DPDService extends SoapClient
         ];
 
         $obj = new StdClass;
-        $obj->method = 'generateSpedLabelsV'. $this->apiVersion;
+        $obj->method = 'generateSpedLabelsV' . $this->apiVersion;
 
-        try
-        {
+        try {
             // api call
-            $result = $this->__soapCall('generateSpedLabelsV'. $this->apiVersion, [$params]);
+            $result = $this->__soapCall('generateSpedLabelsV' . $this->apiVersion, [$params]);
 
             // debug results
             if (isset($this->config->debug) && $this->config->debug)
                 var_dump($result);
 
-            if ($result->return->session->statusInfo->status == 'OK')
-            {
+            if ($result->return->session->statusInfo->status == 'OK') {
                 $obj->success = true;
                 $obj->filedata = $result->return->documentData;
                 $obj->fileformat = $fileFormat;
                 $obj->pageformat = $pageFormat;
 
             } else {
-                \Log::error('Failed Speed Label Generation: ', [$result]);
+                Log::error('Failed Speed Label Generation: ', [$result]);
                 $obj->success = false;
             }
 
             return $obj;
 
-        }
-        catch(SoapFault $e)
-        {
-            echo 'Caught exception: ',  $e->getMessage(), "\n";
+        } catch (SoapFault $e) {
+            echo 'Caught exception: ', $e->getMessage(), "\n";
             $this->log($this->__getLastRequest());
         }
+
+        return null;
+    }
+
+    /**
+     * Generate speedlabels by session id
+     * @param string $id
+     * @param array $pickupAddress
+     * @param string $shippingType
+     * @param string $fileFormat
+     * @param string $pageFormat
+     * @param string $labelType
+     * @return StdClass|null
+     * @throws Exception
+     */
+    public function generateSpeedLabelsBySessionId(
+        string $id,
+        array  $pickupAddress,
+        string $shippingType = 'DOMESTIC',
+        string $fileFormat = 'PDF',
+        string $pageFormat = 'A4',
+        string $labelType = 'BIC3'): StdClass|null
+    {
+
+        $shippingType = strtoupper($shippingType);
+
+        if (!in_array($shippingType, ['DOMESTIC', 'INTERNATIONAL']))
+            throw new Exception('Wrong shipping type, should be DOMESTIC or INTERNATIONAL', 101);
+
+        $refs = [
+            'sessionId' => $id,
+            'sessionType' => $shippingType
+        ];
+
+        return $this->generateSpeedLabels($refs, $pickupAddress, $fileFormat, $pageFormat, $labelType);
     }
 
     /**
@@ -563,9 +574,10 @@ class DPDService extends SoapClient
      * @param array $pickupAddress
      * @param string $shippingType
      * @param string $pageFormat
-     * @return object
+     * @return StdClass|null
+     * @throws Exception
      */
-    public function generateProtocolByPackageIds(array $ids, array $pickupAddress, $shippingType = 'DOMESTIC', $pageFormat = 'A4')
+    public function generateProtocolByPackageIds(array $ids, array $pickupAddress, string $shippingType = 'DOMESTIC', string $pageFormat = 'A4'): StdClass|null
     {
 
         $shippingType = strtoupper($shippingType);
@@ -575,8 +587,7 @@ class DPDService extends SoapClient
 
         $packages = [];
 
-        foreach($ids as $id)
-        {
+        foreach ($ids as $id) {
             $packages[] = [
                 'packageId' => $id,
             ];
@@ -591,38 +602,14 @@ class DPDService extends SoapClient
     }
 
     /**
-     * Generate protocol by session id
-     * @param type $id
-     * @param array $pickupAddress
-     * @param string $shippingType
-     * @param string $pageFormat
-     * @return object
-     */
-    public function generateProtocolBySessionId($id, array $pickupAddress, $shippingType = 'DOMESTIC', $pageFormat = 'A4')
-    {
-
-        $shippingType = strtoupper($shippingType);
-
-        if (!in_array($shippingType, ['DOMESTIC', 'INTERNATIONAL']))
-            throw new Exception('Wrong shipping type, should be DOMESTIC or INTERNATIONAL', 101);
-
-        $refs = [
-            'sessionId' => $id,
-            'sessionType' => $shippingType
-        ];
-
-        return $this->generateProtocol($refs, $pickupAddress, $pageFormat);
-    }
-
-
-    /**
      * Generate protocol by refs
      * @param array $refs
      * @param array $pickupAddress
      * @param string $pageFormat
-     * @return object
+     * @return StdClass|null
+     * @throws Exception
      */
-    public function generateProtocol(array $refs, array $pickupAddress, $pageFormat = 'A4')
+    public function generateProtocol(array $refs, array $pickupAddress, string $pageFormat = 'A4'): ?StdClass
     {
         if (count($refs) == 0)
             throw new Exception("Reference ids are required", 101);
@@ -630,7 +617,7 @@ class DPDService extends SoapClient
         if (count($pickupAddress) == 0)
             throw new Exception('Pickup address are required', 102);
 
-        if (strtoupper($pageFormat) != 'A4' && strtoupper($pageFormat) == 'BIC3')
+        if (strtoupper($pageFormat) !== 'A4' && strtoupper($pageFormat) !== 'BIC3')
             throw new Exception('Wrong page format (only A4 or BIC3)', 102);
 
         $params = [
@@ -647,8 +634,7 @@ class DPDService extends SoapClient
         $obj = new StdClass;
         $obj->method = 'generateProtocolV1';
 
-        try
-        {
+        try {
             // api call
             $result = $this->__soapCall('generateProtocolV1', [$params]);
 
@@ -656,8 +642,7 @@ class DPDService extends SoapClient
             if (isset($this->config->debug) && $this->config->debug)
                 var_dump($result);
 
-            if ($result->return->session->statusInfo->status == 'OK')
-            {
+            if ($result->return->session->statusInfo->status == 'OK') {
                 $obj->success = true;
                 $obj->documentId = $result->return->documentId;
                 $obj->filedata = $result->return->documentData;
@@ -666,29 +651,58 @@ class DPDService extends SoapClient
                 $obj->pageformat = $pageFormat;
 
             } else {
-                \Log::error('Failed generateProtocol: ', [$result]);
+                Log::error('Failed generateProtocol: ', [$result]);
                 $obj->success = false;
             }
 
             return $obj;
 
-        }
-        catch(SoapFault $e)
-        {
-            echo 'Caught exception: ',  $e->getMessage(), "\n";
+        } catch (SoapFault $e) {
+            echo 'Caught exception: ', $e->getMessage(), "\n";
             $this->log($this->__getLastRequest());
         }
+
+        return null;
+    }
+
+    /**
+     * Generate protocol by session id
+     * @param int $id
+     * @param array $pickupAddress
+     * @param string $shippingType
+     * @param string $pageFormat
+     * @return StdClass|null
+     * @throws Exception
+     */
+    public function generateProtocolBySessionId(int $id, array $pickupAddress, string $shippingType = 'DOMESTIC', string $pageFormat = 'A4'): ?StdClass
+    {
+
+        $shippingType = strtoupper($shippingType);
+
+        if (!in_array($shippingType, ['DOMESTIC', 'INTERNATIONAL']))
+            throw new Exception('Wrong shipping type, should be DOMESTIC or INTERNATIONAL', 101);
+
+        $refs = [
+            'sessionId' => $id,
+            'sessionType' => $shippingType
+        ];
+
+        return $this->generateProtocol($refs, $pickupAddress, $pageFormat);
     }
 
     /**
      * Pickup call
      * @param array $protocols
-     * @param type $pickupDate
-     * @param type $pickupTimeFrom
-     * @param type $pickupTimeTo
+     * @param $pickupDate
+     * @param $pickupTimeFrom
+     * @param $pickupTimeTo
      * @param array $contactInfo
      * @param array $pickupAddress
-     * @return object
+     * @param array $parcels
+     * @param array $receiver
+     * TODO Sprawdzić co tu jest zwracany za obiekt lub dać jakieś DTO
+     * @return mixed|void
+     * @throws Exception
      */
     public function pickupRequest(array $protocols, $pickupDate, $pickupTimeFrom, $pickupTimeTo, array $contactInfo, array $pickupAddress, array $parcels, array $receiver)
     {
@@ -709,14 +723,6 @@ class DPDService extends SoapClient
 
         if (count($pickupAddress) == 0)
             throw new Exception("Pickup address are required", 106);
-
-        $protocolsIds = [];
-        foreach ($protocols as $protocol)
-        {
-            $protocolsIds[] = [
-                'documentId' => $protocol
-            ];
-        }
 
         $params = [
             'dpdPickupParamsV3' => [
@@ -766,8 +772,7 @@ class DPDService extends SoapClient
         $obj = new StdClass;
         $obj->method = 'packagesPickupCallV4';
 
-        try
-        {
+        try {
             // api call
             $result = $this->__soapCall('packagesPickupCallV4', [$params]);
 
@@ -777,10 +782,8 @@ class DPDService extends SoapClient
 
             if (isset($result->return->prototocols)) // 'prototocols' wtf?
             {
-                foreach ($result->return->prototocols as $protocol)
-                {
-                    if ($protocol->statusInfo->status == 'OK')
-                    {
+                foreach ($result->return->prototocols as $protocol) {
+                    if ($protocol->statusInfo->status == 'OK') {
                         $obj->protocols[] = $protocol;
                     }
 
@@ -789,18 +792,15 @@ class DPDService extends SoapClient
                 $obj->success = true;
 
             } else {
-                \Log::error('Failed Pickup Request', [$result]);
+                Log::error('Failed Pickup Request', [$result]);
                 $obj->success = false;
             }
 
 
-
             return $result;
 
-        }
-        catch(SoapFault $e)
-        {
-            echo 'Caught exception: ',  $e->getMessage(), "\n";
+        } catch (SoapFault $e) {
+            echo 'Caught exception: ', $e->getMessage(), "\n";
             $this->log($this->__getLastRequest());
         }
     }
@@ -809,11 +809,12 @@ class DPDService extends SoapClient
      * Method to check postcode
      * @param string $postCode
      * @param string $countryCode
-     * @return object
+     * @return StdClass|null
+     * @throws Exception
      */
-    public function checkPostCode($postCode, $countryCode = 'PL')
+    public function checkPostCode(string $postCode, string $countryCode = 'PL'): StdClass|null
     {
-        if ($postCode === '' || is_null($postCode))
+        if ($postCode === '')
             throw new Exception("Postcode are required", 101);
 
         $postCode = str_replace(['-', ' '], '', $postCode);
@@ -829,8 +830,7 @@ class DPDService extends SoapClient
         $obj = new StdClass;
         $obj->method = 'findPostalCodeV1';
 
-        try
-        {
+        try {
 
             $result = $this->__soapCall('findPostalCodeV1', [$params]);
 
@@ -843,23 +843,24 @@ class DPDService extends SoapClient
 
             return $obj;
 
-        } catch(SoapFault $e)
-        {
-            echo 'Caught exception: ',  $e->getMessage(), "\n";
+        } catch (SoapFault $e) {
+            echo 'Caught exception: ', $e->getMessage(), "\n";
             $this->log($this->__getLastRequest());
         }
 
+        return null;
     }
 
     /**
      * Method to check courier service availability
      * @param string $postCode
      * @param string $countryCode
-     * @return object
+     * @return ?StdClass
+     * @throws Exception
      */
-    public function checkCourierAvailability($postCode, $countryCode = 'PL')
+    public function checkCourierAvailability(string $postCode, string $countryCode = 'PL'): ?StdClass
     {
-        if ($postCode === '' || is_null($postCode))
+        if ($postCode === '')
             throw new Exception("Postcode are required", 101);
 
         $postCode = str_replace(['-', ' '], '', $postCode);
@@ -875,8 +876,7 @@ class DPDService extends SoapClient
         $obj = new StdClass;
         $obj->method = 'getCourierOrderAvailabilityV1';
 
-        try
-        {
+        try {
 
             $result = $this->__soapCall('getCourierOrderAvailabilityV1', [$params]);
 
@@ -889,27 +889,12 @@ class DPDService extends SoapClient
 
             return $obj;
 
-        } catch(SoapFault $e)
-        {
-            echo 'Caught exception: ',  $e->getMessage(), "\n";
+        } catch (SoapFault $e) {
+            echo 'Caught exception: ', $e->getMessage(), "\n";
             $this->log($this->__getLastRequest());
         }
 
-    }
-
-    /**
-     * Log error data to file
-     * @param type $logData
-     */
-    public function log($logData)
-    {
-        if (isset($this->config->log_errors) && $this->config->log_errors)
-        {
-            if (!is_dir($this->config->log_path)) @mkdir($this->config->log_path, 0777, true);
-            $log_file = $this->config->log_path . DIRECTORY_SEPARATOR . date('Y-m-d') .'.log';
-
-            file_put_contents($log_file, "--- ". date('Y-m-d H:i:s') ."\r\n". $logData ."\r\n\r\n", FILE_APPEND);
-        }
+        return null;
     }
 
 }

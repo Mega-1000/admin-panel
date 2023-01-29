@@ -23,14 +23,13 @@ use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Queueable;
-use Illuminate\Config\Repository;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Http\Request;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use OutOfRangeException;
 use Psr\Http\Message\ResponseInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Throwable;
 
 /**
@@ -42,12 +41,9 @@ class CheckPackagesStatusJob
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    /**
-     * @var Repository|mixed
-     */
-    protected $config;
+    protected array $config;
 
-    protected $httpClient;
+    protected Client $httpClient;
 
     public function __construct()
     {

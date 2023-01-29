@@ -1,3 +1,4 @@
+@php use App\Entities\ProductMedia; @endphp
 <link href="{{ asset('css/views/offer/style.css') }}" rel="stylesheet">
 <body>
 <p>
@@ -6,7 +7,8 @@
 
 <p>{!! setting('mail.offer_notice') !!}</p>
 
-<table id="productsTable" border="1" class="table table1 table-venice-blue productsTableEdit" style="border-collapse: collapse;">
+<table id="productsTable" border="1" class="table table1 table-venice-blue productsTableEdit"
+       style="border-collapse: collapse;">
     <tbody id="products-tbody">
     @php
         $gross_purchase_sum = 0;
@@ -189,7 +191,7 @@
                     <td>
                         @if($variation['different'] === null)
                             <span>-</span>
-                        @elseif(strstr($variation['different'], '-') != false)
+                        @elseif(str_contains($variation['different'], '-') === true)
                             <span style="color:red;">{{(float)$variation['different']}}</span>
                         @else
                             <span style="color:green;">+{{(float)$variation['different']}}</span>
@@ -197,14 +199,14 @@
                     </td>
                     <td>
                         @php
-                            $productMedia = \App\Entities\ProductMedia::where('product_id', $variation['id'])->get();
+                            $productMedia = ProductMedia::where('product_id', $variation['id'])->get();
                             foreach ($productMedia as $media) {
                                 $exploded = explode('|', $media->url);
-                                if (count($exploded) != 3 || strpos($exploded[2], MessagesHelper::SHOW_VAR) === false) {
+                                if (count($exploded) != 3 || str_contains($exploded[2], \App\Helpers\MessagesHelper::SHOW_VAR) === false) {
                                     continue;
                                 }
                                 $address = $order->getDeliveryAddress();
-                                $token = MessagesHelper::getToken($media->id, $address->postal_code, $address->email);
+                                $token = \App\Helpers\MessagesHelper::getToken($media->id, $address->postal_code, $address->email);
                                 $url = route('chat.show', ['token' => $token]);
                                 echo "<a href='$url' style='
                                         display: inline-block;
@@ -252,19 +254,19 @@
             <td>Różnica wartości do wskazanego producenta w zamówieniu</td>
             <td>Odległość od magazynu</td>
             <td>Uwagi</td>
-{{--            <td>Telefon do konsultanta</td>--}}
-{{--            <td>--}}
-{{--                Recenzja--}}
-{{--            </td>--}}
-{{--            <td>--}}
-{{--                Jakość--}}
-{{--            </td>--}}
-{{--            <td>--}}
-{{--                Jakość do ceny--}}
-{{--            </td>--}}
-{{--            <td>--}}
-{{--                Przybliżona wartość towarów danego magazynu do darmowej przesyłki--}}
-{{--            </td>--}}
+            {{--            <td>Telefon do konsultanta</td>--}}
+            {{--            <td>--}}
+            {{--                Recenzja--}}
+            {{--            </td>--}}
+            {{--            <td>--}}
+            {{--                Jakość--}}
+            {{--            </td>--}}
+            {{--            <td>--}}
+            {{--                Jakość do ceny--}}
+            {{--            </td>--}}
+            {{--            <td>--}}
+            {{--                Przybliżona wartość towarów danego magazynu do darmowej przesyłki--}}
+            {{--            </td>--}}
         </tr>
         <hr>
         </thead>
@@ -275,7 +277,7 @@
                     <td>{{$productSupplier['product_name_supplier']}}</td>
                     <td>{{$productSupplier['sum']}}</td>
                     <td>
-                        @if(strstr($productSupplier['different'], '-') != false)
+                        @if(str_contains($productSupplier['different'], '-') === true)
                             <span style="color:red;">{{(float)$productSupplier['different']}}</span>
                         @else
                             <span style="color:green;">+{{(float)$productSupplier['different']}}</span>
@@ -286,11 +288,11 @@
                     </td>
                     <td>{{(int)$productSupplier['radius']}} km</td>
                     <td>{{$productSupplier['warehouse_property']}}</td>
-{{--                    <td>{{$productSupplier['phone']}}</td>--}}
-{{--                    <td>{{$productSupplier['review']}}</td>--}}
-{{--                    <td>{{$productSupplier['quality']}}</td>--}}
-{{--                    <td>{{$productSupplier['quality_to_price']}}</td>--}}
-{{--                    <td>{{$productSupplier['value_of_the_order_for_free_transport']}}</td>--}}
+                    {{--                    <td>{{$productSupplier['phone']}}</td>--}}
+                    {{--                    <td>{{$productSupplier['review']}}</td>--}}
+                    {{--                    <td>{{$productSupplier['quality']}}</td>--}}
+                    {{--                    <td>{{$productSupplier['quality_to_price']}}</td>--}}
+                    {{--                    <td>{{$productSupplier['value_of_the_order_for_free_transport']}}</td>--}}
                 </tr>
                 @if($productSupplier['comments'])
                     <tr>

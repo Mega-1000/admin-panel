@@ -6,7 +6,7 @@ use App\Services\AllegroApiService;
 
 class AllegroRestClient extends AllegroApiService
 {
-	protected $auth_record_id = 1;
+    protected $auth_record_id = 1;
 
     public function __construct()
     {
@@ -26,7 +26,7 @@ class AllegroRestClient extends AllegroApiService
                 $carrierId = 'DPD';
                 break;
             default:
-                return;
+                return null;
         }
         $waybill = $package->letter_number;
         $carrierName = $package->service_courier_name;

@@ -7,52 +7,54 @@ use Illuminate\Contracts\Validation\Rule;
 class ValidNIP implements Rule
 {
     protected $isAbroad = false;
-	/**
-	 * Create a new rule instance.
-	 *
-	 * @return void
-	 */
-	public function __construct($isAbroad = false)
-	{
+
+    /**
+     * Create a new rule instance.
+     *
+     * @return void
+     */
+    public function __construct($isAbroad = false)
+    {
         $this->isAbroad = $isAbroad;
-	}
-	
-	/**
-	 * Determine if the validation rule passes.
-	 *
-	 * @param  string  $attribute
-	 * @param  mixed  $value
-	 * @return bool
-	 */
-	public function passes($attribute, $value)
-	{
-	    if ($this->isAbroad) {
-	        return strlen($value) > 0;
+    }
+
+    /**
+     * Determine if the validation rule passes.
+     *
+     * @param string $attribute
+     * @param mixed $value
+     * @return bool
+     */
+    public function passes($attribute, $value): bool
+    {
+        if ($this->isAbroad) {
+            return strlen($value) > 0;
         }
-	    
-		$nipWithoutDashes = preg_replace("/-/", "", $value);
-		$reg = '/^[0-9]{10}$/';
-		
-		if (preg_match($reg, $nipWithoutDashes) == false) {
-			return false;
-		} else {
-			$digits = str_split($nipWithoutDashes);
-			$checksum = (6 * intval($digits[0]) + 5 * intval($digits[1]) +
-					7 * intval($digits[2]) + 2 * intval($digits[3]) + 3 * intval($digits[4]) +
-					4 * intval($digits[5]) + 5 * intval($digits[6]) + 6 * intval($digits[7]) +
-					7 * intval($digits[8])) % 11;
-			
-			return (intval($digits[9]) == $checksum);
-		}
-	}
-	
-	/**
-	 * Get the validation error message.
-	 *
-	 * @return string
-	 */
-	public function message()
-	{
-		return __('validation.custom.NIP.ValidNip');
-	}
+
+        $nipWithoutDashes = preg_replace("/-/", "", $value);
+        $reg = '/^[0-9]{10}$/';
+
+        if (!preg_match($reg, $nipWithoutDashes)) {
+            return false;
+        }
+
+        $digits = str_split($nipWithoutDashes);
+        $checksum = (6 * intval($digits[0]) + 5 * intval($digits[1]) +
+                7 * intval($digits[2]) + 2 * intval($digits[3]) + 3 * intval($digits[4]) +
+                4 * intval($digits[5]) + 5 * intval($digits[6]) + 6 * intval($digits[7]) +
+                7 * intval($digits[8])) % 11;
+
+        return (intval($digits[9]) == $checksum);
+
+    }
+
+    /**
+     * Get the validation error message.
+     *
+     * @return string
+     */
+    public function message()
+    {
+        return __('validation.custom.NIP.ValidNip');
+    }
 }

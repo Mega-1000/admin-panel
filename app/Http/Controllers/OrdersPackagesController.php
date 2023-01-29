@@ -17,6 +17,7 @@ use App\Entities\SelTransaction;
 use App\Entities\WorkingEvents;
 use App\Enums\CourierName;
 use App\Enums\Schenker\SupportedService;
+use App\Facades\Mailer;
 use App\Helpers\DateHelper;
 use App\Helpers\OrderPackagesDataHelper;
 use App\Helpers\PdfCharactersHelper;
@@ -35,13 +36,14 @@ use App\Repositories\OrderRepository;
 use App\Repositories\PackageTemplateRepository;
 use App\Repositories\ShipmentGroupRepository;
 use App\Services\OrderPackageService;
-use Barryvdh\DomPDF\Facade as PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use DateTime;
 use Exception;
 use iio\libmergepdf\Merger;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -51,8 +53,6 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\View\View;
-use Mailer;
 use Yajra\DataTables\Facades\DataTables;
 
 /**
@@ -182,9 +182,6 @@ class OrdersPackagesController extends Controller
         return $orderPackage;
     }
 
-    /**
-     * @return Factory|View
-     */
     public function create(Request $request, $id, $multi = null)
     {
         if ($request['package_id']) {
@@ -361,7 +358,7 @@ class OrdersPackagesController extends Controller
                     $isAdditionalDKPExists = true;
                 }
             }
-            if ($order->toPay() > 5 && $isAdditionalDKPExists == false) {
+            if ($order->toPay() > 5 && $isAdditionalDKPExists === false) {
                 $this->orderRepository->update([
                     'additional_cash_on_delivery_cost' => $order->additional_cash_on_delivery_cost + 50,
                 ], $order->id);
@@ -422,11 +419,12 @@ class OrdersPackagesController extends Controller
     /**
      * Remove the specified resource from storage.
      *
+     * @param Request $request
      * @param int $id
      *
-     * @return Response
+     * @return Application|Response|ResponseFactory|RedirectResponse
      */
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, int $id)
     {
         $package = OrderPackage::find($id);
         if (empty($package)) {
@@ -476,6 +474,7 @@ class OrdersPackagesController extends Controller
 
     /**
      * @return JsonResponse
+     * @throws Exception
      */
     public function datatable($id)
     {
@@ -545,7 +544,7 @@ class OrdersPackagesController extends Controller
                         continue;
                     }
                 }
-                $packagesArr = [
+                $packagesArray[] = [
                     'order_id' => $package->order->id,
                     'number' => $package->number,
                     'warehouse' => $package->order->warehouse !== null ? $package->order->warehouse->symbol : null,
@@ -561,11 +560,10 @@ class OrdersPackagesController extends Controller
                     'postal_code' => $package->order->addresses->first->id->postal_code,
                     'city' => PdfCharactersHelper::changePolishCharactersToNonAccented($package->order->addresses->first->id->city ?? ''),
                 ];
-                array_push($packagesArray, $packagesArr);
             }
             $pdfFilename = 'protocol-' . $courierName . '-' . Carbon::today()->toDateString() . '.pdf';
 
-            $pdf = PDF::loadView('pdf.protocol', [
+            $pdf = Pdf::loadView('pdf.protocol', [
                 'packages' => $packagesArray,
                 'date' => DateHelper::dateRangeOrDate($request->date_from, $request->date_to),
                 'courierName' => strtoupper($courierName)
@@ -780,12 +778,12 @@ class OrdersPackagesController extends Controller
             foreach ($resArr->message as $msg) {
                 $itemMessage .= ' ' . $msg;
             }
-            $message = [
+            $messages[] = [
                 'message' => $itemMessage
             ];
-            array_push($messages, $message);
         }
-        return array($message, $messages);
+        // Todo here was something mess with the variables
+        return array($itemMessage, $messages);
     }
 
     public function preparePackageToSend($orderId, $packageId)
@@ -821,6 +819,7 @@ class OrdersPackagesController extends Controller
             'height' => $package->size_c,
             'notices' => $package->notices !== null ? $package->notices : 'Brak',
             'cash_on_delivery' => $package->cash_on_delivery !== null,
+            // TODO REMOVE  ENV
             'number_account_for_cash_on_delivery' => $package->cash_on_delivery !== null ? env('ACCOUNT_NUMBER') : null,
             'bank_name' => $package->cash_on_delivery !== null ? env('BANK_NAME') : null,
             'price_for_cash_on_delivery' => ($package->cash_on_delivery !== null) ? ($package->cash_on_delivery === 0 ? null : $package->cash_on_delivery) : null,
@@ -1042,14 +1041,14 @@ class OrdersPackagesController extends Controller
                 $package->update(
                     [
                         'shipment_date' => $today->copy()->addWeekday(),
-                        'delivery_date' => (empty($package->delivery_date)) ? null : $today->copy()->addWeekday(2)
+                        'delivery_date' => (empty($package->delivery_date)) ? null : $today->copy()->addWeekday()
                     ]
                 );
             }
 
             $pdfFilename = 'day-close-protocol-' . $courierName . '-' . Carbon::today()->toDateString() . '.pdf';
 
-            $pdf = PDF::loadView('pdf.close-day-protocol', [
+            $pdf = Pdf::loadView('pdf.close-day-protocol', [
                 'packages' => $packages,
                 'date' => $today,
                 'courierName' => strtoupper($courierName),
@@ -1088,7 +1087,7 @@ class OrdersPackagesController extends Controller
 
             $pdfFilename = 'group-close-protocol-' . $shipmentGroup->getLabel() . '-' . Carbon::today()->toDateString() . '.pdf';
 
-            $pdf = PDF::loadView('pdf.close-group-protocol', [
+            $pdf = Pdf::loadView('pdf.close-group-protocol', [
                 'packages' => $collection,
                 'date' => Carbon::today(),
                 'shipmentGroup' => $shipmentGroup,

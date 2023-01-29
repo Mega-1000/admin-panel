@@ -5,16 +5,22 @@ namespace App\Http\Controllers;
 use App\Entities\ColumnVisibility;
 use App\Entities\Customer;
 use App\Entities\Order;
+use App\Helpers\Helper;
 use App\Http\Requests\CustomerCreateRequest;
 use App\Http\Requests\CustomerUpdateRequest;
 use App\Repositories\CustomerAddressRepository;
 use App\Repositories\CustomerRepository;
+use DB;
+use Exception;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Yajra\DataTables\Facades\DataTables;
+use Illuminate\View\View;
 use TCG\Voyager\Models\Role;
-use App\Helpers\Helper;
-use Illuminate\Http\Request;
+use Yajra\DataTables\Facades\DataTables;
 
 /**
  * Class CustomersController.
@@ -54,7 +60,7 @@ class CustomersController extends Controller
     {
         try {
             $this->overrideContact($request, $id);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             Log::error("Can't change login or password",
                 ['message' => $exception->getMessage(),
                     'file' => $exception->getFile(),
@@ -71,9 +77,52 @@ class CustomersController extends Controller
         ]);
     }
 
+    /**
+     * @param Request $request
+     * @param $id
+     */
+    private function overrideContact(Request $request, $id): void
+    {
+        $order = Order::findOrFail($request->order_id);
+        $customer = Customer::findOrFail($id);
+        if ($request->login) {
+            $customer->login = $request->login;
+        }
+        if ($request->phone) {
+            $customer->password = $customer->generatePassword($request->phone);
+        }
+
+        $customer->addresses->map(function ($address) use ($request) {
+            if ($request->phone) {
+                $address->phone = $request->phone;
+            }
+            if ($request->login) {
+                $address->email = $request->login;
+            }
+            $address->save();
+        });
+
+        $invoice = $order->getInvoiceAddress();
+        if ($request->invoice_phone && $request->phone) {
+            $invoice->phone = $request->phone;
+        }
+        if ($request->invoice_email && $request->login) {
+            $invoice->email = $request->login;
+        }
+        $invoice->save();
+        $delivery = $order->getDeliveryAddress();
+        if ($request->delivery_phone && $request->phone) {
+            $delivery->phone = $request->phone;
+        }
+        if ($request->delivery_email && $request->login) {
+            $delivery->email = $request->login;
+        }
+        $delivery->save();
+        $customer->save();
+    }
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function index()
     {
@@ -89,33 +138,20 @@ class CustomersController extends Controller
         $this->roleName = $roleName;
         //pobieramy widzialności dla danego moduły oraz użytkownika
         $visibilities = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('customers'));
-        foreach($visibilities as $key => $row)
-        {
-            $visibilities[$key]->show = json_decode($row->show,true);
-            $visibilities[$key]->hidden = json_decode($row->hidden,true);
+        foreach ($visibilities as $key => $row) {
+            $row->show = json_decode($row->show, true);
+            $row->hidden = json_decode($row->hidden, true);
         }
-        return view('customers.index', compact('roleName','visibilities'));
-    }
-
-    /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function create()
-    {
-        $role = Role::find(Auth::user()->role_id);
-        $roleName = $role->name;
-        $this->roleName = $roleName;
-        return view('customers.create', compact('roleName'));
+        return view('customers.index', compact('roleName', 'visibilities'));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  CustomerCreateRequest $request
+     * @param CustomerCreateRequest $request
      *
-     * @return \Illuminate\Http\Response
+     * @return RedirectResponse
      *
-     * @throws \Prettus\Validator\Exceptions\ValidatorException
      */
     public function store(CustomerCreateRequest $request)
     {
@@ -173,13 +209,24 @@ class CustomersController extends Controller
     }
 
     /**
+     * @return Factory|View
+     */
+    public function create()
+    {
+        $role = Role::find(Auth::user()->role_id);
+        $roleName = $role->name;
+        $this->roleName = $roleName;
+        return view('customers.create', compact('roleName'));
+    }
+
+    /**
      * Show the form for editing the specified resource.
      *
-     * @param  int $id
+     * @param int $id
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\View
      */
-    public function edit($id)
+    public function edit(int $id)
     {
         $customer = $this->repository->find($id);
         $customerAddressStandard = $this->customerAddressRepository->findWhere([
@@ -203,9 +250,53 @@ class CustomersController extends Controller
     }
 
     /**
+     * Remove the specified resource from storage.
+     *
+     * @param int $id
+     *
+     * @return RedirectResponse
+     */
+    public function destroy(int $id)
+    {
+        $deleted = $this->repository->delete($id);
+
+        if (empty($deleted)) {
+            return redirect()->back()->with([
+                'message' => __('customers.message.not_delete'),
+                'alert-type' => 'error'
+            ]);
+        }
+
+        return redirect()->back()->with([
+            'message' => __('customers.message.delete'),
+            'alert-type' => 'success'
+        ]);
+    }
+
+    /**
+     * @param $id
+     * @return RedirectResponse
+     */
+    public function changeStatus($id)
+    {
+        $customer = $this->repository->find($id);
+        if (empty($customer)) {
+            abort(404);
+        }
+        $dataToStore = [];
+        $dataToStore['status'] = $customer['status'] === 'ACTIVE' ? 'PENDING' : 'ACTIVE';
+        $this->repository->update($dataToStore, $customer->id);
+
+        return redirect()->back()->with([
+            'message' => __('customers.message.change_status'),
+            'alert-type' => 'success'
+        ]);
+    }
+
+    /**
      * @param CustomerUpdateRequest $request
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function update(CustomerUpdateRequest $request, $id)
     {
@@ -340,53 +431,8 @@ class CustomersController extends Controller
 
     }
 
-
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int $id
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        $deleted = $this->repository->delete($id);
-
-        if (empty($deleted)) {
-            return redirect()->back()->with([
-                'message' => __('customers.message.not_delete'),
-                'alert-type' => 'error'
-            ]);
-        }
-
-        return redirect()->back()->with([
-            'message' => __('customers.message.delete'),
-            'alert-type' => 'success'
-        ]);
-    }
-
-    /**
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function changeStatus($id)
-    {
-        $customer = $this->repository->find($id);
-        if (empty($customer)) {
-            abort(404);
-        }
-        $dataToStore = [];
-        $dataToStore['status'] = $customer['status'] === 'ACTIVE' ? 'PENDING' : 'ACTIVE';
-        $this->repository->update($dataToStore, $customer->id);
-
-        return redirect()->back()->with([
-            'message' => __('customers.message.change_status'),
-            'alert-type' => 'success'
-        ]);
-    }
-
-    /**
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function datatable(Request $request)
     {
@@ -404,13 +450,12 @@ class CustomersController extends Controller
         return DataTables::of($collection)->with(['recordsFiltered' => $countFiltred])->skipPaging()->setTotalRecords($count)->make(true);
     }
 
-
     /**
      * @return mixed
      */
     public function prepareCollection($data)
     {
-        $query = \DB::table('customers')
+        $query = DB::table('customers')
             ->join('customer_addresses', 'customers.id', '=', 'customer_addresses.customer_id')
             ->where('customer_addresses.type', '=', 'STANDARD_ADDRESS');
 
@@ -438,7 +483,7 @@ class CustomersController extends Controller
      */
     public function countFiltered($data)
     {
-        $query = \DB::table('customers')
+        $query = DB::table('customers')
             ->join('customer_addresses', 'customers.id', '=', 'customer_addresses.customer_id')
             ->where('customer_addresses.type', '=', 'STANDARD_ADDRESS');
 
@@ -458,50 +503,6 @@ class CustomersController extends Controller
             ->count();
 
         return $collection;
-    }
-
-    /**
-     * @param Request $request
-     * @param $id
-     */
-    private function overrideContact(Request $request, $id): void
-    {
-        $order = Order::findOrFail($request->order_id);
-        $customer = Customer::findOrFail($id);
-        if ($request->login) {
-            $customer->login = $request->login;
-        }
-        if ($request->phone) {
-            $customer->password = $customer->generatePassword($request->phone);
-        }
-
-        $customer->addresses->map(function ($address) use ($request) {
-            if ($request->phone) {
-                $address->phone = $request->phone;
-            }
-            if ($request->login) {
-                $address->email = $request->login;
-            }
-            $address->save();
-        });
-
-        $invoice = $order->getInvoiceAddress();
-        if ($request->invoice_phone && $request->phone) {
-            $invoice->phone = $request->phone;
-        }
-        if ($request->invoice_email && $request->login) {
-            $invoice->email = $request->login;
-        }
-        $invoice->save();
-        $delivery = $order->getDeliveryAddress();
-        if ($request->delivery_phone && $request->phone) {
-            $delivery->phone = $request->phone;
-        }
-        if ($request->delivery_email && $request->login) {
-            $delivery->email = $request->login;
-        }
-        $delivery->save();
-        $customer->save();
     }
 }
 

@@ -2,8 +2,10 @@
 
 namespace App\Entities;
 
+use Auth;
 use Illuminate\Database\Eloquent\Model;
-use App\Entities\Module;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
 class ColumnVisibility extends Model
 {
     public $table = 'column_visibilities';
@@ -23,24 +25,24 @@ class ColumnVisibility extends Model
      */
     public static function getVisibilities($module_id)
     {
-        return self::where([['module_id',$module_id],['role_id',\Auth::user()->role_id]])->get();
+        return self::where([['module_id', $module_id], ['role_id', Auth::user()->role_id]])->get();
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @param string $module nazwa tabeli lub modułu (zdefiniowana przy tworzeniu modułu)
+     * @return int|null
      */
-    public function modules()
+    public static function getModuleId(string $module): ?int
     {
-        return $this->belongsTo(Module::class,'id','module_id');
+        return Module::select('id')->where('name', $module)->orWhere('table_name', $module)->get()->first()->id ?? null;
     }
 
     /**
-     * @param $module nazwa tabeli lub modułu (zdefiniowana przy tworzeniu modułu)
-     * @return int
+     * @return BelongsTo
      */
-    public static function getModuleId($module)
+    public function modules(): BelongsTo
     {
-        return Module::select('id')->where('name',$module)->orWhere('table_name',$module)->get()->first()->id ?? null;
+        return $this->belongsTo(Module::class, 'id', 'module_id');
     }
 
 

@@ -12,7 +12,7 @@ class Set extends Model
     {
         return SetItem::where('set_id', $this->id)
             ->leftJoin('products', 'products.id', '=', 'product_sets.product_id')
-            ->select('product_sets.*','products.*','product_sets.id as id')
+            ->select(['product_sets.*', 'products.*', 'product_sets.id as id'])
             ->get()
             ->all();
     }

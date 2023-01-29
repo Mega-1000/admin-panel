@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
-use Illuminate\Console\Command;
 use App\Jobs\AddNewWorkHourForUsers as UserWorkJob;
+use Illuminate\Console\Command;
 
 class AddNewWorkHourForUsers extends Command
 {
@@ -34,10 +34,10 @@ class AddNewWorkHourForUsers extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
+        // TODO Deprecated - need to be resolved with IoC
         dispatch_now(new UserWorkJob());
     }
 }

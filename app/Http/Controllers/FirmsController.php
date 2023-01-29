@@ -3,17 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Entities\ColumnVisibility;
-use App\Entities\FirmSource;
-use App\Entities\OrderSource;
-use App\Jobs\SendMailToFirmsToUpdateTheDataJob;
-use App\Repositories\WarehouseRepository;
-use App\Http\Requests\FirmCreateRequest;
-use App\Http\Requests\FirmUpdateRequest;
-use App\Repositories\FirmAddressRepository;
-use App\Repositories\FirmRepository;
-use Yajra\DataTables\Facades\DataTables;
 use App\Entities\Employee;
 use App\Entities\Firm;
+use App\Entities\FirmSource;
+use App\Entities\OrderSource;
+use App\Http\Requests\FirmCreateRequest;
+use App\Http\Requests\FirmUpdateRequest;
+use App\Jobs\SendMailToFirmsToUpdateTheDataJob;
+use App\Repositories\FirmAddressRepository;
+use App\Repositories\FirmRepository;
+use App\Repositories\WarehouseRepository;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
+use Yajra\DataTables\Facades\DataTables;
 
 /**
  * Class FirmsController.
@@ -43,10 +47,11 @@ class FirmsController extends Controller
      * @param FirmRepository $repository
      */
     public function __construct(
-        FirmRepository $repository,
+        FirmRepository        $repository,
         FirmAddressRepository $firmAddressRepository,
-        WarehouseRepository $warehouseRepository
-    ) {
+        WarehouseRepository   $warehouseRepository
+    )
+    {
         $this->repository = $repository;
         $this->firmAddressRepository = $firmAddressRepository;
         $this->warehouseRepository = $warehouseRepository;
@@ -54,31 +59,22 @@ class FirmsController extends Controller
 
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function index()
     {
         $visibilities = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('firms'));
         foreach ($visibilities as $key => $row) {
-            $visibilities[$key]->show = json_decode($row->show, true);
-            $visibilities[$key]->hidden = json_decode($row->hidden, true);
+            $row->show = json_decode($row->show, true);
+            $row->hidden = json_decode($row->hidden, true);
         }
 
         return view('firms.index', compact('visibilities'));
     }
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function create()
-    {
-        $warehouses = $this->warehouseRepository->all();
-        return view('firms.create', compact('warehouses'));
-    }
-
-    /**
      * @param FirmCreateRequest $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function store(FirmCreateRequest $request)
     {
@@ -100,7 +96,7 @@ class FirmsController extends Controller
             $firm->short_name = substr($request->name, 0, 50);
         }
         $firm->save();
-        
+
 
         $this->firmAddressRepository->create([
             'firm_id' => $firm->id,
@@ -113,16 +109,16 @@ class FirmsController extends Controller
             'address2' => $request->input('address2'),
             'postal_code' => $request->input('postal_code'),
         ]);
-	
-	    if ($request->get('firm_source')) {
-	    	foreach ($request->firm_source as $source_id) {
-			    FirmSource::firstOrNew(
-				    ['firm_id' => $firm->id, 'order_source_id' => $source_id],
-				    ['firm_id' => $firm->id, 'order_source_id' => $source_id]
-			    );
-		    }
-	    }
-	    
+
+        if ($request->get('firm_source')) {
+            foreach ($request->firm_source as $source_id) {
+                FirmSource::firstOrNew(
+                    ['firm_id' => $firm->id, 'order_source_id' => $source_id],
+                    ['firm_id' => $firm->id, 'order_source_id' => $source_id]
+                );
+            }
+        }
+
         return redirect()->route('firms.edit', ['id' => $firm->id])->with([
             'message' => __('firms.message.store'),
             'alert-type' => 'success'
@@ -130,51 +126,122 @@ class FirmsController extends Controller
     }
 
     /**
+     * @return Factory|View
+     */
+    public function create()
+    {
+        $warehouses = $this->warehouseRepository->all();
+        return view('firms.create', compact('warehouses'));
+    }
+
+    /**
      * @param $id
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function edit($id)
     {
         $firm = $this->repository->find($id);
-        
+
         $firmAddress = $this->firmAddressRepository->findByField('firm_id', $firm->id);
         $warehouses = $this->warehouseRepository->all();
         $employees = Employee::where('firm_id', $id)->get();
-        
+
         $orderSources = OrderSource::notInUse($firm->id)->get();
-        
+
         foreach ($employees as $employee) {
-           $roles = $employee->employeeRoles;
-           $employee->role = '';
-           foreach ($roles as $role) {
-               $rname = $role->name;
-               $employee->role .= ''.$rname.' ';
-           }
+            $roles = $employee->employeeRoles;
+            $employee->role = '';
+            foreach ($roles as $role) {
+                $rname = $role->name;
+                $employee->role .= '' . $rname . ' ';
+            }
         }
 
         $visibilitiesWarehouse = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('warehouses'));
         foreach ($visibilitiesWarehouse as $key => $row) {
-            $visibilitiesWarehouse[$key]->show = json_decode($row->show, true);
-            $visibilitiesWarehouse[$key]->hidden = json_decode($row->hidden, true);
+            $row->show = json_decode($row->show, true);
+            $row->hidden = json_decode($row->hidden, true);
         }
         $visibilitiesEmployee = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('employees'));
         foreach ($visibilitiesEmployee as $key => $row) {
-            $visibilitiesEmployee[$key]->show = json_decode($row->show, true);
-            $visibilitiesEmployee[$key]->hidden = json_decode($row->hidden, true);
+            $row->show = json_decode($row->show, true);
+            $row->hidden = json_decode($row->hidden, true);
         }
         return view('firms.edit',
-            compact('visibilitiesWarehouse', 'visibilitiesEmployee', 'firm', 'firmAddress', 'warehouses', 'orderSources'))->withEmployees($employees);
+            compact('visibilitiesWarehouse', 'visibilitiesEmployee', 'firm', 'firmAddress', 'warehouses', 'orderSources'))
+            ->withEmployees($employees);
+    }
+
+    /**
+     * @param $id
+     * @return RedirectResponse
+     */
+    public function destroy($id)
+    {
+        $firm = $this->repository->find($id);
+
+        if (empty($firm)) {
+            abort(404);
+        }
+
+        $firm->delete($firm->id);
+
+        return redirect()->route('firms.index')->with([
+            'message' => __('firms.message.delete'),
+            'alert-type' => 'info'
+        ]);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function datatable()
+    {
+        $collection = $this->prepareCollection();
+
+        return DataTables::collection($collection)->make(true);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function prepareCollection()
+    {
+        $collection = $this->repository->all();
+
+        return $collection;
+    }
+
+    /**
+     * @param $id
+     * @return RedirectResponse
+     */
+    public function changeStatus($id)
+    {
+        $firm = $this->repository->find($id);
+
+        if (empty($firm)) {
+            abort(404);
+        }
+        $dataToStore = [];
+        $dataToStore['status'] = $firm['status'] === 'ACTIVE' ? 'PENDING' : 'ACTIVE';
+        $this->repository->update($dataToStore, $firm->id);
+
+        return redirect()->back()->with([
+            'message' => __('firms.message.change_status'),
+            'alert-type' => 'success'
+        ]);
     }
 
     /**
      * @param FirmUpdateRequest $request
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function update(FirmUpdateRequest $request, $id)
     {
         $firm = Firm::find($id);
-        
+
         if (empty($firm)) {
             abort(404);
         }
@@ -196,91 +263,29 @@ class FirmsController extends Controller
         }
         $firm->save();
         $this->firmAddressRepository->update($request->all(), $firm->address->id);
-	
-	    if (!$request->has('firm_source') || !$request->get('firm_source')) {
-		    $firm->firmSources()->delete();
-	    }
-	
-	    if ($request->get('firm_source')) {
-		    $firm->firmSources()->where('firm_id', $firm->id)->whereNotIn('order_source_id', $request->firm_source)->delete();
-		    
-	    	foreach ($request->firm_source as $source_id) {
-	    		$firmSource = FirmSource::withTrashed()->firstOrNew(
-				    ['firm_id' => $firm->id, 'order_source_id' => $source_id],
-				    ['firm_id' => $firm->id, 'order_source_id' => $source_id]
-			    );
-	    		if ($firmSource->trashed()) {
-				    $firmSource->restore();
-			    } else {
-				    $firmSource->save();
-			    }
-		    }
-	    }
-	    
+
+        if (!$request->has('firm_source') || !$request->get('firm_source')) {
+            $firm->firmSources()->delete();
+        }
+
+        if ($request->get('firm_source')) {
+            $firm->firmSources()->where('firm_id', $firm->id)->whereNotIn('order_source_id', $request->firm_source)->delete();
+
+            foreach ($request->firm_source as $source_id) {
+                $firmSource = FirmSource::withTrashed()->firstOrNew(
+                    ['firm_id' => $firm->id, 'order_source_id' => $source_id],
+                    ['firm_id' => $firm->id, 'order_source_id' => $source_id]
+                );
+                if ($firmSource->trashed()) {
+                    $firmSource->restore();
+                } else {
+                    $firmSource->save();
+                }
+            }
+        }
+
         return redirect()->back()->with([
             'message' => __('firms.message.update'),
-            'alert-type' => 'success'
-        ]);
-    }
-
-
-    /**
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function destroy($id)
-    {
-        $firm = $this->repository->find($id);
-
-        if (empty($firm)) {
-            abort(404);
-        }
-
-        $firm->delete($firm->id);
-
-        return redirect()->route('firms.index')->with([
-            'message' => __('firms.message.delete'),
-            'alert-type' => 'info'
-        ]);
-    }
-
-    /**
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function datatable()
-    {
-        $collection = $this->prepareCollection();
-
-        return DataTables::collection($collection)->make(true);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function prepareCollection()
-    {
-        $collection = $this->repository->all();
-
-        return $collection;
-    }
-
-    /**
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function changeStatus($id)
-    {
-        $firm = $this->repository->find($id);
-
-        if (empty($firm)) {
-            abort(404);
-        }
-        $dataToStore = [];
-        $dataToStore['status'] = $firm['status'] === 'ACTIVE' ? 'PENDING' : 'ACTIVE';
-        $this->repository->update($dataToStore, $firm->id);
-
-        return redirect()->back()->with([
-            'message' => __('firms.message.change_status'),
             'alert-type' => 'success'
         ]);
     }
@@ -289,11 +294,11 @@ class FirmsController extends Controller
     {
         $firm = $this->repository->find($id);
 
-        if(empty($firm)){
+        if (empty($firm)) {
             abort(404);
         }
 
-        if($firm->email !== null) {
+        if ($firm->email !== null) {
             $firm->send_request_to_update_data = true;
             $firm->update();
             dispatch_now(new SendMailToFirmsToUpdateTheDataJob($id, $firm->email));

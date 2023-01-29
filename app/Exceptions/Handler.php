@@ -2,14 +2,13 @@
 
 namespace App\Exceptions;
 
-use Exception;
-use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Foundation\Exceptions\Handler as MainHandler;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use League\OAuth2\Server\Exception\OAuthServerException;
+use Symfony\Component\HttpFoundation\Response;
+use Throwable;
 
-class Handler extends ExceptionHandler
+class Handler extends MainHandler
 {
     const ERROR_ACCESS_DENIED = 9;
     /**
@@ -33,37 +32,38 @@ class Handler extends ExceptionHandler
     /**
      * Report or log an exception.
      *
-     * @param Exception $exception
-     * @return void
+     * @param Throwable $e
+     * @throws Throwable
      */
-    public function report(Exception $exception)
+    public function report(Throwable $e): void
     {
-        if ($exception instanceof OAuthServerException && $exception->getCode() == self::ERROR_ACCESS_DENIED) {
+        if ($e->getCode() == self::ERROR_ACCESS_DENIED) {
             return;
         }
-        parent::report($exception);
+        parent::report($e);
     }
 
     /**
      * Render an exception into an HTTP response.
      *
      * @param Request $request
-     * @param Exception $exception
-     * @return Response|JsonResponse
+     * @param Throwable $e
+     * @return JsonResponse|\Illuminate\Http\Response|Response
+     * @throws Throwable
      */
-    public function render($request, Exception $exception)
+    public function render($request, Throwable $e)
     {
-        if ($exception instanceof SoapException && $exception->errorToReturn !== '') {
+        if ($e instanceof SoapException && $e->errorToReturn !== '') {
             return response()->json([
                 'status' => 422,
                 'message' => ['status' => 422,
                     'message' => [
-                        $exception->errorToReturn,
+                        $e->errorToReturn,
                     ],
                 ],
             ]);
         }
 
-        return parent::render($request, $exception);
+        return parent::render($request, $e);
     }
 }

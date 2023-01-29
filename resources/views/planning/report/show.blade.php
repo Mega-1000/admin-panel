@@ -6,7 +6,7 @@
            class="btn btn-info install pull-right">
             <span>Pobierz raport</span>
         </a>
-        <a style="margin-left: 10px;"  href="{{ route('planning.reports.index') }}"
+        <a style="margin-left: 10px;" href="{{ route('planning.reports.index') }}"
            class="btn btn-info install pull-right">
             <span>@lang('reports.list')</span>
         </a>
@@ -37,7 +37,8 @@
     <div class="container-fluid">
         <div class="row">
             @foreach($report->users as $user)
-                <div class="col-md-{{count($report->users) == 1 ? '12' : count($report->users) == 2 ? '6' : count($report->users) >= 3 ? '4' : '4'}}" style="display:inline-block; float:left;">
+                <div class="col-md-{{count($report->users) == 1 ? '12' : (count($report->users) == 2 ? '6' : '4')}}"
+                     style="display:inline-block; float:left;">
                     <div class="col-md-12">
                         <table class="table table-striped">
                             <thead>
@@ -57,7 +58,9 @@
                             @foreach($report->properties->where('user_id', '=', $user->id) as $item)
                                 @if($item != null)
                                     <tr>
-                                        <td><a target="_blank" href="/admin/planning/timetable?id={{$item->task->order_id != null ? 'taskOrder-'.$item->task->order_id : 'task-'.$item->task->id}}">{{$item->task->name}}</a></td>
+                                        <td><a target="_blank"
+                                               href="/admin/planning/timetable?id={{$item->task->order_id != null ? 'taskOrder-'.$item->task->order_id : 'task-'.$item->task->id}}">{{$item->task->name}}</a>
+                                        </td>
                                         <td>{{strlen($item->time_work) != 11 ? number_format($item->time_work, '2') : $item->time_work }}</td>
                                         <td>{{number_format($item->price,'2')}} zł</td>
                                     </tr>
@@ -66,10 +69,14 @@
                                     @endphp
                                 @endif
                             @endforeach
-                            <tr><td colspan="3">Raport wg. dni</td></tr>
+                            <tr>
+                                <td colspan="3">Raport wg. dni</td>
+                            </tr>
                             @foreach($report->daily->where('user_id', '=', $user->id) as $dailyItem)
                                 <tr>
-                                    <td colspan="2"><a target="_blank" href="/admin/planning/timetable?date={{$dailyItem->date}}">{{$dailyItem->date}}</a></td>
+                                    <td colspan="2"><a target="_blank"
+                                                       href="/admin/planning/timetable?date={{$dailyItem->date}}">{{$dailyItem->date}}</a>
+                                    </td>
                                     <td>{{number_format($dailyItem->price,'2')}} zł</td>
                                 </tr>
                             @endforeach
@@ -90,11 +97,11 @@
 @section('scripts')
     <script src="{{URL::asset('js/jscolor.js')}}"></script>
     <script>
-      var breadcrumb = $('.breadcrumb:nth-child(2)');
+        var breadcrumb = $('.breadcrumb:nth-child(2)');
 
-      breadcrumb.children().remove();
-      breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");
-      breadcrumb.append("<li class='active'><a href='/admin/statuses/'>Raporty</a></li>");
-      breadcrumb.append("<li class='disable'><a href='javascript:void()'>Zobacz</a></li>");
+        breadcrumb.children().remove();
+        breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");
+        breadcrumb.append("<li class='active'><a href='/admin/statuses/'>Raporty</a></li>");
+        breadcrumb.append("<li class='disable'><a href='javascript:void()'>Zobacz</a></li>");
     </script>
 @endsection
