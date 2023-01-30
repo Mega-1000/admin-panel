@@ -354,7 +354,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orderPayments/create/{id}/master/without',
             'OrdersPaymentsController@createMasterWithoutOrder')->name('order_payments.createMasterWithoutOrder');
         Route::get('payments', 'OrdersPaymentsController@payments')->name('payments.index');
-        Route::get('payments/{id}/list', 'OrdersPaymentsController@paymentsEdit')->name('payments.edit');
+        Route::get('payments/{id}/list', 'OrdersPaymentsController@paymentsEdit')->name('payment.list');
         Route::get('payments/{id}/delete', 'OrdersPaymentsController@paymentsDestroy')->name('payments.destroy');
         Route::get('payments/{id}/edit', 'OrdersPaymentsController@paymentsEdit')->name('payments.edit');
         Route::put('payments/{id}/update', 'OrdersPaymentsController@paymentUpdate')->name('payments.update');
@@ -433,7 +433,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('orders/label-removal/{orderId}/{labelId}',
             'OrdersController@swapLabelsAfterLabelRemoval')->name('orders.label-removal');
         Route::post('orders/payment-deadline', 'OrdersController@setPaymentDeadline')->name('orders.payment-deadline');
-        
+
         Route::post('orders/set-warehouse/{orderId}', 'OrdersController@setWarehouse')->name('orders.setWarehouse');
 
         Route::post('orders/label-addition/{labelId}',
