@@ -145,7 +145,7 @@ class OrdersPackagesController extends Controller
         $orderPackage->shipment_date = $data['shipment_date'];
         $orderPackage->delivery_date = $data['delivery_date'];
         $orderPackage->delivery_courier_name = $data['delivery_courier_name'];
-        $orderPackage->service_courier_name = $data['service_courier_name'];
+        $orderPackage->service_courier_name = $data['service_courier_name'] ?? '';
         $orderPackage->weight = $data['weight'];
         $orderPackage->quantity = 1;
         $orderPackage->container_type = $data['container_type'];
