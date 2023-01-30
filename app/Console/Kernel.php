@@ -72,7 +72,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\Cron\SendInvoicesMailsJob::class)->dailyAt("23:45");
         $schedule->command('import:allegro')->everyTenMinutes();
 
-        $schedule->job(Jobs\AllegroCustomerReturnsJob::class)->everyFiveMinutes();
+        $schedule->job(Jobs\AllegroCustomerReturnsJob::class)->hourly();
         $schedule->job(Jobs\PreferredInvoiceDateFillJob::class)->monthlyOn();
 
         $schedule->command('schenker:pull_package_dictionary')->daily();
