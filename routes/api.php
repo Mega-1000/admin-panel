@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
   |--------------------------------------------------------------------------
   | API Routes
@@ -13,7 +11,7 @@ use Illuminate\Http\Request;
   |
  */
 //
-Route::middleware('auth:api')->group(function() {
+Route::middleware('auth:api')->group(function () {
     Route::get('/user', 'Api\CustomersController@getDetails')->name('api.customers.getdetails');
     Route::get('orders/getAll', 'Api\OrdersController@getAll')->name('api.orders.getall');
     Route::post('orders/uploadProofOfPayment', 'Api\OrdersController@uploadProofOfPayment')->name('api.orders.proof-of-payment');
@@ -38,7 +36,7 @@ Route::middleware('client')->group(function () {
 });
 
 Route::get('company-info/by-nip/{nip}', 'Api\CompanyInfoController@byNip')
-        ->name('api.company-info.by-nip');
+    ->name('api.company-info.by-nip');
 
 Route::post('customers/{orderId}/update-delivery-address', 'Api\CustomersController@updateCustomerDeliveryAddress')->name('api.orders.update-customer-delivery-addresses');
 Route::post('customers/{orderId}/update-invoice-address', 'Api\CustomersController@updateCustomerInvoiceAddress')->name('api.orders.update-customer-invoice-addresses');
@@ -56,15 +54,15 @@ Route::get('orders/{order}/latests-orders-invoice-info', 'Api\OrdersController@g
 Route::get('orders/getByToken/{token}', 'Api\OrdersController@getByToken');
 
 Route::post('order-warehouse-notification/deny/{notificationId}', 'Api\OrderWarehouseNotificationController@deny')
-        ->name('api.order-warehouse-notification.deny');
+    ->name('api.order-warehouse-notification.deny');
 Route::post('order-warehouse-notification/accept/{notificationId}', 'Api\OrderWarehouseNotificationController@accept')
-        ->name('api.order-warehouse-notification.accept');
+    ->name('api.order-warehouse-notification.accept');
 Route::get('order-warehouse-notification/{notificationId}', 'Api\OrderWarehouseNotificationController@getNotification')
-        ->name('api.order-warehouse-notification.get');
+    ->name('api.order-warehouse-notification.get');
 Route::post('order-warehouse-notification/accept/{notificationId}/sendInvoice', 'Api\OrderWarehouseNotificationController@sendInvoice')
-        ->name('api.order-warehouse-notification.accept.sendInvoice');
+    ->name('api.order-warehouse-notification.accept.sendInvoice');
 Route::post('order-warehouse-notification/accept/{notificationId}/changeStatus', 'Api\OrderWarehouseNotificationController@changeStatus')
-        ->name('api.order-warehouse-notification.accept.changeStatus');
+    ->name('api.order-warehouse-notification.accept.changeStatus');
 Route::get('order-shipping-cancelled/{package_id}', 'Api\OrdersController@orderPackagesCancelled')->name('api.order-shipping-cancelled');
 
 Route::get('get-associated-labels-to-order-from-group/{labelGroupName}', 'Api\LabelsController@getAssociatedLabelsToOrderFromGroup')->name('api.labels.get-associated-labels-to-order-from-group');
@@ -104,7 +102,7 @@ Route::post('chat/editPrices/{token}', 'Api\MessagesController@editPrices')->nam
 
 Route::post('auth/code/{id}', 'Api\AutheticationController@getToken')->name('api.authenticate.get-token');
 
-Route::group(['prefix' => 'sets', 'as' => 'sets.'], __DIR__ . '/api/ProductsSetsRoutes.php');
+Route::group(['prefix' => 'sets', 'as' => 'sets_api.'], __DIR__ . '/api/ProductsSetsRoutes.php');
 Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/api/TrackerLogsRoutes.php');
 Route::group(['prefix' => 'orders', 'as' => 'orders.'], __DIR__ . '/api/OrdersRoutes.php');
 Route::group(['prefix' => 'transactions', 'as' => 'transactions.'], __DIR__ . '/api/TransactionsRoutes.php');
