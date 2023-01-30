@@ -3,9 +3,10 @@
 namespace App\DTO\Schenker;
 
 use App\DTO\BaseDTO;
-use App\Enums\Schenker\DangerProductPackageType;
-use App\Enums\Schenker\DangerProductRiskLevel;
 use JsonSerializable;
+use App\Exceptions\SchenkerException;
+use App\Enums\Schenker\DangerProductRiskLevel;
+use App\Enums\Schenker\DangerProductPackageType;
 
 class DangerProductDTO extends BaseDTO implements JsonSerializable
 {
