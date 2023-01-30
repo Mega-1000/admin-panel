@@ -10,7 +10,10 @@
   | is assigned the "api" middleware group. Enjoy building your API!
   |
  */
+
 //
+use Illuminate\Support\Facades\Route;
+
 Route::middleware('auth:api')->group(function () {
     Route::get('/user', 'Api\CustomersController@getDetails')->name('api.customers.getdetails');
     Route::get('orders/getAll', 'Api\OrdersController@getAll')->name('api.orders.getall');
@@ -94,21 +97,22 @@ Route::get('categories/details/search', 'Api\CategoriesController@getCategoryDet
 
 Route::post('chat/newMessage/{token}', 'Api\MessagesController@postNewMessage')->name('api.messages.post-new-message');
 Route::get('chat/getMessages/{token}', 'Api\MessagesController@getMessages')->name('api.messages.get-messages');
-Route::post('/chat/getUrl', 'Api\MessagesController@getUrl')->name('messages.get-url');
+Route::post('/chat/getUrl', 'Api\MessagesController@getUrl')->name('api.messages.get-url');
 Route::post('chat/askForIntervention/{token}', 'Api\MessagesController@askForIntervention')->name('api.messages.ask-for-intervention');
 Route::post('chat/addUser/{token}', 'Api\MessagesController@addUser')->name('api.messages.add-new-user');
 Route::post('chat/removeUser/{token}', 'Api\MessagesController@removeUser')->name('api.messages.remove-user');
 Route::post('chat/editPrices/{token}', 'Api\MessagesController@editPrices')->name('api.messages.edit-prices');
 
 Route::post('auth/code/{id}', 'Api\AutheticationController@getToken')->name('api.authenticate.get-token');
-
-Route::group(['prefix' => 'sets', 'as' => 'sets_api.'], __DIR__ . '/api/ProductsSetsRoutes.php');
-Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/api/TrackerLogsRoutes.php');
-Route::group(['prefix' => 'orders', 'as' => 'orders.'], __DIR__ . '/api/OrdersRoutes.php');
-Route::group(['prefix' => 'transactions', 'as' => 'transactions.'], __DIR__ . '/api/TransactionsRoutes.php');
-Route::group(['prefix' => 'customers', 'as' => 'customers.'], __DIR__ . '/api/CustomersRoutes.php');
-Route::group(['prefix' => 'working-events', 'as' => 'workingEvents.'], __DIR__ . '/api/WorkingEventsRoutes.php');
-Route::group(['prefix' => 'countries', 'as' => 'countries.'], __DIR__ . '/api/CountriesRoutes.php');
+Route::group(['as' => 'api.'], function () {
+    Route::group(['prefix' => 'sets', 'as' => 'sets.'], __DIR__ . '/api/ProductsSetsRoutes.php');
+    Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/api/TrackerLogsRoutes.php');
+    Route::group(['prefix' => 'orders', 'as' => 'orders.'], __DIR__ . '/api/OrdersRoutes.php');
+    Route::group(['prefix' => 'transactions', 'as' => 'transactions.'], __DIR__ . '/api/TransactionsRoutes.php');
+    Route::group(['prefix' => 'customers', 'as' => 'customers.'], __DIR__ . '/api/CustomersRoutes.php');
+    Route::group(['prefix' => 'working-events', 'as' => 'workingEvents.'], __DIR__ . '/api/WorkingEventsRoutes.php');
+    Route::group(['prefix' => 'countries', 'as' => 'countries.'], __DIR__ . '/api/CountriesRoutes.php');
+});
 
 Route::post('/faqs', 'Api\FaqController@store')->name('api.faq.save');
 Route::get('/faqs/categories', 'Api\FaqController@getCategories')->name('api.faq.categories');
