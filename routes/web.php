@@ -509,7 +509,7 @@ Route::group(['prefix' => 'admin'], function () {
                     Route::get('/create', 'TasksController@create')->name('create');
                     Route::get('/{id}/edit', 'TasksController@edit')->name('edit');
                     Route::get('/{id}/delete', 'TasksController@destroy')->name('destroy');
-                    Route::put('/{id}/update', 'TasksController@update')->name('destroy');
+                    Route::put('/{id}/update', 'TasksController@update')->name('update');
                     Route::post('/addNewTask', 'TasksController@addNewTask')->name('addNewTask');
                     Route::get('/{id}/getTasks', 'TasksController@getTasks')->name('getTasks');
                     Route::put('/{id}/updateTaskTime', 'TasksController@updateTaskTime')->name('updateTaskTime');
