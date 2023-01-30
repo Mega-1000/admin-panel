@@ -571,7 +571,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/cacheClear', 'Controller@refreshCache')->name('admin.refresh');
 
         Route::get('/edit-allegro-terms', 'AllegroController@editTerms')->name('allegro.edit-terms');
-        Route::post('/edit-allegro-terms', 'AllegroController@saveTerms')->name('allegro.edit-terms');
+        Route::post('/edit-allegro-terms', 'AllegroController@saveTerms')->name('allegro.update-terms');
 
         Route::get('/allegro-chat', 'AllegroChatController@chatWindow')->name('allegro.chat-window');
 
