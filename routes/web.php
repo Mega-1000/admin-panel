@@ -442,7 +442,7 @@ Route::group(['prefix' => 'admin'], function () {
             'OrdersController@autocomplete')->name('orders.products.autocomplete');
         Route::get('orders/products/{symbol}', 'OrdersController@addProduct')->name('orders.products.add');
         Route::get('orders/{order_id}/package/{package_id}/send',
-            'OrdersPackagesController@preparePackageToSend')->name('orders.package.prepareToSend');
+            'OrdersPackagesController@preparePackageToSend')->name('orders.package.send');
         Route::get('orders/package/{package_id}/sticker',
             'OrdersPackagesController@getSticker')->name('orders.package.getSticker');
 
