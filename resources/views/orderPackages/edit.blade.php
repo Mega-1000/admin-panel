@@ -159,11 +159,12 @@
                         {{ $orderPackage->delivery_courier_name === 'PACZKOMAT' ? 'selected="selected"' : '' }} value="PACZKOMAT">
                         PACZKOMAT
                     </option>
-                    @if ($isAllegro))
-                    <option
-                        {{ $orderPackage->delivery_courier_name === 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
-                        ALLEGRO-INPOST
-                    </option>
+                    @if ($isAllegro)
+                        <option
+                            {{ $orderPackage->delivery_courier_name === 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
+                            ALLEGRO-INPOST
+                        </option>
+                    @endif
                 </select>
             </div>
             <div class="form-group">
