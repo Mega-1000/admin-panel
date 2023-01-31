@@ -169,6 +169,24 @@
                 </select>
             </div>
             <div class="form-group">
+                <label for="weight">@lang('order_packages.form.real_weight')</label>
+                <input type="text" class="form-control" id="weight" name="weight"
+                       value="{{ $old->weight }}">
+            </div>
+            <div class="form-group">
+                <label for="container_type">@lang('order_packages.form.container_type')</label>
+                <select class="form-control" id="container_type" name="container_type">
+                    @foreach($containerTypes as $containerType)
+                        @if ($containerType->name == "PACZKA" || $containerType->name == "PACZ")
+                            <option value="PACZKA" selected="selected">PACZKA</option>
+                        @else
+                            <option
+                                value="{{ $containerType->name }}">{{($containerType->shipping_provider === '' ? '' : '[' . $containerType->shipping_provider . '] ')}}{{ $containerType->name }}</option>
+                        @endif
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
                 <label for="shape">@lang('order_packages.form.shape')</label><br/>
                 <input type="text" id="shape" name="shape" class="form-control" value="{{ $old->shape }}">
             </div>
