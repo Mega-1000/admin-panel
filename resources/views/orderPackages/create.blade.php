@@ -92,38 +92,36 @@
             <div class="form-group">
                 <label for="service_courier_name">@lang('order_packages.form.service_courier_name')</label>
                 <select class="form-control" id="service_courier_name" name="service_courier_name">
-                    <option {{ old('delivery_courier_name') == 'INPOST' ? 'selected="selected"' : '' }} value="INPOST">
+                    <option {{ old('service_courier_name') == 'INPOST' ? 'selected="selected"' : '' }} value="INPOST">
                         INPOST
                     </option>
                     <option
-                        {{ old('delivery_courier_name') == 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">
+                        {{ old('service_courier_name') == 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">
                         POCZTEX
                     </option>
-                    <option {{ old('delivery_courier_name') == 'DPD' ? 'selected="selected"' : '' }} value="DPD">DPD
+                    <option {{ old('service_courier_name') == 'DPD' ? 'selected="selected"' : '' }} value="DPD">DPD
                     </option>
                     <option
-                        {{ old('delivery_courier_name') == 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
+                        {{ old('service_courier_name') == 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
                         APACZKA
                     </option>
-                    <option {{ old('delivery_courier_name') == 'JAS' ? 'selected="selected"' : '' }} value="JAS">JAS
+                    <option {{ old('service_courier_name') == 'JAS' ? 'selected="selected"' : '' }} value="JAS">JAS
                     </option>
-                    <option {{ old('delivery_courier_name') == 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
+                    <option {{ old('service_courier_name') == 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
                         GIELDA
                     </option>
-                    <option {{ old('delivery_courier_name') == 'GLS' ? 'selected="selected"' : '' }} value="GLS">GLS
+                    <option {{ old('service_courier_name') == 'GLS' ? 'selected="selected"' : '' }} value="GLS">GLS
                     </option>
-                    <option {{ old('delivery_courier_name') == 'UPS' ? 'selected="selected"' : '' }} value="UPS">UPS
+                    <option {{ old('service_courier_name') == 'UPS' ? 'selected="selected"' : '' }} value="UPS">UPS
                     </option>
                     <option
-                        {{ old('delivery_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
+                        {{ old('service_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         ODBIÓR OSOBISTY
                     </option>
-                    @if ($isAllegro)
-                        <option
-                            {{ old('delivery_courier_name') == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
-                            ALLEGRO-INPOST
-                        </option>
-                    @endif
+                    <option
+                        {{ old('service_courier_name') == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
+                        ALLEGRO-INPOST
+                    </option>
                 </select>
             </div>
             <div class="form-group">
@@ -155,12 +153,10 @@
                         {{ old('delivery_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
                         ODBIÓR OSOBISTY
                     </option>
-                    @if ($isAllegro)
-                        <option
-                            {{ old('delivery_courier_name') == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
-                            ALLEGRO-INPOST
-                        </option>
-                    @endif
+                    <option
+                        {{ old('delivery_courier_name') == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
+                        ALLEGRO-INPOST
+                    </option>
                     <option
                         {{ old('delivery_courier_name') == 'PACZKOMAT' ? 'selected="selected"' : '' }} value="PACZKOMAT">
                         PACZKOMAT

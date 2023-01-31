@@ -107,10 +107,6 @@
                         UPS
                     </option>
                     <option
-                        {{ old('delivery_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
-                        PACZKOMAT
-                    </option>
-                    <option
                         {{ $orderPackage->service_courier_name === 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
                         ALLEGRO-INPOST
                     </option>
@@ -143,10 +139,12 @@
                         {{ $orderPackage->delivery_courier_name === 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
                         GIELDA
                     </option>
-                    <option {{ $orderPackage->service_courier_name == 'GLS' ? 'selected="selected"' : '' }} value="GLS">
+                    <option
+                        {{ $orderPackage->delivery_courier_name == 'GLS' ? 'selected="selected"' : '' }} value="GLS">
                         GLS
                     </option>
-                    <option {{ $orderPackage->service_courier_name == 'UPS' ? 'selected="selected"' : '' }} value="UPS">
+                    <option
+                        {{ $orderPackage->delivery_courier_name == 'UPS' ? 'selected="selected"' : '' }} value="UPS">
                         UPS
                     </option>
                     <option
@@ -157,12 +155,10 @@
                         {{ $orderPackage->delivery_courier_name === 'PACZKOMAT' ? 'selected="selected"' : '' }} value="PACZKOMAT">
                         PACZKOMAT
                     </option>
-                    @if ($isAllegro)
-                        <option
-                            {{ $orderPackage->delivery_courier_name === 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
-                            ALLEGRO-INPOST
-                        </option>
-                    @endif
+                    <option
+                        {{ $orderPackage->delivery_courier_name === 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
+                        ALLEGRO-INPOST
+                    </option>
                 </select>
             </div>
             <div class="form-group">
