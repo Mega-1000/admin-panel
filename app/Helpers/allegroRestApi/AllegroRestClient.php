@@ -2,11 +2,12 @@
 
 namespace App\Helpers\allegroRestApi;
 
+use App\Enums\CourierName;
 use App\Services\AllegroApiService;
 
 class AllegroRestClient extends AllegroApiService
 {
-	protected $auth_record_id = 1;
+    protected $auth_record_id = 1;
 
     public function __construct()
     {
@@ -18,15 +19,13 @@ class AllegroRestClient extends AllegroApiService
         $formId = $package->order->selloTransaction->tr_CheckoutFormId;
 
         switch ($package->service_courier_name) {
-            case 'ALLEGRO-INPOST':
-            case 'INPOST':
-                $carrierId = 'INPOST';
+            case CourierName::ALLEGRO_INPOST:
+            case CourierName::INPOST;
+                $carrierId = CourierName::INPOST;
                 break;
-            case 'DPD':
-                $carrierId = 'DPD';
+            case CourierName::DPD:
+                $carrierId = CourierName::DPD;
                 break;
-            default:
-                return;
         }
         $waybill = $package->letter_number;
         $carrierName = $package->service_courier_name;

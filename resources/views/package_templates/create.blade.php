@@ -85,23 +85,76 @@
             <div class="form-group">
                 <label for="service_courier_name">@lang('order_packages.form.service_courier_name')</label>
                 <select class="form-control" id="service_courier_name" name="service_courier_name">
-                    @foreach(CourierName::DELIVERY_TYPE_LABELS as $providerCode => $providerName)
-                        <option value="{{$providerCode}}"
-                            {{ $providerCode === old('service_courier_name') ? "selected='selected" : '' }}>
-                            {{ $providerName }}
-                        </option>
-                    @endforeach
+                    <option {{ old('delivery_courier_name') == 'INPOST' ? 'selected="selected"' : '' }} value="INPOST">
+                        INPOST
+                    </option>
+                    <option
+                        {{ old('delivery_courier_name') == 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">
+                        POCZTEX
+                    </option>
+                    <option {{ old('delivery_courier_name') == 'DPD' ? 'selected="selected"' : '' }} value="DPD">DPD
+                    </option>
+                    <option
+                        {{ old('delivery_courier_name') == 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
+                        APACZKA
+                    </option>
+                    <option {{ old('delivery_courier_name') == 'JAS' ? 'selected="selected"' : '' }} value="JAS">JAS
+                    </option>
+                    <option {{ old('delivery_courier_name') == 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
+                        GIELDA
+                    </option>
+
+                    <option {{ old('delivery_courier_name') == 'GLS' ? 'selected="selected"' : '' }} value="GLS">GLS
+                    </option>
+                    <option {{ old('delivery_courier_name') == 'UPS' ? 'selected="selected"' : '' }} value="UPS">UPS
+                    </option>
+                    <option
+                        {{ old('delivery_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
+                        ODBIÓR OSOBISTY
+                    </option>
+                    <option
+                        {{ old('delivery_courier_name') == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
+                        ALLEGRO-INPOST
+                    </option>
                 </select>
             </div>
             <div class="form-group">
                 <label for="delivery_courier_name">@lang('order_packages.form.delivery_courier_name')</label>
                 <select class="form-control" id="delivery_courier_name" name="delivery_courier_name">
-                    @foreach(CourierName::DELIVERY_TYPE_LABELS as $providerCode => $providerName)
-                        <option value="{{$providerCode}}"
-                            {{ $providerCode === old('delivery_courier_name') ? "selected='selected" : '' }}>
-                            {{ $providerName }}
-                        </option>
-                    @endforeach
+                    <option {{ old('delivery_courier_name') == 'INPOST' ? 'selected="selected"' : '' }} value="INPOST">
+                        INPOST
+                    </option>
+                    <option
+                        {{ old('delivery_courier_name') == 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">
+                        POCZTEX
+                    </option>
+                    <option {{ old('delivery_courier_name') == 'DPD' ? 'selected="selected"' : '' }} value="DPD">DPD
+                    </option>
+                    <option
+                        {{ old('delivery_courier_name') == 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
+                        APACZKA
+                    </option>
+                    <option {{ old('delivery_courier_name') == 'JAS' ? 'selected="selected"' : '' }} value="JAS">JAS
+                    </option>
+                    <option {{ old('delivery_courier_name') == 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
+                        GIELDA
+                    </option>
+                    <option {{ old('delivery_courier_name') == 'GLS' ? 'selected="selected"' : '' }} value="GLS">GLS
+                    </option>
+                    <option {{ old('delivery_courier_name') == 'UPS' ? 'selected="selected"' : '' }} value="UPS">UPS
+                    </option>
+                    <option
+                        {{ old('delivery_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
+                        ODBIÓR OSOBISTY
+                    </option>
+                    <option
+                        {{ old('delivery_courier_name') == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
+                        ALLEGRO-INPOST
+                    </option>
+                    <option
+                        {{ old('delivery_courier_name') == 'PACZKOMAT' ? 'selected="selected"' : '' }} value="PACZKOMAT">
+                        PACZKOMAT
+                    </option>
                 </select>
             </div>
             <div class="form-group">

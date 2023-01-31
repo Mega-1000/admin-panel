@@ -2,7 +2,6 @@
 
 namespace App\Helpers;
 
-use App\Entities\AllegroPackage;
 use App\Entities\Order;
 use App\Entities\OrderAllegroCommission;
 use App\Entities\OrderPackage;
@@ -11,6 +10,7 @@ use App\Entities\SelTransaction;
 use App\Enums\PackageStatus;
 use App\User;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\DB;
 
 class AllegroCommissionParser
@@ -57,7 +57,7 @@ class AllegroCommissionParser
             try {
                 $new = $this->parseCsvForProvision($line, $updatingOrders);
                 if (!empty($new)) {
-                    $newOrders []= $new;
+                    $newOrders [] = $new;
                 }
                 $pack = $this->parseCsvForTransport('DPD', $line);
                 if (!empty($pack)) {
@@ -67,7 +67,7 @@ class AllegroCommissionParser
                 if (!empty($pack)) {
                     $newLetters = array_merge($newLetters, [$pack]);
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $errors[] = $e->getMessage();
             }
         }
@@ -78,7 +78,7 @@ class AllegroCommissionParser
     /**
      * @param array $line
      * @param array $updatingOrders
-     * @throws \Exception
+     * @throws Exception
      */
     public function parseCsvForProvision(array $line, array &$updatingOrders): string
     {
@@ -144,7 +144,7 @@ class AllegroCommissionParser
     /**
      * @param string $formId
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function getTransaction(string $formId)
     {
@@ -178,11 +178,9 @@ class AllegroCommissionParser
         if (!$letterNumber) {
             return [];
         }
-        switch($line[3]) {
-            case 'Przesyłka DPD':
-                $deliveryCourier = 'DPD';
-                break;
+        switch ($line[3]) {
             case 'DPD - Kurier opłaty dodatkowe':
+            case 'Przesyłka DPD':
                 $deliveryCourier = 'DPD';
                 break;
             case 'InPost - opłaty dodatkowe':
@@ -221,7 +219,7 @@ class AllegroCommissionParser
 
     /**
      * @param array $pack
-     * @throws \Exception
+     * @throws Exception
      */
     public function createNewPackage($pack, $formId): void
     {
@@ -233,7 +231,7 @@ class AllegroCommissionParser
     /**
      * @param $formId
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     public function createNewOrder($formId)
     {

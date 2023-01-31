@@ -3,14 +3,14 @@
 namespace App\Jobs;
 
 use App\Domains\DelivererPackageImport\PriceFormatter;
+use App\Entities\OrderPackage;
 use App\Repositories\OrderPackageRepository;
 use Illuminate\Bus\Queueable;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bus\Dispatchable;
-use App\Entities\OrderPackage;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
 
 class UpdatePackageRealCostJob implements ShouldQueue
@@ -31,6 +31,32 @@ class UpdatePackageRealCostJob implements ShouldQueue
         $pocztexPackages = $sortedPackages['POCZTEX'];
         $dpdPackages = $sortedPackages['DPD'];
         $this->updateCost($inpostPackages, $pocztexPackages, $dpdPackages);
+    }
+
+    public function sortPackages()
+    {
+        $inpostPackages = array();
+        $pocztexPackages = array();
+        $dpdPackages = array();
+        $packages = $this->orderPackageRepository->whereDoesntHave('realCostsForCompany')->get();
+        foreach ($packages as $package) {
+            switch ($package->service_courier_name) {
+                case "ALLEGRO-INPOST":
+                case "INPOST":
+                    $inpostPackages[] = $package;
+                    break;
+                case "POCZTEX":
+                    $pocztexPackages[] = $package;
+                    break;
+                case "DPD":
+                    $dpdPackages[] = $package;
+                    break;
+            }
+        }
+        $sortedPackages['INPOST'] = $inpostPackages;
+        $sortedPackages['POCZTEX'] = $pocztexPackages;
+        $sortedPackages['DPD'] = $dpdPackages;
+        return $sortedPackages;
     }
 
     public function updateCost($inpostPackages, $pocztexPackages, $dpdPackages)
@@ -77,34 +103,6 @@ class UpdatePackageRealCostJob implements ShouldQueue
                 }
             }
         }
-    }
-
-    public function sortPackages()
-    {
-        $inpostPackages = array();
-        $pocztexPackages = array();
-        $dpdPackages = array();
-        $packages = $this->orderPackageRepository->whereDoesntHave('realCostsForCompany')->get();
-        foreach ($packages as $package) {
-            switch ($package->service_courier_name) {
-                case "INPOST":
-                    $inpostPackages[] = $package;
-                    break;
-                case "ALLEGRO-INPOST":
-                    $inpostPackages[] = $package;
-                    break;
-                case "POCZTEX":
-                    $pocztexPackages[] = $package;
-                    break;
-                case "DPD":
-                    $dpdPackages[] = $package;
-                    break;
-            }
-        }
-        $sortedPackages['INPOST'] = $inpostPackages;
-        $sortedPackages['POCZTEX'] = $pocztexPackages;
-        $sortedPackages['DPD'] = $dpdPackages;
-        return $sortedPackages;
     }
 
     private function saveOrderPackageRealCostForCompany(OrderPackage $orderPackage, string $cost): Model

@@ -3,7 +3,8 @@
 @section('app-header')
     <h1 class="page-title">
         <i class="voyager-person"></i> @lang('column_visibilities.visibilities.title') {{$roleName}} @lang('column_visibilities.visibilities.title2') {{$moduleName}}
-        <a href="{!! route('columnVisibilities.modules.roles.visibilities.create',['role_id'=>$role_id,'module_id'=>$module_id]) !!}" class="btn btn-success btn-add-new">
+        <a href="{!! route('columnVisibilities.modules.roles.visibilities.create',['role_id'=>$role_id,'module_id'=>$module_id]) !!}"
+           class="btn btn-success btn-add-new">
             <i class="voyager-plus"></i> <span>@lang('column_visibilities.visibilities.create')</span>
         </a>
     </h1>
@@ -30,7 +31,7 @@
             $('#delete_form')[0].action = "{{ url()->current() }}/destroy/" + id;
             $('#delete_modal').modal('show');
         };
-        $(document).ready(function() {
+        $(document).ready(function () {
 
             var breadcrumb = $('.breadcrumb:nth-child(2)');
 
@@ -43,6 +44,7 @@
             // DataTable
             let table = $('#dataTable').DataTable({
                 language: {!! json_encode( __('voyager.datatable'), true) !!},
+                searchDelay: 350,
                 processing: true,
                 serverSide: true,
                 columnDefs: [
@@ -96,8 +98,8 @@
             $('#dataTable thead tr th').each(function (i) {
                 var title = $(this).text();
                 if (title !== '' && title !== 'Akcje') {
-                    $(this).html('<div><span>'+title+'</span></div><div><input type="text" placeholder="Szukaj '+ title +'" id="columnSearch' + i + '"/></div>');
-                } else if(title == 'Akcje') {
+                    $(this).html('<div><span>' + title + '</span></div><div><input type="text" placeholder="Szukaj ' + title + '" id="columnSearch' + i + '"/></div>');
+                } else if (title == 'Akcje') {
                     $(this).html('<span id="columnSearch' + i + '">Akcje</span>');
                 }
                 $('input', this).on('keyup change', function () {
@@ -109,7 +111,6 @@
                     }
                 });
             });
-
 
 
         });

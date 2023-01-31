@@ -72,17 +72,47 @@
             <div class="form-group">
                 <label for="service_courier_name">@lang('order_packages.form.service_courier_name')</label>
                 <select class="form-control" id="service_courier_name" name="service_courier_name">
-                    @foreach(CourierName::DELIVERY_TYPE_LABELS as $providerCode => $providerName)
-                        @if(CourierName::ALLEGRO_INPOST !== $providerCode)
-                            <option value="{{$providerCode}}"
-                                {{ $providerCode === $orderPackage->service_courier_name ? "selected='selected" : '' }}>
-                                {{ $providerName }}
-                            </option>
-                        @endif
-                    @endforeach
+                    <option
+                        {{ $orderPackage->service_courier_name === 'INPOST' ? 'selected="selected"' : '' }} value="INPOST">
+                        INPOST
+                    </option>
+                    <option
+                        {{ $orderPackage->service_courier_name === 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">
+                        POCZTEX
+                    </option>
+                    <option
+                        {{ $orderPackage->service_courier_name === 'DPD' ? 'selected="selected"' : '' }} value="DPD">
+                        DPD
+                    </option>
+                    <option
+                        {{ $orderPackage->service_courier_name === 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
+                        APACZKA
+                    </option>
+                    <option
+                        {{ $orderPackage->service_courier_name === 'JAS' ? 'selected="selected"' : '' }} value="JAS">
+                        JAS
+                    </option>
+                    <option
+                        {{ $orderPackage->service_courier_name === 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
+                        GIELDA
+                    </option>
+                    <option
+                        {{ $orderPackage->service_courier_name === 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
+                        ODBIÓR OSOBISTY
+                    </option>
+                    <option {{ $orderPackage->service_courier_name == 'GLS' ? 'selected="selected"' : '' }} value="GLS">
+                        GLS
+                    </option>
+                    <option {{ $orderPackage->service_courier_name == 'UPS' ? 'selected="selected"' : '' }} value="UPS">
+                        UPS
+                    </option>
+                    <option
+                        {{ old('delivery_courier_name') == 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
+                        PACZKOMAT
+                    </option>
                     @if ($isAllegro)
                         <option
-                            {{ $orderPackage->service_courier_name == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
+                            {{ $orderPackage->service_courier_name === 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
                             ALLEGRO-INPOST
                         </option>
                     @endif
@@ -91,20 +121,49 @@
             <div class="form-group">
                 <label for="delivery_courier_name">@lang('order_packages.form.delivery_courier_name')</label>
                 <select class="form-control" id="delivery_courier_name" name="delivery_courier_name">
-                    @foreach(CourierName::DELIVERY_TYPE_LABELS as $providerCode => $providerName)
-                        @if(CourierName::ALLEGRO_INPOST !== $providerCode)
-                            <option value="{{$providerCode}}"
-                                {{ $providerCode === $orderPackage->delivery_courier_name ? "selected='selected" : '' }}>
-                                {{ $providerName }}
-                            </option>
-                        @endif
-                    @endforeach
-                    @if ($isAllegro)
-                        <option
-                            {{ $orderPackage->delivery_courier_name == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
-                            ALLEGRO-INPOST
-                        </option>
-                    @endif
+                    <option
+                        {{ $orderPackage->delivery_courier_name === 'INPOST' ? 'selected="selected"' : '' }} value="INPOST">
+                        INPOST
+                    </option>
+                    <option
+                        {{ $orderPackage->delivery_courier_name === 'POCZTEX' ? 'selected="selected"' : '' }} value="POCZTEX">
+                        POCZTEX
+                    </option>
+                    <option
+                        {{ $orderPackage->delivery_courier_name === 'DPD' ? 'selected="selected"' : '' }} value="DPD">
+                        DPD
+                    </option>
+                    <option
+                        {{ $orderPackage->delivery_courier_name === 'APACZKA' ? 'selected="selected"' : '' }} value="APACZKA">
+                        APACZKA
+                    </option>
+                    <option
+                        {{ $orderPackage->delivery_courier_name === 'JAS' ? 'selected="selected"' : '' }} value="JAS">
+                        JAS
+                    </option>
+                    <option
+                        {{ $orderPackage->delivery_courier_name === 'GIELDA' ? 'selected="selected"' : '' }} value="GIELDA">
+                        GIELDA
+                    </option>
+                    <option {{ $orderPackage->service_courier_name == 'GLS' ? 'selected="selected"' : '' }} value="GLS">
+                        GLS
+                    </option>
+                    <option {{ $orderPackage->service_courier_name == 'UPS' ? 'selected="selected"' : '' }} value="UPS">
+                        UPS
+                    </option>
+                    <option
+                        {{ $orderPackage->delivery_courier_name === 'ODBIOR_OSOBISTY' ? 'selected="selected"' : '' }} value="ODBIOR_OSOBISTY">
+                        ODBIÓR OSOBISTY
+                    </option>
+                    <option
+                        {{ $orderPackage->delivery_courier_name === 'PACZKOMAT' ? 'selected="selected"' : '' }} value="PACZKOMAT">
+                        PACZKOMAT
+                    </option>
+                    @if ($isAllegro))
+                    <option
+                        {{ $orderPackage->delivery_courier_name === 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
+                        ALLEGRO-INPOST
+                    </option>
                 </select>
             </div>
             <div class="form-group">
