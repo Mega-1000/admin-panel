@@ -33,6 +33,7 @@ final class CourierName extends Enum
         self::ODBIOR_OSOBISTY => 'Odbiór osobisty',
         self::GIELDA => 'Giełda',
         self::DB_SCHENKER => 'DB Schenker',
+        self::PACZKOMAT => 'Paczkomat',
     ];
 
     /**
