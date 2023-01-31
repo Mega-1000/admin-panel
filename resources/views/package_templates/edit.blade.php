@@ -89,17 +89,6 @@
             <div class="form-group">
                 <label for="service_courier_name">@lang('order_packages.form.service_courier_name')</label>
                 <select class="form-control" id="service_courier_name" name="service_courier_name">
-                    @foreach(CourierName::DELIVERY_TYPE_LABELS as $providerCode => $providerName)
-                        <option value="{{$providerCode}}"
-                            {{ $providerCode === $old->service_courier_name ? "selected='selected" : '' }}>
-                            {{ $providerName }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="service_courier_name">@lang('order_packages.form.service_courier_name')</label>
-                <select class="form-control" id="service_courier_name" name="service_courier_name">
                     <option {{ $old->service_courier_name == 'INPOST' ? 'selected="selected"' : '' }} value="INPOST">
                         INPOST
                     </option>
