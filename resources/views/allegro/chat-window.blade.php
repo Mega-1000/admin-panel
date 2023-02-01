@@ -28,6 +28,34 @@
         </style>
         <link href="{{ asset('css/chat-styles.css') }}" rel="stylesheet" type="text/css" />
         <link href="{{ asset('css/main.css') }}" rel="stylesheet" type="text/css" />
+        <script src="{{ asset('admin/voyager-assets?path=js%2Fapp.js') }}"></script>
+        <script src="{{ asset('js/helpers/helpers.js') }}"></script>
+        <script src="{{ asset('js/modules/AllegroChat.js') }}"></script>
+        <script>
+            $(function() {
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                });
+
+                const ajaxPath = this.location.pathname == '/admin' ? '/admin/' : '/admin/';
+
+                let chatWindowParams = window.localStorage.getItem('preview_allegro_chat_storage');
+
+                if(chatWindowParams) {
+                    chatWindowParams = JSON.parse(chatWindowParams);
+                    
+                    const allegroChatInitializer = new AllegroChat(
+                        ajaxPath,
+                        chatWindowParams.threadId,
+                        chatWindowParams.messages,
+                        chatWindowParams.nickname,
+                        chatWindowParams.isPreview
+                    );
+                }
+            });
+        </script>
     </head>
     <body>
         

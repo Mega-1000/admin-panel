@@ -32,8 +32,6 @@ class AllegroChatController extends Controller
 
         $unreadedThreads = $request->input('unreadedThreads');
 
-        if(!$unreadedThreads || empty($unreadedThreads)) return response(null, 500);
-
         $currentThread = $this->allegroChatService->getCurrentThread($unreadedThreads);
         
         if(empty($unreadedThreads)) return response(null, 500);
@@ -84,7 +82,7 @@ class AllegroChatController extends Controller
         ]);
 
         $res = $this->allegroChatService->listMessages($threadId, $lastDate);
-
+        
         if(!$res['messages']) return response('null', 200);
         
         $newMessages = collect( $this->allegroChatService->insertMsgsToDB($res['messages']) );

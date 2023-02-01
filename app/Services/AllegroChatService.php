@@ -79,6 +79,19 @@ class AllegroChatService extends AllegroApiService {
     }
     public function getCurrentThread(array $unreadedThreads): array {
 
+        $user = auth()->user();
+        $currentThread = [];
+
+        // check if user has any opened threads
+        $currentThread = AllegroChatThread::where([
+            'user_id' => $user->id,
+            'type'    => 'PENDING',
+        ])->first();
+
+        if( !empty($currentThread) ) return $currentThread->toArray();
+
+        if( empty($unreadedThreads) ) return $currentThread;
+
         $unreadedThreadsIds = array_column($unreadedThreads, 'id');
 
         $alreadyOpenedThreads = AllegroChatThread::where([
@@ -86,10 +99,9 @@ class AllegroChatService extends AllegroApiService {
             'type'              => 'PENDING',
         ])->pluck('allegro_thread_id')->toArray();
 
+        // flip for swap allegro_thread_id as key
         $alreadyOpenedThreads = array_flip($alreadyOpenedThreads);
 
-        $currentThread = [];
-        $user = auth()->user();
         Log::info("Opened threads: ".json_encode($alreadyOpenedThreads));
         Log::info("Unreaded Threads: ".json_encode($unreadedThreads));
 
@@ -98,21 +110,20 @@ class AllegroChatService extends AllegroApiService {
             if(isset($alreadyOpenedThreads[ $uThread['id'] ])) continue;
 
             // prepare temp Allegro Thread for User
-            AllegroChatThread::insert([
+            $newPendingThread = AllegroChatThread::create([
                 'allegro_thread_id'     => $uThread['id'],
                 'allegro_msg_id'        => 'temp_for_'.$user->id,
                 'user_id'               => $user->id,
-                'allegro_user_login'    => 'unknown',
+                'allegro_user_login'    => $uThread['interlocutor']['login'],
                 'content'               => '',
                 'subject'               => '',
                 'is_outgoing'           => false,
                 'type'                  => 'PENDING',
                 'original_allegro_date' => '2023-01-01 14:00:00',
             ]);
-            $currentThread = $uThread;
+            $currentThread = $newPendingThread->toArray();
             break;
         }
-
         return $currentThread;
     }
     public function insertMsgsToDB(array $msgs): array {
