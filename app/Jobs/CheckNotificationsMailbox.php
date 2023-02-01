@@ -81,15 +81,6 @@ class CheckNotificationsMailbox implements ShouldQueue {
         $this->host = '{'.config('notifications.host').':993/imap/ssl}INBOX';
         $this->user = config('notifications.username');
         $this->password = config('notifications.password');
-        
-        try {
-            $this->imap = imap_open($this->host, $this->user, $this->password);
-        } catch (\Exception $e){
-            Log::error('Problem with imap_open',
-                ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
-            );
-            die();
-        }
     }
 
     /**
@@ -98,6 +89,15 @@ class CheckNotificationsMailbox implements ShouldQueue {
      * @return void
      */
     public function handle() {
+
+        try {
+            $this->imap = imap_open($this->host, $this->user, $this->password);
+        } catch (\Exception $e){
+            Log::error('Problem with imap_open',
+                ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
+            );
+            die();
+        }
 
         $mails = imap_search($this->imap, 'UNSEEN');
 
