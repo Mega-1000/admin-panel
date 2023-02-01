@@ -121,7 +121,7 @@ class PackageTemplatesController extends Controller
         $template->cod_cost_for_us = $request->cod_cost_for_us;
         $template->protection_method = $request->protection_method;
         $template->services = $request->services ?? '';
-        $template->allegro_delivery_method = '[]';
+        $template->allegro_delivery_method = preg_replace('/\'/', '"', $request->allegro_delivery_method ?? '[]');
 
         $template->save();
     }

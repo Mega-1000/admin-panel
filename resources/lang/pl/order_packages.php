@@ -106,6 +106,7 @@ return [
         'volume_factor' => 'Współczynnik objętości (potrzebne do plecaka)',
         'list_order' => 'Miejsce szablonu na liście',
         'protection' => 'Sposób zabezpieczenia towaru (do 20 znaków)',
+        'mapping_to_allegro_status' => 'Mapowanie dostawców z allegro (<b>Zmieniasz na własną odpowiedzialność</b>)',
         'services_db' => 'Usługi do paczki (wpisujemy w formie liczb, oddzielonych przecinkami np. 2,9,82)',
         'accept_time_info' => 'Informacja dotycząca Godzin Zleceń',
         'max_time_info' => 'Informacja dotycząca Godziny Granicznej',

@@ -266,6 +266,11 @@
                     @endforeach
                 </p>
             </div>
+            <div class="form-group">
+                <label for="protection_method">@lang('order_packages.form.mapping_to_allegro_status')</label>
+                <input type="text" class="form-control" id="allegro_delivery_method" name="allegro_delivery_method"
+                       value="{{ $old->allegro_delivery_method }}">
+            </div>
         </div>
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
     </form>
