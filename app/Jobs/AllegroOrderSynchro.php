@@ -34,11 +34,11 @@ use App\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Bus\Queueable;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -169,7 +169,7 @@ class AllegroOrderSynchro implements ShouldQueue
                     }
                     $allegroOrder['buyer']['phoneNumber'] = $allegroOrder['buyer']['address']['phoneNumber'];
                 }
-                $invoiceAddress = ($allegroOrder['invoice']['address']!== null) ? $allegroOrder['invoice'] : $allegroOrder['buyer'];
+                $invoiceAddress = ($allegroOrder['invoice']['address'] !== null) ? $allegroOrder['invoice'] : $allegroOrder['buyer'];
                 $invoiceAddress['address']['phoneNumber'] = $allegroOrder['buyer']['phoneNumber'];
                 $this->createOrUpdateCustomerAddress($customer, $allegroOrder['buyer']);
 
@@ -284,6 +284,11 @@ class AllegroOrderSynchro implements ShouldQueue
     {
         $deliveryMethod = $allegroDelivery['method']['id'];
         if (!($packageTemplate = PackageTemplate::AllegroDeliveryMethod($deliveryMethod)->first())) {
+            Log::info(
+                'Order: ' . $order->id .
+                '\r\nPackage template not found: ' . $deliveryMethod .
+                '\r\nAllegro delivery data: ' . json_encode($allegroDelivery ?? [])
+            );
             return null;
         }
 
@@ -487,7 +492,7 @@ class AllegroOrderSynchro implements ShouldQueue
         } elseif ($deliveryAddress['phoneNumber'] !== null && Helper::phoneIsCorrect($deliveryAddress['phoneNumber'])) {
             $customerPhone = $deliveryAddress['phoneNumber'];
         } else {
-            throw new \Exception('wrong_phone');
+            throw new Exception('wrong_phone');
         }
 
         $customerPhone = str_replace('+48', '', $customerPhone);
@@ -510,8 +515,8 @@ class AllegroOrderSynchro implements ShouldQueue
     /**
      * Create chat
      *
-     * @param int    $orderId
-     * @param int    $customerId
+     * @param int $orderId
+     * @param int $customerId
      * @param string $customerNotices
      *
      * @return void
@@ -533,9 +538,9 @@ class AllegroOrderSynchro implements ShouldQueue
     /**
      * Create or update order address.
      *
-     * @param Order  $order
-     * @param array  $buyer
-     * @param array  $address
+     * @param Order $order
+     * @param array $buyer
+     * @param array $address
      * @param string $type
      *
      * @return void
@@ -580,8 +585,8 @@ class AllegroOrderSynchro implements ShouldQueue
      * Create or update customer address.
      *
      * @param Customer $customer
-     * @param array    $data
-     * @param string   $type
+     * @param array $data
+     * @param string $type
      *
      * @return void
      */

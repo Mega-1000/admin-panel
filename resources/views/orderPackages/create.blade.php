@@ -122,6 +122,9 @@
                         {{ old('service_courier_name') == 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
                         ALLEGRO-INPOST
                     </option>
+                    <option {{ old('service_courier_name') == 'DB' ? 'selected="selected"' : '' }} value="DB">
+                        DB SCHENKER
+                    </option>
                 </select>
             </div>
             <div class="form-group">
@@ -160,6 +163,9 @@
                     <option
                         {{ old('delivery_courier_name') == 'PACZKOMAT' ? 'selected="selected"' : '' }} value="PACZKOMAT">
                         PACZKOMAT
+                    </option>
+                    <option {{ old('delivery_courier_name') == 'DB' ? 'selected="selected"' : '' }} value="DB">
+                        DB SCHENKER
                     </option>
                 </select>
             </div>

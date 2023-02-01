@@ -110,6 +110,9 @@
                         {{ $orderPackage->service_courier_name === 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
                         ALLEGRO-INPOST
                     </option>
+                    <option {{ $orderPackage->service_courier_name == 'DB' ? 'selected="selected"' : '' }} value="DB">
+                        DB SCHENKER
+                    </option>
                 </select>
             </div>
             <div class="form-group">
@@ -158,6 +161,9 @@
                     <option
                         {{ $orderPackage->delivery_courier_name === 'ALLEGRO-INPOST' ? 'selected="selected"' : '' }} value="ALLEGRO-INPOST">
                         ALLEGRO-INPOST
+                    </option>
+                    <option {{ $orderPackage->delivery_courier_name == 'DB' ? 'selected="selected"' : '' }} value="DB">
+                        DB SCHENKER
                     </option>
                 </select>
             </div>
