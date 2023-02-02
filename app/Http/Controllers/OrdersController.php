@@ -608,7 +608,7 @@ class OrdersController extends Controller
             'type' => 'DELIVERY_ADDRESS',
         ])->first();
 
-        if($orderDeliveryAddress){
+        if(empty($orderDeliveryAddress)){
             return [];
         }
 
