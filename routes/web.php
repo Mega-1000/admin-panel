@@ -1,10 +1,5 @@
 <?php
 
-use Carbon\Carbon;
-use App\Entities\AllegroDispute;
-use App\Jobs\AllegroUnlockInactiveThreads;
-use App\Services\AllegroDisputeService;
-
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -30,11 +25,6 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::group(['prefix' => 'products'], function () {
             Route::group(['prefix' => 'sets', 'as' => 'sets.'], __DIR__ . '/web/ProductsSetsRoutes.php');
-        });
-
-        Route::get('/test', function() {
-            $d = new AllegroDisputeService();
-            $d->unlockInactiveDisputes();
         });
 
         Route::get('/disputes', 'AllegroDisputeController@list');

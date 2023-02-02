@@ -15,6 +15,12 @@ class AllegroDisputeService extends AllegroApiService
     const STATUS_CLOSED = 'CLOSED';
     const TYPE_REGULAR = 'REGULAR';
 
+    const CONTENT_TYPES_EXT = [
+        'image/jpeg'      => 'jpg',
+        'image/png'       => 'png',
+        'application/pdf' => 'pdf',
+    ];
+
     public function __construct()
     {
         parent::__construct();
@@ -183,11 +189,11 @@ class AllegroDisputeService extends AllegroApiService
         ]);
     }
 
-    public function getAttachment(string $url)
+    public function getAttachment(string $url): string
     {
-        $response = $this->request('GET', $url, []);
-        $path = '/tmp/' . base64_encode($url);
-        file_put_contents($path, (string)$response->getBody());
+        $path = sys_get_temp_dir() . '/' . base64_encode($url);
+        $this->request('GET', $url, ['sink' => $path]);
+
         return $path;
     }
 

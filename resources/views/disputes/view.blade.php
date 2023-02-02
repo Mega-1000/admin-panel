@@ -34,6 +34,8 @@
     @endif
     @if ($dispute->is_pending === 1 && auth()->user()->id === $dispute->user_id)
         <a id="exit_dispute" class="btn" href="javascript:;">Wyjdź z dyskusji</a>
+    @elseif ($dispute->user_id)
+        <div>Dyskusje zakończył użytkownik o numerze ID: {{ $dispute->user_id }}</div>
     @endif
 
 @endsection
