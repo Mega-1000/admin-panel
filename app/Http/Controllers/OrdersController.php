@@ -428,11 +428,15 @@ class OrdersController extends Controller
         if ($orderInvoiceAddress !== null) {
             $orderAddressService->addressIsValid($orderInvoiceAddress);
             $orderInvoiceAddressErrors = $orderAddressService->errors();
+        } else {
+            $orderInvoiceAddressErrors = [];
         }
 
         if ($orderDeliveryAddress !== null) {
             $orderAddressService->addressIsValid($orderDeliveryAddress);
             $orderDeliveryAddressErrors = $orderAddressService->errors();
+        } else {
+            $orderDeliveryAddressErrors = [];
         }
         $messages = $this->orderMessageRepository->orderBy('type')->findWhere(["order_id" => $order->id]);
         $emails = DB::table('emails_messages')->where('order_id', $orderId)->get();
