@@ -48,6 +48,8 @@ class Kernel extends ConsoleKernel
         // monday to saturday between 6 - 24
         $schedule->job(Jobs\AllegroSaveUnreadedChatThreads::class)->cron('*/2 5-23 * * 1-6')->withoutOverlapping(5);
 
+        $schedule->job(Jobs\AllegroUnlockInactiveThreads::class)->everyTenMinutes();
+
         $schedule->job(Jobs\CheckPromisePaymentsDates::class)->everyThirtyMinutes(); // @TODO this task is very slow, for now
         // i am changing it from everyMinute to everyThirtyMinutes as rewriting would take some time, this should solve
         // queue overload issues
