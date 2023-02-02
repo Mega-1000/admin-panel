@@ -608,6 +608,10 @@ class OrdersController extends Controller
             'type' => 'DELIVERY_ADDRESS',
         ])->first();
 
+        if($orderDeliveryAddress){
+            return [];
+        }
+
         $deliveryAddressLatLon = DB::table('postal_code_lat_lon')->where('postal_code', $orderDeliveryAddress->postal_code)->get()->first();
         if ($deliveryAddressLatLon === null) {
             Session::flash('message', 'Nie znaleziono kodu pocztowego w bazie!');
