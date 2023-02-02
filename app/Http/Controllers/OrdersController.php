@@ -425,19 +425,19 @@ class OrdersController extends Controller
         ])->first();
 
         $orderAddressService = new OrderAddressService();
-        if ($orderInvoiceAddress !== null) {
+//        if ($orderInvoiceAddress !== null) {
             $orderAddressService->addressIsValid($orderInvoiceAddress);
             $orderInvoiceAddressErrors = $orderAddressService->errors();
-        } else {
-            $orderInvoiceAddressErrors = [];
-        }
+//        } else {
+//            $orderInvoiceAddressErrors = [];
+//        }
 
-        if ($orderDeliveryAddress !== null) {
+//        if ($orderDeliveryAddress !== null) {
             $orderAddressService->addressIsValid($orderDeliveryAddress);
             $orderDeliveryAddressErrors = $orderAddressService->errors();
-        } else {
-            $orderDeliveryAddressErrors = [];
-        }
+//        } else {
+//            $orderDeliveryAddressErrors = [];
+//        }
         $messages = $this->orderMessageRepository->orderBy('type')->findWhere(["order_id" => $order->id]);
         $emails = DB::table('emails_messages')->where('order_id', $orderId)->get();
         $orderItems = $order->items;
