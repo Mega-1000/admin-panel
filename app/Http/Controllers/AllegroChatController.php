@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use App\Helpers\PaginationHelper;
 use App\Entities\AllegroChatThread;
 use App\Services\AllegroChatService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 
 class AllegroChatController extends Controller
@@ -23,10 +24,10 @@ class AllegroChatController extends Controller
         return view('allegro.chat-window');
     }
 
-    public function checkUnreadedThreads() {
-        $unreadedThreads = setting('allegro.unreaded_chat_threads');
+    public function checkUnreadedThreads(): JsonResponse {
+        $unreadedThreads = setting('allegro.unreaded_chat_threads') ?: '[]';
 
-        return response($unreadedThreads);
+        return response()->json(json_decode($unreadedThreads));
     }
     public function bookThread(Request $request) {
 

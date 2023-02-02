@@ -1,9 +1,10 @@
 <?php namespace App\Services;
 
-use App\Entities\AllegroDispute;
 use App\Entities\Order;
 use App\Jobs\AddLabelJob;
 use App\Jobs\RemoveLabelJob;
+use App\Entities\AllegroDispute;
+use Illuminate\Database\Eloquent\Collection;
 
 class AllegroDisputeService extends AllegroApiService
 {
@@ -37,6 +38,44 @@ class AllegroDisputeService extends AllegroApiService
         foreach (AllegroDispute::where('status', '=', self::STATUS_ONGOING)->get() as $dispute) {
             $this->updateDisputeRecord($dispute->dispute_id);
         }
+    }
+
+    public function getNewPendingDisputes(): Collection {
+        
+        // get first not booked dispute
+        $newDisputes = AllegroDispute::where('is_pending', 1)->where(function($query) {
+            $user = auth()->user();
+            $query->where('user_id', $user->id)->orWhereNull('user_id');
+        })->get();
+
+        if( $newDisputes->isEmpty() ) throw new \Exception('Nie znaleziono nowych dyskusji');
+
+        return $newDisputes;
+    }
+
+    public function bookDispute(): AllegroDispute {
+        $user = auth()->user();
+
+        // check if user has any opened disputes
+        $currentDispute = AllegroDispute::where([
+            'user_id'    => $user->id,
+            'is_pending' => 1,
+        ])->first();
+
+        if( $currentDispute !== null ) return $currentDispute;
+
+        // get first not booked dispute
+        $currentDispute = AllegroDispute::where([
+            'is_pending' => 1,
+            'user_id'    => null,
+        ])->first();
+
+        if( $currentDispute === null ) throw new \Exception('Nie znaleziono nowych dyskusji');
+
+        $currentDispute->user_id = $user->id;
+        $currentDispute->save();
+
+        return $currentDispute;
     }
 
     public function updateDisputeRecord(string $disputeId): void

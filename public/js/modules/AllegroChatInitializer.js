@@ -1,10 +1,11 @@
 class AllegroChatInitializer {
     
-    constructor(iconWrapper, iconCounter, ajaxPath, paths) {
+    constructor(iconWrapper, iconCounter, ajaxPath, paths, mode) {
         this.iconWrapper = iconWrapper;
         this.iconCounter = iconCounter;
         this.ajaxPath = ajaxPath;
         this.paths = paths;
+        this.mode = mode;
 
         this.allegroChatCheckUnreadedThreads();
 
@@ -22,7 +23,7 @@ class AllegroChatInitializer {
 
     async allegroChatCheckUnreadedThreads() {
         const url = this.ajaxPath + this.paths.checkUnreadedThreads;
-        this.unreadedThreads = await ajaxPost({}, url, true);
+        this.unreadedThreads = await ajaxPost({}, url);
 
         const numberOfUnreadedMsgs = this.unreadedThreads?.length || 0;
 
@@ -40,6 +41,18 @@ class AllegroChatInitializer {
             unreadedThreads: this.unreadedThreads,
         };
         const currentThread = await ajaxPost(data, url);
+
+        if(this.mode == 'disputes') {
+            if(currentThread.error) {
+                toastr.error(currentThread.error);
+                this.iconWrapper.removeClass('loader-2');
+                return false;
+            }
+            this.openDisputedOrder(currentThread.order_id, currentThread.id);
+            this.iconWrapper.removeClass('loader-2');
+            return false;
+        }
+
         if(!currentThread.allegro_thread_id) {
             toastr.error('Wiadomości zostały przypisane do innych użytkowników. Proszę spróbować później');
             this.iconWrapper.removeClass('loader-2');
@@ -55,6 +68,17 @@ class AllegroChatInitializer {
         }
     }
     
+    openDisputedOrder(orderId, disputeId) {
+        window.open(
+          `${this.ajaxPath}orders/${orderId}/edit`,
+          '_blank'
+        );
+        window.open(
+          `${this.ajaxPath}disputes/view/${disputeId}`,
+          '_blank'
+        );
+    }
+    
     openOrders(threadId, nickname) {
         // handle open new window with order
         let dtOrders = window.localStorage.getItem('DataTables_dataTable_/admin/orders');
@@ -67,6 +91,9 @@ class AllegroChatInitializer {
     }
 
     async messagesPreview(e) {
+
+        if(!this.paths.messagesPreview) return false;
+
         $(e.currentTarget).addClass('loader-2');
         const threadId = $(e.currentTarget).find('.allegro-thread-id').text();
         const url = this.ajaxPath + this.paths.messagesPreview + threadId;
@@ -100,6 +127,9 @@ class AllegroChatInitializer {
         window.localStorage.setItem('preview_allegro_chat_storage', JSON.stringify(chatWindowParams));
     }
     async openChatWindow(threadId, nickname) {
+
+        if(!this.paths.getMessages) return false;
+
         const url = this.ajaxPath + this.paths.getMessages + threadId;
         let messages = await ajaxPost({}, url);
         

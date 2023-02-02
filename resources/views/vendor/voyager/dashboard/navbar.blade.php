@@ -32,6 +32,10 @@
                 </ol>
             @show
         </div>
+        <div class="allegro-dispute-icon-wrapper">
+            <span class="icon voyager-bell"></span>
+            <strong class="allegro-dispute-icon-counter hidden">0</strong>
+        </div>
         <div class="allegro-chat-icon-wrapper">
             <span class="icon voyager-chat"></span>
             <strong class="allegro-chat-icon-counter hidden">0</strong>

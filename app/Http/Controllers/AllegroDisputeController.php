@@ -2,6 +2,7 @@
 
 use App\Entities\AllegroDispute;
 use App\Services\AllegroDisputeService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class AllegroDisputeController extends Controller
@@ -51,6 +52,26 @@ class AllegroDisputeController extends Controller
         $url = base64_decode($url);
         $path = $this->allegroDisputeService->getAttachment($url);
         return response()->download($path);
+    }
+
+    public function getNewPendingDisputes(): JsonResponse {
+        try {
+            $pendingDisputes = $this->allegroDisputeService->getNewPendingDisputes();
+        } catch (\Exception $ex) {
+            return response()->json( ['error' => $ex->getMessage()] );
+        }
+
+        return response()->json($pendingDisputes);
+    }
+
+    public function bookDispute(): JsonResponse {
+        try {
+            $bookedDispute = $this->allegroDisputeService->bookDispute();
+        } catch (\Exception $ex) {
+            return response()->json( ['error' => $ex->getMessage()] );
+        }
+
+        return response()->json($bookedDispute);
     }
 
 }

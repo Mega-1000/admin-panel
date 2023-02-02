@@ -1,5 +1,9 @@
 <?php
 
+use Carbon\Carbon;
+use App\Entities\AllegroDispute;
+use App\Jobs\AllegroUnlockInactiveThreads;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -25,6 +29,13 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::group(['prefix' => 'products'], function () {
             Route::group(['prefix' => 'sets', 'as' => 'sets.'], __DIR__ . '/web/ProductsSetsRoutes.php');
+        });
+
+        Route::get('/test', function() {
+            $d = AllegroDispute::where([
+                'is_pending' => 0,
+            ])->first();
+            echo '<pre>' , print_r($d->exists) , '</pre>';
         });
 
         Route::get('/disputes', 'AllegroDisputeController@list');
@@ -574,7 +585,10 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/edit-allegro-terms', 'AllegroController@saveTerms')->name('allegro.edit-terms');
 
         Route::prefix('allegro')->as('allegro.')->group(function () {
-            Route::get('/chat', 'AllegroChatController@chatWindow')->name('allegro.chat-window');
+            Route::post('/getNewPendingDisputes', 'AllegroDisputeController@getNewPendingDisputes')->name('getNewPendingDisputes');
+            Route::post('/bookDispute', 'AllegroDisputeController@bookDispute')->name('bookDispute');
+
+            Route::get('/chat', 'AllegroChatController@chatWindow')->name('chatWindow');
 
             Route::post('/checkUnreadedThreads', 'AllegroChatController@checkUnreadedThreads')->name('checkUnreadedThreads');
             Route::post('/bookThread', 'AllegroChatController@bookThread')->name('bookThread');
