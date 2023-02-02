@@ -23,5 +23,6 @@ class UpdateAllegroDisputes implements ShouldQueue
     {
         $allegroDisputeService = app(AllegroDisputeService::class);
         $allegroDisputeService->updateOngoingDisputes();
+        $allegroDisputeService->unlockInactiveDisputes();
     }
 }

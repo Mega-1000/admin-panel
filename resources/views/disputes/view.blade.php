@@ -32,10 +32,28 @@
         <button class="btn btn-primary">Wyślij</button>
     </form>
     @endif
+    @if ($dispute->is_pending === 1 && auth()->user()->id === $dispute->user_id)
+        <a id="exit_dispute" class="btn" href="javascript:;">Wyjdź z dyskusji</a>
+    @endif
 
 @endsection
 
 
 @section('datatable-scripts')
+<script>
+    $(function() {
+        $('#exit_dispute').on('click', async e => {
+            $(e.target).addClass('loader-2');
 
+            const url = '/admin/allegro/exitDispute';
+
+            const res = await ajaxPost({}, url);
+
+            if(res.error) toastr.error('Nie udało się wyjść z dyskusji, spróbuj ponownie.');
+            if(res.isSuccess) window.location = '/admin/orders';
+        });
+    });
+</script>
 @endsection
+
+

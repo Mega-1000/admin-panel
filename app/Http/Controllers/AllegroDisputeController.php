@@ -74,4 +74,14 @@ class AllegroDisputeController extends Controller
         return response()->json($bookedDispute);
     }
 
+    public function exitDispute(): JsonResponse {
+        try {
+            $isSuccess = $this->allegroDisputeService->exitDispute();
+        } catch (\Exception $ex) {
+            return response()->json( ['error' => $ex->getMessage()] );
+        }
+
+        return response()->json(['isSuccess' => $isSuccess]);
+    }
+
 }

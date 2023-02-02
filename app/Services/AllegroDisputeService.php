@@ -1,5 +1,6 @@
 <?php namespace App\Services;
 
+use Carbon\Carbon;
 use App\Entities\Order;
 use App\Jobs\AddLabelJob;
 use App\Jobs\RemoveLabelJob;
@@ -188,6 +189,31 @@ class AllegroDisputeService extends AllegroApiService
         $path = '/tmp/' . base64_encode($url);
         file_put_contents($path, (string)$response->getBody());
         return $path;
+    }
+
+    public function unlockInactiveDisputes(): void {
+        $currentDate = Carbon::now();
+        $currentDateTime = $currentDate->subMinutes(10)->toDateTimeString();
+
+        AllegroDispute::where([
+            ['is_pending', '=', 1],
+            ['created_at', '<', $currentDateTime],
+        ])->update([
+            'is_pending' => 0,
+        ]);
+    }
+
+    public function exitDispute(): bool {
+        $user = auth()->user();
+
+        AllegroDispute::where([
+            'is_pending' => 1,
+            'user_id' => $user->id,
+        ])->update([
+            'is_pending' => 0,
+        ]);
+
+        return true;
     }
 
     private function updateLabels(AllegroDispute $dispute)

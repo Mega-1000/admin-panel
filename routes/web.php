@@ -3,6 +3,7 @@
 use Carbon\Carbon;
 use App\Entities\AllegroDispute;
 use App\Jobs\AllegroUnlockInactiveThreads;
+use App\Services\AllegroDisputeService;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,10 +33,8 @@ Route::group(['prefix' => 'admin'], function () {
         });
 
         Route::get('/test', function() {
-            $d = AllegroDispute::where([
-                'is_pending' => 0,
-            ])->first();
-            echo '<pre>' , print_r($d->exists) , '</pre>';
+            $d = new AllegroDisputeService();
+            $d->unlockInactiveDisputes();
         });
 
         Route::get('/disputes', 'AllegroDisputeController@list');
@@ -587,6 +586,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::prefix('allegro')->as('allegro.')->group(function () {
             Route::post('/getNewPendingDisputes', 'AllegroDisputeController@getNewPendingDisputes')->name('getNewPendingDisputes');
             Route::post('/bookDispute', 'AllegroDisputeController@bookDispute')->name('bookDispute');
+            Route::post('/exitDispute', 'AllegroDisputeController@exitDispute')->name('exitDispute');
 
             Route::get('/chat', 'AllegroChatController@chatWindow')->name('chatWindow');
 
