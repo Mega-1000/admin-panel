@@ -30,7 +30,7 @@ class AddSchenkerFlag extends Migration
     {
         Schema::table('container_types', function (Blueprint $table) {
             $table->dropColumn(['shipping_provider']);
-            //$table->dropColumn(['additional_informations']);
+            $table->dropColumn(['additional_informations']);
         });
     }
 }

@@ -47,6 +47,10 @@ class Kernel extends ConsoleKernel
 
         // monday to saturday between 6 - 24
         $schedule->job(Jobs\AllegroSaveUnreadedChatThreads::class)->cron('*/2 5-23 * * 1-6')->withoutOverlapping(5);
+        $schedule->job(Jobs\AllegroUnlockInactiveThreads::class)->everyTenMinutes();
+
+        $schedule->job(Jobs\UpdateAllegroDisputes::class)->everyFiveMinutes();
+        $schedule->job(Jobs\GetNewAllegroDisputesJob::class)->everyFiveMinutes();
 
         $schedule->job(Jobs\CheckPromisePaymentsDates::class)->everyThirtyMinutes(); // @TODO this task is very slow, for now
         // i am changing it from everyMinute to everyThirtyMinutes as rewriting would take some time, this should solve
@@ -65,8 +69,6 @@ class Kernel extends ConsoleKernel
 //        $schedule->job(Jobs\ChangeDdpShipmentDatePackagesJob::class)->dailyAt("12:01");
 
         //$schedule->job(Jobs\SendMessagesOnNewAllegroOrders::class)->everyFifteenMinutes();
-        $schedule->job(Jobs\UpdateAllegroDisputes::class)->everyFifteenMinutes();
-        $schedule->job(Jobs\GetNewAllegroDisputesJob::class)->everyFifteenMinutes();
 
         $schedule->job(Jobs\Cron\SendOrderInvoiceMsgMailsJob::class)->dailyAt("09:00");
         $schedule->job(Jobs\Cron\SendInvoicesMailsJob::class)->dailyAt("23:45");

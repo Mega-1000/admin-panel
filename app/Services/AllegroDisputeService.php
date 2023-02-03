@@ -1,9 +1,11 @@
 <?php namespace App\Services;
 
-use App\Entities\AllegroDispute;
+use Carbon\Carbon;
 use App\Entities\Order;
 use App\Jobs\AddLabelJob;
 use App\Jobs\RemoveLabelJob;
+use App\Entities\AllegroDispute;
+use Illuminate\Database\Eloquent\Collection;
 
 class AllegroDisputeService extends AllegroApiService
 {
@@ -12,6 +14,12 @@ class AllegroDisputeService extends AllegroApiService
     const STATUS_ONGOING = 'ONGOING';
     const STATUS_CLOSED = 'CLOSED';
     const TYPE_REGULAR = 'REGULAR';
+
+    const CONTENT_TYPES_EXT = [
+        'image/jpeg'      => 'jpg',
+        'image/png'       => 'png',
+        'application/pdf' => 'pdf',
+    ];
 
     public function __construct()
     {
@@ -37,6 +45,44 @@ class AllegroDisputeService extends AllegroApiService
         foreach (AllegroDispute::where('status', '=', self::STATUS_ONGOING)->get() as $dispute) {
             $this->updateDisputeRecord($dispute->dispute_id);
         }
+    }
+
+    public function getNewPendingDisputes(): Collection {
+        
+        // get first not booked dispute
+        $newDisputes = AllegroDispute::where('is_pending', 1)->where(function($query) {
+            $user = auth()->user();
+            $query->where('user_id', $user->id)->orWhereNull('user_id');
+        })->get();
+
+        if( $newDisputes->isEmpty() ) throw new \Exception('Nie znaleziono nowych dyskusji');
+
+        return $newDisputes;
+    }
+
+    public function bookDispute(): AllegroDispute {
+        $user = auth()->user();
+
+        // check if user has any opened disputes
+        $currentDispute = AllegroDispute::where([
+            'user_id'    => $user->id,
+            'is_pending' => 1,
+        ])->first();
+
+        if( $currentDispute !== null ) return $currentDispute;
+
+        // get first not booked dispute
+        $currentDispute = AllegroDispute::where([
+            'is_pending' => 1,
+            'user_id'    => null,
+        ])->first();
+
+        if( $currentDispute === null ) throw new \Exception('Nie znaleziono nowych dyskusji');
+
+        $currentDispute->user_id = $user->id;
+        $currentDispute->save();
+
+        return $currentDispute;
     }
 
     public function updateDisputeRecord(string $disputeId): void
@@ -143,12 +189,37 @@ class AllegroDisputeService extends AllegroApiService
         ]);
     }
 
-    public function getAttachment(string $url)
+    public function getAttachment(string $url): string
     {
-        $response = $this->request('GET', $url, []);
-        $path = '/tmp/' . base64_encode($url);
-        file_put_contents($path, (string)$response->getBody());
+        $path = sys_get_temp_dir() . '/' . base64_encode($url);
+        $this->request('GET', $url, ['sink' => $path]);
+
         return $path;
+    }
+
+    public function unlockInactiveDisputes(): void {
+        $currentDate = Carbon::now();
+        $currentDateTime = $currentDate->subMinutes(10)->toDateTimeString();
+
+        AllegroDispute::where([
+            ['is_pending', '=', 1],
+            ['created_at', '<', $currentDateTime],
+        ])->update([
+            'is_pending' => 0,
+        ]);
+    }
+
+    public function exitDispute(): bool {
+        $user = auth()->user();
+
+        AllegroDispute::where([
+            'is_pending' => 1,
+            'user_id' => $user->id,
+        ])->update([
+            'is_pending' => 0,
+        ]);
+
+        return true;
     }
 
     private function updateLabels(AllegroDispute $dispute)

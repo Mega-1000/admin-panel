@@ -212,8 +212,9 @@ return [
     ],
 
     'additional_js' => [
-        'js/modules/AllegroChat.js',
+        'js/modules/AllegroChatInitializer.js',
         'js/helpers/helpers.js',
+        'js/main.js',
     ],
 
     'googlemaps' => [
