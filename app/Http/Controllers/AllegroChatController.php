@@ -97,8 +97,6 @@ class AllegroChatController extends Controller
         $threadId = $request->input('threadId');
         $attachmentId = $request->input('attachmentId');
 
-        // $userLogin = AllegroChatThread::where('allegro_thread_id', $threadId)->where('is_outgoing', '!=', 1)->pluck('allegro_user_login')->first();
-
         $data = [
             'text' => $content,
         ];
@@ -117,7 +115,7 @@ class AllegroChatController extends Controller
             'allegro_thread_id' => $threadId,
             'type' => 'PENDING',
         ])->update([
-            'updated_at' => date('Y-m-d G:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
         ]);
 
         if(!$res['id']) return response('null', 200);

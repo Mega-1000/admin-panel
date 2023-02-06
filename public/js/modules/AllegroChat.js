@@ -128,13 +128,14 @@ class AllegroChat {
         }
         const url = this.ajaxPath + 'allegro/getNewMessages/'+this.threadId;
         let messages = await ajaxPost(data, url);
+        this.footer.removeClass('loader-2');
+        
         if(messages == 'null') return false;
 
         const messagesTemplate = messages.map(msg => this.makeSingleMessageTemplate(msg)).join('');
 
         $('.allegro-msgs-wrapper').append(messagesTemplate);
         this.chatScrollDown();
-        this.footer.removeClass('loader-2');
     }
 
     async sendMessage() {

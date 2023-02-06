@@ -30,6 +30,8 @@ class AllegroChatThread extends Model
         'allegro_offer_id',
         'allegro_order_id',
         'original_allegro_date',
+        'created_at',
+        'updated_at',
     ];
 
     public function user() {

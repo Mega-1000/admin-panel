@@ -134,6 +134,7 @@ class AllegroChatService extends AllegroApiService {
 
         foreach($messages as $msg) {
             $createdAt = new Carbon($msg['createdAt']);
+            $currentDateTime = new Carbon();
 
             $newMessages[] = [
                 'allegro_thread_id'     => $msg['thread']['id'],
@@ -148,6 +149,8 @@ class AllegroChatService extends AllegroApiService {
                 'allegro_offer_id'      => $msg['relatesTo']['offer'] ?: '',
                 'allegro_order_id'      => $msg['relatesTo']['order'] ?: '',
                 'original_allegro_date' => $createdAt->toDateTimeString(),
+                'created_at'            => $currentDateTime->toDateTimeString(),
+                'updated_at'            => $currentDateTime->toDateTimeString(),
             ];
         }
         AllegroChatThread::insert($newMessages);
