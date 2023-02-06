@@ -140,13 +140,13 @@ class AllegroChatService extends AllegroApiService {
                 'allegro_msg_id'        => $msg['id'],
                 'user_id'               => $user->id,
                 'allegro_user_login'    => $msg['author']['login'],
-                'subject'               => $msg['subject'] ?? '',
+                'subject'               => $msg['subject'] ?: '',
                 'content'               => $msg['text'],
                 'is_outgoing'           => !$msg['author']['isInterlocutor'],
                 'attachments'           => json_encode($msg['attachments']),
                 'type'                  => $msg['type'],
-                'allegro_offer_id'      => $msg['relatesTo']['offer'] ?? '',
-                'allegro_order_id'      => $msg['relatesTo']['order'] ?? '',
+                'allegro_offer_id'      => $msg['relatesTo']['offer'] ?: '',
+                'allegro_order_id'      => $msg['relatesTo']['order'] ?: '',
                 'original_allegro_date' => $createdAt->toDateTimeString(),
             ];
         }
