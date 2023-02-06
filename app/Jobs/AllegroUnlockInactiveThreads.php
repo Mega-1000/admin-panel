@@ -19,11 +19,11 @@ class AllegroUnlockInactiveThreads implements ShouldQueue
     public function handle()
     {
         $currentDate = Carbon::now();
-        $currentDateTime = $currentDate->subMinutes(10)->toDateTimeString();
+        $currentDateTime = $currentDate->subMinutes(15)->toDateTimeString();
 
         AllegroChatThread::where([
             ['type', '=', 'PENDING'],
-            ['created_at', '<', $currentDateTime],
+            ['updated_at', '<', $currentDateTime],
         ])->delete();
     }
 }

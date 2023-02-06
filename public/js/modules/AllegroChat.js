@@ -6,14 +6,23 @@ class AllegroChat {
     constructor(ajaxPath, threadId, messages, nickname, isPreview) {
         this.ajaxPath = ajaxPath;
         this.threadId = threadId;
-        this.wrapper = $('.allegro-chat-wrapper');
-        this.footer = $('.allegro-chat-footer');
 
         setInterval(() => {
             this.getNewMessages();
         }, 20000);
+        
+        // auto close window after 20 min.
+        setTimeout(() => {
+            this.closeChat();
+        }, 1200000);
 
         this.renderChat(messages, nickname, isPreview);
+        // after render chat we've got char-wrapper and chat-footer
+        this.wrapper = $('.allegro-chat-wrapper');
+        this.footer = $('.allegro-chat-footer');
+        this.footer.addClass('loader-2');
+        this.getNewMessages();
+
         this.chatScrollDown();
         this.initListeners();
     }
@@ -24,9 +33,8 @@ class AllegroChat {
 
             this.sendMessage();
 
-            this.footer.removeClass('loader-2');
         });
-        $('.allegro-attachments-item').on('click', () => {
+        $('body').on('click', '.allegro-attachments-item', e => {
             this.footer.addClass('loader-2');
 
             this.downloadAttachment(e);
@@ -51,9 +59,10 @@ class AllegroChat {
     }
     
     makeSingleMessageTemplate(msg) {
-
+        
         const type = msg.is_outgoing ? 'outgoing' : 'incoming';
-        const attachments = JSON.parse(msg.attachments);
+        
+        const attachments = typeof msg.attachments !== 'undefined' ? JSON.parse(msg.attachments) : [];
         const date = msg.original_allegro_date;
         const attachmentsTemplate = attachments.length > 0 && attachments.map(attachment => {
             if(attachment.status == 'UNSAFE' || attachment.status == 'EXPIRED' || !attachment.url) return ``;
@@ -70,7 +79,7 @@ class AllegroChat {
                 <div class="allegro-msg-header">
                     <div class="allegro-msg-date" data-date="${date}">[${date}]</div>
                     <div class="allegro-msg-consultant">
-                        Konsultant: <strong>${msg.user.name}</strong>
+                        Konsultant: <strong>${msg?.user?.name}</strong>
                     </div>
                     ${msg.subject ? `<div class="allegro-msg-subject">
                         <strong>Temat: ${msg.subject}</strong>
@@ -125,6 +134,7 @@ class AllegroChat {
 
         $('.allegro-msgs-wrapper').append(messagesTemplate);
         this.chatScrollDown();
+        this.footer.removeClass('loader-2');
     }
 
     async sendMessage() {
@@ -168,28 +178,21 @@ class AllegroChat {
         }
 
         const url = this.ajaxPath + 'allegro/writeNewMessage';
-        let message = await ajaxPost(data, url);
+        let messages = await ajaxPost(data, url);
 
-        if(message == 'null') {
+        if(messages == 'null') {
             toastr.error('Nie udało się wysłać wiadomości.');
             return false;
         }
 
         textarea.val('');
-
-        const messagesTemplate = this.makeSingleMessageTemplate(message);
-
-        $(this.chatWindow.document).find('.allegro-msgs-wrapper').append(messagesTemplate);
-        this.chatScrollDown();
+        $('.allegro-add-attachment').val('');
 
     }
 
     renderChat(messages, nickname, isPreview) {
 
-        const messagesTemplate = messages.map(msg => {
-
-            return this.makeSingleMessageTemplate(msg);
-        }).join('');
+        const messagesTemplate = messages.map(msg => this.makeSingleMessageTemplate(msg)).join('');
 
         const chatTemplate = `
         <div class="allegro-chat-wrapper">

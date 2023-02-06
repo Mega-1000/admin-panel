@@ -113,6 +113,13 @@ class AllegroChatController extends Controller
 
         $res = $this->allegroChatService->newMessage($threadId, $data);
 
+        AllegroChatThread::where([
+            'allegro_thread_id' => $threadId,
+            'type' => 'PENDING',
+        ])->update([
+            'updated_at' => date('Y-m-d G:i:s'),
+        ]);
+
         if(!$res['id']) return response('null', 200);
         
         $newMessages = collect( $this->allegroChatService->insertMsgsToDB([ $res ]) );
