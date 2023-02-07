@@ -3,10 +3,10 @@
 namespace App\DTO\Schenker;
 
 use App\DTO\BaseDTO;
-use JsonSerializable;
-use App\Exceptions\SchenkerException;
-use App\Enums\Schenker\DangerProductRiskLevel;
 use App\Enums\Schenker\DangerProductPackageType;
+use App\Enums\Schenker\DangerProductRiskLevel;
+use App\Exceptions\SchenkerException;
+use JsonSerializable;
 
 class DangerProductDTO extends BaseDTO implements JsonSerializable
 {
@@ -66,7 +66,7 @@ class DangerProductDTO extends BaseDTO implements JsonSerializable
         ];
 
         if (DangerProductRiskLevel::checkRiskLevelExists($this->riskLevel)) {
-            $this->optionalFields['adrGroup'] = $this->riskLevel;
+            $this->optionalFields['adrGroup'] = 'riskLevel';
         }
 
         return array_merge($dangerProductData, $this->getOptionalFilledFields());

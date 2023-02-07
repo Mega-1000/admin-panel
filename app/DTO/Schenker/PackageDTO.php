@@ -74,7 +74,7 @@ class PackageDTO extends BaseDTO implements JsonSerializable
         ];
 
         if ($this->notStandard === true) {
-            $this->optionalFields['nstReason'] = $this->notStandardComment;
+            $this->optionalFields['nstReason'] = 'notStandardComment';
         }
 
         return array_merge($packageData, $this->getOptionalFilledFields());
