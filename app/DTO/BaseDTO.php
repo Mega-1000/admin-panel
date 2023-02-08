@@ -15,7 +15,7 @@ class BaseDTO
             if ($this->$propertyName !== null && $this->$propertyName !== '') {
                 if ($this->$propertyName instanceof Carbon) {
 
-                    $filledFields[$fieldName] = $this->$propertyName->format(config('integrations.schenker.default_date_time_format', 'Y-m-dTH:i:s'));
+                    $filledFields[$fieldName] = $this->$propertyName->format(config('integrations.schenker.default_date_time_format', 'Y-m-d\TH:i:s'));
                     continue;
                 }
                 if (is_array($this->$propertyName)) {
@@ -35,7 +35,7 @@ class BaseDTO
     {
         if ($date !== null) {
             return $date->format(
-                $format ?? config('integrations.schenker.default_date_time_format')
+                $format ?? config('integrations.schenker.default_date_time_format', 'Y-m-d\TH:i:s')
             );
         }
         return null;
