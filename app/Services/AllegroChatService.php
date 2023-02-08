@@ -144,7 +144,7 @@ class AllegroChatService extends AllegroApiService {
                 'subject'               => $msg['subject'] ?: '',
                 'content'               => $msg['text'],
                 'is_outgoing'           => !$msg['author']['isInterlocutor'],
-                'attachments'           => json_encode($msg['attachments']),
+                'attachments'           => json_encode($msg['attachments'] ?: []),
                 'type'                  => $msg['type'],
                 'allegro_offer_id'      => $msg['relatesTo']['offer'] ?: '',
                 'allegro_order_id'      => $msg['relatesTo']['order'] ?: '',
