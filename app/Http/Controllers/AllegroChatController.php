@@ -41,10 +41,6 @@ class AllegroChatController extends Controller
     }
     public function messagesPreview(string $threadId) {
 
-        $user = auth()->user();
-
-        if($user->role_id != 1) return response(null, 500);
-
         $allegroPrevMessages = AllegroChatThread::where('allegro_thread_id', $threadId)->where('type', '!=', 'PENDING')->with('user')->get();
 
         return response()->json($allegroPrevMessages);
