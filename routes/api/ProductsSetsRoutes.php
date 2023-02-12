@@ -4,7 +4,7 @@ Route::get('/products', ['as' => 'products', 'uses' => 'Api\SetsController@produ
 Route::get('/', ['as' => 'index', 'uses' => 'Api\SetsController@index']);
 Route::get('/{set}', ['as' => 'set', 'uses' => 'Api\SetsController@set']);
 Route::get('/products/{product}', ['as' => 'product', 'uses' => 'Api\SetsController@productsStocks']);
-Route::get('/{set}/products/', ['as' => 'products', 'uses' => 'Api\SetsController@stocksAllSetsProducts']);
+Route::get('/{set}/products/', ['as' => 'set_products', 'uses' => 'Api\SetsController@stocksAllSetsProducts']);
 Route::post('/products', ['as' => 'searchProducts', 'uses' => 'Api\SetsController@products']);
 Route::post('/', ['as' => 'store', 'uses' => 'Api\SetsController@store']);
 Route::post('/{set}/completing/', ['as' => 'completing', 'uses' => 'Api\SetsController@completing']);
