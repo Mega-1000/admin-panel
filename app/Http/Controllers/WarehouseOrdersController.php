@@ -189,7 +189,7 @@ class WarehouseOrdersController extends Controller
             'order_id' => $warehouseOrder->id,
             'type' => 'INVOICE_ADDRESS'
         ]);
-        return route('orders.edit', $warehouseOrder->id);
+        return route('orders.edit', ['order_id' => $warehouseOrder->id]);
     }
 
     public function update($id, Request $request)

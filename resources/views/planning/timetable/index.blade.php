@@ -1,3 +1,5 @@
+@php use Carbon\Carbon; @endphp
+@php use App\Entities\Order; @endphp
 @extends('layouts.app')
 
 @section('app-header')
@@ -27,7 +29,7 @@
             $activeDay = Request()->active_start;
         }
     if(Request::get('date') != null){
-        $activeDay = new \Carbon\Carbon(Request::get('date'));
+        $activeDay = new Carbon(Request::get('date'));
     }
     @endphp
     <div class="modal fade" tabindex="-1" id="addStorekeeperTimeError" role="dialog">
@@ -277,41 +279,47 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     <script>
         @can('create-bonus')
-        $(document).on('click', '.penalty', (e)=>{
+        $(document).on('click', '.penalty', (e) => {
             e.preventDefault();
             $('#updateTaskModal').hide();
             let orderId = $(e.target).attr('data-order');
             $('#add_bonus_modal').modal('show');
             $('#order_id').val(orderId);
             $('#consultant-name').html('<i class="fas fa-spinner fa-spin  fa-fw"></i>');
-            $('#select-consultant').attr('disabled',true);
+            $('#select-consultant').attr('disabled', true);
             $('#warehouse-name').html('<i class="fas fa-spinner fa-spin  fa-fw"></i>');
-            $('#select-warehouse').attr('disabled',true);
+            $('#select-warehouse').attr('disabled', true);
 
-            $.get('{{ route('bonus.users') }}/'+orderId, (data)=>{
+            $.get('{{ route('bonus.users') }}/' + orderId, (data) => {
                 $('#consultant-name').html(data['consultant']);
                 $('#warehouse-name').html(data['warehouse']);
 
-                if(data['consultant'] != 'BRAK') {
+                if (data['consultant'] != 'BRAK') {
                     $('#select-consultant').removeAttr('disabled');
                 }
-                if(data['warehouse'] != 'BRAK'){
+                if (data['warehouse'] != 'BRAK') {
                     $('#select-warehouse').removeAttr('disabled');
                 }
-            });
-        });
+            })
+        })
+
         @endcan
         function sendComment(type, order_id) {
             $.post(
                 {
                     url: "{{route('orders.updateNotice')}}",
-                    data: {
-                        order_id: order_id,
-                        message: $(`#${type}`).val(),
-                        type: type
-                    }
-                })
-                .done(() => location.reload())
+            {
+                order_id,
+                    message
+            :
+                $(`#${type}`).val(),
+                    type
+            :
+                type
+            }
+        })
+        .
+            done(() => location.reload())
                 .fail((response) => {
                     var json = JSON.parse(response.responseText);
                     alert(Object.values(json.errors));
@@ -339,8 +347,9 @@
             let calendarEl = document.getElementById('calendar');
             let calendar = new FullCalendar.Calendar(calendarEl, {
                 plugins: ['interaction', 'dayGrid', 'timeGrid', 'resourceTimeline'],
-                now: '{{$activeDay != null ? $activeDay : new Carbon\Carbon()}}',
-                editable: true,
+                now: '
+                {{$activeDay != null ? $activeDay : new Carbon\Carbon()}}',
+                true,
                 aspectRatio: 1.8,
                 scrollTime: '7:00',
                 slotDuration: slot,
@@ -348,129 +357,499 @@
                 minTime: minTime,
                 maxTime: maxTime,
                 locale: 'PL',
-                titleFormat: {year: 'numeric', month: 'long', day: '2-digit'},
-                buttonText: {
-                    today: 'Dzisiaj',
-                    month: 'Miesiąc',
-                    week: 'Tydzień',
-                    day: 'Dzień',
-                    days: 'Lista',
-                    resourceTimelineThreeDays: '3 Dni'
-                },
-                slotLabelFormat: [
-                    {day: '2-digit', month: 'long', year: 'numeric'},
-                    {weekday: 'long'},
-                    {hour: '2-digit', minute: '2-digit'}
-                ],
-                header: {
-                    left: 'promptResource today prev,next',
-                    center: 'title changeTimeLine wholeDay twoMins fiveMins fifteenMins',
-                    right: 'resourceTimelineDay,resourceTimelineThreeDays,timeGridWeek,dayGridMonth'
-                },
-                slotWidth: 15,
-                resourceAreaWidth: "5%",
-                customButtons: {
-                    promptResource: {
-                        text: 'Dodaj godziny pracy',
-                        click: function () {
-                            let warehouse = null;
-                            if ($('#warehouseSelect').is(':selected')) {
-                                warehouse = $('#warehouseSelect').val();
-                            }
-                            $.ajax({
-                                url: '/admin/planning/timetable/' + warehouse + '/getStorekeepersToModal',
-                            }).done(function (data) {
-                                $('#addStorekeeperTime').modal();
-                                let i = 1;
-                                if ($('#storekeepers > tbody > tr').length === 1) {
-                                    $.each(data, function (index, value) {
-                                        let html = '<tr class="appendRow">';
-                                        html += '<td>' + i + '</td>';
-                                        html += '<td>' + value.name + '</td>';
-                                        html += '<td>' + value.firstname + '</td>';
-                                        html += '<td>' + value.lastname + '</td>';
-                                        html += '<td><input class="form-control start" type="time" name="start[' + value.id + ']" id="start[' + value.id + ']" value="' + value.user_works[0].start + '"></td>';
-                                        html += '<td><input class="form-control end" type="time" name="end[' + value.id + ']" id="end[' + value.id + ']" value="' + value.user_works[0].end + '"></td>';
-                                        html += '</tr>';
-                                        i++;
-                                        $('#storekeepers > tbody').append(html);
+                titleFormat: {'numeric', month: 'long', day: '2-digit'},
+            {
+                'Dzisiaj',
+                    month
+            :
+                'Miesiąc',
+                    week
+            :
+                'Tydzień',
+                    day
+            :
+                'Dzień',
+                    days
+            :
+                'Lista',
+                    resourceTimelineThreeDays
+            :
+                '3 Dni'
+            }
+        ,
+            [
+                {day: '2-digit', month: 'long', year: 'numeric'},
+                {weekday: 'long'},
+                {hour: '2-digit', minute: '2-digit'}
+            ],
+                header
+        :
+            {
+                'promptResource today prev,next',
+                    center
+            :
+                'title changeTimeLine wholeDay twoMins fiveMins fifteenMins',
+                    right
+            :
+                'resourceTimelineDay,resourceTimelineThreeDays,timeGridWeek,dayGridMonth'
+            }
+        ,
+            15,
+                resourceAreaWidth
+        :
+            "5%",
+                customButtons
+        :
+            {
+                {
+                    'Dodaj godziny pracy',
+                        click
+                :
 
-                                    });
-                                }
-                            }).fail(function () {
-                                $('#addStorekeeperTimeError').modal();
-                            });
-                        }
-                    },
-                    changeTimeLine: {
-                        text: 'Zmień zakres czasu',
-                        click: () => renderCalendarExtendTime()
-                    },
-                    wholeDay: {
-                        text: 'Cała doba',
-                        click: () => renderCalendar("00:00:00","23:59:59", document.calendarSlot)
-                    },
-                    twoMins: {text: '2 minuty', click: () => renderCalendarMins("00:02")},
-                    fifteenMins: {text: '15 minut', click: () => renderCalendarMins("00:15")},
-                    fiveMins: {text: '5 minut', click: () => renderCalendarMins("00:05")},
-                },
-                dateClick: function (info) {
-                    if (info.view.type !== 'timeGridWeek' && info.view.type !== 'dayGridMonth') {
-                        $('#addNewTask').modal();
-                        const startDate = new Date(info.dateStr);
-                        let startMinutes = startDate.getUTCMinutes();
-                        if (startMinutes < 10) {
-                            startMinutes = '0' + startMinutes;
-                        }
-                        let dateTime = startDate.getUTCFullYear() + '-' + ('0' + (startDate.getUTCMonth() + 1)).slice(-2) + '-' + startDate.getUTCDate() + ' ' + startDate.getUTCHours() + ':' + startMinutes;
-                        const newDate = new Date(info.dateStr);
-                        let endDate = new Date(newDate.setUTCHours(newDate.getUTCHours() + 1));
-                        let minutes = endDate.getUTCMinutes();
-                        if (minutes < 10) {
-                            minutes = '0' + minutes;
-                        }
-                        let dateTimeEnd = endDate.getUTCFullYear() + '-' + ('0' + (endDate.getUTCMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getUTCHours() + ':' + minutes;
+                    function () {
                         let warehouse = null;
                         if ($('#warehouseSelect').is(':selected')) {
                             warehouse = $('#warehouseSelect').val();
                         }
-                        let taskGroup = $('#task-group');
+                        $.ajax({
+                            url: '/admin/planning/timetable/' + warehouse + '/getStorekeepersToModal',
+                        }).done(function (data) {
+                            $('#addStorekeeperTime').modal();
+                            let i = 1;
+                            if ($('#storekeepers > tbody > tr').length === 1) {
+                                $.each(data, function (index, value) {
+                                    let html = '<tr class="appendRow">';
+                                    html += '<td>' + i + '</td>';
+                                    html += '<td>' + value.name + '</td>';
+                                    html += '<td>' + value.firstname + '</td>';
+                                    html += '<td>' + value.lastname + '</td>';
+                                    html += '<td><input class="form-control start" type="time" name="start[' + value.id + ']" id="start[' + value.id + ']" value="' + value.user_works[0].start + '"></td>';
+                                    html += '<td><input class="form-control end" type="time" name="end[' + value.id + ']" id="end[' + value.id + ']" value="' + value.user_works[0].end + '"></td>';
+                                    html += '</tr>';
+                                    i++;
+                                    $('#storekeepers > tbody').append(html);
 
+                                });
+                            }
+                        }).fail(function () {
+                            $('#addStorekeeperTimeError').modal();
+                        });
+                    }
+                }
+            ,
+                {
+                    'Zmień zakres czasu',
+                        click
+                :
+                    () => renderCalendarExtendTime()
+                }
+            ,
+                {
+                    'Cała doba',
+                        click
+                :
+                    () => renderCalendar("00:00:00", "23:59:59", document.calendarSlot)
+                }
+            ,
+                {
+                    '2 minuty', click
+                :
+                    () => renderCalendarMins("00:02")
+                }
+            ,
+                {
+                    '15 minut', click
+                :
+                    () => renderCalendarMins("00:15")
+                }
+            ,
+                {
+                    '5 minut', click
+                :
+                    () => renderCalendarMins("00:05")
+                }
+            ,
+            }
+        ,
+            dateClick: function (info) {
+                if (info.view.type !== 'timeGridWeek' && info.view.type !== 'dayGridMonth') {
+                    $('#addNewTask').modal();
+                    const startDate = new Date(info.dateStr);
+                    let startMinutes = startDate.getUTCMinutes();
+                    if (startMinutes < 10) {
+                        startMinutes = '0' + startMinutes;
+                    }
+                    let dateTime = startDate.getUTCFullYear() + '-' + ('0' + (startDate.getUTCMonth() + 1)).slice(-2) + '-' + startDate.getUTCDate() + ' ' + startDate.getUTCHours() + ':' + startMinutes;
+                    const newDate = new Date(info.dateStr);
+                    let endDate = new Date(newDate.setUTCHours(newDate.getUTCHours() + 1));
+                    let minutes = endDate.getUTCMinutes();
+                    if (minutes < 10) {
+                        minutes = '0' + minutes;
+                    }
+                    let dateTimeEnd = endDate.getUTCFullYear() + '-' + ('0' + (endDate.getUTCMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getUTCHours() + ':' + minutes;
+                    let warehouse = null;
+                    if ($('#warehouseSelect').is(':selected')) {
+                        warehouse = $('#warehouseSelect').val();
+                    }
+                    let taskGroup = $('#task-group');
+
+                    let html = '';
+                    html += '<div id="task-group">'
+                    html += '<div class="form-group">';
+                    html += '<label for="title">Nazwa</label>';
+                    html += '<input type="text" name="title" id="title" value="' + info.resource.title + '" class="form-control" disabled>';
+                    html += '<input type="hidden" name="user_id" id="user_id" value="' + info.resource.id + '">';
+                    html += '<input type="hidden" name="warehouse_id" id="user_id" value="' + warehouse + '">';
+                    html += '<input type="hidden" name="view_type" id="view_type" value="' + info.view.type + '">';
+                    html += '<input type="hidden" name="active_start" id="active_start" value="' + info.view.activeStart + '">';
+                    html += '</div>';
+                    html += '<div class="form-group">';
+                    html += '<label for="name">Nazwa zadania</label>';
+                    html += '<input type="text" name="name" id="name" class="form-control" required>';
+                    html += '</div>';
+                    html += '<div class="form-group">';
+                    html += '<label for="start_new">Godzina rozpoczęcia</label>';
+                    html += '<input type="text" name="start" id="start_new" class="form-control default-date-time-picker-now" value="' + dateTime + '">';
+                    html += '</div>';
+                    html += '<div class="form-group">';
+                    html += '<p>Dodaj czas zakończenia:</p>'
+                    html += '<button class="add-end-time" value="5">+5</button>';
+                    html += '<button class="add-end-time" value="10">+10</button>';
+                    html += '<button class="add-end-time" value="15">+15</button>';
+                    html += '<button class="add-end-time" value="20">+20</button>';
+                    html += '<button class="add-end-time" value="25">+25</button>';
+                    html += '<button class="add-end-time" value="30">+30</button>';
+                    html += '<button class="add-end-time" value="40">+40</button>';
+                    html += '<button class="add-end-time" value="50">+50</button>';
+                    html += '<button class="add-end-time" value="60">+60</button>';
+                    html += '<button class="add-end-time" value="70">+70</button>';
+                    html += '<button class="add-end-time" value="80">+80</button>';
+                    html += '<button class="add-end-time" value="90">+90</button>';
+                    html += '<br />';
+                    html += '<label for="end">Godzina zakończenia</label>';
+                    html += '<input type="text" name="end" id="end" class="time-to-finish-task form-control default-date-time-picker-now" value="' + dateTimeEnd + '">';
+                    html += '</div>';
+                    html += '<div class="form-group">';
+                    html += '<label for="color-green">';
+                    html += '<input type="radio" name="color" id="color-green" value="#32CD32" required> ';
+                    html += 'Zielony(wyprodukowane)</label>';
+                    html += '</div>';
+                    html += '<div class="form-group">';
+                    html += '<label for="color-blue">';
+                    html += '<input type="radio" name="color" id="color-blue" value="#194775" checked="checked" required> ';
+                    html += 'Niebieski(dopuszczalne przesunięcie terminu dostawy)</label>';
+                    html += '</div>';
+                    html += '<div class="form-group">';
+                    html += '<label for="color-yellow">';
+                    html += '<input type="radio" name="color" id="color-yellow" value="#E6C74D" required> ';
+                    html += 'Żółty(PILNE - prośba o wysłanie we wskazanym terminie)</label>';
+                    html += '</div>';
+                    html += '<div class="form-group">';
+                    html += '<label for="color-red">';
+                    html += '<input type="radio" name="color" id="color-red" value="#FF0000" required> ';
+                    html += 'Czerwony(awaria koniecznie to wysłać dzisiaj)</label>';
+                    html += '</div>';
+                    html += '<div class="form-group">';
+                    html += '<label for="color-violet">';
+                    html += '<input type="radio" name="color" id="color-violet" value="#9966CC" required> ';
+                    html += 'Fioletowy(zamówienie MEGA-OLAWA)</label>';
+                    html += '</div>';
+                    html += '<div class="form-group">';
+                    html += '<label for="consultant_value">Koszt obsługi konsultanta</label>';
+                    html += '<input type="number" name="consultant_value" id="consultant_value" class="form-control">';
+                    html += '</div>';
+                    html += '<div class="form-group">';
+                    html += '<label for="consultant_notice">Opis obsługi konsultanta</label>';
+                    html += '<textarea rows="5" cols="40" type="text" name="consultant_notice" id="consultant_notice" class="form-control"></textarea>';
+                    html += '</div>';
+                    html += '<div class="form-group">';
+                    html += '<label for="warehouse_value">Koszt obsługi magazynu</label>';
+                    html += '<input type="number" name="warehouse_value" id="warehouse_value" class="form-control">';
+                    html += '</div>';
+                    html += '<div class="form-group">';
+                    html += '<label for="warehouse_notice">Opis obsługi magazynu</label>';
+                    html += '<textarea rows="5" cols="40" type="text" name="warehouse_notice" id="warehouse_notice" class="form-control"></textarea>';
+                    html += '</div>';
+                    html += '</div>';
+                    if (taskGroup.length !== 0) {
+                        taskGroup.remove();
+                    }
+                    $('#addTask').append(html);
+                    $('.default-date-time-picker-now').datetimepicker({
+                        sideBySide: true,
+                        format: "YYYY-MM-DD H:mm",
+                        stepping: 1
+                    });
+                    $('.add-end-time').click(event => {
+                        event.preventDefault();
+                        let start = new Date($("#start_new").val());
+                        let end = new Date(start.getTime() + event.target.value * 60000);
+                        end.setHours(end.getHours() + (end.getTimezoneOffset() * -1) / 60);
+                        let startMinutes = end.getUTCMinutes();
+                        if (startMinutes < 10) {
+                            startMinutes = '0' + startMinutes;
+                        }
+                        let dateTime = end.getUTCFullYear() + '-' + ('0' + (end.getUTCMonth() + 1)).slice(-2) + '-' + end.getUTCDate() + ' ' + end.getUTCHours() + ':' + startMinutes;
+                        $(".time-to-finish-task").val(dateTime);
+                    })
+                    $('#name').val((endDate.getUTCDate() + '-' + ('0' + (endDate.getUTCMonth() + 1)).slice(-2)) + ' - ' + $('#warehouse_value').val());
+                    $(document).on('focusout', '.default-date-time-picker-now', function () {
+                        var dateObj = new Date($('#start_new').val());
+                        var month = ('0' + (dateObj.getUTCMonth() + 1)).slice(-2);
+                        var day = dateObj.getUTCDate();
+                        $('#name').val(day + '-' + month + ' - ' + $('#warehouse_value').val());
+                    });
+                    $('#warehouse_value').change(function () {
+                        var dateObj = new Date($('#start_new').val());
+                        var month = ('0' + (dateObj.getUTCMonth() + 1)).slice(-2);
+                        var day = dateObj.getUTCDate();
+                        $('#name').val(day + '-' + month + ' - ' + $('#warehouse_value').val());
+                    });
+                }
+            }
+        ,
+            '
+            {{$viewType != null ? $viewType : 'resourceTimelineDay'}}
+            ',
+            {
+                {
+                    'resourceTimeline',
+                        duration
+                :
+                    {
+                        3
+                    }
+                ,
+                    '3 days'
+                }
+            }
+        ,
+            'Magazynierzy',
+                resourceRender
+        :
+
+            function (arg) {
+                let resource = arg.resource.id;
+
+                arg.el.addEventListener('click', function () {
+                    $.ajax({
+                        type: "GET",
+                        url: '/admin/planning/tasks/16/getTasksForUser/' + resource,
+                    }).done(function (data) {
+                        $('#acceptTask').modal();
+                        $.each(data, function (index, value) {
+                            if (value.status === 'WAITING_FOR_ACCEPT') {
+                                let startDate = new Date(value.start);
+                                let startMinutes = startDate.getUTCMinutes();
+                                if (startMinutes < 10) {
+                                    startMinutes = '0' + startMinutes;
+                                }
+                                let dateTime = startDate.getUTCFullYear() + '-' + ('0' + (startDate.getUTCMonth() + 1)).slice(-2) + '-' + startDate.getUTCDate() + ' ' + startDate.getUTCHours() + ':' + startMinutes;
+                                let endDate = new Date(value.end);
+                                let minutes = endDate.getUTCMinutes();
+                                if (minutes < 10) {
+                                    minutes = '0' + minutes;
+                                }
+                                let dateTimeEnd = endDate.getUTCFullYear() + '-' + ('0' + (endDate.getUTCMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getUTCHours() + ':' + minutes;
+                                let html = '<tr class="appendRow">';
+                                html += '<td>' + value.id + '</td>';
+                                html += '<td>' + value.title + '</td>';
+                                html += '<input type="hidden" name="view_type" id="view_type" value="' + info.view.type + '">';
+                                html += '<input type="hidden" name="active_start" id="active_start" value="' + info.view.activeStart + '">';
+                                html += '<td><input class="form-control date_start" type="text" name="date_start[' + value.id + ']" id="date_start[' + value.id + ']" value="' + dateTime + '"></td>';
+                                html += '<td><input class="form-control date_end" type="text" name="date_end[' + value.id + ']" id="date_end[' + value.id + ']" value="' + dateTimeEnd + '"></td>';
+                                html += '<td><input class="form-control status" type="text" name="status[' + value.id + ']" id="status[' + value.id + ']" value="Oczekuje na akceptację" disabled></td>';
+                                html += '<td><button type="button" class="btn btn-success" onclick="acceptTask(' + value.id + ')">Akceptuj</button></td>'
+                                html += '<td><button type="button" class="btn btn-danger" onclick="rejectTask(' + value.id + ')">Odrzuć</button></td>'
+                                html += '</tr>';
+                                $('#tasksToAccept > tbody').append(html);
+                            }
+                        });
+
+                    }).fail(function () {
+                        return false;
+                    });
+                });
+            }
+
+        ,
+            {
+                '/admin/planning/timetable/16/getStorekeepers',
+                    method
+            :
+                'GET'
+            }
+        ,
+            {
+                '/admin/planning/tasks/16/getTasks',
+                    method
+            :
+                'GET'
+            }
+        ,
+            eventRender: function (event) {
+
+                let id;
+                id = event.event.extendedProps.customTaskId;
+                $(event.el).attr('id', id);
+
+            }
+        ,
+            eventMouseEnter: function (info) {
+                $(info.el).attr('title', info.event.extendedProps.text);
+            }
+        ,
+            eventDrop: function (info) {
+                let firstDate = new Date(info.event._instance.range.start);
+                let startMinutes = firstDate.getUTCMinutes();
+                if (startMinutes < 10) {
+                    startMinutes = '0' + startMinutes;
+                }
+                let dateTime = firstDate.getUTCFullYear() + '-' + ('0' + (firstDate.getUTCMonth() + 1)).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getUTCHours() + ':' + startMinutes;
+                let endDate = new Date(info.event._instance.range.end);
+                let minutes = endDate.getUTCMinutes();
+                if (minutes < 10) {
+                    minutes = '0' + minutes;
+                }
+                let dateTimeEnd = endDate.getUTCFullYear() + '-' + ('0' + (endDate.getUTCMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getUTCHours() + ':' + minutes;
+                $('input[name="view_type"]').val(info.view.type);
+                $('input[name="active_start"]').val(info.view.activeStart);
+                $('#moveTaskForm').attr('action', '/admin/planning/tasks/' + info.event.id + '/moveTask');
+                if (info.newResource !== null) {
+                    $('input[name="old_resource"]').val(info.oldResource.id);
+                    $('input[name="new_resource"]').val(info.newResource.id);
+                    $('#moveTask > div > div > div.modal-header > h4').text('Czy jesteś pewny że chcesz zabrać zadanie użytkownikowi: ' + info.oldResource.title + ', i dodać go użytkownikowi: ' + info.newResource.title + '?')
+                } else {
+                    $('#moveTask > div > div > div.modal-header > h4').text('Czy chcesz przesunąć to zadanie?')
+                }
+                $('input[name="start"]').val(dateTime);
+                $('input[name="end"]').val(dateTimeEnd);
+                $('#moveTask').modal();
+            }
+        ,
+            eventResize: function (info) {
+                $('#editTask').modal();
+                let firstDate = new Date(info.event.start);
+                let startMinutes = firstDate.getUTCMinutes();
+                if (startMinutes < 10) {
+                    startMinutes = '0' + startMinutes;
+                }
+                let dateTime = firstDate.getUTCFullYear() + '-' + ('0' + (firstDate.getUTCMonth() + 1)).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getUTCHours() + ':' + startMinutes;
+                let endDate = new Date(info.event.end);
+                let minutes = endDate.getUTCMinutes();
+                if (minutes < 10) {
+                    minutes = '0' + minutes;
+                }
+                let dateTimeEnd = endDate.getUTCFullYear() + '-' + ('0' + (endDate.getUTCMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getUTCHours() + ':' + minutes;
+                let warehouse = null;
+                if ($('#warehouseSelect').is(':selected')) {
+                    warehouse = $('#warehouseSelect').val();
+                }
+                let taskGroup = $('#task-group-edit');
+                $('#updateTask').attr('action', '/admin/planning/tasks/' + info.event.id + '/updateTaskTime');
+                let html = '';
+                html += '<div id="task-group-edit">'
+                html += '<div class="form-group">';
+                html += '<label for="title">Nazwa zadania</label>';
+                html += '<input type="text" name="title" id="title" value="' + info.event.title + '" class="form-control" disabled>';
+                html += '<input type="hidden" name="task_id" id="task_id" value="' + info.event.id + '" class="form-control">';
+                html += '<input type="hidden" name="warehouse_id" id="user_id" value="' + warehouse + '" class="form-control">';
+                html += '<input type="hidden" name="view_type" id="view_type" value="' + info.view.type + '">';
+                html += '<input type="hidden" name="active_start" id="active_start" value="' + info.view.activeStart + '">';
+                html += '</div>';
+                html += '<div class="form-group">';
+                html += '<label for="start">Godzina rozpoczęcia</label>';
+                html += '<input type="text" name="start" id="start" class="form-control default-date-time-picker-now" value="' + dateTime + '">';
+                html += '</div>';
+                html += '<div class="form-group">';
+                html += '<label for="end">Godzina zakończenia</label>';
+                html += '<input type="text" name="end" id="end" class="form-control default-date-time-picker-now" value="' + dateTimeEnd + '">';
+                html += '</div>';
+                html += '</div>';
+                if (taskGroup.length !== 0) {
+                    taskGroup.remove();
+                }
+                $('#updateTask').append(html);
+                $('.default-date-time-picker-now').datetimepicker({
+                    sideBySide: true,
+                    format: "YYYY-MM-DD H:mm",
+                    stepping: 1
+                });
+
+            }
+        ,
+            eventClick: function (info) {
+                let warehouse = null;
+                if ($('#warehouseSelect').is(':selected')) {
+                    warehouse = $('#warehouseSelect').val();
+                }
+
+                function prepareOrderList(item) {
+                    let labels = ''
+                    let duplicates = item.order.similar
+                    let input = `<label>${item.name}<input data-orderid="${item.order.id}" data-duplicates="${duplicates ? duplicates.join(',') : ''}" class="export_to_new_group" name="new_group[]" type="checkbox" value="${item.id}"></label>`;
+                    const route = "
+                    {{ route('orders.edit', ['order_id' => '%%']) }}
+                    ";
+                    if (item.order && item.order.labels) {
+                        labels = item.order.labels.map((label) => {
+                            return `<i class="${label.icon_name}" style="color: ${label.color}"/>`
+                        })
+                    }
+                    let url = route.replace('%%', item.order.id);
+                    let tooltipText = item.order.warehouse_notice ?? ''
+                    let tooltipElement = item.order.warehouse_notice ? `<i title="${tooltipText}" data-toggle="tooltip" class="comment-icon fas fa-comment"></i>` : '';
+                    duplicates = duplicates.length > 0 ? ' (D):' + duplicates.join(', (D)') : '';
+                    return input + labels + tooltipElement + `<a href="${url}">Edycja zlecenia</a>` +
+                        ` | <a href="javascript:void(0);" class="penalty" data-order="` +
+                        item.order.id + `">Potrącenie</a>` + duplicates;
+                }
+
+                $.ajax({
+                    url: '/admin/planning/tasks/' + info.event.id + '/getTask',
+                    type: "GET"
+                }).done(function (data) {
+                    $('#updateTaskModal').modal();
+                    let form = $('#updateTaskDetail').length;
+                    if (form === 0) {
                         let html = '';
+                        html += '<form id="updateTaskDetail" action="/admin/planning/tasks/' + info.event.id + '/updateTask" method="POST">';
+                        html += '{{method_field('put')}}';
+                        html += '{{csrf_field()}}';
                         html += '<div id="task-group">'
                         html += '<div class="form-group">';
                         html += '<label for="title">Nazwa</label>';
-                        html += '<input type="text" name="title" id="title" value="' + info.resource.title + '" class="form-control" disabled>';
-                        html += '<input type="hidden" name="user_id" id="user_id" value="' + info.resource.id + '">';
-                        html += '<input type="hidden" name="warehouse_id" id="user_id" value="' + warehouse + '">';
+                        html += '<input type="text" name="title" id="title" value="' + data.user.name + '" class="form-control" disabled>';
+                        html += '<input type="hidden" name="user_id" id="user_id" value="' + data.user.id + '" class="form-control">';
+                        html += '<input type="hidden" name="warehouse_id" id="user_id" value="' + warehouse + '" class="form-control">';
                         html += '<input type="hidden" name="view_type" id="view_type" value="' + info.view.type + '">';
                         html += '<input type="hidden" name="active_start" id="active_start" value="' + info.view.activeStart + '">';
                         html += '</div>';
                         html += '<div class="form-group">';
                         html += '<label for="name">Nazwa zadania</label>';
-                        html += '<input type="text" name="name" id="name" class="form-control" required>';
+                        html += '<input type="text" name="name" id="name" class="form-control" required value="' + info.event.title + '">';
                         html += '</div>';
                         html += '<div class="form-group">';
-                        html += '<label for="start_new">Godzina rozpoczęcia</label>';
-                        html += '<input type="text" name="start" id="start_new" class="form-control default-date-time-picker-now" value="' + dateTime + '">';
+                        html += '<label for="start">Godzina rozpoczęcia</label>';
+                        html += '<input type="text" name="start" id="start" class="form-control default-date-time-picker-now" value="' + data.task_time.date_start + '">';
                         html += '</div>';
                         html += '<div class="form-group">';
-                        html += '<p>Dodaj czas zakończenia:</p>'
-                        html += '<button class="add-end-time" value="5">+5</button>';
-                        html += '<button class="add-end-time" value="10">+10</button>';
-                        html += '<button class="add-end-time" value="15">+15</button>';
-                        html += '<button class="add-end-time" value="20">+20</button>';
-                        html += '<button class="add-end-time" value="25">+25</button>';
-                        html += '<button class="add-end-time" value="30">+30</button>';
-                        html += '<button class="add-end-time" value="40">+40</button>';
-                        html += '<button class="add-end-time" value="50">+50</button>';
-                        html += '<button class="add-end-time" value="60">+60</button>';
-                        html += '<button class="add-end-time" value="70">+70</button>';
-                        html += '<button class="add-end-time" value="80">+80</button>';
-                        html += '<button class="add-end-time" value="90">+90</button>';
-                        html += '<br />';
                         html += '<label for="end">Godzina zakończenia</label>';
-                        html += '<input type="text" name="end" id="end" class="time-to-finish-task form-control default-date-time-picker-now" value="' + dateTimeEnd + '">';
+                        html += '<input type="text" name="end" id="end" class="form-control default-date-time-picker-now" value="' + data.task_time.date_end + '">';
+                        html += '</div>';
+                        if (data.order !== undefined && data.order !== null) {
+                            html += '</div>';
+                            html += '<div class="form-group">';
+                            html += '<label for="shipment_date">Data rozpoczęcia nadawania przesyłki</label>';
+                            html += '<input type="text" name="shipment_date" id="shipment_date" class="form-control default-date-picker-now" value="' + data.order.shipment_date + '">';
+                            html += '</div>';
+                        }
+                        html += '<div style="display: flex">'
+                        html += '<div>'
+                        html += '<div class="form-group">';
+                        html += '<label for="color-dark-green">';
+                        html += '<input type="radio" name="color" id="color-dark-green" value="#008000" required> ';
+                        html += 'Ciemnozielony(towar wydany)</label>';
                         html += '</div>';
                         html += '<div class="form-group">';
                         html += '<label for="color-green">';
@@ -497,461 +876,167 @@
                         html += '<input type="radio" name="color" id="color-violet" value="#9966CC" required> ';
                         html += 'Fioletowy(zamówienie MEGA-OLAWA)</label>';
                         html += '</div>';
+                        html += '</div>';
+                        html += '<div>';
+                        if (data.childs.length > 0) {
+                            html += '<button type="button" data-dismiss="modal" onclick="produceAll(' + data.id + ')">Wyprodukuj wszystko</button>';
+                            html += '<br>';
+                            html += '<p>Wyeksportuj paczki do nowej grupy</p>';
+                            let test = data.childs.map((item) => prepareOrderList(item))
+                            html += test.join('<br>')
+                        }
+
+                        html += '</div>';
+                        html += '</div>';
+                        let consultant_value;
+                        let consultant_notice;
+                        let warehouse_value;
+                        let warehouse_notice
+                        if (data.task_salary_detail == null) {
+                            consultant_value = '';
+                            consultant_notice = '';
+                            warehouse_value = '';
+                            warehouse_notice = '';
+                        } else {
+                            consultant_value = data.task_salary_detail.consultant_value;
+                            consultant_notice = data.order ? data.order.consultant_notices : data.task_salary_detail.consultant_notice;
+                            warehouse_value = data.task_salary_detail.warehouse_value;
+                            warehouse_notice = data.order ? data.order.warehouse_notice : data.task_salary_detail.warehouse_notice;
+                            if (consultant_notice == null) {
+                                consultant_notice = '';
+                            }
+                            if (warehouse_notice == null) {
+                                warehouse_notice = '';
+                            }
+                        }
                         html += '<div class="form-group">';
                         html += '<label for="consultant_value">Koszt obsługi konsultanta</label>';
-                        html += '<input type="number" name="consultant_value" id="consultant_value" class="form-control">';
+                        html += '<input type="number" name="consultant_value" id="consultant_value" class="form-control" value="' + consultant_value + '">';
                         html += '</div>';
                         html += '<div class="form-group">';
                         html += '<label for="consultant_notice">Opis obsługi konsultanta</label>';
-                        html += '<textarea rows="5" cols="40" type="text" name="consultant_notice" id="consultant_notice" class="form-control"></textarea>';
+                        html += '<textarea ';
+                        html += data.order ? 'disabled' : '';
+                        html += ' rows="5" cols="40" type="text" name="consultant_notice" id="consultant_notice" class="form-control">' + consultant_notice + '</textarea>';
                         html += '</div>';
+                        html += data.order ? `
+                                    <div class="flex-input">
+                                        <input type="text" class="form-control" placeholder="@lang('orders.form.consultant_notices')"
+                                               id="{{ Order::COMMENT_CONSULTANT_TYPE }}" name="spedition_comment"/>
+                                        <div class="input-group-append">
+                                            <button onclick="sendComment('{{ Order::COMMENT_CONSULTANT_TYPE }}', ${data.order.id})"
+                                                    class="btn btn-success" type="button">wyślij
+                                            </button>
+                                        </div>
+                                    </div>` : '';
                         html += '<div class="form-group">';
                         html += '<label for="warehouse_value">Koszt obsługi magazynu</label>';
-                        html += '<input type="number" name="warehouse_value" id="warehouse_value" class="form-control">';
+                        html += '<input type="number" name="warehouse_value" id="warehouse_value" class="form-control" value="' + warehouse_value + '">';
                         html += '</div>';
                         html += '<div class="form-group">';
                         html += '<label for="warehouse_notice">Opis obsługi magazynu</label>';
-                        html += '<textarea rows="5" cols="40" type="text" name="warehouse_notice" id="warehouse_notice" class="form-control"></textarea>';
+                        html += '<textarea ';
+                        html += data.order ? 'disabled' : ''
+                        html += ' rows="5" cols="40" type="text" name="warehouse_notice" id="warehouse_notice" class="form-control">' + warehouse_notice + '</textarea>';
+                        html += '</div>';
+                        html += data.order ? `
+                            <div class="flex-input">
+                                <input type="text" class="form-control" placeholder="@lang('orders.form.warehouse_notice')"
+                                       id="{{ Order::COMMENT_WAREHOUSE_TYPE }}" name="warehouse_notice"/>
+                                <div class="input-group-append">
+                                    <button onclick="sendComment('{{ Order::COMMENT_WAREHOUSE_TYPE }}', ${data.order.id})"
+                                            class="btn btn-success" type="button">wyślij
+                                    </button>
+                                </div>
+                            </div>` : '';
+                        html += '<div class="form-group">';
+                        html += '<a class="btn btn-success" target="_blank" href="/admin/orders/' + data.order_id + '/edit">Przenieś mnie do edycji zlecenia</a>';
+                        html += '<br><a class="btn btn-success" target="_blank" href="/admin/orders?order_id=' + data.order_id + '&planning=true">Przenieś mnie do zlecenia na liście zleceń</a>';
                         html += '</div>';
                         html += '</div>';
-                        if (taskGroup.length !== 0) {
-                            taskGroup.remove();
-                        }
-                        $('#addTask').append(html);
+                        html += '</form>';
+                        $('#updateTaskModal > div > div > div.modal-body').append(html);
                         $('.default-date-time-picker-now').datetimepicker({
                             sideBySide: true,
                             format: "YYYY-MM-DD H:mm",
                             stepping: 1
                         });
-                        $('.add-end-time').click(event => {
-                            event.preventDefault();
-                            let start = new Date($("#start_new").val());
-                            let end = new Date(start.getTime() + event.target.value * 60000);
-                            end.setHours(end.getHours() + (end.getTimezoneOffset() * -1) / 60);
-                            let startMinutes = end.getUTCMinutes();
-                            if (startMinutes < 10) {
-                                startMinutes = '0' + startMinutes;
-                            }
-                            let dateTime = end.getUTCFullYear() + '-' + ('0' + (end.getUTCMonth() + 1)).slice(-2) + '-' + end.getUTCDate() + ' ' + end.getUTCHours() + ':' + startMinutes;
-                            $(".time-to-finish-task").val(dateTime);
-                        })
-                        $('#name').val((endDate.getUTCDate() + '-' + ('0' + (endDate.getUTCMonth() + 1)).slice(-2)) + ' - ' + $('#warehouse_value').val());
-                        $(document).on('focusout', '.default-date-time-picker-now', function () {
-                            var dateObj = new Date($('#start_new').val());
-                            var month = ('0' + (dateObj.getUTCMonth() + 1)).slice(-2);
-                            var day = dateObj.getUTCDate();
-                            $('#name').val(day + '-' + month + ' - ' + $('#warehouse_value').val());
+                        $('.default-date-picker-now').datetimepicker({
+                            sideBySide: true,
+                            format: "YYYY-MM-DD",
                         });
-                        $('#warehouse_value').change(function () {
-                            var dateObj = new Date($('#start_new').val());
-                            var month = ('0' + (dateObj.getUTCMonth() + 1)).slice(-2);
-                            var day = dateObj.getUTCDate();
-                            $('#name').val(day + '-' + month + ' - ' + $('#warehouse_value').val());
-                        });
+                        if (info.event.backgroundColor === '#194775') {
+                            $('#color-blue').attr('checked', true);
+                        } else if (info.event.backgroundColor === '#E7A954') {
+                            $('#color-orange').attr('checked', true);
+                        } else if (info.event.backgroundColor === '#E6C74D') {
+                            $('#color-yellow').attr('checked', true);
+                        } else if (info.event.backgroundColor === '#32CD32') {
+                            $('#color-green').attr('checked', true);
+                        } else if (info.event.backgroundColor === '#FF0000') {
+                            $('#color-red').attr('checked', true);
+                        } else if (info.event.backgroundColor === '#008000') {
+                            $('#color-dark-green').attr('checked', true);
+                        } else if (info.event.backgroundColor === '#9966CC') {
+                            $('#color-violet').attr('checked', true);
+                        }
                     }
-                },
-                defaultView: '{{$viewType != null ? $viewType : 'resourceTimelineDay'}}',
-                views: {
-                    resourceTimelineThreeDays: {
-                        type: 'resourceTimeline',
-                        duration: {days: 3},
-                        buttonText: '3 days'
-                    }
-                },
-                resourceLabelText: 'Magazynierzy',
-                resourceRender: function (arg) {
-                    let resource = arg.resource.id;
-
-                    arg.el.addEventListener('click', function () {
-                        $.ajax({
-                            type: "GET",
-                            url: '/admin/planning/tasks/16/getTasksForUser/' + resource,
-                        }).done(function (data) {
-                            $('#acceptTask').modal();
-                            $.each(data, function (index, value) {
-                                if (value.status === 'WAITING_FOR_ACCEPT') {
-                                    let startDate = new Date(value.start);
-                                    let startMinutes = startDate.getUTCMinutes();
-                                    if (startMinutes < 10) {
-                                        startMinutes = '0' + startMinutes;
-                                    }
-                                    let dateTime = startDate.getUTCFullYear() + '-' + ('0' + (startDate.getUTCMonth() + 1)).slice(-2) + '-' + startDate.getUTCDate() + ' ' + startDate.getUTCHours() + ':' + startMinutes;
-                                    let endDate = new Date(value.end);
-                                    let minutes = endDate.getUTCMinutes();
-                                    if (minutes < 10) {
-                                        minutes = '0' + minutes;
-                                    }
-                                    let dateTimeEnd = endDate.getUTCFullYear() + '-' + ('0' + (endDate.getUTCMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getUTCHours() + ':' + minutes;
-                                    let html = '<tr class="appendRow">';
-                                    html += '<td>' + value.id + '</td>';
-                                    html += '<td>' + value.title + '</td>';
-                                    html += '<input type="hidden" name="view_type" id="view_type" value="' + info.view.type + '">';
-                                    html += '<input type="hidden" name="active_start" id="active_start" value="' + info.view.activeStart + '">';
-                                    html += '<td><input class="form-control date_start" type="text" name="date_start[' + value.id + ']" id="date_start[' + value.id + ']" value="' + dateTime + '"></td>';
-                                    html += '<td><input class="form-control date_end" type="text" name="date_end[' + value.id + ']" id="date_end[' + value.id + ']" value="' + dateTimeEnd + '"></td>';
-                                    html += '<td><input class="form-control status" type="text" name="status[' + value.id + ']" id="status[' + value.id + ']" value="Oczekuje na akceptację" disabled></td>';
-                                    html += '<td><button type="button" class="btn btn-success" onclick="acceptTask(' + value.id + ')">Akceptuj</button></td>'
-                                    html += '<td><button type="button" class="btn btn-danger" onclick="rejectTask(' + value.id + ')">Odrzuć</button></td>'
-                                    html += '</tr>';
-                                    $('#tasksToAccept > tbody').append(html);
-                                }
+                    $('.export_to_new_group').on('click', e => {
+                        if (e.shiftKey && lastChecked) {
+                            let start = checkboxes.index(e.target);
+                            let end = checkboxes.index(lastChecked);
+                            checkboxes.slice(Math.min(start, end), Math.max(start, end) + 1).each((index, item) => {
+                                item.checked = lastChecked.checked;
+                                let values = item.dataset.duplicates.split(',');
+                                values.map(val => {
+                                    $(`[data-orderid="${val}"]`).prop('checked', item.checked)
+                                })
                             });
-
-                        }).fail(function () {
-                            return false;
-                        });
-                    });
-                },
-                resources: {
-                    url: '/admin/planning/timetable/16/getStorekeepers',
-                    method: 'GET'
-                },
-                events: {
-                    url: '/admin/planning/tasks/16/getTasks',
-                    method: 'GET'
-                },
-                eventRender: function (event) {
-
-                    let id;
-                    id = event.event.extendedProps.customTaskId;
-                    $(event.el).attr('id', id);
-
-                },
-                eventMouseEnter: function (info) {
-                    $(info.el).attr('title', info.event.extendedProps.text);
-                },
-                eventDrop: function (info) {
-                    let firstDate = new Date(info.event._instance.range.start);
-                    let startMinutes = firstDate.getUTCMinutes();
-                    if (startMinutes < 10) {
-                        startMinutes = '0' + startMinutes;
-                    }
-                    let dateTime = firstDate.getUTCFullYear() + '-' + ('0' + (firstDate.getUTCMonth() + 1)).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getUTCHours() + ':' + startMinutes;
-                    let endDate = new Date(info.event._instance.range.end);
-                    let minutes = endDate.getUTCMinutes();
-                    if (minutes < 10) {
-                        minutes = '0' + minutes;
-                    }
-                    let dateTimeEnd = endDate.getUTCFullYear() + '-' + ('0' + (endDate.getUTCMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getUTCHours() + ':' + minutes;
-                    $('input[name="view_type"]').val(info.view.type);
-                    $('input[name="active_start"]').val(info.view.activeStart);
-                    $('#moveTaskForm').attr('action', '/admin/planning/tasks/' + info.event.id + '/moveTask');
-                    if (info.newResource !== null) {
-                        $('input[name="old_resource"]').val(info.oldResource.id);
-                        $('input[name="new_resource"]').val(info.newResource.id);
-                        $('#moveTask > div > div > div.modal-header > h4').text('Czy jesteś pewny że chcesz zabrać zadanie użytkownikowi: ' + info.oldResource.title + ', i dodać go użytkownikowi: ' + info.newResource.title + '?')
-                    } else {
-                        $('#moveTask > div > div > div.modal-header > h4').text('Czy chcesz przesunąć to zadanie?')
-                    }
-                    $('input[name="start"]').val(dateTime);
-                    $('input[name="end"]').val(dateTimeEnd);
-                    $('#moveTask').modal();
-                },
-                eventResize: function (info) {
-                    $('#editTask').modal();
-                    let firstDate = new Date(info.event.start);
-                    let startMinutes = firstDate.getUTCMinutes();
-                    if (startMinutes < 10) {
-                        startMinutes = '0' + startMinutes;
-                    }
-                    let dateTime = firstDate.getUTCFullYear() + '-' + ('0' + (firstDate.getUTCMonth() + 1)).slice(-2) + '-' + firstDate.getUTCDate() + ' ' + firstDate.getUTCHours() + ':' + startMinutes;
-                    let endDate = new Date(info.event.end);
-                    let minutes = endDate.getUTCMinutes();
-                    if (minutes < 10) {
-                        minutes = '0' + minutes;
-                    }
-                    let dateTimeEnd = endDate.getUTCFullYear() + '-' + ('0' + (endDate.getUTCMonth() + 1)).slice(-2) + '-' + endDate.getUTCDate() + ' ' + endDate.getUTCHours() + ':' + minutes;
-                    let warehouse = null;
-                    if ($('#warehouseSelect').is(':selected')) {
-                        warehouse = $('#warehouseSelect').val();
-                    }
-                    let taskGroup = $('#task-group-edit');
-                    $('#updateTask').attr('action', '/admin/planning/tasks/' + info.event.id + '/updateTaskTime');
-                    let html = '';
-                    html += '<div id="task-group-edit">'
-                    html += '<div class="form-group">';
-                    html += '<label for="title">Nazwa zadania</label>';
-                    html += '<input type="text" name="title" id="title" value="' + info.event.title + '" class="form-control" disabled>';
-                    html += '<input type="hidden" name="task_id" id="task_id" value="' + info.event.id + '" class="form-control">';
-                    html += '<input type="hidden" name="warehouse_id" id="user_id" value="' + warehouse + '" class="form-control">';
-                    html += '<input type="hidden" name="view_type" id="view_type" value="' + info.view.type + '">';
-                    html += '<input type="hidden" name="active_start" id="active_start" value="' + info.view.activeStart + '">';
-                    html += '</div>';
-                    html += '<div class="form-group">';
-                    html += '<label for="start">Godzina rozpoczęcia</label>';
-                    html += '<input type="text" name="start" id="start" class="form-control default-date-time-picker-now" value="' + dateTime + '">';
-                    html += '</div>';
-                    html += '<div class="form-group">';
-                    html += '<label for="end">Godzina zakończenia</label>';
-                    html += '<input type="text" name="end" id="end" class="form-control default-date-time-picker-now" value="' + dateTimeEnd + '">';
-                    html += '</div>';
-                    html += '</div>';
-                    if (taskGroup.length !== 0) {
-                        taskGroup.remove();
-                    }
-                    $('#updateTask').append(html);
-                    $('.default-date-time-picker-now').datetimepicker({
-                        sideBySide: true,
-                        format: "YYYY-MM-DD H:mm",
-                        stepping: 1
-                    });
-
-                },
-                eventClick: function (info) {
-                    let warehouse = null;
-                    if ($('#warehouseSelect').is(':selected')) {
-                        warehouse = $('#warehouseSelect').val();
-                    }
-
-                    function prepareOrderList(item) {
-                        let labels = ''
-                        let duplicates = item.order.similar
-                        let input = `<label>${item.name}<input data-orderid="${item.order.id}" data-duplicates="${duplicates ? duplicates.join(',') : ''}" class="export_to_new_group" name="new_group[]" type="checkbox" value="${item.id}"></label>`;
-                        const route = "{{ route('orders.edit', ['id' => '%%']) }}";
-                        if (item.order && item.order.labels) {
-                            labels = item.order.labels.map((label) => {
-                                return `<i class="${label.icon_name}" style="color: ${label.color}"/>`
+                        } else {
+                            let values = e.target.dataset.duplicates.split(',');
+                            values.map(val => {
+                                $(`[data-orderid="${val}"]`).prop('checked', e.target.checked)
                             })
                         }
-                        let url = route.replace('%%', item.order.id);
-                        let tooltipText = item.order.warehouse_notice ?? ''
-                        let tooltipElement = item.order.warehouse_notice ? `<i title="${tooltipText}" data-toggle="tooltip" class="comment-icon fas fa-comment"></i>` : '';
-                        duplicates = duplicates.length > 0 ? ' (D):' + duplicates.join(', (D)') : '';
-                        return input + labels + tooltipElement + `<a href="${url}">Edycja zlecenia</a>` +
-                            ` | <a href="javascript:void(0);" class="penalty" data-order="`+
-                            item.order.id+`">Potrącenie</a>`+ duplicates;
-                    }
+                        lastChecked = e.target
 
-                    $.ajax({
-                        url: '/admin/planning/tasks/' + info.event.id + '/getTask',
-                        type: "GET"
-                    }).done(function (data) {
-                        $('#updateTaskModal').modal();
-                        let form = $('#updateTaskDetail').length;
-                        if (form === 0) {
-                            let html = '';
-                            html += '<form id="updateTaskDetail" action="/admin/planning/tasks/' + info.event.id + '/updateTask" method="POST">';
-                            html += '{{method_field('put')}}';
-                            html += '{{csrf_field()}}';
-                            html += '<div id="task-group">'
-                            html += '<div class="form-group">';
-                            html += '<label for="title">Nazwa</label>';
-                            html += '<input type="text" name="title" id="title" value="' + data.user.name + '" class="form-control" disabled>';
-                            html += '<input type="hidden" name="user_id" id="user_id" value="' + data.user.id + '" class="form-control">';
-                            html += '<input type="hidden" name="warehouse_id" id="user_id" value="' + warehouse + '" class="form-control">';
-                            html += '<input type="hidden" name="view_type" id="view_type" value="' + info.view.type + '">';
-                            html += '<input type="hidden" name="active_start" id="active_start" value="' + info.view.activeStart + '">';
-                            html += '</div>';
-                            html += '<div class="form-group">';
-                            html += '<label for="name">Nazwa zadania</label>';
-                            html += '<input type="text" name="name" id="name" class="form-control" required value="' + info.event.title + '">';
-                            html += '</div>';
-                            html += '<div class="form-group">';
-                            html += '<label for="start">Godzina rozpoczęcia</label>';
-                            html += '<input type="text" name="start" id="start" class="form-control default-date-time-picker-now" value="' + data.task_time.date_start + '">';
-                            html += '</div>';
-                            html += '<div class="form-group">';
-                            html += '<label for="end">Godzina zakończenia</label>';
-                            html += '<input type="text" name="end" id="end" class="form-control default-date-time-picker-now" value="' + data.task_time.date_end + '">';
-                            html += '</div>';
-                            if (data.order !== undefined && data.order !== null) {
-                                html += '</div>';
-                                html += '<div class="form-group">';
-                                html += '<label for="shipment_date">Data rozpoczęcia nadawania przesyłki</label>';
-                                html += '<input type="text" name="shipment_date" id="shipment_date" class="form-control default-date-picker-now" value="' + data.order.shipment_date + '">';
-                                html += '</div>';
-                            }
-                            html += '<div style="display: flex">'
-                            html += '<div>'
-                            html += '<div class="form-group">';
-                            html += '<label for="color-dark-green">';
-                            html += '<input type="radio" name="color" id="color-dark-green" value="#008000" required> ';
-                            html += 'Ciemnozielony(towar wydany)</label>';
-                            html += '</div>';
-                            html += '<div class="form-group">';
-                            html += '<label for="color-green">';
-                            html += '<input type="radio" name="color" id="color-green" value="#32CD32" required> ';
-                            html += 'Zielony(wyprodukowane)</label>';
-                            html += '</div>';
-                            html += '<div class="form-group">';
-                            html += '<label for="color-blue">';
-                            html += '<input type="radio" name="color" id="color-blue" value="#194775" checked="checked" required> ';
-                            html += 'Niebieski(dopuszczalne przesunięcie terminu dostawy)</label>';
-                            html += '</div>';
-                            html += '<div class="form-group">';
-                            html += '<label for="color-yellow">';
-                            html += '<input type="radio" name="color" id="color-yellow" value="#E6C74D" required> ';
-                            html += 'Żółty(PILNE - prośba o wysłanie we wskazanym terminie)</label>';
-                            html += '</div>';
-                            html += '<div class="form-group">';
-                            html += '<label for="color-red">';
-                            html += '<input type="radio" name="color" id="color-red" value="#FF0000" required> ';
-                            html += 'Czerwony(awaria koniecznie to wysłać dzisiaj)</label>';
-                            html += '</div>';
-                            html += '<div class="form-group">';
-                            html += '<label for="color-violet">';
-                            html += '<input type="radio" name="color" id="color-violet" value="#9966CC" required> ';
-                            html += 'Fioletowy(zamówienie MEGA-OLAWA)</label>';
-                            html += '</div>';
-                            html += '</div>';
-                            html += '<div>';
-                            if (data.childs.length > 0) {
-                                html += '<button type="button" data-dismiss="modal" onclick="produceAll(' + data.id + ')">Wyprodukuj wszystko</button>';
-                                html += '<br>';
-                                html += '<p>Wyeksportuj paczki do nowej grupy</p>';
-                                let test = data.childs.map((item) => prepareOrderList(item))
-                                html += test.join('<br>')
-                            }
-
-                            html += '</div>';
-                            html += '</div>';
-                            let consultant_value;
-                            let consultant_notice;
-                            let warehouse_value;
-                            let warehouse_notice
-                            if (data.task_salary_detail == null) {
-                                consultant_value = '';
-                                consultant_notice = '';
-                                warehouse_value = '';
-                                warehouse_notice = '';
-                            } else {
-                                consultant_value = data.task_salary_detail.consultant_value;
-                                consultant_notice = data.order ? data.order.consultant_notices : data.task_salary_detail.consultant_notice;
-                                warehouse_value = data.task_salary_detail.warehouse_value;
-                                warehouse_notice = data.order ? data.order.warehouse_notice : data.task_salary_detail.warehouse_notice;
-                                if (consultant_notice == null) {
-                                    consultant_notice = '';
-                                }
-                                if (warehouse_notice == null) {
-                                    warehouse_notice = '';
-                                }
-                            }
-                            html += '<div class="form-group">';
-                            html += '<label for="consultant_value">Koszt obsługi konsultanta</label>';
-                            html += '<input type="number" name="consultant_value" id="consultant_value" class="form-control" value="' + consultant_value + '">';
-                            html += '</div>';
-                            html += '<div class="form-group">';
-                            html += '<label for="consultant_notice">Opis obsługi konsultanta</label>';
-                            html += '<textarea ';
-                            html += data.order ? 'disabled' : '';
-                            html += ' rows="5" cols="40" type="text" name="consultant_notice" id="consultant_notice" class="form-control">' + consultant_notice + '</textarea>';
-                            html += '</div>';
-                            html += data.order ? `
-                                    <div class="flex-input">
-                                        <input type="text" class="form-control" placeholder="@lang('orders.form.consultant_notices')"
-                                               id="{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}" name="spedition_comment"/>
-                                        <div class="input-group-append">
-                                            <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}', ${data.order.id})"
-                                                    class="btn btn-success" type="button">wyślij
-                                            </button>
-                                        </div>
-                                    </div>` : '';
-                            html += '<div class="form-group">';
-                            html += '<label for="warehouse_value">Koszt obsługi magazynu</label>';
-                            html += '<input type="number" name="warehouse_value" id="warehouse_value" class="form-control" value="' + warehouse_value + '">';
-                            html += '</div>';
-                            html += '<div class="form-group">';
-                            html += '<label for="warehouse_notice">Opis obsługi magazynu</label>';
-                            html += '<textarea ';
-                            html += data.order ? 'disabled' : ''
-                            html += ' rows="5" cols="40" type="text" name="warehouse_notice" id="warehouse_notice" class="form-control">' + warehouse_notice + '</textarea>';
-                            html += '</div>';
-                            html += data.order ? `
-                            <div class="flex-input">
-                                <input type="text" class="form-control" placeholder="@lang('orders.form.warehouse_notice')"
-                                       id="{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}" name="warehouse_notice"/>
-                                <div class="input-group-append">
-                                    <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}', ${data.order.id})"
-                                            class="btn btn-success" type="button">wyślij
-                                    </button>
-                                </div>
-                            </div>` : '';
-                            html += '<div class="form-group">';
-                            html += '<a class="btn btn-success" target="_blank" href="/admin/orders/' + data.order_id + '/edit">Przenieś mnie do edycji zlecenia</a>';
-                            html += '<br><a class="btn btn-success" target="_blank" href="/admin/orders?order_id=' + data.order_id + '&planning=true">Przenieś mnie do zlecenia na liście zleceń</a>';
-                            html += '</div>';
-                            html += '</div>';
-                            html += '</form>';
-                            $('#updateTaskModal > div > div > div.modal-body').append(html);
-                            $('.default-date-time-picker-now').datetimepicker({
-                                sideBySide: true,
-                                format: "YYYY-MM-DD H:mm",
-                                stepping: 1
-                            });
-                            $('.default-date-picker-now').datetimepicker({
-                                sideBySide: true,
-                                format: "YYYY-MM-DD",
-                            });
-                            if (info.event.backgroundColor === '#194775') {
-                                $('#color-blue').attr('checked', true);
-                            } else if (info.event.backgroundColor === '#E7A954') {
-                                $('#color-orange').attr('checked', true);
-                            } else if (info.event.backgroundColor === '#E6C74D') {
-                                $('#color-yellow').attr('checked', true);
-                            } else if (info.event.backgroundColor === '#32CD32') {
-                                $('#color-green').attr('checked', true);
-                            } else if (info.event.backgroundColor === '#FF0000') {
-                                $('#color-red').attr('checked', true);
-                            } else if (info.event.backgroundColor === '#008000') {
-                                $('#color-dark-green').attr('checked', true);
-                            } else if (info.event.backgroundColor === '#9966CC') {
-                                $('#color-violet').attr('checked', true);
-                            }
-                        }
-                        $('.export_to_new_group').on('click', e => {
-                            if (e.shiftKey && lastChecked) {
-                                let start = checkboxes.index(e.target);
-                                let end = checkboxes.index(lastChecked);
-                                checkboxes.slice(Math.min(start, end), Math.max(start, end) + 1).each((index, item) => {
-                                    item.checked = lastChecked.checked;
-                                    let values = item.dataset.duplicates.split(',');
-                                    values.map(val => {
-                                        $(`[data-orderid="${val}"]`).prop('checked', item.checked)
-                                    })
-                                });
-                            } else {
-                                let values = e.target.dataset.duplicates.split(',');
-                                values.map(val => {
-                                    $(`[data-orderid="${val}"]`).prop('checked', e.target.checked)
-                                })
-                            }
-                            lastChecked = e.target
-
-                        });
-                        var checkboxes = $('.export_to_new_group');
-                        var lastChecked = null;
-
-                        $(() => {
-                            $('[data-toggle="tooltip"]').tooltip();
-                        });
-
-
-                    }).fail(function () {
-                        $('#errorGetToUpdate').modal();
                     });
-                },
-                eventAllow: function (dropLocation, draggedEvent) {
-                    return $.ajax({
-                        type: "POST",
-                        url: '/admin/planning/tasks/allowTaskMove',
-                        data: {
-                            id: draggedEvent.id,
-                            start: dropLocation.startStr,
-                            end: dropLocation.endStr,
-                            user_id: dropLocation.resource.id
-                        },
-                    }).done(function (data) {
-                        if (data === true) {
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }).fail(function () {
+                    var checkboxes = $('.export_to_new_group');
+                    var lastChecked = null;
+
+                    $(() => {
+                        $('[data-toggle="tooltip"]').tooltip();
+                    });
+
+
+                }).fail(function () {
+                    $('#errorGetToUpdate').modal();
+                });
+            }
+        ,
+            eventAllow: function (dropLocation, draggedEvent) {
+                return $.ajax({
+                    type: "POST",
+                    url: '/admin/planning/tasks/allowTaskMove',
+                    data: {
+                        id: draggedEvent.id,
+                        start: dropLocation.startStr,
+                        end: dropLocation.endStr,
+                        user_id: dropLocation.resource.id
+                    },
+                }).done(function (data) {
+                    if (data === true) {
+                        return true;
+                    } else {
                         return false;
-                    });
+                    }
+                }).fail(function () {
+                    return false;
+                });
 
-                }
-            });
+            }
+        })
+            ;
 
             calendar.render();
         }
@@ -1044,9 +1129,9 @@
             if (confirm('Wyprodukować wsystkie zamówienia?')) {
                 $.ajax({
                     url: "{{ route('planning.tasks.produceOrders') }}",
-                    method: "POST",
+                    "POST",
                     data: {
-                        id: id
+                        id
                     }
                 }).done(function (res) {
                     if (res.error) {
@@ -1071,14 +1156,19 @@
                     }
                 }
             };
-            var idFromUrl = 'task-{{ $selectId }}';
+            var idFromUrl = 'task-
+            {{ $selectId }}
+            ';
             let mins = '00:15';
             if (idFromUrl !== 'undefined' && idFromUrl !== 'task-') {
-                let taskDiffInMins = {{ $taskDiffInMins ?? 'undefined'}};
-                let taskHour = {{ $taskHour ?? 'undefined'}};
-                if (taskDiffInMins < 5) {
+                let taskDiffInMins = {{ $taskDiffInMins ?? 'undefined'}}let
+                taskHour =
+                    {{ $taskHour ?? 'undefined'}}if(taskDiffInMins < 5)
+                {
                     mins = '00:02';
-                } else if (taskDiffInMins < 20) {
+                }
+            else
+                if (taskDiffInMins < 20) {
                     mins = '00:05';
                 }
 
@@ -1095,6 +1185,7 @@
                     }, 500);
                 }, 2000);
             }
-        });
+        })
     </script>
+
 @endsection

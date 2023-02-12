@@ -1708,7 +1708,7 @@
                                         return parseInt(label.id) == batteryId;
                                     }).length == 0;
                                     if (hasChildHammerOrBagLabel && isChildNotProducedYet) {
-                                        let url = "{{ route('orders.edit', ['id' => ':id:']) }}"
+                                        let url = "{{ route('orders.edit', ['order_id' => ':id:']) }}"
                                         return acu += '<a target="_blank" href="' + url.replace(":id:", order.id) + `"> (D)${order.id}</a>`
                                     }
                                     return acu;

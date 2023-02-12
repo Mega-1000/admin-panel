@@ -1,4 +1,4 @@
-@php use Carbon\Carbon; @endphp
+@php use App\Entities\Order;use Carbon\Carbon; @endphp
 @php use App\Enums\UserRole; @endphp
 @extends('layouts.datatable')
 @section('app-header')
@@ -487,11 +487,11 @@
                                 <div class="flex-input">
                                     <input type="text" class="form-control scrollable-notice"
                                            placeholder="@lang('orders.form.warehouse_notice')"
-                                           id="{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}"
+                                           id="{{ Order::COMMENT_WAREHOUSE_TYPE }}"
                                            name="warehouse_notice"/>
                                     <div class="input-group-append">
                                         <button
-                                            onclick="sendComment('{{ \App\Entities\Order::COMMENT_WAREHOUSE_TYPE }}')"
+                                            onclick="sendComment('{{ Order::COMMENT_WAREHOUSE_TYPE }}')"
                                             class="btn btn-success" type="button">wyślij
                                         </button>
                                     </div>
@@ -508,11 +508,11 @@
                                 <div class="flex-input">
                                     <input type="text" class="form-control scrollable-notice"
                                            placeholder="Informacje dla spedycji"
-                                           id="{{ \App\Entities\Order::COMMENT_SHIPPING_TYPE }}"
+                                           id="{{ Order::COMMENT_SHIPPING_TYPE }}"
                                            name="spedition_comment"/>
                                     <div class="input-group-append">
                                         <button
-                                            onclick="sendComment('{{ \App\Entities\Order::COMMENT_SHIPPING_TYPE }}')"
+                                            onclick="sendComment('{{ Order::COMMENT_SHIPPING_TYPE }}')"
                                             class="btn btn-success" type="button">wyślij
                                         </button>
                                     </div>
@@ -531,13 +531,13 @@
                             <div class="flex-input">
                                 <input type="text" class="form-control scrollable-notice"
                                        placeholder="@lang('orders.form.consultant_notices')"
-                                       id="{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}"
+                                       id="{{ Order::COMMENT_CONSULTANT_TYPE }}"
                                        name="consultant_notices"/>
                                 <div class="input-group-append">
-                                    <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}')"
+                                    <button onclick="sendComment('{{ Order::COMMENT_CONSULTANT_TYPE }}')"
                                             class="btn btn-success consultant__button--send" type="button">wyślij
                                     </button>
-                                    <h5 onclick="sendComment('{{ \App\Entities\Order::COMMENT_CONSULTANT_TYPE }}')"
+                                    <h5 onclick="sendComment('{{ Order::COMMENT_CONSULTANT_TYPE }}')"
                                         class="consultant__button--send" type="button">wyślij
                                     </h5>
                                 </div>
@@ -555,10 +555,10 @@
                             <div class="flex-input">
                                 <input type="text" class="form-control"
                                        placeholder="@lang('orders.form.financial_notices')"
-                                       id="{{ \App\Entities\Order::COMMENT_FINANCIAL_TYPE }}"
+                                       id="{{ Order::COMMENT_FINANCIAL_TYPE }}"
                                        name="consultant_notices"/>
                                 <div class="input-group-append">
-                                    <button onclick="sendComment('{{ \App\Entities\Order::COMMENT_FINANCIAL_TYPE }}')"
+                                    <button onclick="sendComment('{{ Order::COMMENT_FINANCIAL_TYPE }}')"
                                             class="btn btn-success" type="button">wyślij
                                     </button>
                                 </div>
@@ -4927,7 +4927,7 @@
             let lastOrderId = {{ $order->getLastOrder() }};
             let currentOrderId = {{ $order->id }};
             if (lastOrderId > currentOrderId) {
-                let nextOrderUrl = '{{ route('orders.edit', ['id' => $order->id + 1]) }}';
+                let nextOrderUrl = '{{ route('orders.edit', ['order_id' => $order->id + 1]) }}';
                 window.location.href = nextOrderUrl;
             } else {
                 alert('To jest ostatnie zamówienie');
@@ -4935,7 +4935,7 @@
         }
 
         function goToPreviousOrder() {
-            let previousOrderUrl = '{{ route('orders.edit', ['id' => $order->getPreviousOrderId($order->id)]) }}';
+            let previousOrderUrl = '{{ route('orders.edit', ['order_id' => $order->getPreviousOrderId($order->id)]) }}';
             window.location.href = previousOrderUrl;
         }
 
