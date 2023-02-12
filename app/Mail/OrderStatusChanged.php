@@ -4,6 +4,8 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Attachment;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
 
 class OrderStatusChanged extends Mailable
@@ -11,31 +13,39 @@ class OrderStatusChanged extends Mailable
     use Queueable, SerializesModels;
 
     public string $mailBody;
-    public bool $pdf;
+    public string $pdfPath;
 
     /**
      * OrderStatusChanged constructor.
      */
-    public function __construct(string $subject, string $message, bool $pdf = false)
+    public function __construct(string $subject, string $message, ?string $pdfPath = '')
     {
         $this->subject = $subject;
         $this->mailBody = nl2br($message);
-        $this->pdf = $pdf;
+        $this->pdfPath = $pdfPath ?? '';
     }
 
     /**
      * Build the message.
      */
-    public function build()
+    public function build(): Content
     {
-        if ($this->pdf) {
-            return $this->view('emails.order-status-changed')
-                ->attachData($this->pdf, 'proforma.pdf', [
-                    'mime' => 'application/pdf',
-                ]);
+        return new Content(view: 'emails.order-status-changed');
+    }
+
+    public function attachments(): array
+    {
+        if ($this->pdfPath !== '') {
+            return [
+                Attachment::fromPath($this->pdfPath)
+                    ->as('proforma.pdf')
+                    ->withMime('application/pdf')
+            ];
         }
 
-        return $this->view('emails.order-status-changed');
+        return [];
     }
+
+
 }
 

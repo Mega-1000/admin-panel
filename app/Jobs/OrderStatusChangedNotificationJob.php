@@ -15,7 +15,6 @@ use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 
 /**
@@ -80,11 +79,11 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
             . " na: " . str_replace('-', '', $status);
 
         $mail_to = $order->customer->login;
-        $pdf = "";
+        $pdfPath = "";
 
         if (($order->status_id == 3 || $order->status_id == 4) && !$order->sello_id) {
             dispatch_now(new GenerateOrderProformJob($order, true));
-            $pdf = Storage::disk('local')->get($order->proformStoragePath);
+            $pdfPath = $order->proformStoragePath;
         }
 
         if ($order->status_id === 3) {
@@ -101,7 +100,7 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
             }
             Mailer::create()
                 ->to($mail_to)
-                ->send(new OrderStatusChanged($subject, $message, $pdf));
+                ->send(new OrderStatusChanged($subject, $message, $pdfPath));
         } catch (Exception $e) {
             Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);
         }
