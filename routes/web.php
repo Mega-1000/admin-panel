@@ -354,7 +354,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orderPayments/create/{id}/master/without',
             'OrdersPaymentsController@createMasterWithoutOrder')->name('order_payments.createMasterWithoutOrder');
         Route::get('payments', 'OrdersPaymentsController@payments')->name('payments.index');
-        Route::get('payments/{id}/list', 'OrdersPaymentsController@paymentsEdit')->name('payments.edit');
+        Route::get('payments/{id}/list', 'OrdersPaymentsController@paymentsEdit')->name('payment.index');
         Route::get('payments/{id}/delete', 'OrdersPaymentsController@paymentsDestroy')->name('payments.destroy');
         Route::get('payments/{id}/edit', 'OrdersPaymentsController@paymentsEdit')->name('payments.edit');
         Route::put('payments/{id}/update', 'OrdersPaymentsController@paymentUpdate')->name('payments.update');
@@ -404,7 +404,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orderPackages/{courier_name}/letters',
             'OrdersPackagesController@letters')->name('order_packages.letters');
         Route::get('orderPackages/{package_id}/send',
-            'OrdersPackagesController@prepareGroupPackageToSend')->name('orders.package.prepareToSend');
+            'OrdersPackagesController@prepareGroupPackageToSend')->name('package.prepareToSend');
         Route::post('orderPackages/changeValue', 'OrdersPackagesController@changeValue')->name('order_packages.changeValue');
         Route::put('orderPackages/changePackageCosts', 'OrdersPackagesController@changePackageCost')->name('order_packages.changePackageCost');
 
@@ -433,7 +433,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('orders/label-removal/{orderId}/{labelId}',
             'OrdersController@swapLabelsAfterLabelRemoval')->name('orders.label-removal');
         Route::post('orders/payment-deadline', 'OrdersController@setPaymentDeadline')->name('orders.payment-deadline');
-        
+
         Route::post('orders/set-warehouse/{orderId}', 'OrdersController@setWarehouse')->name('orders.setWarehouse');
 
         Route::post('orders/label-addition/{labelId}',
@@ -509,7 +509,7 @@ Route::group(['prefix' => 'admin'], function () {
                     Route::get('/create', 'TasksController@create')->name('create');
                     Route::get('/{id}/edit', 'TasksController@edit')->name('edit');
                     Route::get('/{id}/delete', 'TasksController@destroy')->name('destroy');
-                    Route::put('/{id}/update', 'TasksController@update')->name('destroy');
+                    Route::put('/{id}/update', 'TasksController@update')->name('update');
                     Route::post('/addNewTask', 'TasksController@addNewTask')->name('addNewTask');
                     Route::get('/{id}/getTasks', 'TasksController@getTasks')->name('getTasks');
                     Route::put('/{id}/updateTaskTime', 'TasksController@updateTaskTime')->name('updateTaskTime');
@@ -571,7 +571,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/cacheClear', 'Controller@refreshCache')->name('admin.refresh');
 
         Route::get('/edit-allegro-terms', 'AllegroController@editTerms')->name('allegro.edit-terms');
-        Route::post('/edit-allegro-terms', 'AllegroController@saveTerms')->name('allegro.edit-terms');
+        Route::post('/edit-allegro-terms', 'AllegroController@saveTerms')->name('allegro.update-terms');
 
         Route::prefix('allegro')->as('allegro.')->group(function () {
             Route::post('/getNewPendingDisputes', 'AllegroDisputeController@getNewPendingDisputes')->name('getNewPendingDisputes');
@@ -619,7 +619,7 @@ Route::post('/payment/confirmation/{token}', 'OrdersPaymentsController@warehouse
 
 Route::get('/chat/{token}', 'MessagesController@show')->name('chat.show');
 Route::get('/chat-show-or-new/{orderId}/{userId}', 'MessagesController@showOrNew')->name('chat.show-or-new');
-Route::get('/chat/getUrl/{mediaId}/{postCode}/{email}/{phone}', 'MessagesController@getUrl')->name('messages.get-url');
+Route::get('/chat/getUrl/{mediaId}/{postCode}/{email}/{phone}', 'MessagesController@getUrl')->name('messages.details');
 
 Route::get('shipment-groups', 'ShipmentGroupController@index')->name('shipment-groups.index');
 Route::get('shipment-groups/datatable/', 'ShipmentGroupController@datatable')->name('shipment-groups.datatable');
