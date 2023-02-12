@@ -8,10 +8,9 @@
 namespace App\Helpers;
 
 use App\Entities\OrderPackage;
-use Barryvdh\DomPDF\Facade as PDF;
-use Illuminate\Support\Carbon;
 use App\Entities\PackageTemplate;
-use Illuminate\Support\Facades\Log;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Carbon;
 
 class OrderPackagesDataHelper extends DateHelper
 {
@@ -83,7 +82,7 @@ class OrderPackagesDataHelper extends DateHelper
         $data['sending_number'] = $data['order_id'] . rand(1000000, 9999999);
         $data['shipment_date'] = $data['shipment_date']->format('Y-m-d');
         $data['delivery_date'] = $data['delivery_date']->format('Y-m-d');
-        $pdf = PDF::loadView('pdf.sticker', [
+        $pdf = Pdf::loadView('pdf.sticker', [
             'order' => $order,
             'package' => $data
         ])->setPaper('a5');

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Entities\OrderOffer;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Repositories\TagRepository;
-use Barryvdh\DomPDF\Facade as PDF;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 
@@ -42,7 +42,7 @@ class OrderOfferController extends Controller
         $date = Carbon::now()->toDateString();
 
         $name = 'Proforma dla: ' . $order->customer()->first()->login . '_' . $order->id . '_' . date('Y-m-d_H-i-s') . '.pdf';
-        $pdf = PDF::loadView('pdf.proform', compact('date', 'proformDate', 'order'))->setPaper('a4');
+        $pdf = Pdf::loadView('pdf.proform', compact('date', 'proformDate', 'order'))->setPaper('a4');
 
         Storage::disk('local')->put('/archive-files/' . $name, $pdf->output());
 

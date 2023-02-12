@@ -8,6 +8,7 @@ use App\Repositories\OrderPackageRepository;
 use App\Repositories\ShipmentGroupRepository;
 use App\Repositories\TagRepository;
 use App\ShipmentGroup;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\View\Factory;
@@ -17,7 +18,6 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\View\View;
-use PDF;
 use Yajra\DataTables\Facades\DataTables;
 
 // TODO Upoerząkować temat z PDFami
@@ -240,7 +240,7 @@ class ShipmentGroupController extends Controller
         try {
             $pdfFilename = 'group-close-protocol-' . $shipmentGroup->getLabel() . '-' . Carbon::today()->toDateString() . '.pdf';
 
-            $pdf = PDF::loadView('pdf.close-group-protocol', [
+            $pdf = Pdf::loadView('pdf.close-group-protocol', [
                 'packages' => $collection,
                 'date' => Carbon::today(),
                 'shipmentGroup' => $shipmentGroup,

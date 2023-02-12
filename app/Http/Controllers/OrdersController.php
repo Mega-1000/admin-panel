@@ -426,15 +426,15 @@ class OrdersController extends Controller
 
         $orderAddressService = new OrderAddressService();
 //        if ($orderInvoiceAddress !== null) {
-            $orderAddressService->addressIsValid($orderInvoiceAddress);
-            $orderInvoiceAddressErrors = $orderAddressService->errors();
+        $orderAddressService->addressIsValid($orderInvoiceAddress);
+        $orderInvoiceAddressErrors = $orderAddressService->errors();
 //        } else {
 //            $orderInvoiceAddressErrors = [];
 //        }
 
 //        if ($orderDeliveryAddress !== null) {
-            $orderAddressService->addressIsValid($orderDeliveryAddress);
-            $orderDeliveryAddressErrors = $orderAddressService->errors();
+        $orderAddressService->addressIsValid($orderDeliveryAddress);
+        $orderDeliveryAddressErrors = $orderAddressService->errors();
 //        } else {
 //            $orderDeliveryAddressErrors = [];
 //        }
@@ -612,7 +612,7 @@ class OrdersController extends Controller
             'type' => 'DELIVERY_ADDRESS',
         ])->first();
 
-        if(empty($orderDeliveryAddress)){
+        if (empty($orderDeliveryAddress)) {
             return [];
         }
 

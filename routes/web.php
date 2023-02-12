@@ -303,7 +303,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('orders/printAll', 'OrdersController@printAll')->name('orders.printAll');
         Route::post('orders/sendVisibleCouriers', 'OrdersController@sendVisibleCouriers')->name('orders.sendVisibleCouriers');
         Route::get('orders/create', 'OrdersController@create')->name('orders.create');
-        Route::get('orders/{id}/edit', 'OrdersController@edit')->name('orders.edit');
+        Route::get('orders/{order_id}/edit', 'OrdersController@edit')->name('orders.edit');
         Route::get('orders/{id}/edit/packages', 'OrdersController@editPackages')->name('orders.editPackages');
         Route::post('orders/{id}/files/add', 'OrdersController@addFile')->name('orders.fileAdd');
         Route::get('orders/{id}/files/{file_id}', 'OrdersController@getFile')->name('orders.getFile');

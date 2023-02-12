@@ -7,7 +7,9 @@ use App\Entities\OrderPackage;
 use App\Exceptions\SoapException;
 use App\Exceptions\SoapParamsException;
 use App\Services\SchenkerService;
+use Exception;
 use Illuminate\Console\Command;
+use Throwable;
 
 /** TODO Check after we will have any order in progress */
 class GetSchenkerTrackingInformationCommand extends Command
@@ -20,6 +22,7 @@ class GetSchenkerTrackingInformationCommand extends Command
      * @throws SoapException
      * @throws SoapParamsException
      * @throws Exception
+     * @throws Throwable
      */
     public function handle()
     {

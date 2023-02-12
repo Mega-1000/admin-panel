@@ -41,6 +41,8 @@ use App\Repositories\WarehousePropertyRepository;
 use App\Repositories\WarehousePropertyRepositoryEloquent;
 use App\Repositories\WarehouseRepository;
 use App\Repositories\WarehouseRepositoryEloquent;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 $app = new Illuminate\Foundation\Application(
     $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)
@@ -87,7 +89,9 @@ $app->bind(TagRepository::class, TagRepositoryEloquent::class);
 $app->bind(WarehouseOrdersRepository::class, WarehouseOrdersRepositoryEloquent::class);
 $app->bind(WarehouseOrdersItemsRepository::class, WarehouseOrdersItemsRepositoryEloquent::class);
 $app->bind(PaymentRepository::class, PaymentRepositoryEloquent::class);
-$app->bind('DB', \Illuminate\Support\Facades\DB::class);
+// TODO Wszystko podmienić na bezpośrednie klasy fasady
+$app->bind('DB', DB::class);
+$app->bind('Log', Log::class);
 /*
 |--------------------------------------------------------------------------
 | Return The Application

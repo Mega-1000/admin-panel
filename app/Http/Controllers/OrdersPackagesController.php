@@ -479,7 +479,12 @@ class OrdersPackagesController extends Controller
     public function datatable($id)
     {
         $collection = $this->prepareCollection($id);
-        return DataTables::collection($collection)->make(true);
+        return DataTables::collection($collection)
+            ->editColumn('shipment_date', function (OrderPackage $package) {
+                return $package->shipment_date?->format('Y-m-d');
+            })->editColumn('delivery_date', function (OrderPackage $package) {
+                return $package->delivery_date?->format('Y-m-d');
+            })->make();
     }
 
     public function prepareCollection($id): Collection

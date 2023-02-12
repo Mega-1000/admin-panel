@@ -1,5 +1,6 @@
 <?php
 
+use App\Facades\Mailer;
 use App\Providers\Entities\OrderAddressModelProvider;
 use App\Providers\Entities\OrderMessageModelServiceProvider;
 use App\Providers\Entities\OrderModelServiceProvider;
@@ -245,9 +246,8 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'Helper' => App\Helpers\Helper::class,
         //'Input' => Illuminate\Support\Facades\Input::class,
-        'Mailer' => \App\Facades\Mailer::class,
+        'Mailer' => Mailer::class,
         'Debugbar' => Barryvdh\Debugbar\Facade::class,
-        'PDF' => Barryvdh\DomPDF\Facade\Pdf::class,
         'MessagesHelper' => App\Helpers\MessagesHelper::class,
         'ChatHelper' => App\Helpers\ChatHelper::class,
         'Label' => App\Entities\Label::class,

@@ -12,7 +12,7 @@ use App\Facades\Mailer;
 use Exception;
 use Illuminate\Mail\SentMessage;
 use Illuminate\Support\Facades\Auth;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 class Helper
 {

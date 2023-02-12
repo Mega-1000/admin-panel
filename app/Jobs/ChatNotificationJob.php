@@ -2,12 +2,16 @@
 
 namespace App\Jobs;
 
+use App\Entities\Chat;
+use App\Helpers\Helper;
+use App\Helpers\MessagesHelper;
+use Exception;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use App\Helpers\MessagesHelper;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Log;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class ChatNotificationJob implements ShouldQueue
@@ -36,14 +40,14 @@ class ChatNotificationJob implements ShouldQueue
      */
     public function handle()
     {
-        $chat = \App\Entities\Chat
+        $chat = Chat
             ::with(['chatUsers', 'messages'])->find($this->chatId);
 
         foreach ($chat->chatUsers as $chatUser) {
             /*if (!MessagesHelper::hasNewMessageStatic($chat, $chatUser, true)) {
                 continue;
             }*/
-            $userObject = $chatUser->user ?: $chatUser->employee ?: $chatUser->customer ?: $chatUser->user ?:false;
+            $userObject = $chatUser->user ?: $chatUser->employee ?: $chatUser->customer ?: $chatUser->user ?: false;
             if (!$userObject) {
                 continue;
             }
@@ -65,14 +69,14 @@ class ChatNotificationJob implements ShouldQueue
             self::sendNewMessageEmail($email, $helper);
             $chatUser->last_notification_time = now();
             $chatUser->save();
-        } catch (\Exception $e) {
-            \Log::error('ChatNotification Exception: ' . $e->getMessage() . ', Class: ' . $e->getFile() . ', Line: ' . $e->getLine());
+        } catch (Exception $e) {
+            Log::error('ChatNotification Exception: ' . $e->getMessage() . ', Class: ' . $e->getFile() . ', Line: ' . $e->getLine());
         }
     }
 
     public static function sendNewMessageEmail($email, MessagesHelper $helper): void
     {
-        \App\Helpers\Helper::sendEmail(
+        Helper::sendEmail(
             $email,
             'chat-notification',
             'Nowa wiadomość w ' . env('APP_NAME'),

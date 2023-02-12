@@ -2,12 +2,13 @@
 
 namespace App\Jobs;
 
-use Barryvdh\DomPDF\Facade as PDF;
+use App\Entities\JpgDatum;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class JpgGeneratorJob implements ShouldQueue
@@ -31,7 +32,7 @@ class JpgGeneratorJob implements ShouldQueue
      */
     public function handle()
     {
-        $rawData = \App\Entities\JpgDatum::orderBy('order')->get();
+        $rawData = JpgDatum::orderBy('order')->get();
         $data = [];
 
         foreach ($rawData as $row) {
@@ -54,7 +55,7 @@ class JpgGeneratorJob implements ShouldQueue
                 $size = 'a2';
             }
 
-            $pdf = PDF::loadView('jpg.table', [
+            $pdf = Pdf::loadView('jpg.table', [
                 'hasSubcolumns' => $fileData['hasSubcolumns'],
                 'cols' => $fileData['cols'],
                 'rows' => $fileData['rows']
@@ -63,7 +64,7 @@ class JpgGeneratorJob implements ShouldQueue
             $path = storage_path('app/public/products/' . $fileName . '.pdf');
             $pdf->save($path);
 
-            $pdf = PDF::loadView('jpg.products', [
+            $pdf = Pdf::loadView('jpg.products', [
                 'hasSubcolumns' => $fileData['hasSubcolumns'],
                 'cols' => $fileData['cols'],
                 'rows' => $fileData['rows']

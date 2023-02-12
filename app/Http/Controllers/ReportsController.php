@@ -2,18 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Entities\ReportProperty;
+use App\Http\Requests\ReportCreateRequest;
 use App\Repositories\ReportDailyRepository;
 use App\Repositories\ReportPropertyRepository;
+use App\Repositories\ReportRepository;
 use App\Repositories\TaskRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
-use App\Http\Requests\ReportCreateRequest;
-use App\Http\Requests\ReportUpdateRequest;
-use App\Repositories\ReportRepository;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 use Yajra\DataTables\Facades\DataTables;
-use Barryvdh\DomPDF\Facade as PDF;
 
 /**
  * Class ReportsController.
@@ -63,12 +65,12 @@ class ReportsController extends Controller
      * @param ReportDailyRepository $reportDailyRepository
      */
     public function __construct(
-        ReportRepository $repository,
-        UserRepository $userRepository,
-        TaskRepository $taskRepository,
-        WarehouseRepository $warehouseRepository,
+        ReportRepository         $repository,
+        UserRepository           $userRepository,
+        TaskRepository           $taskRepository,
+        WarehouseRepository      $warehouseRepository,
         ReportPropertyRepository $reportPropertyRepository,
-        ReportDailyRepository $reportDailyRepository
+        ReportDailyRepository    $reportDailyRepository
     )
     {
         $this->userRepository = $userRepository;
@@ -81,7 +83,7 @@ class ReportsController extends Controller
 
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\JsonResponse|\Illuminate\View\View
+     * @return Factory|JsonResponse|View
      */
     public function index()
     {
@@ -98,7 +100,7 @@ class ReportsController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function create()
     {
@@ -110,7 +112,7 @@ class ReportsController extends Controller
 
     /**
      * @param ReportCreateRequest $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function store(ReportCreateRequest $request)
     {
@@ -193,7 +195,7 @@ class ReportsController extends Controller
                 'message' => __('reports.message.store'),
                 'alert-type' => 'success'
             ]);
-        };
+        }
 
         return redirect()->route('planning.reports.index')->with([
             'message' => __('reports.message.error.store'),
@@ -204,7 +206,7 @@ class ReportsController extends Controller
 
     /**
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function destroy($id)
     {
@@ -223,7 +225,7 @@ class ReportsController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function datatable()
     {
@@ -244,7 +246,7 @@ class ReportsController extends Controller
 
     /**
      * @param $id
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function generateReport($id)
     {
@@ -257,7 +259,7 @@ class ReportsController extends Controller
 
     /**
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function generatePdfReport($id)
     {
@@ -265,7 +267,7 @@ class ReportsController extends Controller
         $report = $this->repository->find($id);
         if ($report) {
 
-            $pdf = PDF::loadView('pdf.report', [
+            $pdf = Pdf::loadView('pdf.report', [
                 'report' => $report,
             ])->setPaper('a4');
             return $pdf->download('report.pdf');
