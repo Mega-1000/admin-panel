@@ -5,27 +5,22 @@ namespace App\Http\Controllers;
 use App\Http\Requests\OrderCreateRequest;
 use App\Http\Requests\OrderMessageCreateRequest;
 use App\Http\Requests\OrderMessageUpdateRequest;
-use App\Http\Requests\OrderPaymentCreateRequest;
-use App\Http\Requests\OrderPaymentUpdateRequest;
-use App\Http\Requests\OrderTaskCreateRequest;
 use App\Http\Requests\OrderTaskUpdateRequest;
-use App\Http\Requests\OrderUpdateRequest;
+use App\Mail\MessageSent;
 use App\Mail\SelfMessageSent;
-use App\Repositories\CustomerRepository;
 use App\Repositories\EmployeeRepository;
-use App\Repositories\LabelRepository;
 use App\Repositories\OrderMessageRepository;
 use App\Repositories\OrderPaymentRepository;
 use App\Repositories\OrderRepository;
-use App\Repositories\OrderTaskRepository;
-use App\Repositories\WarehouseRepository;
-use App\Repositories\FirmAddressRepository;
-use App\Repositories\FirmRepository;
-use Illuminate\Http\Request;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\MessageSent;
+use Illuminate\View\View;
+use Mailer;
+use Yajra\DataTables\Facades\DataTables;
 
 
 /**
@@ -50,10 +45,11 @@ class OrdersMessagesController extends Controller
      * @param OrderRepository $repository
      */
     public function __construct(
-        OrderRepository $orderRepository,
+        OrderRepository        $orderRepository,
         OrderMessageRepository $repository,
-        EmployeeRepository $employeeRepository
-    ) {
+        EmployeeRepository     $employeeRepository
+    )
+    {
         $this->repository = $repository;
         $this->employeeRepository = $employeeRepository;
         $this->orderRepository = $orderRepository;
@@ -61,7 +57,7 @@ class OrdersMessagesController extends Controller
 
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function create($id)
     {
@@ -73,9 +69,9 @@ class OrdersMessagesController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int $id
+     * @param int $id
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit($id)
     {
@@ -87,7 +83,7 @@ class OrdersMessagesController extends Controller
     /**
      * @param OrderTaskUpdateRequest $request
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function update(OrderMessageUpdateRequest $request, $id)
     {
@@ -165,16 +161,19 @@ class OrdersMessagesController extends Controller
         $date = date("Y-m-d H:i:s");
         $clientEmail = $order->customer->login;
 
-        if($order->customer->id == 4128) {
+        if ($order->customer->id == 4128) {
             $mail = $order->warehouse->firm->email;
 
-            \Mailer::create()
+            Mail::mailer(
+                name: ''
+            );
+            Mailer::create()
                 ->to($mail)
                 ->send(new SelfMessageSent($date, $type, $typeText, $order->warehouse->id, $order_id));
         } else {
             if ($request->input('type') == 'GENERAL' || $request->input('type') == 'SHIPPING' || $request->input('type') == 'WAREHOUSE') {
                 if (!strpos($clientEmail, 'allegromail.pl')) {
-                    \Mailer::create()
+                    Mailer::create()
                         ->to($clientEmail)
                         ->send(new MessageSent($date, $type, $typeText, $frontId, $order_id));
                 }
@@ -216,9 +215,9 @@ class OrdersMessagesController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int $id
+     * @param int $id
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy($id)
     {
@@ -238,7 +237,7 @@ class OrdersMessagesController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function datatable($id)
     {
@@ -261,7 +260,7 @@ class OrdersMessagesController extends Controller
         $order = $this->orderRepository->find($orderId);
         $messages = $this->repository->orderBy('type')->findWhere(["order_id" => $orderId]);
 
-        return view('orderMessages.communication', compact('order','messages', 'warehouseId'));
+        return view('orderMessages.communication', compact('order', 'messages', 'warehouseId'));
     }
 
     public function userCommunication($orderId)
@@ -269,6 +268,6 @@ class OrdersMessagesController extends Controller
         $order = $this->orderRepository->find($orderId);
         $messages = $this->repository->orderBy('type')->findWhere(["order_id" => $orderId]);
 
-        return view('orderMessages.user.communication', compact('order','messages'));
+        return view('orderMessages.user.communication', compact('order', 'messages'));
     }
 }

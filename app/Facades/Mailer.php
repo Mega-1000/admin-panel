@@ -10,8 +10,7 @@ namespace App\Facades;
 use App\Repositories\UserRepository;
 use App\User;
 use Illuminate\Support\Facades\Auth;
-use Swift_Mailer;
-use Swift_SmtpTransport;
+use Illuminate\Support\Facades\Mail;
 
 class Mailer
 {
@@ -27,22 +26,14 @@ class Mailer
         $this->userRepository = $userRepository;
     }
 
-    public static function notification()
+    public static function notification(): \Illuminate\Contracts\Mail\Mailer
     {
-        $mailer = app(\Illuminate\Mail\Mailer::class);
-        $notificationsCfg = config('notifications');
-
-
-        $transport = (new Swift_SmtpTransport($notificationsCfg['host'], $notificationsCfg['port'], $notificationsCfg['encryption']))
-            ->setUsername($notificationsCfg['username'])
-            ->setPassword($notificationsCfg['password']);
-        $mailer->setSwiftMailer(new Swift_Mailer($transport));
-        $mailer->alwaysFrom($notificationsCfg['from']);
-
-        return $mailer;
+        return Mail::mailer(
+            name: 'notifications'
+        );
     }
 
-    public function create(User $user = null)
+    public function create(User $user = null): \Illuminate\Contracts\Mail\Mailer
     {
         if (empty($user)) {
             $user = Auth::user();
@@ -53,21 +44,20 @@ class Mailer
         }
 
         if (env('APP_ENV') === 'development') {
-            $transport = (new Swift_SmtpTransport('smtp.mailtrap.io', '2525', $user->userEmailData->encryption))
-                ->setEncryption('tls')
-                ->setUsername('1320d1e69b90c7')
-                ->setPassword('cb7a4a3f6f3fc3');
-        } else {
-            $transport = (new Swift_SmtpTransport($user->userEmailData->host, $user->userEmailData->port, $user->userEmailData->encryption))
-                ->setEncryption($user->userEmailData->encryption)
-                ->setUsername($user->userEmailData->username)
-                ->setPassword($user->userEmailData->password);
+            return Mail::mailer('dev');
         }
 
-        $mailer = app(\Illuminate\Mail\Mailer::class);
-        $mailer->setSwiftMailer(new Swift_Mailer($transport));
-        $mailer->alwaysFrom($user->userEmailData->username);
+        config([
+            'mail.mailers.default' => [
+                'transport' => 'smtp',
+                'host' => $user->userEmailData->host,
+                'port' => $user->userEmailData->port,
+                'username' => $user->userEmailData->username,
+                'password' => $user->userEmailData->password,
+                'encryption' => $user->userEmailData->encryption
+            ]
+        ]);
 
-        return $mailer;
+        return Mail::mailer('default');
     }
 }

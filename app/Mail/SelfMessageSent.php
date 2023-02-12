@@ -5,7 +5,6 @@ namespace App\Mail;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class SelfMessageSent extends Mailable
 {
@@ -40,10 +39,10 @@ class SelfMessageSent extends Mailable
      *
      * @return $this
      */
-    public function build()
+    public function build(): static
     {
         return $this->view('emails.message-to-warehouse')
-                    ->from('info@' . env('DOMAIN_NAME'))
-                    ->subject('Nowa wiadomość od www.' . env('DOMAIN_NAME'));
+            ->from('info@' . env('DOMAIN_NAME'))
+            ->subject('Nowa wiadomość od www.' . env('DOMAIN_NAME'));
     }
 }
