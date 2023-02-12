@@ -42,6 +42,7 @@
         "ext-calendar": "*"
     },
     "require-dev": {
+        "ext-dom": "*",
         "barryvdh/laravel-debugbar": "^3.2",
         "barryvdh/laravel-ide-helper": "v2.12.3",
         "beyondcode/laravel-dump-server": "^1.0",
@@ -50,8 +51,8 @@
         "laravel/dusk": "v7.4.0",
         "mockery/mockery": "^1.0",
         "nunomaduro/collision": "v6.4.0",
-        "phpunit/phpunit": "9.5.28",
-        "ext-dom": "*"
+        "nunomaduro/larastan": "^2.4",
+        "phpunit/phpunit": "9.5.28"
     },
     "config": {
         "optimize-autoloader": true,
