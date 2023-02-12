@@ -14,18 +14,6 @@ use Illuminate\Support\Facades\Mail;
 
 class Mailer
 {
-    /** @var UserRepository */
-    protected $userRepository;
-
-    /**
-     * Mailer constructor.
-     * @param UserRepository $userRepository
-     */
-    public function __construct(UserRepository $userRepository)
-    {
-        $this->userRepository = $userRepository;
-    }
-
     public static function notification(): \Illuminate\Contracts\Mail\Mailer
     {
         return Mail::mailer(
@@ -33,17 +21,17 @@ class Mailer
         );
     }
 
-    public function create(User $user = null): \Illuminate\Contracts\Mail\Mailer
+    public static function create(User $user = null): \Illuminate\Contracts\Mail\Mailer
     {
         if (empty($user)) {
             $user = Auth::user();
         }
-
+        $userRepository = app(UserRepository::class);
         if (empty($user)) {
-            $user = $this->userRepository->findWhere(['name' => '001'])->first();
+            $user = $userRepository->findWhere(['name' => '001'])->first();
         }
 
-        if (env('APP_ENV') === 'development') {
+        if (config('app.env') === 'development') {
             return Mail::mailer('dev');
         }
 
@@ -58,6 +46,6 @@ class Mailer
             ]
         ]);
 
-        return Mail::mailer('default');
+        return Mail::mailer(name: 'default');
     }
 }

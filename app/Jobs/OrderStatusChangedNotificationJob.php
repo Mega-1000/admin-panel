@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Entities\OrderOffer;
 use App\Entities\Status;
+use App\Facades\Mailer;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Jobs\Orders\GenerateOrderProformJob;
 use App\Mail\OrderStatusChanged;
@@ -13,9 +14,8 @@ use App\Repositories\TagRepository;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Log;
-use Mailer;
 
 
 /**
