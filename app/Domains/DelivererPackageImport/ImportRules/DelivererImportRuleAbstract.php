@@ -29,17 +29,15 @@ abstract class DelivererImportRuleAbstract
 
     protected $valueUsedToFindOrder;
 
-    private $column;
-
     public function __construct(
-        DelivererImportRule $delivererImportRuleEntity,
+        DelivererImportRule                          $delivererImportRuleEntity,
         DelivererImportRuleColumnRepositoryInterface $columnRepository
-    ) {
+    )
+    {
         $this->columnRepository = $columnRepository;
         $this->importRuleEntity = $delivererImportRuleEntity;
 
         $this->action = $delivererImportRuleEntity->getAction()->value;
-        $this->column = $delivererImportRuleEntity->getColumnName()->value;
     }
 
     abstract public function run();
@@ -75,14 +73,19 @@ abstract class DelivererImportRuleAbstract
     {
         $columnNumber = $this->getColumnNumber()->get();
 
-        if (isset($this->line[$columnNumber-1])) {
-            return $this->line[$columnNumber-1];
+        if (isset($this->line[$columnNumber - 1])) {
+            return $this->line[$columnNumber - 1];
         }
 
         throw new Exception(sprintf(
             'W pliku CSV nie znaleziono kolumny %s',
             $this->importRuleEntity->getColumnName()->value
         ));
+    }
+
+    private function getColumnNumber(): ?DelivererImportRulesColumnNumberVO
+    {
+        return new DelivererImportRulesColumnNumberVO($this->importRuleEntity->import_column_number);
     }
 
     public function getParsedData(): ?string
@@ -98,14 +101,19 @@ abstract class DelivererImportRuleAbstract
     {
         $columnNumber = $this->getConditionColumnNumber()->get();
 
-        if (isset($this->line[$columnNumber-1])) {
-            return $this->line[$columnNumber-1];
+        if (isset($this->line[$columnNumber - 1])) {
+            return $this->line[$columnNumber - 1];
         }
 
         throw new Exception(sprintf(
             'W pliku CSV nie znaleziono kolumny %s dla dodatkowego warunku',
             $this->importRuleEntity->getColumnName()->value
         ));
+    }
+
+    private function getConditionColumnNumber(): ?DelivererImportRulesColumnNumberVO
+    {
+        return new DelivererImportRulesColumnNumberVO($this->importRuleEntity->condition_column_number);
     }
 
     /**
@@ -130,15 +138,5 @@ abstract class DelivererImportRuleAbstract
     protected function getChangeTo()
     {
         return $this->importRuleEntity->change_to;
-    }
-
-    private function getColumnNumber(): ?DelivererImportRulesColumnNumberVO
-    {
-        return new DelivererImportRulesColumnNumberVO($this->importRuleEntity->import_column_number);
-    }
-
-    private function getConditionColumnNumber(): ?DelivererImportRulesColumnNumberVO
-    {
-        return new DelivererImportRulesColumnNumberVO($this->importRuleEntity->condition_column_number);
     }
 }

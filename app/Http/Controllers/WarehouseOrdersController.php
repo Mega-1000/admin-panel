@@ -8,11 +8,14 @@ use App\Repositories\CustomerAddressRepository;
 use App\Repositories\OrderAddressRepository;
 use App\Repositories\OrderItemRepository;
 use App\Repositories\OrderRepository;
+use App\Repositories\ProductRepository;
 use App\Repositories\WarehouseOrdersItemsRepository;
 use App\Repositories\WarehouseOrdersRepository;
 use App\Repositories\WarehouseRepository;
+use DB;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Repositories\ProductRepository;
+use Illuminate\Support\Collection;
 use Yajra\DataTables\Facades\DataTables;
 
 class WarehouseOrdersController extends Controller
@@ -69,15 +72,16 @@ class WarehouseOrdersController extends Controller
      * @param CustomerAddressRepository $customerAddressRepository
      */
     public function __construct(
-        ProductRepository $repository,
-        WarehouseOrdersRepository $warehouseOrdersRepository,
+        ProductRepository              $repository,
+        WarehouseOrdersRepository      $warehouseOrdersRepository,
         WarehouseOrdersItemsRepository $warehouseOrdersItemsRepository,
-        OrderRepository $orderRepository,
-        OrderItemRepository $orderItemRepository,
-        WarehouseRepository $warehouseRepository,
-        OrderAddressRepository $orderAddressRepository,
-        CustomerAddressRepository $customerAddressRepository
-    ) {
+        OrderRepository                $orderRepository,
+        OrderItemRepository            $orderItemRepository,
+        WarehouseRepository            $warehouseRepository,
+        OrderAddressRepository         $orderAddressRepository,
+        CustomerAddressRepository      $customerAddressRepository
+    )
+    {
         $this->repository = $repository;
         $this->warehouseOrdersRepository = $warehouseOrdersRepository;
         $this->warehouseOrdersItemsRepository = $warehouseOrdersItemsRepository;
@@ -92,8 +96,8 @@ class WarehouseOrdersController extends Controller
     {
         $visibilities = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('products'));
         foreach ($visibilities as $key => $row) {
-            $visibilities[$key]->show = json_decode($row->show, true);
-            $visibilities[$key]->hidden = json_decode($row->hidden, true);
+            $row->show = json_decode($row->show, true);
+            $row->hidden = json_decode($row->hidden, true);
         }
 
         return view('warehouse_orders.index', compact('visibilities'));
@@ -106,38 +110,12 @@ class WarehouseOrdersController extends Controller
         return view('warehouse_orders.edit', compact('warehouseOrder'));
     }
 
-    public function update($id, Request $request)
-    {
-        $this->warehouseOrdersRepository->update([
-            'status' => $request->input('status'),
-            'company' => $request->input('company'),
-            'email' => $request->input('warehouse_mail'),
-            'shipment_date' => $request->input('shipment_date'),
-            'comments_for_warehouse' => $request->input('comments_for_warehouse'),
-            'warehouse_comments' => $request->input('warehouse_comment'),
-        ], $id);
-        foreach ($request->input('itemPrice') as $key => $value) {
-            $this->warehouseOrdersItemsRepository->update([
-                'price' => $value,
-            ], $key);
-        }
-
-        foreach ($request->input('itemQuantity') as $key => $value) {
-            $this->warehouseOrdersItemsRepository->update([
-                'quantity' => $value,
-            ], $key);
-        }
-
-        $warehouseOrder = $this->warehouseOrdersRepository->find($id);
-        return view('warehouse_orders.edit', compact('warehouseOrder'));
-    }
-
     public function makeOrder(Request $request)
     {
         $products = json_decode($request->input('products'));
-        foreach($products as $product) {
-            foreach($product as $key => $value) {
-                if($value->warehouse != null) {
+        foreach ($products as $product) {
+            foreach ($product as $key => $value) {
+                if ($value->warehouse != null) {
                     $warehouseName = $value->warehouse;
                 }
             }
@@ -155,8 +133,8 @@ class WarehouseOrdersController extends Controller
         $orderSum = 0;
         $orderWeight = 0;
 
-        foreach($products as $product) {
-            foreach($product as $key => $value) {
+        foreach ($products as $product) {
+            foreach ($product as $key => $value) {
                 $this->orderItemRepository->create([
                     'order_id' => $warehouseOrder->id,
                     'product_id' => $key,
@@ -214,9 +192,30 @@ class WarehouseOrdersController extends Controller
         return route('orders.edit', $warehouseOrder->id);
     }
 
-    public function all()
+    public function update($id, Request $request)
     {
-        return view('warehouse_orders.all');
+        $this->warehouseOrdersRepository->update([
+            'status' => $request->input('status'),
+            'company' => $request->input('company'),
+            'email' => $request->input('warehouse_mail'),
+            'shipment_date' => $request->input('shipment_date'),
+            'comments_for_warehouse' => $request->input('comments_for_warehouse'),
+            'warehouse_comments' => $request->input('warehouse_comment'),
+        ], $id);
+        foreach ($request->input('itemPrice') as $key => $value) {
+            $this->warehouseOrdersItemsRepository->update([
+                'price' => $value,
+            ], $key);
+        }
+
+        foreach ($request->input('itemQuantity') as $key => $value) {
+            $this->warehouseOrdersItemsRepository->update([
+                'quantity' => $value,
+            ], $key);
+        }
+
+        $warehouseOrder = $this->warehouseOrdersRepository->find($id);
+        return view('warehouse_orders.edit', compact('warehouseOrder'));
     }
 
     public function sendEmail(Request $request)
@@ -228,7 +227,7 @@ class WarehouseOrdersController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function datatableAll(Request $request)
     {
@@ -244,8 +243,71 @@ class WarehouseOrdersController extends Controller
 
     }
 
-     /**
-     * @return \Illuminate\Http\JsonResponse
+    public function all()
+    {
+        return view('warehouse_orders.all');
+    }
+
+    /**
+     * @return Collection
+     */
+    public function prepareCollectionAll($data)
+    {
+        $query = DB::table('warehouse_orders')
+            ->select('*');
+
+
+        $notSearchable = [17, 19];
+
+        foreach ($data['columns'] as $column) {
+            if ($column['searchable'] == 'true' && !empty($column['search']['value'])) {
+                if (array_key_exists($column['name'], $notSearchable) === false) {
+                    $query->where($column['name'], 'LIKE', "%{$column['search']['value']}%");
+                }
+            }
+        }
+
+        if ($data['search']['value']) {
+            foreach ($data['columns'] as $column) {
+                $query->where($column['name'], 'LIKE', "%{$column['search']['value']}%");
+            }
+        }
+
+        return $query
+            ->limit($data['length'])->offset($data['start'])
+            ->get();
+    }
+
+    /**
+     * @return int
+     */
+    public function countFilteredAll($data)
+    {
+        $query = DB::table('warehouse_orders')
+            ->select('*');
+
+        $notSearchable = [17, 19];
+
+        foreach ($data['columns'] as $column) {
+            if ($column['searchable'] == 'true' && !empty($column['search']['value'])) {
+                if (array_key_exists($column['name'], $notSearchable) === false) {
+                    $query->where($column['name'], 'LIKE', "%{$column['search']['value']}%");
+                }
+
+            }
+        }
+
+        if ($data['search']['value']) {
+            foreach ($data['columns'] as $column) {
+                $query->where($column['name'], 'LIKE', "%{$column['search']['value']}%");
+            }
+        }
+
+        return $query->count();
+    }
+
+    /**
+     * @return JsonResponse
      */
     public function datatable(Request $request)
     {
@@ -262,62 +324,22 @@ class WarehouseOrdersController extends Controller
     }
 
     /**
-     * @return mixed
-     */
-    public function prepareCollectionAll($data)
-    {
-        $query = \DB::table('warehouse_orders')
-            ->select('*');
-
-
-
-        $notSearchable = [17, 19];
-
-        foreach ($data['columns'] as $column) {
-            if ($column['searchable'] == 'true' && !empty($column['search']['value'])) {
-                if(array_key_exists($column['name'], $notSearchable)) {
-
-                } else {
-                    $query->where($column['name'], 'LIKE', "%{$column['search']['value']}%");
-                }
-
-            }
-        }
-
-        if ($data['search']['value']) {
-            foreach ($data['columns'] as $column) {
-                $query->where($column['name'], 'LIKE', "%{$column['search']['value']}%");
-            }
-        }
-
-        $collection = $query
-            ->limit($data['length'])->offset($data['start'])
-            ->get();
-
-        return $collection;
-    }
-
-    /**
-     * @return mixed
+     * @return Collection
      */
     public function prepareCollection($data)
     {
-        $query = \DB::table('products')
+        $query = DB::table('products')
             ->select('*', 'product_stocks.id as stockId')
             ->leftJoin('product_stocks', 'product_stocks.product_id', '=', 'products.id')
             ->leftJoin('product_packings', 'product_packings.product_id', '=', 'products.id')
             ->leftJoin('product_prices', 'product_prices.product_id', '=', 'products.id');
 
 
-
-
         $notSearchable = [17, 19];
 
         foreach ($data['columns'] as $column) {
             if ($column['searchable'] == 'true' && !empty($column['search']['value'])) {
-                if(array_key_exists($column['name'], $notSearchable)) {
-
-                } else {
+                if (array_key_exists($column['name'], $notSearchable) === false) {
                     $query->where($column['name'], 'LIKE', "%{$column['search']['value']}%");
                 }
 
@@ -337,18 +359,18 @@ class WarehouseOrdersController extends Controller
             ->get();
 
         foreach ($collection as $row) {
-            $row->positions = \DB::table('product_stock_positions')->where('product_stock_id', $row->stockId)->get();
+            $row->positions = DB::table('product_stock_positions')->where('product_stock_id', $row->stockId)->get();
         }
 
         return $collection;
     }
 
-     /**
-     * @return mixed
+    /**
+     * @return int
      */
     public function countFiltered($data)
     {
-        $query = \DB::table('products')
+        $query = DB::table('products')
             ->select('*')
             ->leftJoin('product_stocks', 'product_stocks.product_id', '=', 'products.id');
 
@@ -356,12 +378,9 @@ class WarehouseOrdersController extends Controller
 
         foreach ($data['columns'] as $column) {
             if ($column['searchable'] == 'true' && !empty($column['search']['value'])) {
-                if(array_key_exists($column['name'], $notSearchable)) {
-
-                } else {
+                if (array_key_exists($column['name'], $notSearchable) === false) {
                     $query->where($column['name'], 'LIKE', "%{$column['search']['value']}%");
                 }
-
             }
         }
 
@@ -373,41 +392,7 @@ class WarehouseOrdersController extends Controller
 
         $query->whereRaw('products.symbol NOT LIKE "%-%"');
 
-        $collection = $query->count();
-
-        return $collection;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function countFilteredAll($data)
-    {
-        $query = \DB::table('warehouse_orders')
-            ->select('*');
-
-        $notSearchable = [17, 19];
-
-        foreach ($data['columns'] as $column) {
-            if ($column['searchable'] == 'true' && !empty($column['search']['value'])) {
-                if(array_key_exists($column['name'], $notSearchable)) {
-
-                } else {
-                    $query->where($column['name'], 'LIKE', "%{$column['search']['value']}%");
-                }
-
-            }
-        }
-
-        if ($data['search']['value']) {
-            foreach ($data['columns'] as $column) {
-                $query->where($column['name'], 'LIKE', "%{$column['search']['value']}%");
-            }
-        }
-
-        $collection = $query->count();
-
-        return $collection;
+        return $query->count();
     }
 
 }

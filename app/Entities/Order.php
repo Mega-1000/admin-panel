@@ -23,6 +23,8 @@ use Prettus\Repository\Traits\TransformableTrait;
 /**
  * Class Order.
  *
+ * @property \Illuminate\Database\Eloquent\Collection<OrderItem>
+ *
  * @property mixed $warehouse
  * @package namespace App\Entities;
  */
@@ -796,6 +798,6 @@ class Order extends Model implements Transformable
 
     public function orderOffers(): HasMany
     {
-        return $this->hasMany(OrderOffer::class)->orderBy('created_at', 'desc');;
+        return $this->hasMany(OrderOffer::class)->orderBy('created_at', 'desc');
     }
 }

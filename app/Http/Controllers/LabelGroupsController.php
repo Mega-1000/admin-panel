@@ -6,6 +6,10 @@ use App\Entities\ColumnVisibility;
 use App\Http\Requests\LabelGroupCreateRequest;
 use App\Http\Requests\LabelGroupUpdateRequest;
 use App\Repositories\LabelGroupRepository;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 use Yajra\DataTables\Facades\DataTables;
 
 /**
@@ -29,32 +33,22 @@ class LabelGroupsController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function index()
     {
         $visibilities = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('label_groups'));
-        foreach($visibilities as $key => $row)
-        {
-            $visibilities[$key]->show = json_decode($row->show,true);
-            $visibilities[$key]->hidden = json_decode($row->hidden,true);
+        foreach ($visibilities as $key => $row) {
+            $row->show = json_decode($row->show, true);
+            $row->hidden = json_decode($row->hidden, true);
         }
 
-        return view('label_group.index',compact('visibilities'));
+        return view('label_group.index', compact('visibilities'));
     }
-
-    /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function create()
-    {
-        return view('label_group.create');
-    }
-
 
     /**
      * @param LabelGroupCreateRequest $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function store(LabelGroupCreateRequest $request)
     {
@@ -66,10 +60,17 @@ class LabelGroupsController extends Controller
         ]);
     }
 
+    /**
+     * @return Factory|View
+     */
+    public function create()
+    {
+        return view('label_group.create');
+    }
 
     /**
      * @param $id
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function edit($id)
     {
@@ -81,7 +82,7 @@ class LabelGroupsController extends Controller
     /**
      * @param LabelGroupUpdateRequest $request
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function update(LabelGroupUpdateRequest $request, $id)
     {
@@ -100,7 +101,7 @@ class LabelGroupsController extends Controller
 
     /**
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function destroy($id)
     {
@@ -118,7 +119,7 @@ class LabelGroupsController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function datatable()
     {

@@ -15,7 +15,7 @@ use App\Enums\Schenker\ProductType;
 use Carbon\Carbon;
 use JsonSerializable;
 
-class OrderRequestDTO extends BaseDTO implements JsonSerializable
+class GetOrderRequestDTO extends BaseDTO implements JsonSerializable
 {
 
     protected $clientId;

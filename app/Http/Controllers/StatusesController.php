@@ -8,6 +8,10 @@ use App\Http\Requests\StatusUpdateRequest;
 use App\Repositories\LabelRepository;
 use App\Repositories\StatusRepository;
 use App\Repositories\TagRepository;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 use Yajra\DataTables\Facades\DataTables;
 
 /**
@@ -38,9 +42,10 @@ class StatusesController extends Controller
      */
     public function __construct(
         StatusRepository $repository,
-        TagRepository $tagRepository,
-        LabelRepository $labelRepository
-    ) {
+        TagRepository    $tagRepository,
+        LabelRepository  $labelRepository
+    )
+    {
         $this->repository = $repository;
         $this->tagRepository = $tagRepository;
         $this->labelRepository = $labelRepository;
@@ -48,35 +53,22 @@ class StatusesController extends Controller
 
 
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function index()
     {
         $visibilities = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('statuses'));
-        foreach($visibilities as $key => $row)
-        {
-            $visibilities[$key]->show = json_decode($row->show,true);
-            $visibilities[$key]->hidden = json_decode($row->hidden,true);
+        foreach ($visibilities as $key => $row) {
+            $row->show = json_decode($row->show, true);
+            $row->hidden = json_decode($row->hidden, true);
         }
 
-        return view('statuses.index',compact('visibilities'));
-    }
-
-
-    /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function create()
-    {
-        $tags = $this->tagRepository->all();
-        $labels = $this->labelRepository->orderBy('name')->all();
-
-        return view('statuses.create', compact('tags', 'labels'));
+        return view('statuses.index', compact('visibilities'));
     }
 
     /**
      * @param StatusCreateRequest $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function store(StatusCreateRequest $request)
     {
@@ -95,8 +87,19 @@ class StatusesController extends Controller
     }
 
     /**
+     * @return Factory|View
+     */
+    public function create()
+    {
+        $tags = $this->tagRepository->all();
+        $labels = $this->labelRepository->orderBy('name')->all();
+
+        return view('statuses.create', compact('tags', 'labels'));
+    }
+
+    /**
      * @param $id
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function edit($id)
     {
@@ -106,7 +109,7 @@ class StatusesController extends Controller
 
         $collection = $status->labelsToAddOnChange()->get();
         $labelsToAddOnChange = [];
-        if(count($collection) > 0) {
+        if (count($collection) > 0) {
             foreach ($collection as $item) {
                 $labelsToAddOnChange[] = $item->id;
             }
@@ -115,11 +118,71 @@ class StatusesController extends Controller
         return view('statuses.edit', compact('status', 'tags', 'labels', 'labelsToAddOnChange'));
     }
 
+    /**
+     * @param $id
+     * @return RedirectResponse
+     */
+    public function destroy($id)
+    {
+        $status = $this->repository->find($id);
+
+        if (empty($status)) {
+            abort(404);
+        }
+
+        $this->repository->delete($status->id);
+
+        return redirect()->route('statuses.index')->with([
+            'message' => __('statuses.message.delete'),
+            'alert-type' => 'info'
+        ]);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function datatable()
+    {
+        $collection = $this->prepareCollection();
+
+        return DataTables::collection($collection)->make(true);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function prepareCollection()
+    {
+        $collection = $this->repository->all();
+
+        return $collection;
+    }
+
+    /**
+     * @param $id
+     * @return RedirectResponse
+     */
+    public function changeStatus($id)
+    {
+        $firm = $this->repository->find($id);
+
+        if (empty($firm)) {
+            abort(404);
+        }
+        $dataToStore = [];
+        $dataToStore['status'] = $firm['status'] === 'ACTIVE' ? 'PENDING' : 'ACTIVE';
+        $this->repository->update($dataToStore, $firm->id);
+
+        return redirect()->back()->with([
+            'message' => __('statuses.message.change_status'),
+            'alert-type' => 'success'
+        ]);
+    }
 
     /**
      * @param StatusUpdateRequest $request
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function update(StatusUpdateRequest $request, $id)
     {
@@ -141,68 +204,6 @@ class StatusesController extends Controller
 
         return redirect()->route('statuses.edit', ['id' => $status->id])->with([
             'message' => __('statuses.message.update'),
-            'alert-type' => 'success'
-        ]);
-    }
-
-
-    /**
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function destroy($id)
-    {
-        $status = $this->repository->find($id);
-
-        if (empty($status)) {
-            abort(404);
-        }
-        
-        $this->repository->delete($status->id);
-
-        return redirect()->route('statuses.index')->with([
-            'message' => __('statuses.message.delete'),
-            'alert-type' => 'info'
-        ]);
-    }
-
-    /**
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function datatable()
-    {
-        $collection = $this->prepareCollection();
-
-        return DataTables::collection($collection)->make(true);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function prepareCollection()
-    {
-        $collection = $this->repository->all();
-
-        return $collection;
-    }
-
-    /**
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function changeStatus($id)
-    {
-        $firm = $this->repository->find($id);
-
-        if (empty($firm)) {
-            abort(404);
-        }
-        $dataToStore = [];
-        $dataToStore['status'] = $firm['status'] === 'ACTIVE' ? 'PENDING' : 'ACTIVE';
-        $this->repository->update($dataToStore, $firm->id);
-
-        return redirect()->back()->with([
-            'message' => __('statuses.message.change_status'),
             'alert-type' => 'success'
         ]);
     }

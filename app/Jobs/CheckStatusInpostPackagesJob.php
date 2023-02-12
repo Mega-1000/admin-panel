@@ -2,22 +2,23 @@
 
 namespace App\Jobs;
 
-use App\Repositories\OrderPackageRepository;
+use App\Entities\OrderPackage;
+use App\Facades\Mailer;
 use App\Integrations\Inpost\Inpost;
+use App\Mail\SendLPToTheWarehouseAfterOrderCourierMail;
+use App\Repositories\OrderPackageRepository;
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
-use App\Mail\SendLPToTheWarehouseAfterOrderCourierMail;
-use Carbon\Carbon;
-use App\Entities\OrderPackage;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class CheckStatusInpostPackagesJob extends Job implements ShouldQueue
 {
     use IsMonitored;
 
-    protected $orderPackageRepository;
-
     const COURIER = ['INPOST', 'ALLEGRO-INPOST'];
+    protected $orderPackageRepository;
 
     /**
      * Create a new job instance.
@@ -37,8 +38,8 @@ class CheckStatusInpostPackagesJob extends Job implements ShouldQueue
     public function handle(OrderPackageRepository $orderPackageRepository)
     {
         $orderPackages = OrderPackage::whereIn('service_courier_name', self::COURIER)
-                ->whereDate('shipment_date', '>', Carbon::today()->subDays(5)->toDateString())
-                ->get();
+            ->whereDate('shipment_date', '>', Carbon::today()->subDays(5)->toDateString())
+            ->get();
 
         if (empty($orderPackages)) {
             return;
@@ -58,7 +59,7 @@ class CheckStatusInpostPackagesJob extends Job implements ShouldQueue
                 $integration->getLabel($href->id, $href->tracking_number);
                 $orderPackage->status = 'WAITING_FOR_SENDING';
                 $orderPackage->save();
-                if ($orderPackage->send_protocol == true) {
+                if ($orderPackage->send_protocol) {
                     continue;
                 }
                 $path = storage_path('app/public/inpost/stickers/sticker' . $orderPackage->letter_number . '.pdf');
@@ -66,10 +67,10 @@ class CheckStatusInpostPackagesJob extends Job implements ShouldQueue
                     continue;
                 }
                 try {
-                    \Mailer::create()
+                    Mailer::create()
                         ->to($orderPackage->order->warehouse->firm->email)
                         ->send(new SendLPToTheWarehouseAfterOrderCourierMail("List przewozowy przesyłki nr: " . $orderPackage->order->id . '/' . $orderPackage->number, $path, $orderPackage->order->id . '/' . $orderPackage->number));
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     Log::error('Send email failed', [$e]);
                 }
                 $orderPackage->send_protocol = true;

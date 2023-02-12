@@ -3,11 +3,10 @@
 namespace App\Services;
 
 use App\DTO\Schenker\Request\CancelOrderRequestDTO;
-use App\DTO\Schenker\Request\GetOrderDocumentDTO;
 use App\DTO\Schenker\Request\GetOrderDocumentRequestDTO;
+use App\DTO\Schenker\Request\GetOrderRequestDTO;
 use App\DTO\Schenker\Request\GetOrderStatusRequestDTO;
 use App\DTO\Schenker\Request\GetTrackingRequestDTO;
-use App\DTO\Schenker\Request\OrderRequestDTO;
 use App\DTO\Schenker\Response\CancelOrderResponseDTO;
 use App\DTO\Schenker\Response\CreateOrderResponseDTO;
 use App\DTO\Schenker\Response\GetOrderDocumentResponseDTO;
@@ -55,7 +54,7 @@ class SchenkerService extends SoapClientService
     /**
      * @throws SoapParamsException|SoapException
      */
-    public static function createNewOrder(OrderRequestDTO $schenkerOrderDTO): CreateOrderResponseDTO
+    public static function createNewOrder(GetOrderRequestDTO $schenkerOrderDTO): CreateOrderResponseDTO
     {
         $response = self::prepareAndSendRequest(
             '',
@@ -104,7 +103,6 @@ class SchenkerService extends SoapClientService
             'getTracking'
         );
 
-        dd($response);
         $trackingResponseDTO = [];
         if (array_key_exists('consignment', $response) && $response['consignment'] !== null) {
             foreach (($response['consignment']['eventList'] ?? []) as $event) {

@@ -41,15 +41,16 @@
                 $arraySelected = [];
             @endphp
             @if(old('users_id') != null)
-            @foreach(old('users_id') as $userId)
-                @php(array_push($arraySelected, $userId))
-            @endforeach
+                @foreach(old('users_id') as $userId)
+                    @php(array_push($arraySelected, $userId))
+                @endforeach
             @endif
             <div class="form-group">
                 <label for="users_id">Użytkownik</label>
                 <select name="users_id[]" class="form-control" multiple>
                     @foreach($users as $user)
-                        <option {{in_array($user->id, $arraySelected) == true ? 'selected="selected"' : ''}} value="{{$user->id}}">{{$user->firstname}} {{$user->lastname}}</option>
+                        <option
+                            {{in_array($user->id, $arraySelected) === true ? 'selected="selected"' : ''}} value="{{$user->id}}">{{$user->firstname}} {{$user->lastname}}</option>
                     @endforeach
                 </select>
             </div>

@@ -116,7 +116,7 @@ class AllegroOrderSynchro implements ShouldQueue
         $this->productService = app(ProductService::class);
         $this->orderRepository = app(OrderRepository::class);
         $this->orderPackagesDataHelper = app(OrderPackagesDataHelper::class);
-
+        // TODO Change to configuration
         $this->tax = (float)(1 + env('VAT'));
         if ($this->synchronizeAll) {
             $allegroOrders = $this->allegroOrderService->getOrdersOutsideSystem();
@@ -212,6 +212,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 $order->shipment_price_for_client = $allegroOrder['delivery']['cost']['amount'];
 
                 $order->total_price = $allegroOrder['summary']['totalToPay']['amount'];
+                // TODO Change to configuration
                 $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 1)->first();
                 $order->firm_source_id = $firmSource ? $firmSource->id : null;
 
@@ -585,8 +586,8 @@ class AllegroOrderSynchro implements ShouldQueue
      * Create or update customer address.
      *
      * @param Customer $customer
-     * @param array $data
-     * @param string $type
+     * @param array    $data
+     * @param string   $type
      *
      * @return void
      */
@@ -608,7 +609,7 @@ class AllegroOrderSynchro implements ShouldQueue
             'lastname' => $data['lastName'] ?? $data['address']['naturalPerson']['lastName'] ?? null,
             'address' => $street,
             'flat_number' => $flatNo,
-            'city' => $data['address']['city'] ?? $data['address']['city'],
+            'city' => $data['address']['city'],
             'firmname' => $data['companyName'] ?? $data['address']['company']['name'] ?? null,
             'nip' => $data['company']['taxId'] ?? null,
             'postal_code' => $data['address']['postCode'] ?? $data['address']['zipCode'],

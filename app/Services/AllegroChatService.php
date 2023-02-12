@@ -155,7 +155,7 @@ class AllegroChatService extends AllegroApiService {
         }
         AllegroChatThread::insert($newMessages);
 
-        // add missing informations about user
+        // add missing information about user
         foreach ($newMessages as &$newMessage) {
             $newMessage['user'] = [
                 'name'  => $user->name,

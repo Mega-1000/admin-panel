@@ -21,17 +21,21 @@ use App\Jobs\AddLabelJob;
 use App\Jobs\DispatchLabelEventByNameJob;
 use App\Jobs\RemoveLabelJob;
 use App\Repositories\CustomerRepository;
+use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderPaymentRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentRepository;
-use App\Repositories\OrderPackageRepository;
 use App\Services\OrderPaymentLogService;
 use App\Services\OrderPaymentService;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 use TCG\Voyager\Models\Role;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -43,23 +47,24 @@ use Yajra\DataTables\Facades\DataTables;
  */
 class OrdersPaymentsController extends Controller
 {
-    protected $repository;
-    protected $orderRepository;
-    protected $paymentRepository;
-    protected $customerRepository;
-    protected $orderPackageRepository;
-    protected $orderPaymentLogService;
-    protected $orderPaymentService;
+    protected OrderPaymentRepository $repository;
+    protected OrderRepository $orderRepository;
+    protected PaymentRepository $paymentRepository;
+    protected CustomerRepository $customerRepository;
+    protected OrderPackageRepository $orderPackageRepository;
+    protected OrderPaymentLogService $orderPaymentLogService;
+    protected OrderPaymentService $orderPaymentService;
 
     public function __construct(
         OrderPaymentRepository $repository,
-        OrderRepository $orderRepository,
-        PaymentRepository $paymentRepository,
-        CustomerRepository $customerRepository,
+        OrderRepository        $orderRepository,
+        PaymentRepository      $paymentRepository,
+        CustomerRepository     $customerRepository,
         OrderPackageRepository $orderPackageRepository,
         OrderPaymentLogService $orderPaymentLogService,
-        OrderPaymentService $orderPaymentService
-    ) {
+        OrderPaymentService    $orderPaymentService
+    )
+    {
         $this->repository = $repository;
         $this->orderRepository = $orderRepository;
         $this->paymentRepository = $paymentRepository;
@@ -69,19 +74,8 @@ class OrdersPaymentsController extends Controller
         $this->orderPaymentService = $orderPaymentService;
     }
 
-
     /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     * @var integer $id Order ID
-     */
-    public function create($id)
-    {
-        WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_CREATE_EVENT, $id);
-        return view('orderPayments.create', compact('id'));
-    }
-
-    /**
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      * @var integer $id Order ID
      */
     public function createMaster($id)
@@ -97,7 +91,8 @@ class OrdersPaymentsController extends Controller
         return view('orderPayments.master.create', compact('customerId', 'order'));
     }
 
-    public function payAllegro(Request $request) {
+    public function payAllegro(Request $request)
+    {
         $file = $request->file('file');
         $maxFileSize = 20000000;
         if ($file->getSize() > $maxFileSize) {
@@ -106,7 +101,7 @@ class OrdersPaymentsController extends Controller
                 'alert-type' => 'error'
             ]);
         }
-        $fixedCSV = str_replace(array("=\r\n", "=\r", "=\n"),"", $file->get());
+        $fixedCSV = str_replace(array("=\r\n", "=\r", "=\n"), "", $file->get());
         do {
             $fileName = Str::random(40) . '.csv';
             $path = Storage::path('user-files/allegro-payments/') . $fileName;
@@ -125,58 +120,14 @@ class OrdersPaymentsController extends Controller
      *
      * @param int $id
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\View\View
      */
-    public function edit($id)
+    public function edit(int $id)
     {
         WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_EDIT_EVENT, $id);
         $orderPayment = $this->repository->find($id);
         $customerOrders = $orderPayment->order->customer->orders;
         return view('orderPayments.edit', compact('orderPayment', 'id', 'customerOrders'));
-    }
-
-    /**
-     * @param OrderPaymentUpdateRequest $request
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function update(OrderPaymentUpdateRequest $request, $id)
-    {
-        WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_UPDATE_EVENT, $id);
-        $orderPayment = $this->repository->find($id);
-        $oldOrderId = $orderPayment->order_id;
-
-        if (empty($orderPayment)) {
-            abort(404);
-        }
-
-        $order_id = $request->input('order_id');
-        $promise = $request->input('promise');
-        if ($promise == 'yes') {
-            $promise = '1';
-        } else {
-            $promise = '';
-        }
-
-        if ($orderPayment->promise == '1' && $promise == '') {
-            dispatch_now(new AddLabelJob($orderPayment->order_id, [5]));
-        }
-
-        $payment = $this->repository->update([
-            'amount' => PriceHelper::modifyPriceToValidFormat($request->input('amount')),
-            'notices' => $request->input('notices'),
-            'promise' => $promise,
-            'promise_date' => $request->input('promise_date'),
-            'order_id' => $order_id,
-            'created_at' => $request->input('created_at')
-        ], $id);
-
-        OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
-
-        return redirect()->route('orders.edit', ['order_id' => $oldOrderId])->with([
-            'message' => __('order_payments.message.update'),
-            'alert-type' => 'success'
-        ]);
     }
 
     public function store(OrderPaymentCreateRequest $request)
@@ -210,7 +161,7 @@ class OrdersPaymentsController extends Controller
             $masterPaymentId, $promise,
             $chooseOrder, $promiseDate,
             $type, $isWarehousePayment
-            );
+        );
 
 
         $orderPaymentAmount = PriceHelper::modifyPriceToValidFormat($request->input('amount'));
@@ -223,7 +174,7 @@ class OrdersPaymentsController extends Controller
             $orderPaymentsSum,
             $orderPaymentAmount,
             $request->input('created_at') ?: Carbon::now(),
-            $request->input('notices')  ?: '',
+            $request->input('notices') ?: '',
             $request->input('amount'),
             OrderPaymentLogTypeEnum::ORDER_PAYMENT,
             true
@@ -235,15 +186,26 @@ class OrdersPaymentsController extends Controller
         ])->withInput(['tab' => 'orderPayments']);
     }
 
+    /**
+     * @return Factory|View
+     * @var integer $id Order ID
+     */
+    public function create($id)
+    {
+        WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_CREATE_EVENT, $id);
+        return view('orderPayments.create', compact('id'));
+    }
+
+    // TODO WTF -- 1400 lines of code in one method?
     public function storeFromImport($orderId, $amount, $date)
     {
-        if($date == null) {
-            $date = \Carbon\Carbon::now();
+        if ($date == null) {
+            $date = Carbon::now();
         }
         $globalAmount = $amount;
-        if(strlen($orderId) > 10) {
+        if (strlen($orderId) > 10) {
             $orderPackage = $this->orderPackageRepository->findWhere(['letter_number' => $orderId])->first();
-            if(!empty($orderPackage)) {
+            if (!empty($orderPackage)) {
                 $orderId = $orderPackage->order_id;
                 $order = $this->orderRepository->findWhere(['id' => $orderId])->first();
             } else {
@@ -258,26 +220,26 @@ class OrdersPaymentsController extends Controller
         /////// połączone
         $clientPaymentAmount = $this->customerRepository->find($order->customer_id)->payments->sum('amount_left');
         $connectedOrders = $this->orderRepository->findWhere(['master_order_id' => $order->id]);
-        if($connectedOrders->count() > 0) {
+        if ($connectedOrders->count() > 0) {
             $hasGroupPromisePayment = false;
             $hasGroupBookedPayment = false;
 
-            foreach($connectedOrders as $connectedOrder) {
-                if($connectedOrder->hasPromisePayments() > 0) {
+            foreach ($connectedOrders as $connectedOrder) {
+                if ($connectedOrder->hasPromisePayments() > 0) {
                     $hasGroupPromisePayment = true;
                 }
-                if($connectedOrder->hasBookedPayments() > 0) {
+                if ($connectedOrder->hasBookedPayments() > 0) {
                     $hasGroupBookedPayment = true;
                 }
             }
-            if($order->hasPromisePayments() > 0) {
+            if ($order->hasPromisePayments() > 0) {
                 $hasGroupPromisePayment = true;
             }
-            if($order->hasBookedPayments() > 0) {
+            if ($order->hasBookedPayments() > 0) {
                 $hasGroupBookedPayment = true;
             }
-            if($hasGroupPromisePayment == true) {
-           $orderGroupPromisePaymentSum = 0;
+            if ($hasGroupPromisePayment === true) {
+                $orderGroupPromisePaymentSum = 0;
                 foreach ($connectedOrders as $connectedOrder) {
                     $orderGroupPromisePaymentSum += $connectedOrder->promisePaymentsSum();
                 }
@@ -292,7 +254,7 @@ class OrdersPaymentsController extends Controller
                                     'promise' => '',
                                 ])->first())) {
 
-                                    if(empty($this->paymentRepository->findWhere([
+                                    if (empty($this->paymentRepository->findWhere([
                                         'amount' => $amount,
                                         'customer_id' => $order->customer_id,
                                     ])->first())) {
@@ -377,7 +339,7 @@ class OrdersPaymentsController extends Controller
                                     'order_id' => $order->id,
                                     'promise' => '',
                                 ])->first())) {
-                                    if(empty($this->paymentRepository->findWhere([
+                                    if (empty($this->paymentRepository->findWhere([
                                         'amount' => $amount,
                                         'customer_id' => $order->customer_id,
                                     ])->first())) {
@@ -399,7 +361,7 @@ class OrdersPaymentsController extends Controller
                                             OrderPaymentLogTypeEnum::CLIENT_PAYMENT,
                                             true
                                         );
-					if($amount > $order->getSumOfGrossValues()) {
+                                        if ($amount > $order->getSumOfGrossValues()) {
                                             $globalPayment->update(['amount_left' => $globalPayment->amount - $order->getSumOfGrossValues()]);
 
                                             $payment = $this->repository->create([
@@ -420,9 +382,9 @@ class OrdersPaymentsController extends Controller
                                                 OrderPaymentLogTypeEnum::ORDER_PAYMENT,
                                                 false
                                             );
-					if($globalPayment->amount_left > 0) {
-                                            foreach ($connectedOrders as $connectedOrder) {
-                                                    if($globalPayment->amount_left > $connectedOrder->getSumOfGrossValues()) {
+                                            if ($globalPayment->amount_left > 0) {
+                                                foreach ($connectedOrders as $connectedOrder) {
+                                                    if ($globalPayment->amount_left > $connectedOrder->getSumOfGrossValues()) {
                                                         $payment = $this->repository->create([
                                                             'amount' => $connectedOrder->getSumOfGrossValues(),
                                                             'order_id' => $connectedOrder->id,
@@ -484,10 +446,10 @@ class OrdersPaymentsController extends Controller
                         }
                     }
                 }
-                return ['orderId' => $orderId, 'amount' => $amount,  'info' => 'Zlecenie zostało pomyślnie utworzone.'];
+                return ['orderId' => $orderId, 'amount' => $amount, 'info' => 'Zlecenie zostało pomyślnie utworzone.'];
             }
 
-            if($hasGroupPromisePayment == true) {
+            if ($hasGroupPromisePayment === true) {
                 $orderGroupPromisePaymentSum = 0;
                 foreach ($connectedOrders as $connectedOrder) {
                     $orderGroupPromisePaymentSum += $connectedOrder->promisePaymentsSum();
@@ -502,7 +464,7 @@ class OrdersPaymentsController extends Controller
                 }
             }
 
-            if($hasGroupPromisePayment == true) {
+            if ($hasGroupPromisePayment === true) {
                 $orderGroupPromisePaymentSum = 0;
                 foreach ($connectedOrders as $connectedOrder) {
                     $orderGroupPromisePaymentSum += $connectedOrder->promisePaymentsSum();
@@ -518,7 +480,7 @@ class OrdersPaymentsController extends Controller
                                     'promise' => '',
                                 ])->first())) {
 
-                                    if(empty($this->paymentRepository->findWhere([
+                                    if (empty($this->paymentRepository->findWhere([
                                         'amount' => $amount,
                                         'customer_id' => $order->customer_id,
                                     ])->first())) {
@@ -596,7 +558,7 @@ class OrdersPaymentsController extends Controller
                             }
                         }
                     }
-                    if(empty($this->paymentRepository->findWhere([
+                    if (empty($this->paymentRepository->findWhere([
                         'amount' => $amount,
                         'customer_id' => $order->customer_id,
                     ])->first())) {
@@ -664,23 +626,23 @@ class OrdersPaymentsController extends Controller
                         );
                     }
                 }
-                return ['orderId' => $orderId, 'amount' => $amount,  'info' => 'Zlecenie zostało pomyślnie utworzone.'];
+                return ['orderId' => $orderId, 'amount' => $amount, 'info' => 'Zlecenie zostało pomyślnie utworzone.'];
             }
 
-            if($hasGroupBookedPayment == true) {
+            if ($hasGroupBookedPayment === true) {
                 $ordersSum = 0;
-                foreach($connectedOrders as $connectedOrder) {
+                foreach ($connectedOrders as $connectedOrder) {
                     $ordersSum += $connectedOrder->getSumOfGrossValues();
                 }
                 $ordersSum += $order->getSumOfGrossValues();
-                if((float)$ordersSum == (float)$amount) {
-                    foreach($connectedOrders as $connectedOrder) {
+                if ((float)$ordersSum == (float)$amount) {
+                    foreach ($connectedOrders as $connectedOrder) {
                         if (empty($this->repository->findWhere([
                             'amount' => $connectedOrder->getSumOfGrossValues(),
                             'order_id' => $connectedOrder->id,
                             'promise' => '',
                         ])->first())) {
-                            if(empty($this->paymentRepository->findWhere([
+                            if (empty($this->paymentRepository->findWhere([
                                 'amount' => $amount,
                                 'customer_id' => $order->customer_id,
                             ])->first())) {
@@ -757,7 +719,7 @@ class OrdersPaymentsController extends Controller
                         'order_id' => $order->id,
                         'promise' => '',
                     ])->first())) {
-                        if(empty($this->paymentRepository->findWhere([
+                        if (empty($this->paymentRepository->findWhere([
                             'amount' => $amount,
                             'customer_id' => $order->customer_id,
                         ])->first())) {
@@ -828,16 +790,16 @@ class OrdersPaymentsController extends Controller
                         dispatch_now(new RemoveLabelJob($order->id, [40]));
                         dispatch_now(new DispatchLabelEventByNameJob($order->id, "payment-received"));
                     }
-                    return ['orderId' => $orderId, 'amount' => $amount,  'info' => 'Zlecenie zostało pomyślnie utworzone.'];
+                    return ['orderId' => $orderId, 'amount' => $amount, 'info' => 'Zlecenie zostało pomyślnie utworzone.'];
                 }
 
-                if((float)$ordersSum > (float)$amount) {
+                if ((float)$ordersSum > (float)$amount) {
                     if (empty($this->repository->findWhere([
                         'amount' => $order->getSumOfGrossValues(),
                         'order_id' => $order->id,
                         'promise' => '',
                     ])->first())) {
-                        if(empty($this->paymentRepository->findWhere([
+                        if (empty($this->paymentRepository->findWhere([
                             'amount' => $globalAmount,
                             'customer_id' => $order->customer_id,
                         ])->first())) {
@@ -860,7 +822,7 @@ class OrdersPaymentsController extends Controller
                                 true
                             );
                             $globalPayment->update(['amount_left' => $globalPayment->amount - $order->toPay()]);
-                            if($order->toPay() < $amount) {
+                            if ($order->toPay() < $amount) {
                                 $amount = $amount - $order->toPay();
                                 $payment = $this->repository->create([
                                     'amount' => $order->toPay(),
@@ -906,14 +868,14 @@ class OrdersPaymentsController extends Controller
                         dispatch_now(new RemoveLabelJob($order->id, [40]));
                         dispatch_now(new DispatchLabelEventByNameJob($order->id, "payment-received"));
                     }
-                    foreach($connectedOrders as $connectedOrder) {
-                        if($amount >= $connectedOrder->toPay()) {
+                    foreach ($connectedOrders as $connectedOrder) {
+                        if ($amount >= $connectedOrder->toPay()) {
                             if (empty($this->repository->findWhere([
                                 'amount' => $connectedOrder->getSumOfGrossValues(),
                                 'order_id' => $connectedOrder->id,
                                 'promise' => '',
                             ])->first())) {
-                                if(empty($this->paymentRepository->findWhere([
+                                if (empty($this->paymentRepository->findWhere([
                                     'amount' => $amount,
                                     'customer_id' => $order->customer_id,
                                 ])->first())) {
@@ -989,7 +951,7 @@ class OrdersPaymentsController extends Controller
                                 'order_id' => $connectedOrder->id,
                                 'promise' => '',
                             ])->first())) {
-                                if(empty($this->paymentRepository->findWhere([
+                                if (empty($this->paymentRepository->findWhere([
                                     'amount' => $globalAmount,
                                     'customer_id' => $order->customer_id,
                                 ])->first())) {
@@ -1061,17 +1023,17 @@ class OrdersPaymentsController extends Controller
                             }
                         }
                     }
-                    return ['orderId' => $orderId, 'amount' => $globalAmount,  'info' => 'Zlecenie zostało pomyślnie utworzone.'];
+                    return ['orderId' => $orderId, 'amount' => $globalAmount, 'info' => 'Zlecenie zostało pomyślnie utworzone.'];
                 }
 
-                if((float)$ordersSum < (float)$amount) {
-                    foreach($connectedOrders as $connectedOrder) {
+                if ((float)$ordersSum < (float)$amount) {
+                    foreach ($connectedOrders as $connectedOrder) {
                         if (empty($this->repository->findWhere([
                             'amount' => $connectedOrder->getSumOfGrossValues(),
                             'order_id' => $connectedOrder->id,
                             'promise' => '',
                         ])->first())) {
-                            if(empty($this->paymentRepository->findWhere([
+                            if (empty($this->paymentRepository->findWhere([
                                 'amount' => $amount,
                                 'customer_id' => $order->customer_id,
                             ])->first())) {
@@ -1151,7 +1113,7 @@ class OrdersPaymentsController extends Controller
                         'order_id' => $order->id,
                         'promise' => '',
                     ])->first())) {
-                        if(empty($this->paymentRepository->findWhere([
+                        if (empty($this->paymentRepository->findWhere([
                             'amount' => $amount,
                             'customer_id' => $order->customer_id,
                         ])->first())) {
@@ -1222,25 +1184,25 @@ class OrdersPaymentsController extends Controller
                         dispatch_now(new RemoveLabelJob($order->id, [40]));
                     }
                     $amount = $amount - $order->getSumOfGrossValues();
-                    return ['orderId' => $orderId, 'amount' => $amount,  'info' => 'Zlecenie zostało pomyślnie utworzone.'];
+                    return ['orderId' => $orderId, 'amount' => $amount, 'info' => 'Zlecenie zostało pomyślnie utworzone.'];
                 }
             }
 
-            if($hasGroupBookedPayment == false && $hasGroupPromisePayment == false) {
+            if ($hasGroupBookedPayment === false) {
                 $ordersSum = 0;
-                foreach($connectedOrders as $connectedOrder) {
+                foreach ($connectedOrders as $connectedOrder) {
                     $ordersSum += $connectedOrder->getSumOfGrossValues();
                 }
                 $ordersSum += $order->getSumOfGrossValues();
 
-                if((float)$ordersSum == (float)$amount) {
-                    foreach($connectedOrders as $connectedOrder) {
+                if ((float)$ordersSum == (float)$amount) {
+                    foreach ($connectedOrders as $connectedOrder) {
                         if (empty($this->repository->findWhere([
                             'amount' => $connectedOrder->getSumOfGrossValues(),
                             'order_id' => $connectedOrder->id,
                             'promise' => '',
                         ])->first())) {
-                            if(empty($this->paymentRepository->findWhere([
+                            if (empty($this->paymentRepository->findWhere([
                                 'amount' => $amount,
                                 'customer_id' => $order->customer_id,
                             ])->first())) {
@@ -1317,7 +1279,7 @@ class OrdersPaymentsController extends Controller
                         'order_id' => $order->id,
                         'promise' => '',
                     ])->first())) {
-                        if(empty($this->paymentRepository->findWhere([
+                        if (empty($this->paymentRepository->findWhere([
                             'amount' => $amount,
                             'customer_id' => $order->customer_id,
                         ])->first())) {
@@ -1386,20 +1348,17 @@ class OrdersPaymentsController extends Controller
 
                         dispatch_now(new RemoveLabelJob($order->id, [40]));
                     }
-                    return ['orderId' => $orderId, 'amount' => $amount,  'info' => 'Zlecenie zostało pomyślnie utworzone.'];
+                    return ['orderId' => $orderId, 'amount' => $amount, 'info' => 'Zlecenie zostało pomyślnie utworzone.'];
                 }
 
-                if((float)$ordersSum > (float)$amount) {
-                }
-
-                if((float)$ordersSum < (float)$amount) {
-                    foreach($connectedOrders as $connectedOrder) {
+                if ((float)$ordersSum < (float)$amount) {
+                    foreach ($connectedOrders as $connectedOrder) {
                         if (empty($this->repository->findWhere([
                             'amount' => $connectedOrder->getSumOfGrossValues(),
                             'order_id' => $connectedOrder->id,
                             'promise' => '',
                         ])->first())) {
-                            if(empty($this->paymentRepository->findWhere([
+                            if (empty($this->paymentRepository->findWhere([
                                 'amount' => $amount,
                                 'customer_id' => $order->customer_id,
                             ])->first())) {
@@ -1478,7 +1437,7 @@ class OrdersPaymentsController extends Controller
                         'order_id' => $order->id,
                         'promise' => '',
                     ])->first())) {
-                        if(empty($this->paymentRepository->findWhere([
+                        if (empty($this->paymentRepository->findWhere([
                             'amount' => $amount,
                             'customer_id' => $order->customer_id,
                         ])->first())) {
@@ -1550,7 +1509,7 @@ class OrdersPaymentsController extends Controller
                         dispatch_now(new RemoveLabelJob($order->id, [40]));
                     }
                     $amount = $amount - $order->getSumOfGrossValues();
-                    return ['orderId' => $orderId, 'amount' => $amount,  'info' => 'Zlecenie zostało pomyślnie utworzone.'];
+                    return ['orderId' => $orderId, 'amount' => $amount, 'info' => 'Zlecenie zostało pomyślnie utworzone.'];
                 }
             }
         } else {
@@ -1563,7 +1522,7 @@ class OrdersPaymentsController extends Controller
                 'order_id' => $orderId,
                 'promise' => '',
             ])->first())) {
-                if(empty($this->paymentRepository->findWhere([
+                if (empty($this->paymentRepository->findWhere([
                     'amount' => $amount,
                     'customer_id' => $order->customer_id,
                 ])->first())) {
@@ -1640,11 +1599,66 @@ class OrdersPaymentsController extends Controller
                         'status_id' => 5,
                     ], $orderId);
                 }
-                return ['orderId' => $orderId, 'amount' => $amount,  'info' => 'Zlecenie zostało pomyślnie utworzone.'];
+                return ['orderId' => $orderId, 'amount' => $amount, 'info' => 'Zlecenie zostało pomyślnie utworzone.'];
 
             } else {
                 return ['orderId' => $orderId, 'amount' => $amount, 'error' => 'Zlecenie posiada już taką wpłatę.'];
             }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param OrderPaymentUpdateRequest $request
+     * @param $id
+     * @return RedirectResponse
+     */
+    public function update(OrderPaymentUpdateRequest $request, $id)
+    {
+        WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_UPDATE_EVENT, $id);
+        $orderPayment = $this->repository->find($id);
+        $oldOrderId = $orderPayment->order_id;
+
+        if (empty($orderPayment)) {
+            abort(404);
+        }
+
+        $order_id = $request->input('order_id');
+        $promise = $request->input('promise');
+        if ($promise == 'yes') {
+            $promise = '1';
+        } else {
+            $promise = '';
+        }
+
+        if ($orderPayment->promise == '1' && $promise == '') {
+            dispatch_now(new AddLabelJob($orderPayment->order_id, [5]));
+        }
+
+        $payment = $this->repository->update([
+            'amount' => PriceHelper::modifyPriceToValidFormat($request->input('amount')),
+            'notices' => $request->input('notices'),
+            'promise' => $promise,
+            'promise_date' => $request->input('promise_date'),
+            'order_id' => $order_id,
+            'created_at' => $request->input('created_at')
+        ], $id);
+
+        OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
+
+        return redirect()->route('orders.edit', ['order_id' => $oldOrderId])->with([
+            'message' => __('order_payments.message.update'),
+            'alert-type' => 'success'
+        ]);
+    }
+
+    public static function dispatchLabelsForPaymentAmount($payment): void
+    {
+        if ($payment->order->isPaymentRegulated()) {
+            dispatch_now(new DispatchLabelEventByNameJob($payment->order->id, "payment-equal-to-order-value"));
+        } else {
+            dispatch_now(new DispatchLabelEventByNameJob($payment->order->id, "required-payment-before-unloading"));
         }
     }
 
@@ -1656,7 +1670,7 @@ class OrdersPaymentsController extends Controller
         $clientPaymentAmount = $this->customerRepository->find($request->input('customer_id'))->payments->sum('amount_left');
         if (!empty($orderId)) {
             $validated = $request->validated();
-            if($request->input('payment-type') == 'WAREHOUSE') {
+            if ($request->input('payment-type') == 'WAREHOUSE') {
                 $order = Order::find($orderId);
                 $payment = Payment::create([
                     'amount' => $amount,
@@ -1677,7 +1691,6 @@ class OrdersPaymentsController extends Controller
                     'promise' => $promise
                 ]);
             }
-
 
 
             $this->orderPaymentLogService->create(
@@ -1761,9 +1774,9 @@ class OrdersPaymentsController extends Controller
      *
      * @param int $id
      *
-     * @return \Illuminate\Http\Response
+     * @return RedirectResponse
      */
-    public function destroy($id)
+    public function destroy(int $id)
     {
         $orderPayment = $this->repository->find($id);
 
@@ -1823,8 +1836,8 @@ class OrdersPaymentsController extends Controller
         //pobieramy widzialności dla danego moduły oraz użytkownika
         $visibilities = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('customers'));
         foreach ($visibilities as $key => $row) {
-            $visibilities[$key]->show = json_decode($row->show, true);
-            $visibilities[$key]->hidden = json_decode($row->hidden, true);
+            $row->show = json_decode($row->show, true);
+            $row->hidden = json_decode($row->hidden, true);
         }
 
         return view('payments.index', compact('roleName', 'visibilities'));
@@ -1843,7 +1856,7 @@ class OrdersPaymentsController extends Controller
         $payment = $this->paymentRepository->find($id);
 
         $this->paymentRepository->update([
-	    'amount' => $request->get('amount'),
+            'amount' => $request->get('amount'),
             'created_at' => $request->get('created_at')
         ], $payment->id);
 
@@ -1851,7 +1864,7 @@ class OrdersPaymentsController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function datatable($id)
     {
@@ -1860,7 +1873,6 @@ class OrdersPaymentsController extends Controller
         return DataTables::collection($collection)->make(true);
     }
 
-
     /**
      * @return mixed
      */
@@ -1868,15 +1880,6 @@ class OrdersPaymentsController extends Controller
     {
         $collection = $this->repository->findWhere(['order_id' => $id]);
         return $collection;
-    }
-
-    public static function dispatchLabelsForPaymentAmount($payment): void
-    {
-        if ($payment->order->isPaymentRegulated()) {
-            dispatch_now(new DispatchLabelEventByNameJob($payment->order->id, "payment-equal-to-order-value"));
-        } else {
-            dispatch_now(new DispatchLabelEventByNameJob($payment->order->id, "required-payment-before-unloading"));
-        }
     }
 
     public function warehousePaymentConfirmation($token)
@@ -1899,7 +1902,7 @@ class OrdersPaymentsController extends Controller
     public function returnSurplusPayment(Request $request)
     {
         $userSurplusPayment = UserSurplusPayment::find($request->input('user_surplus_id'));
-        if(empty($userSurplusPayment)) {
+        if (empty($userSurplusPayment)) {
             abort(404);
         }
         $userSurplusPayment->update([
@@ -1918,12 +1921,12 @@ class OrdersPaymentsController extends Controller
 
         $payments = $customer->surplusPayments;
 
-        if($payments->sum('surplus_amount') == 0) {
-            foreach($customer->orders as $order) {
+        if ($payments->sum('surplus_amount') == 0) {
+            foreach ($customer->orders as $order) {
                 dispatch_now(new RemoveLabelJob($order->id, [Label::ORDER_SURPLUS]));
             }
         } else {
-            foreach($customer->orders as $order) {
+            foreach ($customer->orders as $order) {
                 dispatch_now(new RemoveLabelJob($order->id, [Label::ORDER_SURPLUS]));
             }
         }

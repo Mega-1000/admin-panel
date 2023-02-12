@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpUndefinedFieldInspection */
+<?php
 
 declare(strict_types=1);
 
@@ -10,17 +10,18 @@ use App\Repositories\DelivererRepositoryEloquent;
 use Illuminate\Container\Container as Application;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
-use Prettus\Repository\Eloquent\BaseRepository;
 use Prettus\Repository\Criteria\RequestCriteria;
+use Prettus\Repository\Eloquent\BaseRepository;
 
 class DelivererImportRuleRepositoryEloquent extends BaseRepository implements DelivererImportRuleRepositoryInterface
 {
     private $delivererRepository;
 
     public function __construct(
-        Application $app,
+        Application                 $app,
         DelivererRepositoryEloquent $delivererRepository
-    ) {
+    )
+    {
         parent::__construct($app);
 
         $this->delivererRepository = $delivererRepository;
@@ -43,7 +44,7 @@ class DelivererImportRuleRepositoryEloquent extends BaseRepository implements De
         }
 
         /* @var $rule DelivererImportRule */
-        foreach($delivererImportRules as $rule) {
+        foreach ($delivererImportRules as $rule) {
             $rule->save();
         }
     }
@@ -60,6 +61,6 @@ class DelivererImportRuleRepositoryEloquent extends BaseRepository implements De
 
     public function removeDelivererImportRules(Deliverer $deliverer): bool
     {
-        return (bool) $deliverer->importRules()->delete();
+        return (bool)$deliverer->importRules()->delete();
     }
 }

@@ -193,7 +193,6 @@ return [
         OrderAddressModelProvider::class,
         OrderPaymentModelServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
-        Lord\Laroute\LarouteServiceProvider::class,
 
         SchenkerServiceProvider::class,
     ],
@@ -205,7 +204,7 @@ return [
     |
     | This array of class aliases will be registered when this application
     | is started. However, feel free to register as many as you wish as
-    | the aliases are "lazy" loaded so they don't hinder performance.
+    | the aliases are "lazy" loaded, so they don't hinder performance.
     |
     */
 
@@ -245,10 +244,10 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Helper' => App\Helpers\Helper::class,
-        'Input' => Illuminate\Support\Facades\Input::class,
-        'Mailer' => Facades\App\Facades\Mailer::class,
+        //'Input' => Illuminate\Support\Facades\Input::class,
+        'Mailer' => \App\Facades\Mailer::class,
         'Debugbar' => Barryvdh\Debugbar\Facade::class,
-        'PDF' => Barryvdh\DomPDF\Facade::class,
+        'PDF' => Barryvdh\DomPDF\Facade\Pdf::class,
         'MessagesHelper' => App\Helpers\MessagesHelper::class,
         'ChatHelper' => App\Helpers\ChatHelper::class,
         'Label' => App\Entities\Label::class,

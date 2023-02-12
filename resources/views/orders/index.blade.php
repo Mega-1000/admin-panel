@@ -1116,7 +1116,7 @@
 
         function cancelPackage(id, orderId) {
             if (confirm('Potwierdź anulację paczki')) {
-                url = '{{route('order_packages.sendRequestForCancelled', ['id' => '%id'])}}';
+                url = '{{route('order_packages.sendRequestForCancelled', ['orderPackage' => '%id'])}}';
                 $.ajax({
                     url: url.replace('%id', id),
                 }).done(function (data) {
@@ -1371,7 +1371,7 @@
                                         } else if (value.delivery_courier_name === 'ODBIOR_OSOBISTY') {
                                             html += '<a target="_blank" href="/storage/odbior_osobisty/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                         } else if (value.delivery_courier_name === 'GLS') {
-                                            let url = "{{ route('orders.package.getSticker', ['id' => '%%'])}}"
+                                            let url = "{{ route('orders.package.getSticker', ['package_id' => '%%'])}}"
                                             html += '<a target="_blank" href="' + url.replace('%%', value.id) + '"><p style="margin-bottom: 0px;">';
                                             html += value.letter_number ? value.letter_number : 'wygeneruj naklejkę';
                                             html += '<div>';
@@ -1491,7 +1491,7 @@
                                         } else if (value.delivery_courier_name === 'ODBIOR_OSOBISTY') {
                                             html += '<a target="_blank" href="/storage/odbior_osobisty/stickers/sticker' + value.letter_number + '.pdf"><p>' + value.letter_number + '</p></a>';
                                         } else if (value.delivery_courier_name === 'GLS') {
-                                            let url = "{{ route('orders.package.getSticker', ['id' => '%%'])}}"
+                                            let url = "{{ route('orders.package.getSticker', ['package_id' => '%%'])}}"
                                             html += '<a target="_blank" href="' + url.replace('%%', value.id) + '"><p>';
                                             html += value.letter_number ? value.letter_number : 'wygeneruj naklejkę';
                                             html += '</p></a>';
@@ -3003,7 +3003,7 @@
 
         $('#remove-selected-file').on('click', () => {
             let fileId = $('#files__list option:selected').val();
-            let url = "{{ route('orders.fileDelete', ['id' => '%%']) }}"
+            let url = "{{ route('orders.fileDelete', ['file_id' => '%%']) }}"
             $.ajax({
                 url: url.replace('%%', fileId)
             }).done(function (data) {

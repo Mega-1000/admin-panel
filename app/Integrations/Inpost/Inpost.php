@@ -2,6 +2,7 @@
 
 namespace App\Integrations\Inpost;
 
+use Illuminate\Config\Repository;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -18,12 +19,12 @@ class Inpost
     protected $data;
 
     /**
-     * @var \Illuminate\Config\Repository|mixed
+     * @var Repository|mixed
      */
     protected $url;
 
     /**
-     * @var \Illuminate\Config\Repository|mixed
+     * @var Repository|mixed
      */
     protected $authorization;
 
@@ -45,7 +46,7 @@ class Inpost
      */
     public function prepareJsonForInpost()
     {
-        if($this->data !== null) {
+        if ($this->data !== null) {
             $address = [
                 'street' => $this->data['delivery_address']['address'],
                 'building_number' => $this->data['delivery_address']['flat_number'],
@@ -135,7 +136,7 @@ class Inpost
                 'parcels' => [$parcels]
             ];
 
-            if ($this->data['cash_on_delivery'] == true) {
+            if ($this->data['cash_on_delivery']) {
                 $sections += [
                     'insurance' => [
                         'amount' => $this->data['price_for_cash_on_delivery'],
@@ -180,10 +181,59 @@ class Inpost
         }
     }
 
+    /**
+     * @return array
+     */
+    protected function prepareParcelArray(): array
+    {
+        $parcels = [];
+        $template = false;
+        if ($this->data['courier_type'] == self::PACZKOMAT) {
+            $template = $this->prepareTemplateForLocker();
+        }
+        if ($template) {
+            $parcels['template'] = $template;
+        }
+        $parcels ['dimensions'] = [
+            'length' => $this->data['length'],
+            'width' => $this->data['width'],
+            'height' => $this->data['height'],
+            'unit' => 'mm',
+        ];
+
+        $parcels ['weight'] = [
+            'amount' => $this->data['weight'],
+            'unit' => 'kg'
+        ];
+        return $parcels;
+    }
+
+    /**
+     * @return string
+     */
+    protected function prepareTemplateForLocker(): string
+    {
+        $symbol = explode('_', $this->data['symbol']);
+        switch (strtolower($symbol[1])) {
+            case 'pa':
+                $template = "small";
+                break;
+            case 'pb' :
+                $template = "medium";
+                break;
+            case 'pc':
+                $template = "large";
+                break;
+            default:
+                $template = false;
+        }
+        return $template;
+    }
+
     public function createSimplePackage($json)
     {
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->url . '/v1/organizations/'.$this->org_id.'/shipments');
+        curl_setopt($ch, CURLOPT_URL, $this->url . '/v1/organizations/' . $this->org_id . '/shipments');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -218,7 +268,7 @@ class Inpost
     public function getLabel($id, $trackingNumber)
     {
         $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $this->url . '/v1/organizations/'.$this->org_id.'/shipments/labels');
+        curl_setopt($ch, CURLOPT_URL, $this->url . '/v1/organizations/' . $this->org_id . '/shipments/labels');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
@@ -260,54 +310,5 @@ class Inpost
         $result = json_decode($output);
 
         return $result;
-    }
-
-    /**
-     * @return string
-     */
-    protected function prepareTemplateForLocker(): string
-    {
-        $symbol = explode('_', $this->data['symbol']);
-        switch (strtolower($symbol[1])) {
-            case 'pa':
-                $template = "small";
-                break;
-            case 'pb' :
-                $template = "medium";
-                break;
-            case 'pc':
-                $template = "large";
-                break;
-            default:
-                $template = false;
-        }
-        return $template;
-    }
-
-    /**
-     * @return array
-     */
-    protected function prepareParcelArray(): array
-    {
-        $parcels = [];
-        $template = false;
-        if ($this->data['courier_type'] == self::PACZKOMAT) {
-            $template = $this->prepareTemplateForLocker();
-        }
-        if ($template) {
-            $parcels['template'] = $template;
-        }
-        $parcels ['dimensions'] = [
-            'length' => $this->data['length'],
-            'width' => $this->data['width'],
-            'height' => $this->data['height'],
-            'unit' => 'mm',
-        ];
-
-        $parcels ['weight'] = [
-            'amount' => $this->data['weight'],
-            'unit' => 'kg'
-        ];
-        return $parcels;
     }
 }

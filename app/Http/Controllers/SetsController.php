@@ -1,21 +1,18 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Entities\ProductStock;
 use App\Entities\ProductStockPosition;
-use App\Http\Controllers\Controller;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use App\Entities\Set;
 use App\Entities\SetItem;
-use App\Entities\Product;
+use Illuminate\Http\Request;
 
 class SetsController extends Controller
 {
     public function index()
     {
-        return  view('product_stocks.sets.index');
+        return view('product_stocks.sets.index');
     }
 
     public function create()
@@ -25,7 +22,7 @@ class SetsController extends Controller
 
     public function edit(Set $set)
     {
-        return  view('product_stocks.sets.edit');
+        return view('product_stocks.sets.edit');
     }
 
     public function store(Request $request)
@@ -43,43 +40,6 @@ class SetsController extends Controller
         if ($set->save()) {
             return redirect()->route('sets.index')->with([
                 'message' => __('sets.message.store'),
-                'alert-type' => 'success'
-            ]);
-        }
-        return redirect()->back()->with([
-            'message' => __('sets.messages.error'),
-            'alert-type' => 'error'
-        ]);
-    }
-
-    public function update(Set $set, Request $request)
-    {
-        $this->validate($request, [
-            'name' => 'required',
-            'number' => 'required',
-        ]);
-
-        $set->name = $request->name;
-        $set->number = $request->number;
-        $set->stock = $request->stock;
-
-        if ($set->update()) {
-            return redirect()->route('sets.edit', ['set' => $set->id])->with([
-                'message' => __('sets.message.store'),
-                'alert-type' => 'success'
-            ]);
-        }
-        return redirect()->back()->with([
-            'message' => __('sets.messages.error'),
-            'alert-type' => 'error'
-        ]);
-    }
-
-    public function delete(Set $set)
-    {
-        if ($set->delete()) {
-            return redirect()->route('sets.index')->with([
-                'message' => __('sets.message.delete'),
                 'alert-type' => 'success'
             ]);
         }
@@ -124,6 +84,67 @@ class SetsController extends Controller
                 'alert-type' => 'error'
             ]);
         }
+    }
+
+    private function updateProductStock(int $productId, int $numberProducts): void
+    {
+        $stock = ProductStock::where('product_id', $productId)->get()->first();
+        $stock->quantity = $stock->quantity - $numberProducts;
+        if ($stock->update()) {
+            if ($numberProducts < 0) {
+                $position = ProductStockPosition::where('product_stock_id', $stock->id)->get()->first();
+                if ($position) {
+                    $position->position_quantity += ($numberProducts * -1);
+                    $position->update();
+                } else {
+                    redirect()->back()->with([
+                        'message' => __('sets.messages.empty_id'),
+                        'alert-type' => 'error'
+                    ]);
+                }
+
+            } else {
+                $positions = ProductStockPosition::where('product_stock_id', $stock->id)->get()->all();
+                $countProducts = $numberProducts;
+                foreach ($positions as $position) {
+                    $quantity = $position->position_quantity;
+                    if ($countProducts == 0) {
+                        break;
+                    } elseif ($quantity < $countProducts) {
+                        $position->position_quantity = 0;
+                        $countProducts -= $quantity;
+                        $position->update();
+                    } else {
+                        $position->position_quantity -= $countProducts;
+                        $countProducts = 0;
+                        $position->update();
+                    }
+                }
+            }
+        }
+    }
+
+    public function update(Set $set, Request $request)
+    {
+        $this->validate($request, [
+            'name' => 'required',
+            'number' => 'required',
+        ]);
+
+        $set->name = $request->name;
+        $set->number = $request->number;
+        $set->stock = $request->stock;
+
+        if ($set->update()) {
+            return redirect()->route('sets.edit', ['set' => $set->id])->with([
+                'message' => __('sets.message.store'),
+                'alert-type' => 'success'
+            ]);
+        }
+        return redirect()->back()->with([
+            'message' => __('sets.messages.error'),
+            'alert-type' => 'error'
+        ]);
     }
 
     public function editProduct(Set $set, SetItem $productSet, Request $request)
@@ -177,6 +198,20 @@ class SetsController extends Controller
         ]);
     }
 
+    public function delete(Set $set)
+    {
+        if ($set->delete()) {
+            return redirect()->route('sets.index')->with([
+                'message' => __('sets.message.delete'),
+                'alert-type' => 'success'
+            ]);
+        }
+        return redirect()->back()->with([
+            'message' => __('sets.messages.error'),
+            'alert-type' => 'error'
+        ]);
+    }
+
     public function completing(Set $set, Request $request)
     {
         $this->validate($request, [
@@ -186,9 +221,9 @@ class SetsController extends Controller
         foreach ($set->products() as $product) {
             $stock = ProductStock::where('product_id', $product->id)->get()->first();
             $requiredStock = $product->stock * $request->number;
-            if($stock->quantity < $requiredStock) {
+            if ($stock->quantity < $requiredStock) {
                 return redirect()->back()->with([
-                    'message' => __('sets.messages.not_enough_product')."'".$product->name."'",
+                    'message' => __('sets.messages.not_enough_product') . "'" . $product->name . "'",
                     'alert-type' => 'error'
                 ]);
             }
@@ -202,7 +237,7 @@ class SetsController extends Controller
                 $this->updateProductStock($product->id, $requiredStock);
             }
             return redirect()->route('sets.index')->with([
-                'message' => __('sets.messages.disassembly_success').' '.$request->number.' '.__('sets.sets'),
+                'message' => __('sets.messages.disassembly_success') . ' ' . $request->number . ' ' . __('sets.sets'),
                 'alert-type' => 'success'
             ]);
         }
@@ -230,7 +265,7 @@ class SetsController extends Controller
                 $this->updateProductStock($product->id, -$requiredStock);
             }
             return redirect()->route('sets.index')->with([
-                'message' => __('sets.messages.disassembly_success').' '.$request->number.' '.__('sets.sets'),
+                'message' => __('sets.messages.disassembly_success') . ' ' . $request->number . ' ' . __('sets.sets'),
                 'alert-type' => 'success'
             ]);
         }
@@ -239,42 +274,5 @@ class SetsController extends Controller
             'message' => __('sets.messages.error'),
             'alert-type' => 'error'
         ]);
-    }
-
-    private function updateProductStock(int $productId, int $numberProducts) {
-        $stock = ProductStock::where('product_id', $productId)->get()->first();
-        $stock->quantity = $stock->quantity - $numberProducts;
-        if($stock->update()) {
-            if($numberProducts < 0) {
-                $position = ProductStockPosition::where('product_stock_id', $stock->id)->get()->first();
-                if($position) {
-                    $position->position_quantity += ($numberProducts * -1);
-                    $position->update();
-                } else {
-                    return redirect()->back()->with([
-                        'message' => __('sets.messages.empty_id'),
-                        'alert-type' => 'error'
-                    ]);
-                }
-
-            } else {
-                $positions = ProductStockPosition::where('product_stock_id', $stock->id)->get()->all();
-                $countProducts = $numberProducts;
-                foreach ($positions as $position) {
-                    $quantity = $position->position_quantity;
-                    if($countProducts == 0) {
-                        break;
-                    } elseif ($quantity < $countProducts) {
-                        $position->position_quantity = 0;
-                        $countProducts -= $quantity;
-                        $position->update();
-                    } else {
-                        $position->position_quantity -= $countProducts;
-                        $countProducts = 0;
-                        $position->update();
-                    }
-                }
-            }
-        }
     }
 }

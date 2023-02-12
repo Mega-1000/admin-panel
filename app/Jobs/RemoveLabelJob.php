@@ -6,15 +6,12 @@ use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\WorkingEvents;
 use App\Jobs\WarehouseStocks\ChangeWarehouseStockJob;
-use App\Mail\ConfirmData;
-use App\Mail\DifferentCustomerData;
 use App\Repositories\LabelRepository;
 use App\Repositories\OrderRepository;
 use App\Services\OrderWarehouseNotificationService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 
 class RemoveLabelJob extends Job implements ShouldQueue
@@ -35,20 +32,18 @@ class RemoveLabelJob extends Job implements ShouldQueue
      */
     public function __construct($order, $labelIdsToRemove, &$loopPreventionArray = [], $customLabelIdsToAddAfterRemoval = [], $time = null)
     {
-        $this->order                           = $order;
-        $this->labelIdsToRemove                = $labelIdsToRemove;
-        $this->loopPreventionArray             = $loopPreventionArray;
-        if (is_array($customLabelIdsToAddAfterRemoval)) {
-            $this->customLabelIdsToAddAfterRemoval = $customLabelIdsToAddAfterRemoval;
-        } else {
-            array_push($this->customLabelIdsToAddAfterRemoval, $customLabelIdsToAddAfterRemoval);
-        }
+        $this->order = $order;
+        $this->labelIdsToRemove = $labelIdsToRemove;
+        $this->loopPreventionArray = $loopPreventionArray;
         $this->time = $time;
+        $this->customLabelIdsToAddAfterRemoval = is_array($customLabelIdsToAddAfterRemoval)
+            ? $customLabelIdsToAddAfterRemoval
+            : [$customLabelIdsToAddAfterRemoval];
     }
 
     public function handle(
-        OrderRepository $orderRepository,
-        LabelRepository $labelRepository,
+        OrderRepository                   $orderRepository,
+        LabelRepository                   $labelRepository,
         OrderWarehouseNotificationService $orderWarehouseNotificationService
     )
     {
@@ -58,7 +53,7 @@ class RemoveLabelJob extends Job implements ShouldQueue
         WorkingEvents::createEvent(WorkingEvents::LABEL_REMOVE_EVENT, $this->order->id);
 
         if (count($this->labelIdsToRemove) < 1) {
-            return;
+            return null;
         }
 
         foreach ($this->labelIdsToRemove as $labelId) {
@@ -91,13 +86,13 @@ class RemoveLabelJob extends Job implements ShouldQueue
 //                }
 //            }
 
-            if($labelId == Label::PACKAGE_NOTIFICATION_SENT_LABEL) {
+            if ($labelId == Label::PACKAGE_NOTIFICATION_SENT_LABEL) {
                 $orderWarehouseNotificationService->removeNotifications($this->order->id);
             }
 
             $label = $labelRepository->find($labelId);
 
-            if($this->time !== null) {
+            if ($this->time !== null) {
                 $this->timedLabelChange($label);
             }
 
@@ -109,7 +104,7 @@ class RemoveLabelJob extends Job implements ShouldQueue
                     $labelIdsToAttach[] = $item->id;
                     if ($item->id == 50) {
                         $response = dispatch_now(new ChangeWarehouseStockJob($this->order));
-                        if (strlen((string) $response) > 0) {
+                        if (strlen((string)$response) > 0) {
                             Session::put('removeLabelJobAfterProductStockMove', array_merge([$this], Session::get('removeLabelJobAfterProductStockMove') ?? []));
                             return $response;
                         } else {
@@ -124,8 +119,8 @@ class RemoveLabelJob extends Job implements ShouldQueue
                             //detaching labels to remove after removal
                             if (count($label->labelsToRemoveAfterRemoval) > 0) {
                                 $labelIdsToDetach = [];
-                                foreach ($label->labelsToRemoveAfterRemoval as $item) {
-                                    $labelIdsToDetach[] = $item->id;
+                                foreach ($label->labelsToRemoveAfterRemoval as $itemAfterRemoval) {
+                                    $labelIdsToDetach[] = $itemAfterRemoval->id;
                                 }
                                 dispatch_now(new RemoveLabelJob($this->order, $labelIdsToDetach, $this->loopPreventionArray));
                             }
@@ -151,6 +146,7 @@ class RemoveLabelJob extends Job implements ShouldQueue
                 dispatch_now(new RemoveLabelJob($this->order, $labelIdsToDetach, $this->loopPreventionArray));
             }
         }
+        return null;
     }
 
     private function timedLabelChange($label)
@@ -159,7 +155,7 @@ class RemoveLabelJob extends Job implements ShouldQueue
         $now = Carbon::now();
         $targetDatetime = Carbon::parse($this->time);
         $delay = $now->diffInSeconds($targetDatetime);
-        foreach($labelsToChange as $labelToChange) {
+        foreach ($labelsToChange as $labelToChange) {
             dispatch_now(new AddLabelJob($this->order->id, [$labelToChange->pivot->label_to_add_id]));
             dispatch(new RemoveLabelJob($this->order->id, [$labelToChange->pivot->label_to_add_id]))->delay($delay);
             dispatch(new AddLabelJob($this->order->id, [$labelToChange->pivot->main_label_id]))->delay($delay);

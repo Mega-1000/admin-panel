@@ -2,12 +2,12 @@
 
 namespace App\Jobs;
 
-use Illuminate\Bus\Queueable;
 use App\Services\AllegroChatService;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use TCG\Voyager\Models\Setting;
 
 class AllegroSaveUnreadedChatThreads implements ShouldQueue
@@ -21,7 +21,7 @@ class AllegroSaveUnreadedChatThreads implements ShouldQueue
         $hasUnreadedMessages = true;
         $offset = 0;
         // continue until unreadedThreads will fill with all unreaded threads
-        while($hasUnreadedMessages) {
+        while ($hasUnreadedMessages) {
             $hasUnreadedMessages = $this->getThreads($offset);
             $offset += 20;
         }
@@ -40,15 +40,16 @@ class AllegroSaveUnreadedChatThreads implements ShouldQueue
         ]);
     }
 
-    private function getThreads($offset) {
+    private function getThreads($offset)
+    {
         $allegroChatService = new AllegroChatService();
         $allegroThreads = $allegroChatService->listThreads($offset);
         // if all of 20 downloaded threads are not reads
         $unreadedThreads = 0;
         $totalThreads = count($allegroThreads['threads']);
 
-        foreach($allegroThreads['threads'] as $thread) {
-            if($thread['read'] == false) {
+        foreach ($allegroThreads['threads'] as $thread) {
+            if (!$thread['read']) {
                 $unreadedThreads++;
                 $this->unreadedThreads[] = $thread;
             }

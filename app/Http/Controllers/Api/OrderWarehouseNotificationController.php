@@ -2,24 +2,22 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Entities\Employee;
-use App\Entities\Order;
 use App\Entities\Warehouse;
+use App\Helpers\Exceptions\ChatException;
 use App\Helpers\MessagesHelper;
 use App\Helpers\OrderLabelHelper;
-use App\Helpers\StatusesHelper;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\OrderWarehouseNotification\AcceptShipmentRequest;
 use App\Http\Requests\Api\OrderWarehouseNotification\DenyShipmentRequest;
-use App\Http\Controllers\Controller;
 use App\Jobs\DispatchLabelEventByNameJob;
-use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Repositories\OrderInvoiceRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\OrderWarehouseNotificationRepository;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class OrderWarehouseNotificationController extends Controller
 {
@@ -38,9 +36,10 @@ class OrderWarehouseNotificationController extends Controller
      */
     public function __construct(
         OrderWarehouseNotificationRepository $orderWarehouseNotificationRepository,
-        OrderRepository $orderRepository,
-        OrderInvoiceRepository $orderInvoiceRepository
-    ) {
+        OrderRepository                      $orderRepository,
+        OrderInvoiceRepository               $orderInvoiceRepository
+    )
+    {
         $this->orderWarehouseNotificationRepository = $orderWarehouseNotificationRepository;
         $this->orderRepository = $orderRepository;
         $this->orderInvoiceRepository = $orderInvoiceRepository;
@@ -63,12 +62,38 @@ class OrderWarehouseNotificationController extends Controller
             dispatch_now(new DispatchLabelEventByNameJob($data['order_id'], "warehouse-notification-denied"));
 
             return $this->okResponse();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Problem with deny.',
                 ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
             );
             die();
         }
+    }
+
+    /**
+     * @param $data
+     * @param $notification
+     * @throws ChatException
+     */
+    private function sendMessage($data, $notification): void
+    {
+        $warehouse = Warehouse::findOrFail($data['warehouse_id']);
+        $role_id = config('employees_roles')['zamawianie-towaru'];
+
+        $employees = $warehouse->firm->employees->filter(function ($employee) use ($role_id) {
+            return $employee->employeeRoles->find($role_id);
+        });
+        if (empty($employees)) {
+            $employees = $warehouse->firm->employees;
+        }
+
+        $helper = new MessagesHelper();
+        $helper->orderId = $data['order_id'];
+        $helper->currentUserId = $employees->first()->id;
+        $helper->currentUserType = MessagesHelper::TYPE_EMPLOYEE;
+        $helper->createNewChat();
+        $helper->addMessage($data['customer_notices']);
+        OrderLabelHelper::setYellowLabel($helper->getChat());
     }
 
     public function accept(AcceptShipmentRequest $request, $notificationId)
@@ -98,7 +123,7 @@ class OrderWarehouseNotificationController extends Controller
             dispatch_now(new DispatchLabelEventByNameJob($data['order_id'], "warehouse-notification-accepted"));
 
             return $this->okResponse();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Problem with create new order.',
                 ['exception' => $e->getMessage(), 'class' => $e->getFile(), 'line' => $e->getLine()]
             );
@@ -118,16 +143,15 @@ class OrderWarehouseNotificationController extends Controller
 
             $file = $request->file('file');
             $filename = $file->getClientOriginalName();
-            
+
             Storage::disk('local')->put('public/invoices/' . $filename, file_get_contents($file));
             $invoice = $order->invoices()->create([
                 'invoice_type' => 'buy',
                 'invoice_name' => $filename,
-                'is_visible_for_client' => (boolean) $request->isVisibleForClient,
+                'is_visible_for_client' => (boolean)$request->isVisibleForClient,
             ]);
             $invoiceRequest = $order->invoiceRequests()->first();
-            if(!empty($invoiceRequest) && $invoiceRequest->status === 'MISSING')
-            {
+            if (!empty($invoiceRequest) && $invoiceRequest->status === 'MISSING') {
                 $invoiceRequest->update([
                     'status' => 'SENT'
                 ]);
@@ -135,13 +159,14 @@ class OrderWarehouseNotificationController extends Controller
             dispatch_now(new DispatchLabelEventByNameJob($order, "new-file-added-to-order"));
 
             return $this->okResponse();
-        } catch (\Exception $e){
+        } catch (Exception $e) {
             Log::error('Problem with send invoice.',
                 ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
             );
             die();
         }
     }
+
     public function changeStatus(Request $request)
     {
         try {
@@ -160,37 +185,11 @@ class OrderWarehouseNotificationController extends Controller
             }
             dispatch_now(new DispatchLabelEventByNameJob($order, "all-shipments-went-out"));
             return $this->okResponse();
-        } catch (\Exception $e){
+        } catch (Exception $e) {
             Log::error('Problem with change order status.',
                 ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
             );
             die();
         }
-    }
-
-    /**
-     * @param $data
-     * @param $notification
-     * @throws \App\Helpers\Exceptions\ChatException
-     */
-    private function sendMessage($data, $notification): void
-    {
-        $warehouse = Warehouse::findOrFail($data['warehouse_id']);
-        $role_id = config('employees_roles')['zamawianie-towaru'];
-
-        $employees = $warehouse->firm->employees->filter(function ($employee) use ($role_id) {
-            return $employee->employeeRoles->find($role_id);
-        });
-        if (empty($employees)) {
-            $employees = $warehouse->firm->employees;
-        }
-
-        $helper = new MessagesHelper();
-        $helper->orderId = $data['order_id'];
-        $helper->currentUserId = $employees->first()->id;
-        $helper->currentUserType = MessagesHelper::TYPE_EMPLOYEE;
-        $helper->createNewChat();
-        $helper->addMessage($data['customer_notices']);
-        OrderLabelHelper::setYellowLabel($helper->getChat());
     }
 }

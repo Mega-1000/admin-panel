@@ -10,16 +10,13 @@ class OrderMessageMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $mailBody;
-    public $pdf;
+    public string $mailBody;
+    public bool $pdf;
 
     /**
      * OrderMessageMail constructor.
-     * @param $subject
-     * @param $message
-     * @param $pdf
      */
-    public function __construct($subject, $message, $pdf = false)
+    public function __construct(string $subject, string $message, bool $pdf = false)
     {
         $this->subject = $subject;
         $this->mailBody = nl2br($message);
@@ -31,9 +28,9 @@ class OrderMessageMail extends Mailable
      *
      * @return $this
      */
-    public function build()
+    public function build(): static
     {
-        if($this->pdf != false) {
+        if ($this->pdf) {
             return $this->view('emails.order-message')
                 ->attachData($this->pdf, 'proforma.pdf', [
                     'mime' => 'application/pdf',

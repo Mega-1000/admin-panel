@@ -5,14 +5,19 @@ namespace App\Http\Controllers;
 use App\Entities\ColumnVisibility;
 use App\Http\Requests\UserCreateRequest;
 use App\Http\Requests\UserUpdateRequest;
-use App\Repositories\UserRepository;
 use App\Repositories\UserEmailRepository;
+use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
-use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Support\Facades\Hash;
-use TCG\Voyager\Models\Role;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use TCG\Voyager\Models\Role;
+use Yajra\DataTables\Facades\DataTables;
 
 /**
  * Class UserController
@@ -47,75 +52,25 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return View
      */
     public function index()
     {
         $visibilities = ColumnVisibility::getVisibilities(ColumnVisibility::getModuleId('users'));
-        foreach($visibilities as $key => $row)
-        {
-            $visibilities[$key]->show = json_decode($row->show,true);
-            $visibilities[$key]->hidden = json_decode($row->hidden,true);
+        foreach ($visibilities as $key => $row) {
+            $row->show = json_decode($row->show, true);
+            $row->hidden = json_decode($row->hidden, true);
         }
-        return view('users.index',compact('visibilities'));
+        return view('users.index', compact('visibilities'));
     }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        $roles = Role::all();
-        $warehouses = $this->warehouseRepository->findByField('symbol', 'MEGA-OLAWA');
-        return view('users.create', compact('roles', 'warehouses'));
-    }
-
-    /**
-     * @param UserCreateRequest $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function store(UserCreateRequest $request)
-    {
-        $this->checkRole($request->role_id);
-
-        $user = $this->userRepository->create([
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'role_id' => $request->input('role'),
-            'password' => Hash::make($request->input('password')),
-            'firstname' => $request->input('firstname'),
-            'lastname' => $request->input('lastname'),
-            'phone' => $request->input('phone'),
-            'phone2' => $request->input('phone2'),
-            'warehouse_id' => $request->input('warehouse_id'),
-            'rate_hour' => $request->input('rate_hour')
-        ]);
-
-        $this->userEmailRepository->create([
-            'username' => $request->input('email-username'),
-            'host' => $request->input('host'),
-            'port' => $request->input('port'),
-            'password' => $request->input('email-password'),
-            'encryption' => $request->input('encryption'),
-            'user_id' => $user->id,
-        ]);
-
-        return redirect()->route('users.index')->with([
-            'message' => __('users.message.store'),
-            'alert-type' => 'success'
-        ]);
-    }
-
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
+     * @param int $id
+     * @return View
      */
-    public function edit($id)
+    public function edit(int $id)
     {
         $currentUser = Auth::user();
         $user = $this->userRepository->find($id);
@@ -133,11 +88,76 @@ class UserController extends Controller
         return view('users.edit', compact('user', 'roles', 'selectedRole', 'userEmail', 'warehouses'));
     }
 
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param int $id
+     * @return RedirectResponse
+     */
+    public function destroy(int $id)
+    {
+        $currentUser = Auth::user();
+        $user = $this->userRepository->find($id);
+        if ($currentUser->role_id !== 1 && $user->role_id === 1) {
+            abort(403, 'Nieautoryzowana akcja');
+        }
+        if ($currentUser->role_id > 2 && $user->id === 2 || $currentUser->role_id > 2 && $user->id === 1) {
+            abort(403, 'Nieautoryzowana akcja');
+        }
+        if (empty($user)) {
+            abort(404);
+        }
+        $this->removeAvatar($user);
+        $user->delete($user->id);
+
+        return redirect()->route('users.index')->with([
+            'message' => __('users.message.delete'),
+            'alert-type' => 'info'
+        ]);
+    }
+
+    /**
+     * Detele user avatar from storage
+     *
+     * @param $user
+     *
+     * @return void
+     */
+    private function removeAvatar($user): void
+    {
+        if (basename($user->avatar) !== 'default.png' && Storage::disk('public')->exists($user->avatar)) {
+            Storage::delete('public/' . $user->avatar);
+        }
+    }
+
+    /**
+     * @param $id
+     * @return RedirectResponse
+     */
+    public function changeStatus($id)
+    {
+        $currentUser = Auth::user();
+        $user = $this->userRepository->find($id);
+        if ($currentUser->id == 2 && $user->id === 2) {
+            abort(403, 'Nieautoryzowana akcja');
+        }
+        if (empty($user)) {
+            abort(404);
+        }
+        $dataToStore = [];
+        $dataToStore['status'] = $user['status'] === 'ACTIVE' ? 'PENDING' : 'ACTIVE';
+        $this->userRepository->update($dataToStore, $user->id);
+
+        return redirect()->back()->with([
+            'message' => __('users.message.change_status'),
+            'alert-type' => 'success'
+        ]);
+    }
 
     /**
      * @param UserUpdateRequest $request
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function update(UserUpdateRequest $request, $id)
     {
@@ -174,7 +194,7 @@ class UserController extends Controller
 //        }
 
         $emailData = $this->userEmailRepository->findWhere(['user_id' => $user->id])->first();
-        if(empty($emailData)) {
+        if (empty($emailData)) {
             $this->userEmailRepository->create([
                 'username' => $request->input('email-username'),
                 'host' => $request->input('host'),
@@ -201,60 +221,77 @@ class UserController extends Controller
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+    private function checkRole(int $role): void
     {
-        $currentUser = Auth::user();
-        $user = $this->userRepository->find($id);
-        if ($currentUser->role_id !== 1 && $user->role_id === 1) {
+        if (Auth::user()->role_id != 1 && $role == 1) {
             abort(403, 'Nieautoryzowana akcja');
         }
-        if ($currentUser->role_id > 2 && $user->id === 2 || $currentUser->role_id > 2 && $user->id === 1) {
-            abort(403, 'Nieautoryzowana akcja');
-        }
-        if (empty($user)) {
-            abort(404);
-        }
-        $this->removeAvatar($user);
-        $user->delete($user->id);
-
-        return redirect()->route('users.index')->with([
-            'message' => __('users.message.delete'),
-            'alert-type' => 'info'
-        ]);
     }
 
     /**
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse
+     * Store uploaded image
+     *
+     * @param $avatar
+     *
+     * @return string
      */
-    public function changeStatus($id)
+    private function storeAvatar($avatar)
     {
-        $currentUser = Auth::user();
-        $user = $this->userRepository->find($id);
-        if ($currentUser->id == 2 && $user->id === 2) {
-            abort(403, 'Nieautoryzowana akcja');
-        }
-        if (empty($user)) {
-            abort(404);
-        }
-        $dataToStore = [];
-        $dataToStore['status'] = $user['status'] === 'ACTIVE' ? 'PENDING' : 'ACTIVE';
-        $this->userRepository->update($dataToStore, $user->id);
+        $path = 'users/' . date('F') . date('Y');
+        $avatarPath = $avatar->store('public/' . $path);
+        return $path . '/' . basename($avatarPath);
+    }
 
-        return redirect()->back()->with([
-            'message' => __('users.message.change_status'),
+    /**
+     * @param UserCreateRequest $request
+     * @return RedirectResponse
+     */
+    public function store(UserCreateRequest $request)
+    {
+        $this->checkRole($request->role_id);
+
+        $user = $this->userRepository->create([
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'role_id' => $request->input('role'),
+            'password' => Hash::make($request->input('password')),
+            'firstname' => $request->input('firstname'),
+            'lastname' => $request->input('lastname'),
+            'phone' => $request->input('phone'),
+            'phone2' => $request->input('phone2'),
+            'warehouse_id' => $request->input('warehouse_id'),
+            'rate_hour' => $request->input('rate_hour')
+        ]);
+
+        $this->userEmailRepository->create([
+            'username' => $request->input('email-username'),
+            'host' => $request->input('host'),
+            'port' => $request->input('port'),
+            'password' => $request->input('email-password'),
+            'encryption' => $request->input('encryption'),
+            'user_id' => $user->id,
+        ]);
+
+        return redirect()->route('users.index')->with([
+            'message' => __('users.message.store'),
             'alert-type' => 'success'
         ]);
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * Show the form for creating a new resource.
+     *
+     * @return Application|Factory|View
+     */
+    public function create()
+    {
+        $roles = Role::all();
+        $warehouses = $this->warehouseRepository->findByField('symbol', 'MEGA-OLAWA');
+        return view('users.create', compact('roles', 'warehouses'));
+    }
+
+    /**
+     * @return JsonResponse
      */
     public function datatable()
     {
@@ -278,48 +315,5 @@ class UserController extends Controller
         }
 
         return $collection;
-    }
-
-    /**
-     * Detele user avatar from storage
-     *
-     * @param $user
-     *
-     * @return bool
-     */
-    private function removeAvatar($user)
-    {
-        if (basename($user->avatar) !== 'default.png' && Storage::disk('public')->exists($user->avatar)) {
-            Storage::delete('public/' . $user->avatar);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Store uploaded image
-     *
-     * @param $avatar
-     *
-     * @return string
-     */
-    private function storeAvatar($avatar)
-    {
-        $path = 'users/' . date('F') . date('Y');
-        $avatarPath = $avatar->store('public/' . $path);
-        return $path . '/' . basename($avatarPath);
-    }
-
-    /**
-     * @return bool
-     */
-    private function checkRole($role)
-    {
-        if (Auth::user()->role_id != 1 && $role == 1) {
-            abort(403, 'Nieautoryzowana akcja');
-        }
-        return true;
     }
 }

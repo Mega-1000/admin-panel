@@ -2,8 +2,9 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\RedirectResponse;
 
 class AllegroSetCommission extends FormRequest
 {
@@ -30,7 +31,7 @@ class AllegroSetCommission extends FormRequest
         ];
     }
 
-    protected function failedValidation(Validator $validator)
+    protected function failedValidation(Validator $validator): ?RedirectResponse
     {
         if ($validator->fails()) {
             return redirect()->route('orders.index')->with([
@@ -38,5 +39,7 @@ class AllegroSetCommission extends FormRequest
                 'alert-type' => 'error'
             ]);
         }
+
+        return null;
     }
 }

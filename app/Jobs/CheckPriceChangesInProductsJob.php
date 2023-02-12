@@ -2,6 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Entities\Product;
+use App\Entities\Warehouse;
+use App\Facades\Mailer;
 use App\Mail\SendTableWithProductPriceChangeMail;
 use App\Mail\SendToMega1000WarehouseNotFoundMail;
 use Illuminate\Bus\Queueable;
@@ -36,7 +39,7 @@ class CheckPriceChangesInProductsJob implements ShouldQueue
      */
     public function handle()
     {
-        $products = \App\Entities\Product::where('date_of_price_change', '<=', $this->date)->get();
+        $products = Product::where('date_of_price_change', '<=', $this->date)->get();
 
         if (count($products) == 0) {
             return;
@@ -47,12 +50,12 @@ class CheckPriceChangesInProductsJob implements ShouldQueue
         foreach ($products as $product) {
             if ($product->product_name_supplier !== null && !in_array($product->product_name_supplier,
                     $suppliers)) {
-                array_push($suppliers, $product->product_name_supplier);
+                $suppliers[] = $product->product_name_supplier;
             }
         }
 
         foreach ($suppliers as $supplier) {
-            $warehouse = \App\Entities\Warehouse::where('symbol', $supplier)
+            $warehouse = Warehouse::where('symbol', $supplier)
                 ->with(['employees' => function ($q) {
                     $q->with('employeeRoles');
                 }])
@@ -64,13 +67,15 @@ class CheckPriceChangesInProductsJob implements ShouldQueue
                 if ($email) {
                     $this->sendEmail($warehouse, $email);
                 }
+                // TODO Change to configuration
                 $this->sendEmail($warehouse, 'info@' . env('DOMAIN_NAME'));
             } else {
                 Log::notice(
                     'Warehouse not found',
                     ['supplier' => $supplier, 'class' => get_class($this), 'line' => __LINE__]
                 );
-                \Mailer::create()
+                Mailer::create()
+                    // TODO Change to configuration
                     ->to('info@' . env('DOMAIN_NAME'))
                     ->send(new SendToMega1000WarehouseNotFoundMail("Brak danych magazynu " . $supplier, $supplier));
             }
@@ -91,8 +96,9 @@ class CheckPriceChangesInProductsJob implements ShouldQueue
 
     private function sendEmail($warehouse, $email)
     {
-        $sendFormWithProducts = rtrim(env('FRONT_NUXT_URL'),"/") . "/magazyn/aktualizacja-cen/{$warehouse->id}/zaktualizuj";
-        \Mailer::create()
+        // TODO Change to configuration
+        $sendFormWithProducts = rtrim(env('FRONT_NUXT_URL'), "/") . "/magazyn/aktualizacja-cen/{$warehouse->id}/zaktualizuj";
+        Mailer::create()
             ->to($email)
             ->send(
                 new SendTableWithProductPriceChangeMail("Prośba o aktualizację cen produktów " . $warehouse->symbol,

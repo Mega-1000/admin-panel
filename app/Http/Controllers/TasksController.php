@@ -26,9 +26,11 @@ use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
 use App\User;
 use Carbon\Carbon;
+use Exception;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Yajra\DataTables\Facades\DataTables;
 
 /**
@@ -72,15 +74,6 @@ class TasksController extends Controller
         return view('planning.tasks.index');
     }
 
-    public function create()
-    {
-        $users = $this->userRepository->findWhere([['warehouse_id', '!=', null]]);
-        $orders = $this->orderRepository->all();
-        $warehouses = $this->warehouseRepository->findByField('symbol', 'MEGA-OLAWA');
-
-        return view('planning.tasks.create', compact('users', 'orders', 'warehouses'));
-    }
-
     public function store(TaskCreateRequest $request)
     {
         if ($request->quickTask) {
@@ -114,7 +107,6 @@ class TasksController extends Controller
                     if ($item->product->symbol == 'KMD') {
                         $orderItemKMD = $item->quantity;
                     }
-                    $itemsArray[] = $item->product_id;
                     $profit = $this->calculateProfit($item, $profit);
                 }
                 if ($task->order->status_id === 4) {
@@ -170,6 +162,15 @@ class TasksController extends Controller
         }
     }
 
+    public function create()
+    {
+        $users = $this->userRepository->findWhere([['warehouse_id', '!=', null]]);
+        $orders = $this->orderRepository->all();
+        $warehouses = $this->warehouseRepository->findByField('symbol', 'MEGA-OLAWA');
+
+        return view('planning.tasks.create', compact('users', 'orders', 'warehouses'));
+    }
+
     /**
      * @param       $item
      * @param float $profit
@@ -180,23 +181,6 @@ class TasksController extends Controller
     {
         $profit += (((float)$item->gross_selling_price_commercial_unit * (int)$item->quantity) - ((float)$item->gross_purchase_price_commercial_unit * (int)$item->quantity));
         return $profit;
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param int $id
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        $task = $this->repository->find($id);
-        $users = $this->userRepository->findWhere([['warehouse_id', '!=', null]]);
-        $orders = $this->orderRepository->all();
-        $warehouses = $this->warehouseRepository->findByField('symbol', 'MEGA-OLAWA');
-
-        return view('planning.tasks.edit', compact('task', 'warehouses', 'users', 'orders'));
     }
 
     public function update(TaskUpdateRequest $request, $id)
@@ -230,7 +214,6 @@ class TasksController extends Controller
                     if ($item->product->symbol == 'KMD') {
                         $orderItemKMD = $item->quantity;
                     }
-                    $itemsArray[] = $item->product_id;
                     $profit = $this->calculateProfit($item, $profit);
                 }
                 if ($task->order->status_id === 4) {
@@ -261,6 +244,23 @@ class TasksController extends Controller
                 'alert-type' => 'error'
             ]);
         }
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param int $id
+     *
+     * @return View
+     */
+    public function edit(int $id)
+    {
+        $task = $this->repository->find($id);
+        $users = $this->userRepository->findWhere([['warehouse_id', '!=', null]]);
+        $orders = $this->orderRepository->all();
+        $warehouses = $this->warehouseRepository->findByField('symbol', 'MEGA-OLAWA');
+
+        return view('planning.tasks.edit', compact('task', 'warehouses', 'users', 'orders'));
     }
 
     public function destroy($id)
@@ -319,7 +319,6 @@ class TasksController extends Controller
                     if ($item->product->symbol == 'KMD') {
                         $orderItemKMD = $item->quantity;
                     }
-                    $itemsArray[] = $item->product_id;
                     $profit = $this->calculateProfit($item, $profit);
                 }
                 if ($task->order->status_id === 4) {
@@ -546,7 +545,7 @@ class TasksController extends Controller
 
     public function moveTask(Request $request, $id)
     {
-        if ($request->move == true) {
+        if ($request->move) {
             $task = $this->repository->find($id);
             if ($task->order_id != null) {
                 $customId = 'taskOrder-' . $task->order_id;
@@ -651,7 +650,7 @@ class TasksController extends Controller
                     }
                     $dateStart = new Carbon($item->taskTime->date_start);
                     $dateEnd = new Carbon($item->taskTime->date_end);
-                    if ($request->moveAllLeft == true) {
+                    if ($request->moveAllLeft) {
                         $dateS = $dateStart->subMinutes($different)->toDateTimeString();
                         $dateE = $dateEnd->subMinutes($different)->toDateTimeString();
                     } else {
@@ -739,7 +738,7 @@ class TasksController extends Controller
                 $task->taskSalaryDetail->warehouse_notice .= Order::formatMessage($task->user, $request->warehouse_notice);
                 $task->taskSalaryDetail->save();
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return redirect()->back()->with([
                 'message' => __('tasks.messages.update_error'),
                 'alert-type' => 'error'
@@ -758,7 +757,7 @@ class TasksController extends Controller
     {
         $response = null;
         if ($task->childs->count()) {
-            $task->childs->map(function ($child) use(&$response) {
+            $task->childs->map(function ($child) use (&$response) {
                 if ($child->order_id) {
                     $response = dispatch_now(new RemoveLabelJob($child->order_id,
                         [Label::ORDER_ITEMS_UNDER_CONSTRUCTION],
@@ -846,7 +845,7 @@ class TasksController extends Controller
             try {
                 $task = Task::findOrFail($request->id);
                 $this->markTaskAsProduced($task);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 return response(['error' => true, 'message' => 'Nie znaleziono zadania']);
             }
             return response(['success' => true]);
@@ -875,11 +874,12 @@ class TasksController extends Controller
         if (strtotime($dateStartUser->toDateTimeString()) <= strtotime($taskStart->toDateTimeString()) && strtotime($taskEnd->toDateTimeString()) <= strtotime($dateEndUser->toDateTimeString())) {
             if (count($tasks) > 0) {
                 return response()->json(false);
-            } else {
-                return response()->json(true);
             }
+
+            return response()->json(true);
         }
 
+        return response()->json(false);
     }
 
     public function getTasksForUser($id, $userId)
@@ -970,7 +970,6 @@ class TasksController extends Controller
                     if ($item->product->symbol == 'KMD') {
                         $orderItemKMD = $item->quantity;
                     }
-                    $itemsArray[] = $item->product_id;
                     $profit = $this->calculateProfit($item, $profit);
                 }
                 if ($task->order->status_id === 4) {
@@ -1027,9 +1026,9 @@ class TasksController extends Controller
      * @param         $id
      * @param Request $request
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
-    private function onlyUpdateTask($id, Request $request): \Illuminate\Http\RedirectResponse
+    private function onlyUpdateTask($id, Request $request): RedirectResponse
     {
         $task = $this->repository->find($id);
         if ($task->order_id != null) {
@@ -1117,17 +1116,15 @@ class TasksController extends Controller
                 'message' => __('tasks.messages.update'),
                 'alert-type' => 'success'
             ]);
-        } else {
-            return redirect()->route('planning.timetable.index', [
-                'id' => $customId,
-                'view_type' => $request->view_type,
-                'active_start' => $request->active_start,
-            ])->with([
-                'message' => __('tasks.messages.update_error'),
-                'alert-type' => 'error'
-            ]);
         }
-        return $prev;
+        return redirect()->route('planning.timetable.index', [
+            'id' => $customId,
+            'view_type' => $request->view_type,
+            'active_start' => $request->active_start,
+        ])->with([
+            'message' => __('tasks.messages.update_error'),
+            'alert-type' => 'error'
+        ]);
     }
 
     /**
@@ -1161,9 +1158,9 @@ class TasksController extends Controller
      * @param         $id
      * @param Request $request
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
-    private function deleteTask($id, Request $request): \Illuminate\Http\RedirectResponse
+    private function deleteTask($id, Request $request): RedirectResponse
     {
         $task = Task::find($id);
         if ($task->order_id != null) {

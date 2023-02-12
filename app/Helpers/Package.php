@@ -3,8 +3,7 @@
 namespace App\Helpers;
 
 use App\Entities\PackageTemplate;
-use App\Entities\Product;
-use Illuminate\Database\Eloquent\Collection;
+use Exception;
 
 class Package
 {
@@ -13,12 +12,12 @@ class Package
     public $productList;
     public $packageName;
     public $displayed_name;
+    public $price;
+    protected $visible = ['packageName', 'productList'];
     private $maxWeight;
     private $volumeRatio;
     private $volumeMargin;
     private $isLong = false;
-    public $price;
-    protected $visible = ['packageName', 'productList'];
 
     public function __construct($packageName, $margin)
     {
@@ -39,21 +38,8 @@ class Package
         if ($this->canPutNewItem($product, $quantity)) {
             $this->productList = $this->icreaseAmount($this->productList, $product, $quantity);
         } else {
-            throw new \Exception(self::CAN_NOT_ADD_MORE);
+            throw new Exception(self::CAN_NOT_ADD_MORE);
         }
-    }
-
-    public function getTotalVolume()
-    {
-        return $this->productList->reduce(function ($carry, $item){
-            return $carry + $this->calculateVolumeForItem($item, $this->productList);
-        });
-    }
-    public function getTotalWeight()
-    {
-        return $this->productList->reduce(function ($carry, $item){
-            return $carry + $item->weight_trade_unit * $item->quantity;
-        });
     }
 
     public function canPutNewItem($product, $quantity)
@@ -71,22 +57,6 @@ class Package
         return $total['weight'] < $this->maxWeight && $total['volume'] < $this->volumeRatio;
     }
 
-    private function calculateVolumeForItem($item, $list)
-    {
-        $maxLength = false;
-        if ($this->isLong) {
-            $maxLength = $list->reduce(function ($carry, $item) {
-                return $item->packing->dimension_x > $carry ? $item->packing->dimension_x : $carry;
-            });
-        }
-        return $item->packing->getVolume($maxLength) * $item->quantity * $this->volumeMargin;
-    }
-
-    public function getProducts()
-    {
-        return $this->productList;
-    }
-
     private function icreaseAmount($list, $product, $quantity)
     {
         if (empty($list->firstWhere('id', $product->id))) {
@@ -96,6 +66,36 @@ class Package
         }
         $list->firstWhere('id', $product->id)->quantity += $quantity;
         return $list;
+    }
+
+    private function calculateVolumeForItem($item, $list)
+    {
+        $maxLength = false;
+        if ($this->isLong) {
+            $maxLength = $list->reduce(function ($carry, $item) {
+                return max($item->packing->dimension_x, $carry);
+            });
+        }
+        return $item->packing->getVolume($maxLength) * $item->quantity * $this->volumeMargin;
+    }
+
+    public function getTotalVolume()
+    {
+        return $this->productList->reduce(function ($carry, $item) {
+            return $carry + $this->calculateVolumeForItem($item, $this->productList);
+        });
+    }
+
+    public function getTotalWeight()
+    {
+        return $this->productList->reduce(function ($carry, $item) {
+            return $carry + $item->weight_trade_unit * $item->quantity;
+        });
+    }
+
+    public function getProducts()
+    {
+        return $this->productList;
     }
 
     public function deepCopy()

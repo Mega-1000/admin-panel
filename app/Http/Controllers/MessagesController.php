@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\Chat;
 use App\Entities\Employee;
 use App\Entities\Firm;
 use App\Entities\PostalCodeLatLon;
-use Illuminate\Http\Request;
-use App\Helpers\MessagesHelper;
 use App\Helpers\Exceptions\ChatException;
-use App\Entities\Chat;
+use App\Helpers\MessagesHelper;
+use Exception;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -33,8 +34,8 @@ class MessagesController extends Controller
     /**
      * @param bool $all
      * @param bool $orderId
-     * @param Request $request
-     * @return mixed
+     * @param null $userId
+     * @return array|Chat[]
      */
     public static function getChatView(bool $all, $orderId, $userId = null)
     {
@@ -61,7 +62,7 @@ class MessagesController extends Controller
             $chat->url = route('chat.show', ['token' => $helper->encrypt()]);
             $chat->lastMessage = $chat->messages()->latest()->first();
             if (empty($chat->lastMessage)) {
-                $chat->lastMessage = (object) ['created_at' => null, 'message' => ''];
+                $chat->lastMessage = (object)['created_at' => null, 'message' => ''];
             }
         }
 
@@ -72,10 +73,23 @@ class MessagesController extends Controller
         return $chats;
     }
 
+    public static function getUrl(Request $request, $mediaId, $postCode, $email, $phone)
+    {
+        $url = self::getChatUrl($mediaId, $postCode, $email, $phone);
+        return redirect($url);
+    }
+
+    public static function getChatUrl($mediaId, $postCode, $email, $phone): string
+    {
+        $token = MessagesHelper::getToken($mediaId, $postCode, $email, $phone);
+        $url = route('chat.show', ['token' => $token]);
+        return $url;
+    }
+
     /**
      * Show the form for creating a new resource.
      *
-     * @return Response
+     * @return void
      */
     public function create()
     {
@@ -86,7 +100,7 @@ class MessagesController extends Controller
      * Store a newly created resource in storage.
      *
      * @param Request $request
-     * @return Response
+     * @return void
      */
     public function store(Request $request)
     {
@@ -99,150 +113,9 @@ class MessagesController extends Controller
             return $this->prepareChatView($token);
         } catch (ChatException $e) {
             $e->log();
+            // TODO Change to configuration
             return redirect(env('FRONT_URL'));
         }
-    }
-
-    public function showOrNew(int $orderId, int $userId)
-    {
-        $chat = Chat::where('order_id', '=', $orderId)->first();
-        if (!$chat) {
-            $helper = new MessagesHelper();
-            $helper->orderId = $orderId;
-            $helper->currentUserId = $userId;
-            $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
-            $userToken = $helper->encrypt();
-        } else {
-            $helper = new MessagesHelper();
-            $helper->chatId = $chat->id;
-            $helper->currentUserId = $userId;
-            $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
-            $userToken = $helper->encrypt();
-        }
-
-        return redirect()->route('chat.show', ['token' => $userToken]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param int $id
-     * @return Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param Request $request
-     * @param int $id
-     * @return Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param int $id
-     * @return Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
-
-    public static function getUrl(Request $request, $mediaId, $postCode, $email, $phone)
-    {
-        try {
-            $url = self::getChatUrl($mediaId, $postCode, $email, $phone);
-            return redirect($url);
-        } catch (ChatException $e) {
-            $e->log();
-            return redirect(env('FRONT_URL'));
-        }
-    }
-
-    public static function getChatUrl($mediaId, $postCode, $email, $phone): string
-    {
-        $token = MessagesHelper::getToken($mediaId, $postCode, $email, $phone);
-        $url = route('chat.show', ['token' => $token]);
-        return $url;
-    }
-
-    /**
-     * @param $product
-     * @param $chat
-     * @param Collection $possibleUsers
-     * @param Collection $users
-     * @return Collection
-     */
-    private function getNotAttachedChatUsersForProduct($product, $customer): Collection
-    {
-        $possibleUsers = collect();
-        foreach ($product->media()->get() as $media) {
-            $mediaData = explode('|', $media->url);
-            if (count($mediaData) != 3) {
-                continue;
-            }
-            if ($customer->standardAddress()) {
-                $codeObj = PostalCodeLatLon::where('postal_code',$customer->standardAddress()->postal_code)->first();
-            } else {
-                continue;
-            }
-
-            $availableUser = $media->product->firm->employees->filter(function ($employee) use ($codeObj) {
-                $dist = MessagesHelper::calcDistance($codeObj->latitude, $codeObj->longitude, $employee->latitude, $employee->longitude);
-                return $dist < $employee->radius;
-            });
-            $possibleUsers = $possibleUsers->merge($availableUser);
-        }
-        $possibleUsers = $possibleUsers->unique('id');
-        return $possibleUsers;
-    }
-
-    /**
-     * @param Collection $possibleUsers
-     * @param $chat
-     * @param Collection $users
-     * @return Collection
-     */
-    private function filterPossibleUsersWithCurrentlyAdded(Collection $possibleUsers, $chat, Collection $users): Collection
-    {
-        $possibleUsers = $possibleUsers->filter(function ($item) use ($chat, $users) {
-            $filteredEmployeesCount = $chat->chatUsersWithTrashed->filter(function ($user) use ($item) {
-                if (empty($user->employee)) {
-                    return false;
-                }
-                return $item->id != $user->employee->id || $item->id == $user->employee->id && $user->trashed();
-            })->count();
-            return $filteredEmployeesCount == $chat->employees->count();
-        });
-        return $possibleUsers;
-    }
-
-    /**
-     * @param $order
-     * @param $chat
-     * @param Collection $users
-     * @return array
-     */
-    private function getNotAttachedChatUsersForOrder($order, Collection $users): Collection
-    {
-        $possibleUsers = collect();
-        foreach ($order->items as $product) {
-            $firm = Firm::where('symbol', 'like', $product->product->product_name_supplier)->first();
-            if (empty($firm)) {
-                continue;
-            }
-            $possibleUsers = $possibleUsers->merge($firm->employees);
-        }
-        return $possibleUsers;
     }
 
     private function prepareChatView($token)
@@ -295,6 +168,56 @@ class MessagesController extends Controller
         return $view;
     }
 
+    /**
+     * @param $product
+     * @param $chat
+     * @param Collection $possibleUsers
+     * @param Collection $users
+     * @return Collection
+     */
+    private function getNotAttachedChatUsersForProduct($product, $customer): Collection
+    {
+        $possibleUsers = collect();
+        foreach ($product->media()->get() as $media) {
+            $mediaData = explode('|', $media->url);
+            if (count($mediaData) != 3) {
+                continue;
+            }
+            if ($customer->standardAddress()) {
+                $codeObj = PostalCodeLatLon::where('postal_code', $customer->standardAddress()->postal_code)->first();
+            } else {
+                continue;
+            }
+
+            $availableUser = $media->product->firm->employees->filter(function ($employee) use ($codeObj) {
+                $dist = MessagesHelper::calcDistance($codeObj->latitude, $codeObj->longitude, $employee->latitude, $employee->longitude);
+                return $dist < $employee->radius;
+            });
+            $possibleUsers = $possibleUsers->merge($availableUser);
+        }
+        $possibleUsers = $possibleUsers->unique('id');
+        return $possibleUsers;
+    }
+
+    /**
+     * @param $order
+     * @param $chat
+     * @param Collection $users
+     * @return array
+     */
+    private function getNotAttachedChatUsersForOrder($order, Collection $users): Collection
+    {
+        $possibleUsers = collect();
+        foreach ($order->items as $product) {
+            $firm = Firm::where('symbol', 'like', $product->product->product_name_supplier)->first();
+            if (empty($firm)) {
+                continue;
+            }
+            $possibleUsers = $possibleUsers->merge($firm->employees);
+        }
+        return $possibleUsers;
+    }
+
     private function addCustomerToChatList($chat, $possibleUsers, Collection $users, $helper): Collection
     {
         if ($chat) {
@@ -317,15 +240,41 @@ class MessagesController extends Controller
         return $possibleUsers;
     }
 
-    private function prepareFaq(Collection $users): array
+    /**
+     * @param Collection $possibleUsers
+     * @param $chat
+     * @param Collection $users
+     * @return Collection
+     */
+    private function filterPossibleUsersWithCurrentlyAdded(Collection $possibleUsers, $chat, Collection $users): Collection
     {
-        $faqs = [];
-        foreach ($users as $user) {
-            if ($user->employee && $user->employee->faq) {
-                $faqs [] = $user->employee->faq;
+        $possibleUsers = $possibleUsers->filter(function ($item) use ($chat, $users) {
+            $filteredEmployeesCount = $chat->chatUsersWithTrashed->filter(function ($user) use ($item) {
+                if (empty($user->employee)) {
+                    return false;
+                }
+                return $item->id != $user->employee->id || $item->id == $user->employee->id && $user->trashed();
+            })->count();
+            return $filteredEmployeesCount == $chat->employees->count();
+        });
+        return $possibleUsers;
+    }
+
+    private function prepareProductList(MessagesHelper $helper): Collection
+    {
+        if ($helper->getOrder()) {
+            try {
+                return $this->setProductsForChatUser($helper->getCurrentUser(), $helper->getOrder());
+            } catch (Exception $e) {
+                Log::error('Cannot prepare product list',
+                    ['exception' => $e->getMessage(), 'class' => $e->getFile(), 'line' => $e->getLine()]);
+                return collect();
             }
         }
-        return $faqs;
+        if ($helper->getProduct()) {
+            return collect([$helper->getProduct()]);
+        }
+        return collect();
     }
 
     private function setProductsForChatUser($chatUser, $order)
@@ -338,20 +287,68 @@ class MessagesController extends Controller
         return $order->items;
     }
 
-    private function prepareProductList(MessagesHelper $helper): Collection
+    private function prepareFaq(Collection $users): array
     {
-        if ($helper->getOrder()) {
-            try {
-                return $this->setProductsForChatUser($helper->getCurrentUser(), $helper->getOrder());
-            } catch (\Exception $e) {
-                Log::error('Cannot prepare product list',
-                    ['exception' => $e->getMessage(), 'class' => $e->getFile(), 'line' => $e->getLine()]);
-                return collect();
+        $faqs = [];
+        foreach ($users as $user) {
+            if ($user->employee && $user->employee->faq) {
+                $faqs [] = $user->employee->faq;
             }
         }
-        if ($helper->getProduct()) {
-            return collect([$helper->getProduct()]);
+        return $faqs;
+    }
+
+    public function showOrNew(int $orderId, int $userId)
+    {
+        $chat = Chat::where('order_id', '=', $orderId)->first();
+        if (!$chat) {
+            $helper = new MessagesHelper();
+            $helper->orderId = $orderId;
+            $helper->currentUserId = $userId;
+            $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
+            $userToken = $helper->encrypt();
+        } else {
+            $helper = new MessagesHelper();
+            $helper->chatId = $chat->id;
+            $helper->currentUserId = $userId;
+            $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
+            $userToken = $helper->encrypt();
         }
-        return collect();
+
+        return redirect()->route('chat.show', ['token' => $userToken]);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param int $id
+     * @return void
+     */
+    public function edit(int $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param Request $request
+     * @param int $id
+     * @return void
+     */
+    public function update(Request $request, int $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param int $id
+     * @return void
+     */
+    public function destroy(int $id)
+    {
+        //
     }
 }

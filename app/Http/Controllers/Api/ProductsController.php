@@ -3,18 +3,23 @@
 namespace App\Http\Controllers\Api;
 
 use App\Entities\Category;
-use App\Entities\Product;
 use App\Entities\ChimneyAttribute;
+use App\Entities\Product;
+use App\Helpers\MessagesHelper;
+use App\Http\Controllers\Controller;
 use App\Repositories\ProductPriceRepository;
 use App\Repositories\ProductRepository;
 use App\Repositories\WarehouseRepository;
 use App\Traits\Paginatable;
 use Carbon\Carbon;
+use Exception;
+use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
-
-use App\Http\Controllers\Controller;
+use JetBrains\PhpStorm\NoReturn;
+use ParseError;
 
 class ProductsController extends Controller
 {
@@ -28,8 +33,8 @@ class ProductsController extends Controller
     protected $productPriceRepository;
 
     public function __construct(
-        ProductRepository $repository,
-        WarehouseRepository $warehouseRepository,
+        ProductRepository      $repository,
+        WarehouseRepository    $warehouseRepository,
         ProductPriceRepository $productPriceRepository
     )
     {
@@ -107,7 +112,7 @@ class ProductsController extends Controller
                 '*.date_of_the_new_prices' => 'required|date',
             ]);
             foreach ($request->all() as $item) {
-                $product = \App\Entities\Product::find($item['id']);
+                $product = Product::find($item['id']);
                 if (empty($product)) {
                     continue;
                 }
@@ -124,7 +129,7 @@ class ProductsController extends Controller
             }
 
             return $this->createdResponse();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Problem with update product prices.',
                 ['exception' => $e->getMessage(), 'class' => $e->getFile(), 'line' => $e->getLine()]
             );
@@ -132,7 +137,8 @@ class ProductsController extends Controller
         }
     }
 
-    public function getCurrentPrices() {
+    #[NoReturn] public function getCurrentPrices()
+    {
         $products = Product::where('subject_to_price_change', 1)->whereNotNull('date_of_price_change')->get();
         $data = array();
         foreach ($products as $product) {
@@ -163,7 +169,7 @@ class ProductsController extends Controller
     {
         $products = Product
             ::with(['children' => function ($q) {
-                $q->select('product_prices.*','product_packings.*','products.*');
+                $q->select('product_prices.*', 'product_packings.*', 'products.*');
                 $q->join('product_prices', 'products.id', '=', 'product_prices.product_id');
                 $q->join('product_packings', 'products.id', '=', 'product_packings.product_id');
                 $q->orderBy('priority');
@@ -177,7 +183,7 @@ class ProductsController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     * @return ResponseFactory|Response
      */
     public function getProducts(Request $request)
     {
@@ -204,7 +210,7 @@ class ProductsController extends Controller
 
     /**
      * @param $id
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     * @return ResponseFactory|Response
      */
     public function getProduct($id)
     {
@@ -230,7 +236,7 @@ class ProductsController extends Controller
 
         $products = $category
             ->products()
-            ->select('product_prices.*', 'product_packings.*','products.*')
+            ->select('product_prices.*', 'product_packings.*', 'products.*')
             ->where('products.show_on_page', '=', 1)
             ->join('product_prices', 'products.id', '=', 'product_prices.product_id')
             ->with('media')
@@ -248,7 +254,7 @@ class ProductsController extends Controller
             foreach ($productValue['media'] as $mediaKey => $mediaValue) {
                 $mediaData = explode('|', $mediaValue['url']);
                 if (count($mediaData) == 3) {
-                    if (strpos($mediaData[2], \App\Helpers\MessagesHelper::SHOW_FRONT) !== FALSE) {
+                    if (strpos($mediaData[2], MessagesHelper::SHOW_FRONT) !== FALSE) {
                         $products['data'][$productKey]['media'][$mediaKey]['url'] = null;
                     } else {
                         unset($products['data'][$productKey]['media'][$mediaKey]);
@@ -261,25 +267,13 @@ class ProductsController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     * @return ResponseFactory|Response
      */
     public function getCategoriesTree()
     {
         $allCategories = Category::orderBy('parent_id')->orderBy('priority')->get()->toArray();
         $tree = $this->parseTree($allCategories);
         return response(json_encode($tree));
-    }
-
-    /**
-     * @param $id
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
-     */
-    public function getCategory(int $id)
-    {
-        $category = Category::where('id', $id)->get()->first();
-        $children =  Category::where('parent_id', $id)->orderBy('parent_id')->orderBy('priority')->get()->toArray();
-        $category->children = $children ?? [];
-        return $category;
     }
 
     private function parseTree($tree, $root = 0)
@@ -296,6 +290,19 @@ class ProductsController extends Controller
         return $return;
     }
 
+    /**
+     * @param int $id
+     * @return Category
+     */
+    public function getCategory(int $id): Category
+    {
+        /** @var Category $category */
+        $category = Category::where('id', $id)->get()->first();
+        $children = Category::where('parent_id', $id)->orderBy('parent_id')->orderBy('priority')->get()->toArray();
+        $category->children = $children ?? [];
+        return $category;
+    }
+
     public function getProductsForChimney(Request $request)
     {
         if (!is_array($request->attr) || empty($request->attr)) {
@@ -309,7 +316,7 @@ class ProductsController extends Controller
             $products = $this->getProductsFromParams($params, $category);
             $replaceProducts = $this->getProductsForSymbols(array_keys($replacements['products_replace']));
             $this->attachReplaceParams($products, $replaceProducts, $replacements);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response($e->getMessage(), 400);
         }
 
@@ -335,7 +342,7 @@ class ProductsController extends Controller
                 }])
                 ->find($id);
             if (!$attribute) {
-                throw new \Exception("Wrong attribute ID ($id)");
+                throw new Exception("Wrong attribute ID ($id)");
             }
         }
         return $attribute->category;
@@ -347,7 +354,7 @@ class ProductsController extends Controller
 
         foreach ($category->chimneyAttributes as $attribute) {
             if (empty($request->attr[$attribute->id])) {
-                throw new \Exception("Missing or incorrect attribute \"{$attribute->name}\" (ID {$attribute->id})");
+                throw new Exception("Missing or incorrect attribute \"{$attribute->name}\" (ID {$attribute->id})");
             }
             $value = null;
             foreach ($attribute->options as $option) {
@@ -358,12 +365,12 @@ class ProductsController extends Controller
             }
             if (empty($value)) {
                 if (count($attribute->options) > 0) {
-                    throw new \Exception("Missing or incorrect attribute \"{$attribute->name}\" (ID {$attribute->id})");
+                    throw new Exception("Missing or incorrect attribute \"{$attribute->name}\" (ID {$attribute->id})");
                 }
                 $value = $request->attr[$attribute->id];
                 $value = trim(str_replace(',', '.', $value));
                 if (filter_var($value, FILTER_VALIDATE_FLOAT) === false || $value < 0) {
-                    throw new \Exception("Missing or incorrect attribute \"{$attribute->name}\" (ID {$attribute->id})");
+                    throw new Exception("Missing or incorrect attribute \"{$attribute->name}\" (ID {$attribute->id})");
                 }
                 $value = number_format($value, 2, '.', '');
             }
@@ -371,32 +378,6 @@ class ProductsController extends Controller
         }
 
         return $params;
-    }
-
-    private function getProductsFromParams($params, $category)
-    {
-        $productsData = [];
-        foreach ($category->chimneyProducts as $product) {
-            $code = $this->replaceParams($product->product_code, $params);
-            $quantity = $this->getQuantity($product->formula, $params);
-            if ($quantity == 0) {
-                continue;
-            }
-            $productsData[$code] = [
-                'quantity' => round($quantity, 2),
-                'optional' => $product->optional
-            ];
-        }
-
-        $products = $this->getProductsForSymbols(array_keys($productsData));
-
-        foreach ($products as $product) {
-            $product->quantity = $productsData[$product->symbol]['quantity'];
-            $product->optional = $productsData[$product->symbol]['optional'];
-            $product->id = $product->product_id;
-        }
-
-        return $products;
     }
 
     private function getReplacements($category, $params)
@@ -440,6 +421,55 @@ class ProductsController extends Controller
         return $out;
     }
 
+    private function replaceParams($text, $params)
+    {
+        foreach ($params as $key => $value) {
+            $text = str_replace("[$key]", $value, $text);
+        }
+        return $text;
+    }
+
+    private function getQuantity($formula, $params)
+    {
+        $formula = $this->replaceParams($formula, $params);
+        $formula = str_replace(',', '.', $formula);
+        $wrongChars = preg_replace('/(ceil|round|floor|\d|\.|\+|-|\*|\/|\(|\))/m', '', $formula);
+        if (!empty($wrongChars)) {
+            return 0;
+        }
+        try {
+            return eval("return $formula;");
+        } catch (ParseError $e) {
+            return 0;
+        }
+    }
+
+    private function getProductsFromParams($params, $category)
+    {
+        $productsData = [];
+        foreach ($category->chimneyProducts as $product) {
+            $code = $this->replaceParams($product->product_code, $params);
+            $quantity = $this->getQuantity($product->formula, $params);
+            if ($quantity == 0) {
+                continue;
+            }
+            $productsData[$code] = [
+                'quantity' => round($quantity, 2),
+                'optional' => $product->optional
+            ];
+        }
+
+        $products = $this->getProductsForSymbols(array_keys($productsData));
+
+        foreach ($products as $product) {
+            $product->quantity = $productsData[$product->symbol]['quantity'];
+            $product->optional = $productsData[$product->symbol]['optional'];
+            $product->id = $product->product_id;
+        }
+
+        return $products;
+    }
+
     private function getProductsForSymbols($symbols)
     {
         $products = Product::whereIn('products.symbol', $symbols)
@@ -465,33 +495,10 @@ class ProductsController extends Controller
 
         foreach ($replaceProducts as $product) {
             if (!isset($replacements['products_replace'][$product->symbol])) {
-                throw new \Exception('Unexpected unexisting replacement for symbol ' . $product->symbol);
+                throw new Exception('Unexpected unexisting replacement for symbol ' . $product->symbol);
             }
             $product->changer = $replacements['products_replace'][$product->symbol]['id'];
             $product->quantity = $replacements['products_replace'][$product->symbol]['quantity'];
         }
-    }
-
-    private function getQuantity($formula, $params)
-    {
-        $formula = $this->replaceParams($formula, $params);
-        $formula = str_replace(',', '.', $formula);
-        $wrongChars = preg_replace('/(ceil|round|floor|\d|\.|\+|-|\*|\/|\(|\))/m', '', $formula);
-        if (!empty($wrongChars)) {
-            return 0;
-        }
-        try {
-            return eval("return $formula;");
-        } catch (\ParseError $e) {
-            return 0;
-        }
-    }
-
-    private function replaceParams($text, $params)
-    {
-        foreach ($params as $key => $value) {
-            $text = str_replace("[$key]", $value, $text);
-        }
-        return $text;
     }
 }
