@@ -89,10 +89,10 @@ class OrderStatusChangedToDispatchMail extends Mailable
     public function attachments(): array
     {
         $attachments = [];
-        if ($this->path !== '') {
+        if ($this->path !== '' && $this->path !== null) {
             $attachments[] = Attachment::fromPath($this->path);
         }
-        if ($this->pathSecond !== '') {
+        if ($this->pathSecond !== ''&& $this->pathSecond !== null) {
             $attachments[] = Attachment::fromPath($this->pathSecond);
         }
 
