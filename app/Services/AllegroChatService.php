@@ -136,6 +136,15 @@ class AllegroChatService extends AllegroApiService {
             $createdAt = new Carbon($msg['createdAt']);
             $currentDateTime = new Carbon();
 
+            $offerId = '';
+            $orderId = '';
+            if( isset($msg['relatesTo']['offer']['id']) ) {
+                $offerId = $msg['relatesTo']['offer']['id'];
+            }
+            if( isset($msg['relatesTo']['order']['id']) ) {
+                $orderId = $msg['relatesTo']['order']['id'];
+            }
+
             $newMessages[] = [
                 'allegro_thread_id'     => $msg['thread']['id'],
                 'allegro_msg_id'        => $msg['id'],
@@ -146,8 +155,8 @@ class AllegroChatService extends AllegroApiService {
                 'is_outgoing'           => !$msg['author']['isInterlocutor'],
                 'attachments'           => json_encode($msg['attachments'] ?: []),
                 'type'                  => $msg['type'],
-                'allegro_offer_id'      => $msg['relatesTo']['offer']['id'] ?: '',
-                'allegro_order_id'      => $msg['relatesTo']['order']['id'] ?: '',
+                'allegro_offer_id'      => $offerId,
+                'allegro_order_id'      => $orderId,
                 'original_allegro_date' => $createdAt->toDateTimeString(),
                 'created_at'            => $currentDateTime->toDateTimeString(),
                 'updated_at'            => $currentDateTime->toDateTimeString(),
