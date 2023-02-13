@@ -305,21 +305,13 @@
 
         @endcan
         function sendComment(type, order_id) {
-            $.post(
-                {
-                    url: "{{route('orders.updateNotice')}}",
-            {
+            $.post({
+                url: "{{route("orders.updateNotice")}}",
                 order_id,
-                    message
-            :
-                $(`#${type}`).val(),
-                    type
-            :
-                type
-            }
-        })
-        .
-            done(() => location.reload())
+                message: $(`#${type}`).val(),
+                type: type
+            })
+                .done(() => location.reload())
                 .fail((response) => {
                     var json = JSON.parse(response.responseText);
                     alert(Object.values(json.errors));
