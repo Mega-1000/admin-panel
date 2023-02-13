@@ -2,7 +2,7 @@
 @section('app-header')
     <h1 class="page-title">
         <i class="voyager-tag"></i> @lang('order_payments.create')
-        <a style="margin-left: 15px;" href="{{ action('OrdersController@edit', ["id" => $orderPayment->order_id]) }}"
+        <a style="margin-left: 15px;" href="{{ action('OrdersController@edit', ["order_id" => $orderPayment->order_id]) }}"
            class="btn btn-info install pull-right">
             <span>@lang('order_payments.list')</span>
         </a>

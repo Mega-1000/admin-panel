@@ -16,6 +16,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 /**
  * Class ImportAllegroPayInJob
@@ -76,7 +77,7 @@ class ImportAllegroPayInJob implements ShouldQueue
             while (($row = fgetcsv($handle, 3000, ',')) !== FALSE) {
                 if (!$header) {
                     foreach ($row as &$headerName) {
-                        $headerName = snake_case(strtr($headerName, self::CHAR_TO_REMOVE));
+                        $headerName = Str::snake(strtr($headerName, self::CHAR_TO_REMOVE));
                     }
                     $header = $row;
                     fputcsv($file, $row);

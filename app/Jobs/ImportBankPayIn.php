@@ -21,6 +21,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 /**
  *
@@ -80,7 +81,7 @@ class ImportBankPayIn implements ShouldQueue
                     foreach ($row as &$headerName) {
                         if (!empty($headerName)) {
                             $headerName = str_replace('#', '', iconv('ISO-8859-2', 'UTF-8', $headerName));
-                            $headerName = snake_case(PdfCharactersHelper::changePolishCharactersToNonAccented($headerName));
+                            $headerName = Str::snake(PdfCharactersHelper::changePolishCharactersToNonAccented($headerName));
                         }
                     }
                     $header = $row;
