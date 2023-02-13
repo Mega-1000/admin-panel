@@ -4,8 +4,8 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class ShipmentDateInOrderChangedMail extends Mailable
 {
@@ -28,11 +28,9 @@ class ShipmentDateInOrderChangedMail extends Mailable
 
     /**
      * Build the message.
-     *
-     * @return $this
      */
-    public function build()
+    public function content(): Content
     {
-        return $this->view('emails.shipment-date-in-order-changed');
+        return new Content('emails.shipment-date-in-order-changed');
     }
 }

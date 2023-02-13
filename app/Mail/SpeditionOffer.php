@@ -4,8 +4,8 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class SpeditionOffer extends Mailable
 {
@@ -28,11 +28,9 @@ class SpeditionOffer extends Mailable
 
     /**
      * Build the message.
-     *
-     * @return $this
      */
-    public function build()
+    public function build(): Content
     {
-        return $this->view('emails.spedition-offer-summary');
+        return new Content('emails.spedition-offer-summary');
     }
 }

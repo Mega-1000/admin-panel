@@ -4,8 +4,8 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class MessageSent extends Mailable
 {
@@ -33,17 +33,15 @@ class MessageSent extends Mailable
         $this->typeText = $typeText;
         $this->frontId = $frontId;
         $this->orderId = $orderId;
+        // TODO Zmienić na config
+        $this->subject = 'Nowa wiadomość od www.' . env('DOMAIN_NAME');
     }
 
     /**
      * Build the message.
-     *
-     * @return $this
      */
-    public function build()
+    public function build(): Content
     {
-        return $this->view('emails.message-to-client')
-                    ->from('info@' . env('DOMAIN_NAME'))
-                    ->subject('Nowa wiadomość od www.' . env('DOMAIN_NAME'));
+        return new Content('emails.message-to-client');
     }
 }

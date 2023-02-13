@@ -74,9 +74,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('users/create', 'UserController@create')->name('users.create');
         Route::post('users/store', 'UserController@store')->name('users.store');
         Route::get('users/{id}/editItem', 'UserController@edit')->name('users.edit');
-        Route::put('users/{id}/update', [
-            'uses' => 'UserController@update',
-        ])->name('users.update');
+        Route::put('users/{id}/update', ['uses' => 'UserController@update',])->name('users.update');
         Route::delete('users-destroy/{id}/', [
             'uses' => 'UserController@destroy',
         ])->name('users.destroy');

@@ -28,7 +28,7 @@ class OrderStatusChanged extends Mailable
     /**
      * Build the message.
      */
-    public function build(): Content
+    public function content(): Content
     {
         return new Content(view: 'emails.order-status-changed');
     }

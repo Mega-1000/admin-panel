@@ -4,8 +4,8 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class DifferentCustomerData extends Mailable
 {
@@ -32,11 +32,10 @@ class DifferentCustomerData extends Mailable
     /**
      * Build the message.
      *
-     * @return $this
+     * @return Content
      */
-    public function build()
+    public function content(): Content
     {
-        return $this->view('emails.different-customer-data')
-            ->subject($this->subject);
+        return new Content('emails.different-customer-data');
     }
 }

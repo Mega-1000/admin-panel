@@ -4,7 +4,9 @@ namespace App\Mail;
 
 use App\Helpers\MessagesHelper;
 use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Auth;
 
@@ -70,18 +72,31 @@ class OrderStatusChangedToDispatchMail extends Mailable
 
     /**
      * Build the message.
-     *
-     * @return $this
      */
-    public function build()
+    public function content(): Content
     {
         if ($this->self) {
-            return $this->view('emails.order-status-changed-to-dispatch-self');
+            return new Content('emails.order-status-changed-to-dispatch-self');
         }
         if ($this->path == null) {
-            return $this->view('emails.order-status-changed-to-dispatch');
+            return new Content('emails.order-status-changed-to-dispatch');
         }
 
-        return $this->view('emails.reminder-order-status-changed-to-dispatch')->attach($this->path)->attach($this->pathSecond);
+        return new Content('emails.reminder-order-status-changed-to-dispatch');
+        //->attach($this->path)->attach($this->pathSecond);
     }
+
+    public function attachments(): array
+    {
+        $attachments = [];
+        if ($this->path !== '') {
+            $attachments[] = Attachment::fromPath($this->path);
+        }
+        if ($this->pathSecond !== '') {
+            $attachments[] = Attachment::fromPath($this->pathSecond);
+        }
+
+        return $attachments;
+    }
+
 }

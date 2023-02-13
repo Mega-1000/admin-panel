@@ -24,7 +24,8 @@
                         </div>
                     @endif
                     <div class="panel-body">
-                        <form action="{{ action('UserController@update', ['user_id' => $user->id]) }}" method="POST" enctype="multipart/form-data">
+                        <form action="{{ action('UserController@update', ['id' => $user->id]) }}" method="POST"
+                              enctype="multipart/form-data">
                             {{ csrf_field() }}
                             {{ method_field('put') }}
                             <div class="form-group">
@@ -50,14 +51,15 @@
                                     @if ($roles->count())
                                         @foreach($roles as $role)
                                             @php
-                                            if(Auth::user()->role_id > 1){
-                                                if($role->id == 1){
-                                                    unset($role);
-                                                    continue;
+                                                if(Auth::user()->role_id > 1){
+                                                    if($role->id == 1){
+                                                        unset($role);
+                                                        continue;
+                                                    }
                                                 }
-                                            }
                                             @endphp
-                                            <option value="{{ $role->id }}" {{ $selectedRole == $role->id ? 'selected="selected"' : '' }}>{{ $role->name }}</option>
+                                            <option
+                                                value="{{ $role->id }}" {{ $selectedRole == $role->id ? 'selected="selected"' : '' }}>{{ $role->name }}</option>
                                         @endforeach
                                     @endif
                                 </select>
@@ -68,7 +70,8 @@
                                     <option value="">Wybierz</option>
                                     @if ($warehouses->count())
                                         @foreach($warehouses as $warehouse)
-                                                <option {{ $user->warehouse_id == $warehouse->id ? 'selected="selected"' : '' }} value="{{ $warehouse->id }}">{{ $warehouse->symbol }}</option>
+                                            <option
+                                                {{ $user->warehouse_id == $warehouse->id ? 'selected="selected"' : '' }} value="{{ $warehouse->id }}">{{ $warehouse->symbol }}</option>
                                         @endforeach
                                     @endif
                                 </select>
@@ -116,25 +119,25 @@
                             <div class="form-group">
                                 <label for="encryption">@lang('users.form.encryption')</label>
                                 <select class="form-control text-uppercase" name="encryption">
-                                @if($userEmail != null)
-                                    @if($userEmail->encryption == 'SSL')
-                                        <option value="SSL" selected>SSL</option>
-                                        <option value="TLS">TLS</option>
-                                        <option value="NONE">Brak</option>
-                                    @elseif($userEmail->encryption == 'TLS')
-                                        <option value="SSL">SSL</option>
-                                        <option value="TLS" selected>TLS</option>
-                                        <option value="NONE">Brak</option>
+                                    @if($userEmail != null)
+                                        @if($userEmail->encryption == 'SSL')
+                                            <option value="SSL" selected>SSL</option>
+                                            <option value="TLS">TLS</option>
+                                            <option value="NONE">Brak</option>
+                                        @elseif($userEmail->encryption == 'TLS')
+                                            <option value="SSL">SSL</option>
+                                            <option value="TLS" selected>TLS</option>
+                                            <option value="NONE">Brak</option>
+                                        @else
+                                            <option value="SSL">SSL</option>
+                                            <option value="TLS">TLS</option>
+                                            <option value="NONE" selected>Brak</option>
+                                        @endif
                                     @else
                                         <option value="SSL">SSL</option>
                                         <option value="TLS">TLS</option>
                                         <option value="NONE" selected>Brak</option>
                                     @endif
-                                @else
-                                    <option value="SSL">SSL</option>
-                                    <option value="TLS">TLS</option>
-                                    <option value="NONE" selected>Brak</option>
-                                @endif
                                 </select>
                             </div>
                             <div class="form-group">
@@ -144,9 +147,12 @@
                             </div>
                             <div class="form-group">
                                 <label for="status">@lang('users.form.status')</label>
-                                <select name="status" class="form-control text-uppercase" id="status" {{$selectedRole == 2 ? 'disabled' : ''}}>
-                                    <option value="ACTIVE" {{ $user->status === 'ACTIVE' ? 'selected="selected"' : '' }}>@lang('users.form.active')</option>
-                                    <option value="PENDING" {{ $user->status === 'PENDING' ? 'selected="selected"' : '' }}>@lang('users.form.pending')</option>
+                                <select name="status" class="form-control text-uppercase"
+                                        id="status" {{$selectedRole == 2 ? 'disabled' : ''}}>
+                                    <option
+                                        value="ACTIVE" {{ $user->status === 'ACTIVE' ? 'selected="selected"' : '' }}>@lang('users.form.active')</option>
+                                    <option
+                                        value="PENDING" {{ $user->status === 'PENDING' ? 'selected="selected"' : '' }}>@lang('users.form.pending')</option>
                                 </select>
                             </div>
                             <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>

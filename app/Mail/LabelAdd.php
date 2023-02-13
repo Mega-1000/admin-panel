@@ -4,8 +4,8 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class LabelAdd extends Mailable
 {
@@ -28,11 +28,9 @@ class LabelAdd extends Mailable
     /**
      * Build the message.
      *
-     * @return $this
      */
-    public function build()
+    public function content(): Content
     {
-        return $this->view('emails.label-add')
-            ->subject($this->subject);
+        return new Content('emails.label-add');
     }
 }

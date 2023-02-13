@@ -4,8 +4,8 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class ConfirmData extends Mailable
 {
@@ -29,11 +29,10 @@ class ConfirmData extends Mailable
     /**
      * Build the message.
      *
-     * @return $this
+     * @return Content
      */
-    public function build()
+    public function content(): Content
     {
-        return $this->view('emails.confirm-customer-data')
-            ->subject($this->subject);
+        return new Content('emails.confirm-customer-data');
     }
 }

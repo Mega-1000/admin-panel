@@ -4,8 +4,8 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class InvoiceRequest extends Mailable
 {
@@ -21,16 +21,15 @@ class InvoiceRequest extends Mailable
     public function __construct($orderId)
     {
         $this->orderId = $orderId;
+        $this->subject = 'Prośba o wprowadzenie faktury dla zlecenia ' . $this->orderId;
     }
 
     /**
      * Build the message.
      *
-     * @return $this
      */
-    public function build()
+    public function content(): Content
     {
-        return $this->view('emails.warehouse-invoice-request')
-            ->subject('Prośba o wprowadzenie faktury dla zlecenia ' . $this->orderId);
+        return new Content('emails.warehouse-invoice-request');
     }
 }

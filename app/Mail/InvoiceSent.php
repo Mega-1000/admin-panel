@@ -3,9 +3,10 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class InvoiceSent extends Mailable
 {
@@ -34,12 +35,15 @@ class InvoiceSent extends Mailable
      *
      * @return $this
      */
-    public function build()
+    public function content(): Content
     {
-        return $this->view('emails.invoice-sent')
-	        ->subject($this->subject)
-	        ->attach('/home/mega1000/domains/mega1000.pro-linuxpl.com/public_html/subiekt/invoices/' . $this->attachment);
-        
-        return $this;
+        return new Content('emails.invoice-sent');
+    }
+
+    public function attachments(): array
+    {
+        return [
+            Attachment::fromPath('/home/mega1000/domains/mega1000.pro-linuxpl.com/public_html/subiekt/invoices/' . $this->attachment),
+        ];
     }
 }

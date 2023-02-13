@@ -2,13 +2,16 @@
 
 namespace App\Jobs;
 
+use App\Facades\Mailer;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Jobs\Orders\GenerateOrderProformJob;
 use App\Mail\OrderMessageMail;
 use App\Repositories\TagRepository;
+use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 
@@ -18,7 +21,8 @@ use Illuminate\Support\Facades\Storage;
  */
 class OrderProformSendMailJob extends Job implements ShouldQueue
 {
-	use Queueable, SerializesModels;
+    use Queueable, SerializesModels;
+
     /**
      * @var
      */
@@ -68,20 +72,20 @@ class OrderProformSendMailJob extends Job implements ShouldQueue
             $method = $tag->handler;
             $message = preg_replace("[" . preg_quote($tag->name) . "]", $emailTagHandler->$method(), $message);
         }
-        
+
         $subject = "Numer oferty: " . $this->order->id . ", status: " . $this->order->status->name . ' oraz proforma';
 
         dispatch_now(new GenerateOrderProformJob($this->order));
-        
+
         $mail_to = $this->order->customer->login;
-        $pdf = Storage::disk('local')->get($this->order->proformStoragePath);
-        
+        $pdf = Storage::disk('local')->path($this->order->proformStoragePath);
+
         try {
-            \Mailer::create()
+            Mailer::create()
                 ->to($mail_to)
                 ->send(new OrderMessageMail($subject, $message, $pdf));
-        } catch (\Exception $e) {
-            \Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);
+        } catch (Exception $e) {
+            Log::error('Mailer can\'t send email', ['message' => $e->getMessage(), 'path' => $e->getTraceAsString()]);
         }
     }
 }

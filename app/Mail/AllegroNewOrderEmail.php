@@ -3,15 +3,17 @@
 namespace App\Mail;
 
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
 
 class AllegroNewOrderEmail extends Mailable
 {
     use SerializesModels;
 
-    public function build()
+    public $subject = 'Informacje o Twoim zakupie';
+    
+    public function content(): Content
     {
-        return $this->view('emails.allegro-new-order')
-            ->subject('Informacje o Twoim zakupie');
+        return new Content('emails.allegro-new-order');
     }
 }

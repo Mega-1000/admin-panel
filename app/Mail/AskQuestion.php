@@ -2,8 +2,10 @@
 
 namespace App\Mail;
 
+use DateTime;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
 
 class AskQuestion extends Mailable
@@ -11,34 +13,11 @@ class AskQuestion extends Mailable
     use Queueable, SerializesModels;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      */
     protected $date;
 
-    /**
-     * @var string
-     */
-    protected $firstName;
-
-    /**
-     * @var string
-     */
-    protected $lastName;
-
-    /**
-     * @var string
-     */
-    protected $details;
-
-    /**
-     * @var string
-     */
-    protected $phone;
-
-    /**
-     * @var string
-     */
-    protected $emailAddress;
+    public $subject = 'Zapytanie od klienta';
 
     /**
      * AskQuestion constructor.
@@ -49,14 +28,16 @@ class AskQuestion extends Mailable
      * @param $phone
      * @param $emailAddress
      */
-    public function __construct($firstName, $lastName, $details, $phone, $emailAddress)
+    public function __construct(
+        public readonly string $firstName,
+        public readonly string $lastName,
+        public readonly string $details,
+        public readonly string $phone,
+        public readonly string $emailAddress
+    )
     {
-        $this->firstName = $firstName;
-        $this->lastName = $lastName;
-        $this->details = $details;
-        $this->phone = $phone;
-        $this->emailAddress = $emailAddress;
-        $this->date = new \DateTime();
+        $this->from = $emailAddress;
+        $this->date = new DateTime();
     }
 
     /**
@@ -64,16 +45,8 @@ class AskQuestion extends Mailable
      *
      * @return $this
      */
-    public function build()
+    public function content(): Content
     {
-        return $this->view('emails.ask-question', [
-            'firstName' => $this->firstName,
-            'lastName' => $this->lastName,
-            'details' => $this->details,
-            'phone' => $this->phone,
-            'date' => $this->date,
-        ])
-            ->from($this->emailAddress)
-            ->subject('Zapytanie od klienta');
+        return new Content('emails.ask-question');
     }
 }

@@ -3,15 +3,17 @@
 namespace App\Mail;
 
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
 
 class TestMail extends Mailable
 {
     use SerializesModels;
 
-    public function build()
+    public $subject = 'Testowy email';
+
+    public function content(): Content
     {
-        return $this->view('emails.test')
-            ->subject('Testowy emamil');
+        return new Content('emails.test');
     }
 }

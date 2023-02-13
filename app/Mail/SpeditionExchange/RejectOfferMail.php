@@ -4,8 +4,8 @@ namespace App\Mail\SpeditionExchange;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class RejectOfferMail extends Mailable
 {
@@ -23,11 +23,9 @@ class RejectOfferMail extends Mailable
 
     /**
      * Build the message.
-     *
-     * @return $this
      */
-    public function build()
+    public function content(): Content
     {
-        return $this->view('emails.spedition-exchange.reject-offer');
+        return new Content('emails.spedition-exchange.reject-offer');
     }
 }

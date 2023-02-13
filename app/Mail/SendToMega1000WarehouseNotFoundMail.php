@@ -4,8 +4,8 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class SendToMega1000WarehouseNotFoundMail extends Mailable
 {
@@ -26,11 +26,9 @@ class SendToMega1000WarehouseNotFoundMail extends Mailable
 
     /**
      * Build the message.
-     *
-     * @return $this
      */
-    public function build()
+    public function content(): Content
     {
-        return $this->view('emails.send-to-mega1000-warehouse-not-found');
+        return new Content('emails.send-to-mega1000-warehouse-not-found');
     }
 }

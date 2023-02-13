@@ -10,6 +10,7 @@ namespace App\Facades;
 use App\Repositories\UserRepository;
 use App\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Mail;
 
 class Mailer
@@ -35,14 +36,15 @@ class Mailer
             return Mail::mailer('dev');
         }
 
-        config([
+        Config::set([
             'mail.mailers.default' => [
                 'transport' => 'smtp',
                 'host' => $user->userEmailData->host,
                 'port' => $user->userEmailData->port,
                 'username' => $user->userEmailData->username,
                 'password' => $user->userEmailData->password,
-                'encryption' => $user->userEmailData->encryption
+                'encryption' => $user->userEmailData->encryption,
+                'from' => ['address' => $user->userEMailData->username, 'name' => $user->userEMailData->username],
             ]
         ]);
 

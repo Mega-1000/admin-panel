@@ -4,8 +4,8 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Mail\MailServiceProvider;
 
 class OrderManualNotification extends Mailable
 {
@@ -36,8 +36,8 @@ class OrderManualNotification extends Mailable
      *
      * @return $this
      */
-    public function build()
+    public function content(): Content
     {
-        return $this->view('emails.order-manual-notification');
+        return new Content('emails.order-manual-notification');
     }
 }

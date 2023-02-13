@@ -4,8 +4,8 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class MissingDeliveryAddressMail extends Mailable
 {
@@ -29,8 +29,8 @@ class MissingDeliveryAddressMail extends Mailable
      *
      * @return $this
      */
-    public function build()
+    public function content(): Content
     {
-        return $this->view('emails.missing-delivery-address');
+        return new Content('emails.missing-delivery-address');
     }
 }

@@ -4,8 +4,8 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class StartCommunication extends Mailable
 {
@@ -25,11 +25,9 @@ class StartCommunication extends Mailable
 
     /**
      * Build the message.
-     *
-     * @return $this
      */
-    public function build()
+    public function build(): Content
     {
-        return $this->view('emails.start-communication');
+        return new Content('emails.start-communication');
     }
 }

@@ -15,6 +15,7 @@ use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 
 /**
@@ -83,7 +84,7 @@ class OrderStatusChangedNotificationJob extends Job implements ShouldQueue
 
         if (($order->status_id == 3 || $order->status_id == 4) && !$order->sello_id) {
             dispatch_now(new GenerateOrderProformJob($order, true));
-            $pdfPath = $order->proformStoragePath;
+            $pdfPath = Storage::disk('local')->path($order->proformStoragePath);
         }
 
         if ($order->status_id === 3) {

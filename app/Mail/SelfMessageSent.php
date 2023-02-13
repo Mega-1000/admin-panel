@@ -4,6 +4,7 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
 
 class SelfMessageSent extends Mailable
@@ -32,17 +33,15 @@ class SelfMessageSent extends Mailable
         $this->typeText = $typeText;
         $this->warehouseId = $warehouseId;
         $this->orderId = $orderId;
+        // TODO Zamienić na config
+        $this->subject = 'Nowa wiadomość od www.' . env('DOMAIN_NAME');
     }
 
     /**
      * Build the message.
-     *
-     * @return $this
      */
-    public function build(): static
+    public function content(): Content
     {
-        return $this->view('emails.message-to-warehouse')
-            ->from('info@' . env('DOMAIN_NAME'))
-            ->subject('Nowa wiadomość od www.' . env('DOMAIN_NAME'));
+        return new Content('emails.message-to-warehouse');
     }
 }

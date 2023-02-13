@@ -3,15 +3,17 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Attachment;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
 use Illuminate\Queue\SerializesModels;
 
 class CheckDeliveryAddressMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $mailBody;
-    public $pdf;
+    public string $mailBody;
+    public string $pdf;
 
     /**
      * CheckDeliveryAddressMail constructor.
@@ -19,27 +21,31 @@ class CheckDeliveryAddressMail extends Mailable
      * @param $message
      * @param $pdf
      */
-    public function __construct($subject, $message, $pdf = false)
+    public function __construct($subject, $message, $pdfPath = false)
     {
         $this->subject = $subject;
         $this->mailBody = nl2br($message);
-        $this->pdf = $pdf;
+        $this->pdf = $pdfPath ?? '';
     }
 
     /**
      * Build the message.
-     *
-     * @return $this
      */
-    public function build(): static
+    public function content(): Content
     {
-        if ($this->pdf) {
-            return $this->view('emails.check-delivery-address')
-                ->attachData($this->pdf, 'attachment.pdf', [
-                    'mime' => 'application/pdf',
-                ]);
-        } else {
-            return $this->view('emails.check-delivery-address');
+        return new Content('emails.check-delivery-address');
+    }
+
+    public function attachments(): array
+    {
+        if ($this->pdf !== '') {
+            return [
+                Attachment::fromPath($this->pdf)
+                    ->as('attachment.pdf')
+                    ->withMime('application/pdf'),
+            ];
         }
+
+        return [];
     }
 }
