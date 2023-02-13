@@ -641,7 +641,13 @@ class OrdersPackagesController extends Controller
             ]);
         }
         $this->getStickerForGls($package);
-        return Storage::disk('private')->download('labels/gls/' . $package->sending_number . '.pdf');
+        if (Storage::disk('private')->exists('labels/gls/' . $package->sending_number . '.pdf')) {
+            return Storage::disk('private')->download('labels/gls/' . $package->sending_number . '.pdf');
+        }
+        return redirect()->back()->with([
+            'message' => "Etykieta nie została odnaleziona na serwerze",
+            'alert-type' => 'error'
+        ]);
     }
 
     /**

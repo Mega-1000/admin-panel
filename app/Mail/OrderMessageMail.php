@@ -13,7 +13,7 @@ class OrderMessageMail extends Mailable
     use Queueable, SerializesModels;
 
     public string $mailBody;
-    public bool $pdf;
+    public string $pdf;
 
     /**
      * OrderMessageMail constructor.
@@ -40,7 +40,7 @@ class OrderMessageMail extends Mailable
                 Attachment::fromPath($this->pdf)->withMime('application/pdf')->as('proforma.pdf')
             ];
         }
-        
+
         return [];
     }
 }

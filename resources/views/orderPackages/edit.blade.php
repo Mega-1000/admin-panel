@@ -3,7 +3,8 @@
 @section('app-header')
     <h1 class="page-title">
         <i class="voyager-tag"></i> @lang('order_packages.edit')
-        <a style="margin-left: 15px;" href="{{ action('OrdersController@edit', ["id" => $orderPackage->order_id]) }}"
+        <a style="margin-left: 15px;"
+           href="{{ action('OrdersController@edit', ["order_id" => $orderPackage->order_id]) }}"
            class="btn btn-info install pull-right">
             <span>@lang('order_packages.list')</span>
         </a>
@@ -30,7 +31,7 @@
             </ul>
         </div>
     @endif
-    <form action="{{ action('OrdersPackagesController@update', $id) }}" method="POST">
+    <form action="{{ action('OrdersPackagesController@update', ['id' => $id]) }}" method="POST">
         {{ csrf_field() }}
         {{ method_field('put') }}
         <div class="firms-general" id="orderPackage">
