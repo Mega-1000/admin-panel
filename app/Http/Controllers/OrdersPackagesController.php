@@ -625,6 +625,9 @@ class OrdersPackagesController extends Controller
                 $path));
     }
 
+    /**
+     * @throws FileNotFoundException
+     */
     public function getSticker(Request $request, $id)
     {
         $package = OrderPackage::find($id);
@@ -652,25 +655,28 @@ class OrdersPackagesController extends Controller
 
     /**
      * @param $package
-     *
-     * @throws FileNotFoundException
      */
-    protected function getStickerForGls($package)
+    protected function getStickerForGls($package): string
     {
-        try {
-            $file = Storage::disk('private')->get('labels/gls/' . $package->sending_number . '.pdf');
-        } catch (FileNotFoundException $e) {
-            $gls = new GLSClient();
-            $gls->auth();
-            $gls->getLetterForPackage($package->sending_number);
-            $number = $gls->getPackageNumer($package->sending_number);
-            $package->letter_number = $number;
-            $package->save();
-            $gls->logout();
-            ConfirmPackages::create(['package_id' => $package->id]);
-            $file = Storage::disk('private')->get('labels/gls/' . $package->sending_number . '.pdf');
+        if(Storage::disk('private')->exists('labels/gls/' . $package->sending_number . '.pdf') !== true) {
+            try {
+                $gls = new GLSClient();
+                $gls->auth();
+                $gls->getLetterForPackage($package->sending_number);
+                $number = $gls->getPackageNumer($package->sending_number);
+                $package->letter_number = $number;
+                $package->save();
+                $gls->logout();
+
+                ConfirmPackages::query()->create(['package_id' => $package->id]);
+            }
+            catch (Exception $e)
+            {
+                Log::error("Błąd pobierania paczki" . $e->getMessage() . '<br/>' . $e->getTraceAsString());
+                return '';
+            }
         }
-        return $file;
+        return Storage::disk('private')->get('labels/gls/' . $package->sending_number . '.pdf');
     }
 
     public function letters($courier_name)
