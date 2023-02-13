@@ -347,8 +347,7 @@
             let calendarEl = document.getElementById('calendar');
             let calendar = new FullCalendar.Calendar(calendarEl, {
                 plugins: ['interaction', 'dayGrid', 'timeGrid', 'resourceTimeline'],
-                now: '
-                {{$activeDay != null ? $activeDay : new Carbon\Carbon()}}',
+                now: '{{$activeDay != null ? $activeDay : new Carbon()}}',
                 true,
                 aspectRatio: 1.8,
                 scrollTime: '7:00',
@@ -1036,7 +1035,7 @@
 
             }
         })
-            ;
+
 
             calendar.render();
         }

@@ -63,7 +63,7 @@ class OrderStatusChangedToDispatchMail extends Mailable
         // create new Chat
         $helper = new MessagesHelper();
         $helper->orderId = $order->id;
-        $helper->currentUserId = Auth::user()->id;
+        $helper->currentUserId = Auth::user()?->id;
         $helper->currentUserType = MessagesHelper::TYPE_USER;
         $userToken = $helper->encrypt();
         // $this->chatLink = 'https://'.$_SERVER['HTTP_HOST'].'/chat/'.$userToken;
