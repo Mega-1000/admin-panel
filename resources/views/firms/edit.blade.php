@@ -34,11 +34,11 @@
                 name="change-button-form" id="button-employees"
                 value="employees">@lang('firms.form.buttons.employees')</button>
         <a id="create-button-warehouse" style="float:right;margin-right: 15px;"
-           href="{{route('warehouses.create', ['id' => $firm->id]) }}" class="btn btn-success install pull-right">
+           href="{{route('warehouses.create', ['firm_id' => $firm->id]) }}" class="btn btn-success install pull-right">
             <i class="voyager-plus"></i> <span>@lang('warehouses.create')</span>
         </a>
         <a id="create-button-employee" style="float:right;margin-right: 15px;"
-           href="{{route('employees.create', ['id' => $firm->id]) }}" class="btn btn-success install pull-right">
+           href="{{route('employees.create', ['firm_id' => $firm->id]) }}" class="btn btn-success install pull-right">
             <i class="voyager-plus"></i> <span>@lang('employees.create')</span>
         </a>
     </div>
