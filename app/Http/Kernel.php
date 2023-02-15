@@ -57,11 +57,12 @@ class Kernel extends HttpKernel
             ShareErrorsFromSession::class,
             VerifyCsrfToken::class,
             SubstituteBindings::class,
+            'throttle:86400,1',
         ],
 
         'api' => [
             HandleCors::class,
-            'throttle:300,1',
+            'throttle:1200,1',
             'bindings',
         ],
     ];

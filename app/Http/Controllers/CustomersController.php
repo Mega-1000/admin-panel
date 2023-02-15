@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Entities\ColumnVisibility;
 use App\Entities\Customer;
+use App\Entities\CustomerAddress;
 use App\Entities\Order;
 use App\Helpers\Helper;
 use App\Http\Requests\CustomerCreateRequest;
 use App\Http\Requests\CustomerUpdateRequest;
 use App\Repositories\CustomerAddressRepository;
 use App\Repositories\CustomerRepository;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Exception;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
@@ -300,10 +301,8 @@ class CustomersController extends Controller
      */
     public function update(CustomerUpdateRequest $request, $id)
     {
-        $customer = $this->repository->find($id);
-        if (empty($customer)) {
-            abort(404);
-        }
+        /** @var Customer $customer */
+        $customer = Customer::query()->findOrFail($id);
         if ($request->login !== null) {
             $request->request->remove('login');
         }
@@ -316,113 +315,109 @@ class CustomersController extends Controller
 
         $this->repository->update($dataToStore, $customer->id);
 
-        $customerAddressStandard = $this->customerAddressRepository->findWhere([
-            'customer_id' => $customer->id,
-            'type' => 'STANDARD_ADDRESS'
-        ]);
+        $customerAddressStandard = $customer->standardAddress();
+
         if (Helper::checkRole('customers', 'standard_firstname') === true) {
-            $customerAddressStandard->first->id->firstname = $request->standard_firstname;
+            $customerAddressStandard->firstname = $request->standard_firstname;
         }
         if (Helper::checkRole('customers', 'standard_lastname') === true) {
-            $customerAddressStandard->first->id->lastname = $request->standard_lastname;
+            $customerAddressStandard->lastname = $request->standard_lastname;
         }
         if (Helper::checkRole('customers', 'standard_firmname') === true) {
-            $customerAddressStandard->first->id->firmname = $request->standard_firmname;
+            $customerAddressStandard->firmname = $request->standard_firmname;
         }
         if (Helper::checkRole('customers', 'standard_nip') === true) {
-            $customerAddressStandard->first->id->nip = $request->standard_nip;
+            $customerAddressStandard->nip = $request->standard_nip;
         }
         if (Helper::checkRole('customers', 'standard_phone') === true) {
-            $customerAddressStandard->first->id->phone = $request->standard_phone;
+            $customerAddressStandard->phone = $request->standard_phone;
         }
         if (Helper::checkRole('customers', 'standard_address') === true) {
-            $customerAddressStandard->first->id->address = $request->standard_address;
+            $customerAddressStandard->address = $request->standard_address;
         }
         if (Helper::checkRole('customers', 'standard_flat_number') === true) {
-            $customerAddressStandard->first->id->flat_number = $request->standard_flat_number;
+            $customerAddressStandard->flat_number = $request->standard_flat_number;
         }
         if (Helper::checkRole('customers', 'standard_city') === true) {
-            $customerAddressStandard->first->id->city = $request->standard_city;
+            $customerAddressStandard->city = $request->standard_city;
         }
         if (Helper::checkRole('customers', 'standard_postal_code') === true) {
-            $customerAddressStandard->first->id->postal_code = $request->standard_postal_code;
+            $customerAddressStandard->postal_code = $request->standard_postal_code;
         }
         if (Helper::checkRole('customers', 'standard_email') === true) {
-            $customerAddressStandard->first->id->email = $request->standard_email;
+            $customerAddressStandard->email = $request->standard_email;
         }
-        $customerAddressStandard->first->id->update();
-        $customerAddressInvoice = $this->customerAddressRepository->findWhere([
-            'customer_id' => $customer->id,
-            'type' => 'INVOICE_ADDRESS'
-        ]);
+        $customerAddressStandard->save();
+
+        /** @var CustomerAddress $customerAddressInvoice */
+        $customerAddressInvoice = $customer->invoiceAddress();
+
         if (Helper::checkRole('customers', 'invoice_firstname') === true) {
-            $customerAddressInvoice->first->id->firstname = $request->invoice_firstname;
+            $customerAddressInvoice->firstname = $request->invoice_firstname;
         }
         if (Helper::checkRole('customers', 'invoice_lastname') === true) {
-            $customerAddressInvoice->first->id->lastname = $request->invoice_lastname;
+            $customerAddressInvoice->lastname = $request->invoice_lastname;
         }
         if (Helper::checkRole('customers', 'invoice_firmname') === true) {
-            $customerAddressInvoice->first->id->firmname = $request->invoice_firmname;
+            $customerAddressInvoice->firmname = $request->invoice_firmname;
         }
         if (Helper::checkRole('customers', 'invoice_nip') === true) {
-            $customerAddressInvoice->first->id->nip = $request->invoice_nip;
+            $customerAddressInvoice->nip = $request->invoice_nip;
         }
         if (Helper::checkRole('customers', 'invoice_phone') === true) {
-            $customerAddressInvoice->first->id->phone = $request->invoice_phone;
+            $customerAddressInvoice->phone = $request->invoice_phone;
         }
         if (Helper::checkRole('customers', 'invoice_address') === true) {
-            $customerAddressInvoice->first->id->address = $request->invoice_address;
+            $customerAddressInvoice->address = $request->invoice_address;
         }
         if (Helper::checkRole('customers', 'invoice_flat_number') === true) {
-            $customerAddressInvoice->first->id->flat_number = $request->invoice_flat_number;
+            $customerAddressInvoice->flat_number = $request->invoice_flat_number;
         }
         if (Helper::checkRole('customers', 'invoice_city') === true) {
-            $customerAddressInvoice->first->id->city = $request->invoice_city;
+            $customerAddressInvoice->city = $request->invoice_city;
         }
         if (Helper::checkRole('customers', 'invoice_postal_code') === true) {
-            $customerAddressInvoice->first->id->postal_code = $request->invoice_postal_code;
+            $customerAddressInvoice->postal_code = $request->invoice_postal_code;
         }
         if (Helper::checkRole('customers', 'invoice_email') === true) {
-            $customerAddressInvoice->first->id->email = $request->invoice_email;
+            $customerAddressInvoice->email = $request->invoice_email;
         }
-        $customerAddressInvoice->first->id->update();
+        $customerAddressInvoice->save();
 
 
-        $customerAddressDelivery = $this->customerAddressRepository->findWhere([
-            'customer_id' => $customer->id,
-            'type' => 'DELIVERY_ADDRESS'
-        ]);
+        $customerAddressDelivery = $customer->deliveryAddress();
+
         if (Helper::checkRole('customers', 'delivery_firstname') === true) {
-            $customerAddressDelivery->first->id->firstname = $request->delivery_firstname;
+            $customerAddressDelivery->firstname = $request->delivery_firstname;
         }
         if (Helper::checkRole('customers', 'delivery_lastname') === true) {
-            $customerAddressDelivery->first->id->lastname = $request->delivery_lastname;
+            $customerAddressDelivery->lastname = $request->delivery_lastname;
         }
         if (Helper::checkRole('customers', 'delivery_firmname') === true) {
-            $customerAddressDelivery->first->id->firmname = $request->delivery_firmname;
+            $customerAddressDelivery->firmname = $request->delivery_firmname;
         }
         if (Helper::checkRole('customers', 'delivery_nip') === true) {
-            $customerAddressDelivery->first->id->nip = $request->delivery_nip;
+            $customerAddressDelivery->nip = $request->delivery_nip;
         }
         if (Helper::checkRole('customers', 'delivery_phone') === true) {
-            $customerAddressDelivery->first->id->phone = $request->delivery_phone;
+            $customerAddressDelivery->phone = $request->delivery_phone;
         }
         if (Helper::checkRole('customers', 'delivery_address') === true) {
-            $customerAddressDelivery->first->id->address = $request->delivery_address;
+            $customerAddressDelivery->address = $request->delivery_address;
         }
         if (Helper::checkRole('customers', 'delivery_flat_number') === true) {
-            $customerAddressDelivery->first->id->flat_number = $request->delivery_flat_number;
+            $customerAddressDelivery->flat_number = $request->delivery_flat_number;
         }
         if (Helper::checkRole('customers', 'delivery_city') === true) {
-            $customerAddressDelivery->first->id->city = $request->delivery_city;
+            $customerAddressDelivery->city = $request->delivery_city;
         }
         if (Helper::checkRole('customers', 'delivery_postal_code') === true) {
-            $customerAddressDelivery->first->id->postal_code = $request->delivery_postal_code;
+            $customerAddressDelivery->postal_code = $request->delivery_postal_code;
         }
         if (Helper::checkRole('customers', 'delivery_email') === true) {
-            $customerAddressDelivery->first->id->email = $request->delivery_email;
+            $customerAddressDelivery->email = $request->delivery_email;
         }
-        $customerAddressDelivery->first->id->update();
+        $customerAddressDelivery->save();
 
         return redirect()->back()->with([
             'message' => __('customers.message.update'),
