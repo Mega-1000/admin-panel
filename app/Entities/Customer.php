@@ -2,8 +2,12 @@
 
 namespace App\Entities;
 
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 use Laravel\Passport\HasApiTokens;
@@ -13,6 +17,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * Class Customer.
  *
  * @package namespace App\Entities;
+ *
+ * @property int $id
+ * @property int $id_from_old_db
+ * @property string $login
+ * @property string $password
+ * @property string $nick_allegro
+ * @property string $status
+ *
  */
 class Customer extends Authenticatable implements Transformable
 {
@@ -37,36 +49,46 @@ class Customer extends Authenticatable implements Transformable
         return $this->hasMany(CustomerAddress::class);
     }
 
-    public function standardAddress()
+    public function standardAddress(): CustomerAddress
     {
+        /** @var CustomerAddress $standardAddress */
         $standardAddress = $this->addresses()->where('type', '=', CustomerAddress::ADDRESS_TYPE_STANDARD)->first();
 
         return $standardAddress;
     }
 
-    public function invoiceAddress()
+    public function deliveryAddress(): CustomerAddress
     {
+        /** @var CustomerAddress $deliveryAddress */
+        $deliveryAddress = $this->addresses()->where('type', '=', CustomerAddress::ADDRESS_TYPE_DELIVERY)->first();
+
+        return $deliveryAddress;
+    }
+
+    public function invoiceAddress(): CustomerAddress
+    {
+        /** @var CustomerAddress $invoiceAddress */
         $invoiceAddress = $this->addresses()->where('type', '=', CustomerAddress::ADDRESS_TYPE_INVOICE)->first();
 
         return $invoiceAddress;
     }
 
-    public function orders()
+    public function orders(): HasMany
     {
         return $this->hasMany(Order::class);
     }
 
-    public function payments()
+    public function payments(): HasMany
     {
         return $this->hasMany(Payment::class);
     }
 
-    public function surplusPayments()
+    public function surplusPayments(): HasMany
     {
         return $this->hasMany(UserSurplusPayment::class, 'user_id');
     }
 
-    public $customColumnsVisibilities = [
+    public array $customColumnsVisibilities = [
         "customer_adresses.firstname",
         "lastname",
         "email",
@@ -88,38 +110,37 @@ class Customer extends Authenticatable implements Transformable
         return $this->where('login', $username)->first();
     }
 
+    /**
+     * @throws Exception
+     */
     public function generatePassword($pass)
     {
         $pass = preg_replace('/[^0-9]/', '', $pass);
         if (strlen($pass) < 9) {
-            throw new \Exception('wrong_phone');
+            throw new Exception('wrong_phone');
         }
-        return \Hash::make($pass);
+        return Hash::make($pass);
     }
 
-    public function chats()
+    public function chats():BelongsToMany
     {
         return $this->belongsToMany(Chat::class, 'chat_user')->withTimestamps();
     }
 
-    public function getIsAllegroAttribute()
+    public function getIsAllegroAttribute():bool
     {
-        return strpos($this->login, 'allegro') !== false;
+        return str_contains($this->login, 'allegro');
     }
 
-    public function transactions()
+    public function transactions():HasMany
     {
         return $this->hasMany(Transaction::class);
     }
 
     /**
      * Zwraca kolekcje posortowaną od najnowszych
-     *
-     * @return Collection
-     *
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    public function getOrderedTransaction()
+    public function getOrderedTransaction(): Collection
     {
         return $this->transactions->sortBy('id', true, true)->values();
     }
