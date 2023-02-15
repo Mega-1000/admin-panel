@@ -12,9 +12,9 @@ class AllegroChat {
         }, 20000);
         
         // auto close window after 20 min.
-        setTimeout(() => {
-            this.closeChat();
-        }, 1200000);
+        this.timeout = '';
+
+        this.inactiveCountdown();
 
         this.renderChat(messages, nickname, isPreview);
         // after render chat we've got char-wrapper and chat-footer
@@ -24,6 +24,7 @@ class AllegroChat {
         this.getNewMessages();
 
         this.chatScrollDown();
+
         this.initListeners();
     }
 
@@ -77,6 +78,7 @@ class AllegroChat {
         return `
             <div class="allegro-msg-wrapper ${type}">
                 <div class="allegro-msg-header">
+                    <div class="allegro-msg-type">${type === 'incoming' ? `Przychodząca` : `Wychodząca`}</div>
                     <div class="allegro-msg-date" data-date="${date}">[${date}]</div>
                     <div class="allegro-msg-consultant">
                         Konsultant: <strong>${msg?.user?.name}</strong>
@@ -110,6 +112,16 @@ class AllegroChat {
         window.close();
     }
 
+    inactiveCountdown() {
+        clearTimeout(this.timeout);
+
+        // restart timeout
+        // auto close window after 15 min.
+        this.timeout = setTimeout(() => {
+            this.closeChat();
+        }, 900000);
+    }
+
     chatScrollDown() {
         setTimeout(() => {
             const msgsWrapper = $('.allegro-msgs-wrapper');
@@ -125,12 +137,15 @@ class AllegroChat {
         const data = {
             threadId: this.threadId,
             lastDate,
+            isPreview,
         }
         const url = this.ajaxPath + 'allegro/getNewMessages/'+this.threadId;
         let messages = await ajaxPost(data, url);
         this.footer.removeClass('loader-2');
         
         if(messages == 'null') return false;
+
+        this.inactiveCountdown();
 
         const messagesTemplate = messages.map(msg => this.makeSingleMessageTemplate(msg)).join('');
 
@@ -179,15 +194,17 @@ class AllegroChat {
         }
 
         const url = this.ajaxPath + 'allegro/writeNewMessage';
-        let messages = await ajaxPost(data, url);
+        let res = await ajaxPost(data, url);
 
-        if(messages == 'null') {
+        if(res != 'OK') {
             toastr.error('Nie udało się wysłać wiadomości.');
             return false;
         }
 
         textarea.val('');
         $('.allegro-add-attachment').val('');
+        
+        this.inactiveCountdown();
 
     }
 
@@ -196,7 +213,7 @@ class AllegroChat {
         const messagesTemplate = messages.map(msg => this.makeSingleMessageTemplate(msg)).join('');
 
         const chatTemplate = `
-        <div class="allegro-chat-wrapper">
+        <div class="allegro-chat-wrapper ${isPreview ? 'preview' : ''}">
             <h2>Czat Allegro</h2>
             <h3>Dotyczy użytkownika Allegro: ${nickname}</h3>
             <h3>ID czatu na Allegro: ${this.threadId}</h3>

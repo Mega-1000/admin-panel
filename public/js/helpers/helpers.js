@@ -4,7 +4,7 @@ const ajaxPost = async (data, url = './', isJson = false) => {
 
     await $.post(url, data).done(res => resData = isJson ? JSON.parse(res) : res)
     .fail(err => {
-        console.log(err?.responseJSON?.message || 'Something wrong');
+        console.log(err);
         $('.loader-2').removeClass('loader-2');
         toastr.error('Błąd systemowy, spróbuj później.');
     });
@@ -24,7 +24,7 @@ const ajaxFormData = async (formData, url = './', isJson = false) => {
         data: formData
     }).done(res => resData = isJson ? JSON.parse(res) : res)
     .fail(err => {
-        console.log(err?.responseJSON?.message || 'Something wrong');
+        console.log(err);
         $('.loader-2').removeClass('loader-2');
         toastr.error('Błąd systemowy, spróbuj później.');
     });

@@ -29,7 +29,7 @@ class AllegroChatService extends AllegroApiService {
 
         $data = [];
         if($after) {
-            $carbon = new Carbon($after, 'UTC');
+            $carbon = new Carbon($after);
             $data = [
                 'after' => $carbon->addSecond()->toISOString(),
             ];
@@ -157,7 +157,7 @@ class AllegroChatService extends AllegroApiService {
                 'type'                  => $msg['type'],
                 'allegro_offer_id'      => $offerId,
                 'allegro_order_id'      => $orderId,
-                'original_allegro_date' => $createdAt->toDateTimeString(),
+                'original_allegro_date' => $createdAt->addHour()->toDateTimeString(),
                 'created_at'            => $currentDateTime->toDateTimeString(),
                 'updated_at'            => $currentDateTime->toDateTimeString(),
             ];

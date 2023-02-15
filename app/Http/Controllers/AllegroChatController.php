@@ -33,9 +33,11 @@ class AllegroChatController extends Controller
 
         $unreadedThreads = $request->input('unreadedThreads');
 
+        if(empty($unreadedThreads)) return response()->json(null);
+
         $currentThread = $this->allegroChatService->getCurrentThread($unreadedThreads);
         
-        if(empty($unreadedThreads)) return response(null, 500);
+        if(empty($currentThread)) return response()->json(null);
 
         return response()->json($currentThread);
     }
@@ -45,7 +47,7 @@ class AllegroChatController extends Controller
 
         return response()->json($allegroPrevMessages);
     }
-    public function getMessages(string $threadId) {
+    public function getMessages(string $threadId): JsonResponse {
         // mark thread as read
         $data = [
             'read' => true
@@ -58,7 +60,7 @@ class AllegroChatController extends Controller
         } else {
             $res = $this->allegroChatService->listMessages($threadId, $allegroPrevMessages->last()->original_allegro_date);
         }
-        if($allegroPrevMessages->isEmpty() && !$res['messages']) return response(null, 500);
+        if($allegroPrevMessages->isEmpty() && !$res['messages']) return response()->json(null);
         
         $newMessages = $this->allegroChatService->insertMsgsToDB($res['messages']);
 
@@ -66,17 +68,21 @@ class AllegroChatController extends Controller
 
         if(!$allegroPrevMessages->isEmpty()) $messagesCollection = $allegroPrevMessages->concat($messagesCollection);
 
-        return response($messagesCollection);
+        return response()->json($messagesCollection);
     }
 
     public function getNewMessages(Request $data) {
 
         $threadId = $data->input('threadId');
         $lastDate = $data->input('lastDate');
-        // mark thread as read
-        $this->allegroChatService->changeReadFlagOnThread($threadId, [
-            'read' => true,
-        ]);
+        $isPreview = $data->input('isPreview');
+        
+        if(!$isPreview) {
+            // mark thread as read
+            $this->allegroChatService->changeReadFlagOnThread($threadId, [
+                'read' => true,
+            ]);
+        }
 
         $res = $this->allegroChatService->listMessages($threadId, $lastDate);
         
@@ -87,7 +93,7 @@ class AllegroChatController extends Controller
         return response($newMessages);
     }
 
-    public function writeNewMessage(Request $request) {
+    public function writeNewMessage(Request $request): JsonResponse {
 
         $content = $request->input('content');
         $threadId = $request->input('threadId');
@@ -114,11 +120,9 @@ class AllegroChatController extends Controller
             'updated_at' => date('Y-m-d H:i:s'),
         ]);
 
-        if(!$res['id']) return response('null', 200);
+        if(!$res['id']) return response()->json(null);
         
-        $newMessages = collect( $this->allegroChatService->insertMsgsToDB([ $res ]) );
-
-        return response($newMessages);
+        return response()->json('OK');
     }
 
     public function newAttachmentDeclaration(Request $request) {
@@ -165,7 +169,7 @@ class AllegroChatController extends Controller
 
     public function getAllChats(int $currentPage = 1) {
 
-        $allegroThreads = AllegroChatThread::all()->groupBy('allegro_thread_id');
+        $allegroThreads = AllegroChatThread::all()->sortBy('id', SORT_REGULAR, true)->groupBy('allegro_thread_id');
         $perPage = 20;
         $allegroThreadsChunk = PaginationHelper::paginateModelsGroupBy($allegroThreads, $currentPage, $perPage);
 

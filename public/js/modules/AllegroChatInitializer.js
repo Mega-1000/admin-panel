@@ -54,7 +54,7 @@ class AllegroChatInitializer {
         }
 
         if(!currentThread.allegro_thread_id) {
-            toastr.error('Wiadomości zostały przypisane do innych użytkowników. Proszę spróbować później');
+            toastr.error('Wiadomości zostały przypisane do innych konsultantów. Proszę spróbować później.');
             this.iconWrapper.removeClass('loader-2');
             return false;
         }
@@ -100,6 +100,7 @@ class AllegroChatInitializer {
         const messages = await ajaxPost({}, url);
 
         if(!messages) {
+            $(e.currentTarget).removeClass('loader-2');
             toastr.error('Coś poszło nie tak, prosimy spróbować raz jeszcze');
             return false;
         }
@@ -108,6 +109,7 @@ class AllegroChatInitializer {
         const outgoingMsg = messages.find(msg => !msg.is_outgoing);
 
         if(!outgoingMsg) {
+            $(e.currentTarget).removeClass('loader-2');
             toastr.error('Coś poszło nie tak, prosimy spróbować raz jeszcze');
             return false;
         }
@@ -125,6 +127,8 @@ class AllegroChatInitializer {
         };
 
         window.localStorage.setItem('preview_allegro_chat_storage', JSON.stringify(chatWindowParams));
+        $(e.currentTarget).removeClass('loader-2');
+
     }
     async openChatWindow(threadId, nickname) {
 

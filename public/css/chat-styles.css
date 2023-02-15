@@ -46,7 +46,7 @@
 }
 .allegro-msgs-wrapper {
     overflow: auto;
-    max-height: 300px;
+    max-height: 52vh
 }
 .allegro-msg-consultant {
     font-size: 14px;
@@ -58,6 +58,9 @@
     border-radius: 10px;
     margin-bottom: 15px;
     width: 70%;
+}
+.preview .allegro-msgs-wrapper {
+    max-height: 70vh;
 }
 .allegro-msg-wrapper.outgoing {
     background-color: #22a7f0;
