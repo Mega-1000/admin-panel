@@ -51,9 +51,13 @@ class Customer extends Authenticatable implements Transformable
 
     public function standardAddress(): CustomerAddress
     {
-        /** @var CustomerAddress $standardAddress */
+        /** @var ?CustomerAddress $standardAddress */
         $standardAddress = $this->addresses()->where('type', '=', CustomerAddress::ADDRESS_TYPE_STANDARD)->first();
-
+        if($standardAddress === null) {
+            return $this->addresses()->create([
+                'type' => CustomerAddress::ADDRESS_TYPE_STANDARD,
+            ]);
+        }
         return $standardAddress;
     }
 
@@ -61,15 +65,23 @@ class Customer extends Authenticatable implements Transformable
     {
         /** @var CustomerAddress $deliveryAddress */
         $deliveryAddress = $this->addresses()->where('type', '=', CustomerAddress::ADDRESS_TYPE_DELIVERY)->first();
-
+        if($deliveryAddress === null) {
+            return $this->addresses()->create([
+                'type' => CustomerAddress::ADDRESS_TYPE_DELIVERY,
+            ]);
+        }
         return $deliveryAddress;
     }
 
-    public function invoiceAddress(): CustomerAddress
+    public function invoiceAddress(): ?CustomerAddress
     {
         /** @var CustomerAddress $invoiceAddress */
         $invoiceAddress = $this->addresses()->where('type', '=', CustomerAddress::ADDRESS_TYPE_INVOICE)->first();
-
+        if($invoiceAddress === null) {
+            return $this->addresses()->create([
+                'type' => CustomerAddress::ADDRESS_TYPE_INVOICE,
+            ]);
+        }
         return $invoiceAddress;
     }
 
