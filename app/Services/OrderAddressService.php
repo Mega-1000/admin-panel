@@ -17,9 +17,9 @@ class OrderAddressService
 		return $this->errors;
 	}
 
-	public function addressIsValid(OrderAddress $address): bool
+	public function addressIsValid(?OrderAddress $address): bool
 	{
-		$addressArray = $address->toArray();
+		$addressArray = $address?->toArray() ?? [];
 		$rules = $this->getRules($address);
 
 		$validator = Validator::make($addressArray, $rules);
