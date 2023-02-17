@@ -1,11 +1,11 @@
 class AllegroChat {
     
-    chatWindow = null;
-    isChatWindowOpen = false;
+    isChatWindowOpen = true;
 
     constructor(ajaxPath, threadId, messages, nickname, isPreview) {
         this.ajaxPath = ajaxPath;
         this.threadId = threadId;
+        this.isPreview = isPreview;
 
         setInterval(() => {
             this.getNewMessages();
@@ -16,7 +16,7 @@ class AllegroChat {
 
         this.inactiveCountdown();
 
-        this.renderChat(messages, nickname, isPreview);
+        this.renderChat(messages, nickname);
         // after render chat we've got char-wrapper and chat-footer
         this.wrapper = $('.allegro-chat-wrapper');
         this.footer = $('.allegro-chat-footer');
@@ -29,6 +29,9 @@ class AllegroChat {
     }
 
     initListeners() {
+
+        document.addEventListener("visibilitychange", () => this.handleWindowVisibilityChange());
+
         $('.allegro-send').on('click', () => {
             this.footer.addClass('loader-2');
 
@@ -46,6 +49,16 @@ class AllegroChat {
             this.wrapper.addClass('loader-2');
             this.closeChat();
         });
+
+    }
+
+    handleWindowVisibilityChange() {
+
+        if(!this.isChatWindowOpen) return false;
+
+        const dateTime = getCurrentDateTime(new Date);
+
+        window.localStorage.setItem('allegro_chat_last_check', dateTime);
     }
 
     async downloadAttachment(e) {
@@ -109,6 +122,10 @@ class AllegroChat {
         const url = this.ajaxPath + 'allegro/exitChat/'+this.threadId;
         await ajaxPost({}, url);
 
+        window.localStorage.removeItem('allegro_chat_last_check');
+        window.localStorage.removeItem('DataTables_dataTable_/admin/orders');
+        this.isChatWindowOpen = false;
+        
         window.close();
     }
 
@@ -137,7 +154,7 @@ class AllegroChat {
         const data = {
             threadId: this.threadId,
             lastDate,
-            isPreview,
+            isPreview: this.isPreview,
         }
         const url = this.ajaxPath + 'allegro/getNewMessages/'+this.threadId;
         let messages = await ajaxPost(data, url);
@@ -208,17 +225,17 @@ class AllegroChat {
 
     }
 
-    renderChat(messages, nickname, isPreview) {
+    renderChat(messages, nickname) {
 
         const messagesTemplate = messages.map(msg => this.makeSingleMessageTemplate(msg)).join('');
 
         const chatTemplate = `
-        <div class="allegro-chat-wrapper ${isPreview ? 'preview' : ''}">
+        <div class="allegro-chat-wrapper ${this.isPreview ? 'preview' : ''}">
             <h2>Czat Allegro</h2>
             <h3>Dotyczy użytkownika Allegro: ${nickname}</h3>
             <h3>ID czatu na Allegro: ${this.threadId}</h3>
             <div class="allegro-msgs-wrapper">${messagesTemplate}</div>
-            ${!isPreview ? `<hr>
+            ${!this.isPreview ? `<hr>
             <div class="allegro-chat-footer">
                 <textarea class="allegro-textarea"></textarea>
                 <div>

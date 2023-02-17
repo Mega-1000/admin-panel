@@ -70,3 +70,13 @@ const saveFileAs = (fileName, content, contentType) => {
     
     downloadLink.click();
 }
+
+// pass new Date() for get DateTime format
+const getCurrentDateTime = date => {
+
+    const hour = date.getHours();
+    date.setUTCHours(hour);
+    const currentDateTime = date.toISOString().replace('T', ' ').slice(0, -5);
+    
+    return currentDateTime;
+};

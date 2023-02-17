@@ -24,11 +24,25 @@ class AllegroChatController extends Controller
         return view('allegro.chat-window');
     }
 
-    public function checkUnreadedThreads(): JsonResponse {
-        $unreadedThreads = setting('allegro.unreaded_chat_threads') ?: '[]';
+    public function checkUnreadedThreads(Request $request): JsonResponse {
 
-        return response()->json(json_decode($unreadedThreads));
+        $chatLastCheck = $request->input('chatLastCheck');
+        
+        $areNewMessages = false;
+        if($chatLastCheck) {
+            $areNewMessages = $this->allegroChatService->areNewMessages($chatLastCheck);
+        }
+
+        $unreadedThreads = setting('allegro.unreaded_chat_threads') ?: '[]';
+        
+        $response = [
+            'unreadedThreads' => json_decode($unreadedThreads),
+            'areNewMessages' => $areNewMessages,
+        ];
+
+        return response()->json($response);
     }
+
     public function bookThread(Request $request) {
 
         $unreadedThreads = $request->input('unreadedThreads');
@@ -41,12 +55,14 @@ class AllegroChatController extends Controller
 
         return response()->json($currentThread);
     }
+
     public function messagesPreview(string $threadId) {
 
         $allegroPrevMessages = AllegroChatThread::where('allegro_thread_id', $threadId)->where('type', '!=', 'PENDING')->with('user')->get();
 
         return response()->json($allegroPrevMessages);
     }
+
     public function getMessages(string $threadId): JsonResponse {
         // mark thread as read
         $data = [

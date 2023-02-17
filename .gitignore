@@ -12,6 +12,7 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 package-lock.json
+composer.lock
 composer.phar
 yarn-error.log
 .env
