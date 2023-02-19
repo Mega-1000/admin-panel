@@ -800,4 +800,16 @@ class Order extends Model implements Transformable
     {
         return $this->hasMany(OrderOffer::class)->orderBy('created_at', 'desc');
     }
+
+    public function orderReturn(): HasMany
+    {
+        return $this->hasMany(OrderReturn::class);
+    }
+
+    public function returnPosition($position=null)
+    {
+        $return = $this->orderReturn->where('product_stock_position_id', $position);
+        return $return->first();
+    }
+    
 }

@@ -42,6 +42,7 @@ return [
         'deselect_all'           => 'Odznacz wszystkie',
         'download'               => 'Pobierz',
         'edit'                   => 'Edytuj',
+        'return'                 => 'Zwrot',
         'email'                  => 'E-mail',
         'error_deleting'         => 'Wybacz, ale wygląda na to, że wystąpił problem podczas usuwania tego',
         'exception'              => 'Wyjątek',

@@ -37,6 +37,16 @@ class ProductStockPosition extends Model implements Transformable
         return $this->belongsTo(ProductStock::class, 'product_stock_id', 'id');
     }
 
+
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function return()
+    {
+        return $this->hasMany(OrderReturn::class, 'product_stock_position_id', 'id');
+    }
+
     public $customColumnsVisibilities = [
         'lane',
         'bookstand',

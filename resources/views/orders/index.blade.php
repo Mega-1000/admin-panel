@@ -1655,9 +1655,9 @@
                         render: function (token, row, data) {
                             let html = '';
                             if (data.print_order == '0') {
-                                html = '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-default" id="btn-print">W</a>';
+                                html = '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-default" id="btn-print">W</a><a href="/admin/orderReturn/' + data.order_id + '/print" target="_blank" class="btn btn-danger">WP</a>';
                             } else {
-                                html = '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-success">W</a>';
+                                html = '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-success">W</a><a href="/admin/orderReturn/' + data.order_id + '/print" target="_blank" class="btn btn-danger">WP</a>';
                             }
                             return html;
                         }
@@ -1729,6 +1729,10 @@
                             html += '<a href="{{ url()->current() }}/' + id + '/edit" class="btn btn-sm btn-primary edit">';
                             html += '<i class="voyager-edit"></i>';
                             html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
+                            html += '</a>';
+                            html += '<a href="/admin/orderReturn/' + id + '" class="btn btn-sm btn-danger edit">';
+                            html += '<i class="glyphicon glyphicon-share-alt"></i>';
+                            html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.return')</span>';
                             html += '</a>';
                             @if((Auth::user()->role_id == 1 || Auth::user()->role_id == 2) && Auth::user()->id === User::ORDER_DELETE_USER)
                                 html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecord(' + id + ')">';
