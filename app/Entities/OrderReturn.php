@@ -20,7 +20,8 @@ class OrderReturn extends Model
         'photo',
     ];
 
-    public function getImageUrl(){
+    public function getImageUrl(): ?string
+    {
         return $this->photo ? asset('storage/'.str_replace('public/','/',$this->photo)) : null;
     }
 }
