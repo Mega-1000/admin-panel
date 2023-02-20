@@ -1,5 +1,8 @@
 <?php
 
+use App\Entities\AllegroChatThread;
+use App\Jobs\AllegroSaveUnreadedChatThreads;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -25,6 +28,13 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::group(['prefix' => 'products'], function () {
             Route::group(['prefix' => 'sets', 'as' => 'sets.'], __DIR__ . '/web/ProductsSetsRoutes.php');
+        });
+
+        Route::get('/test', function() {
+            $alreadyOpenedThreads = AllegroChatThread::where('type', 'PENDING')
+                                    ->whereIn('allegro_thread_id', ['sIXfgnBFrqZMyO8w47eebiVMWIKrM7S0CHYSko2Jq8D', 'sIXfgnBFrqZMyO8w47eebiVMWIKrM7S0CHYSko2Jq8H'])
+                                    ->pluck('allegro_thread_id')->toArray();
+            echo '<pre>' , print_r($alreadyOpenedThreads) , '</pre>';
         });
 
         Route::get('/disputes', 'AllegroDisputeController@list');

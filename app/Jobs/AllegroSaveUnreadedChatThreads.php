@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use Illuminate\Bus\Queueable;
 use TCG\Voyager\Models\Setting;
+use Illuminate\Support\Facades\Log;
 use App\Services\AllegroChatService;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -46,6 +47,8 @@ class AllegroSaveUnreadedChatThreads implements ShouldQueue
             'order' => 1,
             'group' => 'AllegroChat',
         ]);
+        
+        Log::info("Unreaded Threads: ".json_encode($this->unreadedThreads));
     }
 
     private function getThreads($offset)

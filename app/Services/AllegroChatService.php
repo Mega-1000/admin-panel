@@ -28,7 +28,7 @@ class AllegroChatService extends AllegroApiService {
     public function listMessages(string $threadId, string $after = null) {
 
         $data = [];
-        if($after) {
+        if ($after) {
             $carbon = new Carbon($after);
             $data = [
                 'after' => $carbon->addSecond()->toISOString(),
@@ -80,7 +80,7 @@ class AllegroChatService extends AllegroApiService {
     public function areNewMessages(string $chatLastCheck): bool {
 
         $user = auth()->user();
-        
+
         $pendingMsg = AllegroChatThread::where([
             ['user_id', '=', $user->id],
             ['updated_at', '>', $chatLastCheck],
@@ -99,31 +99,29 @@ class AllegroChatService extends AllegroApiService {
             'type'    => 'PENDING',
         ])->first();
 
-        if( !empty($currentThread) ) return $currentThread->toArray();
+        Log::info("Current Thread: " . json_encode($currentThread));
 
-        if( empty($unreadedThreads) ) return $currentThread;
+        if (!empty($currentThread)) return $currentThread->toArray();
 
         $unreadedThreadsIds = array_column($unreadedThreads, 'id');
 
-        $alreadyOpenedThreads = AllegroChatThread::where([
-            'allegro_thread_id' => $unreadedThreadsIds,
-            'type'              => 'PENDING',
-        ])->pluck('allegro_thread_id')->toArray();
+        $alreadyOpenedThreads = AllegroChatThread::where('type', 'PENDING')
+            ->whereIn('allegro_thread_id', $unreadedThreadsIds)
+            ->pluck('allegro_thread_id')->toArray();
+
+        Log::info("Already Opened Threads: " . json_encode($alreadyOpenedThreads));
 
         // flip for swap allegro_thread_id as key
         $alreadyOpenedThreads = array_flip($alreadyOpenedThreads);
 
-        Log::info("Opened threads: ".json_encode($alreadyOpenedThreads));
-        Log::info("Unreaded Threads: ".json_encode($unreadedThreads));
-
-        foreach($unreadedThreads as $uThread) {
+        foreach ($unreadedThreads as $uThread) {
             // check if thread is already booked
-            if(isset($alreadyOpenedThreads[ $uThread['id'] ])) continue;
+            if (isset($alreadyOpenedThreads[$uThread['id']])) continue;
 
             // prepare temp Allegro Thread for User
             $newPendingThread = AllegroChatThread::create([
                 'allegro_thread_id'     => $uThread['id'],
-                'allegro_msg_id'        => 'temp_for_'.$user->id,
+                'allegro_msg_id'        => 'temp_for_' . $user->id,
                 'user_id'               => $user->id,
                 'allegro_user_login'    => $uThread['interlocutor']['login'],
                 'content'               => '',
@@ -135,6 +133,8 @@ class AllegroChatService extends AllegroApiService {
             $currentThread = $newPendingThread->toArray();
             break;
         }
+        Log::info("New Pending Thread:" . json_encode($currentThread));
+
         return $currentThread;
     }
     public function insertMsgsToDB(array $msgs): array {
@@ -143,16 +143,16 @@ class AllegroChatService extends AllegroApiService {
         $newMessages = [];
         $user = auth()->user();
 
-        foreach($messages as $msg) {
+        foreach ($messages as $msg) {
             $createdAt = new Carbon($msg['createdAt']);
             $currentDateTime = new Carbon();
 
             $offerId = '';
             $orderId = '';
-            if( isset($msg['relatesTo']['offer']['id']) ) {
+            if (isset($msg['relatesTo']['offer']['id'])) {
                 $offerId = $msg['relatesTo']['offer']['id'];
             }
-            if( isset($msg['relatesTo']['order']['id']) ) {
+            if (isset($msg['relatesTo']['order']['id'])) {
                 $orderId = $msg['relatesTo']['order']['id'];
             }
 
@@ -182,6 +182,8 @@ class AllegroChatService extends AllegroApiService {
                 'email' => $user->email,
             ];
         }
+
+        Log::info("Allegro Chat New Message:" . json_encode($newMessage));
 
         return $newMessages;
     }

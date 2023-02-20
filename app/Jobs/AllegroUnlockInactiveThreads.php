@@ -5,6 +5,7 @@ namespace App\Jobs;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use App\Entities\AllegroChatThread;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -21,9 +22,11 @@ class AllegroUnlockInactiveThreads implements ShouldQueue
         $currentDate = Carbon::now();
         $currentDateTime = $currentDate->subMinutes(15)->toDateTimeString();
 
-        AllegroChatThread::where([
+        $deleted = AllegroChatThread::where([
             ['type', '=', 'PENDING'],
             ['updated_at', '<', $currentDateTime],
         ])->delete();
+
+        Log::info("Deleted Pending Threads: " . json_encode($deleted));
     }
 }

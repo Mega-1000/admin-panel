@@ -129,11 +129,15 @@ class AllegroChatController extends Controller
 
         $res = $this->allegroChatService->newMessage($threadId, $data);
 
+        // update current time for prevent unmark msg for consultant
+        $currentDate = Carbon::now();
+        $currentDateTime = $currentDate->toDateTimeString();
+        
         AllegroChatThread::where([
             'allegro_thread_id' => $threadId,
             'type' => 'PENDING',
         ])->update([
-            'updated_at' => date('Y-m-d H:i:s'),
+            'updated_at' => $currentDateTime,
         ]);
 
         if(!$res['id']) return response()->json(null);
