@@ -46,7 +46,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(Jobs\CheckNotificationsMailbox::class)->cron('*/15 7-19 * * 1-6');
 
         // monday to saturday between 6 - 24
-        $schedule->job(Jobs\AllegroSaveUnreadedChatThreads::class)->cron('*/2 5-23 * * 1-6')->withoutOverlapping(5);
+        $schedule->job(Jobs\AllegroSaveUnreadedChatThreads::class)->cron('*/2 5-23 * * 1-6');
         $schedule->job(Jobs\AllegroUnlockInactiveThreads::class)->everyTenMinutes();
 
         $schedule->job(Jobs\UpdateAllegroDisputes::class)->everyFiveMinutes();

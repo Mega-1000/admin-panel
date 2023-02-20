@@ -2,19 +2,27 @@
 
 namespace App\Jobs;
 
-use App\Services\AllegroChatService;
 use Illuminate\Bus\Queueable;
+use TCG\Voyager\Models\Setting;
+use App\Services\AllegroChatService;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use TCG\Voyager\Models\Setting;
+use Illuminate\Queue\Middleware\WithoutOverlapping;
 
 class AllegroSaveUnreadedChatThreads implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public $unreadedThreads = [];
+
+    public function middleware(): array
+    {
+        return [
+            (new WithoutOverlapping())->dontRelease()
+        ];
+    }
 
     public function handle()
     {
