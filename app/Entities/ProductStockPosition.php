@@ -42,7 +42,7 @@ class ProductStockPosition extends Model implements Transformable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function return()
+    public function return(): HasMany
     {
         return $this->hasMany(OrderReturn::class, 'product_stock_position_id', 'id');
     }
