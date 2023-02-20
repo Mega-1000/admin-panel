@@ -1,5 +1,6 @@
+<h3>{{ $title }}</h3>
 <div class="flex-container-labels">
-    <div class="col-md-8">
+    <div class="col-md-6">
         <p class="text-left">Dodaj etykiety</p>
         <div class="row">
 
@@ -16,7 +17,6 @@
                 @if($user_type === \App\Enums\UserRole::Consultant)
                 <h6 title="{{ $labelsButtons[\App\Entities\Label::WAREHOUSE_MARK]->name}}"
                         data-label-id="{{\App\Entities\Label::WAREHOUSE_MARK}}" class="add-label">
-                    informacja dla mastera - dialog
                 </h6>
                 @endif
             </div>
@@ -33,7 +33,6 @@
                 @if($user_type === \App\Enums\UserRole::Consultant)
                 <h6 title="{{ $labelsButtons[\App\Entities\Label::SHIPPING_MARK]->name}}"
                     data-label-id="{{\App\Entities\Label::SHIPPING_MARK}}" class="add-label">
-                    informacja dla konsultanta - dialog
                 </h6>
                 @endif
             </div>
@@ -50,7 +49,6 @@
                 @if($user_type === \App\Enums\UserRole::Consultant)
                 <h6 title="{{ $labelsButtons[\App\Entities\Label::CONSULTANT_MARK]->name}}"
                     data-label-id="{{\App\Entities\Label::CONSULTANT_MARK}}" class="add-label">
-                    informacja dla magazynu / dialog
                 </h6>
                 @endif
             </div>
@@ -67,14 +65,12 @@
                 @if($user_type === \App\Enums\UserRole::Consultant)
                 <h6 title="{{ $labelsButtons[\App\Entities\Label::MASTER_MARK]->name}}"
                     data-label-id="{{\App\Entities\Label::MASTER_MARK}}" class="add-label">
-                    informacja dla księgowości / dialog
                 </h6>
                 @endif
             </div>
         </div>
     </div>
-    <label for="">{{ $title }}</label>
-    <div class="col-md-2">
+    <div class="col-md-6">
         <p class="text-center">Usuń etykiety</p>
         <div class="row">
 

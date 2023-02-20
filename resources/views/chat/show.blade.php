@@ -39,7 +39,9 @@
                 </div>
             @endif
             <div class="vue-components">
-                <order-dates order-id="{{ $order->id }}" user-type="{{ $user_type }}" chat-id="{{ empty($chat) ? null : $chat->id }}"></order-dates>
+                @if(!empty($order))
+                    <order-dates order-id="{{ $order->id }}" user-type="{{ $user_type }}" chat-id="{{ empty($chat) ? null : $chat->id }}"></order-dates>
+                @endif
             </div>
             @if ($chat)
                 @include('chat.chat_body')

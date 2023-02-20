@@ -477,6 +477,25 @@
             </div>
             <div class="container-fluid">
                 <div class="row">
+                    <div class="col-md-7">
+                        <h3>Podgląd czatu</h3>
+                        <a href="" class="btn btn-success">
+                            Wyświetl czat
+                        </a>
+                    </div>
+                    <div class="col-md-5">
+                        @include('orders.labels', ['title' =>  'Etykiety', 'user_type' => UserRole::Consultant])
+                        <button onclick="goToPreviousOrder()" class="btn btn-success" type="button">
+                            @lang('orders.next_order')
+                        </button>
+                        <button onclick="goToNextOrder()" class="btn btn-success" type="button">
+                            @lang('orders.previous_order')
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="row">
                     <div class="col-md-4">
                         <div class="form-group">
                             <div>

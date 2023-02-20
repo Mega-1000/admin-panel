@@ -9,6 +9,7 @@ use App\Entities\PostalCodeLatLon;
 use App\Helpers\Exceptions\ChatException;
 use App\Helpers\MessagesHelper;
 use Exception;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
@@ -118,7 +119,7 @@ class MessagesController extends Controller
         }
     }
 
-    private function prepareChatView($token)
+    private function prepareChatView(string $token): View
     {
         $helper = new MessagesHelper($token);
         $chat = $helper->getChat();
@@ -136,17 +137,21 @@ class MessagesController extends Controller
         $possibleUsers = collect();
         $notices = '';
         if ($product && !empty($chat->customers)) {
+            // get possible users from company / firm
             $possibleUsers = $this->getNotAttachedChatUsersForProduct($product, $chat->customers->first());
         } else if ($order) {
-            $possibleUsers = $this->getNotAttachedChatUsersForOrder($order, $users);
+            // get possible users from company / firm
+            $possibleUsers = $this->getNotAttachedChatUsersForOrder($order);
             if ($helper->currentUserType == MessagesHelper::TYPE_USER || $helper->currentUserType == MessagesHelper::TYPE_EMPLOYEE) {
                 $notices = $order->consultant_notices;
             }
         }
+        // get possible users from customerChatList
         $possibleUsers = $this->addCustomerToChatList($chat, $possibleUsers, $users, $helper);
         $productList = $this->prepareProductList($helper);
 
         $token = $helper->encrypt();
+
         $view = view('chat.show')->with([
             'product_list' => $productList,
             'faq' => $this->prepareFaq($users),
@@ -205,7 +210,7 @@ class MessagesController extends Controller
      * @param Collection $users
      * @return array
      */
-    private function getNotAttachedChatUsersForOrder($order, Collection $users): Collection
+    private function getNotAttachedChatUsersForOrder($order): Collection
     {
         $possibleUsers = collect();
         foreach ($order->items as $product) {
@@ -218,7 +223,7 @@ class MessagesController extends Controller
         return $possibleUsers;
     }
 
-    private function addCustomerToChatList($chat, $possibleUsers, Collection $users, $helper): Collection
+    private function addCustomerToChatList(Chat|null $chat, Collection $possibleUsers, Collection $users, MessagesHelper $helper): Collection
     {
         if ($chat) {
             $possibleUsers = $this->filterPossibleUsersWithCurrentlyAdded($possibleUsers, $chat, $users);
@@ -231,11 +236,10 @@ class MessagesController extends Controller
                     $possibleUsers->push($chat->customers()->first());
                 }
             }
-        } else {
-            if ($helper->getOrder()) {
-                $customer = $helper->getOrder()->customer;
-                $possibleUsers->push($customer);
-            }
+        }
+        if ($helper->getOrder()) {
+            $customer = $helper->getOrder()->customer;
+            $possibleUsers->push($customer);
         }
         return $possibleUsers;
     }
