@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Entities\Chat;
-use App\Entities\Employee;
-use App\Entities\Firm;
-use App\Entities\PostalCodeLatLon;
-use App\Helpers\Exceptions\ChatException;
-use App\Helpers\MessagesHelper;
 use Exception;
-use Illuminate\Contracts\View\View;
+use App\Entities\Chat;
+use App\Entities\Firm;
+use App\Enums\UserRole;
+use App\Entities\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Helpers\MessagesHelper;
+use App\Entities\PostalCodeLatLon;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use App\Helpers\Exceptions\ChatException;
 
 class MessagesController extends Controller
 {

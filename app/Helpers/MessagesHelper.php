@@ -2,23 +2,24 @@
 
 namespace App\Helpers;
 
-use App\Entities\Chat;
-use App\Entities\CustomerAddress;
-use App\Entities\Label;
-use App\Entities\Product;
-use App\Entities\Order;
-use App\Entities\WorkingEvents;
-use App\Jobs\AddLabelJob;
-use App\Jobs\ChatNotificationJob;
-use App\Jobs\RemoveLabelJob;
 use App\User;
+use App\Entities\Chat;
+use App\Entities\Label;
+use App\Entities\Order;
+use App\Enums\UserRole;
+use App\Entities\Message;
+use App\Entities\Product;
+use App\Jobs\AddLabelJob;
 use App\Entities\Customer;
 use App\Entities\Employee;
+use App\Jobs\RemoveLabelJob;
 use App\Entities\ProductMedia;
+use App\Entities\WorkingEvents;
+use App\Entities\CustomerAddress;
+use App\Jobs\ChatNotificationJob;
 use App\Entities\PostalCodeLatLon;
-use App\Entities\Message;
-use App\Helpers\Exceptions\ChatException;
 use Illuminate\Support\Facades\Hash;
+use App\Helpers\Exceptions\ChatException;
 
 class MessagesHelper
 {
@@ -258,7 +259,7 @@ class MessagesHelper
         }
     }
 
-    public function addMessage($message)
+    public function addMessage(string $message, string $area = UserRole::Main): void
     {
         $chat = $this->getChat();
         $chatUser = $this->getCurrentChatUser();
@@ -268,6 +269,7 @@ class MessagesHelper
         $messageObj = new Message();
         $messageObj->message = $message;
         $messageObj->chat_id = $chat->id;
+        $messageObj->area = $area;
         if (!$chatUser) {
             throw new ChatException('Cannot save message');
         }
@@ -289,6 +291,9 @@ class MessagesHelper
                 ));
             } else {
                 dispatch_now(new RemoveLabelJob($chat->order, [self::MESSAGE_YELLOW_LABEL_ID]));
+            }
+            if($this->currentUserType == self::TYPE_USER) {
+
             }
         }
         WorkingEvents::createEvent(WorkingEvents::CHAT_MESSAGE_ADD_EVENT, $chat->order->id);

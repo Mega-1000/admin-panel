@@ -1,3 +1,5 @@
+@php use App\Enums\UserRole; @endphp
+
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
 <head>
@@ -49,6 +51,13 @@
             <form id="new-message" action="{{ $route }}">
                 <div class="row">
                     <div class="col-sm-9">
+                        <select name="msg_area" id="msg_area">
+                            <option value="{{ UserRole::Main }}">Główny</option>
+                            <option value="{{ UserRole::Storekeeper }}">Magazyn</option>
+                            <option value="{{ UserRole::SuperAdministrator }}">Administrator</option>
+                            <option value="{{ UserRole::Consultant }}">Konsultant</option>
+                            <option value="{{ UserRole::Accountant }}">Księgowość</option>
+                        </select>
                         <textarea required class="form-control" id="message"
                                   style="resize: none; width: 100%; height: 46px;"
                                   placeholder="Tutaj wpisz wiadomość"></textarea>
@@ -126,10 +135,14 @@
             e.preventDefault();
             var message = $('#message').val();
             $('#message').val('');
+            const area = $('#msg_area').val();
 
             $.post(
                 $(this).attr('action'),
-                {message: message},
+                {
+                    area,
+                    message,
+                },
                 function (data) {
                     refreshRate = 1;
                     nextRefresh = 0;

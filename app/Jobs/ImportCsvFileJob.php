@@ -2,19 +2,20 @@
 
 namespace App\Jobs;
 
-use App\Entities\ProductTradeGroup;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
+use App\Entities;
+use App\Entities\Employee;
 use Illuminate\Bus\Queueable;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use App\Entities\ProductTradeGroup;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
-use App\Entities;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 /**
  * Class ImportCsvFileJob
@@ -75,6 +76,8 @@ class ImportCsvFileJob implements ShouldQueue
 
             $array = $this->getProductArray($line, $categoryColumn);
             $categoryTree = $this->getCategoryTree($line, $categoryColumn);
+
+            $employees = $this->getEmployeesToProduct($line);
 
             try {
                 $multiCalcBase = trim($line[$categoryColumn + 12]);
@@ -547,6 +550,61 @@ class ImportCsvFileJob implements ShouldQueue
         }
 
         return $array;
+    }
+
+    public function getEmployeesToProduct(array $line): Employee {
+
+        $employees = collect();
+        // single employee has 17 columns, let's take 10 employees for each product line, we've got result 170 of columns total
+        $employeesColumns = 17;
+        $numberOfEmployees = 10;
+        $employeesLines = array_slice($line, 1147, $employeesColumns * $numberOfEmployees);
+        // get rows with every employee
+        $employeesRows = array_chunk($employeesLines, $employeesColumns);
+
+        foreach ($employeesRows as $employee) {
+            // missing firstname, lastname or email
+            $firstName = $employee[0];
+            $lastName = $employee[2];
+            $email = $employee[4];
+            if( !$firstName || !$lastName || !$email ) continue;
+
+            $employee = Employee::where([
+                'firstname' => $firstName,
+                'lastname'  => $lastName,
+                'email'     => $email,
+            ])->first();
+
+            if(!$employee) {
+                $employee = new Employee();
+                $warehouse = 'TODO';
+                $firm = 'TODO';
+            }
+            
+            $employee->firstname = $firstName;
+            $employee->firstname_visibility = $employee[1];
+            $employee->lastName = $lastName;
+            $employee->lastname_visibility = $employee[3];
+            $employee->email = $email;
+            $employee->email_visibility = $employee[5];
+            $employee->phone = $employee[6];
+            $employee->phone_visibility = $employee[7];
+            $employee->phone_visibility = $employee[8];
+            $employee->warehouse_id = $employee[9];
+            $employee->comments = $employee[10];
+            $employee->comments_visibility = $employee[11];
+            $employee->additional_comments = $employee[12];
+            $employee->faq = $employee[13];
+            $employee->post_code = $employee[14];
+            $employee->radius = $employee[15];
+            $employee->status = $employee[16;
+
+            $employee->save();
+            // TODO save employee ID inside product
+            $employee->id;
+        }
+
+        return $employee;
     }
 
     private function getCategoryColumn($line)

@@ -484,105 +484,16 @@
                         </a>
                     </div>
                     <div class="col-md-5">
-                        @include('orders.labels', ['title' =>  'Etykiety', 'user_type' => UserRole::Consultant])
+                        @include('orders.labels', ['title' => __('orders.form.warehouse_notice'), 'user_type' => UserRole::Storekeeper])
+                        @include('orders.labels', ['title' => 'Informacje dla spedycji', 'user_type' => UserRole::SuperAdministrator])
+                        @include('orders.labels', ['title' =>  __('orders.form.consultant_notices'), 'user_type' => UserRole::Consultant])
+                        @include('orders.labels', ['title' =>  __('orders.form.financial_notices'), 'user_type' => UserRole::Accountant])
                         <button onclick="goToPreviousOrder()" class="btn btn-success" type="button">
                             @lang('orders.next_order')
                         </button>
                         <button onclick="goToNextOrder()" class="btn btn-success" type="button">
                             @lang('orders.previous_order')
                         </button>
-                    </div>
-                </div>
-            </div>
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <div>
-                                @include('orders.labels', ['title' => __('orders.form.warehouse_notice'), 'user_type' => UserRole::Storekeeper])
-                                <textarea rows="5" cols="40" class="form-control" id="warehouse_notice"
-                                          name="warehouse_notice"
-                                          disabled>{{ $order->warehouse_notice ?? ''}}</textarea>
-                                <div class="flex-input">
-                                    <input type="text" class="form-control scrollable-notice"
-                                           placeholder="@lang('orders.form.warehouse_notice')"
-                                           id="{{ Order::COMMENT_WAREHOUSE_TYPE }}"
-                                           name="warehouse_notice"/>
-                                    <div class="input-group-append">
-                                        <button
-                                            onclick="sendComment('{{ Order::COMMENT_WAREHOUSE_TYPE }}')"
-                                            class="btn btn-success" type="button">wyślij
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <div>
-                                @include('orders.labels', ['title' => 'Informacje dla spedycji', 'user_type' => UserRole::SuperAdministrator])
-                                <textarea id="shipping_notice" class="form-control" rows="5"
-                                          disabled>{{ $order->spedition_comment ?? ''}}</textarea>
-                                <div class="flex-input">
-                                    <input type="text" class="form-control scrollable-notice"
-                                           placeholder="Informacje dla spedycji"
-                                           id="{{ Order::COMMENT_SHIPPING_TYPE }}"
-                                           name="spedition_comment"/>
-                                    <div class="input-group-append">
-                                        <button
-                                            onclick="sendComment('{{ Order::COMMENT_SHIPPING_TYPE }}')"
-                                            class="btn btn-success" type="button">wyślij
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            @include('orders.labels', ['title' =>  __('orders.form.consultant_notices'), 'user_type' => UserRole::Consultant])
-                            <textarea id="consultant_notice" disabled class="form-control" name="consultant_notices"
-                                      id="consultant_notices"
-                                      rows="5">{{ $order->consultant_notices ?? ''}}</textarea>
-                            <h5>Zlecenie numer {{ $order->id }}
-                                - {{ $orderInvoiceAddress->nip ? 'Klient firmowy' : 'Klient prywatny' }}</h5>
-                            <div class="flex-input">
-                                <input type="text" class="form-control scrollable-notice"
-                                       placeholder="@lang('orders.form.consultant_notices')"
-                                       id="{{ Order::COMMENT_CONSULTANT_TYPE }}"
-                                       name="consultant_notices"/>
-                                <div class="input-group-append">
-                                    <button onclick="sendComment('{{ Order::COMMENT_CONSULTANT_TYPE }}')"
-                                            class="btn btn-success consultant__button--send" type="button">wyślij
-                                    </button>
-                                    <h5 onclick="sendComment('{{ Order::COMMENT_CONSULTANT_TYPE }}')"
-                                        class="consultant__button--send" type="button">wyślij
-                                    </h5>
-                                </div>
-                            </div>
-                            <h5 onclick="goToNextOrder()">@lang('orders.next_order')</h5>
-                            <h5 onclick="goToPreviousOrder()">@lang('orders.previous_order')</h5>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            @include('orders.labels', ['title' =>  __('orders.form.financial_notices'), 'user_type' => UserRole::Accountant])
-                            <textarea id="financial_notice" disabled class="form-control scrollable-notice"
-                                      name="financial_comment" id="financial_notices"
-                                      rows="5">{{ $order->financial_comment ?? ''}}</textarea>
-                            <div class="flex-input">
-                                <input type="text" class="form-control"
-                                       placeholder="@lang('orders.form.financial_notices')"
-                                       id="{{ Order::COMMENT_FINANCIAL_TYPE }}"
-                                       name="consultant_notices"/>
-                                <div class="input-group-append">
-                                    <button onclick="sendComment('{{ Order::COMMENT_FINANCIAL_TYPE }}')"
-                                            class="btn btn-success" type="button">wyślij
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
