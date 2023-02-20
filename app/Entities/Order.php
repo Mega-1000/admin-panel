@@ -806,7 +806,7 @@ class Order extends Model implements Transformable
         return $this->hasMany(OrderReturn::class);
     }
 
-    public function returnPosition($position=null)
+    public function returnPosition(int $position=null): OrderReturn|null
     {
         $return = $this->orderReturn->where('product_stock_position_id', $position);
         return $return->first();
