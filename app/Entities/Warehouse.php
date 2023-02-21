@@ -3,12 +3,17 @@
 namespace App\Entities;
 
 use App\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
+
 /**
  * Class Warehouse.
+ *
+ * @property Collection<User> $users
  *
  * @package namespace App\Entities;
  */
@@ -63,9 +68,9 @@ class Warehouse extends Model implements Transformable
         return $this->belongsToMany(Employee::class, 'employee_warehouse');
     }
 
-    public function users()
+    public function users():HasMany
     {
-        return $this->hasMany(User::class);
+        return $this->hasMany(User::class, 'warehouse_id', 'id');
     }
 
     public $customColumnsVisibilities = [

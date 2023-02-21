@@ -58,7 +58,7 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::get('/getDelivererImportLog/{id}', 'DelivererController@getDelivererImportLog')->name('deliverer.getImportLog');
 
-        Route::get('/warehouse/{id}', 'OrdersController@getCalendar');
+        Route::get('/warehouse/{warehouse}', 'OrdersController@getCalendar')->name('orders.get-calendar');
 
         Route::get('/get/user/{id}',
             'OrdersController@getUserInfo');

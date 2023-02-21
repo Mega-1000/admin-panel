@@ -102,7 +102,7 @@ class OrderAddressService
         $address->nip = $nipString;
     }
 
-	protected function getRules(OrderAddress $address): array
+	protected function getRules(?OrderAddress $address): array
 	{
 		$rules = [
 			'email' => ['required', 'email'],
@@ -112,6 +112,9 @@ class OrderAddressService
 			'postal_code' => ['required'],
 			'phone' => ['required']
 		];
+        if($address === null) {
+            return $rules;
+        }
 
 		if ($address->type == OrderAddress::TYPE_DELIVERY) {
 			$rules['firstname'] = ['required'];

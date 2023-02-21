@@ -2970,15 +2970,9 @@ class OrdersController extends Controller
         ]);
     }
 
-    public function getCalendar(int $id)
+    public function getCalendar(Warehouse $warehouse)
     {
-        $warehouse = $this->warehouseRepository->find($id);
-
-        if (empty($warehouse)) {
-            abort(404);
-        }
-
-        return response()->json($warehouse->users, 200);
+        return response()->json($warehouse->users()->get(), 200);
     }
 
     public function getFile(int $id, string $file_id)
