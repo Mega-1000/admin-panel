@@ -148,7 +148,14 @@ class ProductStocksController extends Controller
             ->get();
 
         foreach ($collection as $row) {
-            $row->positions = DB::table('product_stock_positions')->where('product_stock_id', $row->stock_id)->get();
+            $positions = DB::table('product_stock_positions')->where('product_stock_id', $row->stock_id)->get();
+            $row->positions = $positions;
+            $damaged = 0;
+            foreach($positions as $p){
+                $damaged = $damaged + DB::table('order_returns')->where('product_stock_position_id', $p->id)->sum('quantity_damaged');
+            }
+
+            $row->damaged = $damaged;
         }
 
 

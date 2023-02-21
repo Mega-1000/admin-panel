@@ -1655,9 +1655,14 @@
                         render: function (token, row, data) {
                             let html = '';
                             if (data.print_order == '0') {
-                                html = '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-default" id="btn-print">W</a><a href="/admin/orderReturn/' + data.order_id + '/print" target="_blank" class="btn btn-danger">WP</a>';
+                                html += '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-default" id="btn-print">W</a>';
                             } else {
-                                html = '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-success">W</a><a href="/admin/orderReturn/' + data.order_id + '/print" target="_blank" class="btn btn-danger">WP</a>';
+                                html += '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-success">W</a>';
+                            }
+                            if (data.order_id != null) {
+                                html += '<a href="/admin/orderReturn/' + data.order_id + '/print" target="_blank" class="btn btn-danger">WP</a>';
+                            } else {
+                                html += '<a href="/admin/orderReturn/' + token + '/print" target="_blank" class="btn btn-danger">WP</a>';
                             }
                             return html;
                         }

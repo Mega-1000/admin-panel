@@ -320,7 +320,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orderReturn/{order_id}', 'OrderReturnController@index')->name('order_return.index');
         Route::put('orderReturn/{id}/store', ['uses' => 'OrderReturnController@store'])->name('order_return.store');
         Route::get('orderReturn/{id}/print', 'OrderReturnController@print')->name('order_return.print');
-
+        Route::get('orderReturn/{id}/image', 'OrderReturnController@getImgFullScreen')->name('order_return.image');
+        
         Route::post('orders/splitOrders', 'OrdersController@splitOrders');
         Route::get('orders/{orderIdToGet}/data/{orderIdToSend}/move',
             'OrdersController@moveData')->name('orders.moveData');

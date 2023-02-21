@@ -25,6 +25,7 @@
             <th>@lang('product_stocks.table.manufacturer')</th>
             <th>@lang('product_stocks.table.positions')</th>
             <th>@lang('product_stocks.table.quantity')</th>
+            <th>ilość uszkodzonych</th>
             <th>@lang('product_stocks.table.min_quantity')</th>
             <th>@lang('product_stocks.table.unit')</th>
             <th>@lang('product_stocks.table.start_quantity')</th>
@@ -196,6 +197,11 @@
 
                     },
                     searchable: false,
+                },
+                {
+                    data: 'damaged',
+                    name: 'damaged',
+                    searchable: false
                 },
                 {
                     data: 'min_quantity',

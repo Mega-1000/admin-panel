@@ -55,9 +55,20 @@ class OrderReturnController extends Controller
         $files = $request->file('photo');
         foreach($request->return as $v=>$return){
             if($return['check'] > 0){
+
                 $return['photoPath'] = null;
+                $updateReturn = 0;
+                
+                if($return['id'] > 0){
+                    $updateReturn = OrderReturn::find($return['id'])->quantity_undamaged;
+                }
+
                 if(isset($files[$v])){
-                    $return['photoPath'] = $this->orderReturnService->saveFile($files[$v]);
+                    if($return['id'] > 0){
+                        $return['photoPath'] = $this->orderReturnService->updateFile($return['id'],$files[$v]);
+                    }else{
+                        $return['photoPath'] = $this->orderReturnService->saveFile($files[$v]);
+                    }
                 }
 
                 if(isset($return['positions'])){
@@ -69,8 +80,10 @@ class OrderReturnController extends Controller
                 if($return['undamaged'] > 0 || $return['damaged'] > 0){
                     $this->orderReturnService->saveReturn($return);
                 }
-               
-                $this->orderReturnService->updateStockPosition($return['position_id'],$return['undamaged']);
+                if($return['undamaged'] > 0){
+                    $return['undamaged'] = $return['undamaged'] - $updateReturn;
+                    $this->orderReturnService->updateStockPosition($return['position_id'],$return['undamaged']);
+                }
             }
         }
 
@@ -92,15 +105,13 @@ class OrderReturnController extends Controller
      * @return \Illuminate\Contracts\View\View
      */
     public function print($id){
-        $order = Order::find($id);
-
+        $order = Order::where('id',$id)->orWhere('token',$id)->first();
         if (empty($order)) {
             abort(404);
         }
         $tagHelper = new EmailTagHandlerHelper();
         $tagHelper->setOrder($order);
-        $order->print_order = true;
-        $order->update();
+
         $showPosition = is_a(Auth::user(), User::class);
         $similar = OrdersHelper::findSimilarOrders($order);
         return View::make('orderReturn.print-return', [
@@ -108,6 +119,18 @@ class OrderReturnController extends Controller
             'similar' => $similar ?? [],
             'tagHelper' => $tagHelper,
             'showPosition' => $showPosition
+        ]);
+    }
+
+    /**
+     * @param $id
+     *
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function getImgFullScreen($id){
+        $orderReturn = OrderReturn::find($id);
+        return View::make('orderReturn.image',  [
+            'orderReturn' =>$orderReturn
         ]);
     }
 }

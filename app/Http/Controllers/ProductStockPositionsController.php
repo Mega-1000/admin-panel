@@ -14,6 +14,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Yajra\DataTables\Facades\DataTables;
+use DB;
 
 /**
  * Class ProductStockPositionsController
@@ -205,6 +206,10 @@ class ProductStockPositionsController extends Controller
     public function prepareCollection($id)
     {
         $collection = ProductStockPosition::where(['product_stock_id' => $id])->get();
+
+        foreach ($collection as $row) {
+            $row->damaged = DB::table('order_returns')->where('product_stock_position_id', $row['id'])->sum('quantity_damaged');
+        }
 
         return $collection;
     }

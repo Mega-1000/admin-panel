@@ -20,6 +20,16 @@ class OrderReturnService
         return $photo->store('public/' . $path);
     }
 
+    public function updateFile($id,$photo): string
+    {
+        $orderReturn = OrderReturn::find($id);
+        if ($photo && $orderReturn->photo && Storage::disk('public')->exists(str_replace('public/','',$orderReturn->photo))) {
+            Storage::delete($orderReturn->photo);
+        }
+        $path = 'orderReturn/' . date('F') . date('Y');
+        return $photo->store('public/' . $path);
+    }
+
     public function saveReturn(array $request): null
     {
         $orderReturn = new OrderReturn();
@@ -34,7 +44,9 @@ class OrderReturnService
         $orderReturn->quantity_undamaged = ($request['undamaged']?$request['undamaged']:0);
         $orderReturn->quantity_damaged = ($request['damaged']?$request['damaged']:0);
         $orderReturn->description = $request['description'];
-        $orderReturn->photo = $request['photoPath'];
+        if($request['photoPath']){
+            $orderReturn->photo = $request['photoPath'];
+        }
         $orderReturn->save();
         
         unset($orderReturn);

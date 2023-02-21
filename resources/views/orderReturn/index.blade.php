@@ -54,7 +54,7 @@
                         <label>
                             <input type="hidden" name="return[{{$loop->iteration}}][check]" value="0">
                             <input type="hidden" name="return[{{$loop->iteration}}][id]" @if(count($item->realProductPositions())) @if(isset($order->returnPosition($item->realProductPositions()[0]['id'])->id))value="{{$order->returnPosition($item->realProductPositions()[0]['id'])->id}}" @endif @endif>
-                            <input class="return-check" type="checkbox" name="return[{{$loop->iteration}}][check]" value="{{$loop->iteration}}" @if(count($item->realProductPositions()) && $order->returnPosition($item->realProductPositions()[0]['id'])!==null) checked disabled @endif> Dodaj zwrot
+                            <input class="return-check" type="checkbox" name="return[{{$loop->iteration}}][check]" value="{{$loop->iteration}}" @if(count($item->realProductPositions()) && $order->returnPosition($item->realProductPositions()[0]['id'])!==null) checked @endif> Dodaj zwrot
                             <input type="hidden" name="return[{{$loop->iteration}}][order_id]" value="{{$order->id}}">
                             <input type="hidden" name="return[{{$loop->iteration}}][product_id]" value="{{$item->product_id}}">
                             @if(count($item->realProductPositions()))
@@ -94,7 +94,7 @@
                                         count($item->realProductPositions()) && 
                                         $order->returnPosition($item->realProductPositions()[0]['id'])!==null
                                     )
-                                        value="{{$order->returnPosition($item->realProductPositions()[0]['id'])->quantity_undamaged}}" disabled 
+                                        value="{{$order->returnPosition($item->realProductPositions()[0]['id'])->quantity_undamaged}}" 
                                     @endif max="{{$item->quantity}}">
                             </div>
                         </div>
@@ -108,7 +108,7 @@
                                         count($item->realProductPositions()) && 
                                         $order->returnPosition($item->realProductPositions()[0]['id'])!==null
                                     )
-                                        value="{{$order->returnPosition($item->realProductPositions()[0]['id'])->quantity_damaged}}" disabled 
+                                        value="{{$order->returnPosition($item->realProductPositions()[0]['id'])->quantity_damaged}}"  
                                     @endif max="{{$item->quantity}}">
                             </div>
                         </div>
@@ -122,7 +122,7 @@
                                         count($item->realProductPositions()) && 
                                         $order->returnPosition($item->realProductPositions()[0]['id'])!==null
                                     ) 
-                                    disabled 
+                                    
                                     @endif
                                 >@if(
                                     count($item->realProductPositions()) && 
@@ -135,11 +135,11 @@
                         <div class="form-group" >
                             <label for="value_of_items_gross" class="col-sm-2 control-label">Zdjęcie uszkodzenia</label>
                             <div class="col-sm-4">
-                                <input type="file" name="photo[{{$loop->iteration}}]" @if(count($item->realProductPositions()) && $order->returnPosition($item->realProductPositions()[0]['id'])!==null) disabled @endif/>
+                                <input type="file" name="photo[{{$loop->iteration}}]" @if(count($item->realProductPositions()) && $order->returnPosition($item->realProductPositions()[0]['id'])!==null) @endif/>
                             </div>
                             <div class="col-sm-6">
                                 @if(count($item->realProductPositions()) && $order->returnPosition($item->realProductPositions()[0]['id'])!==null) 
-                                <a rel="popover" data-img="{{$order->returnPosition($item->realProductPositions()[0]['id'])->getImageUrl()}}" >
+                                <a rel="popover" data-img="{{$order->returnPosition($item->realProductPositions()[0]['id'])->getImageUrl()}}" href="{{ action('OrderReturnController@getImgFullScreen', ['id' => $order->returnPosition($item->realProductPositions()[0]['id'])->id])}}" target="_blank">
                                     <img src="{{$order->returnPosition($item->realProductPositions()[0]['id'])->getImageUrl()}}" style="width: 80px;" />
                                 </a>
                                 @endif
