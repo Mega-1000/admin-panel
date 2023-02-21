@@ -58,7 +58,7 @@ class OrderReturnController extends Controller
 
                 $return['photoPath'] = null;
                 $updateReturn = 0;
-                
+
                 if($return['id'] > 0){
                     $updateReturn = OrderReturn::find($return['id'])->quantity_undamaged;
                 }
@@ -77,10 +77,10 @@ class OrderReturnController extends Controller
                     $return['position_id'] = $this->orderReturnService->saveStockPosition($productStock->first()->id,$return['positions']);
                 }
 
-                if($return['undamaged'] > 0 || $return['damaged'] > 0){
+                if($return['undamaged'] >= 0 || $return['damaged'] >= 0){
                     $this->orderReturnService->saveReturn($return);
                 }
-                if($return['undamaged'] > 0){
+                if($return['undamaged'] >= 0){
                     $return['undamaged'] = $return['undamaged'] - $updateReturn;
                     $this->orderReturnService->updateStockPosition($return['position_id'],$return['undamaged']);
                 }
