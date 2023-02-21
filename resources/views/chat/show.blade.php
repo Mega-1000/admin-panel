@@ -59,7 +59,7 @@
                             <option value="{{ UserRole::Accountant }}">Księgowość</option>
                         </select>
                         <textarea required class="form-control" id="message"
-                                  style="resize: none; width: 100%; height: 46px;"
+                                  style="width: 100%; max-width: 600px; min-width: 200px; height: 100px;"
                                   placeholder="Tutaj wpisz wiadomość"></textarea>
                     </div>
                     <div class="col-sm-3">

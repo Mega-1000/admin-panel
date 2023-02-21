@@ -5,11 +5,11 @@ namespace App\Http\Controllers;
 use Exception;
 use App\Entities\Chat;
 use App\Entities\Firm;
-use App\Enums\UserRole;
 use App\Entities\Employee;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Helpers\MessagesHelper;
+use App\Services\MessagesService;
 use App\Entities\PostalCodeLatLon;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\View\View;
@@ -19,6 +19,13 @@ use App\Helpers\Exceptions\ChatException;
 
 class MessagesController extends Controller
 {
+
+    protected $messagesService;
+
+    public function __construct(MessagesService $messagesService) {
+        $this->messagesService = $messagesService;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -127,170 +134,163 @@ class MessagesController extends Controller
         $product = $helper->getProduct();
         $order = $helper->getOrder();
         $helper->setLastRead();
-        if (empty($chat)) {
-            $users = collect();
-            if ($helper->employeeId) {
-                $users->push(Employee::find($helper->employeeId));
-            }
-        } else {
-            $users = $chat->chatUsers;
-        }
+
+        $users = empty($chat) ? collect() : $chat->chatUsers;
+
+        $currentCustomersOnChat = $users->pluck('customer_id')->filter();
+        $currentEmployeesOnChat = $users->pluck('employee_id')->filter();
+
         $possibleUsers = collect();
         $notices = '';
-        if ($product && !empty($chat->customers)) {
-            // get possible users from company / firm
-            $possibleUsers = $this->getNotAttachedChatUsersForProduct($product, $chat->customers->first());
-        } else if ($order) {
-            // get possible users from company / firm
-            $possibleUsers = $this->getNotAttachedChatUsersForOrder($order);
-            if ($helper->currentUserType == MessagesHelper::TYPE_USER || $helper->currentUserType == MessagesHelper::TYPE_EMPLOYEE) {
-                $notices = $order->consultant_notices;
+        $productList = $this->messagesService->prepareProductList($helper);
+
+        $employeesIds = $productList->pluck('employees_ids');
+        $employeesIdsFiltered = [];
+
+        foreach($employeesIds as $productEmployees) {
+            $productEmployees = json_decode($productEmployees);
+
+            if(!empty($productEmployee)) continue;
+
+            foreach($productEmployees as $employeeId) {
+                
+                $employeesIdsFiltered[] = $employeeId;
             }
         }
+
+        // remove no unique employees
+        $employeesIdsFiltered = collect($employeesIdsFiltered)->unique();
+        // remove already existed as chat users employees
+        $employeesIdsFiltered = $employeesIdsFiltered->diff($currentEmployeesOnChat);
+
+        $possibleUsers = Employee::findMany($employeesIdsFiltered);
+
+        // if ($product) {
+        //     // get possible users from company / firm
+        //     $possibleUsers = $this->getNotAttachedChatUsersForProduct($product, $chat->customers->first());
+        // } else if ($order) {
+        //     // get possible users from company / firm
+        //     $possibleUsers = $this->getNotAttachedChatUsersForOrder($order);
+        //     if ($helper->currentUserType == MessagesHelper::TYPE_USER || $helper->currentUserType == MessagesHelper::TYPE_EMPLOYEE) {
+        //         $notices = $order->consultant_notices;
+        //     }
+        // }
         // get possible users from customerChatList
-        $possibleUsers = $this->addCustomerToChatList($chat, $possibleUsers, $users, $helper);
-        $productList = $this->prepareProductList($helper);
+        // $possibleUsers = $this->addCustomerToChatList($chat, $possibleUsers, $users, $helper);
 
         $token = $helper->encrypt();
 
         $view = view('chat.show')->with([
-            'product_list' => $productList,
-            'faq' => $this->prepareFaq($users),
-            'notices' => $notices,
-            'possible_users' => $possibleUsers,
-            'user_type' => $helper->currentUserType,
-            'users' => $users,
-            'chat' => $chat,
-            'product' => $product,
-            'order' => $order,
-            'title' => $helper->getTitle(true),
-            'route' => route('api.messages.post-new-message', ['token' => $token]),
-            'routeAddUser' => route('api.messages.add-new-user', ['token' => $token]),
-            'routeRemoveUser' => route('api.messages.remove-user', ['token' => $token]),
-            'routeRefresh' => route('api.messages.get-messages', ['token' => $token]),
+            'product_list'            => $productList,
+            'faq'                     => $this->prepareFaq($users),
+            'notices'                 => $notices,
+            'possible_users'          => $possibleUsers,
+            'user_type'               => $helper->currentUserType,
+            'users'                   => $users,
+            'chat'                    => $chat,
+            'product'                 => $product,
+            'order'                   => $order,
+            'title'                   => $helper->getTitle(true),
+            'route'                   => route('api.messages.post-new-message', ['token' => $token]),
+            'routeAddUser'            => route('api.messages.add-new-user', ['token' => $token]),
+            'routeRemoveUser'         => route('api.messages.remove-user', ['token' => $token]),
+            'routeRefresh'            => route('api.messages.get-messages', ['token' => $token]),
             'routeAskForIntervention' => route('api.messages.ask-for-intervention', ['token' => $token]),
-            'routeForEditPrices' => route('api.messages.edit-prices', ['token' => $token])
+            'routeForEditPrices'      => route('api.messages.edit-prices', ['token' => $token])
         ]);
         return $view;
     }
 
-    /**
-     * @param $product
-     * @param $chat
-     * @param Collection $possibleUsers
-     * @param Collection $users
-     * @return Collection
-     */
-    private function getNotAttachedChatUsersForProduct($product, $customer): Collection
-    {
-        $possibleUsers = collect();
-        foreach ($product->media()->get() as $media) {
-            $mediaData = explode('|', $media->url);
-            if (count($mediaData) != 3) {
-                continue;
-            }
-            if ($customer->standardAddress()) {
-                $codeObj = PostalCodeLatLon::where('postal_code', $customer->standardAddress()->postal_code)->first();
-            } else {
-                continue;
-            }
+    // /**
+    //  * @param $product
+    //  * @param $chat
+    //  * @param Collection $possibleUsers
+    //  * @param Collection $users
+    //  * @return Collection
+    //  */
+    // private function getNotAttachedChatUsersForProduct($product, $customer): Collection
+    // {
+    //     $possibleUsers = collect();
+    //     foreach ($product->media()->get() as $media) {
+    //         $mediaData = explode('|', $media->url);
+    //         if (count($mediaData) != 3) {
+    //             continue;
+    //         }
+    //         if ($customer->standardAddress()) {
+    //             $codeObj = PostalCodeLatLon::where('postal_code', $customer->standardAddress()->postal_code)->first();
+    //         } else {
+    //             continue;
+    //         }
 
-            $availableUser = $media->product->firm->employees->filter(function ($employee) use ($codeObj) {
-                $dist = MessagesHelper::calcDistance($codeObj->latitude, $codeObj->longitude, $employee->latitude, $employee->longitude);
-                return $dist < $employee->radius;
-            });
-            $possibleUsers = $possibleUsers->merge($availableUser);
-        }
-        $possibleUsers = $possibleUsers->unique('id');
-        return $possibleUsers;
-    }
+    //         $availableUser = $media->product->firm->employees->filter(function ($employee) use ($codeObj) {
+    //             $dist = MessagesHelper::calcDistance($codeObj->latitude, $codeObj->longitude, $employee->latitude, $employee->longitude);
+    //             return $dist < $employee->radius;
+    //         });
+    //         $possibleUsers = $possibleUsers->merge($availableUser);
+    //     }
+    //     $possibleUsers = $possibleUsers->unique('id');
+    //     return $possibleUsers;
+    // }
 
-    /**
-     * @param $order
-     * @param $chat
-     * @param Collection $users
-     * @return array
-     */
-    private function getNotAttachedChatUsersForOrder($order): Collection
-    {
-        $possibleUsers = collect();
-        foreach ($order->items as $product) {
-            $firm = Firm::where('symbol', 'like', $product->product->product_name_supplier)->first();
-            if (empty($firm)) {
-                continue;
-            }
-            $possibleUsers = $possibleUsers->merge($firm->employees);
-        }
-        return $possibleUsers;
-    }
+    // /**
+    //  * @param $order
+    //  * @param $chat
+    //  * @param Collection $users
+    //  * @return array
+    //  */
+    // private function getNotAttachedChatUsersForOrder($order): Collection
+    // {
+    //     $possibleUsers = collect();
+    //     foreach ($order->items as $product) {
+    //         $firm = Firm::where('symbol', 'like', $product->product->product_name_supplier)->first();
+    //         if (empty($firm)) {
+    //             continue;
+    //         }
+    //         $possibleUsers = $possibleUsers->merge($firm->employees);
+    //     }
+    //     return $possibleUsers;
+    // }
 
-    private function addCustomerToChatList(Chat|null $chat, Collection $possibleUsers, Collection $users, MessagesHelper $helper): Collection
-    {
-        if ($chat) {
-            $possibleUsers = $this->filterPossibleUsersWithCurrentlyAdded($possibleUsers, $chat, $users);
-            if ($chat->customers()->whereNull('deleted_at')->count() < 1) {
-                if ($helper->getOrder()) {
-                    $customer = $helper->getOrder()->customer;
-                    $possibleUsers->push($customer);
-                }
-                if ($helper->getProduct()) {
-                    $possibleUsers->push($chat->customers()->first());
-                }
-            }
-        }
-        if ($helper->getOrder()) {
-            $customer = $helper->getOrder()->customer;
-            $possibleUsers->push($customer);
-        }
-        return $possibleUsers;
-    }
+    // private function addCustomerToChatList(Chat|null $chat, Collection $possibleUsers, Collection $users, MessagesHelper $helper): Collection
+    // {
+    //     if ($chat) {
+    //         $possibleUsers = $this->filterPossibleUsersWithCurrentlyAdded($possibleUsers, $chat, $users);
+    //         if ($chat->customers()->whereNull('deleted_at')->count() < 1) {
+    //             if ($helper->getOrder()) {
+    //                 $customer = $helper->getOrder()->customer;
+    //                 $possibleUsers->push($customer);
+    //             }
+    //             if ($helper->getProduct()) {
+    //                 $possibleUsers->push($chat->customers()->first());
+    //             }
+    //         }
+    //     }
+    //     if ($helper->getOrder()) {
+    //         $customer = $helper->getOrder()->customer;
+    //         $possibleUsers->push($customer);
+    //     }
+    //     return $possibleUsers;
+    // }
 
-    /**
-     * @param Collection $possibleUsers
-     * @param $chat
-     * @param Collection $users
-     * @return Collection
-     */
-    private function filterPossibleUsersWithCurrentlyAdded(Collection $possibleUsers, $chat, Collection $users): Collection
-    {
-        $possibleUsers = $possibleUsers->filter(function ($item) use ($chat, $users) {
-            $filteredEmployeesCount = $chat->chatUsersWithTrashed->filter(function ($user) use ($item) {
-                if (empty($user->employee)) {
-                    return false;
-                }
-                return $item->id != $user->employee->id || $item->id == $user->employee->id && $user->trashed();
-            })->count();
-            return $filteredEmployeesCount == $chat->employees->count();
-        });
-        return $possibleUsers;
-    }
-
-    private function prepareProductList(MessagesHelper $helper): Collection
-    {
-        if ($helper->getOrder()) {
-            try {
-                return $this->setProductsForChatUser($helper->getCurrentUser(), $helper->getOrder());
-            } catch (Exception $e) {
-                Log::error('Cannot prepare product list',
-                    ['exception' => $e->getMessage(), 'class' => $e->getFile(), 'line' => $e->getLine()]);
-                return collect();
-            }
-        }
-        if ($helper->getProduct()) {
-            return collect([$helper->getProduct()]);
-        }
-        return collect();
-    }
-
-    private function setProductsForChatUser($chatUser, $order)
-    {
-        if (is_a($chatUser, Employee::class)) {
-            return $order->items->filter(function ($item) use ($chatUser) {
-                return empty($item->product->firm) || $item->product->firm->id == $chatUser->firm->id;
-            });
-        }
-        return $order->items;
-    }
+    // /**
+    //  * @param Collection $possibleUsers
+    //  * @param $chat
+    //  * @param Collection $users
+    //  * @return Collection
+    //  */
+    // private function filterPossibleUsersWithCurrentlyAdded(Collection $possibleUsers, $chat, Collection $users): Collection
+    // {
+    //     $possibleUsers = $possibleUsers->filter(function ($item) use ($chat, $users) {
+    //         $filteredEmployeesCount = $chat->chatUsersWithTrashed->filter(function ($user) use ($item) {
+    //             if (empty($user->employee)) {
+    //                 return false;
+    //             }
+    //             return $item->id != $user->employee->id || $item->id == $user->employee->id && $user->trashed();
+    //         })->count();
+    //         return $filteredEmployeesCount == $chat->employees->count();
+    //     });
+    //     return $possibleUsers;
+    // }
 
     private function prepareFaq(Collection $users): array
     {

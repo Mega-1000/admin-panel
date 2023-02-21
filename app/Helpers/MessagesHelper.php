@@ -27,7 +27,6 @@ class MessagesHelper
     public $users = [];
     public $productId = 0;
     public $orderId = 0;
-    public $employeeId = 0;
     public $currentUserType;
 
     /**
@@ -74,7 +73,6 @@ class MessagesHelper
             'u' => $this->users,
             'pId' => $this->productId,
             'oId' => $this->orderId,
-            'eId' => $this->employeeId,
             'curT' => $this->currentUserType,
             'curId' => $this->currentUserId
         ]);
@@ -87,7 +85,6 @@ class MessagesHelper
         $this->users = $data['u'] ?? [];
         $this->productId = $data['pId'] ?? 0;
         $this->orderId = $data['oId'] ?? 0;
-        $this->employeeId = $data['eId'] ?? 0;
         $this->currentUserType = $data['curT'];
         $this->currentUserId = $data['curId'];
         $this->setChatId();
@@ -114,12 +111,6 @@ class MessagesHelper
             $q->whereNull('product_id');
         }
 
-        if ($this->employeeId) {
-            $q->where('employee_id', $this->employeeId);
-        } else {
-            $q->whereNull('employee_id');
-        }
-
         $table = $this->currentUserType == self::TYPE_USER ? 'users' : ($this->currentUserType == self::TYPE_EMPLOYEE ? 'employees' : 'customers');
         $userId = $this->currentUserId;
         $q->whereHas($table, function ($q) use ($table, $userId) {
@@ -140,9 +131,6 @@ class MessagesHelper
         }
         if ($this->currentUserType == self::TYPE_EMPLOYEE) {
             $this->users[self::TYPE_EMPLOYEE] = $this->currentUserId;
-        }
-        if ($this->employeeId) {
-            $this->users[self::TYPE_EMPLOYEE] = $this->employeeId;
         }
         if ($this->currentUserType === self::TYPE_USER) {
             $this->users[self::TYPE_USER] = $this->currentUserId;
@@ -216,7 +204,6 @@ class MessagesHelper
         $this->setUsers();
         $chat->product_id = $this->productId ?: null;
         $chat->order_id = $this->orderId ?: null;
-        $chat->employee_id = $this->employeeId ?: null;
         $chat->save();
         if (!empty($this->users[self::TYPE_CUSTOMER])) {
             $customer = Customer::find($this->users[self::TYPE_CUSTOMER]);
@@ -390,11 +377,8 @@ class MessagesHelper
             throw new ChatException('Media URL corrupted');
         }
 
-        $employee = self::findEmployee($media->product->firm->employees, $mediaData, $postCode);
-
         $helper = new self();
         $helper->productId = $media->product_id;
-        $helper->employeeId = $employee->id;
         $helper->currentUserType = self::TYPE_CUSTOMER;
         $helper->currentUserId = $customer->id;
 
@@ -430,41 +414,6 @@ class MessagesHelper
             pow($lat1 - $lat2, 2) +
             pow($lon1 - $lon2, 2)
         );
-    }
-
-    private static function findEmployee($employees, $mediaData, $postCode)
-    {
-        $foundEmployee = null;
-        if ($mediaData[1] == 'c') { //'c' == closest
-            $codeObj = PostalCodeLatLon::where('postal_code', $postCode)->first();
-            if (!$codeObj) {
-                throw new ChatException('Wrong post code');
-            }
-            $closestDist = 0;
-            foreach ($employees as $employee) {
-                if (!$employee->employeeRoles()->where('symbol', $mediaData[0])->first()) {
-                    continue;
-                }
-                $dist = self::calcDistance($codeObj->latitude, $codeObj->longitude, $employee->latitude, $employee->longitude);
-                if ((!$foundEmployee || $dist < $closestDist) && $dist < $employee->radius) {
-                    $foundEmployee = $employee;
-                    $closestDist = $dist;
-                }
-            }
-        } else {
-            foreach ($employees as $employee) {
-                if (!$employee->employeeRoles()->where('symbol', $mediaData[0])->first()) {
-                    continue;
-                }
-                if ($employee->person_number == $mediaData[1]) {
-                    $foundEmployee = $employee;
-                }
-            }
-        }
-        if (!$foundEmployee) {
-            throw new ChatException('Cannot find employee');
-        }
-        return $foundEmployee;
     }
 
     private function setChatLabel(Chat $chat, $clearDanger = false)
