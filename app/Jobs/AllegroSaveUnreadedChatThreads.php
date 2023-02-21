@@ -2,19 +2,13 @@
 
 namespace App\Jobs;
 
-use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use TCG\Voyager\Models\Setting;
 use Illuminate\Support\Facades\Log;
 use App\Services\AllegroChatService;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use romanzipp\QueueMonitor\Traits\IsMonitored;
 
-class AllegroSaveUnreadedChatThreads implements ShouldQueue
+class AllegroSaveUnreadedChatThreads extends Job implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, IsMonitored;
 
     public $unreadedThreads = [];
 
@@ -47,7 +41,7 @@ class AllegroSaveUnreadedChatThreads implements ShouldQueue
             'order' => 1,
             'group' => 'AllegroChat',
         ]);
-        
+
         Log::info("Unreaded Threads: ".json_encode($this->unreadedThreads));
     }
 

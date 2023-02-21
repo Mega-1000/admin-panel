@@ -37,11 +37,11 @@ class OrderObserver
         if (!empty($order->getDirty()['status_id'])) {
             $statusId = $order->getDirty()['status_id'];
             $status = $this->statusRepository->find($statusId);
-            dispatch_now(new AddLabelJob($order, $status->labelsToAddOnChange));
+            dispatch(new AddLabelJob($order, $status->labelsToAddOnChange));
         }
 
         if (!empty($order->getDirty()['employee_id'])) {
-            dispatch_now(new DispatchLabelEventByNameJob($order->id, "consultant-changed"));
+            dispatch(new DispatchLabelEventByNameJob($order->id, "consultant-changed"));
         }
 
         if (!empty($order->getDirty()['shipment_date'])) {

@@ -118,7 +118,7 @@ class ChangeOrderInvoiceData implements ShouldQueue
                             'email' => $delivery[9],
                         ], $invoiceAddress->id);
                     }
-                    dispatch_now(new AddLabelJob($order->id, [135]));
+                    dispatch(new AddLabelJob($order->id, [135]));
                 }
             }
         }

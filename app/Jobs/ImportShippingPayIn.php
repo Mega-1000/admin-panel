@@ -225,7 +225,7 @@ class ImportShippingPayIn implements ShouldQueue
             if ($payIn['kwota'] === (float)$payment->amount) {
                 $payment->delete();
             } else {
-                dispatch_now(new AddLabelJob($order->id, [128]));
+                dispatch(new AddLabelJob($order->id, [128]));
             }
         }
     }

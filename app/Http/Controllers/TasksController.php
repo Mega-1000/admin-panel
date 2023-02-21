@@ -131,7 +131,7 @@ class TasksController extends Controller
                 }
                 $task->taskSalaryDetail()->create(array_merge($dataToStore, $arr));
                 $prev = [];
-                dispatch_now(new AddLabelJob($request->order_id, [47], $prev));
+                dispatch(new AddLabelJob($request->order_id, [47], $prev));
             }
             $this->taskTimeRepository->create([
                 'task_id' => $task->id,
@@ -232,7 +232,7 @@ class TasksController extends Controller
                 ]);
                 $task->taskSalaryDetail()->create($request->all());
                 $prev = [];
-                dispatch_now(new AddLabelJob($request->order_id, [47], $prev));
+                dispatch(new AddLabelJob($request->order_id, [47], $prev));
             }
             return redirect()->route('planning.tasks.edit', ['id' => $task->id])->with([
                 'message' => __('tasks.messages.update'),
@@ -342,7 +342,7 @@ class TasksController extends Controller
                     'name' => $title
                 ]);
                 $prev = [];
-                dispatch_now(new AddLabelJob($request->order_id, [47], $prev));
+                dispatch(new AddLabelJob($request->order_id, [47], $prev));
             }
             $task->taskSalaryDetail()->create($request->all());
             $this->taskTimeRepository->create([
@@ -807,14 +807,14 @@ class TasksController extends Controller
                 $this->addNotification($user, $data['description'], $item);
                 if ($item->order) {
                     $item->order->labels()->attach(Label::SHIPPING_MARK);
-                    dispatch_now(new AddLabelJob($item->order->id, [Label::RED_HAMMER_ID], $prev));
+                    dispatch(new AddLabelJob($item->order->id, [Label::RED_HAMMER_ID], $prev));
                 }
             });
         } else {
             $this->addNotification($user, $data['description'], $task);
             if ($task->order) {
                 $task->order->labels()->attach(Label::SHIPPING_MARK);
-                dispatch_now(new AddLabelJob($task->order->id, [Label::RED_HAMMER_ID], $prev));
+                dispatch(new AddLabelJob($task->order->id, [Label::RED_HAMMER_ID], $prev));
             }
         }
         return redirect()->back()->with([
@@ -988,7 +988,7 @@ class TasksController extends Controller
                 ]);
                 $task->taskSalaryDetail()->create($request->all());
                 $prev = [];
-                dispatch_now(new AddLabelJob($request->order_id, [47], $prev));
+                dispatch(new AddLabelJob($request->order_id, [47], $prev));
             }
             $task->taskTime->update([
                 'date_start' => $dateStart->toDateTimeString(),
@@ -1095,12 +1095,12 @@ class TasksController extends Controller
                 $prev = [];
 
                 if ($task->color == '32CD32') {
-                    dispatch_now(new RemoveLabelJob($task->order_id, [49], $prev));
-                    dispatch_now(new AddLabelJob($task->order_id, [50], $prev));
+                    dispatch(new RemoveLabelJob($task->order_id, [49], $prev));
+                    dispatch(new AddLabelJob($task->order_id, [50], $prev));
                 }
                 if ($task->color == '008000') {
-                    dispatch_now(new RemoveLabelJob($task->order_id, [74], $prev));
-                    dispatch_now(new AddLabelJob($task->order_id, [41], $prev));
+                    dispatch(new RemoveLabelJob($task->order_id, [74], $prev));
+                    dispatch(new AddLabelJob($task->order_id, [41], $prev));
                 }
                 $dateTime = new Carbon($request->start);
                 $title = $task->order_id . ' - ' . $dateTime->format('d-m') . ' - ' . $task->order->warehouse_value;

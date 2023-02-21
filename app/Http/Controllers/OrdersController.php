@@ -1001,16 +1001,16 @@ class OrdersController extends Controller
         ]);
 
         if ($request->get('accountant', false)) {
-            dispatch_now(new AddLabelJob($order, ['153']));
+            dispatch(new AddLabelJob($order, ['153']));
         }
         if ($request->get('warehouse', false)) {
-            dispatch_now(new AddLabelJob($order, ['151']));
+            dispatch(new AddLabelJob($order, ['151']));
         }
         if ($request->get('master', false)) {
-            dispatch_now(new AddLabelJob($order, ['91']));
+            dispatch(new AddLabelJob($order, ['91']));
         }
         if ($request->get('consultant', false)) {
-            dispatch_now(new AddLabelJob($order, ['152']));
+            dispatch(new AddLabelJob($order, ['152']));
         }
 
         return redirect('/admin/orders');
@@ -1427,18 +1427,18 @@ class OrdersController extends Controller
         if ($order->status_id == 5 || $order->status_id == 6) {
             if ($sumToCheck > 5 || $sumToCheck < -5) {
                 foreach ($sumOfOrdersReturn[1] as $ordId) {
-                    dispatch_now(new RemoveLabelJob($ordId, [133]));
-                    dispatch_now(new AddLabelJob($ordId, [134]));
+                    dispatch(new RemoveLabelJob($ordId, [133]));
+                    dispatch(new AddLabelJob($ordId, [134]));
                 }
             } else {
                 foreach ($sumOfOrdersReturn[1] as $ordId) {
-                    dispatch_now(new RemoveLabelJob($ordId, [134]));
-                    dispatch_now(new AddLabelJob($ordId, [133]));
+                    dispatch(new RemoveLabelJob($ordId, [134]));
+                    dispatch(new AddLabelJob($ordId, [133]));
                 }
             }
         } else {
-            dispatch_now(new RemoveLabelJob($order, [134]));
-            dispatch_now(new RemoveLabelJob($order, [133]));
+            dispatch(new RemoveLabelJob($order, [134]));
+            dispatch(new RemoveLabelJob($order, [133]));
         }
 
         if ($order->status_id == 8) {
@@ -1705,7 +1705,7 @@ class OrdersController extends Controller
             } catch (Exception $exception) {
                 \Log::error('Nie udało się zapisać logu', ['message' => $exception->getMessage(), 'trace' => $exception->getTraceAsString()]);
             }
-            dispatch_now(new AddLabelJob($order, [$labelId], $preventionArray, [], null, $time));
+            dispatch(new AddLabelJob($order, [$labelId], $preventionArray, [], null, $time));
         }
     }
 
@@ -2095,7 +2095,7 @@ class OrdersController extends Controller
     {
         $order = $this->orderRepository->find($orderId);
         $prev = [];
-        dispatch_now(new AddLabelJob($order, [52], $prev, [], true));
+        dispatch(new AddLabelJob($order, [52], $prev, [], true));
 
         return redirect()->back()->with([
             'message' => __('orders.message.delete'),
@@ -2717,7 +2717,7 @@ class OrdersController extends Controller
         ]);
 
         foreach ($order->customer->orders as $order) {
-            dispatch_now(new AddLabelJob($order->id, [Label::ORDER_SURPLUS]));
+            dispatch(new AddLabelJob($order->id, [Label::ORDER_SURPLUS]));
         }
 
         return response()->json('done', 200);
@@ -3036,15 +3036,15 @@ class OrdersController extends Controller
         ]);
 
 
-        dispatch_now(new RemoveLabelJob($request->input('orderId'), [124]));
-        dispatch_now(new AddLabelJob($request->input('orderId'), [136]));
+        dispatch(new RemoveLabelJob($request->input('orderId'), [124]));
+        dispatch(new AddLabelJob($request->input('orderId'), [136]));
 
         return view('customers.confirmation.confirmationThanks');
     }
 
     public function getCosts()
     {
-        dispatch_now(new UpdatePackageRealCostJob());
+        dispatch(new UpdatePackageRealCostJob());
         return redirect()->route('orders.index')->with([
             'message' => 'Rozpoczęto pobieranie realnych wartości zleceń',
             'alert-type' => 'success',

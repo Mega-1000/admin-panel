@@ -34,11 +34,11 @@ class DispatchLabelEventByNameJob extends Job implements ShouldQueue
         $preventionArray = [];
 
         if(!empty($config['add'])) {
-            dispatch_now(new AddLabelJob($this->order, $config['add'], $preventionArray));
+            dispatch(new AddLabelJob($this->order, $config['add'], $preventionArray));
         }
 
         if(!empty($config['remove'])) {
-            dispatch_now(new RemoveLabelJob($this->order, $config['remove'], $preventionArray));
+            dispatch(new RemoveLabelJob($this->order, $config['remove'], $preventionArray));
         }
     }
 }

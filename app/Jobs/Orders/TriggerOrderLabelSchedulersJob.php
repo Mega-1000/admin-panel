@@ -55,9 +55,9 @@ class TriggerOrderLabelSchedulersJob extends Job implements ShouldQueue
                     $options['added_type'] = $schedule->type;
                 }
                 $preventionArray = [];
-                dispatch_now(new AddLabelJob($schedule->order_id, [$schedule->label_id_to_handle], $preventionArray, $options));
+                dispatch(new AddLabelJob($schedule->order_id, [$schedule->label_id_to_handle], $preventionArray, $options));
             } else {
-                dispatch_now(new RemoveLabelJob($schedule->order_id, [$schedule->label_id_to_handle]));
+                dispatch(new RemoveLabelJob($schedule->order_id, [$schedule->label_id_to_handle]));
             }
 
             $schedule->triggered_at = $now;

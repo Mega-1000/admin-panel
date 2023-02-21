@@ -56,7 +56,7 @@ class BonusController extends Controller
             $message = __('bonus.create.success_penalty');
         }
         $loopPrevention = [];
-        dispatch_now(new AddLabelJob($bonus->order_id, [180], $loopPrevention, [
+        dispatch(new AddLabelJob($bonus->order_id, [180], $loopPrevention, [
             'added_type' => Label::BONUS_TYPE
         ]));
         return redirect()->route('bonus.chat', ['id' => $bonus->id])->with(['message' => $message,
@@ -88,18 +88,17 @@ class BonusController extends Controller
     {
         $bonus = BonusAndPenalty::find($id);
         $this->service->sendMessage($bonus, $request->message, $request->user());
-
+        $loopPrevention = [];
         if (Gate::allows('create-bonus')) {
-            $loopPrevention = [];
-            dispatch_now(new AddLabelJob($bonus->order_id, [180], $loopPrevention, [
+            dispatch(new AddLabelJob($bonus->order_id, [180], $loopPrevention, [
                 'added_type' => Label::BONUS_TYPE
             ]));
-            dispatch_now(new RemoveLabelJob($bonus->order_id, [91]));
+            dispatch(new RemoveLabelJob($bonus->order_id, [91]));
         } else {
-            dispatch_now(new AddLabelJob($bonus->order_id, [91, $loopPrevention, [
+            dispatch(new AddLabelJob($bonus->order_id, [91, $loopPrevention, [
                 'added_type' => Label::BONUS_TYPE
             ]]));
-            dispatch_now(new RemoveLabelJob($bonus->order_id, [180]));
+            dispatch(new RemoveLabelJob($bonus->order_id, [180]));
         }
 
         return redirect()->back();

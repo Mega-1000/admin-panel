@@ -281,14 +281,14 @@ class MessagesHelper
             }
             if ($this->currentUserType == self::TYPE_CUSTOMER) {
                 $loopPrevention = [];
-                dispatch_now(new AddLabelJob(
+                dispatch(new AddLabelJob(
                     $chat->order,
                     [self::MESSAGE_YELLOW_LABEL_ID],
                     $loopPrevention,
                     ['added_type' => Label::CHAT_TYPE]
                 ));
             } else {
-                dispatch_now(new RemoveLabelJob($chat->order, [self::MESSAGE_YELLOW_LABEL_ID]));
+                dispatch(new RemoveLabelJob($chat->order, [self::MESSAGE_YELLOW_LABEL_ID]));
             }
         }
         WorkingEvents::createEvent(WorkingEvents::CHAT_MESSAGE_ADD_EVENT, $chat->order->id);

@@ -1,12 +1,8 @@
 <?php namespace App\Services;
 
-use App\Entities\Label;
-use App\Entities\Order;
 use App\Entities\OrderAddress;
 use App\Helpers\Helper;
-use App\Jobs\AddLabelJob;
 use App\Rules\ValidNIP;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class OrderAddressService

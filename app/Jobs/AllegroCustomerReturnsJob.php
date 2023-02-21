@@ -133,7 +133,7 @@ class AllegroCustomerReturnsJob implements ShouldQueue
                     $order->refund_id = $return['referenceNumber'];
                     $order->to_refund = $this->countRefund($return['items']);
                     $order->save();
-                    dispatch_now(new AddLabelJob($order, [Label::RETURN_ALLEGRO_ITEMS]));
+                    dispatch(new AddLabelJob($order, [Label::RETURN_ALLEGRO_ITEMS]));
                 }
             } catch (Throwable $ex) {
                 Log::error($ex->getMessage(), [
@@ -158,13 +158,13 @@ class AllegroCustomerReturnsJob implements ShouldQueue
             try {
                 $order = $this->orderRepository->findWhere([['allegro_form_id', 'like', '%' . $cancellation['order']['checkoutForm']['id'] . '%']])->first();
                 if (!empty($order) && !$order->hasLabel(Label::CUSTOMER_CANCELLATION)) {
-                    dispatch_now(new AddLabelJob($order, [Label::CUSTOMER_CANCELLATION]));
+                    dispatch(new AddLabelJob($order, [Label::CUSTOMER_CANCELLATION]));
                     if ($order->hasLabel(Label::ORDER_ITEMS_REDEEMED_LABEL)) {
                         if ($order->hasLabel(50) || $order->hasLabel(49) || $order->hasLabel(47)) {
-                            dispatch_now(new AddLabelJob($order, [Label::HOLD_SHIPMENT]));
+                            dispatch(new AddLabelJob($order, [Label::HOLD_SHIPMENT]));
                         } else {
-                            dispatch_now(new RemoveLabelJob($order, [Label::BLUE_HAMMER_ID]));
-                            dispatch_now(new AddLabelJob($order, [Label::RED_HAMMER_ID]));
+                            dispatch(new RemoveLabelJob($order, [Label::BLUE_HAMMER_ID]));
+                            dispatch(new AddLabelJob($order, [Label::RED_HAMMER_ID]));
                             $order->task->delete();
                         }
 
@@ -198,7 +198,7 @@ class AllegroCustomerReturnsJob implements ShouldQueue
                     $order->return_payment_id = $return['id'];
                     $order->refunded = $return['totalValue']['amount'];
                     $order->save();
-                    dispatch_now(new AddLabelJob($order, [Label::RETURN_ALLEGRO_PAYMENTS]));
+                    dispatch(new AddLabelJob($order, [Label::RETURN_ALLEGRO_PAYMENTS]));
                 }
             } catch (Throwable $ex) {
                 Log::error($ex->getMessage(), [

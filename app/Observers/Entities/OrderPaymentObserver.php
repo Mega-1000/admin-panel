@@ -17,7 +17,7 @@ class OrderPaymentObserver
     {
         foreach ($orderPayment->order->addresses as $orderAddress) {
             if (!(new OrderAddressService())->addressIsValid($orderAddress)) {
-                dispatch_now(new AddLabelJob($orderAddress->order->id, [184]));
+                dispatch(new AddLabelJob($orderAddress->order->id, [184]));
             }
         }
     }
