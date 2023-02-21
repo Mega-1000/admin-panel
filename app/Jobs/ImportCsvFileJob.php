@@ -562,11 +562,11 @@ class ImportCsvFileJob implements ShouldQueue
         // get rows with every employee
         $employeesRows = array_chunk($employeesLines, $employeesColumns);
 
-        foreach ($employeesRows as $employee) {
+        foreach ($employeesRows as $row) {
             // missing firstname, lastname or email
-            $firstName = $employee[0];
-            $lastName = $employee[2];
-            $email = $employee[4];
+            $firstName = $row[0];
+            $lastName = $row[2];
+            $email = $row[4];
             if( !$firstName || !$lastName || !$email ) continue;
 
             $employee = Employee::where([
@@ -582,22 +582,22 @@ class ImportCsvFileJob implements ShouldQueue
             }
             
             $employee->firstname = $firstName;
-            $employee->firstname_visibility = $employee[1];
+            $employee->firstname_visibility = $row[1];
             $employee->lastName = $lastName;
-            $employee->lastname_visibility = $employee[3];
+            $employee->lastname_visibility = $row[3];
             $employee->email = $email;
-            $employee->email_visibility = $employee[5];
-            $employee->phone = $employee[6];
-            $employee->phone_visibility = $employee[7];
-            $employee->phone_visibility = $employee[8];
-            $employee->warehouse_id = $employee[9];
-            $employee->comments = $employee[10];
-            $employee->comments_visibility = $employee[11];
-            $employee->additional_comments = $employee[12];
-            $employee->faq = $employee[13];
-            $employee->post_code = $employee[14];
-            $employee->radius = $employee[15];
-            $employee->status = $employee[16;
+            $employee->email_visibility = $row[5];
+            $employee->phone = $row[6];
+            $employee->phone_visibility = $row[7];
+            $employee->phone_visibility = $row[8];
+            $employee->warehouse_id = $row[9];
+            $employee->comments = $row[10];
+            $employee->comments_visibility = $row[11];
+            $employee->additional_comments = $row[12];
+            $employee->faq = $row[13];
+            $employee->post_code = $row[14];
+            $employee->radius = $row[15];
+            $employee->status = $row[16;
 
             $employee->save();
             // TODO save employee ID inside product
