@@ -95,7 +95,7 @@
                                         $order->returnPosition($item->realProductPositions()[0]['id'])!==null
                                     )
                                         value="{{$order->returnPosition($item->realProductPositions()[0]['id'])->quantity_undamaged}}" 
-                                    @endif max="{{$item->quantity}}">
+                                    @endif max="{{$item->quantity}}" min="0">
                             </div>
                         </div>
                     </div>
@@ -109,7 +109,7 @@
                                         $order->returnPosition($item->realProductPositions()[0]['id'])!==null
                                     )
                                         value="{{$order->returnPosition($item->realProductPositions()[0]['id'])->quantity_damaged}}"  
-                                    @endif max="{{$item->quantity}}">
+                                    @endif max="{{$item->quantity}}" min="0">
                             </div>
                         </div>
                     </div>
