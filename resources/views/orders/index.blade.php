@@ -1659,8 +1659,8 @@
                             } else {
                                 html += '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-success">W</a>';
                             }
-                            if (data.order_id != null) {
-                                html += '<a href="/admin/orderReturn/' + data.order_id + '/print" target="_blank" class="btn btn-danger">WP</a>';
+                            if (data.orderId != null) {
+                                html += '<a href="/admin/orderReturn/' + data.orderId + '/print" target="_blank" class="btn btn-danger">WP</a>';
                             } else {
                                 html += '<a href="/admin/orderReturn/' + token + '/print" target="_blank" class="btn btn-danger">WP</a>';
                             }
