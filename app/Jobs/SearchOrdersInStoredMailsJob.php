@@ -67,7 +67,7 @@ class SearchOrdersInStoredMailsJob extends Job implements ShouldQueue
                             'order_id' => $data['order_id'],
                         ]
                     ]);
-                    dispatch_now(new AddLabelJob($data['order_id'], [138]));
+                    dispatch(new AddLabelJob($data['order_id'], [138]));
                 }
 
             }

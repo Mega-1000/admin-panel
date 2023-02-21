@@ -39,6 +39,9 @@ class ImportCsvFileJob implements ShouldQueue
     {
     }
 
+    /**
+     * @throws FileNotFoundException
+     */
     public function handle()
     {
         $path = Storage::path('user-files/baza/baza.csv');

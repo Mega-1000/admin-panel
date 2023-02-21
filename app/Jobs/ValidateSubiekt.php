@@ -39,20 +39,20 @@ class ValidateSubiekt implements ShouldQueue
 //                \Mailer::create()
 //                    ->to($order->customer->login)
 //                    ->send(new InvoiceSent('Faktura Mega1000', 'Faktura Mega1000', $invoiceRow->ftp_invoice_filename));
-                dispatch_now(new AddLabelJob($order->order_id, [137]));
+                dispatch(new AddLabelJob($order->order_id, [137]));
             } elseif(!empty($invoiceRowDelayed)) {
 //                \Mailer::create()
 //                    ->to($order->customer->login)
 //                    ->send(new InvoiceSent('Faktura Mega1000', 'Faktura Mega1000', $invoiceRowDelayed->ftp_invoice_filename));
-                dispatch_now(new RemoveLabelJob($order->order_id, [74]));
+                dispatch(new RemoveLabelJob($order->order_id, [74]));
             } elseif(!empty($noSymbol)) {
-                dispatch_now(new AddLabelJob($order->order_id, [101]));
+                dispatch(new AddLabelJob($order->order_id, [101]));
             } elseif(!empty($status12)) {
-                dispatch_now(new AddLabelJob($order->order_id, [124]));
+                dispatch(new AddLabelJob($order->order_id, [124]));
             } elseif(!empty($noWarehouseItems)) {
-                dispatch_now(new AddLabelJob($order->order_id, [120]));
+                dispatch(new AddLabelJob($order->order_id, [120]));
             } elseif(!empty($delayInvoice)) {
-                dispatch_now(new AddLabelJob($order->order_id, [42]));
+                dispatch(new AddLabelJob($order->order_id, [42]));
             }
         }
     }

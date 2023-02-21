@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Collection;
 class AllegroDisputeService extends AllegroApiService
 {
     protected $auth_record_id = 2;
-    
+
     const STATUS_ONGOING = 'ONGOING';
     const STATUS_CLOSED = 'CLOSED';
     const TYPE_REGULAR = 'REGULAR';
@@ -48,7 +48,7 @@ class AllegroDisputeService extends AllegroApiService
     }
 
     public function getNewPendingDisputes(): Collection {
-        
+
         // get first not booked dispute
         $newDisputes = AllegroDispute::where('is_pending', 1)->where(function($query) {
             $user = auth()->user();
@@ -96,7 +96,7 @@ class AllegroDisputeService extends AllegroApiService
             $disputeModel->unseen_changes = false;
         }
         $order = Order::where('allegro_form_id', '=', $disputeModel->form_id)->first();
-        
+
         if(!$order) return;
 
         $disputeModel->hash = $this->disputeHash($dispute);
@@ -120,7 +120,7 @@ class AllegroDisputeService extends AllegroApiService
         if (!($response = $this->request('GET', $url, []))) {
         	return [];
         }
-        
+
         return $response['disputes'];
     }
 
@@ -164,7 +164,7 @@ class AllegroDisputeService extends AllegroApiService
             'type' => self::TYPE_REGULAR
         ]);
     }
-    
+
     /** Create a request add attachment */
     public function createAttachmentId($fileName, $fileSize)
     {
@@ -226,16 +226,16 @@ class AllegroDisputeService extends AllegroApiService
     {
         if ($dispute->order_id && $dispute->status != self::STATUS_CLOSED) {
             if ($this->getDisputeMessages($dispute->dispute_id)[0]['author']['role'] != 'SELLER') {
-                dispatch_now(new AddLabelJob($dispute->order->id, [186]));
-                dispatch_now(new RemoveLabelJob($dispute->order->id, [185]));
+                dispatch(new AddLabelJob($dispute->order->id, [186]));
+                dispatch(new RemoveLabelJob($dispute->order->id, [185]));
             } else {
-                dispatch_now(new AddLabelJob($dispute->order->id, [185]));
-                dispatch_now(new RemoveLabelJob($dispute->order->id, [186]));
+                dispatch(new AddLabelJob($dispute->order->id, [185]));
+                dispatch(new RemoveLabelJob($dispute->order->id, [186]));
             }
         } else if ($dispute->status == self::STATUS_CLOSED) {
-            dispatch_now(new RemoveLabelJob($dispute->order->id, [186]));
-            dispatch_now(new RemoveLabelJob($dispute->order->id, [185]));
-            dispatch_now(new AddLabelJob($dispute->order->id, [187]));
+            dispatch(new RemoveLabelJob($dispute->order->id, [186]));
+            dispatch(new RemoveLabelJob($dispute->order->id, [185]));
+            dispatch(new AddLabelJob($dispute->order->id, [187]));
         }
     }
 

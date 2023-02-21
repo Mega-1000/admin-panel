@@ -31,6 +31,7 @@ class ImportController extends Controller
 
         if (File::exists(Storage::path('user-files/baza/baza.csv'))) {
             \Session::flash('flash-message', ['type' => 'danger', 'message' => 'Plik już istnieje. Prosimy poczekać, aż zostanie przetworzony.']);
+
         } else {
             Storage::disk()->put('/user-files/baza/baza.csv', fopen($file, 'r+'));
             \Session::flash('flash-message', ['type' => 'success', 'message' => 'Plik został zapisany, import zostanie wykonany w ciągu kilku minut']);

@@ -369,9 +369,9 @@ class OrdersPackagesController extends Controller
         $this->saveOrderPackage($data);
 
         if ($toCheck != 0) {
-            dispatch_now(new AddLabelJob($order->id, [134]));
+            dispatch(new AddLabelJob($order->id, [134]));
         } else {
-            dispatch_now(new AddLabelJob($order->id, [133]));
+            dispatch(new AddLabelJob($order->id, [133]));
         }
         if (empty($request->input('quantity')) || $request->input('quantity') <= 1) {
             return redirect()->route('orders.edit', ['order_id' => $order_id])->with([

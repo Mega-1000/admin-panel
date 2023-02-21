@@ -34,13 +34,13 @@ class OrderAddressObserver
     {
         $this->removingMissingDeliveryAddressLabelHandler($orderAddress);
         $this->addLabelIfManualCheckIsRequired($orderAddress);
-        
+
 	    if ($orderAddress->wasChanged() && $orderAddress->order->proforma_filename && Storage::disk('local')->exists($orderAddress->order->proformStoragePath)) {
 		    Storage::disk('local')->delete($orderAddress->order->proformStoragePath);
 		    $orderAddress->order->proforma_filename = '';
 		    $orderAddress->order->save();
 	    }
-        
+
         $this->addHistoryLog($orderAddress);
     }
 
@@ -60,38 +60,38 @@ class OrderAddressObserver
     {
         if (app(OrderPaymentService::class)->hasAnyPayment($orderAddress->order) &&
             !(new OrderAddressService())->addressIsValid($orderAddress)) {
-            dispatch_now(new AddLabelJob($orderAddress->order->id, [LabelsHelper::INVALID_ORDER_ADDRESS]));
+            dispatch(new AddLabelJob($orderAddress->order->id, [LabelsHelper::INVALID_ORDER_ADDRESS]));
         } else {
-            dispatch_now(new RemoveLabelJob($orderAddress->order->id, [LabelsHelper::INVALID_ORDER_ADDRESS]));
+            dispatch(new RemoveLabelJob($orderAddress->order->id, [LabelsHelper::INVALID_ORDER_ADDRESS]));
         }
     }
-    
+
     protected function addHistoryLog(OrderAddress $orderAddress): void {
 	    $type = 'api';
 	    if (Route::currentRouteName() != 'api.orders.update-order-delivery-and-invoice-addresses') {
 	    	return;
 	    }
-	    
+
 	    $original = $orderAddress->getOriginal();
-	    
+
 	    $changes = $orderAddress->getChanges();
-	
+
 	    $original = array_intersect_key($original, $changes);
 	    $changeLog = [];
-	
+
 	    foreach ($changes as $field => $new_value) {
 		    if ($field == 'updated_at' || $new_value == $original[$field]) {
 			    continue;
 		    }
-		    
+
 		    $changeLog[] = __("customers.table.{$field}") . ": z `{$original[$field]}` na `{$new_value}`";
 	    }
-	
+
 	    if ($changeLog) {
 		    $messageTitle = sprintf(__('order_addresses.message.title.' . $type),
 			    __('customers.form.buttons.' . strtolower($orderAddress->type))
 		    );
-		    
+
 		    $orderAddress->order->labels_log .= Order::formatMessage(null, $messageTitle . implode(', ', $changeLog));
 		    $orderAddress->order->save();
 	    }

@@ -113,7 +113,7 @@ class RemoveLabelJob extends Job implements ShouldQueue
 
                             //attaching labels to add after removal
                             if (count($labelIdsToAttach) > 0) {
-                                dispatch_now(new AddLabelJob($this->order, $labelIdsToAttach, $this->loopPreventionArray));
+                                dispatch(new AddLabelJob($this->order, $labelIdsToAttach, $this->loopPreventionArray));
                             }
 
                             //detaching labels to remove after removal
@@ -122,7 +122,7 @@ class RemoveLabelJob extends Job implements ShouldQueue
                                 foreach ($label->labelsToRemoveAfterRemoval as $itemAfterRemoval) {
                                     $labelIdsToDetach[] = $itemAfterRemoval->id;
                                 }
-                                dispatch_now(new RemoveLabelJob($this->order, $labelIdsToDetach, $this->loopPreventionArray));
+                                dispatch(new RemoveLabelJob($this->order, $labelIdsToDetach, $this->loopPreventionArray));
                             }
                         }
                     }
@@ -134,7 +134,7 @@ class RemoveLabelJob extends Job implements ShouldQueue
 
             //attaching labels to add after removal
             if (count($labelIdsToAttach) > 0) {
-                dispatch_now(new AddLabelJob($this->order, $labelIdsToAttach, $this->loopPreventionArray));
+                dispatch(new AddLabelJob($this->order, $labelIdsToAttach, $this->loopPreventionArray));
             }
 
             //detaching labels to remove after removal
@@ -143,7 +143,7 @@ class RemoveLabelJob extends Job implements ShouldQueue
                 foreach ($label->labelsToRemoveAfterRemoval as $item) {
                     $labelIdsToDetach[] = $item->id;
                 }
-                dispatch_now(new RemoveLabelJob($this->order, $labelIdsToDetach, $this->loopPreventionArray));
+                dispatch(new RemoveLabelJob($this->order, $labelIdsToDetach, $this->loopPreventionArray));
             }
         }
         return null;
@@ -156,7 +156,7 @@ class RemoveLabelJob extends Job implements ShouldQueue
         $targetDatetime = Carbon::parse($this->time);
         $delay = $now->diffInSeconds($targetDatetime);
         foreach ($labelsToChange as $labelToChange) {
-            dispatch_now(new AddLabelJob($this->order->id, [$labelToChange->pivot->label_to_add_id]));
+            dispatch(new AddLabelJob($this->order->id, [$labelToChange->pivot->label_to_add_id]));
             dispatch(new RemoveLabelJob($this->order->id, [$labelToChange->pivot->label_to_add_id]))->delay($delay);
             dispatch(new AddLabelJob($this->order->id, [$labelToChange->pivot->main_label_id]))->delay($delay);
         }

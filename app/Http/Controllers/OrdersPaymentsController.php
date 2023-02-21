@@ -324,7 +324,7 @@ class OrdersPaymentsController extends Controller
                                     }
 
                                     OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
-                                    dispatch_now(new AddLabelJob($connectedOrder->id, [130]));
+                                    dispatch(new AddLabelJob($connectedOrder->id, [130]));
                                     if ($payment != null && $order->status_id != 5) {
                                         $this->orderRepository->update([
                                             'status_id' => 5,
@@ -435,7 +435,7 @@ class OrdersPaymentsController extends Controller
                                     }
 
                                     OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
-                                    dispatch_now(new AddLabelJob($order->id, [130]));
+                                    dispatch(new AddLabelJob($order->id, [130]));
                                     if ($payment != null && $order->status_id != 5) {
                                         $this->orderRepository->update([
                                             'status_id' => 5,
@@ -458,7 +458,7 @@ class OrdersPaymentsController extends Controller
                 if ((float)$amount < (float)$orderGroupPromisePaymentSum) {
                     foreach ($connectedOrders as $connectedOrder) {
                         if ($connectedOrder->hasPromisePayments() > 0) {
-                            dispatch_now(new AddLabelJob($connectedOrder->id, [128]));
+                            dispatch(new AddLabelJob($connectedOrder->id, [128]));
                         }
                     }
                 }
@@ -710,7 +710,7 @@ class OrdersPaymentsController extends Controller
                                 );
                             }
 
-                            dispatch_now(new AddLabelJob($connectedOrder->id, [40]));
+                            dispatch(new AddLabelJob($connectedOrder->id, [40]));
                         }
                     }
 
@@ -943,7 +943,7 @@ class OrdersPaymentsController extends Controller
                                     );
                                 }
 
-                                dispatch_now(new AddLabelJob($connectedOrder->id, [40]));
+                                dispatch(new AddLabelJob($connectedOrder->id, [40]));
                             }
                         } else {
                             if (empty($this->repository->findWhere([
@@ -1019,7 +1019,7 @@ class OrdersPaymentsController extends Controller
                                     );
                                 }
 
-                                dispatch_now(new AddLabelJob($connectedOrder->id, [40]));
+                                dispatch(new AddLabelJob($connectedOrder->id, [40]));
                             }
                         }
                     }
@@ -1633,7 +1633,7 @@ class OrdersPaymentsController extends Controller
         }
 
         if ($orderPayment->promise == '1' && $promise == '') {
-            dispatch_now(new AddLabelJob($orderPayment->order_id, [5]));
+            dispatch(new AddLabelJob($orderPayment->order_id, [5]));
         }
 
         $payment = $this->repository->update([

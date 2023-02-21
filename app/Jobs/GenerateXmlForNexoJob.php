@@ -152,7 +152,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
 
                 $xml = self::generateValidXmlFromObj($preDokument);
                 Storage::disk('local')->put('public/XMLFS/' . $order->id . '_FS_' . Carbon::now()->format('d-m-Y') . '.xml', mb_convert_encoding($xml, "UTF-8", "auto"));
-                dispatch_now(new AddLabelJob($order, [Label::XML_INVOICE_GENERATED]));
+                dispatch(new AddLabelJob($order, [Label::XML_INVOICE_GENERATED]));
             } catch (\Throwable $ex) {
                 Log::error($ex->getMessage(), [
                     'productId' => (isset($item)) ? $item->product->id : null,

@@ -177,7 +177,7 @@ class AddLabelJob extends Job implements ShouldQueue
                 foreach ($label->labelsToAddAfterAddition as $item) {
                     $labelIdsToAttach[] = $item->id;
                 }
-                dispatch_now(new AddLabelJob($this->order, $labelIdsToAttach, $this->loopPreventionArray));
+                dispatch(new AddLabelJob($this->order, $labelIdsToAttach, $this->loopPreventionArray));
             }
 
             //detaching labels to remove after addition
@@ -186,7 +186,7 @@ class AddLabelJob extends Job implements ShouldQueue
                 foreach ($label->labelsToRemoveAfterAddition as $item) {
                     $labelIdsToDetach[] = $item->id;
                 }
-                dispatch_now(new RemoveLabelJob($this->order, $labelIdsToDetach, $this->loopPreventionArray));
+                dispatch(new RemoveLabelJob($this->order, $labelIdsToDetach, $this->loopPreventionArray));
             }
         }
     }

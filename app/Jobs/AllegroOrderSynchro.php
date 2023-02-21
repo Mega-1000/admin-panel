@@ -156,7 +156,7 @@ class AllegroOrderSynchro implements ShouldQueue
 
                 if ($undefinedProductSymbol) {
                     $order->consultant_notices = 'Nie znaleziono produktu o symbolu ' . $undefinedProductSymbol['id'];
-                    dispatch_now(new AddLabelJob($order, [Label::WAREHOUSE_MARK]));
+                    dispatch(new AddLabelJob($order, [Label::WAREHOUSE_MARK]));
                 }
 
                 $this->saveOrderItems($orderItems, $order);
@@ -244,7 +244,7 @@ class AllegroOrderSynchro implements ShouldQueue
                     }
                 }
 
-                dispatch_now(new AddLabelJob($order, [177]));
+                dispatch(new AddLabelJob($order, [177]));
                 $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
                 DB::commit();
             } catch (Throwable $ex) {
