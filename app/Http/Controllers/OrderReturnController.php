@@ -40,6 +40,9 @@ class OrderReturnController extends Controller
     public function index(int $id)
     {
         $order = Order::with(['customer', 'items','orderReturn'])->find($id);
+        if (empty($order)) {
+            abort(404);
+        }
         $orderId = $id;
         return view('orderReturn.index',compact(
             'order',
