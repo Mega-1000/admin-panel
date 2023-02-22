@@ -62,7 +62,7 @@ class RemoveLabelJob extends Job implements ShouldQueue
                 continue;
             }
 
-            if ($labelId == 49 && Auth::user()->role_id == 4) {
+            if ($labelId == 49 && Auth::user()?->role_id == 4) {
                 continue;
             }
 
@@ -104,7 +104,7 @@ class RemoveLabelJob extends Job implements ShouldQueue
                 foreach ($label->labelsToAddAfterRemoval as $item) {
                     $labelIdsToAttach[] = $item->id;
                     if ($item->id == 50) {
-                        $response = dispatch_now(new ChangeWarehouseStockJob($this->order));
+                        $response = dispatch(new ChangeWarehouseStockJob($this->order));
                         if (strlen((string)$response) > 0) {
                             Session::put('removeLabelJobAfterProductStockMove', array_merge([$this], Session::get('removeLabelJobAfterProductStockMove') ?? []));
                             return $response;
