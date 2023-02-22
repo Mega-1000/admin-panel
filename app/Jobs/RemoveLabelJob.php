@@ -12,6 +12,7 @@ use App\Services\OrderWarehouseNotificationService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 
 class RemoveLabelJob extends Job implements ShouldQueue
@@ -104,7 +105,7 @@ class RemoveLabelJob extends Job implements ShouldQueue
                 foreach ($label->labelsToAddAfterRemoval as $item) {
                     $labelIdsToAttach[] = $item->id;
                     if ($item->id == 50) {
-                        $response = dispatch(new ChangeWarehouseStockJob($this->order));
+                        $response = dispatch_now(new ChangeWarehouseStockJob($this->order));
                         if (strlen((string)$response) > 0) {
                             Session::put('removeLabelJobAfterProductStockMove', array_merge([$this], Session::get('removeLabelJobAfterProductStockMove') ?? []));
                             return $response;
@@ -139,7 +140,7 @@ class RemoveLabelJob extends Job implements ShouldQueue
             }
 
             //detaching labels to remove after removal
-            if (count($label->labelsToRemoveAfterRemoval) > 0) {
+            if (($label->labelsToRemoveAfterRemoval?->count() ?? 0) > 0) {
                 $labelIdsToDetach = [];
                 foreach ($label->labelsToRemoveAfterRemoval as $item) {
                     $labelIdsToDetach[] = $item->id;

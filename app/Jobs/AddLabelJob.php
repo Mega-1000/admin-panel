@@ -91,8 +91,7 @@ class AddLabelJob extends Job implements ShouldQueue
                 }
             }
 
-            if (!empty($this->loopPreventionArray['already-added']) && in_array($labelId,
-                    $this->loopPreventionArray['already-added'])) {
+            if(array_key_exists('already-added', $this->loopPreventionArray) && in_array($labelId, $this->loopPreventionArray['already-added'])) {
                 continue;
             }
 
@@ -113,18 +112,18 @@ class AddLabelJob extends Job implements ShouldQueue
                 $targetDatetime = Carbon::parse($this->time);
                 $delay = $now->diffInSeconds($targetDatetime);
 
+                dispatch(new RemoveLabelJob($this->order->id, [$labelId]))->delay($delay);
+
                 if($labelsAfterTime->count() > 0) {
-                    $removeLabelJob = dispatch(new RemoveLabelJob($this->order->id, [$labelId]));
                     foreach($labelsAfterTime as $labelAfterTime) {
-                        $addLabelJob = dispatch(new AddLabelJob($this->order->id, [$labelAfterTime->label_to_add_id]));
+                        dispatch(new AddLabelJob($this->order->id, [$labelAfterTime->label_to_add_id]))->delay($delay);
                     }
                 } else {
-                    $removeLabelJob = dispatch(new RemoveLabelJob($this->order->id, [$labelId]));
-                    $addLabelJob = dispatch(new AddLabelJob($this->order->id, [Label::URGENT_INTERVENTION]));
+                    dispatch(new AddLabelJob($this->order->id, [Label::URGENT_INTERVENTION]))->delay($delay);
                 }
             }
 
-            if (count($alreadyHasLabel) == 0) {
+            if (($alreadyHasLabel?->count() ?? 0) == 0) {
                 $this->order->labels()->attach($this->order->id, ['label_id' => $label->id, 'added_type' => $this->options['added_type'], 'created_at' => Carbon::now()]);
                 $this->setScheduledLabelsAfterAddition($this->order->id, $label, $orderLabelSchedulerRepository);
                 $this->loopPreventionArray['already-added'][] = $labelId;
