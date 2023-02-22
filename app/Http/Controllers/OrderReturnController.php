@@ -5,22 +5,16 @@ namespace App\Http\Controllers;
 use App\Entities\Order;
 use App\Entities\OrderReturn;
 use App\Entities\ProductStock;
-use App\Entities\ProductStockPosition;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Helpers\OrdersHelper;
 
 use App\Services\OrderReturnService;
 
 use App\User;
-use Carbon\Carbon;
-use Dompdf\Dompdf;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\View;
-use Illuminate\Support\Str;
 
 class OrderReturnController extends Controller
 {

@@ -2,19 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Entities\ProductStock;
-use App\Entities\ProductStockPosition;
-use App\Http\Requests\ProductStockPositionCreate;
-use App\Http\Requests\ProductStockPositionUpdate;
-use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Contracts\View\View;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use App\Entities\OrderReturn;
+use App\Entities\ProductStock;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
+use App\Entities\ProductStockPosition;
+use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Facades\Session;
 use Yajra\DataTables\Facades\DataTables;
-use DB;
+use Illuminate\Contracts\Foundation\Application;
+use App\Http\Requests\ProductStockPositionCreate;
+use App\Http\Requests\ProductStockPositionUpdate;
 
 /**
  * Class ProductStockPositionsController
@@ -208,7 +208,7 @@ class ProductStockPositionsController extends Controller
         $collection = ProductStockPosition::where(['product_stock_id' => $id])->get();
 
         foreach ($collection as $row) {
-            $row->damaged = DB::table('order_returns')->where('product_stock_position_id', $row['id'])->sum('quantity_damaged');
+            $row->damaged = OrderReturn::where('product_stock_position_id', $row['id'])->sum('quantity_damaged');
         }
 
         return $collection;

@@ -1,15 +1,8 @@
 <?php namespace App\Services;
 
 use App\Entities\OrderReturn;
-use App\Entities\ProductStock;
 use App\Entities\ProductStockPosition;
-use Exception;
-
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 
 class OrderReturnService
@@ -20,7 +13,7 @@ class OrderReturnService
         return $photo->store('public/' . $path);
     }
 
-    public function updateFile($id,$photo): string
+    public function updateFile($id, $photo): string
     {
         $orderReturn = OrderReturn::find($id);
         if ($photo && $orderReturn->photo && Storage::disk('public')->exists(str_replace('public/','',$orderReturn->photo))) {

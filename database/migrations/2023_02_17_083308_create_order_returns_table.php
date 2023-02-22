@@ -21,8 +21,8 @@ return new class extends Migration
             $table->unsignedInteger('user_id');
             $table->integer('quantity_undamaged')->default(0);
             $table->integer('quantity_damaged')->default(0);
-            $table->text('description')->nullable();
-            $table->string('photo')->nullable();
+            $table->text('description')->default('');
+            $table->string('photo')->default('');
             $table->timestamps();
 
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
