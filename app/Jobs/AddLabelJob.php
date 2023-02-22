@@ -83,7 +83,9 @@ class AddLabelJob extends Job implements ShouldQueue
             }
 
             if ($labelId=== 45) {
-                if (count(array_intersect($this->order->labels()->pluck('labels.id')->toArray(), Label::NOT_ADD_LABEL_CHECK_CORRECT)) > 0) {
+                if (count(array_intersect(
+                    $this->order->labels()->pluck('labels.id')->toArray(),
+                        Label::NOT_ADD_LABEL_CHECK_CORRECT)) > 0) {
                     continue;
                 }
             }
@@ -104,18 +106,20 @@ class AddLabelJob extends Job implements ShouldQueue
                     'label_id' => $labelId,
                     'is_executed' => false
                 ]);
-                $labelsAfterTime = DB::table('label_labels_to_add_after_timed_label')->where('main_label_id', $labelId)->get();
+                $labelsAfterTime = DB::table('label_labels_to_add_after_timed_label')
+                    ->where('main_label_id', $labelId)
+                    ->get();
                 $targetDatetime = Carbon::parse($this->time);
                 $delay = $now->diffInSeconds($targetDatetime);
 
                 if($labelsAfterTime->count() > 0) {
-                    $removeLabelJob = dispatch(new RemoveLabelJob($this->order->id, [$labelId]))->delay($delay);
+                    $removeLabelJob = dispatch(new RemoveLabelJob($this->order->id, [$labelId]));
                     foreach($labelsAfterTime as $labelAfterTime) {
-                        $addLabelJob = dispatch(new AddLabelJob($this->order->id, [$labelAfterTime->label_to_add_id]))->delay($delay);
+                        $addLabelJob = dispatch(new AddLabelJob($this->order->id, [$labelAfterTime->label_to_add_id]));
                     }
                 } else {
-                    $removeLabelJob = dispatch(new RemoveLabelJob($this->order->id, [$labelId]))->delay($delay);
-                    $addLabelJob = dispatch(new AddLabelJob($this->order->id, [Label::URGENT_INTERVENTION]))->delay($delay);
+                    $removeLabelJob = dispatch(new RemoveLabelJob($this->order->id, [$labelId]));
+                    $addLabelJob = dispatch(new AddLabelJob($this->order->id, [Label::URGENT_INTERVENTION]));
                 }
             }
 
@@ -125,14 +129,14 @@ class AddLabelJob extends Job implements ShouldQueue
                 $this->loopPreventionArray['already-added'][] = $labelId;
 
                 if ($label->message !== null && $labelId !== 89) {
-                    dispatch_now(new LabelAddNotificationJob($this->order->id, $label->id));
+                    dispatch(new LabelAddNotificationJob($this->order->id, $label->id));
                 }
 
                 if ($label->id == 52) {  //wyslana do awizacji
                     if($this->order->customer->id == 4128) {
-                        dispatch_now(new OrderStatusChangedToDispatchNotificationJob($this->order->id, true));
+                        dispatch(new OrderStatusChangedToDispatchNotificationJob($this->order->id, true));
                     } else {
-                        dispatch_now(new OrderStatusChangedToDispatchNotificationJob($this->order->id));
+                        dispatch(new OrderStatusChangedToDispatchNotificationJob($this->order->id));
                     }
 
                 }
@@ -142,7 +146,7 @@ class AddLabelJob extends Job implements ShouldQueue
 
                 if($labelId == Label::ORDER_ITEMS_CONSTRUCTED){
                 	dispatch(new SendItemsConstructedMailJob($this->order));
-                    dispatch_now(new SavePackageGroupJob($this->order));
+                    dispatch(new SavePackageGroupJob($this->order));
 
                     $tasks = $taskRepository->findByField('order_id',$this->order->id)->all();
                     if(count($tasks) != 0) {
