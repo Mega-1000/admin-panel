@@ -42,6 +42,7 @@ class AddLabelJob extends Job implements ShouldQueue
      */
     public function __construct($order, $labelIdsToAdd, &$loopPreventionArray = [], $options = [], $self = null, $time = false)
     {
+        $this->queue = 'labels';
         $this->order = $order;
         $this->labelIdsToAdd = $labelIdsToAdd;
         $this->loopPreventionArray = $loopPreventionArray;

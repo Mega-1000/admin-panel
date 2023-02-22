@@ -39,6 +39,7 @@ class LabelAddNotificationJob implements ShouldQueue
      */
     public function __construct($orderId, $labelId)
     {
+        $this->queue = 'labels';
         $this->orderId = $orderId;
         $this->labelId = $labelId;
     }

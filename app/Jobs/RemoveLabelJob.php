@@ -32,6 +32,7 @@ class RemoveLabelJob extends Job implements ShouldQueue
      */
     public function __construct($order, $labelIdsToRemove, &$loopPreventionArray = [], $customLabelIdsToAddAfterRemoval = [], $time = null)
     {
+        $this->queue = 'labels';
         $this->order = $order;
         $this->labelIdsToRemove = $labelIdsToRemove;
         $this->loopPreventionArray = $loopPreventionArray;
