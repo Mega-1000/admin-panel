@@ -113,7 +113,7 @@ class ChangeWarehouseStockJob extends Job implements ShouldQueue
                     'action' => ProductStockLogActionEnum::DELETE,
                     'quantity' => $item->quantity,
                     'order_id' => $this->orderId,
-                    'user_id' => Auth::id(),
+                    'user_id' => Auth::user()->id,
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now()
                 ]);

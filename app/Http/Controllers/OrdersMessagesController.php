@@ -100,7 +100,7 @@ class OrdersMessagesController extends Controller
             'message' => $request->input('message'),
             'status' => $request->input('status'),
             'type' => $request->input('type'),
-            'user_id' => Auth::id(),
+            'user_id' => Auth::user()->id,
         ], $id);
 
         return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
@@ -125,7 +125,7 @@ class OrdersMessagesController extends Controller
             'message' => $request->input('message'),
             'status' => 'OPEN',
             'type' => $request->input('type'),
-            'user_id' => Auth::id(),
+            'user_id' => Auth::user()->id,
             'order_id' => $order_id,
         ]);
 
@@ -164,9 +164,6 @@ class OrdersMessagesController extends Controller
         if ($order->customer->id == 4128) {
             $mail = $order->warehouse->firm->email;
 
-            Mail::mailer(
-                name: ''
-            );
             Mailer::create()
                 ->to($mail)
                 ->send(new SelfMessageSent($date, $type, $typeText, $order->warehouse->id, $order_id));

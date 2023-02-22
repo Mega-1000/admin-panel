@@ -101,7 +101,7 @@
                                                     <option value="COMPLAINT">Reklamacja</option>
                                                 </select>
                                             </div>
-                                            <input type="hidden" name="employee_id" value="{{ Auth::id() }}">
+                                            <input type="hidden" name="employee_id" value="{{ \Illuminate\Support\Facades\Auth::user()->id }}">
                                             <input type="hidden" name="order_id" value="{{ $order->id }}">
                                             <div class="form-group">
                                                 <label for="message">Wiadomość</label>

@@ -12,13 +12,14 @@ use App\Entities\UserWork;
 use App\Entities\Warehouse;
 use App\Entities\Order;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Passport\HasApiTokens;
 
 /**
  * Class User
  * @package App
+ *
+ * @property int $id
+ *
  */
 class User extends \TCG\Voyager\Models\User
 {

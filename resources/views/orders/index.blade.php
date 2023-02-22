@@ -2628,7 +2628,7 @@
 
             let refreshDtOrReload = function () {
                 $.ajax({
-                    url: '/api/get-labels-scheduler-await/{{ Auth::id() }}'
+                    url: '/api/get-labels-scheduler-await/{{ \Illuminate\Support\Facades\Auth::user()->id }}'
                 }).done(function (res) {
                     if (res.length) {
                         location.reload();
@@ -2872,7 +2872,7 @@
             let url = "{{ route('orders.label-addition', ['labelId' => ':id'])}}"
             url = url.replace(':id', chosenLabel.val());
             let schedulerUrl = "{{ route('api.labels.get-labels-scheduler-await', ['userId' => ':id']) }}"
-            schedulerUrl = schedulerUrl.replace(':id', {{ Auth::id() }});
+            schedulerUrl = schedulerUrl.replace(':id', {{ \Illuminate\Support\Facades\Auth::user()->id }});
             if (timed == true) {
                 data = {orderIds: orderIds, time: $('#time_label').val()};
             } else {

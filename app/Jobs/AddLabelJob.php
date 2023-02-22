@@ -14,8 +14,8 @@ use App\Repositories\OrderRepository;
 use App\Repositories\TaskRepository;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class AddLabelJob extends Job implements ShouldQueue
@@ -220,7 +220,7 @@ class AddLabelJob extends Job implements ShouldQueue
         if (!empty($pivot->$action)) {
             $this->awaitRepository->create([
                 'order_id' => $orderId,
-                'user_id' => \Auth::id(),
+                'user_id' => Auth::user()->id,
                 'labels_timed_after_addition_id' => $pivot->id,
             ]);
         }

@@ -1898,7 +1898,7 @@ class OrdersController extends Controller
                     'order_id' => $request->input('orderId'),
                     'action' => 'ADD',
                     'quantity' => $quantity,
-                    'user_id' => Auth::id(),
+                    'user_id' => Auth::user()->id,
                 ]);
 
                 $this->productStockRepository->update([
@@ -1958,7 +1958,7 @@ class OrdersController extends Controller
                     'order_id' => $request->input('orderId'),
                     'action' => 'ADD',
                     'quantity' => $quantity,
-                    'user_id' => Auth::id(),
+                    'user_id' => Auth::user()->id,
                 ]);
 
                 $this->productStockRepository->update([
@@ -2019,7 +2019,7 @@ class OrdersController extends Controller
                     'order_id' => $request->input('orderId'),
                     'action' => 'ADD',
                     'quantity' => $quantity,
-                    'user_id' => Auth::id(),
+                    'user_id' => Auth::user()->id,
                 ]);
 
                 $this->productStockRepository->update([
@@ -2068,7 +2068,7 @@ class OrdersController extends Controller
                     'order_id' => $request->input('orderId'),
                     'action' => 'DELETE',
                     'quantity' => $quantity,
-                    'user_id' => Auth::id(),
+                    'user_id' => Auth::user()->id,
                 ]);
 
                 $this->productStockRepository->update([

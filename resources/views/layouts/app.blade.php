@@ -470,7 +470,7 @@
         @include('voyager::dimmers')
         @yield('app-content')
         <label-scheduler-await-user
-                :user-id="{{ Auth::id() }}"
+                :user-id="{{ \Illuminate\Support\Facades\Auth::user()->id }}"
         />
     </div>
 @endsection
