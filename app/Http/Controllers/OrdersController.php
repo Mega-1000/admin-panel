@@ -1649,12 +1649,13 @@ class OrdersController extends Controller
             && in_array(LabelsHelper::SEND_TO_WAREHOUSE_FOR_VALIDATION, $labelsToAddAfterRemoval)
             && empty($order->warehouse)
         ) {
-            return response('warehouse not found', 400);
+            return new JsonResponse(['status' => false, 'message' => 'warehouse not found'], 400);
         }
 
         $time = $request->input('time');
 
-        return dispatch_now(new RemoveLabelJob($order, [$labelId], $preventionArray, $labelsToAddAfterRemoval, $time));
+        dispatch(new RemoveLabelJob($order, [$labelId], $preventionArray, $labelsToAddAfterRemoval, $time));
+        return new JsonResponse(['status' => true, 'message' => 'Label remove started'], 200);
     }
 
     public function setPaymentDeadline(Request $request)
