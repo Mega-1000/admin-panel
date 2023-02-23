@@ -2,18 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Exception;
 use App\Entities\Chat;
-use App\Entities\Firm;
-use App\Entities\Employee;
+use App\Entities\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Helpers\MessagesHelper;
 use App\Services\MessagesService;
-use App\Entities\PostalCodeLatLon;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\Exceptions\ChatException;
 
@@ -126,45 +122,46 @@ class MessagesController extends Controller
             return redirect(env('FRONT_URL'));
         }
     }
-
+    /**
+     * prepare chat View from given $token
+     *
+     * @param string $token
+     * @return View
+     */
     private function prepareChatView(string $token): View
     {
         $helper = new MessagesHelper($token);
         $chat = $helper->getChat();
         $product = $helper->getProduct();
         $order = $helper->getOrder();
+
+        $chatType = $order ? 'order' : 'product';
+
         $helper->setLastRead();
 
-        $users = empty($chat) ? collect() : $chat->chatUsers;
+        $chatUsers = empty($chat) ? collect() : $chat->chatUsers;
 
-        $currentCustomersOnChat = $users->pluck('customer_id')->filter();
-        $currentEmployeesOnChat = $users->pluck('employee_id')->filter();
+        $currentCustomersIdsOnChat = $chatUsers->pluck('customer_id')->filter();
+        $currentEmployeesIdsOnChat = $chatUsers->pluck('employee_id')->filter();
 
         $possibleUsers = collect();
+        $productList = collect();
         $notices = '';
-        $productList = $this->messagesService->prepareProductList($helper);
-
-        $employeesIds = $productList->pluck('employees_ids');
-        $employeesIdsFiltered = [];
-
-        foreach($employeesIds as $productEmployees) {
-            $productEmployees = json_decode($productEmployees);
-
-            if(!empty($productEmployee)) continue;
-
-            foreach($productEmployees as $employeeId) {
-                
-                $employeesIdsFiltered[] = $employeeId;
-            }
+        if($chatType == 'order') {
+            $productList = $this->messagesService->prepareOrderItemsCollection($helper);
+            $products = $productList->pluck('product');
+        } else if($chatType == 'product') {
+            $productList = $products = collect([$helper->getProduct()]);
         }
 
-        // remove no unique employees
-        $employeesIdsFiltered = collect($employeesIdsFiltered)->unique();
-        // remove already existed as chat users employees
-        $employeesIdsFiltered = $employeesIdsFiltered->diff($currentEmployeesOnChat);
-
-        $possibleUsers = Employee::findMany($employeesIdsFiltered);
-
+        $employeesIds = $products->pluck('employees_ids');
+        
+        if($employeesIds->isNotEmpty()) {
+            $possibleUsers = $this->messagesService->prepareEmployees($employeesIds, $currentEmployeesIdsOnChat);
+        }
+        if($currentCustomersIdsOnChat->isEmpty() && $chatType == 'order') {
+            $possibleUsers->push($order->customer);
+        }
         // if ($product) {
         //     // get possible users from company / firm
         //     $possibleUsers = $this->getNotAttachedChatUsersForProduct($product, $chat->customers->first());
@@ -182,11 +179,11 @@ class MessagesController extends Controller
 
         $view = view('chat.show')->with([
             'product_list'            => $productList,
-            'faq'                     => $this->prepareFaq($users),
+            'faq'                     => $this->prepareFaq($chatUsers),
             'notices'                 => $notices,
             'possible_users'          => $possibleUsers,
             'user_type'               => $helper->currentUserType,
-            'users'                   => $users,
+            'users'                   => $chatUsers,
             'chat'                    => $chat,
             'product'                 => $product,
             'order'                   => $order,
