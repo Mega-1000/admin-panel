@@ -474,7 +474,7 @@ class Order extends Model implements Transformable
      */
     public function items()
     {
-        return $this->hasMany(OrderItem::class)->with('product');
+        return $this->hasMany(OrderItem::class);
     }
 
     /**

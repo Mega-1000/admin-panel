@@ -12,12 +12,15 @@ use App\Entities\Product;
 use App\Jobs\AddLabelJob;
 use App\Entities\Customer;
 use App\Entities\Employee;
+use App\Entities\OrderItem;
 use App\Jobs\RemoveLabelJob;
 use App\Entities\ProductMedia;
 use App\Entities\WorkingEvents;
 use App\Entities\CustomerAddress;
 use App\Jobs\ChatNotificationJob;
 use App\Entities\PostalCodeLatLon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use App\Helpers\Exceptions\ChatException;
 
@@ -461,5 +464,60 @@ class MessagesHelper
             default:
                 throw new \Exception('Userd does not exist');
         }
+    }
+
+    /**
+     * Prepare list of products
+     *
+     * @return Collection<OrderItem|null>
+     */
+    public function prepareOrderItemsCollection()
+    {
+        try {
+            $chatUser = $this->getCurrentUser();
+            $order = $this->getOrder();
+
+            if (is_a($chatUser, Employee::class)) {
+                return $order->items->filter(function ($item) use ($chatUser) {
+                    return empty($item->product->firm) || $item->product->firm->id == $chatUser->firm->id;
+                });
+            }
+            return $order->items;
+        } catch (\Exception $e) {
+            Log::error('Cannot prepare product list',
+                ['exception' => $e->getMessage(), 'class' => $e->getFile(), 'line' => $e->getLine()]);
+            return collect();
+        }
+    }
+
+    /**
+     * Prepare Employees for possible Users
+     *
+     * @param Collection<Product> $employeesIds
+     * @param Collection $currentEmployeesOnChat - collections with Employees ids
+     * @return Collection<Employee>
+     */
+    public function prepareEmployees(Collection $employeesIds, Collection $currentEmployeesOnChat): Collection {
+
+        $employeesIdsFiltered = [];
+
+        foreach($employeesIds as $productEmployees) {
+            $productEmployees = json_decode($productEmployees);
+
+            if(!empty($productEmployee)) continue;
+
+            foreach($productEmployees as $employeeId) {
+                $employeesIdsFiltered[] = $employeeId;
+            }
+        }
+
+        // remove no unique employees
+        $employeesIdsFiltered = collect($employeesIdsFiltered)->unique();
+        // remove already existed as chat users employees
+        $employeesIdsFiltered = $employeesIdsFiltered->diff($currentEmployeesOnChat);
+
+        $possibleUsers = Employee::findMany($employeesIdsFiltered);
+
+        return $possibleUsers;
     }
 }

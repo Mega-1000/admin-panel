@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Entities\Chat;
-use App\Entities\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Helpers\MessagesHelper;
-use App\Services\MessagesService;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
@@ -15,12 +13,6 @@ use App\Helpers\Exceptions\ChatException;
 
 class MessagesController extends Controller
 {
-
-    protected $messagesService;
-
-    public function __construct(MessagesService $messagesService) {
-        $this->messagesService = $messagesService;
-    }
 
     /**
      * Display a listing of the resource.
@@ -148,7 +140,7 @@ class MessagesController extends Controller
         $productList = collect();
         $notices = '';
         if($chatType == 'order') {
-            $productList = $this->messagesService->prepareOrderItemsCollection($helper);
+            $productList = $helper->prepareOrderItemsCollection($helper);
             $products = $productList->pluck('product');
         } else if($chatType == 'product') {
             $productList = $products = collect([$helper->getProduct()]);
@@ -157,7 +149,7 @@ class MessagesController extends Controller
         $employeesIds = $products->pluck('employees_ids');
         
         if($employeesIds->isNotEmpty()) {
-            $possibleUsers = $this->messagesService->prepareEmployees($employeesIds, $currentEmployeesIdsOnChat);
+            $possibleUsers = $helper->prepareEmployees($employeesIds, $currentEmployeesIdsOnChat);
         }
         if($currentCustomersIdsOnChat->isEmpty() && $chatType == 'order') {
             $possibleUsers->push($order->customer);
