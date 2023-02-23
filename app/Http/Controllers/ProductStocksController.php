@@ -2,23 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use App\Entities\ColumnVisibility;
-use App\Entities\ProductStock;
-use App\Entities\ProductStockLog;
-use App\Entities\ProductStockPosition;
-use App\Http\Requests\ProductStockUpdateRequest;
-use App\Repositories\ProductRepository;
-use App\Repositories\ProductStockLogRepository;
-use App\Repositories\ProductStockPositionRepository;
-use App\Repositories\ProductStockRepository;
-use App\Services\ProductService;
 use DB;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use App\Entities\OrderReturn;
+use App\Entities\ProductStock;
+use App\Services\ProductService;
+use App\Entities\ProductStockLog;
+use Illuminate\Http\JsonResponse;
+use App\Entities\ColumnVisibility;
 use Illuminate\Support\Facades\View;
+use Illuminate\Http\RedirectResponse;
+use App\Entities\ProductStockPosition;
+use Illuminate\Contracts\View\Factory;
+use App\Repositories\ProductRepository;
 use Yajra\DataTables\Facades\DataTables;
+use App\Repositories\ProductStockRepository;
+use App\Repositories\ProductStockLogRepository;
+use App\Http\Requests\ProductStockUpdateRequest;
+use App\Repositories\ProductStockPositionRepository;
 
 class ProductStocksController extends Controller
 {
@@ -148,7 +149,14 @@ class ProductStocksController extends Controller
             ->get();
 
         foreach ($collection as $row) {
-            $row->positions = DB::table('product_stock_positions')->where('product_stock_id', $row->stock_id)->get();
+            $positions = ProductStockPosition::where('product_stock_id', $row->stock_id)->get();
+            $row->positions = $positions;
+            $damaged = 0;
+            foreach($positions as $p){
+                $damaged = $damaged + OrderReturn::where('product_stock_position_id', $p->id)->sum('quantity_damaged');
+            }
+
+            $row->damaged = $damaged;
         }
 
 

@@ -1655,9 +1655,16 @@
                         render: function (token, row, data) {
                             let html = '';
                             if (data.print_order == '0') {
-                                html = '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-default" id="btn-print">W</a>';
+                                html += '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-default" id="btn-print">W</a>';
                             } else {
-                                html = '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-success">W</a>';
+                                html += '<a href="/admin/orders/' + token + '/print" target="_blank" class="btn btn-success">W</a>';
+                            }
+                            if(data.items.length){
+                                if (data.orderId != null) {
+                                    html += '<a href="/admin/orderReturn/' + data.orderId + '/print" target="_blank" class="btn btn-danger">WP</a>';
+                                } else {
+                                    html += '<a href="/admin/orderReturn/' + token + '/print" target="_blank" class="btn btn-danger">WP</a>';
+                                }
                             }
                             return html;
                         }
@@ -1730,6 +1737,12 @@
                             html += '<i class="voyager-edit"></i>';
                             html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
                             html += '</a>';
+                            if(data.items.length){
+                                html += '<a href="/admin/orderReturn/' + id + '" class="btn btn-sm btn-danger edit">';
+                                html += '<i class="glyphicon glyphicon-share-alt"></i>';
+                                html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.return')</span>';
+                                html += '</a>';
+                            }
                             @if((Auth::user()->role_id == 1 || Auth::user()->role_id == 2) && Auth::user()->id === User::ORDER_DELETE_USER)
                                 html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecord(' + id + ')">';
                             html += '<i class="voyager-trash"></i>';

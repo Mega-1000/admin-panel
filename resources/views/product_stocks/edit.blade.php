@@ -131,6 +131,7 @@
                     <th>@lang('product_stock_positions.table.shelf')</th>
                     <th>@lang('product_stock_positions.table.position')</th>
                     <th>@lang('product_stock_positions.table.position_quantity')</th>
+                    <th>ilość uszkodzonych</th>
                     <th>@lang('warehouses.table.created_at')</th>
                     <th>@lang('voyager.generic.actions')</th>
                 </tr>
@@ -359,6 +360,10 @@
                 {
                     data: 'position_quantity',
                     name: 'position_quantity'
+                },
+                {
+                    data: 'damaged',
+                    name: 'damaged'
                 },
                 {
                     data: 'created_at',
