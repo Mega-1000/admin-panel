@@ -12,11 +12,13 @@ use App\Services\OrderWarehouseNotificationService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Session;
 
 class RemoveLabelJob extends Job implements ShouldQueue
 {
+
+    protected int $userId;
+
     protected $order;
     protected $labelIdsToRemove;
     protected $loopPreventionArray;
@@ -33,6 +35,7 @@ class RemoveLabelJob extends Job implements ShouldQueue
      */
     public function __construct($order, $labelIdsToRemove, &$loopPreventionArray = [], $customLabelIdsToAddAfterRemoval = [], $time = null)
     {
+        $this->userId = Auth::user()->id;
         $this->order = $order;
         $this->labelIdsToRemove = $labelIdsToRemove;
         $this->loopPreventionArray = $loopPreventionArray;
@@ -104,7 +107,7 @@ class RemoveLabelJob extends Job implements ShouldQueue
                 foreach ($label->labelsToAddAfterRemoval as $item) {
                     $labelIdsToAttach[] = $item->id;
                     if ($item->id == 50) {
-                        $response = dispatch_now(new ChangeWarehouseStockJob($this->order));
+                        $response = dispatch_now(new ChangeWarehouseStockJob($this->order, $this->userId));
                         if (strlen((string)$response) > 0) {
                             Session::put('removeLabelJobAfterProductStockMove', array_merge([$this], Session::get('removeLabelJobAfterProductStockMove') ?? []));
                             return $response;

@@ -11,7 +11,6 @@ use App\Repositories\ProductStockRepository;
 use App\Repositories\ProductRepository;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Facades\Auth;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class ChangeWarehouseStockJob extends Job implements ShouldQueue
@@ -23,10 +22,9 @@ class ChangeWarehouseStockJob extends Job implements ShouldQueue
      */
     protected $orderId;
 
-    public function __construct($orderId)
+    public function __construct(int $orderId, protected readonly int $userId)
     {
         $this->orderId = $orderId;
-
     }
 
     public function handle(
@@ -113,7 +111,7 @@ class ChangeWarehouseStockJob extends Job implements ShouldQueue
                     'action' => ProductStockLogActionEnum::DELETE,
                     'quantity' => $item->quantity,
                     'order_id' => $this->orderId,
-                    'user_id' => Auth::user()->id,
+                    'user_id' => $this->userId,
                     'created_at' => Carbon::now(),
                     'updated_at' => Carbon::now()
                 ]);
