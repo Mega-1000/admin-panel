@@ -2668,16 +2668,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "v9.52.0",
+            "version": "v9.52.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "eb85cd9d72e5bfa54b4d0d9040786f26d6184a9e"
+                "reference": "9239128cfb4d22afefb64060dfecf53e82987267"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/eb85cd9d72e5bfa54b4d0d9040786f26d6184a9e",
-                "reference": "eb85cd9d72e5bfa54b4d0d9040786f26d6184a9e",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/9239128cfb4d22afefb64060dfecf53e82987267",
+                "reference": "9239128cfb4d22afefb64060dfecf53e82987267",
                 "shasum": ""
             },
             "require": {
@@ -2862,7 +2862,7 @@
                 "issues": "https://github.com/laravel/framework/issues",
                 "source": "https://github.com/laravel/framework"
             },
-            "time": "2023-02-14T14:51:14+00:00"
+            "time": "2023-02-22T14:38:06+00:00"
         },
         {
             "name": "laravel/passport",
@@ -3071,16 +3071,16 @@
         },
         {
             "name": "laravel/ui",
-            "version": "v4.2.0",
+            "version": "v4.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/ui.git",
-                "reference": "810adddcf4e2538b0d1ed470c3a5220ffe761370"
+                "reference": "05ff7ac1eb55e2dfd10edcfb18c953684d693907"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/ui/zipball/810adddcf4e2538b0d1ed470c3a5220ffe761370",
-                "reference": "810adddcf4e2538b0d1ed470c3a5220ffe761370",
+                "url": "https://api.github.com/repos/laravel/ui/zipball/05ff7ac1eb55e2dfd10edcfb18c953684d693907",
+                "reference": "05ff7ac1eb55e2dfd10edcfb18c953684d693907",
                 "shasum": ""
             },
             "require": {
@@ -3091,7 +3091,8 @@
                 "php": "^8.0"
             },
             "require-dev": {
-                "orchestra/testbench": "^7.0|^8.0"
+                "orchestra/testbench": "^7.0|^8.0",
+                "phpunit/phpunit": "^9.3"
             },
             "type": "library",
             "extra": {
@@ -3126,9 +3127,9 @@
                 "ui"
             ],
             "support": {
-                "source": "https://github.com/laravel/ui/tree/v4.2.0"
+                "source": "https://github.com/laravel/ui/tree/v4.2.1"
             },
-            "time": "2023-01-10T12:13:29+00:00"
+            "time": "2023-02-17T09:17:24+00:00"
         },
         {
             "name": "lcobucci/clock",
@@ -3512,16 +3513,16 @@
         },
         {
             "name": "league/flysystem",
-            "version": "3.12.2",
+            "version": "3.12.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "f6377c709d2275ed6feaf63e44be7a7162b0e77f"
+                "reference": "81e87e74dd5213795c7846d65089712d2dda90ce"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/f6377c709d2275ed6feaf63e44be7a7162b0e77f",
-                "reference": "f6377c709d2275ed6feaf63e44be7a7162b0e77f",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/81e87e74dd5213795c7846d65089712d2dda90ce",
+                "reference": "81e87e74dd5213795c7846d65089712d2dda90ce",
                 "shasum": ""
             },
             "require": {
@@ -3583,7 +3584,7 @@
             ],
             "support": {
                 "issues": "https://github.com/thephpleague/flysystem/issues",
-                "source": "https://github.com/thephpleague/flysystem/tree/3.12.2"
+                "source": "https://github.com/thephpleague/flysystem/tree/3.12.3"
             },
             "funding": [
                 {
@@ -3599,7 +3600,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-01-19T12:02:19+00:00"
+            "time": "2023-02-18T15:32:41+00:00"
         },
         {
             "name": "league/glide",
@@ -6048,27 +6049,27 @@
         },
         {
             "name": "prettus/l5-repository",
-            "version": "2.8.0",
+            "version": "2.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/andersao/l5-repository.git",
-                "reference": "bdaf12dcf1fcc2637ccbe06999f789a9ff522fea"
+                "reference": "a9b4e7255988ea9f18b016b96e16967891dbfef6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/andersao/l5-repository/zipball/bdaf12dcf1fcc2637ccbe06999f789a9ff522fea",
-                "reference": "bdaf12dcf1fcc2637ccbe06999f789a9ff522fea",
+                "url": "https://api.github.com/repos/andersao/l5-repository/zipball/a9b4e7255988ea9f18b016b96e16967891dbfef6",
+                "reference": "a9b4e7255988ea9f18b016b96e16967891dbfef6",
                 "shasum": ""
             },
             "require": {
-                "illuminate/config": "~5.0|~6.0|~7.0|^8.0|^9.0",
-                "illuminate/console": "~5.0|~6.0|~7.0|^8.0|^9.0",
-                "illuminate/database": "~5.0|~6.0|~7.0|^8.0|^9.0",
-                "illuminate/filesystem": "~5.0|~6.0|~7.0|^8.0|^9.0",
-                "illuminate/http": "~5.0|~6.0|~7.0|^8.0|^9.0",
-                "illuminate/pagination": "~5.0|~6.0|~7.0|^8.0|^9.0",
-                "illuminate/support": "~5.0|~6.0|~7.0|^8.0|^9.0",
-                "illuminate/validation": "~5.0|~6.0|~7.0|^8.0|^9.0",
+                "illuminate/config": "~5.0|~6.0|~7.0|^8.0|^9.0|^10.0",
+                "illuminate/console": "~5.0|~6.0|~7.0|^8.0|^9.0|^10.0",
+                "illuminate/database": "~5.0|~6.0|~7.0|^8.0|^9.0|^10.0",
+                "illuminate/filesystem": "~5.0|~6.0|~7.0|^8.0|^9.0|^10.0",
+                "illuminate/http": "~5.0|~6.0|~7.0|^8.0|^9.0|^10.0",
+                "illuminate/pagination": "~5.0|~6.0|~7.0|^8.0|^9.0|^10.0",
+                "illuminate/support": "~5.0|~6.0|~7.0|^8.0|^9.0|^10.0",
+                "illuminate/validation": "~5.0|~6.0|~7.0|^8.0|^9.0|^10.0",
                 "prettus/laravel-validation": "~1.1|~1.2|~1.3|~1.4"
             },
             "suggest": {
@@ -6101,7 +6102,7 @@
                     "role": "Developer"
                 }
             ],
-            "description": "Laravel 5|6|7|8|9 - Repositories to  the database layer",
+            "description": "Laravel 5|6|7|8|9|10 - Repositories to  the database layer",
             "homepage": "http://andersao.github.io/l5-repository",
             "keywords": [
                 "cache",
@@ -6117,25 +6118,25 @@
                 "source": "https://github.com/andersao/l5-repository",
                 "wiki": "https://github.com/andersao/l5-repository"
             },
-            "time": "2022-02-21T11:19:35+00:00"
+            "time": "2023-02-22T02:22:15+00:00"
         },
         {
             "name": "prettus/laravel-validation",
-            "version": "1.4.0",
+            "version": "1.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/andersao/laravel-validator.git",
-                "reference": "45d6b64e35d966aa0866d6f5fd22ecbb33ea41d9"
+                "reference": "5af73c58801fdd0344dd6281d0ae5ae7df248ec3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/andersao/laravel-validator/zipball/45d6b64e35d966aa0866d6f5fd22ecbb33ea41d9",
-                "reference": "45d6b64e35d966aa0866d6f5fd22ecbb33ea41d9",
+                "url": "https://api.github.com/repos/andersao/laravel-validator/zipball/5af73c58801fdd0344dd6281d0ae5ae7df248ec3",
+                "reference": "5af73c58801fdd0344dd6281d0ae5ae7df248ec3",
                 "shasum": ""
             },
             "require": {
-                "illuminate/support": "~5.4|^6.0|^7.0|^8.0|^9.0",
-                "illuminate/validation": "~5.4|^6.0|^7.0|^8.0|^9.0",
+                "illuminate/support": "~5.4|^6.0|^7.0|^8.0|^9.0|^10.0",
+                "illuminate/validation": "~5.4|^6.0|^7.0|^8.0|^9.0|^10.0",
                 "php": ">=5.4.0"
             },
             "type": "library",
@@ -6167,7 +6168,7 @@
                 "source": "https://github.com/andersao/laravel-validation",
                 "wiki": "https://github.com/andersao/laravel-validation"
             },
-            "time": "2022-02-21T11:18:30+00:00"
+            "time": "2023-02-22T13:20:29+00:00"
         },
         {
             "name": "psr/clock",
@@ -10820,23 +10821,23 @@
     "packages-dev": [
         {
             "name": "barryvdh/laravel-debugbar",
-            "version": "v3.8.0",
+            "version": "v3.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/barryvdh/laravel-debugbar.git",
-                "reference": "eb01216141e62433178c52b0cbdb785b45bae871"
+                "reference": "aff3235fecb4104203b1e62c32239c56530eee32"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/barryvdh/laravel-debugbar/zipball/eb01216141e62433178c52b0cbdb785b45bae871",
-                "reference": "eb01216141e62433178c52b0cbdb785b45bae871",
+                "url": "https://api.github.com/repos/barryvdh/laravel-debugbar/zipball/aff3235fecb4104203b1e62c32239c56530eee32",
+                "reference": "aff3235fecb4104203b1e62c32239c56530eee32",
                 "shasum": ""
             },
             "require": {
                 "illuminate/routing": "^9|^10",
                 "illuminate/session": "^9|^10",
                 "illuminate/support": "^9|^10",
-                "maximebf/debugbar": "^1.17.2",
+                "maximebf/debugbar": "^1.18.2",
                 "php": "^8.0",
                 "symfony/finder": "^6"
             },
@@ -10849,7 +10850,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "3.6-dev"
+                    "dev-master": "3.8-dev"
                 },
                 "laravel": {
                     "providers": [
@@ -10888,7 +10889,7 @@
             ],
             "support": {
                 "issues": "https://github.com/barryvdh/laravel-debugbar/issues",
-                "source": "https://github.com/barryvdh/laravel-debugbar/tree/v3.8.0"
+                "source": "https://github.com/barryvdh/laravel-debugbar/tree/v3.8.1"
             },
             "funding": [
                 {
@@ -10900,7 +10901,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2023-02-04T15:47:28+00:00"
+            "time": "2023-02-21T14:21:02+00:00"
         },
         {
             "name": "barryvdh/laravel-ide-helper",
@@ -11722,16 +11723,16 @@
         },
         {
             "name": "nunomaduro/larastan",
-            "version": "2.4.0",
+            "version": "2.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nunomaduro/larastan.git",
-                "reference": "14f631348ead3e245651606931863b4f218d1f78"
+                "reference": "238fdbfba3aae133cdec73e99826c9b0232141f7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/14f631348ead3e245651606931863b4f218d1f78",
-                "reference": "14f631348ead3e245651606931863b4f218d1f78",
+                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/238fdbfba3aae133cdec73e99826c9b0232141f7",
+                "reference": "238fdbfba3aae133cdec73e99826c9b0232141f7",
                 "shasum": ""
             },
             "require": {
@@ -11794,7 +11795,7 @@
             ],
             "support": {
                 "issues": "https://github.com/nunomaduro/larastan/issues",
-                "source": "https://github.com/nunomaduro/larastan/tree/2.4.0"
+                "source": "https://github.com/nunomaduro/larastan/tree/2.4.1"
             },
             "funding": [
                 {
@@ -11814,7 +11815,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2023-01-11T11:57:44+00:00"
+            "time": "2023-02-05T12:19:17+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -12190,16 +12191,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.9.17",
+            "version": "1.10.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "204e459e7822f2c586463029f5ecec31bb45a1f2"
+                "reference": "a2ffec7db373d8da4973d1d62add872db5cd22dd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/204e459e7822f2c586463029f5ecec31bb45a1f2",
-                "reference": "204e459e7822f2c586463029f5ecec31bb45a1f2",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/a2ffec7db373d8da4973d1d62add872db5cd22dd",
+                "reference": "a2ffec7db373d8da4973d1d62add872db5cd22dd",
                 "shasum": ""
             },
             "require": {
@@ -12229,7 +12230,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/1.9.17"
+                "source": "https://github.com/phpstan/phpstan/tree/1.10.2"
             },
             "funding": [
                 {
@@ -12245,7 +12246,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2023-02-08T12:25:00+00:00"
+            "time": "2023-02-23T14:36:46+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",

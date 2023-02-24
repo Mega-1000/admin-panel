@@ -59,6 +59,18 @@ class ProductStock extends Model implements Transformable
         return $this->hasMany(ProductStockPacket::class)->where('packet_quantity', '>', 0);
     }
 
+    public function orders(): HasMany
+    {
+        return $this->hasMany(ProductStockOrder::class);
+    }
+
+    public function calculateOrderQuantity(Int $weeks): int
+    {
+        $logs = $this->logs()->where('created_at', '>=', now()->subWeeks($weeks))->where('action', 'ADD')->get();
+        
+        return $logs->sum('quantity');
+    }
+
     public $customColumnsVisibilities = [
         'name',
         'symbol',

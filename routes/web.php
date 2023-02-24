@@ -282,6 +282,12 @@ Route::group(['prefix' => 'admin'], function () {
             'ProductStockPacketsController@edit')->name('product_stock_packets.edit');
         Route::put('products/stocks/packets',
             'ProductStockPacketsController@update')->name('product_stock_packets.update');
+        Route::get('products/stocks/{product_stock}/orders/create',
+            'ProductStockOrdersController@create')->name('product_stocks.orders.create');
+        Route::post('products/stocks/{product_stock}/orders',
+            'ProductStockOrdersController@store')->name('product_stocks.orders.store');
+        Route::post('products/stocks/{product_stock}/calculate-order-quantity',
+            'ProductStockOrdersController@calculateOrderQuantity')->name('product_stocks.orders.calculate_order_quantity');
         Route::post('positions/{from}/{to}/quantity/move',
             'ProductStockPositionsController@quantityMove')->name('product_stocks.quantity_move');
         Route::get('products/analyzer', 'ProductAnalyzerController@index')->name('product_analyzer.index');

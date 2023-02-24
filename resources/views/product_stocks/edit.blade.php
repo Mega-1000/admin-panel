@@ -32,6 +32,10 @@
         <button class="btn btn-primary"
                 name="change-button-form" id="button-logs"
                 value="logs">@lang('product_stocks.form.buttons.logs')</button>
+        <a class="btn btn-primary"
+            href="{{ route('product_stocks.orders.create', ['product_stock' => $productStocks->id]) }}">
+            Zamów produkty
+        </a>
         <a id="create-button-position" style="float:right;margin-right: 15px;"
            href="{{route('product_stocks.position.create', ['id' => $productStocks->id]) }}"
            class="btn btn-success install pull-right">

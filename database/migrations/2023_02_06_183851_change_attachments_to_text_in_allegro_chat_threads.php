@@ -17,7 +17,7 @@ class ChangeAttachmentsToTextInAllegroChatThreads extends Migration
         Schema::table('allegro_chat_threads', function (Blueprint $table) {
             $table->text('attachments')->change();
         });
-        Artisan::call('db:seed', ['--class' => 'MenuItemsTableSeeder', '--force' => true]);
+        Artisan::call('db:seed', ['--class' => 'p', '--force' => true]);
     }
 
     /**
