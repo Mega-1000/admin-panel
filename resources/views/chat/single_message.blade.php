@@ -1,4 +1,7 @@
 <div class='row message-row' data-messageid="{{ $message->id }}">
+    @php
+        $header = ChatHelper::getMessageHeader($message);
+    @endphp
     @if ($message->customer())
         <div class='col-sm-2'>&nbsp;</div>
     @endif

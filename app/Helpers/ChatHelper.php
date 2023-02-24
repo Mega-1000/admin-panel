@@ -79,7 +79,7 @@ class ChatHelper
         return $userData;
     }
 
-    public static function getMessageHelper($message)
+    public static function getMessageHeader($message)
     {
         $header = '';
         if ($message->chatUser->customer) {

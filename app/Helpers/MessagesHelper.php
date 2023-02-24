@@ -256,6 +256,7 @@ class MessagesHelper
         if (!$chatUser) {
             throw new ChatException('Cannot save message - User not added to chat');
         }
+
         $messageObj = new Message();
         $messageObj->message = $message;
         $messageObj->chat_id = $chat->id;
@@ -264,10 +265,15 @@ class MessagesHelper
             throw new ChatException('Cannot save message');
         }
         $msg = $chatUser->messages()->save($messageObj);
-        $assignedMessagesIds = json_decode($chatUser->assigned_messages_ids, true);
-        $assignedMessagesIds[] = $msg->id;
-        $chatUser->assigned_messages_ids = json_encode($assignedMessagesIds);
-        $chatUser->save();
+
+        foreach($chat->chatUsers as $singleUser) {
+            if($singleUser->user_id !== null) continue;
+
+            $assignedMessagesIds = json_decode($singleUser->assigned_messages_ids, true);
+            $assignedMessagesIds[] = $msg->id;
+            $singleUser->assigned_messages_ids = json_encode($assignedMessagesIds);
+            $singleUser->save();
+        }
         
         if ($chat->order) {
             if ($chatUser->user) {
@@ -322,7 +328,7 @@ class MessagesHelper
         return $this->getAdminChatUser(true);
     }
 
-    private function getCurrentChatUser()
+    public function getCurrentChatUser()
     {
         $column = $this->currentUserType == self::TYPE_CUSTOMER ? 'customer_id' : ($this->currentUserType == self::TYPE_EMPLOYEE ? 'employee_id' : 'user_id');
         if (!$this->getChat()) {

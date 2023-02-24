@@ -1,5 +1,3 @@
-@php use App\Enums\UserRole; @endphp
-
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
 
@@ -57,13 +55,7 @@
                 <form id="new-message" action="{{ $route }}">
                     <div class="row">
                         <div class="col-sm-9">
-                            <select name="msg_area" id="msg_area">
-                                <option value="{{ UserRole::Main }}">Główny</option>
-                                <option value="{{ UserRole::Storekeeper }}">Magazyn</option>
-                                <option value="{{ UserRole::SuperAdministrator }}">Administrator</option>
-                                <option value="{{ UserRole::Consultant }}">Konsultant</option>
-                                <option value="{{ UserRole::Accountant }}">Księgowość</option>
-                            </select>
+                            @include('chat/msg_area', ['msgAreaId' => 'msg_area'])
                             <textarea required class="form-control" id="message"
                                 style="width: 100%; max-width: 600px; min-width: 200px; height: 100px;" placeholder="Tutaj wpisz wiadomość"></textarea>
                         </div>
@@ -78,54 +70,66 @@
                     <button id="call-mod" class="btn bg-primary call-button">Wezwij moderatora</button>
                 @endif
             </div>
-            <div class="chat-users-wrapper" style="overflow: auto; height: 100vh;">
-                <table id="chat-users">
-                    @include('chat/users', [
-                        'title'            => 'Klienci:',
-                        'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni klienci',
-                        'users'            => $chatCustomers,
-                        'userType'         => MessagesHelper::TYPE_CUSTOMER,
-                        'currentUserType'  => $userType,
-                        'arePossibleUsers' => false,
-                        'class'               => 'bg-warning alert alert-warning',
-                    ])
-                    @include('chat/users', [
-                        'title'            => 'Pracownicy firm:',
-                        'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni pracownicy firm',
-                        'users'            => $chatEmployees,
-                        'userType'         => MessagesHelper::TYPE_EMPLOYEE,
-                        'currentUserType'  => $userType,
-                        'arePossibleUsers' => false,
-                        'class'               => 'bg-info alert alert-info',
-                    ])
-                    @include('chat/users', [
-                        'title'            => 'Konsultanci:',
-                        'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni konsultanci',
-                        'users'            => $chatConsultants,
-                        'userType'         => MessagesHelper::TYPE_USER,
-                        'currentUserType'  => $userType,
-                        'arePossibleUsers' => false,
-                        'class'               => 'bg-primary alert',
-                    ])
-                    @include('chat/users', [
-                        'title'            => 'Powiązani klienci:',
-                        'isEmptyMsg'       => 'Brak powiązanych klientów',
-                        'users'            => $possibleCustomers,
-                        'userType'         => MessagesHelper::TYPE_CUSTOMER,
-                        'currentUserType'  => $userType,
-                        'arePossibleUsers' => true,
-                        'class'               => 'bg-warning alert alert-warning',
-                    ])
-                    @include('chat/users', [
-                        'title'            => 'Powiązani pracownicy firm:',
-                        'isEmptyMsg'       => 'Brak powiązanych pracowników firm',
-                        'users'            => $possibleEmployees,
-                        'userType'         => MessagesHelper::TYPE_EMPLOYEE,
-                        'currentUserType'  => $userType,
-                        'arePossibleUsers' => true,
-                        'class'               => 'bg-info alert alert-info',
-                    ])
-                </table>
+            <div class="chat-right-column">
+                <h3>Użytkownicy:</h3>
+                <div class="chat-users-wrapper" style="overflow: auto; max-height: 100vh;">
+                    <table id="chat-users">
+                        @include('chat/users', [
+                            'title'            => 'Klienci:',
+                            'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni klienci',
+                            'users'            => $chatCustomers,
+                            'userType'         => MessagesHelper::TYPE_CUSTOMER,
+                            'currentUserType'  => $userType,
+                            'arePossibleUsers' => false,
+                            'class'               => 'bg-warning alert alert-warning',
+                        ])
+                        @include('chat/users', [
+                            'title'            => 'Pracownicy firm:',
+                            'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni pracownicy firm',
+                            'users'            => $chatEmployees,
+                            'userType'         => MessagesHelper::TYPE_EMPLOYEE,
+                            'currentUserType'  => $userType,
+                            'arePossibleUsers' => false,
+                            'class'               => 'bg-info alert alert-info',
+                        ])
+                        @include('chat/users', [
+                            'title'            => 'Konsultanci:',
+                            'isEmptyMsg'       => 'Aktualnie w rozmowie nie biorą udziału żadni konsultanci',
+                            'users'            => $chatConsultants,
+                            'userType'         => MessagesHelper::TYPE_USER,
+                            'currentUserType'  => $userType,
+                            'arePossibleUsers' => false,
+                            'class'               => 'bg-primary alert',
+                        ])
+                        @include('chat/users', [
+                            'title'            => 'Powiązani klienci:',
+                            'isEmptyMsg'       => 'Brak powiązanych klientów',
+                            'users'            => $possibleCustomers,
+                            'userType'         => MessagesHelper::TYPE_CUSTOMER,
+                            'currentUserType'  => $userType,
+                            'arePossibleUsers' => true,
+                            'class'               => 'bg-warning alert alert-warning',
+                        ])
+                        @include('chat/users', [
+                            'title'            => 'Powiązani pracownicy firm:',
+                            'isEmptyMsg'       => 'Brak powiązanych pracowników firm',
+                            'users'            => $possibleEmployees,
+                            'userType'         => MessagesHelper::TYPE_EMPLOYEE,
+                            'currentUserType'  => $userType,
+                            'arePossibleUsers' => true,
+                            'class'               => 'bg-info alert alert-info',
+                        ])
+                    </table>
+                </div>
+                @if ($userType == MessagesHelper::TYPE_USER)
+                    <div class="filters-wrapper">
+                        <h3>Filtry:</h3>
+                        <label>
+                            Obszar:
+                            @include('chat/msg_area', ['msgAreaId' => 'area'])
+                        </label>
+                    </div>
+                @endif
             </div>
         </div>
     </div>
@@ -144,6 +148,13 @@
     <script type="text/javascript" src="{{ URL::asset('js/helpers/dynamic-calculator.js') }}"></script>
     <script>
         $(document).ready(function() {
+
+            $('#area').change(() => {
+                var searchParams = new URLSearchParams(window.location.search);
+                searchParams.set('area', $('#area').val());
+                window.location.search = searchParams.toString();
+            });
+
             $('.panel-default').animate({
                 scrollTop: $('.panel-body').height()
             });
@@ -183,7 +194,8 @@
 
                 $.getJSON(
                     '{{ $routeRefresh }}', {
-                        lastId: $('.message-row:last-child').data('messageid')
+                        lastId: $('.message-row:last-child').data('messageid'),
+                        area: $('#area').val()
                     },
                     function(data) {
                         if (data.messages.length > 0) {

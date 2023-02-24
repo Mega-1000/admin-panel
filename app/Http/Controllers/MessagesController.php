@@ -165,6 +165,8 @@ class MessagesController extends Controller {
 
         $token = $helper->encrypt();
 
+        $assignedMessagesIds = json_decode($helper->getCurrentChatUser()->assigned_messages_ids, true);
+
         $view = view('chat.show')->with([
             'product_list'            => $productList,
             'faq'                     => $this->prepareFaq($chatUsers),
@@ -178,6 +180,7 @@ class MessagesController extends Controller {
             'chat'                    => $chat,
             'product'                 => $product,
             'order'                   => $order,
+            'assignedMessagesIds'     => array_flip($assignedMessagesIds),
             'title'                   => $helper->getTitle(true),
             'route'                   => route('api.messages.post-new-message', ['token' => $token]),
             'routeAddUser'            => route('api.messages.add-new-user', ['token' => $token]),

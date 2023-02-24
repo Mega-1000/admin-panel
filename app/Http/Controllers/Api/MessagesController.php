@@ -2,20 +2,21 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\User;
+use Exception;
+use App\Entities\Chat;
 use App\Entities\ChatUser;
 use App\Entities\Customer;
 use App\Entities\Employee;
 use App\Entities\OrderItem;
-use App\Helpers\ChatHelper;
-use App\Helpers\Exceptions\ChatException;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Helpers\MessagesHelper;
 use App\Helpers\OrderLabelHelper;
-use App\Http\Controllers\Controller;
 use App\Jobs\ChatNotificationJob;
-use App\User;
-use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use App\Helpers\Exceptions\ChatException;
 
 class MessagesController extends Controller
 {
@@ -124,7 +125,7 @@ class MessagesController extends Controller
         }
     }
 
-    private function findCustomerOrEmployee(Request $request, $chat): array
+    private function findCustomerOrEmployee(Request $request, Chat $chat): array
     {
         if ($request->type == Customer::class) {
             $user = Customer::findOrFail($request->user_id);
@@ -137,7 +138,7 @@ class MessagesController extends Controller
         return array($user, $chatUser);
     }
 
-    public function askForIntervention(Request $request, $token)
+    public function askForIntervention($token)
     {
         try {
             $helper = new MessagesHelper($token);
@@ -187,23 +188,27 @@ class MessagesController extends Controller
         }
     }
 
-    public function getMessages(Request $request, $token)
+    public function getMessages(Request $request, string $token): Response
     {
         try {
             $helper = new MessagesHelper($token);
             $chat = $helper->getChat();
+            $area = $request->input('area');
             if (!$chat) {
                 throw new ChatException('Wrong chat token');
             }
+            $assignedMessagesIds = json_decode($helper->getCurrentChatUser()->assigned_messages_ids, true);
+            $assignedMessagesIds = array_flip($assignedMessagesIds);
             $out = '';
             foreach ($chat->messages as $message) {
-                if ($message->id <= $request->lastId) {
+                if ($message->id <= $request->lastId || $area != $message->area) {
                     continue;
                 }
-                $header = ChatHelper::getMessageHelper($message);
-
-                // TODO with message in many places is not found, maybe we need something new here
-                $out .= view('chat/single_message')->withMessage($message)->withHeader($header)->render();
+                if($helper->currentUserType == MessagesHelper::TYPE_USER || isset($assignedMessagesIds[$message->id] )) {
+                    $out .= view('chat/single_message')->with([
+                        'message' => $message,
+                    ])->render();
+                }
             }
             $helper->setLastRead();
 
