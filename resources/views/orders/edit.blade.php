@@ -698,37 +698,37 @@
                     <label for="order_invoice_address_firstname">@lang('customers.form.invoice_firstname')</label>
                     <input type="text" class="form-control" id="order_invoice_address_firstname"
                            name="order_invoice_address_firstname"
-                           value="{{ $orderInvoiceAddress->firstname ?? ''}}">
+                           value="{{ $orderInvoiceAddress?->firstname ?? ''}}">
                 </div>
                 <div class="form-group" style="width: 10%; float: left; padding: 5px;">
                     <label for="order_invoice_address_lastname">@lang('customers.form.invoice_lastname')</label>
                     <input type="text" class="form-control" id="order_invoice_address_lastname"
                            name="order_invoice_address_lastname"
-                           value="{{ $orderInvoiceAddress->lastname ?? ''}}">
+                           value="{{ $orderInvoiceAddress?->lastname ?? ''}}">
                 </div>
                 <div class="form-group" style="width: 20%; float: left; padding: 5px;">
                     <label for="order_invoice_address_email">@lang('customers.form.invoice_email')</label>
                     <input type="email" class="form-control" id="order_invoice_address_email"
                            name="order_invoice_address_email"
-                           value="{{ $orderInvoiceAddress->email }}">
+                           value="{{ $orderInvoiceAddress?->email }}">
                 </div>
                 <div class="form-group" style="width: 10%; float: left; padding: 5px;">
                     <label for="order_invoice_address_firmname">@lang('customers.form.invoice_firmname')</label>
                     <input type="text" class="form-control" id="order_invoice_address_firmname"
                            name="order_invoice_address_firmname"
-                           value="{{ $orderInvoiceAddress->firmname ?? ''}}">
+                           value="{{ $orderInvoiceAddress?->firmname ?? ''}}">
                 </div>
                 <div class="form-group" style="width: 18%; float: left; padding: 5px;">
                     <label for="order_invoice_address_phone_code">@lang('customers.form.invoice_phone_code')</label>
                     <input type="text" class="form-control" id="order_invoice_address_phone_code"
                            name="order_invoice_address_phone_code"
-                           value="{{ $orderInvoiceAddress->phone_code ?? ''}}">
+                           value="{{ $orderInvoiceAddress?->phone_code ?? ''}}">
                 </div>
                 <div class="form-group" style="width: 10%; float: left; padding: 5px;">
                     <label for="order_invoice_address_phone">@lang('customers.form.invoice_phone')</label>
                     <input type="text" class="form-control" id="order_invoice_address_phone"
                            name="order_invoice_address_phone"
-                           value="{{ $orderInvoiceAddress->phone ?? ''}}">
+                           value="{{ $orderInvoiceAddress?->phone ?? ''}}">
                 </div>
             </div>
             <div class="row">
@@ -736,13 +736,13 @@
                     <label for="order_invoice_address_address">@lang('customers.form.invoice_address')</label>
                     <input type="text" class="form-control" id="order_invoice_address_address"
                            name="order_invoice_address_address"
-                           value="{{ $orderInvoiceAddress->address ?? ''}}">
+                           value="{{ $orderInvoiceAddress?->address ?? ''}}">
                 </div>
                 <div class="form-group" style="width: 10%; float: left; padding: 5px;">
                     <label for="order_invoice_address_flat_number">@lang('customers.form.invoice_flat_number')</label>
                     <input type="text" class="form-control" id="order_invoice_address_flat_number"
                            name="order_invoice_address_flat_number"
-                           value="{{ $orderInvoiceAddress->flat_number ?? ''}}">
+                           value="{{ $orderInvoiceAddress?->flat_number ?? ''}}">
                 </div>
                 <div class="form-group" style="width: 11%; float: left; padding: 5px;">
                     <label for="order_invoice_address_city">@lang('customers.form.delivery_city')</label>
@@ -750,7 +750,7 @@
                             name="order_invoice_address_country_id">
                         @foreach($countries as $country)
                             <option value="{{$country->id}}"
-                                    @if ($country->id == $orderInvoiceAddress->country_id) selected @endif>{{$country->name}}</option>
+                                    @if ($country->id == $orderInvoiceAddress?->country_id) selected @endif>{{$country->name}}</option>
                         @endforeach
                     </select>
                 </div>
@@ -758,20 +758,20 @@
                     <label for="order_invoice_address_city">@lang('customers.form.invoice_city')</label>
                     <input type="text" class="form-control" id="order_invoice_address_city"
                            name="order_invoice_address_city"
-                           value="{{ $orderInvoiceAddress->city ?? ''}}">
+                           value="{{ $orderInvoiceAddress?->city ?? ''}}">
                 </div>
                 <div class="form-group" style="width: 10%; float: left; padding: 5px;">
                     <label for="order_invoice_address_postal_code">@lang('customers.form.invoice_postal_code')</label>
                     <input type="text" class="form-control" id="order_invoice_address_postal_code"
                            name="order_invoice_address_postal_code"
-                           value="{{ $orderInvoiceAddress->postal_code ?? ''}}">
+                           value="{{ $orderInvoiceAddress?->postal_code ?? ''}}">
                 </div>
 
                 <div class="form-group" style="width: 10%; float: left; padding: 5px;">
                     <label for="order_invoice_address_nip">@lang('customers.form.invoice_nip')</label>
                     <input type="text" class="form-control" id="order_invoice_address_nip"
                            name="order_invoice_address_nip"
-                           value="{{ $orderInvoiceAddress->nip ?? ''}}">
+                           value="{{ $orderInvoiceAddress?->nip ?? ''}}">
                 </div>
             </div>
 
