@@ -726,11 +726,11 @@ class TasksController extends Controller
             $task->TaskTime->save();
 
             $response = $this->markTaskAsProduced($task);
-            if (!empty($response)) {
+            if ($response === false) {
                 return redirect()->back()->with([
                     'message' => __('tasks.messages.stocks_invalid'),
                     'alert-type' => 'error',
-                    'stock-response' => $response->getData(),
+                    'stock-response' => [],
                 ]);
             }
             $task->save();
@@ -753,23 +753,23 @@ class TasksController extends Controller
     /**
      * @param Request $request
      */
-    private function markTaskAsProduced($task)
+    private function markTaskAsProduced($task): bool
     {
         $response = null;
         if ($task->childs->count()) {
             $task->childs->map(function ($child) use (&$response) {
                 if ($child->order_id) {
-                    $response = dispatch_now(new RemoveLabelJob($child->order_id,
+                    $response = dispatch(new RemoveLabelJob($child->order_id,
                         [Label::ORDER_ITEMS_UNDER_CONSTRUCTION],
                         $prev));
                 }
             });
         } else if ($task->order_id) {
-            $response = dispatch_now(new RemoveLabelJob($task->order_id,
+            $response = dispatch(new RemoveLabelJob($task->order_id,
                 [Label::ORDER_ITEMS_UNDER_CONSTRUCTION],
                 $prev));
         }
-        return $response;
+        return $response !== null;
     }
 
     public function deny(DenyTaskRequest $request)

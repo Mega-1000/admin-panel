@@ -604,38 +604,38 @@
                     <label for="order_delivery_address_firstname">@lang('customers.form.delivery_firstname')</label>
                     <input type="text" class="form-control" id="order_delivery_address_firstname"
                            name="order_delivery_address_firstname"
-                           value="{{ $orderDeliveryAddress->firstname ?? ''}}">
+                           value="{{ $orderDeliveryAddress?->firstname ?? ''}}">
                 </div>
                 <div class="form-group" style="width: 11%; float: left; padding: 5px;">
                     <label for="order_delivery_address_lastname">@lang('customers.form.delivery_lastname')</label>
                     <input type="text" class="form-control" id="order_delivery_address_lastname"
                            name="order_delivery_address_lastname"
-                           value="{{ $orderDeliveryAddress->lastname ?? ''}}">
+                           value="{{ $orderDeliveryAddress?->lastname ?? ''}}">
                 </div>
                 <div class="form-group" style="width: 25%; float: left; padding: 5px;">
                     <label for="order_delivery_address_email">@lang('customers.form.delivery_email')</label>
                     <input type="email" class="form-control" id="order_delivery_address_email"
                            name="order_delivery_address_email"
-                           value="{{ $orderDeliveryAddress->email }}">
+                           value="{{ $orderDeliveryAddress?->email ?? '' }}">
                 </div>
                 <div class="form-group" style="width: 11%; float: left; padding: 5px;">
                     <label for="order_delivery_address_firmname">@lang('customers.form.delivery_firmname')</label>
                     <input type="text" class="form-control" id="order_delivery_address_firmname"
                            name="order_delivery_address_firmname"
-                           value="{{ $orderDeliveryAddress->firmname ?? ''}}">
+                           value="{{ $orderDeliveryAddress?->firmname ?? ''}}">
                 </div>
 
                 <div class="form-group" style="width: 18%; float: left; padding: 5px;">
                     <label for="order_delivery_address_phone_code">@lang('customers.form.delivery_phone_code')</label>
                     <input type="text" class="form-control" id="order_delivery_address_phone_code"
                            name="order_delivery_address_phone_code"
-                           value="{{ $orderDeliveryAddress->phone_code ?? ''}}">
+                           value="{{ $orderDeliveryAddress?->phone_code ?? ''}}">
                 </div>
                 <div class="form-group" style="width: 11%; float: left; padding: 5px;">
                     <label for="order_delivery_address_phone">@lang('customers.form.delivery_phone')</label>
                     <input type="text" class="form-control" id="order_delivery_address_phone"
                            name="order_delivery_address_phone"
-                           value="{{ $orderDeliveryAddress->phone ?? ''}}">
+                           value="{{ $orderDeliveryAddress?->phone ?? ''}}">
                 </div>
             </div>
 

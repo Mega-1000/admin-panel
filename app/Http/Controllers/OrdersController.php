@@ -1038,10 +1038,11 @@ class OrdersController extends Controller
         $order->save();
         $loop = [];
 
-        return dispatch_now(new RemoveLabelJob($order, [$request->label], $loop, $request->labelsToAddIds));
+        dispatch(new RemoveLabelJob($order, [$request->label], $loop, $request->labelsToAddIds));
+        return response('Usuwanie etykiety rozpoczęte', 200);
     }
 
-    public function setWarehouse(int $orderId, Request $request): string
+    public function setWarehouse(int $orderId, Request $request)
     {
         $order = Order::find($orderId);
         if (!$order) return response(['errorMessage' => 'Nie można znaleźć zamówienia'], 400);
@@ -1052,7 +1053,7 @@ class OrdersController extends Controller
         $order->warehouse()->associate($warehouse->id);
         $order->save();
 
-        die(true);
+        return new JsonResponse('Magazyn poprawnie zaktualizowany', 200);
     }
 
     /**
