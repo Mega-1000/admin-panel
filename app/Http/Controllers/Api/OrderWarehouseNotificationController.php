@@ -142,23 +142,30 @@ class OrderWarehouseNotificationController extends Controller
             }
 
             $file = $request->file('file');
-            $filename = $file->getClientOriginalName();
+            if($file !== null) {
+                $filename = $file?->getClientOriginalName();
 
-            Storage::disk('local')->put('public/invoices/' . $filename, file_get_contents($file));
-            $invoice = $order->invoices()->create([
-                'invoice_type' => 'buy',
-                'invoice_name' => $filename,
-                'is_visible_for_client' => (boolean)$request->isVisibleForClient,
-            ]);
-            $invoiceRequest = $order->invoiceRequests()->first();
-            if (!empty($invoiceRequest) && $invoiceRequest->status === 'MISSING') {
-                $invoiceRequest->update([
-                    'status' => 'SENT'
+                Storage::disk('local')->put('public/invoices/' . $filename, file_get_contents($file));
+                $invoice = $order->invoices()->create([
+                    'invoice_type' => 'buy',
+                    'invoice_name' => $filename,
+                    'is_visible_for_client' => (boolean)$request->isVisibleForClient,
                 ]);
-            }
-            dispatch_now(new DispatchLabelEventByNameJob($order, "new-file-added-to-order"));
+                $invoiceRequest = $order->invoiceRequests()->first();
+                if (!empty($invoiceRequest) && $invoiceRequest->status === 'MISSING') {
+                    $invoiceRequest->update([
+                        'status' => 'SENT'
+                    ]);
+                }
 
-            return $this->okResponse();
+                dispatch(new DispatchLabelEventByNameJob($order, "new-file-added-to-order"));
+
+                return $this->okResponse();
+            }
+            Log::error('Problem with send invoice.',
+                ['exception' => 'No file in request', 'class' => get_class($this), 'line' => __LINE__]
+            );
+            die();
         } catch (Exception $e) {
             Log::error('Problem with send invoice.',
                 ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]

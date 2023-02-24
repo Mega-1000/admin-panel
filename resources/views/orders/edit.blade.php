@@ -646,7 +646,7 @@
                             name="order_delivery_address_country_id">
                         @foreach($countries as $country)
                             <option value="{{$country->id}}"
-                                    @if ($country->id == $orderDeliveryAddress->country_id) selected @endif>{{$country->name}}</option>
+                                    @if ($country->id == $orderDeliveryAddress?->country_id) selected @endif>{{$country->name}}</option>
                         @endforeach
                     </select>
                 </div>
@@ -654,25 +654,25 @@
                     <label for="order_delivery_address_postal_code">@lang('customers.form.delivery_postal_code')</label>
                     <input type="text" class="form-control" id="order_delivery_address_postal_code"
                            name="order_delivery_address_postal_code"
-                           value="{{ $orderDeliveryAddress->postal_code ?? ''}}">
+                           value="{{ $orderDeliveryAddress?->postal_code ?? ''}}">
                 </div>
                 <div class="form-group" style="width: 11%; float: left; padding: 5px;">
                     <label for="order_delivery_address_address">@lang('customers.form.delivery_address')</label>
                     <input type="text" class="form-control" id="order_delivery_address_address"
                            name="order_delivery_address_address"
-                           value="{{ $orderDeliveryAddress->address ?? ''}}">
+                           value="{{ $orderDeliveryAddress?->address ?? ''}}">
                 </div>
                 <div class="form-group" style="width: 11%; float: left; padding: 5px;">
                     <label for="order_delivery_address_city">@lang('customers.form.delivery_city')</label>
                     <input type="text" class="form-control" id="order_delivery_address_city"
                            name="order_delivery_address_city"
-                           value="{{ $orderDeliveryAddress->city ?? ''}}">
+                           value="{{ $orderDeliveryAddress?->city ?? ''}}">
                 </div>
                 <div class="form-group" style="width: 11%; float: left; padding: 5px;">
                     <label for="order_delivery_address_flat_number">@lang('customers.form.delivery_flat_number')</label>
                     <input type="text" class="form-control" id="order_delivery_address_flat_number"
                            name="order_delivery_address_flat_number"
-                           value="{{ $orderDeliveryAddress->flat_number ?? ''}}">
+                           value="{{ $orderDeliveryAddress?->flat_number ?? ''}}">
                 </div>
                 <div class="form-group" style="width: 15%; float: left; padding: 5px;">
                     <label for="order_delivery_address_isAbroad">
@@ -680,7 +680,7 @@
                     </label>
                     <input type="checkbox" id="order_delivery_address_isAbroad"
                            name="order_delivery_address_isAbroad" value="1"
-                           @if ($orderDeliveryAddress->isAbroad)
+                           @if ($orderDeliveryAddress?->isAbroad)
                                checked
                         @endif
                     >
