@@ -527,7 +527,7 @@
                                       id="consultant_notices"
                                       rows="5">{{ $order->consultant_notices ?? ''}}</textarea>
                             <h5>Zlecenie numer {{ $order->id }}
-                                - {{ $orderInvoiceAddress->nip ? 'Klient firmowy' : 'Klient prywatny' }}</h5>
+                                - {{ $orderInvoiceAddress?->nip ? 'Klient firmowy' : 'Klient prywatny' }}</h5>
                             <div class="flex-input">
                                 <input type="text" class="form-control scrollable-notice"
                                        placeholder="@lang('orders.form.consultant_notices')"
