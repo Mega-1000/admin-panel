@@ -28,6 +28,7 @@ class AddLabelJob extends Job implements ShouldQueue
     protected $options;
     protected $self;
     protected $time;
+    protected ?int $userId;
 
     protected $awaitRepository;
 
@@ -42,6 +43,7 @@ class AddLabelJob extends Job implements ShouldQueue
      */
     public function __construct($order, $labelIdsToAdd, &$loopPreventionArray = [], $options = [], $self = null, $time = false)
     {
+        $this->userId = Auth::user()?->id;
         $this->order = $order;
         $this->labelIdsToAdd = $labelIdsToAdd;
         $this->loopPreventionArray = $loopPreventionArray;
@@ -64,6 +66,10 @@ class AddLabelJob extends Job implements ShouldQueue
         OrderLabelSchedulerAwaitRepository $awaitRepository,
         TaskRepository $taskRepository
     ) {
+        if(Auth::user() === null && $this->userId !== null) {
+            Auth::loginUsingId($this->userId);
+        }
+
         $now = Carbon::now();
 
         if (!($this->order instanceof Order)) {

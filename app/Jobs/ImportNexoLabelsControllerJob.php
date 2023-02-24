@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Entities\Label;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Throwable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Log;
@@ -21,6 +22,13 @@ class ImportNexoLabelsControllerJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    protected ?int $userId;
+
+    public function __construct()
+    {
+        $this->userId = Auth::user()?->id;
+    }
+
     /**
      * Execute the job.
      *
@@ -28,6 +36,10 @@ class ImportNexoLabelsControllerJob implements ShouldQueue
      */
     public function handle()
     {
+        if(Auth::user() === null && $this->userId !== null) {
+            Auth::loginUsingId($this->userId);
+        }
+
         $header = $ordersVerified = $data = [];
         $orderRepository = app(OrderRepository::class);
         $file = Storage::path('user-files/nexo-controller.csv');

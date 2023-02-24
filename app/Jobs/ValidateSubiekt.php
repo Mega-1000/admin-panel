@@ -11,12 +11,20 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class ValidateSubiekt implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, IsMonitored;
+
+    protected ?int $userId;
+
+    public function __construct()
+    {
+        $this->userId = Auth::user()?->id;
+    }
 
     /**
      * Execute the job.
@@ -25,6 +33,10 @@ class ValidateSubiekt implements ShouldQueue
      */
     public function handle(OrderRepository $orderRepository)
     {
+        if(Auth::user() === null && $this->userId !== null) {
+            Auth::loginUsingId($this->userId);
+        }
+
         $toCheck = DB::table('gt_invoices')->where('created_at', '>', Carbon::now()->subMinutes(5)->toDateTimeString())->get();
 
         foreach($toCheck as $order){

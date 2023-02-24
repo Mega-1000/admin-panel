@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Session;
 class RemoveLabelJob extends Job implements ShouldQueue
 {
 
-    protected int $userId;
+    protected ?int $userId;
 
     protected $order;
     protected $labelIdsToRemove;
@@ -35,7 +35,7 @@ class RemoveLabelJob extends Job implements ShouldQueue
      */
     public function __construct($order, $labelIdsToRemove, &$loopPreventionArray = [], $customLabelIdsToAddAfterRemoval = [], $time = null)
     {
-        $this->userId = Auth::user()->id;
+        $this->userId = Auth::user()?->id;
         $this->order = $order;
         $this->labelIdsToRemove = $labelIdsToRemove;
         $this->loopPreventionArray = $loopPreventionArray;
@@ -51,6 +51,10 @@ class RemoveLabelJob extends Job implements ShouldQueue
         OrderWarehouseNotificationService $orderWarehouseNotificationService
     )
     {
+        if(Auth::user() === null && $this->userId !== null) {
+            Auth::loginUsingId($this->userId);
+        }
+
         if (!($this->order instanceof Order)) {
             $this->order = $orderRepository->find($this->order);
         }

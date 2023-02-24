@@ -32,6 +32,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
@@ -42,6 +43,8 @@ class ImportOrdersFromSelloJob implements ShouldQueue
 
     const DEFAULT_WAREHOUSE = 'MEGA-OLAWA';
 
+    protected ?int $userId;
+
     /**
      * Create a new job instance.
      *
@@ -49,7 +52,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
      */
     public function __construct()
     {
-        //
+        $this->userId = Auth::user()?->id;
     }
 
     /**
@@ -59,6 +62,10 @@ class ImportOrdersFromSelloJob implements ShouldQueue
      */
     public function handle(ProductService $productService, OrderPaymentService $orderPaymentService)
     {
+        if(Auth::user() === null && $this->userId !== null) {
+            Auth::loginUsingId($this->userId);
+        }
+
         $date = Carbon::now();
         $taskPrimal = Task::create([
             'warehouse_id' => Warehouse::OLAWA_WAREHOUSE_ID,
@@ -369,14 +376,14 @@ class ImportOrdersFromSelloJob implements ShouldQueue
     {
         $preventionArray = [];
         $order->labels()->attach(Label::FROM_SELLO);
-        dispatch_now(new RemoveLabelJob($order, [LabelsHelper::FINISH_LOGISTIC_LABEL_ID], $preventionArray, LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID));
-        dispatch_now(new RemoveLabelJob($order, [LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID], $preventionArray, []));
-        dispatch_now(new RemoveLabelJob($order, [LabelsHelper::WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID], $preventionArray, []));
+        dispatch(new RemoveLabelJob($order, [LabelsHelper::FINISH_LOGISTIC_LABEL_ID], $preventionArray, LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID));
+        dispatch(new RemoveLabelJob($order, [LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID], $preventionArray, []));
+        dispatch(new RemoveLabelJob($order, [LabelsHelper::WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID], $preventionArray, []));
         if ($order->warehouse->id == Warehouse::OLAWA_WAREHOUSE_ID) {
-            dispatch_now(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::WAIT_FOR_WAREHOUSE_TO_ACCEPT]));
+            dispatch(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::WAIT_FOR_WAREHOUSE_TO_ACCEPT]));
             $order->createNewTask(5, $taskPrimalId);
         } else {
-            dispatch_now(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::SEND_TO_WAREHOUSE_FOR_VALIDATION]));
+            dispatch(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::SEND_TO_WAREHOUSE_FOR_VALIDATION]));
         }
     }
 

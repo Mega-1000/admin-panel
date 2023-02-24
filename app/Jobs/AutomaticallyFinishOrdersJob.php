@@ -12,11 +12,14 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Auth;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class AutomaticallyFinishOrdersJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, IsMonitored;
+
+    protected ?int $userId;
 
     /**
      * Create a new job instance.
@@ -25,6 +28,7 @@ class AutomaticallyFinishOrdersJob implements ShouldQueue
      */
     public function __construct()
     {
+        $this->userId = Auth::user()?->id;
     }
 
     /**
@@ -34,6 +38,10 @@ class AutomaticallyFinishOrdersJob implements ShouldQueue
      */
     public function handle()
     {
+        if(Auth::user() === null && $this->userId !== null) {
+            Auth::loginUsingId($this->userId);
+        }
+
         $orders = Order
             ::whereHas('packages', function (Builder $query) {
                 $query->whereIn('status', [PackageStatus::DELIVERED, PackageStatus::SENDING]);
@@ -55,7 +63,7 @@ class AutomaticallyFinishOrdersJob implements ShouldQueue
             })
             ->get();
         $orders->map(function ($order) {
-            dispatch_now(new RemoveLabelJob($order, [Label::BLUE_BATTERY_LABEL_ID], $preventionArray, Label::ORDER_ITEMS_REDEEMED_LABEL));
+            dispatch(new RemoveLabelJob($order, [Label::BLUE_BATTERY_LABEL_ID], $preventionArray, Label::ORDER_ITEMS_REDEEMED_LABEL));
         });
     }
 }

@@ -10,11 +10,14 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class CheckPromisePaymentsDates implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, IsMonitored;
+
+    protected ?int $userId;
 
     /**
      * Create a new job instance.
@@ -23,7 +26,7 @@ class CheckPromisePaymentsDates implements ShouldQueue
      */
     public function __construct()
     {
-        //
+        $this->userId = Auth::user()?->id;
     }
 
     /**
@@ -33,6 +36,10 @@ class CheckPromisePaymentsDates implements ShouldQueue
      */
     public function handle()
     {
+        if(Auth::user() === null && $this->userId !== null) {
+            Auth::loginUsingId($this->userId);
+        }
+
         $now = new Carbon('now');
 
         $notConfirmedPayments = OrderPayment::with('order')->where('promise', '=', 1)->get();

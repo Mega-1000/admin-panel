@@ -39,6 +39,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -92,6 +93,8 @@ class AllegroOrderSynchro implements ShouldQueue
      */
     private $synchronizeAll;
 
+    protected ?int $userId;
+
     /**
      * Create a new job instance.
      *
@@ -100,6 +103,7 @@ class AllegroOrderSynchro implements ShouldQueue
     public function __construct(bool $synchronizeAll = false)
     {
         $this->synchronizeAll = $synchronizeAll;
+        $this->userId = Auth::user()?->id;
     }
 
     /**
@@ -110,6 +114,10 @@ class AllegroOrderSynchro implements ShouldQueue
      */
     public function handle(): void
     {
+        if(Auth::user() === null && $this->userId !== null) {
+            Auth::loginUsingId($this->userId);
+        }
+
         $this->customerRepository = app(CustomerRepository::class);
         $this->allegroOrderService = app(AllegroOrderService::class);
         $this->productRepository = app(ProductRepository::class);

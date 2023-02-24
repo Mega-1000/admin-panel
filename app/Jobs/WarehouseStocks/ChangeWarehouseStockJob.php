@@ -22,7 +22,7 @@ class ChangeWarehouseStockJob extends Job implements ShouldQueue
      */
     protected $orderId;
 
-    public function __construct(int $orderId, protected readonly int $userId)
+    public function __construct($orderId, protected readonly int $userId)
     {
         $this->orderId = $orderId;
     }

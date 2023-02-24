@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Auth;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class DispatchLabelEventByNameJob extends Job implements ShouldQueue
@@ -11,6 +12,7 @@ class DispatchLabelEventByNameJob extends Job implements ShouldQueue
 
     protected $order;
     protected $eventName;
+    protected ?int $userId;
 
     /**
      * DispatchLabelEventByNameJob constructor.
@@ -19,6 +21,7 @@ class DispatchLabelEventByNameJob extends Job implements ShouldQueue
      */
     public function __construct($order, $eventName)
     {
+        $this->userId = Auth::user()?->id;
         $this->order = $order;
         $this->eventName = $eventName;
     }
@@ -30,6 +33,10 @@ class DispatchLabelEventByNameJob extends Job implements ShouldQueue
      */
     public function handle()
     {
+        if(Auth::user() === null && $this->userId !== null) {
+            Auth::loginUsingId($this->userId);
+        }
+
         $config = config('labels-map')[$this->eventName];
         $preventionArray = [];
 

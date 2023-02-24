@@ -9,6 +9,7 @@ use App\Jobs\RemoveLabelJob;
 use App\Repositories\OrderLabelSchedulerRepository;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Auth;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class TriggerOrderLabelSchedulersJob extends Job implements ShouldQueue
@@ -18,6 +19,13 @@ class TriggerOrderLabelSchedulersJob extends Job implements ShouldQueue
     /** @var DateHelper */
     protected $dateHelper;
 
+    protected ?int $userId;
+
+    public function __construct()
+    {
+        $this->userId = Auth::user()?->id;
+    }
+
     /**
      * Execute the job.
      *
@@ -25,6 +33,9 @@ class TriggerOrderLabelSchedulersJob extends Job implements ShouldQueue
      */
     public function handle(OrderLabelSchedulerRepository $orderLabelSchedulerRepository, DateHelper $dateHelper)
     {
+        if(Auth::user() === null && $this->userId !== null) {
+            Auth::loginUsingId($this->userId);
+        }
         $this->dateHelper = $dateHelper;
         $now = new Carbon();
 

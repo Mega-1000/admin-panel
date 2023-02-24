@@ -14,6 +14,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -49,6 +50,8 @@ class AllegroCustomerReturnsJob implements ShouldQueue
      */
     private $orderRepository;
 
+    protected ?int $userId;
+
     /**
      * Create a new job instance.
      *
@@ -56,6 +59,7 @@ class AllegroCustomerReturnsJob implements ShouldQueue
      */
     public function __construct()
     {
+        $this->userId = Auth::user()?->id;
     }
 
     /**
@@ -65,6 +69,10 @@ class AllegroCustomerReturnsJob implements ShouldQueue
      */
     public function handle()
     {
+        if(Auth::user() === null && $this->userId !== null) {
+            Auth::loginUsingId($this->userId);
+        }
+
         $this->customerRepository = app(CustomerRepository::class);
         $this->allegroOrderService = app(AllegroOrderService::class);
         $this->productRepository = app(ProductRepository::class);

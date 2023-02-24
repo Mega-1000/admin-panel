@@ -26,6 +26,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use OutOfRangeException;
 use Psr\Http\Message\ResponseInterface;
@@ -45,8 +46,11 @@ class CheckPackagesStatusJob
 
     protected Client $httpClient;
 
+    protected ?int $userId;
+
     public function __construct()
     {
+        $this->userId = Auth::user()?->id;
         $this->config = config('integrations');
         $options = [];
         if (config('app.env') == 'local') {
@@ -57,6 +61,10 @@ class CheckPackagesStatusJob
 
     public function handle(): void
     {
+        if(Auth::user() === null && $this->userId !== null) {
+            Auth::loginUsingId($this->userId);
+        }
+
         $orders = Order::whereHas('packages', function ($query) {
             $query->whereIn('status', ['SENDING', 'WAITING_FOR_SENDING'])->whereDate('shipment_date', '>', Carbon::today()->subDays(30)->toDateString());
         })->get();
@@ -101,7 +109,7 @@ class CheckPackagesStatusJob
                 }
 
                 if (!$order->packages()->whereIn('status', [PackageStatus::SENDING, PackageStatus::WAITING_FOR_SENDING])->count()) {
-                    dispatch_now(new RemoveLabelJob($order, [Label::BLUE_BATTERY_LABEL_ID]));
+                    dispatch(new RemoveLabelJob($order, [Label::BLUE_BATTERY_LABEL_ID]));
                 }
             } catch (Throwable $ex) {
                 Log::error($ex->getMessage());
