@@ -111,9 +111,6 @@ class MessagesController extends Controller
         try {
             $helper = new MessagesHelper($token);
             $chat = $helper->getChat();
-            if (!$chat) {
-                $chat = $helper->createNewChat();
-            }
             if ($request->type == ChatUser::class) {
                 $chatUser = ChatUser::findOrFail($request->user_id);
             } else {

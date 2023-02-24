@@ -16,7 +16,7 @@
                 cena: {{ $product->price }} PLN
             </p>
         </div>
-        @if($user_type != MessagesHelper::TYPE_CUSTOMER)
+        @if($userType != MessagesHelper::TYPE_CUSTOMER)
             <form style="display: flex; flex-direction: column" action="{{ $routeForEditPrices }}" method="POST">
                 <input type="hidden" class="unit_consumption"
                        value="{{ $product->product->packing->unit_consumption }}">

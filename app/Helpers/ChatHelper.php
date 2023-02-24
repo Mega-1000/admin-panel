@@ -2,15 +2,26 @@
 
 namespace App\Helpers;
 
+use App\User;
+use App\Entities\Firm;
+use App\Entities\ChatUser;
 use App\Entities\Customer;
 use App\Entities\Employee;
-use App\Entities\Firm;
+use Illuminate\Support\Collection;
 
 class ChatHelper
 {
-    public static function formatChatUsers($users, $userType = MessagesHelper::TYPE_USER)
+    /**
+     * Return many chat user data formatted to array
+     *
+     * @param  Collection<Employee|Customer|User> $users
+     * @param  string $userType
+     *
+     * @return array[string]
+     */
+    public static function formatChatUsers(Collection $users, string $userType): array
     {
-        return $users->map(function ($user) use ($userType) {
+        return $users->map(function ($user) use($userType) {
             return self::formatChatUser($user, $userType);
         })->toArray();
     }
@@ -40,24 +51,32 @@ class ChatHelper
         }
         return $header;
     }
-
-    public static function formatChatUser($user, $userType = MessagesHelper::TYPE_USER)
+    /**
+     * Return chat user data formatted to string
+     *
+     * @param  Employee|Customer|User $chatUser
+     * @param  string  $userType
+     *
+     * @return string
+     */
+    public static function formatChatUser(Employee|Customer|User $chatUser, string $userType): string
     {
-        if (is_a($user, Employee::class) && $userType == MessagesHelper::TYPE_CUSTOMER) {
-            $ret [] = $user->firstname_visibility ? $user->firstname : '';
-            $ret [] = $user->lastname_visibility ? $user->lastname : '';
-            $ret = implode(' ', $ret);
-            $ret2 [] = $user->phone_visibility ? $user->phone : '';
-            $ret2 [] = $user->email_visibility ? $user->email : '';
-            $ret2 = implode(' ', $ret2);
-            $ret = [$ret, $ret2];
-        } else if (is_a($user, Customer::class)) {
-            $ret = ['klient: ' . self::formatEmailAndPhone($user->login, $user->addresses->first()->phone),
-                $user->addresses->first()->postal_code . ' ' . $user->addresses->first()->city];
-        } else {
-            $ret = [$user->name . ' ' . $user->firstname . ' ' . $user->lastname, $user->email, $user->phone];
+        if ($userType == MessagesHelper::TYPE_EMPLOYEE) {
+            $firstname = $chatUser->firstname_visibility ? $chatUser->firstname : '';
+            $lastname  = $chatUser->lastname_visibility ? $chatUser->lastname : '';
+            $phone     = $chatUser->phone_visibility ? $chatUser->phone : '';
+            $email     = $chatUser->email_visibility ? $chatUser->email : '';
+            $userData  = "$firstname $lastname </br>$phone $email";
+
+        } else if ($userType == MessagesHelper::TYPE_CUSTOMER) {
+            $emailPhone = self::formatEmailAndPhone($chatUser->login, $chatUser->addresses->first()->phone);
+            $userData   = $emailPhone.'<br>'.$chatUser->addresses->first()->postal_code
+                          .' '. $chatUser->addresses->first()->city;
+        } else if($userType == MessagesHelper::TYPE_USER) {
+            $userData = $chatUser->name .' '. $chatUser->firstname
+                        .' '. $chatUser->lastname.'<br>'.$chatUser->email.'<br>'. $chatUser->phone;
         }
-        return implode('<br />', $ret);
+        return $userData;
     }
 
     public static function getMessageHelper($message)

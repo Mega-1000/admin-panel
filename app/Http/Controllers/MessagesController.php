@@ -11,8 +11,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\Exceptions\ChatException;
 
-class MessagesController extends Controller
-{
+class MessagesController extends Controller {
 
     /**
      * Display a listing of the resource.
@@ -22,8 +21,7 @@ class MessagesController extends Controller
      * @param bool $orderId
      * @return Response
      */
-    public static function index(Request $request, $all = false, $orderId = 0)
-    {
+    public static function index(Request $request, $all = false, $orderId = 0) {
         $chats = self::getChatView($all, $orderId, $request->user()->id);
         return view('chat.index')->withChats($chats)->withShowAll($all);
     }
@@ -34,8 +32,7 @@ class MessagesController extends Controller
      * @param null $userId
      * @return array|Chat[]
      */
-    public static function getChatView(bool $all, $orderId, $userId = null)
-    {
+    public static function getChatView(bool $all, $orderId, $userId = null) {
         if ($all) {
             $chats = Chat::where('id', '>', 0);
         } else {
@@ -70,14 +67,12 @@ class MessagesController extends Controller
         return $chats;
     }
 
-    public static function getUrl(Request $request, $mediaId, $postCode, $email, $phone)
-    {
+    public static function getUrl(Request $request, $mediaId, $postCode, $email, $phone) {
         $url = self::getChatUrl($mediaId, $postCode, $email, $phone);
         return redirect($url);
     }
 
-    public static function getChatUrl($mediaId, $postCode, $email, $phone): string
-    {
+    public static function getChatUrl($mediaId, $postCode, $email, $phone): string {
         $token = MessagesHelper::getToken($mediaId, $postCode, $email, $phone);
         $url = route('chat.show', ['token' => $token]);
         return $url;
@@ -88,8 +83,7 @@ class MessagesController extends Controller
      *
      * @return void
      */
-    public function create()
-    {
+    public function create() {
         //
     }
 
@@ -99,13 +93,11 @@ class MessagesController extends Controller
      * @param Request $request
      * @return void
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
         //
     }
 
-    public function show($token)
-    {
+    public function show($token) {
         try {
             return $this->prepareChatView($token);
         } catch (ChatException $e) {
@@ -120,8 +112,7 @@ class MessagesController extends Controller
      * @param string $token
      * @return View
      */
-    private function prepareChatView(string $token): View
-    {
+    private function prepareChatView(string $token): View {
         $helper = new MessagesHelper($token);
         $chat = $helper->getChat();
         $product = $helper->getProduct();
@@ -133,26 +124,31 @@ class MessagesController extends Controller
 
         $chatUsers = empty($chat) ? collect() : $chat->chatUsers;
 
-        $currentCustomersIdsOnChat = $chatUsers->pluck('customer_id')->filter();
-        $currentEmployeesIdsOnChat = $chatUsers->pluck('employee_id')->filter();
+        $chatEmployees   = $chatUsers->pluck('employee')->filter();
+        $chatCustomers   = $chatUsers->pluck('customer')->filter();
+        $chatConsultants = $chatUsers->pluck('user')->filter();
 
-        $possibleUsers = collect();
+        $currentCustomersIdsOnChat = $chatCustomers->pluck('id');
+        $currentEmployeesIdsOnChat = $chatEmployees->pluck('id');
+
+        $possibleEmployees = collect();
+        $possibleCustomers = collect();
         $productList = collect();
         $notices = '';
-        if($chatType == 'order') {
+        if ($chatType == 'order') {
             $productList = $helper->prepareOrderItemsCollection($helper);
             $products = $productList->pluck('product');
-        } else if($chatType == 'product') {
+        } else if ($chatType == 'product') {
             $productList = $products = collect([$helper->getProduct()]);
         }
 
         $employeesIds = $products->pluck('employees_ids');
-        
-        if($employeesIds->isNotEmpty()) {
-            $possibleUsers = $helper->prepareEmployees($employeesIds, $currentEmployeesIdsOnChat);
+
+        if ($employeesIds->isNotEmpty()) {
+            $possibleEmployees = $helper->prepareEmployees($employeesIds, $currentEmployeesIdsOnChat);
         }
-        if($currentCustomersIdsOnChat->isEmpty() && $chatType == 'order') {
-            $possibleUsers->push($order->customer);
+        if ($currentCustomersIdsOnChat->isEmpty() && $chatType == 'order') {
+            $possibleCustomers = collect([$order->customer]);
         }
         // if ($product) {
         //     // get possible users from company / firm
@@ -173,9 +169,12 @@ class MessagesController extends Controller
             'product_list'            => $productList,
             'faq'                     => $this->prepareFaq($chatUsers),
             'notices'                 => $notices,
-            'possible_users'          => $possibleUsers,
-            'user_type'               => $helper->currentUserType,
-            'users'                   => $chatUsers,
+            'possibleEmployees'       => $possibleEmployees,
+            'possibleCustomers'       => $possibleCustomers,
+            'userType'                => $helper->currentUserType,
+            'chatCustomers'           => $chatCustomers,
+            'chatEmployees'           => $chatEmployees,
+            'chatConsultants'         => $chatConsultants,
             'chat'                    => $chat,
             'product'                 => $product,
             'order'                   => $order,
@@ -281,19 +280,17 @@ class MessagesController extends Controller
     //     return $possibleUsers;
     // }
 
-    private function prepareFaq(Collection $users): array
-    {
+    private function prepareFaq(Collection $users): array {
         $faqs = [];
         foreach ($users as $user) {
             if ($user->employee && $user->employee->faq) {
-                $faqs [] = $user->employee->faq;
+                $faqs[] = $user->employee->faq;
             }
         }
         return $faqs;
     }
 
-    public function showOrNew(int $orderId, int $userId)
-    {
+    public function showOrNew(int $orderId, int $userId) {
         $chat = Chat::where('order_id', '=', $orderId)->first();
         if (!$chat) {
             $helper = new MessagesHelper();
@@ -318,8 +315,7 @@ class MessagesController extends Controller
      * @param int $id
      * @return void
      */
-    public function edit(int $id)
-    {
+    public function edit(int $id) {
         //
     }
 
@@ -330,8 +326,7 @@ class MessagesController extends Controller
      * @param int $id
      * @return void
      */
-    public function update(Request $request, int $id)
-    {
+    public function update(Request $request, int $id) {
         //
     }
 
@@ -341,8 +336,7 @@ class MessagesController extends Controller
      * @param int $id
      * @return void
      */
-    public function destroy(int $id)
-    {
+    public function destroy(int $id) {
         //
     }
 }

@@ -263,7 +263,12 @@ class MessagesHelper
         if (!$chatUser) {
             throw new ChatException('Cannot save message');
         }
-        $chatUser->messages()->save($messageObj);
+        $msg = $chatUser->messages()->save($messageObj);
+        $assignedMessagesIds = json_decode($chatUser->assigned_messages_ids, true);
+        $assignedMessagesIds[] = $msg->id;
+        $chatUser->assigned_messages_ids = json_encode($assignedMessagesIds);
+        $chatUser->save();
+        
         if ($chat->order) {
             if ($chatUser->user) {
                 $this->setChatLabel($chat, true);
