@@ -519,14 +519,14 @@ class TasksController extends Controller
                         $differentE = (strtotime($differentEnd) - strtotime($request->end)) / 60;
                         $dateStart = new Carbon($item->taskTime->date_start);
                         $dateEnd = new Carbon($item->taskTime->date_end);
+                        $dateS = $dateStart->addMinutes(abs($differentE))->toDateTimeString();
+                        $dateE = $dateEnd->addMinutes(abs($differentE))->toDateTimeString();
 
                         if ($differentS > 0) {
                             $dateS = $dateStart->subMinutes($differentS)->toDateTimeString();
                             $dateE = $dateEnd->subMinutes($differentS)->toDateTimeString();
-                        } elseif ($differentE < 0) {
-                            $dateS = $dateStart->addMinutes(abs($differentE))->toDateTimeString();
-                            $dateE = $dateEnd->addMinutes(abs($differentE))->toDateTimeString();
                         }
+
                         $item->taskTime->update(['date_start' => $dateS, 'date_end' => $dateE]);
                     }
                 }
@@ -650,13 +650,15 @@ class TasksController extends Controller
                     }
                     $dateStart = new Carbon($item->taskTime->date_start);
                     $dateEnd = new Carbon($item->taskTime->date_end);
+
+                    $dateS = $dateStart->addMinutes($different)->toDateTimeString();
+                    $dateE = $dateEnd->addMinutes($different)->toDateTimeString();
+
                     if ($request->moveAllLeft) {
                         $dateS = $dateStart->subMinutes($different)->toDateTimeString();
                         $dateE = $dateEnd->subMinutes($different)->toDateTimeString();
-                    } else {
-                        $dateS = $dateStart->addMinutes($different)->toDateTimeString();
-                        $dateE = $dateEnd->addMinutes($different)->toDateTimeString();
                     }
+
                     $item->taskTime->update([
                         'date_start' => $dateS,
                         'date_end' => $dateE
