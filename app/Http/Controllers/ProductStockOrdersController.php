@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Entities\ProductStock;
 use App\Entities\Firm;
 use App\Http\Requests\CreateProductStockOrdersRequest;
+use App\Mail\ProductStockOrderMail;
+use Illuminate\Support\Facades\Mail;
 
 class ProductStockOrdersController extends Controller
 {
@@ -17,7 +19,9 @@ class ProductStockOrdersController extends Controller
     }
 
     public function store(CreateProductStockOrdersRequest $request, ProductStock $productStock): \Illuminate\Http\RedirectResponse {
-        $productStock->createOrder($request->all());
+        $firm = Firm::findorfail($request->firm_id);
+
+        Mail::to($firm->email)->send(new ProductStockOrderMail($productStock, $request->validated()));
 
         return redirect()->route('product_stocks.show', $productStock->id);
     }
