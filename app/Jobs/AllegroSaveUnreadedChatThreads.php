@@ -19,7 +19,7 @@ class AllegroSaveUnreadedChatThreads extends Job implements ShouldQueue
 
     public function handle()
     {
-        Log::info("Start AllegroSaveUnreadedChatThreads!");
+        Log::channel('allegro_chat')->info("Start AllegroSaveUnreadedChatThreads!");
 
         $hasUnreadedMessages = true;
         $offset = 0;
@@ -42,7 +42,7 @@ class AllegroSaveUnreadedChatThreads extends Job implements ShouldQueue
             'group' => 'AllegroChat',
         ]);
 
-        Log::info("Unreaded Threads: ".json_encode($this->unreadedThreads));
+        Log::channel('allegro_chat')->info("Unreaded Threads: ".json_encode($this->unreadedThreads));
     }
 
     private function getThreads($offset)

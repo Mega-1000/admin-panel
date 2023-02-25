@@ -57,6 +57,12 @@ return [
             'level' => 'debug',
             'days' => 14,
         ],
+        'allegro_chat' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/allegro_chat.log'),
+            'level' => 'debug',
+            'days' => 3,
+        ],
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
