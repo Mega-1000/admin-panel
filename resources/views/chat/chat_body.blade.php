@@ -2,7 +2,9 @@
     <div class="panel-body">
         @foreach ($chat->messages as $message)
             @if( $userType == MessagesHelper::TYPE_USER || isset($assignedMessagesIds[$message->id] ))
-                @include ('chat/single_message', ['message' => $message])
+                @if ($area == $message->area)
+                    @include ('chat/single_message', ['message' => $message])
+                @endif
             @endif
         @endforeach
     </div>

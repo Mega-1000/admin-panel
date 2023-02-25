@@ -261,18 +261,24 @@ class MessagesHelper
         $messageObj->message = $message;
         $messageObj->chat_id = $chat->id;
         $messageObj->area = $area;
+        if ($area != 0 && $this->currentUserType != self::TYPE_USER) {
+            throw new ChatException('You don\'t have permission to write in other area');
+        }
         if (!$chatUser) {
             throw new ChatException('Cannot save message');
         }
         $msg = $chatUser->messages()->save($messageObj);
 
-        foreach($chat->chatUsers as $singleUser) {
-            if($singleUser->user_id !== null) continue;
+        // assign messages if area is default (0)
+        if($area == 0) {
+            foreach($chat->chatUsers as $singleUser) {
+                if($singleUser->user_id !== null) continue;
 
-            $assignedMessagesIds = json_decode($singleUser->assigned_messages_ids, true);
-            $assignedMessagesIds[] = $msg->id;
-            $singleUser->assigned_messages_ids = json_encode($assignedMessagesIds);
-            $singleUser->save();
+                $assignedMessagesIds = json_decode($singleUser->assigned_messages_ids, true);
+                $assignedMessagesIds[] = $msg->id;
+                $singleUser->assigned_messages_ids = json_encode($assignedMessagesIds);
+                $singleUser->save();
+            }
         }
         
         if ($chat->order) {

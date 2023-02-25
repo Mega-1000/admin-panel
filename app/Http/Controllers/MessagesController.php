@@ -150,6 +150,13 @@ class MessagesController extends Controller {
         if ($currentCustomersIdsOnChat->isEmpty() && $chatType == 'order') {
             $possibleCustomers = collect([$order->customer]);
         }
+        
+        $usersHistory = [
+            'customers' => $chat->chatUsersWithTrashed()->whereNotNull('customer_id')->get(),
+            'employees' => $chat->chatUsersWithTrashed()->whereNotNull('employee_id')->get(),
+            'consultants' => $chat->chatUsersWithTrashed()->whereNotNull('user_id')->get(),
+        ];
+
         // if ($product) {
         //     // get possible users from company / firm
         //     $possibleUsers = $this->getNotAttachedChatUsersForProduct($product, $chat->customers->first());
@@ -180,6 +187,8 @@ class MessagesController extends Controller {
             'chat'                    => $chat,
             'product'                 => $product,
             'order'                   => $order,
+            'usersHistory'            => $usersHistory,
+            'area'                    => request()->get('area', 0),
             'assignedMessagesIds'     => array_flip($assignedMessagesIds),
             'title'                   => $helper->getTitle(true),
             'route'                   => route('api.messages.post-new-message', ['token' => $token]),

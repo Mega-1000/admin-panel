@@ -55,7 +55,9 @@
                 <form id="new-message" action="{{ $route }}">
                     <div class="row">
                         <div class="col-sm-9">
-                            @include('chat/msg_area', ['msgAreaId' => 'msg_area'])
+                            @if ($userType == MessagesHelper::TYPE_USER)
+                                @include('chat/msg_area', ['msgAreaId' => 'msg_area'])
+                            @endif
                             <textarea required class="form-control" id="message"
                                 style="width: 100%; max-width: 600px; min-width: 200px; height: 100px;" placeholder="Tutaj wpisz wiadomość"></textarea>
                         </div>
@@ -128,6 +130,8 @@
                             Obszar:
                             @include('chat/msg_area', ['msgAreaId' => 'area'])
                         </label>
+                        <h3>Pokaż:</h3>
+                        @include('chat/history')
                     </div>
                 @endif
             </div>
@@ -153,6 +157,26 @@
                 var searchParams = new URLSearchParams(window.location.search);
                 searchParams.set('area', $('#area').val());
                 window.location.search = searchParams.toString();
+            });
+
+            let usersHistoryFilter = new Set();
+            $('.filter-users-history').each(function() {
+                usersHistoryFilter.add($(this).val());
+            });
+            $('.filter-users-history').change( function() {
+                if($(this).prop('checked') == true) {
+                    usersHistoryFilter.add($(this).val());
+                } else {
+                    usersHistoryFilter.delete($(this).val());
+                }
+                $('.message-row').each(function() {
+                    const chatUserId = String($(this).data('user-id'));
+                    if(usersHistoryFilter.has(chatUserId)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
             });
 
             $('.panel-default').animate({
