@@ -6,7 +6,7 @@ const ajaxPost = async (data, url = './', isJson = false) => {
     .fail(err => {
         console.log(err);
         $('.loader-2').removeClass('loader-2');
-        toastr.error('Błąd systemowy, spróbuj później.');
+        if(typeof toastr != 'undefined') toastr.error('Błąd systemowy, spróbuj później.');
     });
     
     return resData;
@@ -26,7 +26,7 @@ const ajaxFormData = async (formData, url = './', isJson = false) => {
     .fail(err => {
         console.log(err);
         $('.loader-2').removeClass('loader-2');
-        toastr.error('Błąd systemowy, spróbuj później.');
+        if(typeof toastr != 'undefined') toastr.error('Błąd systemowy, spróbuj później.');
     });
 
     return resData;

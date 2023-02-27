@@ -31,8 +31,9 @@ class MessagesController extends Controller
             if (!$helper->canUserSendMessage()) {
                 throw new ChatException('User not allowed to send message');
             }
-            $area = $request->input('area') ?: 'default';
-            $helper->addMessage($request->message, $area);
+            $area = $request->input('area') ?: 0;
+            $file = $request->file('file');
+            $helper->addMessage($request->message, $area, $file);
             $helper->setLastRead();
             return response('ok');
         } catch (ChatException $e) {

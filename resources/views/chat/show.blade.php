@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css"
         integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
     <link href="{{ asset('css/views/chat/style.css') }}" rel="stylesheet">
-
+    <script type="text/javascript" src="{{ URL::asset('js/helpers/helpers.js') }}"></script>
 </head>
 
 <body>
@@ -55,11 +55,10 @@
                 <form id="new-message" action="{{ $route }}">
                     <div class="row">
                         <div class="col-sm-9">
-                            @if ($userType == MessagesHelper::TYPE_USER)
-                                @include('chat/msg_area', ['msgAreaId' => 'msg_area'])
-                            @endif
                             <textarea required class="form-control" id="message"
-                                style="width: 100%; max-width: 600px; min-width: 200px; height: 100px;" placeholder="Tutaj wpisz wiadomość"></textarea>
+                                style="width: 100%; max-width: 650px; min-width: 200px; height: 100px;"
+                                placeholder="Tutaj wpisz wiadomość"></textarea>
+                            <input id="attachment" name="attachment" type="file" style="margin-top: 10px;" />
                         </div>
                         <div class="col-sm-3">
                             <input type="submit" value="Wyślij" class="btn btn-success btn-lg btn-block">
@@ -72,7 +71,7 @@
                     <button id="call-mod" class="btn bg-primary call-button">Wezwij moderatora</button>
                 @endif
             </div>
-            <div class="chat-right-column">
+            <div class="chat-right-column" style="padding-left: 10px;">
                 <h3>Użytkownicy:</h3>
                 <div class="chat-users-wrapper" style="overflow: auto; max-height: 100vh;">
                     <table id="chat-users">
@@ -83,7 +82,7 @@
                             'userType'         => MessagesHelper::TYPE_CUSTOMER,
                             'currentUserType'  => $userType,
                             'arePossibleUsers' => false,
-                            'class'               => 'bg-warning alert alert-warning',
+                            'class'            => 'bg-warning alert alert-warning',
                         ])
                         @include('chat/users', [
                             'title'            => 'Pracownicy firm:',
@@ -92,7 +91,7 @@
                             'userType'         => MessagesHelper::TYPE_EMPLOYEE,
                             'currentUserType'  => $userType,
                             'arePossibleUsers' => false,
-                            'class'               => 'bg-info alert alert-info',
+                            'class'            => 'bg-info alert alert-info',
                         ])
                         @include('chat/users', [
                             'title'            => 'Konsultanci:',
@@ -101,7 +100,7 @@
                             'userType'         => MessagesHelper::TYPE_USER,
                             'currentUserType'  => $userType,
                             'arePossibleUsers' => false,
-                            'class'               => 'bg-primary alert',
+                            'class'            => 'bg-primary alert',
                         ])
                         @include('chat/users', [
                             'title'            => 'Powiązani klienci:',
@@ -110,7 +109,7 @@
                             'userType'         => MessagesHelper::TYPE_CUSTOMER,
                             'currentUserType'  => $userType,
                             'arePossibleUsers' => true,
-                            'class'               => 'bg-warning alert alert-warning',
+                            'class'            => 'bg-warning alert alert-warning',
                         ])
                         @include('chat/users', [
                             'title'            => 'Powiązani pracownicy firm:',
@@ -119,7 +118,7 @@
                             'userType'         => MessagesHelper::TYPE_EMPLOYEE,
                             'currentUserType'  => $userType,
                             'arePossibleUsers' => true,
-                            'class'               => 'bg-info alert alert-info',
+                            'class'            => 'bg-info alert alert-info',
                         ])
                     </table>
                 </div>
@@ -153,54 +152,88 @@
     <script>
         $(document).ready(function() {
 
-            $('#area').change(() => {
-                var searchParams = new URLSearchParams(window.location.search);
-                searchParams.set('area', $('#area').val());
-                window.location.search = searchParams.toString();
+            const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}';
+            
+            let usersHistoryFilter = new Set();
+            let selectedArea = 0;
+
+            const scrollBottom = () => {
+                $('.panel-default').animate({
+                    scrollTop: $('.panel-body').height()
+                });
+            }
+
+            const filterMessages = () => {
+                
+                if(!isConsultant) return false;
+
+                $('.message-row').each(function() {
+                    const chatUserId = String($(this).data('user-id'));
+                    const area = String($(this).data('area'));
+
+                    usersHistoryFilter.has(chatUserId) && selectedArea == area ? $(this).show() : $(this).hide();
+                });
+                scrollBottom();
+            }
+
+            const getAllUsers = () => {
+                if(!isConsultant) return false;
+
+                $('.filter-users-history').each(function() {
+                    usersHistoryFilter.add($(this).val());
+                    $(this).prop('checked', true);
+                });
+            }
+
+            getAllUsers();
+            filterMessages();
+            
+            $('#area').change(function() {
+                selectedArea = $(this).val();
+                filterMessages();
             });
 
-            let usersHistoryFilter = new Set();
-            $('.filter-users-history').each(function() {
-                usersHistoryFilter.add($(this).val());
+            $('.show-all').on('click', () => {
+                getAllUsers();
+                filterMessages();
             });
+
             $('.filter-users-history').change( function() {
                 if($(this).prop('checked') == true) {
                     usersHistoryFilter.add($(this).val());
                 } else {
                     usersHistoryFilter.delete($(this).val());
                 }
-                $('.message-row').each(function() {
-                    const chatUserId = String($(this).data('user-id'));
-                    if(usersHistoryFilter.has(chatUserId)) {
-                        $(this).show();
-                    } else {
-                        $(this).hide();
-                    }
-                });
-            });
-
-            $('.panel-default').animate({
-                scrollTop: $('.panel-body').height()
+                filterMessages();
             });
 
             $('#message').focus();
 
-            $('#new-message').submit(function(e) {
+            $('#new-message').submit(async e => {
                 e.preventDefault();
                 var message = $('#message').val();
                 $('#message').val('');
-                const area = $('#msg_area').val();
 
-                $.post(
-                    $(this).attr('action'), {
-                        area,
-                        message,
-                    },
-                    function(data) {
-                        refreshRate = 1;
-                        nextRefresh = 0;
-                    }
-                );
+                const url = $('#new-message').attr('action');
+                
+                const area = $('#area').val() || 0;
+                const attachmentInput = $('#attachment')[0];
+                $('#attachment').val('');
+                const formData = new FormData();
+
+                if(attachmentInput.files.length > 0) {
+                    const file = attachmentInput.files[0];
+                    const filename = file.name;
+
+                    formData.append('file', file);
+                }
+
+                formData.append('area', area);
+                formData.append('message', message);
+                await ajaxFormData(formData, url);
+
+                refreshRate = 1;
+                nextRefresh = 0;
             });
 
             var nextRefresh = $.now() + 3000;
@@ -225,9 +258,8 @@
                         if (data.messages.length > 0) {
                             refreshRate = 1;
                             $('.panel-body').append(data.messages);
-                            $('.panel-default').animate({
-                                scrollTop: $('.panel-body').height()
-                            });
+                            filterMessages();
+                            scrollBottom();
                         }
                         nextRefresh = $.now() + refreshRate * 1000;
                         running = false;
@@ -235,8 +267,8 @@
                 );
             }
 
-            $('.add-user').click((event) => {
-                $.ajax({
+                $('.add-user').click((event) => {
+                    $.ajax({
                         method: "POST",
                         url: "{{ $routeAddUser }}",
                         data: {

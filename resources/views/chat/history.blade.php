@@ -1,3 +1,6 @@
+<button class="btn btn-success show-all">
+    Pokaż wszystkich
+</button>
 @foreach ($usersHistory['customers'] as $user)
     <h5>Klienci:</h5>
     <label>{{ $user->customer->addresses->first()->email }}

@@ -188,7 +188,6 @@ class MessagesController extends Controller {
             'product'                 => $product,
             'order'                   => $order,
             'usersHistory'            => $usersHistory,
-            'area'                    => request()->get('area', 0),
             'assignedMessagesIds'     => array_flip($assignedMessagesIds),
             'title'                   => $helper->getTitle(true),
             'route'                   => route('api.messages.post-new-message', ['token' => $token]),

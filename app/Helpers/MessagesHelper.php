@@ -18,6 +18,7 @@ use App\Entities\ProductMedia;
 use App\Entities\WorkingEvents;
 use App\Entities\CustomerAddress;
 use App\Jobs\ChatNotificationJob;
+use Illuminate\Http\UploadedFile;
 use App\Entities\PostalCodeLatLon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
@@ -249,7 +250,16 @@ class MessagesHelper
         }
     }
 
-    public function addMessage(string $message, string $area = UserRole::Main): void
+    /**
+     * Handle add message to Chat
+     *
+     * @param  string       $message
+     * @param  string       $area
+     * @param  UploadedFile $file
+     *
+     * @return void
+     */
+    public function addMessage(string $message, string $area = UserRole::Main, UploadedFile $file = null): void
     {
         $chat = $this->getChat();
         $chatUser = $this->getCurrentChatUser();
@@ -263,6 +273,15 @@ class MessagesHelper
         $messageObj->area = $area;
         if ($area != 0 && $this->currentUserType != self::TYPE_USER) {
             throw new ChatException('You don\'t have permission to write in other area');
+        }
+        if($file) {
+            $originalFileName = $file->getClientOriginalName();
+            $hashedFileName = Hash::make($originalFileName);
+            $path = $file->storeAs('chat_files/'.$chat->id, $hashedFileName, 'public');
+            if($path) {
+                $messageObj->attachment_path = $path;
+                $messageObj->attachment_name = $originalFileName;
+            }
         }
         if (!$chatUser) {
             throw new ChatException('Cannot save message');
@@ -315,7 +334,7 @@ class MessagesHelper
             $email = $this->getCurrentChatUser()->user->email;
         }
 
-        (new ChatNotificationJob($chat->id, $email))->handle();
+        (new ChatNotificationJob($chat->id, $email, $this->getCurrentChatUser()->id))->handle();
     }
 
     private function getAdminChatUser($secondTry = false)
