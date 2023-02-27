@@ -99,7 +99,7 @@ class AllegroChatService extends AllegroApiService {
             'type'    => 'PENDING',
         ])->first();
 
-        Log::info("Current Thread: " . json_encode($currentThread));
+        Log::channel('allegro_chat')->info("Current Thread: " . json_encode($currentThread));
 
         if (!empty($currentThread)) return $currentThread->toArray();
 
@@ -109,7 +109,7 @@ class AllegroChatService extends AllegroApiService {
             ->whereIn('allegro_thread_id', $unreadedThreadsIds)
             ->pluck('allegro_thread_id')->toArray();
 
-        Log::info("Already Opened Threads: " . json_encode($alreadyOpenedThreads));
+        Log::channel('allegro_chat')->info("Already Opened Threads: " . json_encode($alreadyOpenedThreads));
 
         // flip for swap allegro_thread_id as key
         $alreadyOpenedThreads = array_flip($alreadyOpenedThreads);
@@ -133,7 +133,7 @@ class AllegroChatService extends AllegroApiService {
             $currentThread = $newPendingThread->toArray();
             break;
         }
-        Log::info("New Pending Thread:" . json_encode($currentThread));
+        Log::channel('allegro_chat')->info("New Pending Thread:" . json_encode($currentThread));
 
         return $currentThread;
     }
@@ -183,7 +183,7 @@ class AllegroChatService extends AllegroApiService {
             ];
         }
 
-        Log::info("Allegro Chat New Message:" . json_encode($newMessage));
+        Log::channel('allegro_chat')->info("Allegro Chat New Message:" . json_encode($newMessages));
 
         return $newMessages;
     }

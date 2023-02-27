@@ -27,6 +27,6 @@ class AllegroUnlockInactiveThreads implements ShouldQueue
             ['updated_at', '<', $currentDateTime],
         ])->delete();
 
-        Log::info("Deleted Pending Threads: " . json_encode($deleted));
+        Log::channel('allegro_chat')->info("Deleted Pending Threads: " . json_encode($deleted));
     }
 }
