@@ -1,5 +1,9 @@
 <?php
 
+use App\Entities\Employee;
+use App\Helpers\MessagesHelper;
+use Illuminate\Support\Facades\Auth;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -28,9 +32,8 @@ Route::group(['prefix' => 'admin'], function () {
         });
 
         Route::get('/test', function() {
-            $hash = Hash::make('asdasdasd');
-            echo '<pre>' , print_r($hash) , '</pre>';
-            exit;
+            $employee = Employee::find(7);
+            dd($employee->employeeRoles->pluck('name')->join(', '));
         });
 
         Route::get('/disputes', 'AllegroDisputeController@list');

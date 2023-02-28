@@ -23,7 +23,10 @@ use App\Entities\PostalCodeLatLon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\NoticesRequest;
 use App\Helpers\Exceptions\ChatException;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\OrdersController;
 
 class MessagesHelper
 {
@@ -207,7 +210,18 @@ class MessagesHelper
         $chat = new Chat();
         $this->setUsers();
         $chat->product_id = $this->productId ?: null;
-        $chat->order_id = $this->orderId ?: null;
+
+        if($this->orderId) {
+            $chat->order_id = $this->orderId;
+            // ensure that is only one order chat
+            $chat = Chat::where('order_id', $this->orderId)->first();
+            if($chat) {
+                $this->cache['chat'] = $chat;
+                return $chat;
+            }
+        } else {
+            $chat->order_id = null;
+        }
         $chat->save();
         if (!empty($this->users[self::TYPE_CUSTOMER])) {
             $customer = Customer::find($this->users[self::TYPE_CUSTOMER]);
@@ -273,6 +287,28 @@ class MessagesHelper
         $messageObj->area = $area;
         if ($area != 0 && $this->currentUserType != self::TYPE_USER) {
             throw new ChatException('You don\'t have permission to write in other area');
+        } else if($area != 0 && $this->currentUserType == self::TYPE_USER && $chat->order_id) {
+
+            // map UserRole Enum to Order constants
+            $type = [
+                '1' => Order::COMMENT_SHIPPING_TYPE,
+                '2' => Order::COMMENT_SHIPPING_TYPE,
+                '3' => Order::COMMENT_FINANCIAL_TYPE,
+                '4' => Order::COMMENT_CONSULTANT_TYPE,
+                '5' => Order::COMMENT_WAREHOUSE_TYPE,
+            ];
+            $noticesRequestParams = [
+                'message'  => $message,
+                'type'     => $type[ $area ],
+                'order_id' => $chat->order_id,
+                'user_id'  => $chatUser->user_id,
+            ];
+            $noticeRequest = new NoticesRequest($noticesRequestParams);
+            $noticeValidator = Validator::make($noticeRequest->all(), $noticeRequest->rules());
+            $noticeRequest->setValidator($noticeValidator);
+
+            $order = app(OrdersController::class);
+            $order->updateNotices($noticeRequest);
         }
         if($file) {
             $originalFileName = $file->getClientOriginalName();

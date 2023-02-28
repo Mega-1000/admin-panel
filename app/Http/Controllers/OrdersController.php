@@ -2,104 +2,105 @@
 
 namespace App\Http\Controllers;
 
-use App\Entities\Auth_code;
-use App\Entities\ColumnVisibility;
-use App\Entities\Country;
-use App\Entities\Customer;
-use App\Entities\Deliverer;
-use App\Entities\InvoiceRequest;
-use App\Entities\Label;
-use App\Entities\Order;
-use App\Entities\OrderFiles;
-use App\Entities\OrderInvoice;
-use App\Entities\OrderItem;
-use App\Entities\OrderPackage;
-use App\Entities\OrderPayment;
-use App\Entities\PackageTemplate;
-use App\Entities\Product;
-use App\Entities\ProductStockPacket;
+use App\User;
+use Exception;
+use Carbon\Carbon;
+use Dompdf\Dompdf;
 use App\Entities\Role;
 use App\Entities\Task;
-use App\Entities\UserSurplusPayment;
-use App\Entities\UserSurplusPaymentHistory;
-use App\Entities\Warehouse;
-use App\Entities\WorkingEvents;
-use App\Enums\LabelStatusEnum;
+use function response;
+use App\Entities\Label;
+use App\Entities\Order;
 use App\Facades\Mailer;
-use App\Helpers\BackPackPackageDivider;
-use App\Helpers\EmailTagHandlerHelper;
-use App\Helpers\GetCustomerForNewOrder;
+use App\Entities\Country;
+use App\Entities\Product;
+use App\Jobs\AddLabelJob;
+use App\Entities\Customer;
+use App\Entities\Auth_code;
+use App\Entities\Deliverer;
+use App\Entities\OrderItem;
+use App\Entities\Warehouse;
+use App\Helpers\TaskHelper;
+use iio\libmergepdf\Merger;
+use Illuminate\Support\Str;
+use App\Entities\OrderFiles;
+use App\Jobs\RemoveLabelJob;
+use Illuminate\Http\Request;
 use App\Helpers\LabelsHelper;
 use App\Helpers\OrderBuilder;
-use App\Helpers\OrderCalcHelper;
-use App\Helpers\OrderPriceCalculator;
 use App\Helpers\OrdersHelper;
-use App\Helpers\TaskHelper;
-use App\Helpers\TransportSumCalculator;
-use App\Http\Requests\CreatePaymentsRequest;
-use App\Http\Requests\NoticesRequest;
-use App\Http\Requests\OrdersFindPackageRequest;
-use App\Http\Requests\OrderUpdateRequest;
-use App\Jobs\AddLabelJob;
-use App\Jobs\AllegroTrackingNumberUpdater;
-use App\Jobs\GenerateXmlForNexoJob;
-use App\Jobs\ImportOrdersFromSelloJob;
-use App\Jobs\Orders\ChangeOrderStatusJob;
-use App\Jobs\OrderStatusChangedNotificationJob;
+use App\Services\TaskService;
+use App\Entities\OrderInvoice;
+use App\Entities\OrderPackage;
+use App\Entities\OrderPayment;
+use App\Enums\LabelStatusEnum;
+use App\Entities\WorkingEvents;
+use App\Helpers\MessagesHelper;
 use App\Jobs\RemoveFileLockJob;
-use App\Jobs\RemoveLabelJob;
-use App\Jobs\SendRequestForCancelledPackageJob;
-use App\Jobs\UpdatePackageRealCostJob;
+use App\Entities\InvoiceRequest;
+use App\Helpers\OrderCalcHelper;
+use App\Entities\PackageTemplate;
+use Illuminate\Http\JsonResponse;
+use App\Entities\ColumnVisibility;
+use Illuminate\Support\Facades\DB;
+use App\Jobs\GenerateXmlForNexoJob;
+use App\Services\OrderExcelService;
+use Illuminate\Support\Facades\Log;
+use App\Entities\ProductStockPacket;
+use App\Entities\UserSurplusPayment;
+use App\Repositories\FirmRepository;
+use App\Repositories\TaskRepository;
+use App\Repositories\UserRepository;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\View;
+use App\Helpers\OrderPriceCalculator;
+use App\Http\Requests\NoticesRequest;
 use App\Mail\SendOfferToCustomerMail;
-use App\Repositories\CustomerAddressRepository;
+use App\Repositories\LabelRepository;
+use App\Repositories\OrderRepository;
+use App\Services\OrderAddressService;
+use App\Services\OrderInvoiceService;
+use Illuminate\Http\RedirectResponse;
+use App\Helpers\EmailTagHandlerHelper;
+use App\Jobs\ImportOrdersFromSelloJob;
+use App\Jobs\UpdatePackageRealCostJob;
+use App\Repositories\StatusRepository;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Database\Query\Builder;
+use App\Helpers\BackPackPackageDivider;
+use App\Helpers\GetCustomerForNewOrder;
+use App\Helpers\TransportSumCalculator;
+use App\Repositories\ProductRepository;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Storage;
 use App\Repositories\CustomerRepository;
 use App\Repositories\EmployeeRepository;
-use App\Repositories\FirmRepository;
-use App\Repositories\LabelGroupRepository;
-use App\Repositories\LabelRepository;
-use App\Repositories\OrderAddressRepository;
+use Yajra\DataTables\Facades\DataTables;
+use App\Http\Requests\OrderUpdateRequest;
+use App\Jobs\Orders\ChangeOrderStatusJob;
 use App\Repositories\OrderItemRepository;
+use App\Repositories\WarehouseRepository;
+use App\Jobs\AllegroTrackingNumberUpdater;
+use App\Repositories\LabelGroupRepository;
+use App\Entities\UserSurplusPaymentHistory;
+use App\Http\Requests\CreatePaymentsRequest;
+use App\Repositories\OrderAddressRepository;
 use App\Repositories\OrderMessageRepository;
 use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderPaymentRepository;
-use App\Repositories\OrderRepository;
+use App\Repositories\ProductStockRepository;
 use App\Repositories\ProductPackingRepository;
-use App\Repositories\ProductRepository;
+use App\Http\Requests\OrdersFindPackageRequest;
+use App\Jobs\OrderStatusChangedNotificationJob;
+use App\Jobs\SendRequestForCancelledPackageJob;
+use App\Repositories\CustomerAddressRepository;
 use App\Repositories\ProductStockLogRepository;
+use App\Repositories\SpeditionExchangeRepository;
 use App\Repositories\ProductStockPacketRepository;
 use App\Repositories\ProductStockPositionRepository;
-use App\Repositories\ProductStockRepository;
-use App\Repositories\SpeditionExchangeRepository;
-use App\Repositories\StatusRepository;
-use App\Repositories\TaskRepository;
-use App\Repositories\UserRepository;
-use App\Repositories\WarehouseRepository;
-use App\Services\OrderAddressService;
-use App\Services\OrderExcelService;
-use App\Services\OrderInvoiceService;
-use App\Services\TaskService;
-use App\User;
-use Carbon\Carbon;
-use Dompdf\Dompdf;
-use Exception;
-use iio\libmergepdf\Merger;
-use Illuminate\Contracts\View\Factory;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\Query\Builder;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Yajra\DataTables\Facades\DataTables;
-use function response;
 
 /**
  * Class OrderController.
@@ -529,6 +530,18 @@ class OrdersController extends Controller
         $orderHasSentLP = $order->hasOrderSentLP();
         $packets = ProductStockPacket::with('items')->get();
         $countries = Country::all();
+
+        $helper = new MessagesHelper();
+        $helper->orderId = $order->id;
+        $helper->currentUserId = Auth::user()->id;
+        $helper->currentUserType = $userType = MessagesHelper::TYPE_USER;
+        $chatUserToken = $helper->encrypt();
+        $chat = $helper->getChat();
+        // last five msg from area 0
+        $chatMessages = $chat->messages->filter(function($msg) {
+            return $msg->area == 0;
+        })->slice(-5);
+
         if ($order->customer_id == 4128) {
             return view(
                 'orders.edit_self',
@@ -560,7 +573,10 @@ class OrdersController extends Controller
                     'clientTotalCost',
                     'ourTotalCost',
                     'labelsButtons',
-                    'countries'
+                    'countries',
+                    'chatUserToken',
+                    'chatMessages',
+                    'userType'
                 )
             );
         }
@@ -597,7 +613,10 @@ class OrdersController extends Controller
                 'ourTotalCost',
                 'labelsButtons',
                 'packets',
-                'countries'
+                'countries',
+                'chatUserToken',
+                'chatMessages',
+                'userType'
             )
         );
 
@@ -936,6 +955,10 @@ class OrdersController extends Controller
     {
         $request->validated();
         $user = Auth::user();
+        $userId = $request->input('user_id');
+        if( isset($userId) ) {
+            $user = User::find($userId);
+        }
         if (empty($user)) {
             return response(['errors' => ['message' => "Użytkownik nie jest zalogowany"]], 400);
         }

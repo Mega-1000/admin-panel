@@ -66,7 +66,9 @@ class ChatHelper
             $lastname  = $chatUser->lastname_visibility ? $chatUser->lastname : '';
             $phone     = $chatUser->phone_visibility ? $chatUser->phone : '';
             $email     = $chatUser->email_visibility ? $chatUser->email : '';
-            $userData  = "$firstname $lastname </br>$phone $email";
+            $email     = $chatUser->email_visibility ? $chatUser->email : '';
+            $roles     = $chatUser->employeeRoles->pluck('name')->join('<br>');
+            $userData  = "$roles</br>$firstname $lastname </br>$phone $email";
 
         } else if ($userType == MessagesHelper::TYPE_CUSTOMER) {
             $emailPhone = self::formatEmailAndPhone($chatUser->login, $chatUser->addresses->first()->phone);

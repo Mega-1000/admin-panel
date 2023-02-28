@@ -477,10 +477,31 @@
             </div>
             <div class="container-fluid">
                 <div class="row">
+                    <div class="col-md-12">
+                        @if(!empty($emails))
+                            @foreach($emails as $email)
+                                <div style="display: inline-block;">
+                                    <img
+                                        src="{{ asset('images/mail-icon.png') }}"
+                                        alt="" style="width: 50px; height: 50px;">
+                                    <div style="display: inline-block;">
+                                        <span>{{ str_replace('+0100', '', $email->timestamp) }}</span>
+                                        <a href="{{ Storage::url('mails/' . $email->path) }}"
+                                        style="display: block;">Ściągnij</a>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @endif
+                    </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="row">
                     <div class="col-md-7">
                         <h3>Podgląd czatu</h3>
-                        <a href="" class="btn btn-success">
-                            Wyświetl czat
+                        @include('chat/chat_body')
+                        <a class="btn btn-success" href="/chat/{{ $chatUserToken }}" target="_blank">
+                            Przejdź do czatu
                         </a>
                     </div>
                     <div class="col-md-5">
@@ -1787,62 +1808,6 @@
             </tbody>
         </table>
     </div>
-    <div class="order-messages" id="order-messages">
-        <div class="panel panel-bordered">
-            <div class="panel-body">
-                @php
-                    $orderButtons = ChatHelper::createButtonsArrayForOrder($order, Auth::user()->id, MessagesHelper::TYPE_USER);
-                    $helper = new MessagesHelper();
-                    $helper->orderId = $order->id;
-                    $helper->currentUserId = Auth::user()->id;
-                    $helper->currentUserType = MessagesHelper::TYPE_USER;
-                    $userToken = $helper->encrypt();
-
-                @endphp
-                @foreach($orderButtons as $producent => $buttons)
-                    <p> {{ $producent }}
-                        @foreach($buttons as $button)
-                            <a id="create-button-orderPackages"
-                               href="{{ $button['url'] }}" target="_blank" class="btn btn-success">
-                                <i class="voyager-plus"></i> <span>{{ $button['description'] }}</span>
-                            </a>
-                        @endforeach
-                    </p>
-                @endforeach
-                <p> Pusta rozmowa:
-                    <a id="create-button-orderPackages"
-                       href="/chat/{{ $userToken }}" target="_blank" class="btn btn-success">
-                        <i class="voyager-plus"></i> <span>Rozpocznij</span>
-                    </a>
-                </p>
-
-
-                @if(!empty($emails))
-                    @foreach($emails as $email)
-                        <div style="display: inline-block;">
-                            <img
-                                src="https://purepng.com/public/uploads/large/purepng.com-mail-iconsymbolsiconsapple-iosiosios-8-iconsios-8-721522596075clftr.png"
-                                alt="" style="width: 50px; height: 50px;">
-                            <div style="
-    display: inline-block;
-">
-                                <span>{{ str_replace('+0100', '', $email->timestamp) }}</span>
-
-                                <a href="{{ Storage::url('mails/' . $email->path) }}"
-                                   style="display: block;">Ściągnij</a>
-                            </div>
-
-                        </div>
-                    @endforeach
-                @endif
-            </div>
-        </div>
-        @inject('provider', 'App\Http\Controllers\MessagesController')
-        @php
-            $chats = $provider::getChatView(1, $order->id);
-        @endphp
-        @include('chat.table', ['chats' => $chats])
-    </div>
 
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
          aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -2755,7 +2720,6 @@
             var payments = $('#order-payments').hide();
             var tasks = $('#order-tasks').hide();
             var packages = $('#order-packages').hide();
-            var messages = $('#order-messages').hide();
             var warehousePayments = $('#warehouse-payments').hide();
             var speditionPayments = $('#spedition-payments').hide();
             var status = $('#order-status').hide();
@@ -3001,7 +2965,6 @@
                     createButtonOrderTasks.hide();
 
                     breadcrumb.children().last().remove();
-                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#order-messages'>Wiadomości</a></li>");
                     addOrder.hide();
                 } else if (value === 'packages') {
                     $('#button-general').removeClass('active');
