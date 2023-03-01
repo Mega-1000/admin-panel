@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Session;
 
 class RemoveLabelService
 {
-    public static function removeLabels(Order $order, array $labelIdsToRemove, array &$loopPreventionArray, array $customLabelIdsToAddAfterRemoval, int $userId, ?string $time = null): array
+    public static function removeLabels(Order $order, array $labelIdsToRemove, array &$loopPreventionArray, array $customLabelIdsToAddAfterRemoval, ?int $userId, ?string $time = null): array
     {
 
         WorkingEvents::createEvent(WorkingEvents::LABEL_REMOVE_EVENT, $order->id);
@@ -25,7 +25,7 @@ class RemoveLabelService
             return [];
         }
 
-        if (Auth::user() === null) {
+        if (Auth::user() === null && $userId !== null) {
             Auth::loginUsingId($userId);
         }
         $removeLabelAtTheEnd = [];
@@ -35,7 +35,7 @@ class RemoveLabelService
                 continue;
             }
 
-            if ($labelId == 49 && Auth::user()->role_id == 4) {
+            if ($labelId == 49 && Auth::user()?->role_id == 4) {
                 continue;
             }
 
@@ -100,7 +100,7 @@ class RemoveLabelService
         return ['success' => true];
     }
 
-    private static function changeWarehouseStock(Order $order, int $userId): array
+    private static function changeWarehouseStock(Order $order, ?int $userId): array
     {
 
         $errors = [];

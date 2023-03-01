@@ -49,10 +49,10 @@ class CheckPromisePaymentsDates implements ShouldQueue
             foreach ($notConfirmedPayments as $notConfirmedPayment) {
                 if ($this->shouldAttachLabel($notConfirmedPayment, $now)) {
                     $prev = [];
-                    AddLabelService::addLabels($notConfirmedPayment->order, [119], $prev, [], Auth::user()->id);
+                    AddLabelService::addLabels($notConfirmedPayment->order, [119], $prev, [], null);
                 } else if ($notConfirmedPayment->order->hasLabel(119)) {
                     $prev = [];
-                    RemoveLabelService::removeLabels($notConfirmedPayment->order, [119], $prev, [], Auth::user()->id);
+                    RemoveLabelService::removeLabels($notConfirmedPayment->order, [119], $prev, [], null);
                 }
             }
         }

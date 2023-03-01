@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\DB;
 class AddLabelService
 {
 
-    public static function addLabels(Order $order, array $labelIdsToAdd, array &$loopPreventionArray, array $options, int $userId, ?Carbon $time = null): void
+    public static function addLabels(Order $order, array $labelIdsToAdd, array &$loopPreventionArray, array $options, ?int $userId, ?Carbon $time = null): void
     {
         $now = Carbon::now();
 
@@ -115,11 +115,11 @@ class AddLabelService
             self::addLabels($order, $labelsToAddAtTheEnd, $loopPreventionArray, $options, $userId);
         }
         if (count($labelsToRemoveAtTheEnd) > 0) {
-            RemoveLabelService::removeLabels($order, $labelsToRemoveAtTheEnd);
+            RemoveLabelService::removeLabels($order, $labelsToRemoveAtTheEnd, $loopPreventionArray, [], $userId);
         }
     }
 
-    private static function setScheduledLabelsAfterAddition(Order $order, Label $label, int $userId): void
+    private static function setScheduledLabelsAfterAddition(Order $order, Label $label, ?int $userId): void
     {
         $timedLabelsAfterAddition = $label->timedLabelsAfterAddition()->get();
 
@@ -157,7 +157,7 @@ class AddLabelService
         }
     }
 
-    private static function awaitForUserToEnterDate(Order $order, $pivot, string $action, int $userId): void
+    private static function awaitForUserToEnterDate(Order $order, $pivot, string $action, ?int $userId): void
     {
         if (!empty($pivot->$action)) {
             OrderLabelSchedulerAwait::query()->create([
