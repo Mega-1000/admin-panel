@@ -2473,6 +2473,9 @@ class OrdersController extends Controller
                 if (Auth::user()->role_id == 4) {
                     $query->where('orders.employee_id', '=', Auth::user()->id);
                 }
+            })->where(function ($query) {
+                $query->where('orders.created_at', '>', Carbon::now()->addMonths(-2))
+                    ->orWhere('orders.updated_at', '>', Carbon::now()->addMonths(-2));
             });
     }
 
