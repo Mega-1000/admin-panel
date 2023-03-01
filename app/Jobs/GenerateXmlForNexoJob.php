@@ -16,14 +16,17 @@ use App\Integrations\Artoit\PreKlient;
 use App\Integrations\Artoit\PrePozycja;
 use App\Integrations\Artoit\PreTowar;
 use App\Repositories\OrderRepository;
+use App\Services\Label\AddLabelService;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 /**
  * Generate xml for nexo import.
@@ -60,7 +63,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
             $query->where('label_id', Label::ORDER_RECEIVED_INVOICE_TODAY);
         })->whereHas('labels', function ($query) {
             $query->where('label_id', Label::ORDER_ITEMS_REDEEMED_LABEL)
-            ->orWhere('label_id', Label::RETURN_ALLEGRO_PAYMENTS);
+                ->orWhere('label_id', Label::RETURN_ALLEGRO_PAYMENTS);
         })->whereDoesntHave('labels', function ($query) {
             $query->where('label_id', Label::XML_INVOICE_GENERATED);
         })->get();
@@ -152,8 +155,9 @@ class GenerateXmlForNexoJob implements ShouldQueue
 
                 $xml = self::generateValidXmlFromObj($preDokument);
                 Storage::disk('local')->put('public/XMLFS/' . $order->id . '_FS_' . Carbon::now()->format('d-m-Y') . '.xml', mb_convert_encoding($xml, "UTF-8", "auto"));
-                dispatch(new AddLabelJob($order, [Label::XML_INVOICE_GENERATED]));
-            } catch (\Throwable $ex) {
+                $preventionArray = [];
+                AddLabelService::addLabels($order, [Label::XML_INVOICE_GENERATED], $preventionArray, [], Auth::user()->id);
+            } catch (Throwable $ex) {
                 Log::error($ex->getMessage(), [
                     'productId' => (isset($item)) ? $item->product->id : null,
                     'orderItemId' => (isset($item)) ? $item->id : null,
@@ -161,34 +165,6 @@ class GenerateXmlForNexoJob implements ShouldQueue
                 ]);
                 continue;
             }
-        }
-    }
-
-    /**
-     *
-     * @param Order $order
-     *
-     * @return string
-     */
-    private function getOrderDate(Order $order): string
-    {
-        $now = Carbon::now();
-        $settledAdvanceDeclared = $order->paymentsWithTrash->filter(function (OrderPayment $payment) {
-            return $payment->deleted_at !== null;
-        })->last();
-
-        if (!empty($order->allegro_operation_date)) {
-            $operationDate = Carbon::parse($order->allegro_operation_date);
-            if ($operationDate->lessThan($now->firstOfMonth())) {
-                return $operationDate->lastOfMonth()->toDateTimeLocalString();
-            } else {
-                return Carbon::now()->toDateTimeLocalString();
-            }
-        } elseif (isset($settledAdvanceDeclared->deleted_at)) {
-            $operationDate = Carbon::parse($settledAdvanceDeclared->deleted_at);
-            return $operationDate->lastOfMonth()->toDateTimeLocalString();
-        } else {
-            return Carbon::now()->toDateTimeLocalString();
         }
     }
 
@@ -207,65 +183,6 @@ class GenerateXmlForNexoJob implements ShouldQueue
         } else {
             return $preferredInvoiceDate->lastOfMonth()->toDateTimeLocalString();
         }
-    }
-
-    /**
-     * @param $obj
-     * @param $node_block
-     * @param $node_name
-     *
-     * @return string
-     */
-    public static function generateValidXmlFromObj($obj, $node_block = 'PreDokument', $node_name = 'PrePozycja')
-    {
-        $arr = get_object_vars($obj);
-        return self::generateValidXmlFromArray($arr, $node_block, $node_name);
-    }
-
-    /**
-     * @param $array
-     * @param $node_block
-     * @param $node_name
-     *
-     * @return string
-     */
-    public static function generateValidXmlFromArray($array, $node_block = 'nodes', $node_name = 'node')
-    {
-        $xml = '<?xml version="1.0"?>';
-
-        $xml .= '<' . $node_block . ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">';
-        $xml .= self::generateXmlFromArray($array, $node_name);
-        $xml .= '</' . $node_block . '>';
-
-        return $xml;
-    }
-
-    /**
-     * @param $array
-     * @param $node_name
-     *
-     * @return string
-     */
-    private static function generateXmlFromArray($array, $node_name)
-    {
-        $xml = '';
-
-        if (is_array($array) || is_object($array)) {
-            foreach ($array as $key => $value) {
-                if (is_numeric($key)) {
-                    $key = $node_name;
-                }
-                if (!empty($value) || $value === 0 || $value === '0' || $value === 0.0) {
-                    $xml .= '<' . ucfirst($key) . '>' . self::generateXmlFromArray($value, $node_name) . '</' . ucfirst($key) . '>';
-                } else {
-                    $xml .= '<' . ucfirst($key) . '/>';
-                }
-            }
-        } else {
-            $xml = htmlspecialchars($array, ENT_QUOTES);
-        }
-
-        return $xml;
     }
 
     /**
@@ -374,5 +291,92 @@ class GenerateXmlForNexoJob implements ShouldQueue
             ->setWartoscCalejPozycjiNettoZRabatem(0)
             ->setWartoscCalejPozycjiBruttoZRabatem($order->shipment_price_for_client ?? 0);
         return $prePozycja;
+    }
+
+    /**
+     * @param $obj
+     * @param $node_block
+     * @param $node_name
+     *
+     * @return string
+     */
+    public static function generateValidXmlFromObj($obj, $node_block = 'PreDokument', $node_name = 'PrePozycja')
+    {
+        $arr = get_object_vars($obj);
+        return self::generateValidXmlFromArray($arr, $node_block, $node_name);
+    }
+
+    /**
+     * @param $array
+     * @param $node_block
+     * @param $node_name
+     *
+     * @return string
+     */
+    public static function generateValidXmlFromArray($array, $node_block = 'nodes', $node_name = 'node')
+    {
+        $xml = '<?xml version="1.0"?>';
+
+        $xml .= '<' . $node_block . ' xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">';
+        $xml .= self::generateXmlFromArray($array, $node_name);
+        $xml .= '</' . $node_block . '>';
+
+        return $xml;
+    }
+
+    /**
+     * @param $array
+     * @param $node_name
+     *
+     * @return string
+     */
+    private static function generateXmlFromArray($array, $node_name)
+    {
+        $xml = '';
+
+        if (is_array($array) || is_object($array)) {
+            foreach ($array as $key => $value) {
+                if (is_numeric($key)) {
+                    $key = $node_name;
+                }
+                if (!empty($value) || $value === 0 || $value === '0' || $value === 0.0) {
+                    $xml .= '<' . ucfirst($key) . '>' . self::generateXmlFromArray($value, $node_name) . '</' . ucfirst($key) . '>';
+                } else {
+                    $xml .= '<' . ucfirst($key) . '/>';
+                }
+            }
+        } else {
+            $xml = htmlspecialchars($array, ENT_QUOTES);
+        }
+
+        return $xml;
+    }
+
+    /**
+     *
+     * @param Order $order
+     *
+     * @return string
+     */
+    private function getOrderDate(Order $order): string
+    {
+        $now = Carbon::now();
+        $settledAdvanceDeclared = $order->paymentsWithTrash->filter(function (OrderPayment $payment) {
+            return $payment->deleted_at !== null;
+        })->last();
+
+        if (!empty($order->allegro_operation_date)) {
+            $operationDate = Carbon::parse($order->allegro_operation_date);
+            if ($operationDate->lessThan($now->firstOfMonth())) {
+                return $operationDate->lastOfMonth()->toDateTimeLocalString();
+            } else {
+                return Carbon::now()->toDateTimeLocalString();
+            }
+        } elseif (isset($settledAdvanceDeclared->deleted_at)) {
+            $operationDate = Carbon::parse($settledAdvanceDeclared->deleted_at);
+            return $operationDate->lastOfMonth()->toDateTimeLocalString();
+        } else {
+            return Carbon::now()->toDateTimeLocalString();
+        }
     }
 }

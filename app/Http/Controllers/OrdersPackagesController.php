@@ -26,7 +26,6 @@ use App\Http\Requests\OrderPackageCostsUpdateRequest;
 use App\Http\Requests\OrderPackageCreateRequest;
 use App\Http\Requests\OrderPackageUpdateRequest;
 use App\Integrations\GLS\GLSClient;
-use App\Jobs\AddLabelJob;
 use App\Jobs\OrdersCourierJobs;
 use App\Jobs\SendRequestForCancelledPackageJob;
 use App\Mail\SendDailyProtocolToDeliveryFirmMail;
@@ -35,6 +34,7 @@ use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PackageTemplateRepository;
 use App\Repositories\ShipmentGroupRepository;
+use App\Services\Label\AddLabelService;
 use App\Services\OrderPackageService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
@@ -49,6 +49,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -367,12 +368,15 @@ class OrdersPackagesController extends Controller
         }
 
         $this->saveOrderPackage($data);
+        $prev = [];
+        AddLabelService::addLabels(
+            $order,
+            ($toCheck != 0 ? [134] : [133]),
+            $prev,
+            [],
+            Auth::user()->id,
+        );
 
-        if ($toCheck != 0) {
-            dispatch(new AddLabelJob($order->id, [134]));
-        } else {
-            dispatch(new AddLabelJob($order->id, [133]));
-        }
         if (empty($request->input('quantity')) || $request->input('quantity') <= 1) {
             return redirect()->route('orders.edit', ['order_id' => $order_id])->with([
                 'message' => __('order_packages.message.store'),
@@ -658,7 +662,7 @@ class OrdersPackagesController extends Controller
      */
     protected function getStickerForGls($package): string
     {
-        if(Storage::disk('private')->exists('labels/gls/' . $package->sending_number . '.pdf') !== true) {
+        if (Storage::disk('private')->exists('labels/gls/' . $package->sending_number . '.pdf') !== true) {
             try {
                 $gls = new GLSClient();
                 $gls->auth();
@@ -669,9 +673,7 @@ class OrdersPackagesController extends Controller
                 $gls->logout();
 
                 ConfirmPackages::query()->create(['package_id' => $package->id]);
-            }
-            catch (Exception $e)
-            {
+            } catch (Exception $e) {
                 Log::error("Błąd pobierania paczki" . $e->getMessage() . '<br/>' . $e->getTraceAsString());
                 return '';
             }

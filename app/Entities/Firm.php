@@ -3,18 +3,42 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
 /**
  * Class Firm.
- *
+ * @property string $email
  * @package namespace App\Entities;
  */
 class Firm extends Model implements Transformable
 {
     use TransformableTrait;
 
+    public $customColumnsVisibilities = [
+        'name',
+        'short_name',
+        'symbol',
+        'email',
+        'secondary_email',
+        'nip',
+        'account_number',
+        'status',
+        'active',
+        'pending',
+        'created_at',
+        'changeStatus',
+        'phone',
+        'secondary_phone',
+        'notices',
+        'secondary_notices',
+        'firm_type',
+        'production',
+        'delivery',
+        'other',
+    ];
     /**
      * The attributes that are mass assignable.
      *
@@ -39,7 +63,7 @@ class Firm extends Model implements Transformable
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return HasOne
      */
     public function address()
     {
@@ -47,7 +71,7 @@ class Firm extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function warehouses()
     {
@@ -55,7 +79,7 @@ class Firm extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function employees()
     {
@@ -63,41 +87,18 @@ class Firm extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return HasOne
      */
     public function deliveryWarehouse()
     {
         return $this->hasOne(Warehouse::class, 'delivery_warehouse_id');
     }
-	
-	/**
-	 * @return \Illuminate\Database\Eloquent\Relations\HasMany
-	 */
-	public function firmSources()
-	{
-		return $this->hasMany(FirmSource::class);
-	}
-	
-    public $customColumnsVisibilities = [
-        'name',
-        'short_name',
-        'symbol' ,
-        'email' ,
-        'secondary_email' ,
-        'nip' ,
-        'account_number' ,
-        'status' ,
-        'active' ,
-        'pending',
-        'created_at',
-        'changeStatus',
-        'phone',
-        'secondary_phone' ,
-        'notices' ,
-        'secondary_notices' ,
-        'firm_type' ,
-        'production' ,
-        'delivery' ,
-        'other' ,
-    ];
+
+    /**
+     * @return HasMany
+     */
+    public function firmSources()
+    {
+        return $this->hasMany(FirmSource::class);
+    }
 }

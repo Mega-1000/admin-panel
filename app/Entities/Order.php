@@ -23,9 +23,20 @@ use Prettus\Repository\Traits\TransformableTrait;
 /**
  * Class Order.
  *
+ * @property int $id
+ * @property int $warehouse_id
+ * @property int $sello_id
  * @property \Illuminate\Database\Eloquent\Collection<OrderItem>
  *
- * @property mixed $warehouse
+ * @property Carbon $created_at
+ * @property ?Warehouse $warehouse
+ * @property ?Customer $customer
+ * @property ?Carbon $preferred_invoice_date
+ *
+ * @property Collection<OrderPackage> $packages
+ *
+ * @property Collection<OrderItem> $items
+ *
  * @package namespace App\Entities;
  */
 class Order extends Model implements Transformable
@@ -464,7 +475,7 @@ class Order extends Model implements Transformable
     /**
      * @return BelongsTo
      */
-    public function warehouse()
+    public function warehouse(): BelongsTo
     {
         return $this->belongsTo(Warehouse::class);
     }
@@ -472,7 +483,7 @@ class Order extends Model implements Transformable
     /**
      * @return HasMany
      */
-    public function items()
+    public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
     }
@@ -496,7 +507,7 @@ class Order extends Model implements Transformable
     /**
      * @return HasOne
      */
-    public function task()
+    public function task(): HasOne
     {
         return $this->hasOne(OrderTask::class);
     }
@@ -806,10 +817,10 @@ class Order extends Model implements Transformable
         return $this->hasMany(OrderReturn::class);
     }
 
-    public function returnPosition(int $position=null): ?OrderReturn
+    public function returnPosition(int $position = null): ?OrderReturn
     {
         $return = $this->orderReturn->where('product_stock_position_id', $position);
         return $return->first();
     }
-    
+
 }

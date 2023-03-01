@@ -5,6 +5,14 @@ namespace App\Helpers;
 use App\Entities\PackageTemplate;
 use Exception;
 
+/**
+ * @property int $id
+ *
+ * @property string $delivery_courier_name
+ * @property string $service_courier_name
+ * @property string $symbol
+ *
+ */
 class Package
 {
     const CAN_NOT_ADD_MORE = 'Nie można dodać produktu do koszyka';

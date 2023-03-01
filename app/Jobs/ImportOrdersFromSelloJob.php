@@ -22,6 +22,7 @@ use App\Helpers\SelloTransportSumCalculator;
 use App\Helpers\TaskTimeHelper;
 use App\Jobs\Orders\CheckDeliveryAddressSendMailJob;
 use App\Services\AllegroOrderService;
+use App\Services\Label\RemoveLabelService;
 use App\Services\OrderPaymentService;
 use App\Services\ProductService;
 use App\User;
@@ -62,7 +63,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
      */
     public function handle(ProductService $productService, OrderPaymentService $orderPaymentService)
     {
-        if(Auth::user() === null && $this->userId !== null) {
+        if (Auth::user() === null && $this->userId !== null) {
             Auth::loginUsingId($this->userId);
         }
 
@@ -376,15 +377,14 @@ class ImportOrdersFromSelloJob implements ShouldQueue
     {
         $preventionArray = [];
         $order->labels()->attach(Label::FROM_SELLO);
-        dispatch(new RemoveLabelJob($order, [LabelsHelper::FINISH_LOGISTIC_LABEL_ID], $preventionArray, LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID));
-        dispatch(new RemoveLabelJob($order, [LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID], $preventionArray, []));
-        dispatch(new RemoveLabelJob($order, [LabelsHelper::WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID], $preventionArray, []));
+        RemoveLabelService::removeLabels($order, [LabelsHelper::FINISH_LOGISTIC_LABEL_ID], $preventionArray, [LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID], Auth::user()->id);
+        RemoveLabelService::removeLabels($order, [LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID], $preventionArray, [], Auth::user()->id);
+        RemoveLabelService::removeLabels($order, [LabelsHelper::WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID], $preventionArray, [], Auth::user()->id);
         if ($order->warehouse->id == Warehouse::OLAWA_WAREHOUSE_ID) {
-            dispatch(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::WAIT_FOR_WAREHOUSE_TO_ACCEPT]));
+            RemoveLabelService::removeLabels($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::WAIT_FOR_WAREHOUSE_TO_ACCEPT], Auth::user()->id);
             $order->createNewTask(5, $taskPrimalId);
-        } else {
-            dispatch(new RemoveLabelJob($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::SEND_TO_WAREHOUSE_FOR_VALIDATION]));
+            return;
         }
+        RemoveLabelService::removeLabels($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::SEND_TO_WAREHOUSE_FOR_VALIDATION], Auth::user()->id);
     }
-
 }

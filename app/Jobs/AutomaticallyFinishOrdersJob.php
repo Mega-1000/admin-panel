@@ -4,8 +4,8 @@ namespace App\Jobs;
 
 use App\Entities\Label;
 use App\Entities\Order;
-use App\Entities\OrderPackage;
 use App\Enums\PackageStatus;
+use App\Services\Label\RemoveLabelService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Builder;
@@ -38,7 +38,7 @@ class AutomaticallyFinishOrdersJob implements ShouldQueue
      */
     public function handle()
     {
-        if(Auth::user() === null && $this->userId !== null) {
+        if (Auth::user() === null && $this->userId !== null) {
             Auth::loginUsingId($this->userId);
         }
 
@@ -63,7 +63,8 @@ class AutomaticallyFinishOrdersJob implements ShouldQueue
             })
             ->get();
         $orders->map(function ($order) {
-            dispatch(new RemoveLabelJob($order, [Label::BLUE_BATTERY_LABEL_ID], $preventionArray, Label::ORDER_ITEMS_REDEEMED_LABEL));
+            $preventionArray = [];
+            RemoveLabelService::removeLabels($order, [Label::BLUE_BATTERY_LABEL_ID], $preventionArray, [Label::ORDER_ITEMS_REDEEMED_LABEL], Auth::user()->id);
         });
     }
 }

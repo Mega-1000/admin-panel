@@ -2,11 +2,14 @@
 
 namespace App\Jobs\Orders;
 
+use App\Entities\Order;
 use App\Helpers\DateHelper;
 use App\Jobs\AddLabelJob;
 use App\Jobs\Job;
 use App\Jobs\RemoveLabelJob;
 use App\Repositories\OrderLabelSchedulerRepository;
+use App\Services\Label\AddLabelService;
+use App\Services\Label\RemoveLabelService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Auth;
@@ -33,7 +36,7 @@ class TriggerOrderLabelSchedulersJob extends Job implements ShouldQueue
      */
     public function handle(OrderLabelSchedulerRepository $orderLabelSchedulerRepository, DateHelper $dateHelper)
     {
-        if(Auth::user() === null && $this->userId !== null) {
+        if (Auth::user() === null && $this->userId !== null) {
             Auth::loginUsingId($this->userId);
         }
         $this->dateHelper = $dateHelper;
@@ -59,16 +62,18 @@ class TriggerOrderLabelSchedulersJob extends Job implements ShouldQueue
                 $schedule->delete();
                 continue;
             }
-
+            /** @var Order $order */
+            $order = Order::query()->findOrFail($schedule->order_id);
+            $loopPrevention = [];
             if (substr($schedule->action, 0, 6) == "to_add") {
                 $options = [];
                 if ($schedule->type == "C") {
                     $options['added_type'] = $schedule->type;
                 }
-                $preventionArray = [];
-                dispatch(new AddLabelJob($schedule->order_id, [$schedule->label_id_to_handle], $preventionArray, $options));
+
+                AddLabelService::addLabels($order, [$schedule->label_id_to_handle], $loopPrevention, $options, Auth::user()->id);
             } else {
-                dispatch(new RemoveLabelJob($schedule->order_id, [$schedule->label_id_to_handle]));
+                RemoveLabelService::removeLabels($order, [$schedule->label_id_to_handle], $loopPrevention, [], Auth::user()->id);
             }
 
             $schedule->triggered_at = $now;

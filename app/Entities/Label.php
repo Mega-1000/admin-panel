@@ -2,12 +2,25 @@
 
 namespace App\Entities;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
 /**
  * Class Label.
+ *
+ * @property int $id
+ * @property ?string $message
+ * @property string $name
+ * @property bool $manual_label_selection_to_add_after_removal
+ * @property Collection<Label> $labelsToAddAfterAddition
+ * @property Collection<Label> $labelsToRemoveAfterAddition
+ * @property Collection<Label> $labelsToAddAfterRemoval
+ * @property Collection<Label> $labelsToAddAfterTimedLabel
+ * @property Collection<Label> $labelsToRemoveAfterRemoval
  *
  * @package namespace App\Entities;
  */
@@ -107,7 +120,7 @@ class Label extends Model implements Transformable
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function orders()
     {
@@ -115,7 +128,7 @@ class Label extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function labelGroup()
     {
@@ -123,31 +136,31 @@ class Label extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
-    public function labelsToAddAfterAddition()
+    public function labelsToAddAfterAddition(): BelongsToMany
     {
         return $this->belongsToMany(Label::class, 'label_labels_to_add_after_addition', 'main_label_id', 'label_to_add_id');
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
-    public function labelsToAddAfterTimedLabel()
+    public function labelsToAddAfterTimedLabel(): BelongsToMany
     {
         return $this->belongsToMany(Label::class, 'label_labels_to_add_after_timed_label', 'main_label_id', 'label_to_add_id');
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
-    public function labelsToAddAfterRemoval()
+    public function labelsToAddAfterRemoval(): BelongsToMany
     {
         return $this->belongsToMany(Label::class, 'label_labels_to_add_after_removal', 'main_label_id', 'label_to_add_id');
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function labelsToRemoveAfterAddition()
     {
@@ -155,15 +168,15 @@ class Label extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
-    public function labelsToRemoveAfterRemoval()
+    public function labelsToRemoveAfterRemoval(): BelongsToMany
     {
         return $this->belongsToMany(Label::class, 'label_labels_to_remove_after_removal', 'main_label_id', 'label_to_add_id');
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function timedLabelsAfterAddition()
     {

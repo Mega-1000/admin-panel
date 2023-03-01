@@ -3,16 +3,17 @@
 namespace App\Jobs;
 
 use App\Entities\Label;
-use App\Entities\Order;
 use App\Repositories\OrderRepository;
+use App\Services\Label\AddLabelService;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class PreferredInvoiceDateFillJob implements ShouldQueue
 {
@@ -53,11 +54,11 @@ class PreferredInvoiceDateFillJob implements ShouldQueue
                 if ($order->allegro_payment_id !== null || $order->transactions->count() > 0) {
                     Log::notice($order->id);
                     $loopPrevention = [];
-                    dispatch(new AddLabelJob($order, [Label::ISSUE_ADVANCE_INVOICE], $loopPrevention));
+                    AddLabelService::addLabels($order, [Label::ISSUE_ADVANCE_INVOICE], $loopPrevention, [], Auth::user()->id);
                     $order->preferred_invoice_date = new Carbon('last day of last month');
                     $order->save();
                 }
-            } catch (\Throwable $th) {
+            } catch (Throwable $th) {
                 Log::error('Błąd podczas przypisywania preferowanej daty wystawienia faktury: ' . $th->getMessage(), [
                     'orderId' => $order->id,
                 ]);

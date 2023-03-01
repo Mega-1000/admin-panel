@@ -10,7 +10,11 @@ use Prettus\Repository\Traits\TransformableTrait;
 
 /**
  * Class OrderPackage.
+ * @property string $delivery_courier_name
+ * @property string $service_courier_name
+ * @property string $symbol
  *
+ * @property ?ShipmentGroup $shipmentGroup
  * @package namespace App\Entities;
  */
 class OrderPackage extends Model implements Transformable
@@ -109,7 +113,7 @@ class OrderPackage extends Model implements Transformable
         return $this->belongsToMany('App\Entities\Product')->withPivot('quantity');
     }
 
-    public function shipmentGroup()
+    public function shipmentGroup(): BelongsTo
     {
         return $this->belongsTo(ShipmentGroup::class);
     }

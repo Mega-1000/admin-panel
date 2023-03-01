@@ -17,7 +17,6 @@ use App\Helpers\PriceHelper;
 use App\Http\Requests\MasterPaymentCreateRequest;
 use App\Http\Requests\OrderPaymentCreateRequest;
 use App\Http\Requests\OrderPaymentUpdateRequest;
-use App\Jobs\AddLabelJob;
 use App\Jobs\DispatchLabelEventByNameJob;
 use App\Jobs\RemoveLabelJob;
 use App\Repositories\CustomerRepository;
@@ -25,6 +24,8 @@ use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderPaymentRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentRepository;
+use App\Services\Label\AddLabelService;
+use App\Services\Label\RemoveLabelService;
 use App\Services\OrderPaymentLogService;
 use App\Services\OrderPaymentService;
 use Carbon\Carbon;
@@ -324,7 +325,8 @@ class OrdersPaymentsController extends Controller
                                     }
 
                                     OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
-                                    dispatch(new AddLabelJob($connectedOrder->id, [130]));
+                                    $prev = [];
+                                    AddLabelService::addLabels($connectedOrder, [130], $prev, [], Auth::user()->id);
                                     if ($payment != null && $order->status_id != 5) {
                                         $this->orderRepository->update([
                                             'status_id' => 5,
@@ -435,7 +437,8 @@ class OrdersPaymentsController extends Controller
                                     }
 
                                     OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
-                                    dispatch(new AddLabelJob($order->id, [130]));
+                                    $prev = [];
+                                    AddLabelService::addLabels($order, [130], $prev, [], Auth::user()->id);
                                     if ($payment != null && $order->status_id != 5) {
                                         $this->orderRepository->update([
                                             'status_id' => 5,
@@ -458,7 +461,8 @@ class OrdersPaymentsController extends Controller
                 if ((float)$amount < (float)$orderGroupPromisePaymentSum) {
                     foreach ($connectedOrders as $connectedOrder) {
                         if ($connectedOrder->hasPromisePayments() > 0) {
-                            dispatch(new AddLabelJob($connectedOrder->id, [128]));
+                            $prev = [];
+                            AddLabelService::addLabels($order, [128], $prev, [], Auth::user()->id);
                         }
                     }
                 }
@@ -709,8 +713,8 @@ class OrdersPaymentsController extends Controller
                                     false
                                 );
                             }
-
-                            dispatch(new AddLabelJob($connectedOrder->id, [40]));
+                            $prev = [];
+                            AddLabelService::addLabels($order, [40], $prev, [], Auth::user()->id);
                         }
                     }
 
@@ -786,8 +790,8 @@ class OrdersPaymentsController extends Controller
                                 false
                             );
                         }
-
-                        dispatch_now(new RemoveLabelJob($order->id, [40]));
+                        $preventionArray = [];
+                        RemoveLabelService::removeLabels($order, [40], $preventionArray, [], Auth::user()->id);
                         dispatch_now(new DispatchLabelEventByNameJob($order->id, "payment-received"));
                     }
                     return ['orderId' => $orderId, 'amount' => $amount, 'info' => 'Zlecenie zostało pomyślnie utworzone.'];
@@ -942,8 +946,8 @@ class OrdersPaymentsController extends Controller
                                         false
                                     );
                                 }
-
-                                dispatch(new AddLabelJob($connectedOrder->id, [40]));
+                                $prev = [];
+                                AddLabelService::addLabels($connectedOrder, [40], $prev, [], Auth::user()->id);
                             }
                         } else {
                             if (empty($this->repository->findWhere([
@@ -1018,8 +1022,8 @@ class OrdersPaymentsController extends Controller
                                         false
                                     );
                                 }
-
-                                dispatch(new AddLabelJob($connectedOrder->id, [40]));
+                                $prev = [];
+                                AddLabelService::addLabels($connectedOrder, [40], $prev, [], Auth::user()->id);
                             }
                         }
                     }
@@ -1103,7 +1107,8 @@ class OrdersPaymentsController extends Controller
                                 );
                             }
 
-                            dispatch_now(new RemoveLabelJob($connectedOrder->id, [40]));
+                            $preventionArray = [];
+                            RemoveLabelService::removeLabels($connectedOrder, [40], $preventionArray, [], Auth::user()->id);
                         }
                         $amount = $amount - $connectedOrder->getSumOfGrossValues();
                     }
@@ -1181,7 +1186,8 @@ class OrdersPaymentsController extends Controller
                                 false
                             );
                         }
-                        dispatch_now(new RemoveLabelJob($order->id, [40]));
+                        $preventionArray = [];
+                        RemoveLabelService::removeLabels($order, [40], $preventionArray, [], Auth::user()->id);
                     }
                     $amount = $amount - $order->getSumOfGrossValues();
                     return ['orderId' => $orderId, 'amount' => $amount, 'info' => 'Zlecenie zostało pomyślnie utworzone.'];
@@ -1270,7 +1276,8 @@ class OrdersPaymentsController extends Controller
                                 );
                             }
 
-                            dispatch_now(new RemoveLabelJob($connectedOrder->id, [40]));
+                            $preventionArray = [];
+                            RemoveLabelService::removeLabels($connectedOrder, [40], $preventionArray, [], Auth::user()->id);
                         }
                     }
 
@@ -1345,8 +1352,8 @@ class OrdersPaymentsController extends Controller
                                 false
                             );
                         }
-
-                        dispatch_now(new RemoveLabelJob($order->id, [40]));
+                        $preventionArray = [];
+                        RemoveLabelService::removeLabels($order, [40], $preventionArray, [], Auth::user()->id);
                     }
                     return ['orderId' => $orderId, 'amount' => $amount, 'info' => 'Zlecenie zostało pomyślnie utworzone.'];
                 }
@@ -1426,8 +1433,8 @@ class OrdersPaymentsController extends Controller
                                     false
                                 );
                             }
-
-                            dispatch_now(new RemoveLabelJob($connectedOrder->id, [40]));
+                            $preventionArray = [];
+                            RemoveLabelService::removeLabels($connectedOrder, [40], $preventionArray, [], Auth::user()->id);
                         }
                         $amount = $amount - $connectedOrder->getSumOfGrossValues();
                     }
@@ -1506,7 +1513,9 @@ class OrdersPaymentsController extends Controller
                                 false
                             );
                         }
-                        dispatch_now(new RemoveLabelJob($order->id, [40]));
+
+                        $preventionArray = [];
+                        RemoveLabelService::removeLabels($order, [40], $preventionArray, [], Auth::user()->id);
                     }
                     $amount = $amount - $order->getSumOfGrossValues();
                     return ['orderId' => $orderId, 'amount' => $amount, 'info' => 'Zlecenie zostało pomyślnie utworzone.'];
@@ -1515,7 +1524,10 @@ class OrdersPaymentsController extends Controller
         } else {
             if ($order->payments->count() == 0) {
                 dispatch_now(new DispatchLabelEventByNameJob($orderId, "payment-received"));
-                dispatch_now(new RemoveLabelJob($orderId, [44]));
+
+                $order = Order::query()->find($orderId);
+                $preventionArray = [];
+                RemoveLabelService::removeLabels($order, [44], $preventionArray, [], Auth::user()->id);
             }
             if (empty($this->repository->findWhere([
                 'amount' => $amount,
@@ -1633,7 +1645,8 @@ class OrdersPaymentsController extends Controller
         }
 
         if ($orderPayment->promise == '1' && $promise == '') {
-            dispatch(new AddLabelJob($orderPayment->order_id, [5]));
+            $prev = [];
+            AddLabelService::addLabels($orderPayment, [5], $prev, [], Auth::user()->id);
         }
 
         $payment = $this->repository->update([
@@ -1923,11 +1936,13 @@ class OrdersPaymentsController extends Controller
 
         if ($payments->sum('surplus_amount') == 0) {
             foreach ($customer->orders as $order) {
-                dispatch_now(new RemoveLabelJob($order->id, [Label::ORDER_SURPLUS]));
+                $preventionArray = [];
+                RemoveLabelService::removeLabels($order, [Label::ORDER_SURPLUS], $preventionArray, [], Auth::user()->id);
             }
         } else {
             foreach ($customer->orders as $order) {
-                dispatch_now(new RemoveLabelJob($order->id, [Label::ORDER_SURPLUS]));
+                $preventionArray = [];
+                RemoveLabelService::removeLabels($order, [Label::ORDER_SURPLUS], $preventionArray, [], Auth::user()->id);
             }
         }
 

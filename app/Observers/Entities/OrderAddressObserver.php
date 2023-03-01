@@ -8,8 +8,11 @@ use App\Helpers\LabelsHelper;
 use App\Jobs\AddLabelJob;
 use App\Jobs\DispatchLabelEventByNameJob;
 use App\Jobs\RemoveLabelJob;
+use App\Services\Label\AddLabelService;
+use App\Services\Label\RemoveLabelService;
 use App\Services\OrderAddressService;
 use App\Services\OrderPaymentService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
@@ -30,20 +33,6 @@ class OrderAddressObserver
         $this->removingMissingDeliveryAddressLabelHandler($orderAddress);
     }
 
-    public function updated(OrderAddress $orderAddress)
-    {
-        $this->removingMissingDeliveryAddressLabelHandler($orderAddress);
-        $this->addLabelIfManualCheckIsRequired($orderAddress);
-
-	    if ($orderAddress->wasChanged() && $orderAddress->order->proforma_filename && Storage::disk('local')->exists($orderAddress->order->proformStoragePath)) {
-		    Storage::disk('local')->delete($orderAddress->order->proformStoragePath);
-		    $orderAddress->order->proforma_filename = '';
-		    $orderAddress->order->save();
-	    }
-
-        $this->addHistoryLog($orderAddress);
-    }
-
     protected function removingMissingDeliveryAddressLabelHandler(OrderAddress $orderAddress)
     {
         $hasMissingDeliveryAddressLabel = $orderAddress->order->labels()->where('label_id', 75)->get();    //brak danych do dostawy
@@ -56,44 +45,60 @@ class OrderAddressObserver
         }
     }
 
-    protected function addLabelIfManualCheckIsRequired(OrderAddress $orderAddress): void
+    public function updated(OrderAddress $orderAddress)
     {
-        if (app(OrderPaymentService::class)->hasAnyPayment($orderAddress->order) &&
-            !(new OrderAddressService())->addressIsValid($orderAddress)) {
-            dispatch(new AddLabelJob($orderAddress->order->id, [LabelsHelper::INVALID_ORDER_ADDRESS]));
-        } else {
-            dispatch(new RemoveLabelJob($orderAddress->order->id, [LabelsHelper::INVALID_ORDER_ADDRESS]));
+        $this->removingMissingDeliveryAddressLabelHandler($orderAddress);
+        $this->addLabelIfManualCheckIsRequired($orderAddress);
+
+        if ($orderAddress->wasChanged() && $orderAddress->order->proforma_filename && Storage::disk('local')->exists($orderAddress->order->proformStoragePath)) {
+            Storage::disk('local')->delete($orderAddress->order->proformStoragePath);
+            $orderAddress->order->proforma_filename = '';
+            $orderAddress->order->save();
         }
+
+        $this->addHistoryLog($orderAddress);
     }
 
-    protected function addHistoryLog(OrderAddress $orderAddress): void {
-	    $type = 'api';
-	    if (Route::currentRouteName() != 'api.orders.update-order-delivery-and-invoice-addresses') {
-	    	return;
-	    }
+    protected function addLabelIfManualCheckIsRequired(OrderAddress $orderAddress): void
+    {
+        $loopPresentationArray = [];
+        if (app(OrderPaymentService::class)->hasAnyPayment($orderAddress->order) &&
+            !(new OrderAddressService())->addressIsValid($orderAddress)) {
+            AddLabelService::addLabels($orderAddress->order, [LabelsHelper::INVALID_ORDER_ADDRESS], $loopPresentationArray, [], Auth::user()->id);
+            return;
+        }
+        RemoveLabelService::removeLabels($orderAddress->order, [LabelsHelper::INVALID_ORDER_ADDRESS], $loopPresentationArray, [], Auth::user()->id);
+    }
 
-	    $original = $orderAddress->getOriginal();
+    protected function addHistoryLog(OrderAddress $orderAddress): void
+    {
+        $type = 'api';
+        if (Route::currentRouteName() != 'api.orders.update-order-delivery-and-invoice-addresses') {
+            return;
+        }
 
-	    $changes = $orderAddress->getChanges();
+        $original = $orderAddress->getOriginal();
 
-	    $original = array_intersect_key($original, $changes);
-	    $changeLog = [];
+        $changes = $orderAddress->getChanges();
 
-	    foreach ($changes as $field => $new_value) {
-		    if ($field == 'updated_at' || $new_value == $original[$field]) {
-			    continue;
-		    }
+        $original = array_intersect_key($original, $changes);
+        $changeLog = [];
 
-		    $changeLog[] = __("customers.table.{$field}") . ": z `{$original[$field]}` na `{$new_value}`";
-	    }
+        foreach ($changes as $field => $new_value) {
+            if ($field == 'updated_at' || $new_value == $original[$field]) {
+                continue;
+            }
 
-	    if ($changeLog) {
-		    $messageTitle = sprintf(__('order_addresses.message.title.' . $type),
-			    __('customers.form.buttons.' . strtolower($orderAddress->type))
-		    );
+            $changeLog[] = __("customers.table.{$field}") . ": z `{$original[$field]}` na `{$new_value}`";
+        }
 
-		    $orderAddress->order->labels_log .= Order::formatMessage(null, $messageTitle . implode(', ', $changeLog));
-		    $orderAddress->order->save();
-	    }
-	}
+        if ($changeLog) {
+            $messageTitle = sprintf(__('order_addresses.message.title.' . $type),
+                __('customers.form.buttons.' . strtolower($orderAddress->type))
+            );
+
+            $orderAddress->order->labels_log .= Order::formatMessage(null, $messageTitle . implode(', ', $changeLog));
+            $orderAddress->order->save();
+        }
+    }
 }

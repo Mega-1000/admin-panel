@@ -9,6 +9,9 @@ use App\Entities\Order;
 use App\Entities\SelTransaction;
 use App\Http\Controllers\OrdersPaymentsController;
 use App\Jobs\RemoveLabelJob;
+use App\Services\Label\RemoveLabelService;
+use Exception;
+use Illuminate\Support\Facades\Auth;
 
 class AllegroPaymentImporter
 {
@@ -25,7 +28,7 @@ class AllegroPaymentImporter
     public function import()
     {
         if (($handle = fopen($this->filename, "r")) === FALSE) {
-            throw new \Exception('Nie można otworzyć pliku');
+            throw new Exception('Nie można otworzyć pliku');
         }
         $errors = [];
         $firstline = true;
@@ -36,7 +39,7 @@ class AllegroPaymentImporter
             }
             try {
                 $this->payForOrder($line);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 switch ($e->getCode()) {
                     case 1:
                     case 2:
@@ -56,7 +59,7 @@ class AllegroPaymentImporter
 
     /**
      * @param array|null $line
-     * @throws \Exception
+     * @throws Exception
      */
     private function payForOrder(?array $line): void
     {
@@ -70,11 +73,11 @@ class AllegroPaymentImporter
             if ($order) {
                 return;
             }
-            throw new \Exception(json_encode(['id' => $id, 'amount' => $amount]), 1);
+            throw new Exception(json_encode(['id' => $id, 'amount' => $amount]), 1);
         }
         $order = $transaction->order;
         if (empty($order)) {
-            throw new \Exception(json_encode(['id' => $id, 'amount' => $amount]), 2);
+            throw new Exception(json_encode(['id' => $id, 'amount' => $amount]), 2);
         }
         $payment = $order->promisePayments();
         $found = $payment->filter(function ($item) use ($amount) {
@@ -84,13 +87,14 @@ class AllegroPaymentImporter
         if (empty($found)) {
             $isPaid = $order->bookedPayments()->where('amount', $amount)->count() > 0;
             if ($isPaid) {
-                throw new \Exception(json_encode(['id' => $id, 'amount' => $amount]), 3);
+                throw new Exception(json_encode(['id' => $id, 'amount' => $amount]), 3);
             }
-            throw new \Exception(json_encode(['id' => $id, 'amount' => $amount]), 4);
+            throw new Exception(json_encode(['id' => $id, 'amount' => $amount]), 4);
         }
         $found->promise = 0;
         $found->save();
-        dispatch_now(new RemoveLabelJob($order->id, [Label::IS_NOT_PAID]));
+        $prev = [];
+        RemoveLabelService::removeLabels($order, [Label::IS_NOT_PAID], $prev, [], Auth::user()->id);
         OrdersPaymentsController::dispatchLabelsForPaymentAmount($found);
     }
 }

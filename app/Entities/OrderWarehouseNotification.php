@@ -9,6 +9,8 @@ use Prettus\Repository\Traits\TransformableTrait;
 /**
  * Class OrderShipmentNotification.
  *
+ * @property int $id
+ *
  * @package namespace App\Entities;
  */
 class OrderWarehouseNotification extends Model implements Transformable

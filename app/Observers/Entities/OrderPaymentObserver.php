@@ -4,7 +4,9 @@ namespace App\Observers\Entities;
 
 use App\Entities\OrderPayment;
 use App\Jobs\AddLabelJob;
+use App\Services\Label\AddLabelService;
 use App\Services\OrderAddressService;
+use Illuminate\Support\Facades\Auth;
 
 class OrderPaymentObserver
 {
@@ -17,7 +19,8 @@ class OrderPaymentObserver
     {
         foreach ($orderPayment->order->addresses as $orderAddress) {
             if (!(new OrderAddressService())->addressIsValid($orderAddress)) {
-                dispatch(new AddLabelJob($orderAddress->order->id, [184]));
+                $loopPresentationArray = [];
+                AddLabelService::addLabels($orderPayment->order, [184], $loopPresentationArray, [], Auth::user()->id);
             }
         }
     }

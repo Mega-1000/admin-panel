@@ -27,7 +27,6 @@ use App\Http\Requests\Api\Orders\DeclineProformRequest;
 use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
 use App\Http\Requests\Api\Orders\StoreOrderRequest;
 use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
-use App\Jobs\AddLabelJob;
 use App\Mail\SendOfferToCustomerMail;
 use App\Repositories\CustomerAddressRepository;
 use App\Repositories\CustomerRepository;
@@ -40,6 +39,7 @@ use App\Repositories\OrderRepository;
 use App\Repositories\ProductPackingRepository;
 use App\Repositories\ProductPriceRepository;
 use App\Repositories\ProductRepository;
+use App\Services\Label\AddLabelService;
 use App\Services\OrderPackageService;
 use App\Services\ProductService;
 use Carbon\Carbon;
@@ -791,8 +791,8 @@ class OrdersController extends Controller
 
         $order->labels_log .= Order::formatMessage(Auth::user(), $request->description);
         $order->save();
-
-        dispatch(new AddLabelJob($order->id, [Label::FINAL_CONFIRMATION_DECLINED, Label::MASTER_MARK]));
+        $prev = [];
+        AddLabelService::addLabels($order, [Label::FINAL_CONFIRMATION_DECLINED, Label::MASTER_MARK], $prev, [], Auth::user()->id);
 
         return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
     }
@@ -803,7 +803,8 @@ class OrdersController extends Controller
             return [];
         }
 
-        dispatch(new AddLabelJob($order->id, [116, 137]));
+        $prev = [];
+        AddLabelService::addLabels($order, [116, 137], $prev, [], Auth::user()->id);
 
         return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
     }
@@ -814,13 +815,14 @@ class OrdersController extends Controller
             return [];
         }
 
-        switch ($request->invoice_day) {
-            case 'standard':
-                dispatch(new AddLabelJob($order->id, [Label::ORDER_RECEIVED_INVOICE_STANDARD]));
-                break;
-            case 'today':
-                dispatch(new AddLabelJob($order->id, [Label::ORDER_RECEIVED_INVOICE_TODAY]));
-                break;
+        $labelId = match ($request->invoice_day) {
+            'standard' => Label::ORDER_RECEIVED_INVOICE_STANDARD,
+            'today' => Label::ORDER_RECEIVED_INVOICE_TODAY,
+            default => 0,
+        };
+        if ($labelId > 0) {
+            $prev = [];
+            AddLabelService::addLabels($order, [$labelId], $prev, [], Auth::user()->id);
         }
 
         return response()->json(__('orders.message.update'), 200, [], JSON_UNESCAPED_UNICODE);
@@ -837,12 +839,14 @@ class OrdersController extends Controller
     public function uploadProofOfPayment(Request $request)
     {
         $orderId = $request->id;
-        $order = Order::find($orderId);
+        /** @var Order $order */
+        $order = Order::query()->find($orderId);
         if (!$order) return response(['errorMessage' => 'Nie można znaleźć zamówienia'], 400);
         if ($order->customer_id != $request->user()->id) return response(['errorMessage' => 'Nie twoje zamówienie'], 400);
         $ordersController = App::make(OrdersControllerApp::class);
         $ordersController->addFile($request, $orderId);
-        dispatch(new AddLabelJob($orderId, [Label::PROOF_OF_PAYMENT_UPLOADED]));
+        $prev = [];
+        AddLabelService::addLabels($order, [Label::PROOF_OF_PAYMENT_UPLOADED], $prev, [], Auth::user()->id);
         return response('success', 200);
     }
 

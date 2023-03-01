@@ -7,13 +7,17 @@ use App\Entities\OrderPayment;
 use App\Entities\Transaction;
 use App\Http\Controllers\OrdersPaymentsController;
 use App\Repositories\TransactionRepository;
+use App\Services\Label\AddLabelService;
+use DateTime;
+use Exception;
 use Illuminate\Bus\Queueable;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -109,12 +113,117 @@ class ImportAllegroPayInJob implements ShouldQueue
                 } else {
                     fputcsv($file, $payIn);
                 }
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 Log::notice('Błąd podczas importu: ' . $exception->getMessage(), ['line' => __LINE__]);
             }
         }
         fclose($file);
         Storage::disk('local')->put('public/transaction/TransactionWithoutOrders' . date('Y-m-d') . '.csv', file_get_contents($fileName));
+    }
+
+    /**
+     * Save new transaction
+     *
+     * @param Order $order Order object
+     * @param array $data Additional data
+     * @return Transaction
+     *
+     * @throws Exception
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    private function saveTransaction(Order $order, array $data): ?Transaction
+    {
+        $existingTransaction = $this->transactionRepository->select()->where('payment_id', '=', 'w-' . $data['identyfikator'])->first();
+        if ($existingTransaction !== null) {
+            if ($data['operacja'] == 'zwrot') {
+                $paymentsToReturn = $order->payments()->where('amount', '=', $data['kwota'])->whereNull('deleted_at')->first();
+                if (!empty($paymentsToReturn)) {
+                    $paymentsToReturn->delete();
+                }
+                $this->saveRefund($order, $existingTransaction, (float)$data['kwota']);
+            } else {
+                return null;
+            }
+        }
+        return $this->transactionRepository->create([
+            'customer_id' => $order->customer_id,
+            'posted_in_system_date' => new DateTime(),
+            'posted_in_bank_date' => new DateTime($data['data']),
+            'payment_id' => (($data['operacja'] === 'zwrot') ? 'z' : 'w-') . $data['identyfikator'],
+            'kind_of_operation' => $data['operacja'],
+            'order_id' => $order->id,
+            'operator' => $data['operator'],
+            'operation_value' => preg_replace('/[^.\d]/', '', $data['kwota']),
+            'balance' => (float)$this->getCustomerBalance($order->customer_id) + (float)$data['kwota'],
+            'accounting_notes' => '',
+            'transaction_notes' => '',
+            'company_name' => Transaction::NEW_COMPANY_NAME_SYMBOL
+        ]);
+    }
+
+    /**
+     * Tworzy transakcje przeksięgowania
+     *
+     * @param Order $order
+     * @param Transaction $transaction
+     * @return Transaction
+     *
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    private function saveRefund(Order $order, Transaction $transaction, float $amount): Transaction
+    {
+        return $this->transactionRepository->create([
+            'customer_id' => $order->customer_id,
+            'posted_in_system_date' => new DateTime(),
+            'payment_id' => str_replace('w-', 'z-', $transaction->payment_id) . '-' . $transaction->posted_in_system_date,
+            'kind_of_operation' => 'przeksięgowanie zwrotne',
+            'order_id' => $order->id,
+            'operator' => 'SYSTEM',
+            'operation_value' => abs($amount),
+            'balance' => (float)$this->getCustomerBalance($order->customer_id) + abs($amount),
+            'accounting_notes' => '',
+            'transaction_notes' => '',
+            'company_name' => Transaction::NEW_COMPANY_NAME_SYMBOL,
+        ]);
+    }
+
+    /**
+     * Calculate balance
+     *
+     * @param integer $customerId Customer id
+     * @return float
+     *
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    private function getCustomerBalance(int $customerId): float
+    {
+        if (!empty($lastCustomerTransaction = $this->transactionRepository->findWhere([
+            ['customer_id', '=', $customerId]
+        ])->last())) {
+            return $lastCustomerTransaction->balance;
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Settle promise.
+     *
+     * @param Order $order Order object.
+     * @param array $payIn Pay in row.
+     *
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    private function settlePromisePayments(Order $order, array $payIn): void
+    {
+        foreach ($order->payments()->where('promise', '=', '1')->whereNull('deleted_at')->get() as $payment) {
+            if ($payIn['kwota'] === (float)$payment->amount) {
+                $payment->delete();
+            } else {
+                $preventionArray = [];
+                AddLabelService::addLabels($order, [128], $preventionArray, [], Auth::user()->id);
+            }
+        }
     }
 
     /**
@@ -191,84 +300,6 @@ class ImportAllegroPayInJob implements ShouldQueue
     }
 
     /**
-     * Settle promise.
-     *
-     * @param Order $order Order object.
-     * @param array $payIn Pay in row.
-     *
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
-     */
-    private function settlePromisePayments(Order $order, array $payIn): void
-    {
-        foreach ($order->payments()->where('promise', '=', '1')->whereNull('deleted_at')->get() as $payment) {
-            if ($payIn['kwota'] === (float)$payment->amount) {
-                $payment->delete();
-            } else {
-                dispatch(new AddLabelJob($order->id, [128]));
-            }
-        }
-    }
-
-    /**
-     * Save new transaction
-     *
-     * @param Order $order Order object
-     * @param array $data Additional data
-     * @return Transaction
-     *
-     * @throws \Exception
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
-     */
-    private function saveTransaction(Order $order, array $data): ?Transaction
-    {
-        $existingTransaction = $this->transactionRepository->select()->where('payment_id', '=', 'w-' . $data['identyfikator'])->first();
-        if ($existingTransaction !== null) {
-            if ($data['operacja'] == 'zwrot') {
-                $paymentsToReturn = $order->payments()->where('amount', '=', $data['kwota'])->whereNull('deleted_at')->first();
-                if (!empty($paymentsToReturn)) {
-                    $paymentsToReturn->delete();
-                }
-                $this->saveRefund($order, $existingTransaction, (float)$data['kwota']);
-            } else {
-                return null;
-            }
-        }
-        return $this->transactionRepository->create([
-            'customer_id' => $order->customer_id,
-            'posted_in_system_date' => new \DateTime(),
-            'posted_in_bank_date' => new \DateTime($data['data']),
-            'payment_id' => (($data['operacja'] === 'zwrot') ? 'z' : 'w-') . $data['identyfikator'],
-            'kind_of_operation' => $data['operacja'],
-            'order_id' => $order->id,
-            'operator' => $data['operator'],
-            'operation_value' => preg_replace('/[^.\d]/', '', $data['kwota']),
-            'balance' => (float)$this->getCustomerBalance($order->customer_id) + (float)$data['kwota'],
-            'accounting_notes' => '',
-            'transaction_notes' => '',
-            'company_name' => Transaction::NEW_COMPANY_NAME_SYMBOL
-        ]);
-    }
-
-    /**
-     * Calculate balance
-     *
-     * @param integer $customerId Customer id
-     * @return float
-     *
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
-     */
-    private function getCustomerBalance(int $customerId): float
-    {
-        if (!empty($lastCustomerTransaction = $this->transactionRepository->findWhere([
-            ['customer_id', '=', $customerId]
-        ])->last())) {
-            return $lastCustomerTransaction->balance;
-        } else {
-            return 0;
-        }
-    }
-
-    /**
      * Tworzy transakcje przeksięgowania
      *
      * @param Order $order
@@ -281,40 +312,13 @@ class ImportAllegroPayInJob implements ShouldQueue
     {
         return $this->transactionRepository->create([
             'customer_id' => $order->customer_id,
-            'posted_in_system_date' => new \DateTime(),
+            'posted_in_system_date' => new DateTime(),
             'payment_id' => str_replace('w-', 'p-', $transaction->payment_id) . '-' . $transaction->posted_in_system_date->format('Y-m-d H:i:s'),
             'kind_of_operation' => 'przeksięgowanie',
             'order_id' => $order->id,
             'operator' => 'SYSTEM',
             'operation_value' => -$amount,
             'balance' => (float)$this->getCustomerBalance($order->customer_id) - $amount,
-            'accounting_notes' => '',
-            'transaction_notes' => '',
-            'company_name' => Transaction::NEW_COMPANY_NAME_SYMBOL,
-        ]);
-    }
-
-
-    /**
-     * Tworzy transakcje przeksięgowania
-     *
-     * @param Order $order
-     * @param Transaction $transaction
-     * @return Transaction
-     *
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
-     */
-    private function saveRefund(Order $order, Transaction $transaction, float $amount): Transaction
-    {
-        return $this->transactionRepository->create([
-            'customer_id' => $order->customer_id,
-            'posted_in_system_date' => new \DateTime(),
-            'payment_id' => str_replace('w-', 'z-', $transaction->payment_id) . '-' . $transaction->posted_in_system_date,
-            'kind_of_operation' => 'przeksięgowanie zwrotne',
-            'order_id' => $order->id,
-            'operator' => 'SYSTEM',
-            'operation_value' => abs($amount),
-            'balance' => (float)$this->getCustomerBalance($order->customer_id) + abs($amount),
             'accounting_notes' => '',
             'transaction_notes' => '',
             'company_name' => Transaction::NEW_COMPANY_NAME_SYMBOL,

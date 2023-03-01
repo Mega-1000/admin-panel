@@ -10,6 +10,9 @@ use Prettus\Repository\Traits\TransformableTrait;
 /**
  * Class OrderItem.
  *
+ * @property Product $product
+ * @property int $quantity
+ * @property ProductStockPacket $packet
  * @package namespace App\Entities;
  */
 class OrderItem extends Model implements Transformable
@@ -52,7 +55,7 @@ class OrderItem extends Model implements Transformable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function order()
+    public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
@@ -60,7 +63,7 @@ class OrderItem extends Model implements Transformable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function product()
+    public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class)->withTrashed();
     }
