@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Entities\Order;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -12,7 +13,7 @@ class DispatchLabelEventByNameJob extends Job implements ShouldQueue
 {
     use IsMonitored;
 
-    protected $order;
+    protected Order $order;
     protected $eventName;
     protected ?int $userId;
 
@@ -21,7 +22,7 @@ class DispatchLabelEventByNameJob extends Job implements ShouldQueue
      * @param $order
      * @param $eventName
      */
-    public function __construct($order, $eventName)
+    public function __construct(Order $order, $eventName)
     {
         $this->userId = Auth::user()?->id;
         $this->order = $order;

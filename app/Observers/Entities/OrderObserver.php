@@ -46,7 +46,7 @@ class OrderObserver
         }
 
         if (!empty($order->getDirty()['employee_id'])) {
-            dispatch(new DispatchLabelEventByNameJob($order->id, "consultant-changed"));
+            dispatch(new DispatchLabelEventByNameJob($order, "consultant-changed"));
         }
 
         if (!empty($order->getDirty()['shipment_date'])) {
@@ -78,9 +78,9 @@ class OrderObserver
     {
         if (count($order->payments)) {
             if ($order->isPaymentRegulated()) {
-                dispatch_now(new DispatchLabelEventByNameJob($order->id, "payment-equal-to-order-value"));
+                dispatch_now(new DispatchLabelEventByNameJob($order, "payment-equal-to-order-value"));
             } else {
-                dispatch_now(new DispatchLabelEventByNameJob($order->id, "required-payment-before-unloading"));
+                dispatch_now(new DispatchLabelEventByNameJob($order, "required-payment-before-unloading"));
             }
         }
 

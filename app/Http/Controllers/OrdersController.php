@@ -1684,6 +1684,7 @@ class OrdersController extends Controller
      * @param Request $request
      * @param $orderId
      * @param $labelId
+     * @return JsonResponse
      */
     public function swapLabelsAfterLabelRemoval(Request $request, $orderId, $labelId)
     {
@@ -1702,7 +1703,7 @@ class OrdersController extends Controller
             return new JsonResponse(['status' => false, 'message' => 'warehouse not found'], 400);
         }
 
-        $time = $request->input('time');
+        $time = $request->input('time', null) !== null ? Carbon::parse($request->input('time')) : null;
         RemoveLabelService::removeLabels($order, [$labelId], $preventionArray, $labelsToAddAfterRemoval, Auth::user()->id, $time);
         return new JsonResponse(['status' => true, 'message' => 'Label remove started'], 200);
     }
@@ -1740,9 +1741,9 @@ class OrdersController extends Controller
         }
 
         if ($request->input('time') !== null) {
-            $time = $request->input('time');
+            $time = Carbon::parse($request->input('time'));
         } else {
-            $time = false;
+            $time = null;
         }
         $user = Auth::user();
         $label = Label::find($labelId);
