@@ -2,19 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\PostalCodeLatLon;
 use App\Entities\Warehouse;
+use App\Entities\WarehouseAddress;
 use App\Entities\WarehouseProperty;
 use App\Http\Requests\WarehouseCreateRequest;
 use App\Http\Requests\WarehouseUpdateRequest;
 use App\Repositories\WarehouseAddressRepository;
 use App\Repositories\WarehousePropertyRepository;
 use App\Repositories\WarehouseRepository;
-use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Support\Facades\Input;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\DB;
-use App\Entities\PostalCodeLatLon;
-use App\Entities\WarehouseAddress;
+use Illuminate\Support\Facades\Input;
+use Illuminate\View\View;
+use Yajra\DataTables\Facades\DataTables;
+
 /**
  * Class WarehousesController.
  *
@@ -53,7 +57,7 @@ class WarehousesController extends Controller
 
     /**
      * @param $id
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function create($id)
     {
@@ -63,7 +67,7 @@ class WarehousesController extends Controller
     /**
      * @param WarehouseCreateRequest $request
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function store(WarehouseCreateRequest $request, $id)
     {
@@ -74,7 +78,7 @@ class WarehousesController extends Controller
             'symbol' => $request->input('symbol'),
             'status' => $request->input('status'),
             'radius' => $request->input('radius'),
-            'warehouse_email'  => $request->input('warehouse-email')
+            'warehouse_email' => $request->input('warehouse-email')
         ]);
 
         $warehouseAddress = new WarehouseAddress;
@@ -83,7 +87,7 @@ class WarehousesController extends Controller
         $warehouseAddress->warehouse_number = $request->input('warehouse_number');
         $warehouseAddress->postal_code = $request->input('postal_code');
         $warehouseAddress->city = $request->input('city');
-        if(!empty($postal)) {
+        if (!empty($postal)) {
             $warehouseAddress->latitude = $postal->latitude;
             $warehouseAddress->longitude = $postal->longitude;
         }
@@ -101,7 +105,7 @@ class WarehousesController extends Controller
             'email' => $request->input('email'),
         ]);
 
-        return redirect()->route('firms.edit', ['firm_id' => $id])->with([
+        return redirect()->route('firms.edit', ['firm' => $id])->with([
             'message' => __('warehouses.message.store'),
             'alert-type' => 'success'
         ]);
@@ -110,14 +114,14 @@ class WarehousesController extends Controller
 
     /**
      * @param $id
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function edit($id)
     {
         $warehouse = $this->repository->find($id);
         $warehouseAddress = $warehouse->address;
         $warehouseProperty = $warehouse->property;
-        if(!empty($warehouseProperty)) {
+        if (!empty($warehouseProperty)) {
             $openDays = json_decode($warehouseProperty->open_days, true);
         }
 
@@ -128,7 +132,7 @@ class WarehousesController extends Controller
     /**
      * @param WarehouseUpdateRequest $request
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function update(WarehouseUpdateRequest $request, $id)
     {
@@ -142,14 +146,14 @@ class WarehousesController extends Controller
         $this->repository->update($request->all(), $warehouse->id);
         $this->repository->update(['warehouse_email' => $request->input('warehouse-email')], $warehouse->id);
 
-        $warehouseAddress =  WarehouseAddress::find($id);
-        if(!empty($warehouseAddress)) {
+        $warehouseAddress = WarehouseAddress::find($id);
+        if (!empty($warehouseAddress)) {
             $warehouseAddress->warehouse_id = $warehouse->id;
             $warehouseAddress->address = $request->input('address');
             $warehouseAddress->warehouse_number = $request->input('warehouse_number');
             $warehouseAddress->postal_code = $request->input('postal_code');
             $warehouseAddress->city = $request->input('city');
-            if(!empty($postal)) {
+            if (!empty($postal)) {
                 $warehouseAddress->latitude = $postal->latitude ?: null;
                 $warehouseAddress->longitude = $postal->longitude ?: null;
             }
@@ -161,14 +165,14 @@ class WarehousesController extends Controller
             $warehouseAddress->warehouse_number = '';
             $warehouseAddress->postal_code = '';
             $warehouseAddress->city = $request->input('city');
-            if(!empty($postal)) {
+            if (!empty($postal)) {
                 $warehouseAddress->latitude = $postal->latitude ?: null;
                 $warehouseAddress->longitude = $postal->longitude ?: null;
             }
             $warehouseAddress->save();
         }
 
-        if(!empty($warehouse->property)) {
+        if (!empty($warehouse->property)) {
             $this->warehousePropertyRepository->update([
                 'firstname' => $request->input('firstname'),
                 'lastname' => $request->input('lastname'),
@@ -198,9 +202,9 @@ class WarehousesController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int $id
+     * @param int $id
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy($id)
     {
@@ -213,7 +217,7 @@ class WarehousesController extends Controller
     }
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function datatable($id)
     {
@@ -234,7 +238,7 @@ class WarehousesController extends Controller
 
     /**
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function changeStatus($id)
     {

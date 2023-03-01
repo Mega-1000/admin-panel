@@ -86,7 +86,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('firms/datatable', 'FirmsController@datatable')->name('firms.datatable');
         Route::get('firms/create', 'FirmsController@create')->name('firms.create');
         Route::post('firms/store', 'FirmsController@store')->name('firms.store');
-        Route::get('firms/{id}/edit', 'FirmsController@edit')->name('firms.edit');
+        Route::get('firms/{firm}/edit', 'FirmsController@edit')->name('firms.edit');
         Route::put('firms/{id}/update', [
             'uses' => 'FirmsController@update',
         ])->name('firms.update');
@@ -321,7 +321,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('orderReturn/{id}/store', ['uses' => 'OrderReturnController@store'])->name('order_return.store');
         Route::get('orderReturn/{id}/print', 'OrderReturnController@print')->name('order_return.print');
         Route::get('orderReturn/{id}/image', 'OrderReturnController@getImgFullScreen')->name('order_return.image');
-        
+
         Route::post('orders/splitOrders', 'OrdersController@splitOrders');
         Route::get('orders/{orderIdToGet}/data/{orderIdToSend}/move',
             'OrdersController@moveData')->name('orders.moveData');

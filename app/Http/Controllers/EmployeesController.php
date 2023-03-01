@@ -2,14 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\Employee;
+use App\Entities\EmployeeRole;
+use App\Entities\PostalCodeLatLon;
+use App\Entities\Warehouse;
 use App\Http\Requests\EmployeeCreateRequest;
 use App\Http\Requests\EmployeeUpdateRequest;
 use App\Repositories\EmployeeRepository;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 use Yajra\DataTables\Facades\DataTables;
-use App\Entities\EmployeeRole;
-use App\Entities\Warehouse;
-use App\Entities\Employee;
-use App\Entities\PostalCodeLatLon;
 
 /**
  * Class EmployeesController.
@@ -35,33 +39,33 @@ class EmployeesController extends Controller
 
     /**
      * @param $id
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function create($id)
     {
         $roles = EmployeeRole::all();
         $warehouses = Warehouse::where('firm_id', $id)->get();
-        return view('firms.employees.create', compact('id'))->withRoles($roles)->withWarehouses($warehouses); 
+        return view('firms.employees.create', compact('id'))->withRoles($roles)->withWarehouses($warehouses);
     }
 
     /**
      * @param EmployeeCreateRequest $request
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function store(EmployeeCreateRequest $request, $id)
     {
         $this->validate($request, array(
             'radius' => 'integer|required'
         ));
-        $postal = PostalCodeLatLon::where('postal_code', $request->input('postal_code'))->first(); 
+        $postal = PostalCodeLatLon::where('postal_code', $request->input('postal_code'))->first();
         $employee = new Employee;
         $employee->firm_id = $id;
         $employee->email = $request->input('email');
         $employee->firstname = $request->input('firstname');
         $employee->lastname = $request->input('lastname');
-        $employee->phone= $request->input('phone');
-        $employee->comments =  $request->input('comments');
+        $employee->phone = $request->input('phone');
+        $employee->comments = $request->input('comments');
         $employee->additional_comments = $request->input('additional_comments');
         $employee->postal_code = $request->input('postal_code');
         $employee->status = $request->input('status');
@@ -73,39 +77,39 @@ class EmployeesController extends Controller
         $employee->person_number = $request->input('person_number');
         $employee->radius = $request->input('radius');
         if (!empty($request->input('firm_visibility'))) {
-            $employee->firm_visibility = 0;           
+            $employee->firm_visibility = 0;
         }
         if (!empty($request->input('firstname_visibility'))) {
-            $employee->firstname_visibility = 0;           
+            $employee->firstname_visibility = 0;
         }
         if (!empty($request->input('lastname_visibility'))) {
-            $employee->lastname_visibility = 0;           
+            $employee->lastname_visibility = 0;
         }
         if (!empty($request->input('email_visibility'))) {
-            $employee->email_visibility = 0;           
+            $employee->email_visibility = 0;
         }
         if (!empty($request->input('phone_visibility'))) {
-            $employee->phone_visibility = 0;           
+            $employee->phone_visibility = 0;
         }
         if (!empty($request->input('comments_visibility'))) {
-            $employee->comments_visibility = 0;           
+            $employee->comments_visibility = 0;
         }
         if (!empty($request->input('postal_code_visibility'))) {
-            $employee->postal_code_visibility = 0;           
+            $employee->postal_code_visibility = 0;
         }
         $employee->save();
-        for ($i = $request->input('rolecount'); $i>0 ; $i--){
-            if(!empty($request->input('role'.$i))) {
-                $employee->employeeRoles()->attach([$request->input('role'.$i)]);
+        for ($i = $request->input('rolecount'); $i > 0; $i--) {
+            if (!empty($request->input('role' . $i))) {
+                $employee->employeeRoles()->attach([$request->input('role' . $i)]);
             }
         }
-        for ($i = $request->input('magazinecount'); $i>0 ; $i--){
-            if(!empty($request->input('magazine'.$i))) {
-                $employee->warehouses()->attach([$request->input('magazine'.$i)]);
+        for ($i = $request->input('magazinecount'); $i > 0; $i--) {
+            if (!empty($request->input('magazine' . $i))) {
+                $employee->warehouses()->attach([$request->input('magazine' . $i)]);
             }
         }
 
-        return redirect()->route('firms.edit', ['firm_id' => $id])->with([
+        return redirect()->route('firms.edit', ['firm' => $id])->with([
             'message' => __('firms.message.store'),
             'alert-type' => 'success'
         ]);
@@ -114,7 +118,7 @@ class EmployeesController extends Controller
 
     /**
      * @param $id
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return Factory|View
      */
     public function edit($id)
     {
@@ -133,7 +137,7 @@ class EmployeesController extends Controller
     /**
      * @param EmployeeUpdateRequest $request
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function update(EmployeeUpdateRequest $request, $id)
     {
@@ -141,16 +145,16 @@ class EmployeesController extends Controller
             'radius' => 'integer|required'
         ));
         $employee = Employee::find($id);
-        $postal = PostalCodeLatLon::where('postal_code', $request->input('postal_code'))->first(); 
-         
-        if(empty($employee)){
+        $postal = PostalCodeLatLon::where('postal_code', $request->input('postal_code'))->first();
+
+        if (empty($employee)) {
             abort(404);
         }
         $employee->email = $request->input('email');
         $employee->firstname = $request->input('firstname');
         $employee->lastname = $request->input('lastname');
-        $employee->phone= $request->input('phone');
-        $employee->comments =  $request->input('comments');
+        $employee->phone = $request->input('phone');
+        $employee->comments = $request->input('comments');
         $employee->additional_comments = $request->input('additional_comments');
         $employee->postal_code = $request->input('postal_code');
         $employee->status = $request->input('status');
@@ -170,19 +174,19 @@ class EmployeesController extends Controller
         $employee->postal_code_visibility = $request->input('postal_code_visibility') ?? 1;
         $employee->save();
         $employee->employeeRoles()->detach();
-        for ($i = $request->input('rolecount'); $i>0 ; $i--){
-            if(!empty($request->input('role'.$i))) {
-                $employee->employeeRoles()->attach([$request->input('role'.$i)]);
+        for ($i = $request->input('rolecount'); $i > 0; $i--) {
+            if (!empty($request->input('role' . $i))) {
+                $employee->employeeRoles()->attach([$request->input('role' . $i)]);
             }
         }
         $employee->warehouses()->detach();
-        for ($i = $request->input('magazinecount'); $i>0 ; $i--){
-            if(!empty($request->input('warehouse'.$i))) {
-                $employee->warehouses()->attach([$request->input('warehouse'.$i)]);
+        for ($i = $request->input('magazinecount'); $i > 0; $i--) {
+            if (!empty($request->input('warehouse' . $i))) {
+                $employee->warehouses()->attach([$request->input('warehouse' . $i)]);
             }
         }
         $firm_id = $employee->firm_id;
-        return redirect()->route('firms.edit', ['firm_id' => $firm_id]);
+        return redirect()->route('firms.edit', ['firm' => $firm_id]);
     }
 
 
@@ -198,7 +202,7 @@ class EmployeesController extends Controller
 
 
     /**
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function datatable($id)
     {
@@ -219,7 +223,7 @@ class EmployeesController extends Controller
 
     /**
      * @param $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function changeStatus($id)
     {

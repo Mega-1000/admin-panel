@@ -119,7 +119,7 @@ class FirmsController extends Controller
             }
         }
 
-        return redirect()->route('firms.edit', ['id' => $firm->id])->with([
+        return redirect()->route('firms.edit', ['firma' => $firm->id])->with([
             'message' => __('firms.message.store'),
             'alert-type' => 'success'
         ]);
