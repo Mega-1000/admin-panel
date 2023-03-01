@@ -2,7 +2,7 @@
 @section('app-header')
     <h1 class="page-title">
         <i class="voyager-paint-bucket"></i> @lang('warehouses.create')
-        <a style="margin-left:15px" href="{{ action('FirmsController@edit', ['firm_id' => $id]) }}"
+        <a style="margin-left:15px" href="{{ action('FirmsController@edit', ['firm' => $id]) }}"
            class="btn btn-info install pull-right">
             <span>@lang('firms.back_to_edit')</span>
         </a>
@@ -97,12 +97,12 @@
                                 <div class="form-group">
                                     <label for="latitude">@lang('firms.form.address.latitude')</label>
                                     <input type="text" class="form-control disabled" id="latitude" name="latitude"
-                                            value="{{ old('latitude') }}" disabled>
+                                           value="{{ old('latitude') }}" disabled>
                                 </div>
                                 <div class="form-group">
                                     <label for="longitude">@lang('firms.form.address.longitude')</label>
                                     <input type="text" class="form-control" id="longitude" name="longitude"
-                                            value="{{ old('longitude') }}" disabled>
+                                           value="{{ old('longitude') }}" disabled>
                                 </div>
                             </div>
                             <div class="warehouses-property" id="property">
@@ -127,7 +127,8 @@
                                               value="{{ old('comments') }}"></textarea>
                                 </div>
                                 <div class="form-group">
-                                    <label for="additional_comments">@lang('warehouses.form.additional_comments')</label>
+                                    <label
+                                        for="additional_comments">@lang('warehouses.form.additional_comments')</label>
                                     <textarea rows="4" cols="50" class="form-control" id="additional_comments"
                                               name="additional_comments"
                                               value="{{ old('additional_comments') }}"></textarea>
@@ -290,6 +291,7 @@
                 }
             });
 
-        });
+        })
     </script>
+
 @endsection

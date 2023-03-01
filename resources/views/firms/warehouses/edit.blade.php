@@ -2,7 +2,7 @@
 @section('app-header')
     <h1 class="page-title">
         <i class="voyager-paint-bucket"></i> @lang('warehouses.edit')
-        <a style="margin-left:15px" href="{{ action('FirmsController@edit', ['firm_id' => $warehouse->firm_id]) }}"
+        <a style="margin-left:15px" href="{{ action('FirmsController@edit', ['firm' => $warehouse->firm_id]) }}"
            class="btn btn-info install pull-right">
             <span>@lang('firms.back_to_edit')</span>
         </a>
@@ -129,7 +129,8 @@
                                               name="comments">{{ $warehouseProperty->comments ?? '' }}</textarea>
                                 </div>
                                 <div class="form-group">
-                                    <label for="additional_comments">@lang('warehouses.form.additional_comments')</label>
+                                    <label
+                                        for="additional_comments">@lang('warehouses.form.additional_comments')</label>
                                     <textarea rows="4" cols="50" class="form-control" id="additional_comments"
                                               name="additional_comments">{{ $warehouseProperty->additional_comments ?? '' }}</textarea>
                                 </div>
@@ -289,7 +290,8 @@
                 }
             });
 
-        });
+        })
 
     </script>
+
 @endsection
