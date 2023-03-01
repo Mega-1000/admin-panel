@@ -10,7 +10,8 @@ use Prettus\Repository\Traits\TransformableTrait;
 
 /**
  * Class ShipmentGroup.
- *
+ * @property int $id
+ * @property bool $closed
  * @package namespace App\Entities;
  */
 class ShipmentGroup extends Model implements Transformable

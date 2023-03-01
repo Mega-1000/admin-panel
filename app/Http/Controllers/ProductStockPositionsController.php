@@ -2,19 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\DTO\Label\LabelSessionRemoveLabelDTO;
 use App\Entities\OrderReturn;
 use App\Entities\ProductStock;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Contracts\View\View;
-use Illuminate\Http\RedirectResponse;
 use App\Entities\ProductStockPosition;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Support\Facades\Session;
-use Yajra\DataTables\Facades\DataTables;
-use Illuminate\Contracts\Foundation\Application;
 use App\Http\Requests\ProductStockPositionCreate;
 use App\Http\Requests\ProductStockPositionUpdate;
+use App\Services\Label\RemoveLabelService;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Session;
+use Yajra\DataTables\Facades\DataTables;
 
 /**
  * Class ProductStockPositionsController
@@ -228,10 +230,17 @@ class ProductStockPositionsController extends Controller
         ]);
 
         if (Session::exists('removeLabelJobAfterProductStockMove')) {
-            $ordersToRefresh = Session::get('removeLabelJobAfterProductStockMove');
-            foreach ($ordersToRefresh as $order) {
-                $response = dispatch_now($order);
-                if (!strlen((string)$response) > 0) {
+            $labelSessionRemoveLabelDTOs = Session::get('removeLabelJobAfterProductStockMove');
+            /** @var LabelSessionRemoveLabelDTO $labelSessionRemoveLabelDTO */
+            foreach ($labelSessionRemoveLabelDTOs as $labelSessionRemoveLabelDTO) {
+                $loopPreventionArray = $labelSessionRemoveLabelDTO->getLoopPreventionArray();
+                $response = RemoveLabelService::removeLabels(
+                    $labelSessionRemoveLabelDTO->getOrder(),
+                    $labelSessionRemoveLabelDTO->getLabelIdsToRemove(),
+                    $loopPreventionArray,
+                    $labelSessionRemoveLabelDTO->getCustomLabelIdsToAddAfterRemoval(),
+                );
+                if (!array_key_exists('success', $response)) {
                     Session::forget('removeLabelJobAfterProductStockMove');
                 }
             }

@@ -7,8 +7,12 @@ use App\Jobs\AddLabelJob;
 use App\Jobs\DispatchLabelEventByNameJob;
 use App\Mail\ShipmentDateInOrderChangedMail;
 use App\Repositories\StatusRepository;
+use App\Services\Label\AddLabelService;
 use Carbon\Carbon;
+use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Mailer;
 
 class OrderObserver
 {
@@ -37,7 +41,8 @@ class OrderObserver
         if (!empty($order->getDirty()['status_id'])) {
             $statusId = $order->getDirty()['status_id'];
             $status = $this->statusRepository->find($statusId);
-            dispatch(new AddLabelJob($order, $status->labelsToAddOnChange));
+            $loopPresentationArray = [];
+            AddLabelService::addLabels($order, $status->labelsToAddOnChange, $loopPresentationArray, [], Auth::user()->id);
         }
 
         if (!empty($order->getDirty()['employee_id'])) {
@@ -53,14 +58,14 @@ class OrderObserver
                     if (strpos($order->customer->login, 'allegromail.pl')) {
                         return;
                     }
-                    \Mailer::create()
+                    Mailer::create()
                         ->to($order->customer->login)
                         ->send(new ShipmentDateInOrderChangedMail([
                             'oldDate' => $original,
                             'newDate' => $newDate,
                             'orderId' => $order->id,
                         ]));
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     Log::error('Can\'t send email about shipment date change .',
                         ['exception' => $exception->getMessage(), 'class' => $exception->getFile(), 'line' => $exception->getLine()]
                     );

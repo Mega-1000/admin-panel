@@ -2,15 +2,15 @@
 
 namespace App\Jobs;
 
-use App\Mail\DifferentCustomerData;
-use App\Mail\InvoiceSent;
 use App\Repositories\OrderRepository;
+use App\Services\Label\AddLabelService;
+use App\Services\Label\RemoveLabelService;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
@@ -33,13 +33,13 @@ class ValidateSubiekt implements ShouldQueue
      */
     public function handle(OrderRepository $orderRepository)
     {
-        if(Auth::user() === null && $this->userId !== null) {
+        if (Auth::user() === null && $this->userId !== null) {
             Auth::loginUsingId($this->userId);
         }
 
         $toCheck = DB::table('gt_invoices')->where('created_at', '>', Carbon::now()->subMinutes(5)->toDateTimeString())->get();
 
-        foreach($toCheck as $order){
+        foreach ($toCheck as $order) {
             $invoiceRow = DB::table('gt_invoices')->where('order_id', $order->order_id)->where('gt_invoice_status_id', '18')->first();
             $status12 = DB::table('gt_invoices')->where('order_id', $order->order_id)->where('gt_invoice_status_id', '12')->first();
             $invoiceRowDelayed = DB::table('gt_invoices')->where('order_id', $order->order_id)->where('gt_invoice_status_id', '11')->first();
@@ -47,24 +47,32 @@ class ValidateSubiekt implements ShouldQueue
 
             $noWarehouseItems = DB::table('gt_invoices')->where('order_id', $order->order_id)->where('gt_invoice_status_id', '61')->first();
             $delayInvoice = DB::table('gt_invoices')->where('order_id', $order->order_id)->where('gt_invoice_status_id', '60')->first();
-            if(!empty($invoiceRow)) {
+            $labelToAdd = 0;
+            if (!empty($invoiceRow)) {
 //                \Mailer::create()
 //                    ->to($order->customer->login)
 //                    ->send(new InvoiceSent('Faktura Mega1000', 'Faktura Mega1000', $invoiceRow->ftp_invoice_filename));
-                dispatch(new AddLabelJob($order->order_id, [137]));
-            } elseif(!empty($invoiceRowDelayed)) {
+                $labelToAdd = 137;
+            } elseif (!empty($invoiceRowDelayed)) {
 //                \Mailer::create()
 //                    ->to($order->customer->login)
 //                    ->send(new InvoiceSent('Faktura Mega1000', 'Faktura Mega1000', $invoiceRowDelayed->ftp_invoice_filename));
-                dispatch(new RemoveLabelJob($order->order_id, [74]));
-            } elseif(!empty($noSymbol)) {
-                dispatch(new AddLabelJob($order->order_id, [101]));
-            } elseif(!empty($status12)) {
-                dispatch(new AddLabelJob($order->order_id, [124]));
-            } elseif(!empty($noWarehouseItems)) {
-                dispatch(new AddLabelJob($order->order_id, [120]));
-            } elseif(!empty($delayInvoice)) {
-                dispatch(new AddLabelJob($order->order_id, [42]));
+
+                $loopPrevention = [];
+                RemoveLabelService::removeLabels($order, [74], $loopPrevention, [], Auth::user()->id);
+            } elseif (!empty($noSymbol)) {
+                $labelToAdd = 101;
+            } elseif (!empty($status12)) {
+                $labelToAdd = 124;
+            } elseif (!empty($noWarehouseItems)) {
+                $labelToAdd = 120;
+            } elseif (!empty($delayInvoice)) {
+                $labelToAdd = 42;
+            }
+
+            if ($labelToAdd > 0) {
+                $loopPrevention = [];
+                AddLabelService::addLabels($order, [$labelToAdd], $loopPrevention, [], Auth::user()->id);
             }
         }
     }

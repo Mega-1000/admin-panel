@@ -3,12 +3,13 @@
 namespace App\Jobs;
 
 use App\Entities\OrderPayment;
-use App\Repositories\OrderPaymentRepository;
+use App\Services\Label\AddLabelService;
+use App\Services\Label\RemoveLabelService;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
@@ -36,7 +37,7 @@ class CheckPromisePaymentsDates implements ShouldQueue
      */
     public function handle()
     {
-        if(Auth::user() === null && $this->userId !== null) {
+        if (Auth::user() === null && $this->userId !== null) {
             Auth::loginUsingId($this->userId);
         }
 
@@ -47,9 +48,11 @@ class CheckPromisePaymentsDates implements ShouldQueue
         if (!empty($notConfirmedPayments)) {
             foreach ($notConfirmedPayments as $notConfirmedPayment) {
                 if ($this->shouldAttachLabel($notConfirmedPayment, $now)) {
-                    dispatch(new AddLabelJob($notConfirmedPayment->order->id, [119]));
-                } else if($notConfirmedPayment->order->hasLabel(119)) {
-                    dispatch(new RemoveLabelJob($notConfirmedPayment->order->id, [119]));
+                    $prev = [];
+                    AddLabelService::addLabels($notConfirmedPayment->order, [119], $prev, [], Auth::user()->id);
+                } else if ($notConfirmedPayment->order->hasLabel(119)) {
+                    $prev = [];
+                    RemoveLabelService::removeLabels($notConfirmedPayment->order, [119], $prev, [], Auth::user()->id);
                 }
             }
         }

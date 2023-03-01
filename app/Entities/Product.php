@@ -3,6 +3,7 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
@@ -10,6 +11,9 @@ use Prettus\Repository\Traits\TransformableTrait;
 /**
  * Class Product.
  *
+ * @property int $id
+ * @property string $symbol
+ * @property ProductStock $stock
  * @package namespace App\Entities;
  */
 class Product extends Model implements Transformable
@@ -197,7 +201,7 @@ class Product extends Model implements Transformable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function stock()
+    public function stock(): HasOne
     {
         return $this->hasOne(ProductStock::class);
     }

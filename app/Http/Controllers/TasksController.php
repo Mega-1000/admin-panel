@@ -17,13 +17,14 @@ use App\Helpers\TaskTimeHelper;
 use App\Http\Requests\DenyTaskRequest;
 use App\Http\Requests\TaskCreateRequest;
 use App\Http\Requests\TaskUpdateRequest;
-use App\Jobs\AddLabelJob;
 use App\Jobs\RemoveLabelJob;
 use App\Repositories\OrderRepository;
 use App\Repositories\TaskRepository;
 use App\Repositories\TaskTimeRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
+use App\Services\Label\AddLabelService;
+use App\Services\Label\RemoveLabelService;
 use App\User;
 use Carbon\Carbon;
 use Exception;
@@ -131,7 +132,8 @@ class TasksController extends Controller
                 }
                 $task->taskSalaryDetail()->create(array_merge($dataToStore, $arr));
                 $prev = [];
-                dispatch(new AddLabelJob($request->order_id, [47], $prev));
+                $order = Order::query()->findOrFail($request->order_id);
+                AddLabelService::addLabels($order, [47], $prev, [], Auth::user()->id);
             }
             $this->taskTimeRepository->create([
                 'task_id' => $task->id,
@@ -232,7 +234,8 @@ class TasksController extends Controller
                 ]);
                 $task->taskSalaryDetail()->create($request->all());
                 $prev = [];
-                dispatch(new AddLabelJob($request->order_id, [47], $prev));
+                $order = Order::query()->findOrFail($request->order_id);
+                AddLabelService::addLabels($order, [47], $prev, [], Auth::user()->id);
             }
             return redirect()->route('planning.tasks.edit', ['id' => $task->id])->with([
                 'message' => __('tasks.messages.update'),
@@ -342,7 +345,8 @@ class TasksController extends Controller
                     'name' => $title
                 ]);
                 $prev = [];
-                dispatch(new AddLabelJob($request->order_id, [47], $prev));
+                $order = Order::query()->findOrFail($request->order_id);
+                AddLabelService::addLabels($order, [47], $prev, [], Auth::user()->id);
             }
             $task->taskSalaryDetail()->create($request->all());
             $this->taskTimeRepository->create([
@@ -683,8 +687,8 @@ class TasksController extends Controller
     private function removeLabel(Request $request, $task)
     {
         if ($request->old_resource == 37 && $task->order_id != null) {
-            $prev = [];
-            dispatch_now(new RemoveLabelJob($task->order_id, [47], $prev));
+            $preventionArray = [];
+            RemoveLabelService::removeLabels($task->order, [47], $preventionArray, [], Auth::user()->id);
         }
     }
 
@@ -761,17 +765,27 @@ class TasksController extends Controller
         if ($task->childs->count()) {
             $task->childs->map(function ($child) use (&$response) {
                 if ($child->order_id) {
-                    $response = dispatch(new RemoveLabelJob($child->order_id,
+                    $preventionArray = [];
+                    $response = RemoveLabelService::removeLabels(
+                        $child->order,
                         [Label::ORDER_ITEMS_UNDER_CONSTRUCTION],
-                        $prev));
+                        $preventionArray,
+                        [],
+                        Auth::user()->id
+                    );
                 }
             });
         } else if ($task->order_id) {
-            $response = dispatch(new RemoveLabelJob($task->order_id,
+            $preventionArray = [];
+            $response = RemoveLabelService::removeLabels(
+                $task->order,
                 [Label::ORDER_ITEMS_UNDER_CONSTRUCTION],
-                $prev));
+                $preventionArray,
+                [],
+                Auth::user()->id
+            );
         }
-        return $response !== null;
+        return array_key_exists('success', $response);
     }
 
     public function deny(DenyTaskRequest $request)
@@ -809,14 +823,16 @@ class TasksController extends Controller
                 $this->addNotification($user, $data['description'], $item);
                 if ($item->order) {
                     $item->order->labels()->attach(Label::SHIPPING_MARK);
-                    dispatch(new AddLabelJob($item->order->id, [Label::RED_HAMMER_ID], $prev));
+                    $prev = [];
+                    AddLabelService::addLabels($item->order, [Label::RED_HAMMER_ID], $prev, [], Auth::user()->id);
                 }
             });
         } else {
             $this->addNotification($user, $data['description'], $task);
             if ($task->order) {
                 $task->order->labels()->attach(Label::SHIPPING_MARK);
-                dispatch(new AddLabelJob($task->order->id, [Label::RED_HAMMER_ID], $prev));
+                $prev = [];
+                AddLabelService::addLabels($task->order, [Label::RED_HAMMER_ID], $prev, [], Auth::user()->id);
             }
         }
         return redirect()->back()->with([
@@ -989,8 +1005,9 @@ class TasksController extends Controller
                     'total_price' => $totalPrice
                 ]);
                 $task->taskSalaryDetail()->create($request->all());
+                $order = Order::query()->findOrFail($request->order_id);
                 $prev = [];
-                dispatch(new AddLabelJob($request->order_id, [47], $prev));
+                AddLabelService::addLabels($order, [Label::RED_HAMMER_ID], $prev, [], Auth::user()->id);
             }
             $task->taskTime->update([
                 'date_start' => $dateStart->toDateTimeString(),
@@ -1097,12 +1114,12 @@ class TasksController extends Controller
                 $prev = [];
 
                 if ($task->color == '32CD32') {
-                    dispatch(new RemoveLabelJob($task->order_id, [49], $prev));
-                    dispatch(new AddLabelJob($task->order_id, [50], $prev));
+                    RemoveLabelService::removeLabels($task->order, [49], $prev, [], Auth::user()->id);
+                    AddLabelService::addLabels($task->order, [50], $prev, [], Auth::user()->id);
                 }
                 if ($task->color == '008000') {
-                    dispatch(new RemoveLabelJob($task->order_id, [74], $prev));
-                    dispatch(new AddLabelJob($task->order_id, [41], $prev));
+                    RemoveLabelService::removeLabels($task->order, [74], $prev, [], Auth::user()->id);
+                    AddLabelService::addLabels($task->order, [41], $prev, [], Auth::user()->id);
                 }
                 $dateTime = new Carbon($request->start);
                 $title = $task->order_id . ' - ' . $dateTime->format('d-m') . ' - ' . $task->order->warehouse_value;

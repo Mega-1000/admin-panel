@@ -40,7 +40,6 @@ use App\Http\Requests\CreatePaymentsRequest;
 use App\Http\Requests\NoticesRequest;
 use App\Http\Requests\OrdersFindPackageRequest;
 use App\Http\Requests\OrderUpdateRequest;
-use App\Jobs\AddLabelJob;
 use App\Jobs\AllegroTrackingNumberUpdater;
 use App\Jobs\GenerateXmlForNexoJob;
 use App\Jobs\ImportOrdersFromSelloJob;
@@ -74,6 +73,8 @@ use App\Repositories\StatusRepository;
 use App\Repositories\TaskRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
+use App\Services\Label\AddLabelService;
+use App\Services\Label\RemoveLabelService;
 use App\Services\OrderAddressService;
 use App\Services\OrderExcelService;
 use App\Services\OrderInvoiceService;
@@ -780,9 +781,14 @@ class OrdersController extends Controller
             'user_id' => $user_id
         ];
         foreach ($similar as $order_id) {
-            dispatch_now(new RemoveLabelJob($order_id, [Label::BLUE_HAMMER_ID]));
+            $prev = [];
+            /** @var Order $order */
+            $order = Order::query()->find($order_id);
+            RemoveLabelService::removeLabels($order, [Label::BLUE_HAMMER_ID], $prev, [], Auth::user()->id);
         }
-        dispatch_now(new RemoveLabelJob($task->order->id, [Label::BLUE_HAMMER_ID]));
+
+        $prev = [];
+        RemoveLabelService::removeLabels($task->order, [Label::BLUE_HAMMER_ID], $prev, [], Auth::user()->id);
 
         if ($newGroup->count() > 1) {
             TaskHelper::createNewGroup($newGroup, $task, $duration, $data);
@@ -999,18 +1005,27 @@ class OrdersController extends Controller
             'city' => 'Oława',
             'phone' => '111111111',
         ]);
-
+        $labelToAdd = [];
         if ($request->get('accountant', false)) {
-            dispatch(new AddLabelJob($order, ['153']));
+            $labelToAdd[] = 153;
         }
         if ($request->get('warehouse', false)) {
-            dispatch(new AddLabelJob($order, ['151']));
+            $labelToAdd[] = 151;
         }
         if ($request->get('master', false)) {
-            dispatch(new AddLabelJob($order, ['91']));
+            $labelToAdd[] = 91;
         }
         if ($request->get('consultant', false)) {
-            dispatch(new AddLabelJob($order, ['152']));
+            $labelToAdd[] = 152;
+        }
+        if (count($labelToAdd) > 0) {
+            $loopPreventionArray = [];
+            AddLabelService::addLabels(
+                $order,
+                $labelToAdd,
+                $loopPreventionArray,
+                [],
+                Auth::user()->id);
         }
 
         return redirect('/admin/orders');
@@ -1037,8 +1052,7 @@ class OrdersController extends Controller
         $order->warehouse()->associate($warehouse);
         $order->save();
         $loop = [];
-
-        dispatch(new RemoveLabelJob($order, [$request->label], $loop, $request->labelsToAddIds));
+        RemoveLabelService::removeLabels($order, [$request->label], $loop, $request->labelsToAddIds, Auth::user()->id);
         return response('Usuwanie etykiety rozpoczęte', 200);
     }
 
@@ -1424,22 +1438,57 @@ class OrdersController extends Controller
 
         $sumOfOrdersReturn = $this->sumOfOrders($order);
         $sumToCheck = $sumOfOrdersReturn[0];
-
+        $removeLabel = 0;
+        $addLabel = 0;
+        $ordersToUpdate = [];
         if ($order->status_id == 5 || $order->status_id == 6) {
             if ($sumToCheck > 5 || $sumToCheck < -5) {
-                foreach ($sumOfOrdersReturn[1] as $ordId) {
-                    dispatch(new RemoveLabelJob($ordId, [133]));
-                    dispatch(new AddLabelJob($ordId, [134]));
+                /** @var Order $ord */
+                foreach ($sumOfOrdersReturn[1] as $orderInstance) {
+                    $ordersToUpdate[] = [
+                        'order' => $orderInstance,
+                        'removeLabel' => 133,
+                        'addLabel' => 134,
+                    ];
                 }
             } else {
-                foreach ($sumOfOrdersReturn[1] as $ordId) {
-                    dispatch(new RemoveLabelJob($ordId, [134]));
-                    dispatch(new AddLabelJob($ordId, [133]));
+                foreach ($sumOfOrdersReturn[1] as $orderInstance) {
+                    $ordersToUpdate[] = [
+                        'order' => $orderInstance,
+                        'removeLabel' => 134,
+                        'addLabel' => 133,
+                    ];
                 }
             }
         } else {
-            dispatch(new RemoveLabelJob($order, [134]));
-            dispatch(new RemoveLabelJob($order, [133]));
+            $ordersToUpdate[] = [
+                'order' => $order,
+                'removeLabel' => [133, 134],
+            ];
+        }
+
+        foreach ($ordersToUpdate as $element) {
+            $loopPreventionArray = [];
+            if (array_key_exists('removeLabel', $element)) {
+                RemoveLabelService::removeLabels(
+                    $element['order'],
+                    is_array($element['removeLabel']) ? $element['removeLabel'] : [$element['removeLabel']],
+                    $loopPreventionArray,
+                    [],
+                    Auth::user()->id,
+                );
+            }
+            $loopPreventionArray = [];
+            if (array_key_exists('addLabel', $element)) {
+                AddLabelService::addLabels(
+                    $element['order'],
+                    is_array($element['addLabel']) ? $element['addLabel'] : [$element['addLabel']],
+                    $loopPreventionArray,
+                    [],
+                    Auth::user()->id
+                );
+            }
+
         }
 
         if ($order->status_id == 8) {
@@ -1531,7 +1580,7 @@ class OrdersController extends Controller
         } else {
             $order = $this->orderRepository->find($order->id);
         }
-        $ids = [];
+
         $orderItems = $order->items;
         $sum = 0;
         foreach ($orderItems as $item) {
@@ -1556,7 +1605,7 @@ class OrdersController extends Controller
         $connectedOrders = $this->orderRepository->findWhere(['master_order_id' => $order->id]);
 
         $connectedSum = 0;
-        $ids[] = $order->id;
+        $ids[] = $order;
         foreach ($connectedOrders as $connectedOrder) {
             $orderItems = $connectedOrder->items;
             $sum = 0;
@@ -1581,7 +1630,7 @@ class OrdersController extends Controller
             }
 
             $connectedSum += $connOrderSum;
-            $ids[] = $connectedOrder->id;
+            $ids[] = $connectedOrder;
         }
 
         if ($mainOrderSum < 0) {
@@ -1654,8 +1703,7 @@ class OrdersController extends Controller
         }
 
         $time = $request->input('time');
-
-        dispatch(new RemoveLabelJob($order, [$labelId], $preventionArray, $labelsToAddAfterRemoval, $time));
+        RemoveLabelService::removeLabels($order, [$labelId], $preventionArray, $labelsToAddAfterRemoval, Auth::user()->id, $time);
         return new JsonResponse(['status' => true, 'message' => 'Label remove started'], 200);
     }
 
@@ -1707,7 +1755,7 @@ class OrdersController extends Controller
             } catch (Exception $exception) {
                 Log::error('Nie udało się zapisać logu', ['message' => $exception->getMessage(), 'trace' => $exception->getTraceAsString()]);
             }
-            dispatch(new AddLabelJob($order, [$labelId], $preventionArray, [], null, $time));
+            AddLabelService::addLabels($order, [$labelId], $preventionArray, [], Auth::user()->id, $time);
         }
     }
 
@@ -2097,7 +2145,7 @@ class OrdersController extends Controller
     {
         $order = $this->orderRepository->find($orderId);
         $prev = [];
-        dispatch(new AddLabelJob($order, [52], $prev, [], true));
+        AddLabelService::addLabels($order, [52], $prev, [], Auth::user()->id);
 
         return redirect()->back()->with([
             'message' => __('orders.message.delete'),
@@ -2719,7 +2767,8 @@ class OrdersController extends Controller
         ]);
 
         foreach ($order->customer->orders as $order) {
-            dispatch(new AddLabelJob($order->id, [Label::ORDER_SURPLUS]));
+            $loopPresentationArray = [];
+            AddLabelService::addLabels($order, [Label::ORDER_SURPLUS], $loopPresentationArray, [], Auth::user()->id);
         }
 
         return response()->json('done', 200);
@@ -3037,9 +3086,13 @@ class OrdersController extends Controller
             'email' => $request->input('crm-email')
         ]);
 
+        /** @var Order $order */
+        $order = Order::query()->findOrFail($request->input('orderId'));
 
-        dispatch(new RemoveLabelJob($request->input('orderId'), [124]));
-        dispatch(new AddLabelJob($request->input('orderId'), [136]));
+        $loopPreventionArray = [];
+        RemoveLabelService::removeLabels($order, [124], $loopPreventionArray, [], Auth::user()->id);
+        $loopPreventionArray = [];
+        AddLabelService::addLabels($order, [136], $loopPreventionArray, [], Auth::user()->id);
 
         return view('customers.confirmation.confirmationThanks');
     }

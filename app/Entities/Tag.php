@@ -8,6 +8,9 @@ use Prettus\Repository\Traits\TransformableTrait;
 
 /**
  * Class Tag.
+ * @property int $id
+ * @property string $name
+ * @property string $handler
  *
  * @package namespace App\Entities;
  */

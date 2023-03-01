@@ -2,6 +2,7 @@
 
 namespace App\Entities;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Prettus\Repository\Contracts\Transformable;
@@ -9,7 +10,9 @@ use Prettus\Repository\Traits\TransformableTrait;
 
 /**
  * Class ProductStock.
- *
+ * @property int $id
+ * @property int $quantity
+ * @property Collection<ProductStockPosition> $position
  * @package namespace App\Entities;
  */
 class ProductStock extends Model implements Transformable
@@ -41,7 +44,7 @@ class ProductStock extends Model implements Transformable
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function position()
+    public function position(): HasMany
     {
         return $this->hasMany(ProductStockPosition::class);
     }

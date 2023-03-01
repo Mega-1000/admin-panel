@@ -7,13 +7,15 @@ use App\Repositories\CustomerRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\ProductRepository;
 use App\Services\AllegroOrderService;
+use App\Services\Label\AddLabelService;
+use App\Services\Label\RemoveLabelService;
 use App\Services\ProductService;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -25,32 +27,27 @@ class AllegroCustomerReturnsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    protected ?int $userId;
     /**
      * @var CustomerRepository
      */
     private $customerRepository;
-
     /**
      * @var AllegroOrderService
      */
     private $allegroOrderService;
-
     /**
      * @var ProductRepository
      */
     private $productRepository;
-
     /**
      * @var ProductService
      */
     private $productService;
-
     /**
      * @var OrderRepository
      */
     private $orderRepository;
-
-    protected ?int $userId;
 
     /**
      * Create a new job instance.
@@ -69,7 +66,7 @@ class AllegroCustomerReturnsJob implements ShouldQueue
      */
     public function handle()
     {
-        if(Auth::user() === null && $this->userId !== null) {
+        if (Auth::user() === null && $this->userId !== null) {
             Auth::loginUsingId($this->userId);
         }
 
@@ -141,72 +138,8 @@ class AllegroCustomerReturnsJob implements ShouldQueue
                     $order->refund_id = $return['referenceNumber'];
                     $order->to_refund = $this->countRefund($return['items']);
                     $order->save();
-                    dispatch(new AddLabelJob($order, [Label::RETURN_ALLEGRO_ITEMS]));
-                }
-            } catch (Throwable $ex) {
-                Log::error($ex->getMessage(), [
-                    'line' => $ex->getLine(),
-                    'file' => $ex->getFile()
-                ]);
-                continue;
-            }
-        }
-    }
-
-    /**
-     * Synchronize customer returns
-     *
-     * @return void
-     */
-    private function buyerCancellation()
-    {
-        $cancellations = $this->allegroOrderService->getBuyerCancelled();
-
-        foreach ($cancellations as $cancellation) {
-            try {
-                $order = $this->orderRepository->findWhere([['allegro_form_id', 'like', '%' . $cancellation['order']['checkoutForm']['id'] . '%']])->first();
-                if (!empty($order) && !$order->hasLabel(Label::CUSTOMER_CANCELLATION)) {
-                    dispatch(new AddLabelJob($order, [Label::CUSTOMER_CANCELLATION]));
-                    if ($order->hasLabel(Label::ORDER_ITEMS_REDEEMED_LABEL)) {
-                        if ($order->hasLabel(50) || $order->hasLabel(49) || $order->hasLabel(47)) {
-                            dispatch(new AddLabelJob($order, [Label::HOLD_SHIPMENT]));
-                        } else {
-                            dispatch(new RemoveLabelJob($order, [Label::BLUE_HAMMER_ID]));
-                            dispatch(new AddLabelJob($order, [Label::RED_HAMMER_ID]));
-                            $order->task->delete();
-                        }
-
-                    }
-                }
-            } catch (Throwable $ex) {
-                Log::error($ex->getMessage(), [
-                    'line' => $ex->getLine(),
-                    'file' => $ex->getFile()
-                ]);
-                continue;
-            }
-        }
-    }
-
-
-    /**
-     * Synchronize payment returns
-     *
-     * @return void
-     */
-    private function paymentsReturns(): void
-    {
-        $returns = $this->allegroOrderService->getPaymentsRefunds();
-
-        foreach ($returns as $return) {
-            try {
-                $order = $this->orderRepository->findWhere(['allegro_payment_id' => $return['payment']['id']])->first();
-
-                if (!empty($order) && (empty($order->return_payment_id) || empty($order->refunded))) {
-                    $order->return_payment_id = $return['id'];
-                    $order->refunded = $return['totalValue']['amount'];
-                    $order->save();
-                    dispatch(new AddLabelJob($order, [Label::RETURN_ALLEGRO_PAYMENTS]));
+                    $prev = [];
+                    AddLabelService::addLabels($order, [Label::RETURN_ALLEGRO_ITEMS], $prev, [], Auth::user()->id);
                 }
             } catch (Throwable $ex) {
                 Log::error($ex->getMessage(), [
@@ -231,5 +164,73 @@ class AllegroCustomerReturnsJob implements ShouldQueue
         }
 
         return $sum;
+    }
+
+    /**
+     * Synchronize payment returns
+     *
+     * @return void
+     */
+    private function paymentsReturns(): void
+    {
+        $returns = $this->allegroOrderService->getPaymentsRefunds();
+
+        foreach ($returns as $return) {
+            try {
+                $order = $this->orderRepository->findWhere(['allegro_payment_id' => $return['payment']['id']])->first();
+
+                if (!empty($order) && (empty($order->return_payment_id) || empty($order->refunded))) {
+                    $order->return_payment_id = $return['id'];
+                    $order->refunded = $return['totalValue']['amount'];
+                    $order->save();
+
+                    $prev = [];
+                    AddLabelService::addLabels($order, [Label::RETURN_ALLEGRO_PAYMENTS], $prev, [], Auth::user()->id);
+                }
+            } catch (Throwable $ex) {
+                Log::error($ex->getMessage(), [
+                    'line' => $ex->getLine(),
+                    'file' => $ex->getFile()
+                ]);
+                continue;
+            }
+        }
+    }
+
+    /**
+     * Synchronize customer returns
+     *
+     * @return void
+     */
+    private function buyerCancellation()
+    {
+        $cancellations = $this->allegroOrderService->getBuyerCancelled();
+
+        foreach ($cancellations as $cancellation) {
+            try {
+                $order = $this->orderRepository->findWhere([['allegro_form_id', 'like', '%' . $cancellation['order']['checkoutForm']['id'] . '%']])->first();
+                if (!empty($order) && !$order->hasLabel(Label::CUSTOMER_CANCELLATION)) {
+
+                    $prev = [];
+                    AddLabelService::addLabels($order, [Label::CUSTOMER_CANCELLATION], $prev, [], Auth::user()->id);
+                    if ($order->hasLabel(Label::ORDER_ITEMS_REDEEMED_LABEL)) {
+                        if ($order->hasLabel(50) || $order->hasLabel(49) || $order->hasLabel(47)) {
+                            AddLabelService::addLabels($order, [Label::HOLD_SHIPMENT], $prev, [], Auth::user()->id);
+                        } else {
+                            RemoveLabelService::removeLabels($order, [Label::BLUE_HAMMER_ID], $prev, [], Auth::user()->id);
+                            AddLabelService::addLabels($order, [Label::RED_HAMMER_ID], $prev, [], Auth::user()->id);
+                            $order->task->delete();
+                        }
+
+                    }
+                }
+            } catch (Throwable $ex) {
+                Log::error($ex->getMessage(), [
+                    'line' => $ex->getLine(),
+                    'file' => $ex->getFile()
+                ]);
+                continue;
+            }
+        }
     }
 }

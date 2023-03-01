@@ -13,13 +13,17 @@ use App\Repositories\DelivererRepositoryEloquent;
 use App\Repositories\OrderPackageRepositoryEloquent;
 use App\Repositories\ProviderTransactionRepositoryEloquent;
 use App\Repositories\TransactionRepository;
+use App\Services\Label\AddLabelService;
+use DateTime;
+use Exception;
 use Illuminate\Bus\Queueable;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -140,7 +144,7 @@ class ImportShippingPayIn implements ShouldQueue
                 } else {
                     fputcsv($file, $payIn);
                 }
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 Log::notice('Błąd podczas importu: ' . $exception->getMessage() . ' w lini ' . $exception->getLine(), ['line' => __LINE__, 'file' => __FILE__]);
             }
         }
@@ -148,29 +152,11 @@ class ImportShippingPayIn implements ShouldQueue
         Storage::disk('local')->put('public/transaction/shippingTransactionWithoutOrder' . date('Y-m-d') . '.csv', file_get_contents($fileName));
     }
 
-    private function settleProvider($payIn, $transaction)
+    private function findOrderByLetterNumber(string $letterNumber): ?OrderPackage
     {
-        $providerBalance = $this->providerTransactionRepositoryEloquent->getBalance($payIn['symbol_spedytora']);
-        $providerBalanceOnInvoice = $this->providerTransactionRepositoryEloquent->getBalanceOnInvoice($payIn['symbol_spedytora'], $payIn['nr_faktury_do_ktorej_dany_lp_zostal_przydzielony']);
-        $existingTransaction = $this->providerTransactionRepositoryEloquent->select()
-            ->where('provider', '=', $payIn['symbol_spedytora'])
-            ->where('invoice_number', '=', $payIn['nr_faktury_do_ktorej_dany_lp_zostal_przydzielony'])
-            ->where('cash_on_delivery', '=', $payIn['wartosc_pobrania'])
-            ->first();
-        if ($existingTransaction !== null) {
-            return null;
-        }
-
-        $this->providerTransactionRepositoryEloquent->create([
-            'provider' => $payIn['symbol_spedytora'],
-            'waybill_number' => $payIn['numer_listu'],
-            'invoice_number' => $payIn['nr_faktury_do_ktorej_dany_lp_zostal_przydzielony'],
-            'order_id' => $transaction->order_id,
-            'cash_on_delivery' => $payIn['wartosc_pobrania'],
-            'provider_balance' => $providerBalance + (float)$transaction->operation_value,
-            'provider_balance_on_invoice' => $providerBalanceOnInvoice + (float)$transaction->operation_value,
-            'transaction_id' => $transaction->id,
-        ]);
+        return $this->orderPackageRepositoryEloquent->findWhere([
+            'letter_number' => $letterNumber,
+        ])->first();
     }
 
     private function addRealCost(OrderPackage $orderPackage, array $payIn): bool
@@ -198,11 +184,62 @@ class ImportShippingPayIn implements ShouldQueue
         }
     }
 
-    private function findOrderByLetterNumber(string $letterNumber): ?OrderPackage
+    /**
+     * Save new transaction
+     *
+     * @param Order $order Order object
+     * @param array $data Additional data
+     * @return ?Transaction
+     *
+     * @throws Exception
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    private function saveTransaction(Order $order, array $data): ?Transaction
     {
-        return $this->orderPackageRepositoryEloquent->findWhere([
-            'letter_number' => $letterNumber,
-        ])->first();
+        $identifier = 's-' . strtotime($data['data_nadania_otrzymania']) . '-' . $order->id;
+        $existingTransaction = $this->transactionRepository->select()->where('payment_id', '=', $identifier)->first();
+        if ($existingTransaction !== null) {
+            return null;
+        }
+
+        try {
+            return $this->transactionRepository->create([
+                'customer_id' => $order->customer_id,
+                'posted_in_system_date' => new DateTime($data['data_nadania_otrzymania']),
+                'posted_in_bank_date' => new DateTime(),
+                'payment_id' => $identifier,
+                'kind_of_operation' => 'wpłata pobraniowa',
+                'order_id' => $order->id,
+                'operator' => $data['symbol_spedytora'],
+                'operation_value' => $data['wartosc_pobrania'],
+                'balance' => (float)$this->getCustomerBalance($order->customer_id) + (float)$data['wartosc_pobrania'],
+                'accounting_notes' => '',
+                'transaction_notes' => 'Numer listu: ' . $data['numer_listu'] . ' Nr faktury:' . $data['nr_faktury_do_ktorej_dany_lp_zostal_przydzielony'],
+                'company_name' => Transaction::NEW_COMPANY_NAME_SYMBOL,
+            ]);
+        } catch (Exception $exception) {
+            Log::notice('Błąd podczas zapisu transakcji: ' . $exception->getMessage(), ['line' => __LINE__, 'file' => __FILE__]);
+            return null;
+        }
+    }
+
+    /**
+     * Calculate balance
+     *
+     * @param integer $customerId Customer id
+     * @return float
+     *
+     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
+     */
+    private function getCustomerBalance(int $customerId): float
+    {
+        if (!empty($lastCustomerTransaction = $this->transactionRepository->findWhere([
+            ['customer_id', '=', $customerId]
+        ])->last())) {
+            return $lastCustomerTransaction->balance;
+        } else {
+            return 0;
+        }
     }
 
     /**
@@ -225,7 +262,8 @@ class ImportShippingPayIn implements ShouldQueue
             if ($payIn['kwota'] === (float)$payment->amount) {
                 $payment->delete();
             } else {
-                dispatch(new AddLabelJob($order->id, [128]));
+                $preventionArray = [];
+                AddLabelService::addLabels($order, [128], $preventionArray, [], Auth::user()->id);
             }
         }
     }
@@ -298,64 +336,6 @@ class ImportShippingPayIn implements ShouldQueue
     }
 
     /**
-     * Save new transaction
-     *
-     * @param Order $order Order object
-     * @param array $data Additional data
-     * @return ?Transaction
-     *
-     * @throws \Exception
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
-     */
-    private function saveTransaction(Order $order, array $data): ?Transaction
-    {
-        $identifier = 's-' . strtotime($data['data_nadania_otrzymania']) . '-' . $order->id;
-        $existingTransaction = $this->transactionRepository->select()->where('payment_id', '=', $identifier)->first();
-        if ($existingTransaction !== null) {
-            return null;
-        }
-
-        try {
-            return $this->transactionRepository->create([
-                'customer_id' => $order->customer_id,
-                'posted_in_system_date' => new \DateTime($data['data_nadania_otrzymania']),
-                'posted_in_bank_date' => new \DateTime(),
-                'payment_id' => $identifier,
-                'kind_of_operation' => 'wpłata pobraniowa',
-                'order_id' => $order->id,
-                'operator' => $data['symbol_spedytora'],
-                'operation_value' => $data['wartosc_pobrania'],
-                'balance' => (float)$this->getCustomerBalance($order->customer_id) + (float)$data['wartosc_pobrania'],
-                'accounting_notes' => '',
-                'transaction_notes' => 'Numer listu: ' . $data['numer_listu'] . ' Nr faktury:' . $data['nr_faktury_do_ktorej_dany_lp_zostal_przydzielony'],
-                'company_name' => Transaction::NEW_COMPANY_NAME_SYMBOL,
-            ]);
-        } catch (\Exception $exception) {
-            Log::notice('Błąd podczas zapisu transakcji: ' . $exception->getMessage(), ['line' => __LINE__, 'file' => __FILE__]);
-            return null;
-        }
-    }
-
-    /**
-     * Calculate balance
-     *
-     * @param integer $customerId Customer id
-     * @return float
-     *
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
-     */
-    private function getCustomerBalance(int $customerId): float
-    {
-        if (!empty($lastCustomerTransaction = $this->transactionRepository->findWhere([
-            ['customer_id', '=', $customerId]
-        ])->last())) {
-            return $lastCustomerTransaction->balance;
-        } else {
-            return 0;
-        }
-    }
-
-    /**
      * Tworzy transakcje przeksięgowania
      *
      * @param Order $order
@@ -375,7 +355,7 @@ class ImportShippingPayIn implements ShouldQueue
         }
         return $this->transactionRepository->create([
             'customer_id' => $order->customer_id,
-            'posted_in_system_date' => new \DateTime(),
+            'posted_in_system_date' => new DateTime(),
             'payment_id' => $identifier,
             'kind_of_operation' => 'przeksięgowanie wpłaty pobraniowej',
             'order_id' => $order->id,
@@ -385,6 +365,31 @@ class ImportShippingPayIn implements ShouldQueue
             'accounting_notes' => '',
             'transaction_notes' => $transaction->transaction_notes,
             'company_name' => Transaction::NEW_COMPANY_NAME_SYMBOL,
+        ]);
+    }
+
+    private function settleProvider($payIn, $transaction)
+    {
+        $providerBalance = $this->providerTransactionRepositoryEloquent->getBalance($payIn['symbol_spedytora']);
+        $providerBalanceOnInvoice = $this->providerTransactionRepositoryEloquent->getBalanceOnInvoice($payIn['symbol_spedytora'], $payIn['nr_faktury_do_ktorej_dany_lp_zostal_przydzielony']);
+        $existingTransaction = $this->providerTransactionRepositoryEloquent->select()
+            ->where('provider', '=', $payIn['symbol_spedytora'])
+            ->where('invoice_number', '=', $payIn['nr_faktury_do_ktorej_dany_lp_zostal_przydzielony'])
+            ->where('cash_on_delivery', '=', $payIn['wartosc_pobrania'])
+            ->first();
+        if ($existingTransaction !== null) {
+            return null;
+        }
+
+        $this->providerTransactionRepositoryEloquent->create([
+            'provider' => $payIn['symbol_spedytora'],
+            'waybill_number' => $payIn['numer_listu'],
+            'invoice_number' => $payIn['nr_faktury_do_ktorej_dany_lp_zostal_przydzielony'],
+            'order_id' => $transaction->order_id,
+            'cash_on_delivery' => $payIn['wartosc_pobrania'],
+            'provider_balance' => $providerBalance + (float)$transaction->operation_value,
+            'provider_balance_on_invoice' => $providerBalanceOnInvoice + (float)$transaction->operation_value,
+            'transaction_id' => $transaction->id,
         ]);
     }
 }

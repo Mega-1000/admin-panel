@@ -8,7 +8,8 @@ use Prettus\Repository\Traits\TransformableTrait;
 
 /**
  * Class ProductStockPosition.
- *
+ * @property int $id
+ * @property int $position_quantity
  * @package namespace App\Entities;
  */
 class ProductStockPosition extends Model implements Transformable

@@ -2,15 +2,16 @@
 
 namespace App\Jobs;
 
-use App\Mail\InvoiceSent;
 use App\Repositories\OrderAddressRepository;
 use App\Repositories\OrderRepository;
+use App\Services\Label\AddLabelService;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
@@ -118,7 +119,8 @@ class ChangeOrderInvoiceData implements ShouldQueue
                             'email' => $delivery[9],
                         ], $invoiceAddress->id);
                     }
-                    dispatch(new AddLabelJob($order->id, [135]));
+                    $prev = [];
+                    AddLabelService::addLabels($order, [135], $prev, [], Auth::user()->id);
                 }
             }
         }

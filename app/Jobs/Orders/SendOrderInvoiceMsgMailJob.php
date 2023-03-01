@@ -50,6 +50,5 @@ class SendOrderInvoiceMsgMailJob extends Job implements ShouldQueue
         Mailer::create()
             ->to($this->order->customer->login)
             ->send(new OrderMessageMail($subject, $message, $pdf));
-//		dispatch_now(new AddLabelJob($this->order->id, [Label::ORDER_INVOICE_MSG_SENDED]));
     }
 }

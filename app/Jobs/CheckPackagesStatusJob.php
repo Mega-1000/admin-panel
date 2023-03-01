@@ -19,6 +19,7 @@ use App\Integrations\Pocztex\envelopeStatusType;
 use App\Integrations\Pocztex\getEnvelopeContentShort;
 use App\Integrations\Pocztex\getEnvelopeStatus;
 use App\Integrations\Pocztex\statusType;
+use App\Services\Label\RemoveLabelService;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -61,7 +62,7 @@ class CheckPackagesStatusJob
 
     public function handle(): void
     {
-        if(Auth::user() === null && $this->userId !== null) {
+        if (Auth::user() === null && $this->userId !== null) {
             Auth::loginUsingId($this->userId);
         }
 
@@ -109,7 +110,8 @@ class CheckPackagesStatusJob
                 }
 
                 if (!$order->packages()->whereIn('status', [PackageStatus::SENDING, PackageStatus::WAITING_FOR_SENDING])->count()) {
-                    dispatch(new RemoveLabelJob($order, [Label::BLUE_BATTERY_LABEL_ID]));
+                    $preventionArray = [];
+                    RemoveLabelService::removeLabels($order, [Label::BLUE_BATTERY_LABEL_ID], $preventionArray, [], Auth::user()->id);
                 }
             } catch (Throwable $ex) {
                 Log::error($ex->getMessage());

@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Services\Label\AddLabelService;
+use App\Services\Label\RemoveLabelService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Auth;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
@@ -33,19 +35,19 @@ class DispatchLabelEventByNameJob extends Job implements ShouldQueue
      */
     public function handle()
     {
-        if(Auth::user() === null && $this->userId !== null) {
+        if (Auth::user() === null && $this->userId !== null) {
             Auth::loginUsingId($this->userId);
         }
 
         $config = config('labels-map')[$this->eventName];
         $preventionArray = [];
 
-        if(!empty($config['add'])) {
-            dispatch(new AddLabelJob($this->order, $config['add'], $preventionArray));
+        if (!empty($config['add'])) {
+            AddLabelService::addLabels($this->order, $config['add'], $preventionArray, [], Auth::user()->id);
         }
 
-        if(!empty($config['remove'])) {
-            dispatch(new RemoveLabelJob($this->order, $config['remove'], $preventionArray));
+        if (!empty($config['remove'])) {
+            RemoveLabelService::removeLabels($this->order, $config['remove'], $preventionArray, [], Auth::user()->id);
         }
     }
 }

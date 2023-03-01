@@ -3,17 +3,20 @@
 namespace App\Jobs;
 
 use App\Entities\Label;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Throwable;
-use Illuminate\Bus\Queueable;
-use Illuminate\Support\Facades\Log;
+use App\Entities\Order;
 use App\Repositories\OrderRepository;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Queue\InteractsWithQueue;
+use App\Services\Label\AddLabelService;
+use App\Services\Label\RemoveLabelService;
+use Carbon\Carbon;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 /**
  * Controller nexo
@@ -36,7 +39,7 @@ class ImportNexoLabelsControllerJob implements ShouldQueue
      */
     public function handle()
     {
-        if(Auth::user() === null && $this->userId !== null) {
+        if (Auth::user() === null && $this->userId !== null) {
             Auth::loginUsingId($this->userId);
         }
 
@@ -120,19 +123,20 @@ class ImportNexoLabelsControllerJob implements ShouldQueue
         }
 
         foreach ($orders as $order) {
-            dispatch(new RemoveLabelJob($order, [
-                    Label::INVOICE_OCCURS_IN_NEXO,
-                    Label::GROSS_VALUE_DIFFERS_FROM_INVOICES_IN_NEXO,
-                    Label::FAILURE_TO_INVOICE_DESPITE_DEPARTURE_OF_GOODS,
-                    Label::OFFER_FROM_ALLEGRO_DOES_NOT_HAVE_THE_REQUIRED_PARAMS,
-                    Label::INVOICE_DATE_AND_PREFERRED_DATE_HAVE_DIFFERENT_MONTHS,
-                    Label::GROSS_VALUE_AGREES_FROM_INVOICES_IN_NEXO
-                ]
-            ));
+            $preventionArray = [];
+            RemoveLabelService::removeLabels($order, [
+                Label::INVOICE_OCCURS_IN_NEXO,
+                Label::GROSS_VALUE_DIFFERS_FROM_INVOICES_IN_NEXO,
+                Label::FAILURE_TO_INVOICE_DESPITE_DEPARTURE_OF_GOODS,
+                Label::OFFER_FROM_ALLEGRO_DOES_NOT_HAVE_THE_REQUIRED_PARAMS,
+                Label::INVOICE_DATE_AND_PREFERRED_DATE_HAVE_DIFFERENT_MONTHS,
+                Label::GROSS_VALUE_AGREES_FROM_INVOICES_IN_NEXO
+            ], $preventionArray, [], Auth::user()->id);
         }
 
         foreach ($ordersVerified as $orderId => $labelsToAdd) {
-            dispatch(new AddLabelJob($orderRepository->find($orderId), $labelsToAdd));
+            $preventionArray = [];
+            AddLabelService::addLabels(Order::query()->findOrFail($orderId), $labelsToAdd, $preventionArray, [], Auth::user()->id);
         }
 
         Storage::disk()->delete('user-files/nexo-controller.csv');
