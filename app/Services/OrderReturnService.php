@@ -34,11 +34,11 @@ class OrderReturnService
         $orderReturn->product_id = $request['product_id'];
         $orderReturn->product_stock_position_id = $request['position_id'];
         $orderReturn->user_id = Auth::user()->id;
-        $orderReturn->quantity_undamaged = ($request['undamaged']?$request['undamaged']:0);
-        $orderReturn->quantity_damaged = ($request['damaged']?$request['damaged']:0);
-        $orderReturn->description = $request['description'];
+        $orderReturn->quantity_undamaged = ($request['undamaged'] ? $request['undamaged'] : 0);
+        $orderReturn->quantity_damaged = ($request['damaged'] ? $request['damaged'] : 0);
+        $orderReturn->description = $request['description'] ?: '';
         if($request['photoPath']){
-            $orderReturn->photo = $request['photoPath'];
+            $orderReturn->photo = $request['photoPath'] ?: '';
         }
         $orderReturn->save();
         
