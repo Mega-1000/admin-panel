@@ -48,7 +48,7 @@ class RemoveLabelService
             if ($time !== null) {
                 $labelsToChange = $label->labelsToAddAfterTimedLabel;
                 foreach ($labelsToChange as $labelToChange) {
-                    AddLabelService::addLabels($order, [$labelToChange->pivot->label_to_add_id], $loopPreventationArray, [], $userId);
+                    AddLabelService::addLabels($order, [$labelToChange->pivot->label_to_add_id], $loopPreventionArray, [], $userId);
                     $removeLabelAtTheEnd[] = $labelToChange->pivot->label_to_add_id;
                     $addLabelAtTheEnd[] = $labelToChange->pivot->main_label_id;
                 }
