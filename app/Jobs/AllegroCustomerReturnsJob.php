@@ -139,7 +139,7 @@ class AllegroCustomerReturnsJob implements ShouldQueue
                     $order->to_refund = $this->countRefund($return['items']);
                     $order->save();
                     $prev = [];
-                    AddLabelService::addLabels($order, [Label::RETURN_ALLEGRO_ITEMS], $prev, [], Auth::user()->id);
+                    AddLabelService::addLabels($order, [Label::RETURN_ALLEGRO_ITEMS], $prev, [], Auth::user()?->id);
                 }
             } catch (Throwable $ex) {
                 Log::error($ex->getMessage(), [
@@ -185,7 +185,7 @@ class AllegroCustomerReturnsJob implements ShouldQueue
                     $order->save();
 
                     $prev = [];
-                    AddLabelService::addLabels($order, [Label::RETURN_ALLEGRO_PAYMENTS], $prev, [], Auth::user()->id);
+                    AddLabelService::addLabels($order, [Label::RETURN_ALLEGRO_PAYMENTS], $prev, [], Auth::user()?->id);
                 }
             } catch (Throwable $ex) {
                 Log::error($ex->getMessage(), [
@@ -212,13 +212,13 @@ class AllegroCustomerReturnsJob implements ShouldQueue
                 if (!empty($order) && !$order->hasLabel(Label::CUSTOMER_CANCELLATION)) {
 
                     $prev = [];
-                    AddLabelService::addLabels($order, [Label::CUSTOMER_CANCELLATION], $prev, [], Auth::user()->id);
+                    AddLabelService::addLabels($order, [Label::CUSTOMER_CANCELLATION], $prev, [], Auth::user()?->id);
                     if ($order->hasLabel(Label::ORDER_ITEMS_REDEEMED_LABEL)) {
                         if ($order->hasLabel(50) || $order->hasLabel(49) || $order->hasLabel(47)) {
-                            AddLabelService::addLabels($order, [Label::HOLD_SHIPMENT], $prev, [], Auth::user()->id);
+                            AddLabelService::addLabels($order, [Label::HOLD_SHIPMENT], $prev, [], Auth::user()?->id);
                         } else {
-                            RemoveLabelService::removeLabels($order, [Label::BLUE_HAMMER_ID], $prev, [], Auth::user()->id);
-                            AddLabelService::addLabels($order, [Label::RED_HAMMER_ID], $prev, [], Auth::user()->id);
+                            RemoveLabelService::removeLabels($order, [Label::BLUE_HAMMER_ID], $prev, [], Auth::user()?->id);
+                            AddLabelService::addLabels($order, [Label::RED_HAMMER_ID], $prev, [], Auth::user()?->id);
                             $order->task->delete();
                         }
 

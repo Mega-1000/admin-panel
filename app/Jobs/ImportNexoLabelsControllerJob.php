@@ -131,12 +131,12 @@ class ImportNexoLabelsControllerJob implements ShouldQueue
                 Label::OFFER_FROM_ALLEGRO_DOES_NOT_HAVE_THE_REQUIRED_PARAMS,
                 Label::INVOICE_DATE_AND_PREFERRED_DATE_HAVE_DIFFERENT_MONTHS,
                 Label::GROSS_VALUE_AGREES_FROM_INVOICES_IN_NEXO
-            ], $preventionArray, [], Auth::user()->id);
+            ], $preventionArray, [], Auth::user()?->id);
         }
 
         foreach ($ordersVerified as $orderId => $labelsToAdd) {
             $preventionArray = [];
-            AddLabelService::addLabels(Order::query()->findOrFail($orderId), $labelsToAdd, $preventionArray, [], Auth::user()->id);
+            AddLabelService::addLabels(Order::query()->findOrFail($orderId), $labelsToAdd, $preventionArray, [], Auth::user()?->id);
         }
 
         Storage::disk()->delete('user-files/nexo-controller.csv');

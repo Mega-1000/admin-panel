@@ -377,14 +377,14 @@ class ImportOrdersFromSelloJob implements ShouldQueue
     {
         $preventionArray = [];
         $order->labels()->attach(Label::FROM_SELLO);
-        RemoveLabelService::removeLabels($order, [LabelsHelper::FINISH_LOGISTIC_LABEL_ID], $preventionArray, [LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID], Auth::user()->id);
-        RemoveLabelService::removeLabels($order, [LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID], $preventionArray, [], Auth::user()->id);
-        RemoveLabelService::removeLabels($order, [LabelsHelper::WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID], $preventionArray, [], Auth::user()->id);
+        RemoveLabelService::removeLabels($order, [LabelsHelper::FINISH_LOGISTIC_LABEL_ID], $preventionArray, [LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID], Auth::user()?->id);
+        RemoveLabelService::removeLabels($order, [LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID], $preventionArray, [], Auth::user()?->id);
+        RemoveLabelService::removeLabels($order, [LabelsHelper::WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID], $preventionArray, [], Auth::user()?->id);
         if ($order->warehouse->id == Warehouse::OLAWA_WAREHOUSE_ID) {
-            RemoveLabelService::removeLabels($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::WAIT_FOR_WAREHOUSE_TO_ACCEPT], Auth::user()->id);
+            RemoveLabelService::removeLabels($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::WAIT_FOR_WAREHOUSE_TO_ACCEPT], Auth::user()?->id);
             $order->createNewTask(5, $taskPrimalId);
             return;
         }
-        RemoveLabelService::removeLabels($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::SEND_TO_WAREHOUSE_FOR_VALIDATION], Auth::user()->id);
+        RemoveLabelService::removeLabels($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::SEND_TO_WAREHOUSE_FOR_VALIDATION], Auth::user()?->id);
     }
 }

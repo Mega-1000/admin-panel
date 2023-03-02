@@ -111,7 +111,7 @@ class CheckPackagesStatusJob
 
                 if (!$order->packages()->whereIn('status', [PackageStatus::SENDING, PackageStatus::WAITING_FOR_SENDING])->count()) {
                     $preventionArray = [];
-                    RemoveLabelService::removeLabels($order, [Label::BLUE_BATTERY_LABEL_ID], $preventionArray, [], Auth::user()->id);
+                    RemoveLabelService::removeLabels($order, [Label::BLUE_BATTERY_LABEL_ID], $preventionArray, [], Auth::user()?->id);
                 }
             } catch (Throwable $ex) {
                 Log::error($ex->getMessage());

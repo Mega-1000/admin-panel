@@ -74,7 +74,7 @@ class SearchOrdersInStoredMailsJob extends Job implements ShouldQueue
                     $loopPrevention = [];
                     /** @var Order $order */
                     $order = Order::query()->findOrFail($data['order_id']);
-                    AddLabelService::addLabels($order, [138], $loopPrevention, [], Auth::user()->id);
+                    AddLabelService::addLabels($order, [138], $loopPrevention, [], Auth::user()?->id);
                 }
 
             }

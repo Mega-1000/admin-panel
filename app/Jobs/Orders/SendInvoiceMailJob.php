@@ -56,6 +56,6 @@ class SendInvoiceMailJob extends Job implements ShouldQueue
             ->send(new InvoiceSent($subject, $message, $invoiceRow->ftp_invoice_filename));
 
         $loopPrevention = [];
-        AddLabelService::addLabels($this->order, [Label::INVOICE_ISSUED_WITH_EXERTED_EFFECT], $loopPrevention, [], Auth::user()->id);
+        AddLabelService::addLabels($this->order, [Label::INVOICE_ISSUED_WITH_EXERTED_EFFECT], $loopPrevention, [], Auth::user()?->id);
     }
 }

@@ -159,7 +159,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 if ($undefinedProductSymbol) {
                     $order->consultant_notices = 'Nie znaleziono produktu o symbolu ' . $undefinedProductSymbol['id'];
                     $prev = [];
-                    AddLabelService::addLabels($order, [Label::WAREHOUSE_MARK], $prev, [], Auth::user()->id);
+                    AddLabelService::addLabels($order, [Label::WAREHOUSE_MARK], $prev, [], Auth::user()?->id);
                 }
 
                 $this->saveOrderItems($orderItems, $order);
@@ -247,7 +247,7 @@ class AllegroOrderSynchro implements ShouldQueue
                     }
                 }
                 $prev = [];
-                AddLabelService::addLabels($order, [177], $prev, [], Auth::user()->id);
+                AddLabelService::addLabels($order, [177], $prev, [], Auth::user()?->id);
                 $this->allegroOrderService->setSellerOrderStatus($allegroOrder['id'], AllegroOrderService::STATUS_PROCESSING);
                 DB::commit();
             } catch (Throwable $ex) {
@@ -408,15 +408,15 @@ class AllegroOrderSynchro implements ShouldQueue
     private function addLabels(Order $order): void
     {
         $preventionArray = [];
-        RemoveLabelService::removeLabels($order, [LabelsHelper::FINISH_LOGISTIC_LABEL_ID], $preventionArray, [LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID], Auth::user()->id);
-        RemoveLabelService::removeLabels($order, [LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID], $preventionArray, [], Auth::user()->id);
-        RemoveLabelService::removeLabels($order, [LabelsHelper::WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID], $preventionArray, [], Auth::user()->id);
+        RemoveLabelService::removeLabels($order, [LabelsHelper::FINISH_LOGISTIC_LABEL_ID], $preventionArray, [LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID], Auth::user()?->id);
+        RemoveLabelService::removeLabels($order, [LabelsHelper::TRANSPORT_SPEDITION_INIT_LABEL_ID], $preventionArray, [], Auth::user()?->id);
+        RemoveLabelService::removeLabels($order, [LabelsHelper::WAIT_FOR_SPEDITION_FOR_ACCEPT_LABEL_ID], $preventionArray, [], Auth::user()?->id);
 
         if ($order->warehouse->id == Warehouse::OLAWA_WAREHOUSE_ID) {
-            RemoveLabelService::removeLabels($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::WAIT_FOR_WAREHOUSE_TO_ACCEPT], Auth::user()->id);
+            RemoveLabelService::removeLabels($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::WAIT_FOR_WAREHOUSE_TO_ACCEPT], Auth::user()?->id);
             $order->createNewTask(5);
         } else {
-            RemoveLabelService::removeLabels($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::SEND_TO_WAREHOUSE_FOR_VALIDATION], Auth::user()->id);
+            RemoveLabelService::removeLabels($order, [LabelsHelper::VALIDATE_ORDER], $preventionArray, [LabelsHelper::SEND_TO_WAREHOUSE_FOR_VALIDATION], Auth::user()?->id);
         }
     }
 

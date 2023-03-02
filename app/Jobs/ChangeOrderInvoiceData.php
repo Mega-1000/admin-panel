@@ -120,7 +120,7 @@ class ChangeOrderInvoiceData implements ShouldQueue
                         ], $invoiceAddress->id);
                     }
                     $prev = [];
-                    AddLabelService::addLabels($order, [135], $prev, [], Auth::user()->id);
+                    AddLabelService::addLabels($order, [135], $prev, [], Auth::user()?->id);
                 }
             }
         }

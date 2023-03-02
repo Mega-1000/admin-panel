@@ -71,9 +71,9 @@ class TriggerOrderLabelSchedulersJob extends Job implements ShouldQueue
                     $options['added_type'] = $schedule->type;
                 }
 
-                AddLabelService::addLabels($order, [$schedule->label_id_to_handle], $loopPrevention, $options, Auth::user()->id);
+                AddLabelService::addLabels($order, [$schedule->label_id_to_handle], $loopPrevention, $options, Auth::user()?->id);
             } else {
-                RemoveLabelService::removeLabels($order, [$schedule->label_id_to_handle], $loopPrevention, [], Auth::user()->id);
+                RemoveLabelService::removeLabels($order, [$schedule->label_id_to_handle], $loopPrevention, [], Auth::user()?->id);
             }
 
             $schedule->triggered_at = $now;

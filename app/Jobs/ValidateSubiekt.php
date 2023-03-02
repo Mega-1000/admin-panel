@@ -59,7 +59,7 @@ class ValidateSubiekt implements ShouldQueue
 //                    ->send(new InvoiceSent('Faktura Mega1000', 'Faktura Mega1000', $invoiceRowDelayed->ftp_invoice_filename));
 
                 $loopPrevention = [];
-                RemoveLabelService::removeLabels($order, [74], $loopPrevention, [], Auth::user()->id);
+                RemoveLabelService::removeLabels($order, [74], $loopPrevention, [], Auth::user()?->id);
             } elseif (!empty($noSymbol)) {
                 $labelToAdd = 101;
             } elseif (!empty($status12)) {
@@ -72,7 +72,7 @@ class ValidateSubiekt implements ShouldQueue
 
             if ($labelToAdd > 0) {
                 $loopPrevention = [];
-                AddLabelService::addLabels($order, [$labelToAdd], $loopPrevention, [], Auth::user()->id);
+                AddLabelService::addLabels($order, [$labelToAdd], $loopPrevention, [], Auth::user()?->id);
             }
         }
     }
