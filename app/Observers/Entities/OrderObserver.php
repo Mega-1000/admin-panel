@@ -30,7 +30,7 @@ class OrderObserver
 
     public function created(Order $order)
     {
-        dispatch_now(new DispatchLabelEventByNameJob($order->id, "new-order-created"));
+        dispatch_now(new DispatchLabelEventByNameJob($order, "new-order-created"));
     }
 
     public function updating(Order $order)
