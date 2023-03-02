@@ -3,6 +3,8 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
@@ -25,7 +27,7 @@ class Status extends Model implements Transformable
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return HasOne
      */
     public function status()
     {
@@ -33,20 +35,20 @@ class Status extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
-    public function labelsToAddOnChange()
+    public function labelsToAddOnChange(): BelongsToMany
     {
         return $this->belongsToMany(Label::class, 'order_status_changed_labels_to_add', 'status_id', 'label_id');
     }
 
     public $customColumnsVisibilities = [
         'name',
-        'color' ,
-        'status' ,
+        'color',
+        'status',
         'message',
-        'created_at' ,
-        'active' ,
+        'created_at',
+        'active',
         'pending'
     ];
 }

@@ -3,7 +3,8 @@
 namespace App\Observers\Entities;
 
 use App\Entities\Order;
-use App\Jobs\AddLabelJob;
+use App\Entities\Status;
+use App\Facades\Mailer;
 use App\Jobs\DispatchLabelEventByNameJob;
 use App\Mail\ShipmentDateInOrderChangedMail;
 use App\Repositories\StatusRepository;
@@ -12,7 +13,6 @@ use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Mailer;
 
 class OrderObserver
 {
@@ -40,9 +40,10 @@ class OrderObserver
         }
         if (!empty($order->getDirty()['status_id'])) {
             $statusId = $order->getDirty()['status_id'];
-            $status = $this->statusRepository->find($statusId);
+            /** @var Status $status */
+            $status = Status::query()->find($statusId);
             $loopPresentationArray = [];
-            AddLabelService::addLabels($order, $status->labelsToAddOnChange, $loopPresentationArray, [], Auth::user()->id);
+            AddLabelService::addLabels($order, $status->labelsToAddOnChange()->pluck('id')->toArray(), $loopPresentationArray, [], Auth::user()->id);
         }
 
         if (!empty($order->getDirty()['employee_id'])) {
