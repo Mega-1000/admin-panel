@@ -7,7 +7,6 @@ use App\Entities\Label;
 use App\Entities\Order;
 use App\Http\Requests\CreateNewBonus;
 use App\Http\Requests\DeleteNewBonus;
-use App\Jobs\RemoveLabelJob;
 use App\Services\BonusService;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;

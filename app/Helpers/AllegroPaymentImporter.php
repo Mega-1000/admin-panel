@@ -8,7 +8,6 @@ use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\SelTransaction;
 use App\Http\Controllers\OrdersPaymentsController;
-use App\Jobs\RemoveLabelJob;
 use App\Services\Label\RemoveLabelService;
 use Exception;
 use Illuminate\Support\Facades\Auth;

@@ -207,7 +207,7 @@ class OrdersController extends Controller
             }
             $message = $this->errors[$this->error_code] ?? $e->getMessage();
             Log::error(
-                "Problem with create new order: [{$this->error_code}] $message",
+                "Problem with create new order: [{$this->error_code}] $message" . '. Trace log: ' . $e->getTraceAsString(),
                 ['request' => $data, 'class' => $e->getFile(), 'line' => $e->getLine()]
             );
             $message = $this->errors[$this->error_code] ?? $this->defaultError;

@@ -46,7 +46,6 @@ use App\Jobs\ImportOrdersFromSelloJob;
 use App\Jobs\Orders\ChangeOrderStatusJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Jobs\RemoveFileLockJob;
-use App\Jobs\RemoveLabelJob;
 use App\Jobs\SendRequestForCancelledPackageJob;
 use App\Jobs\UpdatePackageRealCostJob;
 use App\Mail\SendOfferToCustomerMail;

@@ -3,7 +3,6 @@
 namespace App\Observers\Entities;
 
 use App\Entities\OrderPayment;
-use App\Jobs\AddLabelJob;
 use App\Services\Label\AddLabelService;
 use App\Services\OrderAddressService;
 use Illuminate\Support\Facades\Auth;

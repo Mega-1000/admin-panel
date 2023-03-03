@@ -18,7 +18,6 @@ use App\Http\Requests\MasterPaymentCreateRequest;
 use App\Http\Requests\OrderPaymentCreateRequest;
 use App\Http\Requests\OrderPaymentUpdateRequest;
 use App\Jobs\DispatchLabelEventByNameJob;
-use App\Jobs\RemoveLabelJob;
 use App\Repositories\CustomerRepository;
 use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderPaymentRepository;
@@ -868,8 +867,8 @@ class OrdersPaymentsController extends Controller
                                 $amount = 0;
                             }
                         }
-
-                        dispatch_now(new RemoveLabelJob($order->id, [40]));
+                        $prev = [];
+                        RemoveLabelService::removeLabels($order, [40], $prev, [], Auth::user()?->id);
                         dispatch_now(new DispatchLabelEventByNameJob($order->id, "payment-received"));
                     }
                     foreach ($connectedOrders as $connectedOrder) {
