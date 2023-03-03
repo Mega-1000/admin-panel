@@ -17,6 +17,7 @@ use App\Helpers\interfaces\iSumable;
 use App\Repositories\CustomerRepository;
 use App\Services\OrderSourceService;
 use App\Services\ProductService;
+use App\Services\EmailSendingService;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -55,6 +56,11 @@ class OrderBuilder
     private $postOrderActions;
 
     private $productService;
+
+    /**
+     * @var EmailSendingService
+     */
+    private $emailSendingService;
 
     public function setPackageGenerator(iDividable $generator)
     {
@@ -98,6 +104,12 @@ class OrderBuilder
         return $this;
     }
 
+    public function setEmailSendingService(EmailSendingService $emailSendingService): OrderBuilder
+    {
+        $this->emailSendingService = $emailSendingService;
+        return $this;
+    }
+
     public function newStore($data)
     {
         if (empty($this->packageGenerator) || empty($this->priceCalculator) || empty($this->userSelector)) {
@@ -134,6 +146,8 @@ class OrderBuilder
         }
 
         $order->save();
+        
+        $this->emailSendingService->addNewScheduledEmail($order->id);
 
         if (!empty($data['files'])) {
             foreach ($data['files'] as $file) {

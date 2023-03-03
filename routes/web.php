@@ -600,6 +600,15 @@ Route::group(['prefix' => 'admin'], function () {
     Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/web/TrackerLogsRoutes.php');
     Route::group(['as' => 'transactions.'], __DIR__ . '/web/TransactionsRoutes.php');
     Route::group(['as' => 'workingEvents.'], __DIR__ . '/web/WorkingEventsRoutes.php');
+
+
+
+    Route::get('/email/settings', 'EmailSettingsController@index')->name('emailSettings');
+    Route::get('/email/settings/add', 'EmailSettingsController@create')->name('emailSettings.add');
+    Route::post('/email/settings', 'EmailSettingsController@store')->name('emailSettings.store');
+    Route::get('/email/settings/{id}/edit', 'EmailSettingsController@edit')->name('emailSettings.edit');
+    Route::put('/email/settings/{id}/update', 'EmailSettingsController@update')->name('emailSettings.update');
+
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');

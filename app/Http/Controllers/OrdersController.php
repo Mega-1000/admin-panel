@@ -25,6 +25,7 @@ use App\Entities\UserSurplusPaymentHistory;
 use App\Entities\Warehouse;
 use App\Entities\WorkingEvents;
 use App\Enums\LabelStatusEnum;
+use App\Enums\EmailSettingsEnum;
 use App\Facades\Mailer;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
@@ -78,6 +79,7 @@ use App\Services\OrderAddressService;
 use App\Services\OrderExcelService;
 use App\Services\OrderInvoiceService;
 use App\Services\TaskService;
+use App\Services\EmailSendingService;
 use App\User;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
@@ -222,6 +224,8 @@ class OrdersController extends Controller
 
     protected $orderExcelService;
 
+    protected $emailSendingService;
+
     /** @var TaskService */
     protected $taskService;
 
@@ -267,6 +271,7 @@ class OrdersController extends Controller
         TaskRepository                 $taskRepository,
         OrderInvoiceService            $orderInvoiceService,
         OrderExcelService              $orderExcelService,
+        EmailSendingService            $emailSendingService,
         ProductStockPacketRepository   $productStockPacketRepository,
         TaskService                    $taskService
     )
@@ -296,6 +301,7 @@ class OrdersController extends Controller
         $this->taskRepository = $taskRepository;
         $this->orderInvoiceService = $orderInvoiceService;
         $this->orderExcelService = $orderExcelService;
+        $this->emailSendingService = $emailSendingService;
         $this->productStockPacketRepository = $productStockPacketRepository;
         $this->taskService = $taskService;
     }
@@ -1708,6 +1714,10 @@ class OrdersController extends Controller
                 Log::error('Nie udało się zapisać logu', ['message' => $exception->getMessage(), 'trace' => $exception->getTraceAsString()]);
             }
             dispatch(new AddLabelJob($order, [$labelId], $preventionArray, [], null, $time));
+
+            if(in_array($label->id, EmailSettingsEnum::STATUS_LABELS)){
+                $this->emailSendingService->addScheduledEmail($order->id, $label->id);
+            }
         }
     }
 
