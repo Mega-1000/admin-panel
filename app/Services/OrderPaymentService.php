@@ -27,10 +27,10 @@ class OrderPaymentService
     protected $orderPaymentMailService;
 
     public function __construct(
-        OrderPaymentRepository $orderPaymentRepository,
-        OrderRepository $orderRepository,
-        PaymentRepository $paymentRepository,
-        LabelService $labelService,
+        OrderPaymentRepository  $orderPaymentRepository,
+        OrderRepository         $orderRepository,
+        PaymentRepository       $paymentRepository,
+        LabelService            $labelService,
         OrderPaymentMailService $orderPaymentMailService
     )
     {
@@ -42,36 +42,36 @@ class OrderPaymentService
     }
 
     public function payOrder(
-        int $orderId,
+        int    $orderId,
         string $amount,
-        $masterPaymentId,
+               $masterPaymentId,
         string $promise,
-        $chooseOrder,
+               $chooseOrder,
         string $promiseDate,
         string $type = null,
-        bool $isWarehousePayment = null
+        bool   $isWarehousePayment = null
     ): OrderPayment
     {
         $order = $this->orderRepository->find($orderId);
 
         if ($order->payments->count() == 0) {
-            $this->labelService->dispatchLabelEventByNameJob($orderId, LabelEventName::PAYMENT_RECEIVED);
+            $this->labelService->dispatchLabelEventByNameJob($order, LabelEventName::PAYMENT_RECEIVED);
             $this->labelService->removeLabel($orderId, [Label::ORDER_FOR_REALISATION]);
         }
 
-        if($type == null) {
+        if ($type == null) {
             $type = OrderPaymentPayer::WAREHOUSE;
         }
 
-        if($isWarehousePayment == null) {
+        if ($isWarehousePayment == null) {
             $type = OrderPaymentPayer::CLIENT;
         }
 
         $token = null;
 
-        if($isWarehousePayment) {
+        if ($isWarehousePayment) {
             $token = TokenHelper::generateMD5Token();
-            if($order->buyInvoices()->first() !== null) {
+            if ($order->buyInvoices()->first() !== null) {
                 $this->orderPaymentMailService->sendWarehousePaymentAcceptMail(
                     $order->warehouse->warehouse_email,
                     $orderId,
@@ -100,7 +100,7 @@ class OrderPaymentService
         OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
 
         if (!empty($chooseOrder)) {
-           $this->removePromisedPayment($masterPaymentId, $amount, $orderId);
+            $this->removePromisedPayment($masterPaymentId, $amount, $orderId);
         }
 
         if ($payment != null && $order->status_id != OrderStatus::IN_REALISATION) {
@@ -121,7 +121,7 @@ class OrderPaymentService
         $masterPayment = $this->paymentRepository->find($masterPaymentId);
         $masterPayment->amount_left = $masterPayment->amount_left - PriceHelper::modifyPriceToValidFormat($amount);
         $masterPayment->save();
-        $deleted = $this->orderPaymentRepository->getPromisedPayment($orderId , $amount);
+        $deleted = $this->orderPaymentRepository->getPromisedPayment($orderId, $amount);
 
         if (!empty($deleted)) {
             $deleted->delete();

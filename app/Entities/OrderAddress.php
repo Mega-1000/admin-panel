@@ -3,12 +3,13 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
 /**
  * Class OrderAddress.
- *
+ * @property Order $order
  * @package namespace App\Entities;
  */
 class OrderAddress extends Model implements Transformable
@@ -45,7 +46,7 @@ class OrderAddress extends Model implements Transformable
 
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function order()
     {

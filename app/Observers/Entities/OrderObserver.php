@@ -30,7 +30,7 @@ class OrderObserver
 
     public function created(Order $order)
     {
-        dispatch_now(new DispatchLabelEventByNameJob($order, "new-order-created"));
+        dispatch(new DispatchLabelEventByNameJob($order, "new-order-created"));
     }
 
     public function updating(Order $order)
@@ -79,9 +79,9 @@ class OrderObserver
     {
         if (count($order->payments)) {
             if ($order->isPaymentRegulated()) {
-                dispatch_now(new DispatchLabelEventByNameJob($order, "payment-equal-to-order-value"));
+                dispatch(new DispatchLabelEventByNameJob($order, "payment-equal-to-order-value"));
             } else {
-                dispatch_now(new DispatchLabelEventByNameJob($order, "required-payment-before-unloading"));
+                dispatch(new DispatchLabelEventByNameJob($order, "required-payment-before-unloading"));
             }
         }
 
@@ -89,7 +89,7 @@ class OrderObserver
 
         if (count($hasMissingDeliveryAddressLabel) > 0) {
             if ($order->isDeliveryDataComplete()) {
-                dispatch_now(new DispatchLabelEventByNameJob($order, "added-delivery-address"));
+                dispatch(new DispatchLabelEventByNameJob($order, "added-delivery-address"));
             }
         }
     }

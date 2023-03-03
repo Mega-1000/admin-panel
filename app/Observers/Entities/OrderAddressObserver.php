@@ -37,7 +37,7 @@ class OrderAddressObserver
         if (count($hasMissingDeliveryAddressLabel) > 0) {
             if ($orderAddress->type == "DELIVERY_ADDRESS") {
                 if ($orderAddress->order->isDeliveryDataComplete()) {
-                    dispatch_now(new DispatchLabelEventByNameJob($orderAddress->order, "added-delivery-address"));
+                    dispatch(new DispatchLabelEventByNameJob($orderAddress->order, "added-delivery-address"));
                 }
             }
         }

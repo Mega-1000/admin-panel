@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Entities\Order;
 use App\Entities\Warehouse;
 use App\Helpers\Exceptions\ChatException;
 use App\Helpers\MessagesHelper;
@@ -58,8 +59,9 @@ class OrderWarehouseNotificationController extends Controller
             $notification = $this->orderWarehouseNotificationRepository->update($data, $notificationId);
 
             $this->sendMessage($data, $notification);
-
-            dispatch_now(new DispatchLabelEventByNameJob($data['order_id'], "warehouse-notification-denied"));
+            /** @var Order $order */
+            $order = Order::query()->findOrFail($data['order_id']);
+            dispatch(new DispatchLabelEventByNameJob($order, "warehouse-notification-denied"));
 
             return $this->okResponse();
         } catch (Exception $e) {
@@ -119,8 +121,9 @@ class OrderWarehouseNotificationController extends Controller
                 'warehouse_acceptance' => true,
                 'message' => 'Magazyn <strong>wprowadził</strong> daty dotyczące przesyłki.'
             ]);
-
-            dispatch_now(new DispatchLabelEventByNameJob($data['order_id'], "warehouse-notification-accepted"));
+            /** @var Order $order */
+            $order = Order::query()->findOrFail($data['order_id']);
+            dispatch(new DispatchLabelEventByNameJob($order, "warehouse-notification-accepted"));
 
             return $this->okResponse();
         } catch (Exception $e) {
@@ -142,7 +145,7 @@ class OrderWarehouseNotificationController extends Controller
             }
 
             $file = $request->file('file');
-            if($file !== null) {
+            if ($file !== null) {
                 $filename = $file?->getClientOriginalName();
 
                 Storage::disk('local')->put('public/invoices/' . $filename, file_get_contents($file));
@@ -190,7 +193,7 @@ class OrderWarehouseNotificationController extends Controller
                     $package->save();
                 }
             }
-            dispatch_now(new DispatchLabelEventByNameJob($order, "all-shipments-went-out"));
+            dispatch(new DispatchLabelEventByNameJob($order, "all-shipments-went-out"));
             return $this->okResponse();
         } catch (Exception $e) {
             Log::error('Problem with change order status.',

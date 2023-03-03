@@ -275,7 +275,7 @@ class ImportBankPayIn implements ShouldQueue
                 }
                 $transfer = $this->saveTransfer($order, $transaction, $paymentAmount);
                 if ($order->payments->count() == 0) {
-                    $this->labelService->dispatchLabelEventByNameJob($order->id, LabelEventName::PAYMENT_RECEIVED);
+                    $this->labelService->dispatchLabelEventByNameJob($order, LabelEventName::PAYMENT_RECEIVED);
                     $this->labelService->removeLabel($order->id, [Label::ORDER_FOR_REALISATION]);
                 }
 

@@ -21,7 +21,7 @@ class OrderMessageObserver
                 break;
             case 'SHIPPING':
                 if ($orderMessage->source == "MAIL") {
-                    dispatch_now(new DispatchLabelEventByNameJob($orderMessage->order_id,
+                    dispatch(new DispatchLabelEventByNameJob($orderMessage->order,
                         "new-mail-from-shipping-company"));
                 } else {
                     $this->dispatchLabels(
@@ -51,16 +51,23 @@ class OrderMessageObserver
         }
     }
 
+    /**
+     * @param ?OrderMessage $orderMessage
+     * @param $started
+     * @param $sentToUs
+     * @param $sentToClient
+     * @return void
+     */
     protected function dispatchLabels($orderMessage, $started, $sentToUs, $sentToClient)
     {
         if (empty($orderMessage->user_id)) {
             if ($this->isFirstMessageWithThisType($orderMessage)) {
-                dispatch_now(new DispatchLabelEventByNameJob($orderMessage->order_id, $started));
+                dispatch(new DispatchLabelEventByNameJob($orderMessage->order, $started));
             } else {
-                dispatch_now(new DispatchLabelEventByNameJob($orderMessage->order_id, $sentToUs));
+                dispatch(new DispatchLabelEventByNameJob($orderMessage->order, $sentToUs));
             }
         } else {
-            dispatch_now(new DispatchLabelEventByNameJob($orderMessage->order_id, $sentToClient));
+            dispatch(new DispatchLabelEventByNameJob($orderMessage->order, $sentToClient));
         }
     }
 

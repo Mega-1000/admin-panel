@@ -20,7 +20,8 @@ class LabelService
 
     public function dispatchLabelEventByNameJob(int $orderId, string $eventName): void
     {
+        /** @var Order $order */
         $order = Order::query()->findOrFail($orderId);
-        dispatch_now(new DispatchLabelEventByNameJob($order, $eventName));
+        dispatch(new DispatchLabelEventByNameJob($order, $eventName));
     }
 }
