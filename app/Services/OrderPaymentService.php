@@ -55,7 +55,7 @@ class OrderPaymentService
         $order = $this->orderRepository->find($orderId);
 
         if ($order->payments->count() == 0) {
-            $this->labelService->dispatchLabelEventByNameJob($order, LabelEventName::PAYMENT_RECEIVED);
+            $this->labelService->dispatchLabelEventByNameJob($order->id, LabelEventName::PAYMENT_RECEIVED);
             $this->labelService->removeLabel($orderId, [Label::ORDER_FOR_REALISATION]);
         }
 
