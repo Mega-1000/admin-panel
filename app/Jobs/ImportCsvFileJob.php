@@ -562,7 +562,7 @@ class ImportCsvFileJob implements ShouldQueue
         // single employee has 17 columns, let's take 10 employees for each product line, we've got result 170 of columns total
         $employeesColumns = 17;
         $numberOfEmployees = 10;
-        $employeesLines = array_slice($line, 1147, $employeesColumns * $numberOfEmployees);
+        $employeesLines = array_slice($line, 1080, $employeesColumns * $numberOfEmployees);
         // get rows with every employee
         $employeesRows = array_chunk($employeesLines, $employeesColumns);
 
