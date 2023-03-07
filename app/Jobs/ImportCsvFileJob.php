@@ -73,7 +73,7 @@ class ImportCsvFileJob implements ShouldQueue
                 $time = microtime(true);
             }
 
-            //intentional variable assigning here, not an error
+            // intentional variable assigning here, not an error
             if (!$categoryColumn = $this->getCategoryColumn($line)) {
                 continue;
             }
@@ -562,7 +562,7 @@ class ImportCsvFileJob implements ShouldQueue
         // single employee has 17 columns, let's take 10 employees for each product line, we've got result 170 of columns total
         $employeesColumns = 17;
         $numberOfEmployees = 10;
-        $employeesLines = array_slice($line, 1080, $employeesColumns * $numberOfEmployees);
+        $employeesLines = array_slice($line, 1120, $employeesColumns * $numberOfEmployees);
         // get rows with every employee
         $employeesRows = array_chunk($employeesLines, $employeesColumns);
 
@@ -572,6 +572,7 @@ class ImportCsvFileJob implements ShouldQueue
             $lastName   = $row[2];
             $email      = $row[4];
             $postalCode = $row[14];
+            $this->log(json_encode($row));
             if( !$firstName || !$lastName || !$email || !$postalCode ) continue;
 
             $employee = Employee::where([
@@ -583,15 +584,17 @@ class ImportCsvFileJob implements ShouldQueue
             if(!$employee) {
                 $employee = new Employee();
                 $postal = PostalCodeLatLon::where('postal_code', $postalCode)->first();
+                if(!$postal) continue;
                 $employee->latitude = $postal->latitude;
                 $employee->longitude = $postal->longitude;
             }
             
             $firmSymbol = $line[20];
-            $firm = Firm::where('symbol', $firmSymbol)->first();
-            $firmId = $firm->id;
-            
-            $employee->firm_id = $firmId;
+            $firm = Firm::where('symbol', trim($firmSymbol))->first();
+
+            if(isset($firm->id)) {
+                $employee->firm_id = $firm->id;
+            }
             $employee->firstname = $firstName;
             $employee->firstname_visibility = !empty($row[1]);
             $employee->lastName = $lastName;
@@ -604,7 +607,7 @@ class ImportCsvFileJob implements ShouldQueue
             $employee->comments_visibility = !empty($row[11]);
             $employee->additional_comments = $row[12];
             $employee->faq = $row[13];
-            $employee->post_code = $postalCode;
+            $employee->postal_code = $postalCode;
             $employee->radius = intval($row[15]);
             $employee->status = ($row[16] == 'ACTIVE') ? 'ACTIVE' : 'PENDING';
 
@@ -616,7 +619,7 @@ class ImportCsvFileJob implements ShouldQueue
             // attach roles
             if( !empty($roles) ) {
                 foreach($roles as $roleSymbol) {
-                    $employeeRole = EmployeeRole::where('symbol', $roleSymbol)->first();
+                    $employeeRole = EmployeeRole::where('symbol', trim($roleSymbol))->first();
 
                     if(!empty($employeeRole)) {
                         $employee->employeeRoles()->attach([ $employeeRole->id ]);
@@ -626,7 +629,7 @@ class ImportCsvFileJob implements ShouldQueue
             // attach warehouses
             if( !empty($warehouses) ) {
                 foreach($warehouses as $warehouseSymbol) {
-                    $warehouse = Warehouse::where('symbol', $warehouseSymbol)->first();
+                    $warehouse = Warehouse::where('symbol', trim($warehouseSymbol))->first();
 
                     if(!empty($warehouse)) {
                         $employee->warehouses()->attach([ $warehouse->id ]);
