@@ -4,29 +4,28 @@ namespace App\Helpers;
 
 use App\User;
 use App\Entities\Chat;
-use App\Entities\Label;
-use App\Entities\Order;
-use App\Enums\UserRole;
-use App\Entities\Message;
-use App\Entities\Product;
-use App\Jobs\AddLabelJob;
 use App\Entities\Customer;
+use App\Entities\CustomerAddress;
 use App\Entities\Employee;
-use App\Entities\OrderItem;
-use App\Jobs\RemoveLabelJob;
+use App\Entities\Label;
+use App\Entities\Message;
+use App\Entities\Order;
+use App\Entities\Product;
 use App\Entities\ProductMedia;
 use App\Entities\WorkingEvents;
-use App\Entities\CustomerAddress;
+use App\Helpers\Exceptions\ChatException;
 use App\Jobs\ChatNotificationJob;
-use Illuminate\Http\UploadedFile;
-use App\Entities\PostalCodeLatLon;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\NoticesRequest;
-use App\Helpers\Exceptions\ChatException;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\OrdersController;
+use App\Enums\UserRole;
+use Illuminate\Http\UploadedFile;
+use App\Jobs\AddLabelJob;
+use App\Jobs\RemoveLabelJob;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 
 class MessagesHelper
 {
@@ -382,10 +381,10 @@ class MessagesHelper
         if ($chatUser) {
             return $chatUser;
         }
-        if ($secondTry || !(\Auth::user() instanceof User)) {
+        if ($secondTry || !(Auth::user() instanceof User)) {
             return null;
         }
-        $chat->users()->attach(\Auth::user());
+        $chat->users()->attach(Auth::user());
         return $this->getAdminChatUser(true);
     }
 
