@@ -477,48 +477,21 @@
             </div>
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <div>
-                                @include('orders.labels', ['title' => __('orders.form.warehouse_notice'), 'user_type' => UserRole::Storekeeper])
-                                <textarea rows="5" cols="40" class="form-control" id="warehouse_notice"
-                                          name="warehouse_notice"
-                                          disabled>{{ $order->warehouse_notice ?? ''}}</textarea>
-                                <div class="flex-input">
-                                    <input type="text" class="form-control scrollable-notice"
-                                           placeholder="@lang('orders.form.warehouse_notice')"
-                                           id="{{ Order::COMMENT_WAREHOUSE_TYPE }}"
-                                           name="warehouse_notice"/>
-                                    <div class="input-group-append">
-                                        <button
-                                            onclick="sendComment('{{ Order::COMMENT_WAREHOUSE_TYPE }}')"
-                                            class="btn btn-success" type="button">wyślij
-                                        </button>
+                    <div class="col-md-12">
+                        @if(!empty($emails))
+                            @foreach($emails as $email)
+                                <div style="display: inline-block;">
+                                    <img
+                                        src="{{ asset('images/mail-icon.png') }}"
+                                        alt="" style="width: 50px; height: 50px;">
+                                    <div style="display: inline-block;">
+                                        <span>{{ str_replace('+0100', '', $email->timestamp) }}</span>
+                                        <a href="{{ Storage::url('mails/' . $email->path) }}"
+                                        style="display: block;">Ściągnij</a>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <div>
-                                @include('orders.labels', ['title' => 'Informacje dla spedycji', 'user_type' => UserRole::SuperAdministrator])
-                                <textarea id="shipping_notice" class="form-control" rows="5"
-                                          disabled>{{ $order->spedition_comment ?? ''}}</textarea>
-                                <div class="flex-input">
-                                    <input type="text" class="form-control scrollable-notice"
-                                           placeholder="Informacje dla spedycji"
-                                           id="{{ Order::COMMENT_SHIPPING_TYPE }}"
-                                           name="spedition_comment"/>
-                                    <div class="input-group-append">
-                                        <button
-                                            onclick="sendComment('{{ Order::COMMENT_SHIPPING_TYPE }}')"
-                                            class="btn btn-success" type="button">wyślij
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                            @endforeach
+                        @endif
                     </div>
                     <div class="col-md-4">
                         <div class="form-group">
@@ -545,25 +518,28 @@
                             <h5 onclick="goToNextOrder()">@lang('orders.next_order')</h5>
                             <h5 onclick="goToPreviousOrder()">@lang('orders.previous_order')</h5>
                         </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-7">
+                        <h3>Podgląd czatu</h3>
+                        @include('chat/chat_body')
+                        <a class="btn btn-success" href="/chat/{{ $chatUserToken }}" target="_blank">
+                            Przejdź do czatu
+                        </a>
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            @include('orders.labels', ['title' =>  __('orders.form.financial_notices'), 'user_type' => UserRole::Accountant])
-                            <textarea id="financial_notice" disabled class="form-control scrollable-notice"
-                                      name="financial_comment" id="financial_notices"
-                                      rows="5">{{ $order->financial_comment ?? ''}}</textarea>
-                            <div class="flex-input">
-                                <input type="text" class="form-control"
-                                       placeholder="@lang('orders.form.financial_notices')"
-                                       id="{{ Order::COMMENT_FINANCIAL_TYPE }}"
-                                       name="consultant_notices"/>
-                                <div class="input-group-append">
-                                    <button onclick="sendComment('{{ Order::COMMENT_FINANCIAL_TYPE }}')"
-                                            class="btn btn-success" type="button">wyślij
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="col-md-5">
+                        @include('orders.labels', ['title' => __('orders.form.warehouse_notice'), 'user_type' => UserRole::Storekeeper])
+                        @include('orders.labels', ['title' => 'Informacje dla spedycji', 'user_type' => UserRole::SuperAdministrator])
+                        @include('orders.labels', ['title' =>  __('orders.form.consultant_notices'), 'user_type' => UserRole::Consultant])
+                        @include('orders.labels', ['title' =>  __('orders.form.financial_notices'), 'user_type' => UserRole::Accountant])
+                        <button onclick="goToPreviousOrder()" class="btn btn-success" type="button">
+                            @lang('orders.next_order')
+                        </button>
+                        <button onclick="goToNextOrder()" class="btn btn-success" type="button">
+                            @lang('orders.previous_order')
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1857,62 +1833,6 @@
             </tbody>
         </table>
     </div>
-    <div class="order-messages" id="order-messages">
-        <div class="panel panel-bordered">
-            <div class="panel-body">
-                @php
-                    $orderButtons = ChatHelper::createButtonsArrayForOrder($order, Auth::user()->id, MessagesHelper::TYPE_USER);
-                    $helper = new MessagesHelper();
-                    $helper->orderId = $order->id;
-                    $helper->currentUserId = Auth::user()->id;
-                    $helper->currentUserType = MessagesHelper::TYPE_USER;
-                    $userToken = $helper->encrypt();
-
-                @endphp
-                @foreach($orderButtons as $producent => $buttons)
-                    <p> {{ $producent }}
-                        @foreach($buttons as $button)
-                            <a id="create-button-orderPackages"
-                               href="{{ $button['url'] }}" target="_blank" class="btn btn-success">
-                                <i class="voyager-plus"></i> <span>{{ $button['description'] }}</span>
-                            </a>
-                        @endforeach
-                    </p>
-                @endforeach
-                <p> Pusta rozmowa:
-                    <a id="create-button-orderPackages"
-                       href="/chat/{{ $userToken }}" target="_blank" class="btn btn-success">
-                        <i class="voyager-plus"></i> <span>Rozpocznij</span>
-                    </a>
-                </p>
-
-
-                @if(!empty($emails))
-                    @foreach($emails as $email)
-                        <div style="display: inline-block;">
-                            <img
-                                src="https://purepng.com/public/uploads/large/purepng.com-mail-iconsymbolsiconsapple-iosiosios-8-iconsios-8-721522596075clftr.png"
-                                alt="" style="width: 50px; height: 50px;">
-                            <div style="
-    display: inline-block;
-">
-                                <span>{{ str_replace('+0100', '', $email->timestamp) }}</span>
-
-                                <a href="{{ Storage::url('mails/' . $email->path) }}"
-                                   style="display: block;">Ściągnij</a>
-                            </div>
-
-                        </div>
-                    @endforeach
-                @endif
-            </div>
-        </div>
-        @inject('provider', 'App\Http\Controllers\MessagesController')
-        @php
-            $chats = $provider::getChatView(1, $order->id);
-        @endphp
-        @include('chat.table', ['chats' => $chats])
-    </div>
 
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
          aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -2825,7 +2745,6 @@
             var payments = $('#order-payments').hide();
             var tasks = $('#order-tasks').hide();
             var packages = $('#order-packages').hide();
-            var messages = $('#order-messages').hide();
             var warehousePayments = $('#warehouse-payments').hide();
             var speditionPayments = $('#spedition-payments').hide();
             var status = $('#order-status').hide();
@@ -3071,7 +2990,6 @@
                     createButtonOrderTasks.hide();
 
                     breadcrumb.children().last().remove();
-                    breadcrumb.append("<li class='active'><a href='/admin/orders/{{$order->id}}/edit#order-messages'>Wiadomości</a></li>");
                     addOrder.hide();
                 } else if (value === 'packages') {
                     $('#button-general').removeClass('active');

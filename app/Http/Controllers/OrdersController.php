@@ -100,6 +100,7 @@ use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Yajra\DataTables\Facades\DataTables;
 use function response;
+use App\Helpers\MessagesHelper;
 
 /**
  * Class OrderController.
@@ -529,6 +530,18 @@ class OrdersController extends Controller
         $orderHasSentLP = $order->hasOrderSentLP();
         $packets = ProductStockPacket::with('items')->get();
         $countries = Country::all();
+
+        $helper = new MessagesHelper();
+        $helper->orderId = $order->id;
+        $helper->currentUserId = Auth::user()->id;
+        $helper->currentUserType = $userType = MessagesHelper::TYPE_USER;
+        $chatUserToken = $helper->encrypt();
+        $chat = $helper->getChat();
+        // last five msg from area 0
+        $chatMessages = $chat->messages->filter(function($msg) {
+            return $msg->area == 0;
+        })->slice(-5);
+
         if ($order->customer_id == 4128) {
             return view(
                 'orders.edit_self',
@@ -560,7 +573,10 @@ class OrdersController extends Controller
                     'clientTotalCost',
                     'ourTotalCost',
                     'labelsButtons',
-                    'countries'
+                    'countries',
+                    'chatUserToken',
+                    'chatMessages',
+                    'userType'
                 )
             );
         }
@@ -597,7 +613,10 @@ class OrdersController extends Controller
                 'ourTotalCost',
                 'labelsButtons',
                 'packets',
-                'countries'
+                'countries',
+                'chatUserToken',
+                'chatMessages',
+                'userType'
             )
         );
 
@@ -941,6 +960,10 @@ class OrdersController extends Controller
     {
         $request->validated();
         $user = Auth::user();
+        $userId = $request->input('user_id');
+        if( isset($userId) ) {
+            $user = User::find($userId);
+        }
         if (empty($user)) {
             return response(['errors' => ['message' => "Użytkownik nie jest zalogowany"]], 400);
         }

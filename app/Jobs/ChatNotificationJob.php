@@ -2,16 +2,16 @@
 
 namespace App\Jobs;
 
+use Exception;
 use App\Entities\Chat;
 use App\Helpers\Helper;
-use App\Helpers\MessagesHelper;
-use Exception;
 use Illuminate\Bus\Queueable;
+use App\Helpers\MessagesHelper;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
-use Log;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class ChatNotificationJob implements ShouldQueue
@@ -22,15 +22,18 @@ class ChatNotificationJob implements ShouldQueue
 
     private $senderEmail;
 
+    private $currentChatUserId;
+
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($chatId, $senderEmail = false)
+    public function __construct($chatId, $senderEmail = false, $currentChatUserId = null)
     {
         $this->chatId = $chatId;
         $this->senderEmail = $senderEmail;
+        $this->currentChatUserId = $currentChatUserId;
     }
 
     /**
@@ -47,7 +50,9 @@ class ChatNotificationJob implements ShouldQueue
             /*if (!MessagesHelper::hasNewMessageStatic($chat, $chatUser, true)) {
                 continue;
             }*/
-            $userObject = $chatUser->user ?: $chatUser->employee ?: $chatUser->customer ?: $chatUser->user ?: false;
+            if($chatUser->id == $this->currentChatUserId) continue;
+
+            $userObject = $chatUser->user ?: $chatUser->employee ?: $chatUser->customer ?: false;
             if (!$userObject) {
                 continue;
             }
