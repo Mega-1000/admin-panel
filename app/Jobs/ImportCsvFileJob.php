@@ -611,7 +611,7 @@ class ImportCsvFileJob implements ShouldQueue
             $employee->faq = $row[13];
             $employee->postal_code = $postalCode;
             $employee->radius = intval($row[15]);
-            $employee->status = ($row[16] == 'ACTIVE') ? 'ACTIVE' : 'PENDING';
+            $employee->status = ($row[16] == 1) ? 'ACTIVE' : 'PENDING';
 
             $employee->save();
 
@@ -620,23 +620,27 @@ class ImportCsvFileJob implements ShouldQueue
 
             // attach roles
             if( !empty($roles) ) {
+                $rolesToAttach = [];
                 foreach($roles as $roleSymbol) {
-                    $employeeRole = EmployeeRole::where('symbol', trim($roleSymbol))->first();
 
+                    $employeeRole = EmployeeRole::where('symbol', trim($roleSymbol))->first();
                     if(!empty($employeeRole)) {
-                        $employee->employeeRoles()->attach([ $employeeRole->id ]);
+                        $rolesToAttach[] = $employeeRole->id;
                     }
                 }
+                if( !empty($rolesToAttach) ) $employee->employeeRoles()->sync($rolesToAttach);
             }
             // attach warehouses
             if( !empty($warehouses) ) {
+                $warehousesToAttach = [];
                 foreach($warehouses as $warehouseSymbol) {
-                    $warehouse = Warehouse::where('symbol', trim($warehouseSymbol))->first();
 
+                    $warehouse = Warehouse::where('symbol', trim($warehouseSymbol))->first();
                     if(!empty($warehouse)) {
-                        $employee->warehouses()->attach([ $warehouse->id ]);
+                        $warehousesToAttach[] = $warehouse->id;
                     }
                 }
+                if( !empty($warehousesToAttach) ) $employee->warehouses()->sync($warehousesToAttach);
             }
             $employeesIds[] = $employee->id;
         }
