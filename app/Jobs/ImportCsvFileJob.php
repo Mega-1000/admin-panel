@@ -575,7 +575,6 @@ class ImportCsvFileJob implements ShouldQueue
             $lastName   = $row[2];
             $email      = $row[4];
             $postalCode = $row[14];
-            $this->log(json_encode($row));
             if( !$firstName || !$lastName || !$email || !$postalCode ) continue;
 
             $employee = Employee::where([
