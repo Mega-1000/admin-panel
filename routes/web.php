@@ -608,7 +608,8 @@ Route::group(['prefix' => 'admin'], function () {
     Route::post('/email/settings', 'EmailSettingsController@store')->name('emailSettings.store');
     Route::get('/email/settings/{id}/edit', 'EmailSettingsController@edit')->name('emailSettings.edit');
     Route::put('/email/settings/{id}/update', 'EmailSettingsController@update')->name('emailSettings.update');
-
+    Route::delete('/email/settings/{id}/destroy', 'EmailSettingsController@destroy')->name('emailSettings.destroy');
+                        
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');

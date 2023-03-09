@@ -83,4 +83,28 @@ class EmailSettingsController extends Controller
             'alert-type' => 'success'
         ]);
     }
+
+
+    /**
+     * Remove the specified resource.
+     *
+     * @param  int $id
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        $emailSetting = EmailSetting::find($id);
+
+        if (empty($emailSetting)) {
+            abort(404);
+        }
+        
+        $emailSetting->delete();
+
+        return redirect()->route('emailSettings')->with([
+            'message' => 'Ustawienia E-mail usunięte!',
+            'alert-type' => 'success'
+        ]);
+    }
 }

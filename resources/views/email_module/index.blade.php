@@ -24,7 +24,14 @@
                 <td>{{$s->statusTitle}}</td>
                 <td>{{$s->title}}</td>
                 <td>{{$s->time}} min.</td>
-                <td><a style="text-decoration: none;" href="{{ action('EmailSettingsController@edit',[$s->id]) }}" class="btn btn-warning btn-xs"><span>Edytuj</span></a></td>
+                <td>
+                    <form method="post" action="{{ action('EmailSettingsController@destroy',[$s->id]) }}" onsubmit="return confirm('Czy na pewno chcesz usunąć rekord?');">
+                        @method('delete')
+                        @csrf
+                        <a style="text-decoration: none;" href="{{ action('EmailSettingsController@edit',[$s->id]) }}" class="btn btn-warning btn-xs"><span>Edytuj</span></a>
+                        <button type="submit" class="btn btn-danger btn-sm">Usuń</button>
+                    </form>
+                </td>
             </tr>
             @endforeach
         </tbody>
