@@ -2197,7 +2197,7 @@ class OrdersController extends Controller
         } else {
             $sortingColumn = 'orders.id';
         }
-        $query = $this->getQueryForDataTables()->orderBy($sortingColumn, $sortingColumnDirection);
+        $query = $this->getQueryForDataTables($data['selectAllDates'])->orderBy($sortingColumn, $sortingColumnDirection);
 
         foreach ($data['columns'] as $column) {
             if ($column['searchable'] == 'true' && !empty($column['search']['value'])) {
@@ -2434,7 +2434,7 @@ class OrdersController extends Controller
     /**
      * @return Builder
      */
-    private function getQueryForDataTables(): Builder
+    private function getQueryForDataTables($selectAllDates = null): Builder
     {
         return \DB::table('orders')
             ->distinct()
@@ -2472,9 +2472,11 @@ class OrdersController extends Controller
                 if (Auth::user()->role_id == 4) {
                     $query->where('orders.employee_id', '=', Auth::user()->id);
                 }
-            })->where(function ($query) {
-                $query->where('orders.created_at', '>', Carbon::now()->addMonths(-2))
-                    ->orWhere('orders.updated_at', '>', Carbon::now()->addMonths(-2));
+            })->where(function ($query) use (&$selectAllDates) {
+                if ($selectAllDates === 'false') {
+                    $query->where('orders.created_at', '>', Carbon::now()->addMonths(-3))
+                        ->orWhere('orders.updated_at', '>', Carbon::now()->addMonths(-3));
+                }
             });
     }
 

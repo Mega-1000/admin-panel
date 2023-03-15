@@ -681,6 +681,7 @@
         </div>
     </div>
     @include('orders.buttons')
+    <button name="selectAllDates" id="selectAllDates">Wybierz wszystkie daty</button>
     <table id="dataTable" class="table table-hover spacious-container ordersTable">
         <thead>
         <tr>
@@ -1241,6 +1242,7 @@
                             d.dateColumn = ajaxParams.dateColumn;
                             d.same = ajaxParams.same;
                         }
+                        d.selectAllDates = localStorage.getItem('selectAllDates');
                         let differenceMode = localStorage.getItem('differenceMode');
                         if (differenceMode !== null) d.differenceMode = localStorage.getItem('differenceMode');
                     },
@@ -3820,6 +3822,16 @@
             }
         })
 
+        const setSelectAllDatesText = () => {
+            $('#selectAllDates').text(localStorage.getItem('selectAllDates') === 'true' ? 'Wybierz ostatnie 3 miesiące' : 'Wybierz wszystkie daty');
+        }
+
+        $('#selectAllDates').on('click', () => {
+            localStorage.setItem('selectAllDates', localStorage.getItem('selectAllDates') === 'true' ? 'false' : 'true');
+            setSelectAllDatesText();
+            table.ajax.reload();
+        })
+
     </script>
 
     <script>
@@ -3835,6 +3847,8 @@
 
             dateFrom.value = today;
             dateTo.value = today;
+
+            setSelectAllDatesText();
         });
     </script>
 
