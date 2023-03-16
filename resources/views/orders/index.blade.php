@@ -3823,7 +3823,7 @@
         })
 
         const setSelectAllDatesText = () => {
-            $('#selectAllDates').text(localStorage.getItem('selectAllDates') === 'true' ? 'Wybierz ostatnie 3 miesiące' : 'Wybierz wszystkie daty');
+            $('#selectAllDates').text(localStorage.getItem('selectAllDates') === 'true' ? 'Przeszukuj bazę ostatnie 3 miesiące' : 'Przeszukaj całą bazę');
         }
 
         $('#selectAllDates').on('click', () => {

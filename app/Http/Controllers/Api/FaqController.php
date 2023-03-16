@@ -93,9 +93,12 @@ class FaqController
     public function getQuestions()
     {
         $result = [];
-        $rawQuestions = $this->faqRepository->all(['category', 'questions']);
+        $rawQuestions = $this->faqRepository->all(['id', 'category', 'questions']);
         foreach ($rawQuestions as $value) {
-            $result[$value->category] = array_merge($result[$value->category] ?? [], $value->questions);
+            $result[$value->category] = array_merge($result[$value->category] ?? [], array_map(function ($item) use ($value) {
+                $item['id'] = $value->id;
+                return $item;
+            }, $value->questions));
         }
 
         return response()->json($result, 200);
