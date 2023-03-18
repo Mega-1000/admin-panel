@@ -493,32 +493,6 @@
                             @endforeach
                         @endif
                     </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            @include('orders.labels', ['title' =>  __('orders.form.consultant_notices'), 'user_type' => UserRole::Consultant])
-                            <textarea id="consultant_notice" disabled class="form-control" name="consultant_notices"
-                                      id="consultant_notices"
-                                      rows="5">{{ $order->consultant_notices ?? ''}}</textarea>
-                            <h5>Zlecenie numer {{ $order->id }}
-                                - {{ $orderInvoiceAddress?->nip ? 'Klient firmowy' : 'Klient prywatny' }}</h5>
-                            <div class="flex-input">
-                                <input type="text" class="form-control scrollable-notice"
-                                       placeholder="@lang('orders.form.consultant_notices')"
-                                       id="{{ Order::COMMENT_CONSULTANT_TYPE }}"
-                                       name="consultant_notices"/>
-                                <div class="input-group-append">
-                                    <button onclick="sendComment('{{ Order::COMMENT_CONSULTANT_TYPE }}')"
-                                            class="btn btn-success consultant__button--send" type="button">wyślij
-                                    </button>
-                                    <h5 onclick="sendComment('{{ Order::COMMENT_CONSULTANT_TYPE }}')"
-                                        class="consultant__button--send" type="button">wyślij
-                                    </h5>
-                                </div>
-                            </div>
-                            <h5 onclick="goToNextOrder()">@lang('orders.next_order')</h5>
-                            <h5 onclick="goToPreviousOrder()">@lang('orders.previous_order')</h5>
-                        </div>
-                </div>
             </div>
             <div class="container-fluid">
                 <div class="row">

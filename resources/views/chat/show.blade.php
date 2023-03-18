@@ -52,7 +52,7 @@
                 @if ($chat)
                     @include('chat.chat_body')
                 @endif
-                <form id="new-message" action="{{ $route }}">
+                <div id="new-message">
                     <div class="row">
                         <div class="col-sm-9">
                             <textarea required class="form-control" id="message"
@@ -61,10 +61,10 @@
                             <input id="attachment" name="attachment" type="file" style="margin-top: 10px;" />
                         </div>
                         <div class="col-sm-3">
-                            <input type="submit" value="Wyślij" class="btn btn-success btn-lg btn-block">
+                            <input type="submit" value="Wyślij" class="btn btn-success btn-lg btn-block send-btn" data-action="{{ $route }}">
                         </div>
                     </div>
-                </form>
+                </div>
                 @if (is_a(Auth::user(), \App\User::class))
                     <button id="call-worker" class="btn bg-primary call-button">Wyślij maila pracownikom</button>
                 @else
@@ -129,8 +129,10 @@
                             Obszar:
                             @include('chat/msg_area', ['msgAreaId' => 'area'])
                         </label>
-                        <h3>Pokaż:</h3>
-                        @include('chat/history')
+                        @if(!empty($usersHistory))
+                            <h3>Pokaż:</h3>
+                            @include('chat/history')
+                        @endif
                     </div>
                 @endif
             </div>
@@ -209,16 +211,15 @@
 
             $('#message').focus();
 
-            $('#new-message').submit(async e => {
+            $('.send-btn').click(async e => {
                 e.preventDefault();
                 var message = $('#message').val();
                 $('#message').val('');
 
-                const url = $('#new-message').attr('action');
+                const url = $(e.target).data('action');
                 
                 const area = $('#area').val() || 0;
                 const attachmentInput = $('#attachment')[0];
-                $('#attachment').val('');
                 const formData = new FormData();
 
                 if(attachmentInput.files.length > 0) {
@@ -230,6 +231,7 @@
 
                 formData.append('area', area);
                 formData.append('message', message);
+                console.log(formData.has('file'));
                 await ajaxFormData(formData, url);
 
                 refreshRate = 1;

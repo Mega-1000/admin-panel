@@ -96,6 +96,12 @@ class MessagesController extends Controller {
     private function prepareChatView(string $token): View {
         $helper = new MessagesHelper($token);
         $chat = $helper->getChat();
+
+        if($chat === null) {
+            $helper->createNewChat();
+            $chat = $helper->getChat();
+        }
+
         $product = $helper->getProduct();
         $order = $helper->getOrder();
 
@@ -103,7 +109,7 @@ class MessagesController extends Controller {
 
         $helper->setLastRead();
 
-        $chatUsers = empty($chat) ? collect() : $chat->chatUsers;
+        $chatUsers = $chat->chatUsers;
 
         $chatEmployees   = $chatUsers->pluck('employee')->filter();
         $chatCustomers   = $chatUsers->pluck('customer')->filter();
@@ -140,7 +146,12 @@ class MessagesController extends Controller {
 
         $token = $helper->encrypt();
 
-        $assignedMessagesIds = json_decode($helper->getCurrentChatUser()->assigned_messages_ids, true);
+        $currentChatUser = $helper->getCurrentChatUser();
+
+        $assignedMessagesIds = [];
+        if($currentChatUser !== null) {
+            $assignedMessagesIds = json_decode($helper->getCurrentChatUser()->assigned_messages_ids, true);
+        }
 
         $chatMessages = $chat->messages;
         

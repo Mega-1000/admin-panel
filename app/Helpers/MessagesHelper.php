@@ -206,20 +206,25 @@ class MessagesHelper
     public function createNewChat()
     {
         $chat = new Chat();
-        $this->setUsers();
-        $chat->product_id = $this->productId ?: null;
+        $chat->order_id = null;
 
         if($this->orderId) {
-            $chat->order_id = $this->orderId;
             // ensure that is only one order chat
             $chat = Chat::where('order_id', $this->orderId)->first();
+            $this->setUsers();
+
             if($chat) {
                 $this->cache['chat'] = $chat;
+                $chat->order_id = $this->orderId;
                 return $chat;
             }
-        } else {
-            $chat->order_id = null;
+
+            $chat = new Chat();
+            $chat->order_id = $this->orderId;
         }
+        
+        $chat->product_id = $this->productId ?: null;
+        $this->cache['chat'] = $chat;
         $chat->save();
         if (!empty($this->users[self::TYPE_CUSTOMER])) {
             $customer = Customer::find($this->users[self::TYPE_CUSTOMER]);
@@ -350,7 +355,7 @@ class MessagesHelper
                     ['added_type' => Label::CHAT_TYPE],
                     Auth::user()->id
                 );
-            } else {
+            } else if( isset(Auth::user()->id) ) {
                 $loopPrevention = [];
                 RemoveLabelService::removeLabels(
                     $chat->order, [self::MESSAGE_YELLOW_LABEL_ID],
@@ -391,7 +396,7 @@ class MessagesHelper
         return $this->getAdminChatUser(true);
     }
 
-    private function getCurrentChatUser()
+    public function getCurrentChatUser()
     {
         $column = $this->currentUserType == self::TYPE_CUSTOMER ? 'customer_id' : ($this->currentUserType == self::TYPE_EMPLOYEE ? 'employee_id' : 'user_id');
         if (!$this->getChat()) {
@@ -438,7 +443,7 @@ class MessagesHelper
         return false;
     }
 
-    public static function getToken($mediaId, $postCode, $email, $phone)
+    public static function getToken(int $mediaId, string $postCode, string $email, string $phone): string
     {
         $customer = self::getCustomer($email, $phone, $postCode);
 
@@ -462,7 +467,7 @@ class MessagesHelper
         return $helper->encrypt();
     }
 
-    private static function getCustomer($email, $phone, $postCode)
+    private static function getCustomer(string $email, string $phone, string $postCode): Customer
     {
         $customer = Customer::where('login', $email)->first();
         if ($customer && $customer->password && !Hash::check($phone, $customer->password)) {
@@ -477,7 +482,7 @@ class MessagesHelper
             $address->type = CustomerAddress::ADDRESS_TYPE_STANDARD;
             $address->phone = $phone;
             $address->email = $email;
-            $address->postal_code = $email;
+            $address->postal_code = $postCode;
             $customer->addresses()->save($address);
 
             $customer->save();
@@ -485,7 +490,7 @@ class MessagesHelper
         return $customer;
     }
 
-    public static function calcDistance($lat1, $lon1, $lat2, $lon2)
+    public static function calcDistance(float $lat1, float $lon1, float $lat2, float $lon2): float
     {
         return 73 * sqrt(
             pow($lat1 - $lat2, 2) +
@@ -493,7 +498,7 @@ class MessagesHelper
         );
     }
 
-    private function setChatLabel(Chat $chat, $clearDanger = false)
+    private function setChatLabel(Chat $chat, bool $clearDanger = false): void
     {
         if ($clearDanger) {
             $total = Chat::where('order_id', $chat->order->id)->where('need_intervention', true)->count();
@@ -545,7 +550,7 @@ class MessagesHelper
      *
      * @return Collection<OrderItem|null>
      */
-    public function prepareOrderItemsCollection()
+    public function prepareOrderItemsCollection(): Collection
     {
         try {
             $chatUser = $this->getCurrentUser();

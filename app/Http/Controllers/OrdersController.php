@@ -538,9 +538,13 @@ class OrdersController extends Controller
         $chatUserToken = $helper->encrypt();
         $chat = $helper->getChat();
         // last five msg from area 0
-        $chatMessages = $chat->messages->filter(function($msg) {
-            return $msg->area == 0;
-        })->slice(-5);
+
+        $chatMessages = [];
+        if( isset($chat) && count($chat->messages) > 0 ) {
+            $chatMessages = $chat->messages->filter(function($msg) {
+                return $msg->area == 0;
+            })->slice(-5);
+        }
 
         if ($order->customer_id == 4128) {
             return view(

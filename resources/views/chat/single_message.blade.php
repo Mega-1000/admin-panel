@@ -18,9 +18,9 @@
             <br>
             {{ $message->message }}
             @if ($message->attachment_path)
-                <a class="attachment-path" style="display: block; margin-top: 10px;"
+                <a class="attachment-path" style="display: block; margin-top: 10px; color: #000;"
                     href="{{ asset('storage/' . $message->attachment_path) }}" download="{{ $message->attachment_name }}">
-                    {{ $message->attachment_name }}
+                    załącznik: {{ $message->attachment_name }}
                 </a>
             @endif
         </div>

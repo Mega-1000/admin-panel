@@ -18,23 +18,16 @@ class ChatNotificationJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, IsMonitored;
 
-    private $chatId;
-
-    private $senderEmail;
-
-    private $currentChatUserId;
-
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($chatId, $senderEmail = false, $currentChatUserId = null)
-    {
-        $this->chatId = $chatId;
-        $this->senderEmail = $senderEmail;
-        $this->currentChatUserId = $currentChatUserId;
-    }
+    public function __construct(
+        private int $chatId,
+        private bool $senderEmail = false,
+        private int $currentChatUserId = 0
+    ) {}
 
     /**
      * Execute the job.

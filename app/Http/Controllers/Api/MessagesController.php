@@ -17,10 +17,12 @@ use App\Jobs\ChatNotificationJob;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Helpers\Exceptions\ChatException;
+use App\Http\Requests\Messages\PostMessageRequest;
+use App\Http\Requests\Messages\GetMessagesRequest;
 
 class MessagesController extends Controller
 {
-    public function postNewMessage(Request $request, $token)
+    public function postNewMessage(PostMessageRequest $request, $token)
     {
         try {
             $helper = new MessagesHelper($token);
@@ -31,9 +33,9 @@ class MessagesController extends Controller
             if (!$helper->canUserSendMessage()) {
                 throw new ChatException('User not allowed to send message');
             }
-            $area = $request->input('area') ?: 0;
-            $file = $request->file('file');
-            $helper->addMessage($request->message, $area, $file);
+            $data = $request->validated();
+            $file = $data['file'] ?? null;
+            $helper->addMessage($data['message'], $data['area'], $file);
             $helper->setLastRead();
             return response('ok');
         } catch (ChatException $e) {
@@ -108,15 +110,14 @@ class MessagesController extends Controller
         $chatUser->save();
     }
 
-    public function removeUser(Request $request, $token)
+    public function removeUser(Request $request, string $token)
     {
         try {
             $helper = new MessagesHelper($token);
-            $chat = $helper->getChat();
             if ($request->type == ChatUser::class) {
                 $chatUser = ChatUser::findOrFail($request->user_id);
             } else {
-                list($user, $chatUser) = $this->findCustomerOrEmployee($request, $chat);
+                $chatUser = $this->findCustomerOrEmployee($request);
             }
             $chatUser->delete();
             return response('ok');
@@ -126,17 +127,15 @@ class MessagesController extends Controller
         }
     }
 
-    private function findCustomerOrEmployee(Request $request, Chat $chat): array
+    private function findCustomerOrEmployee(Request $request): ChatUser
     {
         if ($request->type == Customer::class) {
-            $user = Customer::findOrFail($request->user_id);
-            $chatUser = $chat->customers->first;
+            $chatUser = ChatUser::where('customer_id', $request->user_id)->first();
         }
         if ($request->type == Employee::class) {
-            $user = Employee::findOrFail($request->user_id);
-            $chatUser = $chat->employees->where('employee_id', $user->id)->withTrashed()->first();
+            $chatUser = ChatUser::where('employee_id', $request->user_id)->first();
         }
-        return array($user, $chatUser);
+        return $chatUser;
     }
 
     public function askForIntervention($token)
@@ -189,12 +188,16 @@ class MessagesController extends Controller
         }
     }
 
-    public function getMessages(Request $request, string $token): Response
+    public function getMessages(GetMessagesRequest $request, string $token): Response
     {
         try {
             $helper = new MessagesHelper($token);
             $chat = $helper->getChat();
-            $area = $request->input('area');
+
+            $data = $request->validated();
+            $area = $data['area'];
+            $lastId = $data['lastId'] ?? 0;
+
             if (!$chat) {
                 throw new ChatException('Wrong chat token');
             }
@@ -202,7 +205,7 @@ class MessagesController extends Controller
             $assignedMessagesIds = array_flip($assignedMessagesIds);
             $out = '';
             foreach ($chat->messages as $message) {
-                if ($message->id <= $request->lastId || $area != $message->area) {
+                if ($message->id <= $lastId || $area != $message->area) {
                     continue;
                 }
                 if($helper->currentUserType == MessagesHelper::TYPE_USER || isset($assignedMessagesIds[$message->id] )) {
