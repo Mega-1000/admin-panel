@@ -3,20 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Entities\Chat;
-use App\Entities\Employee;
-use App\Entities\Firm;
-use App\Entities\PostalCodeLatLon;
-use App\Helpers\Exceptions\ChatException;
-use App\Helpers\MessagesHelper;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Helpers\MessagesHelper;
 use Illuminate\Support\Collection;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
+use App\Helpers\Exceptions\ChatException;
 
-class MessagesController extends Controller
-{
+class MessagesController extends Controller {
+
     /**
      * Display a listing of the resource.
      *
@@ -25,20 +21,18 @@ class MessagesController extends Controller
      * @param bool $orderId
      * @return Response
      */
-    public static function index(Request $request, $all = false, $orderId = 0)
-    {
+    public static function index(Request $request, $all = false, $orderId = 0) {
         $chats = self::getChatView($all, $orderId, $request->user()->id);
         return view('chat.index')->withChats($chats)->withShowAll($all);
     }
 
     /**
      * @param bool $all
-     * @param bool $orderId
-     * @param null $userId
+     * @param int $orderId
+     * @param int $userId
      * @return array|Chat[]
      */
-    public static function getChatView(bool $all, $orderId, $userId = null)
-    {
+    public static function getChatView(bool $all, int $orderId, int $userId = null) {
         if ($all) {
             $chats = Chat::where('id', '>', 0);
         } else {
@@ -73,42 +67,18 @@ class MessagesController extends Controller
         return $chats;
     }
 
-    public static function getUrl(Request $request, $mediaId, $postCode, $email, $phone)
-    {
+    public static function getUrl(Request $request, $mediaId, $postCode, $email, $phone) {
         $url = self::getChatUrl($mediaId, $postCode, $email, $phone);
         return redirect($url);
     }
 
-    public static function getChatUrl($mediaId, $postCode, $email, $phone): string
-    {
+    public static function getChatUrl($mediaId, $postCode, $email, $phone): string {
         $token = MessagesHelper::getToken($mediaId, $postCode, $email, $phone);
         $url = route('chat.show', ['token' => $token]);
         return $url;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return void
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param Request $request
-     * @return void
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    public function show($token)
-    {
+    public function show($token) {
         try {
             return $this->prepareChatView($token);
         } catch (ChatException $e) {
@@ -117,189 +87,112 @@ class MessagesController extends Controller
             return redirect(env('FRONT_URL'));
         }
     }
-
-    private function prepareChatView($token)
-    {
+    /**
+     * prepare chat View from given $token
+     *
+     * @param string $token
+     * @return View
+     */
+    private function prepareChatView(string $token): View {
         $helper = new MessagesHelper($token);
         $chat = $helper->getChat();
+
+        if($chat === null) {
+            $helper->createNewChat();
+            $chat = $helper->getChat();
+        }
+
         $product = $helper->getProduct();
         $order = $helper->getOrder();
+
+        $chatType = $order ? 'order' : 'product';
+
         $helper->setLastRead();
-        if (empty($chat)) {
-            $users = collect();
-            if ($helper->employeeId) {
-                $users->push(Employee::find($helper->employeeId));
-            }
-        } else {
-            $users = $chat->chatUsers;
-        }
-        $possibleUsers = collect();
+
+        $chatUsers = $chat->chatUsers;
+
+        $chatEmployees   = $chatUsers->pluck('employee')->filter();
+        $chatCustomers   = $chatUsers->pluck('customer')->filter();
+        $chatConsultants = $chatUsers->pluck('user')->filter();
+
+        $currentCustomersIdsOnChat = $chatCustomers->pluck('id');
+        $currentEmployeesIdsOnChat = $chatEmployees->pluck('id');
+
+        $possibleEmployees = collect();
+        $possibleCustomers = collect();
+        $productList = collect();
         $notices = '';
-        if ($product && !empty($chat->customers)) {
-            $possibleUsers = $this->getNotAttachedChatUsersForProduct($product, $chat->customers->first());
-        } else if ($order) {
-            $possibleUsers = $this->getNotAttachedChatUsersForOrder($order, $users);
-            if ($helper->currentUserType == MessagesHelper::TYPE_USER || $helper->currentUserType == MessagesHelper::TYPE_EMPLOYEE) {
-                $notices = $order->consultant_notices;
-            }
+        if ($chatType == 'order') {
+            $productList = $helper->prepareOrderItemsCollection($helper);
+            $products = $productList->pluck('product');
+        } else if ($chatType == 'product') {
+            $productList = $products = collect([$helper->getProduct()]);
         }
-        $possibleUsers = $this->addCustomerToChatList($chat, $possibleUsers, $users, $helper);
-        $productList = $this->prepareProductList($helper);
+
+        $employeesIds = $products->pluck('employees_ids');
+
+        if ($employeesIds->isNotEmpty()) {
+            $possibleEmployees = $helper->prepareEmployees($employeesIds, $currentEmployeesIdsOnChat);
+        }
+        if ($currentCustomersIdsOnChat->isEmpty() && $chatType == 'order') {
+            $possibleCustomers = collect([$order->customer]);
+        }
+        
+        $usersHistory = [
+            'customers' => $chat->chatUsersWithTrashed()->whereNotNull('customer_id')->get(),
+            'employees' => $chat->chatUsersWithTrashed()->whereNotNull('employee_id')->get(),
+            'consultants' => $chat->chatUsersWithTrashed()->whereNotNull('user_id')->get(),
+        ];
 
         $token = $helper->encrypt();
+
+        $currentChatUser = $helper->getCurrentChatUser();
+
+        $assignedMessagesIds = [];
+        if($currentChatUser !== null) {
+            $assignedMessagesIds = json_decode($helper->getCurrentChatUser()->assigned_messages_ids, true);
+        }
+
+        $chatMessages = $chat->messages;
+        
         $view = view('chat.show')->with([
-            'product_list' => $productList,
-            'faq' => $this->prepareFaq($users),
-            'notices' => $notices,
-            'possible_users' => $possibleUsers,
-            'user_type' => $helper->currentUserType,
-            'users' => $users,
-            'chat' => $chat,
-            'product' => $product,
-            'order' => $order,
-            'title' => $helper->getTitle(true),
-            'route' => route('api.messages.post-new-message', ['token' => $token]),
-            'routeAddUser' => route('api.messages.add-new-user', ['token' => $token]),
-            'routeRemoveUser' => route('api.messages.remove-user', ['token' => $token]),
-            'routeRefresh' => route('api.messages.get-messages', ['token' => $token]),
+            'product_list'            => $productList,
+            'faq'                     => $this->prepareFaq($chatUsers),
+            'notices'                 => $notices,
+            'possibleEmployees'       => $possibleEmployees,
+            'possibleCustomers'       => $possibleCustomers,
+            'userType'                => $helper->currentUserType,
+            'chatCustomers'           => $chatCustomers,
+            'chatEmployees'           => $chatEmployees,
+            'chatConsultants'         => $chatConsultants,
+            'chat'                    => $chat,
+            'product'                 => $product,
+            'order'                   => $order,
+            'usersHistory'            => $usersHistory,
+            'chatMessages'            => $chatMessages,
+            'assignedMessagesIds'     => array_flip($assignedMessagesIds),
+            'title'                   => $helper->getTitle(true),
+            'route'                   => route('api.messages.post-new-message', ['token' => $token]),
+            'routeAddUser'            => route('api.messages.add-new-user', ['token' => $token]),
+            'routeRemoveUser'         => route('api.messages.remove-user', ['token' => $token]),
+            'routeRefresh'            => route('api.messages.get-messages', ['token' => $token]),
             'routeAskForIntervention' => route('api.messages.ask-for-intervention', ['token' => $token]),
-            'routeForEditPrices' => route('api.messages.edit-prices', ['token' => $token])
+            'routeForEditPrices'      => route('api.messages.edit-prices', ['token' => $token])
         ]);
         return $view;
     }
 
-    /**
-     * @param $product
-     * @param $chat
-     * @param Collection $possibleUsers
-     * @param Collection $users
-     * @return Collection
-     */
-    private function getNotAttachedChatUsersForProduct($product, $customer): Collection
-    {
-        $possibleUsers = collect();
-        foreach ($product->media()->get() as $media) {
-            $mediaData = explode('|', $media->url);
-            if (count($mediaData) != 3) {
-                continue;
-            }
-            if ($customer->standardAddress()) {
-                $codeObj = PostalCodeLatLon::where('postal_code', $customer->standardAddress()->postal_code)->first();
-            } else {
-                continue;
-            }
-
-            $availableUser = $media->product->firm->employees->filter(function ($employee) use ($codeObj) {
-                $dist = MessagesHelper::calcDistance($codeObj->latitude, $codeObj->longitude, $employee->latitude, $employee->longitude);
-                return $dist < $employee->radius;
-            });
-            $possibleUsers = $possibleUsers->merge($availableUser);
-        }
-        $possibleUsers = $possibleUsers->unique('id');
-        return $possibleUsers;
-    }
-
-    /**
-     * @param $order
-     * @param $chat
-     * @param Collection $users
-     * @return array
-     */
-    private function getNotAttachedChatUsersForOrder($order, Collection $users): Collection
-    {
-        $possibleUsers = collect();
-        foreach ($order->items as $product) {
-            $firm = Firm::where('symbol', 'like', $product->product->product_name_supplier)->first();
-            if (empty($firm)) {
-                continue;
-            }
-            $possibleUsers = $possibleUsers->merge($firm->employees);
-        }
-        return $possibleUsers;
-    }
-
-    private function addCustomerToChatList($chat, $possibleUsers, Collection $users, $helper): Collection
-    {
-        if ($chat) {
-            $possibleUsers = $this->filterPossibleUsersWithCurrentlyAdded($possibleUsers, $chat, $users);
-            if ($chat->customers()->whereNull('deleted_at')->count() < 1) {
-                if ($helper->getOrder()) {
-                    $customer = $helper->getOrder()->customer;
-                    $possibleUsers->push($customer);
-                }
-                if ($helper->getProduct()) {
-                    $possibleUsers->push($chat->customers()->first());
-                }
-            }
-        } else {
-            if ($helper->getOrder()) {
-                $customer = $helper->getOrder()->customer;
-                $possibleUsers->push($customer);
-            }
-        }
-        return $possibleUsers;
-    }
-
-    /**
-     * @param Collection $possibleUsers
-     * @param $chat
-     * @param Collection $users
-     * @return Collection
-     */
-    private function filterPossibleUsersWithCurrentlyAdded(Collection $possibleUsers, $chat, Collection $users): Collection
-    {
-        $possibleUsers = $possibleUsers->filter(function ($item) use ($chat, $users) {
-            $filteredEmployeesCount = $chat->chatUsersWithTrashed->filter(function ($user) use ($item) {
-                if (empty($user->employee)) {
-                    return false;
-                }
-                return $item->id != $user->employee->id || $item->id == $user->employee->id && $user->trashed();
-            })->count();
-            return $filteredEmployeesCount == $chat->employees->count();
-        });
-        return $possibleUsers;
-    }
-
-    private function prepareProductList(MessagesHelper $helper): Collection
-    {
-        if ($helper->getOrder()) {
-            try {
-                return $this->setProductsForChatUser($helper->getCurrentUser(), $helper->getOrder());
-            } catch (Exception $e) {
-                Log::error('Cannot prepare product list',
-                    ['exception' => $e->getMessage(), 'class' => $e->getFile(), 'line' => $e->getLine()]);
-                return collect();
-            }
-        }
-        if ($helper->getProduct()) {
-            return collect([$helper->getProduct()]);
-        }
-        return collect();
-    }
-
-    private function setProductsForChatUser($chatUser, $order)
-    {
-        if (is_a($chatUser, Employee::class)) {
-            return $order->items->filter(function ($item) use ($chatUser) {
-                return empty($item->product->firm) || $item->product->firm->id == $chatUser->firm->id;
-            });
-        }
-        return $order->items;
-    }
-
-    private function prepareFaq(Collection $users): array
-    {
+    private function prepareFaq(Collection $users): array {
         $faqs = [];
         foreach ($users as $user) {
             if ($user->employee && $user->employee->faq) {
-                $faqs [] = $user->employee->faq;
+                $faqs[] = $user->employee->faq;
             }
         }
         return $faqs;
     }
 
-    public function showOrNew(int $orderId, int $userId)
-    {
+    public function showOrNew(int $orderId, int $userId) {
         $chat = Chat::where('order_id', '=', $orderId)->first();
         if (!$chat) {
             $helper = new MessagesHelper();
@@ -316,39 +209,5 @@ class MessagesController extends Controller
         }
 
         return redirect()->route('chat.show', ['token' => $userToken]);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param int $id
-     * @return void
-     */
-    public function edit(int $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param Request $request
-     * @param int $id
-     * @return void
-     */
-    public function update(Request $request, int $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param int $id
-     * @return void
-     */
-    public function destroy(int $id)
-    {
-        //
     }
 }

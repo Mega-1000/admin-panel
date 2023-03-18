@@ -24,8 +24,8 @@
             @else
                 <td></td>
             @endif
-            <td>{!! implode('<br />' , ChatHelper::formatChatUsers($chat->users)) !!}</td>
-            <td>{!! implode('<br />' , ChatHelper::formatChatUsers($chat->employees)) !!}</td>
+            <td>{!! implode('<br />' , ChatHelper::formatChatUsers($chat->users, MessagesHelper::TYPE_USER)) !!}</td>
+            <td>{!! implode('<br />' , ChatHelper::formatChatUsers($chat->employees, MessagesHelper::TYPE_EMPLOYEE)) !!}</td>
             <td>{{ '['.$chat->lastMessage->created_at.'] '.$chat->lastMessage->message }}</td>
             <td>
                 <a href="{{ $chat->url }}" target="_blank" class="btn btn-large btn-success go_to_chat">Pokaż</a>
