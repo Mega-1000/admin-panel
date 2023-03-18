@@ -2659,7 +2659,11 @@
 @section('datatable-scripts')
     <script type="application/javascript">
         $(document).ready(function () {
-            document.getElementById("consultant_comment").focus();
+            const consultantComment = document.getElementById("consultant_comment");
+
+            if (consultantComment) {
+                consultantComment.focus();
+            }
             $('#warehouse_notice').scrollTop(1E10);
             $('#shipping_notice').scrollTop(1E10);
             $('#consultant_notice').scrollTop(1E10);
