@@ -1287,6 +1287,7 @@
             <button type="submit" form="orders" id="new-order" name="submit" value="store" class="btn btn-success">Dodaj
                 nowe zamówienie
             </button>
+        </div>
     </form>
     <div class="order-payments" id="order-payments">
         @if(!empty($uri))
