@@ -2,20 +2,29 @@
 
 namespace App\Entities;
 
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ChatUser extends Model
 {
     use SoftDeletes;
+
     protected $table = 'chat_user';
 
     protected $softDelete = true;
 
+    protected $casts = [
+        'assigned_messages_ids' => 'json',
+    ];
+
+    public $attributes = [
+        'assigned_messages_ids' => [],
+    ];
 
     public function user()
     {
-        return $this->belongsTo(\App\User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function customer()

@@ -3,6 +3,8 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Prettus\Repository\Contracts\Transformable;
@@ -163,12 +165,17 @@ class Product extends Model implements Transformable
         'gross_purchase_price_the_largest_unit_after_discounts'
     ];
 
+    protected $attributes = [
+        'employees_ids' => [],
+    ];
+
     protected $casts = [
         'stock_product' => 'boolean',
+        'employees_ids' => 'json',
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     * @return BelongsToMany
      */
     public function category()
     {
@@ -176,7 +183,7 @@ class Product extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return HasOne
      */
     public function packing()
     {
@@ -184,7 +191,7 @@ class Product extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function photos()
     {
@@ -192,7 +199,7 @@ class Product extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return HasOne
      */
     public function price()
     {
@@ -200,7 +207,7 @@ class Product extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return HasOne
      */
     public function stock(): HasOne
     {
@@ -208,7 +215,7 @@ class Product extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function orderItems()
     {
@@ -240,13 +247,13 @@ class Product extends Model implements Transformable
         return $this->belongsTo(Firm::class, 'product_name_supplier', 'symbol');
     }
 
-	/**
-	 * @return \Illuminate\Database\Eloquent\Relations\HasMany
-	 */
-	public function productAnalyzer()
-	{
-		return $this->hasMany(ProductAnalyzer::class);
-	}
+    /**
+     * @return HasMany
+     */
+    public function productAnalyzer()
+    {
+        return $this->hasMany(ProductAnalyzer::class);
+    }
 
     public function isInTransportGroup()
     {
