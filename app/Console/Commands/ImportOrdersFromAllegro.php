@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Jobs\AllegroOrderSynchro;
-use App\Jobs\ImportOrdersFromSelloJob;
 use Illuminate\Console\Command;
 
 class ImportOrdersFromAllegro extends Command
@@ -39,6 +38,6 @@ class ImportOrdersFromAllegro extends Command
      */
     public function handle()
     {
-        dispatch_now(new AllegroOrderSynchro());
+        dispatch(new AllegroOrderSynchro());
     }
 }
