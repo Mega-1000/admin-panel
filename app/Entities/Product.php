@@ -272,9 +272,6 @@ class Product extends Model implements Transformable
 
     public function getImageUrl()
     {
-        if (str_contains('g:\\Mj dysk\\EPH\\70 Zdjecia\\zdjecia uzywane', $this->url)) {
-            return str_replace("g:\\Mj dysk\\EPH\\70 Zdjecia\\zdjecia uzywane\\", env('APP_URL') . 'storage/products/', $this->url);
-        }
         return str_replace("D:\\z\\", env('APP_URL') . 'storage/products/', $this->url);
     }
 
