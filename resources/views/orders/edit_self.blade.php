@@ -1467,7 +1467,7 @@
                                         var payments = $('#order-payments').hide();
                                         var tasks = $('#order-tasks').hide();
                                         var packages = $('#order-packages').hide();
-                                        //var messages = $('#order-messages').hide();
+                                        var messages = $('#order-messages').hide();
                                         var status = $('#order-status').hide();
                                         var pageTitle = $('.page-title').children('i');
                                         var createButtonOrderPayments = $('#create-button-orderPayments').hide();
@@ -1496,7 +1496,7 @@
                                             tasks.hide();
                                             payments.show();
                                             packages.hide();
-                                            //messages.hide();
+                                            messages.hide();
                                             status.hide();
                                             createButtonOrderPayments.show();
                                             createButtonOrderPackages.hide();
