@@ -97,6 +97,7 @@ class FaqController
         foreach ($rawQuestions as $value) {
             $result[$value->category] = array_merge($result[$value->category] ?? [], array_map(function ($item) use ($value) {
                 $item['id'] = $value->id;
+                $item['questions'] = $value->questions;
                 return $item;
             }, $value->questions));
         }
