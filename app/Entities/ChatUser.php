@@ -19,7 +19,7 @@ class ChatUser extends Model
     ];
 
     public $attributes = [
-        'assigned_messages_ids' => [],
+        'assigned_messages_ids' => '{}',
     ];
 
     public function user()

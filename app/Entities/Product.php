@@ -166,7 +166,7 @@ class Product extends Model implements Transformable
     ];
 
     protected $attributes = [
-        'employees_ids' => [],
+        'employees_ids' => '{}',
     ];
 
     protected $casts = [
