@@ -2851,9 +2851,11 @@
             window.table = table = datatable(ajaxParams);
         }
 
+        let chosenLabel = '';
+        let orderIds = [];
 
         function addLabel() {
-            let chosenLabel = $("#choosen-label");
+            chosenLabel = $("#choosen-label");
             let timed = chosenLabel[0].selectedOptions[0].dataset.timed;
 
             if (chosenLabel.val() == "") {
@@ -2867,20 +2869,21 @@
                 return;
             }
 
-            let orderIds = [];
+            orderIds = [];
             $.each(selectedOrders, function (index, order) {
                 orderIds.push($(order).val());
             });
 
             if (timed == 1) {
                 $('#timed_label').modal('show');
-                $('#time_label_ok').on('click', () => {
-                    addLabelAjax(orderIds, chosenLabel, true)
-                })
             } else {
                 addLabelAjax(orderIds, chosenLabel, false)
             }
         }
+
+        $('body').on('click', '#time_label_ok', () => {
+            addLabelAjax(orderIds, chosenLabel, true);
+        });
 
         function addLabelAjax(orderIds, chosenLabel, timed = false) {
             let data = '';

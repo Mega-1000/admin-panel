@@ -9,9 +9,9 @@ use App\Entities\OrderLabelSchedulerAwait;
 use App\Entities\ShipmentGroup;
 use App\Entities\Task;
 use App\Entities\WorkingEvents;
-use Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use App\Jobs\TimedLabelJob;
 
 class AddLabelService
 {
@@ -47,26 +47,26 @@ class AddLabelService
             $label = Label::query()->find($labelId);
             $alreadyHasLabel = $order->labels()->where('label_id', $labelId)->exists();
 
-            if ($time !== null) {
-                $timedLabel = DB::table('timed_labels')->insert([
+            // init timed labels
+            if ($time !== null && $alreadyHasLabel === null) {
+                $timedLabelId = DB::table('timed_labels')->insertGetId([
                     'execution_time' => $time,
                     'order_id' => $order->id,
                     'label_id' => $labelId,
                     'is_executed' => false
                 ]);
-                $labelsAfterTime = DB::table('label_labels_to_add_after_timed_label')->where('main_label_id', $labelId)->get();
+                $order->labels()->attach($order->id, ['label_id' => $labelId, 'added_type' => $options['added_type'], 'created_at' => Carbon::now()]);
 
-                $labelsToRemoveAtTheEnd[] = $labelId;
-                if ($labelsAfterTime->count() > 0) {
-                    foreach ($labelsAfterTime as $labelAfterTime) {
-                        $labelsToAddAtTheEnd[] = $labelAfterTime->label_to_add_id;
-                    }
-                } else {
-                    $labelsToAddAtTheEnd[] = Label::URGENT_INTERVENTION;
-                }
+                // calc time to run timed label job
+                $dateFrom = Carbon::now();
+                $dateTo = new Carbon($time);
+                $diff = $dateFrom->diffInSeconds($dateTo);
+                
+                TimedLabelJob::dispatch($timedLabelId, $labelId, $order, $loopPreventionArray, $options, $userId)->delay( now()->addSeconds($diff) );
+                continue;
             }
 
-            if ($alreadyHasLabel === false) {
+            if ($alreadyHasLabel === false && $time === null) {
                 $order->labels()->attach($order->id, ['label_id' => $label->id, 'added_type' => $options['added_type'], 'created_at' => Carbon::now()]);
                 self::setScheduledLabelsAfterAddition($order, $label, $userId);
                 $loopPreventionArray['already-added'][] = $labelId;
