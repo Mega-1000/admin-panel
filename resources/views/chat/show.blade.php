@@ -231,9 +231,10 @@
 
                 formData.append('area', area);
                 formData.append('message', message);
-                console.log(formData.has('file'));
-                await ajaxFormData(formData, url);
 
+                await ajaxFormData(formData, url);
+                
+                $('#attachment').val('');
                 refreshRate = 1;
                 nextRefresh = 0;
             });

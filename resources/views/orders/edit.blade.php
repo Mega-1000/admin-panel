@@ -474,51 +474,6 @@
             </div>
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-md-12">
-                        @if(!empty($emails))
-                            @foreach($emails as $email)
-                                <div style="display: inline-block;">
-                                    <img
-                                        src="{{ asset('images/mail-icon.png') }}"
-                                        alt="" style="width: 50px; height: 50px;">
-                                    <div style="display: inline-block;">
-                                        <span>{{ str_replace('+0100', '', $email->timestamp) }}</span>
-                                        <a href="{{ Storage::url('mails/' . $email->path) }}"
-                                        style="display: block;">Ściągnij</a>
-                                    </div>
-                                </div>
-                            @endforeach
-                        @endif
-                    </div>
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            @include('orders.labels', ['title' =>  __('orders.form.consultant_notices'), 'user_type' => UserRole::Consultant])
-                            <textarea id="consultant_notice" disabled class="form-control" name="consultant_notices"
-                                      id="consultant_notices"
-                                      rows="5">{{ $order->consultant_notices ?? ''}}</textarea>
-                            <h5>Zlecenie numer {{ $order->id }}
-                                - {{ $orderInvoiceAddress?->nip ? 'Klient firmowy' : 'Klient prywatny' }}</h5>
-                            <div class="flex-input">
-                                <input type="text" class="form-control scrollable-notice"
-                                       placeholder="@lang('orders.form.consultant_notices')"
-                                       id="{{ Order::COMMENT_CONSULTANT_TYPE }}"
-                                       name="consultant_notices"/>
-                                <div class="input-group-append">
-                                    <button onclick="sendComment('{{ Order::COMMENT_CONSULTANT_TYPE }}')"
-                                            class="btn btn-success consultant__button--send" type="button">wyślij
-                                    </button>
-                                    <h5 onclick="sendComment('{{ Order::COMMENT_CONSULTANT_TYPE }}')"
-                                        class="consultant__button--send" type="button">wyślij
-                                    </h5>
-                                </div>
-                            </div>
-                            <h5 onclick="goToNextOrder()">@lang('orders.next_order')</h5>
-                            <h5 onclick="goToPreviousOrder()">@lang('orders.previous_order')</h5>
-                        </div>
-                </div>
-            </div>
-            <div class="container-fluid">
-                <div class="row">
                     <div class="col-md-7">
                         <h3>Podgląd czatu</h3>
                         @include('chat/chat_body')
@@ -537,39 +492,18 @@
                         <button onclick="goToNextOrder()" class="btn btn-success" type="button">
                             @lang('orders.previous_order')
                         </button>
-                </div>
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-md-7">
-                            <h3>Podgląd czatu</h3>
-                            @include('chat/chat_body')
-                            <a class="btn btn-success" href="/chat/{{ $chatUserToken }}" target="_blank">
-                                Przejdź do czatu
-                            </a>
-                        </div>
-                        <div class="col-md-5">
-                            @include('orders.labels', ['title' => __('orders.form.warehouse_notice'), 'user_type' => UserRole::Storekeeper])
-                            @include('orders.labels', ['title' => 'Informacje dla spedycji', 'user_type' => UserRole::SuperAdministrator])
-                            @include('orders.labels', ['title' =>  __('orders.form.consultant_notices'), 'user_type' => UserRole::Consultant])
-                            @include('orders.labels', ['title' =>  __('orders.form.financial_notices'), 'user_type' => UserRole::Accountant])
-                            <button onclick="goToPreviousOrder()" class="btn btn-success" type="button">
-                                @lang('orders.next_order')
-                            </button>
-                            <button onclick="goToNextOrder()" class="btn btn-success" type="button">
-                                @lang('orders.previous_order')
-                            </button>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label>@lang('orders.form.labels_log')</label>
+                            <textarea id="labels_log" disabled class="form-control scrollable-notice"
+                                    name="financial_comment"
+                                    id="labels_log"
+                                    rows="5">{{ $order->labels_log ?? ''}}</textarea>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label>@lang('orders.form.labels_log')</label>
-                        <textarea id="labels_log" disabled class="form-control scrollable-notice"
-                                  name="financial_comment"
-                                  id="labels_log"
-                                  rows="5">{{ $order->labels_log ?? ''}}</textarea>
-                    </div>
-                </div>
+            </div>
                 <div class="form-group" style="width: 40%; float: left; padding: 5px;">
                     <label for="remainder_date">@lang('orders.form.remainder_date')</label>
                     <input type="text" class="form-control default-date-time-picker-now" id="remainder_date"
@@ -585,7 +519,6 @@
                     <button type="button" class="btn btn-success" onclick="getFirmData({{$order->id}})">Pobierz dane
                         firmy
                     </button>
-
                 </div>
                 <h3 style="float: left; width: 100%;">Dane do wysyłki</h3>
 

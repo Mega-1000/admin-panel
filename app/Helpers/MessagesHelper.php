@@ -25,6 +25,7 @@ use App\Http\Requests\NoticesRequest;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Collection;
+use App\Http\Controllers\OrdersController;
 
 class MessagesHelper
 {
