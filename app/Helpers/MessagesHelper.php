@@ -580,6 +580,10 @@ class MessagesHelper
 
         $employeesIdsFiltered = [];
         foreach($employeesIds as $productEmployees) {
+            
+            if( is_string($productEmployees) ) {
+                $productEmployees = json_decode($productEmployees ?: '[]', true);
+            }
 
             if(empty($productEmployees)) continue;
 
