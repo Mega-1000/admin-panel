@@ -114,10 +114,11 @@ class MessagesController extends Controller
     {
         try {
             $helper = new MessagesHelper($token);
+            $chatId = $helper->getChat()->id;
             if ($request->type == ChatUser::class) {
                 $chatUser = ChatUser::findOrFail($request->user_id);
             } else {
-                $chatUser = $this->findCustomerOrEmployee($request);
+                $chatUser = $this->findCustomerOrEmployee($request, $chatId);
             }
             $chatUser->delete();
             return response('ok');
@@ -127,13 +128,19 @@ class MessagesController extends Controller
         }
     }
 
-    private function findCustomerOrEmployee(Request $request): ChatUser
+    private function findCustomerOrEmployee(Request $request, int $chatId): ChatUser
     {
         if ($request->type == Customer::class) {
-            $chatUser = ChatUser::where('customer_id', $request->user_id)->first();
+            $chatUser = ChatUser::where([
+                'customer_id' => $request->user_id,
+                'chat_id'     => $chatId,
+                ])->first();
         }
         if ($request->type == Employee::class) {
-            $chatUser = ChatUser::where('employee_id', $request->user_id)->first();
+            $chatUser = ChatUser::where([
+                'employee_id' => $request->user_id,
+                'chat_id'     => $chatId,
+            ])->first();
         }
         return $chatUser;
     }
@@ -201,7 +208,7 @@ class MessagesController extends Controller
             if (!$chat) {
                 throw new ChatException('Wrong chat token');
             }
-            $assignedMessagesIds = json_decode($helper->getCurrentChatUser()->assigned_messages_ids, true);
+            $assignedMessagesIds = json_decode($helper->getCurrentChatUser()->assigned_messages_ids ?: '[]', true);
             $assignedMessagesIds = array_flip($assignedMessagesIds);
             $out = '';
             foreach ($chat->messages as $message) {

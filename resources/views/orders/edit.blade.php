@@ -51,9 +51,6 @@
         <button class="btn btn-primary"
                 name="change-button-form" id="button-tasks"
                 value="tasks">@lang('orders.form.buttons.tasks')</button>
-        <button class="btn btn-primary"
-                name="change-button-form" id="button-messages"
-                value="messages">@lang('orders.form.buttons.messages')</button>
         @if($order->dispute)
             <a href="/admin/disputes/view/{{$order->dispute->id}}" class="btn btn-primary">
                 @if($order->dispute->unseen_changes)
@@ -487,12 +484,59 @@
                                     <div style="display: inline-block;">
                                         <span>{{ str_replace('+0100', '', $email->timestamp) }}</span>
                                         <a href="{{ Storage::url('mails/' . $email->path) }}"
-                                           style="display: block;">Ściągnij</a>
+                                        style="display: block;">Ściągnij</a>
                                     </div>
                                 </div>
                             @endforeach
                         @endif
                     </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            @include('orders.labels', ['title' =>  __('orders.form.consultant_notices'), 'user_type' => UserRole::Consultant])
+                            <textarea id="consultant_notice" disabled class="form-control" name="consultant_notices"
+                                      id="consultant_notices"
+                                      rows="5">{{ $order->consultant_notices ?? ''}}</textarea>
+                            <h5>Zlecenie numer {{ $order->id }}
+                                - {{ $orderInvoiceAddress?->nip ? 'Klient firmowy' : 'Klient prywatny' }}</h5>
+                            <div class="flex-input">
+                                <input type="text" class="form-control scrollable-notice"
+                                       placeholder="@lang('orders.form.consultant_notices')"
+                                       id="{{ Order::COMMENT_CONSULTANT_TYPE }}"
+                                       name="consultant_notices"/>
+                                <div class="input-group-append">
+                                    <button onclick="sendComment('{{ Order::COMMENT_CONSULTANT_TYPE }}')"
+                                            class="btn btn-success consultant__button--send" type="button">wyślij
+                                    </button>
+                                    <h5 onclick="sendComment('{{ Order::COMMENT_CONSULTANT_TYPE }}')"
+                                        class="consultant__button--send" type="button">wyślij
+                                    </h5>
+                                </div>
+                            </div>
+                            <h5 onclick="goToNextOrder()">@lang('orders.next_order')</h5>
+                            <h5 onclick="goToPreviousOrder()">@lang('orders.previous_order')</h5>
+                        </div>
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-7">
+                        <h3>Podgląd czatu</h3>
+                        @include('chat/chat_body')
+                        <a class="btn btn-success" href="/chat/{{ $chatUserToken }}" target="_blank">
+                            Przejdź do czatu
+                        </a>
+                    </div>
+                    <div class="col-md-5">
+                        @include('orders.labels', ['title' => __('orders.form.warehouse_notice'), 'user_type' => UserRole::Storekeeper])
+                        @include('orders.labels', ['title' => 'Informacje dla spedycji', 'user_type' => UserRole::SuperAdministrator])
+                        @include('orders.labels', ['title' =>  __('orders.form.consultant_notices'), 'user_type' => UserRole::Consultant])
+                        @include('orders.labels', ['title' =>  __('orders.form.financial_notices'), 'user_type' => UserRole::Accountant])
+                        <button onclick="goToPreviousOrder()" class="btn btn-success" type="button">
+                            @lang('orders.next_order')
+                        </button>
+                        <button onclick="goToNextOrder()" class="btn btn-success" type="button">
+                            @lang('orders.previous_order')
+                        </button>
                 </div>
                 <div class="container-fluid">
                     <div class="row">
@@ -2771,7 +2815,6 @@
             if (referrer.search('orderPayments') != -1 || uri.search('orderPayments') != -1 || item === 'orderPayments') {
                 $('#button-general').removeClass('active');
                 $('#button-tasks').removeClass('active');
-                $('#button-messages').removeClass('active');
                 $('#button-payments').addClass('active');
                 $('#button-packages').removeClass('active');
                 $('#button-customer').removeClass('active');
@@ -2798,7 +2841,6 @@
             } else if (referrer.search('orderTasks') != -1 || uri.search('orderTasks') != -1 || item === 'orderTasks') {
                 $('#button-general').removeClass('active');
                 $('#button-tasks').addClass('active');
-                $('#button-messages').removeClass('active');
                 $('#button-payments').removeClass('active');
                 $('#button-packages').removeClass('active');
                 $('#button-customer').removeClass('active');
@@ -2826,7 +2868,6 @@
             } else if (referrer.search('orderPackages') != -1 || uri.search('orderPackages') != -1 || item === 'orderPackages') {
                 $('#button-general').removeClass('active');
                 $('#button-tasks').removeClass('active');
-                $('#button-messages').removeClass('active');
                 $('#button-payments').removeClass('active');
                 $('#button-packages').addClass('active');
                 $('#button-customer').removeClass('active');
@@ -2852,7 +2893,6 @@
             } else if (referrer.search('orderMessages') != -1 || uri.search('orderMessages') != -1 || item === 'orderMessages') {
                 $('#button-general').removeClass('active');
                 $('#button-tasks').removeClass('active');
-                $('#button-messages').addClass('active');
                 $('#button-payments').removeClass('active');
                 $('#button-packages').removeClass('active');
                 $('#button-customer').removeClass('active');
@@ -2882,7 +2922,6 @@
                 if (value === 'general') {
                     $('#button-general').addClass('active');
                     $('#button-tasks').removeClass('active');
-                    $('#button-messages').removeClass('active');
                     $('#button-payments').removeClass('active');
                     $('#button-packages').removeClass('active');
                     $('#button-customer').removeClass('active');
@@ -2912,7 +2951,6 @@
                 } else if (value === 'tasks') {
                     $('#button-general').removeClass('active');
                     $('#button-tasks').addClass('active');
-                    $('#button-messages').removeClass('active');
                     $('#button-payments').removeClass('active');
                     $('#button-packages').removeClass('active');
                     $('#button-customer').removeClass('active');
@@ -2940,7 +2978,6 @@
                 } else if (value === 'payments') {
                     $('#button-general').removeClass('active');
                     $('#button-tasks').removeClass('active');
-                    $('#button-messages').removeClass('active');
                     $('#button-payments').addClass('active');
                     $('#button-customer').removeClass('active');
                     $('#button-packages').removeClass('active');
@@ -2970,7 +3007,6 @@
                 } else if (value === 'messages') {
                     $('#button-general').removeClass('active');
                     $('#button-tasks').removeClass('active');
-                    $('#button-messages').addClass('active');
                     $('#button-payments').removeClass('active');
                     $('#button-customer').removeClass('active');
                     $('#button-packages').removeClass('active');
@@ -2998,7 +3034,6 @@
                 } else if (value === 'packages') {
                     $('#button-general').removeClass('active');
                     $('#button-tasks').removeClass('active');
-                    $('#button-messages').removeClass('active');
                     $('#button-payments').removeClass('active');
                     $('#button-customer').removeClass('active');
                     $('#button-packages').addClass('active');
@@ -3026,7 +3061,6 @@
                 } else if (value === 'status') {
                     $('#button-general').removeClass('active');
                     $('#button-tasks').removeClass('active');
-                    $('#button-messages').removeClass('active');
                     $('#button-payments').removeClass('active');
                     $('#button-packages').removeClass('active');
                     $('#button-customer').removeClass('active');
@@ -3054,7 +3088,6 @@
                 } else if (value === 'customer') {
                     $('#button-general').removeClass('active');
                     $('#button-tasks').removeClass('active');
-                    $('#button-messages').removeClass('active');
                     $('#button-payments').removeClass('active');
                     $('#button-packages').removeClass('active');
                     $('#button-customer').addClass('active');
@@ -3082,7 +3115,6 @@
                 } else if (value === 'warehouse-payments') {
                     $('#button-general').removeClass('active');
                     $('#button-tasks').removeClass('active');
-                    $('#button-messages').removeClass('active');
                     $('#button-payments').removeClass('active');
                     $('#button-packages').removeClass('active');
                     $('#button-customer').removeClass('active');
@@ -3110,7 +3142,6 @@
                 } else if (value === 'spedition-payments') {
                     $('#button-general').removeClass('active');
                     $('#button-tasks').removeClass('active');
-                    $('#button-messages').removeClass('active');
                     $('#button-payments').removeClass('active');
                     $('#button-packages').removeClass('active');
                     $('#button-customer').removeClass('active');

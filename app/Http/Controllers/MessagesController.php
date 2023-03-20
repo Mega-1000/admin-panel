@@ -150,7 +150,7 @@ class MessagesController extends Controller {
 
         $assignedMessagesIds = [];
         if($currentChatUser !== null) {
-            $assignedMessagesIds = json_decode($helper->getCurrentChatUser()->assigned_messages_ids, true);
+            $assignedMessagesIds = json_decode($helper->getCurrentChatUser()->assigned_messages_ids ?: '[]', true);
         }
 
         $chatMessages = $chat->messages;

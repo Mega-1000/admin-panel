@@ -332,7 +332,7 @@ class MessagesHelper
             foreach($chat->chatUsers as $singleUser) {
                 if($singleUser->user_id !== null) continue;
 
-                $assignedMessagesIds = json_decode($singleUser->assigned_messages_ids, true);
+                $assignedMessagesIds = json_decode($singleUser->assigned_messages_ids ?: '[]', true);
                 $assignedMessagesIds[] = $msg->id;
                 $singleUser->assigned_messages_ids = json_encode($assignedMessagesIds);
                 $singleUser->save();
@@ -572,18 +572,16 @@ class MessagesHelper
     /**
      * Prepare Employees for possible Users
      *
-     * @param Collection<Product> $employeesIds
+     * @param Collection $employeesIds
      * @param Collection $currentEmployeesOnChat - collections with Employees ids
      * @return Collection<Employee>
      */
     public function prepareEmployees(Collection $employeesIds, Collection $currentEmployeesOnChat): Collection {
 
         $employeesIdsFiltered = [];
-
         foreach($employeesIds as $productEmployees) {
-            $productEmployees = json_decode($productEmployees);
 
-            if(!empty($productEmployee)) continue;
+            if(empty($productEmployees)) continue;
 
             foreach($productEmployees as $employeeId) {
                 $employeesIdsFiltered[] = $employeeId;
