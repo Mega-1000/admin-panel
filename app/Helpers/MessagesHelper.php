@@ -354,7 +354,7 @@ class MessagesHelper
                     [self::MESSAGE_YELLOW_LABEL_ID],
                     $loopPrevention,
                     ['added_type' => Label::CHAT_TYPE],
-                    Auth::user()->id
+                    Auth::user()->id ?: null
                 );
             } else if( isset(Auth::user()->id) ) {
                 $loopPrevention = [];
