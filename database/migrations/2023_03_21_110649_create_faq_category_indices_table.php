@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('faq_category_indices', function (Blueprint $table) {
+        Schema::create('faq_category_indexes', function (Blueprint $table) {
             $table->id();
             $table->string('faq_category_name');
             $table->unsignedInteger('faq_category_index');
