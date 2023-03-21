@@ -276,7 +276,7 @@ class FaqController
     }
 
     public function setQuestionsPosition(SetPositionRequest $request) {
-        foreach ($request->validated('questions') as $key => $question) {
+        foreach ($request->validated('categories') as $key => $question) {
         
             $faq = Faq::find($question['id']);
 
