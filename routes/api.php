@@ -110,13 +110,17 @@ Route::group(['prefix' => 'customers', 'as' => 'customers.'], __DIR__ . '/api/Cu
 Route::group(['prefix' => 'working-events', 'as' => 'workingEvents_api.'], __DIR__ . '/api/WorkingEventsRoutes.php');
 Route::group(['prefix' => 'countries', 'as' => 'countries.'], __DIR__ . '/api/CountriesRoutes.php');
 
-Route::post('/faqs', 'Api\FaqController@store')->name('api.faq.save');
-Route::get('/faqs/categories', 'Api\FaqController@getCategories')->name('api.faq.categories');
-Route::get('/faqs/get', 'Api\FaqController@getQuestions')->name('api.faq.get');
-Route::get('/faqs', 'Api\FaqController@index')->name('api.faq.index');
-Route::get('/faqs/{id}', 'Api\FaqController@show')->name('api.faq.show');
-Route::put('/faqs/{id}', 'Api\FaqController@update')->name('api.faq.update');
-Route::delete('/faqs/{id}', 'Api\FaqController@destroy')->name('api.faq.destroy');
-Route::post('/faqs/ask', 'Api\FaqController@askQuestion')->name('api.faq.ask');
+Route::group(['prefix' => 'faqs'], function () {
+    Route::post('/', 'Api\FaqController@store')->name('api.faq.save');
+    Route::get('/categories', 'Api\FaqController@getCategories')->name('api.faq.categories');
+    Route::get('/get', 'Api\FaqController@getQuestions')->name('api.faq.get');
+    Route::get('/', 'Api\FaqController@index')->name('api.faq.index');
+    Route::get('/{id}', 'Api\FaqController@show')->name('api.faq.show');
+    Route::put('/{id}', 'Api\FaqController@update')->name('api.faq.update');
+    Route::delete('/{id}', 'Api\FaqController@destroy')->name('api.faq.destroy');
+    Route::post('/ask', 'Api\FaqController@askQuestion')->name('api.faq.ask');
+    Route::post('/categories-positions', 'Api\FaqController@setCategoryPosition')->name('api.faq.categories-positions');
+    Route::post('/questions-positions', 'Api\FaqController@setQuestionsPosition')->name('api.faq.questions-positions');
+});
 
 Route::get('/orders/{id}/sendOfferToCustomer', 'Api\OrdersController@sendOfferToCustomer')->name('api.orders.sendOfferToCustomer');
