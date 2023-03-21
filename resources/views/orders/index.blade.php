@@ -2877,24 +2877,24 @@
             if (timed == 1) {
                 $('#timed_label').modal('show');
             } else {
-                addLabelAjax(orderIds, chosenLabel, false)
+                addLabelAjax();
             }
         }
 
         $('body').on('click', '#time_label_ok', () => {
-            addLabelAjax(orderIds, chosenLabel, true);
+            addLabelAjax(true);
         });
 
-        function addLabelAjax(orderIds, chosenLabel, timed = false) {
+        function addLabelAjax(timed = false) {
             let data = '';
             let url = "{{ route('orders.label-addition', ['labelId' => ':id'])}}"
             url = url.replace(':id', chosenLabel.val());
             let schedulerUrl = "{{ route('api.labels.get-labels-scheduler-await', ['userId' => ':id']) }}"
             schedulerUrl = schedulerUrl.replace(':id', {{ \Illuminate\Support\Facades\Auth::user()->id }});
             if (timed == true) {
-                data = {orderIds: orderIds, time: $('#time_label').val()};
+                data = {orderIds, time: $('#time_label').val()};
             } else {
-                data = {orderIds: orderIds}
+                data = {orderIds}
             }
             $.ajax({
                 url: url,
