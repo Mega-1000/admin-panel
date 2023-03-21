@@ -2,30 +2,31 @@
 
 namespace App\Helpers;
 
-use App\User;
 use App\Entities\Chat;
-use App\Entities\CustomerAddress;
-use App\Entities\Label;
-use App\Entities\Product;
-use App\Entities\Order;
-use App\Entities\WorkingEvents;
-use App\Jobs\ChatNotificationJob;
 use App\Entities\Customer;
+use App\Entities\CustomerAddress;
 use App\Entities\Employee;
-use App\Entities\ProductMedia;
+use App\Entities\Label;
 use App\Entities\Message;
+use App\Entities\Order;
+use App\Entities\Product;
+use App\Entities\ProductMedia;
+use App\Entities\WorkingEvents;
+use App\Enums\UserRole;
 use App\Helpers\Exceptions\ChatException;
-use Illuminate\Support\Facades\Hash;
+use App\Http\Controllers\OrdersController;
+use App\Http\Requests\NoticesRequest;
+use App\Jobs\ChatNotificationJob;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
-use Illuminate\Support\Facades\Auth;
-use App\Enums\UserRole;
+use App\User;
+use Exception;
 use Illuminate\Http\UploadedFile;
-use App\Http\Requests\NoticesRequest;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Collection;
-use App\Http\Controllers\OrdersController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class MessagesHelper
 {
@@ -178,9 +179,9 @@ class MessagesHelper
     private function getChatObject()
     {
         return Chat
-            ::with(['messages' => function($q) {
-                $q->with(['chatUser' => function($q) {
-                    $q->with(['customer' => function($q) {
+            ::with(['messages' => function ($q) {
+                $q->with(['chatUser' => function ($q) {
+                    $q->with(['customer' => function ($q) {
                         $q->with(['addresses' => function ($q) {
                             $q->whereNotNull('phone');
                         }]);
@@ -191,8 +192,7 @@ class MessagesHelper
                 $q->oldest();
             }])
             ->with('order')
-            ->find($this->chatId)
-        ;
+            ->find($this->chatId);
     }
 
     public function getTitle($withBold = false)
@@ -209,12 +209,12 @@ class MessagesHelper
         $chat = new Chat();
         $chat->order_id = null;
 
-        if($this->orderId) {
+        if ($this->orderId) {
             // ensure that is only one order chat
             $chat = Chat::where('order_id', $this->orderId)->first();
             $this->setUsers();
 
-            if($chat) {
+            if ($chat) {
                 $this->cache['chat'] = $chat;
                 $chat->order_id = $this->orderId;
                 return $chat;
@@ -223,7 +223,7 @@ class MessagesHelper
             $chat = new Chat();
             $chat->order_id = $this->orderId;
         }
-        
+
         $chat->product_id = $this->productId ?: null;
         $this->cache['chat'] = $chat;
         $chat->save();
@@ -271,13 +271,13 @@ class MessagesHelper
     /**
      * Handle add message to Chat
      *
-     * @param  string       $message
-     * @param  string       $area
-     * @param  UploadedFile $file
+     * @param string $message
+     * @param string $area
+     * @param UploadedFile $file
      *
      * @return void
      */
-    public function addMessage(string $message, string $area = UserRole::Main, UploadedFile $file = null): void
+    public function addMessage(string $message, int $area = UserRole::Main, UploadedFile $file = null): void
     {
         $chat = $this->getChat();
         $chatUser = $this->getCurrentChatUser();
@@ -291,7 +291,7 @@ class MessagesHelper
         $messageObj->area = $area;
         if ($area != 0 && $this->currentUserType != self::TYPE_USER) {
             throw new ChatException('You don\'t have permission to write in other area');
-        } else if($area != 0 && $this->currentUserType == self::TYPE_USER && $chat->order_id) {
+        } else if ($area != 0 && $this->currentUserType == self::TYPE_USER && $chat->order_id) {
 
             // map UserRole Enum to Order constants
             $type = [
@@ -302,10 +302,10 @@ class MessagesHelper
                 '5' => Order::COMMENT_WAREHOUSE_TYPE,
             ];
             $noticesRequestParams = [
-                'message'  => $message,
-                'type'     => $type[ $area ],
+                'message' => $message,
+                'type' => $type[$area],
                 'order_id' => $chat->order_id,
-                'user_id'  => $chatUser->user_id,
+                'user_id' => $chatUser->user_id,
             ];
             $noticeRequest = new NoticesRequest($noticesRequestParams);
             $noticeValidator = Validator::make($noticeRequest->all(), $noticeRequest->rules());
@@ -314,11 +314,11 @@ class MessagesHelper
             $order = app(OrdersController::class);
             $order->updateNotices($noticeRequest);
         }
-        if($file) {
+        if ($file) {
             $originalFileName = $file->getClientOriginalName();
             $hashedFileName = Hash::make($originalFileName);
-            $path = $file->storeAs('chat_files/'.$chat->id, $hashedFileName, 'public');
-            if($path) {
+            $path = $file->storeAs('chat_files/' . $chat->id, $hashedFileName, 'public');
+            if ($path) {
                 $messageObj->attachment_path = $path;
                 $messageObj->attachment_name = $originalFileName;
             }
@@ -329,9 +329,9 @@ class MessagesHelper
         $msg = $chatUser->messages()->save($messageObj);
 
         // assign messages if area is default (0)
-        if($area == 0) {
-            foreach($chat->chatUsers as $singleUser) {
-                if($singleUser->user_id !== null) continue;
+        if ($area == 0) {
+            foreach ($chat->chatUsers as $singleUser) {
+                if ($singleUser->user_id !== null) continue;
 
                 $assignedMessagesIds = json_decode($singleUser->assigned_messages_ids ?: '[]', true);
                 $assignedMessagesIds[] = $msg->id;
@@ -339,7 +339,7 @@ class MessagesHelper
                 $singleUser->save();
             }
         }
-        
+
         if ($chat->order) {
             if ($chatUser->user) {
                 $this->setChatLabel($chat, true);
@@ -356,7 +356,7 @@ class MessagesHelper
                     ['added_type' => Label::CHAT_TYPE],
                     Auth::user()?->id
                 );
-            } else if( isset(Auth::user()->id) ) {
+            } else if (isset(Auth::user()->id)) {
                 $loopPrevention = [];
                 RemoveLabelService::removeLabels(
                     $chat->order, [self::MESSAGE_YELLOW_LABEL_ID],
@@ -494,9 +494,9 @@ class MessagesHelper
     public static function calcDistance(float $lat1, float $lon1, float $lat2, float $lon2): float
     {
         return 73 * sqrt(
-            pow($lat1 - $lat2, 2) +
-            pow($lon1 - $lon2, 2)
-        );
+                pow($lat1 - $lat2, 2) +
+                pow($lon1 - $lon2, 2)
+            );
     }
 
     private function setChatLabel(Chat $chat, bool $clearDanger = false): void
@@ -532,18 +532,17 @@ class MessagesHelper
         $chat->save();
     }
 
+    /**
+     * @throws Exception
+     */
     public function getCurrentUser()
     {
-        switch ($this->currentUserType) {
-            case self::TYPE_CUSTOMER:
-                return Customer::find($this->currentUserId);
-            case self::TYPE_EMPLOYEE:
-                return Employee::find($this->currentUserId);
-            case self::TYPE_USER:
-                return User::find($this->currentUserId);
-            default:
-                throw new \Exception('Userd does not exist');
-        }
+        return match ($this->currentUserType) {
+            self::TYPE_CUSTOMER => Customer::find($this->currentUserId),
+            self::TYPE_EMPLOYEE => Employee::find($this->currentUserId),
+            self::TYPE_USER => User::find($this->currentUserId),
+            default => throw new Exception('Userd does not exist'),
+        };
     }
 
     /**
@@ -563,7 +562,7 @@ class MessagesHelper
                 });
             }
             return $order->items;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Cannot prepare product list',
                 ['exception' => $e->getMessage(), 'class' => $e->getFile(), 'line' => $e->getLine()]);
             return collect();
@@ -577,18 +576,19 @@ class MessagesHelper
      * @param Collection $currentEmployeesOnChat - collections with Employees ids
      * @return Collection<Employee>
      */
-    public function prepareEmployees(Collection $employeesIds, Collection $currentEmployeesOnChat): Collection {
+    public function prepareEmployees(Collection $employeesIds, Collection $currentEmployeesOnChat): Collection
+    {
 
         $employeesIdsFiltered = [];
-        foreach($employeesIds as $productEmployees) {
-            
-            if( is_string($productEmployees) ) {
+        foreach ($employeesIds as $productEmployees) {
+
+            if (is_string($productEmployees)) {
                 $productEmployees = json_decode($productEmployees ?: '[]', true);
             }
 
-            if(empty($productEmployees)) continue;
+            if (empty($productEmployees)) continue;
 
-            foreach($productEmployees as $employeeId) {
+            foreach ($productEmployees as $employeeId) {
                 $employeesIdsFiltered[] = $employeeId;
             }
         }
