@@ -9,6 +9,9 @@ use App\Repositories\OrderAllegroRepository;
 use App\Repositories\OrderRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Entities\FaqCategoryIndex;
+use Illuminate\Support\Arr;
+use App\Entities\Faq;
 
 /**
  * Klasa kontrolera obsługująca
@@ -100,6 +103,13 @@ class FaqController
                 $item['questions'] = $value->questions;
                 return $item;
             }, $value->questions));
+        }
+
+        foreach ($result as &$value) {
+            foreach ($value as &$item) {
+                $index = FaqCategoryIndex::where('faq_id', $item['id']);
+                $item['index'] = $index->exists() ? $index->first()->faq_category_index : null; 
+            }
         }
 
         return response()->json($result, 200);
@@ -242,6 +252,43 @@ class FaqController
             $result[] = $category->category;
         }
 
+        $faqCategoryIndex = FaqCategoryIndex::where('faq_category_type', 'category')->get();
+        $faqCategoryIndex = $faqCategoryIndex->sortBy('faq_category_index');
+        $faqCategoryIndex = $faqCategoryIndex->pluck('faq_category_name')->toArray();
+        $result = array_merge($faqCategoryIndex, array_diff($result, $faqCategoryIndex));
+
         return response()->json($result);
+    }
+
+    public function setCategoryPosition(Request $request)
+    {
+        FaqCategoryIndex::where('faq_category_type', 'category')->delete();
+
+        foreach ($request->get('categories') as $key => $category) {
+            $faqCategoryIndex = new FaqCategoryIndex();
+            $faqCategoryIndex->faq_category_name = $category;
+            $faqCategoryIndex->faq_category_index = $key;
+            $faqCategoryIndex->save();
+        }
+
+        return response()->json(['status' => 200]);
+    }
+
+    public function setQuestionsPosition(Request $request) {
+        foreach ($request->get('questions') as $key => $question) {
+        
+            $faq = Faq::find($question['id']);
+
+            FaqCategoryIndex::where('faq_category_type', 'question')
+                ->where('faq_id', $question['id'])
+                ->delete();
+
+
+            $index = new FaqCategoryIndex();
+            $index->faq_category_type = 'question';
+            $index->faq_id = $question['id'];
+            $index->faq_category_index = $key;
+            $index->save();
+        }
     }
 }
