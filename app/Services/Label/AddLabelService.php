@@ -19,7 +19,6 @@ class AddLabelService
     public static function addLabels(Order $order, array $labelIdsToAdd, array &$loopPreventionArray, array $options, ?int $userId, ?Carbon $time = null): void
     {
         $now = Carbon::now();
-
         $labelsToAddAtTheEnd = [];
         $labelsToRemoveAtTheEnd = [];
 
@@ -48,7 +47,7 @@ class AddLabelService
             $alreadyHasLabel = $order->labels()->where('label_id', $labelId)->exists();
 
             // init timed labels
-            if ($time !== null && $alreadyHasLabel === null) {
+            if ($time !== null && $alreadyHasLabel === false) {
                 $timedLabelId = DB::table('timed_labels')->insertGetId([
                     'execution_time' => $time,
                     'order_id' => $order->id,
