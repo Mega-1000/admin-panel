@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use App\Entities\FaqCategoryIndex;
 use Illuminate\Support\Arr;
 use App\Entities\Faq;
+use App\Http\Requests\SetPositionRequest;
 
 /**
  * Klasa kontrolera obsługująca
@@ -260,11 +261,11 @@ class FaqController
         return response()->json($result);
     }
 
-    public function setCategoryPosition(Request $request)
+    public function setCategoryPosition(SetPositionRequest $request)
     {
         FaqCategoryIndex::where('faq_category_type', 'category')->delete();
 
-        foreach ($request->get('categories') as $key => $category) {
+        foreach ($request->validated('categories') as $key => $category) {
             $faqCategoryIndex = new FaqCategoryIndex();
             $faqCategoryIndex->faq_category_name = $category;
             $faqCategoryIndex->faq_category_index = $key;
@@ -274,8 +275,8 @@ class FaqController
         return response()->json(['status' => 200]);
     }
 
-    public function setQuestionsPosition(Request $request) {
-        foreach ($request->get('questions') as $key => $question) {
+    public function setQuestionsPosition(SetPositionRequest $request) {
+        foreach ($request->validated('questions') as $key => $question) {
         
             $faq = Faq::find($question['id']);
 
