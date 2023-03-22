@@ -364,7 +364,7 @@ class AllegroOrderSynchro implements ShouldQueue
                     $undefinedProductSymbol = $item['offer']['external'];
                 }
 
-                if (!$product->stock()->count()) {
+                if ($product !== null && $product->stock() === null) {
                     ProductStock::create([
                         'product_id' => $product->id,
                         'quantity' => 0,

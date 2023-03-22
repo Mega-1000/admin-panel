@@ -99,6 +99,7 @@ class OrderBuilder
 
     /**
      * @throws ChatException
+     * @throws Exception
      */
     public function newStore($data)
     {
@@ -190,9 +191,7 @@ class OrderBuilder
             $order->shipment_price_for_client = $this->totalTransportSumCalculator->getSum($order);
         }
         $order->save();
-        if ($this->postOrderActions) {
-            $this->postOrderActions->run($order);
-        }
+        $this->postOrderActions?->run($order);
         return ['id' => $order->id, 'canPay' => $canPay ?? false];
     }
 
