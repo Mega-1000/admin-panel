@@ -115,12 +115,12 @@ Route::group(['prefix' => 'faqs'], function () {
     Route::get('/categories', 'Api\FaqController@getCategories')->name('api.faq.categories');
     Route::get('/get', 'Api\FaqController@getQuestions')->name('api.faq.get');
     Route::get('/', 'Api\FaqController@index')->name('api.faq.index');
-    Route::get('/{id}', 'Api\FaqController@show')->name('api.faq.show');
-    Route::put('/{id}', 'Api\FaqController@update')->name('api.faq.update');
-    Route::delete('/{id}', 'Api\FaqController@destroy')->name('api.faq.destroy');
     Route::post('/ask', 'Api\FaqController@askQuestion')->name('api.faq.ask');
     Route::post('/categories-positions', 'Api\FaqController@setCategoryPosition')->name('api.faq.categories-positions');
     Route::post('/questions-positions', 'Api\FaqController@setQuestionsPosition')->name('api.faq.questions-positions');
+    Route::get('/{id}', 'Api\FaqController@show')->name('api.faq.show');
+    Route::put('/{id}', 'Api\FaqController@update')->name('api.faq.update');
+    Route::delete('/{id}', 'Api\FaqController@destroy')->name('api.faq.destroy');
 });
 
 Route::get('/orders/{id}/sendOfferToCustomer', 'Api\OrdersController@sendOfferToCustomer')->name('api.orders.sendOfferToCustomer');
