@@ -143,13 +143,14 @@ class OrderBuilder
                 $this->attachFileToOrder($file, $order);
             }
         }
-
+        $chatUserToken = '';
         if (!empty($data['customer_notices'])) {
             $helper = new MessagesHelper();
             $helper->orderId = $order->id;
             $helper->currentUserId = $customer->id;
             $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
             $helper->createNewChat();
+            $chatUserToken = $helper->encrypt();
             $helper->addMessage($data['customer_notices']);
             $order->labels()->attach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
         }
@@ -192,7 +193,7 @@ class OrderBuilder
         }
         $order->save();
         $this->postOrderActions?->run($order);
-        return ['id' => $order->id, 'canPay' => $canPay ?? false];
+        return ['id' => $order->id, 'canPay' => $canPay ?? false, 'chatUserToken' => $chatUserToken];
     }
 
     private static function setEmptyOrderData(&$data)
