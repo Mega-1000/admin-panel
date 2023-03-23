@@ -13,6 +13,8 @@ use App\Enums\ProductStockLogActionEnum;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
+use App\Jobs\TimedLabelJob;
 
 class RemoveLabelService
 {
@@ -28,8 +30,6 @@ class RemoveLabelService
         if (Auth::user() === null && $userId !== null) {
             Auth::loginUsingId($userId);
         }
-        $removeLabelAtTheEnd = [];
-        $addLabelAtTheEnd = [];
         foreach ($labelIdsToRemove as $labelId) {
             if (array_key_exists('already-removed', $loopPreventionArray) && in_array($labelId, $loopPreventionArray['already-removed'])) {
                 continue;
@@ -45,13 +45,25 @@ class RemoveLabelService
 
             /** @var Label $label */
             $label = Label::query()->find($labelId);
+
             if ($time !== null) {
-                $labelsToChange = $label->labelsToAddAfterTimedLabel;
-                foreach ($labelsToChange as $labelToChange) {
-                    AddLabelService::addLabels($order, [$labelToChange->pivot->label_to_add_id], $loopPreventionArray, [], $userId);
-                    $removeLabelAtTheEnd[] = $labelToChange->pivot->label_to_add_id;
-                    $addLabelAtTheEnd[] = $labelToChange->pivot->main_label_id;
-                }
+
+                $preLabelId = DB::table('label_labels_to_add_after_timed_label')->where('main_label_id', $labelId)->first()?->label_to_add_id;
+
+                if($preLabelId === null) continue;
+
+                $now = Carbon::now();
+
+                $order->labels()->detach($labelId);
+
+                $order->labels()->attach($order->id, ['label_id' => $preLabelId, 'added_type' => NULL, 'created_at' => $now]);
+
+                // // calc time to run timed label job
+                $dateTo = new Carbon($time);
+                $diff = $now->diffInSeconds($dateTo);
+
+                TimedLabelJob::dispatch($labelId, $preLabelId, $order, $loopPreventionArray, [], $userId, $now)->delay( now()->addSeconds($diff) );
+                continue;
             }
 
             if ($label->manual_label_selection_to_add_after_removal) {
@@ -88,13 +100,6 @@ class RemoveLabelService
                 }
                 self::removeLabels($order, array_unique($labelIdsToDetach), $loopPreventionArray, [], $userId);
             }
-        }
-
-        if (count($removeLabelAtTheEnd) > 0) {
-            self::removeLabels($order, array_unique($removeLabelAtTheEnd), $loopPreventionArray, [], $userId);
-        }
-        if (count($addLabelAtTheEnd) > 0) {
-            AddLabelService::addLabels($order, array_unique($addLabelAtTheEnd), $loopPreventionArray, [], $userId);
         }
 
         return ['success' => true];
