@@ -188,7 +188,9 @@ class FaqController
         try {
             $faq = $this->faqRepository->find($id);
             FaqCategoryIndex::where('faq_id', $id)->delete();
-            FaqCategoryIndex::where('faq_category_name', $faq->category)->delete();
+            if (Faq::where('category', $faq->category)->count() === 1) {
+                FaqCategoryIndex::where('faq_category_name', $faq->category)->delete();
+            }
             $result = $faq->delete();
             if ($result) {
                 $response['status'] = 200;
