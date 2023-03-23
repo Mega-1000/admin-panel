@@ -191,15 +191,16 @@ class OrdersController extends Controller
             } else {
                 $orderBuilder->setUserSelector(new GetCustomerForAdminEdit());
             }
-            ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($data);
+            $builderData = $orderBuilder->newStore($data);
             DB::commit();
-
-            $order = Order::find($id);
+            
+            $order = Order::find($builderData['id']);
+            $builderData['token'] = $order->getToken();
             $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 2)->first();
             $order->firm_source_id = $firmSource ? $firmSource->id : null;
             $order->save();
 
-            return $this->createdResponse(['order_id' => $id, 'canPay' => $canPay, 'token' => $order->getToken()]);
+            return response()->json($builderData);
         } catch (Exception $e) {
             DB::rollBack();
             if (empty($this->error_code)) {
