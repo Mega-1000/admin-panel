@@ -19,8 +19,6 @@ class AddLabelService
     public static function addLabels(Order $order, array $labelIdsToAdd, array &$loopPreventionArray, array $options, ?int $userId, ?Carbon $time = null): void
     {
         $now = Carbon::now();
-        $labelsToAddAtTheEnd = [];
-        $labelsToRemoveAtTheEnd = [];
 
         $options = array_merge([
             'added_type' => null,
@@ -44,26 +42,30 @@ class AddLabelService
 
             /** @var Label $label */
             $label = Label::query()->find($labelId);
-            $alreadyHasLabel = $order->labels()->where('label_id', $labelId)->exists();
-
             // init timed labels
-            if ($time !== null && $alreadyHasLabel === false) {
-                $timedLabelId = DB::table('timed_labels')->insertGetId([
-                    'execution_time' => $time,
-                    'order_id' => $order->id,
-                    'label_id' => $labelId,
-                    'is_executed' => false
-                ]);
-                $order->labels()->attach($order->id, ['label_id' => $labelId, 'added_type' => $options['added_type'], 'created_at' => Carbon::now()]);
+            if ($time !== null) {
+
+                $preLabelId = DB::table('label_labels_to_add_after_timed_label')->where('main_label_id', $labelId)->first()?->label_to_add_id;
+                if($preLabelId === null) continue;
+
+                $alreadyHasLabel = $order->labels()->where('label_id', $preLabelId)->exists();
+
+                $now = Carbon::now();
+                if($alreadyHasLabel) {
+                    $order->labels()->updateExistingPivot($preLabelId, ['label_id' => $preLabelId, 'added_type' => $options['added_type'], 'created_at' => $now]);
+                } else {
+                    $order->labels()->attach($preLabelId, ['label_id' => $preLabelId, 'added_type' => $options['added_type'], 'created_at' => $now]);
+                }
 
                 // calc time to run timed label job
-                $dateFrom = Carbon::now();
                 $dateTo = new Carbon($time);
-                $diff = $dateFrom->diffInSeconds($dateTo);
-                
-                TimedLabelJob::dispatch($timedLabelId, $labelId, $order, $loopPreventionArray, $options, $userId)->delay( now()->addSeconds($diff) );
+                $diff = $now->diffInSeconds($dateTo);
+
+                TimedLabelJob::dispatch($labelId, $preLabelId, $order, $loopPreventionArray, $options, $userId, $now)->delay( now()->addSeconds($diff) );
                 continue;
             }
+
+            $alreadyHasLabel = $order->labels()->where('label_id', $labelId)->exists();
 
             if ($alreadyHasLabel === false && $time === null) {
                 $order->labels()->attach($order->id, ['label_id' => $label->id, 'added_type' => $options['added_type'], 'created_at' => Carbon::now()]);
@@ -108,13 +110,6 @@ class AddLabelService
                     }
                 }
             }
-        }
-
-        if (count($labelsToAddAtTheEnd) > 0) {
-            self::addLabels($order, $labelsToAddAtTheEnd, $loopPreventionArray, $options, $userId);
-        }
-        if (count($labelsToRemoveAtTheEnd) > 0) {
-            RemoveLabelService::removeLabels($order, $labelsToRemoveAtTheEnd, $loopPreventionArray, [], $userId);
         }
     }
 

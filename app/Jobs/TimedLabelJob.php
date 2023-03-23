@@ -7,11 +7,9 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\DB;
-use App\Services\Label\RemoveLabelService;
-use App\Entities\Label;
 use App\Entities\Order;
 use App\Services\Label\AddLabelService;
+use Carbon\Carbon;
 
 class TimedLabelJob implements ShouldQueue
 {
@@ -23,12 +21,13 @@ class TimedLabelJob implements ShouldQueue
      * @return void
      */
     public function __construct(
-        private int $timedLabelId,
         private int $labelId,
+        private int $preLabelId,
         private Order $order,
         private array $loopPreventionArray,
         private array $options,
-        private ?int $userId
+        private ?int $userId,
+        private Carbon $now
     ) {}
 
     /**
@@ -38,22 +37,12 @@ class TimedLabelJob implements ShouldQueue
      */
     public function handle()
     {
-        
-        DB::table('timed_labels')->where('id', $this->timedLabelId)->update(['is_executed' => true]);
+        $currentLabelId = $this->order->labels()->where('label_id', $this->preLabelId);
 
-        $labelsAfterTime = DB::table('label_labels_to_add_after_timed_label')->where('main_label_id', $this->labelId)->get();
-
-        if ($labelsAfterTime->count() > 0) {
-            foreach ($labelsAfterTime as $labelAfterTime) {
-                $labelsToAddAtTheEnd[] = $labelAfterTime->label_to_add_id;
-            }
-        } else {
-            $labelsToAddAtTheEnd[] = Label::URGENT_INTERVENTION;
+        // job must have the same creation date
+        if( $currentLabelId->created_at == $this->now->toDateTimeString() ) {
+            $this->order->labels()->detach($this->preLabelId);
+            AddLabelService::addLabels($this->order, [ $this->labelId ], $this->loopPreventionArray, $this->options, $this->userId);
         }
-
-        if (count($labelsToAddAtTheEnd) > 0) {
-            AddLabelService::addLabels($this->order, $labelsToAddAtTheEnd, $this->loopPreventionArray, $this->options, $this->userId);
-        }
-        RemoveLabelService::removeLabels($this->order, [ $this->labelId ], $this->loopPreventionArray, [], $this->userId);
     }
 }

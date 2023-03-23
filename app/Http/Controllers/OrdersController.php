@@ -1766,7 +1766,7 @@ class OrdersController extends Controller
             return;
         }
 
-        if ($request->input('time') !== null) {
+        if ($request->input('time') !== null && $request->input('time') !== '') {
             $time = Carbon::parse($request->input('time'));
         } else {
             $time = null;
