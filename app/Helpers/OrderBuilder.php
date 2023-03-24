@@ -144,17 +144,12 @@ class OrderBuilder
             }
         }
         $chatUserToken = '';
-        if (!empty($data['customer_notices'])) {
+        if ( $data['need_support'] === true ) {
             $helper = new MessagesHelper();
-            $helper->orderId = $order->id;
-            $helper->currentUserId = $customer->id;
-            $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
             $helper->createNewChat();
-            $chatUserToken = $helper->encrypt();
+            $chatUserToken = $helper->getChatToken($order->id, $customer->id, MessagesHelper::TYPE_CUSTOMER);
 
-            if($data['customer_notices'] === 'need_support') {
-                $order->need_support = true;
-            } else {
+            if( !empty($data['customer_notices']) ) {
                 $helper->addMessage($data['customer_notices']);
             }
             $order->labels()->attach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
