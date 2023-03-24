@@ -2,14 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Entities\EmailSetting;
 use App\Enums\EmailSettingsEnum;
 use App\Http\Requests\EmailSettingsCreateRequest;
-use Jobs\EmailSendingJob;
-
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Str;
 
 class EmailSettingsController extends Controller
 {

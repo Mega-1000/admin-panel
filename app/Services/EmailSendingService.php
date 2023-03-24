@@ -1,6 +1,5 @@
 <?php namespace App\Services;
 
-use Illuminate\Support\Facades\Auth;
 use App\Enums\EmailSettingsEnum;
 use App\Entities\Order;
 use App\Entities\AllegroOrder;
@@ -8,12 +7,12 @@ use App\Entities\EmailSending;
 use App\Entities\EmailSetting;
 use App\Mail\MailSending;
 use Exception;
-
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 
 class EmailSendingService
 {
-    public function addNewScheduledEmail($order_id): bool
+    public function addNewScheduledEmail(int $order_id): bool
     {
         $order = Order::find($order_id);
         if (empty($order)) {
@@ -28,7 +27,7 @@ class EmailSendingService
         return true;
     }
 
-    public function addScheduledEmail($order_id, $labelID): bool
+    public function addScheduledEmail(int $order_id, int $labelID): bool
     {
         $order = Order::find($order_id);
         if (empty($order)) {
@@ -59,7 +58,7 @@ class EmailSendingService
         return true;
     }
 
-    public function saveScheduledEmail($order, $setting): int
+    public function saveScheduledEmail(Order $order, EmailSetting $setting): int
     {
         $file = $this->generateAttachment($setting->content);
         
@@ -79,7 +78,7 @@ class EmailSendingService
     }
 
 
-    public function getEmail($order): string
+    public function getEmail(Order $order): string
     {
         if($order->allegro_form_id){
             $allegroOrder = AllegroOrder::where('order_id',$order->allegro_form_id)->get();
@@ -90,45 +89,45 @@ class EmailSendingService
     }
 
 
-    public function getDate($setting): string
+    public function getDate(EmailSetting $setting): string
     {
         $date = new \DateTime();
         $date->modify('+'.$setting->time.' minute');
         return $date->format('Y-m-d H:i:s');
     }
 
-    public function generateContent($content,$file=null): string
+    public function generateContent(string $content, ?string $file = null): string
     {
         $text = $this->getStringBetween($content, '[text]', '[/text]');
         $link = $this->getStringBetween($content, '[link]', '[/link]');
 
-        if($text){
+        if($text) {
             $content = $this->getText($content,$text);
         }
-        if($link){
+        if($link) {
             $content = $this->getLink($content,$link);
         }
-        if($file){
+        if($file) {
             $content = str_replace("[file]".$file."[/file]", "", $content);
         }
         return $content;
     }
 
 
-    public function generateAttachment($content): string
+    public function generateAttachment(string $content): string
     {
         $file = $this->getStringBetween($content, '[file]', '[/file]');
         return $file;
     }
 
-    public function getText($content,$text): string
+    public function getText(string $content, string $text): string
     {
         $txt = file_get_contents($text);
         $msg = str_replace("[text]".$text."[/text]", $txt, $content);
         return $msg;
     }
 
-    public function getLink($content,$link): string
+    public function getLink(string $content, string $link): string
     {
         $l = explode("|",$link);
         $txt = '<a href="'.$l[0].'">'.$l[1].'</a>';
@@ -136,7 +135,7 @@ class EmailSendingService
         return $msg;
     }
 
-    public function getStringBetween($string, $start, $end){
+    public function getStringBetween(string $string, string $start, string $end): string {
         $string = ' ' . $string;
         $ini = strpos($string, $start);
 
@@ -151,25 +150,24 @@ class EmailSendingService
 
     public function sendScheduledEmail(): bool
     {
-        $date = new \DateTime();
-        $now = $date->format('Y-m-d H:i:s');
-        $sending = EmailSending::where('scheduled_date', '<=', $now)->where('message_send', 0)->get();
-        foreach($sending as $send){
-            $this->sendEmail($send,$now);
+        $now = new Carbon();
+        $sending = EmailSending::where( 'scheduled_date', '<=', $now->toDateTimeString() )->where('message_send', 0)->get();
+        foreach($sending as $send) {
+            $this->sendEmail($send, $now);
         }
 
         return true;
     }
 
-    public function sendEmail($send,$now): bool
+    public function sendEmail(EmailSending $send, Carbon $now): bool
     {
         try {
             \Mailer::create()
                 ->to($send->email)
-                ->send(new MailSending($send->title,$send->content,$send->attachment));
+                ->send(new MailSending($send->title, $send->content, $send->attachment));
             
             $send->message_send = 1;
-            $send->send_date = $now;
+            $send->send_date = $now->toDateTimeString();
             $send->save();
 
             return true;
