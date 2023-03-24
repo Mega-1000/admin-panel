@@ -1,4 +1,4 @@
-.allegro-chat-icon-wrapper, .allegro-dispute-icon-wrapper {
+.chat-icon-wrapper {
     position: absolute;
     right: 100px;
     top: 11px;
@@ -8,13 +8,15 @@
 .allegro-dispute-icon-wrapper {
     right: 170px;
 }
-.allegro-chat-icon-wrapper.loader-2:before,
-.allegro-dispute-icon-wrapper.loader-2:before {
+.need-support-icon-wrapper {
+    right: 240px;
+}
+.chat-icon-wrapper.loader-2:before {
     top: -8px;
     left: -5px;
     width: 150%;
 }
-.allegro-chat-icon-counter, .allegro-dispute-icon-counter {
+.chat-icon-wrapper-counter {
     background: #fa2a00;
     color: #fff;
     border-radius: 50%;

@@ -23,4 +23,17 @@ $(function() {
     };
 
     const allegroDisputesInitializer = new AllegroChatInitializer(iconWrapperDisputes, iconCounterDisputes, ajaxPath, disputesPaths, 'disputes');
+
+    // init Orders Chat
+    const iconWrapperOrders = $('.need-support-icon-wrapper');
+    const iconCounterOrders = $('.need-support-icon-counter');
+
+    const ordersPaths = {
+        checkUnreadedThreads: 'getNewNeedSupportOrders',
+        resolveOrderNeededSupport: 'resolveOrderNeededSupport',
+    };
+
+    const allegroOrdersInitializer = new AllegroChatInitializer(iconWrapperOrders, iconCounterOrders, ajaxPath, ordersPaths, 'orders');
+
+
 });

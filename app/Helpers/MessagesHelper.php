@@ -425,6 +425,24 @@ class MessagesHelper
         return self::hasNewMessageStatic($this->getChat(), $this->getCurrentChatUser());
     }
 
+    /**
+     * Get encrypted chat token for given data
+     *
+     * @param  int      $orderId
+     * @param  int      $userId
+     * @param  string   $userType
+     *
+     * @return string   $chatUserToken
+     */
+    public function getChatToken(int $orderId, int $userId, string $userType = MessagesHelper::TYPE_USER): string {
+        $this->orderId = $orderId;
+        $this->currentUserId = $userId;
+        $this->currentUserType = $userType;
+        $chatUserToken = $this->encrypt();
+
+        return $chatUserToken;
+    }
+
     public static function hasNewMessageStatic($chat, $chatUser, $notification = false)
     {
         if (!$chatUser) {

@@ -151,7 +151,12 @@ class OrderBuilder
             $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
             $helper->createNewChat();
             $chatUserToken = $helper->encrypt();
-            $helper->addMessage($data['customer_notices']);
+
+            if($data['customer_notices'] === 'need_support') {
+                $order->need_support = true;
+            } else {
+                $helper->addMessage($data['customer_notices']);
+            }
             $order->labels()->attach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
         }
         $this->assignItemsToOrder($order, $data['order_items']);

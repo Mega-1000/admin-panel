@@ -532,10 +532,8 @@ class OrdersController extends Controller
         $countries = Country::all();
 
         $helper = new MessagesHelper();
-        $helper->orderId = $order->id;
-        $helper->currentUserId = Auth::user()->id;
-        $helper->currentUserType = $userType = MessagesHelper::TYPE_USER;
-        $chatUserToken = $helper->encrypt();
+        $userId = Auth::user()->id;
+        $chatUserToken = $helper->getChatToken($order->id, $userId);
         $chat = $helper->getChat();
         // last five msg from area 0
 
@@ -3373,5 +3371,48 @@ class OrdersController extends Controller
             }, 0);
             return $acu + $totalAmountForPack;
         }, 0);
+    }
+
+    /**
+     * Get Current User Chat Token for given order ID
+     *
+     * @param  int $orderId
+     *
+     * @return JsonResponse
+     */
+    public function resolveOrderNeededSupport(int $orderId): JsonResponse {
+        
+        $helper = new MessagesHelper();
+        
+        $userId = Auth::user()?->id;
+        if(!$userId) response()->json( ['error' => 'Auth error!'] );
+        
+        $chatUserToken = $helper->getChatToken($orderId, $userId);
+        
+        Order::where('id', $orderId)->update([
+            'need_support' => false
+        ]);
+
+        $response = [
+            'chatUserToken' => $chatUserToken,
+        ];
+
+        return response()->json($response);
+    }
+    
+    /**
+     * Get orders that marked by client as needed support for ex. for new customers orders
+     *
+     * @return JsonResponse
+     */
+    public function getNewNeedSupportOrders(): JsonResponse {
+
+        $ordersNeededSupport = Order::where('need_support', true)->get();
+
+        $response = [
+            'unreadedThreads' => $ordersNeededSupport,
+        ];
+
+        return response()->json($response);
     }
 }
