@@ -38,6 +38,6 @@ class ImportCsvFile extends Command
      */
     public function handle()
     {
-        dispatch_now(new ImportCsvFileJob());
+        dispatch(new ImportCsvFileJob());
     }
 }

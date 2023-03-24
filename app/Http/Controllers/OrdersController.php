@@ -47,7 +47,6 @@ use App\Jobs\ImportOrdersFromSelloJob;
 use App\Jobs\Orders\ChangeOrderStatusJob;
 use App\Jobs\OrderStatusChangedNotificationJob;
 use App\Jobs\RemoveFileLockJob;
-use App\Jobs\RemoveLabelJob;
 use App\Jobs\SendRequestForCancelledPackageJob;
 use App\Jobs\UpdatePackageRealCostJob;
 use App\Mail\SendOfferToCustomerMail;
@@ -103,6 +102,7 @@ use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Yajra\DataTables\Facades\DataTables;
 use function response;
+use App\Helpers\MessagesHelper;
 
 /**
  * Class OrderController.
@@ -536,6 +536,22 @@ class OrdersController extends Controller
         $orderHasSentLP = $order->hasOrderSentLP();
         $packets = ProductStockPacket::with('items')->get();
         $countries = Country::all();
+
+        $helper = new MessagesHelper();
+        $helper->orderId = $order->id;
+        $helper->currentUserId = Auth::user()->id;
+        $helper->currentUserType = $userType = MessagesHelper::TYPE_USER;
+        $chatUserToken = $helper->encrypt();
+        $chat = $helper->getChat();
+        // last five msg from area 0
+
+        $chatMessages = [];
+        if( isset($chat) && count($chat->messages) > 0 ) {
+            $chatMessages = $chat->messages->filter(function($msg) {
+                return $msg->area == 0;
+            })->slice(-5);
+        }
+
         if ($order->customer_id == 4128) {
             return view(
                 'orders.edit_self',
@@ -567,7 +583,10 @@ class OrdersController extends Controller
                     'clientTotalCost',
                     'ourTotalCost',
                     'labelsButtons',
-                    'countries'
+                    'countries',
+                    'chatUserToken',
+                    'chatMessages',
+                    'userType'
                 )
             );
         }
@@ -604,7 +623,10 @@ class OrdersController extends Controller
                 'ourTotalCost',
                 'labelsButtons',
                 'packets',
-                'countries'
+                'countries',
+                'chatUserToken',
+                'chatMessages',
+                'userType'
             )
         );
 
@@ -948,6 +970,10 @@ class OrdersController extends Controller
     {
         $request->validated();
         $user = Auth::user();
+        $userId = $request->input('user_id');
+        if( isset($userId) ) {
+            $user = User::find($userId);
+        }
         if (empty($user)) {
             return response(['errors' => ['message' => "Użytkownik nie jest zalogowany"]], 400);
         }
@@ -1746,7 +1772,7 @@ class OrdersController extends Controller
             return;
         }
 
-        if ($request->input('time') !== null) {
+        if ($request->input('time') !== null && $request->input('time') !== '') {
             $time = Carbon::parse($request->input('time'));
         } else {
             $time = null;
@@ -2209,7 +2235,7 @@ class OrdersController extends Controller
         } else {
             $sortingColumn = 'orders.id';
         }
-        $query = $this->getQueryForDataTables()->orderBy($sortingColumn, $sortingColumnDirection);
+        $query = $this->getQueryForDataTables($data['selectAllDates'])->orderBy($sortingColumn, $sortingColumnDirection);
 
         foreach ($data['columns'] as $column) {
             if ($column['searchable'] == 'true' && !empty($column['search']['value'])) {
@@ -2446,7 +2472,7 @@ class OrdersController extends Controller
     /**
      * @return Builder
      */
-    private function getQueryForDataTables(): Builder
+    private function getQueryForDataTables($selectAllDates = null): Builder
     {
         return \DB::table('orders')
             ->distinct()
@@ -2484,9 +2510,11 @@ class OrdersController extends Controller
                 if (Auth::user()->role_id == 4) {
                     $query->where('orders.employee_id', '=', Auth::user()->id);
                 }
-            })->where(function ($query) {
-                $query->where('orders.created_at', '>', Carbon::now()->addMonths(-2))
-                    ->orWhere('orders.updated_at', '>', Carbon::now()->addMonths(-2));
+            })->where(function ($query) use (&$selectAllDates) {
+                if ($selectAllDates === 'false') {
+                    $query->where('orders.created_at', '>', Carbon::now()->addMonths(-3))
+                        ->orWhere('orders.updated_at', '>', Carbon::now()->addMonths(-3));
+                }
             });
     }
 

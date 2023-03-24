@@ -3,16 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Entities\Category;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class CategoriesController extends Controller
 {
     //
 
     /**
-     * @return \Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
+     * @return ResponseFactory|Response
      */
     public function getCategoriesDetails()
     {
@@ -28,8 +29,8 @@ class CategoriesController extends Controller
                     $q->with('options');
                 }
             ])
-            ->find((int) $request->input('category'));
+            ->find((int)$request->input('category'));
 
-        return response($category->toJson());
+        return response($category?->toJson() ?? []);
     }
 }

@@ -239,6 +239,7 @@ class ProductStockPositionsController extends Controller
                     $labelSessionRemoveLabelDTO->getLabelIdsToRemove(),
                     $loopPreventionArray,
                     $labelSessionRemoveLabelDTO->getCustomLabelIdsToAddAfterRemoval(),
+                    null
                 );
                 if (!array_key_exists('success', $response)) {
                     Session::forget('removeLabelJobAfterProductStockMove');

@@ -681,6 +681,7 @@
         </div>
     </div>
     @include('orders.buttons')
+    <button name="selectAllDates" id="selectAllDates">Wybierz wszystkie daty</button>
     <table id="dataTable" class="table table-hover spacious-container ordersTable">
         <thead>
         <tr>
@@ -1241,6 +1242,7 @@
                             d.dateColumn = ajaxParams.dateColumn;
                             d.same = ajaxParams.same;
                         }
+                        d.selectAllDates = localStorage.getItem('selectAllDates');
                         let differenceMode = localStorage.getItem('differenceMode');
                         if (differenceMode !== null) d.differenceMode = localStorage.getItem('differenceMode');
                     },
@@ -2849,9 +2851,11 @@
             window.table = table = datatable(ajaxParams);
         }
 
+        let chosenLabel = '';
+        let orderIds = [];
 
         function addLabel() {
-            let chosenLabel = $("#choosen-label");
+            chosenLabel = $("#choosen-label");
             let timed = chosenLabel[0].selectedOptions[0].dataset.timed;
 
             if (chosenLabel.val() == "") {
@@ -2865,31 +2869,32 @@
                 return;
             }
 
-            let orderIds = [];
+            orderIds = [];
             $.each(selectedOrders, function (index, order) {
                 orderIds.push($(order).val());
             });
 
             if (timed == 1) {
                 $('#timed_label').modal('show');
-                $('#time_label_ok').on('click', () => {
-                    addLabelAjax(orderIds, chosenLabel, true)
-                })
             } else {
-                addLabelAjax(orderIds, chosenLabel, false)
+                addLabelAjax();
             }
         }
 
-        function addLabelAjax(orderIds, chosenLabel, timed = false) {
+        $('body').on('click', '#time_label_ok', () => {
+            addLabelAjax(true);
+        });
+
+        function addLabelAjax(timed = false) {
             let data = '';
             let url = "{{ route('orders.label-addition', ['labelId' => ':id'])}}"
             url = url.replace(':id', chosenLabel.val());
             let schedulerUrl = "{{ route('api.labels.get-labels-scheduler-await', ['userId' => ':id']) }}"
             schedulerUrl = schedulerUrl.replace(':id', {{ \Illuminate\Support\Facades\Auth::user()->id }});
             if (timed == true) {
-                data = {orderIds: orderIds, time: $('#time_label').val()};
+                data = {orderIds, time: $('#time_label').val()};
             } else {
-                data = {orderIds: orderIds}
+                data = {orderIds}
             }
             $.ajax({
                 url: url,
@@ -3820,6 +3825,16 @@
             }
         })
 
+        const setSelectAllDatesText = () => {
+            $('#selectAllDates').text(localStorage.getItem('selectAllDates') === 'true' ? 'Przeszukuj bazę ostatnie 3 miesiące' : 'Przeszukaj całą bazę');
+        }
+
+        $('#selectAllDates').on('click', () => {
+            localStorage.setItem('selectAllDates', localStorage.getItem('selectAllDates') === 'true' ? 'false' : 'true');
+            setSelectAllDatesText();
+            table.ajax.reload();
+        })
+
     </script>
 
     <script>
@@ -3835,6 +3850,8 @@
 
             dateFrom.value = today;
             dateTo.value = today;
+
+            setSelectAllDatesText();
         });
     </script>
 

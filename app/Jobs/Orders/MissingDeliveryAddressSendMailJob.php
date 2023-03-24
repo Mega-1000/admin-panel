@@ -39,7 +39,7 @@ class MissingDeliveryAddressSendMailJob extends Job implements ShouldQueue
             if (!empty($this->options)) {
                 if (!empty($this->options["dispatch-labels-by-name"])) {
                     foreach ($this->options["dispatch-labels-by-name"] as $name) {
-                        dispatch_now(new DispatchLabelEventByNameJob($this->order, $name));
+                        dispatch(new DispatchLabelEventByNameJob($this->order, $name));
                     }
                 }
             }

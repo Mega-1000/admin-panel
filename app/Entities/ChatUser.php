@@ -2,22 +2,29 @@
 
 namespace App\Entities;
 
-use App\Entities\interfaces\iChatNickname;
-use App\Helpers\ChatHelper;
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ChatUser extends Model implements iChatNickname
+class ChatUser extends Model
 {
     use SoftDeletes;
+
     protected $table = 'chat_user';
 
     protected $softDelete = true;
 
+    protected $casts = [
+        'assigned_messages_ids' => 'json',
+    ];
+
+    public $attributes = [
+        'assigned_messages_ids' => '{}',
+    ];
 
     public function user()
     {
-        return $this->belongsTo(\App\User::class);
+        return $this->belongsTo(User::class);
     }
 
     public function customer()
@@ -40,21 +47,4 @@ class ChatUser extends Model implements iChatNickname
         return $this->hasMany(Message::class);
     }
 
-    public function getUserNicknameForChat($userType)
-    {
-        $user = $this->customer;
-        if (! empty($user)) {
-            $display = '<th class="alert-warning alert"> Klient ';
-            $display .= ChatHelper::formatChatUser($user). '</th>';
-            return $display;
-        }
-        $user = $this->user;
-        if (! empty($user)) {
-            return '<th class="bg-primary alert">' . ChatHelper::formatChatUser($user, $userType) . '</th>';
-        }
-        $user = $this->employee;
-        if (! empty($user)) {
-            return '<th class="alert-info alert">' . ChatHelper::formatChatUser($user, $userType) . '</th>';
-        }
-    }
 }

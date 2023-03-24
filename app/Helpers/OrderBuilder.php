@@ -8,14 +8,13 @@ use App\Entities\Order;
 use App\Entities\OrderAddress;
 use App\Entities\OrderItem;
 use App\Entities\Product;
+use App\Helpers\Exceptions\ChatException;
 use App\Helpers\interfaces\iDividable;
 use App\Helpers\interfaces\iGetUser;
 use App\Helpers\interfaces\iOrderPriceOverrider;
 use App\Helpers\interfaces\iOrderTotalPriceCalculator;
 use App\Helpers\interfaces\iPostOrderAction;
 use App\Helpers\interfaces\iSumable;
-use App\Repositories\CustomerRepository;
-use App\Services\OrderSourceService;
 use App\Services\ProductService;
 use App\Services\EmailSendingService;
 use Exception;
@@ -110,6 +109,10 @@ class OrderBuilder
         return $this;
     }
 
+    /**
+    * @throws ChatException
+    * @throws Exception
+    */
     public function newStore($data)
     {
         if (empty($this->packageGenerator) || empty($this->priceCalculator) || empty($this->userSelector)) {
@@ -154,13 +157,14 @@ class OrderBuilder
                 $this->attachFileToOrder($file, $order);
             }
         }
-
+        $chatUserToken = '';
         if (!empty($data['customer_notices'])) {
             $helper = new MessagesHelper();
             $helper->orderId = $order->id;
             $helper->currentUserId = $customer->id;
             $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
             $helper->createNewChat();
+            $chatUserToken = $helper->encrypt();
             $helper->addMessage($data['customer_notices']);
             $order->labels()->attach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
         }
@@ -202,10 +206,8 @@ class OrderBuilder
             $order->shipment_price_for_client = $this->totalTransportSumCalculator->getSum($order);
         }
         $order->save();
-        if ($this->postOrderActions) {
-            $this->postOrderActions->run($order);
-        }
-        return ['id' => $order->id, 'canPay' => $canPay ?? false];
+        $this->postOrderActions?->run($order);
+        return ['id' => $order->id, 'canPay' => $canPay ?? false, 'chatUserToken' => $chatUserToken];
     }
 
     private static function setEmptyOrderData(&$data)
@@ -283,10 +285,10 @@ class OrderBuilder
         $oldPrices = [];
 
         foreach ($orderItems as $item) {
-        foreach (OrderBuilder::getPriceColumns() as $column) {
-            $oldPrices[$item->product_id][$column] = $item->$column;
+            foreach (OrderBuilder::getPriceColumns() as $column) {
+                $oldPrices[$item->product_id][$column] = $item->$column;
+            }
         }
-    }
 
         foreach ($items as $item) {
             $product = Product::find($item['id']);
@@ -302,7 +304,7 @@ class OrderBuilder
 
             $orderItem = new OrderItem();
             $orderItem->quantity = $item['amount'];
-            if(!empty($item['type'])){
+            if (!empty($item['type'])) {
                 $orderItem->type = $item['type'];
             }
             $orderItem->product_id = $getStockProduct ? $getStockProduct->id : $product->id;

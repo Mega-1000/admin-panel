@@ -6,7 +6,6 @@ use App\Entities\Label;
 use App\Entities\Order;
 use App\Facades\Mailer;
 use App\Helpers\EmailTagHandlerHelper;
-use App\Jobs\AddLabelJob;
 use App\Jobs\Job;
 use App\Mail\InvoiceSent;
 use App\Repositories\TagRepository;

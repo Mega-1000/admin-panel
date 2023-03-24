@@ -4,9 +4,7 @@ namespace App\Jobs\Orders;
 
 use App\Entities\Order;
 use App\Helpers\DateHelper;
-use App\Jobs\AddLabelJob;
 use App\Jobs\Job;
-use App\Jobs\RemoveLabelJob;
 use App\Repositories\OrderLabelSchedulerRepository;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;

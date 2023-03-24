@@ -2,18 +2,26 @@
 
 namespace App\Jobs;
 
+use App\Entities;
+use App\Entities\Employee;
+use App\Entities\EmployeeRole;
+use App\Entities\Firm;
+use App\Entities\JpgDatum;
+use App\Entities\PostalCodeLatLon;
 use App\Entities\ProductTradeGroup;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Log;
+use App\Entities\Warehouse;
+use DateTime;
+use Exception;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use App\Entities;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 /**
@@ -64,6 +72,7 @@ class ImportCsvFileJob implements ShouldQueue
         $this->log('Clear tables end');
 
         $time = microtime(true);
+        
         for ($i = 1; $line = fgetcsv($handle, 0, ';'); $i++) {
             $this->currentLine = $i;
             if ($i % 100 === 0) {
@@ -71,13 +80,15 @@ class ImportCsvFileJob implements ShouldQueue
                 $time = microtime(true);
             }
 
-            //intentional variable assigning here, not an error
+            // intentional variable assigning here, not an error
             if (!$categoryColumn = $this->getCategoryColumn($line)) {
                 continue;
             }
 
             $array = $this->getProductArray($line, $categoryColumn);
             $categoryTree = $this->getCategoryTree($line, $categoryColumn);
+
+            $array = $this->attachEmployeesToProduct($line, $array);
 
             try {
                 $multiCalcBase = trim($line[$categoryColumn + 12]);
@@ -108,7 +119,7 @@ class ImportCsvFileJob implements ShouldQueue
                     }
                 }
                 $this->generateJpgData($line, $categoryColumn, $product ?? null);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->log("Row $i EXCEPTION: " . $e->getMessage() . ", File: " . $e->getFile() . ", Line: " . $e->getLine());
             }
         }
@@ -211,7 +222,7 @@ class ImportCsvFileJob implements ShouldQueue
                         $this->log("Row {$this->currentLine} WARNING: Products should be placed in deepest category only");
                         return $this->categories;
                     }
-                    throw new \Exception("Category already exists");
+                    throw new Exception("Category already exists");
                 }
                 continue;
             } elseif ($i < $iMax) {
@@ -222,7 +233,7 @@ class ImportCsvFileJob implements ShouldQueue
                     $this->log("Row {$this->currentLine} WARNING: Products should be placed in deepest category only");
                     return $this->categories;
                 }
-                throw new \Exception("Missing category parent");
+                throw new Exception("Missing category parent");
             }
         }
         return $current;
@@ -381,7 +392,7 @@ class ImportCsvFileJob implements ShouldQueue
         $packing->fill($array);
         $product->packing()->save($packing);
 
-        if (!$product->stock) {
+        if ($product->stock !== null) {
             $product->stock()->save(new Entities\ProductStock([
                 'quantity' => 0
             ]));
@@ -552,6 +563,96 @@ class ImportCsvFileJob implements ShouldQueue
         return $array;
     }
 
+    public function attachEmployeesToProduct(array $line, array $array): array
+    {
+
+        $employeesIds = [];
+        // single employee has 17 columns, let's take 10 employees for each product line, we've got result 170 of columns total
+        $employeesColumns = 17;
+        $numberOfEmployees = 10;
+        $employeesLines = array_slice($line, 1120, $employeesColumns * $numberOfEmployees);
+        // get rows with every employee
+        $employeesRows = array_chunk($employeesLines, $employeesColumns);
+
+        foreach ($employeesRows as $row) {
+            // missing firstname, lastname or email
+            $firstName = $row[0];
+            $lastName = $row[2];
+            $email = $row[4];
+            $postalCode = $row[14];
+            if (!$firstName || !$lastName || !$email || !$postalCode) continue;
+
+            $employee = Employee::where([
+                'firstname' => $firstName,
+                'lastname' => $lastName,
+                'email' => $email,
+            ])->first();
+
+            if (!$employee) {
+                $employee = new Employee();
+                $postal = PostalCodeLatLon::where('postal_code', $postalCode)->first();
+                if (!$postal) continue;
+                $employee->latitude = $postal->latitude;
+                $employee->longitude = $postal->longitude;
+            }
+
+            $firmSymbol = $line[20];
+            $firm = Firm::where('symbol', trim($firmSymbol))->first();
+
+            if (isset($firm->id)) {
+                $employee->firm_id = $firm->id;
+            }
+            $employee->firstname = $firstName;
+            $employee->firstname_visibility = !empty($row[1]);
+            $employee->lastName = $lastName;
+            $employee->lastname_visibility = !empty($row[3]);
+            $employee->email = $email;
+            $employee->email_visibility = !empty($row[5]);
+            $employee->phone = $row[6];
+            $employee->phone_visibility = !empty($row[7]);
+            $employee->comments = $row[10];
+            $employee->comments_visibility = !empty($row[11]);
+            $employee->additional_comments = $row[12];
+            $employee->faq = $row[13];
+            $employee->postal_code = $postalCode;
+            $employee->radius = intval($row[15]);
+            $employee->status = ($row[16] == 1) ? 'ACTIVE' : 'PENDING';
+
+            $employee->save();
+
+            $roles = explode(',', $row[8]);
+            $warehouses = explode(',', $row[9]);
+
+            // attach roles
+            if (!empty($roles)) {
+                $rolesToAttach = [];
+                foreach ($roles as $roleSymbol) {
+
+                    $employeeRole = EmployeeRole::where('symbol', trim($roleSymbol))->first();
+                    if (!empty($employeeRole)) {
+                        $rolesToAttach[] = $employeeRole->id;
+                    }
+                }
+                if (!empty($rolesToAttach)) $employee->employeeRoles()->sync($rolesToAttach);
+            }
+            // attach warehouses
+            if (!empty($warehouses)) {
+                $warehousesToAttach = [];
+                foreach ($warehouses as $warehouseSymbol) {
+
+                    $warehouse = Warehouse::where('symbol', trim($warehouseSymbol))->first();
+                    if (!empty($warehouse)) {
+                        $warehousesToAttach[] = $warehouse->id;
+                    }
+                }
+                if (!empty($warehousesToAttach)) $employee->warehouses()->sync($warehousesToAttach);
+            }
+            $employeesIds[] = $employee->id;
+        }
+        $array['employees_ids'] = json_encode($employeesIds);
+        return $array;
+    }
+
     private function getCategoryColumn($line)
     {
         for ($col = 598; $col <= count($line) - 15; $col += 16) {
@@ -640,7 +741,7 @@ class ImportCsvFileJob implements ShouldQueue
                     $prefix = 'third';
                     break;
                 default:
-                    throw new \Exception('Błąd ustawiania grupy');
+                    throw new Exception('Błąd ustawiania grupy');
             }
             $conditionField = $prefix . '_condition';
             $priceField = $prefix . '_price';
@@ -706,7 +807,7 @@ class ImportCsvFileJob implements ShouldQueue
             }
         }
 
-        \App\Entities\JpgDatum::insert($data);
+        JpgDatum::insert($data);
     }
 
     private function log($text)
@@ -717,7 +818,7 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function getDateOrNull($date)
     {
-        $d = \DateTime::createFromFormat('Y/m/d', $date);
+        $d = DateTime::createFromFormat('Y/m/d', $date);
         return $d && $d->format('Y/m/d') == $date ? $d->format('Y-m-d') : null;
     }
 

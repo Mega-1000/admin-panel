@@ -1,3 +1,4 @@
+@php use Illuminate\Support\Facades\Auth; @endphp
 @extends('layouts.datatable')
 @section('app-header')
     <link rel="stylesheet" href="{{ URL::asset('css/views/orders/edit.css') }}">
@@ -39,9 +40,6 @@
         <button class="btn btn-primary"
                 name="change-button-form" id="button-tasks"
                 value="tasks">@lang('orders.form.buttons.tasks')</button>
-        <button class="btn btn-primary"
-                name="change-button-form" id="button-messages"
-                value="messages">@lang('orders.form.buttons.messages')</button>
         <button class="btn btn-primary"
                 name="change-button-form" id="button-packages"
                 value="packages">@lang('orders.form.buttons.packages')</button>
@@ -1259,7 +1257,7 @@
                                                             </select>
                                                         </div>
                                                         <input type="hidden" name="employee_id"
-                                                               value="{{ \Illuminate\Support\Facades\Auth::user()->id }}">
+                                                               value="{{ Auth::user()->id }}">
                                                         <input type="hidden" name="order_id" value="{{ $order->id }}">
                                                         <div class="form-group">
                                                             <label for="message">Wiadomość</label>
@@ -1486,7 +1484,6 @@
                                         if (referrer.search('orderPayments') != -1 || uri.search('orderPayments') != -1 || item === 'orderPayments') {
                                             $('#button-general').removeClass('active');
                                             $('#button-tasks').removeClass('active');
-                                            $('#button-messages').removeClass('active');
                                             $('#button-payments').addClass('active');
                                             $('#button-packages').removeClass('active');
                                             $('#submit').hide();
@@ -1509,7 +1506,6 @@
                                         } else if (referrer.search('orderTasks') != -1 || uri.search('orderTasks') != -1 || item === 'orderTasks') {
                                             $('#button-general').removeClass('active');
                                             $('#button-tasks').addClass('active');
-                                            $('#button-messages').removeClass('active');
                                             $('#button-payments').removeClass('active');
                                             $('#button-packages').removeClass('active');
                                             $('#submit').hide();
@@ -1533,7 +1529,6 @@
                                         } else if (referrer.search('orderPackages') != -1 || uri.search('orderPackages') != -1 || item === 'orderPackages') {
                                             $('#button-general').removeClass('active');
                                             $('#button-tasks').removeClass('active');
-                                            $('#button-messages').removeClass('active');
                                             $('#button-payments').removeClass('active');
                                             $('#button-packages').addClass('active');
                                             $('#submit').hide();
@@ -1555,7 +1550,6 @@
                                         } else if (referrer.search('orderMessages') != -1 || uri.search('orderMessages') != -1 || item === 'orderMessages') {
                                             $('#button-general').removeClass('active');
                                             $('#button-tasks').removeClass('active');
-                                            $('#button-messages').addClass('active');
                                             $('#button-payments').removeClass('active');
                                             $('#button-packages').removeClass('active');
                                             $('#submit').hide();
@@ -1581,7 +1575,6 @@
                                             if (value === 'general') {
                                                 $('#button-general').addClass('active');
                                                 $('#button-tasks').removeClass('active');
-                                                $('#button-messages').removeClass('active');
                                                 $('#button-payments').removeClass('active');
                                                 $('#button-packages').removeClass('active');
                                                 general.show();
@@ -1605,7 +1598,6 @@
                                             } else if (value === 'tasks') {
                                                 $('#button-general').removeClass('active');
                                                 $('#button-tasks').addClass('active');
-                                                $('#button-messages').removeClass('active');
                                                 $('#button-payments').removeClass('active');
                                                 $('#button-packages').removeClass('active');
                                                 $('#submit').hide();
@@ -1627,7 +1619,6 @@
                                             } else if (value === 'payments') {
                                                 $('#button-general').removeClass('active');
                                                 $('#button-tasks').removeClass('active');
-                                                $('#button-messages').removeClass('active');
                                                 $('#button-payments').addClass('active');
                                                 $('#button-packages').removeClass('active');
                                                 $('#submit').hide();
@@ -1651,7 +1642,6 @@
                                             } else if (value === 'messages') {
                                                 $('#button-general').removeClass('active');
                                                 $('#button-tasks').removeClass('active');
-                                                $('#button-messages').addClass('active');
                                                 $('#button-payments').removeClass('active');
                                                 $('#button-packages').removeClass('active');
                                                 $('#submit').hide();
@@ -1674,7 +1664,6 @@
                                             } else if (value === 'packages') {
                                                 $('#button-general').removeClass('active');
                                                 $('#button-tasks').removeClass('active');
-                                                $('#button-messages').removeClass('active');
                                                 $('#button-payments').removeClass('active');
                                                 $('#button-packages').addClass('active');
                                                 $('#submit').hide();
@@ -1696,7 +1685,6 @@
                                             } else if (value === 'status') {
                                                 $('#button-general').removeClass('active');
                                                 $('#button-tasks').removeClass('active');
-                                                $('#button-messages').removeClass('active');
                                                 $('#button-payments').removeClass('active');
                                                 $('#button-packages').removeClass('active');
                                                 $('#submit').show();

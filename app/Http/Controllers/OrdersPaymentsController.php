@@ -18,7 +18,6 @@ use App\Http\Requests\MasterPaymentCreateRequest;
 use App\Http\Requests\OrderPaymentCreateRequest;
 use App\Http\Requests\OrderPaymentUpdateRequest;
 use App\Jobs\DispatchLabelEventByNameJob;
-use App\Jobs\RemoveLabelJob;
 use App\Repositories\CustomerRepository;
 use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderPaymentRepository;
@@ -792,7 +791,7 @@ class OrdersPaymentsController extends Controller
                         }
                         $preventionArray = [];
                         RemoveLabelService::removeLabels($order, [40], $preventionArray, [], Auth::user()->id);
-                        dispatch_now(new DispatchLabelEventByNameJob($order->id, "payment-received"));
+                        dispatch(new DispatchLabelEventByNameJob($order, "payment-received"));
                     }
                     return ['orderId' => $orderId, 'amount' => $amount, 'info' => 'Zlecenie zostało pomyślnie utworzone.'];
                 }
@@ -868,9 +867,9 @@ class OrdersPaymentsController extends Controller
                                 $amount = 0;
                             }
                         }
-
-                        dispatch_now(new RemoveLabelJob($order->id, [40]));
-                        dispatch_now(new DispatchLabelEventByNameJob($order->id, "payment-received"));
+                        $prev = [];
+                        RemoveLabelService::removeLabels($order, [40], $prev, [], Auth::user()?->id);
+                        dispatch(new DispatchLabelEventByNameJob($order, "payment-received"));
                     }
                     foreach ($connectedOrders as $connectedOrder) {
                         if ($amount >= $connectedOrder->toPay()) {
@@ -1523,7 +1522,8 @@ class OrdersPaymentsController extends Controller
             }
         } else {
             if ($order->payments->count() == 0) {
-                dispatch_now(new DispatchLabelEventByNameJob($orderId, "payment-received"));
+
+                dispatch(new DispatchLabelEventByNameJob($order, "payment-received"));
 
                 $order = Order::query()->find($orderId);
                 $preventionArray = [];
@@ -1669,9 +1669,9 @@ class OrdersPaymentsController extends Controller
     public static function dispatchLabelsForPaymentAmount($payment): void
     {
         if ($payment->order->isPaymentRegulated()) {
-            dispatch_now(new DispatchLabelEventByNameJob($payment->order->id, "payment-equal-to-order-value"));
+            dispatch(new DispatchLabelEventByNameJob($payment->order, "payment-equal-to-order-value"));
         } else {
-            dispatch_now(new DispatchLabelEventByNameJob($payment->order->id, "required-payment-before-unloading"));
+            dispatch(new DispatchLabelEventByNameJob($payment->order, "required-payment-before-unloading"));
         }
     }
 
@@ -1773,8 +1773,9 @@ class OrdersPaymentsController extends Controller
             'amount' => $amount,
             'promise' => ''
         ]);
-
-        dispatch_now(new DispatchLabelEventByNameJob($orderId, "payment-received"));
+        /** @var Order $order */
+        $order = Order::query()->findOrFail($orderId);
+        dispatch(new DispatchLabelEventByNameJob($order, "payment-received"));
 
         return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
             'message' => __('order_payments.message.store'),

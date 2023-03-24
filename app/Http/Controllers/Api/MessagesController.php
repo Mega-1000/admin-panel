@@ -2,24 +2,26 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\User;
+use Exception;
 use App\Entities\ChatUser;
 use App\Entities\Customer;
 use App\Entities\Employee;
 use App\Entities\OrderItem;
-use App\Helpers\ChatHelper;
-use App\Helpers\Exceptions\ChatException;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use App\Helpers\MessagesHelper;
 use App\Helpers\OrderLabelHelper;
-use App\Http\Controllers\Controller;
 use App\Jobs\ChatNotificationJob;
-use App\User;
-use Exception;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Http\Controllers\Controller;
+use App\Helpers\Exceptions\ChatException;
+use App\Http\Requests\Messages\PostMessageRequest;
+use App\Http\Requests\Messages\GetMessagesRequest;
 
 class MessagesController extends Controller
 {
-    public function postNewMessage(Request $request, $token)
+    public function postNewMessage(PostMessageRequest $request, $token)
     {
         try {
             $helper = new MessagesHelper($token);
@@ -30,7 +32,9 @@ class MessagesController extends Controller
             if (!$helper->canUserSendMessage()) {
                 throw new ChatException('User not allowed to send message');
             }
-            $helper->addMessage($request->message);
+            $data = $request->validated();
+            $file = $data['file'] ?? null;
+            $helper->addMessage($data['message'], $data['area'], $file);
             $helper->setLastRead();
             return response('ok');
         } catch (ChatException $e) {
@@ -105,18 +109,15 @@ class MessagesController extends Controller
         $chatUser->save();
     }
 
-    public function removeUser(Request $request, $token)
+    public function removeUser(Request $request, string $token)
     {
         try {
             $helper = new MessagesHelper($token);
-            $chat = $helper->getChat();
-            if (!$chat) {
-                $chat = $helper->createNewChat();
-            }
+            $chatId = $helper->getChat()->id;
             if ($request->type == ChatUser::class) {
                 $chatUser = ChatUser::findOrFail($request->user_id);
             } else {
-                list($user, $chatUser) = $this->findCustomerOrEmployee($request, $chat);
+                $chatUser = $this->findCustomerOrEmployee($request, $chatId);
             }
             $chatUser->delete();
             return response('ok');
@@ -126,20 +127,24 @@ class MessagesController extends Controller
         }
     }
 
-    private function findCustomerOrEmployee(Request $request, $chat): array
+    private function findCustomerOrEmployee(Request $request, int $chatId): ChatUser
     {
         if ($request->type == Customer::class) {
-            $user = Customer::findOrFail($request->user_id);
-            $chatUser = $chat->customers->first;
+            $chatUser = ChatUser::where([
+                'customer_id' => $request->user_id,
+                'chat_id'     => $chatId,
+                ])->first();
         }
         if ($request->type == Employee::class) {
-            $user = Employee::findOrFail($request->user_id);
-            $chatUser = $chat->employees->where('employee_id', $user->id)->withTrashed()->first();
+            $chatUser = ChatUser::where([
+                'employee_id' => $request->user_id,
+                'chat_id'     => $chatId,
+            ])->first();
         }
-        return array($user, $chatUser);
+        return $chatUser;
     }
 
-    public function askForIntervention(Request $request, $token)
+    public function askForIntervention($token)
     {
         try {
             $helper = new MessagesHelper($token);
@@ -189,23 +194,31 @@ class MessagesController extends Controller
         }
     }
 
-    public function getMessages(Request $request, $token)
+    public function getMessages(GetMessagesRequest $request, string $token): Response
     {
         try {
             $helper = new MessagesHelper($token);
             $chat = $helper->getChat();
+
+            $data = $request->validated();
+            $area = $data['area'];
+            $lastId = $data['lastId'] ?? 0;
+
             if (!$chat) {
                 throw new ChatException('Wrong chat token');
             }
+            $assignedMessagesIds = json_decode($helper->getCurrentChatUser()->assigned_messages_ids ?: '[]', true);
+            $assignedMessagesIds = array_flip($assignedMessagesIds);
             $out = '';
             foreach ($chat->messages as $message) {
-                if ($message->id <= $request->lastId) {
+                if ($message->id <= $lastId || $area != $message->area) {
                     continue;
                 }
-                $header = ChatHelper::getMessageHelper($message);
-
-                // TODO with message in many places is not found, maybe we need something new here
-                $out .= view('chat/single_message')->withMessage($message)->withHeader($header)->render();
+                if($helper->currentUserType == MessagesHelper::TYPE_USER || isset($assignedMessagesIds[$message->id] )) {
+                    $out .= view('chat/single_message')->with([
+                        'message' => $message,
+                    ])->render();
+                }
             }
             $helper->setLastRead();
 

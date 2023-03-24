@@ -191,15 +191,16 @@ class OrdersController extends Controller
             } else {
                 $orderBuilder->setUserSelector(new GetCustomerForAdminEdit());
             }
-            ['id' => $id, 'canPay' => $canPay] = $orderBuilder->newStore($data);
+            $builderData = $orderBuilder->newStore($data);
             DB::commit();
-
-            $order = Order::find($id);
+            
+            $order = Order::find($builderData['id']);
+            $builderData['token'] = $order->getToken();
             $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 2)->first();
             $order->firm_source_id = $firmSource ? $firmSource->id : null;
             $order->save();
 
-            return $this->createdResponse(['order_id' => $id, 'canPay' => $canPay, 'token' => $order->getToken()]);
+            return response()->json($builderData);
         } catch (Exception $e) {
             DB::rollBack();
             if (empty($this->error_code)) {
@@ -207,7 +208,7 @@ class OrdersController extends Controller
             }
             $message = $this->errors[$this->error_code] ?? $e->getMessage();
             Log::error(
-                "Problem with create new order: [{$this->error_code}] $message",
+                "Problem with create new order: [{$this->error_code}] $message" . '. Trace log: ' . $e->getTraceAsString(),
                 ['request' => $data, 'class' => $e->getFile(), 'line' => $e->getLine()]
             );
             $message = $this->errors[$this->error_code] ?? $this->defaultError;

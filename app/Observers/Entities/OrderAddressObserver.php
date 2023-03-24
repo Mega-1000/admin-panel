@@ -5,9 +5,7 @@ namespace App\Observers\Entities;
 use App\Entities\Order;
 use App\Entities\OrderAddress;
 use App\Helpers\LabelsHelper;
-use App\Jobs\AddLabelJob;
 use App\Jobs\DispatchLabelEventByNameJob;
-use App\Jobs\RemoveLabelJob;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
 use App\Services\OrderAddressService;
@@ -39,7 +37,7 @@ class OrderAddressObserver
         if (count($hasMissingDeliveryAddressLabel) > 0) {
             if ($orderAddress->type == "DELIVERY_ADDRESS") {
                 if ($orderAddress->order->isDeliveryDataComplete()) {
-                    dispatch_now(new DispatchLabelEventByNameJob($orderAddress->order, "added-delivery-address"));
+                    dispatch(new DispatchLabelEventByNameJob($orderAddress->order, "added-delivery-address"));
                 }
             }
         }

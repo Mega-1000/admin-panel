@@ -3,13 +3,14 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
-use Illuminate\Http\Request;
 
 /**
  * Class OrderMessage.
- *
+ * @property Order $order
  * @package namespace App\Entities;
  */
 class OrderMessage extends Model implements Transformable
@@ -26,7 +27,7 @@ class OrderMessage extends Model implements Transformable
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function order()
     {
@@ -34,7 +35,7 @@ class OrderMessage extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
     public function user()
     {
@@ -42,7 +43,7 @@ class OrderMessage extends Model implements Transformable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function attachments()
     {
