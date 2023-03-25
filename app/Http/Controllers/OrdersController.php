@@ -3385,7 +3385,6 @@ class OrdersController extends Controller
         $helper = new MessagesHelper();
         
         $userId = Auth::user()?->id;
-        if(!$userId) response()->json( ['error' => 'Auth error!'] );
         
         $chatUserToken = $helper->getChatToken($orderId, $userId);
         

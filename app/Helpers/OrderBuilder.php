@@ -144,7 +144,7 @@ class OrderBuilder
             }
         }
         $chatUserToken = '';
-        if ( $data['need_support'] === true ) {
+        if ( isset($data['need_support']) && $data['need_support'] === true ) {
             $helper = new MessagesHelper();
             $helper->createNewChat();
             $chatUserToken = $helper->getChatToken($order->id, $customer->id, MessagesHelper::TYPE_CUSTOMER);
