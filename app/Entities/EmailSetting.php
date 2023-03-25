@@ -7,6 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Enums\EmailSettingsEnum;
 
+/**
+ * @property int    $id
+ * @property string $status - NEW | PRODUCED | PICKED_UP | PROVIDED
+ * @property int    $time
+ * @property string $title
+ * @property string $content
+ * @property string $statusTitle
+*/
+
 class EmailSetting extends Model
 {
     use HasFactory, SoftDeletes;
@@ -16,7 +25,7 @@ class EmailSetting extends Model
     ];
 
     protected $fillable = [
-        'status', 
+        'status',
         'time',
         'title',
         'content'

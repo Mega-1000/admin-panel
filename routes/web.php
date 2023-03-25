@@ -603,12 +603,12 @@ Route::group(['prefix' => 'admin'], function () {
 
 
 
-    Route::get('/email/settings', 'EmailSettingsController@index')->name('emailSettings');
-    Route::get('/email/settings/add', 'EmailSettingsController@create')->name('emailSettings.add');
-    Route::post('/email/settings', 'EmailSettingsController@store')->name('emailSettings.store');
-    Route::get('/email/settings/{id}/edit', 'EmailSettingsController@edit')->name('emailSettings.edit');
-    Route::put('/email/settings/{id}/update', 'EmailSettingsController@update')->name('emailSettings.update');
-    Route::delete('/email/settings/{id}/destroy', 'EmailSettingsController@destroy')->name('emailSettings.destroy');
+    Route::get('/email/settings', [EmailSettingsController::class, 'index'])->name('emailSettings');
+    Route::get('/email/settings/add', [EmailSettingsController::class, 'create'])->name('emailSettings.add');
+    Route::post('/email/settings', [EmailSettingsController::class, 'store'])->name('emailSettings.store');
+    Route::get('/email/settings/{emailSetting}/edit', [EmailSettingsController::class, 'edit'])->name('emailSettings.edit');
+    Route::put('/email/settings/{emailSetting}/update', [EmailSettingsController::class, 'update'])->name('emailSettings.update');
+    Route::delete('/email/settings/{emailSetting}/destroy', [EmailSettingsController::class, 'destroy'])->name('emailSettings.destroy');
                         
 });
 

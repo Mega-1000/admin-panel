@@ -1792,7 +1792,7 @@ class OrdersController extends Controller
             dispatch(new AddLabelJob($order, [$labelId], $preventionArray, [], null, $time));
 
             if(in_array($label->id, EmailSettingsEnum::STATUS_LABELS)){
-                $this->emailSendingService->addScheduledEmail($order->id, $label->id);
+                $this->emailSendingService->addScheduledEmail($order, $label->id);
             }
         }
     }

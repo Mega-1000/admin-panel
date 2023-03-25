@@ -156,7 +156,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 $order->allegro_payment_id = $allegroOrder['payment']['id'];
                 $order->saveQuietly();
 
-                $this->emailSendingService->addNewScheduledEmail($order->id);
+                $this->emailSendingService->addNewScheduledEmail($order);
 
                 if ($allegroOrder['messageToSeller'] !== null) {
                     $this->createChat($order->id, $customer->id, $allegroOrder['messageToSeller']);

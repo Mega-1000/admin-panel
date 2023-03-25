@@ -5,38 +5,41 @@ namespace App\Http\Controllers;
 use App\Entities\EmailSetting;
 use App\Enums\EmailSettingsEnum;
 use App\Http\Requests\EmailSettingsCreateRequest;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Contracts\View\View;
 
 class EmailSettingsController extends Controller
 {
     /**
      * Show the return form of a specific resource.
      *
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
-    public function index()
+    public function index(): View
     {
         $emailSettings = EmailSetting::get();
-        return view('email_module.index',compact('emailSettings'));
+        return view('email_module.index', compact('emailSettings'));
     }
 
     /**
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
-    public function create()
+    public function create(): View
     {
         $status['NEW'] = EmailSettingsEnum::STATUS_NEW;
         $status['PRODUCED'] = EmailSettingsEnum::STATUS_PRODUCED;
         $status['PICKED_UP'] = EmailSettingsEnum::STATUS_PICKED_UP;
         $status['PROVIDED'] = EmailSettingsEnum::STATUS_PROVIDED;
 
-        return view('email_module.create',compact('status'));
+        return view('email_module.create', compact('status'));
     }
 
     /**
      * @param EmailSettingsCreateRequest $request
-     * @return \Illuminate\Http\RedirectResponse
+     *
+     * @return RedirectResponse
      */
-    public function store(EmailSettingsCreateRequest $request){
+    public function store(EmailSettingsCreateRequest $request): RedirectResponse {
 
         $email_setting = new EmailSetting;
         $email_setting->fill($request->all());
@@ -49,27 +52,27 @@ class EmailSettingsController extends Controller
     }
 
     /**
-     * @param $id
-     * @return \Illuminate\Contracts\View\View
+     * @param EmailSetting $emailSetting
+     *
+     * @return View
      */
-    public function edit($id){
-        $emailSetting = EmailSetting::findOrFail($id);
+    public function edit(EmailSetting $emailSetting): View {
 
         $status['NEW'] = EmailSettingsEnum::STATUS_NEW;
         $status['PRODUCED'] = EmailSettingsEnum::STATUS_PRODUCED;
         $status['PICKED_UP'] = EmailSettingsEnum::STATUS_PICKED_UP;
         $status['PROVIDED'] = EmailSettingsEnum::STATUS_PROVIDED;
 
-        return view('email_module.edit',compact('emailSetting','status'));
+        return view('email_module.edit', compact('emailSetting', 'status'));
     }
 
     /**
-     * @param EmailSettingsCreateRequest $request
-     * @param $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @param  EmailSettingsCreateRequest $request
+     * @param  EmailSetting               $emailSetting
+     * @return RedirectResponse
      */
-    public function update(EmailSettingsCreateRequest $request,$id){
-        $emailSetting = EmailSetting::find($id);
+    public function update(EmailSettingsCreateRequest $request, EmailSetting $emailSetting): RedirectResponse {
+
         $emailSetting->fill($request->all());
         $emailSetting->save();
 
@@ -83,14 +86,12 @@ class EmailSettingsController extends Controller
     /**
      * Remove the specified resource.
      *
-     * @param  int $id
+     * @param  EmailSetting     $emailSetting
      *
-     * @return \Illuminate\Http\Response
+     * @return RedirectResponse
      */
-    public function destroy($id)
+    public function destroy(EmailSetting $emailSetting): RedirectResponse
     {
-        $emailSetting = EmailSetting::find($id);
-
         if (empty($emailSetting)) {
             abort(404);
         }

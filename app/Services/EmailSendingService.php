@@ -12,9 +12,8 @@ use Illuminate\Support\Facades\Log;
 
 class EmailSendingService
 {
-    public function addNewScheduledEmail(int $order_id): bool
+    public function addNewScheduledEmail(Order $order): bool
     {
-        $order = Order::find($order_id);
         if (empty($order)) {
             abort(404);
         }
@@ -27,32 +26,20 @@ class EmailSendingService
         return true;
     }
 
-    public function addScheduledEmail(int $order_id, int $labelID): bool
+    public function addScheduledEmail(Order $order, int $labelID): bool
     {
-        $order = Order::find($order_id);
         if (empty($order)) {
             abort(404);
         }
 
-        if($labelID==EmailSettingsEnum::STATUS_LABELS['PRODUCED']){
-            $emailSetting = EmailSetting::where('status', 'PRODUCED')->get();
-            foreach($emailSetting as $setting){
-                $this->saveScheduledEmail($order, $setting);
-            }
-        }
+        $possibleStatues = array_flip(EmailSettingsEnum::STATUS_LABELS);
+        $status = $possibleStatues[ $labelID ];
+        if( !$status ) return false;
 
-        if($labelID==EmailSettingsEnum::STATUS_LABELS['PICKED_UP']){
-            $emailSetting = EmailSetting::where('status', 'PICKED_UP')->get();
-            foreach($emailSetting as $setting){
-                $this->saveScheduledEmail($order, $setting);
-            }
-        }
+        $emailSetting = EmailSetting::where('status', $status)->get();
 
-        if($labelID==EmailSettingsEnum::STATUS_LABELS['PROVIDED']){
-            $emailSetting = EmailSetting::where('status', 'PROVIDED')->get();
-            foreach($emailSetting as $setting){
-                $this->saveScheduledEmail($order, $setting);
-            }
+        foreach($emailSetting as $setting) {
+            $this->saveScheduledEmail($order, $setting);
         }
 
         return true;

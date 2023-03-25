@@ -150,7 +150,7 @@ class OrderBuilder
 
         $order->save();
         
-        $this->emailSendingService->addNewScheduledEmail($order->id);
+        $this->emailSendingService->addNewScheduledEmail($order);
 
         if (!empty($data['files'])) {
             foreach ($data['files'] as $file) {
