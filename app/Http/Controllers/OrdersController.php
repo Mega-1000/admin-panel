@@ -550,6 +550,8 @@ class OrdersController extends Controller
             })->slice(-5);
         }
 
+        $userType = MessagesHelper::TYPE_USER;
+
         if ($order->customer_id == 4128) {
             return view(
                 'orders.edit_self',
@@ -584,6 +586,7 @@ class OrdersController extends Controller
                     'countries',
                     'chatUserToken',
                     'chatMessages',
+                    'userType'
                 )
             );
         }
@@ -623,6 +626,7 @@ class OrdersController extends Controller
                 'countries',
                 'chatUserToken',
                 'chatMessages',
+                'userType'
             )
         );
 
