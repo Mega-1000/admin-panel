@@ -24,13 +24,14 @@ use App\Entities\UserSurplusPayment;
 use App\Entities\UserSurplusPaymentHistory;
 use App\Entities\Warehouse;
 use App\Entities\WorkingEvents;
-use App\Enums\LabelStatusEnum;
 use App\Enums\EmailSettingsEnum;
+use App\Enums\LabelStatusEnum;
 use App\Facades\Mailer;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Helpers\GetCustomerForNewOrder;
 use App\Helpers\LabelsHelper;
+use App\Helpers\MessagesHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderCalcHelper;
 use App\Helpers\OrderPriceCalculator;
@@ -73,13 +74,13 @@ use App\Repositories\StatusRepository;
 use App\Repositories\TaskRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
+use App\Services\EmailSendingService;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
 use App\Services\OrderAddressService;
 use App\Services\OrderExcelService;
 use App\Services\OrderInvoiceService;
 use App\Services\TaskService;
-use App\Services\EmailSendingService;
 use App\User;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
@@ -102,7 +103,6 @@ use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Yajra\DataTables\Facades\DataTables;
 use function response;
-use App\Helpers\MessagesHelper;
 
 /**
  * Class OrderController.
@@ -544,8 +544,8 @@ class OrdersController extends Controller
         // last five msg from area 0
 
         $chatMessages = [];
-        if( isset($chat) && count($chat->messages) > 0 ) {
-            $chatMessages = $chat->messages->filter(function($msg) {
+        if (isset($chat) && count($chat->messages) > 0) {
+            $chatMessages = $chat->messages->filter(function ($msg) {
                 return $msg->area == 0;
             })->slice(-5);
         }
@@ -584,7 +584,6 @@ class OrdersController extends Controller
                     'countries',
                     'chatUserToken',
                     'chatMessages',
-                    'userType'
                 )
             );
         }
@@ -624,7 +623,6 @@ class OrdersController extends Controller
                 'countries',
                 'chatUserToken',
                 'chatMessages',
-                'userType'
             )
         );
 
@@ -969,7 +967,7 @@ class OrdersController extends Controller
         $request->validated();
         $user = Auth::user();
         $userId = $request->input('user_id');
-        if( isset($userId) ) {
+        if (isset($userId)) {
             $user = User::find($userId);
         }
         if (empty($user)) {
@@ -1789,7 +1787,7 @@ class OrdersController extends Controller
 
             dispatch(new AddLabelJob($order, [$labelId], $preventionArray, [], null, $time));
 
-            if(in_array($label->id, EmailSettingsEnum::STATUS_LABELS)){
+            if (in_array($label->id, EmailSettingsEnum::STATUS_LABELS)) {
                 $this->emailSendingService->addScheduledEmail($order, $label->id);
             }
         }
@@ -3387,18 +3385,19 @@ class OrdersController extends Controller
     /**
      * Get Current User Chat Token for given order ID
      *
-     * @param  int $orderId
+     * @param int $orderId
      *
      * @return JsonResponse
      */
-    public function resolveOrderNeededSupport(int $orderId): JsonResponse {
-        
+    public function resolveOrderNeededSupport(int $orderId): JsonResponse
+    {
+
         $helper = new MessagesHelper();
-        
+
         $userId = Auth::user()?->id;
-        
+
         $chatUserToken = $helper->getChatToken($orderId, $userId);
-        
+
         Order::where('id', $orderId)->update([
             'need_support' => false
         ]);
@@ -3409,13 +3408,14 @@ class OrdersController extends Controller
 
         return response()->json($response);
     }
-    
+
     /**
      * Get orders that marked by client as needed support for ex. for new customers orders
      *
      * @return JsonResponse
      */
-    public function getNewNeedSupportOrders(): JsonResponse {
+    public function getNewNeedSupportOrders(): JsonResponse
+    {
 
         $ordersNeededSupport = Order::where('need_support', true)->get();
 
