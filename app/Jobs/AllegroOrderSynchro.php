@@ -32,6 +32,7 @@ use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
 use App\Services\OrderAddressService;
 use App\Services\ProductService;
+use App\Services\EmailSendingService;
 use App\User;
 use Carbon\Carbon;
 use Exception;
@@ -72,6 +73,12 @@ class AllegroOrderSynchro implements ShouldQueue
      * @var ProductService
      */
     private $productService;
+    
+    /**
+     * @var EmailSendingService
+     */
+    private $emailSendingService;
+
     /**
      * @var OrderRepository
      */
@@ -111,13 +118,13 @@ class AllegroOrderSynchro implements ShouldQueue
         if (Auth::user() === null && $this->userId !== null) {
             Auth::loginUsingId($this->userId);
         }
-
         $this->customerRepository = app(CustomerRepository::class);
         $this->allegroOrderService = app(AllegroOrderService::class);
         $this->productRepository = app(ProductRepository::class);
         $this->productService = app(ProductService::class);
         $this->orderRepository = app(OrderRepository::class);
         $this->orderPackagesDataHelper = app(OrderPackagesDataHelper::class);
+        $this->emailSendingService = app(EmailSendingService::class);
         // TODO Change to configuration
         $this->tax = (float)(1 + env('VAT'));
         if ($this->synchronizeAll) {
@@ -148,6 +155,8 @@ class AllegroOrderSynchro implements ShouldQueue
                 $order->payment_channel = $allegroOrder['payment']['provider'];
                 $order->allegro_payment_id = $allegroOrder['payment']['id'];
                 $order->saveQuietly();
+
+                $this->emailSendingService->addNewScheduledEmail($order);
 
                 if ($allegroOrder['messageToSeller'] !== null) {
                     $this->createChat($order->id, $customer->id, $allegroOrder['messageToSeller']);

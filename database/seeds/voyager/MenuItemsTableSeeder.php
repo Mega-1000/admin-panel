@@ -440,5 +440,21 @@ class MenuItemsTableSeeder extends Seeder
                 'order' => 24,
             ])->save();
         }
+
+        $menuItem = MenuItem::firstOrNew([
+            'menu_id' => $menu->id,
+            'title' => 'Ustawienia e-mail',
+            'url' => '',
+            'route' => 'emailSettings',
+        ]);
+        if (!$menuItem->exists) {
+            $menuItem->fill([
+                'target' => '_self',
+                'icon_class' => 'voyager-settings',
+                'color' => null,
+                'parent_id' => null,
+                'order' => 7,
+            ])->save();
+        }
     }
 }
