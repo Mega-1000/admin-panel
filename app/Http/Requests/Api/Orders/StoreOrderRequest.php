@@ -63,6 +63,7 @@ class StoreOrderRequest extends FormRequest
             $name . '.address' => $required . '',
             $name . '.postal_code' => $required . '',
             $name . '.flat_number' => $required . '',
+            $name . '.need_support' => 'boolean',
         ];
     }
 }

@@ -18,8 +18,33 @@ class AllegroChatInitializer {
     }
     
     initListeners() {
-        this.iconWrapper.on('click', () => this.bookThread());
+        if(this.mode === 'orders') {
+            this.iconWrapper.on('click', () => this.viewOrderChat());
+        } else {
+            this.iconWrapper.on('click', () => this.bookThread());
+        }
         $('.allegro-thread').on('click', e => this.messagesPreview(e));
+    }
+
+    async viewOrderChat() {
+
+        this.iconWrapper.addClass('loader-2');
+
+        if(this.unreadedThreads.length < 1) {
+            toastr.error('Brak zamówień wymagających pomocy');
+            this.iconWrapper.removeClass('loader-2');
+
+            return false;
+        }
+        
+        // get first order needed support from array
+        const orderId = this.unreadedThreads[0].id;
+
+        const url = this.ajaxPath + this.paths.resolveOrderNeededSupport + '/' + orderId;
+        
+        const res = await ajaxPost({}, url);
+        toastr.success('Trwa ładowanie się czatu');
+        window.location.href = `/chat/${res.chatUserToken}`;
     }
 
     async checkUnreadedThreadsAndMsgs() {
