@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
 use App\Entities\Import;
 use App\Jobs\ImportNexoLabelsControllerJob;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -22,7 +23,9 @@ class ImportController extends Controller
         $import = Import::find(1);
         $importDone = Import::find(2);
 
-        return view('import.index', compact('import', 'importDone'));
+        $currentDate = Carbon::now()->subMonths(3)->toDateString();
+
+        return view('import.index', compact('import', 'importDone', 'currentDate'));
     }
 
     public function store(Request $request)
@@ -49,13 +52,14 @@ class ImportController extends Controller
     public function storeNexoController(Request $request)
     {
         $file = $request->file('importFile');
+        $nexoStartDate = $request->input('nexoStartDate');
         try {
             if (File::exists(Storage::path('user-files/nexo-controller.csv'))) {
                 \Session::flash('flash-message', ['type' => 'info', 'message' => 'Plik kontrolny nexo już istnieje. Prosimy poczekać, aż zostanie przetworzony.']);
             } else {
                 Storage::disk()->put('user-files/nexo-controller.csv', fopen($file, 'r+'));
                 \Session::flash('flash-message', ['type' => 'success', 'message' => 'Plik kontrolny nexo został zapisany, import zostanie wykonany w ciągu kilku minut']);
-                dispatch(new ImportNexoLabelsControllerJob());
+                dispatch(new ImportNexoLabelsControllerJob($nexoStartDate));
             }
         } catch (Throwable $ex) {
             Log::error($ex->getMessage());

@@ -69,11 +69,14 @@
                     <form action="{{ route('import.storeNexoController') }}" enctype="multipart/form-data" method="POST">
                         {{ csrf_field() }}
                         <div class="col-md-12">
+                            <input type="date" name="nexoStartDate" value="{{ $currentDate }}" id="nexoStartDate">
+                        </div>
+                        <div class="col-md-12">
                             <div class="input-group-file">
                                 <input id="file" name="importFile" class="btn btn-file" type="file" aria-describedby="file">
                             </div>
-
                             <button type="submit" class="btn btn-success">Wczytaj</button>
+                        </div>
                     </form>
                 </div>
             </div>
