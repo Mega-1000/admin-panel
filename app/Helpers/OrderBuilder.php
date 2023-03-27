@@ -56,11 +56,6 @@ class OrderBuilder
 
     private $productService;
 
-    /**
-     * @var EmailSendingService
-     */
-    private $emailSendingService;
-
     public function setPackageGenerator(iDividable $generator)
     {
         $this->packageGenerator = $generator;
@@ -100,12 +95,6 @@ class OrderBuilder
     public function setProductService(ProductService $productService): OrderBuilder
     {
         $this->productService = $productService;
-        return $this;
-    }
-
-    public function setEmailSendingService(EmailSendingService $emailSendingService): OrderBuilder
-    {
-        $this->emailSendingService = $emailSendingService;
         return $this;
     }
 
@@ -150,7 +139,8 @@ class OrderBuilder
 
         $order->save();
         
-        $this->emailSendingService->addNewScheduledEmail($order);
+        $emailSendingService = new EmailSendingService();
+        $emailSendingService->addNewScheduledEmail($order);
 
         if (!empty($data['files'])) {
             foreach ($data['files'] as $file) {
