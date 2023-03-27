@@ -74,6 +74,9 @@ class ImportNexoLabelsControllerJob implements ShouldQueue
 
             foreach ($data as $key => $rawData) {
                 $labelsToAdd = [];
+                if($rawData[0]['data'] < $this->currentDate) {
+                   continue;
+                }
                 $order = Order::find($key);
                 if ($order === null || $order->created_at < $this->currentDate) {
                     continue;
