@@ -183,6 +183,9 @@ class GenerateXmlForNexoJob implements ShouldQueue
         }
         $zip->close();
 
+        foreach ($fileNames as $fileName) {
+            Storage::disk('local')->delete('public/XMLFS/' . $fileName);
+        }
         
         Mailer::create()
             ->to('ksiegowosc@ephpolska.pl')
