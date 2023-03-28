@@ -127,7 +127,7 @@
                         <h3>Filtry:</h3>
                         <label>
                             Obszar:
-                            @include('chat/msg_area', ['msgAreaId' => 'area'])
+                            @include('chat/msg_area')
                         </label>
                         @if(!empty($usersHistory))
                             <h3>Pokaż:</h3>

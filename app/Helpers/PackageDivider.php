@@ -145,11 +145,11 @@ class PackageDivider implements iPackageDivider
             return false;
         }
         if ($sum > $condition->first_condition) {
-            return $condition->first_price;
+            return $condition->first_price ?? false;
         } else if (isset($condition->second_condition) && $sum > $condition->second_condition) {
-            return $condition->second_price;
+            return $condition->second_price ?? false;
         } else if (isset($condition->second_condition) && $sum > $condition->third_condition) {
-            return $condition->third_price;
+            return $condition->third_price ?? false;
         }
         return false;
     }
