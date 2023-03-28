@@ -482,10 +482,7 @@
                         </a>
                     </div>
                     <div class="col-md-5">
-                        @include('orders.labels', ['title' => __('orders.form.warehouse_notice'), 'user_type' => UserRole::Storekeeper])
-                        @include('orders.labels', ['title' => 'Informacje dla spedycji', 'user_type' => UserRole::SuperAdministrator])
-                        @include('orders.labels', ['title' =>  __('orders.form.consultant_notices'), 'user_type' => UserRole::Consultant])
-                        @include('orders.labels', ['title' =>  __('orders.form.financial_notices'), 'user_type' => UserRole::Accountant])
+                        @include('orders.labels', ['title' => __('orders.form.warehouse_notice'), 'user_type' => UserRole::Consultant])
                         <button onclick="goToPreviousOrder()" class="btn btn-success" type="button">
                             @lang('orders.next_order')
                         </button>
