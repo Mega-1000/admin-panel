@@ -1,4 +1,4 @@
-<h3>{{ $title }}</h3>
+<h3>Etykiety</h3>
 <div class="flex-container-labels">
     <div class="col-md-6">
         <p class="text-left">Dodaj etykiety</p>

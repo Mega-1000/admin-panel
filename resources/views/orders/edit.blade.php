@@ -482,7 +482,12 @@
                         </a>
                     </div>
                     <div class="col-md-5">
-                        @include('orders.labels', ['title' => __('orders.form.warehouse_notice'), 'user_type' => UserRole::Consultant])
+                        @include('orders.labels')
+                        <div class="form-group" style="width: 40%;">
+                            <label for="remainder_date">@lang('orders.form.remainder_date')</label>
+                            <input type="text" class="form-control default-date-time-picker-now" id="remainder_date"
+                                   name="remainder_date" value="{{ $order->remainder_date }}">
+                        </div>
                         <button onclick="goToPreviousOrder()" class="btn btn-success" type="button">
                             @lang('orders.next_order')
                         </button>
@@ -501,11 +506,6 @@
                     </div>
                 </div>
             </div>
-                <div class="form-group" style="width: 40%; float: left; padding: 5px;">
-                    <label for="remainder_date">@lang('orders.form.remainder_date')</label>
-                    <input type="text" class="form-control default-date-time-picker-now" id="remainder_date"
-                           name="remainder_date" value="{{ $order->remainder_date }}">
-                </div>
                 <div class="form-group" style="width: 40%; padding: 5px;">
                     <a href="/admin/orders/{{$order->id}}/getDataFromLastOrder" class="btn btn-success">Pobierz dane z
                         ostatniego zamówienia</a>
