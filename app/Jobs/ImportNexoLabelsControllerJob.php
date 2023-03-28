@@ -4,7 +4,6 @@ namespace App\Jobs;
 
 use App\Entities\Label;
 use App\Entities\Order;
-use App\Repositories\OrderRepository;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
 use Carbon\Carbon;
@@ -27,8 +26,9 @@ class ImportNexoLabelsControllerJob implements ShouldQueue
 
     protected ?int $userId;
 
-    public function __construct()
-    {
+    public function __construct(
+        public string $currentDate
+    ) {
         $this->userId = Auth::user()?->id;
     }
 
@@ -44,11 +44,9 @@ class ImportNexoLabelsControllerJob implements ShouldQueue
         }
 
         $header = $ordersVerified = $data = [];
-        $orderRepository = app(OrderRepository::class);
         $file = Storage::path('user-files/nexo-controller.csv');
 
-        $orders = $orderRepository
-            ->where([["created_at", ">", '2022-06-01']])
+        $orders = Order::where([["created_at", ">", $this->currentDate]])
             ->whereHas('labels', function ($query) {
                 $query->where('label_id', Label::INVOICE_OCCURS_IN_NEXO);
             })->orWhereHas('labels', function ($query) {
@@ -76,12 +74,13 @@ class ImportNexoLabelsControllerJob implements ShouldQueue
 
             foreach ($data as $key => $rawData) {
                 $labelsToAdd = [];
-                $order = $orderRepository->find($key);
-
-                if ($order === null || $order->created_at < '2022-06-01') {
+                if($rawData[0]['data'] < $this->currentDate) {
+                   continue;
+                }
+                $order = Order::find($key);
+                if ($order === null || $order->created_at < $this->currentDate) {
                     continue;
                 }
-
                 $orderValueFromSystem = $order->getSumOfGrossValues() - $order->refunded;
                 $orderValueFromNexo = $this->countTheValueOfInvoices($rawData);
 
@@ -99,14 +98,8 @@ class ImportNexoLabelsControllerJob implements ShouldQueue
                 $orderDate = new Carbon($order->preferred_invoice_date);
                 $date = new Carbon(end($rawData)['data']);
 
-                if ($orderDate->format('Y-m') !== $date->format('Y-m') && $order->created_at > '2022-11-01') {
+                if ($orderDate->format('Y-m') !== $date->format('Y-m')) {
                     $labelsToAdd[] = Label::INVOICE_DATE_AND_PREFERRED_DATE_HAVE_DIFFERENT_MONTHS;
-                }
-
-                if ($order->hasLabel(Label::ALLEGRO_OFFERS) || !empty($order->allegro_form_id)) {
-                    if (empty($order->allegro_payment_id) || empty($order->allegro_form_id) || $order->sum_of_gross_values === 0) {
-                        $labelsToAdd[] = Label::OFFER_FROM_ALLEGRO_DOES_NOT_HAVE_THE_REQUIRED_PARAMS;
-                    }
                 }
 
                 $ordersVerified[$order->id] = $labelsToAdd;
@@ -117,7 +110,7 @@ class ImportNexoLabelsControllerJob implements ShouldQueue
                 [
                     'class' => $ex->getFile(),
                     'line' => $ex->getLine(),
-                    'orderId' => $key
+                    'orderId' => $key ?? 'unknown'
                 ]
             );
         }
@@ -128,11 +121,11 @@ class ImportNexoLabelsControllerJob implements ShouldQueue
                 Label::INVOICE_OCCURS_IN_NEXO,
                 Label::GROSS_VALUE_DIFFERS_FROM_INVOICES_IN_NEXO,
                 Label::FAILURE_TO_INVOICE_DESPITE_DEPARTURE_OF_GOODS,
-                Label::OFFER_FROM_ALLEGRO_DOES_NOT_HAVE_THE_REQUIRED_PARAMS,
                 Label::INVOICE_DATE_AND_PREFERRED_DATE_HAVE_DIFFERENT_MONTHS,
                 Label::GROSS_VALUE_AGREES_FROM_INVOICES_IN_NEXO
             ], $preventionArray, [], Auth::user()?->id);
         }
+
 
         foreach ($ordersVerified as $orderId => $labelsToAdd) {
             $preventionArray = [];

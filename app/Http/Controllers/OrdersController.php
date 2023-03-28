@@ -1789,7 +1789,7 @@ class OrdersController extends Controller
                 Log::error('Nie udało się zapisać logu', ['message' => $exception->getMessage(), 'trace' => $exception->getTraceAsString()]);
             }
 
-            dispatch(new AddLabelJob($order, [$labelId], $preventionArray, [], null, $time));
+            AddLabelService::addLabels($order, [$labelId], $preventionArray, [], Auth::user()->id, $time);
 
             if (in_array($label->id, EmailSettingsEnum::STATUS_LABELS)) {
                 $this->emailSendingService->addScheduledEmail($order, $label->id);
