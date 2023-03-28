@@ -46,6 +46,7 @@ class CustomerUpdateRequest extends FormRequest
             'delivery_email' => 'nullable|email|min:5',
             'delivery_postal_code' => 'nullable|min:6',
             'delivery_nip' => 'nullable|regex:/[0-9]{9}/',
+            'is_staff' => 'boolean',
         ];
     }
 }

@@ -86,7 +86,8 @@ class Kernel extends HttpKernel
         'verified' => EnsureEmailIsVerified::class,
         'client' => CheckClientCredentials::class,
         'admin' => IsAdmin::class,
-        'https' => HttpsProtocol::class
+        'https' => HttpsProtocol::class,
+        'staff.api' => \App\Http\Middleware\CheckAdminApi::class,
     ];
 
     /**

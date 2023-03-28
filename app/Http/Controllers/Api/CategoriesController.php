@@ -7,6 +7,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use App\Http\Requests\ChangeCategoryImage;
+use App\Http\Requests\UpdateCategoryRequest;
+use App\Http\Requests\CreateCategoryRequest;
 
 class CategoriesController extends Controller
 {
@@ -32,5 +35,43 @@ class CategoriesController extends Controller
             ->find((int)$request->input('category'));
 
         return response($category?->toJson() ?? []);
+    }
+
+    public function changeImage(ChangeCategoryImage $request)
+    {
+        $category = Category::find($request->validated('category'));
+        $image = $request->file('image')->store('public/images');
+        $category->img = '/' . str_replace('public', 'storage', $image);
+
+        $category->save();
+
+        return response($category->toJson());
+    }
+
+    public function updateCategory(UpdateCategoryRequest $request)
+    {
+        $category = Category::findorfail($request->validated('category'));
+        $category->update($request->validated());
+
+        $category->save_name = $request->validated('save_name');
+        $category->save_description = $request->validated('save_description');
+        $category->save_image = $request->validated('save_image');
+        $category->save();
+
+        return response($category->toJson());
+    }
+
+    public function create(CreateCategoryRequest $request)
+    {
+        $category = Category::create($request->validated() + [
+            'is_visible' => true,
+            'priority' => 0,
+            'img' => 'https://via.placeholder.com/150',
+        ]);
+
+        $category->rewrite = $request->validated('name');
+        $category->save();
+
+        return response($category->toJson());
     }
 }

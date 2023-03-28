@@ -419,6 +419,10 @@ class CustomersController extends Controller
         }
         $customerAddressDelivery->save();
 
+
+        $customer->is_staff = $request->is_staff;
+        $customer->save();
+
         return redirect()->back()->with([
             'message' => __('customers.message.update'),
             'alert-type' => 'success'

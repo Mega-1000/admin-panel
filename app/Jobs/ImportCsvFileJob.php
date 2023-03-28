@@ -133,6 +133,8 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function clearTables()
     {
+        $this->categories = DB::table('categories')->get()->keyBy('id')->toArray();
+
         Entities\Product::withTrashed()->where('symbol', '')->orWhereNull('symbol')->forceDelete();
         Entities\Product::withTrashed()->update([
             'category_id' => null,
@@ -183,6 +185,9 @@ class ImportCsvFileJob implements ShouldQueue
     private function saveCategory($line, $categoryTree, $categoryColumn)
     {
         $parent = &$this->getCategoryParent($categoryTree);
+
+        // get previous category witch was deleted
+        $this->log($this->categories);
 
         $category = new Entities\Category;
         $category->name = end($categoryTree);
