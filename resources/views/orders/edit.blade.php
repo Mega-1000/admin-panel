@@ -474,12 +474,22 @@
             </div>
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-md-7">
-                        <h3>Podgląd czatu</h3>
+                    <div class="col-md-7 chat-preview">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <h3>Podgląd czatu</h3>
+                            <a class="btn btn-success" href="/chat/{{ $chatUserToken }}" target="_blank">
+                                Przejdź do czatu
+                            </a>
+                        </div>
                         @include('chat/chat_body')
-                        <a class="btn btn-success" href="/chat/{{ $chatUserToken }}" target="_blank">
-                            Przejdź do czatu
-                        </a>
+                        <label>
+                            Obszar:
+                            @include('chat/msg_area')
+                        </label>
+                        <div class="quick-msg-area" style="display: flex; align-items: center; justify-content: flex-start;">
+                            <textarea id="quick_msg_content" cols="30" rows="3" style="width: 85%;"></textarea>
+                            <button class="btn btn-success" style="margin-left: 10px;" id="quick_msg_send" data-url="{{ route('api.messages.post-new-message', ['token' => $chatUserToken]) }}">Wyślij</button>
+                        </div>
                     </div>
                     <div class="col-md-5">
                         @include('orders.labels')
@@ -2644,6 +2654,24 @@
             $('#consultant_notice').scrollTop(1E10);
             $('#financial_notice').scrollTop(1E10);
         });
+
+        $('#quick_msg_send').click(async e => {
+            e.preventDefault();
+            const target = $(e.target);
+            $('.chat-preview').addClass('loader-2');
+
+            const url = target.data('url');
+            const data = {
+                message: $('#quick_msg_content').val(),
+                area: $('#area').val(),
+            };
+
+            await ajaxPost(data, url);
+            $('.chat-preview').removeClass('loader-2');
+
+            window.location.reload();
+        });
+
         $(() => $(document).tooltip());
         $(".add-label").click(event => {
             event.preventDefault();
