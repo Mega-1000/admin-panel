@@ -150,13 +150,14 @@ class OrderBuilder
         $chatUserToken = '';
         if ( isset($data['need_support']) && $data['need_support'] === true ) {
             $helper = new MessagesHelper();
-            $helper->createNewChat();
             $chatUserToken = $helper->getChatToken($order->id, $customer->id, MessagesHelper::TYPE_CUSTOMER);
+            $helper->createNewChat();
 
             if( !empty($data['customer_notices']) ) {
                 $helper->addMessage($data['customer_notices']);
             }
             $order->labels()->attach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
+            $order->need_support = true;
         }
         $this->assignItemsToOrder($order, $data['order_items']);
 
