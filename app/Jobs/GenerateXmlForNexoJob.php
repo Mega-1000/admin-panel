@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Mail\XmlForNexoMail;
 use App\Facades\Mailer;
 use Throwable;
+use ZipArchive;
 
 /**
  * Generate xml for nexo import.
@@ -176,8 +177,8 @@ class GenerateXmlForNexoJob implements ShouldQueue
         
 
         $zipName = 'XMLFS_' . Carbon::now()->format('d-m-Y') . '.zip';
-        $zip = new \ZipArchive();
-        $zip->open(storage_path('app/public/XMLFS/' . $zipName), \ZipArchive::CREATE);
+        $zip = new ZipArchive();
+        $zip->open(storage_path('app/public/XMLFS/' . $zipName), ZipArchive::CREATE);
         foreach ($fileNames as $fileName) {
             $zip->addFile(storage_path('app/public/XMLFS/' . $fileName), $fileName);
         }
