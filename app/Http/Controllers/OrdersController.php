@@ -103,6 +103,7 @@ use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Yajra\DataTables\Facades\DataTables;
 use function response;
+use App\Entities\Chat;
 
 /**
  * Class OrderController.
@@ -3389,11 +3390,11 @@ class OrdersController extends Controller
     /**
      * Get Current User Chat Token for given order ID
      *
-     * @param int $orderId
+     * @param ?int $orderId
      *
      * @return JsonResponse
      */
-    public function resolveOrderNeededSupport(int $orderId): JsonResponse
+    public function resolveOrderNeededSupport(?int $orderId): JsonResponse
     {
 
         $helper = new MessagesHelper();
@@ -3402,9 +3403,11 @@ class OrdersController extends Controller
 
         $chatUserToken = $helper->getChatToken($orderId, $userId);
 
-        Order::where('id', $orderId)->update([
-            'need_support' => false
-        ]);
+        if($orderId !== null) {
+            Order::where('id', $orderId)->update([
+                'need_support' => false
+            ]);
+        }
 
         $response = [
             'chatUserToken' => $chatUserToken,
@@ -3422,6 +3425,8 @@ class OrdersController extends Controller
     {
 
         $ordersNeededSupport = Order::where('need_support', true)->get();
+        $customersNeededSupport = Chat::where('need_intervention', true)->whereNull('product_id')->whereNull('order_id')->get();
+        $ordersNeededSupport->merge($ordersNeededSupport);
 
         $response = [
             'unreadedThreads' => $ordersNeededSupport,

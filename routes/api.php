@@ -29,6 +29,8 @@ Route::post('orders', 'Api\OrdersController@store')->name('api.orders.store');
 Route::post('customers', 'Api\CustomersController@store')->name('api.customers.store');
 Route::get('customers/emailExists/{email}', 'Api\CustomersController@emailExists')->name('api.customers.email-exists');
 Route::post('new_order', 'Api\OrdersController@newOrder')->name('api.orders.new');
+Route::post('create_contact_chat', 'Api\MessagesController@createContactChat')->name('api.orders.create_contact_chat');
+
 Route::middleware('client')->group(function () {
     Route::post('orders/message', 'Api\OrdersController@storeMessage')->name('api.orders.message.store');
     Route::get('orders/messages/{frontDbOrderId}', 'Api\OrdersController@getMessages')->name('api.orders.messages.get');

@@ -64,10 +64,16 @@ class MessagesHelper
         }
     }
 
-    public function encrypt()
+    /**
+     * Encrypt data
+     *
+     * @return string
+     */
+    public function encrypt(): string
     {
         $this->setChatId();
         $this->setUsers();
+
         if ($this->chatId) {
             return encrypt([
                 'cId' => $this->chatId,
@@ -76,13 +82,19 @@ class MessagesHelper
             ]);
         }
 
-        return encrypt([
+        $dataToEncrypt = [
             'u' => $this->users,
-            'pId' => $this->productId,
-            'oId' => $this->orderId,
             'curT' => $this->currentUserType,
             'curId' => $this->currentUserId
-        ]);
+        ];
+        if($this->orderId) {
+            $dataToEncrypt['oId'] = $this->orderId;
+        }
+        if($this->productId) {
+            $dataToEncrypt['pId'] = $this->productId;
+        }
+
+        return encrypt($dataToEncrypt);
     }
 
     public function decrypt($token)
@@ -366,7 +378,9 @@ class MessagesHelper
                 );
             }
         }
-        WorkingEvents::createEvent(WorkingEvents::CHAT_MESSAGE_ADD_EVENT, $chat->order->id);
+        if( isset($chat->order->id) ) {
+            WorkingEvents::createEvent(WorkingEvents::CHAT_MESSAGE_ADD_EVENT, $chat->order->id);
+        }
 
         //\App\Jobs\ChatNotificationJob::dispatch($chat->id)->delay(now()->addSeconds(self::NOTIFICATION_TIME + 5));
         // @TODO this should use queue, but at this point (08.05.2021) queue is bugged
@@ -434,7 +448,7 @@ class MessagesHelper
      *
      * @return string   $chatUserToken
      */
-    public function getChatToken(int $orderId, int $userId, string $userType = MessagesHelper::TYPE_USER): string {
+    public function getChatToken(?int $orderId, int $userId, string $userType = MessagesHelper::TYPE_USER): string {
         $this->orderId = $orderId;
         $this->currentUserId = $userId;
         $this->currentUserType = $userType;
@@ -541,7 +555,7 @@ class MessagesHelper
         if ($order) {
             return 'Czat dotyczy zamówienia nr <b>' . $order->id . '</b>';
         }
-        return 'Czat ogólny z administracją ' . env('APP_NAME');
+        return 'Czat ogólny z administracją mega1000';
     }
 
     private function clearIntervention($chat)
