@@ -18,6 +18,9 @@ use App\Http\Controllers\Controller;
 use App\Helpers\Exceptions\ChatException;
 use App\Http\Requests\Messages\PostMessageRequest;
 use App\Http\Requests\Messages\GetMessagesRequest;
+use App\Http\Requests\Api\Orders\ChatRequest;
+use Illuminate\Http\JsonResponse;
+use App\Helpers\GetCustomerForNewOrder;
 
 class MessagesController extends Controller
 {
@@ -201,7 +204,7 @@ class MessagesController extends Controller
             $chat = $helper->getChat();
 
             $data = $request->validated();
-            $area = $data['area'];
+            $area = $data['area'] ?? 0;
             $lastId = $data['lastId'] ?? 0;
 
             if (!$chat) {
@@ -227,6 +230,36 @@ class MessagesController extends Controller
             $e->log();
             return response($e->getMessage(), 400);
         }
+    }
+
+    /**
+     * Create chat used to contact between customer and consultant
+     *
+     * @param  ChatRequest  $request
+     *
+     * @return JsonResponse
+     */
+    public function createContactChat(ChatRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+
+        try {
+            $helper = new MessagesHelper();
+            $customerForNewOrder = new GetCustomerForNewOrder();
+            $customer = $customerForNewOrder->getCustomer(null, $data);
+            $chatUserToken = $helper->getChatToken(null, $customer->id, MessagesHelper::TYPE_CUSTOMER);
+            $helper->createNewChat();
+
+            return response()->json([
+                'chatUserToken' => $chatUserToken,
+            ]);
+        } catch (ChatException $e) {
+            $e->log();
+        }
+
+        return response()->json([
+            'error' => 'Problem z utworzeniem nowego czatu dla klienta',
+        ]);
     }
 
     public function getHistory(Request $request)

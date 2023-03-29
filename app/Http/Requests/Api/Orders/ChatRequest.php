@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Messages;
+namespace App\Http\Requests\Api\Orders;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class GetMessagesRequest extends FormRequest
+class ChatRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -19,13 +19,13 @@ class GetMessagesRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, mixed>
+     * @return array
      */
     public function rules()
     {
         return [
-            'area'    => 'integer|digits:1',
-            'lastId'  => 'integer'
+            'phone' => 'required|regex:/[\+0-9]{9,12}/',
+            'customer_login' => 'required|email',
         ];
     }
 }

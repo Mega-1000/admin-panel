@@ -27,8 +27,8 @@ Route::group(['prefix' => 'admin'], function () {
             Route::group(['prefix' => 'sets', 'as' => 'sets.'], __DIR__ . '/web/ProductsSetsRoutes.php');
         });
 
-        Route::post('/getNewNeedSupportOrders', 'OrdersController@getNewNeedSupportOrders')->name('getNewNeedSupportOrders');
-        Route::post('/resolveOrderNeededSupport/{orderId}', 'OrdersController@resolveOrderNeededSupport')->name('resolveOrderNeededSupport');
+        Route::post('/getChatNeededSupport', 'OrdersController@getChatNeededSupport')->name('getChatNeededSupport');
+        Route::post('/resolveChatIntervention/{type}/{id}', 'OrdersController@resolveChatIntervention')->name('resolveChatIntervention');
 
         Route::get('/disputes', 'AllegroDisputeController@list');
         Route::get('/disputes/view/{id}', 'AllegroDisputeController@view');

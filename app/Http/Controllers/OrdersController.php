@@ -103,6 +103,7 @@ use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Yajra\DataTables\Facades\DataTables;
 use function response;
+use App\Entities\Chat;
 
 /**
  * Class OrderController.
@@ -1766,7 +1767,6 @@ class OrdersController extends Controller
     public function swapLabelsAfterLabelAddition(Request $request, $labelId)
     {
         $orderIds = $request->input('orderIds');
-        $preventionArray = [];
 
         if (count($orderIds) < 1) {
             return;
@@ -1780,15 +1780,15 @@ class OrdersController extends Controller
         $user = Auth::user();
         $label = Label::find($labelId);
 
-        $orders = $this->orderRepository->findWhereIn('id', $orderIds);
+        $orders = Order::whereIn('id', $orderIds)->get();
         foreach ($orders as $order) {
+            $preventionArray = [];
             try {
                 $order->labels_log .= Order::formatMessage($user, "dodał etykietę: $label->name");
                 $order->save();
             } catch (Exception $exception) {
                 Log::error('Nie udało się zapisać logu', ['message' => $exception->getMessage(), 'trace' => $exception->getTraceAsString()]);
             }
-
             AddLabelService::addLabels($order, [$labelId], $preventionArray, [], Auth::user()->id, $time);
 
             if (in_array($label->id, EmailSettingsEnum::STATUS_LABELS)) {
@@ -3387,24 +3387,32 @@ class OrdersController extends Controller
     }
 
     /**
-     * Get Current User Chat Token for given order ID
+     * Get Current User Chat Token for given chat ID or order ID
      *
-     * @param int $orderId
+     * @param string $type - order | chat
+     * @param int    $id - order or chat id
      *
      * @return JsonResponse
      */
-    public function resolveOrderNeededSupport(int $orderId): JsonResponse
+    public function resolveChatIntervention(string $type, int $id): JsonResponse
     {
 
         $helper = new MessagesHelper();
 
         $userId = Auth::user()?->id;
+        if($type === 'chat') {
+            $chatUserToken = $helper->getChatToken(null, $userId);
+            
+            Chat::where('id', $id)->update([
+                'need_intervention' => false
+            ]);
+        } else if($type === 'order') {
+            $chatUserToken = $helper->getChatToken($id, $userId);
 
-        $chatUserToken = $helper->getChatToken($orderId, $userId);
-
-        Order::where('id', $orderId)->update([
-            'need_support' => false
-        ]);
+            Order::where('id', $id)->update([
+                'need_support' => false
+            ]);
+        }
 
         $response = [
             'chatUserToken' => $chatUserToken,
@@ -3414,17 +3422,18 @@ class OrdersController extends Controller
     }
 
     /**
-     * Get orders that marked by client as needed support for ex. for new customers orders
+     * Get orders / chats that marked as needed support / intervention for ex. for new customers orders / or contact chats
      *
      * @return JsonResponse
      */
-    public function getNewNeedSupportOrders(): JsonResponse
+    public function getChatNeededSupport(): JsonResponse
     {
-
-        $ordersNeededSupport = Order::where('need_support', true)->get();
+        $ordersNeededSupport = Order::where('need_support', true)->get()->toArray();
+        $customersNeededSupport = Chat::where('need_intervention', true)->whereNull('product_id')->whereNull('order_id')->get()->toArray();
+        $unreadedChats = array_merge($ordersNeededSupport, $customersNeededSupport);
 
         $response = [
-            'unreadedThreads' => $ordersNeededSupport,
+            'unreadedThreads' => $unreadedChats,
         ];
 
         return response()->json($response);
