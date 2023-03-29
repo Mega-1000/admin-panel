@@ -29,8 +29,8 @@ $(function() {
     const iconCounterOrders = $('.need-support-icon-counter');
 
     const ordersPaths = {
-        checkUnreadedThreads: 'getNewNeedSupportOrders',
-        resolveOrderNeededSupport: 'resolveOrderNeededSupport',
+        checkUnreadedThreads: 'getChatNeededSupport',
+        resolveChatIntervention: 'resolveChatIntervention',
     };
 
     const allegroOrdersInitializer = new AllegroChatInitializer(iconWrapperOrders, iconCounterOrders, ajaxPath, ordersPaths, 'orders');

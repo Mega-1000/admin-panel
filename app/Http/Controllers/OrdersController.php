@@ -3388,23 +3388,29 @@ class OrdersController extends Controller
     }
 
     /**
-     * Get Current User Chat Token for given order ID
+     * Get Current User Chat Token for given chat ID or order ID
      *
-     * @param ?int $orderId
+     * @param string $type - order | chat
+     * @param int    $id - order or chat id
      *
      * @return JsonResponse
      */
-    public function resolveOrderNeededSupport(?int $orderId): JsonResponse
+    public function resolveChatIntervention(string $type, int $id): JsonResponse
     {
 
         $helper = new MessagesHelper();
 
         $userId = Auth::user()?->id;
+        if($type === 'chat') {
+            $chatUserToken = $helper->getChatToken(null, $userId);
+            
+            Chat::where('id', $id)->update([
+                'need_intervention' => false
+            ]);
+        } else if($type === 'order') {
+            $chatUserToken = $helper->getChatToken($id, $userId);
 
-        $chatUserToken = $helper->getChatToken($orderId, $userId);
-
-        if($orderId !== null) {
-            Order::where('id', $orderId)->update([
+            Order::where('id', $id)->update([
                 'need_support' => false
             ]);
         }
@@ -3417,19 +3423,18 @@ class OrdersController extends Controller
     }
 
     /**
-     * Get orders that marked by client as needed support for ex. for new customers orders
+     * Get orders / chats that marked as needed support / intervention for ex. for new customers orders / or contact chats
      *
      * @return JsonResponse
      */
-    public function getNewNeedSupportOrders(): JsonResponse
+    public function getChatNeededSupport(): JsonResponse
     {
-
-        $ordersNeededSupport = Order::where('need_support', true)->get();
-        $customersNeededSupport = Chat::where('need_intervention', true)->whereNull('product_id')->whereNull('order_id')->get();
-        $ordersNeededSupport->merge($ordersNeededSupport);
+        $ordersNeededSupport = Order::where('need_support', true)->get()->toArray();
+        $customersNeededSupport = Chat::where('need_intervention', true)->whereNull('product_id')->whereNull('order_id')->get()->toArray();
+        $unreadedChats = array_merge($ordersNeededSupport, $customersNeededSupport);
 
         $response = [
-            'unreadedThreads' => $ordersNeededSupport,
+            'unreadedThreads' => $unreadedChats,
         ];
 
         return response()->json($response);

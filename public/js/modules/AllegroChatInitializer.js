@@ -7,11 +7,14 @@ class AllegroChatInitializer {
         this.paths = paths;
         this.mode = mode;
         this.chatWindow = null;
+        this.tabActive = true;
 
         this.checkUnreadedThreadsAndMsgs();
 
         setInterval(() => {
-            this.checkUnreadedThreadsAndMsgs();
+            if(this.tabActive) {
+                this.checkUnreadedThreadsAndMsgs();
+            }
         }, 30000);
 
         this.initListeners();
@@ -24,6 +27,8 @@ class AllegroChatInitializer {
             this.iconWrapper.on('click', () => this.bookThread());
         }
         $('.allegro-thread').on('click', e => this.messagesPreview(e));
+        $(window).on('focus', () => this.tabActive = true);
+        $(window).on('blur', () => this.tabActive = false);
     }
 
     async viewOrderChat() {
@@ -37,10 +42,10 @@ class AllegroChatInitializer {
             return false;
         }
         
-        // get first order needed support from array
-        const orderId = this.unreadedThreads[0].id;
 
-        const url = this.ajaxPath + this.paths.resolveOrderNeededSupport + '/' + orderId;
+        const id = this.unreadedThreads[0].id;
+        const type = this.unreadedThreads[0].hasOwnProperty('need_intervention') ? 'chat' : 'order';
+        const url = `${this.ajaxPath}${this.paths.resolveChatIntervention}/${type}/${id}`;
         
         const res = await ajaxPost({}, url);
         toastr.success('Trwa ładowanie się czatu');

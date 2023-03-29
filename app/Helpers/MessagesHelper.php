@@ -237,6 +237,11 @@ class MessagesHelper
         }
 
         $chat->product_id = $this->productId ?: null;
+
+        if($chat->product_id === null && $chat->order_id === null) {
+            $chat->need_intervention = true;
+        }
+
         $this->cache['chat'] = $chat;
         $chat->save();
         if (!empty($this->users[self::TYPE_CUSTOMER])) {
