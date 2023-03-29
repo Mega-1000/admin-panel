@@ -61,6 +61,12 @@ return [
             'visibility' => 'public',
         ],
 
+        'xmlForNexoDisk' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public' . env('XML_FOR_NEXO_PATH')),
+            'visibility' => 'private',
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
