@@ -1767,7 +1767,6 @@ class OrdersController extends Controller
     public function swapLabelsAfterLabelAddition(Request $request, $labelId)
     {
         $orderIds = $request->input('orderIds');
-        $preventionArray = [];
 
         if (count($orderIds) < 1) {
             return;
@@ -1781,15 +1780,15 @@ class OrdersController extends Controller
         $user = Auth::user();
         $label = Label::find($labelId);
 
-        $orders = $this->orderRepository->findWhereIn('id', $orderIds);
+        $orders = Order::whereIn('id', $orderIds)->get();
         foreach ($orders as $order) {
+            $preventionArray = [];
             try {
                 $order->labels_log .= Order::formatMessage($user, "dodał etykietę: $label->name");
                 $order->save();
             } catch (Exception $exception) {
                 Log::error('Nie udało się zapisać logu', ['message' => $exception->getMessage(), 'trace' => $exception->getTraceAsString()]);
             }
-
             AddLabelService::addLabels($order, [$labelId], $preventionArray, [], Auth::user()->id, $time);
 
             if (in_array($label->id, EmailSettingsEnum::STATUS_LABELS)) {
