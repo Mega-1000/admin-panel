@@ -177,9 +177,9 @@ class GenerateXmlForNexoJob implements ShouldQueue
 
         $zipName = 'XMLFS_' . Carbon::now()->format('d-m-Y') . '.zip';
         $zip = new ZipArchive();
-        $zip->open(storage_path('app/public' . env('XML_FOR_NEXO_PATH') . $zipName), ZipArchive::CREATE);
+        $zip->open(storage_path('app/public' . env('XML_FOR_NEXO_PATH', '/XMLFS/') . $zipName), ZipArchive::CREATE);
         foreach ($fileNames as $fileName) {
-            $zip->addFile(storage_path('app/public' . env('XML_FOR_NEXO_PATH') . $fileName), $fileName);
+            $zip->addFile(storage_path('app/public' . env('XML_FOR_NEXO_PATH', '/XMLFS/') . $fileName), $fileName);
         }
         $zip->close();
 

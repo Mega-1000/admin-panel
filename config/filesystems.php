@@ -63,8 +63,8 @@ return [
 
         'xmlForNexoDisk' => [
             'driver' => 'local',
-            'root' => storage_path('app/public' . env('XML_FOR_NEXO_PATH')),
-            'visibility' => 'private',
+            'root' => storage_path('app/public' . env('XML_FOR_NEXO_PATH', '/XMLFS/')),
+            'visibility' => 'public',
         ],
 
         's3' => [
