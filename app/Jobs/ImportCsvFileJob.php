@@ -134,8 +134,6 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function clearTables()
     {
-        $this->categories = DB::table('categories')->get()->keyBy('id')->toArray();
-
         Entities\Product::withTrashed()->where('symbol', '')->orWhereNull('symbol')->forceDelete();
         Entities\Product::withTrashed()->update([
             'category_id' => null,
@@ -152,7 +150,7 @@ class ImportCsvFileJob implements ShouldQueue
         DB::table('chimney_products')->delete();
         DB::table('chimney_attribute_options')->delete();
         DB::table('chimney_attributes')->delete();
-        DB::table('categories')->where('save_name', true)->where('save_description', true)->where('save_image', false)->where('artificially_created', false)->delete();
+        DB::table('categories')->where('save_name', true)->where('save_description', true)->where('save_image', true)->where('artificially_created', false)->delete();
         DB::table('jpg_data')->delete();
         DB::statement("ALTER TABLE categories AUTO_INCREMENT = 1;");
         DB::statement("ALTER TABLE product_media AUTO_INCREMENT = 1;");
@@ -189,17 +187,36 @@ class ImportCsvFileJob implements ShouldQueue
         
         $previousCategory = Category::where('name', end($categoryTree))->first();
 
-        $category = new Entities\Category;
-        if ($previousCategory && $previousCategory->save_name) {
-            $category->name = end($categoryTree);
-        } else {
+        $category = new Category;
+        if (isset($previousCategory) && !$previousCategory->save_name) {
             $category->name = $previousCategory->name;
+        } else {
+            $category->name = end($categoryTree);
         }
-        $category->rewrite = $this->rewrite($category->name);
-        $category->description = $line[310];
-        $category->img = $line[303];
+        $category->rewrite = $this->rewrite(end($categoryTree));
+        
+        if (isset($previousCategory) && !$previousCategory->save_description) {
+            $category->description = $previousCategory->description;
+        } else {
+            $category->description = $line[310];
+        }
+
+        if (isset($previousCategory) && !$previousCategory->save_image) {
+            $category->img = $previousCategory->img;
+        } else {
+            $category->img = $line[303];
+        }
         $category->is_visible = $this->getShowOnPageParameter($line, $categoryColumn);
         $category->priority = $this->getProductsOrder($line, $categoryColumn);
+
+        if (isset($previousCategory)) {
+            $category->save_name = $previousCategory->save_name;
+            $category->save_description = $previousCategory->save_description;
+            $category->save_image = $previousCategory->save_image;
+
+            $previousCategory->delete();
+        }
+
         $category->parent_id = $parent['id'];
 
         if (!empty($category->img) && strpos($category->img, "\\")
