@@ -67,11 +67,19 @@ class CategoriesController extends Controller
             'is_visible' => true,
             'priority' => 0,
             'img' => 'https://via.placeholder.com/150',
+            'artificially_created' => true,
         ]);
 
         $category->rewrite = $request->validated('name');
         $category->save();
 
         return response($category->toJson());
+    }
+
+    public function delete(Category $category)
+    {
+        $category->delete();
+
+        return response('Category deleted', 201);
     }
 }

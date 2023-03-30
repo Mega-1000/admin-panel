@@ -38,8 +38,8 @@ Route::middleware('auth:api')->group(function () {
         Route::get('staff/isStaff', function () { return true; })->name('api.staff.isStaff');
         Route::post('change-image', 'Api\CategoriesController@changeImage')->name('api.categories.change-image');
         Route::post('update-category', 'Api\CategoriesController@updateCategory')->name('api.categories.update-category');
-    
         Route::post('categories/create', 'Api\CategoriesController@create')->name('api.categories.create');
+        Route::delete('categories/delete/{category}', 'Api\CategoriesController@delete')->name('api.categories.delete');
     });
 });
 

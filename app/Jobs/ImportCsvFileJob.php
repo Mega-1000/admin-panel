@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
+use App\Entities\Category;
 
 /**
  * Class ImportCsvFileJob
@@ -151,7 +152,7 @@ class ImportCsvFileJob implements ShouldQueue
         DB::table('chimney_products')->delete();
         DB::table('chimney_attribute_options')->delete();
         DB::table('chimney_attributes')->delete();
-        DB::table('categories')->delete();
+        DB::table('categories')->where('save_name', true)->where('save_description', true)->where('save_image', false)->where('artificially_created', false)->delete();
         DB::table('jpg_data')->delete();
         DB::statement("ALTER TABLE categories AUTO_INCREMENT = 1;");
         DB::statement("ALTER TABLE product_media AUTO_INCREMENT = 1;");
@@ -185,12 +186,15 @@ class ImportCsvFileJob implements ShouldQueue
     private function saveCategory($line, $categoryTree, $categoryColumn)
     {
         $parent = &$this->getCategoryParent($categoryTree);
-
-        // get previous category witch was deleted
-        $this->log($this->categories);
+        
+        $previousCategory = Category::where('name', end($categoryTree))->first();
 
         $category = new Entities\Category;
-        $category->name = end($categoryTree);
+        if ($previousCategory && $previousCategory->save_name) {
+            $category->name = end($categoryTree);
+        } else {
+            $category->name = $previousCategory->name;
+        }
         $category->rewrite = $this->rewrite($category->name);
         $category->description = $line[310];
         $category->img = $line[303];

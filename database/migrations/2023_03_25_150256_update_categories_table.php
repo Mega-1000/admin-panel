@@ -17,6 +17,7 @@ return new class extends Migration
             $table->boolean('save_name')->default(true)->tooltip('Zaczytywanie nazwy kategorii z nazwy pliku cvs');
             $table->boolean('save_description')->default(true)->tooltip('Zaczytywanie opisu kategorii z nazwy pliku cvs');
             $table->boolean('save_image')->default(true)->tooltip('Zaczytywanie obrazka kategorii z nazwy pliku cvs');
+            $table->boolean('artificially_created')->default(false)->tooltip('Czy kategoria została stworzona ręcznie');
         });
     }
 
