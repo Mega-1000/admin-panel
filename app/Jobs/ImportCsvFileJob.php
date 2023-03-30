@@ -3,13 +3,16 @@
 namespace App\Jobs;
 
 use App\Entities;
+use App\Entities\Category;
 use App\Entities\Employee;
 use App\Entities\EmployeeRole;
 use App\Entities\Firm;
 use App\Entities\JpgDatum;
 use App\Entities\PostalCodeLatLon;
+use App\Entities\Product;
 use App\Entities\ProductTradeGroup;
 use App\Entities\Warehouse;
+use App\Repositories\Categories;
 use DateTime;
 use Exception;
 use Illuminate\Bus\Queueable;
@@ -23,7 +26,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
-use App\Entities\Category;
 
 /**
  * Class ImportCsvFileJob
@@ -73,7 +75,7 @@ class ImportCsvFileJob implements ShouldQueue
         $this->log('Clear tables end');
 
         $time = microtime(true);
-        
+
         for ($i = 1; $line = fgetcsv($handle, 0, ';'); $i++) {
             $this->currentLine = $i;
             if ($i % 100 === 0) {
@@ -134,8 +136,8 @@ class ImportCsvFileJob implements ShouldQueue
 
     private function clearTables()
     {
-        Entities\Product::withTrashed()->where('symbol', '')->orWhereNull('symbol')->forceDelete();
-        Entities\Product::withTrashed()->update([
+        Product::withTrashed()->where('symbol', '')->orWhereNull('symbol')->forceDelete();
+        Product::withTrashed()->update([
             'category_id' => null,
             'parent_id' => null,
             'product_name_supplier' => '',
@@ -144,22 +146,16 @@ class ImportCsvFileJob implements ShouldQueue
             'products_related_to_the_automatic_price_change' => '',
             'deleted_at' => Carbon::now()
         ]);
-        DB::table('product_media')->delete();
-        DB::table('product_trade_groups')->delete();
-        DB::table('chimney_replacements')->delete();
-        DB::table('chimney_products')->delete();
-        DB::table('chimney_attribute_options')->delete();
-        DB::table('chimney_attributes')->delete();
-        DB::table('categories')->where('save_name', true)->where('save_description', true)->where('save_image', true)->where('artificially_created', false)->delete();
-        DB::table('jpg_data')->delete();
-        DB::statement("ALTER TABLE categories AUTO_INCREMENT = 1;");
-        DB::statement("ALTER TABLE product_media AUTO_INCREMENT = 1;");
-        DB::statement("ALTER TABLE product_trade_groups AUTO_INCREMENT = 1;");
-        DB::statement("ALTER TABLE chimney_replacements AUTO_INCREMENT = 1;");
-        DB::statement("ALTER TABLE chimney_products AUTO_INCREMENT = 1;");
-        DB::statement("ALTER TABLE chimney_attribute_options AUTO_INCREMENT = 1;");
-        DB::statement("ALTER TABLE chimney_attributes AUTO_INCREMENT = 1;");
-        DB::statement("ALTER TABLE jpg_data AUTO_INCREMENT = 1;");
+
+        Categories::removeElementsForCsvReloadJob();
+
+        DB::statement("TRUNCATE product_media");
+        DB::statement("TRUNCATE product_trade_groups");
+        DB::statement("TRUNCATE chimney_replacements");
+        DB::statement("TRUNCATE chimney_products");
+        DB::statement("TRUNCATE chimney_attribute_options");
+        DB::statement("TRUNCATE chimney_attributes");
+        DB::statement("TRUNCATE jpg_data");
     }
 
     private function getUrl($url)
@@ -181,49 +177,36 @@ class ImportCsvFileJob implements ShouldQueue
         return ((int)$line[$columnIterator + 7]) ?: 1000000;
     }
 
+    /**
+     * @throws Exception
+     */
     private function saveCategory($line, $categoryTree, $categoryColumn)
     {
         $parent = &$this->getCategoryParent($categoryTree);
-        
-        $previousCategory = Category::where('name', end($categoryTree))->first();
 
-        $category = new Category;
-        if (isset($previousCategory) && !$previousCategory->save_name) {
-            $category->name = $previousCategory->name;
-        } else {
-            $category->name = end($categoryTree);
-        }
-        $category->rewrite = $this->rewrite(end($categoryTree));
-        
-        if (isset($previousCategory) && !$previousCategory->save_description) {
-            $category->description = $previousCategory->description;
-        } else {
-            $category->description = $line[310];
+        /** @var ?Category $existingCategory */
+        $existingCategory = Category::where('name', end($categoryTree))->first();
+
+        $image = $existingCategory?->save_image ? $line[303] : $existingCategory->img;
+        if (strpos($image, "\\")) {
+            $image = $this->getUrl($image);
         }
 
-        if (isset($previousCategory) && !$previousCategory->save_image) {
-            $category->img = $previousCategory->img;
-        } else {
-            $category->img = $line[303];
-        }
-        $category->is_visible = $this->getShowOnPageParameter($line, $categoryColumn);
-        $category->priority = $this->getProductsOrder($line, $categoryColumn);
+        /** @var Category $category */
+        $category = Category::query()->create([
+            'name' => $existingCategory?->save_name === true ? end($categoryTree) : $existingCategory->name,
+            'description' => $existingCategory?->save_description ? $line[310] : $existingCategory->description,
+            'img' => $image,
+            'rewrite' => $this->rewrite(end($categoryTree)),
+            'is_visible' => $this->getShowOnPageParameter($line, $categoryColumn),
+            'priority' => $this->getProductsOrder($line, $categoryColumn),
+            'save_name' => $existingCategory?->save_name ?? true,
+            'save_description' => $existingCategory?->save_description ?? true,
+            'save_image' => $existingCategory?->save_description ?? true,
+            'parent_id' => $parent['id'],
+        ]);
 
-        if (isset($previousCategory)) {
-            $category->save_name = $previousCategory->save_name;
-            $category->save_description = $previousCategory->save_description;
-            $category->save_image = $previousCategory->save_image;
-
-            $previousCategory->delete();
-        }
-
-        $category->parent_id = $parent['id'];
-
-        if (!empty($category->img) && strpos($category->img, "\\")
-        ) {
-            $category->img = $this->getUrl($category->img);
-        }
-        $category->save();
+        $existingCategory?->delete();
 
         $parent['children'][$category->name] = ['id' => $category->id, 'children' => []];
 
@@ -233,6 +216,9 @@ class ImportCsvFileJob implements ShouldQueue
         $this->appendChimneyProducts($category, $line, 518, 38, true);
     }
 
+    /**
+     * @throws Exception
+     */
     private function &getCategoryParent($categoryTree, $isProduct = false)
     {
         $current = &$this->categories;
@@ -427,7 +413,7 @@ class ImportCsvFileJob implements ShouldQueue
         return $product;
     }
 
-    private function getProductArray($line, $categoryColumn)
+    private function getProductArray($line, $categoryColumn): array
     {
         $trade = explode('|', $line[378]);
         $tradeGroup = $trade[0];

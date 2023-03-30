@@ -39,7 +39,8 @@
         "ext-soap": "*",
         "ext-mailparse": "*",
         "ext-curl": "*",
-        "ext-calendar": "*"
+        "ext-calendar": "*",
+        "ext-iconv": "*"
     },
     "require-dev": {
         "ext-dom": "*",
