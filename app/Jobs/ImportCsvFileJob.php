@@ -13,7 +13,6 @@ use App\Entities\Product;
 use App\Entities\ProductTradeGroup;
 use App\Entities\Warehouse;
 use App\Repositories\Categories;
-use App\Repositories\ChimneyAttributes;
 use DateTime;
 use Exception;
 use Illuminate\Bus\Queueable;
