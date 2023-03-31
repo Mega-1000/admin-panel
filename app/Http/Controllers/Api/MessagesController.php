@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Entities\Chat;
 use App\User;
 use Exception;
 use App\Entities\ChatUser;
@@ -247,8 +248,22 @@ class MessagesController extends Controller
             $helper = new MessagesHelper();
             $customerForNewOrder = new GetCustomerForNewOrder();
             $customer = $customerForNewOrder->getCustomer(null, $data);
+            // get customer chats
+            $possibleChatIds = ChatUser::where('customer_id', $customer->id)->get()->pluck('chat_id');
+
+            if($possibleChatIds->isNotEmpty()) {
+                // get contact chat for this customer, then add chat id to helper
+                $contactChat = Chat::whereNull(['order_id', 'product_id'])->whereIn('id', $possibleChatIds)->first();
+                if($contactChat !== null) {
+                    $helper->chatId = $contactChat->id;
+                }
+            }
             $chatUserToken = $helper->getChatToken(null, $customer->id, MessagesHelper::TYPE_CUSTOMER);
-            $helper->createNewChat();
+
+            // if no previous chats, then create new one
+            if(!$helper->chatId) {
+                $helper->createNewChat();
+            }
 
             return response()->json([
                 'chatUserToken' => $chatUserToken,

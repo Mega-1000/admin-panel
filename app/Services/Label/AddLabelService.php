@@ -67,7 +67,11 @@ class AddLabelService
 
             $alreadyHasLabel = $order->labels()->where('label_id', $labelId)->exists();
 
-            if ($alreadyHasLabel === false && $time === null) {
+            if ($time === null) {
+
+                if($alreadyHasLabel) {
+                    $order->labels()->detach($labelId);
+                }
 
                 foreach($label->labelsToRemoveAfterAddition as $labelToRemove) {
                     $order->labels()->detach($labelToRemove->id);
