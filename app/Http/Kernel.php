@@ -26,6 +26,7 @@ use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Laravel\Passport\Http\Middleware\CheckClientCredentials;
+use App\Http\Middleware\CheckAdminApi;
 
 class Kernel extends HttpKernel
 {
@@ -86,7 +87,8 @@ class Kernel extends HttpKernel
         'verified' => EnsureEmailIsVerified::class,
         'client' => CheckClientCredentials::class,
         'admin' => IsAdmin::class,
-        'https' => HttpsProtocol::class
+        'https' => HttpsProtocol::class,
+        'staff.api' => CheckAdminApi::class,
     ];
 
     /**

@@ -3,16 +3,46 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * Class Category.
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $description
+ * @property string $img
+ * @property string $rewrite
+ * @property boolean $save_name
+ * @property boolean $save_description
+ * @property boolean $save_image
  *
  * @package namespace App\Entities;
  */
 class Category extends Model
 {
+    protected $fillable = [
+        'name',
+        'description',
+        'parent_id',
+        'img',
+        'slug',
+        'is_active',
+        'is_deleted',
+        'save_name',
+        'save_description',
+        'save_image',
+        'rewrite',
+    ];
+
+    protected $casts = [
+        'save_name' => 'boolean',
+        'save_description' => 'boolean',
+        'save_image' => 'boolean',
+    ];
+
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function products()
     {
@@ -38,4 +68,5 @@ class Category extends Model
     {
         return $this->hasMany(self::class, 'parent_id', 'id');
     }
+
 }

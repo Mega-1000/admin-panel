@@ -71,6 +71,13 @@
                                         <option value="PENDING">@lang('customers.form.pending')</option>
                                     </select>
                                 </div>
+                                <div class="form-group">
+                                    <label for="is_staff">@lang('customers.form.is_staff')</label>
+                                    <select class="form-control text-uppercase" name="is_staff">
+                                        <option value="0" {{ $customer->is_staff == 0 ? 'selected' : '' }}>@lang('customers.form.no')</option>
+                                        <option value="1" {{ $customer->is_staff == 1 ? 'selected' : '' }}>@lang('customers.form.yes')</option>
+                                    </select>                                    
+                                </div>
                             </div>
                             <div class="customer-address" id="standard-address">
                                 @if(App\Helpers\Helper::checkRole('customers', 'standard_firstname') === true)

@@ -74,6 +74,9 @@ return [
             'invoice_address' => 'Adres do faktury',
             'delivery_address' => 'Adres do dostawy',
         ],
+        'is_staff' => 'Czy pracownik?',
+        'yes' => 'Tak',
+        'no' => 'Nie',
     ],
     'message' => [
         'store' => 'Klient został dodany pomyślnie!',
