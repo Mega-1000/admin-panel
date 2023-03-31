@@ -31,7 +31,8 @@ class Category extends Model
         'is_deleted',
         'save_name',
         'save_description',
-        'save_image'
+        'save_image',
+        'rewrite',
     ];
 
     protected $casts = [

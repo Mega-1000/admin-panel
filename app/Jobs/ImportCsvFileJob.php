@@ -13,6 +13,7 @@ use App\Entities\Product;
 use App\Entities\ProductTradeGroup;
 use App\Entities\Warehouse;
 use App\Repositories\Categories;
+use App\Repositories\ChimneyAttributes;
 use DateTime;
 use Exception;
 use Illuminate\Bus\Queueable;
@@ -147,8 +148,7 @@ class ImportCsvFileJob implements ShouldQueue
             'deleted_at' => Carbon::now()
         ]);
 
-        Categories::removeElementsForCsvReloadJob();
-
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         DB::statement("TRUNCATE product_media");
         DB::statement("TRUNCATE product_trade_groups");
         DB::statement("TRUNCATE chimney_replacements");
@@ -156,6 +156,8 @@ class ImportCsvFileJob implements ShouldQueue
         DB::statement("TRUNCATE chimney_attribute_options");
         DB::statement("TRUNCATE chimney_attributes");
         DB::statement("TRUNCATE jpg_data");
+
+        Categories::removeElementsForCsvReloadJob();
     }
 
     private function getUrl($url)
@@ -185,17 +187,17 @@ class ImportCsvFileJob implements ShouldQueue
         $parent = &$this->getCategoryParent($categoryTree);
 
         /** @var ?Category $existingCategory */
-        $existingCategory = Category::where('name', end($categoryTree))->first();
+        $existingCategory = Category::query()->where('name', end($categoryTree))->first();
 
-        $image = $existingCategory?->save_image ? $line[303] : $existingCategory->img;
+        $image = $existingCategory?->save_image ? $line[303] : $existingCategory?->img ?? 'https://via.placeholder.com/300';
         if (strpos($image, "\\")) {
             $image = $this->getUrl($image);
         }
 
         /** @var Category $category */
         $category = Category::query()->create([
-            'name' => $existingCategory?->save_name === true ? end($categoryTree) : $existingCategory->name,
-            'description' => $existingCategory?->save_description ? $line[310] : $existingCategory->description,
+            'name' => end($categoryTree),
+            'description' => $existingCategory?->save_description === false ? $existingCategory->description : $line[310],
             'img' => $image,
             'rewrite' => $this->rewrite(end($categoryTree)),
             'is_visible' => $this->getShowOnPageParameter($line, $categoryColumn),
@@ -205,6 +207,8 @@ class ImportCsvFileJob implements ShouldQueue
             'save_image' => $existingCategory?->save_description ?? true,
             'parent_id' => $parent['id'],
         ]);
+
+        $this->log($category);
 
         $existingCategory?->delete();
 
