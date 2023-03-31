@@ -27,6 +27,9 @@ Route::group(['prefix' => 'admin'], function () {
             Route::group(['prefix' => 'sets', 'as' => 'sets.'], __DIR__ . '/web/ProductsSetsRoutes.php');
         });
 
+        Route::post('/getChatNeededSupport', 'OrdersController@getChatNeededSupport')->name('getChatNeededSupport');
+        Route::post('/resolveChatIntervention/{type}/{id}', 'OrdersController@resolveChatIntervention')->name('resolveChatIntervention');
+
         Route::get('/disputes', 'AllegroDisputeController@list');
         Route::get('/disputes/view/{id}', 'AllegroDisputeController@view');
         Route::post('/disputes/send/{id}', 'AllegroDisputeController@sendMessage');
@@ -600,6 +603,16 @@ Route::group(['prefix' => 'admin'], function () {
     Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/web/TrackerLogsRoutes.php');
     Route::group(['as' => 'transactions.'], __DIR__ . '/web/TransactionsRoutes.php');
     Route::group(['as' => 'workingEvents.'], __DIR__ . '/web/WorkingEventsRoutes.php');
+
+
+
+    Route::get('/email/settings', [EmailSettingsController::class, 'index'])->name('emailSettings');
+    Route::get('/email/settings/add', [EmailSettingsController::class, 'create'])->name('emailSettings.add');
+    Route::post('/email/settings', [EmailSettingsController::class, 'store'])->name('emailSettings.store');
+    Route::get('/email/settings/{emailSetting}/edit', [EmailSettingsController::class, 'edit'])->name('emailSettings.edit');
+    Route::put('/email/settings/{emailSetting}/update', [EmailSettingsController::class, 'update'])->name('emailSettings.update');
+    Route::delete('/email/settings/{emailSetting}/destroy', [EmailSettingsController::class, 'destroy'])->name('emailSettings.destroy');
+                        
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');

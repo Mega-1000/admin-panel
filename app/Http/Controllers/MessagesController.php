@@ -10,6 +10,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\Exceptions\ChatException;
+use Barryvdh\Debugbar\Facades\Debugbar;
 
 class MessagesController extends Controller {
 
@@ -79,6 +80,9 @@ class MessagesController extends Controller {
     }
 
     public function show($token) {
+        if(config('env') == 'production') {
+            Debugbar::disable();
+        }
         try {
             return $this->prepareChatView($token);
         } catch (ChatException $e) {

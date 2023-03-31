@@ -16,6 +16,7 @@ use App\Helpers\interfaces\iOrderTotalPriceCalculator;
 use App\Helpers\interfaces\iPostOrderAction;
 use App\Helpers\interfaces\iSumable;
 use App\Services\ProductService;
+use App\Services\EmailSendingService;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
@@ -98,9 +99,9 @@ class OrderBuilder
     }
 
     /**
-     * @throws ChatException
-     * @throws Exception
-     */
+    * @throws ChatException
+    * @throws Exception
+    */
     public function newStore($data)
     {
         if (empty($this->packageGenerator) || empty($this->priceCalculator) || empty($this->userSelector)) {
@@ -137,6 +138,9 @@ class OrderBuilder
         }
 
         $order->save();
+        
+        $emailSendingService = new EmailSendingService();
+        $emailSendingService->addNewScheduledEmail($order);
 
         if (!empty($data['files'])) {
             foreach ($data['files'] as $file) {
@@ -144,15 +148,16 @@ class OrderBuilder
             }
         }
         $chatUserToken = '';
-        if (!empty($data['customer_notices'])) {
+        if ( isset($data['need_support']) && $data['need_support'] === true ) {
             $helper = new MessagesHelper();
-            $helper->orderId = $order->id;
-            $helper->currentUserId = $customer->id;
-            $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
+            $chatUserToken = $helper->getChatToken($order->id, $customer->id, MessagesHelper::TYPE_CUSTOMER);
             $helper->createNewChat();
-            $chatUserToken = $helper->encrypt();
-            $helper->addMessage($data['customer_notices']);
+
+            if( !empty($data['customer_notices']) ) {
+                $helper->addMessage($data['customer_notices']);
+            }
             $order->labels()->attach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
+            $order->need_support = true;
         }
         $this->assignItemsToOrder($order, $data['order_items']);
 

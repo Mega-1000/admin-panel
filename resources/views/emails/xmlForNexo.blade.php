@@ -1,0 +1,1 @@
+{{ asset('storage' . env('XML_FOR_NEXO_PATH', '/XMLFS/') . $zipName) }}

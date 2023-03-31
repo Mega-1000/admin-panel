@@ -40,7 +40,8 @@
         "ext-mailparse": "*",
         "ext-curl": "*",
         "ext-calendar": "*",
-        "ext-iconv": "*"
+        "ext-iconv": "*",
+        "ext-zip": "*"
     },
     "require-dev": {
         "ext-dom": "*",

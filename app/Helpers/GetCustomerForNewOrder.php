@@ -11,10 +11,11 @@ class GetCustomerForNewOrder implements iGetUser
 {
     public function getCustomer($order, $data)
     {
-        return $this->getCustomerByLogin($data['customer_login'] ?? '', $data['phone'] ?? '');
+        $customer = $this->getCustomerByLogin($data['customer_login'] ?? '', $data['phone'] ?? '');
+        return $customer;
     }
 
-    private function getCustomerByLogin(string $login, string $pass)
+    private function getCustomerByLogin(string $login, string $pass): Customer
     {
         if (empty($login)) {
             throw new Exception('missing_customer_login');

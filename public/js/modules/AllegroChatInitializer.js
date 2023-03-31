@@ -7,19 +7,49 @@ class AllegroChatInitializer {
         this.paths = paths;
         this.mode = mode;
         this.chatWindow = null;
+        this.tabActive = true;
 
         this.checkUnreadedThreadsAndMsgs();
 
         setInterval(() => {
-            this.checkUnreadedThreadsAndMsgs();
+            if(this.tabActive) {
+                this.checkUnreadedThreadsAndMsgs();
+            }
         }, 30000);
 
         this.initListeners();
     }
     
     initListeners() {
-        this.iconWrapper.on('click', () => this.bookThread());
+        if(this.mode === 'orders') {
+            this.iconWrapper.on('click', () => this.viewOrderChat());
+        } else {
+            this.iconWrapper.on('click', () => this.bookThread());
+        }
         $('.allegro-thread').on('click', e => this.messagesPreview(e));
+        $(window).on('focus', () => this.tabActive = true);
+        $(window).on('blur', () => this.tabActive = false);
+    }
+
+    async viewOrderChat() {
+
+        this.iconWrapper.addClass('loader-2');
+
+        if(this.unreadedThreads.length < 1) {
+            toastr.error('Brak zamówień wymagających pomocy');
+            this.iconWrapper.removeClass('loader-2');
+
+            return false;
+        }
+        
+
+        const id = this.unreadedThreads[0].id;
+        const type = this.unreadedThreads[0].hasOwnProperty('need_intervention') ? 'chat' : 'order';
+        const url = `${this.ajaxPath}${this.paths.resolveChatIntervention}/${type}/${id}`;
+        
+        const res = await ajaxPost({}, url);
+        toastr.success('Trwa ładowanie się czatu');
+        window.location.href = `/chat/${res.chatUserToken}`;
     }
 
     async checkUnreadedThreadsAndMsgs() {

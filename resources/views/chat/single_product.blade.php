@@ -31,10 +31,12 @@
         @endif
     </div>
 @else
-    <div class="product">
-        <img width="100" height="100" src="{{$product->getImageUrl()}}"
-             onerror="this.onerror=null;this.src='http://via.placeholder.com/300'"/>
-        {{ $product->name }}
-        cena: {{ $product->price->gross_selling_price_commercial_unit }} PLN / {{ $product->packing->unit_commercial }}
-    </div>
+    @if( $product !== null )
+        <div class="product">
+            <img width="100" height="100" src="{{$product->getImageUrl()}}"
+                onerror="this.onerror=null;this.src='http://via.placeholder.com/300'"/>
+            {{ $product->name }}
+            cena: {{ $product->price->gross_selling_price_commercial_unit }} PLN / {{ $product->packing->unit_commercial }}
+        </div>
+    @endif
 @endif

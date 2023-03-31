@@ -24,12 +24,14 @@ use App\Entities\UserSurplusPayment;
 use App\Entities\UserSurplusPaymentHistory;
 use App\Entities\Warehouse;
 use App\Entities\WorkingEvents;
+use App\Enums\EmailSettingsEnum;
 use App\Enums\LabelStatusEnum;
 use App\Facades\Mailer;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Helpers\GetCustomerForNewOrder;
 use App\Helpers\LabelsHelper;
+use App\Helpers\MessagesHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderCalcHelper;
 use App\Helpers\OrderPriceCalculator;
@@ -72,6 +74,7 @@ use App\Repositories\StatusRepository;
 use App\Repositories\TaskRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
+use App\Services\EmailSendingService;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
 use App\Services\OrderAddressService;
@@ -100,7 +103,7 @@ use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Yajra\DataTables\Facades\DataTables;
 use function response;
-use App\Helpers\MessagesHelper;
+use App\Entities\Chat;
 
 /**
  * Class OrderController.
@@ -223,6 +226,8 @@ class OrdersController extends Controller
 
     protected $orderExcelService;
 
+    protected $emailSendingService;
+
     /** @var TaskService */
     protected $taskService;
 
@@ -268,6 +273,7 @@ class OrdersController extends Controller
         TaskRepository                 $taskRepository,
         OrderInvoiceService            $orderInvoiceService,
         OrderExcelService              $orderExcelService,
+        EmailSendingService            $emailSendingService,
         ProductStockPacketRepository   $productStockPacketRepository,
         TaskService                    $taskService
     )
@@ -297,6 +303,7 @@ class OrdersController extends Controller
         $this->taskRepository = $taskRepository;
         $this->orderInvoiceService = $orderInvoiceService;
         $this->orderExcelService = $orderExcelService;
+        $this->emailSendingService = $emailSendingService;
         $this->productStockPacketRepository = $productStockPacketRepository;
         $this->taskService = $taskService;
     }
@@ -532,19 +539,19 @@ class OrdersController extends Controller
         $countries = Country::all();
 
         $helper = new MessagesHelper();
-        $helper->orderId = $order->id;
-        $helper->currentUserId = Auth::user()->id;
-        $helper->currentUserType = $userType = MessagesHelper::TYPE_USER;
-        $chatUserToken = $helper->encrypt();
+        $userId = Auth::user()->id;
+        $chatUserToken = $helper->getChatToken($order->id, $userId);
         $chat = $helper->getChat();
         // last five msg from area 0
 
         $chatMessages = [];
-        if( isset($chat) && count($chat->messages) > 0 ) {
-            $chatMessages = $chat->messages->filter(function($msg) {
+        if (isset($chat) && count($chat->messages) > 0) {
+            $chatMessages = $chat->messages->filter(function ($msg) {
                 return $msg->area == 0;
             })->slice(-5);
         }
+
+        $userType = MessagesHelper::TYPE_USER;
 
         if ($order->customer_id == 4128) {
             return view(
@@ -965,7 +972,7 @@ class OrdersController extends Controller
         $request->validated();
         $user = Auth::user();
         $userId = $request->input('user_id');
-        if( isset($userId) ) {
+        if (isset($userId)) {
             $user = User::find($userId);
         }
         if (empty($user)) {
@@ -1760,7 +1767,6 @@ class OrdersController extends Controller
     public function swapLabelsAfterLabelAddition(Request $request, $labelId)
     {
         $orderIds = $request->input('orderIds');
-        $preventionArray = [];
 
         if (count($orderIds) < 1) {
             return;
@@ -1774,8 +1780,9 @@ class OrdersController extends Controller
         $user = Auth::user();
         $label = Label::find($labelId);
 
-        $orders = $this->orderRepository->findWhereIn('id', $orderIds);
+        $orders = Order::whereIn('id', $orderIds)->get();
         foreach ($orders as $order) {
+            $preventionArray = [];
             try {
                 $order->labels_log .= Order::formatMessage($user, "dodał etykietę: $label->name");
                 $order->save();
@@ -1783,6 +1790,10 @@ class OrdersController extends Controller
                 Log::error('Nie udało się zapisać logu', ['message' => $exception->getMessage(), 'trace' => $exception->getTraceAsString()]);
             }
             AddLabelService::addLabels($order, [$labelId], $preventionArray, [], Auth::user()->id, $time);
+
+            if (in_array($label->id, EmailSettingsEnum::STATUS_LABELS)) {
+                $this->emailSendingService->addScheduledEmail($order, $label->id);
+            }
         }
     }
 
@@ -3373,5 +3384,58 @@ class OrdersController extends Controller
             }, 0);
             return $acu + $totalAmountForPack;
         }, 0);
+    }
+
+    /**
+     * Get Current User Chat Token for given chat ID or order ID
+     *
+     * @param string $type - order | chat
+     * @param int    $id - order or chat id
+     *
+     * @return JsonResponse
+     */
+    public function resolveChatIntervention(string $type, int $id): JsonResponse
+    {
+
+        $helper = new MessagesHelper();
+
+        $userId = Auth::user()?->id;
+        if($type === 'chat') {
+            $chatUserToken = $helper->getChatToken(null, $userId);
+            
+            Chat::where('id', $id)->update([
+                'need_intervention' => false
+            ]);
+        } else if($type === 'order') {
+            $chatUserToken = $helper->getChatToken($id, $userId);
+
+            Order::where('id', $id)->update([
+                'need_support' => false
+            ]);
+        }
+
+        $response = [
+            'chatUserToken' => $chatUserToken,
+        ];
+
+        return response()->json($response);
+    }
+
+    /**
+     * Get orders / chats that marked as needed support / intervention for ex. for new customers orders / or contact chats
+     *
+     * @return JsonResponse
+     */
+    public function getChatNeededSupport(): JsonResponse
+    {
+        $ordersNeededSupport = Order::where('need_support', true)->get()->toArray();
+        $customersNeededSupport = Chat::where('need_intervention', true)->whereNull('product_id')->whereNull('order_id')->get()->toArray();
+        $unreadedChats = array_merge($ordersNeededSupport, $customersNeededSupport);
+
+        $response = [
+            'unreadedThreads' => $unreadedChats,
+        ];
+
+        return response()->json($response);
     }
 }

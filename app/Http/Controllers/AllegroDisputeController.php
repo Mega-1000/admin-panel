@@ -60,8 +60,10 @@ class AllegroDisputeController extends Controller
         } catch (\Exception $ex) {
             return response()->json( ['error' => $ex->getMessage()] );
         }
-
-        return response()->json($pendingDisputes);
+        $response = [
+            'unreadedThreads' => $pendingDisputes,
+        ];
+        return response()->json($response);
     }
 
     public function bookDispute(): JsonResponse {

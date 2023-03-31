@@ -26,7 +26,10 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use App\Mail\XmlForNexoMail;
+use App\Facades\Mailer;
 use Throwable;
+use ZipArchive;
 
 /**
  * Generate xml for nexo import.
@@ -67,6 +70,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
         })->whereDoesntHave('labels', function ($query) {
             $query->where('label_id', Label::XML_INVOICE_GENERATED);
         })->get();
+        $fileNames = [];
 
         foreach ($orders as $order) {
             try {
@@ -154,8 +158,11 @@ class GenerateXmlForNexoJob implements ShouldQueue
                 ])));
 
                 $xml = self::generateValidXmlFromObj($preDokument);
-                Storage::disk('local')->put('public/XMLFS/' . $order->id . '_FS_' . Carbon::now()->format('d-m-Y') . '.xml', mb_convert_encoding($xml, "UTF-8", "auto"));
+                Storage::disk('xmlForNexoDisk')->put($order->id . '_FS_' . Carbon::now()->format('d-m-Y') . '.xml', mb_convert_encoding($xml, "UTF-8", "auto"));
                 $preventionArray = [];
+
+                $fileNames[] = $order->id . '_FS_' . Carbon::now()->format('d-m-Y') . '.xml';
+
                 AddLabelService::addLabels($order, [Label::XML_INVOICE_GENERATED], $preventionArray, [], Auth::user()?->id);
             } catch (Throwable $ex) {
                 Log::error($ex->getMessage(), [
@@ -166,6 +173,24 @@ class GenerateXmlForNexoJob implements ShouldQueue
                 continue;
             }
         }
+        
+
+        $zipName = 'XMLFS_' . Carbon::now()->format('d-m-Y') . '.zip';
+        $zip = new ZipArchive();
+        $zip->open(storage_path('app/public' . env('XML_FOR_NEXO_PATH', '/XMLFS/') . $zipName), ZipArchive::CREATE);
+        foreach ($fileNames as $fileName) {
+            $zip->addFile(storage_path('app/public' . env('XML_FOR_NEXO_PATH', '/XMLFS/') . $fileName), $fileName);
+        }
+        $zip->close();
+
+        foreach ($fileNames as $fileName) {
+            Storage::disk('xmlForNexoDisk')->delete($fileName);
+        }
+        
+        Mailer::create()
+            ->to('ksiegowosc@ephpolska.pl')
+            ->send(new XmlForNexoMail($zipName));
+        
     }
 
     /**
