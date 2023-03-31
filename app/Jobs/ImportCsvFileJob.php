@@ -155,6 +155,7 @@ class ImportCsvFileJob implements ShouldQueue
         DB::statement("TRUNCATE chimney_attribute_options");
         DB::statement("TRUNCATE chimney_attributes");
         DB::statement("TRUNCATE jpg_data");
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
 
         Categories::removeElementsForCsvReloadJob();
     }
@@ -206,8 +207,6 @@ class ImportCsvFileJob implements ShouldQueue
             'save_image' => $existingCategory?->save_description ?? true,
             'parent_id' => $parent['id'],
         ]);
-
-        $this->log($category);
 
         $existingCategory?->delete();
 
