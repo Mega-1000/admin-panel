@@ -161,7 +161,7 @@
 
             const scrollBottom = () => {
                 $('.panel-default').animate({
-                    scrollTop: $('.panel-body').height()
+                    scrollTop: $('.chat-panel').height()
                 });
             }
 
@@ -260,7 +260,7 @@
                     function(data) {
                         if (data.messages.length > 0) {
                             refreshRate = 1;
-                            $('.panel-body').append(data.messages);
+                            $('.chat-panel').append(data.messages);
                             filterMessages();
                             scrollBottom();
                         }

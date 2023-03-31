@@ -4857,12 +4857,19 @@
 
         let selectedArea = 0;
 
+        const scrollBottom = () => {
+            $('.panel-default').animate({
+                scrollTop: $('.chat-panel').height()
+            });
+        }
+
         const filterMessages = () => {
             $('.message-row').each(function() {
                 const area = String($(this).data('area'));
 
                 selectedArea == area ? $(this).show() : $(this).hide();
             });
+            scrollBottom();
         }
 
         filterMessages();

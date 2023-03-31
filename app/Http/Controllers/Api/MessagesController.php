@@ -250,20 +250,23 @@ class MessagesController extends Controller
             $customer = $customerForNewOrder->getCustomer(null, $data);
             // get customer chats
             $possibleChatIds = ChatUser::where('customer_id', $customer->id)->get()->pluck('chat_id');
+            $chat = null;
 
             if($possibleChatIds->isNotEmpty()) {
                 // get contact chat for this customer, then add chat id to helper
                 $contactChat = Chat::whereNull(['order_id', 'product_id'])->whereIn('id', $possibleChatIds)->first();
                 if($contactChat !== null) {
                     $helper->chatId = $contactChat->id;
+                    $chat = $contactChat;
                 }
             }
             $chatUserToken = $helper->getChatToken(null, $customer->id, MessagesHelper::TYPE_CUSTOMER);
 
-            // if no previous chats, then create new one
-            if(!$helper->chatId) {
-                $helper->createNewChat();
+            if($chat === null) {
+                $chat = $helper->createNewChat();
             }
+            $chat->need_intervention = true;
+            $chat->save();
 
             return response()->json([
                 'chatUserToken' => $chatUserToken,
