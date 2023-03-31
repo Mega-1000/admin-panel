@@ -544,12 +544,7 @@ class OrdersController extends Controller
         $chat = $helper->getChat();
         // last five msg from area 0
 
-        $chatMessages = [];
-        if (isset($chat) && count($chat->messages) > 0) {
-            $chatMessages = $chat->messages->filter(function ($msg) {
-                return $msg->area == 0;
-            })->slice(-5);
-        }
+        $chatMessages = $chat->messages;
 
         $userType = MessagesHelper::TYPE_USER;
 
