@@ -474,7 +474,7 @@ class OrdersController extends Controller
         } catch (Exception $e) {
             Log::error(
                 'Problem with update customer invoice and delivery address.',
-                ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => __LINE__]
+                ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => $e->getLine()]
             );
             die();
         }

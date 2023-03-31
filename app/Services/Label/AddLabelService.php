@@ -68,7 +68,24 @@ class AddLabelService
             $alreadyHasLabel = $order->labels()->where('label_id', $labelId)->exists();
 
             if ($alreadyHasLabel === false && $time === null) {
-                $order->labels()->attach($order->id, ['label_id' => $label->id, 'added_type' => $options['added_type'], 'created_at' => Carbon::now()]);
+
+                foreach($label->labelsToRemoveAfterAddition as $labelToRemove) {
+                    $order->labels()->detach($labelToRemove->id);
+                }
+                foreach($label->labelsToAddAfterAddition as $labelToAdd) {
+                    $order->labels()->attach($order->id, [
+                        'label_id'   => $labelToAdd->id,
+                        'added_type' => $options['added_type'],
+                        'created_at' => Carbon::now()
+                    ]);
+                }
+
+                $order->labels()->attach($order->id, [
+                    'label_id'   => $label->id,
+                    'added_type' => $options['added_type'],
+                    'created_at' => Carbon::now()
+                ]);
+
                 self::setScheduledLabelsAfterAddition($order, $label, $userId);
                 $loopPreventionArray['already-added'][] = $labelId;
 
