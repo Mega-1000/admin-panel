@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\OrderPayment;
+use App\Facades\Mailer;
 use App\Helpers\PdfCharactersHelper;
 use App\Integrations\Artoit\EPreKlientRodzajNaDok;
 use App\Integrations\Artoit\EPreKlientTyp;
@@ -15,6 +16,7 @@ use App\Integrations\Artoit\PreDokument;
 use App\Integrations\Artoit\PreKlient;
 use App\Integrations\Artoit\PrePozycja;
 use App\Integrations\Artoit\PreTowar;
+use App\Mail\XmlForNexoMail;
 use App\Repositories\OrderRepository;
 use App\Services\Label\AddLabelService;
 use Carbon\Carbon;
@@ -26,8 +28,6 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use App\Mail\XmlForNexoMail;
-use App\Facades\Mailer;
 use Throwable;
 use ZipArchive;
 
@@ -173,24 +173,27 @@ class GenerateXmlForNexoJob implements ShouldQueue
                 continue;
             }
         }
-        
 
-        $zipName = 'XMLFS_' . Carbon::now()->format('d-m-Y') . '.zip';
-        $zip = new ZipArchive();
-        $zip->open(storage_path('app/public' . env('XML_FOR_NEXO_PATH', '/XMLFS/') . $zipName), ZipArchive::CREATE);
-        foreach ($fileNames as $fileName) {
-            $zip->addFile(storage_path('app/public' . env('XML_FOR_NEXO_PATH', '/XMLFS/') . $fileName), $fileName);
-        }
-        $zip->close();
+        if (count($fileNames) > 0) {
 
-        foreach ($fileNames as $fileName) {
-            Storage::disk('xmlForNexoDisk')->delete($fileName);
+            $zipName = 'XMLFS_' . Carbon::now()->format('d-m-Y') . '.zip';
+            $zip = new ZipArchive();
+            $zip->open(storage_path('app/public' . env('XML_FOR_NEXO_PATH', '/XMLFS/') . $zipName), ZipArchive::CREATE);
+            foreach ($fileNames as $fileName) {
+                $zip->addFile(storage_path('app/public' . env('XML_FOR_NEXO_PATH', '/XMLFS/') . $fileName), $fileName);
+            }
+            $zip->close();
+
+            foreach ($fileNames as $fileName) {
+                Storage::disk('xmlForNexoDisk')->delete($fileName);
+            }
+
+            Mailer::create()
+                ->to('ksiegowosc@ephpolska.pl')
+                ->send(new XmlForNexoMail($zipName));
+
+            Storage::disk('xmlForNexoDisk')->delete($zipName);
         }
-        
-        Mailer::create()
-            ->to('ksiegowosc@ephpolska.pl')
-            ->send(new XmlForNexoMail($zipName));
-        
     }
 
     /**
