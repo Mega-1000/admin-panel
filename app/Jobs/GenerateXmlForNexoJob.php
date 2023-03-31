@@ -176,7 +176,7 @@ class GenerateXmlForNexoJob implements ShouldQueue
 
         if (count($fileNames) > 0) {
 
-            $zipName = 'XMLFS_' . Carbon::now()->format('d-m-Y') . '.zip';
+            $zipName = 'XMLFS_' . Carbon::now()->format('d-m-Y_H-i-s') . '.zip';
             $zip = new ZipArchive();
             $zip->open(storage_path('app/public' . env('XML_FOR_NEXO_PATH', '/XMLFS/') . $zipName), ZipArchive::CREATE);
             foreach ($fileNames as $fileName) {
@@ -191,8 +191,6 @@ class GenerateXmlForNexoJob implements ShouldQueue
             Mailer::create()
                 ->to('ksiegowosc@ephpolska.pl')
                 ->send(new XmlForNexoMail($zipName));
-
-            Storage::disk('xmlForNexoDisk')->delete($zipName);
         }
     }
 
