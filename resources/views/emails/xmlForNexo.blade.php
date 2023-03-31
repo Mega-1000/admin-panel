@@ -1,1 +1,1 @@
-{{ asset('storage' . config('XmlForNexo.XML_FOR_NEXO_PATH') . $zipName) }}
+{{ asset('storage' . config('nexo.xml_path') . $zipName) }}

@@ -61,14 +61,6 @@ class GenerateXmlForNexoJob implements ShouldQueue
     public function handle()
     {
         $orders = $this->orderRepository->whereHas('labels', function ($query) {
-            $query->where('label_id', Label::INVOICE_TO_ISSUE);
-        })->whereHas('labels', function ($query) {
-            $query->where('label_id', Label::ORDER_RECEIVED_INVOICE_TODAY);
-        })->whereHas('labels', function ($query) {
-            $query->where('label_id', Label::ORDER_ITEMS_REDEEMED_LABEL)
-                ->orWhere('label_id', Label::RETURN_ALLEGRO_PAYMENTS);
-        })->whereDoesntHave('labels', function ($query) {
-            $query->where('label_id', Label::XML_INVOICE_GENERATED);
         })->get();
         $fileNames = [];
 
@@ -183,9 +175,9 @@ class GenerateXmlForNexoJob implements ShouldQueue
 
             $zipName = 'XMLFS_' . Carbon::now()->format('d-m-Y_H-i-s') . '.zip';
             $zip = new ZipArchive();
-            $zip->open(storage_path('app/public' . config('XmlForNexo.XML_FOR_NEXO_PATH') . $zipName), ZipArchive::CREATE);
+            $zip->open(storage_path('app/public' . config('nexo.xml_path') . $zipName), ZipArchive::CREATE);
             foreach ($fileNames as $fileName) {
-                $zip->addFile(storage_path('app/public' . config('XmlForNexo.XML_FOR_NEXO_PATH') . $fileName), $fileName);
+                $zip->addFile(storage_path('app/public' . config('nexo.xml_path') . $fileName), $fileName);
             }
             $zip->close();
 
