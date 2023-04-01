@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
 /*
   |--------------------------------------------------------------------------
   | API Routes
@@ -12,25 +10,15 @@ use Illuminate\Support\Facades\Route;
   | is assigned the "api" middleware group. Enjoy building your API!
   |
  */
-
+//
 Route::middleware('auth:api')->group(function () {
     Route::get('/user', 'Api\CustomersController@getDetails')->name('api.customers.getdetails');
-
-    Route::prefix('orders')->group(function () {
-        Route::get('getAll', 'Api\OrdersController@getAll')->name('api.orders.getall');
-        Route::post('uploadProofOfPayment', 'Api\OrdersController@uploadProofOfPayment')->name('api.orders.proof-of-payment');
-        Route::post('update-order-address/{orderId}', 'Api\OrdersController@updateOrderAddressEndpoint')->name('api.orders.update-order-addresses');
-        Route::get('get-payments-for-order/{token}', 'Api\OrdersController@getPaymentDetailsForOrder')->name('api.orders.getPayments');
-        Route::post('move-to-unactive/{order}', 'Api\OrdersController@moveToUnactive')->name('api.orders.moveToUnactive');
-        Route::post('remind-about-offer/{order}', 'Api\OrdersController@scheduleOrderReminder')->name('api.orders.remindAboutOffer');
-    });
-
+    Route::get('orders/getAll', 'Api\OrdersController@getAll')->name('api.orders.getall');
+    Route::post('orders/uploadProofOfPayment', 'Api\OrdersController@uploadProofOfPayment')->name('api.orders.proof-of-payment');
+    Route::post('orders/update-order-address/{orderId}', 'Api\OrdersController@updateOrderAddressEndpoint')->name('api.orders.update-order-addresses');
+    Route::get('orders/get-payments-for-order/{token}', 'Api\OrdersController@getPaymentDetailsForOrder')->name('api.orders.getPayments');
     Route::get('chat/getHistory', 'Api\MessagesController@getHistory')->name('api.messages.get-history');
     Route::get('invoices/get/{id}', 'Api\InvoicesController@getInvoice')->name('api.invoices.get');
-    Route::post('user/change-password', 'Api\CustomersController@changePassword')->name('api.customers.change-password');
-    Route::post('user/update-informations', 'Api\CustomersController@updateInformations')->name('api.customers.update-informations');
-    Route::get('user/get-orders', 'Api\CustomersController@getOrders')->name('api.customers.get-orders');
-    Route::post('create_contact_chat', 'Api\MessagesController@createContactChat')->name('api.orders.create_contact_chat');
 
     Route::middleware('staff.api')->group(function () {
         Route::group(['prefix' => 'faqs'], function () {
@@ -38,6 +26,7 @@ Route::middleware('auth:api')->group(function () {
             Route::post('/ask', 'Api\FaqController@askQuestion')->name('api.faq.ask');
             Route::post('/categories-positions', 'Api\FaqController@setCategoryPosition')->name('api.faq.categories-positions');
             Route::post('/questions-positions', 'Api\FaqController@setQuestionsPosition')->name('api.faq.questions-positions');
+            Route::put('/{id}', 'Api\FaqController@update')->name('api.faq.update');
             Route::delete('/{id}', 'Api\FaqController@destroy')->name('api.faq.destroy');
         });
 
@@ -49,15 +38,10 @@ Route::middleware('auth:api')->group(function () {
     });
 });
 
-Route::post('/register', 'Api\CustomersController@register')->name('api.customers.register');
-
-Route::group(['prefix' => 'faqs'], function () {
-    Route::put('/{id}', 'Api\FaqController@update')->name('api.faq.update');
-    Route::get('/categories', 'Api\FaqController@getCategories')->name('api.faq.categories');
-    Route::get('/get', 'Api\FaqController@getQuestions')->name('api.faq.get');
-    Route::get('/', 'Api\FaqController@index')->name('api.faq.index');
-    Route::get('/{id}', 'Api\FaqController@show')->name('api.faq.show');
-});
+Route::get('/{id}', 'Api\FaqController@show')->name('api.faq.show');
+Route::get('/categories', 'Api\FaqController@getCategories')->name('api.faq.categories');
+Route::get('/get', 'Api\FaqController@getQuestions')->name('api.faq.get');
+Route::get('/', 'Api\FaqController@index')->name('api.faq.index');
 
 Route::get('custom/pages', 'Api\CustomPagesController@getPages')->name('api.custompages.get');
 
@@ -67,6 +51,7 @@ Route::post('orders', 'Api\OrdersController@store')->name('api.orders.store');
 Route::post('customers', 'Api\CustomersController@store')->name('api.customers.store');
 Route::get('customers/emailExists/{email}', 'Api\CustomersController@emailExists')->name('api.customers.email-exists');
 Route::post('new_order', 'Api\OrdersController@newOrder')->name('api.orders.new');
+Route::post('create_contact_chat', 'Api\MessagesController@createContactChat')->name('api.orders.create_contact_chat');
 
 Route::middleware('client')->group(function () {
     Route::post('orders/message', 'Api\OrdersController@storeMessage')->name('api.orders.message.store');
@@ -138,7 +123,6 @@ Route::post('chat/askForIntervention/{token}', 'Api\MessagesController@askForInt
 Route::post('chat/addUser/{token}', 'Api\MessagesController@addUser')->name('api.messages.add-new-user');
 Route::post('chat/removeUser/{token}', 'Api\MessagesController@removeUser')->name('api.messages.remove-user');
 Route::post('chat/editPrices/{token}', 'Api\MessagesController@editPrices')->name('api.messages.edit-prices');
-Route::post('chat/closeChatByClient/{token}', 'Api\MessagesController@closeChatByClient')->name('api.messages.closeChatByClient');
 
 Route::post('auth/code/{id}', 'Api\AutheticationController@getToken')->name('api.authenticate.get-token');
 
