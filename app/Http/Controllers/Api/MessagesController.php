@@ -22,6 +22,7 @@ use App\Http\Requests\Messages\GetMessagesRequest;
 use App\Http\Requests\Api\Orders\ChatRequest;
 use Illuminate\Http\JsonResponse;
 use App\Helpers\GetCustomerForNewOrder;
+use App\Repositories\Chats;
 
 class MessagesController extends Controller
 {
@@ -249,12 +250,12 @@ class MessagesController extends Controller
             $customerForNewOrder = new GetCustomerForNewOrder();
             $customer = $customerForNewOrder->getCustomer(null, $data);
             // get customer chats
-            $possibleChatIds = ChatUser::where('customer_id', $customer->id)->get()->pluck('chat_id');
+            $customerChatIds = Chats::getCustomerChats($customer->id);
             $chat = null;
 
-            if($possibleChatIds->isNotEmpty()) {
+            if($customerChatIds->isNotEmpty()) {
                 // get contact chat for this customer, then add chat id to helper
-                $contactChat = Chat::whereNull(['order_id', 'product_id'])->whereIn('id', $possibleChatIds)->first();
+                $contactChat = Chats::getContactChats($customerChatIds);
                 if($contactChat !== null) {
                     $helper->chatId = $contactChat->id;
                     $chat = $contactChat;
