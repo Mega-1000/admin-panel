@@ -72,6 +72,11 @@ class GenerateXmlForNexoJob implements ShouldQueue
         })->get();
         $fileNames = [];
 
+        $files = Storage::disk('xmlForNexoDisk')->files();
+        foreach ($files as $file) {
+            Storage::disk('xmlForNexoDisk')->delete($file);
+        }
+
         foreach ($orders as $order) {
             try {
                 $preDokument = new PreDokument();
@@ -178,9 +183,9 @@ class GenerateXmlForNexoJob implements ShouldQueue
 
             $zipName = 'XMLFS_' . Carbon::now()->format('d-m-Y_H-i-s') . '.zip';
             $zip = new ZipArchive();
-            $zip->open(storage_path('app/public' . env('XML_FOR_NEXO_PATH', '/XMLFS/') . $zipName), ZipArchive::CREATE);
+            $zip->open(storage_path('app/public' . config('nexo.xml_path') . $zipName), ZipArchive::CREATE);
             foreach ($fileNames as $fileName) {
-                $zip->addFile(storage_path('app/public' . env('XML_FOR_NEXO_PATH', '/XMLFS/') . $fileName), $fileName);
+                $zip->addFile(storage_path('app/public' . config('nexo.xml_path') . $fileName), $fileName);
             }
             $zip->close();
 
