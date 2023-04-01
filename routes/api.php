@@ -38,10 +38,12 @@ Route::middleware('auth:api')->group(function () {
     });
 });
 
-Route::get('/{id}', 'Api\FaqController@show')->name('api.faq.show');
-Route::get('/categories', 'Api\FaqController@getCategories')->name('api.faq.categories');
-Route::get('/get', 'Api\FaqController@getQuestions')->name('api.faq.get');
-Route::get('/', 'Api\FaqController@index')->name('api.faq.index');
+Route::group(['prefix' => 'faqs'], function () {
+    Route::get('/{id}', 'Api\FaqController@show')->name('api.faq.show');
+    Route::get('/categories', 'Api\FaqController@getCategories')->name('api.faq.categories');
+    Route::get('/get', 'Api\FaqController@getQuestions')->name('api.faq.get');
+    Route::get('/', 'Api\FaqController@index')->name('api.faq.index');
+});
 
 Route::get('custom/pages', 'Api\CustomPagesController@getPages')->name('api.custompages.get');
 
