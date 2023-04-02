@@ -23,24 +23,28 @@ Route::middleware('auth:api')->group(function () {
     Route::middleware('staff.api')->group(function () {
         Route::group(['prefix' => 'faqs'], function () {
             Route::post('/', 'Api\FaqController@store')->name('api.faq.save');
-            Route::get('/categories', 'Api\FaqController@getCategories')->name('api.faq.categories');
-            Route::get('/get', 'Api\FaqController@getQuestions')->name('api.faq.get');
-            Route::get('/', 'Api\FaqController@index')->name('api.faq.index');
             Route::post('/ask', 'Api\FaqController@askQuestion')->name('api.faq.ask');
             Route::post('/categories-positions', 'Api\FaqController@setCategoryPosition')->name('api.faq.categories-positions');
             Route::post('/questions-positions', 'Api\FaqController@setQuestionsPosition')->name('api.faq.questions-positions');
-            Route::get('/{id}', 'Api\FaqController@show')->name('api.faq.show');
-            Route::put('/{id}', 'Api\FaqController@update')->name('api.faq.update');
             Route::delete('/{id}', 'Api\FaqController@destroy')->name('api.faq.destroy');
         });
-        
-        
+
         Route::get('staff/isStaff', function () { return true; })->name('api.staff.isStaff');
         Route::post('change-image', 'Api\CategoriesController@changeImage')->name('api.categories.change-image');
         Route::post('update-category', 'Api\CategoriesController@updateCategory')->name('api.categories.update-category');
         Route::post('categories/create', 'Api\CategoriesController@create')->name('api.categories.create');
         Route::delete('categories/delete/{category}', 'Api\CategoriesController@delete')->name('api.categories.delete');
     });
+});
+
+Route::post('/register', 'Api\CustomersController@register')->name('api.customers.register');
+
+Route::group(['prefix' => 'faqs'], function () {
+    Route::put('/{id}', 'Api\FaqController@update')->name('api.faq.update');
+    Route::get('/categories', 'Api\FaqController@getCategories')->name('api.faq.categories');
+    Route::get('/get', 'Api\FaqController@getQuestions')->name('api.faq.get');
+    Route::get('/', 'Api\FaqController@index')->name('api.faq.index');
+    Route::get('/{id}', 'Api\FaqController@show')->name('api.faq.show');
 });
 
 Route::get('custom/pages', 'Api\CustomPagesController@getPages')->name('api.custompages.get');
