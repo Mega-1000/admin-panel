@@ -80,3 +80,15 @@ const getCurrentDateTime = date => {
     
     return currentDateTime;
 };
+
+// open url in new window trick the popup window blocking
+const openInNewTab = url => {
+
+    let anchorEl = document.createElement('a');
+
+    Object.assign(anchorEl, {
+      target: '_blank',
+      rel: 'noopener noreferrer',
+      href: url,
+    }).click();
+}

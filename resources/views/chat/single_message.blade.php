@@ -15,8 +15,9 @@
                 [{{ $message->created_at }}]
                 <strong> {!! $header !!} </strong>
             @endif
-            <br>
-            {{ $message->message }}
+            <div class="msg-content" style="white-space: pre-line;">
+                {{ $message->message }}
+            </div>
             @if ($message->attachment_path)
                 <a class="attachment-path" style="display: block; margin-top: 10px; color: #000;"
                     href="{{ asset('storage/' . $message->attachment_path) }}" download="{{ $message->attachment_name }}">

@@ -33,23 +33,22 @@ class AllegroChatInitializer {
 
     async viewOrderChat() {
 
-        this.iconWrapper.addClass('loader-2');
-
         if(this.unreadedThreads.length < 1) {
             toastr.error('Brak zamówień wymagających pomocy');
-            this.iconWrapper.removeClass('loader-2');
-
             return false;
         }
-        
+
+        this.iconWrapper.addClass('loader-2');
 
         const id = this.unreadedThreads[0].id;
         const type = this.unreadedThreads[0].hasOwnProperty('need_intervention') ? 'chat' : 'order';
+        const customerId = this.unreadedThreads[0].customer_id;
         const url = `${this.ajaxPath}${this.paths.resolveChatIntervention}/${type}/${id}`;
         
         const res = await ajaxPost({}, url);
         toastr.success('Trwa ładowanie się czatu');
-        window.location.href = `/chat/${res.chatUserToken}`;
+        openInNewTab(`/chat/${res.chatUserToken}`);
+        window.location.href = this.ajaxPath + 'orders?customer_id=' + customerId;
     }
 
     async checkUnreadedThreadsAndMsgs() {

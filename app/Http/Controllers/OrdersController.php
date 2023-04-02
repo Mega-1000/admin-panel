@@ -384,8 +384,9 @@ class OrdersController extends Controller
         $templateData = PackageTemplate::orderBy('list_order', 'asc')->get();
         $deliverers = Deliverer::all();
         $couriersTasks = $this->taskService->groupTaskByShipmentDate();
+        $customerId = $request->get('customer_id');
 
-        return view('orders.index', compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses', 'allWarehousesString'))
+        return view('orders.index', compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses', 'customerId', 'allWarehousesString'))
             ->withOuts($out)
             ->withLabIds($labIds)
             ->withLabels($labels)
@@ -544,12 +545,7 @@ class OrdersController extends Controller
         $chat = $helper->getChat();
         // last five msg from area 0
 
-        $chatMessages = [];
-        if (isset($chat) && count($chat->messages) > 0) {
-            $chatMessages = $chat->messages->filter(function ($msg) {
-                return $msg->area == 0;
-            })->slice(-5);
-        }
+        $chatMessages = $chat?->messages;
 
         $userType = MessagesHelper::TYPE_USER;
 
@@ -2369,6 +2365,10 @@ class OrdersController extends Controller
             if (isset($data['dateTo'])) {
                 $query->whereRaw("date({$data["dateColumn"]}) <= '{$data['dateTo']}'");
             }
+        }
+
+        if( !empty($data['customerId']) ) {
+            $query->where('orders.customer_id', $data['customerId']);
         }
 
         //$query->whereRaw('COALESCE(last_status_update_date, orders.created_at) < DATE_ADD(NOW(), INTERVAL -30 DAY)');

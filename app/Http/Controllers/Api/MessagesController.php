@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Entities\Chat;
 use App\User;
 use Exception;
 use App\Entities\ChatUser;
@@ -21,6 +22,7 @@ use App\Http\Requests\Messages\GetMessagesRequest;
 use App\Http\Requests\Api\Orders\ChatRequest;
 use Illuminate\Http\JsonResponse;
 use App\Helpers\GetCustomerForNewOrder;
+use App\Repositories\Chats;
 
 class MessagesController extends Controller
 {
@@ -247,8 +249,25 @@ class MessagesController extends Controller
             $helper = new MessagesHelper();
             $customerForNewOrder = new GetCustomerForNewOrder();
             $customer = $customerForNewOrder->getCustomer(null, $data);
+            // get customer chats
+            $customerChatIds = Chats::getCustomerChats($customer->id);
+            $chat = null;
+
+            if($customerChatIds->isNotEmpty()) {
+                // get contact chat for this customer, then add chat id to helper
+                $contactChat = Chats::getContactChats($customerChatIds);
+                if($contactChat !== null) {
+                    $helper->chatId = $contactChat->id;
+                    $chat = $contactChat;
+                }
+            }
             $chatUserToken = $helper->getChatToken(null, $customer->id, MessagesHelper::TYPE_CUSTOMER);
-            $helper->createNewChat();
+
+            if($chat === null) {
+                $chat = $helper->createNewChat();
+            }
+            $chat->need_intervention = true;
+            $chat->save();
 
             return response()->json([
                 'chatUserToken' => $chatUserToken,
