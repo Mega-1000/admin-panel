@@ -2,14 +2,20 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Entities\Customer;
 use App\Entities\Order;
 use App\Helpers\OrderBuilder;
+use App\Http\Requests\ChangeCustomerPasswordRequest;
+use App\Http\Requests\RegisterCustomerRequest;
+use App\Http\Requests\UpdateCustomerRequest;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\Api\Customers\StoreCustomerRequest;
 use App\Http\Controllers\Controller;
 use App\Repositories\CustomerAddressRepository;
 use App\Repositories\CustomerRepository;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\Api\Customers\StoreCustomerAddressRequest;
 use Throwable;
@@ -26,13 +32,14 @@ class CustomersController extends Controller
 
     /**
      * CustomersController constructor.
-     * @param CustomerRepository        $customerRepository
+     * @param CustomerRepository $customerRepository
      * @param CustomerAddressRepository $customerAddressRepository
      */
     public function __construct(
-        CustomerRepository $customerRepository,
+        CustomerRepository        $customerRepository,
         CustomerAddressRepository $customerAddressRepository
-    ) {
+    )
+    {
         $this->customerRepository = $customerRepository;
         $this->customerAddressRepository = $customerAddressRepository;
     }
@@ -268,6 +275,75 @@ class CustomersController extends Controller
                 'errorMessage' => $ex->getMessage()
             ];
         }
+        return response()->json($response);
+    }
+
+    /**
+     * Create new account for customer.
+     */
+    public function register(RegisterCustomerRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+        try {
+            $customer = Customer::query()->create($data);
+            $customer->password = $customer->generatePassword($data['password']);
+            $customer->save();
+
+            $response['status'] = true;
+            $response['customer'] = $customer;
+        } catch (Throwable $ex) {
+            $response = [
+                'errorCode' => $ex->getCode(),
+                'errorMessage' => $ex->getMessage()
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+
+    /**
+     * Change customer password.
+     */
+    public function changePassword(ChangeCustomerPasswordRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+        try {
+            $customer = $request->user();
+            $customer->password = Hash::make($data['password']);
+            $customer->save();
+
+            $response['status'] = true;
+            $response['customer'] = $customer;
+        } catch (Throwable $ex) {
+            $response = [
+                'errorCode' => $ex->getCode(),
+                'errorMessage' => $ex->getMessage()
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    /**
+     * Update user information.
+     */
+    public function updateInformations(UpdateCustomerRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+        try {
+            $standardAddress = $request->user()->standardAddress();
+            $standardAddress->update($data['standardAddress']);
+
+            $response['status'] = true;
+            $response['customer'] = $request->user();
+        } catch (Throwable $ex) {
+            $response = [
+                'errorCode' => $ex->getCode(),
+                'errorMessage' => $ex->getMessage()
+            ];
+        }
+
         return response()->json($response);
     }
 }
