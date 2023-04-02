@@ -26,7 +26,6 @@ Route::middleware('auth:api')->group(function () {
             Route::post('/ask', 'Api\FaqController@askQuestion')->name('api.faq.ask');
             Route::post('/categories-positions', 'Api\FaqController@setCategoryPosition')->name('api.faq.categories-positions');
             Route::post('/questions-positions', 'Api\FaqController@setQuestionsPosition')->name('api.faq.questions-positions');
-            Route::put('/{id}', 'Api\FaqController@update')->name('api.faq.update');
             Route::delete('/{id}', 'Api\FaqController@destroy')->name('api.faq.destroy');
         });
 
@@ -38,7 +37,10 @@ Route::middleware('auth:api')->group(function () {
     });
 });
 
+Route::post('/register', 'Api\CustomersController@register')->name('api.customers.register');
+
 Route::group(['prefix' => 'faqs'], function () {
+    Route::put('/{id}', 'Api\FaqController@update')->name('api.faq.update');
     Route::get('/categories', 'Api\FaqController@getCategories')->name('api.faq.categories');
     Route::get('/get', 'Api\FaqController@getQuestions')->name('api.faq.get');
     Route::get('/', 'Api\FaqController@index')->name('api.faq.index');
