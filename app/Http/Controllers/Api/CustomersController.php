@@ -2,14 +2,21 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Entities\Customer;
 use App\Entities\Order;
 use App\Helpers\OrderBuilder;
+use App\Http\Requests\ChangeCustomerPasswordRequest;
+use App\Http\Requests\RegisterCustomerRequest;
+use App\Http\Requests\UpdateCustomerRequest;
+use App\Services\AddressService;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\Api\Customers\StoreCustomerRequest;
 use App\Http\Controllers\Controller;
 use App\Repositories\CustomerAddressRepository;
 use App\Repositories\CustomerRepository;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use App\Http\Requests\Api\Customers\StoreCustomerAddressRequest;
 use Throwable;
@@ -26,13 +33,14 @@ class CustomersController extends Controller
 
     /**
      * CustomersController constructor.
-     * @param CustomerRepository        $customerRepository
+     * @param CustomerRepository $customerRepository
      * @param CustomerAddressRepository $customerAddressRepository
      */
     public function __construct(
-        CustomerRepository $customerRepository,
+        CustomerRepository        $customerRepository,
         CustomerAddressRepository $customerAddressRepository
-    ) {
+    )
+    {
         $this->customerRepository = $customerRepository;
         $this->customerAddressRepository = $customerAddressRepository;
     }
@@ -106,7 +114,7 @@ class CustomersController extends Controller
 
     public function emailExists(Request $request, $email)
     {
-        $customer = \App\Entities\Customer::where('login', $email)->first();
+        $customer = Customer::where('login', $email)->first();
         return response($customer ? 1 : 0);
     }
 
@@ -269,5 +277,113 @@ class CustomersController extends Controller
             ];
         }
         return response()->json($response);
+    }
+
+    /**
+     * Create new account for customer.
+     */
+    public function register(RegisterCustomerRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+        try {
+            $customer = Customer::query()->create($data);
+            $customer->password = $customer->generatePassword($data['password']);
+            $customer->save();
+
+            $response['status'] = true;
+            $response['customer'] = $customer;
+        } catch (Throwable $ex) {
+            $response = [
+                'errorCode' => $ex->getCode(),
+                'errorMessage' => $ex->getMessage()
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+
+    /**
+     * Change customer password.
+     *
+     * @param ChangeCustomerPasswordRequest $request
+     * @return JsonResponse
+     */
+    public function changePassword(ChangeCustomerPasswordRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+        try {
+            $customer = $request->user();
+            $customer->password = Hash::make($data['password']);
+            $customer->save();
+
+            $response['status'] = true;
+            $response['customer'] = $customer;
+        } catch (Throwable $ex) {
+            $response = [
+                'errorCode' => $ex->getCode(),
+                'errorMessage' => $ex->getMessage()
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    /**
+     * Update user information.
+     *
+     * @param UpdateCustomerRequest $request
+     * @return JsonResponse
+     */
+    public function updateInformations(UpdateCustomerRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+        try {
+            (new AddressService)->updateAddressesForUser($request->user(), $data);
+
+            $response['status'] = true;
+            $response['customer'] = $request->user();
+        } catch (Throwable $ex) {
+            $response = [
+                'errorCode' => $ex->getCode(),
+                'errorMessage' => $ex->getMessage()
+            ];
+        }
+
+        return response()->json($response);
+    }
+
+    /**
+     * Get customer orders.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function getLatestOrders(Request $request): JsonResponse
+    {
+        $orders = Order::query()
+            ->where('customer_id', $request->user()->id)
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        return response()->json($orders);
+    }
+
+    /**
+     * Get customer orders.
+     *
+     * @param Request $request
+     * @param $customerId
+     * @return JsonResponse
+     */
+    public function getOrders(Request $request, $customerId): JsonResponse
+    {
+        $deliveryInfos = $request->user()->orders()->get();
+        foreach ($deliveryInfos as $deliveryInfo) {
+            $deliveryInfo->adress = $deliveryInfo->getDeliveryAddress();
+        };
+
+        return response()->json($deliveryInfos);
     }
 }
