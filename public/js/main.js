@@ -1,4 +1,8 @@
 $(function() {
+    toastr.options = {
+      "positionClass": "toast-top-left",
+    }
+
     // init Allegro Chat
     const ajaxPath = '/admin/';
     const iconWrapperChat = $('.allegro-chat-icon-wrapper');

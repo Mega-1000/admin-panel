@@ -67,7 +67,14 @@ class AllegroChatInitializer {
 
         numberOfUnreadedMsgs > 0 ? this.iconCounter.removeClass('hidden') : this.iconCounter.addClass('hidden');
 
+        // const prevCounter = parseInt( this.iconCounter.text() );
+        // const shouldFlash = numberOfUnreadedMsgs > prevCounter;
+
         this.iconCounter.text(numberOfUnreadedMsgs);
+
+        // if(shouldFlash) {
+            
+        // }
 
         // are new msgs
         if(res.areNewMessages) {

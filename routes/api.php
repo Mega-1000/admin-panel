@@ -22,7 +22,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('user/change-password', 'Api\CustomersController@changePassword')->name('api.customers.change-password');
     Route::post('user/update-informations', 'Api\CustomersController@updateInformations')->name('api.customers.update-informations');
     Route::get('user/get-orders', 'Api\CustomersController@getOrders')->name('api.customers.get-orders');
-
+    Route::post('create_contact_chat', 'Api\MessagesController@createContactChat')->name('api.orders.create_contact_chat');
+    
     Route::middleware('staff.api')->group(function () {
         Route::group(['prefix' => 'faqs'], function () {
             Route::post('/', 'Api\FaqController@store')->name('api.faq.save');
@@ -58,7 +59,6 @@ Route::post('orders', 'Api\OrdersController@store')->name('api.orders.store');
 Route::post('customers', 'Api\CustomersController@store')->name('api.customers.store');
 Route::get('customers/emailExists/{email}', 'Api\CustomersController@emailExists')->name('api.customers.email-exists');
 Route::post('new_order', 'Api\OrdersController@newOrder')->name('api.orders.new');
-Route::post('create_contact_chat', 'Api\MessagesController@createContactChat')->name('api.orders.create_contact_chat');
 
 Route::middleware('client')->group(function () {
     Route::post('orders/message', 'Api\OrdersController@storeMessage')->name('api.orders.message.store');

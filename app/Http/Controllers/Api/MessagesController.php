@@ -241,14 +241,13 @@ class MessagesController extends Controller
      *
      * @return JsonResponse
      */
-    public function createContactChat(ChatRequest $request): JsonResponse
+    public function createContactChat(Request $request): JsonResponse
     {
-        $data = $request->validated();
+        $data = $request->input('questionsTree');
+        $customer = $request->user();
 
         try {
             $helper = new MessagesHelper();
-            $customerForNewOrder = new GetCustomerForNewOrder();
-            $customer = $customerForNewOrder->getCustomer(null, $data);
             // get customer chats
             $customerChatIds = Chats::getCustomerChats($customer->id);
             $chat = null;

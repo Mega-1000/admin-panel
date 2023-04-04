@@ -11,6 +11,11 @@
 .need-support-icon-wrapper {
     right: 240px;
 }
+.icon-navbar-wrapper {
+    position: absolute;
+    width: 300px;
+    left: 400px;
+}
 .chat-icon-wrapper.loader-2:before {
     top: -8px;
     left: -5px;
@@ -30,6 +35,9 @@
     right: -15px;
     top: -5px;
     left: -4px;
+}
+.toast-top-left {
+    left: 650px;
 }
 .allegro-chat-wrapper {
     position: relative;
