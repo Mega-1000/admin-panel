@@ -270,6 +270,13 @@
                 );
             }
 
+                window.onunload = function () {
+                    $.ajax({
+                        method: "POST",
+                        url: "{{ $routeCloseChatByClient }}",
+                    })
+                };
+
                 $('.add-user').click((event) => {
                     $.ajax({
                         method: "POST",

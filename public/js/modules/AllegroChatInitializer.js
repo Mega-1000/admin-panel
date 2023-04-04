@@ -48,7 +48,9 @@ class AllegroChatInitializer {
         const res = await ajaxPost({}, url);
         toastr.success('Trwa ładowanie się czatu');
         openInNewTab(`/chat/${res.chatUserToken}`);
-        window.location.href = this.ajaxPath + 'orders?customer_id=' + customerId;
+        openInNewTab(this.ajaxPath + 'orders?customer_id=' + customerId);
+        
+        this.iconWrapper.removeClass('loader-2');
     }
 
     async checkUnreadedThreadsAndMsgs() {
@@ -67,7 +69,16 @@ class AllegroChatInitializer {
 
         numberOfUnreadedMsgs > 0 ? this.iconCounter.removeClass('hidden') : this.iconCounter.addClass('hidden');
 
+        const prevCounter = parseInt( this.iconCounter.text() );
+        const shouldFlash = numberOfUnreadedMsgs > prevCounter;
+
         this.iconCounter.text(numberOfUnreadedMsgs);
+
+        if(shouldFlash) {
+            this.iconWrapper.addClass('jello-horizontal');
+        } else {
+            this.iconWrapper.removeClass('jello-horizontal');
+        }
 
         // are new msgs
         if(res.areNewMessages) {

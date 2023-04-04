@@ -21,6 +21,7 @@ use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Entities\Customer;
 
 class OrderBuilder
 {
@@ -99,10 +100,16 @@ class OrderBuilder
     }
 
     /**
-    * @throws ChatException
-    * @throws Exception
-    */
-    public function newStore($data)
+     * Handle store new order
+     *
+     * @param  array         $data
+     * @param  Customer|null $customer
+     *
+     * @throws ChatException
+     * @throws Exception
+     * @return array
+     */
+    public function newStore(array $data, ?Customer $customer): array
     {
         if (empty($this->packageGenerator) || empty($this->priceCalculator) || empty($this->userSelector)) {
             throw new Exception('Nie zdefiniowano bazowych komponentów klasy');
@@ -125,7 +132,9 @@ class OrderBuilder
         }
 
         $order->getToken();
-        $customer = $this->userSelector->getCustomer($order, $data);
+        if($customer === null) {
+            $customer = $this->userSelector->getCustomer($order, $data);
+        }
         $order->customer_id = $customer->id;
 
         if (!$orderExists) {

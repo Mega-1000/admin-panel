@@ -179,6 +179,8 @@ class OrdersController extends Controller
     {
         $data = $request->all();
         DB::beginTransaction();
+        $customer = auth()->guard('api')->user();
+
         try {
             $orderBuilder = new OrderBuilder();
             $orderBuilder
@@ -191,7 +193,7 @@ class OrdersController extends Controller
             } else {
                 $orderBuilder->setUserSelector(new GetCustomerForAdminEdit());
             }
-            $builderData = $orderBuilder->newStore($data);
+            $builderData = $orderBuilder->newStore($data, $customer);
             DB::commit();
             
             $order = Order::find($builderData['id']);
