@@ -16,7 +16,7 @@ use App\Jobs\TimedLabelJob;
 class AddLabelService
 {
 
-    public static function addLabels(Order $order, array $labelIdsToAdd, array &$loopPreventionArray, array $options, ?int $userId, ?Carbon $time = null): void
+    public static function addLabels(Order $order, array $labelIdsToAdd, array &$loopPreventionArray, array $options, ?int $userId = null, ?Carbon $time = null): void
     {
         $now = Carbon::now();
 
