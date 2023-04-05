@@ -8,6 +8,7 @@
 namespace App\Helpers;
 
 use App\Entities\Order;
+use App\Entities\Tag;
 
 class EmailTagHandlerHelper
 {
@@ -324,5 +325,30 @@ class EmailTagHandlerHelper
 	//[LINK-DO-FORMULARZA-NIEZGODNOSCI]
 	public function declineProformFormLink() {
 		return rtrim(env('FRONT_NUXT_URL'),"/") . "/zamowienie/niezgodnosc-w-proformie/{$this->order->id}";
+	}
+
+    /**
+     * Parse existing tags from message using tags handlers
+     *
+     * @param  Order  $order
+     * @param  string $message
+     *
+     * @return string $message
+     */
+	public function parseTags(Order $order, string $message): string {
+        
+        $this->order = $order;
+        $matchedTagsCount = preg_match_all('/\[.*\]/', $message, $matchedTags);
+
+        if( $matchedTagsCount < 1 ) return $message;
+
+        $tags = Tag::whereIn('name', $matchedTags[0])->get();
+
+        foreach ($tags as $tag) {
+            $tagResult = call_user_func([$this, $tag->handler]);
+            $message   = str_replace( $tag->name, $tagResult, $message);
+        }
+
+        return $message;
 	}
 }

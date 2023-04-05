@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\EmailSettingsController;
+use Illuminate\Support\Facades\Route;
+use TCG\Voyager\Facades\Voyager;
 
 /*
 |--------------------------------------------------------------------------

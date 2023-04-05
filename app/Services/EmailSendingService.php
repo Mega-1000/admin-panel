@@ -9,6 +9,8 @@ use App\Mail\MailSending;
 use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
+use App\Helpers\EmailTagHandlerHelper;
+use App\Facades\Mailer;
 
 class EmailSendingService
 {
@@ -149,9 +151,14 @@ class EmailSendingService
     public function sendEmail(EmailSending $send, Carbon $now): bool
     {
         try {
-            \Mailer::create()
+
+            $order = Order::find( $send->order_id );
+            $emailTagHandlerHelper = new EmailTagHandlerHelper();
+            $msg = $emailTagHandlerHelper->parseTags($order, $send->content);
+
+            Mailer::create()
                 ->to($send->email)
-                ->send(new MailSending($send->title, $send->content, $send->attachment));
+                ->send(new MailSending($send->title, $msg, $send->attachment));
             
             $send->message_send = 1;
             $send->send_date = $now->toDateTimeString();
