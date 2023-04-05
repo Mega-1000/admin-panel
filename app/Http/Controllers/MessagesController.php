@@ -80,7 +80,7 @@ class MessagesController extends Controller {
     }
 
     public function show($token) {
-        if(config('env') == 'production') {
+        if(config('app.env') == 'production') {
             Debugbar::disable();
         }
         try {

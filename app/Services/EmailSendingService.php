@@ -155,7 +155,6 @@ class EmailSendingService
             $order = Order::find( $send->order_id );
             $emailTagHandlerHelper = new EmailTagHandlerHelper();
             $msg = $emailTagHandlerHelper->parseTags($order, $send->content);
-
             Mailer::create()
                 ->to($send->email)
                 ->send(new MailSending($send->title, $msg, $send->attachment));

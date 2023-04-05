@@ -56,21 +56,12 @@ class AllegroOrderService extends AllegroApiService
     public function sendNewOrderMessageToClient(string $orderId): void
     {
         $orderAllegro = AllegroOrder::where('order_id', '=', $orderId)->first();
-        $order        = Order::where('allegro_form_id', $orderId);
         $orderAllegro->new_order_message_sent = true;
         $orderAllegro->save();
-        $deliveryAddress = $order->customer->getDeliveryAddress();
-        $base64Email = '';
-        $base64Phone = '';
-
-        if($deliveryAddress !== null) {
-            $base64Email = base64_encode($orderAllegro->buyer_email);
-            $base64Phone = base64_encode($deliveryAddress->phone);
-        }
 
         Mailer::create()
             ->to($orderAllegro->buyer_email)
-            ->send(new AllegroNewOrderEmail($base64Email, $base64Phone));
+            ->send(new AllegroNewOrderEmail());
     }
 
     public function fixOrdersWithInvalidData()
