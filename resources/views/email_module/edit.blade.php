@@ -27,13 +27,14 @@
         </div>
         <div class="form-group">
             <div class="col-sm-10">
-                <label>Tytuł:</label>
+                <label>Nazwa ustawienia:</label>
                 <input type="text" class="form-control" id="title" name="title" value="{{$emailSetting->title}}" required />
             </div>
         </div>
         <div class="form-group">
             <div class="col-sm-10">
-                <label>Tytuł:</label>
+                @include('email_module/_tags_selector')
+                <label>Wiadomość:</label>
                 <textarea rows="20" class="form-control" id="content" name="content" required>{{$emailSetting->content}}</textarea>
             </div>
         </div>
