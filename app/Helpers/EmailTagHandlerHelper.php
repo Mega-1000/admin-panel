@@ -319,12 +319,12 @@ class EmailTagHandlerHelper
 
 	//[LINK-DO-FORMULARZA-ADRESU]
 	public function addressFormLink() {
-		return rtrim(config('app.front_url') . "/zamowienie/mozliwe-do-realizacji/brak-danych/{$this->order->id}");
+		return rtrim(config('app.front_nuxt_url') . "/zamowienie/mozliwe-do-realizacji/brak-danych/{$this->order->id}");
 	}
 
 	//[LINK-DO-FORMULARZA-NIEZGODNOSCI]
 	public function declineProformFormLink() {
-		return rtrim(config('app.front_url') . "/zamowienie/niezgodnosc-w-proformie/{$this->order->id}");
+		return rtrim(config('app.front_nuxt_url') . "/zamowienie/niezgodnosc-w-proformie/{$this->order->id}");
 	}
 
 	/**
