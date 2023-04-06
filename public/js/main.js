@@ -15,29 +15,33 @@ $(function() {
         messagesPreview: 'allegro/messagesPreview/',
     };
 
-    const allegroChatInitializer = new AllegroChatInitializer(iconWrapperChat, iconCounterChat, ajaxPath, chatPaths, 'chat');
+    new AllegroChatInitializer(iconWrapperChat, iconCounterChat, ajaxPath, chatPaths, 'chat');
 
     // init Disputes Chat
     const iconWrapperDisputes = $('.allegro-dispute-icon-wrapper');
     const iconCounterDisputes = $('.allegro-dispute-icon-counter');
 
+    // const disputesPaths = {
+    //     checkUnreadedThreads: 'allegro/getNewPendingDisputes',
+    //     bookThread: 'allegro/bookDispute',
+    // };
     const disputesPaths = {
-        checkUnreadedThreads: 'allegro/getNewPendingDisputes',
-        bookThread: 'allegro/bookDispute',
+        checkUnreadedThreads: 'getChatDisputes',
+        resolveChat: 'resolveOrderDispute',
     };
 
-    const allegroDisputesInitializer = new AllegroChatInitializer(iconWrapperDisputes, iconCounterDisputes, ajaxPath, disputesPaths, 'disputes');
+    new AllegroChatInitializer(iconWrapperDisputes, iconCounterDisputes, ajaxPath, disputesPaths, 'disputes');
 
     // init Orders Chat
     const iconWrapperOrders = $('.need-support-icon-wrapper');
     const iconCounterOrders = $('.need-support-icon-counter');
 
-    const ordersPaths = {
-        checkUnreadedThreads: 'getChatNeededSupport',
-        resolveChatIntervention: 'resolveChatIntervention',
+    const contactChatPaths = {
+        checkUnreadedThreads: 'checkChatsNeedIntervention',
+        resolveChat: 'resolveChatIntervention',
     };
 
-    const allegroOrdersInitializer = new AllegroChatInitializer(iconWrapperOrders, iconCounterOrders, ajaxPath, ordersPaths, 'orders');
+    new AllegroChatInitializer(iconWrapperOrders, iconCounterOrders, ajaxPath, contactChatPaths, 'contactChats');
 
 
 });

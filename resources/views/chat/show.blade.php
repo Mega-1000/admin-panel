@@ -9,7 +9,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>CZAT MEGA 1000</title>
 
     <!-- Styles -->
     <link href="{{ asset('css/admin.css') }}" rel="stylesheet">
@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css"
         integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
     <link href="{{ asset('css/views/chat/style.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/main.css') }}" rel="stylesheet">
     <script type="text/javascript" src="{{ URL::asset('js/helpers/helpers.js') }}"></script>
 </head>
 
@@ -52,7 +53,7 @@
                 @if ($chat)
                     @include('chat.chat_body')
                 @endif
-                <div id="new-message">
+                <div id="new-message" class="loader-2" style="position: relative;">
                     <div class="row">
                         <div class="col-sm-9">
                             <textarea required class="form-control" id="message"
@@ -150,9 +151,12 @@
     </script>
     <script src="{{ asset('js/vue-chunk.js') }}"></script>
     <script src="{{ asset('js/vue-scripts.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/libs/blink-title.js') }}"></script>
     <script type="text/javascript" src="{{ URL::asset('js/helpers/dynamic-calculator.js') }}"></script>
     <script>
         $(document).ready(function() {
+
+            $('#new-message').removeClass('loader-2');
 
             const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}';
             
@@ -213,6 +217,7 @@
 
             $('.send-btn').click(async e => {
                 e.preventDefault();
+                $('#new-message').addClass('loader-2');
                 var message = $('#message').val();
                 $('#message').val('');
 
@@ -232,8 +237,13 @@
                 formData.append('area', area);
                 formData.append('message', message);
 
-                await ajaxFormData(formData, url);
-                
+                const res = await ajaxFormData(formData, url);
+
+                if(res) {
+                    $('.chat-panel').append(res);
+                    scrollBottom();
+                }
+                $('#new-message').removeClass('loader-2');
                 $('#attachment').val('');
                 refreshRate = 1;
                 nextRefresh = 0;
@@ -260,6 +270,14 @@
                     function(data) {
                         if (data.messages.length > 0) {
                             refreshRate = 1;
+                            if(data.messages != '' && document.hidden) {
+                                blinkTitle({
+                                  title: "CZAT MEGA 1000",
+                                  message: "!!! NOWA WIADOMOŚĆ !!!",
+                                  delay: 900,
+                                  notifyOffPage: true
+                                });
+                            }
                             $('.chat-panel').append(data.messages);
                             filterMessages();
                             scrollBottom();
@@ -270,23 +288,26 @@
                 );
             }
 
-                window.onunload = function () {
-                    $.ajax({
-                        method: "POST",
-                        url: "{{ $routeCloseChatByClient }}",
-                    })
-                };
+            $(window).on('focus', () => blinkTitleStop() );
 
-                $('.add-user').click((event) => {
-                    $.ajax({
-                        method: "POST",
-                        url: "{{ $routeAddUser }}",
-                        data: {
-                            'user_id': event.target.value,
-                            'type': event.target.name
-                        }
-                    })
-                    .done(() => location.reload());
+
+            window.onunload = function () {
+                $.ajax({
+                    method: "POST",
+                    url: "{{ $routeCloseChatByClient }}",
+                })
+            };
+
+            $('.add-user').click((event) => {
+                $.ajax({
+                    method: "POST",
+                    url: "{{ $routeAddUser }}",
+                    data: {
+                        'user_id': event.target.value,
+                        'type': event.target.name
+                    }
+                })
+                .done(() => location.reload());
             })
             $('.remove-user').click((event) => {
                 $.ajax({
