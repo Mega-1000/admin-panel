@@ -217,6 +217,29 @@ class MessagesHelper
         return $title;
     }
 
+    /**
+     * Add welcome message to chat
+     *
+     * @param  Chat $chat
+     *
+     * @return void
+     */
+    public function addWelcomeMessage(Chat $chat): void {
+        $message = new Message();
+        $message->message = "Witamy! \n
+        Prosimy się poczekać.\n
+        Konsultant zapoznaje się ze sprawą wkrótce rozpocznie rozmowe.\n
+        Zajmie to do kilku minut";
+        $message->chat_id = $chat->id;
+        $message->area = 0;
+        $message->save();
+        $message = $message->refresh();
+
+        $user = $this->getCurrentUser();
+        $user->assigned_messages_ids = [$message->id];
+        $user->save();
+    }
+
     public function createNewChat()
     {
         $chat = new Chat();
@@ -241,6 +264,7 @@ class MessagesHelper
 
         $this->cache['chat'] = $chat;
         $chat->save();
+
         if (!empty($this->users[self::TYPE_CUSTOMER])) {
             $customer = Customer::find($this->users[self::TYPE_CUSTOMER]);
             if (!$customer) {
@@ -262,6 +286,9 @@ class MessagesHelper
             }
             $chat->users()->attach($user);
         }
+
+        $this->addWelcomeMessage($chat);
+
         $this->cache['chat'] = $chat;
         $this->chatId = $chat->id;
         return $chat;

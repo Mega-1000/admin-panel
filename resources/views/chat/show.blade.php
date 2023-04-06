@@ -9,7 +9,7 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>CZAT MEGA 1000</title>
+    <title>{{ config('app.chat_name') }}</title>
 
     <!-- Styles -->
     <link href="{{ asset('css/admin.css') }}" rel="stylesheet">
@@ -268,7 +268,7 @@
                         area: $('#area').val()
                     },
                     function(data) {
-                        if (data.messages.length > 0) {
+                        if (data?.messages?.length > 0) {
                             refreshRate = 1;
                             if(data.messages != '' && document.hidden) {
                                 blinkTitle({

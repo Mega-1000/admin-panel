@@ -107,16 +107,6 @@ class AllegroChatInitializer {
         };
         const currentThread = await ajaxPost(data, url);
 
-        // if(this.mode == 'disputes') {
-        //     if(currentThread.error) {
-        //         toastr.error(currentThread.error);
-        //         this.iconWrapper.removeClass('loader-2');
-        //         return false;
-        //     }
-        //     this.openDisputedOrder(currentThread.order_id, currentThread.id);
-        //     this.iconWrapper.removeClass('loader-2');
-        //     return false;
-        // }
         if(this.mode == 'disputes') {
             if(currentThread.error) {
                 toastr.error(currentThread.error);
@@ -142,17 +132,6 @@ class AllegroChatInitializer {
             this.openOrders(threadId, nickname);
         }
     }
-    
-    // openDisputedOrder(orderId, disputeId) {
-    //     window.open(
-    //       `${this.ajaxPath}orders/${orderId}/edit`,
-    //       '_blank'
-    //     );
-    //     window.open(
-    //       `${this.ajaxPath}disputes/view/${disputeId}`,
-    //       '_blank'
-    //     );
-    // }
     
     openOrders(threadId, nickname) {
         // handle open new window with order
