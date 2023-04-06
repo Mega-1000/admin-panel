@@ -282,9 +282,9 @@ class OrdersController extends Controller
 
     public function getMessages($frontDbOrderId)
     {
-        $order = $this->orderRepository->findWhere(['id_from_front_db' => $frontDbOrderId])->first();
+        $order = Order::where('id_from_front_db', $frontDbOrderId)->first();
 
-        if (empty($order)) {
+        if ($order === null) {
             return $this->notFoundResponse("Couldn't find requested Order");
         }
 

@@ -25,7 +25,7 @@ use App\Services\Label\AddLabelService;
 
 class MessagesController extends Controller
 {
-    public function postNewMessage(PostMessageRequest $request, $token)
+    public function postNewMessage(PostMessageRequest $request, string $token)
     {
         try {
             $helper = new MessagesHelper($token);
@@ -38,9 +38,14 @@ class MessagesController extends Controller
             }
             $data = $request->validated();
             $file = $data['file'] ?? null;
-            $helper->addMessage($data['message'], $data['area'], $file);
+            $message = $helper->addMessage($data['message'], $data['area'], $file);
             $helper->setLastRead();
-            return response('ok');
+
+            $msgTemplate = view('chat/single_message')->with([
+                'message' => $message,
+            ])->render();
+
+            return response($msgTemplate);
         } catch (ChatException $e) {
             $e->log();
             return response($e->getMessage(), 400);
@@ -253,7 +258,7 @@ class MessagesController extends Controller
 
             if($customerChatIds->isNotEmpty()) {
                 // get contact chat for this customer, then add chat id to helper
-                $contactChat = Chats::getContactChats($customerChatIds);
+                $contactChat = Chats::getContactChat($customerChatIds);
                 if($contactChat !== null) {
                     $helper->chatId = $contactChat->id;
                     $chat = $contactChat;

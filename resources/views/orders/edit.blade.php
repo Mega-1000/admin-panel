@@ -2666,10 +2666,14 @@
                 area: $('#area').val(),
             };
 
-            await ajaxPost(data, url);
-            $('.chat-preview').removeClass('loader-2');
+            const res = await ajaxPost(data, url);
 
-            window.location.reload();
+            if(res) {
+                $('.chat-panel').append(res);
+                scrollBottom();
+            }
+            $('#quick_msg_content').val('');
+            $('.chat-preview').removeClass('loader-2');
         });
 
         $(() => $(document).tooltip());

@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 /*
   |--------------------------------------------------------------------------
   | API Routes
@@ -10,7 +12,7 @@
   | is assigned the "api" middleware group. Enjoy building your API!
   |
  */
-//
+
 Route::middleware('auth:api')->group(function () {
     Route::get('/user', 'Api\CustomersController@getDetails')->name('api.customers.getdetails');
     Route::get('orders/getAll', 'Api\OrdersController@getAll')->name('api.orders.getall');
