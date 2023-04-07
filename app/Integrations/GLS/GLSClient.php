@@ -6,7 +6,10 @@ namespace App\Integrations\GLS;
 
 use App\Entities\OrderPackage;
 use App\Integrations\GLS\soap\PackageObjectBuilder;
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\Storage;
+use Log;
 use SoapClient;
 use stdClass;
 
@@ -18,17 +21,17 @@ class GLSClient
 
     public function auth()
     {
-        $login = env("GLS_LOGIN");
-        $password = env("GLS_PASSWORD");
-        $url = env('GLS_API_URL');
+        $login = config('integrations.gls.login');
+        $password = config('integrations.gls.password');
+        $url = config('integrations.gls.api_url');
         if (empty($url)) {
-            throw new \Exception('Brak zdefiniowanego adresu url API ' . __class__);
+            throw new Exception('Brak zdefiniowanego adresu url API ' . __class__);
         }
         if (empty($login) || empty($password)) {
-            throw new \Exception('Brak danych logowania API ' . __class__);
+            throw new Exception('Brak danych logowania API ' . __class__);
         }
         $options = [];
-        
+
         $this->client = new SoapClient($url, $options);
         try {
             $oCredentials = new stdClass();
@@ -36,8 +39,8 @@ class GLSClient
             $oCredentials->user_password = $password;
             $oResponse = $this->client->adeLogin($oCredentials);
             $this->session = $oResponse->return->session;
-        } catch (\Exception $e) {
-            \Log::error('Problem autentykacji GLS ',
+        } catch (Exception $e) {
+            Log::error('Problem autentykacji GLS ',
                 ['soapDebug' => 'Code: ' . $e->faultcode ?? 'none' . ', FaultString: ' . $e->faultstring ?? 'none',
                     'message' => $e->getMessage(),
                     'stack' => $e->getTraceAsString()]);
@@ -50,8 +53,8 @@ class GLSClient
             $oSession = new stdClass();
             $oSession->session = $this->session;
             $this->client->adeLogout($oSession);
-        } catch (\Exception $e) {
-            \Log::error('Problem z wylogowaniem się z GLS ', ['message' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
+        } catch (Exception $e) {
+            Log::error('Problem z wylogowaniem się z GLS ', ['message' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
         }
     }
 
@@ -65,8 +68,8 @@ class GLSClient
             $oPackage = PackageObjectBuilder::preparePackageObject($package, $this->session);
             $oClient = $this->client->adePreparingBox_Insert($oPackage);
             return ['error' => false, 'content' => $oClient->return->id];
-        } catch (\Exception $e) {
-            \Log::error('Problem z utworzeniem nowej paczki GLS ',
+        } catch (Exception $e) {
+            Log::error('Problem z utworzeniem nowej paczki GLS ',
                 ['soapDebug' => 'Code: ' . $e->faultcode ?? 'none' . ', FaultString: ' . $e->faultstring ?? 'none',
                     'message' => $e->getMessage(),
                     'stack' => $e->getTraceAsString()]);
@@ -85,8 +88,8 @@ class GLSClient
             $oClient = $this->client->adePreparingBox_GetConsignLabels($oInput);
             $szLabels = base64_decode($oClient->return->labels);
             Storage::disk('private')->put('labels/gls/' . $number . '.pdf', $szLabels);
-        } catch (\Exception $e) {
-            \Log::error('Problem z pobraniem naklejki GLS ',
+        } catch (Exception $e) {
+            Log::error('Problem z pobraniem naklejki GLS ',
                 ['soapDebug' => 'Code: ' . $e->faultcode ?? 'none' . ', FaultString: ' . $e->faultstring ?? 'none',
                     'message' => $e->getMessage(),
                     'stack' => $e->getTraceAsString()]);
@@ -101,8 +104,8 @@ class GLSClient
             $oInput->id = $number;
             $oClient = $this->client->adePreparingBox_GetConsign($oInput);
             return $oClient->return->parcels->items->number;
-        } catch (\Exception $e) {
-            \Log::error('Problem ze pobraniem numeru paczki GLS ',
+        } catch (Exception $e) {
+            Log::error('Problem ze pobraniem numeru paczki GLS ',
                 ['soapDebug' => 'Code: ' . $e->faultcode ?? 'none' . ', FaultString: ' . $e->faultstring ?? 'none',
                     'message' => $e->getMessage(),
                     'stack' => $e->getTraceAsString()]);
@@ -117,11 +120,11 @@ class GLSClient
             $oInput->session = $this->session;
             $oInput->consigns_ids = new stdClass();
             $oInput->consigns_ids->items = $ids;
-            $oInput->desc = 'Potwierdzenie nadania z dn. ' . \Carbon\Carbon::now()->toDateString();
+            $oInput->desc = 'Potwierdzenie nadania z dn. ' . Carbon::now()->toDateString();
             $oClient = $this->client->adePickup_Create($oInput);
             return $oClient->return->id;
-        } catch (\Exception $e) {
-            \Log::error('Problem ze potwierdzeniem przesyłek GLS ',
+        } catch (Exception $e) {
+            Log::error('Problem ze potwierdzeniem przesyłek GLS ',
                 ['soapDebug' => 'Code: ' . $e->faultcode ?? 'none' . ', FaultString: ' . $e->faultstring ?? 'none',
                     'message' => $e->getMessage(),
                     'stack' => $e->getTraceAsString()]);
@@ -136,8 +139,8 @@ class GLSClient
             $oInput->id = $id;
             $oClient = $this->client->adePreparingBox_DeleteConsign($oInput);
             return true;
-        } catch (\Exception $e) {
-            \Log::error('Problem ze usunięciem przesyłki GLS ',
+        } catch (Exception $e) {
+            Log::error('Problem ze usunięciem przesyłki GLS ',
                 ['soapDebug' => 'Code: ' . $e->faultcode ?? 'none' . ', FaultString: ' . $e->faultstring ?? 'none',
                     'message' => $e->getMessage(),
                     'stack' => $e->getTraceAsString()]);
