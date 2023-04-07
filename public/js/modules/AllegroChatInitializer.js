@@ -1,5 +1,5 @@
 class AllegroChatInitializer {
-    
+
     constructor(iconWrapper, iconCounter, ajaxPath, paths, mode) {
         this.iconWrapper = iconWrapper;
         this.iconCounter = iconCounter;
@@ -15,13 +15,19 @@ class AllegroChatInitializer {
             if(this.tabActive) {
                 this.checkUnreadedThreadsAndMsgs();
             }
-        }, 15000);
+        }, 30000);
 
         this.initListeners();
     }
-    
-    initListeners() {
-        if(this.mode === 'contactChats' || this.mode === 'disputes') {
+
+    async initListeners() {
+        Notification.requestPermission().then(permission => {
+            if (permission !== 'granted') {
+                alert('Powiadomienia zostały zablokowane. Aby odbierać powiadomienia o nowych wiadomościach na chacie Allegro, prosimy odblokować powiadomienia w przeglądarce.')
+            }
+        });
+
+        if(this.mode === 'orders') {
             this.iconWrapper.on('click', () => this.viewOrderChat());
         } else {
             this.iconWrapper.on('click', () => this.bookThread());
@@ -31,53 +37,30 @@ class AllegroChatInitializer {
         $(window).on('blur', () => this.tabActive = false);
     }
 
-    handleMsgsCounter() {
-        const numberOfUnreadedMsgs = this.unreadedThreads?.length || 0;
-
-        numberOfUnreadedMsgs > 0 ? this.iconCounter.removeClass('hidden') : this.iconCounter.addClass('hidden');
-
-        const prevCounter = parseInt( this.iconCounter.text() );
-        const shouldFlash = numberOfUnreadedMsgs > prevCounter;
-
-        this.iconCounter.text(numberOfUnreadedMsgs);
-
-        if(shouldFlash) {
-            this.iconWrapper.addClass('jello-horizontal');
-        } else {
-            this.iconWrapper.removeClass('jello-horizontal');
-        }
-    }
-
     async viewOrderChat() {
-
-        if(this.unreadedThreads.length < 1) {
-            toastr.error('Brak zamówień wymagających pomocy');
-            return false;
-        }
 
         this.iconWrapper.addClass('loader-2');
 
-        const thread = this.unreadedThreads.shift();
-        this.handleMsgsCounter();
+        if(this.unreadedThreads.length < 1) {
+            toastr.error('Brak zamówień wymagających pomocy');
+            this.iconWrapper.removeClass('loader-2');
 
-        const id = this.mode === 'disputes' ? thread.order.id : thread.id;
-        const url = `${this.ajaxPath}${this.paths.resolveChat}/${id}`;
-        
+            return false;
+        }
+
+
+        const id = this.unreadedThreads[0].id;
+        const type = this.unreadedThreads[0].hasOwnProperty('need_intervention') ? 'chat' : 'order';
+        const url = `${this.ajaxPath}${this.paths.resolveChatIntervention}/${type}/${id}`;
+
         const res = await ajaxPost({}, url);
         toastr.success('Trwa ładowanie się czatu');
-        window.open(`/chat/${res.chatUserToken}`, 'chat_' + id);
-        
-        if(this.mode === 'disputes') {
-            const customerId = thread.order.customer_id;
-            window.open(this.ajaxPath + 'orders?customer_id=' + customerId, 'orders_' + customerId);
-        }
-        
-        this.iconWrapper.removeClass('loader-2');
+        window.location.href = `/chat/${res.chatUserToken}`;
     }
 
     async checkUnreadedThreadsAndMsgs() {
         const url = this.ajaxPath + this.paths.checkUnreadedThreads;
-        
+
         // DateTime
         const chatLastCheck = window.localStorage.getItem('allegro_chat_last_check');
         const data = {
@@ -87,11 +70,22 @@ class AllegroChatInitializer {
 
         // unreaded threads
         this.unreadedThreads = res.unreadedThreads;
+        const numberOfUnreadedMsgs = this.unreadedThreads?.length || 0;
 
-        this.handleMsgsCounter();
+        numberOfUnreadedMsgs > 0 ? this.iconCounter.removeClass('hidden') : this.iconCounter.addClass('hidden');
+
+        this.iconCounter.text(numberOfUnreadedMsgs);
 
         // are new msgs
         if(res.areNewMessages) {
+            const notification = new Notification('Nowy chat jest dostępny', {
+                body: 'Kliknij, aby przejść do czatu'
+            });
+
+            notification.onclick = () => {
+                this.bookThread();
+            }
+
             if(this.chatWindow) this.chatWindow.focus();
             toastr.warning('Nowe wiadomości na chacie Allegro');
         }
@@ -132,7 +126,18 @@ class AllegroChatInitializer {
             this.openOrders(threadId, nickname);
         }
     }
-    
+
+    openDisputedOrder(orderId, disputeId) {
+        window.open(
+          `${this.ajaxPath}orders/${orderId}/edit`,
+          '_blank'
+        );
+        window.open(
+          `${this.ajaxPath}disputes/view/${disputeId}`,
+          '_blank'
+        );
+    }
+
     openOrders(threadId, nickname) {
         // handle open new window with order
         let dtOrders = window.localStorage.getItem('DataTables_dataTable_/admin/orders');
