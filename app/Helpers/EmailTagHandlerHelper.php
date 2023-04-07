@@ -334,12 +334,19 @@ class EmailTagHandlerHelper
      * @return string $template
      */
 	public function faqLink(): string {
-        $deliveryAddress = $this->order->customer->deliveryAddress();
 
-        if($deliveryAddress === null) return '';
+        $workingAddress = null;
+        foreach($this->order->customer?->addresses as $address) {
+            if($address->phone !== null && $address->email !== null) {
+                $workingAddress = $address;
+                break;
+            }
+        }
 
-        $base64Email = base64_encode($deliveryAddress->email);
-        $base64Phone = base64_encode($deliveryAddress->phone);
+        if($workingAddress === null) return '';
+
+        $base64Email = base64_encode($workingAddress->email);
+        $base64Phone = base64_encode($workingAddress->phone);
 
         // Jeżeli masz pytania zapoznaj się z naszym FAQ:<br>
         $template = config('app.front_url') . "/faq?phone=$base64Email&email=$base64Phone&showFaq=true";
