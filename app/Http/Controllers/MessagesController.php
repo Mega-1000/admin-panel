@@ -106,10 +106,27 @@ class MessagesController extends Controller {
             $chat = $helper->getChat();
         }
 
+        // if no exist any user ID then bind one
+        if($chat->user_id === null && $helper->currentUserType === MessagesHelper::TYPE_USER) {
+            $userId = auth()->user()->id;
+            $chat->user_id = $userId;
+            $chat->save();
+        }
+
         $product = $helper->getProduct();
         $order = $helper->getOrder();
 
         $chatType = $order ? 'order' : 'product';
+
+        // if exist order with need support then set need support to false, only for consultants
+        if($order !== null && $order->need_support && $helper->currentUserType === MessagesHelper::TYPE_USER) {
+            $order->need_support = false;
+            $order->save();
+        }
+        if($order === null && $chat->need_intervention && $helper->currentUserType === MessagesHelper::TYPE_USER) {
+            $chat->need_intervention = false;
+            $chat->save();
+        }
 
         $helper->setLastRead();
 
@@ -178,7 +195,7 @@ class MessagesController extends Controller {
             'title'                   => $helper->getTitle(true),
             'route'                   => route('api.messages.post-new-message', ['token' => $token]),
             'routeAddUser'            => route('api.messages.add-new-user', ['token' => $token]),
-            'routeCloseChatByClient'  => route('api.messages.closeChatByClient', ['token' => $token]),
+            'routeCloseChat'          => route('api.messages.closeChat', ['token' => $token]),
             'routeRemoveUser'         => route('api.messages.remove-user', ['token' => $token]),
             'routeRefresh'            => route('api.messages.get-messages', ['token' => $token]),
             'routeAskForIntervention' => route('api.messages.ask-for-intervention', ['token' => $token]),

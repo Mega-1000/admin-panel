@@ -105,6 +105,7 @@ use Yajra\DataTables\Facades\DataTables;
 use function response;
 use App\Entities\Chat;
 use App\Repositories\Chats;
+use App\Repositories\Orders;
 
 /**
  * Class OrderController.
@@ -3398,12 +3399,9 @@ class OrdersController extends Controller
     {
 
         $helper        = new MessagesHelper();
-        $userId        = Auth::user()?->id;
+        $userId        = Auth::user()->id;
         $chatUserToken = $helper->getChatToken($order->id, $userId);
-
-        $order->need_support = false;
-        $order->save();
-
+        
         $response = [
             'chatUserToken' => $chatUserToken,
         ];
@@ -3414,19 +3412,17 @@ class OrdersController extends Controller
     /**
      * Get Current User Chat Token for given chat
      *
-     * @param Chat $chat
+     * @param int $chatId
      *
      * @return JsonResponse
      */
-    public function resolveChatIntervention(Chat $chat): JsonResponse
+    public function resolveChatIntervention(int $chatId): JsonResponse
     {
 
-        $helper        = new MessagesHelper();
-        $userId        = Auth::user()?->id;
-        $chatUserToken = $helper->getChatToken(null, $userId);
-        
-        $chat->need_intervention = false;
-        $chat->save();
+        $helper         = new MessagesHelper();
+        $helper->chatId = $chatId;
+        $userId         = Auth::user()->id;
+        $chatUserToken  = $helper->getChatToken(null, $userId);
 
         $response = [
             'chatUserToken' => $chatUserToken,
@@ -3442,9 +3438,7 @@ class OrdersController extends Controller
      */
     public function checkChatsNeedIntervention(): JsonResponse
     {
-        $userId = auth()->user()->id;
-
-        $chatsNeedIntervention = Chats::getChatsNeedIntervention($userId);
+        $chatsNeedIntervention = Chats::getChatsNeedIntervention();
 
         $response = [
             'unreadedThreads' => $chatsNeedIntervention,
@@ -3460,9 +3454,7 @@ class OrdersController extends Controller
      */
     public function getChatDisputes(): JsonResponse
     {
-        $userId = auth()->user()->id;
-
-        $ordersNeedSupport = Chats::getChatOrdersNeedSupport($userId);
+        $ordersNeedSupport = Orders::getChatOrdersNeedSupport();
 
         $response = [
             'unreadedThreads' => $ordersNeedSupport,

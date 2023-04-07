@@ -288,13 +288,16 @@
                 );
             }
 
-            $(window).on('focus', () => blinkTitleStop() );
+            $(window).on('focus', () => {
+                blinkTitleStop();
+                document.title = 'CZAT MEGA 1000';
+            } );
 
 
             window.onunload = function () {
                 $.ajax({
                     method: "POST",
-                    url: "{{ $routeCloseChatByClient }}",
+                    url: "{{ $routeCloseChat }}",
                 })
             };
 

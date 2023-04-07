@@ -34,7 +34,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/checkChatsNeedIntervention', 'OrdersController@checkChatsNeedIntervention')->name('checkChatsNeedIntervention');
         Route::post('/getChatDisputes', 'OrdersController@getChatDisputes')->name('getChatDisputes');
         Route::post('/resolveOrderDispute/{order}', 'OrdersController@resolveOrderDispute')->name('resolveOrderDispute');
-        Route::post('/resolveChatIntervention/{chat}', 'OrdersController@resolveChatIntervention')->name('resolveChatIntervention');
+        Route::post('/resolveChatIntervention/{chatId}', 'OrdersController@resolveChatIntervention')->name('resolveChatIntervention');
 
         Route::get('/disputes', 'AllegroDisputeController@list');
         Route::get('/disputes/view/{id}', 'AllegroDisputeController@view');

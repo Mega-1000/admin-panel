@@ -132,7 +132,7 @@ Route::post('chat/askForIntervention/{token}', 'Api\MessagesController@askForInt
 Route::post('chat/addUser/{token}', 'Api\MessagesController@addUser')->name('api.messages.add-new-user');
 Route::post('chat/removeUser/{token}', 'Api\MessagesController@removeUser')->name('api.messages.remove-user');
 Route::post('chat/editPrices/{token}', 'Api\MessagesController@editPrices')->name('api.messages.edit-prices');
-Route::post('chat/closeChatByClient/{token}', 'Api\MessagesController@closeChatByClient')->name('api.messages.closeChatByClient');
+Route::post('chat/closeChat/{token}', 'Api\MessagesController@closeChat')->name('api.messages.closeChat');
 
 Route::post('auth/code/{id}', 'Api\AutheticationController@getToken')->name('api.authenticate.get-token');
 

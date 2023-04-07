@@ -191,8 +191,7 @@ class MessagesHelper
 
     private function getChatObject()
     {
-        return Chat
-            ::with(['messages' => function ($q) {
+        return Chat::with(['messages' => function ($q) {
                 $q->with(['chatUser' => function ($q) {
                     $q->with(['customer' => function ($q) {
                         $q->with(['addresses' => function ($q) {
@@ -357,9 +356,12 @@ class MessagesHelper
         }
 
         if ($chat->order) {
+            if($this->currentUserType === self::TYPE_CUSTOMER && $chat->user_id === null) {
+                $chat->order->need_support = true;
+                $chat->order->save();
+            }
             if ($chatUser->user) {
                 $this->setChatLabel($chat, true);
-                $this->clearIntervention($chat);
             } else {
                 $this->setChatLabel($chat, false);
             }
@@ -382,15 +384,11 @@ class MessagesHelper
                 );
             }
             WorkingEvents::createEvent(WorkingEvents::CHAT_MESSAGE_ADD_EVENT, $chat->order->id);
-
-            if($this->currentUserType == self::TYPE_CUSTOMER) {
-                $chat->order->need_support = true;
-                $chat->order->save();
+        } else {
+            if($this->currentUserType === self::TYPE_CUSTOMER && $chat->user_id === null) {
+                $chat->need_intervention = true;
+                $chat->save();
             }
-        }
-        if (!$chat->order && !$chat->product && $this->currentUserType == self::TYPE_CUSTOMER) {
-            $chat->need_intervention = true;
-            $chat->save();
         }
 
         $email = null;

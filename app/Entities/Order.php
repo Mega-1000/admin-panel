@@ -755,7 +755,7 @@ class Order extends Model implements Transformable
 
     public function chat()
     {
-        $this->hasOne(Chat::class);
+        return $this->hasOne(Chat::class);
     }
 
     public function transactions()
