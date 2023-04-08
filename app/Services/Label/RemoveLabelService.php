@@ -55,8 +55,13 @@ class RemoveLabelService
                 $now = Carbon::now();
 
                 $order->labels()->detach($labelId);
+                $alreadyHasLabel = $order->labels()->where('label_id', $preLabelId)->exists();
 
-                $order->labels()->attach($order->id, ['label_id' => $preLabelId, 'added_type' => NULL, 'created_at' => $now]);
+                if($alreadyHasLabel) {
+                    $order->labels()->updateExistingPivot($preLabelId, ['label_id' => $preLabelId, 'created_at' => $now]);
+                } else {
+                    $order->labels()->attach($preLabelId, ['label_id' => $preLabelId, 'created_at' => $now]);
+                }
 
                 // // calc time to run timed label job
                 $dateTo = new Carbon($time);

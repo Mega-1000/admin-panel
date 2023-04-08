@@ -350,7 +350,7 @@ class Order extends Model implements Transformable
      */
     public function labels()
     {
-        return $this->belongsToMany(Label::class, 'order_labels')->withPivot('added_type');
+        return $this->belongsToMany(Label::class, 'order_labels')->withPivot(['added_type', 'created_at']);
     }
 
     public function orderLabels()
