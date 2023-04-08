@@ -159,7 +159,7 @@
             $('#new-message').removeClass('loader-2');
 
             const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}';
-            
+
             let usersHistoryFilter = new Set();
             let selectedArea = 0;
 
@@ -170,7 +170,7 @@
             }
 
             const filterMessages = () => {
-                
+
                 if(!isConsultant) return false;
 
                 $('.message-row').each(function() {
@@ -193,7 +193,7 @@
 
             getAllUsers();
             filterMessages();
-            
+
             $('#area').change(function() {
                 selectedArea = $(this).val();
                 filterMessages();
@@ -222,7 +222,7 @@
                 $('#message').val('');
 
                 const url = $(e.target).data('action');
-                
+
                 const area = $('#area').val() || 0;
                 const attachmentInput = $('#attachment')[0];
                 const formData = new FormData();
@@ -277,6 +277,19 @@
                                   delay: 900,
                                   notifyOffPage: true
                                 });
+
+                                const notification = new Notification(
+                                    "CZAT MEGA 1000",
+                                    {
+                                        body: "!!! NOWA WIADOMOŚĆ !!!",
+                                        icon: "https://mega1000.pl/images/chat-logo.jpg"
+                                    }
+                                );
+
+                                notification.onclick = function() {
+                                    window.focus();
+                                }
+
                             }
                             $('.chat-panel').append(data.messages);
                             filterMessages();
