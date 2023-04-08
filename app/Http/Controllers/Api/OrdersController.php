@@ -44,6 +44,7 @@ use App\Services\OrderPackageService;
 use App\Services\ProductService;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
@@ -195,7 +196,7 @@ class OrdersController extends Controller
             }
             $builderData = $orderBuilder->newStore($data, $customer);
             DB::commit();
-            
+
             $order = Order::find($builderData['id']);
             $builderData['token'] = $order->getToken();
             $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 2)->first();
