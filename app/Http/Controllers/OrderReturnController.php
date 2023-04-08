@@ -7,14 +7,13 @@ use App\Entities\OrderReturn;
 use App\Entities\ProductStock;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Helpers\OrdersHelper;
-
 use App\Services\OrderReturnService;
-
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
+use App\Entities\ProductStockLog;
 
 class OrderReturnController extends Controller
 {
@@ -52,12 +51,11 @@ class OrderReturnController extends Controller
         $files = $request->file('photo');
         foreach($request->return as $v=>$return){
             if($return['check'] > 0){
-
                 $return['photoPath'] = null;
-                $updateReturn = 0;
+                $orderReturn = null;
 
-                if($return['id'] > 0){
-                    $updateReturn = OrderReturn::find($return['id'])->quantity_undamaged;
+                if($return['id'] > 0) {
+                    $orderReturn = OrderReturn::find($return['id']);
                 }
 
                 if(isset($files[$v])){
@@ -68,22 +66,22 @@ class OrderReturnController extends Controller
                     }
                 }
 
-                if(isset($return['positions'])){
-                    $productStock = ProductStock::where('product_id',$return['product_id'])->get();
-                    
-                    $return['position_id'] = $this->orderReturnService->saveStockPosition($productStock->first()->id,$return['positions']);
-                }
+                $productStock = ProductStock::where('product_id', $return['product_id'])->first();
 
+                if(isset($return['positions'])){
+                    $return['position_id'] = $this->orderReturnService->saveStockPosition($productStock->id, $return['positions']);
+                }
                 if($return['undamaged'] >= 0 || $return['damaged'] >= 0){
                     $this->orderReturnService->saveReturn($return);
                 }
-                if($return['undamaged'] >= 0){
-                    $return['undamaged'] = $return['undamaged'] - $updateReturn;
-                    $this->orderReturnService->updateStockPosition($return['position_id'],$return['undamaged']);
+                if($return['damaged'] >= 0) {
+                    $this->orderReturnService->updateStockPositionDamaged($orderReturn, $return['position_id'], $return['damaged'], $productStock->id, $return['order_id']);
+                }
+                if($return['undamaged'] >= 0) {
+                    $this->orderReturnService->updateStockPosition($orderReturn, $return['position_id'], $return['undamaged'], $productStock->id, $return['order_id']);
                 }
             }
         }
-
         if ($request->submit == 'updateAndStay') {
             return redirect()->route('order_return.index', ['order_id' => $request->id])->with([
                 'message' => 'Zwrot zostało dodany pomyślnie!',
