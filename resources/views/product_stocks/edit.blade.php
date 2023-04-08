@@ -563,6 +563,8 @@
                     render: function(action) {
                         if (action === 'ADD') {
                             return '<span style="color: green;">' + {!! json_encode(__('product_stock_logs.table.add'), true) !!} + '</span>';
+                        } else if(action === 'DAMAGED') {
+                            return '<span style="color: orange;">Uszkodzone</span>';
                         } else {
                             return '<span style="color: red;">' + {!! json_encode(__('product_stock_logs.table.delete'), true) !!} + '</span>';
                         }

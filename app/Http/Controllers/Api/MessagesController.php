@@ -22,6 +22,7 @@ use App\Http\Requests\Api\Orders\ChatRequest;
 use Illuminate\Http\JsonResponse;
 use App\Repositories\Chats;
 use App\Services\Label\AddLabelService;
+use App\Entities\Chat;
 
 class MessagesController extends Controller
 {
@@ -285,25 +286,36 @@ class MessagesController extends Controller
     }
     
     /**
-     * Close chat by client
+     * Close chat
      *
      * @param  string $token
      *
      * @return void
      */
-    public function closeChatByClient(string $token): void
+    public function closeChat(string $token): void
     {
         $helper = new MessagesHelper($token);
         $chat = $helper->getChat();
         $order = $helper->getOrder();
-        if ($chat === null || $order === null) {
+        if ($chat === null) {
             throw new ChatException('Nieprawidłowy token chatu');
         }
         $user = $helper->getCurrentUser();
-        // only client can close chat by unload
-        if (is_a($user, Customer::class)) {
+
+        if ( $helper->currentUserType === MessagesHelper::TYPE_CUSTOMER && $order !== null ) {
+            // close by client
             $loopPreventionArray = [];
             AddLabelService::addLabels($order, [$helper::MESSAGE_GREEN_LABEL_ID], $loopPreventionArray, [], $user->id);
+
+        } else if ( $helper->currentUserType === MessagesHelper::TYPE_USER ) {
+            // close by consultant
+            $chat->user_id = null;
+            $chat->save();
+
+            if($order !== null) {
+                $loopPreventionArray = [];
+                AddLabelService::addLabels($order, [$helper::MESSAGE_GREEN_LABEL_ID], $loopPreventionArray, [], $user->id);
+            }
         }
     }
 

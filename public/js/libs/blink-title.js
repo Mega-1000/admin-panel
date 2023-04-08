@@ -31,5 +31,4 @@ function blinkTitle (opts) {
 
 function blinkTitleStop () {
   clearInterval(hold);
-  document.title = title;
 }

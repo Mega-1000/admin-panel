@@ -64,6 +64,7 @@ class Controller extends BaseController
      */
     public function refreshCache(){
         Artisan::call('optimize:clear', []);
+        Artisan::call('queue:restart', []);
         return redirect('/');
     }
 }

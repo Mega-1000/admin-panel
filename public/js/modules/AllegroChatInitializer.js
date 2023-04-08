@@ -60,11 +60,13 @@ class AllegroChatInitializer {
         const thread = this.unreadedThreads.shift();
         this.handleMsgsCounter();
 
-        const id = this.mode === 'disputes' ? thread.order.id : thread.id;
+        const id = this.mode === 'disputes' ? thread.id : thread.id;
         const url = `${this.ajaxPath}${this.paths.resolveChat}/${id}`;
         
         const res = await ajaxPost({}, url);
         toastr.success('Trwa ładowanie się czatu');
+        this.iconWrapper.removeClass('loader-2');
+        
         window.open(`/chat/${res.chatUserToken}`, 'chat_' + id);
         
         if(this.mode === 'disputes') {
@@ -72,7 +74,6 @@ class AllegroChatInitializer {
             window.open(this.ajaxPath + 'orders?customer_id=' + customerId, 'orders_' + customerId);
         }
         
-        this.iconWrapper.removeClass('loader-2');
     }
 
     async checkUnreadedThreadsAndMsgs() {

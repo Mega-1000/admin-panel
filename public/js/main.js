@@ -21,10 +21,6 @@ $(function() {
     const iconWrapperDisputes = $('.allegro-dispute-icon-wrapper');
     const iconCounterDisputes = $('.allegro-dispute-icon-counter');
 
-    // const disputesPaths = {
-    //     checkUnreadedThreads: 'allegro/getNewPendingDisputes',
-    //     bookThread: 'allegro/bookDispute',
-    // };
     const disputesPaths = {
         checkUnreadedThreads: 'getChatDisputes',
         resolveChat: 'resolveOrderDispute',
