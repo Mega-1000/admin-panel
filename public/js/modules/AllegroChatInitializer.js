@@ -1,5 +1,5 @@
 class AllegroChatInitializer {
-    
+
     constructor(iconWrapper, iconCounter, ajaxPath, paths, mode) {
         this.iconWrapper = iconWrapper;
         this.iconCounter = iconCounter;
@@ -19,7 +19,7 @@ class AllegroChatInitializer {
 
         this.initListeners();
     }
-    
+
     initListeners() {
         if(this.mode === 'contactChats' || this.mode === 'disputes') {
             this.iconWrapper.on('click', () => this.viewOrderChat());
@@ -62,23 +62,23 @@ class AllegroChatInitializer {
 
         const id = this.mode === 'disputes' ? thread.id : thread.id;
         const url = `${this.ajaxPath}${this.paths.resolveChat}/${id}`;
-        
+
         const res = await ajaxPost({}, url);
         toastr.success('Trwa ładowanie się czatu');
         this.iconWrapper.removeClass('loader-2');
-        
+
         window.open(`/chat/${res.chatUserToken}`, 'chat_' + id);
-        
+
         if(this.mode === 'disputes') {
             const customerId = thread.order.customer_id;
             window.open(this.ajaxPath + 'orders?customer_id=' + customerId, 'orders_' + customerId);
         }
-        
+
     }
 
     async checkUnreadedThreadsAndMsgs() {
         const url = this.ajaxPath + this.paths.checkUnreadedThreads;
-        
+
         // DateTime
         const chatLastCheck = window.localStorage.getItem('allegro_chat_last_check');
         const data = {
@@ -133,7 +133,7 @@ class AllegroChatInitializer {
             this.openOrders(threadId, nickname);
         }
     }
-    
+
     openOrders(threadId, nickname) {
         // handle open new window with order
         let dtOrders = window.localStorage.getItem('DataTables_dataTable_/admin/orders');
