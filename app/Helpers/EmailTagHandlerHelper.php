@@ -349,7 +349,7 @@ class EmailTagHandlerHelper
         $base64Phone = base64_encode($workingAddress->phone);
 
         // Jeżeli masz pytania zapoznaj się z naszym FAQ:<br>
-        $template = config('app.front_url') . "/faq?phone=$base64Email&email=$base64Phone&showFaq=true";
+        $template = config('app.front_url') . "/faq?phone=$base64Phone&email=$base64Email&showFaq=true";
 
 		return $template;
 	}
