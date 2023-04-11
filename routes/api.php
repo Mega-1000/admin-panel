@@ -19,6 +19,8 @@ Route::middleware('auth:api')->group(function () {
     Route::get('orders/get-payments-for-order/{token}', 'Api\OrdersController@getPaymentDetailsForOrder')->name('api.orders.getPayments');
     Route::get('chat/getHistory', 'Api\MessagesController@getHistory')->name('api.messages.get-history');
     Route::get('invoices/get/{id}', 'Api\InvoicesController@getInvoice')->name('api.invoices.get');
+    Route::post('user/change-password', 'Api\CustomersController@changePassword')->name('api.customers.change-password');
+    Route::post('user/update-informations', 'Api\CustomersController@updateInformations')->name('api.customers.update-informations');
 
     Route::middleware('staff.api')->group(function () {
         Route::group(['prefix' => 'faqs'], function () {

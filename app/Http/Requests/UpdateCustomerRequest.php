@@ -23,22 +23,18 @@ class UpdateCustomerRequest extends FormRequest
      */
     public function rules()
     {
-        $addressRules = [
-            'name' => 'required',
-            'surname' => 'required',
-            'street' => 'required',
-            'house_number' => 'required',
-            'flat_number' => 'nullable',
-            'city' => 'required',
-            'postal_code' => 'required',
-            'phone' => 'required',
-            'email' => 'required',
-        ];
-
         return [
-            "standardAddress" => $addressRules,
-            "invoiceAddress" => $addressRules,
-            "deliveryAddress" => $addressRules,
+            "standardAddress" => [
+                'name' => 'required',
+                'surname' => 'required',
+                'street' => 'required',
+                'house_number' => 'required',
+                'flat_number' => 'nullable',
+                'city' => 'required',
+                'postal_code' => 'required',
+                'phone' => 'required',
+                'email' => 'required',
+            ],
         ];
     }
 }
