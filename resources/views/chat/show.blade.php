@@ -73,6 +73,7 @@
                 @endif
             </div>
             <div class="chat-right-column" style="padding-left: 10px;">
+                <img id="bell-icon" onclick="askForPermision" src="/svg/bell-icon.svg" alt="" style="width: 35px; cursor: pointer">
                 <h3>Użytkownicy:</h3>
                 <div class="chat-users-wrapper" style="overflow: auto; max-height: 100vh;">
                     <table id="chat-users">
@@ -154,12 +155,60 @@
     <script type="text/javascript" src="{{ asset('js/libs/blink-title.js') }}"></script>
     <script type="text/javascript" src="{{ URL::asset('js/helpers/dynamic-calculator.js') }}"></script>
     <script>
-        $(document).ready(function() {
+        const askForPermision = () => {
+            Notification.requestPermission().then((permission) => {
+                if (permission !== "granted") {
+                    const browser = navigator.userAgent.toLowerCase();
 
+                    if (browser.indexOf('chrome') > -1) {
+                        window.location.href = 'https://support.google.com/chrome/answer/3220216?co=GENIE.Platform%3DDesktop&hl=pl';
+                    } else if (browser.indexOf('firefox') > -1) {
+                        window.location.href = 'https://support.mozilla.org/pl/kb/powiadomienia-web-push-firefox';
+                    } else if (browser.indexOf('safari') > -1) {
+                        window.location.href = 'https://support.apple.com/pl-pl/guide/safari/sfri40734/mac';
+                    } else if (browser.indexOf('opera') > -1) {
+                        window.location.href = 'https://help.opera.com/pl/latest/web-preferences/';
+                    } else if (browser.indexOf('edge') > -1) {
+                        window.location.href = 'https://support.microsoft.com/pl-pl/microsoft-edge/zarz%C4%85dzanie-powiadomieniami-witryn-internetowych-w-przegl%C4%85darce-microsoft-edge-0c555609-5bf2-479d-a59d-fb30a0b80b2b';
+                    } else {
+                        alert('Nie udało się wykryć przeglądarki');
+                    }
+
+                    return false;
+                }
+
+                document.querySelector('#bell-icon').src = '/svg/bell-icon.svg';
+                document.querySelector('#bell-icon').addEventListener('click', () => {
+                    alert('Powiadomienia są włączone');
+                });
+            });
+        }
+
+        Notification.requestPermission().then((permission) => {
+            if (permission !== "granted") {
+                const bellIcon = document.getElementById('bell-icon');
+                bellIcon.addEventListener('click', () => {
+                    askForPermision();
+                });
+
+                bellIcon.src = '/svg/bell-red-icon.svg';
+
+                alert('Prosimy o włączenie powiadomień w przeglądarce');
+                alert('Kliknij w inkonę dzwonka, aby dowiedzieć się więcej');
+
+                return false;
+            }
+
+            document.querySelector('#bell-icon').addEventListener('click', () => {
+                alert('Powiadomienia są włączone');
+            });
+        });
+
+        $(document).ready(function() {
             $('#new-message').removeClass('loader-2');
 
             const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}';
-            
+
             let usersHistoryFilter = new Set();
             let selectedArea = 0;
 
@@ -170,7 +219,7 @@
             }
 
             const filterMessages = () => {
-                
+
                 if(!isConsultant) return false;
 
                 $('.message-row').each(function() {
@@ -193,7 +242,7 @@
 
             getAllUsers();
             filterMessages();
-            
+
             $('#area').change(function() {
                 selectedArea = $(this).val();
                 filterMessages();
@@ -222,7 +271,7 @@
                 $('#message').val('');
 
                 const url = $(e.target).data('action');
-                
+
                 const area = $('#area').val() || 0;
                 const attachmentInput = $('#attachment')[0];
                 const formData = new FormData();
@@ -272,10 +321,15 @@
                             refreshRate = 1;
                             if(data.messages != '' && document.hidden) {
                                 blinkTitle({
-                                  title: "CZAT MEGA 1000",
-                                  message: "!!! NOWA WIADOMOŚĆ !!!",
-                                  delay: 900,
-                                  notifyOffPage: true
+                                    title: "CZAT MEGA 1000",
+                                    message: "!!! NOWA WIADOMOŚĆ !!!",
+                                    delay: 900,
+                                    notifyOffPage: true
+                                });
+
+                                const notification = new Notification("!!! NOWA WIADOMOŚĆ !!!", {
+                                    body: "CZAT MEGA 1000",
+                                    icon: "{{ asset('images/logo.png') }}"
                                 });
                             }
                             $('.chat-panel').append(data.messages);
