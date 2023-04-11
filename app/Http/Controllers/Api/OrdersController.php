@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Domains\DelivererPackageImport\Exceptions\OrderNotFoundException;
 use App\Entities\Country;
+use App\Entities\Customer;
 use App\Entities\FirmSource;
 use App\Entities\Label;
 use App\Entities\Order;
@@ -52,6 +53,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Facades\Mailer;
@@ -175,51 +177,76 @@ class OrdersController extends Controller
         throw new Exception("Method deprecated");
     }
 
-    public function newOrder(StoreOrderRequest $request, ProductService $productService)
+    /**
+     * Create or update order
+     *
+     * @param StoreOrderRequest $request
+     * @param ProductService $productService
+     * @return JsonResponse
+     * @throws Throwable
+     */
+    public function newOrder(StoreOrderRequest $request, ProductService $productService): JsonResponse
     {
         $data = $request->all();
-        DB::beginTransaction();
-        $customer = auth()->guard('api')->user();
+        $customer = Customer::query()->where('login', $data['customer_login'])->first();
+
+        if ($data['customer_login'] && !$customer) {
+            $customer = Customer::query()->create([
+                'login' => $data['customer_login'],
+                'status' => 'ACTIVE',
+                'password' => Hash::make($data['phone']),
+            ]);
+        }
+
+        $customer = $customer ?? auth()->guard('api')->user();
 
         try {
-            $orderBuilder = new OrderBuilder();
-            $orderBuilder
+            DB::beginTransaction();
+
+            $orderBuilder = (new OrderBuilder())
                 ->setPackageGenerator(new BackPackPackageDivider())
                 ->setPriceCalculator(new OrderPriceCalculator())
                 ->setProductService($productService);
+
             if (empty($data['cart_token'])) {
-                $orderBuilder->setTotalTransportSumCalculator(new TransportSumCalculator())
+                $orderBuilder
+                    ->setTotalTransportSumCalculator(new TransportSumCalculator())
                     ->setUserSelector(new GetCustomerForNewOrder());
             } else {
                 $orderBuilder->setUserSelector(new GetCustomerForAdminEdit());
             }
+
             $builderData = $orderBuilder->newStore($data, $customer);
+
             DB::commit();
-            
-            $order = Order::find($builderData['id']);
-            $builderData['token'] = $order->getToken();
-            $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 2)->first();
-            $order->firm_source_id = $firmSource ? $firmSource->id : null;
+
+            $order = Order::query()->find($builderData['id']);
+            $order->firm_source_id = FirmSource::byFirmAndSource(env('FIRM_ID'), 2)->value('id');
             $order->save();
 
+            $builderData['token'] = $order->getToken();
             return response()->json($builderData);
         } catch (Exception $e) {
             DB::rollBack();
-            if (empty($this->error_code)) {
-                $this->error_code = $e->getMessage();
-            }
+
+            $this->error_code = $e->getMessage();
+
             $message = $this->errors[$this->error_code] ?? $e->getMessage();
+
             Log::error(
-                "Problem with create new order: [{$this->error_code}] $message" . '. Trace log: ' . $e->getTraceAsString(),
+                "Problem with creating a new order: [{$this->error_code}] $message" . '. Trace log: ' . $e->getTraceAsString(),
                 ['request' => $data, 'class' => $e->getFile(), 'line' => $e->getLine()]
             );
+
             $message = $this->errors[$this->error_code] ?? $this->defaultError;
-            return response(json_encode([
+
+            return response()->json([
                 'error_code' => $this->error_code,
                 'error_message' => $message
-            ]), $this->error_code ? 400 : 500);
+            ], $this->error_code ? 400 : 500);
         }
     }
+
 
     public function storeMessage(StoreOrderMessageRequest $request)
     {
