@@ -201,3 +201,5 @@
     from {transform:rotate(0deg);}
     to {transform:rotate(359deg);}
 }
+.fc-rows tr:nth-child(even) {background: #eee;}
+.fc-rows tr:nth-child(even) td {border: 1px solid #ddd;}

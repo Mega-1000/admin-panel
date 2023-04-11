@@ -2610,15 +2610,15 @@
                     }
                 }).done(function () {
                     if ($.inArray('47', ids) != -1) {
-                        $('#magazine').modal();
+                        //$('#magazine').modal();
                         $('input[name="order_id"]').val(orderId);
                         $('#selectWarehouse').val(16);
                         $('#warehouseSelect').attr('selected', true);
                         $('#selectWarehouse').click();
                     }
                     refreshDtOrReload();
-
-                    renderCalendar();
+                    window.open('/admin/planning/timetable', '_blank');
+                    //renderCalendar();
                 })
                     .fail((error) => {
                         if (error.responseText === 'warehouse not found') {
@@ -2664,11 +2664,15 @@
                 $('.warehouse-template').remove();
 
                 let warehouseTemplate = `
+                <div class="error" style="display: none">
+                    <div class="alert alert-danger" role="alert">
+                    </div>
+                </div>
                 <div class="warehouse-template">
                 <p>Magazyn nie został przypisany, przypisz magazyn przed wysłaniem</p>
                 <div class="form-group" style="width: 15%; padding: 5px;">
-                    <label for="delivery_warehouse2">Magazyn</label>
-                    <input type="text" class="form-control" id="delivery_warehouse2" name="delivery_warehouse2" value="${warehouse}">
+                    <label for="delivery_warehouse2">Magazyn obsługujący</label>
+                    <input type="text" class="form-control" id="delivery_warehouse2" name="delivery_warehouse2" value="${warehouse}" readonly>
                 </div><br>
                 </div>`;
 
@@ -2712,8 +2716,7 @@
                     data.forEach(function (item) {
                         input.append($('<option>', {
                             value: item.id,
-                            text: item.name,
-                            selected: true
+                            text: item.name
                         }));
                     });
                     $('#manual_label_selection_to_add_modal').modal('show');
@@ -2721,8 +2724,20 @@
                     if (labelId == 45) showSelectWarehouseTemplate(modal, orderId);
 
                     modal.find("#labels_to_add_after_removal_modal_ok").off().on('click', function () {
-                        let ids = input.val();
+                        let ids = [];
+                        ids.push(input.val());
+                        if(modal.find("#delivery_warehouse2").val() == ''){
+                            modal.find(".error").show();
+                            modal.find(".error .alert").text('Wybierz magazyn');
+                            return false;
+                        }
+                        if(!ids){
+                            modal.find(".error").show();
+                            modal.find(".error .alert").text('Wybierz przynajmniej jeden etykietę');
+                            return false;
+                        }
                         removeMultiLabel(orderId, labelId, ids);
+                        modal.modal('hide');
                     });
                 });
             } else {
