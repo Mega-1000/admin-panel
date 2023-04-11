@@ -60,8 +60,14 @@ return [
     */
 
     'url' => env('APP_URL', 'http://localhost'),
+    
+    'front_url' => env('FRONT_URL', '/'),
+    
+    'front_nuxt_url' => env('FRONT_NUXT_URL', '/'),
 
     'asset_url' => env('ASSET_URL', null),
+
+    'chat_name' => env('CHAT_NAME', 'CZAT MEGA 1000'),
 
     /*
     |--------------------------------------------------------------------------

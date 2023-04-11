@@ -53,14 +53,14 @@ class AllegroOrderService extends AllegroApiService
         }
     }
 
-    public function sendNewOrderMessageToClient($orderId): void
+    public function sendNewOrderMessageToClient(string $orderId): void
     {
-        $orderModel = AllegroOrder::where('order_id', '=', $orderId)->first();
-        $orderModel->new_order_message_sent = true;
-        $orderModel->save();
+        $orderAllegro = AllegroOrder::where('order_id', '=', $orderId)->first();
+        $orderAllegro->new_order_message_sent = true;
+        $orderAllegro->save();
 
         Mailer::create()
-            ->to($orderModel->buyer_email)
+            ->to($orderAllegro->buyer_email)
             ->send(new AllegroNewOrderEmail());
     }
 

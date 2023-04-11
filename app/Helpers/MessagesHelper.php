@@ -53,6 +53,7 @@ class MessagesHelper
     const MESSAGE_RED_LABEL_ID = 55;
     const MESSAGE_BLUE_LABEL_ID = 56;
     const MESSAGE_YELLOW_LABEL_ID = 57;
+    const MESSAGE_GREEN_LABEL_ID = 58;
 
     public function __construct($token = null)
     {
@@ -238,12 +239,9 @@ class MessagesHelper
 
         $chat->product_id = $this->productId ?: null;
 
-        if($chat->product_id === null && $chat->order_id === null) {
-            $chat->need_intervention = true;
-        }
-
         $this->cache['chat'] = $chat;
         $chat->save();
+
         if (!empty($this->users[self::TYPE_CUSTOMER])) {
             $customer = Customer::find($this->users[self::TYPE_CUSTOMER]);
             if (!$customer) {
@@ -265,6 +263,7 @@ class MessagesHelper
             }
             $chat->users()->attach($user);
         }
+
         $this->cache['chat'] = $chat;
         $this->chatId = $chat->id;
         return $chat;
@@ -292,9 +291,9 @@ class MessagesHelper
      * @param string $area
      * @param UploadedFile $file
      *
-     * @return void
+     * @return Message
      */
-    public function addMessage(string $message, int $area = UserRole::Main, UploadedFile $file = null): void
+    public function addMessage(string $message, int $area = UserRole::Main, UploadedFile $file = null): Message
     {
         $chat = $this->getChat();
         $chatUser = $this->getCurrentChatUser();
@@ -328,8 +327,8 @@ class MessagesHelper
             $noticeValidator = Validator::make($noticeRequest->all(), $noticeRequest->rules());
             $noticeRequest->setValidator($noticeValidator);
 
-            $order = app(OrdersController::class);
-            $order->updateNotices($noticeRequest);
+            $orderController = app(OrdersController::class);
+            $orderController->updateNotices($noticeRequest);
         }
         if ($file) {
             $originalFileName = $file->getClientOriginalName();
@@ -382,13 +381,18 @@ class MessagesHelper
                     Auth::user()->id
                 );
             }
-        }
-        if( isset($chat->order->id) ) {
             WorkingEvents::createEvent(WorkingEvents::CHAT_MESSAGE_ADD_EVENT, $chat->order->id);
+
+            if($this->currentUserType == self::TYPE_CUSTOMER) {
+                $chat->order->need_support = true;
+                $chat->order->save();
+            }
+        }
+        if (!$chat->order && !$chat->product && $this->currentUserType == self::TYPE_CUSTOMER) {
+            $chat->need_intervention = true;
+            $chat->save();
         }
 
-        //\App\Jobs\ChatNotificationJob::dispatch($chat->id)->delay(now()->addSeconds(self::NOTIFICATION_TIME + 5));
-        // @TODO this should use queue, but at this point (08.05.2021) queue is bugged
         $email = null;
 
         if ($this->getCurrentChatUser()->customer_id) {
@@ -398,6 +402,8 @@ class MessagesHelper
         }
 
         (new ChatNotificationJob($chat->id, $email, $this->getCurrentChatUser()->id))->handle();
+
+        return $msg;
     }
 
     private function getAdminChatUser($secondTry = false)

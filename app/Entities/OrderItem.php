@@ -2,6 +2,7 @@
 
 namespace App\Entities;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Prettus\Repository\Contracts\Transformable;
@@ -52,34 +53,31 @@ class OrderItem extends Model implements Transformable
         'product_stock_packet_id',
     ];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class)->withTrashed();
     }
 
-    public function realProduct()
+    public function packet(): BelongsTo
+    {
+        return $this->belongsTo(ProductStockPacket::class, 'product_stock_packet_id');
+    }
+
+    public function realProduct(): int
     {
         return $this->product->stock->quantity;
     }
 
-    public function realProductPositions()
+    /**
+     * @return ?Collection<ProductStockPosition>
+     */
+    public function realProductPositions(): ?Collection
     {
-        return $this->product->stock->position;
-    }
-
-    public function packet(): BelongsTo
-    {
-        return $this->belongsTo(ProductStockPacket::class, 'product_stock_packet_id');
+        return $this->product?->stock?->position ?? new Collection();
     }
 }

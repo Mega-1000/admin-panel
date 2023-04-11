@@ -80,7 +80,7 @@ class MessagesController extends Controller {
     }
 
     public function show($token) {
-        if(config('env') == 'production') {
+        if(config('app.env') == 'production') {
             Debugbar::disable();
         }
         try {
@@ -178,6 +178,7 @@ class MessagesController extends Controller {
             'title'                   => $helper->getTitle(true),
             'route'                   => route('api.messages.post-new-message', ['token' => $token]),
             'routeAddUser'            => route('api.messages.add-new-user', ['token' => $token]),
+            'routeCloseChatByClient'  => route('api.messages.closeChatByClient', ['token' => $token]),
             'routeRemoveUser'         => route('api.messages.remove-user', ['token' => $token]),
             'routeRefresh'            => route('api.messages.get-messages', ['token' => $token]),
             'routeAskForIntervention' => route('api.messages.ask-for-intervention', ['token' => $token]),

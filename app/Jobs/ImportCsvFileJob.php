@@ -189,7 +189,7 @@ class ImportCsvFileJob implements ShouldQueue
         /** @var ?Category $existingCategory */
         $existingCategory = Category::query()->where('name', end($categoryTree))->first();
 
-        $image = $existingCategory?->save_image ? $line[303] : $existingCategory?->img ?? 'https://via.placeholder.com/300';
+        $image = $existingCategory?->save_image === false ? $existingCategory?->img : $line[303] ?? 'https://via.placeholder.com/300';
         if (strpos($image, "\\")) {
             $image = $this->getUrl($image);
         }
@@ -204,7 +204,7 @@ class ImportCsvFileJob implements ShouldQueue
             'priority' => $this->getProductsOrder($line, $categoryColumn),
             'save_name' => $existingCategory?->save_name ?? true,
             'save_description' => $existingCategory?->save_description ?? true,
-            'save_image' => $existingCategory?->save_description ?? true,
+            'save_image' => $existingCategory?->save_image ?? true,
             'parent_id' => $parent['id'],
         ]);
 

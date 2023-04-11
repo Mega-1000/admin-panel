@@ -15,13 +15,13 @@ class AllegroChatInitializer {
             if(this.tabActive) {
                 this.checkUnreadedThreadsAndMsgs();
             }
-        }, 30000);
+        }, 15000);
 
         this.initListeners();
     }
     
     initListeners() {
-        if(this.mode === 'orders') {
+        if(this.mode === 'contactChats' || this.mode === 'disputes') {
             this.iconWrapper.on('click', () => this.viewOrderChat());
         } else {
             this.iconWrapper.on('click', () => this.bookThread());
@@ -31,25 +31,48 @@ class AllegroChatInitializer {
         $(window).on('blur', () => this.tabActive = false);
     }
 
-    async viewOrderChat() {
+    handleMsgsCounter() {
+        const numberOfUnreadedMsgs = this.unreadedThreads?.length || 0;
 
-        this.iconWrapper.addClass('loader-2');
+        numberOfUnreadedMsgs > 0 ? this.iconCounter.removeClass('hidden') : this.iconCounter.addClass('hidden');
+
+        const prevCounter = parseInt( this.iconCounter.text() );
+        const shouldFlash = numberOfUnreadedMsgs > prevCounter;
+
+        this.iconCounter.text(numberOfUnreadedMsgs);
+
+        if(shouldFlash) {
+            this.iconWrapper.addClass('jello-horizontal');
+        } else {
+            this.iconWrapper.removeClass('jello-horizontal');
+        }
+    }
+
+    async viewOrderChat() {
 
         if(this.unreadedThreads.length < 1) {
             toastr.error('Brak zamówień wymagających pomocy');
-            this.iconWrapper.removeClass('loader-2');
-
             return false;
         }
-        
 
-        const id = this.unreadedThreads[0].id;
-        const type = this.unreadedThreads[0].hasOwnProperty('need_intervention') ? 'chat' : 'order';
-        const url = `${this.ajaxPath}${this.paths.resolveChatIntervention}/${type}/${id}`;
+        this.iconWrapper.addClass('loader-2');
+
+        const thread = this.unreadedThreads.shift();
+        this.handleMsgsCounter();
+
+        const id = this.mode === 'disputes' ? thread.order.id : thread.id;
+        const url = `${this.ajaxPath}${this.paths.resolveChat}/${id}`;
         
         const res = await ajaxPost({}, url);
         toastr.success('Trwa ładowanie się czatu');
-        window.location.href = `/chat/${res.chatUserToken}`;
+        window.open(`/chat/${res.chatUserToken}`, 'chat_' + id);
+        
+        if(this.mode === 'disputes') {
+            const customerId = thread.order.customer_id;
+            window.open(this.ajaxPath + 'orders?customer_id=' + customerId, 'orders_' + customerId);
+        }
+        
+        this.iconWrapper.removeClass('loader-2');
     }
 
     async checkUnreadedThreadsAndMsgs() {
@@ -64,11 +87,8 @@ class AllegroChatInitializer {
 
         // unreaded threads
         this.unreadedThreads = res.unreadedThreads;
-        const numberOfUnreadedMsgs = this.unreadedThreads?.length || 0;
 
-        numberOfUnreadedMsgs > 0 ? this.iconCounter.removeClass('hidden') : this.iconCounter.addClass('hidden');
-
-        this.iconCounter.text(numberOfUnreadedMsgs);
+        this.handleMsgsCounter();
 
         // are new msgs
         if(res.areNewMessages) {
@@ -111,17 +131,6 @@ class AllegroChatInitializer {
         if(isChatWindow) {
             this.openOrders(threadId, nickname);
         }
-    }
-    
-    openDisputedOrder(orderId, disputeId) {
-        window.open(
-          `${this.ajaxPath}orders/${orderId}/edit`,
-          '_blank'
-        );
-        window.open(
-          `${this.ajaxPath}disputes/view/${disputeId}`,
-          '_blank'
-        );
     }
     
     openOrders(threadId, nickname) {

@@ -2666,10 +2666,14 @@
                 area: $('#area').val(),
             };
 
-            await ajaxPost(data, url);
-            $('.chat-preview').removeClass('loader-2');
+            const res = await ajaxPost(data, url);
 
-            window.location.reload();
+            if(res) {
+                $('.chat-panel').append(res);
+                scrollBottom();
+            }
+            $('#quick_msg_content').val('');
+            $('.chat-preview').removeClass('loader-2');
         });
 
         $(() => $(document).tooltip());
@@ -4853,7 +4857,31 @@
         $('#usePackageButton').on('click', () => {
             let assignPacketUrl = '/admin/orders/' + {{ $order->id}} + '/packet/' + $('#packetList').val() + '/use';
             window.location.href = assignPacketUrl;
-        })
+        });
+
+        let selectedArea = 0;
+
+        const scrollBottom = () => {
+            $('.panel-default').animate({
+                scrollTop: $('.chat-panel').height()
+            });
+        }
+
+        const filterMessages = () => {
+            $('.message-row').each(function() {
+                const area = String($(this).data('area'));
+
+                selectedArea == area ? $(this).show() : $(this).hide();
+            });
+            scrollBottom();
+        }
+
+        filterMessages();
+
+        $('#area').change(function() {
+            selectedArea = $(this).val();
+            filterMessages();
+        });
     </script>
 
     <script src="{{ URL::asset('js/views/orders/edit.js') }}"></script>

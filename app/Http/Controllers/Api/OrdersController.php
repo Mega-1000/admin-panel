@@ -27,6 +27,8 @@ use App\Http\Requests\Api\Orders\DeclineProformRequest;
 use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
 use App\Http\Requests\Api\Orders\StoreOrderRequest;
 use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
+use App\Http\Requests\scheduleOrderReminderRequest;
+use App\Jobs\SendReminderAboutOfferJob;
 use App\Mail\SendOfferToCustomerMail;
 use App\Repositories\CustomerAddressRepository;
 use App\Repositories\CustomerRepository;
@@ -44,6 +46,7 @@ use App\Services\OrderPackageService;
 use App\Services\ProductService;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
@@ -179,6 +182,8 @@ class OrdersController extends Controller
     {
         $data = $request->all();
         DB::beginTransaction();
+        $customer = auth()->guard('api')->user();
+
         try {
             $orderBuilder = new OrderBuilder();
             $orderBuilder
@@ -191,9 +196,9 @@ class OrdersController extends Controller
             } else {
                 $orderBuilder->setUserSelector(new GetCustomerForAdminEdit());
             }
-            $builderData = $orderBuilder->newStore($data);
+            $builderData = $orderBuilder->newStore($data, $customer);
             DB::commit();
-            
+
             $order = Order::find($builderData['id']);
             $builderData['token'] = $order->getToken();
             $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 2)->first();
@@ -280,9 +285,9 @@ class OrdersController extends Controller
 
     public function getMessages($frontDbOrderId)
     {
-        $order = $this->orderRepository->findWhere(['id_from_front_db' => $frontDbOrderId])->first();
+        $order = Order::where('id_from_front_db', $frontDbOrderId)->first();
 
-        if (empty($order)) {
+        if ($order === null) {
             return $this->notFoundResponse("Couldn't find requested Order");
         }
 
@@ -976,5 +981,50 @@ class OrdersController extends Controller
 
         return response()->json($invoiceInfos, 200, [], JSON_UNESCAPED_UNICODE);
 
+    }
+
+    /**
+     * @param Order $order
+     *
+     * @return JsonResponse|Response
+     */
+    public function moveToUnactive(Order $order): Response | JsonResponse
+    {
+        try {
+            $order->labels()->detach(224);
+            $order->labels()->attach(225);
+        } catch (Throwable $exception) {
+            return response(json_encode([
+                'status' => false,
+                'error_code' => 500,
+                'error_message' => $exception->getMessage()
+            ]), 500);
+        }
+        return response()->json($order, 200, [], JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * @param Order $order
+     * @param ScheduleOrderReminderRequest $request
+     *
+     * @return JsonResponse|Response
+     */
+    public function scheduleOrderReminder(Order $order, Request $request): Response | JsonResponse
+    {
+        $data = $request->all();
+
+        Order::query()->update([
+            'reminder_date' => $data['dateTime']
+        ]);
+
+        $date = Carbon::createFromFormat('Y-m-d H:i', $data['dateTime']);
+
+        SendReminderAboutOfferJob::dispatch($order)->delay($date);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Przypomnienie zostało zaplanowane',
+            'date' => $date->format('Y-m-d H:i')
+        ], 200, [], JSON_UNESCAPED_UNICODE);
     }
 }

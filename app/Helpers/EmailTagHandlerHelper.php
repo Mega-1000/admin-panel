@@ -8,6 +8,7 @@
 namespace App\Helpers;
 
 use App\Entities\Order;
+use App\Entities\Tag;
 
 class EmailTagHandlerHelper
 {
@@ -318,11 +319,56 @@ class EmailTagHandlerHelper
 
 	//[LINK-DO-FORMULARZA-ADRESU]
 	public function addressFormLink() {
-		return rtrim(env('FRONT_NUXT_URL'),"/") . "/zamowienie/mozliwe-do-realizacji/brak-danych/{$this->order->id}";
+		return rtrim(config('app.front_nuxt_url') . "/zamowienie/mozliwe-do-realizacji/brak-danych/{$this->order->id}");
 	}
 
 	//[LINK-DO-FORMULARZA-NIEZGODNOSCI]
 	public function declineProformFormLink() {
-		return rtrim(env('FRONT_NUXT_URL'),"/") . "/zamowienie/niezgodnosc-w-proformie/{$this->order->id}";
+		return rtrim(config('app.front_nuxt_url') . "/zamowienie/niezgodnosc-w-proformie/{$this->order->id}");
+	}
+
+	/**
+     * [FAQ-LINK]
+     * Insert FAQ link with encoded user credentials
+     *
+     * @return string $template
+     */
+	public function faqLink(): string {
+        $deliveryAddress = $this->order->customer->deliveryAddress();
+
+        if($deliveryAddress === null) return '';
+
+        $base64Email = base64_encode($deliveryAddress->email);
+        $base64Phone = base64_encode($deliveryAddress->phone);
+
+        // Jeżeli masz pytania zapoznaj się z naszym FAQ:<br>
+        $template = config('app.front_url') . "/faq?phone=$base64Email&email=$base64Phone&showFaq=true";
+
+		return $template;
+	}
+
+    /**
+     * Parse existing tags from message using tags handlers
+     *
+     * @param  Order  $order
+     * @param  string $message
+     *
+     * @return string $message
+     */
+	public function parseTags(Order $order, string $message): string {
+        
+        $this->order = $order;
+        $matchedTagsCount = preg_match_all('/\[.*\]/', $message, $matchedTags);
+        if( $matchedTagsCount < 1 ) return $message;
+
+        $tags = Tag::whereIn('name', $matchedTags[0])->get();
+
+        foreach ($tags as $tag) {
+            if(method_exists($this, $tag->handler)) {
+                $tagResult = call_user_func([$this, $tag->handler]);
+                $message   = str_replace( $tag->name, $tagResult, $message);
+            }
+        }
+        return $message;
 	}
 }

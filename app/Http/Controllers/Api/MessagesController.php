@@ -20,11 +20,12 @@ use App\Http\Requests\Messages\PostMessageRequest;
 use App\Http\Requests\Messages\GetMessagesRequest;
 use App\Http\Requests\Api\Orders\ChatRequest;
 use Illuminate\Http\JsonResponse;
-use App\Helpers\GetCustomerForNewOrder;
+use App\Repositories\Chats;
+use App\Services\Label\AddLabelService;
 
 class MessagesController extends Controller
 {
-    public function postNewMessage(PostMessageRequest $request, $token)
+    public function postNewMessage(PostMessageRequest $request, string $token)
     {
         try {
             $helper = new MessagesHelper($token);
@@ -37,9 +38,14 @@ class MessagesController extends Controller
             }
             $data = $request->validated();
             $file = $data['file'] ?? null;
-            $helper->addMessage($data['message'], $data['area'], $file);
+            $message = $helper->addMessage($data['message'], $data['area'], $file);
             $helper->setLastRead();
-            return response('ok');
+
+            $msgTemplate = view('chat/single_message')->with([
+                'message' => $message,
+            ])->render();
+
+            return response($msgTemplate);
         } catch (ChatException $e) {
             $e->log();
             return response($e->getMessage(), 400);
@@ -239,16 +245,32 @@ class MessagesController extends Controller
      *
      * @return JsonResponse
      */
-    public function createContactChat(ChatRequest $request): JsonResponse
+    public function createContactChat(Request $request): JsonResponse
     {
-        $data = $request->validated();
+        $data = $request->input('questionsTree');
+        $customer = $request->user();
 
         try {
             $helper = new MessagesHelper();
-            $customerForNewOrder = new GetCustomerForNewOrder();
-            $customer = $customerForNewOrder->getCustomer(null, $data);
+            // get customer chats
+            $customerChatIds = Chats::getCustomerChats($customer->id);
+            $chat = null;
+
+            if($customerChatIds->isNotEmpty()) {
+                // get contact chat for this customer, then add chat id to helper
+                $contactChat = Chats::getContactChat($customerChatIds);
+                if($contactChat !== null) {
+                    $helper->chatId = $contactChat->id;
+                    $chat = $contactChat;
+                }
+            }
             $chatUserToken = $helper->getChatToken(null, $customer->id, MessagesHelper::TYPE_CUSTOMER);
-            $helper->createNewChat();
+
+            if($chat === null) {
+                $chat = $helper->createNewChat();
+            }
+            $chat->need_intervention = true;
+            $chat->save();
 
             return response()->json([
                 'chatUserToken' => $chatUserToken,
@@ -260,6 +282,29 @@ class MessagesController extends Controller
         return response()->json([
             'error' => 'Problem z utworzeniem nowego czatu dla klienta',
         ]);
+    }
+    
+    /**
+     * Close chat by client
+     *
+     * @param  string $token
+     *
+     * @return void
+     */
+    public function closeChatByClient(string $token): void
+    {
+        $helper = new MessagesHelper($token);
+        $chat = $helper->getChat();
+        $order = $helper->getOrder();
+        if ($chat === null || $order === null) {
+            throw new ChatException('Nieprawidłowy token chatu');
+        }
+        $user = $helper->getCurrentUser();
+        // only client can close chat by unload
+        if (is_a($user, Customer::class)) {
+            $loopPreventionArray = [];
+            AddLabelService::addLabels($order, [$helper::MESSAGE_GREEN_LABEL_ID], $loopPreventionArray, [], $user->id);
+        }
     }
 
     public function getHistory(Request $request)

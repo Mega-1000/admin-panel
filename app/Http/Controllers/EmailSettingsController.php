@@ -7,6 +7,7 @@ use App\Enums\EmailSettingsEnum;
 use App\Http\Requests\EmailSettingsCreateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\View\View;
+use App\Entities\Tag;
 
 class EmailSettingsController extends Controller
 {
@@ -31,7 +32,9 @@ class EmailSettingsController extends Controller
         $status['PICKED_UP'] = EmailSettingsEnum::STATUS_PICKED_UP;
         $status['PROVIDED'] = EmailSettingsEnum::STATUS_PROVIDED;
 
-        return view('email_module.create', compact('status'));
+        $tags = Tag::all();
+
+        return view('email_module.create', compact('status', 'tags'));
     }
 
     /**
@@ -63,7 +66,9 @@ class EmailSettingsController extends Controller
         $status['PICKED_UP'] = EmailSettingsEnum::STATUS_PICKED_UP;
         $status['PROVIDED'] = EmailSettingsEnum::STATUS_PROVIDED;
 
-        return view('email_module.edit', compact('emailSetting', 'status'));
+        $tags = Tag::all();
+
+        return view('email_module.edit', compact('emailSetting', 'status', 'tags'));
     }
 
     /**

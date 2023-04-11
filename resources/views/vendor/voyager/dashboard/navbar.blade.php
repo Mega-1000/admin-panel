@@ -33,17 +33,19 @@
                 </ol>
             @show
         </div>
-        <div class="chat-icon-wrapper need-support-icon-wrapper">
-            <span class="icon voyager-info-circled"></span>
-            <strong class="chat-icon-wrapper-counter need-support-icon-counter hidden">0</strong>
-        </div>
-        <div class="chat-icon-wrapper allegro-dispute-icon-wrapper">
-            <span class="icon voyager-bell"></span>
-            <strong class="chat-icon-wrapper-counter allegro-dispute-icon-counter hidden">0</strong>
-        </div>
-        <div class="chat-icon-wrapper allegro-chat-icon-wrapper">
-            <span class="icon voyager-chat"></span>
-            <strong class="chat-icon-wrapper-counter allegro-chat-icon-counter hidden">0</strong>
+        <div class="icon-navbar-wrapper">
+            <div class="chat-icon-wrapper need-support-icon-wrapper">
+                <span class="icon voyager-info-circled"></span>
+                <strong class="chat-icon-wrapper-counter need-support-icon-counter hidden">0</strong>
+            </div>
+            <div class="chat-icon-wrapper allegro-dispute-icon-wrapper">
+                <span class="icon voyager-bell"></span>
+                <strong class="chat-icon-wrapper-counter allegro-dispute-icon-counter hidden">0</strong>
+            </div>
+            <div class="chat-icon-wrapper allegro-chat-icon-wrapper">
+                <span class="icon voyager-chat"></span>
+                <strong class="chat-icon-wrapper-counter allegro-chat-icon-counter hidden">0</strong>
+            </div>
         </div>
         <ul class="nav navbar-nav @if (__('voyager::generic.is_rtl') == 'true') navbar-left @else navbar-right @endif">
             <li class="dropdown profile">

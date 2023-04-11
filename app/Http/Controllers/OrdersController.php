@@ -104,6 +104,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Yajra\DataTables\Facades\DataTables;
 use function response;
 use App\Entities\Chat;
+use App\Repositories\Chats;
 
 /**
  * Class OrderController.
@@ -384,8 +385,9 @@ class OrdersController extends Controller
         $templateData = PackageTemplate::orderBy('list_order', 'asc')->get();
         $deliverers = Deliverer::all();
         $couriersTasks = $this->taskService->groupTaskByShipmentDate();
+        $customerId = $request->get('customer_id');
 
-        return view('orders.index', compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses', 'allWarehousesString'))
+        return view('orders.index', compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses', 'customerId', 'allWarehousesString'))
             ->withOuts($out)
             ->withLabIds($labIds)
             ->withLabels($labels)
@@ -544,12 +546,7 @@ class OrdersController extends Controller
         $chat = $helper->getChat();
         // last five msg from area 0
 
-        $chatMessages = [];
-        if (isset($chat) && count($chat->messages) > 0) {
-            $chatMessages = $chat->messages->filter(function ($msg) {
-                return $msg->area == 0;
-            })->slice(-5);
-        }
+        $chatMessages = $chat?->messages;
 
         $userType = MessagesHelper::TYPE_USER;
 
@@ -2371,6 +2368,10 @@ class OrdersController extends Controller
             }
         }
 
+        if( !empty($data['customerId']) ) {
+            $query->where('orders.customer_id', $data['customerId']);
+        }
+
         //$query->whereRaw('COALESCE(last_status_update_date, orders.created_at) < DATE_ADD(NOW(), INTERVAL -30 DAY)');
 
         $count = $query->count();
@@ -3387,32 +3388,45 @@ class OrdersController extends Controller
     }
 
     /**
-     * Get Current User Chat Token for given chat ID or order ID
+     * Get Current User Chat Token for given order
      *
-     * @param string $type - order | chat
-     * @param int    $id - order or chat id
+     * @param Order $order
      *
      * @return JsonResponse
      */
-    public function resolveChatIntervention(string $type, int $id): JsonResponse
+    public function resolveOrderDispute(Order $order): JsonResponse
     {
 
-        $helper = new MessagesHelper();
+        $helper        = new MessagesHelper();
+        $userId        = Auth::user()?->id;
+        $chatUserToken = $helper->getChatToken($order->id, $userId);
 
-        $userId = Auth::user()?->id;
-        if($type === 'chat') {
-            $chatUserToken = $helper->getChatToken(null, $userId);
-            
-            Chat::where('id', $id)->update([
-                'need_intervention' => false
-            ]);
-        } else if($type === 'order') {
-            $chatUserToken = $helper->getChatToken($id, $userId);
+        $order->need_support = false;
+        $order->save();
 
-            Order::where('id', $id)->update([
-                'need_support' => false
-            ]);
-        }
+        $response = [
+            'chatUserToken' => $chatUserToken,
+        ];
+
+        return response()->json($response);
+    }
+
+    /**
+     * Get Current User Chat Token for given chat
+     *
+     * @param Chat $chat
+     *
+     * @return JsonResponse
+     */
+    public function resolveChatIntervention(Chat $chat): JsonResponse
+    {
+
+        $helper        = new MessagesHelper();
+        $userId        = Auth::user()?->id;
+        $chatUserToken = $helper->getChatToken(null, $userId);
+        
+        $chat->need_intervention = false;
+        $chat->save();
 
         $response = [
             'chatUserToken' => $chatUserToken,
@@ -3426,14 +3440,32 @@ class OrdersController extends Controller
      *
      * @return JsonResponse
      */
-    public function getChatNeededSupport(): JsonResponse
+    public function checkChatsNeedIntervention(): JsonResponse
     {
-        $ordersNeededSupport = Order::where('need_support', true)->get()->toArray();
-        $customersNeededSupport = Chat::where('need_intervention', true)->whereNull('product_id')->whereNull('order_id')->get()->toArray();
-        $unreadedChats = array_merge($ordersNeededSupport, $customersNeededSupport);
+        $userId = auth()->user()->id;
+
+        $chatsNeedIntervention = Chats::getChatsNeedIntervention($userId);
 
         $response = [
-            'unreadedThreads' => $unreadedChats,
+            'unreadedThreads' => $chatsNeedIntervention,
+        ];
+
+        return response()->json($response);
+    }
+
+    /**
+     * Get orders / chats that marked as needed support / intervention for ex. for new customers orders / or contact chats
+     *
+     * @return JsonResponse
+     */
+    public function getChatDisputes(): JsonResponse
+    {
+        $userId = auth()->user()->id;
+
+        $ordersNeedSupport = Chats::getChatOrdersNeedSupport($userId);
+
+        $response = [
+            'unreadedThreads' => $ordersNeedSupport,
         ];
 
         return response()->json($response);
