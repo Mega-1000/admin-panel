@@ -28,6 +28,8 @@ use App\Http\Requests\Api\Orders\DeclineProformRequest;
 use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
 use App\Http\Requests\Api\Orders\StoreOrderRequest;
 use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
+use App\Http\Requests\ScheduleOrderReminderRequest;
+use App\Jobs\SendReminderAboutOfferJob;
 use App\Mail\SendOfferToCustomerMail;
 use App\Repositories\CustomerAddressRepository;
 use App\Repositories\CustomerRepository;
@@ -1005,5 +1007,50 @@ class OrdersController extends Controller
 
         return response()->json($invoiceInfos, 200, [], JSON_UNESCAPED_UNICODE);
 
+    }
+
+    /**
+     * @param Order $order
+     *
+     * @return JsonResponse|Response
+     */
+    public function moveToUnactive(Order $order): Response | JsonResponse
+    {
+        try {
+            $order->labels()->detach(224);
+            $order->labels()->attach(225);
+        } catch (Throwable $exception) {
+            return response(json_encode([
+                'status' => false,
+                'error_code' => 500,
+                'error_message' => $exception->getMessage()
+            ]), 500);
+        }
+        return response()->json($order, 200, [], JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * @param Order $order
+     * @param ScheduleOrderReminderRequest $request
+     *
+     * @return JsonResponse|Response
+     */
+    public function scheduleOrderReminder(Order $order, ScheduleOrderReminderRequest $request): Response | JsonResponse
+    {
+        $data = $request->validated();
+
+        Order::query()->update([
+            'reminder_date' => $data['dateTime']
+        ]);
+
+        $date = Carbon::createFromFormat('Y-m-d H:i', $data['dateTime']);
+
+        SendReminderAboutOfferJob::dispatch($order)->delay($date);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Przypomnienie zostało zaplanowane',
+            'date' => $date->format('Y-m-d H:i')
+        ], 200, [], JSON_UNESCAPED_UNICODE);
     }
 }

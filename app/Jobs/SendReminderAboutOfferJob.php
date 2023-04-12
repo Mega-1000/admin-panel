@@ -33,7 +33,7 @@ class SendReminderAboutOfferJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $this->order->reminder_date = null;
         $this->order->save();

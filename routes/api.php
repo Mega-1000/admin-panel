@@ -14,8 +14,8 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::middleware('auth:api')->group(function () {
-    Route::prefix('api/customers')->name('api.customers.')->group(function () {
-        Route::get('/user', 'Api\CustomersController@show')->name('show');
+    Route::prefix('user')->name('api.customers.')->group(function () {
+        Route::get('/', 'Api\CustomersController@getDetails')->name('show');
         Route::post('change-password', 'Api\CustomersController@changePassword')->name('change-password');
         Route::put('update', 'Api\CustomersController@update')->name('update');
         Route::get('orders', 'Api\CustomersController@getOrders')->name('get-orders');
