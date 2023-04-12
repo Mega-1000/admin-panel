@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Entities\Order;
 use App\Facades\Mailer;
 use App\Mail\SendReminderAboutOffer;
+use App\Repositories\Orders;
 use Illuminate\Console\Command;
 
 class SendDailyReminders extends Command
@@ -30,9 +31,7 @@ class SendDailyReminders extends Command
      */
     public function handle()
     {
-        $orders = Order::whereHas('labels', function ($query) {
-            $query->where('label_id', 224);
-        })->get();
+        $orders = Orders::getOrdersWithoutReminderForLabel(224);
 
 
         foreach ($orders as $order) {
