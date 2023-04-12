@@ -1012,19 +1012,19 @@ class OrdersController extends Controller
     /**
      * @param Order $order
      *
-     * @return JsonResponse|Response
+     * @return JsonResponse
      */
-    public function moveToUnactive(Order $order): Response | JsonResponse
+    public function moveToUnactive(Order $order): JsonResponse
     {
         try {
             $order->labels()->detach(224);
             $order->labels()->attach(225);
         } catch (Throwable $exception) {
-            return response(json_encode([
+            return response()->json([
                 'status' => false,
                 'error_code' => 500,
                 'error_message' => $exception->getMessage()
-            ]), 500);
+            ], 500);
         }
         return response()->json($order, 200, [], JSON_UNESCAPED_UNICODE);
     }
@@ -1033,9 +1033,9 @@ class OrdersController extends Controller
      * @param Order $order
      * @param ScheduleOrderReminderRequest $request
      *
-     * @return JsonResponse|Response
+     * @return JsonResponse
      */
-    public function scheduleOrderReminder(Order $order, ScheduleOrderReminderRequest $request): Response | JsonResponse
+    public function scheduleOrderReminder(Order $order, ScheduleOrderReminderRequest $request): JsonResponse
     {
         $data = $request->validated();
 
