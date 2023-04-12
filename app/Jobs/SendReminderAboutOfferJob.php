@@ -16,6 +16,11 @@ class SendReminderAboutOfferJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * The order instance.
+     *
+     * @var Order
+     */
     public Order $order;
 
     /**

@@ -15,6 +15,11 @@ class SendReminderAboutOffer extends Mailable
 {
     use Queueable, SerializesModels;
 
+    /**
+     * The user instance.
+     *
+     * @var Customer
+     */
     public Customer $user;
 
     /**
