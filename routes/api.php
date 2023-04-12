@@ -14,18 +14,26 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::middleware('auth:api')->group(function () {
-    Route::get('/user', 'Api\CustomersController@getDetails')->name('api.customers.getdetails');
-    Route::get('orders/getAll', 'Api\OrdersController@getAll')->name('api.orders.getall');
-    Route::post('orders/uploadProofOfPayment', 'Api\OrdersController@uploadProofOfPayment')->name('api.orders.proof-of-payment');
-    Route::post('orders/update-order-address/{orderId}', 'Api\OrdersController@updateOrderAddressEndpoint')->name('api.orders.update-order-addresses');
-    Route::get('orders/get-payments-for-order/{token}', 'Api\OrdersController@getPaymentDetailsForOrder')->name('api.orders.getPayments');
+    Route::prefix('user')->name('api.customers.')->group(function () {
+        Route::get('/', 'Api\CustomersController@getDetails')->name('show');
+        Route::post('change-password', 'Api\CustomersController@changePassword')->name('change-password');
+        Route::put('update', 'Api\CustomersController@update')->name('update');
+        Route::get('orders', 'Api\CustomersController@getOrders')->name('get-orders');
+    });
+
+    Route::prefix('orders')->name('api.orders.')->group(function () {
+        Route::get('getAll', 'Api\OrdersController@getAll')->name('getall');
+        Route::post('uploadProofOfPayment', 'Api\OrdersController@uploadProofOfPayment')->name('proof-of-payment');
+        Route::post('update-order-address/{orderId}', 'Api\OrdersController@updateOrderAddressEndpoint')->name('update-order-addresses');
+        Route::get('get-payments-for-order/{token}', 'Api\OrdersController@getPaymentDetailsForOrder')->name('getPayments');
+        Route::post('move-to-unactive/{order}', 'Api\OrdersController@moveToUnactive')->name('moveToUnactive');
+        Route::post('remind-about-offer/{order}', 'Api\OrdersController@scheduleOrderReminder')->name('remindAboutOffer');
+    });
+
     Route::get('chat/getHistory', 'Api\MessagesController@getHistory')->name('api.messages.get-history');
     Route::get('invoices/get/{id}', 'Api\InvoicesController@getInvoice')->name('api.invoices.get');
-    Route::post('user/change-password', 'Api\CustomersController@changePassword')->name('api.customers.change-password');
-    Route::post('user/update-informations', 'Api\CustomersController@updateInformations')->name('api.customers.update-informations');
-    Route::get('user/get-orders', 'Api\CustomersController@getOrders')->name('api.customers.get-orders');
     Route::post('create_contact_chat', 'Api\MessagesController@createContactChat')->name('api.orders.create_contact_chat');
-    
+
     Route::middleware('staff.api')->group(function () {
         Route::group(['prefix' => 'faqs'], function () {
             Route::post('/', 'Api\FaqController@store')->name('api.faq.save');
