@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 
 use App\Domains\DelivererPackageImport\Exceptions\OrderNotFoundException;
 use App\Entities\Country;
-use App\Entities\Customer;
 use App\Entities\FirmSource;
 use App\Entities\Label;
 use App\Entities\Order;
@@ -28,6 +27,8 @@ use App\Http\Requests\Api\Orders\DeclineProformRequest;
 use App\Http\Requests\Api\Orders\StoreOrderMessageRequest;
 use App\Http\Requests\Api\Orders\StoreOrderRequest;
 use App\Http\Requests\Api\Orders\UpdateOrderDeliveryAndInvoiceAddressesRequest;
+use App\Http\Requests\scheduleOrderReminderRequest;
+use App\Jobs\SendReminderAboutOfferJob;
 use App\Mail\SendOfferToCustomerMail;
 use App\Repositories\CustomerAddressRepository;
 use App\Repositories\CustomerRepository;
@@ -45,6 +46,7 @@ use App\Services\OrderPackageService;
 use App\Services\ProductService;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
@@ -53,10 +55,9 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use App\Facades\Mailer;
+use Mailer;
 use Throwable;
 
 /**
@@ -177,76 +178,51 @@ class OrdersController extends Controller
         throw new Exception("Method deprecated");
     }
 
-    /**
-     * Create or update order
-     *
-     * @param StoreOrderRequest $request
-     * @param ProductService $productService
-     * @return JsonResponse
-     * @throws Throwable
-     */
-    public function newOrder(StoreOrderRequest $request, ProductService $productService): JsonResponse
+    public function newOrder(StoreOrderRequest $request, ProductService $productService)
     {
         $data = $request->all();
-        $customer = Customer::query()->where('login', $data['customer_login'])->first();
-
-        if ($data['customer_login'] && !$customer) {
-            $customer = Customer::query()->create([
-                'login' => $data['customer_login'],
-                'status' => 'ACTIVE',
-                'password' => Hash::make($data['phone']),
-            ]);
-        }
-
-        $customer = $customer ?? auth()->guard('api')->user();
+        DB::beginTransaction();
+        $customer = auth()->guard('api')->user();
 
         try {
-            DB::beginTransaction();
-
-            $orderBuilder = (new OrderBuilder())
+            $orderBuilder = new OrderBuilder();
+            $orderBuilder
                 ->setPackageGenerator(new BackPackPackageDivider())
                 ->setPriceCalculator(new OrderPriceCalculator())
                 ->setProductService($productService);
-
             if (empty($data['cart_token'])) {
-                $orderBuilder
-                    ->setTotalTransportSumCalculator(new TransportSumCalculator())
+                $orderBuilder->setTotalTransportSumCalculator(new TransportSumCalculator())
                     ->setUserSelector(new GetCustomerForNewOrder());
             } else {
                 $orderBuilder->setUserSelector(new GetCustomerForAdminEdit());
             }
-
             $builderData = $orderBuilder->newStore($data, $customer);
-
             DB::commit();
 
-            $order = Order::query()->find($builderData['id']);
-            $order->firm_source_id = FirmSource::byFirmAndSource(env('FIRM_ID'), 2)->value('id');
+            $order = Order::find($builderData['id']);
+            $builderData['token'] = $order->getToken();
+            $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 2)->first();
+            $order->firm_source_id = $firmSource ? $firmSource->id : null;
             $order->save();
 
-            $builderData['token'] = $order->getToken();
             return response()->json($builderData);
         } catch (Exception $e) {
             DB::rollBack();
-
-            $this->error_code = $e->getMessage();
-
+            if (empty($this->error_code)) {
+                $this->error_code = $e->getMessage();
+            }
             $message = $this->errors[$this->error_code] ?? $e->getMessage();
-
             Log::error(
-                "Problem with creating a new order: [{$this->error_code}] $message" . '. Trace log: ' . $e->getTraceAsString(),
+                "Problem with create new order: [{$this->error_code}] $message" . '. Trace log: ' . $e->getTraceAsString(),
                 ['request' => $data, 'class' => $e->getFile(), 'line' => $e->getLine()]
             );
-
             $message = $this->errors[$this->error_code] ?? $this->defaultError;
-
-            return response()->json([
+            return response(json_encode([
                 'error_code' => $this->error_code,
                 'error_message' => $message
-            ], $this->error_code ? 400 : 500);
+            ]), $this->error_code ? 400 : 500);
         }
     }
-
 
     public function storeMessage(StoreOrderMessageRequest $request)
     {
@@ -1005,5 +981,50 @@ class OrdersController extends Controller
 
         return response()->json($invoiceInfos, 200, [], JSON_UNESCAPED_UNICODE);
 
+    }
+
+    /**
+     * @param Order $order
+     *
+     * @return JsonResponse|Response
+     */
+    public function moveToUnactive(Order $order): Response | JsonResponse
+    {
+        try {
+            $order->labels()->detach(224);
+            $order->labels()->attach(225);
+        } catch (Throwable $exception) {
+            return response(json_encode([
+                'status' => false,
+                'error_code' => 500,
+                'error_message' => $exception->getMessage()
+            ]), 500);
+        }
+        return response()->json($order, 200, [], JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * @param Order $order
+     * @param ScheduleOrderReminderRequest $request
+     *
+     * @return JsonResponse|Response
+     */
+    public function scheduleOrderReminder(Order $order, Request $request): Response | JsonResponse
+    {
+        $data = $request->all();
+
+        Order::query()->update([
+            'reminder_date' => $data['dateTime']
+        ]);
+
+        $date = Carbon::createFromFormat('Y-m-d H:i', $data['dateTime']);
+
+        SendReminderAboutOfferJob::dispatch($order)->delay($date);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Przypomnienie zostało zaplanowane',
+            'date' => $date->format('Y-m-d H:i')
+        ], 200, [], JSON_UNESCAPED_UNICODE);
     }
 }
