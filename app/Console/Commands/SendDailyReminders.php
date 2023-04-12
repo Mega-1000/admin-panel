@@ -7,6 +7,7 @@ use App\Facades\Mailer;
 use App\Mail\SendReminderAboutOffer;
 use App\Repositories\Orders;
 use Illuminate\Console\Command;
+use Symfony\Component\Console\Command\Command as CommandAlias;
 
 class SendDailyReminders extends Command
 {
@@ -29,10 +30,9 @@ class SendDailyReminders extends Command
      *
      * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         $orders = Orders::getOrdersWithoutReminderForLabel(224);
-
 
         foreach ($orders as $order) {
             Mailer::create()
@@ -40,6 +40,6 @@ class SendDailyReminders extends Command
                 ->send(new SendReminderAboutOffer($order->customer));
         }
 
-        return Command::SUCCESS;
+        return CommandAlias::SUCCESS;
     }
 }

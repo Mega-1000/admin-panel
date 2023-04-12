@@ -21,7 +21,12 @@ class Orders
         return $ordersNeedSupport;
     }
 
-
+    /**
+     * get orders without reminder for label
+     *
+     * @param int $labelId
+     * @return Collection $ordersWithoutReminder
+     */
     public static function getOrdersWithoutReminderForLabel(int $labelId): Collection
     {
         return Order::query()->whereHas('labels', function ($query) {
