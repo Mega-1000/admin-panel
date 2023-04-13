@@ -10,11 +10,11 @@ use App\Entities\ProductStockLog;
 use App\Entities\ProductStockPosition;
 use App\Entities\WorkingEvents;
 use App\Enums\ProductStockLogActionEnum;
+use App\Jobs\TimedLabelJob;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\DB;
-use App\Jobs\TimedLabelJob;
+use Illuminate\Support\Facades\Session;
 
 class RemoveLabelService
 {
@@ -50,14 +50,14 @@ class RemoveLabelService
 
                 $preLabelId = DB::table('label_labels_to_add_after_timed_label')->where('main_label_id', $labelId)->first()?->label_to_add_id;
 
-                if($preLabelId === null) continue;
+                if ($preLabelId === null) continue;
 
                 $now = Carbon::now();
 
                 $order->labels()->detach($labelId);
                 $alreadyHasLabel = $order->labels()->where('label_id', $preLabelId)->exists();
 
-                if($alreadyHasLabel) {
+                if ($alreadyHasLabel) {
                     $order->labels()->updateExistingPivot($preLabelId, ['label_id' => $preLabelId, 'created_at' => $now]);
                 } else {
                     $order->labels()->attach($preLabelId, ['label_id' => $preLabelId, 'created_at' => $now]);
@@ -67,7 +67,7 @@ class RemoveLabelService
                 $dateTo = new Carbon($time);
                 $diff = $now->diffInSeconds($dateTo);
 
-                TimedLabelJob::dispatch($labelId, $preLabelId, $order, $loopPreventionArray, [], $userId, $now)->delay( now()->addSeconds($diff) );
+                TimedLabelJob::dispatch($labelId, $preLabelId, $order, $loopPreventionArray, [], $userId, $now)->delay(now()->addSeconds($diff));
                 continue;
             }
 
@@ -131,13 +131,13 @@ class RemoveLabelService
         foreach ($items as $item) {
             $product = $item->product;
             if ($product !== null) {
-                $productStockPosition = $product->stock->position->first();
+                $productStockPosition = $product->stock?->position->first();
                 if (empty($productStockPosition)) {
                     $errors[] = ['error' => 'position', 'product' => $product->id, 'productName' => $product->symbol, 'productStock' => $product->stock];
                     continue;
                 }
 
-                $isMoreThanOnePosition = $product->stock->position->count() > 1;
+                $isMoreThanOnePosition = ($product->stock?->position->count() ?? 0) > 1;
                 $hasPositionLessQuantityThanOrderQuantity = $productStockPosition->position_quantity < $item->quantity;
 
                 if ($isMoreThanOnePosition && $hasPositionLessQuantityThanOrderQuantity) {
