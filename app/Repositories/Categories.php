@@ -3,17 +3,18 @@
 namespace App\Repositories;
 
 use App\Entities\Category;
+use Illuminate\Database\Eloquent\Collection;
 
 class Categories
 {
-    public static function removeElementsForCsvReloadJob(): void
+    public static function getElementsForCsvReloadJob(): Collection
     {
-        Category::query()
-            ->where('save_name', true)
-            ->where('save_description', true)
-            ->where('save_image', true)
-            ->where('artificially_created', false)
-            ->delete();
+        return Category::query()
+            ->Where('save_name', '!=', true)
+            ->orWhere('save_description','!=', true)
+            ->orWhere('save_image','!=', true)
+            ->orWhere('artificially_created','!=', false)
+            ->get();
     }
 
 }
