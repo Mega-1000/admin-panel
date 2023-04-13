@@ -487,7 +487,7 @@
                 <button class="btn btn-info print-group col-lg-12"
                         name="{{ $courierCode }}"
                         data-courierTasks="{{ json_encode($tasksInDay) }}">
-                    {{ \App\Enums\CourierName::DELIVERY_TYPE_LABELS[$courierCode] }}
+                        {{ \App\Enums\CourierName::DELIVERY_TYPE_LABELS[$courierCode] }}
                     <div>
                         <span class="badge"
                               style=" color:#fff !important; background-color:#f96868 !important;">{{ count($tasksInDay['past']) }}</span>

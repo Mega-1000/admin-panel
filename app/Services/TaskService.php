@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Entities\Label;
 use App\Entities\Task;
+use App\Entities\Courier;
 use App\Enums\CourierName;
 use App\Repositories\TaskRepository;
 use Carbon\Carbon;
@@ -66,9 +67,11 @@ class TaskService
         foreach ($period as $date) {
             $dates[$date->toDateString()] = [];
         }
-        foreach (CourierName::DELIVERY_TYPE_FOR_TASKS as $deliveryTypeName => $deliveryTypes) {
+        
+        $couriers = Courier::where('active',1)->orderBy('item_number')->get();
+        foreach ($couriers as $deliveryTypes) {
             $tasksByDay = $dates;
-            foreach ($this->getTaskQuery($deliveryTypes)->get() as $task) {
+            foreach ($this->getTaskQuery([$deliveryTypes['courier_name']])->get() as $task) {
                 $orderDate = Carbon::parse($task->order->dates->customer_shipment_date_to);
                 $key = $orderDate->toDateString();
                 if ($orderDate->isBefore($today)) {
@@ -80,7 +83,7 @@ class TaskService
                 }
             }
             ksort($tasksByDay);
-            $result[$deliveryTypeName] = $tasksByDay;
+            $result[$deliveryTypes['courier_key']] = $tasksByDay;
         }
         return $result;
     }

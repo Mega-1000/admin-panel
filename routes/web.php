@@ -618,7 +618,10 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('/email/settings/{emailSetting}/edit', [EmailSettingsController::class, 'edit'])->name('emailSettings.edit');
     Route::put('/email/settings/{emailSetting}/update', [EmailSettingsController::class, 'update'])->name('emailSettings.update');
     Route::delete('/email/settings/{emailSetting}/destroy', [EmailSettingsController::class, 'destroy'])->name('emailSettings.destroy');
-                        
+
+    Route::get('/courier', 'CourierController@index')->name('courier.index');           
+    Route::get('/courier/{courier}/edit', 'CourierController@edit')->name('courier.edit');
+    Route::put('/courier/{courier}/update', 'CourierController@update')->name('courier.update');     
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
