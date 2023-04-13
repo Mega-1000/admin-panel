@@ -41,7 +41,8 @@
         "ext-curl": "*",
         "ext-calendar": "*",
         "ext-iconv": "*",
-        "ext-zip": "*"
+        "ext-zip": "*",
+        "ext-bcmath": "*"
     },
     "require-dev": {
         "ext-dom": "*",

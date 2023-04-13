@@ -211,7 +211,7 @@ class Product extends Model implements Transformable
      */
     public function stock(): HasOne
     {
-        return $this->hasOne(ProductStock::class);
+        return $this->hasOne(ProductStock::class, 'product_id', 'id');
     }
 
     /**
@@ -265,7 +265,7 @@ class Product extends Model implements Transformable
         return $this->packing->warehouse && $this->packing->recommended_courier && $this->packing->packing_name;
     }
 
-    public static function getDefaultProduct()
+    public static function getDefaultProduct(): self
     {
         return Product::where('symbol', 'TWSU')->first();
     }

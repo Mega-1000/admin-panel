@@ -2,24 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use DB;
-use Illuminate\Http\Request;
+use App\Entities\ColumnVisibility;
 use App\Entities\OrderReturn;
 use App\Entities\ProductStock;
-use App\Services\ProductService;
 use App\Entities\ProductStockLog;
-use Illuminate\Http\JsonResponse;
-use App\Entities\ColumnVisibility;
-use Illuminate\Support\Facades\View;
-use Illuminate\Http\RedirectResponse;
 use App\Entities\ProductStockPosition;
-use Illuminate\Contracts\View\Factory;
-use App\Repositories\ProductRepository;
-use Yajra\DataTables\Facades\DataTables;
-use App\Repositories\ProductStockRepository;
-use App\Repositories\ProductStockLogRepository;
 use App\Http\Requests\ProductStockUpdateRequest;
+use App\Repositories\ProductRepository;
+use App\Repositories\ProductStockLogRepository;
 use App\Repositories\ProductStockPositionRepository;
+use App\Repositories\ProductStockRepository;
+use App\Services\ProductService;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\View;
+use Yajra\DataTables\Facades\DataTables;
 
 class ProductStocksController extends Controller
 {
@@ -118,7 +118,7 @@ class ProductStocksController extends Controller
             ->join('products', 'product_stocks.product_id', '=', 'products.id')
             ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
             ->leftJoin('product_prices', 'product_stocks.product_id', '=', 'product_prices.product_id')
-            ->whereNull('deleted_at');
+            ->whereNull('products.deleted_at');
 
         $notSearchable = [17, 19];
 
@@ -152,7 +152,7 @@ class ProductStocksController extends Controller
             $positions = ProductStockPosition::where('product_stock_id', $row->stock_id)->get();
             $row->positions = $positions;
             $damaged = 0;
-            foreach($positions as $p){
+            foreach ($positions as $p) {
                 $damaged = $damaged + OrderReturn::where('product_stock_position_id', $p->id)->sum('quantity_damaged');
             }
 

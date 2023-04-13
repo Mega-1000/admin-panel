@@ -28,11 +28,11 @@ use App\Repositories\CustomerRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\ProductRepository;
 use App\Services\AllegroOrderService;
+use App\Services\EmailSendingService;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
 use App\Services\OrderAddressService;
 use App\Services\ProductService;
-use App\Services\EmailSendingService;
 use App\User;
 use Carbon\Carbon;
 use Exception;
@@ -73,7 +73,7 @@ class AllegroOrderSynchro implements ShouldQueue
      * @var ProductService
      */
     private $productService;
-    
+
     /**
      * @var EmailSendingService
      */
@@ -366,15 +366,15 @@ class AllegroOrderSynchro implements ShouldQueue
                     $newSymbol = [$symbol[0], $symbol[1], '0'];
                     $newSymbol = join('-', $newSymbol);
 
-                    $product = $this->productRepository->findWhere(['symbol' => $newSymbol])->first();
+                    $product = Product::query()->where('symbol', '=', $newSymbol)->first();
                 }
                 if (empty($product)) {
                     $product = Product::getDefaultProduct();
                     $undefinedProductSymbol = $item['offer']['external'];
                 }
 
-                if ($product !== null && $product->stock() === null) {
-                    ProductStock::create([
+                if ($product?->stock()?->exists() !== true) {
+                    ProductStock::query()->create([
                         'product_id' => $product->id,
                         'quantity' => 0,
                         'min_quantity' => null,
