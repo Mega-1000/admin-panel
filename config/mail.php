@@ -132,7 +132,7 @@ return [
             'from' => ["address" => env('MAIL_NOTIFICATION_FROM', 'awizacje@ephpolska.pl'), "name" => env('MAIL_NOTIFICATION_FROM', 'awizacje@ephpolska.pl')],
         ],
         'dev' => [
-            'transport' => 'log',
+            'transport' => 'smtp',
             'host' => 'mailtrap.io',
             'port' => '2525',
             'username' => '1320d1e69b90c7',
