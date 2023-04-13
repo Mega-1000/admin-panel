@@ -36,16 +36,14 @@ class ChatNotificationJob implements ShouldQueue
      */
     public function handle()
     {
-        $chat = Chat
-            ::with(['chatUsers', 'messages'])->find($this->chatId);
+        $chat = Chat::with(['chatUsers', 'messages'])->find($this->chatId);
 
         foreach ($chat->chatUsers as $chatUser) {
-            /*if (!MessagesHelper::hasNewMessageStatic($chat, $chatUser, true)) {
-                continue;
-            }*/
+
             if($chatUser->id == $this->currentChatUserId) continue;
 
             $userObject = $chatUser->user ?: $chatUser->employee ?: $chatUser->customer ?: false;
+
             if (!$userObject) {
                 continue;
             }
@@ -61,9 +59,7 @@ class ChatNotificationJob implements ShouldQueue
         $helper->currentUserId = $userObject->id;
         try {
             $email = $userObject->email ?? $userObject->login;
-            if ($email == $this->senderEmail) {
-                return;
-            }
+
             self::sendNewMessageEmail($email, $helper);
             $chatUser->last_notification_time = now();
             $chatUser->save();
@@ -77,7 +73,7 @@ class ChatNotificationJob implements ShouldQueue
         Helper::sendEmail(
             $email,
             'chat-notification',
-            'Nowa wiadomość w ' . env('APP_NAME'),
+            'Nowa wiadomość w ' . config('app.name'),
             [
                 'url' => route('chat.show', ['token' => $helper->encrypt()]),
                 'title' => $helper->getTitle(false)
