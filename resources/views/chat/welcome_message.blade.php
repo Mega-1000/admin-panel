@@ -2,6 +2,7 @@
     <div class="col-sm-2">&nbsp;</div>
     <div class="col-sm-12">
         <div class="text-left alert-info alert">
+            [{{ $chat->created_at->toDateTimeString() }}]
             <div class="msg-content" style="white-space: pre-line;">
                 Witamy!
                 Konsultant zapoznaje się ze sprawą wkrótce się odezwie.
