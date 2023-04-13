@@ -43,7 +43,7 @@ class Helper
     public static function sendEmail($email, $template, $subject, $additionalData = []): ?SentMessage
     {
         try {
-            Mailer::create()->send(
+            return Mailer::create()->send(
                 "emails/$template",
                 array_merge(['email' => $email], $additionalData),
                 function ($m) use ($email, $subject) {

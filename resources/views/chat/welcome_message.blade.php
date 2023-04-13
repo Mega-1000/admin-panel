@@ -7,6 +7,13 @@
                 Witamy!
                 Konsultant zapoznaje się ze sprawą wkrótce się odezwie.
                 Zajmuje to zwykle do kilku minut.
+                @if($chat->questions_tree && $userType === MessagesHelper::TYPE_USER)
+                    <br><br>
+                    Ścieżka FAQ użytkownika:<br>
+                    @foreach (json_decode($chat->questions_tree) as $questionData)
+                        -> {{ $questionData->question }}<br>
+                    @endforeach
+                @endif
             </div>
         </div>
     </div>

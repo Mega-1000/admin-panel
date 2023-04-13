@@ -22,7 +22,6 @@ use App\Http\Requests\Api\Orders\ChatRequest;
 use Illuminate\Http\JsonResponse;
 use App\Repositories\Chats;
 use App\Services\Label\AddLabelService;
-use App\Entities\Chat;
 
 class MessagesController extends Controller
 {
@@ -248,7 +247,7 @@ class MessagesController extends Controller
      */
     public function createContactChat(Request $request): JsonResponse
     {
-        $data = $request->input('questionsTree');
+        $questionsTree = $request->input('questionsTree') ?: '';
         $customer = $request->user();
 
         try {
@@ -270,6 +269,7 @@ class MessagesController extends Controller
             if($chat === null) {
                 $chat = $helper->createNewChat();
             }
+            $chat->questions_tree = $questionsTree;
             $chat->need_intervention = true;
             $chat->save();
 
