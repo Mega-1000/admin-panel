@@ -85,6 +85,7 @@ class FirmsController extends Controller
         $firm->delivery_warehouse = $request->delivery_warehouse;
         $firm->email = $request->email;
         $firm->secondary_email = $request->secondary_email;
+        $firm->complaint_email = $request->complaint_email;
         $firm->nip = $request->nip;
         $firm->account_number = $request->account_number;
         $firm->status = $request->status;
@@ -92,6 +93,7 @@ class FirmsController extends Controller
         $firm->notices = $request->notices;
         $firm->secondary_phone = $request->secondary_phone;
         $firm->secondary_notices = $request->secondary_notices;
+        
         if (empty($request->short_name)) {
             $firm->short_name = substr($request->name, 0, 50);
         }
@@ -251,6 +253,7 @@ class FirmsController extends Controller
         $firm->delivery_warehouse = $request->delivery_warehouse;
         $firm->email = $request->email;
         $firm->secondary_email = $request->secondary_email;
+        $firm->complaint_email = $request->complaint_email;
         $firm->nip = $request->nip;
         $firm->account_number = $request->account_number;
         $firm->status = $request->status;

@@ -13,9 +13,8 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('chats', function (Blueprint $table) {
-            $table->text('complaint_form')->default('');
-            $table->text('questions_tree')->default('');
+        Schema::table('firms', function (Blueprint $table) {
+            $table->string('complaint_email')->default('')->after('secondary_email');
         });
     }
 
@@ -26,9 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('chats', function (Blueprint $table) {
-            $table->dropColumn('complaint_form');
-            $table->dropColumn('questions_tree');
+        Schema::table('firms', function (Blueprint $table) {
+            $table->dropColumn('complaint_email');
         });
     }
 };
