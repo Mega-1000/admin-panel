@@ -67,7 +67,7 @@ return [
 
     'asset_url' => env('ASSET_URL', null),
 
-    'chat_name' => env('CHAT_NAME', 'CZAT MEGA 1000'),
+    'chat_name' => env('CHAT_NAME', 'Dyskusje EPH'),
 
     /*
     |--------------------------------------------------------------------------

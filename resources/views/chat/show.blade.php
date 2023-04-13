@@ -208,6 +208,7 @@
             $('#new-message').removeClass('loader-2');
 
             const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}';
+            const documentTitle = document.title;
 
             let usersHistoryFilter = new Set();
             let selectedArea = 0;
@@ -321,14 +322,14 @@
                             refreshRate = 1;
                             if(data.messages != '' && document.hidden) {
                                 blinkTitle({
-                                    title: "CZAT MEGA 1000",
+                                    title: documentTitle,
                                     message: "!!! NOWA WIADOMOŚĆ !!!",
                                     delay: 900,
                                     notifyOffPage: true
                                 });
 
                                 const notification = new Notification("!!! NOWA WIADOMOŚĆ !!!", {
-                                    body: "CZAT MEGA 1000",
+                                    body: documentTitle,
                                     icon: "{{ asset('images/logo.png') }}"
                                 });
                             }
@@ -344,7 +345,7 @@
 
             $(window).on('focus', () => {
                 blinkTitleStop();
-                document.title = 'CZAT MEGA 1000';
+                document.title = documentTitle;
             } );
 
 
