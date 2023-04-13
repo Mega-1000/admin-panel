@@ -643,4 +643,38 @@ class MessagesHelper
 
         return $possibleUsers;
     }
+
+    public function sendComplaintEmail(string $email) {
+
+        $chat = $this->getChat();
+        $complaintForm = $chat->complaint_form;
+
+        if($chat === null) {
+            throw new ChatException('Nieprawidłowy token chatu');
+        }
+        if($complaintForm === '') {
+            throw new ChatException('Czat nie posiada uzupełnionego formularza reklamacji');
+        }
+        if($this->currentUserType !== self::TYPE_USER) {
+            throw new ChatException('Nie masz uprawnień do wysłania wiadomości');
+        }
+        $subject = 'Reklamacja do oferty EPH ID ' . $chat->order_id;
+
+        $complaintForm = json_decode($complaintForm);
+
+        if( isset($complaintForm->trackingNumber) ) {
+            $subject .= ', numer listu przewozowego: '.$complaintForm->trackingNumber;
+        }
+
+        Helper::sendEmail(
+            $email,
+            'chat-complaint-form',
+            $subject,
+            [
+                'url' => route('chat.show', ['token' => $this->encrypt()]),
+                'title' => $this->getTitle(false),
+                'complaintForm' => $complaintForm,
+            ]
+        );
+    }
 }

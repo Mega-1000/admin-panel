@@ -25,6 +25,7 @@ use App\Services\Label\AddLabelService;
 use App\Http\Requests\Messages\CustomerComplaintRequest;
 use App\Entities\Order;
 use App\Entities\Chat;
+use App\Helpers\Helper;
 
 class MessagesController extends Controller
 {
@@ -365,6 +366,20 @@ class MessagesController extends Controller
                 AddLabelService::addLabels($order, [$helper::MESSAGE_GREEN_LABEL_ID], $loopPreventionArray, [], $user->id);
             }
         }
+    }
+    /**
+     * send complaint email with chat link to employer
+     *
+     * @param  string $token
+     *
+     * @return void
+     */
+    public function callComplaint(Request $request, string $token): void
+    {
+        $helper = new MessagesHelper($token);
+        $email = $request->input('email');
+
+        $helper->sendComplaintEmail($email);
     }
 
     public function getHistory(Request $request)

@@ -135,6 +135,18 @@
                             <h3>Pokaż:</h3>
                             @include('chat/history')
                         @endif
+                        @if( $chat->complaint_form !== '' && $firmWithComplaintEmails->isNotEmpty() )
+                            <div>
+                                <br>
+                                <h4>Reklamacje:</h4>
+                                <select id="complaint_email" style="padding: 5px; margin: 10px 0;">
+                                    @foreach ($firmWithComplaintEmails as $firm)
+                                        <option value="{{ $firm->complaint_email }}">{{ $firm->name }}</option>
+                                    @endforeach
+                                </select>
+                                <button id="call_complaint" class="btn bg-primary">Napisz do firmy z reklamacją</button>
+                            </div>
+                        @endif
                     </div>
                 @endif
             </div>
@@ -377,6 +389,16 @@
                         }
                     })
                     .done(() => location.reload());
+            })
+            $('#call_complaint').click((event) => {
+                alert('Reklamacja została wysłana na podany adres email')
+                $.ajax({
+                    method: "POST",
+                    url: "{{ $routeCallComplaint }}",
+                    data: {
+                        'email': $('#complaint_email').val()
+                    }
+                })
             })
             $('#call-mod').click((event) => {
                 alert('Moderator został poinformowany')

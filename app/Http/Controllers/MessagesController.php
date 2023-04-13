@@ -11,6 +11,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\Exceptions\ChatException;
 use Barryvdh\Debugbar\Facades\Debugbar;
+use App\Entities\Firm;
 
 class MessagesController extends Controller {
 
@@ -174,6 +175,8 @@ class MessagesController extends Controller {
             $assignedMessagesIds = json_decode($helper->getCurrentChatUser()->assigned_messages_ids ?: '[]', true);
         }
 
+        $firmWithComplaintEmails = Firm::where('complaint_email', '<>', '')->get();
+
         $chatMessages = $chat->messages;
         
         $view = view('chat.show')->with([
@@ -185,6 +188,7 @@ class MessagesController extends Controller {
             'userType'                => $helper->currentUserType,
             'chatCustomers'           => $chatCustomers,
             'chatEmployees'           => $chatEmployees,
+            'firmWithComplaintEmails' => $firmWithComplaintEmails,
             'chatConsultants'         => $chatConsultants,
             'chat'                    => $chat,
             'product'                 => $product,
@@ -198,6 +202,7 @@ class MessagesController extends Controller {
             'routeCloseChat'          => route('api.messages.closeChat', ['token' => $token]),
             'routeRemoveUser'         => route('api.messages.remove-user', ['token' => $token]),
             'routeRefresh'            => route('api.messages.get-messages', ['token' => $token]),
+            'routeCallComplaint'      => route('api.messages.callComplaint', ['token' => $token]),
             'routeAskForIntervention' => route('api.messages.ask-for-intervention', ['token' => $token]),
             'routeForEditPrices'      => route('api.messages.edit-prices', ['token' => $token])
         ]);
