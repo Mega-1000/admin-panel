@@ -32,7 +32,7 @@ class SendDailyReminders extends Command
      */
     public function handle(): int
     {
-        $orders = Orders::getOrdersWithoutReminderForLabel(224);
+        $orders = Orders::getOrdersWithoutReminderForLabel(['224']);
 
         foreach ($orders as $order) {
             Mailer::create()
