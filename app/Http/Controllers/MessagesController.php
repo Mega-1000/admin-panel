@@ -122,7 +122,7 @@ class MessagesController extends Controller {
         $chatType = $order ? 'order' : 'product';
 
         // create welcome message
-        if($order?->need_support || $chat?->need_intervention) {
+        if($helper->currentUserType === MessagesHelper::TYPE_CUSTOMER && ($order?->need_support || $chat?->need_intervention)) {
             $blankChatUser = $helper->createOrGetBlankUser($chat);
 
             $content = "Witamy!
