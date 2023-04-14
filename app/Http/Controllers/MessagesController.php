@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Auth;
 use App\Helpers\Exceptions\ChatException;
 use Barryvdh\Debugbar\Facades\Debugbar;
 use App\Entities\Firm;
+use App\Entities\Message;
+use App\Enums\UserRole;
 
 class MessagesController extends Controller {
 
@@ -119,6 +121,15 @@ class MessagesController extends Controller {
 
         $chatType = $order ? 'order' : 'product';
 
+        // create welcome message
+        if($order?->need_support || $chat?->need_intervention) {
+            $blankChatUser = $helper->createOrGetBlankUser($chat);
+
+            $content = "Witamy!
+                        Konsultant zapoznaje się ze sprawą wkrótce się odezwie.
+                        Zajmuje to zwykle do kilku minut.";
+            $helper->addMessage($content, UserRole::Main, null, $blankChatUser);
+        }
         // if exist order with need support then set need support to false, only for consultants
         if($order !== null && $order->need_support && $helper->currentUserType === MessagesHelper::TYPE_USER) {
             $order->need_support = false;

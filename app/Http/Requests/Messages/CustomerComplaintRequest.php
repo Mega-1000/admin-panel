@@ -29,7 +29,7 @@ class CustomerComplaintRequest extends FormRequest
             'phone'          => 'required|regex:/[\+0-9]{9,12}/',
             'email'          => 'required|email',
             'description'    => 'required|string',
-            'valueOfProduct' => 'required|string',
+            'valueOfProduct' => 'nullable|string',
             'accountNumber'  => 'nullable|min:10',
             'date'           => 'required|date|date_format:"Y-m-d"',
             'image'          => 'nullable|image|mimes:jpeg,png,jpg|max:4096',

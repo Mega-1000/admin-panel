@@ -28,6 +28,14 @@
         <div class="container" id="flex-container">
             <div id="chat-container">
                 <div class="text-center alert alert-info">{!! $title !!}</div>
+                @if($chat->questions_tree && $userType === MessagesHelper::TYPE_USER)
+                    <div class="text-center alert alert-info">
+                        Ścieżka FAQ użytkownika:<br>
+                        @foreach(json_decode($chat->questions_tree) as $questionData)
+                            -> {{ $questionData->question }}<br>
+                        @endforeach
+                    </div>
+                @endif
                 @if (!empty($notices))
                     <div class="alert-info alert">Uwagi konsultanta: <b>{{ $notices }}</b></div>
                 @endif
@@ -74,6 +82,9 @@
             </div>
             <div class="chat-right-column" style="padding-left: 10px;">
                 <img id="bell-icon" onclick="askForPermision" src="/svg/bell-icon.svg" alt="" style="width: 35px; cursor: pointer">
+                @if($chat->complaint_form)
+                    <button id="show_complaint_form" data-complaint-form="{{ $chat->complaint_form }}" class="btn bg-primary call-button">Pokaż formularz reklamacyjny</button>
+                @endif
                 <h3>Użytkownicy:</h3>
                 <div class="chat-users-wrapper" style="overflow: auto; max-height: 100vh;">
                     <table id="chat-users">
@@ -409,6 +420,26 @@
                         'user_id': event.target.value
                     }
                 })
+            })
+            $('#show_complaint_form').click((e) => {
+                const complaintForm = $(e.target).data('complaint-form');
+                const complaintFormTemplate = `
+                    <div>Imię: ${complaintForm.firstname}</div>
+                    <div>Nazwisko: ${complaintForm.surname}</div>
+                    <div>Telefon: ${complaintForm.phone}</div>
+                    <div>Email: ${complaintForm.email}</div>
+                    <div>Opis: ${complaintForm.description}</div>
+                    <div>Wartość produktu: ${complaintForm?.valueOfProduct}</div>
+                    <div>Numer konta: ${complaintForm?.accountNumber}</div>
+                    <div>Data: ${complaintForm.date}</div>
+                    <div>Numer kontaktowy do kierowcy: ${complaintForm?.driverPhone}</div>
+                    <div>Numer śledzenia: ${complaintForm?.trackingNumber}</div>
+                `;
+                let params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,
+                width=700,height=450,left=100,top=100`;
+
+                const complaintWindow = window.open('about:blank', '', params);
+                complaintWindow.document.body.innerHTML = complaintFormTemplate;
             })
             $('#call-worker').click((event) => {
                 alert('Pracownicy zostali poinformowani')

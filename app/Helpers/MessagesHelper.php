@@ -217,6 +217,26 @@ class MessagesHelper
         return $title;
     }
 
+    /**
+     * Get or if no exist create Blank user (user without any ids, for sending generic messages)
+     *
+     * @param  Chat     $chat
+     *
+     * @return ChatUser $chatUser
+     */
+    public function createOrGetBlankUser(Chat $chat): ChatUser {
+        $chatUser = $chat->chatUsers->whereNull('user_id')->whereNull('customer_id')->whereNull('employee_id')->first();
+
+        if($chatUser === null) {
+
+            $chatUser = new ChatUser();
+            $chatUser->chat()->associate($chat);
+            $chatUser->save();
+        }
+
+        return $chatUser;
+    }
+
     public function createNewChat()
     {
         $chat = new Chat();
@@ -287,16 +307,17 @@ class MessagesHelper
     /**
      * Handle add message to Chat
      *
-     * @param string $message
-     * @param string $area
-     * @param UploadedFile $file
+     * @param string             $message
+     * @param string             $area
+     * @param UploadedFile|null  $file
+     * @param ChatUser|null      $customChatUser
      *
-     * @return Message
+     * @return Message      $msg
      */
-    public function addMessage(string $message, int $area = UserRole::Main, UploadedFile $file = null): Message
+    public function addMessage(string $message, int $area = UserRole::Main, UploadedFile $file = null, ?ChatUser $customChatUser = null): Message
     {
         $chat = $this->getChat();
-        $chatUser = $this->getCurrentChatUser();
+        $chatUser = $customChatUser ?? $this->getCurrentChatUser();
         if (!$chatUser) {
             throw new ChatException('Cannot save message - User not added to chat');
         }
