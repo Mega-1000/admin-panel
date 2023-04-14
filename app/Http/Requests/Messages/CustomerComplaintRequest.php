@@ -32,7 +32,7 @@ class CustomerComplaintRequest extends FormRequest
             'valueOfProduct' => 'required|string',
             'accountNumber'  => 'nullable|min:10',
             'date'           => 'required|date|date_format:"Y-m-d"',
-            'image'          => 'required|image|mimes:jpeg,png,jpg|max:4096',
+            'image'          => 'nullable|image|mimes:jpeg,png,jpg|max:4096',
             'driverPhone'    => 'nullable|regex:/[\+0-9]{9,12}/',
             'trackingNumber' => 'nullable|string',
         ];

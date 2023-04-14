@@ -13,6 +13,7 @@ use App\Jobs\SendMailToFirmsToUpdateTheDataJob;
 use App\Repositories\FirmAddressRepository;
 use App\Repositories\FirmRepository;
 use App\Repositories\WarehouseRepository;
+use App\Services\FirmService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -99,6 +100,8 @@ class FirmsController extends Controller
         }
         $firm->save();
 
+        $firmService = new FirmService($firm);
+        $firmService->addNewEmployeeForComplaint();
 
         $this->firmAddressRepository->create([
             'firm_id' => $firm->id,
@@ -265,6 +268,10 @@ class FirmsController extends Controller
             $firm->short_name = substr($request->name, 0, 50);
         }
         $firm->save();
+
+        $firmService = new FirmService($firm);
+        $firmService->addNewEmployeeForComplaint();
+
         $this->firmAddressRepository->update($request->all(), $firm->address->id);
 
         if (!$request->has('firm_source') || !$request->get('firm_source')) {

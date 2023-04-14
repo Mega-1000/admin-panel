@@ -25,7 +25,7 @@ class ChatNotificationJob implements ShouldQueue
      */
     public function __construct(
         private int $chatId,
-        private bool $senderEmail = false,
+        private ?string $senderEmail = null,
         private int $currentChatUserId = 0
     ) {}
 

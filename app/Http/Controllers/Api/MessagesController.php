@@ -25,7 +25,6 @@ use App\Services\Label\AddLabelService;
 use App\Http\Requests\Messages\CustomerComplaintRequest;
 use App\Entities\Order;
 use App\Entities\Chat;
-use App\Helpers\Helper;
 
 class MessagesController extends Controller
 {
@@ -290,9 +289,10 @@ class MessagesController extends Controller
     }
 
     /**
-     * Create chat used to contact between customer and consultant
+     * Create Chat for Customer Complaint
      *
-     * @param  ChatRequest  $request
+     * @param  CustomerComplaintRequest $request
+     * @param  Order                    $order
      *
      * @return JsonResponse
      */
@@ -368,7 +368,7 @@ class MessagesController extends Controller
         }
     }
     /**
-     * send complaint email with chat link to employer
+     * Send complaint email to employee
      *
      * @param  string $token
      *

@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use App\Entities\ChatUser;
 
 class MessagesHelper
 {
@@ -644,6 +645,13 @@ class MessagesHelper
         return $possibleUsers;
     }
 
+    /**
+     * Send complaint email to employee with given chat token
+     *
+     * @param  string $email
+     *
+     * @return void
+     */
     public function sendComplaintEmail(string $email) {
 
         $chat = $this->getChat();
@@ -658,6 +666,27 @@ class MessagesHelper
         if($this->currentUserType !== self::TYPE_USER) {
             throw new ChatException('Nie masz uprawnień do wysłania wiadomości');
         }
+
+        $employee = Employee::where('email', $email)->first();
+        
+        if($employee === null) {
+            throw new ChatException('Brak pracownika dla danego adresu Email');
+        }
+
+        $chatUser = ChatUser::where([
+            'chat_id' => $chat->id,
+            'employee_id' => $employee->id,
+        ])->first();
+
+        if($chatUser === null) {
+            $chatUser = new ChatUser();
+            $chatUser->chat()->associate($chat);
+            $chatUser->employee()->associate($employee);
+            $chatUser->save();
+        }
+
+        $newChatToken = $this->getChatToken($chat->order_id, $employee->id, self::TYPE_EMPLOYEE);
+
         $subject = 'Reklamacja do oferty EPH ID ' . $chat->order_id;
 
         $complaintForm = json_decode($complaintForm);
@@ -665,13 +694,12 @@ class MessagesHelper
         if( isset($complaintForm->trackingNumber) ) {
             $subject .= ', numer listu przewozowego: '.$complaintForm->trackingNumber;
         }
-
         Helper::sendEmail(
             $email,
             'chat-complaint-form',
             $subject,
             [
-                'url' => route('chat.show', ['token' => $this->encrypt()]),
+                'url' => route('chat.show', ['token' => $newChatToken]),
                 'title' => $this->getTitle(false),
                 'complaintForm' => $complaintForm,
             ]

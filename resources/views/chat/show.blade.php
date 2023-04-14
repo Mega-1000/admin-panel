@@ -391,14 +391,14 @@
                     .done(() => location.reload());
             })
             $('#call_complaint').click((event) => {
-                alert('Reklamacja została wysłana na podany adres email')
+                alert('Reklamacja zostanie wysłana na podany adres email');
                 $.ajax({
                     method: "POST",
                     url: "{{ $routeCallComplaint }}",
                     data: {
                         'email': $('#complaint_email').val()
                     }
-                })
+                }).done(() => location.reload());
             })
             $('#call-mod').click((event) => {
                 alert('Moderator został poinformowany')
