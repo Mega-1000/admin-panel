@@ -335,7 +335,7 @@ class CustomersController extends Controller
      * @param UpdateCustomerRequest $request
      * @return JsonResponse
      */
-    public function updateInformations(UpdateCustomerRequest $request): JsonResponse
+    public function update(UpdateCustomerRequest $request): JsonResponse
     {
         $data = $request->validated();
         try {
@@ -373,17 +373,30 @@ class CustomersController extends Controller
     /**
      * Get customer orders.
      *
-     * @param Request $request
-     * @param $customerId
      * @return JsonResponse
      */
-    public function getOrders(Request $request, $customerId): JsonResponse
+    public function getOrders(): JsonResponse
     {
-        $deliveryInfos = $request->user()->orders()->get();
+        $deliveryInfos = auth()->user()->orders()->get();
         foreach ($deliveryInfos as $deliveryInfo) {
             $deliveryInfo->adress = $deliveryInfo->getDeliveryAddress();
         };
 
         return response()->json($deliveryInfos);
+    }
+
+    /**
+     * Unregister user by changing mail do mega1000 domain
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function unregister(Request $request): JsonResponse
+    {
+        $customer = $request->user();
+        $customer->login = 'wyrejestrowany' . $customer->id . '@mega1000.pl';
+        $customer->save();
+
+        return response()->json(['status' => true]);
     }
 }
