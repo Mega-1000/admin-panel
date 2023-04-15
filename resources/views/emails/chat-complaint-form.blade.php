@@ -1,6 +1,7 @@
 <div>
     Dzień dobry,<br><br>
     prosimy zapoznac sie ze zgłoszniem reklamacyjnym i wypowiedzieć sie w tym temacie: <a href='{{ $url }}'>TUTAJ</a><br>
+    Przyczyna: {{ $complaintForm->reason }}<br>
     Opis: {{ nl2br($complaintForm->description) }}<br>
     Wartość produktu: {{ $complaintForm->valueOfProduct }}<br>
     Data: {{ $complaintForm->date }}<br>

@@ -28,7 +28,7 @@ class CustomerComplaintRequest extends FormRequest
             'surname'        => 'required|string|max:255',
             'phone'          => 'required|regex:/[\+0-9]{9,12}/',
             'email'          => 'required|email',
-            'reason'         => 'string',
+            'reason'         => 'required|string',
             'description'    => 'required|string',
             'valueOfProduct' => 'nullable|string',
             'accountNumber'  => 'nullable|min:10',

@@ -428,6 +428,7 @@
                     <div>Nazwisko: ${complaintForm.surname}</div>
                     <div>Telefon: ${complaintForm.phone}</div>
                     <div>Email: ${complaintForm.email}</div>
+                    <div>Przyczyna: ${complaintForm.reason}</div>
                     <div>Opis: ${complaintForm.description}</div>
                     <div>Wartość produktu: ${complaintForm?.valueOfProduct}</div>
                     <div>Numer konta: ${complaintForm?.accountNumber}</div>
