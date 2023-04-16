@@ -583,6 +583,7 @@ class OrdersController extends Controller
                     'ourTotalCost',
                     'labelsButtons',
                     'countries',
+                    'chat',
                     'chatUserToken',
                     'chatMessages',
                     'userType'
@@ -623,12 +624,12 @@ class OrdersController extends Controller
                 'labelsButtons',
                 'packets',
                 'countries',
+                'chat',
                 'chatUserToken',
                 'chatMessages',
                 'userType'
             )
         );
-
     }
 
     private function getVariations($order)

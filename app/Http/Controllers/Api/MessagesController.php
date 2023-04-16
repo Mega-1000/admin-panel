@@ -22,6 +22,8 @@ use App\Http\Requests\Api\Orders\ChatRequest;
 use Illuminate\Http\JsonResponse;
 use App\Repositories\Chats;
 use App\Services\Label\AddLabelService;
+use App\Http\Requests\Messages\CustomerComplaintRequest;
+use App\Entities\Order;
 use App\Entities\Chat;
 
 class MessagesController extends Controller
@@ -248,7 +250,7 @@ class MessagesController extends Controller
      */
     public function createContactChat(Request $request): JsonResponse
     {
-        $data = $request->input('questionsTree');
+        $questionsTree = $request->input('questionsTree') ?: '';
         $customer = $request->user();
 
         try {
@@ -270,6 +272,53 @@ class MessagesController extends Controller
             if($chat === null) {
                 $chat = $helper->createNewChat();
             }
+            $chat->questions_tree = $questionsTree;
+            $chat->need_intervention = true;
+            $chat->save();
+
+            return response()->json([
+                'chatUserToken' => $chatUserToken,
+            ]);
+        } catch (ChatException $e) {
+            $e->log();
+        }
+
+        return response()->json([
+            'error' => 'Problem z utworzeniem nowego czatu dla klienta',
+        ]);
+    }
+
+    /**
+     * Create Chat for Customer Complaint
+     *
+     * @param  CustomerComplaintRequest $request
+     * @param  Order                    $order
+     *
+     * @return JsonResponse
+     */
+    public function createCustomerComplaintChat(CustomerComplaintRequest $request, Order $order): JsonResponse
+    {
+        $complaintForm = $request->validated();
+        $customer = $request->user();
+
+        try {
+            $helper = new MessagesHelper();
+
+            if($order->customer_id !== $customer->id) {
+                throw new ChatException('Customer ID is different than in the order');
+            }
+            $chat = Chat::where('order_id', $order->id)->first();
+            
+            if($chat !== null) {
+                $helper->chatId = $chat->id;
+            }
+
+            $chatUserToken = $helper->getChatToken($order->id, $customer->id, MessagesHelper::TYPE_CUSTOMER);
+            
+            if($chat === null) {
+                $chat = $helper->createNewChat();
+            }
+            $chat->complaint_form = json_encode($complaintForm);
             $chat->need_intervention = true;
             $chat->save();
 
@@ -317,6 +366,20 @@ class MessagesController extends Controller
                 AddLabelService::addLabels($order, [$helper::MESSAGE_GREEN_LABEL_ID], $loopPreventionArray, [], $user->id);
             }
         }
+    }
+    /**
+     * Send complaint email to employee
+     *
+     * @param  string $token
+     *
+     * @return void
+     */
+    public function callComplaint(Request $request, string $token): void
+    {
+        $helper = new MessagesHelper($token);
+        $email = $request->input('email');
+
+        $helper->sendComplaintEmail($email);
     }
 
     public function getHistory(Request $request)

@@ -70,7 +70,7 @@ class AllegroChatInitializer {
         window.open(`/chat/${res.chatUserToken}`, 'chat_' + id);
 
         if(this.mode === 'disputes') {
-            const customerId = thread.order.customer_id;
+            const customerId = thread.customer_id;
             window.open(this.ajaxPath + 'orders?customer_id=' + customerId, 'orders_' + customerId);
         }
 

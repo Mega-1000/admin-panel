@@ -29,6 +29,7 @@ class FirmCreateRequest extends FormRequest
             'email' => 'required|email|unique:firms',
             'firm_type' => 'required|in:PRODUCTION,DELIVERY,OTHER',
             'secondary_email' => 'nullable|email',
+            'complaint_email' => 'nullable|email',
             'phone' => 'nullable',
             'secondary_phone' => 'nullable',
             'nip' => 'nullable|regex:/[0-9]{9}/',

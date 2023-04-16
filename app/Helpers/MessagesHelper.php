@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use App\Entities\ChatUser;
 
 class MessagesHelper
 {
@@ -216,6 +217,26 @@ class MessagesHelper
         return $title;
     }
 
+    /**
+     * Get or if no exist create Blank user (user without any ids, for sending generic messages)
+     *
+     * @param  Chat     $chat
+     *
+     * @return ChatUser $chatUser
+     */
+    public function createOrGetBlankUser(Chat $chat): ChatUser {
+        $chatUser = $chat->chatUsers->whereNull('user_id')->whereNull('customer_id')->whereNull('employee_id')->first();
+
+        if($chatUser === null) {
+
+            $chatUser = new ChatUser();
+            $chatUser->chat()->associate($chat);
+            $chatUser->save();
+        }
+
+        return $chatUser;
+    }
+
     public function createNewChat()
     {
         $chat = new Chat();
@@ -286,16 +307,17 @@ class MessagesHelper
     /**
      * Handle add message to Chat
      *
-     * @param string $message
-     * @param string $area
-     * @param UploadedFile $file
+     * @param string             $message
+     * @param string             $area
+     * @param UploadedFile|null  $file
+     * @param ChatUser|null      $customChatUser
      *
-     * @return Message
+     * @return Message      $msg
      */
-    public function addMessage(string $message, int $area = UserRole::Main, UploadedFile $file = null): Message
+    public function addMessage(string $message, int $area = UserRole::Main, UploadedFile $file = null, ?ChatUser $customChatUser = null): Message
     {
         $chat = $this->getChat();
-        $chatUser = $this->getCurrentChatUser();
+        $chatUser = $customChatUser ?? $this->getCurrentChatUser();
         if (!$chatUser) {
             throw new ChatException('Cannot save message - User not added to chat');
         }
@@ -642,5 +664,66 @@ class MessagesHelper
         $possibleUsers = Employee::findMany($employeesIdsFiltered);
 
         return $possibleUsers;
+    }
+
+    /**
+     * Send complaint email to employee with given chat token
+     *
+     * @param  string $email
+     *
+     * @return void
+     */
+    public function sendComplaintEmail(string $email) {
+
+        $chat = $this->getChat();
+        $complaintForm = $chat->complaint_form;
+
+        if($chat === null) {
+            throw new ChatException('Nieprawidłowy token chatu');
+        }
+        if($complaintForm === '') {
+            throw new ChatException('Czat nie posiada uzupełnionego formularza reklamacji');
+        }
+        if($this->currentUserType !== self::TYPE_USER) {
+            throw new ChatException('Nie masz uprawnień do wysłania wiadomości');
+        }
+
+        $employee = Employee::where('email', $email)->first();
+        
+        if($employee === null) {
+            throw new ChatException('Brak pracownika dla danego adresu Email');
+        }
+
+        $chatUser = ChatUser::where([
+            'chat_id' => $chat->id,
+            'employee_id' => $employee->id,
+        ])->first();
+
+        if($chatUser === null) {
+            $chatUser = new ChatUser();
+            $chatUser->chat()->associate($chat);
+            $chatUser->employee()->associate($employee);
+            $chatUser->save();
+        }
+
+        $newChatToken = $this->getChatToken($chat->order_id, $employee->id, self::TYPE_EMPLOYEE);
+
+        $subject = 'Reklamacja do oferty EPH ID ' . $chat->order_id;
+
+        $complaintForm = json_decode($complaintForm);
+
+        if( isset($complaintForm->trackingNumber) ) {
+            $subject .= ', numer listu przewozowego: '.$complaintForm->trackingNumber;
+        }
+        Helper::sendEmail(
+            $email,
+            'chat-complaint-form',
+            $subject,
+            [
+                'url' => route('chat.show', ['token' => $newChatToken]),
+                'title' => $this->getTitle(false),
+                'complaintForm' => $complaintForm,
+            ]
+        );
     }
 }

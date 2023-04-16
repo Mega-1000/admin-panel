@@ -36,6 +36,7 @@ class FirmUpdateRequest extends FormRequest
             'longitude' => 'nullable',
             'postal_code' => 'nullable|regex:/[0-9]{2}\-[0-9]{3}/',
             'secondary_email' => 'nullable|email',
+            'complaint_email' => 'nullable|email',
             'phone' => 'nullable',
             'secondary_phone' => 'nullable',
         ];

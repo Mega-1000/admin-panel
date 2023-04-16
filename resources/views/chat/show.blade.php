@@ -28,6 +28,14 @@
         <div class="container" id="flex-container">
             <div id="chat-container">
                 <div class="text-center alert alert-info">{!! $title !!}</div>
+                @if($chat->questions_tree && $userType === MessagesHelper::TYPE_USER)
+                    <div class="text-center alert alert-info">
+                        Ścieżka FAQ użytkownika:<br>
+                        @foreach(json_decode($chat->questions_tree) as $questionData)
+                            -> {{ $questionData->question }}<br>
+                        @endforeach
+                    </div>
+                @endif
                 @if (!empty($notices))
                     <div class="alert-info alert">Uwagi konsultanta: <b>{{ $notices }}</b></div>
                 @endif
@@ -74,6 +82,9 @@
             </div>
             <div class="chat-right-column" style="padding-left: 10px;">
                 <img id="bell-icon" onclick="askForPermision" src="/svg/bell-icon.svg" alt="" style="width: 35px; cursor: pointer">
+                @if($chat->complaint_form)
+                    <button id="show_complaint_form" data-complaint-form="{{ $chat->complaint_form }}" class="btn bg-primary call-button">Pokaż formularz reklamacyjny</button>
+                @endif
                 <h3>Użytkownicy:</h3>
                 <div class="chat-users-wrapper" style="overflow: auto; max-height: 100vh;">
                     <table id="chat-users">
@@ -134,6 +145,18 @@
                         @if(!empty($usersHistory))
                             <h3>Pokaż:</h3>
                             @include('chat/history')
+                        @endif
+                        @if( $chat->complaint_form !== '' && $firmWithComplaintEmails->isNotEmpty() )
+                            <div>
+                                <br>
+                                <h4>Reklamacje:</h4>
+                                <select id="complaint_email" style="padding: 5px; margin: 10px 0;">
+                                    @foreach ($firmWithComplaintEmails as $firm)
+                                        <option value="{{ $firm->complaint_email }}">{{ $firm->name }}</option>
+                                    @endforeach
+                                </select>
+                                <button id="call_complaint" class="btn bg-primary">Napisz do firmy z reklamacją</button>
+                            </div>
                         @endif
                     </div>
                 @endif
@@ -208,6 +231,7 @@
             $('#new-message').removeClass('loader-2');
 
             const isConsultant = '{{ $userType == MessagesHelper::TYPE_USER }}';
+            const documentTitle = document.title;
 
             let usersHistoryFilter = new Set();
             let selectedArea = 0;
@@ -321,14 +345,14 @@
                             refreshRate = 1;
                             if(data.messages != '' && document.hidden) {
                                 blinkTitle({
-                                    title: "CZAT MEGA 1000",
+                                    title: documentTitle,
                                     message: "!!! NOWA WIADOMOŚĆ !!!",
                                     delay: 900,
                                     notifyOffPage: true
                                 });
 
                                 const notification = new Notification("!!! NOWA WIADOMOŚĆ !!!", {
-                                    body: "CZAT MEGA 1000",
+                                    body: documentTitle,
                                     icon: "{{ asset('images/logo.png') }}"
                                 });
                             }
@@ -344,7 +368,7 @@
 
             $(window).on('focus', () => {
                 blinkTitleStop();
-                document.title = 'CZAT MEGA 1000';
+                document.title = documentTitle;
             } );
 
 
@@ -377,6 +401,16 @@
                     })
                     .done(() => location.reload());
             })
+            $('#call_complaint').click((event) => {
+                alert('Reklamacja zostanie wysłana na podany adres email');
+                $.ajax({
+                    method: "POST",
+                    url: "{{ $routeCallComplaint }}",
+                    data: {
+                        'email': $('#complaint_email').val()
+                    }
+                }).done(() => location.reload());
+            })
             $('#call-mod').click((event) => {
                 alert('Moderator został poinformowany')
                 $.ajax({
@@ -386,6 +420,27 @@
                         'user_id': event.target.value
                     }
                 })
+            })
+            $('#show_complaint_form').click((e) => {
+                const complaintForm = $(e.target).data('complaint-form');
+                const complaintFormTemplate = `
+                    <div>Imię: ${complaintForm.firstname}</div>
+                    <div>Nazwisko: ${complaintForm.surname}</div>
+                    <div>Telefon: ${complaintForm.phone}</div>
+                    <div>Email: ${complaintForm.email}</div>
+                    <div>Przyczyna: ${complaintForm.reason}</div>
+                    <div>Opis: ${complaintForm.description}</div>
+                    <div>Wartość produktu: ${complaintForm?.valueOfProduct}</div>
+                    <div>Numer konta: ${complaintForm?.accountNumber}</div>
+                    <div>Data: ${complaintForm.date}</div>
+                    <div>Numer kontaktowy do kierowcy: ${complaintForm?.driverPhone}</div>
+                    <div>Numer śledzenia: ${complaintForm?.trackingNumber}</div>
+                `;
+                let params = `scrollbars=no,resizable=no,status=no,location=no,toolbar=no,menubar=no,
+                width=700,height=450,left=100,top=100`;
+
+                const complaintWindow = window.open('about:blank', '', params);
+                complaintWindow.document.body.innerHTML = complaintFormTemplate;
             })
             $('#call-worker').click((event) => {
                 alert('Pracownicy zostali poinformowani')

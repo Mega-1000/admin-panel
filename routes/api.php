@@ -34,6 +34,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('chat/getHistory', 'Api\MessagesController@getHistory')->name('api.messages.get-history');
     Route::get('invoices/get/{id}', 'Api\InvoicesController@getInvoice')->name('api.invoices.get');
     Route::post('create_contact_chat', 'Api\MessagesController@createContactChat')->name('api.orders.create_contact_chat');
+    Route::post('createCustomerComplaintChat/{order_id}', 'Api\MessagesController@createCustomerComplaintChat')->name('api.orders.createCustomerComplaintChat');
 
     Route::middleware('staff.api')->group(function () {
         Route::group(['prefix' => 'faqs'], function () {
@@ -142,6 +143,7 @@ Route::post('chat/addUser/{token}', 'Api\MessagesController@addUser')->name('api
 Route::post('chat/removeUser/{token}', 'Api\MessagesController@removeUser')->name('api.messages.remove-user');
 Route::post('chat/editPrices/{token}', 'Api\MessagesController@editPrices')->name('api.messages.edit-prices');
 Route::post('chat/closeChat/{token}', 'Api\MessagesController@closeChat')->name('api.messages.closeChat');
+Route::post('chat/callComplaint/{token}', 'Api\MessagesController@callComplaint')->name('api.messages.callComplaint');
 
 Route::post('auth/code/{id}', 'Api\AutheticationController@getToken')->name('api.authenticate.get-token');
 
