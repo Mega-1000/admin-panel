@@ -18,7 +18,6 @@ use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
@@ -186,12 +185,12 @@ class ImportCsvFileJob implements ShouldQueue
     /**
      * @throws Exception
      */
-    private function saveCategory($line, $categoryTree, $categoryColumn)
+    private function saveCategory(array $line, array $categoryTree, int $categoryColumn)
     {
         $parent = &$this->getCategoryParent($categoryTree);
 
 
-        /** @var Collection $existingCategory */
+        /** @var Category $existingCategory */
         $existingCategory = $this->currentCategories->filter(function ($category) use ($categoryTree) {
             return $category->name === end($categoryTree);
         })->first();
@@ -412,10 +411,10 @@ class ImportCsvFileJob implements ShouldQueue
         $packing->fill($array);
         $product->packing()->save($packing);
 
-        if ($product->stock === null) {
-            $product->stock()->save(new Entities\ProductStock([
+        if ($product->stock()->exists() === false) {
+            $product->stock()->create([
                 'quantity' => 0
-            ]));
+            ]);
         }
 
         return $product;
