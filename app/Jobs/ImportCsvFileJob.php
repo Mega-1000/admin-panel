@@ -58,7 +58,6 @@ class ImportCsvFileJob implements ShouldQueue
      */
     public function handle()
     {
-        $this->log('okej');
         $path = Storage::path('user-files/baza/baza.csv');
 
         if (!file_exists($path) || !$this->tryStartImport()) {
