@@ -412,7 +412,7 @@ class ImportCsvFileJob implements ShouldQueue
         $packing->fill($array);
         $product->packing()->save($packing);
 
-        if ($product->stock !== null) {
+        if ($product->stock === null) {
             $product->stock()->save(new Entities\ProductStock([
                 'quantity' => 0
             ]));
