@@ -58,6 +58,7 @@ class ImportCsvFileJob implements ShouldQueue
      */
     public function handle()
     {
+        $this->log('okej');
         $path = Storage::path('user-files/baza/baza.csv');
 
         if (!file_exists($path) || !$this->tryStartImport()) {
@@ -412,7 +413,7 @@ class ImportCsvFileJob implements ShouldQueue
         $packing->fill($array);
         $product->packing()->save($packing);
 
-        if ($product->stock !== null) {
+        if ($product->stock === null) {
             $product->stock()->save(new Entities\ProductStock([
                 'quantity' => 0
             ]));
