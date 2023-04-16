@@ -19,6 +19,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('change-password', 'Api\CustomersController@changePassword')->name('change-password');
         Route::put('update', 'Api\CustomersController@update')->name('update');
         Route::get('orders', 'Api\CustomersController@getOrders')->name('get-orders');
+        Route::post('unregister', 'Api\CustomersController@unregister')->name('unregister');
     });
 
     Route::prefix('orders')->name('api.orders.')->group(function () {
