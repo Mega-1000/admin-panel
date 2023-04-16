@@ -1017,8 +1017,10 @@ class OrdersController extends Controller
     public function moveToUnactive(Order $order): JsonResponse
     {
         try {
-            $order->labels()->detach(224);
             $order->labels()->attach(225);
+
+            $order->status_id = 8;
+            $order->save();
         } catch (Throwable $exception) {
             return response()->json([
                 'status' => false,
@@ -1042,6 +1044,8 @@ class OrdersController extends Controller
         Order::query()->update([
             'reminder_date' => $data['dateTime']
         ]);
+
+        $order->labels()->attach(224);
 
         $date = Carbon::createFromFormat('Y-m-d H:i', $data['dateTime']);
 
