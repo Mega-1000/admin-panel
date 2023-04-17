@@ -622,9 +622,6 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('/courier', 'CourierController@index')->name('courier.index');           
     Route::get('/courier/{courier}/edit', 'CourierController@edit')->name('courier.edit');
     Route::put('/courier/{courier}/update', 'CourierController@update')->name('courier.update');     
-
-
-    Route::get('/timetables/cron', 'TimetablesController@cron')->name('timetables.cron');
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
