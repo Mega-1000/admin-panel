@@ -13,6 +13,7 @@ use App\Entities\OrderAddress;
 use App\Entities\OrderDates;
 use App\Entities\WorkingEvents;
 use App\Enums\PackageStatus;
+use App\Facades\Mailer;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\ChatHelper;
 use App\Helpers\GetCustomerForAdminEdit;
@@ -58,7 +59,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use App\Facades\Mailer;
 use Throwable;
 
 /**
@@ -505,7 +505,7 @@ class OrdersController extends Controller
         } catch (Exception $e) {
             Log::error(
                 'Problem with update customer invoice and delivery address.',
-                ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => $e->getLine()]
+                ['exception' => $e->getMessage(), 'class' => $e->getTraceAsString(), 'line' => $e->getLine()]
             );
             die();
         }
