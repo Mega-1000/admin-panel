@@ -155,7 +155,10 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    align-items: center;
     margin-bottom: 5px !important;
+    border: 1px solid #ddd;
+    background-color: #f7f6f6;
 }
 
 .z-index-max {

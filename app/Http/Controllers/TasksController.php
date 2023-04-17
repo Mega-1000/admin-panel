@@ -24,6 +24,7 @@ use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
+use App\Services\TaskService;
 use App\User;
 use Carbon\Carbon;
 use Exception;
@@ -53,12 +54,16 @@ class TasksController extends Controller
 
     protected $taskTimeRepository;
 
+    /** @var TaskService */
+    protected $taskService;
+
     public function __construct(
         TaskRepository      $repository,
         UserRepository      $userRepository,
         OrderRepository     $orderRepository,
         WarehouseRepository $warehouseRepository,
-        TaskTimeRepository  $taskTimeRepository
+        TaskTimeRepository  $taskTimeRepository,
+        TaskService $taskService
     )
     {
         $this->repository = $repository;
@@ -66,6 +71,7 @@ class TasksController extends Controller
         $this->orderRepository = $orderRepository;
         $this->warehouseRepository = $warehouseRepository;
         $this->taskTimeRepository = $taskTimeRepository;
+        $this->taskService = $taskService;
     }
 
 
@@ -139,6 +145,7 @@ class TasksController extends Controller
                 'date_start' => $request->date_start,
                 'date_end' => $request->date_end,
             ]);
+
             $task->taskSalaryDetail()->create($request->all());
 
             if ($request->quickTask) {
@@ -451,6 +458,9 @@ class TasksController extends Controller
 //                'customTaskId' => ''
 //            ];
 //        }
+
+        //DODANIE SEPARATORA
+        $array = array_merge($array,$this->taskService->getSeparator($id,$request->start,$request->end));
 
         return response()->json($array);
     }

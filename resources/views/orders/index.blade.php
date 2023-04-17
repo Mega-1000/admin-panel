@@ -1037,7 +1037,7 @@
                 $('#print-package-group').modal('hide');
             }, 5000);
         });
-        $('.print-group').click(event => {
+        $('.print-group .print-list').click(event => {
             $('#print-package-type').val(event.currentTarget.name);
             let opt = $(event.currentTarget).data('couriertasks');
             let select = $('#print-package-group').find('[name="task_id"]');

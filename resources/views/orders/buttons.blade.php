@@ -78,7 +78,7 @@
             Edytuj regulamin allegro
         </a>
     </div>
-    <div class="col-md-10">
+    <div class="col-md-8">
         <form method="POST" action="{{ route('order_packages.getProtocols') }}">
             @if ($errors->any())
                 <div class="alert alert-danger">
@@ -480,15 +480,19 @@
             </div>
         </div>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-3">
         <h4>Drukuj paczki z grupy:</h4>
         @foreach($couriersTasks as $courierCode => $tasksInDay)
             <div class="row">
-                <button class="btn btn-info print-group col-lg-12"
-                        name="{{ $courierCode }}"
-                        data-courierTasks="{{ json_encode($tasksInDay) }}">
+                <div class="col-lg-12 print-group">
                         {{ \App\Enums\CourierName::DELIVERY_TYPE_LABELS[$courierCode] }}
                     <div>
+                        <span class="print-auto btn btn-success"
+                        name="{{ $courierCode }}"
+                        data-courierTasks="{{ json_encode($tasksInDay) }}">Automat</span>
+                        <span class="print-list btn btn-primary"
+                        name="{{ $courierCode }}"
+                        data-courierTasks="{{ json_encode($tasksInDay) }}">Z listy</span>
                         <span class="badge"
                               style=" color:#fff !important; background-color:#f96868 !important;">{{ count($tasksInDay['past']) }}</span>
                         @foreach($tasksInDay as $date => $tasks)
@@ -499,7 +503,7 @@
                         <span class="badge"
                               style=" color:#fff !important; background-color:#526069 !important;">{{ count($tasksInDay['future']) }}</span>
                     </div>
-                </button>
+</div>
             </div>
         @endforeach
         <div class="row">

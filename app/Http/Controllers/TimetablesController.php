@@ -6,6 +6,7 @@ use App\Entities\Task;
 use App\Entities\Warehouse;
 use App\Repositories\TaskRepository;
 use App\Repositories\WarehouseRepository;
+use App\Services\TaskService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -15,10 +16,18 @@ class TimetablesController extends Controller
 
     protected $taskRepository;
 
-    public function __construct(WarehouseRepository $warehouseRepository, TaskRepository $taskRepository)
+    /** @var TaskService */
+    protected $taskService;
+
+    public function __construct(
+        WarehouseRepository $warehouseRepository, 
+        TaskRepository $taskRepository,
+        TaskService $taskService
+    )
     {
         $this->warehouseRepository = $warehouseRepository;
         $this->taskRepository = $taskRepository;
+        $this->taskService = $taskService;
     }
 
     public function index(Request $request)
