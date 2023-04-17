@@ -3,61 +3,53 @@
 namespace App\Http\Controllers;
 
 use App\Entities\ColumnVisibility;
+use App\Entities\Customer;
+use App\Entities\FirmSource;
+use App\Entities\Order;
+use App\Entities\OrderItem;
 use App\Entities\OrderReturn;
+use App\Entities\Product;
 use App\Entities\ProductStock;
 use App\Entities\ProductStockLog;
 use App\Entities\ProductStockPosition;
+use App\Helpers\BackPackPackageDivider;
+use App\Helpers\GetCustomerForAdminEdit;
+use App\Helpers\GetCustomerForNewOrder;
+use App\Helpers\OrderBuilder;
+use App\Helpers\OrderPriceCalculator;
+use App\Helpers\TransportSumCalculator;
+use App\Http\Requests\CalculateAdminOrderRequest;
+use App\Http\Requests\CreateAdminOrderRequest;
 use App\Http\Requests\ProductStockUpdateRequest;
 use App\Repositories\ProductRepository;
 use App\Repositories\ProductStockLogRepository;
+use App\Repositories\ProductStockLogs;
 use App\Repositories\ProductStockPositionRepository;
 use App\Repositories\ProductStockRepository;
+use App\Services\OrderService;
 use App\Services\ProductService;
+use App\User;
+use Carbon\Carbon;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
 
 class ProductStocksController extends Controller
 {
-    /**
-     * @var ProductStockRepository
-     */
-    protected $repository;
-
-    /**
-     * @var ProductRepository
-     */
-    protected $productRepository;
-
-    /**
-     * @var ProductStockPositionRepository
-     */
-    protected $productStockPositionRepository;
-
-    /**
-     * @var ProductStockLogRepository
-     */
-    protected $productStockLogRepository;
-
-    protected $productService;
-
     public function __construct(
-        ProductStockRepository         $repository,
-        ProductRepository              $productRepository,
-        ProductStockPositionRepository $productStockPositionRepository,
-        ProductStockLogRepository      $productStockLogRepository,
-        ProductService                 $productService
+        protected readonly ProductStockRepository         $repository,
+        protected readonly ProductRepository              $productRepository,
+        protected readonly ProductStockPositionRepository $productStockPositionRepository,
+        protected readonly ProductStockLogRepository      $productStockLogRepository,
+        protected readonly ProductService                 $productService,
+        protected readonly OrderService                   $orderService
     )
     {
-        $this->repository = $repository;
-        $this->productRepository = $productRepository;
-        $this->productStockPositionRepository = $productStockPositionRepository;
-        $this->productStockLogRepository = $productStockLogRepository;
-        $this->productService = $productService;
     }
 
     /**
@@ -294,5 +286,47 @@ class ProductStocksController extends Controller
         }
 
         return view('product_stocks.changes', compact('groupedProductsStocksChanges', 'startDate', 'endDate'));
+    }
+
+    /**
+     * @param ProductStock $productStock
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function placeAdminSideOrder(ProductStock $productStock): \Illuminate\Contracts\View\View
+    {
+        return view('product_stocks.place_admin_side_order', compact('productStock'));
+    }
+
+    /**
+     * Calculate order quantity for admin side order
+     *
+     * @param CalculateAdminOrderRequest $request
+     * @param ProductStock $productStock
+     * @return JsonResponse
+     */
+    public function calculateAdminOrder(CalculateAdminOrderRequest $request, ProductStock $productStock): JsonResponse
+    {
+        return response()->json([
+            'orderQuantity' =>  $this->orderService->calculateOrderData($productStock, $request->validated('daysBack'), $request->validated('daysToFuture')),
+        ]);
+    }
+
+    /**
+     * create order
+     *
+     * @param CreateAdminOrderRequest $request
+     * @param ProductStock $productStock
+     * @param ProductService $productService
+     * @return JsonResponse
+     */
+    public function createAdminOrder(CreateAdminOrderRequest $request, ProductStock $productStock, ProductService $productService): JsonResponse
+    {
+        $data = $request->validated();
+
+        $order = $this->orderService->createOrder($productStock, $data, $productService);
+
+        return response()->json([
+            'order' => $order,
+        ]);
     }
 }

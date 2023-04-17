@@ -57,6 +57,7 @@ class OrderBuilder
 
     private $productService;
 
+
     public function setPackageGenerator(iDividable $generator)
     {
         $this->packageGenerator = $generator;
@@ -147,7 +148,7 @@ class OrderBuilder
         }
 
         $order->save();
-        
+
         $emailSendingService = new EmailSendingService();
         $emailSendingService->addNewScheduledEmail($order);
 
@@ -277,7 +278,7 @@ class OrderBuilder
         ]);
     }
 
-    private function assignItemsToOrder($order, $items)
+    public function assignItemsToOrder($order, $items)
     {
         $weight = 0;
         $orderItems = $order->items;
