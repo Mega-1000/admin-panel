@@ -345,10 +345,10 @@ class EmailTagHandlerHelper
 
         if($workingAddress === null) return '';
 
-        $credentials = base64_encode($workingAddress->email.':'.$workingAddress->phone);
+        $credentials = $workingAddress->email.':'.$workingAddress->phone;
 
         // Jeżeli masz pytania zapoznaj się z naszym FAQ:<br>
-        $template = config('app.front_url') . "/faq?credentials=".$credentials;
+        $template = config('app.front_url') . "/faq?credentials=".$credentials."&showFaq=true";
 
 		return $template;
 	}
