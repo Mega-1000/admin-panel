@@ -430,7 +430,8 @@
                     <div>Email: ${complaintForm.email}</div>
                     <div>Przyczyna: ${complaintForm.reason}</div>
                     <div>Opis: ${complaintForm.description}</div>
-                    <div>Wartość produktu: ${complaintForm?.valueOfProduct}</div>
+                    <div>Wartość produktu: ${complaintForm?.productValue}</div>
+                    <div>Wartość uszkodzonych produktów: ${complaintForm?.damagedProductsValue}</div>
                     <div>Numer konta: ${complaintForm?.accountNumber}</div>
                     <div>Data: ${complaintForm.date}</div>
                     <div>Numer kontaktowy do kierowcy: ${complaintForm?.driverPhone}</div>
