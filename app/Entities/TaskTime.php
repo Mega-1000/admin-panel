@@ -26,6 +26,9 @@ class TaskTime extends Model implements Transformable
         'date_end'
     ];
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function task()
     {
         return $this->belongsTo(Task::class);

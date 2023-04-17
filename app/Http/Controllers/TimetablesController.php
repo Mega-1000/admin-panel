@@ -109,4 +109,9 @@ class TimetablesController extends Controller
 
         return response()->json($warehouse->users, 200);
     }
+    
+    public function cron(Request $request)
+    {
+        return $this->taskService->transfersTask();
+    }
 }

@@ -122,7 +122,7 @@ class TaskService
         $array = [];
 
         foreach($users as $user_id){
-            $takstime = TaskTime::with(['task'])
+            $takstime = TaskTime::with('task')
             ->whereHas('task',
                 function ($query) use ($user_id,$id) {
                     $query->where('user_id', $user_id);
@@ -134,15 +134,15 @@ class TaskService
             ->whereDate('date_end', '<=', $end)
             ->whereNull('transfer_date')
             ->orderBy('date_start', 'asc')
-            ->get()->first();
+            ->get();
             
-            if($takstime){
-                $start = Carbon::parse($takstime->date_start)->subMinute();
-                $end = Carbon::parse($takstime->date_start);
+            if($takstime->first()){
+                $start = Carbon::parse($takstime->first()->date_start)->subMinute();
+                $end = Carbon::parse($takstime->first()->date_start);
                 
                 $array[] = [
                     'id' => null,
-                    'resourceId' => $takstime->task->user_id,
+                    'resourceId' => $takstime->first()->task->user_id,
                     'title' => '',
                     'start' => $start->format('Y-m-d\TH:i'),
                     'end' => $end->format('Y-m-d\TH:i'),
@@ -185,7 +185,7 @@ class TaskService
     {
         $users = [36, 37, 38];
         $colors = ['FF0000', 'E6C74D', '194775'];
-        
+
         $today = Carbon::today();
         foreach($users as $user_id){
             $time_start = Carbon::parse($today->format('Y-m-d').' '.$this->getTimeLastTask($user_id));
@@ -193,7 +193,7 @@ class TaskService
                 $time_start = $this->prepareTransfersTask($user_id,$color,$time_start);
             }
         }
-
+ 
         return 'completed';
     }
 
@@ -267,10 +267,10 @@ class TaskService
             ->where('date_start', 'like' , $date->format('Y-m-d')."%")
             ->whereNotNull('transfer_date')
             ->orderBy('date_start', 'asc')
-            ->get()->first();
+            ->get();
 
-        if(isset($takstime)){
-            $time = Carbon::parse($takstime->date_end)->format('H:i:s');
+        if(count($takstime)){
+            $time = Carbon::parse($takstime->first()->date_end)->format('H:i:s');
         }else{
             $time = Carbon::parse($date->format('Y-m-d').' 7:00')->format('H:i:s');
         }

@@ -70,6 +70,9 @@ class Task extends Model implements Transformable
         return $this->hasOne(TaskSalaryDetails::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
     public function taskTime()
     {
         return $this->hasOne(TaskTime::class);
