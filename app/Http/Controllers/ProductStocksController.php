@@ -41,37 +41,13 @@ use Yajra\DataTables\Facades\DataTables;
 
 class ProductStocksController extends Controller
 {
-    /**
-     * @var ProductStockRepository
-     */
-    protected $repository;
-
-    /**
-     * @var ProductRepository
-     */
-    protected $productRepository;
-
-    /**
-     * @var ProductStockPositionRepository
-     */
-    protected $productStockPositionRepository;
-
-    /**
-     * @var ProductStockLogRepository
-     */
-    protected $productStockLogRepository;
-
-    protected $productService;
-
-    protected $orderService;
-
     public function __construct(
-        ProductStockRepository         $repository,
-        ProductRepository              $productRepository,
-        ProductStockPositionRepository $productStockPositionRepository,
-        ProductStockLogRepository      $productStockLogRepository,
-        ProductService                 $productService,
-        OrderService                   $orderService
+        protected ProductStockRepository         $repository,
+        protected ProductRepository              $productRepository,
+        protected ProductStockPositionRepository $productStockPositionRepository,
+        protected ProductStockLogRepository      $productStockLogRepository,
+        protected ProductService       $productService,
+        protected OrderService         $orderService
     )
     {
         $this->repository = $repository;
