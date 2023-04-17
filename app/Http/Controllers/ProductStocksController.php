@@ -46,8 +46,8 @@ class ProductStocksController extends Controller
         protected ProductRepository              $productRepository,
         protected ProductStockPositionRepository $productStockPositionRepository,
         protected ProductStockLogRepository      $productStockLogRepository,
-        protected ProductService       $productService,
-        protected OrderService         $orderService
+        protected ProductService                 $productService,
+        protected OrderService                   $orderService
     )
     {
         $this->repository = $repository;
