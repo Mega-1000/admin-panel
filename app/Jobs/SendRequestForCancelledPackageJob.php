@@ -2,15 +2,16 @@
 
 namespace App\Jobs;
 
+use App\Facades\Mailer;
+use App\Mail\SendRequestForCancelledPackageMail;
 use App\Repositories\FirmRepository;
 use App\Repositories\OrderPackageRepository;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
-use App\Mail\SendRequestForCancelledPackageMail;
 use romanzipp\QueueMonitor\Traits\IsMonitored;
 
 class SendRequestForCancelledPackageJob implements ShouldQueue
@@ -66,9 +67,9 @@ class SendRequestForCancelledPackageJob implements ShouldQueue
                 die();
         }
 
-        $url = env('APP_URL') . '/api/order-shipping-cancelled/' . $package->id;
+        $url = config('app.url') . '/api/order-shipping-cancelled/' . $package->id;
 
-        \Mailer::create()
+        Mailer::create()
             ->to($email)
             ->send(new SendRequestForCancelledPackageMail("Prośba o anulację nadania paczki", $package,
                 $url));

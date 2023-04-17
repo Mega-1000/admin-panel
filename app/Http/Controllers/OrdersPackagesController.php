@@ -838,9 +838,8 @@ class OrdersPackagesController extends Controller
             'height' => $package->size_c,
             'notices' => $package->notices !== null ? $package->notices : 'Brak',
             'cash_on_delivery' => $package->cash_on_delivery !== null,
-            // TODO REMOVE  ENV
-            'number_account_for_cash_on_delivery' => $package->cash_on_delivery !== null ? env('ACCOUNT_NUMBER') : null,
-            'bank_name' => $package->cash_on_delivery !== null ? env('BANK_NAME') : null,
+            'number_account_for_cash_on_delivery' => $package->cash_on_delivery !== null ? config('orders.account_number') : null,
+            'bank_name' => $package->cash_on_delivery !== null ? config('orders.bank_name') : null,
             'price_for_cash_on_delivery' => ($package->cash_on_delivery !== null) ? ($package->cash_on_delivery === 0 ? null : $package->cash_on_delivery) : null,
             'amount' => 1000,
             'content' => $package->content,

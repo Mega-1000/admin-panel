@@ -125,8 +125,7 @@ class AllegroOrderSynchro implements ShouldQueue
         $this->orderRepository = app(OrderRepository::class);
         $this->orderPackagesDataHelper = app(OrderPackagesDataHelper::class);
         $this->emailSendingService = app(EmailSendingService::class);
-        // TODO Change to configuration
-        $this->tax = (float)(1 + env('VAT'));
+        $this->tax = (float)(1 + config('orders.vat'));
         if ($this->synchronizeAll) {
             $allegroOrders = $this->allegroOrderService->getOrdersOutsideSystem();
         } else {
@@ -225,7 +224,7 @@ class AllegroOrderSynchro implements ShouldQueue
 
                 $order->total_price = $allegroOrder['summary']['totalToPay']['amount'];
                 // TODO Change to configuration
-                $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 1)->first();
+                $firmSource = FirmSource::byFirmAndSource(config('orders.firm_id'), 1)->first();
                 $order->firm_source_id = $firmSource ? $firmSource->id : null;
 
                 $user = User::where('name', '001')->first();

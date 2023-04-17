@@ -24,7 +24,7 @@ class SearchOrdersInStoredMailsJob extends Job implements ShouldQueue
         OrderRepository        $orderRepository
     )
     {
-        $mbox = imap_open(env('IMAP_INBOX'), "info@" . env('DOMAIN_NAME'), env('IMAP_PASSWORD'));
+        $mbox = imap_open(config('mail.imap_inbox'), "info@" . config('app.domain_name'), config('mail.imap_password'));
         $message_count = imap_num_msg($mbox);
         for ($i = 1; $i < $message_count; $i++) {
             $headers = imap_fetchheader($mbox, $i, FT_PREFETCHTEXT);

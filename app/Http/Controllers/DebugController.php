@@ -10,7 +10,7 @@ class DebugController extends Controller
 {
     public function index()
     {
-        if (env('APP_ENV') == 'production') {
+        if (config('app.env') == 'production') {
             return null;
         }
         $ess = new EmailSendingService();

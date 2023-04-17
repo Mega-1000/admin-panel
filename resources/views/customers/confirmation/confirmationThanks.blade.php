@@ -8,7 +8,7 @@
             crossorigin="anonymous"></script>
 
     <script>
-        $( document ).ready(function() {
+        $(document).ready(function () {
             $('input#crm-data').on('click', function () {
                 console.log('test');
                 $('#whichData').val(0);
@@ -22,9 +22,10 @@
     </script>
 </head>
 <div class="container text-center">
-    <img src="{{env('APP_URL') . 'images/logo.png'}}" alt="">
+    <img src="{{config('app.url') . 'images/logo.png'}}" alt="">
     <h1>Dziękujemy za wybranie danych do faktury.</h1>
-    <h3>Zapraszamy do odwiedzin naszego sklepu <a href="{{env('FRONT_URL')}}">{{env('DOMAIN_NAME')}}</a></h3>
+    <h3>Zapraszamy do odwiedzin naszego sklepu <a
+            href="{{config('app.front_url')}}">{{config('app.domain_name')}}</a></h3>
 </div>
 
 @section('javascript')
@@ -49,10 +50,12 @@
         });
 
     </script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.1/bootstrap3-typeahead.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-3-typeahead/4.0.1/bootstrap3-typeahead.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/locale/pl.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/eonasdan-bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/eonasdan-bootstrap-datetimepicker/4.17.47/js/bootstrap-datetimepicker.min.js"></script>
     <script src="{{ URL::asset('js/app.js') }}"></script>
     @yield('scripts')
 @endsection

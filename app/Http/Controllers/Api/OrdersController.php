@@ -223,7 +223,7 @@ class OrdersController extends Controller
             DB::commit();
 
             $order = Order::query()->find($builderData['id']);
-            $order->firm_source_id = FirmSource::byFirmAndSource(env('FIRM_ID'), 2)->value('id');
+            $order->firm_source_id = FirmSource::byFirmAndSource(config('orders.firm_id'), 2)->value('id');
             $order->save();
 
             $builderData['token'] = $order->getToken();

@@ -4,11 +4,12 @@ namespace App\Jobs;
 
 use App\Entities\Label;
 use App\Entities\Order;
-use App\Facades\Mailer;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use App\Entities\OrderWarehouseNotification;
+use App\Facades\Mailer;
 use App\Mail\OrderStatusChangedToDispatchMail;
+use Exception;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class OrderStatusChangedToDispatchNotificationJob
@@ -56,10 +57,11 @@ class OrderStatusChangedToDispatchNotificationJob extends Job implements ShouldQ
      *
      * @return void
      */
-    public function handle() {
+    public function handle()
+    {
         try {
             $order = Order::findOrFail($this->orderId);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             Log::error($exception->getMessage(), ['line' => $exception->getLine(), 'file' => $exception->getFile(), 'comment' => 'Nie znaleziono zamówienia o numerze: ' . $this->orderId . ' podczas wysyłania awizacji.']);
             return;
         }
@@ -81,7 +83,7 @@ class OrderStatusChangedToDispatchNotificationJob extends Job implements ShouldQ
         ];
 
         $notification = OrderWarehouseNotification::where($dataArray)->first();
-        if(!empty($notification) && (!$order->isOrderHasLabel(Label::PACKAGE_NOTIFICATION_SENT_LABEL) || $order->isOrderHasLabel(Label::PACKAGE_NOTIFICATION_LABEL))) {
+        if (!empty($notification) && (!$order->isOrderHasLabel(Label::PACKAGE_NOTIFICATION_SENT_LABEL) || $order->isOrderHasLabel(Label::PACKAGE_NOTIFICATION_LABEL))) {
             $notification->update([
                 'order_id' => $this->orderId,
                 'warehouse_id' => $order->warehouse_id,
@@ -95,10 +97,10 @@ class OrderStatusChangedToDispatchNotificationJob extends Job implements ShouldQ
             $notification = OrderWarehouseNotification::create($dataArray);
         }
 
-        $acceptanceFormLink = rtrim(env('FRONT_NUXT_URL'),"/") . "/magazyn/awizacja/{$notification->id}/{$order->warehouse_id}/{$this->orderId}";
-        $sendFormInvoice = rtrim(env('FRONT_NUXT_URL'),"/") . "/magazyn/awizacja/{$notification->id}/{$order->warehouse_id}/{$this->orderId}/wyslij-fakture";
+        $acceptanceFormLink = rtrim(config('app.front_nuxt_url'), "/") . "/magazyn/awizacja/{$notification->id}/{$order->warehouse_id}/{$this->orderId}";
+        $sendFormInvoice = rtrim(config('app.front_nuxt_url'), "/") . "/magazyn/awizacja/{$notification->id}/{$order->warehouse_id}/{$this->orderId}/wyslij-fakture";
 
-        if(!!filter_var($warehouseMail, FILTER_VALIDATE_EMAIL)) {
+        if (!!filter_var($warehouseMail, FILTER_VALIDATE_EMAIL)) {
             if ($this->path === null) {
                 $email = new OrderStatusChangedToDispatchMail($subject, $acceptanceFormLink, $sendFormInvoice, $order, $this->self);
                 Mailer::notification()->to($warehouseMail)->send($email);

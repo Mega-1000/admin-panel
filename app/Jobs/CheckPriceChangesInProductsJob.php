@@ -68,7 +68,7 @@ class CheckPriceChangesInProductsJob implements ShouldQueue
                     $this->sendEmail($warehouse, $email);
                 }
                 // TODO Change to configuration
-                $this->sendEmail($warehouse, 'info@' . env('DOMAIN_NAME'));
+                $this->sendEmail($warehouse, 'info@' . config('app.domain_name'));
             } else {
                 Log::notice(
                     'Warehouse not found',
@@ -76,7 +76,7 @@ class CheckPriceChangesInProductsJob implements ShouldQueue
                 );
                 Mailer::create()
                     // TODO Change to configuration
-                    ->to('info@' . env('DOMAIN_NAME'))
+                    ->to('info@' . config('app.domain_name'))
                     ->send(new SendToMega1000WarehouseNotFoundMail("Brak danych magazynu " . $supplier, $supplier));
             }
         }
@@ -97,7 +97,7 @@ class CheckPriceChangesInProductsJob implements ShouldQueue
     private function sendEmail($warehouse, $email)
     {
         // TODO Change to configuration
-        $sendFormWithProducts = rtrim(env('FRONT_NUXT_URL'), "/") . "/magazyn/aktualizacja-cen/{$warehouse->id}/zaktualizuj";
+        $sendFormWithProducts = rtrim(config('app.front_nuxt_url'), "/") . "/magazyn/aktualizacja-cen/{$warehouse->id}/zaktualizuj";
         Mailer::create()
             ->to($email)
             ->send(

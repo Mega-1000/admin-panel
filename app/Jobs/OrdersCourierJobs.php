@@ -826,7 +826,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                 auth()->user()->email,
                 'send-log',
                 // TODO Change to configuration
-                'Błąd zamiawiania paczki ' . env('APP_NAME'),
+                'Błąd zamiawiania paczki ' . config('app.name'),
                 [
                     'date' => now(),
                     'logMessage' => $id
@@ -855,8 +855,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
             Helper::sendEmail(
                 auth()->user()->email,
                 'send-log',
-                // TODO Change to configuration
-                'Błąd zamiawiania paczki ' . env('APP_NAME'),
+                'Błąd zamiawiania paczki ' . config('app.name'),
                 [
                     'date' => now(),
                     'logMessage' => $createOrderResponseDTO->getOrderId()

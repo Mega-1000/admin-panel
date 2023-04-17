@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ExchangeRequest\GenerateLinkRequest;
 use App\Http\Requests\Api\ExchangeRequest\NewOfferRequest;
 use App\Jobs\SendOfferToSpedition;
@@ -11,9 +12,8 @@ use App\Repositories\FirmRepository;
 use App\Repositories\SpeditionExchangeItemRepository;
 use App\Repositories\SpeditionExchangeOfferRepository;
 use App\Repositories\SpeditionExchangeRepository;
-use App\Http\Controllers\Controller;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
+use Mailer;
 
 class SpeditionExchangeController extends Controller
 {
@@ -39,11 +39,12 @@ class SpeditionExchangeController extends Controller
      * @param FirmRepository $firmRepository
      */
     public function __construct(
-        SpeditionExchangeRepository $speditionExchangeRepository,
-        SpeditionExchangeItemRepository $speditionExchangeItemRepository,
+        SpeditionExchangeRepository      $speditionExchangeRepository,
+        SpeditionExchangeItemRepository  $speditionExchangeItemRepository,
         SpeditionExchangeOfferRepository $speditionExchangeOffer,
-        FirmRepository $firmRepository
-    ) {
+        FirmRepository                   $firmRepository
+    )
+    {
         $this->speditionExchangeRepository = $speditionExchangeRepository;
         $this->speditionExchangeItemRepository = $speditionExchangeItemRepository;
         $this->speditionExchangeOffer = $speditionExchangeOffer;
@@ -77,12 +78,12 @@ class SpeditionExchangeController extends Controller
     public function getDetails($hash)
     {
         return $this->speditionExchangeRepository
-            ->with(['items', 'items.order.speditionPayments', 'items.order', 'items.order.addresses' => function($q) {
+            ->with(['items', 'items.order.speditionPayments', 'items.order', 'items.order.addresses' => function ($q) {
                     $q->where('type', '=', 'DELIVERY_ADDRESS');
                 }, 'items.order.warehouse', 'items.order.warehouse.address', 'items.order.warehouse.property',
-                'items.order.packages'  => function($q) {
-                    $q->where('service_courier_name', '=', 'GIELDA');
-                }]
+                    'items.order.packages' => function ($q) {
+                        $q->where('service_courier_name', '=', 'GIELDA');
+                    }]
             )
             ->findByField('hash', $hash)
             ->first();
@@ -128,13 +129,13 @@ class SpeditionExchangeController extends Controller
         $exchange->chosen_spedition_offer_id = $offer->id;
         $exchange->save();
 
-        \Mailer::create()
+        Mailer::create()
             ->to($offer->email)
             ->send(new AcceptOfferMail("Potwierdzenie spedycji", $this->generateLinkForExchange($offer->speditionExchange->hash)));
 
         $rejectedOffers = $exchange->speditionOffers()->where('id', '<>', $offerId)->get();
         foreach ((array)$rejectedOffers as $rejectedOffer) {
-            \Mailer::create()
+            Mailer::create()
                 ->to($rejectedOffer[0]->email)
                 ->send(new RejectOfferMail("Spedycja nieaktualna"));
         }
@@ -145,6 +146,6 @@ class SpeditionExchangeController extends Controller
     /** Helper function */
     protected function generateLinkForExchange($hash)
     {
-        return rtrim(env('FRONT_NUXT_URL'),"/") . "/gielda/transport/{$hash}";
+        return rtrim(config('app.front_nuxt_url'), "/") . "/gielda/transport/{$hash}";
     }
 }
