@@ -192,6 +192,11 @@ class OrdersController extends Controller
         $data = $request->all();
         $customer = Customer::query()->where('login', $data['customer_login'])->first();
 
+        // ensure to get last 9 number from data['phone']
+        if( strlen($data['phone']) > 9 ) {
+            $data['phone'] = substr( $data['phone'], -9);
+        }
+
         if ($data['customer_login'] && !$customer) {
             $customer = Customer::query()->create([
                 'login' => $data['customer_login'],
