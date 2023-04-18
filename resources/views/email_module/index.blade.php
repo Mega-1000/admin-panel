@@ -1,10 +1,13 @@
+@php
+    use App\Enums\EmailSettingsEnum;
+@endphp
 @extends('layouts.datatable')
 @section('app-header')
     @include('email_module._header')
 @endsection
 
 @section('table')
-
+@use
 
     <table class="table table-hover">
         <thead>
@@ -21,7 +24,7 @@
 
             <tr data-toggle="tooltip" data-placement="top" data-html="true" title="{{ \Illuminate\Support\Str::limit($s->content, 200, '...')}}">
                 <td>{{$s->id}}</td>
-                <td>{{$s->statusTitle}}</td>
+                <td>{{ EmailSettingsEnum::fromKey( $s->status ) }}</td>
                 <td>{{$s->title}}</td>
                 <td>{{$s->time}} min.</td>
                 <td>

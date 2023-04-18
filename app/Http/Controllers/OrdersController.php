@@ -1789,7 +1789,7 @@ class OrdersController extends Controller
             }
             AddLabelService::addLabels($order, [$labelId], $preventionArray, [], Auth::user()->id, $time);
 
-            if (in_array($label->id, EmailSettingsEnum::STATUS_LABELS)) {
+            if (EmailSettingsEnum::coerce($label->id) !== null) {
                 $this->emailSendingService->addScheduledEmail($order, $label->id);
             }
         }

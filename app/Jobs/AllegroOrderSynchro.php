@@ -126,14 +126,25 @@ class AllegroOrderSynchro implements ShouldQueue
         $this->orderPackagesDataHelper = app(OrderPackagesDataHelper::class);
         $this->emailSendingService = app(EmailSendingService::class);
         $this->tax = (float)(1 + config('orders.vat'));
+
+        $cancelledOrders = [];
         if ($this->synchronizeAll) {
             $allegroOrders = $this->allegroOrderService->getOrdersOutsideSystem();
         } else {
             $allegroOrders = $this->allegroOrderService->getPendingOrders();
+            $cancelledOrders = $this->allegroOrderService->getCancelledOrders();
         }
-        foreach ($allegroOrders as $allegroOrder) {
+        $allegroOrders = array_merge($allegroOrders, $cancelledOrders);
+
+        foreach (array_reverse($allegroOrders) as $allegroOrder) {
             try {
                 if (Order::where('allegro_form_id', $allegroOrder['id'])->count() > 0) {
+                    continue;
+                }
+                if(
+                    $allegroOrder['status'] === $this->allegroOrderService::STATUS_CANCELLED &&
+                    $allegroOrder['payment']['paidAmount']['amount'] !== $allegroOrder['summary']['totalToPay']['amount']
+                ) {
                     continue;
                 }
 
@@ -156,6 +167,11 @@ class AllegroOrderSynchro implements ShouldQueue
                 $order->saveQuietly();
 
                 $this->emailSendingService->addNewScheduledEmail($order);
+
+                if($allegroOrder['status'] === $this->allegroOrderService::STATUS_CANCELLED) {
+                    $prev = [];
+                    AddLabelService::addLabels($order, [176], $prev, []);
+                }
 
                 if ($allegroOrder['messageToSeller'] !== null) {
                     $this->createChat($order->id, $customer->id, $allegroOrder['messageToSeller']);

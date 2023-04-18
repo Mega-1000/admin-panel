@@ -13,7 +13,7 @@ class EmailSettingsCreateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'status' => 'required|in:NEW,PRODUCED,PICKED_UP,PROVIDED',
+            'status' => 'required|string',
             'time' => 'required|numeric',
             'title' => 'required',
             'content' => 'required'
