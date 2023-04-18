@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Entities\ColumnVisibility;
 use App\Entities\Customer;
+use App\Entities\Firm;
 use App\Entities\FirmSource;
 use App\Entities\Order;
 use App\Entities\OrderItem;
@@ -19,6 +20,7 @@ use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceCalculator;
 use App\Helpers\TransportSumCalculator;
 use App\Http\Requests\CalculateAdminOrderRequest;
+use App\Http\Requests\CalculateMultipleAdminOrder;
 use App\Http\Requests\CreateAdminOrderRequest;
 use App\Http\Requests\ProductStockUpdateRequest;
 use App\Repositories\ProductRepository;
@@ -329,4 +331,44 @@ class ProductStocksController extends Controller
             'order' => $order,
         ]);
     }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function placeMultipleAdminSideOrders(Request $request): \Illuminate\Contracts\View\View
+    {
+        return view('product_stocks.place_multiple_admin_orders', [
+            'productStocks' => ProductStock::all(),
+            'firms' => Firm::all(),
+        ]);
+    }
+
+    /**
+     * Calculate order quantity for
+     *
+     * @param CalculateMultipleAdminOrder $request
+     * @param ProductStock $productStock
+     * @return JsonResponse
+     */
+    public function calculateMultipleAdminOrders(CalculateMultipleAdminOrder $request, ProductStock $productStock): JsonResponse
+    {
+        $products = Product::query()->where('manufacturer', 'ZIELPLAST-BULOWICE')->get();
+        $data = $request->validated();
+
+        $response = [];
+        foreach ($products as $product) {
+            $productStock = $product->stock;
+            $response[] = [
+                'productStock' => $productStock,
+                'product' => $product,
+                'orderQuantity' => $this->orderService->calculateOrderData($productStock, $data['daysBack'], $data['daysToFuture']),
+            ];
+        }
+
+        return response()->json([
+            'orders' => $response,
+        ]);
+    }
+
 }

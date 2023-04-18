@@ -16,6 +16,7 @@ use Prettus\Repository\Traits\TransformableTrait;
  * @property int $id
  * @property string $symbol
  * @property ProductStock $stock
+ * @property string $manufacturer
  * @package namespace App\Entities;
  */
 class Product extends Model implements Transformable
