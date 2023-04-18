@@ -247,7 +247,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('sello-import', 'OrdersController@selloImport')->name('orders.sello_import');
         Route::get('send_tracking_numbers', 'OrdersController@sendTrackingNumbers')->name('orders.send_tracking_numbers');
 
-        require_once('web/ProductStocksRoutes.php');
+        Route::group(['as' => ''], __DIR__ . '/web/ProductStocksRoutes.php');
 
         Route::post('positions/{from}/{to}/quantity/move',
             'ProductStockPositionsController@quantityMove')->name('product_stocks.quantity_move');
