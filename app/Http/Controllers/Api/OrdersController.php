@@ -48,6 +48,7 @@ use App\Services\OrderPackageService;
 use App\Services\ProductService;
 use Carbon\Carbon;
 use Exception;
+use Http\Discovery\Exception\NotFoundException;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
@@ -191,21 +192,22 @@ class OrdersController extends Controller
     {
         $data = $request->all();
         $customer = Customer::query()->where('login', $data['customer_login'])->first();
-
-        // ensure to get last 9 number from data['phone']
-        if( strlen($data['phone']) > 9 ) {
-            $data['phone'] = substr( $data['phone'], -9);
-        }
-
-        if ($data['customer_login'] && !$customer) {
-            $customer = Customer::query()->create([
-                'login' => $data['customer_login'],
-                'status' => 'ACTIVE',
-                'password' => Hash::make($data['phone']),
-            ]);
-        }
-
         $customer = $customer ?? auth()->guard('api')->user();
+
+        if ($customer === null && array_key_exists('customer_login', $data)) {
+            if (array_key_exists('phone', $data)) {
+                // ensure to get last 9 number from data['phone']
+                if (strlen($data['phone']) > 9) {
+                    $data['phone'] = substr($data['phone'], -9);
+                }
+                $customer = Customer::query()->create([
+                    'login' => $data['customer_login'],
+                    'status' => 'ACTIVE',
+                    'password' => Hash::make($data['phone']),
+                ]);
+            }
+            throw new NotFoundException('Phone number is not existing, need this information to create new (not existing) customer', 500);
+        }
 
         try {
             DB::beginTransaction();
