@@ -247,7 +247,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('sello-import', 'OrdersController@selloImport')->name('orders.sello_import');
         Route::get('send_tracking_numbers', 'OrdersController@sendTrackingNumbers')->name('orders.send_tracking_numbers');
 
-        Route::group(['as' => ''], __DIR__ . '/web/ProductStocksRoutes.php');
+        require_once('./web/ProductStocksRoutes.php');
 
         Route::post('positions/{from}/{to}/quantity/move',
             'ProductStockPositionsController@quantityMove')->name('product_stocks.quantity_move');
@@ -567,7 +567,6 @@ Route::group(['prefix' => 'admin'], function () {
     Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/web/TrackerLogsRoutes.php');
     Route::group(['as' => 'transactions.'], __DIR__ . '/web/TransactionsRoutes.php');
     Route::group(['as' => 'workingEvents.'], __DIR__ . '/web/WorkingEventsRoutes.php');
-
 
 
     Route::get('/email/settings', [EmailSettingsController::class, 'index'])->name('emailSettings');
