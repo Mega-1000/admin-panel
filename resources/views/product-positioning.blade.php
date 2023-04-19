@@ -1,7 +1,7 @@
 <table border="1">
     <thead>
     <tr>
-        <th style="width: 100px"></th>
+        <th style="width: 65px"></th>
         <th>GLO</th>
         <th>HAN</th>
         <th>P1</th>
@@ -40,6 +40,60 @@
     </tr>
     </tbody>
 </table>
+
+@if($productPositioningDTO->getProduct()->packing->number_of_trade_items_in_the_largest_unit != 0)
+    <div style="display: flex; flex-direction: row;">
+
+                @php
+                    $maxNumberOfSquares = $productPositioningDTO->IKWJZWOG + $productPositioningDTO->IPJZNRWWOG;
+                    $borderRadius = $maxNumberOfSquares == 0;
+                @endphp
+                <td>
+                    <table style="align-self: flex-start;">
+                        <thead></thead>
+                        <tbody>
+                        @while($maxNumberOfSquares > 0)
+                            <tr>
+                                @for ($j = 0; $j <= $productPositioningDTO->IJZPSWOG; $j++)
+                                    @if($maxNumberOfSquares <= 0)
+                                        <td style="padding: 10px; border: 1px black solid; border-radius: 100%;"></td>
+                                        @php($borderRadius = true)
+                                        @break
+                                    @endif
+
+                                    <td style="padding: 10px; border: 1px black solid;"></td>
+                                    @php($maxNumberOfSquares--)
+                                @endfor
+                            </tr>
+                        @endwhile
+
+                        @if(!$borderRadius)
+                            <tr>
+                                <td style="padding: 10px; border: 1px black solid; border-radius: 100%;"></td>
+                            </tr>
+                        @endif
+                        </tbody>
+                    </table>
+                </td>
+{{--            </tr>--}}
+{{--            </tbody>--}}
+{{--        </table>--}}
+
+{{--        <table style="margin-top: 10px; align-self: flex-start;">--}}
+{{--            <tbody>--}}
+{{--            @for ($i = 0; $i < $productPositioningDTO->getQuantityOfCompleteRowsOfTradeItemsInStartedLayerInStartedGlobalUnit(); $i++)--}}
+{{--                <tr>--}}
+{{--                    @for ($j = 0; $j < $productPositioningDTO->getProduct()->packing->number_of_trade_units_in_package_width; $j++)--}}
+{{--                        <td style="padding: 10px; border: 1px black solid;"></td>--}}
+{{--                    @endfor--}}
+{{--                </tr>--}}
+{{--            @endfor--}}
+{{--            </tbody>--}}
+{{--        </table>--}}
+    </div>
+@endif
+
+
 
 {{--IJHWOZ: {{ $productPositioningDTO->IJHWOZ }}<br>--}}
 {{--IJHWOG: {{ $productPositioningDTO->IJHWOG }}<br>--}}
