@@ -12,10 +12,11 @@
             <div class="col-sm-6">
                 <label>Zdarzenie:</label>
                 <select class="form-control" id="status" name="status" required>
-                    <option @if($emailSetting->status=='NEW') selected @endif value="NEW">{{$status['NEW']}}</option>
-                    <option @if($emailSetting->status=='PRODUCED') selected @endif value="PRODUCED">{{$status['PRODUCED']}}</option>
-                    <option @if($emailSetting->status=='PICKED_UP') selected @endif value="PICKED_UP">{{$status['PICKED_UP']}}</option>
-                    <option @if($emailSetting->status=='PROVIDED') selected @endif value="PROVIDED">{{$status['PROVIDED']}}</option>
+                    @foreach ($statuses as $name => $label)
+                        <option @if($emailSetting->status == $name) selected @endif value="{{ $name }}">
+                            {{ $label }}
+                        </option>
+                    @endforeach
                 </select>
             </div>
         </div>

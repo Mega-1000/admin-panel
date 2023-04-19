@@ -96,14 +96,14 @@ class ImportOrdersFromSelloJob implements ShouldQueue
             try {
                 $transactionArray = $this->createAddressArray($transaction);
             } catch (Exception $e) {
-                \Log::error('sello adress creation', ['message' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
+                Log::error('sello adress creation', ['message' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
                 return $count;
             }
-            $tax = 1 + env('VAT');
+            $tax = 1 + config('orders.vat');
             try {
                 $products = $this->prepareProducts($transactionGroup, $tax);
             } catch (Exception $e) {
-                \Log::error('sello product preparation', ['message' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
+                Log::error('sello product preparation', ['message' => $e->getMessage(), 'stack' => $e->getTraceAsString()]);
                 return $count;
             }
 
@@ -343,7 +343,7 @@ class ImportOrdersFromSelloJob implements ShouldQueue
          * TODO REMOVE ENV AND ADD CONFIG
          * maybe move to cron or something else
          */
-        $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 1)->first();
+        $firmSource = FirmSource::byFirmAndSource(config('orders.firm_id'), 1)->first();
         $order->firm_source_id = $firmSource ? $firmSource->id : null;
 
         $user = User::where('name', '001')->first();

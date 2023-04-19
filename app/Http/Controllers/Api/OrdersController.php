@@ -13,6 +13,7 @@ use App\Entities\OrderAddress;
 use App\Entities\OrderDates;
 use App\Entities\WorkingEvents;
 use App\Enums\PackageStatus;
+use App\Facades\Mailer;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\ChatHelper;
 use App\Helpers\GetCustomerForAdminEdit;
@@ -47,6 +48,7 @@ use App\Services\OrderPackageService;
 use App\Services\ProductService;
 use Carbon\Carbon;
 use Exception;
+use Http\Discovery\Exception\NotFoundException;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
@@ -58,8 +60,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use App\Facades\Mailer;
 use Throwable;
+use App\Services\EmailSendingService;
+use App\Entities\EmailSetting;
 
 /**
  * Class OrdersController
@@ -191,16 +194,22 @@ class OrdersController extends Controller
     {
         $data = $request->all();
         $customer = Customer::query()->where('login', $data['customer_login'])->first();
-
-        if ($data['customer_login'] && !$customer) {
-            $customer = Customer::query()->create([
-                'login' => $data['customer_login'],
-                'status' => 'ACTIVE',
-                'password' => Hash::make($data['phone']),
-            ]);
-        }
-
         $customer = $customer ?? auth()->guard('api')->user();
+
+        if ($customer === null && array_key_exists('customer_login', $data)) {
+            if (array_key_exists('phone', $data)) {
+                // ensure to get last 9 number from data['phone']
+                if (strlen($data['phone']) > 9) {
+                    $data['phone'] = substr($data['phone'], -9);
+                }
+                $customer = Customer::query()->create([
+                    'login' => $data['customer_login'],
+                    'status' => 'ACTIVE',
+                    'password' => Hash::make($data['phone']),
+                ]);
+            }
+            throw new NotFoundException('Phone number is not existing, need this information to create new (not existing) customer', 500);
+        }
 
         try {
             DB::beginTransaction();
@@ -223,7 +232,7 @@ class OrdersController extends Controller
             DB::commit();
 
             $order = Order::query()->find($builderData['id']);
-            $order->firm_source_id = FirmSource::byFirmAndSource(env('FIRM_ID'), 2)->value('id');
+            $order->firm_source_id = FirmSource::byFirmAndSource(config('orders.firm_id'), 2)->value('id');
             $order->save();
 
             $builderData['token'] = $order->getToken();
@@ -498,14 +507,15 @@ class OrdersController extends Controller
             }
 
             if ($deliveryAddress->wasChanged() || $invoiceAddress->wasChanged()) {
-                // dispatch(new OrderProformSendMailJob($order, setting('allegro.address_changed_msg')));
+                $emailSendingService = new EmailSendingService();
+                $emailSendingService->addNewScheduledEmail($order, EmailSetting::ADDRESS_CHANGED);
             }
 
             return response()->json(implode(" ", $message), 200, [], JSON_UNESCAPED_UNICODE);
         } catch (Exception $e) {
             Log::error(
                 'Problem with update customer invoice and delivery address.',
-                ['exception' => $e->getMessage(), 'class' => get_class($this), 'line' => $e->getLine()]
+                ['exception' => $e->getMessage(), 'class' => $e->getTraceAsString(), 'line' => $e->getLine()]
             );
             die();
         }

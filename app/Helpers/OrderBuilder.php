@@ -369,7 +369,7 @@ class OrderBuilder
         if ($type == CustomerAddress::ADDRESS_TYPE_STANDARD) {
             $phone = $phone ?? $adressArray['phone'];
         } else {
-            $phone = $adressArray['phone'] ?? $phone;
+            $phone = $phone ?? $adressArray['phone'];
         }
         $phone = preg_replace('/[^0-9]/', '', $phone);
         if (!is_array($adressArray)) {

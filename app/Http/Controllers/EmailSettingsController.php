@@ -27,14 +27,11 @@ class EmailSettingsController extends Controller
      */
     public function create(): View
     {
-        $status['NEW'] = EmailSettingsEnum::STATUS_NEW;
-        $status['PRODUCED'] = EmailSettingsEnum::STATUS_PRODUCED;
-        $status['PICKED_UP'] = EmailSettingsEnum::STATUS_PICKED_UP;
-        $status['PROVIDED'] = EmailSettingsEnum::STATUS_PROVIDED;
+        $statuses = EmailSettingsEnum::getAllStatuses();
 
         $tags = Tag::all();
 
-        return view('email_module.create', compact('status', 'tags'));
+        return view('email_module.create', compact('statuses', 'tags'));
     }
 
     /**
@@ -61,14 +58,11 @@ class EmailSettingsController extends Controller
      */
     public function edit(EmailSetting $emailSetting): View {
 
-        $status['NEW'] = EmailSettingsEnum::STATUS_NEW;
-        $status['PRODUCED'] = EmailSettingsEnum::STATUS_PRODUCED;
-        $status['PICKED_UP'] = EmailSettingsEnum::STATUS_PICKED_UP;
-        $status['PROVIDED'] = EmailSettingsEnum::STATUS_PROVIDED;
+        $statuses = EmailSettingsEnum::getAllStatuses();
 
         $tags = Tag::all();
 
-        return view('email_module.edit', compact('emailSetting', 'status', 'tags'));
+        return view('email_module.edit', compact('emailSetting', 'statuses', 'tags'));
     }
 
     /**

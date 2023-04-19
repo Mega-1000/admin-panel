@@ -5,14 +5,23 @@ use BenSampo\Enum\Enum;
 
 final class EmailSettingsEnum extends Enum
 {
-    const STATUS_NEW = 'stworzenie oferty w systemie';
-    const STATUS_PRODUCED = 'zmiana statusu na wyprodukowano';
-    const STATUS_PICKED_UP = 'zmiana statusu na towar odebrano przez spedycję';
-    const STATUS_PROVIDED = 'zmiana statusu LP na dostarczono';
+    const NEW = 'Stworzenie oferty w systemie';
+    const PRODUCED = 'Zmiana statusu na wyprodukowano';
+    const PICKED_UP = 'Zmiana statusu na towar odebrano przez spedycję';
+    const PROVIDED = 'Zmiana statusu LP na dostarczono';
+    const ADDRESS_CHANGED = 'Zmiana adresu dostawy, faktury';
+    const PICKED_UP_2 = 'Towar wydano + 1 dzień roboczy';
 
-    const STATUS_LABELS = [
-        'PRODUCED' => 50,
-        'PICKED_UP' => 107,
-        'PROVIDED' => 203,
-    ];
+    const LABEL_PRODUCED = 50;
+    const LABEL_PICKED_UP = 107;
+    const LABEL_PROVIDED = 203;
+
+    public static function getAllStatuses(): array {
+
+        $allStatuses = array_filter(self::getConstants(), function($key) {
+            return strpos($key, 'LABEL_') === false;
+        }, ARRAY_FILTER_USE_KEY);
+        
+        return $allStatuses;
+    }
 }

@@ -125,16 +125,26 @@ class AllegroOrderSynchro implements ShouldQueue
         $this->orderRepository = app(OrderRepository::class);
         $this->orderPackagesDataHelper = app(OrderPackagesDataHelper::class);
         $this->emailSendingService = app(EmailSendingService::class);
-        // TODO Change to configuration
-        $this->tax = (float)(1 + env('VAT'));
+        $this->tax = (float)(1 + config('orders.vat'));
+
+        $cancelledOrders = [];
         if ($this->synchronizeAll) {
             $allegroOrders = $this->allegroOrderService->getOrdersOutsideSystem();
         } else {
             $allegroOrders = $this->allegroOrderService->getPendingOrders();
+            $cancelledOrders = $this->allegroOrderService->getCancelledOrders();
         }
-        foreach ($allegroOrders as $allegroOrder) {
+        $allegroOrders = array_merge($allegroOrders, $cancelledOrders);
+
+        foreach (array_reverse($allegroOrders) as $allegroOrder) {
             try {
                 if (Order::where('allegro_form_id', $allegroOrder['id'])->count() > 0) {
+                    continue;
+                }
+                if(
+                    $allegroOrder['status'] === $this->allegroOrderService::STATUS_CANCELLED &&
+                    $allegroOrder['payment']['paidAmount']['amount'] !== $allegroOrder['summary']['totalToPay']['amount']
+                ) {
                     continue;
                 }
 
@@ -157,6 +167,11 @@ class AllegroOrderSynchro implements ShouldQueue
                 $order->saveQuietly();
 
                 $this->emailSendingService->addNewScheduledEmail($order);
+
+                if($allegroOrder['status'] === $this->allegroOrderService::STATUS_CANCELLED) {
+                    $prev = [];
+                    AddLabelService::addLabels($order, [176], $prev, []);
+                }
 
                 if ($allegroOrder['messageToSeller'] !== null) {
                     $this->createChat($order->id, $customer->id, $allegroOrder['messageToSeller']);
@@ -225,7 +240,7 @@ class AllegroOrderSynchro implements ShouldQueue
 
                 $order->total_price = $allegroOrder['summary']['totalToPay']['amount'];
                 // TODO Change to configuration
-                $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 1)->first();
+                $firmSource = FirmSource::byFirmAndSource(config('orders.firm_id'), 1)->first();
                 $order->firm_source_id = $firmSource ? $firmSource->id : null;
 
                 $user = User::where('name', '001')->first();

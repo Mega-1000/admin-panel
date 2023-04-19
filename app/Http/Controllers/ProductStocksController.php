@@ -20,15 +20,19 @@ use App\Http\Requests\ProductStockUpdateRequest;
 use App\Repositories\Firms;
 use App\Repositories\ProductRepository;
 use App\Repositories\ProductStockLogRepository;
+use App\Repositories\ProductStockLogs;
 use App\Repositories\ProductStockPositionRepository;
 use App\Repositories\ProductStockRepository;
 use App\Services\OrderService;
 use App\Services\ProductService;
+use App\User;
+use Carbon\Carbon;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -369,5 +373,4 @@ class ProductStocksController extends Controller
             'orders' => $order,
         ]);
     }
-
 }
