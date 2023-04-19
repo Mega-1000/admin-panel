@@ -13,7 +13,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\TimedLabelJob;
 use App\Services\EmailSendingService;
-use App\Enums\EmailSettingsEnum;
+use App\Entities\EmailSetting;
 
 class AddLabelService
 {
@@ -121,7 +121,7 @@ class AddLabelService
                 if ($label->id == Label::ORDER_ITEMS_REDEEMED_LABEL) {
 
                     $emailSendingService = new EmailSendingService();
-                    $emailSendingService->addNewScheduledEmail($order, EmailSettingsEnum::PICKED_UP_2);
+                    $emailSendingService->addNewScheduledEmail($order, EmailSetting::PICKED_UP_2);
 
                     LabelNotificationService::sendItemsRedeemedMail($order);
                     $order->preferred_invoice_date = $now;

@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Requests;
 
+use App\Enums\EmailSettingsEnum;
 use Illuminate\Foundation\Http\FormRequest;
 
 class EmailSettingsCreateRequest extends FormRequest
@@ -12,8 +13,11 @@ class EmailSettingsCreateRequest extends FormRequest
 
     public function rules(): array
     {
+
+        $validStatuses = array_flip(EmailSettingsEnum::getAllStatuses());
+
         return [
-            'status' => 'required|string',
+            'status' => 'required|in:'.implode(',', $validStatuses),
             'time' => 'required|numeric',
             'title' => 'required',
             'content' => 'required'

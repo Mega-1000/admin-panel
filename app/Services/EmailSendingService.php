@@ -19,22 +19,17 @@ class EmailSendingService
      * Add new scheduled email with given status
      *
      * @param  Order  $order
-     * @param  string $status - EmailSettingsEnum
+     * @param  string $status -
      *
      * @return bool
      */
-    public function addNewScheduledEmail(Order $order, string $status = EmailSettingsEnum::NEW): bool
+    public function addNewScheduledEmail(Order $order, string $status = EmailSetting::NEW): bool
     {
         if (empty($order)) {
             abort(404);
         }
-        $statusEnum = EmailSettingsEnum::coerce($status);
-        
-        if($statusEnum === null) {
-            return false;
-        }
 
-        $emailSetting = EmailSetting::where('status', $statusEnum->key)->get();
+        $emailSetting = EmailSetting::where('status', $status)->get();
         foreach($emailSetting as $setting) {
             $this->saveScheduledEmail($order, $setting);
         }
@@ -72,7 +67,7 @@ class EmailSendingService
         $sending->content = $this->generateContent($setting->content, $file);
         $sending->attachment = $file;
 
-        if($setting->status === 'PICKED_UP_2') {
+        if($setting->status === EmailSetting::PICKED_UP_2) {
             $nextBusinessDay = Carbon::now()->nextBusinessDay()->startOfDay()->addHours(7)->toDateTimeString();
             $sending->scheduled_date = $nextBusinessDay;
         } else {

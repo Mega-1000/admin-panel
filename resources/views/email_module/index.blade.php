@@ -23,10 +23,10 @@
             @foreach($emailSettings as $s)
 
             <tr data-toggle="tooltip" data-placement="top" data-html="true" title="{{ \Illuminate\Support\Str::limit($s->content, 200, '...')}}">
-                <td>{{$s->id}}</td>
-                <td>{{ EmailSettingsEnum::fromKey( $s->status ) }}</td>
-                <td>{{$s->title}}</td>
-                <td>{{$s->time}} min.</td>
+                <td>{{ $s->id }}</td>
+                <td>{{ $s->getStatusUserFriendlyName() }}</td>
+                <td>{{ $s->title }}</td>
+                <td>{{ $s->time }} min.</td>
                 <td>
                     <form method="post" action="{{ action('EmailSettingsController@destroy',[$s->id]) }}" onsubmit="return confirm('Czy na pewno chcesz usunąć rekord?');">
                         @method('delete')

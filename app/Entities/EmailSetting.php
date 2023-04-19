@@ -20,10 +20,21 @@ class EmailSetting extends Model
 {
     use HasFactory, SoftDeletes;
 
+    const NEW = 'NEW';
+    const PRODUCED = 'PRODUCED';
+    const PICKED_UP = 'PICKED_UP';
+    const PROVIDED = 'PROVIDED';
+    const ADDRESS_CHANGED = 'ADDRESS_CHANGED';
+    const PICKED_UP_2 = 'PICKED_UP_2';
+
     protected $fillable = [
         'status',
         'time',
         'title',
         'content'
     ];
+
+    public function getStatusUserFriendlyName(): string {
+        return EmailSettingsEnum::fromKey( $this->status );
+    }
 }
