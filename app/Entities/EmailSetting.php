@@ -9,7 +9,7 @@ use App\Enums\EmailSettingsEnum;
 
 /**
  * @property int    $id
- * @property string $status - NEW | PRODUCED | PICKED_UP | PROVIDED
+ * @property string $status - NEW | PRODUCED | PICKED_UP | PROVIDED | ADDRESS_CHANGED | PICKED_UP_2
  * @property int    $time
  * @property string $title
  * @property string $content
@@ -19,10 +19,13 @@ use App\Enums\EmailSettingsEnum;
 class EmailSetting extends Model
 {
     use HasFactory, SoftDeletes;
-   
-    protected $attribute = [
-        'statusTitle'
-    ];
+
+    const NEW = 'NEW';
+    const PRODUCED = 'PRODUCED';
+    const PICKED_UP = 'PICKED_UP';
+    const PROVIDED = 'PROVIDED';
+    const ADDRESS_CHANGED = 'ADDRESS_CHANGED';
+    const PICKED_UP_2 = 'PICKED_UP_2';
 
     protected $fillable = [
         'status',
@@ -31,23 +34,7 @@ class EmailSetting extends Model
         'content'
     ];
 
-    public function getStatusTitleAttribute(): string
-    {
-        $status = '';
-        if($this->status=='NEW'){
-            $status = EmailSettingsEnum::STATUS_NEW;
-        }
-        if($this->status=='PRODUCED'){
-            $status = EmailSettingsEnum::STATUS_PRODUCED;
-        }
-        if($this->status=='PICKED_UP')
-        {
-            $status = EmailSettingsEnum::STATUS_PICKED_UP;
-        }
-        if($this->status=='PROVIDED'){
-            $status = EmailSettingsEnum::STATUS_PROVIDED;
-        }
-
-        return $status;
+    public function getStatusUserFriendlyName(): string {
+        return EmailSettingsEnum::fromKey( $this->status );
     }
 }

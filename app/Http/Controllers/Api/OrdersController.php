@@ -61,6 +61,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
+use App\Services\EmailSendingService;
+use App\Entities\EmailSetting;
 
 /**
  * Class OrdersController
@@ -505,7 +507,8 @@ class OrdersController extends Controller
             }
 
             if ($deliveryAddress->wasChanged() || $invoiceAddress->wasChanged()) {
-                // dispatch(new OrderProformSendMailJob($order, setting('allegro.address_changed_msg')));
+                $emailSendingService = new EmailSendingService();
+                $emailSendingService->addNewScheduledEmail($order, EmailSetting::ADDRESS_CHANGED);
             }
 
             return response()->json(implode(" ", $message), 200, [], JSON_UNESCAPED_UNICODE);
