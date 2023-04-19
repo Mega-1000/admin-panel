@@ -62,9 +62,10 @@ class OrderReturnService
     }
 
 
-    public function updateStockPositionDamaged(OrderReturn $orderReturn, int $positionId, int $damaged, int $productStockId, int $orderId): null
+    public function updateStockPositionDamaged(?OrderReturn $orderReturn, int $positionId, int $damaged, int $productStockId, int $orderId): null
     {
-        $damaged = $damaged - $orderReturn->quantity_damaged;
+        $prevDamaged = $orderReturn?->quantity_damaged ?? 0;
+        $damaged = $damaged - $prevDamaged;
 
         if($damaged > 0) {
             ProductStockLog::create([
@@ -80,9 +81,11 @@ class OrderReturnService
         return null;
     }
 
-    public function updateStockPosition(OrderReturn $orderReturn, int $positionId, int $undamaged, int $productStockId, int $orderId): null
+    public function updateStockPosition(?OrderReturn $orderReturn, int $positionId, int $undamaged, int $productStockId, int $orderId): null
     {
-        $undamaged = $undamaged - $orderReturn->quantity_undamaged;
+        $prevUndamaged = $orderReturn?->quantity_undamaged ?? 0;
+        $undamaged = $undamaged - $prevUndamaged;
+        
         $stock = ProductStockPosition::find($positionId);
         $quantity = $stock->position_quantity;
         $stock->position_quantity = $quantity + $undamaged;
