@@ -1,8 +1,8 @@
 <?php
 
-namespace App\DTO\ProductStocks\Schenker;
+namespace App\DTO\Schenker;
 
-use App\DTO\ProductStocks\BaseDTO;
+use App\DTO\BaseDTO;
 use JsonSerializable;
 
 class AddressDTO extends BaseDTO implements JsonSerializable
