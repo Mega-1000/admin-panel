@@ -74,10 +74,10 @@ class OrderReturnController extends Controller
                 if($return['undamaged'] >= 0 || $return['damaged'] >= 0){
                     $this->orderReturnService->saveReturn($return);
                 }
-                if($return['damaged'] >= 0) {
+                if($return['damaged'] !== null && $return['damaged'] >= 0) {
                     $this->orderReturnService->updateStockPositionDamaged($orderReturn, $return['position_id'], $return['damaged'], $productStock->id, $return['order_id']);
                 }
-                if($return['undamaged'] >= 0) {
+                if($return['undamaged'] !== null && $return['undamaged'] >= 0) {
                     $this->orderReturnService->updateStockPosition($orderReturn, $return['position_id'], $return['undamaged'], $productStock->id, $return['order_id']);
                 }
             }

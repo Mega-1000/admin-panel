@@ -569,7 +569,6 @@ Route::group(['prefix' => 'admin'], function () {
     Route::group(['as' => 'workingEvents.'], __DIR__ . '/web/WorkingEventsRoutes.php');
 
 
-
     Route::get('/email/settings', [EmailSettingsController::class, 'index'])->name('emailSettings');
     Route::get('/email/settings/add', [EmailSettingsController::class, 'create'])->name('emailSettings.add');
     Route::post('/email/settings', [EmailSettingsController::class, 'store'])->name('emailSettings.store');

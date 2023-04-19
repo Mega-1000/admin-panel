@@ -155,4 +155,7 @@ return [
 
     'log_channel' => env('MAIL_LOG_CHANNEL'),
 
+    'imap_inbox' => env('IMAP_INBOX'),
+    'imap_password' => env('IMAP_PASSWORD'),
+
 ];

@@ -3,19 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\Entities\Chat;
+use App\Entities\Firm;
+use App\Enums\UserRole;
+use App\Helpers\Exceptions\ChatException;
+use App\Helpers\MessagesHelper;
+use Barryvdh\Debugbar\Facades\Debugbar;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use App\Helpers\MessagesHelper;
 use Illuminate\Support\Collection;
-use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
-use App\Helpers\Exceptions\ChatException;
-use Barryvdh\Debugbar\Facades\Debugbar;
-use App\Entities\Firm;
-use App\Entities\Message;
-use App\Enums\UserRole;
 
-class MessagesController extends Controller {
+class MessagesController extends Controller
+{
 
     /**
      * Display a listing of the resource.
@@ -25,7 +25,8 @@ class MessagesController extends Controller {
      * @param bool $orderId
      * @return Response
      */
-    public static function index(Request $request, $all = false, $orderId = 0) {
+    public static function index(Request $request, $all = false, $orderId = 0)
+    {
         $chats = self::getChatView($all, $orderId, $request->user()->id);
         return view('chat.index')->withChats($chats)->withShowAll($all);
     }
@@ -36,7 +37,8 @@ class MessagesController extends Controller {
      * @param int $userId
      * @return array|Chat[]
      */
-    public static function getChatView(bool $all, int $orderId, int $userId = null) {
+    public static function getChatView(bool $all, int $orderId, int $userId = null)
+    {
         if ($all) {
             $chats = Chat::where('id', '>', 0);
         } else {
@@ -71,46 +73,51 @@ class MessagesController extends Controller {
         return $chats;
     }
 
-    public static function getUrl(Request $request, $mediaId, $postCode, $email, $phone) {
+    public static function getUrl(Request $request, $mediaId, $postCode, $email, $phone)
+    {
         $url = self::getChatUrl($mediaId, $postCode, $email, $phone);
         return redirect($url);
     }
 
-    public static function getChatUrl($mediaId, $postCode, $email, $phone): string {
+    public static function getChatUrl($mediaId, $postCode, $email, $phone): string
+    {
         $token = MessagesHelper::getToken($mediaId, $postCode, $email, $phone);
         $url = route('chat.show', ['token' => $token]);
         return $url;
     }
 
-    public function show($token) {
-        if(config('app.env') == 'production') {
+    public function show($token)
+    {
+        if (config('app.env') == 'production') {
             Debugbar::disable();
         }
         try {
             return $this->prepareChatView($token);
         } catch (ChatException $e) {
             $e->log();
-            // TODO Change to configuration
-            return redirect(env('FRONT_URL'));
+            return redirect(config('app.front_url'));
         }
     }
+
     /**
      * prepare chat View from given $token
      *
      * @param string $token
      * @return View
+     * @throws ChatException
      */
-    private function prepareChatView(string $token): View {
+    private function prepareChatView(string $token): View
+    {
         $helper = new MessagesHelper($token);
         $chat = $helper->getChat();
 
-        if($chat === null) {
+        if ($chat === null) {
             $helper->createNewChat();
             $chat = $helper->getChat();
         }
 
         // if no exist any user ID then bind one
-        if($chat->user_id === null && $helper->currentUserType === MessagesHelper::TYPE_USER) {
+        if ($chat->user_id === null && $helper->currentUserType === MessagesHelper::TYPE_USER) {
             $userId = auth()->user()->id;
             $chat->user_id = $userId;
             $chat->save();
@@ -122,7 +129,7 @@ class MessagesController extends Controller {
         $chatType = $order ? 'order' : 'product';
 
         // create welcome message
-        if($helper->currentUserType === MessagesHelper::TYPE_CUSTOMER && ($order?->need_support || $chat?->need_intervention)) {
+        if ($helper->currentUserType === MessagesHelper::TYPE_CUSTOMER && ($order?->need_support || $chat?->need_intervention)) {
             $blankChatUser = $helper->createOrGetBlankUser($chat);
 
             $content = "Witamy!
@@ -131,11 +138,11 @@ class MessagesController extends Controller {
             $helper->addMessage($content, UserRole::Main, null, $blankChatUser);
         }
         // if exist order with need support then set need support to false, only for consultants
-        if($order !== null && $order->need_support && $helper->currentUserType === MessagesHelper::TYPE_USER) {
+        if ($order !== null && $order->need_support && $helper->currentUserType === MessagesHelper::TYPE_USER) {
             $order->need_support = false;
             $order->save();
         }
-        if($order === null && $chat->need_intervention && $helper->currentUserType === MessagesHelper::TYPE_USER) {
+        if ($order === null && $chat->need_intervention && $helper->currentUserType === MessagesHelper::TYPE_USER) {
             $chat->need_intervention = false;
             $chat->save();
         }
@@ -144,8 +151,8 @@ class MessagesController extends Controller {
 
         $chatUsers = $chat->chatUsers;
 
-        $chatEmployees   = $chatUsers->pluck('employee')->filter();
-        $chatCustomers   = $chatUsers->pluck('customer')->filter();
+        $chatEmployees = $chatUsers->pluck('employee')->filter();
+        $chatCustomers = $chatUsers->pluck('customer')->filter();
         $chatConsultants = $chatUsers->pluck('user')->filter();
 
         $currentCustomersIdsOnChat = $chatCustomers->pluck('id');
@@ -170,7 +177,7 @@ class MessagesController extends Controller {
         if ($currentCustomersIdsOnChat->isEmpty() && $chatType == 'order') {
             $possibleCustomers = collect([$order->customer]);
         }
-        
+
         $usersHistory = [
             'customers' => $chat->chatUsersWithTrashed()->whereNotNull('customer_id')->get(),
             'employees' => $chat->chatUsersWithTrashed()->whereNotNull('employee_id')->get(),
@@ -182,45 +189,46 @@ class MessagesController extends Controller {
         $currentChatUser = $helper->getCurrentChatUser();
 
         $assignedMessagesIds = [];
-        if($currentChatUser !== null) {
+        if ($currentChatUser !== null) {
             $assignedMessagesIds = json_decode($helper->getCurrentChatUser()->assigned_messages_ids ?: '[]', true);
         }
 
         $firmWithComplaintEmails = Firm::where('complaint_email', '<>', '')->get();
 
         $chatMessages = $chat->messages;
-        
+
         $view = view('chat.show')->with([
-            'product_list'            => $productList,
-            'faq'                     => $this->prepareFaq($chatUsers),
-            'notices'                 => $notices,
-            'possibleEmployees'       => $possibleEmployees,
-            'possibleCustomers'       => $possibleCustomers,
-            'userType'                => $helper->currentUserType,
-            'chatCustomers'           => $chatCustomers,
-            'chatEmployees'           => $chatEmployees,
+            'product_list' => $productList,
+            'faq' => $this->prepareFaq($chatUsers),
+            'notices' => $notices,
+            'possibleEmployees' => $possibleEmployees,
+            'possibleCustomers' => $possibleCustomers,
+            'userType' => $helper->currentUserType,
+            'chatCustomers' => $chatCustomers,
+            'chatEmployees' => $chatEmployees,
             'firmWithComplaintEmails' => $firmWithComplaintEmails,
-            'chatConsultants'         => $chatConsultants,
-            'chat'                    => $chat,
-            'product'                 => $product,
-            'order'                   => $order,
-            'usersHistory'            => $usersHistory,
-            'chatMessages'            => $chatMessages,
-            'assignedMessagesIds'     => array_flip($assignedMessagesIds),
-            'title'                   => $helper->getTitle(true),
-            'route'                   => route('api.messages.post-new-message', ['token' => $token]),
-            'routeAddUser'            => route('api.messages.add-new-user', ['token' => $token]),
-            'routeCloseChat'          => route('api.messages.closeChat', ['token' => $token]),
-            'routeRemoveUser'         => route('api.messages.remove-user', ['token' => $token]),
-            'routeRefresh'            => route('api.messages.get-messages', ['token' => $token]),
-            'routeCallComplaint'      => route('api.messages.callComplaint', ['token' => $token]),
+            'chatConsultants' => $chatConsultants,
+            'chat' => $chat,
+            'product' => $product,
+            'order' => $order,
+            'usersHistory' => $usersHistory,
+            'chatMessages' => $chatMessages,
+            'assignedMessagesIds' => array_flip($assignedMessagesIds),
+            'title' => $helper->getTitle(true),
+            'route' => route('api.messages.post-new-message', ['token' => $token]),
+            'routeAddUser' => route('api.messages.add-new-user', ['token' => $token]),
+            'routeCloseChat' => route('api.messages.closeChat', ['token' => $token]),
+            'routeRemoveUser' => route('api.messages.remove-user', ['token' => $token]),
+            'routeRefresh' => route('api.messages.get-messages', ['token' => $token]),
+            'routeCallComplaint' => route('api.messages.callComplaint', ['token' => $token]),
             'routeAskForIntervention' => route('api.messages.ask-for-intervention', ['token' => $token]),
-            'routeForEditPrices'      => route('api.messages.edit-prices', ['token' => $token])
+            'routeForEditPrices' => route('api.messages.edit-prices', ['token' => $token])
         ]);
         return $view;
     }
 
-    private function prepareFaq(Collection $users): array {
+    private function prepareFaq(Collection $users): array
+    {
         $faqs = [];
         foreach ($users as $user) {
             if ($user->employee && $user->employee->faq) {
@@ -230,7 +238,8 @@ class MessagesController extends Controller {
         return $faqs;
     }
 
-    public function showOrNew(int $orderId, int $userId) {
+    public function showOrNew(int $orderId, int $userId)
+    {
         $chat = Chat::where('order_id', '=', $orderId)->first();
         if (!$chat) {
             $helper = new MessagesHelper();

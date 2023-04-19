@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'gus' => [
+        'api_key' => env('GUS_API_KEY', ''),
+
+    ],
     'apaczka' => [
         'login' => 'info@mega1000.pl',
         'password' => env('APACZKA_PASSWORD'),

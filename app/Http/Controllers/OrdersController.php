@@ -51,6 +51,7 @@ use App\Jobs\RemoveFileLockJob;
 use App\Jobs\SendRequestForCancelledPackageJob;
 use App\Jobs\UpdatePackageRealCostJob;
 use App\Mail\SendOfferToCustomerMail;
+use App\Repositories\Chats;
 use App\Repositories\CustomerAddressRepository;
 use App\Repositories\CustomerRepository;
 use App\Repositories\EmployeeRepository;
@@ -63,6 +64,7 @@ use App\Repositories\OrderMessageRepository;
 use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderPaymentRepository;
 use App\Repositories\OrderRepository;
+use App\Repositories\Orders;
 use App\Repositories\ProductPackingRepository;
 use App\Repositories\ProductRepository;
 use App\Repositories\ProductStockLogRepository;
@@ -103,9 +105,6 @@ use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Yajra\DataTables\Facades\DataTables;
 use function response;
-use App\Entities\Chat;
-use App\Repositories\Chats;
-use App\Repositories\Orders;
 
 /**
  * Class OrderController.
@@ -1790,7 +1789,7 @@ class OrdersController extends Controller
             }
             AddLabelService::addLabels($order, [$labelId], $preventionArray, [], Auth::user()->id, $time);
 
-            if (in_array($label->id, EmailSettingsEnum::STATUS_LABELS)) {
+            if (EmailSettingsEnum::coerce($label->id) !== null) {
                 $this->emailSendingService->addScheduledEmail($order, $label->id);
             }
         }
@@ -2370,7 +2369,7 @@ class OrdersController extends Controller
             }
         }
 
-        if( !empty($data['customerId']) ) {
+        if (!empty($data['customerId'])) {
             $query->where('orders.customer_id', $data['customerId']);
         }
 
@@ -3252,8 +3251,7 @@ class OrdersController extends Controller
                 'cart_token' => $order->getToken(),
                 'user_code' => $code
             ]);
-            // TODO Change to configuration
-            $frontUrl = env('FRONT_URL') . '/koszyk.html?' . $query;
+            $frontUrl = config('app.front_url') . '/koszyk.html?' . $query;
             return redirect($frontUrl);
         } catch (Exception $exception) {
             Log::notice('Can not edit basket', ['message' => $exception->getMessage(), 'stack' => $exception->getTraceAsString()]);
@@ -3399,10 +3397,10 @@ class OrdersController extends Controller
     public function resolveOrderDispute(Order $order): JsonResponse
     {
 
-        $helper        = new MessagesHelper();
-        $userId        = Auth::user()->id;
+        $helper = new MessagesHelper();
+        $userId = Auth::user()->id;
         $chatUserToken = $helper->getChatToken($order->id, $userId);
-        
+
         $response = [
             'chatUserToken' => $chatUserToken,
         ];
@@ -3420,10 +3418,10 @@ class OrdersController extends Controller
     public function resolveChatIntervention(int $chatId): JsonResponse
     {
 
-        $helper         = new MessagesHelper();
+        $helper = new MessagesHelper();
         $helper->chatId = $chatId;
-        $userId         = Auth::user()->id;
-        $chatUserToken  = $helper->getChatToken(null, $userId);
+        $userId = Auth::user()->id;
+        $chatUserToken = $helper->getChatToken(null, $userId);
 
         $response = [
             'chatUserToken' => $chatUserToken,

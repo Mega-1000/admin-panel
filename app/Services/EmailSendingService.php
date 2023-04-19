@@ -11,34 +11,42 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Facades\Mailer;
+use DateTime;
 
 class EmailSendingService
 {
-    public function addNewScheduledEmail(Order $order): bool
+    /**
+     * Add new scheduled email with given status
+     *
+     * @param  Order  $order
+     * @param  string $status -
+     *
+     * @return bool
+     */
+    public function addNewScheduledEmail(Order $order, string $status = EmailSetting::NEW): bool
     {
         if (empty($order)) {
             abort(404);
         }
 
-        $emailSetting = EmailSetting::where('status', 'NEW')->get();
-        foreach($emailSetting as $setting){
+        $emailSetting = EmailSetting::where('status', $status)->get();
+        foreach($emailSetting as $setting) {
             $this->saveScheduledEmail($order, $setting);
         }
 
         return true;
     }
-
     public function addScheduledEmail(Order $order, int $labelID): bool
     {
         if (empty($order)) {
             abort(404);
         }
 
-        $possibleStatues = array_flip(EmailSettingsEnum::STATUS_LABELS);
-        $status = $possibleStatues[ $labelID ];
-        if( !$status ) return false;
+        $status = EmailSettingsEnum::coerce($labelID);
+        if( $status === null ) return false;
+        $statusName = str_replace('LABEL_', '', $status->key);
 
-        $emailSetting = EmailSetting::where('status', $status)->get();
+        $emailSetting = EmailSetting::where('status', $statusName)->get();
 
         foreach($emailSetting as $setting) {
             $this->saveScheduledEmail($order, $setting);
@@ -56,9 +64,15 @@ class EmailSendingService
         $sending->email_setting_id = $setting->id;
         $sending->email = $this->getEmail($order);
         $sending->title = $setting->title;
-        $sending->content = $this->generateContent($setting->content,$file);
+        $sending->content = $this->generateContent($setting->content, $file);
         $sending->attachment = $file;
-        $sending->scheduled_date = $this->getDate($setting);
+
+        if($setting->status === EmailSetting::PICKED_UP_2) {
+            $nextBusinessDay = Carbon::now()->nextBusinessDay()->startOfDay()->addHours(7)->toDateTimeString();
+            $sending->scheduled_date = $nextBusinessDay;
+        } else {
+            $sending->scheduled_date = $this->getDate($setting);
+        }
         $sending->send_date = null;
         $sending->message_send = false;
         $sending->save();
@@ -80,7 +94,7 @@ class EmailSendingService
 
     public function getDate(EmailSetting $setting): string
     {
-        $date = new \DateTime();
+        $date = new DateTime();
         $date->modify('+'.$setting->time.' minute');
         return $date->format('Y-m-d H:i:s');
     }

@@ -26,5 +26,7 @@ return [
         'local_number' => env('PAYER_LOCAL_NUMBER', '12'),
         'email' => env('PAYER_EMAIL', 'logistyka@ephpolska.pl'),
         'phone' => env('PAYER_PHONE', '691801594'),
-    ]
+    ],
+
+    'package_divide_margin' => env('PACKAGE_DIVIDE_MARGIN', ''),
 ];
