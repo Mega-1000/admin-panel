@@ -59,6 +59,8 @@ Route::prefix('products/stocks')->group(function () {
         'ProductStocksController@placeMultipleAdminSideOrders')->name('product_stocks.placeMultipleAdminOrders');
     Route::get('place-multiple-admin-orders/calculate',
         'ProductStocksController@calculateMultipleAdminOrders')->name('product_stocks.calculateMultipleAdminOrders');
+    Route::post('place-multiple-admin-orders/confirm', 'ProductStocksController@createMultipleAdminOrders')
+        ->name('product_stocks.createMultipleAdminOrders');
 });
 
 
