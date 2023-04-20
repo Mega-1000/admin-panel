@@ -28,7 +28,7 @@ class OrderService
      */
     public function calculateOrderData(CalculateMultipleAdminOrderDTO $dto): array
     {
-        $traffic = (ProductStockLogs::getTotalQuantityForProductStockInLastDays($dto->productStock, $dto->daysToFuture) / $dto->daysBack) * $dto->daysToFuture;
+        $traffic = (ProductStockLogs::getTotalQuantityForProductStockInLastDays($dto->productStock, $dto->daysBack) / $dto->daysBack) * $dto->daysToFuture;
 
         $currentStock = $this->getAllProductsQuantity($dto->productStock->id);
 
