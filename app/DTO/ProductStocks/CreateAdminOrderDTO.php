@@ -4,7 +4,7 @@ namespace App\DTO\ProductStocks\ProductStocks;
 
 use App\Entities\ProductStock;
 
-class CreateAdminOrderDTO
+readonly class CreateAdminOrderDTO
 {
     public function __construct(
         public int $daysBack,
