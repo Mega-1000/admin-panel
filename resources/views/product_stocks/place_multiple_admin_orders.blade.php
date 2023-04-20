@@ -130,7 +130,7 @@
                             <tr>
                               <td>${product.name}</td>
                               <td>${product.symbol}</td>
-                              <td>${item.productStock.quantity}</td>
+                              <td>${item.currentQuantity}</td>
                               <td>${orderQuantity.calculatedQuantity}</td>
                               <td>${packing.unit_commercial}</td>
                               <td>${packing.unit_of_collective}</td>
