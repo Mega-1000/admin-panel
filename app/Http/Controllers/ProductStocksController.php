@@ -2,25 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\ProductStocks\CalculateMultipleAdminOrderDTO;
+use App\DTO\ProductStocks\CreateMultipleOrdersDTO;
+use App\DTO\ProductStocks\ProductStocks\CreateAdminOrderDTO;
 use App\Entities\ColumnVisibility;
-use App\Entities\Customer;
-use App\Entities\FirmSource;
-use App\Entities\Order;
-use App\Entities\OrderItem;
+use App\Entities\Firm;
 use App\Entities\OrderReturn;
 use App\Entities\Product;
 use App\Entities\ProductStock;
 use App\Entities\ProductStockLog;
 use App\Entities\ProductStockPosition;
-use App\Helpers\BackPackPackageDivider;
-use App\Helpers\GetCustomerForAdminEdit;
-use App\Helpers\GetCustomerForNewOrder;
-use App\Helpers\OrderBuilder;
-use App\Helpers\OrderPriceCalculator;
-use App\Helpers\TransportSumCalculator;
 use App\Http\Requests\CalculateAdminOrderRequest;
+use App\Http\Requests\CalculateMultipleAdminOrder;
 use App\Http\Requests\CreateAdminOrderRequest;
+use App\Http\Requests\CreateMultipleAdminOrdersRequest;
 use App\Http\Requests\ProductStockUpdateRequest;
+use App\Repositories\Firms;
 use App\Repositories\ProductRepository;
 use App\Repositories\ProductStockLogRepository;
 use App\Repositories\ProductStockLogs;
@@ -307,7 +304,7 @@ class ProductStocksController extends Controller
     public function calculateAdminOrder(CalculateAdminOrderRequest $request, ProductStock $productStock): JsonResponse
     {
         return response()->json([
-            'orderQuantity' =>  $this->orderService->calculateOrderData($productStock, $request->validated('daysBack'), $request->validated('daysToFuture')),
+            'orderQuantity' =>  $this->orderService->calculateOrderData(CalculateMultipleAdminOrderDTO::fromRequest($productStock, $request->validated())),
         ]);
     }
 
@@ -323,10 +320,57 @@ class ProductStocksController extends Controller
     {
         $data = $request->validated();
 
-        $order = $this->orderService->createOrder($productStock, $data, $productService);
+        $order = $this->orderService->createOrder(CreateAdminOrderDTO::fromRequest($data, $productStock), $productService);
 
         return response()->json([
             'order' => $order,
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function placeMultipleAdminSideOrders(Request $request): \Illuminate\Contracts\View\View
+    {
+        return view('product_stocks.place_multiple_admin_orders', [
+            'productStocks' => ProductStock::all(),
+            'firms' => Firm::all(),
+        ]);
+    }
+
+    /**
+     * Calculate order quantity for
+     *
+     * @param CalculateMultipleAdminOrder $request
+     * @param ProductStock $productStock
+     * @return JsonResponse
+     */
+    public function calculateMultipleAdminOrders(CalculateMultipleAdminOrder $request, ProductStock $productStock): JsonResponse
+    {
+        $products = Firms::getAllProductsForFirm($request->validated('firmSymbol'));
+
+        $response = [];
+        foreach ($products as $product) {
+            $productStock = $product->stock;
+            $response[] = [
+                'productStock' => $productStock,
+                'product' => $product,
+                'orderQuantity' => $this->orderService->calculateOrderData(CalculateMultipleAdminOrderDTO::fromRequest($productStock, $request->validated())),
+            ];
+        }
+
+        return response()->json([
+            'orders' => $response,
+        ]);
+    }
+
+    public function createMultipleAdminOrders(CreateMultipleAdminOrdersRequest $request, ProductService $productService): JsonResponse
+    {
+        $order = $this->orderService->createMultipleOrders(CreateMultipleOrdersDTO::fromRequest($request), $productService);
+
+        return response()->json([
+            'orders' => $order,
         ]);
     }
 }
