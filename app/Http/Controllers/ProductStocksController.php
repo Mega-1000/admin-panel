@@ -357,6 +357,7 @@ class ProductStocksController extends Controller
                 'productStock' => $productStock,
                 'product' => $product,
                 'orderQuantity' => $this->orderService->calculateOrderData(CalculateMultipleAdminOrderDTO::fromRequest($productStock, $request->validated())),
+                'currentQuantity' => $this->orderService->getAllProductsQuantity($productStock->id),
             ];
         }
 

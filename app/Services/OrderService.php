@@ -8,6 +8,8 @@ use App\DTO\ProductStocks\ProductStocks\CreateAdminOrderDTO;
 use App\Entities\Customer;
 use App\Entities\Order;
 use App\Entities\Product;
+use App\Entities\ProductStock;
+use App\Entities\ProductStockPosition;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceCalculator;
@@ -26,15 +28,16 @@ class OrderService
      */
     public function calculateOrderData(CalculateMultipleAdminOrderDTO $dto): array
     {
-        $traffic = ProductStockLogs::getTotalQuantityForProductStockInLastDays($dto->productStock, $dto->daysToFuture) / $dto->daysBack * $dto->daysToFuture;
+        $traffic = (ProductStockLogs::getTotalQuantityForProductStockInLastDays($dto->productStock, $dto->daysBack) / $dto->daysBack) * $dto->daysToFuture;
 
-        $currentStock = $dto->productStock->quantity;
+        $currentStock = $this->getAllProductsQuantity($dto->productStock->id);
 
         $orderQuantity =  $traffic - $currentStock;
 
         return [
             'calculatedQuantity' => max($orderQuantity, 0),
-            'inOneDay' => ProductStockLogs::getTotalQuantityForProductStockInLastDays($dto->productStock, $dto->daysToFuture) / $dto->daysBack
+            'inOneDay' => ProductStockLogs::getTotalQuantityForProductStockInLastDays($dto->productStock, $dto->daysToFuture) / $dto->daysBack,
+            'soldInLastDays' => ProductStockLogs::getTotalQuantityForProductStockInLastDays($dto->productStock, $dto->daysToFuture),
         ];
     }
 
@@ -113,5 +116,12 @@ class OrderService
         });
 
         return $order;
+    }
+
+    public function getAllProductsQuantity(int $id)
+    {
+        return ProductStockPosition::query()
+            ->where('product_stock_id', $id)
+            ->sum('position_quantity');
     }
 }
