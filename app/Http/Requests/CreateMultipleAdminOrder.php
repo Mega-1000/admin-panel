@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class CreateMultipleAdminOrder extends FormRequest
 {
-    public mixed $clientEmail;
+    public $clientEmail;
 
     /**
      * Determine if the user is authorized to make this request.
