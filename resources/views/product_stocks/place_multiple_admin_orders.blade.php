@@ -127,6 +127,7 @@
                         const floorFloorPackUnits = Math.floor(floorPackUnits / orderQuantity.inOneDay);
 
                         res += `
+                            ${orderQuantity.soldInLastDays}
                             <tr>
                               <td>${product.name}</td>
                               <td>${product.symbol}</td>
