@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Domains\DelivererPackageImport\PriceFormatter;
+use App\DTO\Domains\DelivererPackageImport\PriceFormatter;
 use App\Entities\OrderPackage;
 use App\Repositories\OrderPackageRepository;
 use Illuminate\Bus\Queueable;

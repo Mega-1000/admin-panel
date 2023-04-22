@@ -5,6 +5,7 @@ namespace App\Entities;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
@@ -71,6 +72,11 @@ class OrderItem extends Model implements Transformable
     public function realProduct(): int
     {
         return $this->product->stock->quantity;
+    }
+
+    public function chatAuctionOffers(): HasMany
+    {
+        return $this->hasMany(ChatAuctionOffer::class);
     }
 
     /**

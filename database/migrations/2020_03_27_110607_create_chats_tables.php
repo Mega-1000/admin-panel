@@ -11,7 +11,7 @@ class CreateChatsTables extends DatabaseRelations
         'messages' => ['chat_user' => ['table' => 'chat_user'], 'chat'],
         'chat_user' => ['chat', 'user' => ['nullable' => true], 'employee' => ['nullable' => true], 'customer' => ['nullable' => true]]
     ];
-    
+
     /**
      * Run the migrations.
      *
@@ -23,7 +23,7 @@ class CreateChatsTables extends DatabaseRelations
             $table->increments('id');
             $table->timestamps();
         });
-        
+
         Schema::create('messages', function (Blueprint $table) {
             $table->increments('id');
             $table->text('message');

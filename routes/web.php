@@ -584,6 +584,7 @@ Route::get('/order-offer-pdf/{id}', 'OrderOfferController@getPdf');
 Route::get('/order-proform-pdf/{id}', 'OrderOfferController@getProform');
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
 
+Route::group([], __DIR__ . '/web/AuctionsRoutes.php');
 
 Route::get('/debug', 'DebugController@index');
 Route::get('/communication/{warehouseId}/{orderId}', 'OrdersMessagesController@communication');
