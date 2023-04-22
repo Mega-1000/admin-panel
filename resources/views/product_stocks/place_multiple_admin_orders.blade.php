@@ -129,21 +129,20 @@
                         res += `
                             ${orderQuantity.soldInLastDays}
                             <tr>
-                              <td>${product.name}</td>
-                              <td>${product.symbol}</td>
-                              <td>${item.currentQuantity}</td>
-                              <td>${orderQuantity.calculatedQuantity}</td>
-                              <td>${packing.unit_commercial}</td>
-                              <td>${packing.unit_of_collective}</td>
-                              <td>${numSaleUnitsInPack}</td>
-                              <td>${calculatedQuantity / numSaleUnitsInPack}</td>
-                              <td>${ceilCalcQuantity}</td>
-                              <td>${floorCalcQuantity}</td>
-                              <td>${packing.unit_of_collective}</td>
-                              <td>${ceilPackUnits}</td>
-                              <td>${floorCeilPackUnits}</td>
-                              <td>${floorPackUnits}</td>
-                              <td>${floorFloorPackUnits}</td>
+                              <td>${product.name}</td> <!-- Nazwa towaru -->
+                              <td>${product.symbol}</td> <!-- Symbol towaru -->
+                              <td>${item.currentQuantity}</td> <!-- Stan magazynowy -->
+                              <td>${orderQuantity.calculatedQuantity}</td> <!-- Ilość towaru, którą powinniśmy zamówićw jednostkach handlowych -->
+                              <td>${packing.unit_commercial}</td> <!-- Nazwa jednostki handlowej -->
+                              <td>${packing.unit_of_collective}</td> <!-- Nazwa jednostki zbiorczej -->
+                              <td>${numSaleUnitsInPack}</td>  <!-- Ilość opakowań handlowych w jednosce zbiorczej -->
+                              <td>${calculatedQuantity / numSaleUnitsInPack}</td> <!-- Ilość jednostek zbiorczych bez zaokrąglania -->
+                              <td>${ceilCalcQuantity}</td> <!-- Ilość jednostek zbiorczych zaokrąglona w górę -->
+                              <td>${floorCalcQuantity}</td> <!-- Ilość jednostek zbiorczych zaokrąglona w dół -->
+                              <td>${ceilPackUnits}</td> <!-- ilość jednostek handlowych więcej po zaokrągleniu w górę -->
+                              <td>${Math.floor(ceilPackUnits  / orderQuantity.inOneDay)}</td> <!-- okres na jaki starczy towaru przy zamówieniu po zaokrągleniu w górę -->
+                              <td>${floorPackUnits}</td> <!-- ilość jednostek handlowych mniej po zaokrągleniu w dół jednostek zbiorczych -->
+                              <td>${Math.floor(floorPackUnits / orderQuantity.inOneDay)}</td> <!--- okres na jaki starczy towaru przy zamówieniu po zaokrągleniu w dół -->
                               <td>
                                 <input type="text" onChange="updateUnitsBox(${product.id})" class="form-control" id="quantity-${product.id}" value="${ceilCalcQuantity}">
                               </td>
@@ -171,12 +170,11 @@
                                 <th>Stan magazynowy</th>
                                 <th>Ilość towaru, którą powinniśmy zamówićw jednostkach handlowych</th>
                                 <th>Nazwa jednostki handlowej</th>
-                                <th>Ilość opakowań handlowych w jednosce zbiorczej</th>
                                 <th>Nazwa jednostki zbiorczej</th>
+                                <th>Ilość opakowań handlowych w jednosce zbiorczej</th>
                                 <th>Ilość jednostek zbiorczych bez zaokrąglania</th>
                                 <th>Ilość jednostek zbiorczych zaokrąglona w górę</th>
                                 <th>Ilość jednostek zbiorczych zaokrąglona w dół</th>
-                                <th>Nazwa jednostki zbiorczej</th>
                                 <th>ilość jednostek handlowych więcej po zaokrągleniu w górę</th>
                                 <th>okres na jaki starczy towaru przy zamówieniu po zaokrągleniu w górę</th>
                                 <th>ilość jednostek handlowych mniej po zaokrągleniu w dół jednostek zbiorczych</th>
