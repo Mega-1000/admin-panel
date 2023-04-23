@@ -2,29 +2,29 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\User;
-use Exception;
+use App\Entities\Chat;
 use App\Entities\ChatUser;
 use App\Entities\Customer;
 use App\Entities\Employee;
+use App\Entities\Order;
 use App\Entities\OrderItem;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use App\Helpers\Exceptions\ChatException;
 use App\Helpers\MessagesHelper;
 use App\Helpers\OrderLabelHelper;
-use App\Jobs\ChatNotificationJob;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Helpers\Exceptions\ChatException;
-use App\Http\Requests\Messages\PostMessageRequest;
-use App\Http\Requests\Messages\GetMessagesRequest;
 use App\Http\Requests\Api\Orders\ChatRequest;
-use Illuminate\Http\JsonResponse;
+use App\Http\Requests\Messages\CustomerComplaintRequest;
+use App\Http\Requests\Messages\GetMessagesRequest;
+use App\Http\Requests\Messages\PostMessageRequest;
+use App\Jobs\ChatNotificationJob;
 use App\Repositories\Chats;
 use App\Services\Label\AddLabelService;
-use App\Http\Requests\Messages\CustomerComplaintRequest;
-use App\Entities\Order;
-use App\Entities\Chat;
+use App\User;
+use Exception;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 
 class MessagesController extends Controller
 {
