@@ -50,21 +50,33 @@ class Task extends Model implements Transformable
         });
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function warehouse()
     {
         return $this->belongsTo(Warehouse::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function order()
     {
         return $this->belongsTo(Order::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
     public function taskSalaryDetail()
     {
         return $this->hasOne(TaskSalaryDetails::class);
@@ -78,16 +90,25 @@ class Task extends Model implements Transformable
         return $this->hasOne(TaskTime::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function reportProperty()
     {
         return $this->hasMany(ReportProperty::class);
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function childs()
     {
         return $this->hasMany(Task::class, 'parent_id', 'id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function parent()
     {
         return $this->hasMany(Task::class, 'id', 'parent_id');

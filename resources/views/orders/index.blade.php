@@ -182,6 +182,58 @@
             </div>
         </div>
     </div>
+    <div class="modal fade" tabindex="-1" id="mark-as-created-desc" role="dialog">
+        <div class="modal-dialog" id="modalDialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="titleModal">@lang('orders.task_realized')</h4>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" id="finish-task-form2"
+                          action="{{ route('planning.tasks.produceOrdersRedirect') }}">
+                        @csrf()
+                        <div class="form-group">
+                            <label for="select-user-for-finish-task2">Wybierz użytkownika</label>
+                            <select onchange="fetchUsersTasks(this, '#select-task-for-finish2')"
+                                    id="select-user-for-finish-task2" name="user_id" required
+                                    class="form-control">
+                                <option value="" selected="selected">brak</option>
+                                @foreach($users as $user)
+                                    <option
+                                        value="{{$user->id}}">{{$user->name}} {{$user->firstname}} {{$user->lastname}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="select-task-for-finish2">Wybierz zadanie</label>
+                            <select
+                                onchange="taskSelected(this, '#warehouse-done-notice2', '#warehouse-done-notice-input2')"
+                                name="id" id="select-task-for-finish2" required class="form-control">
+                                <option value="" selected="selected">brak</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="warehouse-done-notice2">
+                            <label for="warehouse_notice">Podaj nazwę zadania</label>
+                            <input id="warehouse-done-notice-input2" class="form-control" name="warehouse_notice"
+                                   type="text">
+                        </div>
+                        <div class="form-group" id="task-description">
+                            <label for="description">Opis</label>
+                            <textarea id="task-description-input" class="form-control" name="description"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" form="finish-task-form2" class="btn btn-success pull-right">Zakończ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" tabindex="-1" id="mark-as-denied" role="dialog">
         <div class="modal-dialog" id="modalDialog">
             <div class="modal-content">
@@ -680,6 +732,45 @@
             </div>
         </div>
     </div>
+
+
+    <div class="modal fade" tabindex="-1" id="break-down-pack-modal" role="dialog">
+        <div class="modal-dialog" id="modalDialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="titleModal">Rozbij zadanie</h4>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" id="finish-breakDownTask"
+                          action="{{ route('planning.tasks.breakDownTask') }}">
+                        @csrf()
+                        <div class="form-group">
+                            <label for="select-task-with-child-for-finish">Wybierz zadanie</label>
+                            <select
+                                onchange="fetchChildren(this,'.form-group-checkobox')"
+                                name="id" id="select-task-with-child-for-finish" required class="form-control">
+                                <option value="" selected="selected">brak</option>
+                            </select>
+                        </div>
+                        <div class="form-group-checkobox">
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" form="finish-breakDownTask" class="btn btn-success pull-right">Rozbij
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+
     @include('orders.buttons')
     <button name="selectAllDates" id="selectAllDates">Wybierz wszystkie daty</button>
     <table id="dataTable" class="table table-hover spacious-container ordersTable">
@@ -1006,6 +1097,35 @@
                 })
         }
 
+        function fetchTasksWithChildren(select) {
+            $(select).empty();
+            $(select).append('<option value="" selected="selected">brak</option>');
+            let url = "{{route('planning.tasks.getTasksWithChildren')}}"
+            $.ajax(url)
+                .done(response => {
+                    if (response.errors) {
+                        alert('Wystąpił błąd pobierania danych')
+                        return;
+                    }
+                    response.forEach(task => $(select).append(`<option data-order="${task.order_id ?? ''}" class="temporary-option" value="${task.id}">${task.name}</option>`))
+                })
+        }
+        fetchTasksWithChildren('#select-task-with-child-for-finish');
+
+        function fetchChildren(task,div) {
+            $(div).empty();
+            let id = task.value
+            let url = "{{route('planning.tasks.getChildren', ['id' => '%%'])}}"
+            $.ajax(url.replace('%%', id))
+                .done(response => {
+                    if (response.errors) {
+                        alert('Wystąpił błąd pobierania danych')
+                        return;
+                    }
+                    response.forEach(task => $(div).append(`<div><label><input type="hidden" name="task[${task.id}]" value="${task.id}"><input type="checkbox" name="task[${task.id}]" data-order="${task.order_id ?? ''}" value="0"> ${task.order_id}</label></div>`))
+                })
+        }
+
         function showPackageCostModal(packageId, dataTemplate, costForClient, costForCompany) {
             $('#changePackageCost').val(packageId);
             $('#packageTemplatesList option').prop('selected', '');
@@ -1021,6 +1141,12 @@
 
         $('#accept-pack').click(event => {
             $("#mark-as-created").modal('show');
+        });
+        $('#accept-pack-desc').click(event => {
+            $("#mark-as-created-desc").modal('show');
+        });
+        $('#break-down-pack').click(event => {
+            $("#break-down-pack-modal").modal('show');
         });
         $('#deny-pack').click(event => $('#mark-as-denied').modal('show'));
         $('#create-new-task-button').click(event => {
@@ -2615,6 +2741,7 @@
                         $('#selectWarehouse').val(16);
                         $('#warehouseSelect').attr('selected', true);
                         $('#selectWarehouse').click();
+                        //tutaj dodac laczenie zadan
                     }
                     refreshDtOrReload();
                     window.open('/admin/planning/timetable', '_blank');

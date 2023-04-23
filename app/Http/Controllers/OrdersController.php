@@ -386,6 +386,7 @@ class OrdersController extends Controller
         $templateData = PackageTemplate::orderBy('list_order', 'asc')->get();
         $deliverers = Deliverer::all();
         $couriersTasks = $this->taskService->groupTaskByShipmentDate();
+
         $customerId = $request->get('customer_id');
 
         return view('orders.index', compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses', 'customerId', 'allWarehousesString'))
@@ -791,6 +792,9 @@ class OrdersController extends Controller
     {
         $newGroup = Task::whereIn('order_id', $similar)->get();
         $newGroup = $newGroup->concat([$task]);
+        $duration = 2;
+        /*
+        //not working
         $duration = $newGroup->reduce(function ($prev, $next) {
             $time = $next->taskTime;
             $finishTime = new Carbon($time->date_start);
@@ -799,6 +803,7 @@ class OrdersController extends Controller
             // TODO WTF here?
             // return $prev + $totalDuration;
         }, 0);
+        */
         $dt = Carbon::now();
         $dt->second = 0;
         $data = [
@@ -870,6 +875,7 @@ class OrdersController extends Controller
         $views = $this->createListOfWz($similar, $task, $finalPdfFileName, $lockName);
         $pdf = Storage::disk('public')->get($finalPdfFileName);
         if (!$user->can_decline) {
+            unlink(public_path($lockName));
             return response($pdf, 200, [
                 'Content-Type' => 'application/pdf',
                 'Content-Disposition' => 'inline'
@@ -879,6 +885,67 @@ class OrdersController extends Controller
         return response($views . $view, 200);
     }
 
+    public function findPackageAuto(Request $request)
+    {
+        $finalPdfFileName = self::ALLSMALLPRINTS_PDF;
+        $data = $request->all();
+        $lockName = 'file.lock.small';
+
+        dispatch((new RemoveFileLockJob($lockName))->delay(360));
+        if (File::exists(public_path($lockName)) === true) {
+            return response(['error' => 'file_exist']);
+        }
+        file_put_contents($lockName, '');
+
+        $user =  Auth::user();
+        //$user = User::find(2);
+        
+        $open = $this->taskService->getOpenUserTask($user->id);
+
+        if (count($open)) {
+            unlink(public_path($lockName));
+            return redirect()->back()->with([
+                'message' => 'Ostatnie pobrane zadanie to numer: ' . $open->first()->order_id . ' i nie zostało zamkniete. Zamknij zadanie aby pobrać kolejne',
+                'alert-type' => 'error',
+            ]);
+        }
+
+        try {
+            $task = $this->taskService->prepareTask($data['package_type'], 0);
+        } catch (Exception $e) {
+            return redirect()->back()->with([
+                'message' => $e->getMessage(),
+                'alert-type' => 'error',
+            ]);
+        }
+
+        if (empty($task)) {
+            unlink(public_path($lockName));
+            return redirect()->back()->with([
+                'message' => 'Brak nieprzydzielonych paczek dla: ' . $data['package_type'] . ' spróbuj wygenerować paczki dla innego kuriera',
+                'alert-type' => 'error',
+            ]);
+        }
+
+        $similar = OrdersHelper::findSimilarOrders($task->order);
+
+        if (!$user->can_decline) {
+            $this->attachTaskForUser($task, $user->id, $similar);
+            $t = $this->taskService->movingTasksBackward($task);
+        }
+        $views = $this->createListOfWz($similar, $task, $finalPdfFileName, $lockName);
+        $pdf = Storage::disk('public')->get($finalPdfFileName);
+        if (!$user->can_decline) {
+            return response($pdf, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline'
+            ]);
+        }
+
+        $view = View::make('orders.confirm', ['user_id' => $user->id, 'skip' => $skip + 1, 'package_type' => $data['package_type']]);
+        return response($views . $view, 200);
+
+    }
     /**
      * @param array $similar
      * @param $task

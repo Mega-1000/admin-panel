@@ -32,7 +32,8 @@ class TaskService
      */
     public function getTaskQuery(array $courierArray)
     {
-        return $this->taskRepository->where('user_id', Task::WAREHOUSE_USER_ID)
+        //$colors = '"FF0000", "E6C74D", "194775"';
+        return Task::where('user_id', Task::WAREHOUSE_USER_ID)
             ->whereHas('order', function ($query) use ($courierArray) {
                 $query->whereHas('packages', function ($query) use ($courierArray) {
                     $query->whereIn('service_courier_name', $courierArray);
@@ -47,7 +48,8 @@ class TaskService
                             ->orWhere('labels.id', Label::GRAY_HAMMER_ID)
                             ->orWhere('labels.id', Label::PRODUCTION_STOP_ID);
                     });
-            });
+            })
+            ->orderByRaw("FIELD(color, 'FF0000', 'E6C74D', '194775')");
     }
 
     /**
@@ -217,6 +219,9 @@ class TaskService
             ->whereNull('rendering')
             ->whereHas('taskTime', function ($query) use ($date) {
                 $query->where('date_start', 'like' , $date->format('Y-m-d')."%");
+            })->whereHas('order', function ($query) {
+                $query->where('labels.id', Label::RED_HAMMER_ID)
+                    ->orWhere('labels.id', Label::BLUE_HAMMER_ID);
             })->get();
 
         foreach($tasks as $task){
@@ -312,5 +317,60 @@ class TaskService
         }
 
         return true;
+    }
+
+    /**
+     * Get user task query
+     *
+     * @param $user_id
+     * @return mixed
+     */
+    public function getOpenUserTask($user_id)
+    {
+        return Task::where('user_id', $user_id)
+            ->whereHas('order', function ($query) {
+                $query->whereDoesntHave('labels', function ($query) {
+                    $query
+                        ->where('labels.id', Label::ORDER_ITEMS_CONSTRUCTED)
+                        ->orWhere('labels.id', Label::ORDER_ITEMS_REDEEMED_LABEL);
+                })->whereHas('dates', function ($query) {
+                    $query->orderBy('consultant_shipment_date_to');
+                });
+            })->get();
+    }
+
+    /**
+     * moving tasks backward
+     *
+     * @param $task
+     * @return mixed
+     */
+    public function movingTasksBackward($task){
+        $taskTime = TaskTime::where('task_id',$task->id)->first();
+        $date_start = Carbon::parse($taskTime->date_start);
+        $date_end = Carbon::parse($taskTime->date_end);
+
+        $totalDuration = $date_end->diffInMinutes($date_start);
+
+        $tasks = TaskTime::with(['task'])
+            ->whereHas('task',
+                function ($query) use ($task) {
+                    $query->where('user_id', $task->user_id);
+                    $query->whereNull('parent_id');
+                    $query->whereNull('rendering');
+                })
+            ->where('date_start', 'like' , $date_start->format('Y-m-d')."%")
+            ->where('date_start', '>', $taskTime->date_start)
+            ->where('id', '!=', $taskTime->id)
+            ->orderBy('date_start', 'asc')
+            ->get();
+
+        foreach($tasks as $t){
+            $t->date_start = Carbon::parse($t->date_start)->subMinutes($totalDuration)->format('Y-m-d H:i:s');
+            $t->date_end = Carbon::parse($t->date_end)->subMinutes($totalDuration)->format('Y-m-d H:i:s');
+            $t->save();
+        }
+
+        return $tasks;
     }
 }

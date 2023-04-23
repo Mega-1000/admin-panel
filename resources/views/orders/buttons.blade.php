@@ -487,21 +487,23 @@
                 <div class="col-lg-12 print-group">
                         {{ \App\Enums\CourierName::DELIVERY_TYPE_LABELS[$courierCode] }}
                     <div>
-                        <span class="print-auto btn btn-success"
-                        name="{{ $courierCode }}"
-                        data-courierTasks="{{ json_encode($tasksInDay) }}">Automat</span>
+                        <form target="_blank" method="POST" id="print-auto-package-form" action="{{ route('orders.findPackageAuto') }}">
+                            @csrf()
+                            <input name="package_type" id="print-package-type" value="{{ $courierCode }}" type="hidden">
+                            <button type="submit" class="print-auto btn btn-success">Automat</button>
+                        </form>
                         <span class="print-list btn btn-primary"
                         name="{{ $courierCode }}"
                         data-courierTasks="{{ json_encode($tasksInDay) }}">Z listy</span>
                         <span class="badge"
-                              style=" color:#fff !important; background-color:#f96868 !important;">{{ count($tasksInDay['past']) }}</span>
+                              style="color:#fff !important; background-color:#f96868 !important;">{{ count($tasksInDay['past']) }}</span>
                         @foreach($tasksInDay as $date => $tasks)
                             @if(preg_match('/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/', $date))
                                 <span class="badge badge-light">{{ count($tasks) }}</span>
                             @endif
                         @endforeach
                         <span class="badge"
-                              style=" color:#fff !important; background-color:#526069 !important;">{{ count($tasksInDay['future']) }}</span>
+                              style="color:#fff !important; background-color:#526069 !important;">{{ count($tasksInDay['future']) }}</span>
                     </div>
 </div>
             </div>
@@ -511,6 +513,8 @@
         </div>
         <div class="row">
             <button id="accept-pack" class="btn btn-success">Wykonano</button>
+            <button id="accept-pack-desc" class="btn btn-success">Wykonano z opisem</button>
+            <button id="break-down-pack" class="btn btn-primary">Rozbij zadania</button>
             <button id="deny-pack" class="btn btn-danger">Odrzucono</button>
         </div>
     </div>

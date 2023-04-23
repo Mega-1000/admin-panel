@@ -753,6 +753,11 @@ class TasksController extends Controller
                 $task->taskSalaryDetail->warehouse_notice .= Order::formatMessage($task->user, $request->warehouse_notice);
                 $task->taskSalaryDetail->save();
             }
+
+            if ($request->description) {
+                $task->taskSalaryDetail->warehouse_notice .= Order::formatMessage($task->user, $request->description);
+                $task->taskSalaryDetail->save();
+            }
         } catch (Exception $e) {
             return redirect()->back()->with([
                 'message' => __('tasks.messages.update_error'),
@@ -1247,6 +1252,10 @@ class TasksController extends Controller
         ]);
     }
 
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
     public function getTask($id)
     {
         $task = Task::with(['user', 'taskTime', 'taskSalaryDetail', 'order', 'childs' => function ($q) {
@@ -1266,5 +1275,81 @@ class TasksController extends Controller
         }
 
         return response()->json($task);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function getTasksWithChildren()
+    {
+        $tasks = Task::with('taskTime','childs')
+            ->has('childs')
+            ->where('status',Task::WAITING_FOR_ACCEPT)
+            ->get();
+        
+        return response()->json($tasks);
+    }
+
+    /**
+     * @param $id
+     * @return JsonResponse
+     */
+    public function getChildren($id)
+    {
+        $task = Task::with('taskTime','childs')
+            ->has('childs')
+            ->find($id);
+        
+        return response()->json($task->childs);
+    }
+
+    /**
+     * @param Request $request
+     */
+    public function breakDownTask(Request $request)
+    {
+        try {
+            $tasks = $request->task;
+            if($tasks){
+                foreach($tasks as $t){
+                    $task = Task::find($t);
+                    if(!empty($task)){
+
+                        //Usuniecie z nazwy parenta
+                        $parent = Task::find($task->parent_id);
+                        $name = explode(',',$parent->name);
+                        if (($key = array_search($task->order_id, $name)) !== false) {
+                            unset($name[$key]);
+                        }
+                        $parent->name = join(',',$name);
+                        $parent->save();
+
+                        //return $tasks;
+                        //rozłaczenie zadania
+                        $task->user_id = 36;
+                        $task->parent_id = null;
+                        $task->status = Task::WAITING_FOR_ACCEPT;
+                        $task->save();
+
+                        //do oferty dodajemy czerwony mlotek (RED_HAMMER_ID), kasujemy zielony(GREEN_HAMMER_ID)) i dodajemy pomaranczowy wykrzykinik (CONSULTANT_MARK)
+                        if($task->order_id){
+                            $preventionArray = [];
+                            RemoveLabelService::removeLabels(Order::find($task->order_id),[Label::GREEN_HAMMER_ID],$preventionArray,[],Auth::user()->id);
+                            $prev = [];
+                            AddLabelService::addLabels(Order::find($task->order_id), [Label::RED_HAMMER_ID,Label::CONSULTANT_MARK], $prev, [], Auth::user()->id);
+                        }
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            return redirect()->back()->with([
+                'message' => __('tasks.messages.update_error'),
+                'alert-type' => 'error'
+            ]);
+        }
+        return redirect()->back()->with([
+            'message' => __('tasks.messages.update'),
+            'alert-type' => 'success'
+        ]);
     }
 }

@@ -305,6 +305,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('orders/sendSelfOrderToWarehouse/{id}',
             'OrdersController@sendSelfOrderToWarehouse')->name('orders.sendSelfOrderToWarehouse');
         Route::post('orders/findPackage', 'OrdersController@findPackage')->name('orders.findPackage');
+        Route::post('orders/findPackageAuto', 'OrdersController@findPackageAuto')->name('orders.findPackageAuto');
         Route::post('orders/accept-deny', 'OrdersController@acceptDeny')->name('accept-deny');
         Route::post('orders/datatable', 'OrdersController@datatable')->name('orders.datatable');
         Route::post('orders/printAll', 'OrdersController@printAll')->name('orders.printAll');
@@ -520,6 +521,8 @@ Route::group(['prefix' => 'admin'], function () {
                     Route::get('/datatable', 'TasksController@datatable')->name('datatable');
                     Route::post('/store', 'TasksController@store')->name('store');
                     Route::get('/create', 'TasksController@create')->name('create');
+                    Route::get('/getTasksWithChildren', 'TasksController@getTasksWithChildren')->name('getTasksWithChildren');
+                    Route::get('/{id}/getChildren', 'TasksController@getChildren')->name('getChildren');
                     Route::get('/{id}/edit', 'TasksController@edit')->name('edit');
                     Route::get('/{id}/delete', 'TasksController@destroy')->name('destroy');
                     Route::put('/{id}/update', 'TasksController@update')->name('update');
@@ -535,6 +538,7 @@ Route::group(['prefix' => 'admin'], function () {
                     Route::post('/rejectTask', 'TasksController@rejectTask')->name('rejectTask');
                     Route::post('/produce', 'TasksController@produceOrders')->name('produceOrders');
                     Route::post('/produce-redirect', 'TasksController@produceOrdersRedirect')->name('produceOrdersRedirect');
+                    Route::post('/produce-break-down', 'TasksController@breakDownTask')->name('breakDownTask');
                     Route::post('/mark-denied/', 'TasksController@deny')->name('deny');
                 });
             Route::prefix('reports')->as('reports.')
