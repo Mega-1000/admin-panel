@@ -199,7 +199,7 @@ class MessagesController extends Controller
 
         $isStyrofoarm = false;
         foreach ($products as $product) {
-            if ($product->variation_group === 'styropiany') {
+            if ($product?->variation_group === 'styropiany') {
                 $isStyrofoarm = true;
                 break;
             }
