@@ -10,6 +10,7 @@ use App\Entities\ChatAuctionFirm;
 use App\Exceptions\DeliverAddressNotFoundException;
 use App\Http\Requests\CreateAuctionRequest;
 use App\Http\Requests\CreateChatAuctionOfferRequest;
+use App\Repositories\ChatAuctionFirms;
 use App\Services\ChatAuctionsService;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -19,13 +20,11 @@ use Illuminate\Http\Request;
 
 class AuctionsController extends Controller
 {
-
     public function __construct(
         private readonly ChatAuctionsService $chatAuctionsService
     )
     {
     }
-
 
     /**
      * Show the form for creating a new resource.
@@ -67,6 +66,11 @@ class AuctionsController extends Controller
         ]);
     }
 
+    /**
+     * Show success page
+     *
+     * @return View
+     */
     public function success(): View
     {
         return view('auctions.success');
@@ -82,8 +86,6 @@ class AuctionsController extends Controller
         return redirect()->back();
     }
 
-
-
     /**
      * Show the form for creating a new resource.
      *
@@ -93,8 +95,8 @@ class AuctionsController extends Controller
     public function createOffer($token): View
     {
         return view('auctions.create-offer', [
-            'chat_auction_firm' => ChatAuctionFirm::query()->where('token', $token)->first(),
-            'products' => ChatAuctionFirm::query()->where('token', $token)->first()->chatAuction->chat->order->items
+            'chat_auction_firm' => ChatAuctionFirms::getChatAuctionFirmByToken($token),
+            'products' => ChatAuctionFirms::getItemsByToken($token)
         ]);
     }
 

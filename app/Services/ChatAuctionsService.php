@@ -11,6 +11,7 @@ use App\Entities\Firm;
 use App\Exceptions\DeliverAddressNotFoundException;
 use App\Facades\Mailer;
 use App\Mail\NotifyFirmAboutAuction;
+use App\Repositories\Firms;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
@@ -27,7 +28,7 @@ class ChatAuctionsService
         $firms = [];
         foreach ($variations as $variation) {
             foreach ($variation as $item) {
-                $firms[] = Firm::query()->where('symbol', $item['product_name_supplier'])->first();
+                $firms[] = Firms::getFirmBySymbol($item['product_name_supplier']);
             }
         }
 

@@ -17,4 +17,9 @@ class Firms
     {
         return Product::where('manufacturer', $firmSymbol)->with('packing')->get();
     }
+
+    public static function getFirmBySymbol(String $firmSymbol): Firm
+    {
+        return Firm::where('symbol', $firmSymbol)->first();
+    }
 }
