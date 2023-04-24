@@ -42,17 +42,13 @@ class Helper
 
     public static function sendEmail($email, $template, $subject, $additionalData = []): ?SentMessage
     {
-        if (strpos($email, 'allegromail.pl')) {
-            return null;
-        }
         try {
             return Mailer::create()->send(
                 "emails/$template",
                 array_merge(['email' => $email], $additionalData),
                 function ($m) use ($email, $subject) {
-                    // TODO Change to configurations
-                    $to = env('MAIL_DEV_ADDRESS', $email);
-                    $name = env('MAIL_DEV_NAME', $email);
+                    $to = $email;
+                    $name = $email;
                     $m->to($to, $name)->subject($subject);
                 }
             );

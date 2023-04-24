@@ -2,27 +2,29 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\User;
-use Exception;
+use App\Entities\Chat;
 use App\Entities\ChatUser;
 use App\Entities\Customer;
 use App\Entities\Employee;
+use App\Entities\Order;
 use App\Entities\OrderItem;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use App\Helpers\Exceptions\ChatException;
 use App\Helpers\MessagesHelper;
 use App\Helpers\OrderLabelHelper;
-use App\Jobs\ChatNotificationJob;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Helpers\Exceptions\ChatException;
-use App\Http\Requests\Messages\PostMessageRequest;
-use App\Http\Requests\Messages\GetMessagesRequest;
 use App\Http\Requests\Api\Orders\ChatRequest;
-use Illuminate\Http\JsonResponse;
+use App\Http\Requests\Messages\CustomerComplaintRequest;
+use App\Http\Requests\Messages\GetMessagesRequest;
+use App\Http\Requests\Messages\PostMessageRequest;
+use App\Jobs\ChatNotificationJob;
 use App\Repositories\Chats;
 use App\Services\Label\AddLabelService;
-use App\Entities\Chat;
+use App\User;
+use Exception;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 
 class MessagesController extends Controller
 {
@@ -142,13 +144,13 @@ class MessagesController extends Controller
         if ($request->type == Customer::class) {
             $chatUser = ChatUser::where([
                 'customer_id' => $request->user_id,
-                'chat_id'     => $chatId,
-                ])->first();
+                'chat_id' => $chatId,
+            ])->first();
         }
         if ($request->type == Employee::class) {
             $chatUser = ChatUser::where([
                 'employee_id' => $request->user_id,
-                'chat_id'     => $chatId,
+                'chat_id' => $chatId,
             ])->first();
         }
         return $chatUser;
@@ -224,7 +226,7 @@ class MessagesController extends Controller
                 if ($message->id <= $lastId || $area != $message->area) {
                     continue;
                 }
-                if($helper->currentUserType == MessagesHelper::TYPE_USER || isset($assignedMessagesIds[$message->id] )) {
+                if ($helper->currentUserType == MessagesHelper::TYPE_USER || isset($assignedMessagesIds[$message->id])) {
                     $out .= view('chat/single_message')->with([
                         'message' => $message,
                     ])->render();
@@ -242,13 +244,13 @@ class MessagesController extends Controller
     /**
      * Create chat used to contact between customer and consultant
      *
-     * @param  ChatRequest  $request
+     * @param ChatRequest $request
      *
      * @return JsonResponse
      */
     public function createContactChat(Request $request): JsonResponse
     {
-        $data = $request->input('questionsTree');
+        $questionsTree = $request->input('questionsTree') ?: '';
         $customer = $request->user();
 
         try {
@@ -257,19 +259,20 @@ class MessagesController extends Controller
             $customerChatIds = Chats::getCustomerChats($customer->id);
             $chat = null;
 
-            if($customerChatIds->isNotEmpty()) {
+            if ($customerChatIds->isNotEmpty()) {
                 // get contact chat for this customer, then add chat id to helper
                 $contactChat = Chats::getContactChat($customerChatIds);
-                if($contactChat !== null) {
+                if ($contactChat !== null) {
                     $helper->chatId = $contactChat->id;
                     $chat = $contactChat;
                 }
             }
             $chatUserToken = $helper->getChatToken(null, $customer->id, MessagesHelper::TYPE_CUSTOMER);
 
-            if($chat === null) {
+            if ($chat === null) {
                 $chat = $helper->createNewChat();
             }
+            $chat->questions_tree = $questionsTree;
             $chat->need_intervention = true;
             $chat->save();
 
@@ -284,11 +287,57 @@ class MessagesController extends Controller
             'error' => 'Problem z utworzeniem nowego czatu dla klienta',
         ]);
     }
-    
+
+    /**
+     * Create Chat for Customer Complaint
+     *
+     * @param CustomerComplaintRequest $request
+     * @param Order $order
+     *
+     * @return JsonResponse
+     */
+    public function createCustomerComplaintChat(CustomerComplaintRequest $request, Order $order): JsonResponse
+    {
+        $complaintForm = $request->validated();
+        $customer = $request->user();
+
+        try {
+            $helper = new MessagesHelper();
+
+            if ($order->customer_id !== $customer->id) {
+                throw new ChatException('Customer ID is different than in the order');
+            }
+            $chat = Chat::where('order_id', $order->id)->first();
+
+            if ($chat !== null) {
+                $helper->chatId = $chat->id;
+            }
+
+            $chatUserToken = $helper->getChatToken($order->id, $customer->id, MessagesHelper::TYPE_CUSTOMER);
+
+            if ($chat === null) {
+                $chat = $helper->createNewChat();
+            }
+            $chat->complaint_form = json_encode($complaintForm);
+            $chat->need_intervention = true;
+            $chat->save();
+
+            return response()->json([
+                'chatUserToken' => $chatUserToken,
+            ]);
+        } catch (ChatException $e) {
+            $e->log();
+        }
+
+        return response()->json([
+            'error' => 'Problem z utworzeniem nowego czatu dla klienta',
+        ]);
+    }
+
     /**
      * Close chat
      *
-     * @param  string $token
+     * @param string $token
      *
      * @return void
      */
@@ -302,21 +351,36 @@ class MessagesController extends Controller
         }
         $user = $helper->getCurrentUser();
 
-        if ( $helper->currentUserType === MessagesHelper::TYPE_CUSTOMER && $order !== null ) {
+        if ($helper->currentUserType === MessagesHelper::TYPE_CUSTOMER && $order !== null) {
             // close by client
             $loopPreventionArray = [];
             AddLabelService::addLabels($order, [$helper::MESSAGE_GREEN_LABEL_ID], $loopPreventionArray, [], $user->id);
 
-        } else if ( $helper->currentUserType === MessagesHelper::TYPE_USER ) {
+        } else if ($helper->currentUserType === MessagesHelper::TYPE_USER) {
             // close by consultant
             $chat->user_id = null;
             $chat->save();
 
-            if($order !== null) {
+            if ($order !== null) {
                 $loopPreventionArray = [];
                 AddLabelService::addLabels($order, [$helper::MESSAGE_GREEN_LABEL_ID], $loopPreventionArray, [], $user->id);
             }
         }
+    }
+
+    /**
+     * Send complaint email to employee
+     *
+     * @param string $token
+     *
+     * @return void
+     */
+    public function callComplaint(Request $request, string $token): void
+    {
+        $helper = new MessagesHelper($token);
+        $email = $request->input('email');
+
+        $helper->sendComplaintEmail($email);
     }
 
     public function getHistory(Request $request)

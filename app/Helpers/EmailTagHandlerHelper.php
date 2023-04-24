@@ -345,11 +345,9 @@ class EmailTagHandlerHelper
 
         if($workingAddress === null) return '';
 
-        $base64Email = base64_encode($workingAddress->email);
-        $base64Phone = base64_encode($workingAddress->phone);
+        $credentials = $workingAddress->email.':'.$workingAddress->phone;
 
-        // Jeżeli masz pytania zapoznaj się z naszym FAQ:<br>
-        $template = config('app.front_url') . "/faq?phone=$base64Phone&email=$base64Email&showFaq=true";
+        $template = config('app.front_url') . "/faq?credentials=".$credentials."&showFaq=true";
 
 		return $template;
 	}

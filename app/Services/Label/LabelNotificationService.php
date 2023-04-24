@@ -91,8 +91,8 @@ class LabelNotificationService
             $notification = OrderWarehouseNotification::query()->create($dataArray);
         }
 
-        $acceptanceFormLink = rtrim(env('FRONT_NUXT_URL'), "/") . "/magazyn/awizacja/{$notification->id}/{$order->warehouse_id}/{$order->id}";
-        $sendFormInvoice = rtrim(env('FRONT_NUXT_URL'), "/") . "/magazyn/awizacja/{$notification->id}/{$order->warehouse_id}/{$order->id}/wyslij-fakture";
+        $acceptanceFormLink = rtrim(config('app.front_nuxt_url'), "/") . "/magazyn/awizacja/{$notification->id}/{$order->warehouse_id}/{$order->id}";
+        $sendFormInvoice = rtrim(config('app.front_nuxt_url'), "/") . "/magazyn/awizacja/{$notification->id}/{$order->warehouse_id}/{$order->id}/wyslij-fakture";
 
         if (!!filter_var($warehouseMail, FILTER_VALIDATE_EMAIL)) {
             if ($path === null) {

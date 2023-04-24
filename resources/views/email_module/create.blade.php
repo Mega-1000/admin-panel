@@ -12,10 +12,9 @@
             <div class="col-sm-6">
                 <label>Zdarzenie:</label>
                 <select class="form-control" id="status" name="status" required>
-                    <option value="NEW">{{$status['NEW']}}</option>
-                    <option value="PRODUCED">{{$status['PRODUCED']}}</option>
-                    <option value="PICKED_UP">{{$status['PICKED_UP']}}</option>
-                    <option value="PROVIDED">{{$status['PROVIDED']}}</option>
+                    @foreach ($statuses as $name => $label)
+                        <option value="{{ $name }}">{{ $label }}</option>
+                    @endforeach
                 </select>
             </div>
         </div>

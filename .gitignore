@@ -32,3 +32,6 @@ admin-panel.iml
 /public/css/vue/styles.css
 
 .env.local
+
+/storage/debugbar/
+*.sh
