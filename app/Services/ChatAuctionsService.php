@@ -23,6 +23,12 @@ class ChatAuctionsService
     {
     }
 
+    /**
+     * Get all firms for auction
+     *
+     * @param array $variations
+     * @return array
+     */
     private function getFirms(array $variations): array
     {
         $firms = [];
@@ -35,6 +41,12 @@ class ChatAuctionsService
         return $firms;
     }
 
+    /**
+     * Create auction
+     *
+     * @param CreateChatAuctionDTO $data
+     * @return Model
+     */
     public function createAuction(CreateChatAuctionDTO $data): Model
     {
         return $data->chat->auctions()->create([
