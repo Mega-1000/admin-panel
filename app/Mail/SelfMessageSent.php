@@ -33,8 +33,7 @@ class SelfMessageSent extends Mailable
         $this->typeText = $typeText;
         $this->warehouseId = $warehouseId;
         $this->orderId = $orderId;
-        // TODO Zamienić na config
-        $this->subject = 'Nowa wiadomość od www.' . env('DOMAIN_NAME');
+        $this->subject = 'Nowa wiadomość od www.' . config('app.domain_name');
     }
 
     /**

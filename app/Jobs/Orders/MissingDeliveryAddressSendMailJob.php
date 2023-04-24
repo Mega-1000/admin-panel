@@ -34,7 +34,7 @@ class MissingDeliveryAddressSendMailJob extends Job implements ShouldQueue
             $this->order = $orderRepository->find($this->order);
         }
 
-        $formLink = rtrim(env('FRONT_NUXT_URL'), "/") . "/zamowienie/mozliwe-do-realizacji/brak-danych/{$this->order->id}";
+        $formLink = rtrim(config('app.front_nuxt_url'), "/") . "/zamowienie/mozliwe-do-realizacji/brak-danych/{$this->order->id}";
         if (!$this->order->isDeliveryDataComplete()) {
             if (!empty($this->options)) {
                 if (!empty($this->options["dispatch-labels-by-name"])) {

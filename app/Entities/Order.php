@@ -26,6 +26,8 @@ use Prettus\Repository\Traits\TransformableTrait;
  * @property int $id
  * @property int $warehouse_id
  * @property int $sello_id
+ * @property int $reminder_date
+ * @property int $status_id
  * @property \Illuminate\Database\Eloquent\Collection<OrderItem>
  *
  * @property Carbon $created_at

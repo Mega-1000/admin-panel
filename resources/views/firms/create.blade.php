@@ -71,6 +71,11 @@
                        value="{{ old('secondary_email') }}">
             </div>
             <div class="form-group">
+                <label for="complaint_email">@lang('firms.form.complaint_email')</label>
+                <input type="email" class="form-control" id="complaint_email" name="complaint_email"
+                       value="{{ old('complaint_email') }}">
+            </div>
+            <div class="form-group">
                 <label for="nip">@lang('firms.form.nip')</label>
                 <input type="text" class="form-control" id="nip" name="nip"
                        value="{{ old('nip') }}">

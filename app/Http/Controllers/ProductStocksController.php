@@ -2,62 +2,51 @@
 
 namespace App\Http\Controllers;
 
-use DB;
-use Illuminate\Http\Request;
-use App\Entities\OrderReturn;
-use App\Entities\ProductStock;
-use App\Services\ProductService;
-use App\Entities\ProductStockLog;
-use Illuminate\Http\JsonResponse;
+use App\DTO\ProductStocks\CalculateMultipleAdminOrderDTO;
+use App\DTO\ProductStocks\CreateMultipleOrdersDTO;
+use App\DTO\ProductStocks\ProductStocks\CreateAdminOrderDTO;
 use App\Entities\ColumnVisibility;
-use Illuminate\Support\Facades\View;
-use Illuminate\Http\RedirectResponse;
+use App\Entities\Firm;
+use App\Entities\OrderReturn;
+use App\Entities\Product;
+use App\Entities\ProductStock;
+use App\Entities\ProductStockLog;
 use App\Entities\ProductStockPosition;
-use Illuminate\Contracts\View\Factory;
-use App\Repositories\ProductRepository;
-use Yajra\DataTables\Facades\DataTables;
-use App\Repositories\ProductStockRepository;
-use App\Repositories\ProductStockLogRepository;
+use App\Http\Requests\CalculateAdminOrderRequest;
+use App\Http\Requests\CalculateMultipleAdminOrder;
+use App\Http\Requests\CreateAdminOrderRequest;
+use App\Http\Requests\CreateMultipleAdminOrdersRequest;
 use App\Http\Requests\ProductStockUpdateRequest;
+use App\Repositories\Firms;
+use App\Repositories\ProductRepository;
+use App\Repositories\ProductStockLogRepository;
+use App\Repositories\ProductStockLogs;
 use App\Repositories\ProductStockPositionRepository;
+use App\Repositories\ProductStockRepository;
+use App\Services\OrderService;
+use App\Services\ProductService;
+use App\User;
+use Carbon\Carbon;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\View;
+use Yajra\DataTables\Facades\DataTables;
 
 class ProductStocksController extends Controller
 {
-    /**
-     * @var ProductStockRepository
-     */
-    protected $repository;
-
-    /**
-     * @var ProductRepository
-     */
-    protected $productRepository;
-
-    /**
-     * @var ProductStockPositionRepository
-     */
-    protected $productStockPositionRepository;
-
-    /**
-     * @var ProductStockLogRepository
-     */
-    protected $productStockLogRepository;
-
-    protected $productService;
-
     public function __construct(
-        ProductStockRepository         $repository,
-        ProductRepository              $productRepository,
-        ProductStockPositionRepository $productStockPositionRepository,
-        ProductStockLogRepository      $productStockLogRepository,
-        ProductService                 $productService
+        protected readonly ProductStockRepository         $repository,
+        protected readonly ProductRepository              $productRepository,
+        protected readonly ProductStockPositionRepository $productStockPositionRepository,
+        protected readonly ProductStockLogRepository      $productStockLogRepository,
+        protected readonly ProductService                 $productService,
+        protected readonly OrderService                   $orderService
     )
     {
-        $this->repository = $repository;
-        $this->productRepository = $productRepository;
-        $this->productStockPositionRepository = $productStockPositionRepository;
-        $this->productStockLogRepository = $productStockLogRepository;
-        $this->productService = $productService;
     }
 
     /**
@@ -118,7 +107,7 @@ class ProductStocksController extends Controller
             ->join('products', 'product_stocks.product_id', '=', 'products.id')
             ->join('product_packings', 'products.id', '=', 'product_packings.product_id')
             ->leftJoin('product_prices', 'product_stocks.product_id', '=', 'product_prices.product_id')
-            ->whereNull('deleted_at');
+            ->whereNull('products.deleted_at');
 
         $notSearchable = [17, 19];
 
@@ -152,7 +141,7 @@ class ProductStocksController extends Controller
             $positions = ProductStockPosition::where('product_stock_id', $row->stock_id)->get();
             $row->positions = $positions;
             $damaged = 0;
-            foreach($positions as $p){
+            foreach ($positions as $p) {
                 $damaged = $damaged + OrderReturn::where('product_stock_position_id', $p->id)->sum('quantity_damaged');
             }
 
@@ -294,5 +283,95 @@ class ProductStocksController extends Controller
         }
 
         return view('product_stocks.changes', compact('groupedProductsStocksChanges', 'startDate', 'endDate'));
+    }
+
+    /**
+     * @param ProductStock $productStock
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function placeAdminSideOrder(ProductStock $productStock): \Illuminate\Contracts\View\View
+    {
+        return view('product_stocks.place_admin_side_order', compact('productStock'));
+    }
+
+    /**
+     * Calculate order quantity for admin side order
+     *
+     * @param CalculateAdminOrderRequest $request
+     * @param ProductStock $productStock
+     * @return JsonResponse
+     */
+    public function calculateAdminOrder(CalculateAdminOrderRequest $request, ProductStock $productStock): JsonResponse
+    {
+        return response()->json([
+            'orderQuantity' =>  $this->orderService->calculateOrderData(CalculateMultipleAdminOrderDTO::fromRequest($productStock, $request->validated())),
+        ]);
+    }
+
+    /**
+     * create order
+     *
+     * @param CreateAdminOrderRequest $request
+     * @param ProductStock $productStock
+     * @param ProductService $productService
+     * @return JsonResponse
+     */
+    public function createAdminOrder(CreateAdminOrderRequest $request, ProductStock $productStock, ProductService $productService): JsonResponse
+    {
+        $data = $request->validated();
+
+        $order = $this->orderService->createOrder(CreateAdminOrderDTO::fromRequest($data, $productStock), $productService);
+
+        return response()->json([
+            'order' => $order,
+        ]);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function placeMultipleAdminSideOrders(Request $request): \Illuminate\Contracts\View\View
+    {
+        return view('product_stocks.place_multiple_admin_orders', [
+            'productStocks' => ProductStock::all(),
+            'firms' => Firm::all(),
+        ]);
+    }
+
+    /**
+     * Calculate order quantity for
+     *
+     * @param CalculateMultipleAdminOrder $request
+     * @param ProductStock $productStock
+     * @return JsonResponse
+     */
+    public function calculateMultipleAdminOrders(CalculateMultipleAdminOrder $request, ProductStock $productStock): JsonResponse
+    {
+        $products = Firms::getAllProductsForFirm($request->validated('firmSymbol'));
+
+        $response = [];
+        foreach ($products as $product) {
+            $productStock = $product->stock;
+            $response[] = [
+                'productStock' => $productStock,
+                'product' => $product,
+                'orderQuantity' => $this->orderService->calculateOrderData(CalculateMultipleAdminOrderDTO::fromRequest($productStock, $request->validated())),
+                'currentQuantity' => $this->orderService->getAllProductsQuantity($productStock->id),
+            ];
+        }
+
+        return response()->json([
+            'orders' => $response,
+        ]);
+    }
+
+    public function createMultipleAdminOrders(CreateMultipleAdminOrdersRequest $request, ProductService $productService): JsonResponse
+    {
+        $order = $this->orderService->createMultipleOrders(CreateMultipleOrdersDTO::fromRequest($request), $productService);
+
+        return response()->json([
+            'orders' => $order,
+        ]);
     }
 }
