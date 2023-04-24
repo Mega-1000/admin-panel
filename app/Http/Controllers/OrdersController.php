@@ -792,7 +792,6 @@ class OrdersController extends Controller
     {
         $newGroup = Task::whereIn('order_id', $similar)->get();
         $newGroup = $newGroup->concat([$task]);
-        $duration = 2;
         /*
         //not working
         $duration = $newGroup->reduce(function ($prev, $next) {
@@ -808,7 +807,7 @@ class OrdersController extends Controller
         $dt->second = 0;
         $data = [
             'start' => $dt->toDateTimeString(),
-            'end' => $dt->addMinutes($duration)->toDateTimeString(),
+            'end' => $dt->addMinutes(2)->toDateTimeString(),
             'id' => $user_id,
             'user_id' => $user_id
         ];
@@ -823,9 +822,9 @@ class OrdersController extends Controller
         RemoveLabelService::removeLabels($task->order, [Label::BLUE_HAMMER_ID], $prev, [], Auth::user()->id);
 
         if ($newGroup->count() > 1) {
-            TaskHelper::createNewGroup($newGroup, $task, $duration, $data);
+            TaskHelper::createNewGroup($newGroup, $task, 2, $data);
         } else {
-            TaskHelper::updateAbandonedTaskTime($newGroup->first(), $duration, $data);
+            TaskHelper::updateAbandonedTaskTime($newGroup->first(), 2, $data);
         }
 
         $tsk = Task::find($task->id);

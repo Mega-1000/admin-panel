@@ -50,66 +50,42 @@ class Task extends Model implements Transformable
         });
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function warehouse()
+    public function warehouse() :BelongsTo
     {
         return $this->belongsTo(Warehouse::class);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function user()
+    public function user() :BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function order()
+    public function order() :BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function taskSalaryDetail()
+    public function taskSalaryDetail() :HasOne
     {
         return $this->hasOne(TaskSalaryDetails::class);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function taskTime()
+    public function taskTime() :HasOne
     {
         return $this->hasOne(TaskTime::class);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function reportProperty()
+    public function reportProperty() :HasMany
     {
         return $this->hasMany(ReportProperty::class);
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function childs()
+    public function childs() :HasMany
     {
         return $this->hasMany(Task::class, 'parent_id', 'id');
     }
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function parent()
+    public function parent() :HasMany
     {
         return $this->hasMany(Task::class, 'id', 'parent_id');
     }

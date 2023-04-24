@@ -17,13 +17,13 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($couriers as $c)
+            @foreach($couriers as $courier)
             <tr>
-                <td>{{$c->courier_name}}</td>
-                <td>{{$c->item_number}}</td>
-                <td>@if($c->active==1)aktywny @else nieaktywny @endif</td>
+                <td>{{$courier->courier_name}}</td>
+                <td>{{$courier->item_number}}</td>
+                <td>@if($courier->active==1)aktywny @else nieaktywny @endif</td>
                 <td>
-                    <a style="text-decoration: none;" href="{{ action('CourierController@edit',[$c->id]) }}" class="btn btn-warning btn-xs"><span>Edytuj</span></a>
+                    <a style="text-decoration: none;" href="{{ action('CourierController@edit',[$courier->id]) }}" class="btn btn-warning btn-xs"><span>Edytuj</span></a>
                 </td>
             </tr>
             @endforeach

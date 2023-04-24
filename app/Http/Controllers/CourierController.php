@@ -13,8 +13,6 @@ class CourierController extends Controller
 
     /**
      * Show the return form of a specific resource.
-     *
-     * @return View
      */
     public function index(): View
     {
@@ -24,8 +22,6 @@ class CourierController extends Controller
 
     /**
      * @param Courier $courier
-     *
-     * @return View
      */
     public function edit(Courier $courier): View {
         return view('courier.edit', compact('courier'));
@@ -34,7 +30,6 @@ class CourierController extends Controller
     /**
      * @param  CurierUpdateRequest $request
      * @param  Courier             $courier
-     * @return RedirectResponse
      */
     public function update(CurierUpdateRequest $request, Courier $courier): RedirectResponse {
 
