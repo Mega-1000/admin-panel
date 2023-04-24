@@ -12,9 +12,40 @@ use Illuminate\Support\Facades\Log;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Facades\Mailer;
 use DateTime;
+use App\Services\AllegroChatService;
 
 class EmailSendingService
 {
+    /**
+     * Add new msg for Allegro client
+     *
+     * @param  string $threadId
+     * @param  string $email
+     *
+     * @return void
+     */
+    public function addAllegroMsg(string $threadId, string $email): void
+    {
+
+        $emailTagHandlerHelper = new EmailTagHandlerHelper();
+
+        $allegroChatService = new AllegroChatService();
+
+        $emailSetting = EmailSetting::where('status', EmailSetting::NEW_ALLEGRO_MSG)->get();
+        
+        foreach($emailSetting as $setting) {
+            
+            $order = Order::whereHas('customer', function($q) use ($email) {
+                $q->where('login', $email);
+            })->first();
+            
+            $content = $emailTagHandlerHelper->parseTags($order, $setting->content, $email);
+            $data = [
+                'text' => $content,
+            ];
+            $allegroChatService->newMessage($threadId, $data);
+        }
+    }
     /**
      * Add new scheduled email with given status
      *
