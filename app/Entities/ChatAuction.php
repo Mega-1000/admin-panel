@@ -5,18 +5,19 @@ namespace App\Entities;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ChatAuction extends Model
 {
     use HasFactory;
 
     /**
-     * @property int $id
+     * @property integer $id
      * @property string $end_of_auction
      * @property string $date_of_delivery
-     * @property int $price
-     * @property int $quality
-     * @property int $chat_id
+     * @property integer $price
+     * @property integer $quality
+     * @property integer $chat_id
      * @property Chat $chat
      * @property bool $confirmed
      */
@@ -36,5 +37,21 @@ class ChatAuction extends Model
     public function chat(): BelongsTo
     {
         return $this->belongsTo(Chat::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public  function offers(): HasMany
+    {
+        return $this->hasMany(ChatAuctionOffer::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public  function firms(): HasMany
+    {
+        return $this->hasMany(ChatAuctionFirm::class);
     }
 }

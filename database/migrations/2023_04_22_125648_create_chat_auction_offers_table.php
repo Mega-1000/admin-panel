@@ -15,10 +15,17 @@ return new class extends Migration
     {
         Schema::create('chat_auction_offers', function (Blueprint $table) {
             $table->id();
+            $table->float('commercial_price_net');
+            $table->float('basic_price_net');
+            $table->float('calculated_price_net');
+            $table->float('aggregate_price_net');
+            $table->float('commercial_price_gross');
+            $table->float('basic_price_gross');
+            $table->float('calculated_price_gross');
+            $table->float('aggregate_price_gross');
             $table->unsignedInteger('order_item_id');
             $table->unsignedInteger('chat_auction_id');
             $table->unsignedInteger('firm_id');
-            $table->integer('price');
             $table->timestamps();
         });
     }

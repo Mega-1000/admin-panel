@@ -197,16 +197,16 @@ class MessagesController extends Controller
 
         $chatMessages = $chat->messages;
 
-        $isStyropian = false;
+        $isStyrofoarm = false;
         foreach ($products as $product) {
-            if (str_starts_with($product->symbol, 'S')) {
-                $isStyropian = true;
+            if ($product->variation_group === 'styropiany') {
+                $isStyrofoarm = true;
                 break;
             }
         }
 
         return view('chat.show')->with([
-            'isStyropian' => $isStyropian,
+            'isStyropian' => $isStyrofoarm,
             'product_list' => $productList,
             'faq' => $this->prepareFaq($chatUsers),
             'notices' => $notices,

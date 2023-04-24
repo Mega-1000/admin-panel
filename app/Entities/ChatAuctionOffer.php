@@ -13,7 +13,15 @@ class ChatAuctionOffer extends Model
     protected $fillable = [
         'chat_auction_id',
         'firm_id',
-        'price',
+        'commercial_price_net',
+        'basic_price_net',
+        'calculated_price_net',
+        'aggregate_price_net',
+        'commercial_price_gross',
+        'basic_price_gross',
+        'calculated_price_gross',
+        'aggregate_price_gross',
+        'order_item_id',
     ];
 
     public function chatAuction(): BelongsTo

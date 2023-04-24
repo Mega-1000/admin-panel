@@ -15,15 +15,22 @@ class ChatAuctionFirm extends Model
      * @property int $chat_auction_id
      * @property int $firm_id
      * @property ChatAuction $chatAuction
+     * @property string $token
      */
 
     protected $fillable = [
         'chat_auction_id',
         'firm_id',
+        'token'
     ];
 
     public function chatAuction(): BelongsTo
     {
         return $this->belongsTo(ChatAuction::class);
+    }
+
+    public function firm(): BelongsTo
+    {
+        return $this->belongsTo(Firm::class);
     }
 }

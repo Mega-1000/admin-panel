@@ -45,7 +45,7 @@
                 @if($isStyropian)
                     <div class="mb-4 alert alert-warning">
                         @if($chat->auctions->count() === 0)
-                            <a href="{{ route('auctions.create', ['chat' => $chat->id]) }}" class="btn btn-primary">
+                            <a href="{{ route('auctions.create', ['chat' => $chat->id]) }}" class="btn btn-primary" target="_blank">
                                 Rozpocznij przetarg
                             </a>
                         @else
@@ -64,9 +64,7 @@
                             Aktywny: {{ $chat->auctions->first()->confirmed ? 'Tak' : 'Nie' }}
                         @endif
 
-
-                        <!-- if user is admin and chat have auction -->
-                        @if($userType === MessagesHelper::TYPE_USER && $chat->auctions->count() > 0)
+                        @if($userType === MessagesHelper::TYPE_USER && $chat->auctions->count() > 0 && $chat->auctions->first()?->confirmed === 0)
                             <form method="post" action="{{ route('auctions.confirm', ['auction' => $chat->auctions->first()->id]) }}">
                                 @csrf
                                 <button class="btn btn-success">

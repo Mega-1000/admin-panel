@@ -1,8 +1,9 @@
 W imieniu naszego klienta, chcielibyśmy ogłosić przetarg na dostawę styropianu.
-Najważniejsze parametry po których klient będzie decydował o wyborze oraz asortyment znajdują się poniżej.
-Prosimy o wypełnienie formularza ofertowego, podając swoją propozycję cenową w odpowiedniej kolumnie za m3 lub opakowanie.
-Po wyborze klienta będzie można transakcje przeprowadzić przez nasz system lub sprzedać bezpośrenio przez siebie.
-Prosimy wziaść pod uwage że jeżeli macie możliwość sprzedaży styropianu po niższej cenie niż przez nas lub bezpośrednio przez siebie to prosimy przeprowadzić przetarg po najniżyszych cenach a na końcu sprzedaż dokonamy przez firmę wskazaną przez państwa.
+Prosimy kliknąć poniższy link który przeniesie Was do modułu na którym prowadzony jest przetarg.
+<a href="{{ route('auctions.offer.store', ['token' => $token]) }}">{{ route('auctions.offer.store', ['token' => $token]) }}</a>
+Podane tam będą wszystkie parametry oraz asortyment dotyczący przetargu oraz możliwość wprowadzenie swoich cen w m3 lub w opakowaniach.
+Ze względu na fakt że do przetargu jest zaproszonych wielu sprzedawców i producentów prosimy podać najniższe możliwe ceny aby zwiększyć prawdopodobieństwo wyboru waszej oferty.
+Nie będzie widoczne kto dokonuje propozycji ofertowej tylko jedynie najniższa cena zaproponowana przez któregoś z oferentów.
+Ostatecznie sprzedaż klientowi może się odbyć przez was bezpośrednio lub przez naszą firmę  lub ewentualnie przez inna firmę którą możecie wskazać jeżeli sprzedaż przez nich gwarantuje najniższą cenę.
 
-{{ $token }}
-A wiec zapraszamy to bitwy :)
+A więc kliknij i dołącz do przetargu.
