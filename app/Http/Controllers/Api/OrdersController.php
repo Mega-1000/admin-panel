@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 
-use App\DTO\Domains\DelivererPackageImport\Exceptions\OrderNotFoundException;
+use App\Domains\DelivererPackageImport\Exceptions\OrderNotFoundException;
 use App\Entities\Country;
 use App\Entities\Customer;
 use App\Entities\EmailSetting;
