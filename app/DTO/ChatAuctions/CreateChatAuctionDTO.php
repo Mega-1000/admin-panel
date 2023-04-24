@@ -4,7 +4,7 @@ namespace App\DTO\ChatAuctions;
 
 use App\Entities\Chat;
 
-class CreateChatAuctionDTO
+readonly class CreateChatAuctionDTO
 {
     public function __construct(
         public Chat $chat,
