@@ -306,7 +306,7 @@ class AllegroOrderSynchro implements ShouldQueue
 
         $customer = $this->customerRepository->findWhere(['login' => $buyerEmail])->first();
 
-        if ($customer && $deliveryAddress['phoneNumber']) {
+        if ($customer && array_key_exists('phoneNumber', $deliveryAddress) && $deliveryAddress['phoneNumber']) {
             $customer->password = Hash::make($deliveryAddress['phoneNumber']);
             $customer->saveQuietly();
         }
