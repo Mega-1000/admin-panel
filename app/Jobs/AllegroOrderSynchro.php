@@ -141,10 +141,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 if (Order::where('allegro_form_id', $allegroOrder['id'])->count() > 0) {
                     continue;
                 }
-                if(
-                    $allegroOrder['status'] === $this->allegroOrderService::STATUS_CANCELLED &&
-                    $allegroOrder['payment']['paidAmount']['amount'] !== $allegroOrder['summary']['totalToPay']['amount']
-                ) {
+                if ($this->checkAllegroStatusAndOrderPaid($allegroOrder) === true) {
                     continue;
                 }
 
@@ -168,7 +165,7 @@ class AllegroOrderSynchro implements ShouldQueue
 
                 $this->emailSendingService->addNewScheduledEmail($order);
 
-                if($allegroOrder['status'] === $this->allegroOrderService::STATUS_CANCELLED) {
+                if ($allegroOrder['status'] === $this->allegroOrderService::STATUS_CANCELLED) {
                     $prev = [];
                     AddLabelService::addLabels($order, [176], $prev, []);
                 }
@@ -283,6 +280,26 @@ class AllegroOrderSynchro implements ShouldQueue
                 ]);
             }
         }
+    }
+
+    private function checkAllegroStatusAndOrderPaid(array $allegroOrder): bool
+    {
+        if ($allegroOrder['status'] === $this->allegroOrderService::STATUS_CANCELLED) {
+            if (
+                array_key_exists('payment', $allegroOrder) &&
+                array_key_exists('paidAmount', $allegroOrder['payment']) &&
+                array_key_exists('amount', $allegroOrder['payment']['paidAmount'])
+            ) {
+                if (
+                    array_key_exists('summary', $allegroOrder) &&
+                    array_key_exists('totalToPay', $allegroOrder['summary']) &&
+                    array_key_exists('amount', $allegroOrder['summary']['totalToPay'])
+                ) {
+                    return $allegroOrder['payment']['paidAmount']['amount'] !== $allegroOrder['summary']['totalToPay']['amount'];
+                }
+            }
+        }
+        return false;
     }
 
     /**
