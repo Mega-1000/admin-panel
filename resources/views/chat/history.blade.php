@@ -1,20 +1,20 @@
 <button class="btn btn-success show-all">
     Pokaż wszystkich
 </button>
+<h5>Klienci:</h5>
 @foreach ($usersHistory['customers'] as $user)
-    <h5>Klienci:</h5>
-    <label>{{ $user->customer->addresses->first()->email }}
+    <label>{{ $user->customer->addresses->first()?->email }}
         <input type="checkbox" checked class="filter-users-history" value="{{ $user->id }}" />
     </label>
 @endforeach
+<h5>Pracownicy:</h5>
 @foreach ($usersHistory['employees'] as $user)
-    <h5>Pracownicy:</h5>
     <label>{{ $user->employee->email }}
         <input type="checkbox" checked class="filter-users-history" value="{{ $user->id }}" />
     </label>
 @endforeach
+<h5>Konsultanci:</h5>
 @foreach ($usersHistory['consultants'] as $user)
-    <h5>Konsultanci:</h5>
     <label>{{ $user->user->email }}
         <input type="checkbox" checked class="filter-users-history" value="{{ $user->id }}" />
     </label>

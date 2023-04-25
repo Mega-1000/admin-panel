@@ -34,7 +34,7 @@ class MessageSent extends Mailable
         $this->frontId = $frontId;
         $this->orderId = $orderId;
         // TODO Zmienić na config
-        $this->subject = 'Nowa wiadomość od www.' . env('DOMAIN_NAME');
+        $this->subject = 'Nowa wiadomość od www.' . config('app.domain_name');
     }
 
     /**

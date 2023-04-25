@@ -930,6 +930,8 @@
             @endphp
         ];
 
+        const customerId = '{{ $customerId }}';
+
         $(document).ready(() => {
             let nof = getUrlParameter('nof');
             if (nof) {
@@ -1242,6 +1244,7 @@
                             d.dateColumn = ajaxParams.dateColumn;
                             d.same = ajaxParams.same;
                         }
+                        d.customerId = customerId;
                         d.selectAllDates = localStorage.getItem('selectAllDates');
                         let differenceMode = localStorage.getItem('differenceMode');
                         if (differenceMode !== null) d.differenceMode = localStorage.getItem('differenceMode');

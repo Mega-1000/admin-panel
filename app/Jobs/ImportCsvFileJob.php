@@ -40,6 +40,8 @@ class ImportCsvFileJob implements ShouldQueue
         SerializesModels,
         IsMonitored;
 
+    public $currentCategories;
+
     private $categories = ['id' => 0, 'children' => []];
     private $productsRelated = [];
     private $jpgData = [];
@@ -147,6 +149,8 @@ class ImportCsvFileJob implements ShouldQueue
             'deleted_at' => Carbon::now()
         ]);
 
+        $this->currentCategories = Categories::getElementsForCsvReloadJob();
+
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
         DB::statement("TRUNCATE product_media");
         DB::statement("TRUNCATE product_trade_groups");
@@ -155,9 +159,8 @@ class ImportCsvFileJob implements ShouldQueue
         DB::statement("TRUNCATE chimney_attribute_options");
         DB::statement("TRUNCATE chimney_attributes");
         DB::statement("TRUNCATE jpg_data");
+        DB::statement("TRUNCATE categories");
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-
-        Categories::removeElementsForCsvReloadJob();
     }
 
     private function getUrl($url)
@@ -182,33 +185,35 @@ class ImportCsvFileJob implements ShouldQueue
     /**
      * @throws Exception
      */
-    private function saveCategory($line, $categoryTree, $categoryColumn)
+    private function saveCategory(array $line, array $categoryTree, int $categoryColumn)
     {
         $parent = &$this->getCategoryParent($categoryTree);
 
-        /** @var ?Category $existingCategory */
-        $existingCategory = Category::query()->where('name', end($categoryTree))->first();
 
-        $image = $existingCategory?->save_image ? $line[303] : $existingCategory?->img ?? 'https://via.placeholder.com/300';
+        /** @var Category $existingCategory */
+        $existingCategory = $this->currentCategories->filter(function ($category) use ($categoryTree) {
+            return $category->name === end($categoryTree);
+        })->first();
+
+        $image = $existingCategory?->save_image === false ? $existingCategory?->img : $line[303] ?? 'https://via.placeholder.com/300';
         if (strpos($image, "\\")) {
             $image = $this->getUrl($image);
         }
 
+
         /** @var Category $category */
         $category = Category::query()->create([
             'name' => end($categoryTree),
-            'description' => $existingCategory?->save_description === false ? $existingCategory->description : $line[310],
+            'description' => $existingCategory?->description ?? $line[310],
             'img' => $image,
             'rewrite' => $this->rewrite(end($categoryTree)),
             'is_visible' => $this->getShowOnPageParameter($line, $categoryColumn),
             'priority' => $this->getProductsOrder($line, $categoryColumn),
             'save_name' => $existingCategory?->save_name ?? true,
             'save_description' => $existingCategory?->save_description ?? true,
-            'save_image' => $existingCategory?->save_description ?? true,
+            'save_image' => $existingCategory?->save_image ?? true,
             'parent_id' => $parent['id'],
         ]);
-
-        $existingCategory?->delete();
 
         $parent['children'][$category->name] = ['id' => $category->id, 'children' => []];
 
@@ -406,10 +411,10 @@ class ImportCsvFileJob implements ShouldQueue
         $packing->fill($array);
         $product->packing()->save($packing);
 
-        if ($product->stock !== null) {
-            $product->stock()->save(new Entities\ProductStock([
+        if ($product->stock()->exists() === false) {
+            $product->stock()->create([
                 'quantity' => 0
-            ]));
+            ]);
         }
 
         return $product;

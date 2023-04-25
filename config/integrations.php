@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'gus' => [
+        'api_key' => env('GUS_API_KEY', ''),
+
+    ],
     'apaczka' => [
         'login' => 'info@mega1000.pl',
         'password' => env('APACZKA_PASSWORD'),
@@ -44,6 +48,9 @@ return [
     ],
     'gls' => [
         'tracking_url' => 'https://gls-group.eu/app/service/open/rest/PL/pl/rstt001?match=',
+        'password' => env('GLS_PASSWORD', ''),
+        'login' => env('GLS_LOGIN', ''),
+        'api_url' => env('GLS_API_URL', ''),
     ],
 
     'schenker' => [

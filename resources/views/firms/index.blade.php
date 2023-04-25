@@ -30,6 +30,7 @@
             <th>@lang('firms.table.firm_type')</th>
             <th>@lang('firms.table.email')</th>
             <th>@lang('firms.table.secondary_email')</th>
+            <th>@lang('firms.table.complaint_email')</th>
             <th>@lang('firms.table.nip')</th>
             <th>@lang('firms.table.account_number')</th>
             <th>@lang('firms.table.status')</th>
@@ -119,6 +120,10 @@
                 {
                     data: 'secondary_email',
                     name: 'secondary_email'
+                },
+                {
+                    data: 'complaint_email',
+                    name: 'complaint_email'
                 },
                 {
                     data: 'nip',

@@ -16,6 +16,7 @@ use Prettus\Repository\Traits\TransformableTrait;
  * @property int $id
  * @property string $symbol
  * @property ProductStock $stock
+ * @property string $manufacturer
  * @package namespace App\Entities;
  */
 class Product extends Model implements Transformable
@@ -211,7 +212,7 @@ class Product extends Model implements Transformable
      */
     public function stock(): HasOne
     {
-        return $this->hasOne(ProductStock::class);
+        return $this->hasOne(ProductStock::class, 'product_id', 'id');
     }
 
     /**
@@ -265,14 +266,14 @@ class Product extends Model implements Transformable
         return $this->packing->warehouse && $this->packing->recommended_courier && $this->packing->packing_name;
     }
 
-    public static function getDefaultProduct()
+    public static function getDefaultProduct(): self
     {
         return Product::where('symbol', 'TWSU')->first();
     }
 
     public function getImageUrl()
     {
-        return str_replace("D:\\z\\", env('APP_URL') . 'storage/products/', $this->url);
+        return str_replace("D:\\z\\", config('app.url') . 'storage/products/', $this->url);
     }
 
     public function getProducent()

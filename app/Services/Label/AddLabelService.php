@@ -12,11 +12,13 @@ use App\Entities\WorkingEvents;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Jobs\TimedLabelJob;
+use App\Services\EmailSendingService;
+use App\Entities\EmailSetting;
 
 class AddLabelService
 {
 
-    public static function addLabels(Order $order, array $labelIdsToAdd, array &$loopPreventionArray, array $options, ?int $userId, ?Carbon $time = null): void
+    public static function addLabels(Order $order, array $labelIdsToAdd, array &$loopPreventionArray, array $options, ?int $userId = null, ?Carbon $time = null): void
     {
         $now = Carbon::now();
 
@@ -67,8 +69,29 @@ class AddLabelService
 
             $alreadyHasLabel = $order->labels()->where('label_id', $labelId)->exists();
 
-            if ($alreadyHasLabel === false && $time === null) {
-                $order->labels()->attach($order->id, ['label_id' => $label->id, 'added_type' => $options['added_type'], 'created_at' => Carbon::now()]);
+            if ($time === null) {
+
+                if($alreadyHasLabel) {
+                    $order->labels()->detach($labelId);
+                }
+
+                foreach($label->labelsToRemoveAfterAddition as $labelToRemove) {
+                    $order->labels()->detach($labelToRemove->id);
+                }
+                foreach($label->labelsToAddAfterAddition as $labelToAdd) {
+                    $order->labels()->attach($order->id, [
+                        'label_id'   => $labelToAdd->id,
+                        'added_type' => $options['added_type'],
+                        'created_at' => Carbon::now()
+                    ]);
+                }
+
+                $order->labels()->attach($order->id, [
+                    'label_id'   => $label->id,
+                    'added_type' => $options['added_type'],
+                    'created_at' => Carbon::now()
+                ]);
+
                 self::setScheduledLabelsAfterAddition($order, $label, $userId);
                 $loopPreventionArray['already-added'][] = $labelId;
 
@@ -96,6 +119,10 @@ class AddLabelService
                 }
 
                 if ($label->id == Label::ORDER_ITEMS_REDEEMED_LABEL) {
+
+                    $emailSendingService = new EmailSendingService();
+                    $emailSendingService->addNewScheduledEmail($order, EmailSetting::PICKED_UP_2);
+
                     LabelNotificationService::sendItemsRedeemedMail($order);
                     $order->preferred_invoice_date = $now;
                     $tasks = Task::query()->where('order_id', '=', $order->id)->get();

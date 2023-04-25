@@ -24,12 +24,14 @@ use App\Entities\UserSurplusPayment;
 use App\Entities\UserSurplusPaymentHistory;
 use App\Entities\Warehouse;
 use App\Entities\WorkingEvents;
+use App\Enums\EmailSettingsEnum;
 use App\Enums\LabelStatusEnum;
 use App\Facades\Mailer;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\EmailTagHandlerHelper;
 use App\Helpers\GetCustomerForNewOrder;
 use App\Helpers\LabelsHelper;
+use App\Helpers\MessagesHelper;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderCalcHelper;
 use App\Helpers\OrderPriceCalculator;
@@ -49,6 +51,7 @@ use App\Jobs\RemoveFileLockJob;
 use App\Jobs\SendRequestForCancelledPackageJob;
 use App\Jobs\UpdatePackageRealCostJob;
 use App\Mail\SendOfferToCustomerMail;
+use App\Repositories\Chats;
 use App\Repositories\CustomerAddressRepository;
 use App\Repositories\CustomerRepository;
 use App\Repositories\EmployeeRepository;
@@ -61,6 +64,7 @@ use App\Repositories\OrderMessageRepository;
 use App\Repositories\OrderPackageRepository;
 use App\Repositories\OrderPaymentRepository;
 use App\Repositories\OrderRepository;
+use App\Repositories\Orders;
 use App\Repositories\ProductPackingRepository;
 use App\Repositories\ProductRepository;
 use App\Repositories\ProductStockLogRepository;
@@ -72,6 +76,7 @@ use App\Repositories\StatusRepository;
 use App\Repositories\TaskRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
+use App\Services\EmailSendingService;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
 use App\Services\OrderAddressService;
@@ -100,7 +105,6 @@ use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Yajra\DataTables\Facades\DataTables;
 use function response;
-use App\Helpers\MessagesHelper;
 
 /**
  * Class OrderController.
@@ -223,6 +227,8 @@ class OrdersController extends Controller
 
     protected $orderExcelService;
 
+    protected $emailSendingService;
+
     /** @var TaskService */
     protected $taskService;
 
@@ -268,6 +274,7 @@ class OrdersController extends Controller
         TaskRepository                 $taskRepository,
         OrderInvoiceService            $orderInvoiceService,
         OrderExcelService              $orderExcelService,
+        EmailSendingService            $emailSendingService,
         ProductStockPacketRepository   $productStockPacketRepository,
         TaskService                    $taskService
     )
@@ -297,6 +304,7 @@ class OrdersController extends Controller
         $this->taskRepository = $taskRepository;
         $this->orderInvoiceService = $orderInvoiceService;
         $this->orderExcelService = $orderExcelService;
+        $this->emailSendingService = $emailSendingService;
         $this->productStockPacketRepository = $productStockPacketRepository;
         $this->taskService = $taskService;
     }
@@ -377,8 +385,9 @@ class OrdersController extends Controller
         $templateData = PackageTemplate::orderBy('list_order', 'asc')->get();
         $deliverers = Deliverer::all();
         $couriersTasks = $this->taskService->groupTaskByShipmentDate();
+        $customerId = $request->get('customer_id');
 
-        return view('orders.index', compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses', 'allWarehousesString'))
+        return view('orders.index', compact('customColumnLabels', 'groupedLabels', 'visibilities', 'couriers', 'warehouses', 'customerId', 'allWarehousesString'))
             ->withOuts($out)
             ->withLabIds($labIds)
             ->withLabels($labels)
@@ -532,19 +541,14 @@ class OrdersController extends Controller
         $countries = Country::all();
 
         $helper = new MessagesHelper();
-        $helper->orderId = $order->id;
-        $helper->currentUserId = Auth::user()->id;
-        $helper->currentUserType = $userType = MessagesHelper::TYPE_USER;
-        $chatUserToken = $helper->encrypt();
+        $userId = Auth::user()->id;
+        $chatUserToken = $helper->getChatToken($order->id, $userId);
         $chat = $helper->getChat();
         // last five msg from area 0
 
-        $chatMessages = [];
-        if( isset($chat) && count($chat->messages) > 0 ) {
-            $chatMessages = $chat->messages->filter(function($msg) {
-                return $msg->area == 0;
-            })->slice(-5);
-        }
+        $chatMessages = $chat?->messages;
+
+        $userType = MessagesHelper::TYPE_USER;
 
         if ($order->customer_id == 4128) {
             return view(
@@ -578,6 +582,7 @@ class OrdersController extends Controller
                     'ourTotalCost',
                     'labelsButtons',
                     'countries',
+                    'chat',
                     'chatUserToken',
                     'chatMessages',
                     'userType'
@@ -618,12 +623,12 @@ class OrdersController extends Controller
                 'labelsButtons',
                 'packets',
                 'countries',
+                'chat',
                 'chatUserToken',
                 'chatMessages',
                 'userType'
             )
         );
-
     }
 
     private function getVariations($order)
@@ -965,7 +970,7 @@ class OrdersController extends Controller
         $request->validated();
         $user = Auth::user();
         $userId = $request->input('user_id');
-        if( isset($userId) ) {
+        if (isset($userId)) {
             $user = User::find($userId);
         }
         if (empty($user)) {
@@ -1760,7 +1765,6 @@ class OrdersController extends Controller
     public function swapLabelsAfterLabelAddition(Request $request, $labelId)
     {
         $orderIds = $request->input('orderIds');
-        $preventionArray = [];
 
         if (count($orderIds) < 1) {
             return;
@@ -1774,8 +1778,9 @@ class OrdersController extends Controller
         $user = Auth::user();
         $label = Label::find($labelId);
 
-        $orders = $this->orderRepository->findWhereIn('id', $orderIds);
+        $orders = Order::whereIn('id', $orderIds)->get();
         foreach ($orders as $order) {
+            $preventionArray = [];
             try {
                 $order->labels_log .= Order::formatMessage($user, "dodał etykietę: $label->name");
                 $order->save();
@@ -1783,6 +1788,10 @@ class OrdersController extends Controller
                 Log::error('Nie udało się zapisać logu', ['message' => $exception->getMessage(), 'trace' => $exception->getTraceAsString()]);
             }
             AddLabelService::addLabels($order, [$labelId], $preventionArray, [], Auth::user()->id, $time);
+
+            if (EmailSettingsEnum::coerce($label->id) !== null) {
+                $this->emailSendingService->addScheduledEmail($order, $label->id);
+            }
         }
     }
 
@@ -2358,6 +2367,10 @@ class OrdersController extends Controller
             if (isset($data['dateTo'])) {
                 $query->whereRaw("date({$data["dateColumn"]}) <= '{$data['dateTo']}'");
             }
+        }
+
+        if (!empty($data['customerId'])) {
+            $query->where('orders.customer_id', $data['customerId']);
         }
 
         //$query->whereRaw('COALESCE(last_status_update_date, orders.created_at) < DATE_ADD(NOW(), INTERVAL -30 DAY)');
@@ -3238,8 +3251,7 @@ class OrdersController extends Controller
                 'cart_token' => $order->getToken(),
                 'user_code' => $code
             ]);
-            // TODO Change to configuration
-            $frontUrl = env('FRONT_URL') . '/koszyk.html?' . $query;
+            $frontUrl = config('app.front_url') . '/koszyk.html?' . $query;
             return redirect($frontUrl);
         } catch (Exception $exception) {
             Log::notice('Can not edit basket', ['message' => $exception->getMessage(), 'stack' => $exception->getTraceAsString()]);
@@ -3373,5 +3385,80 @@ class OrdersController extends Controller
             }, 0);
             return $acu + $totalAmountForPack;
         }, 0);
+    }
+
+    /**
+     * Get Current User Chat Token for given order
+     *
+     * @param Order $order
+     *
+     * @return JsonResponse
+     */
+    public function resolveOrderDispute(Order $order): JsonResponse
+    {
+
+        $helper = new MessagesHelper();
+        $userId = Auth::user()->id;
+        $chatUserToken = $helper->getChatToken($order->id, $userId);
+
+        $response = [
+            'chatUserToken' => $chatUserToken,
+        ];
+
+        return response()->json($response);
+    }
+
+    /**
+     * Get Current User Chat Token for given chat
+     *
+     * @param int $chatId
+     *
+     * @return JsonResponse
+     */
+    public function resolveChatIntervention(int $chatId): JsonResponse
+    {
+
+        $helper = new MessagesHelper();
+        $helper->chatId = $chatId;
+        $userId = Auth::user()->id;
+        $chatUserToken = $helper->getChatToken(null, $userId);
+
+        $response = [
+            'chatUserToken' => $chatUserToken,
+        ];
+
+        return response()->json($response);
+    }
+
+    /**
+     * Get orders / chats that marked as needed support / intervention for ex. for new customers orders / or contact chats
+     *
+     * @return JsonResponse
+     */
+    public function checkChatsNeedIntervention(): JsonResponse
+    {
+        $chatsNeedIntervention = Chats::getChatsNeedIntervention();
+
+        $response = [
+            'unreadedThreads' => $chatsNeedIntervention,
+        ];
+
+        return response()->json($response);
+    }
+
+    /**
+     * Get orders / chats that marked as needed support / intervention for ex. for new customers orders / or contact chats
+     *
+     * @return JsonResponse
+     */
+    public function getChatDisputes(): JsonResponse
+    {
+        $ordersNeedSupport = Orders::getChatOrdersNeedSupport();
+
+        $response = [
+            'unreadedThreads' => $ordersNeedSupport,
+        ];
+
+        return response()->json($response);
     }
 }

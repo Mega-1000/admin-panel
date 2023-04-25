@@ -53,14 +53,14 @@ class AllegroOrderService extends AllegroApiService
         }
     }
 
-    public function sendNewOrderMessageToClient($orderId): void
+    public function sendNewOrderMessageToClient(string $orderId): void
     {
-        $orderModel = AllegroOrder::where('order_id', '=', $orderId)->first();
-        $orderModel->new_order_message_sent = true;
-        $orderModel->save();
+        $orderAllegro = AllegroOrder::where('order_id', '=', $orderId)->first();
+        $orderAllegro->new_order_message_sent = true;
+        $orderAllegro->save();
 
         Mailer::create()
-            ->to($orderModel->buyer_email)
+            ->to($orderAllegro->buyer_email)
             ->send(new AllegroNewOrderEmail());
     }
 
@@ -269,11 +269,9 @@ class AllegroOrderService extends AllegroApiService
     }
 
     /**
-     * @param array $addParams
-     *
      * @return array
      */
-    public function getPendingOrders($addParams = []): array
+    public function getPendingOrders(): array
     {
         $params = [
             'offset' => 0,
@@ -281,11 +279,27 @@ class AllegroOrderService extends AllegroApiService
             'status' => self::READY_FOR_PROCESSING,
             'fulfillment.status' => 'NEW'
         ];
-        $params = $params + $addParams;
         $url = $this->getRestUrl('/order/checkout-forms?' . http_build_query($params));
         $response = $this->request('GET', $url, $params);
 
-        return $response && is_array($response) && array_key_exists('checkoutForms', $response) ? $response['checkoutForms'] : [];
+        return $response && array_key_exists('checkoutForms', $response) ? $response['checkoutForms'] : [];
+    }
+
+    /**
+     * @return array
+     */
+    public function getCancelledOrders(): array
+    {
+        $params = [
+            'offset' => 0,
+            'limit' => 100,
+            'status' => self::STATUS_CANCELLED,
+            'boughtAt.gte' => Carbon::now()->subMinutes(10)->toISOString(),
+        ];
+        $url = $this->getRestUrl('/order/checkout-forms?' . http_build_query($params));
+        $response = $this->request('GET', $url, $params);
+
+        return $response && array_key_exists('checkoutForms', $response) ? $response['checkoutForms'] : [];
     }
 
     /**

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ad124d0b78be643dbaf599b74ccafdb8",
+    "content-hash": "c6e1186394ac742cda99efe5aad85332",
     "packages": [
         {
             "name": "arrilot/laravel-widgets",
@@ -435,6 +435,70 @@
                 }
             ],
             "time": "2022-02-21T13:15:14+00:00"
+        },
+        {
+            "name": "cmixin/business-day",
+            "version": "1.16.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kylekatarnls/business-day.git",
+                "reference": "22ec68a59fb14ffc35c03f5b5fef16aef6d67bb9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kylekatarnls/business-day/zipball/22ec68a59fb14ffc35c03f5b5fef16aef6d67bb9",
+                "reference": "22ec68a59fb14ffc35c03f5b5fef16aef6d67bb9",
+                "shasum": ""
+            },
+            "require": {
+                "nesbot/carbon": "^2.29 || ^3@dev",
+                "php": ">=7.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^7.5.20 || ^8.5.31"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                },
+                "laravel": {
+                    "providers": [
+                        "Cmixin\\BusinessDay\\Laravel\\ServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Cmixin\\": "src/Cmixin/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "KyleKatarn",
+                    "email": "carbon@selfbuild.fr"
+                }
+            ],
+            "description": "Carbon mixin to handle business days",
+            "support": {
+                "issues": "https://github.com/kylekatarnls/business-day/issues",
+                "source": "https://github.com/kylekatarnls/business-day/tree/1.16.1"
+            },
+            "funding": [
+                {
+                    "url": "https://opencollective.com/Carbon",
+                    "type": "open_collective"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/nesbot/carbon",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2022-12-23T21:09:31+00:00"
         },
         {
             "name": "composer/class-map-generator",
@@ -13689,11 +13753,14 @@
     "prefer-lowest": false,
     "platform": {
         "php": "8.2.*",
-        "ext-json": "*",
-        "ext-soap": "*",
-        "ext-mailparse": "*",
+        "ext-bcmath": "*",
+        "ext-calendar": "*",
         "ext-curl": "*",
-        "ext-calendar": "*"
+        "ext-iconv": "*",
+        "ext-json": "*",
+        "ext-mailparse": "*",
+        "ext-soap": "*",
+        "ext-zip": "*"
     },
     "platform-dev": {
         "ext-dom": "*"

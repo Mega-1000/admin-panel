@@ -15,7 +15,7 @@ class CompanyInfoController extends Controller
 
     public function byNip($nip)
     {
-        $gus = new GusApi(env('GUS_API_KEY'));
+        $gus = new GusApi(config('integrations.gus.api_key'));
 
         try {
             $gus->login();

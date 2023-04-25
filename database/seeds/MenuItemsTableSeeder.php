@@ -1,5 +1,7 @@
 <?php
 
+namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 use TCG\Voyager\Models\Menu;
 use TCG\Voyager\Models\MenuItem;
@@ -438,6 +440,22 @@ class MenuItemsTableSeeder extends Seeder
                 'color' => null,
                 'parent_id' => null,
                 'order' => 24,
+            ])->save();
+        }
+
+        $menuItem = MenuItem::firstOrNew([
+            'menu_id' => $menu->id,
+            'title' => 'Ustawienia e-mail',
+            'url' => '',
+            'route' => 'emailSettings',
+        ]);
+        if (!$menuItem->exists) {
+            $menuItem->fill([
+                'target' => '_self',
+                'icon_class' => 'voyager-settings',
+                'color' => null,
+                'parent_id' => null,
+                'order' => 7,
             ])->save();
         }
     }

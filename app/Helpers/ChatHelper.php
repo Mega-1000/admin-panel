@@ -71,9 +71,9 @@ class ChatHelper
             $userData  = "$roles</br>$firstname $lastname </br>$phone $email";
 
         } else if ($userType == MessagesHelper::TYPE_CUSTOMER) {
-            $emailPhone = self::formatEmailAndPhone($chatUser->login, $chatUser->addresses->first()->phone);
-            $userData   = $emailPhone.'<br>'.$chatUser->addresses->first()->postal_code
-                          .' '. $chatUser->addresses->first()->city;
+            $emailPhone = self::formatEmailAndPhone($chatUser->login, $chatUser->addresses->first()?->phone);
+            $userData   = $emailPhone.'<br>'.$chatUser->addresses->first()?->postal_code
+                          .' '. $chatUser->addresses->first()?->city;
         } else if($userType == MessagesHelper::TYPE_USER) {
             $userData = $chatUser->name .' '. $chatUser->firstname
                         .' '. $chatUser->lastname.'<br>'.$chatUser->email.'<br>'. $chatUser->phone;

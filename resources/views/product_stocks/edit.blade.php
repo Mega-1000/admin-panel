@@ -37,6 +37,9 @@
            class="btn btn-success install pull-right">
             <i class="voyager-plus"></i> <span>@lang('product_stocks.form.buttons.position_create')</span>
         </a>
+        <a href="{{ route('product_stocks.placeAdminOrder', ['productStock' => $productStocks->product_id]) }}" class="btn btn-primary">
+            Zamów produkt
+        </a>
         <h4 class="inline">Produkt: {{ $productStocks->product->name }}</h4> - <h4 class="inline">Symbol: {{ $productStocks->product->symbol }}</h4>
     </div>
     <form action="{{ action('ProductStocksController@update', ['id' => $productStocks->id]) }}" method="POST">
@@ -563,6 +566,8 @@
                     render: function(action) {
                         if (action === 'ADD') {
                             return '<span style="color: green;">' + {!! json_encode(__('product_stock_logs.table.add'), true) !!} + '</span>';
+                        } else if(action === 'DAMAGED') {
+                            return '<span style="color: orange;">Uszkodzone</span>';
                         } else {
                             return '<span style="color: red;">' + {!! json_encode(__('product_stock_logs.table.delete'), true) !!} + '</span>';
                         }

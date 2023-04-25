@@ -4,8 +4,9 @@
         <th>ID</th>
         <th>Temat</th>
         <th>Telefon klienta</th>
-        <th>Dane opiekuna</th>
+        <th>Email klienta</th>
         <th>Dane konsultanta</th>
+        <th>Dane pracownika</th>
         <th>Ostatnia wiadomość</th>
         <th>Przejrzyj/odpowiedz</th>
     </tr>
@@ -21,6 +22,11 @@
             <td>{!! $chat->title !!}</td>
             @if($chat->customers->first())
                 <td>{{ $chat->customers->first()->addresses->first()->phone ?? '' }}</td>
+            @else
+                <td></td>
+            @endif
+            @if($chat->customers->first())
+                <td>{{ $chat->customers->first()->addresses->first()->email ?? '' }}</td>
             @else
                 <td></td>
             @endif

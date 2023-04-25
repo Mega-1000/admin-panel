@@ -27,6 +27,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use App\Entities\ChatUser;
 
 class MessagesHelper
 {
@@ -53,6 +54,7 @@ class MessagesHelper
     const MESSAGE_RED_LABEL_ID = 55;
     const MESSAGE_BLUE_LABEL_ID = 56;
     const MESSAGE_YELLOW_LABEL_ID = 57;
+    const MESSAGE_GREEN_LABEL_ID = 58;
 
     public function __construct($token = null)
     {
@@ -64,10 +66,16 @@ class MessagesHelper
         }
     }
 
-    public function encrypt()
+    /**
+     * Encrypt data
+     *
+     * @return string
+     */
+    public function encrypt(): string
     {
         $this->setChatId();
         $this->setUsers();
+
         if ($this->chatId) {
             return encrypt([
                 'cId' => $this->chatId,
@@ -76,13 +84,19 @@ class MessagesHelper
             ]);
         }
 
-        return encrypt([
+        $dataToEncrypt = [
             'u' => $this->users,
-            'pId' => $this->productId,
-            'oId' => $this->orderId,
             'curT' => $this->currentUserType,
             'curId' => $this->currentUserId
-        ]);
+        ];
+        if($this->orderId) {
+            $dataToEncrypt['oId'] = $this->orderId;
+        }
+        if($this->productId) {
+            $dataToEncrypt['pId'] = $this->productId;
+        }
+
+        return encrypt($dataToEncrypt);
     }
 
     public function decrypt($token)
@@ -178,8 +192,7 @@ class MessagesHelper
 
     private function getChatObject()
     {
-        return Chat
-            ::with(['messages' => function ($q) {
+        return Chat::with(['messages' => function ($q) {
                 $q->with(['chatUser' => function ($q) {
                     $q->with(['customer' => function ($q) {
                         $q->with(['addresses' => function ($q) {
@@ -204,6 +217,26 @@ class MessagesHelper
         return $title;
     }
 
+    /**
+     * Get or if no exist create Blank user (user without any ids, for sending generic messages)
+     *
+     * @param  Chat     $chat
+     *
+     * @return ChatUser $chatUser
+     */
+    public function createOrGetBlankUser(Chat $chat): ChatUser {
+        $chatUser = $chat->chatUsers->whereNull('user_id')->whereNull('customer_id')->whereNull('employee_id')->first();
+
+        if($chatUser === null) {
+
+            $chatUser = new ChatUser();
+            $chatUser->chat()->associate($chat);
+            $chatUser->save();
+        }
+
+        return $chatUser;
+    }
+
     public function createNewChat()
     {
         $chat = new Chat();
@@ -225,8 +258,10 @@ class MessagesHelper
         }
 
         $chat->product_id = $this->productId ?: null;
+
         $this->cache['chat'] = $chat;
         $chat->save();
+
         if (!empty($this->users[self::TYPE_CUSTOMER])) {
             $customer = Customer::find($this->users[self::TYPE_CUSTOMER]);
             if (!$customer) {
@@ -248,6 +283,7 @@ class MessagesHelper
             }
             $chat->users()->attach($user);
         }
+
         $this->cache['chat'] = $chat;
         $this->chatId = $chat->id;
         return $chat;
@@ -271,16 +307,17 @@ class MessagesHelper
     /**
      * Handle add message to Chat
      *
-     * @param string $message
-     * @param string $area
-     * @param UploadedFile $file
+     * @param string             $message
+     * @param string             $area
+     * @param UploadedFile|null  $file
+     * @param ChatUser|null      $customChatUser
      *
-     * @return void
+     * @return Message      $msg
      */
-    public function addMessage(string $message, int $area = UserRole::Main, UploadedFile $file = null): void
+    public function addMessage(string $message, int $area = UserRole::Main, UploadedFile $file = null, ?ChatUser $customChatUser = null): Message
     {
         $chat = $this->getChat();
-        $chatUser = $this->getCurrentChatUser();
+        $chatUser = $customChatUser ?? $this->getCurrentChatUser();
         if (!$chatUser) {
             throw new ChatException('Cannot save message - User not added to chat');
         }
@@ -311,8 +348,8 @@ class MessagesHelper
             $noticeValidator = Validator::make($noticeRequest->all(), $noticeRequest->rules());
             $noticeRequest->setValidator($noticeValidator);
 
-            $order = app(OrdersController::class);
-            $order->updateNotices($noticeRequest);
+            $orderController = app(OrdersController::class);
+            $orderController->updateNotices($noticeRequest);
         }
         if ($file) {
             $originalFileName = $file->getClientOriginalName();
@@ -341,9 +378,12 @@ class MessagesHelper
         }
 
         if ($chat->order) {
+            if($this->currentUserType === self::TYPE_CUSTOMER && $chat->user_id === null) {
+                $chat->order->need_support = true;
+                $chat->order->save();
+            }
             if ($chatUser->user) {
                 $this->setChatLabel($chat, true);
-                $this->clearIntervention($chat);
             } else {
                 $this->setChatLabel($chat, false);
             }
@@ -365,11 +405,14 @@ class MessagesHelper
                     Auth::user()->id
                 );
             }
+            WorkingEvents::createEvent(WorkingEvents::CHAT_MESSAGE_ADD_EVENT, $chat->order->id);
+        } else {
+            if($this->currentUserType === self::TYPE_CUSTOMER && $chat->user_id === null) {
+                $chat->need_intervention = true;
+                $chat->save();
+            }
         }
-        WorkingEvents::createEvent(WorkingEvents::CHAT_MESSAGE_ADD_EVENT, $chat->order->id);
 
-        //\App\Jobs\ChatNotificationJob::dispatch($chat->id)->delay(now()->addSeconds(self::NOTIFICATION_TIME + 5));
-        // @TODO this should use queue, but at this point (08.05.2021) queue is bugged
         $email = null;
 
         if ($this->getCurrentChatUser()->customer_id) {
@@ -379,6 +422,8 @@ class MessagesHelper
         }
 
         (new ChatNotificationJob($chat->id, $email, $this->getCurrentChatUser()->id))->handle();
+
+        return $msg;
     }
 
     private function getAdminChatUser($secondTry = false)
@@ -423,6 +468,24 @@ class MessagesHelper
     public function hasNewMessage()
     {
         return self::hasNewMessageStatic($this->getChat(), $this->getCurrentChatUser());
+    }
+
+    /**
+     * Get encrypted chat token for given data
+     *
+     * @param  int      $orderId
+     * @param  int      $userId
+     * @param  string   $userType
+     *
+     * @return string   $chatUserToken
+     */
+    public function getChatToken(?int $orderId, int $userId, string $userType = MessagesHelper::TYPE_USER): string {
+        $this->orderId = $orderId;
+        $this->currentUserId = $userId;
+        $this->currentUserType = $userType;
+        $chatUserToken = $this->encrypt();
+
+        return $chatUserToken;
     }
 
     public static function hasNewMessageStatic($chat, $chatUser, $notification = false)
@@ -523,7 +586,7 @@ class MessagesHelper
         if ($order) {
             return 'Czat dotyczy zamówienia nr <b>' . $order->id . '</b>';
         }
-        return 'Czat ogólny z administracją ' . env('APP_NAME');
+        return 'Czat ogólny z administracją mega1000';
     }
 
     private function clearIntervention($chat)
@@ -601,5 +664,66 @@ class MessagesHelper
         $possibleUsers = Employee::findMany($employeesIdsFiltered);
 
         return $possibleUsers;
+    }
+
+    /**
+     * Send complaint email to employee with given chat token
+     *
+     * @param  string $email
+     *
+     * @return void
+     */
+    public function sendComplaintEmail(string $email) {
+
+        $chat = $this->getChat();
+        $complaintForm = $chat->complaint_form;
+
+        if($chat === null) {
+            throw new ChatException('Nieprawidłowy token chatu');
+        }
+        if($complaintForm === '') {
+            throw new ChatException('Czat nie posiada uzupełnionego formularza reklamacji');
+        }
+        if($this->currentUserType !== self::TYPE_USER) {
+            throw new ChatException('Nie masz uprawnień do wysłania wiadomości');
+        }
+
+        $employee = Employee::where('email', $email)->first();
+        
+        if($employee === null) {
+            throw new ChatException('Brak pracownika dla danego adresu Email');
+        }
+
+        $chatUser = ChatUser::where([
+            'chat_id' => $chat->id,
+            'employee_id' => $employee->id,
+        ])->first();
+
+        if($chatUser === null) {
+            $chatUser = new ChatUser();
+            $chatUser->chat()->associate($chat);
+            $chatUser->employee()->associate($employee);
+            $chatUser->save();
+        }
+
+        $newChatToken = $this->getChatToken($chat->order_id, $employee->id, self::TYPE_EMPLOYEE);
+
+        $subject = 'Reklamacja do oferty EPH ID ' . $chat->order_id;
+
+        $complaintForm = json_decode($complaintForm);
+
+        if( isset($complaintForm->trackingNumber) ) {
+            $subject .= ', numer listu przewozowego: '.$complaintForm->trackingNumber;
+        }
+        Helper::sendEmail(
+            $email,
+            'chat-complaint-form',
+            $subject,
+            [
+                'url' => route('chat.show', ['token' => $newChatToken]),
+                'title' => $this->getTitle(false),
+                'complaintForm' => $complaintForm,
+            ]
+        );
     }
 }

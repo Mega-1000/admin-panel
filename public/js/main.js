@@ -1,4 +1,8 @@
 $(function() {
+    toastr.options = {
+      "positionClass": "toast-top-left",
+    }
+
     // init Allegro Chat
     const ajaxPath = '/admin/';
     const iconWrapperChat = $('.allegro-chat-icon-wrapper');
@@ -11,16 +15,29 @@ $(function() {
         messagesPreview: 'allegro/messagesPreview/',
     };
 
-    const allegroChatInitializer = new AllegroChatInitializer(iconWrapperChat, iconCounterChat, ajaxPath, chatPaths, 'chat');
+    new AllegroChatInitializer(iconWrapperChat, iconCounterChat, ajaxPath, chatPaths, 'chat');
 
     // init Disputes Chat
     const iconWrapperDisputes = $('.allegro-dispute-icon-wrapper');
     const iconCounterDisputes = $('.allegro-dispute-icon-counter');
 
     const disputesPaths = {
-        checkUnreadedThreads: 'allegro/getNewPendingDisputes',
-        bookThread: 'allegro/bookDispute',
+        checkUnreadedThreads: 'getChatDisputes',
+        resolveChat: 'resolveOrderDispute',
     };
 
-    const allegroDisputesInitializer = new AllegroChatInitializer(iconWrapperDisputes, iconCounterDisputes, ajaxPath, disputesPaths, 'disputes');
+    new AllegroChatInitializer(iconWrapperDisputes, iconCounterDisputes, ajaxPath, disputesPaths, 'disputes');
+
+    // init Orders Chat
+    const iconWrapperOrders = $('.need-support-icon-wrapper');
+    const iconCounterOrders = $('.need-support-icon-counter');
+
+    const contactChatPaths = {
+        checkUnreadedThreads: 'checkChatsNeedIntervention',
+        resolveChat: 'resolveChatIntervention',
+    };
+
+    new AllegroChatInitializer(iconWrapperOrders, iconCounterOrders, ajaxPath, contactChatPaths, 'contactChats');
+
+
 });

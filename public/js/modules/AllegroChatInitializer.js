@@ -1,5 +1,5 @@
 class AllegroChatInitializer {
-    
+
     constructor(iconWrapper, iconCounter, ajaxPath, paths, mode) {
         this.iconWrapper = iconWrapper;
         this.iconCounter = iconCounter;
@@ -7,24 +7,78 @@ class AllegroChatInitializer {
         this.paths = paths;
         this.mode = mode;
         this.chatWindow = null;
+        this.tabActive = true;
 
         this.checkUnreadedThreadsAndMsgs();
 
         setInterval(() => {
-            this.checkUnreadedThreadsAndMsgs();
-        }, 30000);
+            if(this.tabActive) {
+                this.checkUnreadedThreadsAndMsgs();
+            }
+        }, 15000);
 
         this.initListeners();
     }
-    
+
     initListeners() {
-        this.iconWrapper.on('click', () => this.bookThread());
+        if(this.mode === 'contactChats' || this.mode === 'disputes') {
+            this.iconWrapper.on('click', () => this.viewOrderChat());
+        } else {
+            this.iconWrapper.on('click', () => this.bookThread());
+        }
         $('.allegro-thread').on('click', e => this.messagesPreview(e));
+        $(window).on('focus', () => this.tabActive = true);
+        $(window).on('blur', () => this.tabActive = false);
+    }
+
+    handleMsgsCounter() {
+        const numberOfUnreadedMsgs = this.unreadedThreads?.length || 0;
+
+        numberOfUnreadedMsgs > 0 ? this.iconCounter.removeClass('hidden') : this.iconCounter.addClass('hidden');
+
+        const prevCounter = parseInt( this.iconCounter.text() );
+        const shouldFlash = numberOfUnreadedMsgs > prevCounter;
+
+        this.iconCounter.text(numberOfUnreadedMsgs);
+
+        if(shouldFlash) {
+            this.iconWrapper.addClass('jello-horizontal');
+        } else {
+            this.iconWrapper.removeClass('jello-horizontal');
+        }
+    }
+
+    async viewOrderChat() {
+
+        if(this.unreadedThreads.length < 1) {
+            toastr.error('Brak zamówień wymagających pomocy');
+            return false;
+        }
+
+        this.iconWrapper.addClass('loader-2');
+
+        const thread = this.unreadedThreads.shift();
+        this.handleMsgsCounter();
+
+        const id = this.mode === 'disputes' ? thread.id : thread.id;
+        const url = `${this.ajaxPath}${this.paths.resolveChat}/${id}`;
+
+        const res = await ajaxPost({}, url);
+        toastr.success('Trwa ładowanie się czatu');
+        this.iconWrapper.removeClass('loader-2');
+
+        window.open(`/chat/${res.chatUserToken}`, 'chat_' + id);
+
+        if(this.mode === 'disputes') {
+            const customerId = thread.customer_id;
+            window.open(this.ajaxPath + 'orders?customer_id=' + customerId, 'orders_' + customerId);
+        }
+
     }
 
     async checkUnreadedThreadsAndMsgs() {
         const url = this.ajaxPath + this.paths.checkUnreadedThreads;
-        
+
         // DateTime
         const chatLastCheck = window.localStorage.getItem('allegro_chat_last_check');
         const data = {
@@ -34,11 +88,8 @@ class AllegroChatInitializer {
 
         // unreaded threads
         this.unreadedThreads = res.unreadedThreads;
-        const numberOfUnreadedMsgs = this.unreadedThreads?.length || 0;
 
-        numberOfUnreadedMsgs > 0 ? this.iconCounter.removeClass('hidden') : this.iconCounter.addClass('hidden');
-
-        this.iconCounter.text(numberOfUnreadedMsgs);
+        this.handleMsgsCounter();
 
         // are new msgs
         if(res.areNewMessages) {
@@ -82,18 +133,7 @@ class AllegroChatInitializer {
             this.openOrders(threadId, nickname);
         }
     }
-    
-    openDisputedOrder(orderId, disputeId) {
-        window.open(
-          `${this.ajaxPath}orders/${orderId}/edit`,
-          '_blank'
-        );
-        window.open(
-          `${this.ajaxPath}disputes/view/${disputeId}`,
-          '_blank'
-        );
-    }
-    
+
     openOrders(threadId, nickname) {
         // handle open new window with order
         let dtOrders = window.localStorage.getItem('DataTables_dataTable_/admin/orders');

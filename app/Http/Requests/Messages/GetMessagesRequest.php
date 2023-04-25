@@ -24,7 +24,7 @@ class GetMessagesRequest extends FormRequest
     public function rules()
     {
         return [
-            'area'    => 'integer|required|digits:1',
+            'area'    => 'integer|digits:1',
             'lastId'  => 'integer'
         ];
     }
