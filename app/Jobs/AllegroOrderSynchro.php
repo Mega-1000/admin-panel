@@ -315,7 +315,7 @@ class AllegroOrderSynchro implements ShouldQueue
     private function findOrCreateCustomer(array $allegroOrder): Customer
     {
         $buyer = $allegroOrder['buyer'];
-        $deliveryAddress = $allegroOrder['delivery']['address'];
+        $deliveryAddress = $allegroOrder['delivery']['address'] ?? [];
         $buyerEmail = $buyer['email'];
 
         if (preg_match('/\+([a-zA-Z0-9]+)@/', $buyer['email'], $matches)) {
@@ -520,7 +520,7 @@ class AllegroOrderSynchro implements ShouldQueue
     private function savePayments(Order $order, array $allegroPayment)
     {
         OrderPayment::create([
-            'amount' => $allegroPayment['paidAmount']['amount'],
+            'amount' => $allegroPayment['paidAmount']['amount'] ?? 0,
             'master_payment_id' => null,
             'order_id' => $order->id,
             'promise' => true,
