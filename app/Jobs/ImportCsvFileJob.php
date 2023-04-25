@@ -149,7 +149,6 @@ class ImportCsvFileJob implements ShouldQueue
             'deleted_at' => Carbon::now()
         ]);
 
-
         $this->currentCategories = Categories::getElementsForCsvReloadJob();
 
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
