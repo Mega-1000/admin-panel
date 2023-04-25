@@ -3,7 +3,6 @@
 namespace App\Repositories;
 
 use App\Entities\Category;
-
 use Illuminate\Database\Eloquent\Collection;
 
 class Categories
