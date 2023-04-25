@@ -42,9 +42,42 @@
                 @if (!empty($faq))
                     <div class="alert-info alert"><b>FAQ:</b> <br>{!! implode('<br/>', $faq) !!}</div>
                 @endif
+                @if($isStyropian)
+                    <div class="mb-4 alert alert-warning">
+                        @if($chat->auctions->count() === 0)
+                            <a href="{{ route('auctions.create', ['chat' => $chat->id]) }}" class="btn btn-primary" target="_blank">
+                                Rozpocznij przetarg
+                            </a>
+                        @else
+                            <h3>
+                                Aktywny przetarg
+                            </h3>
+                            <br>
+                            Koniec: {{ $chat->auctions->first()->end_of_auction }}
+                            <br>
+                            data do wysyłki: {{ $chat->auctions->first()->date_of_delivery }}
+                            <br>
+                            Cena: {{ $chat->auctions->first()->price }} %
+                            <br>
+                            Jakość: {{ $chat->auctions->first()->quality }} %
+                            <br>
+                            Aktywny: {{ $chat->auctions->first()->confirmed ? 'Tak' : 'Nie' }}
+                        @endif
+
+                        @if($userType === MessagesHelper::TYPE_USER && $chat->auctions->count() > 0 && $chat->auctions->first()?->confirmed === 0)
+                            <form method="post" action="{{ route('auctions.confirm', ['auction' => $chat->auctions->first()->id]) }}">
+                                @csrf
+                                <button class="btn btn-success">
+                                    Rozpocznij przetarg
+                                </button>
+                            </form>
+                        @endif
+                    </div>
+                @endif
                 @if ($product_list->count() > 0)
                     <div class="alert alert-warning"><b>Lista produktów:</b>
                         @foreach ($product_list as $product)
+
                             @include('chat/single_product', [
                                 'product' => $product,
                                 'userType' => $userType,

@@ -197,7 +197,16 @@ class MessagesController extends Controller
 
         $chatMessages = $chat->messages;
 
-        $view = view('chat.show')->with([
+        $isStyrofoarm = false;
+        foreach ($products as $product) {
+            if ($product?->variation_group === 'styropiany') {
+                $isStyrofoarm = true;
+                break;
+            }
+        }
+
+        return view('chat.show')->with([
+            'isStyropian' => $isStyrofoarm,
             'product_list' => $productList,
             'faq' => $this->prepareFaq($chatUsers),
             'notices' => $notices,
@@ -224,7 +233,6 @@ class MessagesController extends Controller
             'routeAskForIntervention' => route('api.messages.ask-for-intervention', ['token' => $token]),
             'routeForEditPrices' => route('api.messages.edit-prices', ['token' => $token])
         ]);
-        return $view;
     }
 
     private function prepareFaq(Collection $users): array
