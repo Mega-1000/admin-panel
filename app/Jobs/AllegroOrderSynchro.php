@@ -600,6 +600,9 @@ class AllegroOrderSynchro implements ShouldQueue
         if (isset($address['address'])) {
             $address = array_merge($address, $address['address']);
         }
+        if (count($address) === 0) {
+            return;
+        }
         list($street, $flatNo) = $this->getAddress($address['street']);
         $country = Country::firstOrCreate(['iso2' => $address['countryCode']], ['name' => $address['countryCode']]);
 
