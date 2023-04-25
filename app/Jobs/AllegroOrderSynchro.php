@@ -273,10 +273,11 @@ class AllegroOrderSynchro implements ShouldQueue
                 DB::commit();
             } catch (Throwable $ex) {
                 DB::rollBack();
-                Log::error($ex->getMessage(), [
+                Log::error($ex->getMessage() . PHP_EOL . $ex->getTraceAsString(), [
                     'file' => $ex->getFile(),
                     'line' => $ex->getLine(),
-                    'orderId' => (isset($order)) ? $order->id : $allegroOrder['id']
+                    'orderId' => (isset($order)) ? $order->id : $allegroOrder['id'],
+                    'allegroOrder' => $allegroOrder,
                 ]);
             }
         }
