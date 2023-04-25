@@ -9,6 +9,7 @@ use App\Http\Requests\ChangeCustomerPasswordRequest;
 use App\Http\Requests\RegisterCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
 use App\Services\AddressService;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -398,5 +399,20 @@ class CustomersController extends Controller
         $customer->save();
 
         return response()->json(['status' => true]);
+    }
+
+    /**
+     * Get token from only email.
+     *
+     * @param $email
+     * @return JsonResponse
+     */
+    public function getTokenFromEmail($email): JsonResponse
+    {
+        $customer = Customer::query()->where('login', $email)->firstorfail();
+
+        $token = $customer->createToken('authToken');
+        return response()->json(['access_token' => $customer->createToken('Api code')->accessToken,
+            'expires_in' => CarbonInterface::HOURS_PER_DAY * CarbonInterface::MINUTES_PER_HOUR * CarbonInterface::SECONDS_PER_MINUTE], 200);
     }
 }
