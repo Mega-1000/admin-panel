@@ -751,7 +751,7 @@
                             <label for="select-task-with-child-for-finish">Wybierz zadanie</label>
                             <select
                                 onchange="fetchChildren(this,'.form-group-checkobox')"
-                                name="id" id="select-task-with-child-for-finish" required class="form-control">
+                                name="task" id="select-task-with-child-for-finish" required class="form-control">
                                 <option value="" selected="selected">brak</option>
                             </select>
                         </div>
@@ -1115,7 +1115,7 @@
         function fetchChildren(task,div) {
             $(div).empty();
             let id = task.value
-            let url = "{{route('planning.tasks.getChildren', ['id' => '%%'])}}"
+            let url = "{{route('planning.tasks.getChildren', ['taskId' => '%%'])}}"
             $.ajax(url.replace('%%', id))
                 .done(response => {
                     if (response.errors) {
@@ -2726,7 +2726,7 @@
                 });
             };
 
-            function removeMultiLabel(orderId, labelId, ids) {
+            function removeMultiLabel(orderId, labelId, ids, delivery_warehouse=null) {
                 $.ajax({
                     url: "/admin/orders/label-removal/" + orderId + "/" + labelId,
                     method: "POST",
@@ -2736,16 +2736,17 @@
                     }
                 }).done(function () {
                     if ($.inArray('47', ids) != -1) {
-                        //$('#magazine').modal();
                         $('input[name="order_id"]').val(orderId);
                         $('#selectWarehouse').val(16);
                         $('#warehouseSelect').attr('selected', true);
                         $('#selectWarehouse').click();
+
                         //tutaj dodac laczenie zadan
+                        addingTaskToPlanner(orderId,delivery_warehouse);
+                        refreshDtOrReload();
                     }
                     refreshDtOrReload();
                     window.open('/admin/planning/timetable', '_blank');
-                    //renderCalendar();
                 })
                     .fail((error) => {
                         if (error.responseText === 'warehouse not found') {
@@ -2782,6 +2783,22 @@
                     }
                 });
             };
+
+            function addingTaskToPlanner(orderId,delivery_warehouse) {
+                $.ajax({
+                    method: 'post',
+                    url: '/admin/planning/tasks/adding-task-to-planner',
+                    dataType: 'json',
+                    data: {
+                        order_id: orderId,
+                        delivery_warehouse: delivery_warehouse
+                    },
+                }).done(function (data) {
+
+                }).fail(function (data) {
+                    //modal z informacja czy wstrzymac czy dodac.
+                });
+            } 
 
             const showSelectWarehouseTemplate = (modal, orderId) => {
                 const row = $('#id-' + orderId);
@@ -2863,7 +2880,8 @@
                             modal.find(".error .alert").text('Wybierz przynajmniej jeden etykietę');
                             return false;
                         }
-                        removeMultiLabel(orderId, labelId, ids);
+                        delivery_warehouse = modal.find("#delivery_warehouse2").val();
+                        removeMultiLabel(orderId, labelId, ids, delivery_warehouse);
                         modal.modal('hide');
                     });
                 });

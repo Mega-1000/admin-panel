@@ -19,6 +19,18 @@ class Courier extends Model
 
     protected $table = 'courier';
 
+    protected $casts = [
+        'id' => 'integer',
+        'item_number' => 'integer',
+        'active' => 'boolean'
+    ];
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+
     protected $fillable = [
         'courier_name', 
         'courier_key', 

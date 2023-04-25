@@ -853,28 +853,40 @@ class OrdersController extends Controller
                 $task = $this->taskRepository->find($data['task_id']);
             }
         } catch (Exception $e) {
-            unlink(public_path($lockName));
+            if (File::exists(public_path($lockName)) === true) {
+                unlink(public_path($lockName));
+            }
             return redirect()->back()->with([
                 'message' => $e->getMessage(),
                 'alert-type' => 'error',
             ]);
         }
-        if (empty($task)) {
-            unlink(public_path($lockName));
+        
+        try {
+            if (empty($task)) {
+                throw new Exception('Brak nieprzydzielonych paczek dla: ' . $data['package_type'] . ' spróbuj wygenerować paczki dla innego kuriera');
+            }
+        }catch (\Exception $e) {
+            if (File::exists(public_path($lockName)) === true) {
+                unlink(public_path($lockName));
+            }
             return redirect()->back()->with([
                 'message' => 'Brak nieprzydzielonych paczek dla: ' . $data['package_type'] . ' spróbuj wygenerować paczki dla innego kuriera',
                 'alert-type' => 'error',
             ]);
         }
         $user = User::find($data['user_id']);
-        $similar = OrdersHelper::findSimilarOrders($task->order);
+        $ordersSimilar = OrdersHelper::findSimilarOrders($task->order);
+
         if (!$user->can_decline) {
-            $this->attachTaskForUser($task, $data['user_id'], $similar);
+            $this->attachTaskForUser($task, $data['user_id'], $ordersSimilar);
         }
-        $views = $this->createListOfWz($similar, $task, $finalPdfFileName, $lockName);
+        $views = $this->createListOfWz($ordersSimilar, $task, $finalPdfFileName, $lockName);
         $pdf = Storage::disk('public')->get($finalPdfFileName);
         if (!$user->can_decline) {
-            unlink(public_path($lockName));
+            if (File::exists(public_path($lockName)) === true) {
+                unlink(public_path($lockName));
+            }
             return response($pdf, 200, [
                 'Content-Type' => 'application/pdf',
                 'Content-Disposition' => 'inline'
@@ -897,12 +909,13 @@ class OrdersController extends Controller
         file_put_contents($lockName, '');
 
         $user =  Auth::user();
-        //$user = User::find(2);
         
         $open = $this->taskService->getOpenUserTask($user->id);
 
-        if (count($open)) {
-            unlink(public_path($lockName));
+        if ($open->count()) {
+            if (File::exists(public_path($lockName)) === true) {
+                unlink(public_path($lockName));
+            }
             return redirect()->back()->with([
                 'message' => 'Ostatnie pobrane zadanie to numer: ' . $open->first()->order_id . ' i nie zostało zamkniete. Zamknij zadanie aby pobrać kolejne',
                 'alert-type' => 'error',
@@ -911,6 +924,7 @@ class OrdersController extends Controller
 
         try {
             $task = $this->taskService->prepareTask($data['package_type'], 0);
+            throw new Exception('błąd pobierania task');
         } catch (Exception $e) {
             return redirect()->back()->with([
                 'message' => $e->getMessage(),
@@ -918,21 +932,26 @@ class OrdersController extends Controller
             ]);
         }
 
-        if (empty($task)) {
-            unlink(public_path($lockName));
+        try {
+            if (empty($task)) {
+                throw new Exception('Brak nieprzydzielonych paczek dla: ' . $data['package_type'] . ' spróbuj wygenerować paczki dla innego kuriera');
+            }
+        }catch (\Exception $e) {
+            if (File::exists(public_path($lockName)) === true) {
+                unlink(public_path($lockName));
+            }
             return redirect()->back()->with([
                 'message' => 'Brak nieprzydzielonych paczek dla: ' . $data['package_type'] . ' spróbuj wygenerować paczki dla innego kuriera',
                 'alert-type' => 'error',
             ]);
         }
-
-        $similar = OrdersHelper::findSimilarOrders($task->order);
+        $ordersSimilar = OrdersHelper::findSimilarOrders($task->order);
 
         if (!$user->can_decline) {
-            $this->attachTaskForUser($task, $user->id, $similar);
+            $this->attachTaskForUser($task, $user->id, $ordersSimilar);
             $t = $this->taskService->movingTasksBackward($task);
         }
-        $views = $this->createListOfWz($similar, $task, $finalPdfFileName, $lockName);
+        $views = $this->createListOfWz($ordersSimilar, $task, $finalPdfFileName, $lockName);
         $pdf = Storage::disk('public')->get($finalPdfFileName);
         if (!$user->can_decline) {
             return response($pdf, 200, [

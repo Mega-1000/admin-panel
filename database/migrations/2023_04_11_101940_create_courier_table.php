@@ -15,9 +15,9 @@ return new class extends Migration
     {
         Schema::create('courier', function (Blueprint $table) {
             $table->id();
-            $table->string('courier_name')->comment('Courier name');
-            $table->string('courier_key')->comment('Courier key');
-            $table->integer('item_number')->comment('order');
+            $table->string('courier_name')->default('')->comment('Courier name');
+            $table->string('courier_key')->default('')->comment('Courier key');
+            $table->integer('item_number')->default(0)->comment('order');
             $table->boolean('active')->default(true);
             $table->timestamps();
         });

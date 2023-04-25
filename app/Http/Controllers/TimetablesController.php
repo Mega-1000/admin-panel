@@ -16,18 +16,14 @@ class TimetablesController extends Controller
 
     protected $taskRepository;
 
-    /** @var TaskService */
-    protected $taskService;
-
     public function __construct(
         WarehouseRepository $warehouseRepository, 
         TaskRepository $taskRepository,
-        TaskService $taskService
+        protected readonly TaskService  $taskService
     )
     {
         $this->warehouseRepository = $warehouseRepository;
         $this->taskRepository = $taskRepository;
-        $this->taskService = $taskService;
     }
 
     public function index(Request $request)

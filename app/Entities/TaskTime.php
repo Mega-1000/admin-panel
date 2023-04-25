@@ -15,6 +15,7 @@ class TaskTime extends Model implements Transformable
 {
     use TransformableTrait;
 
+    public const TIME_START = '07:00:00';
     /**
      * The attributes that are mass assignable.
      *
@@ -23,7 +24,8 @@ class TaskTime extends Model implements Transformable
     protected $fillable = [
         'task_id',
         'date_start',
-        'date_end'
+        'date_end',
+        'transfer_date'
     ];
 
     /**

@@ -2,12 +2,16 @@
 
 namespace App\Services;
 
+use App\Repositories\Couriers;
+use Illuminate\Database\Eloquent\Collection;
 use App\Entities\Label;
 use App\Entities\Task;
 use App\Entities\TaskTime;
 use App\Entities\Courier;
 use App\Enums\CourierName;
 use App\Repositories\TaskRepository;
+use App\Repositories\Tasks;
+use App\Repositories\TaskTimes;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Exception;
@@ -19,7 +23,12 @@ class TaskService
      */
     protected $taskRepository;
 
-    public function __construct(TaskRepository $taskRepository)
+    public function __construct(
+        TaskRepository $taskRepository, 
+        protected readonly Tasks $tasksRepository,
+        protected readonly Couriers $courierRepository,
+        protected readonly TaskTimes $taskTimesRepository
+    )
     {
         $this->taskRepository = $taskRepository;
     }
@@ -32,30 +41,11 @@ class TaskService
      */
     public function getTaskQuery(array $courierArray)
     {
-        //$colors = '"FF0000", "E6C74D", "194775"';
-        return Task::where('user_id', Task::WAREHOUSE_USER_ID)
-            ->whereHas('order', function ($query) use ($courierArray) {
-                $query->whereHas('packages', function ($query) use ($courierArray) {
-                    $query->whereIn('service_courier_name', $courierArray);
-                })->whereHas('labels', function ($query) {
-                    $query
-                        ->where('labels.id', Label::BLUE_HAMMER_ID);
-                })->whereHas('dates', function ($query) {
-                    $query->orderBy('consultant_shipment_date_to');
-                })
-                    ->whereDoesntHave('labels', function ($query) {
-                        $query->where('labels.id', Label::RED_HAMMER_ID)
-                            ->orWhere('labels.id', Label::GRAY_HAMMER_ID)
-                            ->orWhere('labels.id', Label::PRODUCTION_STOP_ID);
-                    });
-            })
-            ->orderByRaw("FIELD(color, 'FF0000', 'E6C74D', '194775')");
+        return $this->tasksRepository->getTaskQuery($courierArray);
     }
 
     /**
      * Get task grouped by date
-     *
-     * @return array
      */
     public function groupTaskByShipmentDate(): array
     {
@@ -71,10 +61,10 @@ class TaskService
             $dates[$date->toDateString()] = [];
         }
         
-        $couriers = Courier::where('active',1)->orderBy('item_number')->get();
-        foreach ($couriers as $deliveryTypes) {
+        $couriers = $this->courierRepository->getActiveOrderByNumber();
+        foreach ($couriers as $courier) {
             $tasksByDay = $dates;
-            foreach ($this->getTaskQuery([$deliveryTypes['courier_name']])->get() as $task) {
+            foreach ($this->getTaskQuery([$courier->courier_name])->get() as $task) {
                 $orderDate = Carbon::parse($task->order->dates->customer_shipment_date_to);
                 $key = $orderDate->toDateString();
                 if ($orderDate->isBefore($today)) {
@@ -86,7 +76,7 @@ class TaskService
                 }
             }
             ksort($tasksByDay);
-            $result[$deliveryTypes['courier_key']] = $tasksByDay;
+            $result[$courier->courier_key] = $tasksByDay;
         }
         return $result;
     }
@@ -112,39 +102,28 @@ class TaskService
     /**
      * Prepare task for handling
      *
-     * @param $id
-     * @param $start
-     * @param $end
-     * @return array
+     * @param int $id
+     * @param string $start
+     * @param string $end
      */
     public function getSeparator($id,$start,$end) :array
     {
         $users = [36, 37, 38];
 
-        $array = [];
+        $separators = [];
 
         foreach($users as $user_id){
-            $takstime = TaskTime::with('task')
-            ->whereHas('task',
-                function ($query) use ($user_id,$id) {
-                    $query->where('user_id', $user_id);
-                    $query->where('warehouse_id', $id);
-                    $query->whereNull('parent_id');
-                    $query->whereNull('rendering');
-                })
-            ->whereDate('date_start', '>=', $start)
-            ->whereDate('date_end', '<=', $end)
-            ->whereNull('transfer_date')
-            ->orderBy('date_start', 'asc')
-            ->get();
-            
-            if($takstime->first()){
-                $start = Carbon::parse($takstime->first()->date_start)->subMinute();
-                $end = Carbon::parse($takstime->first()->date_start);
+            $taskTime = $this->taskTimesRepository->getSeparator($user_id,$id,$start,$end);
+               
+            if($taskTime->count()>0){
+                $taskTimeFirst = $taskTime->first();
+
+                $start = Carbon::parse($taskTimeFirst->date_start)->subMinute();
+                $end = Carbon::parse($taskTimeFirst->date_start);
                 
-                $array[] = [
+                $separators[] = [
                     'id' => null,
-                    'resourceId' => $takstime->first()->task->user_id,
+                    'resourceId' => $taskTimeFirst->task->user_id,
                     'title' => '',
                     'start' => $start->format('Y-m-d\TH:i'),
                     'end' => $end->format('Y-m-d\TH:i'),
@@ -156,19 +135,18 @@ class TaskService
             }
         }
         
-        return $array;
+        return $separators;
     }
 
     /**
      * Prepare task for handling
      *
-     * @param $user_id
-     * @param $date
-     * @return string|null
+     * @param int $user_id
+     * @param string $date
      */
-    public function getUserSeparator($user_id,$date) :string|null
+    public function getUserSeparator($user_id,$date) :string
     {
-        $sep = null;
+        $sep = '';
         $separator = $this->getSeparator(16,$date->format('Y-m-d').' 00:00:00',$date->format('Y-m-d').' 23:59:59');
         foreach($separator as $s){
             if($s['resourceId'] == $user_id){
@@ -179,11 +157,9 @@ class TaskService
     }
 
     /**
-     * Prepare task for handling
-     *
-     * @return mixed
+     * Transfers Task
      */
-    public function transfersTask()
+    public function transfersTask() :string
     {
         $users = [36, 37, 38];
         $colors = ['FF0000', 'E6C74D', '194775'];
@@ -191,6 +167,7 @@ class TaskService
         $today = Carbon::today();
         foreach($users as $user_id){
             $time_start = Carbon::parse($today->format('Y-m-d').' '.$this->getTimeLastTask($user_id));
+            
             foreach($colors as $color){
                 $time_start = $this->prepareTransfersTask($user_id,$color,$time_start);
             }
@@ -200,55 +177,43 @@ class TaskService
     }
 
     /**
-     * Prepare task for handling
+     * Prepare Transfer Task
      *
-     * @param $user_id
-     * @param $color
-     * @param $time_start
-     * @return string
+     * @param int $user_id
+     * @param string $color
+     * @param string $time_start
      */
     public function prepareTransfersTask($user_id,$color,$time_start) :string
     {
         $date = Carbon::yesterday();
 
-        $tasks = Task::with(['taskTime'])
-            ->where('status',Task::WAITING_FOR_ACCEPT)
-            ->where('user_id',$user_id)
-            ->where('color',$color)
-            ->whereNull('parent_id')
-            ->whereNull('rendering')
-            ->whereHas('taskTime', function ($query) use ($date) {
-                $query->where('date_start', 'like' , $date->format('Y-m-d')."%");
-            })->whereHas('order', function ($query) {
-                $query->where('labels.id', Label::RED_HAMMER_ID)
-                    ->orWhere('labels.id', Label::BLUE_HAMMER_ID);
-            })->get();
+        $tasks = $this->tasksRepository->transfersTask($user_id,$color,$date);
 
         foreach($tasks as $task){
-            $this->moveTask($user_id,$time_start);
             $time_start = $this->storeTransfersTask($task->taskTime->id,$time_start);
+            $this->moveTask($user_id,$time_start);
         }
-
         return $time_start;
     }
 
     /**
      * Prepare task for handling
      *
-     * @param $taskTime_id
-     * @param $time_start
-     * @return string
+     * @param int $taskTime_id
+     * @param string $time_start
      */
     public function storeTransfersTask($taskTime_id,$time_start) :string
     {
         $date_start = $time_start;
         $date_end = Carbon::parse($time_start)->addMinutes(2);
+
         $taskTime = TaskTime::find($taskTime_id);
         $transfer_date = $taskTime->date_start;
-        $taskTime->date_start = $date_start;
-        $taskTime->date_end = $date_end->format('Y-m-d H:i:s');
-        $taskTime->transfer_date = $transfer_date;
-        $taskTime->save();
+        $taskTime->update([
+            'date_start' => $date_start,
+            'date_end' => $date_end->format('Y-m-d H:i:s'),
+            'transfer_date' => $transfer_date
+        ]);
         
         return $date_end;
     }
@@ -256,39 +221,22 @@ class TaskService
     /**
      * Prepare task for handling
      *
-     * @param $user_id
-     * @return string
+     * @param int $user_id
      */
     public function getTimeLastTask($user_id) :string
     {
         $date = Carbon::today();
-        $takstime = TaskTime::with(['task'])
-            ->whereHas('task',
-                function ($query) use ($user_id) {
-                    $query->where('user_id', $user_id);
-                    $query->whereNull('parent_id');
-                    $query->whereNull('rendering');
-                })
-            ->where('date_start', 'like' , $date->format('Y-m-d')."%")
-            ->whereNotNull('transfer_date')
-            ->orderBy('date_start', 'asc')
-            ->get();
+        $taskTime = $this->taskTimesRepository->getTimeLastTask($user_id, $date);
+        $firstTaskTime = $taskTime->first(); 
 
-        if(count($takstime)){
-            $time = Carbon::parse($takstime->first()->date_end)->format('H:i:s');
-        }else{
-            $time = Carbon::parse($date->format('Y-m-d').' 7:00')->format('H:i:s');
-        }
-
-        return $time;
+        return (isset($firstTaskTime->date_end) ? Carbon::parse($firstTaskTime->date_end)->format('H:i:s') : TaskTime::TIME_START);
     }
 
     /**
      * Prepare task for handling
      *
-     * @param $user_id
-     * @param $time
-     * @return bool
+     * @param int $user_id
+     * @param string $time
      */
     public function moveTask($user_id,$time) :bool
     {
@@ -297,22 +245,13 @@ class TaskService
 
         if($time>=$sep){
 
-            $takstime = TaskTime::with(['task'])
-                ->whereHas('task',
-                    function ($query) use ($user_id) {
-                        $query->where('user_id', $user_id);
-                        $query->whereNull('parent_id');
-                        $query->whereNull('rendering');
-                    })
-                ->where('date_start', 'like' , $date->format('Y-m-d')."%")
-                ->whereNull('transfer_date')
-                ->orderBy('date_start', 'asc')
-                ->get();
+            $taskTimes = $this->taskTimesRepository->getMoveTask($user_id, $date);
 
-            foreach($takstime as $task){
-                $task->date_start = Carbon::parse($task->date_start)->addMinutes(30);
-                $task->date_end = Carbon::parse($task->date_end)->addMinutes(30);
-                $task->save();
+            foreach($taskTimes as $taskTime){
+                $taskTime->update([
+                    'date_start' => Carbon::parse($taskTime->date_start)->addMinutes(30),
+                    'date_end' => Carbon::parse($taskTime->date_end)->addMinutes(30)
+                ]);
             }
         }
 
@@ -322,55 +261,114 @@ class TaskService
     /**
      * Get user task query
      *
-     * @param $user_id
-     * @return mixed
+     * @param int $user_id
      */
-    public function getOpenUserTask($user_id)
+    public function getOpenUserTask($user_id): Collection
     {
-        return Task::where('user_id', $user_id)
-            ->whereHas('order', function ($query) {
-                $query->whereDoesntHave('labels', function ($query) {
-                    $query
-                        ->where('labels.id', Label::ORDER_ITEMS_CONSTRUCTED)
-                        ->orWhere('labels.id', Label::ORDER_ITEMS_REDEEMED_LABEL);
-                })->whereHas('dates', function ($query) {
-                    $query->orderBy('consultant_shipment_date_to');
-                });
-            })->get();
+        return $this->tasksRepository->getOpenUserTask($user_id);
     }
 
     /**
      * moving tasks backward
      *
-     * @param $task
-     * @return mixed
+     * @param object $task
      */
-    public function movingTasksBackward($task){
-        $taskTime = TaskTime::where('task_id',$task->id)->first();
-        $date_start = Carbon::parse($taskTime->date_start);
-        $date_end = Carbon::parse($taskTime->date_end);
+    public function movingTasksBackward($task): Collection
+    {
+        $actualTaskTime = TaskTime::where('task_id',$task->id)->first();
+        $date_start = Carbon::parse($actualTaskTime->date_start);
+        $date_end = Carbon::parse($actualTaskTime->date_end);
 
         $totalDuration = $date_end->diffInMinutes($date_start);
 
-        $tasks = TaskTime::with(['task'])
-            ->whereHas('task',
-                function ($query) use ($task) {
-                    $query->where('user_id', $task->user_id);
-                    $query->whereNull('parent_id');
-                    $query->whereNull('rendering');
-                })
-            ->where('date_start', 'like' , $date_start->format('Y-m-d')."%")
-            ->where('date_start', '>', $taskTime->date_start)
-            ->where('id', '!=', $taskTime->id)
-            ->orderBy('date_start', 'asc')
-            ->get();
-
-        foreach($tasks as $t){
-            $t->date_start = Carbon::parse($t->date_start)->subMinutes($totalDuration)->format('Y-m-d H:i:s');
-            $t->date_end = Carbon::parse($t->date_end)->subMinutes($totalDuration)->format('Y-m-d H:i:s');
-            $t->save();
+        $moveTasksTime = $this->taskTimesRepository->movingTasksBackward($task,$actualTaskTime,$date_start);
+        
+        foreach($moveTasksTime as $taskTime){
+            $startNextTaskAt = Carbon::parse($t->date_start)->subMinutes($totalDuration);
+	        $endNextTaskAt = Carbon::parse($t->date_end)->subMinutes($totalDuration);
+            $taskTime->update([
+                'date_start' => $startNextTaskAt,
+                'date_end' => $endNextTaskAt
+            ]);
+            $taskTime->refresh();
         }
 
-        return $tasks;
+        return $moveTasksTime;
+    }
+
+    /**
+     * check task login
+     *
+     * @param string $login
+     * @param object $address
+     * @param int $user_id
+     */
+    public function checkTaskLogin($login,$address,$user_id) :bool|array
+    {
+        $tasks = $this->tasksRepository->checkTaskLogin($login, $user_id);
+
+        if(empty($tasks)){
+            return false;
+        }
+
+        $array = [];
+        return $array[0] = 'error'; 
+        foreach($tasks as $task){
+            if(
+                $task->order->getDeliveryAddress()->address = $address->address &&
+                $task->order->getDeliveryAddress()->flat_number = $address->flat_number &&
+                $task->order->getDeliveryAddress()->postal_code = $address->postal_code &&
+                $task->order->getDeliveryAddress()->city = $address->city &&
+                $task->order->getDeliveryAddress()->phone = $address->phone
+            ){
+                if($task->order->labels->contains('id', Label::BLUE_HAMMER_ID)){
+                    if(!$task->order->labels->contains('id', Label::RED_HAMMER_ID)){
+                        if(!$task->order->labels->contains('id', Label::ORDER_ITEMS_CONSTRUCTED)){
+                            if($task->parent_id){
+                                $array[$task->parent_id] = $task->parent_id;
+                            }else{
+                                $array[$task->id] = $task->id;
+                            }
+                        }else{
+                            return false;
+                        }
+                    }else{
+                        return false;
+                    }
+                }else{
+                    if($task->order->labels->contains('id', Label::ORDER_ITEMS_REDEEMED_LABEL)){
+                        return false;
+                    }else{
+                        $array[0] = 'error'; 
+                        //zielona bateria jeśli nie to wyświetlic komunikat
+                    }
+                }
+            }
+            
+        }
+        return $array;
+    }
+
+    /**
+     * add task to planer
+     *
+     * @param object $order
+     * @param int $user_id
+     */
+    public function addTaskToPlanner($order,$user_id) :int
+    {
+
+    }
+
+    /**
+     * add task to group planer
+     *
+     * @param object $order
+     * @param object $task
+     * @param int $user_id
+     */
+    public function addTaskToGroupPlanner($order,$task,$user_id) :int
+    {
+
     }
 }

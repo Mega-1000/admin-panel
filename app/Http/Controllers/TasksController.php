@@ -17,8 +17,13 @@ use App\Helpers\TaskTimeHelper;
 use App\Http\Requests\DenyTaskRequest;
 use App\Http\Requests\TaskCreateRequest;
 use App\Http\Requests\TaskUpdateRequest;
+use App\Http\Requests\BreakDownRequest;
+use App\Http\Requests\AddingTaskToPlanerRequest;
+use App\Http\Requests\GetTaskRequest;
 use App\Repositories\OrderRepository;
 use App\Repositories\TaskRepository;
+use App\Repositories\Tasks;
+use App\Repositories\TaskTimes;
 use App\Repositories\TaskTimeRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
@@ -28,8 +33,10 @@ use App\Services\TaskService;
 use App\User;
 use Carbon\Carbon;
 use Exception;
+use Log;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\Facades\DataTables;
@@ -52,26 +59,21 @@ class TasksController extends Controller
 
     protected $warehouseRepository;
 
-    protected $taskTimeRepository;
-
-    /** @var TaskService */
-    protected $taskService;
-
     public function __construct(
         TaskRepository      $repository,
         UserRepository      $userRepository,
         OrderRepository     $orderRepository,
         WarehouseRepository $warehouseRepository,
-        TaskTimeRepository  $taskTimeRepository,
-        TaskService $taskService
+        protected readonly Tasks                $tasksRepository,
+        protected readonly TaskTimeRepository   $taskTimeRepository,
+        protected readonly TaskService          $taskService,
+        protected readonly TaskTimes            $taskTimesRepository
     )
     {
         $this->repository = $repository;
         $this->userRepository = $userRepository;
         $this->orderRepository = $orderRepository;
         $this->warehouseRepository = $warehouseRepository;
-        $this->taskTimeRepository = $taskTimeRepository;
-        $this->taskService = $taskService;
     }
 
 
@@ -395,8 +397,11 @@ class TasksController extends Controller
         return $collection;
     }
 
-    public function getTasks(Request $request, $id)
+    public function getTasks(GetTaskRequest $request, $id)
     {
+        $request->validated();
+        $data = $request->all();
+
         $tasks = Task::with(['taskTime', 'taskSalaryDetail'])
             ->whereHas('taskTime',
                 function ($query) use ($request) {
@@ -460,7 +465,7 @@ class TasksController extends Controller
 //        }
 
         //DODANIE SEPARATORA
-        $array = array_merge($array,$this->taskService->getSeparator($id,$request->start,$request->end));
+        $array = array_merge($array,$this->taskService->getSeparator($id,$data['start'],$data['end']));
 
         return response()->json($array);
     }
@@ -804,7 +809,9 @@ class TasksController extends Controller
 
     public function deny(DenyTaskRequest $request)
     {
-        $data = $request->validated();
+        $request->validated();
+        $data = $request->all();
+
         $task = Task::find($data['task_id']);
         $time = $task->taskTime()->first();
         $newTask = Task::create([
@@ -1253,10 +1260,10 @@ class TasksController extends Controller
     }
 
     /**
+     * Get Task
      * @param $id
-     * @return JsonResponse
      */
-    public function getTask($id)
+    public function getTask($id): JsonResponse
     {
         $task = Task::with(['user', 'taskTime', 'taskSalaryDetail', 'order', 'childs' => function ($q) {
             $q->with(['order' => function ($q) {
@@ -1278,70 +1285,67 @@ class TasksController extends Controller
     }
 
     /**
-     * @return JsonResponse
+     * Get Tasks with children
      */
-    public function getTasksWithChildren()
+    public function getTasksWithChildren(): JsonResponse
     {
-        $tasks = Task::with('taskTime','childs')
-            ->has('childs')
-            ->where('status',Task::WAITING_FOR_ACCEPT)
-            ->get();
+        $tasks = $this->tasksRepository->getTasksWithChildren();
         
         return response()->json($tasks);
     }
 
     /**
+     * Get Children
      * @param $id
-     * @return JsonResponse
      */
-    public function getChildren($id)
+    public function getChildren($id): JsonResponse
     {
-        $task = Task::with('taskTime','childs')
-            ->has('childs')
-            ->find($id);
+        $task = $this->tasksRepository->getChildren($id);
         
         return response()->json($task->childs);
     }
 
     /**
-     * @param Request $request
+     * @param BreakDownRequest $request
      */
-    public function breakDownTask(Request $request)
+    public function breakDownTask(BreakDownRequest $request): RedirectResponse
     {
         try {
-            $tasks = $request->task;
-            if($tasks){
-                foreach($tasks as $t){
-                    $task = Task::find($t);
-                    if(!empty($task)){
+            $request->validated();
+            $data = $request->all();
 
-                        //Usuniecie z nazwy parenta
-                        $parent = Task::find($task->parent_id);
-                        $name = explode(',',$parent->name);
-                        if (($key = array_search($task->order_id, $name)) !== false) {
-                            unset($name[$key]);
-                        }
-                        $parent->name = join(',',$name);
-                        $parent->save();
+            $taskId = $data['task'];
+            if($taskId != null){
+                $tasks = Task::with(['parent'])->where('parent_id', $taskId)->get();
+                foreach($tasks as $task){
 
-                        //return $tasks;
-                        //rozłaczenie zadania
-                        $task->user_id = 36;
-                        $task->parent_id = null;
-                        $task->status = Task::WAITING_FOR_ACCEPT;
-                        $task->save();
+                    $parent = $task->parent->first();
+                    $name = explode(',',$parent->name);
+                    if (($key = array_search($task->order_id, $name)) !== false) {
+                        unset($name[$key]);
+                    }
+                    $parent->update([
+                        'name' => join(',',$name)
+                    ]);
 
-                        //do oferty dodajemy czerwony mlotek (RED_HAMMER_ID), kasujemy zielony(GREEN_HAMMER_ID)) i dodajemy pomaranczowy wykrzykinik (CONSULTANT_MARK)
-                        if($task->order_id){
-                            $preventionArray = [];
-                            RemoveLabelService::removeLabels(Order::find($task->order_id),[Label::GREEN_HAMMER_ID],$preventionArray,[],Auth::user()->id);
-                            $prev = [];
-                            AddLabelService::addLabels(Order::find($task->order_id), [Label::RED_HAMMER_ID,Label::CONSULTANT_MARK], $prev, [], Auth::user()->id);
-                        }
+                    $task->update([
+                        'user_id' => 36,
+                        'parent_id' => null,
+                        'status' => Task::WAITING_FOR_ACCEPT
+                    ]);
+
+                    if($task->order_id > 0){
+                        $preventionArray = [];
+                        RemoveLabelService::removeLabels(Order::find($task->order_id),[Label::GREEN_HAMMER_ID],$preventionArray,[],Auth::user()->id);
+                        $prev = [];
+                        AddLabelService::addLabels(Order::find($task->order_id), [Label::RED_HAMMER_ID,Label::CONSULTANT_MARK], $prev, [], Auth::user()->id);
                     }
                 }
             }
         } catch (Exception $e) {
+
+            Log::error('Nie udało się rozbic zadań', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+
             return redirect()->back()->with([
                 'message' => __('tasks.messages.update_error'),
                 'alert-type' => 'error'
@@ -1351,5 +1355,49 @@ class TasksController extends Controller
             'message' => __('tasks.messages.update'),
             'alert-type' => 'success'
         ]);
+    }
+
+    /**
+     * @param AddingTaskToPlanerRequest $request
+     */
+    public function addingTaskToPlanner(AddingTaskToPlanerRequest $request): JsonResponse
+    {
+        $request->validated();
+        $data = $request->all();
+
+        $order = Order::with(['customer','labels'])->find($data['order_id']);
+
+        $task = $this->taskService->checkTaskLogin(
+            $order->customer->login,
+            $order->getDeliveryAddress(),
+            $data['delivery_warehouse']
+        );
+        
+        if(!$task){
+            //$id = $this->taskService->addTaskToPlanner($order,$data['delivery_warehouse']);
+        }else{
+            if($task=='error'){
+                $array = [
+                    'status' => 'ERROR',
+                    'id' => $order->id,
+                    'delivery_warehouse' => $data['delivery_warehouse'],
+                    'message' => 'Wstrzymać dodanianie zadania?'
+                ];
+                return response()->json($array);
+            }else {
+                //$id = $this->taskService->addTaskToGroupPlanner($order,$task,$data['delivery_warehouse']);
+            }
+        }
+
+        $array = [
+            'status' => 'ADDED_TASK',
+            'id' => $id,
+            'message' => 'Dodano zadanie id: '.$id
+        ];
+        return response()->json($array);
+    }
+
+    public function saveTaskToPlanner(Request $request){
+
     }
 }
