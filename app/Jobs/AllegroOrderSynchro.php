@@ -28,6 +28,7 @@ use App\Repositories\CustomerRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\ProductRepository;
 use App\Services\AllegroOrderService;
+use App\Services\EmailSendingService;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
 use App\Services\OrderAddressService;
@@ -72,6 +73,12 @@ class AllegroOrderSynchro implements ShouldQueue
      * @var ProductService
      */
     private $productService;
+
+    /**
+     * @var EmailSendingService
+     */
+    private $emailSendingService;
+
     /**
      * @var OrderRepository
      */
@@ -111,23 +118,33 @@ class AllegroOrderSynchro implements ShouldQueue
         if (Auth::user() === null && $this->userId !== null) {
             Auth::loginUsingId($this->userId);
         }
-
         $this->customerRepository = app(CustomerRepository::class);
         $this->allegroOrderService = app(AllegroOrderService::class);
         $this->productRepository = app(ProductRepository::class);
         $this->productService = app(ProductService::class);
         $this->orderRepository = app(OrderRepository::class);
         $this->orderPackagesDataHelper = app(OrderPackagesDataHelper::class);
-        // TODO Change to configuration
-        $this->tax = (float)(1 + env('VAT'));
+        $this->emailSendingService = app(EmailSendingService::class);
+        $this->tax = (float)(1 + config('orders.vat'));
+
+        $cancelledOrders = [];
         if ($this->synchronizeAll) {
             $allegroOrders = $this->allegroOrderService->getOrdersOutsideSystem();
         } else {
             $allegroOrders = $this->allegroOrderService->getPendingOrders();
+            $cancelledOrders = $this->allegroOrderService->getCancelledOrders();
         }
-        foreach ($allegroOrders as $allegroOrder) {
+        $allegroOrders = array_merge($allegroOrders, $cancelledOrders);
+
+        foreach (array_reverse($allegroOrders) as $allegroOrder) {
             try {
                 if (Order::where('allegro_form_id', $allegroOrder['id'])->count() > 0) {
+                    continue;
+                }
+                if(
+                    $allegroOrder['status'] === $this->allegroOrderService::STATUS_CANCELLED &&
+                    $allegroOrder['payment']['paidAmount']['amount'] !== $allegroOrder['summary']['totalToPay']['amount']
+                ) {
                     continue;
                 }
 
@@ -148,6 +165,13 @@ class AllegroOrderSynchro implements ShouldQueue
                 $order->payment_channel = $allegroOrder['payment']['provider'];
                 $order->allegro_payment_id = $allegroOrder['payment']['id'];
                 $order->saveQuietly();
+
+                $this->emailSendingService->addNewScheduledEmail($order);
+
+                if($allegroOrder['status'] === $this->allegroOrderService::STATUS_CANCELLED) {
+                    $prev = [];
+                    AddLabelService::addLabels($order, [176], $prev, []);
+                }
 
                 if ($allegroOrder['messageToSeller'] !== null) {
                     $this->createChat($order->id, $customer->id, $allegroOrder['messageToSeller']);
@@ -216,7 +240,7 @@ class AllegroOrderSynchro implements ShouldQueue
 
                 $order->total_price = $allegroOrder['summary']['totalToPay']['amount'];
                 // TODO Change to configuration
-                $firmSource = FirmSource::byFirmAndSource(env('FIRM_ID'), 1)->first();
+                $firmSource = FirmSource::byFirmAndSource(config('orders.firm_id'), 1)->first();
                 $order->firm_source_id = $firmSource ? $firmSource->id : null;
 
                 $user = User::where('name', '001')->first();
@@ -357,15 +381,15 @@ class AllegroOrderSynchro implements ShouldQueue
                     $newSymbol = [$symbol[0], $symbol[1], '0'];
                     $newSymbol = join('-', $newSymbol);
 
-                    $product = $this->productRepository->findWhere(['symbol' => $newSymbol])->first();
+                    $product = Product::query()->where('symbol', '=', $newSymbol)->first();
                 }
                 if (empty($product)) {
                     $product = Product::getDefaultProduct();
                     $undefinedProductSymbol = $item['offer']['external'];
                 }
 
-                if ($product !== null && $product->stock() === null) {
-                    ProductStock::create([
+                if ($product?->stock()?->exists() !== true) {
+                    ProductStock::query()->create([
                         'product_id' => $product->id,
                         'quantity' => 0,
                         'min_quantity' => null,

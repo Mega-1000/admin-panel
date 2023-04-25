@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Entities\Customer;
 use App\Entities\Order;
 use App\Helpers\OrderBuilder;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Http\Requests\Api\Customers\StoreCustomerRequest;
 use App\Http\Controllers\Controller;
@@ -269,5 +272,20 @@ class CustomersController extends Controller
             ];
         }
         return response()->json($response);
+    }
+
+    /**
+     * Get token from only email.
+     *
+     * @param $email
+     * @return JsonResponse
+     */
+    public function getTokenFromEmail($email): JsonResponse
+    {
+        $customer = Customer::query()->where('login', $email)->firstorfail();
+
+        $token = $customer->createToken('authToken');
+        return response()->json(['access_token' => $customer->createToken('Api code')->accessToken,
+            'expires_in' => CarbonInterface::HOURS_PER_DAY * CarbonInterface::MINUTES_PER_HOUR * CarbonInterface::SECONDS_PER_MINUTE], 200);
     }
 }
