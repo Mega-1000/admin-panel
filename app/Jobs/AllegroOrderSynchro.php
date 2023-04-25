@@ -287,7 +287,7 @@ class AllegroOrderSynchro implements ShouldQueue
         if ($allegroOrder['status'] === $this->allegroOrderService::STATUS_CANCELLED) {
             if (
                 array_key_exists('payment', $allegroOrder) &&
-                array_key_exists('paidAmount', $allegroOrder['payment']) &&
+                array_key_exists('paidAmount', $allegroOrder['payment']) && $allegroOrder['payment']['paidAmount'] !== null &&
                 array_key_exists('amount', $allegroOrder['payment']['paidAmount'])
             ) {
                 if (
