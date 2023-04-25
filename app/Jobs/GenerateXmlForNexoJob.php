@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\OrderPayment;
+use App\Facades\Mailer;
 use App\Helpers\PdfCharactersHelper;
 use App\Integrations\Artoit\EPreKlientRodzajNaDok;
 use App\Integrations\Artoit\EPreKlientTyp;
@@ -15,6 +16,7 @@ use App\Integrations\Artoit\PreDokument;
 use App\Integrations\Artoit\PreKlient;
 use App\Integrations\Artoit\PrePozycja;
 use App\Integrations\Artoit\PreTowar;
+use App\Mail\XmlForNexoMail;
 use App\Repositories\OrderRepository;
 use App\Services\Label\AddLabelService;
 use Carbon\Carbon;
@@ -27,6 +29,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
+use ZipArchive;
 
 /**
  * Generate xml for nexo import.
@@ -67,6 +70,12 @@ class GenerateXmlForNexoJob implements ShouldQueue
         })->whereDoesntHave('labels', function ($query) {
             $query->where('label_id', Label::XML_INVOICE_GENERATED);
         })->get();
+        $fileNames = [];
+
+        $files = Storage::disk('xmlForNexoDisk')->files();
+        foreach ($files as $file) {
+            Storage::disk('xmlForNexoDisk')->delete($file);
+        }
 
         foreach ($orders as $order) {
             try {
@@ -154,8 +163,11 @@ class GenerateXmlForNexoJob implements ShouldQueue
                 ])));
 
                 $xml = self::generateValidXmlFromObj($preDokument);
-                Storage::disk('local')->put('public/XMLFS/' . $order->id . '_FS_' . Carbon::now()->format('d-m-Y') . '.xml', mb_convert_encoding($xml, "UTF-8", "auto"));
+                Storage::disk('xmlForNexoDisk')->put($order->id . '_FS_' . Carbon::now()->format('d-m-Y') . '.xml', mb_convert_encoding($xml, "UTF-8", "auto"));
                 $preventionArray = [];
+
+                $fileNames[] = $order->id . '_FS_' . Carbon::now()->format('d-m-Y') . '.xml';
+
                 AddLabelService::addLabels($order, [Label::XML_INVOICE_GENERATED], $preventionArray, [], Auth::user()?->id);
             } catch (Throwable $ex) {
                 Log::error($ex->getMessage(), [
@@ -165,6 +177,25 @@ class GenerateXmlForNexoJob implements ShouldQueue
                 ]);
                 continue;
             }
+        }
+
+        if (count($fileNames) > 0) {
+
+            $zipName = 'XMLFS_' . Carbon::now()->format('d-m-Y_H-i-s') . '.zip';
+            $zip = new ZipArchive();
+            $zip->open(storage_path('app/public' . config('nexo.xml_path') . $zipName), ZipArchive::CREATE);
+            foreach ($fileNames as $fileName) {
+                $zip->addFile(storage_path('app/public' . config('nexo.xml_path') . $fileName), $fileName);
+            }
+            $zip->close();
+
+            foreach ($fileNames as $fileName) {
+                Storage::disk('xmlForNexoDisk')->delete($fileName);
+            }
+
+            Mailer::create()
+                ->to('ksiegowosc@ephpolska.pl')
+                ->send(new XmlForNexoMail($zipName));
         }
     }
 

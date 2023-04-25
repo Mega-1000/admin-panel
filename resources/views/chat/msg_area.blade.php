@@ -1,6 +1,6 @@
 @php use App\Enums\UserRole; @endphp
 
-<select name="{{ $msgAreaId }}" id="{{ $msgAreaId }}">
+<select name="area" id="area">
     <option value="{{ UserRole::Main }}">
         Główny
     </option>

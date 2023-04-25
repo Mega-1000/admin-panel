@@ -4,6 +4,7 @@ use App\Entities\OrderReturn;
 use App\Entities\ProductStockPosition;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Entities\ProductStockLog;
 
 class OrderReturnService
 {
@@ -61,12 +62,46 @@ class OrderReturnService
     }
 
 
-    public function updateStockPosition(int $positionId, int $undamaged): null
+    public function updateStockPositionDamaged(?OrderReturn $orderReturn, int $positionId, int $damaged, int $productStockId, int $orderId): null
     {
+        $prevDamaged = $orderReturn?->quantity_damaged ?? 0;
+        $damaged = $damaged - $prevDamaged;
+
+        if($damaged > 0) {
+            ProductStockLog::create([
+                'product_stock_id' => $productStockId,
+                'product_stock_position_id' => $positionId,
+                'order_id' => $orderId,
+                'action' => 'DAMAGED',
+                'quantity' => $damaged,
+                'user_id' => auth()->user()->id,
+            ]);
+        }
+        
+        return null;
+    }
+
+    public function updateStockPosition(?OrderReturn $orderReturn, int $positionId, int $undamaged, int $productStockId, int $orderId): null
+    {
+        $prevUndamaged = $orderReturn?->quantity_undamaged ?? 0;
+        $undamaged = $undamaged - $prevUndamaged;
+        
         $stock = ProductStockPosition::find($positionId);
         $quantity = $stock->position_quantity;
         $stock->position_quantity = $quantity + $undamaged;
         $stock->save();
+
+        if($undamaged > 0) {
+            ProductStockLog::create([
+                'product_stock_id' => $productStockId,
+                'product_stock_position_id' => $positionId,
+                'order_id' => $orderId,
+                'action' => 'ADD',
+                'quantity' => $undamaged,
+                'user_id' => auth()->user()->id,
+            ]);
+        }
+        
         return null;
     }
 }

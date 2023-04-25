@@ -20,8 +20,9 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
-
+    'name' => env('APP_NAME', 'EPH Polska'),
+    'domain_name' => env('DOMAIN_NAME', 'https://admin.mega1000.pl/'),
+    'debug_query' => env('DEBUG_QUERY', false),
     /*
     |--------------------------------------------------------------------------
     | Application Environment
@@ -61,7 +62,13 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    'front_url' => env('FRONT_URL', '/'),
+
+    'front_nuxt_url' => env('FRONT_NUXT_URL', '/'),
+
     'asset_url' => env('ASSET_URL', null),
+
+    'chat_name' => env('CHAT_NAME', 'Dyskusje EPH'),
 
     /*
     |--------------------------------------------------------------------------

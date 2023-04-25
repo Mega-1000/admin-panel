@@ -145,11 +145,11 @@ class PackageDivider implements iPackageDivider
             return false;
         }
         if ($sum > $condition->first_condition) {
-            return $condition->first_price;
+            return $condition->first_price ?? false;
         } else if (isset($condition->second_condition) && $sum > $condition->second_condition) {
-            return $condition->second_price;
+            return $condition->second_price ?? false;
         } else if (isset($condition->second_condition) && $sum > $condition->third_condition) {
-            return $condition->third_price;
+            return $condition->third_price ?? false;
         }
         return false;
     }
@@ -210,8 +210,7 @@ class PackageDivider implements iPackageDivider
             $item->packing->recommended_courier,
             $item->packing->packing_name);
         try {
-            // TODO Use here configuration
-            $package = new Package($packageName, env('PACKAGE_DIVIDE_MARGIN'));
+            $package = new Package($packageName, config('shipping.package_divide_margin'));
         } catch (Exception $exception) {
             return ['packages' => false, 'failed' => $item];
         }
@@ -227,9 +226,7 @@ class PackageDivider implements iPackageDivider
                 } else if ($package->getProducts()->count() === 0) {
                     return ['packages' => false, 'failed' => $item];
                 } else {
-
-                    // TODO Use here configuration
-                    $package = new Package($packageName, env('PACKAGE_DIVIDE_MARGIN'));
+                    $package = new Package($packageName, config('shipping.package_divide_margin'));
                     $packageList[] = $package;
                 }
             }

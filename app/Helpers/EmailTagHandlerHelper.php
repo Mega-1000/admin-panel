@@ -8,11 +8,14 @@
 namespace App\Helpers;
 
 use App\Entities\Order;
+use App\Entities\Tag;
 
 class EmailTagHandlerHelper
 {
     /** @var Order */
     protected $order;
+    
+    protected $email;
 
     public function setOrder($order)
     {
@@ -318,11 +321,73 @@ class EmailTagHandlerHelper
 
 	//[LINK-DO-FORMULARZA-ADRESU]
 	public function addressFormLink() {
-		return rtrim(env('FRONT_NUXT_URL'),"/") . "/zamowienie/mozliwe-do-realizacji/brak-danych/{$this->order->id}";
+		return rtrim(config('app.front_nuxt_url') . "/zamowienie/mozliwe-do-realizacji/brak-danych/{$this->order->id}");
 	}
 
 	//[LINK-DO-FORMULARZA-NIEZGODNOSCI]
 	public function declineProformFormLink() {
-		return rtrim(env('FRONT_NUXT_URL'),"/") . "/zamowienie/niezgodnosc-w-proformie/{$this->order->id}";
+		return rtrim(config('app.front_nuxt_url') . "/zamowienie/niezgodnosc-w-proformie/{$this->order->id}");
+	}
+
+	/**
+     * [FAQ-LINK]
+     * Insert FAQ link with encoded user credentials
+     *
+     * @return string $template
+     */
+	public function faqLink(): string {
+
+        $url = config('app.front_url') . "/faq";
+        $faqAttr = 'showFaq=true';
+
+        if($this->order === null && $this->email !== null) {
+            return $url . "?credentials={$this->email}&{$faqAttr}";
+        }
+        if($this->order === null) {
+            return $url . "?{$faqAttr}";
+        }
+
+        $workingAddress = null;
+        foreach($this->order->customer?->addresses as $address) {
+            if($address->phone !== null && $address->email !== null) {
+                $workingAddress = $address;
+                break;
+            }
+        }
+
+        if($workingAddress === null) return $url . "?{$faqAttr}";
+
+        $credentials = $workingAddress->email.':'.$workingAddress->phone;
+
+        $url .= "?credentials={$credentials}&{$faqAttr}";
+
+		return $url;
+	}
+
+    /**
+     * Parse existing tags from message using tags handlers
+     *
+     * @param  Order|null  $order
+     * @param  string      $message
+     * @param  string|null $email
+     *
+     * @return string $message
+     */
+	public function parseTags(?Order $order, string $message, ?string $email = null): string {
+        
+        $this->order = $order;
+        $this->email = $email;
+        $matchedTagsCount = preg_match_all('/\[.*\]/', $message, $matchedTags);
+        if( $matchedTagsCount < 1 ) return $message;
+
+        $tags = Tag::whereIn('name', $matchedTags[0])->get();
+
+        foreach ($tags as $tag) {
+            if(method_exists($this, $tag->handler)) {
+                $tagResult = call_user_func([$this, $tag->handler]);
+                $message   = str_replace( $tag->name, $tagResult, $message);
+            }
+        }
+        return $message;
 	}
 }

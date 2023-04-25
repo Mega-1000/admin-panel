@@ -55,4 +55,9 @@ class Chat extends Model
     {
         return $this->messages()->orderBy('id', 'desc')->first();
     }
+
+    public function auctions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ChatAuction::class);
+    }
 }

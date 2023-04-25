@@ -37,10 +37,10 @@ class TimedLabelJob implements ShouldQueue
      */
     public function handle()
     {
-        $currentLabelId = $this->order->labels()->where('label_id', $this->preLabelId);
+        $currentLabelId = $this->order->labels()->where('label_id', $this->preLabelId)->first();
 
         // job must have the same creation date
-        if( isset($currentLabelId->created_at) && $currentLabelId->created_at == $this->now->toDateTimeString() ) {
+        if( $currentLabelId !== null && $currentLabelId->pivot->created_at->toDateTimeString() == $this->now->toDateTimeString() ) {
             $this->order->labels()->detach($this->preLabelId);
             AddLabelService::addLabels($this->order, [ $this->labelId ], $this->loopPreventionArray, $this->options, $this->userId);
         }

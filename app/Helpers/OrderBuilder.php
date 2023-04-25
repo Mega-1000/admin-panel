@@ -16,10 +16,12 @@ use App\Helpers\interfaces\iOrderTotalPriceCalculator;
 use App\Helpers\interfaces\iPostOrderAction;
 use App\Helpers\interfaces\iSumable;
 use App\Services\ProductService;
+use App\Services\EmailSendingService;
 use Exception;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Entities\Customer;
 
 class OrderBuilder
 {
@@ -54,6 +56,7 @@ class OrderBuilder
     private $postOrderActions;
 
     private $productService;
+
 
     public function setPackageGenerator(iDividable $generator)
     {
@@ -98,10 +101,16 @@ class OrderBuilder
     }
 
     /**
+     * Handle store new order
+     *
+     * @param  array         $data
+     * @param  Customer|null $customer
+     *
      * @throws ChatException
      * @throws Exception
+     * @return array
      */
-    public function newStore($data)
+    public function newStore(array $data, ?Customer $customer): array
     {
         if (empty($this->packageGenerator) || empty($this->priceCalculator) || empty($this->userSelector)) {
             throw new Exception('Nie zdefiniowano bazowych komponentów klasy');
@@ -124,7 +133,9 @@ class OrderBuilder
         }
 
         $order->getToken();
-        $customer = $this->userSelector->getCustomer($order, $data);
+        if($customer === null) {
+            $customer = $this->userSelector->getCustomer($order, $data);
+        }
         $order->customer_id = $customer->id;
 
         if (!$orderExists) {
@@ -138,21 +149,25 @@ class OrderBuilder
 
         $order->save();
 
+        $emailSendingService = new EmailSendingService();
+        $emailSendingService->addNewScheduledEmail($order);
+
         if (!empty($data['files'])) {
             foreach ($data['files'] as $file) {
                 $this->attachFileToOrder($file, $order);
             }
         }
         $chatUserToken = '';
-        if (!empty($data['customer_notices'])) {
+        if ( isset($data['need_support']) && $data['need_support'] === true ) {
             $helper = new MessagesHelper();
-            $helper->orderId = $order->id;
-            $helper->currentUserId = $customer->id;
-            $helper->currentUserType = MessagesHelper::TYPE_CUSTOMER;
+            $chatUserToken = $helper->getChatToken($order->id, $customer->id, MessagesHelper::TYPE_CUSTOMER);
             $helper->createNewChat();
-            $chatUserToken = $helper->encrypt();
-            $helper->addMessage($data['customer_notices']);
+
+            if( !empty($data['customer_notices']) ) {
+                $helper->addMessage($data['customer_notices']);
+            }
             $order->labels()->attach(MessagesHelper::MESSAGE_YELLOW_LABEL_ID);
+            $order->need_support = true;
         }
         $this->assignItemsToOrder($order, $data['order_items']);
 
@@ -263,7 +278,7 @@ class OrderBuilder
         ]);
     }
 
-    private function assignItemsToOrder($order, $items)
+    public function assignItemsToOrder($order, $items)
     {
         $weight = 0;
         $orderItems = $order->items;
@@ -354,7 +369,7 @@ class OrderBuilder
         if ($type == CustomerAddress::ADDRESS_TYPE_STANDARD) {
             $phone = $phone ?? $adressArray['phone'];
         } else {
-            $phone = $adressArray['phone'] ?? $phone;
+            $phone = $phone ?? $adressArray['phone'];
         }
         $phone = preg_replace('/[^0-9]/', '', $phone);
         if (!is_array($adressArray)) {

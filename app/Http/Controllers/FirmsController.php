@@ -13,6 +13,7 @@ use App\Jobs\SendMailToFirmsToUpdateTheDataJob;
 use App\Repositories\FirmAddressRepository;
 use App\Repositories\FirmRepository;
 use App\Repositories\WarehouseRepository;
+use App\Services\FirmService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -85,6 +86,7 @@ class FirmsController extends Controller
         $firm->delivery_warehouse = $request->delivery_warehouse;
         $firm->email = $request->email;
         $firm->secondary_email = $request->secondary_email;
+        $firm->complaint_email = $request->complaint_email;
         $firm->nip = $request->nip;
         $firm->account_number = $request->account_number;
         $firm->status = $request->status;
@@ -92,11 +94,14 @@ class FirmsController extends Controller
         $firm->notices = $request->notices;
         $firm->secondary_phone = $request->secondary_phone;
         $firm->secondary_notices = $request->secondary_notices;
+        
         if (empty($request->short_name)) {
             $firm->short_name = substr($request->name, 0, 50);
         }
         $firm->save();
 
+        $firmService = new FirmService($firm);
+        $firmService->addNewEmployeeForComplaint();
 
         $this->firmAddressRepository->create([
             'firm_id' => $firm->id,
@@ -251,6 +256,7 @@ class FirmsController extends Controller
         $firm->delivery_warehouse = $request->delivery_warehouse;
         $firm->email = $request->email;
         $firm->secondary_email = $request->secondary_email;
+        $firm->complaint_email = $request->complaint_email;
         $firm->nip = $request->nip;
         $firm->account_number = $request->account_number;
         $firm->status = $request->status;
@@ -262,6 +268,10 @@ class FirmsController extends Controller
             $firm->short_name = substr($request->name, 0, 50);
         }
         $firm->save();
+
+        $firmService = new FirmService($firm);
+        $firmService->addNewEmployeeForComplaint();
+
         $this->firmAddressRepository->update($request->all(), $firm->address->id);
 
         if (!$request->has('firm_source') || !$request->get('firm_source')) {

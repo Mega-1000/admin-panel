@@ -4,10 +4,10 @@ namespace App\Providers;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
-use DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
-use URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,8 +18,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        // TODO Change to configuration
-        if (env('DEBUG_QUERY', false)) {
+        if (config('app.debug_query')) {
             DB::listen(function ($sql) {
                 error_log($sql->sql);
             });
