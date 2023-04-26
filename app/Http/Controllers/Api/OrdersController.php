@@ -197,18 +197,21 @@ class OrdersController extends Controller
         $customer = $customer ?? auth()->guard('api')->user();
 
         if ($customer === null && array_key_exists('customer_login', $data)) {
-            if (array_key_exists('phone', $data)) {
-                // ensure to get last 9 number from data['phone']
-                if (strlen($data['phone']) > 9) {
-                    $data['phone'] = substr($data['phone'], -9);
-                }
-                $customer = Customer::query()->create([
-                    'login' => $data['customer_login'],
-                    'status' => 'ACTIVE',
-                    'password' => Hash::make($data['phone']),
-                ]);
+            if (!array_key_exists('phone', $data)) {
+                throw new NotFoundException('Phone number is not existing, need this information to create new (not existing) customer', 500);
             }
-            throw new NotFoundException('Phone number is not existing, need this information to create new (not existing) customer', 500);
+            // ensure to get last 9 number from data['phone']
+            if (strlen($data['phone']) > 9) {
+                $data['phone'] = substr($data['phone'], -9);
+            }
+            if (!array_key_exists('customer_login', $data) || ($data['customer_login'] ?? '') === '') {
+                throw new NotFoundException('No customer login in request data', 500);
+            }
+            $customer = Customer::query()->create([
+                'login' => $data['customer_login'],
+                'status' => 'ACTIVE',
+                'password' => Hash::make($data['phone']),
+            ]);
         }
 
         try {
