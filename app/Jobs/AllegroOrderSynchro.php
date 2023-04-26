@@ -154,7 +154,7 @@ class AllegroOrderSynchro implements ShouldQueue
                 if ($this->checkAllegroDeliveryAddressExisting($allegroOrder) === false) {
                     Log::error(
                         'Not existing address data in Allegro Order',
-                        $allegroOrders
+                        $allegroOrder
                     );
                     continue;
                 }
