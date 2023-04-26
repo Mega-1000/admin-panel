@@ -225,7 +225,7 @@ class AllegroOrderSynchro implements ShouldQueue
 
                 }
 
-                if (!Helper::phoneIsCorrect($orderDeliveryAddress->phone)) {
+                if (!Helper::phoneIsCorrect($orderDeliveryAddress?->phone ?? '')) {
                     $order->labels_log .= Order::formatMessage(null, 'ebudownictwo@wp.pl 691801594 55-200');
                     $order->labels()->attach(176);
                     $order->saveQuietly();
@@ -233,10 +233,9 @@ class AllegroOrderSynchro implements ShouldQueue
 
                 // order package
                 $this->addOrderPackage($order, $allegroOrder['delivery']);
-                $order->shipment_price_for_client = $allegroOrder['delivery']['cost']['amount'];
+                $order->shipment_price_for_client = $allegroOrder['delivery']['cost']['amount'] ?? 0;
 
-                $order->total_price = $allegroOrder['summary']['totalToPay']['amount'];
-                // TODO Change to configuration
+                $order->total_price = $allegroOrder['summary']['totalToPay']['amount'] ?? 0;
                 $firmSource = FirmSource::byFirmAndSource(config('orders.firm_id'), 1)->first();
                 $order->firm_source_id = $firmSource ? $firmSource->id : null;
 
