@@ -4,34 +4,31 @@ namespace App\Services;
 
 use App\Repositories\Couriers;
 use Illuminate\Database\Eloquent\Collection;
+use App\Helpers\TaskTimeHelper;
 use App\Entities\Label;
 use App\Entities\Task;
 use App\Entities\TaskTime;
 use App\Entities\Courier;
 use App\Enums\CourierName;
 use App\Repositories\TaskRepository;
+use App\Repositories\TaskTimeRepository;
 use App\Repositories\Tasks;
 use App\Repositories\TaskTimes;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Exception;
+use Auth;
 
 class TaskService
 {
-    /**
-     * @var TaskRepository
-     */
-    protected $taskRepository;
-
     public function __construct(
-        TaskRepository $taskRepository, 
+        protected readonly TaskRepository $taskRepository, 
+        protected readonly TaskTimeRepository $taskTimeRepository, 
         protected readonly Tasks $tasksRepository,
         protected readonly Couriers $courierRepository,
         protected readonly TaskTimes $taskTimesRepository
     )
-    {
-        $this->taskRepository = $taskRepository;
-    }
+    {}
 
     /**
      * Get task query
@@ -233,6 +230,21 @@ class TaskService
     }
 
     /**
+     * get now task for handling
+     *
+     * @param int $user_id
+     */
+    public function getTimeLastNowTask($user_id) :string
+    {
+        $date = Carbon::today();
+        $taskTime = $this->taskTimesRepository->getTimeLastNowTask($user_id, $date);
+        $firstTaskTime = $taskTime->first(); 
+
+        return (isset($firstTaskTime->date_end) ? Carbon::parse($firstTaskTime->date_end)->format('H:i:s') : Carbon::now()->format('H:i:s'));
+    }
+
+
+    /**
      * Prepare task for handling
      *
      * @param int $user_id
@@ -303,7 +315,7 @@ class TaskService
      * @param object $address
      * @param int $user_id
      */
-    public function checkTaskLogin($login,$address,$user_id) :bool|array
+    public function checkTaskLogin($login,$address,$user_id) :bool|int
     {
         $tasks = $this->tasksRepository->checkTaskLogin($login, $user_id);
 
@@ -311,8 +323,7 @@ class TaskService
             return false;
         }
 
-        $array = [];
-        return $array[0] = 'error'; 
+        $taskID = false;
         foreach($tasks as $task){
             if(
                 $task->order->getDeliveryAddress()->address = $address->address &&
@@ -325,9 +336,9 @@ class TaskService
                     if(!$task->order->labels->contains('id', Label::RED_HAMMER_ID)){
                         if(!$task->order->labels->contains('id', Label::ORDER_ITEMS_CONSTRUCTED)){
                             if($task->parent_id){
-                                $array[$task->parent_id] = $task->parent_id;
+                                $taskID = $task->parent_id;
                             }else{
-                                $array[$task->id] = $task->id;
+                                $taskID = $task->id;
                             }
                         }else{
                             return false;
@@ -339,14 +350,13 @@ class TaskService
                     if($task->order->labels->contains('id', Label::ORDER_ITEMS_REDEEMED_LABEL)){
                         return false;
                     }else{
-                        $array[0] = 'error'; 
-                        //zielona bateria jeśli nie to wyświetlic komunikat
+                        $taskID = -1; 
                     }
                 }
             }
             
         }
-        return $array;
+        return $taskID;
     }
 
     /**
@@ -357,18 +367,106 @@ class TaskService
      */
     public function addTaskToPlanner($order,$user_id) :int
     {
+        $date = Carbon::today();
+        $start_date = $this->getTimeLastNowTask($user_id);
+        $start = Carbon::parse($date->format('Y-m-d').' '.$start_date);
+        $end = Carbon::parse($date->format('Y-m-d').' '.$start_date)->addMinutes(2);
 
+        $dataToStore = [
+            'start' => $start,
+            'end' => $end,
+            'id' => $user_id,
+            'user_id' => $user_id
+        ];
+        $task = $this->taskRepository->create([
+            'user_id' => $user_id,
+            'name' => $order->id !== null ? $order->id : null,
+            'created_by' => Auth::user()->id,
+            'color' => '194775',
+            'warehouse_id' => 16,
+            'status' => 'WAITING_FOR_ACCEPT',
+            'order_id' => $order->id !== null ? $order->id : null
+        ]);
+        $this->taskTimeRepository->create([
+            'task_id' => $task->id,
+            'date_start' => $start,
+            'date_end' => $end,
+        ]);
+
+        return $task->id;
     }
 
     /**
      * add task to group planer
      *
      * @param object $order
-     * @param object $task
+     * @param int $task_id
      * @param int $user_id
      */
-    public function addTaskToGroupPlanner($order,$task,$user_id) :int
+    public function addTaskToGroupPlanner($order,$task_id,$user_id) :int
     {
+        $task = Task::find($task_id);
+        $date = Carbon::today();
+        $start_date = $this->getTimeLastNowTask($user_id);
+        $start = Carbon::parse($date->format('Y-m-d').' '.$start_date);
+        $end = Carbon::parse($date->format('Y-m-d').' '.$start_date)->addMinutes(2);
 
+        $dataToStore = [
+            'start' => $start,
+            'end' => $end,
+            'id' => $user_id,
+            'user_id' => $user_id
+        ];
+
+        if($task->childs->count() == 0){
+            $newGroup = $this->taskRepository->create([
+                'user_id' => $user_id,
+                'name' => $task->order_id.', '.$order->id,
+                'created_by' => Auth::user()->id,
+                'color' => '194775',
+                'warehouse_id' => 16,
+                'status' => 'WAITING_FOR_ACCEPT',
+            ]);
+            $this->taskTimeRepository->create([
+                'task_id' => $newGroup->id,
+                'date_start' => $start,
+                'date_end' => $end,
+            ]);
+
+            $task->update([
+                'parent_id' => $newGroup->id,
+            ]);
+            $group_id = $newGroup->id;
+        }else{
+            $name = explode(',',$task->name);
+            $name[] = $order->id;
+            $task->update([
+                'name' => join(', ',$name)
+            ]);
+
+            $task->taskTime->update([
+                'date_start' => $dataToStore['start'],
+                'date_end' => $dataToStore['end']
+            ]);
+            $group_id = $task->id;
+        }
+
+        $newTask = $this->taskRepository->create([
+            'user_id' => $user_id,
+            'name' => $order->id !== null ? $order->id : null,
+            'created_by' => Auth::user()->id,
+            'color' => '194775',
+            'warehouse_id' => 16,
+            'status' => 'WAITING_FOR_ACCEPT',
+            'order_id' => $order->id !== null ? $order->id : null,
+            'parent_id' => $group_id
+        ]);
+        $this->taskTimeRepository->create([
+            'task_id' => $newTask->id,
+            'date_start' => $start,
+            'date_end' => $end,
+        ]);
+
+        return $newTask->id;
     }
 }

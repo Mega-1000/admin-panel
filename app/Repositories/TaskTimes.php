@@ -55,6 +55,26 @@ class TaskTimes
     }
 
     /**
+     * Get Separator
+     * @param int $user_id
+     * @param Carbon $date
+     */
+    public static function getTimeLastNowTask($user_id, $date): Collection
+    {
+        return TaskTime::with(['task'])
+        ->whereHas('task',
+            function ($query) use ($user_id) {
+                $query->where('user_id', $user_id);
+                $query->whereNull('parent_id');
+                $query->whereNull('rendering');
+            })
+        ->where('date_start', 'like' , $date->format('Y-m-d')."%")
+        ->whereNull('transfer_date')
+        ->orderBy('date_start', 'asc')
+        ->get();
+    }
+    
+    /**
      * Get Move Task
      * @param int $user_id
      * @param Carbon $date

@@ -768,6 +768,34 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" tabindex="-1" id="add-withdraw-task" role="dialog">
+        <div class="modal-dialog" id="modalDialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="titleModal">Potwierdź</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Dany klient ma juz wyprodukowaną ofertę/grupę ofert, która lezy na tym magazynie</p>
+                    <p>Zalecane sprawdznie czy jest mozliwośc dołączenia do paczek juz istnijących.</p>
+                    <form method="POST" id="addToPlanner"
+                          action="{{ url('admin/planning/tasks/store/planner') }}">
+                        @csrf()
+                        <input type="hidden" id="add-withdraw-task-delivery_warehouse" name="delivery_warehouse" value="">
+                        <input type="hidden" id="add-withdraw-task-order_id" name="order_id" value="">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" form="withdrawTask" id="withdrawTaskButton" class="btn btn-danger">Wycofaj, chcę sprawdzic</button>
+                    <button type="submit" form="addToPlanner" class="btn btn-success pull-right">Dodaj
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
     
 
 
@@ -2741,12 +2769,10 @@
                         $('#warehouseSelect').attr('selected', true);
                         $('#selectWarehouse').click();
 
-                        //tutaj dodac laczenie zadan
                         addingTaskToPlanner(orderId,delivery_warehouse);
                         refreshDtOrReload();
                     }
                     refreshDtOrReload();
-                    window.open('/admin/planning/timetable', '_blank');
                 })
                     .fail((error) => {
                         if (error.responseText === 'warehouse not found') {
@@ -2794,9 +2820,37 @@
                         delivery_warehouse: delivery_warehouse
                     },
                 }).done(function (data) {
-
-                }).fail(function (data) {
-                    //modal z informacja czy wstrzymac czy dodac.
+                    if(data.status=='ERROR'){
+                        let modal = $('#add-withdraw-task');
+                        let input_delivery_warehouse = modal.find("#add-withdraw-task-delivery_warehouse");
+                        let input_order_id = modal.find("#add-withdraw-task-order_id");
+                        input_delivery_warehouse.val(data.delivery_warehouse);
+                        input_order_id.val(data.id);
+                        let order_ids = [data.id];
+                        let clickCount = 0;
+                        modal.modal();
+                        $('#withdrawTaskButton').on('click', () => {
+                            if(clickCount > 0) {
+                                return false;
+                            }else{
+                                $.ajax({
+                                    url: "/admin/orders/label-addition/45",
+                                    method: "POST",
+                                    data: {
+                                        orderIds: order_ids
+                                    }
+                                }).done(function () {
+                                    modal.modal('hide');
+                                    table.ajax.reload(null, false);
+                                    return false;
+                                });
+                                
+                                clickCount++;
+                            }
+                        })
+                    }else{
+                        window.open('/admin/planning/timetable', '_blank');
+                    }
                 });
             } 
 

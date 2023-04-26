@@ -1325,7 +1325,7 @@ class TasksController extends Controller
                         unset($name[$key]);
                     }
                     $parent->update([
-                        'name' => join(',',$name)
+                        'name' => join(', ',$name)
                     ]);
 
                     $task->update([
@@ -1372,11 +1372,10 @@ class TasksController extends Controller
             $order->getDeliveryAddress(),
             $data['delivery_warehouse']
         );
-        
         if(!$task){
-            //$id = $this->taskService->addTaskToPlanner($order,$data['delivery_warehouse']);
+            $id = $this->taskService->addTaskToPlanner($order,$data['delivery_warehouse']);
         }else{
-            if($task=='error'){
+            if($task==-1){
                 $array = [
                     'status' => 'ERROR',
                     'id' => $order->id,
@@ -1385,7 +1384,7 @@ class TasksController extends Controller
                 ];
                 return response()->json($array);
             }else {
-                //$id = $this->taskService->addTaskToGroupPlanner($order,$task,$data['delivery_warehouse']);
+                $id = $this->taskService->addTaskToGroupPlanner($order,$task,$data['delivery_warehouse']);
             }
         }
 
@@ -1397,7 +1396,24 @@ class TasksController extends Controller
         return response()->json($array);
     }
 
-    public function saveTaskToPlanner(Request $request){
+    /**
+     * @param AddingTaskToPlanerRequest $request
+     */
+    public function saveTaskToPlanner(AddingTaskToPlanerRequest $request): RedirectResponse
+    {
+        $request->validated();
+        $data = $request->all();
+        $order = Order::with(['customer','labels'])->find($data['order_id']);
+        $id = $this->taskService->addTaskToPlanner($order,$data['delivery_warehouse']);
+        $array = [
+            'status' => 'ADDED_TASK',
+            'id' => $id,
+            'message' => 'Dodano zadanie id: '.$id
+        ];
 
+        return redirect()->route('planning.tasks.index')->with([
+            'message' => __('tasks.messages.store'),
+            'alert-type' => 'success'
+        ]);
     }
 }
