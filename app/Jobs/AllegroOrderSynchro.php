@@ -138,18 +138,29 @@ class AllegroOrderSynchro implements ShouldQueue
 
         foreach (array_reverse($allegroOrders) as $allegroOrder) {
             try {
-                if (Order::where('allegro_form_id', $allegroOrder['id'])->count() > 0) {
+                $orderModel = Order::query()->where('allegro_from_id', $allegroOrder['id'])->first();
+                if ($orderModel !== null) {
                     continue;
                 }
-                if ($this->checkAllegroStatusAndOrderPaid($allegroOrder) === true) {
-                    continue;
+                $orderStatus = $allegroOrder['status'] ?? AllegroOrderService::STATUS_CANCELLED;
+                $paidAmount = $allegroOrder['payment']['paidAmount']['amount'] ?? 0;
+
+                if ($orderStatus === AllegroOrderService::STATUS_CANCELLED) {
+                    if ($paidAmount <= 0) {
+                        continue;
+                    }
                 }
+
                 if ($this->checkAllegroDeliveryAddressExisting($allegroOrders) === false) {
+                    Log::error(
+                        'Not existing address data in Allegro Order',
+                        $allegroOrders
+                    );
                     continue;
                 }
 
                 DB::beginTransaction();
-                $orderModel = AllegroOrder::firstOrNew(['order_id' => $allegroOrder['id']]);
+                $orderModel = AllegroOrder::query()->firstOrNew(['order_id' => $allegroOrder['id']]);
                 $orderModel->order_id = $allegroOrder['id'];
                 $orderModel->buyer_email = $allegroOrder['buyer']['email'];
                 $orderModel->save();
@@ -289,26 +300,6 @@ class AllegroOrderSynchro implements ShouldQueue
     {
         if (array_key_exists('delivery', $allegroOrder) && array_key_exists('address', $allegroOrder['delivery'] ?? []) && count($allegroOrder['delivery']['address'] ?? []) > 0) {
             return true;
-        }
-        return false;
-    }
-
-    private function checkAllegroStatusAndOrderPaid(array $allegroOrder): bool
-    {
-        if ($allegroOrder['status'] === $this->allegroOrderService::STATUS_CANCELLED) {
-            if (
-                array_key_exists('payment', $allegroOrder) &&
-                array_key_exists('paidAmount', $allegroOrder['payment']) && $allegroOrder['payment']['paidAmount'] !== null &&
-                array_key_exists('amount', $allegroOrder['payment']['paidAmount'])
-            ) {
-                if (
-                    array_key_exists('summary', $allegroOrder) &&
-                    array_key_exists('totalToPay', $allegroOrder['summary']) &&
-                    array_key_exists('amount', $allegroOrder['summary']['totalToPay'])
-                ) {
-                    return $allegroOrder['payment']['paidAmount']['amount'] !== $allegroOrder['summary']['totalToPay']['amount'];
-                }
-            }
         }
         return false;
     }
