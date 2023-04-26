@@ -144,6 +144,9 @@ class AllegroOrderSynchro implements ShouldQueue
                 if ($this->checkAllegroStatusAndOrderPaid($allegroOrder) === true) {
                     continue;
                 }
+                if ($this->checkAllegroDeliveryAddressExisting($allegroOrders) === false) {
+                    continue;
+                }
 
                 DB::beginTransaction();
                 $orderModel = AllegroOrder::firstOrNew(['order_id' => $allegroOrder['id']]);
