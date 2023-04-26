@@ -285,6 +285,14 @@ class AllegroOrderSynchro implements ShouldQueue
         }
     }
 
+    private function checkAllegroDeliveryAddressExisting(array $allegroOrder): bool
+    {
+        if (array_key_exists('delivery', $allegroOrder) && array_key_exists('address', $allegroOrder['delivery'] ?? []) && count($allegroOrder['delivery']['address'] ?? []) > 0) {
+            return true;
+        }
+        return false;
+    }
+
     private function checkAllegroStatusAndOrderPaid(array $allegroOrder): bool
     {
         if ($allegroOrder['status'] === $this->allegroOrderService::STATUS_CANCELLED) {
