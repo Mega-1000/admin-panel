@@ -138,7 +138,7 @@ class AllegroOrderSynchro implements ShouldQueue
 
         foreach (array_reverse($allegroOrders) as $allegroOrder) {
             try {
-                $orderModel = Order::query()->where('allegro_from_id', $allegroOrder['id'])->first();
+                $orderModel = Order::query()->where('allegro_form_id', $allegroOrder['id'])->first();
                 if ($orderModel !== null) {
                     continue;
                 }
