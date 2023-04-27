@@ -307,9 +307,7 @@ class AllegroOrderSynchro implements ShouldQueue
     /**
      * Find customer by buyer
      *
-     * @param array $buyer
-     * @param array $deliveryAddress
-     *
+     * @param array $allegroOrder
      * @return Customer
      * @throws Exception
      */
@@ -323,7 +321,7 @@ class AllegroOrderSynchro implements ShouldQueue
             $buyerEmail = str_replace('+' . $matches[1], '', $buyer['email']);
         }
 
-        $customer = $this->customerRepository->findWhere(['login' => $buyerEmail])->first();
+        $customer = $this->customerRepository->findWhere(['login' => $buyerEmail])->orWhere('login_allegro', $buyer['login'])->first();
 
         if ($customer && array_key_exists('phoneNumber', $deliveryAddress) && !empty($deliveryAddress['phoneNumber'])) {
             $customer->password = Hash::make($deliveryAddress['phoneNumber']);

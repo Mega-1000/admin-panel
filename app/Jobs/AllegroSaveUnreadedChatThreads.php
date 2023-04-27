@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Services\AllegroChatUserManagmentService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use TCG\Voyager\Models\Setting;
 use Illuminate\Support\Facades\Log;
@@ -65,8 +66,10 @@ class AllegroSaveUnreadedChatThreads extends Job implements ShouldQueue
 
                 if($thread['lastMessageDateTime'] > $minutesAgo) {
                     $emailSendingService = new EmailSendingService();
-                    
-                    $emailSendingService->addAllegroMsg($thread['id'], $thread['interlocutor']['login']);
+
+                    $customer = AllegroChatUserManagmentService::createOrFindUserFromAllegro($thread['interlocutor']['login']);
+
+                    $emailSendingService->addAllegroMsg($thread['id'], $customer->login);
                 }
             }
         }
