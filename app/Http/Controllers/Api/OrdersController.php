@@ -46,6 +46,7 @@ use App\Repositories\ProductPriceRepository;
 use App\Repositories\ProductRepository;
 use App\Services\EmailSendingService;
 use App\Services\Label\AddLabelService;
+use App\Services\OrderAddressesService;
 use App\Services\OrderPackageService;
 use App\Services\ProductService;
 use Carbon\Carbon;
@@ -190,7 +191,7 @@ class OrdersController extends Controller
      * @return JsonResponse
      * @throws Throwable
      */
-    public function newOrder(StoreOrderRequest $request, ProductService $productService): JsonResponse
+    public function newOrder(StoreOrderRequest $request, ProductService $productService)
     {
         $data = $request->all();
         $customer = Customer::query()->where('login', $data['customer_login'])->first();
@@ -237,6 +238,12 @@ class OrdersController extends Controller
             $order = Order::query()->find($builderData['id']);
             $order->firm_source_id = FirmSource::byFirmAndSource(config('orders.firm_id'), 2)->value('id');
             $order->save();
+
+            $orderAddresses = $order->addresses()->get();
+
+            foreach ($orderAddresses as $orderAddress) {
+                $orderAddress = OrderAddressesService::updateOrderAddressFromCustomer($orderAddress, $customer) ;
+            }
 
             $builderData['token'] = $order->getToken();
             return response()->json($builderData);
