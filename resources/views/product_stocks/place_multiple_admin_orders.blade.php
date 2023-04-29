@@ -17,6 +17,10 @@
             <input id="days-to-future" class="form-control" placeholder="Ilość dni do przodu">
         </div>
         <div class="mt-5">
+            <label for="days-interval">interwal liczenia dla okresów sprzedaży</label>
+            <input id="days-interval" class="form-control" value="7" placeholder="interwal liczenia dla okresów sprzedaży">
+        </div>
+        <div class="mt-5">
             <label for="firm-id">Symbol firmy</label>
             <input class="form-control" id="firm-id" type="text">
         </div>
@@ -101,12 +105,14 @@
             const daysBack = document.getElementById('days-back').value
             const daysToFuture = document.getElementById('days-to-future').value
             const clientEmail = document.getElementById('client-email').value
+            const daysInterval = document.getElementById('days-interval').value
 
             const params = encodeToGetParams({
                 firmSymbol,
                 daysBack,
                 daysToFuture,
-                clientEmail
+                clientEmail,
+                daysInterval
             })
 
             axios.get(`place-multiple-admin-orders/calculate?${params}`)
@@ -152,6 +158,9 @@
                               <td>
                                 <span id="quantity-pack-units-${product.id}">${ceilPackUnits}</span>
                               </td>
+                              <td>
+                                <a class="btn btn-primary" target="_blank" href='/admin/products/stocks/place-multiple-admin-orders/intervals/${JSON.stringify(item.intervals)}'>pokaż wykres</a>
+                              </td>
                             </tr>
                         `;
 
@@ -186,6 +195,7 @@
                                 <th>okres na jaki starczy towaru przy zamówieniu po zaokrągleniu w dół</th>
                                 <th>ostateczna iloć jednostek zbiorczych wybranych w zamówieniu</th>
                                 <th>ostateczna ilość jednostek handlowych wybranych w zamówieniu</th>
+                                <th>Wyświetl wykres interwałów</th>
                               </tr>
                             </thead>
                             <tbody>

@@ -27,6 +27,7 @@ use App\Services\OrderService;
 use App\Services\ProductService;
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -365,6 +366,7 @@ class ProductStocksController extends Controller
                 'product' => $product,
                 'orderQuantity' => $orderQuantity,
                 'currentQuantity' => $this->orderService->getAllProductsQuantity($productStock->id),
+                'intervals' => $this->orderService->getProductIntervals($productStock, $request->validated('daysInterval'), $request->validated('daysBack')),
             ];
         }
 
@@ -379,6 +381,17 @@ class ProductStocksController extends Controller
 
         return response()->json([
             'orders' => $order,
+        ]);
+    }
+
+    /**
+     * @param string $data
+     * @return Application|Factory|\Illuminate\Contracts\View\View
+     */
+    public function getProductStockIntervals(string $data): Application|Factory|\Illuminate\Contracts\View\View
+    {
+        return view('product_stocks.interval_chart', [
+            'intervals' => $data,
         ]);
     }
 }

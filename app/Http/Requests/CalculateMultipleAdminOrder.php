@@ -27,7 +27,8 @@ class CalculateMultipleAdminOrder extends FormRequest
             'firmSymbol' => 'nullable|string',
             'daysBack' => 'required|integer',
             'daysToFuture' => 'required|integer',
-            'clientEmail' => 'required|email'
+            'clientEmail' => 'required|email',
+            'daysInterval' => 'required|integer',
         ];
     }
 }
