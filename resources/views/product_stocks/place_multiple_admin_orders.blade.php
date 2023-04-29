@@ -61,7 +61,8 @@
                                 id: item.product.id,
                                 quantity: item.orderQuantity.calculatedQuantity
                             }
-                        }).filter((item) => item.quantity > 0),
+                        }).filter((item) => item.quantity > 0 && document.getElementById(`checkbox-order-${item.id}`).checked
+                        ),
                         clientEmail: document.getElementById('client-email').value
                     }
                     axios.post('place-multiple-admin-orders/confirm', postData).then((response) => {
@@ -128,6 +129,7 @@
                         res += `
                             ${orderQuantity.soldInLastDays}
                             <tr>
+                              <td><input type="checkbox" id="checkbox-order-${product.id}" checked></td> <!-- Zaznaczenie -->
                               <td>${product.name}</td> <!-- Nazwa towaru -->
                               <td>${product.symbol}</td> <!-- Symbol towaru -->
                               <td>${product.manufacturer}</td> <!-- Nazwa producenta towaru -->
@@ -165,6 +167,7 @@
                           <table class="table">
                             <thead>
                               <tr>
+                                <th>Zaznaczenie</th>
                                 <th>Nazwa towaru</th>
                                 <th>Symbol towaru</th>
                                 <th>Nazwa producenta towaru</th>
