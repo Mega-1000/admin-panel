@@ -407,7 +407,7 @@ class CustomersController extends Controller
      * @param String $email
      * @return JsonResponse
      */
-    public function getTokenFromEmail(string $email): JsonResponse
+        public function getTokenFromEmail(string $email): JsonResponse
     {
         $customer = Customer::query()->where('login', $email)->firstorfail();
 

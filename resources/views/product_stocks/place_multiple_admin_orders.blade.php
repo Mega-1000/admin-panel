@@ -9,15 +9,15 @@
 @section('table')
     <div class="form-group-default">
         <div>
-            <label for="product-name">Ilość dni do tyłu</label>
+            <label for="product-name"> Ilość dni wstecz od dzisiaj dla których będziemy liczyć sprzedaż</label>
             <input id="days-back" class="form-control" placeholder="Ilość dni do tyłu">
         </div>
         <div class="mt-5">
-            <label for="days-to-future">Ilość dni do przodu</label>
+            <label for="days-to-future">Ilość dni od dzisiaj dla jakich chcemy przeliczyć zapotrzebowanie</label>
             <input id="days-to-future" class="form-control" placeholder="Ilość dni do przodu">
         </div>
         <div class="mt-5">
-            <label for="firm-id">Nazwa firmy</label>
+            <label for="firm-id">Symbol firmy</label>
             <input class="form-control" id="firm-id" type="text">
         </div>
         <div class="mt-5">
@@ -27,6 +27,8 @@
         <button class="btn btn-primary" id="submit-button">
             Oblicz
         </button>
+
+        <div id="spinner"></div>
 
         <div id="result-value"></div>
     </div>
@@ -89,7 +91,6 @@
             const value = Math.round(quantity * Number(item.product.packing.number_of_sale_units_in_the_pack)) / Number(item.product.packing.number_of_sale_units_in_the_pack) * Number(item.product.packing.number_of_sale_units_in_the_pack);
             document.getElementById(`quantity-${id}`).value = value / Number(item.product.packing.number_of_sale_units_in_the_pack);
 
-
             resultBox.innerHTML = value;
 
             item.orderQuantity.calculatedQuantity = value;
@@ -117,14 +118,12 @@
                         const product = item.product;
                         const packing = product.packing;
                         const orderQuantity = item.orderQuantity;
-                        const calculatedQuantity = Number(orderQuantity.calculatedQuantity);
-                        const numSaleUnitsInPack = Number(packing.number_of_sale_units_in_the_pack);
+                        const calculatedQuantity = Number(orderQuantity.calculatedQuantity).toFixed(2);
+                        const numSaleUnitsInPack = Number(packing.number_of_sale_units_in_the_pack).toFixed(2);
                         const ceilCalcQuantity = Math.ceil(calculatedQuantity / numSaleUnitsInPack);
                         const floorCalcQuantity = Math.floor(calculatedQuantity / numSaleUnitsInPack);
-                        const ceilPackUnits = ceilCalcQuantity * numSaleUnitsInPack;
-                        const floorPackUnits = floorCalcQuantity * numSaleUnitsInPack;
-                        const floorCeilPackUnits = Math.floor(ceilPackUnits / orderQuantity.inOneDay);
-                        const floorFloorPackUnits = Math.floor(floorPackUnits / orderQuantity.inOneDay);
+                        const ceilPackUnits = (ceilCalcQuantity * numSaleUnitsInPack).toFixed(2);
+                        const floorPackUnits = (floorCalcQuantity * numSaleUnitsInPack).toFixed(2);
 
                         res += `
                             ${orderQuantity.soldInLastDays}
@@ -132,17 +131,19 @@
                               <td>${product.name}</td> <!-- Nazwa towaru -->
                               <td>${product.symbol}</td> <!-- Symbol towaru -->
                               <td>${item.currentQuantity}</td> <!-- Stan magazynowy -->
-                              <td>${orderQuantity.calculatedQuantity}</td> <!-- Ilość towaru, którą powinniśmy zamówićw jednostkach handlowych -->
+                              <td>${orderQuantity.soldInLastDays}</td> <!-- ilosci sprzedazy w danym okresie -->
+                              <td>${orderQuantity.calculatedQuantity.toFixed(2)}</td> <!-- Ilość towaru, którą powinniśmy zamówićw jednostkach handlowych -->
                               <td>${packing.unit_commercial}</td> <!-- Nazwa jednostki handlowej -->
                               <td>${packing.unit_of_collective}</td> <!-- Nazwa jednostki zbiorczej -->
                               <td>${numSaleUnitsInPack}</td>  <!-- Ilość opakowań handlowych w jednosce zbiorczej -->
-                              <td>${calculatedQuantity / numSaleUnitsInPack}</td> <!-- Ilość jednostek zbiorczych bez zaokrąglania -->
+                              <td>${(calculatedQuantity / numSaleUnitsInPack).toFixed(2)}</td> <!-- Ilość jednostek zbiorczych bez zaokrąglania -->
                               <td>${ceilCalcQuantity}</td> <!-- Ilość jednostek zbiorczych zaokrąglona w górę -->
                               <td>${floorCalcQuantity}</td> <!-- Ilość jednostek zbiorczych zaokrąglona w dół -->
                               <td>${ceilPackUnits}</td> <!-- ilość jednostek handlowych więcej po zaokrągleniu w górę -->
-                              <td>${Math.floor(ceilPackUnits  / orderQuantity.inOneDay)}</td> <!-- okres na jaki starczy towaru przy zamówieniu po zaokrągleniu w górę -->
+                              <td>${item.currentQuantity / orderQuantity.inOneDay}</td> <!-- okres na jaki starczy towaru bez zamowienia -->
+                              <td>${Math.floor((Number(ceilPackUnits) + Number(item.currentQuantity))  / orderQuantity.inOneDay)}</td> <!-- okres na jaki starczy towaru przy zamówieniu po zaokrągleniu w górę -->
                               <td>${floorPackUnits}</td> <!-- ilość jednostek handlowych mniej po zaokrągleniu w dół jednostek zbiorczych -->
-                              <td>${Math.floor(floorPackUnits / orderQuantity.inOneDay)}</td> <!--- okres na jaki starczy towaru przy zamówieniu po zaokrągleniu w dół -->
+                              <td>${Math.floor((Number(floorPackUnits) + Number(item.currentQuantity))  / orderQuantity.inOneDay)}</td> <!--- okres na jaki starczy towaru przy zamówieniu po zaokrągleniu w dół -->
                               <td>
                                 <input type="text" onChange="updateUnitsBox(${product.id})" class="form-control" id="quantity-${product.id}" value="${ceilCalcQuantity}">
                               </td>
@@ -153,10 +154,9 @@
                         `;
 
                     this.orders = orders;
+
                     return res;
                 })
-
-
 
             const result = document.getElementById('result-value')
                 result.innerHTML = `
@@ -168,7 +168,8 @@
                                 <th>Symbol towaru</th
                                 <th>Nazwa producenta towaru</th>
                                 <th>Stan magazynowy</th>
-                                <th>Ilość towaru, którą powinniśmy zamówićw jednostkach handlowych</th>
+                                <th>ilosc sprzedanego towaru dla zadanego okresu</th>
+                                <th>Ilość towaru, którą powinniśmy zamówić w jednostkach handlowych</th>
                                 <th>Nazwa jednostki handlowej</th>
                                 <th>Nazwa jednostki zbiorczej</th>
                                 <th>Ilość opakowań handlowych w jednosce zbiorczej</th>
@@ -176,6 +177,7 @@
                                 <th>Ilość jednostek zbiorczych zaokrąglona w górę</th>
                                 <th>Ilość jednostek zbiorczych zaokrąglona w dół</th>
                                 <th>ilość jednostek handlowych więcej po zaokrągleniu w górę</th>
+                                <th>okres na jaki starczy towaru bez zamowienia</th>
                                 <th>okres na jaki starczy towaru przy zamówieniu po zaokrągleniu w górę</th>
                                 <th>ilość jednostek handlowych mniej po zaokrągleniu w dół jednostek zbiorczych</th>
                                 <th>okres na jaki starczy towaru przy zamówieniu po zaokrągleniu w dół</th>
@@ -198,6 +200,13 @@
             }).catch((error) => {
                 console.log(error)
             })
+        }
+
+        const nextPage = () => {
+            window.pagination.page += 1;
+            alert(window.pagination.page)
+
+            calculate();
         }
 
         document.querySelector('#submit-button').addEventListener('click', calculate)
