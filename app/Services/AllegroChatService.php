@@ -14,6 +14,7 @@ class AllegroChatService extends AllegroApiService {
     public function __construct() {
         parent::__construct();
     }
+
     public function listThreads(int $offset = 0) {
 
         $data = [
