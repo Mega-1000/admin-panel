@@ -202,13 +202,6 @@
             })
         }
 
-        const nextPage = () => {
-            window.pagination.page += 1;
-            alert(window.pagination.page)
-
-            calculate();
-        }
-
         document.querySelector('#submit-button').addEventListener('click', calculate)
     </script>
 @endsection
