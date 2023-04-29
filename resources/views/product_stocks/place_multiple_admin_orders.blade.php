@@ -61,11 +61,10 @@
                                 id: item.product.id,
                                 quantity: item.orderQuantity.calculatedQuantity
                             }
-                        }).filter((item) => item.quantity > 0 && document.getElementById(`checkbox-order-${item.id}`).checked
-                        ),
+                        }).filter((item) => item.quantity > 0 && document.getElementById(`checkbox-order-${item.id}`).checked),
                         clientEmail: document.getElementById('client-email').value
                     }
-                    axios.post('place-multiple-admin-orders/confirm', postData).then((response) => {
+                    axios.post('place-multiple-admin-orders/confirm', postData).then(() => {
                         Swal.fire(
                             'Zamówienie złożone!',
                             'Zamówienie zostało złożone.',
