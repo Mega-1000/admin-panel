@@ -130,6 +130,7 @@
                             <tr>
                               <td>${product.name}</td> <!-- Nazwa towaru -->
                               <td>${product.symbol}</td> <!-- Symbol towaru -->
+                              <td>${product.manufacturer}</td> <!-- Nazwa producenta towaru -->
                               <td>${item.currentQuantity}</td> <!-- Stan magazynowy -->
                               <td>${orderQuantity.soldInLastDays}</td> <!-- ilosci sprzedazy w danym okresie -->
                               <td>${orderQuantity.calculatedQuantity.toFixed(2)}</td> <!-- Ilość towaru, którą powinniśmy zamówićw jednostkach handlowych -->
@@ -165,7 +166,7 @@
                             <thead>
                               <tr>
                                 <th>Nazwa towaru</th>
-                                <th>Symbol towaru</th
+                                <th>Symbol towaru</th>
                                 <th>Nazwa producenta towaru</th>
                                 <th>Stan magazynowy</th>
                                 <th>ilosc sprzedanego towaru dla zadanego okresu</th>
