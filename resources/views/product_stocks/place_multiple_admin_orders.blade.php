@@ -17,15 +17,11 @@
             <input id="days-to-future" class="form-control" placeholder="Ilość dni do przodu">
         </div>
         <div class="mt-5">
-<<<<<<< Updated upstream
-            <label for="firm-id">Nazwa firmy</label>
-=======
             <label for="days-interval">interwal liczenia dla okresów sprzedaży</label>
             <input id="days-interval" class="form-control" value="7" placeholder="interwal liczenia dla okresów sprzedaży">
         </div>
         <div class="mt-5">
             <label for="firm-id">Symbol firmy</label>
->>>>>>> Stashed changes
             <input class="form-control" id="firm-id" type="text">
         </div>
         <div class="mt-5">

@@ -7,6 +7,7 @@ use App\DTO\ChatAuctions\CreateChatAuctionOfferDTO;
 use App\Entities\ChatAuction;
 use App\Entities\ChatAuctionFirm;
 use App\Entities\ChatAuctionOffer;
+use App\Entities\Employees;
 use App\Entities\Firm;
 use App\Exceptions\DeliverAddressNotFoundException;
 use App\Facades\Mailer;
@@ -66,11 +67,16 @@ class ChatAuctionsService
         $variations = $this->productService->getVariations($order);
 
         $firms = $this->getFirms($variations);
+        $employees = [];
 
         foreach ($firms as $firm) {
+            $employees[] = Employees::getAllEmployeesByFirmWithActiveStatus($firm);
+        }
+
+        foreach ($employees as $employee) {
             Mailer::create()
-                ->to($firm->email)
-                ->send(new NotifyFirmAboutAuction($auction, $firm, $this->generateLinkForAuction($auction, $firm)));
+                ->to($employee->email)
+                ->send(new NotifyFirmAboutAuction($auction, $employee, $this->generateLinkForAuction($auction, $employee)));
         }
 
         $auction->update([
