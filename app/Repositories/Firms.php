@@ -14,7 +14,7 @@ class Firms
      * @param String $warehouseSymbol
      * @return Collection
      */
-    public static function getAllProductsForFirm(String $warehouseSymbol): Collection
+    public static function getAllProductsForFirm(string $warehouseSymbol): Collection
     {
         return Product::where('manufacturer', self::getFirmByWarehouseSymbol($warehouseSymbol)->symbol)->with('packing')->get();
     }
@@ -22,10 +22,10 @@ class Firms
     /**
      * Get firm by warehouse symbol
      *
-     * @param $warehouseSymbol
+     * @param string $warehouseSymbol
      * @return Firm
      */
-    public static function getFirmByWarehouseSymbol($warehouseSymbol): Firm
+    public static function getFirmByWarehouseSymbol(string $warehouseSymbol): Firm
     {
         return Warehouse::where('symbol', $warehouseSymbol)->first()->firm;
     }

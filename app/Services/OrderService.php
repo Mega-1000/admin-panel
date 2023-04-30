@@ -37,7 +37,7 @@ class OrderService
         return [
             'calculatedQuantity' => max($orderQuantity, 0),
             'inOneDay' => ProductStockLogs::getTotalQuantityForProductStockInLastDays($dto->productStock, $dto->daysToFuture) / $dto->daysBack,
-            'soldInLastDays' => ProductStockLogs::getTotalQuantityForProductStockInLastDays($dto->productStock, $dto->daysToFuture)
+            'soldInLastDays' => ProductStockLogs::getTotalQuantityForProductStockInLastDays($dto->productStock, $dto->daysToFuture),
         ];
     }
 
