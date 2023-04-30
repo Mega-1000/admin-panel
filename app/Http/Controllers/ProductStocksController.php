@@ -348,15 +348,22 @@ class ProductStocksController extends Controller
      */
     public function calculateMultipleAdminOrders(CalculateMultipleAdminOrder $request, ProductStock $productStock): JsonResponse
     {
-        $products = Firms::getAllProductsForFirm($request->validated('firmSymbol'));
+        $products = empty($request->validated('firmSymbol')) ? Firms::getAllProductsForFirm($request->validated('firmSymbol')) :
+            Product::query()->has('stock.position')->with('packing')->get();
 
         $response = [];
         foreach ($products as $product) {
             $productStock = $product->stock;
+            $orderQuantity = $this->orderService->calculateOrderData(CalculateMultipleAdminOrderDTO::fromRequest($productStock, $request->validated()));
+
+            if ($orderQuantity['calculatedQuantity'] === 0) {
+                continue;
+            }
+
             $response[] = [
                 'productStock' => $productStock,
                 'product' => $product,
-                'orderQuantity' => $this->orderService->calculateOrderData(CalculateMultipleAdminOrderDTO::fromRequest($productStock, $request->validated())),
+                'orderQuantity' => $orderQuantity,
                 'currentQuantity' => $this->orderService->getAllProductsQuantity($productStock->id),
             ];
         }
