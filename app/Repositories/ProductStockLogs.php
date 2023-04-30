@@ -22,4 +22,13 @@ class ProductStockLogs
             ->where('action', 'DELETE')
             ->sum('quantity');
     }
+
+    public static function getTotalQuantityForProductStockPeriod(ProductStock $productStock, int $start, int $end): int
+    {
+        return $productStock->logs()
+            ->where('created_at', '>=', Carbon::now()->subDays($start))
+            ->where('created_at', '<=', Carbon::now()->subDays($end))
+            ->where('action', 'DELETE')
+            ->sum('quantity');
+    }
 }

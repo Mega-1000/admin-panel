@@ -27,14 +27,15 @@ use App\Services\OrderService;
 use App\Services\ProductService;
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Contracts\View\View;
 
 class ProductStocksController extends Controller
 {
@@ -153,7 +154,7 @@ class ProductStocksController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
     public function print()
     {
@@ -287,9 +288,9 @@ class ProductStocksController extends Controller
 
     /**
      * @param ProductStock $productStock
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
-    public function placeAdminSideOrder(ProductStock $productStock): \Illuminate\Contracts\View\View
+    public function placeAdminSideOrder(ProductStock $productStock): View
     {
         return view('product_stocks.place_admin_side_order', compact('productStock'));
     }
@@ -329,9 +330,9 @@ class ProductStocksController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
-    public function placeMultipleAdminSideOrders(Request $request): \Illuminate\Contracts\View\View
+    public function placeMultipleAdminSideOrders(Request $request): View
     {
         return view('product_stocks.place_multiple_admin_orders', [
             'productStocks' => ProductStock::all(),
@@ -365,6 +366,7 @@ class ProductStocksController extends Controller
                 'product' => $product,
                 'orderQuantity' => $orderQuantity,
                 'currentQuantity' => $this->orderService->getAllProductsQuantity($productStock->id),
+                'intervals' => $this->orderService->getProductIntervals($productStock, $request->validated('daysInterval'), $request->validated('daysBack')),
             ];
         }
 
@@ -379,6 +381,17 @@ class ProductStocksController extends Controller
 
         return response()->json([
             'orders' => $order,
+        ]);
+    }
+
+    /**
+     * @param string $data
+     * @return View
+     */
+    public function getProductStockIntervals(string $data): View
+    {
+        return view('product_stocks.interval_chart', [
+            'intervals' => $data,
         ]);
     }
 }
