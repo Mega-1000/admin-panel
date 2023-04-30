@@ -348,7 +348,7 @@ class ProductStocksController extends Controller
      */
     public function calculateMultipleAdminOrders(CalculateMultipleAdminOrder $request, ProductStock $productStock): JsonResponse
     {
-        $products = $request->validated('firmSymbol') ? Firms::getAllProductsForFirm($request->validated('firmSymbol')) :
+        $products = empty($request->validated('firmSymbol')) ? Firms::getAllProductsForFirm($request->validated('firmSymbol')) :
             Product::query()->has('stock.position')->with('packing')->get();
 
         $response = [];
