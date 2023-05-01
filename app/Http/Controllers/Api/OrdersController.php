@@ -241,9 +241,12 @@ class OrdersController extends Controller
 
             $orderAddresses = $order->addresses()->get();
 
-            foreach ($orderAddresses as $orderAddress) {
-                $orderAddress = OrderAddressesService::updateOrderAddressFromCustomer($orderAddress, $customer) ;
+            if (empty($data['cart_token'])) {
+                foreach ($orderAddresses as $orderAddress) {
+                    OrderAddressesService::updateOrderAddressFromCustomer($orderAddress, $customer) ;
+                }
             }
+
 
             $builderData['token'] = $order->getToken();
             return response()->json($builderData);
