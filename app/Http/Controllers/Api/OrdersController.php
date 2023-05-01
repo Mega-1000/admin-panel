@@ -247,7 +247,6 @@ class OrdersController extends Controller
                 }
             }
 
-
             $builderData['token'] = $order->getToken();
             return response()->json($builderData);
         } catch (Exception $e) {
