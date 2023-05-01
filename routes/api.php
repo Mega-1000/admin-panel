@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\StyrofoamTableController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -158,3 +159,5 @@ Route::group(['prefix' => 'working-events', 'as' => 'workingEvents_api.'], __DIR
 Route::group(['prefix' => 'countries', 'as' => 'countries.'], __DIR__ . '/api/CountriesRoutes.php');
 
 Route::get('/orders/{id}/sendOfferToCustomer', 'Api\OrdersController@sendOfferToCustomer')->name('api.orders.sendOfferToCustomer');
+
+Route::get('/styrofoarm/generate-tables/{postalCode}', StyrofoamTableController::class)->name('api.styrofoam.generate-tables');
