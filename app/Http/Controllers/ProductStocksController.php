@@ -19,6 +19,7 @@ use App\Http\Requests\CreateMultipleAdminOrdersRequest;
 use App\Http\Requests\ProductStockUpdateRequest;
 use App\Repositories\Firms;
 use App\Repositories\ProductRepository;
+use App\Repositories\Products;
 use App\Repositories\ProductStockLogRepository;
 use App\Repositories\ProductStockLogs;
 use App\Repositories\ProductStockPositionRepository;
@@ -349,8 +350,9 @@ class ProductStocksController extends Controller
      */
     public function calculateMultipleAdminOrders(CalculateMultipleAdminOrder $request, ProductStock $productStock): JsonResponse
     {
-        $products = empty($request->validated('firmSymbol')) ? Firms::getAllProductsForFirm($request->validated('firmSymbol')) :
-            Product::query()->has('stock.position')->with('packing')->get();
+        $products = empty($request->validated('firmSymbol'))
+            ? Products::getAllProductsWithStock()
+            : Firms::getAllProductsForFirm($request->validated('firmSymbol'));
 
         $response = [];
         foreach ($products as $product) {
