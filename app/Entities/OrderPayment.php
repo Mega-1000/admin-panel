@@ -33,6 +33,15 @@ class OrderPayment extends Model implements Transformable
         'status',
         'token',
         'transaction_id',
+        'external_payment_id',
+        'payer',
+        'operation_date',
+        'tracking_number',
+        'operation_id',
+        'declared_sum',
+        'posting_date',
+        'operation_type',
+        'comments',
     ];
 
     /**
@@ -52,5 +61,14 @@ class OrderPayment extends Model implements Transformable
         'actions',
         'created_at',
         'change_status',
+        'external_payment_id',
+        'payer',
+        'operation_date',
+        'tracking_number',
+        'operation_id',
+        'declared_sum',
+        'posting_date',
+        'operation_type',
+        'comments',
     ];
 }

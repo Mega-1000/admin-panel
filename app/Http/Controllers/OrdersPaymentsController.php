@@ -167,7 +167,7 @@ class OrdersPaymentsController extends Controller
         $orderPaymentAmount = PriceHelper::modifyPriceToValidFormat($request->input('amount'));
         $orderPaymentsSum = $orderPayment->order->payments->sum('amount') - $orderPaymentAmount;
 
-        $this->orderPaymentLogService->create(
+        $payment = $this->orderPaymentLogService->create(
             $orderId,
             $orderPayment->id,
             $orderPayment->order->customer_id,
@@ -177,7 +177,16 @@ class OrdersPaymentsController extends Controller
             $request->input('notices') ?: '',
             $request->input('amount'),
             OrderPaymentLogTypeEnum::ORDER_PAYMENT,
-            true
+            true,
+            $request->validated('external_payment_id'),
+            $request->validated('payer'),
+            $request->validated('operation_date'),
+            $request->validated('tracking_number'),
+            $request->validated('operation_id'),
+            $request->validated('declared_sum'),
+            $request->validated('posting_date'),
+            $request->validated('operation_type'),
+            $request->validated('comments')
         );
 
         return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
@@ -1649,14 +1658,19 @@ class OrdersPaymentsController extends Controller
             AddLabelService::addLabels($orderPayment, [5], $prev, [], Auth::user()->id);
         }
 
-        $payment = $this->repository->update([
+        $updateData = $request->validated();
+        unset($updateData['amount']);
+
+        OrderPayment::query()->find($id)->update([
             'amount' => PriceHelper::modifyPriceToValidFormat($request->input('amount')),
             'notices' => $request->input('notices'),
             'promise' => $promise,
             'promise_date' => $request->input('promise_date'),
             'order_id' => $order_id,
-            'created_at' => $request->input('created_at')
-        ], $id);
+            'created_at' => $request->input('created_at'),
+        ] + $updateData);
+
+        $payment = OrderPayment::query()->find($id);
 
         OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
 

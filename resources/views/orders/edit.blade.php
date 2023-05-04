@@ -1289,6 +1289,15 @@
                 <th>@lang('order_payments.table.promise')</th>
                 <th>@lang('order_payments.table.promise_date')</th>
                 <th>@lang('order_payments.table.created_at')</th>
+                <th>@lang('order_payments.table.external_payment_id')</th>
+                <th>@lang('order_payments.table.payer')</th>
+                <th>@lang('order_payments.table.operation_date')</th>
+                <th>@lang('order_payments.table.tracking_number')</th>
+                <th>@lang('order_payments.table.operation_id')</th>
+                <th>@lang('order_payments.table.declared_sum')</th>
+                <th>@lang('order_payments.table.posting_date')</th>
+                <th>@lang('order_payments.table.operation_type')</th>
+                <th>@lang('order_payments.table.comments')</th>
                 <th>@lang('order_payments.table.actions')</th>
             </tr>
             </thead>
@@ -3210,6 +3219,42 @@
                 {
                     data: 'created_at',
                     name: 'created_at'
+                },
+                {
+                    data: 'external_payment_id',
+                    name: 'external_payment_id',
+                },
+                {
+                    data: 'payer',
+                    name: 'payer',
+                },
+                {
+                    data: 'operation_date',
+                    name: 'operation_date',
+                },
+                {
+                    data: 'tracking_number',
+                    name: 'tracking_number',
+                },
+                {
+                    data: 'operation_id',
+                    name: 'operation_id',
+                },
+                {
+                    data: 'declared_sum',
+                    name: 'declared_sum',
+                },
+                {
+                    data: 'posting_date',
+                    name: 'posting_date',
+                },
+                {
+                    data: 'operation_type',
+                    name: 'operation_type',
+                },
+                {
+                    data: 'comments',
+                    name: 'comments',
                 },
                 {
                     data: 'id',

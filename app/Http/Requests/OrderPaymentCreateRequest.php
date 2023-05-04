@@ -25,6 +25,15 @@ class OrderPaymentCreateRequest extends FormRequest
     {
         return [
             'amount' => 'required|regex:/^\d*([\.,]{1}\d{1,2})?$/',
+            'external_payment_id' => 'nullable|string',
+            'payer' => 'nullable|string',
+            'operation_date' => 'nullable|date',
+            'tracking_number' => 'nullable|string',
+            'operation_id' => 'nullable|string',
+            'declared_sum' => 'nullable|regex:/^\d*([\.,]{1}\d{1,2})?$/',
+            'posting_date' => 'nullable|date',
+            'operation_type' => 'nullable|string',
+            'comments' => 'nullable|string'
         ];
     }
 }

@@ -31,7 +31,16 @@ return [
         'invoice' => 'Faktura',
         'status' => 'Status',
         'return' => 'Zwrot nadpłaty',
-        'order-return' => 'Nadpłata pochodzi z zamówienia:'
+        'order-return' => 'Nadpłata pochodzi z zamówienia:',
+        'external_payment_id' => 'ID zewnetrznych płatności',
+        'payer' => 'Płatnik',
+        'operation_date' => 'Data operacji',
+        'tracking_number' => 'Numer listu przewozowego firmy spedycyjnej',
+        'operation_id' => 'ID platnosci',
+        'declared_sum' => 'Kwota deklarowana',
+        'posting_date' => 'Data księgowania',
+        'operation_type' => 'Typ operacji',
+        'comments' => 'Komentarze',
     ],
     'message' => [
         'store' => 'Płatność została dodana pomyślnie!',
@@ -53,7 +62,15 @@ return [
             'tasks' => 'Zadania',
             'messages' => 'Wiadomości',
             'packages' => 'Przesyłki'
-        ]
+        ],
+        'external_payment_id' => 'ID zewnetrznych płatności',
+        'payer' => 'Płatnik',
+        'operation_date' => 'Data operacji',
+        'tracking_number' => 'Numer listu przewozowego firmy spedycyjnej',
+        'operation_id' => 'ID platnosci',
+        'declared_sum' => 'Kwota deklarowana',
+        'posting_date' => 'Data księgowania',
+        'operation_type' => 'Typ operacji',
+        'comments' => 'Komentarze',
     ],
-
 ];
