@@ -22,15 +22,6 @@ class OrderPaymentLogService
         string $amount,
         string $type,
         bool $sign,
-        ?string $externalPaymentId,
-        ?string $payer,
-        ?string $operationDate,
-        ?string $trackingNumber,
-        ?string $operationId,
-        ?string $declaredSum,
-        ?string $postingDate,
-        ?string $operationType,
-        ?string $comments
     ) {
         return OrderPayment::query()->create([
             'booked_date' => $createdAt,
@@ -43,15 +34,6 @@ class OrderPaymentLogService
             'payment_amount' => PriceHelper::modifyPriceToValidFormat($amount),
             'payment_sum_before_payment' => $clientPaymentAmount,
             'payment_sum_after_payment' => $sign ? $clientPaymentAmount + $orderPaymentAmount : $clientPaymentAmount - $orderPaymentAmount,
-            'external_payment_id' => $externalPaymentId,
-            'payer' => $payer,
-            'operation_date' => $operationDate,
-            'tracking_number' => $trackingNumber,
-            'operation_id' => $operationId,
-            'declared_sum' => $declaredSum,
-            'posting_date' => $postingDate,
-            'operation_type' => $operationType,
-            'comments' => $comments
         ]);
     }
 }
