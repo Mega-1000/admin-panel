@@ -69,45 +69,46 @@
             <div class="form-group">
                 <label for="external_payment_id">@lang('order_payments.form.external_payment_id')</label>
                 <input type="text" class="form-control" id="external_payment_id" name="external_payment_id"
-                       value="{{ old('external_payment_id') }}">
+                       value="{{ $orderPayment->external_payment_id }}">
             </div>
             <div class="form-group">
                 <label for="payer">@lang('order_payments.form.payer')</label>
                 <input type="text" class="form-control" id="payer" name="payer"
-                       value="{{ old('payer') }}">
+                       value="{{ $orderPayment->payer }}">
             </div>
             <div class="form-group">
                 <label for="operation_date">@lang('order_payments.form.operation_date')</label><br/>
-                <input type="datetime" id="operation_date" name="operation_date" value="{{ Carbon\Carbon::now() }}" class="form-control default-date-picker-now">
+                <input type="datetime" id="operation_date" name="operation_date" value="{{ $orderPayment->operation_date }}" class="form-control default-date-picker-now">
             </div>
             <div class="form-group">
                 <label for="tracking_number">@lang('order_payments.form.tracking_number')</label>
                 <input type="text" class="form-control" id="tracking_number" name="tracking_number"
-                       value="{{ old('tracking_number') }}">
+                       value="{{ $orderPayment->tracking_number }}">
             </div>
             <div class="form-group">
                 <label for="operation_id">@lang('order_payments.form.operation_id')</label>
                 <input type="text" class="form-control" id="operation_id" name="operation_id"
-                       value="{{ old('operation_id') }}">
+                       value="{{ $orderPayment->operation_id }}">
             </div>
             <div class="form-group">
                 <label for="declared_sum">@lang('order_payments.form.declared_sum')</label>
                 <input type="text" class="form-control" id="declared_sum" name="declared_sum"
-                       value="{{ old('declared_sum') }}">
+                       value="{{ $orderPayment->declared_sum }}">
             </div>
             <div class="form-group">
                 <label for="posting_date">@lang('order_payments.form.posting_date')</label><br/>
-                <input type="datetime" id="posting_date" name="posting_date" value="{{ Carbon\Carbon::now() }}" class="form-control default-date-picker-now">
+                <input type="datetime" id="posting_date" name="posting_date" value="{{ $orderPayment->posting_date }}" class="form-control default-date-picker-now">
             </div>
             <div class="form-group">
                 <label for="operation_type">@lang('order_payments.form.operation_type')</label>
                 <input type="text" class="form-control" id="operation_type" name="operation_type"
-                       value="{{ old('operation_type') }}">
+                       value="{{ $orderPayment->operation_type }}">
             </div>
             <div class="form-group">
                 <label for="comments">@lang('order_payments.form.comments')</label>
-                <textarea class="form-control" id="comments" name="comments"
-                          value="{{old('comments')}}" rows="5"></textarea>
+                <textarea class="form-control" id="comments" name="comments" rows="5">
+                    {{ $orderPayment->operation_type }}
+                </textarea>
             </div>
         </div>
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
