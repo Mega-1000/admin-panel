@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Entities\ColumnVisibility;
 use App\Entities\Customer;
+use App\Entities\Firm;
 use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\OrderPayment;
@@ -127,7 +128,9 @@ class OrdersPaymentsController extends Controller
         WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_EDIT_EVENT, $id);
         $orderPayment = $this->repository->find($id);
         $customerOrders = $orderPayment->order->customer->orders;
-        return view('orderPayments.edit', compact('orderPayment', 'id', 'customerOrders'));
+        $firms = Firm::all();
+
+        return view('orderPayments.edit', compact('orderPayment', 'id', 'customerOrders', 'firms'));
     }
 
     public function store(OrderPaymentCreateRequest $request)

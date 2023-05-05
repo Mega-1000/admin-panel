@@ -16,6 +16,11 @@
             float: right;
         }
     </style>
+    <!-- Select2 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/css/select2.min.css">
+
+    <!-- Select2 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/js/select2.min.js"></script>
 @endsection
 
 @section('table')
@@ -72,9 +77,13 @@
                        value="{{ $orderPayment->external_payment_id }}">
             </div>
             <div class="form-group">
-                <label for="payer">@lang('order_payments.form.payer')</label>
-                <input type="text" class="form-control" id="payer" name="payer"
-                       value="{{ $orderPayment->payer }}">
+                <select class="select2" data-live-search="true">
+                    <option value="{{ $orderPayment->order()->first()->customer()->first()->login }}">{{ $orderPayment->order()->first()->customer()->first()->login }}</option>
+
+                    @foreach($firms as $firm)
+                        <option value="{{ $firm->symbol }}">{{ $firm->symbol }}</option>
+                    @endforeach
+                </select>
             </div>
             <div class="form-group">
                 <label for="operation_date">@lang('order_payments.form.operation_date')</label><br/>

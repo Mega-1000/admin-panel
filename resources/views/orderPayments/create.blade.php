@@ -70,9 +70,13 @@
                        value="{{ old('external_payment_id') }}">
             </div>
             <div class="form-group">
-                <label for="payer">@lang('order_payments.form.payer')</label>
-                <input type="text" class="form-control" id="payer" name="payer"
-                       value="{{ old('payer') }}">
+                <select class="select2" data-live-search="true">
+                    <option value="{{ $orderPayment->order()->first()->customer()->first()->login }}">{{ $orderPayment->order()->first()->customer()->first()->login }}</option>
+
+                    @foreach($firms as $firm)
+                        <option value="{{ $firm->symbol }}">{{ $firm->symbol }}</option>
+                    @endforeach
+                </select>
             </div>
             <div class="form-group">
                 <label for="operation_date">@lang('order_payments.form.operation_date')</label><br/>
