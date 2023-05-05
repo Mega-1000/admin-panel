@@ -13,6 +13,7 @@ use Prettus\Repository\Traits\TransformableTrait;
  * @property string $delivery_courier_name
  * @property string $service_courier_name
  * @property string $symbol
+ * @property string $status
  *
  * @property ?ShipmentGroup $shipmentGroup
  * @package namespace App\Entities;
@@ -145,5 +146,10 @@ class OrderPackage extends Model implements Transformable
     public function getOurCosts()
     {
         return $this->cost_for_company + $this->cod_cost_for_us;
+    }
+
+    public function orderPayments(): HasMany
+    {
+        return $this->hasMany(OrderPayment::class, 'order_package_id', 'id');
     }
 }
