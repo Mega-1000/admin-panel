@@ -32,11 +32,6 @@
         {{ csrf_field() }}
         <div class="firms-general" id="orderPayment">
             <div class="form-group">
-                <label for="amount">@lang('order_payments.form.amount')</label>
-                <input type="text" class="form-control" id="amount" name="amount"
-                       value="{{ old('amount') }}">
-            </div>
-            <div class="form-group">
                 <label for="payment-type">Typ płatności</label>
                 <select class="form-control" id="payment-type" name="payment-type">
                     <option value="CLIENT">@lang('order_payments.form.client')</option>
@@ -44,15 +39,10 @@
                     <option value="SPEDITION">@lang('order_payments.form.spedition')</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label for="notices">@lang('order_payments.form.notices')</label>
-                <textarea class="form-control" id="notices" name="notices"
-                          value="{{old('notices')}}" rows="5"></textarea>
-            </div>
             @if(Auth::user()->role_id == 3 || Auth::user()->role_id == 2 || Auth::user()->role_id == 1)
-            <div class="form-group">
+            <div class="hidden">
                 <label for="tags">@lang('order_payments.form.promise')</label>
-                <input type="checkbox" id="promise" name="promise">
+                <input type="checkbox" id="promise" name="promise" checked>
             </div>
             @else
                 <div class="form-group">
@@ -65,46 +55,19 @@
                 <input type="datetime" id="promise_date" name="promise_date" value="{{ Carbon\Carbon::now() }}" class="form-control default-date-picker-now">
             </div>
             <div class="form-group">
-                <label for="external_payment_id">@lang('order_payments.form.external_payment_id')</label>
-                <input type="text" class="form-control" id="external_payment_id" name="external_payment_id"
-                       value="{{ old('external_payment_id') }}">
-            </div>
-            <div class="form-group">
-                <select class="select2" data-live-search="true">
-                    <option value="{{ $orderPayment->order()->first()->customer()->first()->login }}">{{ $orderPayment->order()->first()->customer()->first()->login }}</option>
+                Płatnik
+                <select class="select2" data-live-search="true" name="payer">
+                    <option value="{{ $order->customer()->first()->login }}">{{ $order->customer()->first()->login }}</option>
 
                     @foreach($firms as $firm)
                         <option value="{{ $firm->symbol }}">{{ $firm->symbol }}</option>
                     @endforeach
                 </select>
-            </div>
-            <div class="form-group">
-                <label for="operation_date">@lang('order_payments.form.operation_date')</label><br/>
-                <input type="datetime" id="operation_date" name="operation_date" value="{{ Carbon\Carbon::now() }}" class="form-control default-date-picker-now">
-            </div>
-            <div class="form-group">
-                <label for="tracking_number">@lang('order_payments.form.tracking_number')</label>
-                <input type="text" class="form-control" id="tracking_number" name="tracking_number"
-                       value="{{ old('tracking_number') }}">
-            </div>
-            <div class="form-group">
-                <label for="operation_id">@lang('order_payments.form.operation_id')</label>
-                <input type="text" class="form-control" id="operation_id" name="operation_id"
-                       value="{{ old('operation_id') }}">
-            </div>
+            </div>`
             <div class="form-group">
                 <label for="declared_sum">@lang('order_payments.form.declared_sum')</label>
                 <input type="text" class="form-control" id="declared_sum" name="declared_sum"
                        value="{{ old('declared_sum') }}">
-            </div>
-            <div class="form-group">
-                <label for="posting_date">@lang('order_payments.form.posting_date')</label><br/>
-                <input type="datetime" id="posting_date" name="posting_date" value="{{ Carbon\Carbon::now() }}" class="form-control default-date-picker-now">
-            </div>
-            <div class="form-group">
-                <label for="operation_type">@lang('order_payments.form.operation_type')</label>
-                <input type="text" class="form-control" id="operation_type" name="operation_type"
-                       value="{{ old('operation_type') }}">
             </div>
             <div class="form-group">
                 <label for="comments">@lang('order_payments.form.comments')</label>

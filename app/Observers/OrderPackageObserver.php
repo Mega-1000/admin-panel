@@ -18,13 +18,12 @@ class OrderPackageObserver
         // is cash on delivery
         if ($orderPackage->cash_on_delivery) {
             $orderPackage->orderPayments()->create([
-                'amount' => $orderPackage->cash_on_delivery,
+                'declared_sum' => $orderPackage->cash_on_delivery,
                 'type' => 'cash_on_delivery',
                 'status' => 'new',
                 'token' => Str::random(32),
                 'order_id' => $orderPackage->order_id,
                 'tracking_number' => $orderPackage->tracking_number,
-                'payer' => $orderPackage->order->client->name,
             ]);
         }
     }

@@ -16,7 +16,7 @@ class Firms
      */
     public static function getAllProductsForFirm(string $warehouseSymbol): Collection
     {
-        return Product::where('manufacturer', self::getFirmByWarehouseSymbol($warehouseSymbol)->symbol)->with('packing')->get();
+        return Product::query()->where('manufacturer', self::getFirmByWarehouseSymbol($warehouseSymbol)->symbol)->with('packing')->get();
     }
 
     /**

@@ -205,7 +205,10 @@ class OrdersPaymentsController extends Controller
     public function create($id)
     {
         WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_CREATE_EVENT, $id);
-        return view('orderPayments.create', compact('id'));
+        return view('orderPayments.create', compact('id'), [
+            'order' => Order::query()->findorFail($id),
+            'firms' => Firm::all()
+        ]);
     }
 
     // TODO WTF -- 1400 lines of code in one method?
