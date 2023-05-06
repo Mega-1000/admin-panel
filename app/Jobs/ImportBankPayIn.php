@@ -7,6 +7,7 @@ use App\Entities\Order;
 use App\Entities\OrderPayment;
 use App\Entities\Transaction;
 use App\Enums\LabelEventName;
+use App\Enums\OrderTransactionEnum;
 use App\Helpers\PdfCharactersHelper;
 use App\Http\Controllers\OrdersPaymentsController;
 use App\Repositories\TransactionRepository;
@@ -16,7 +17,9 @@ use DateTime;
 use Exception;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Queue\InteractsWithQueue;
@@ -64,16 +67,27 @@ class ImportBankPayIn implements ShouldQueue
      * @param LabelService $labelService
      * @return void
      */
-    public function handle(TransactionRepository $transaction, LabelService $labelService): void
+    /**
+     * Execute the job.
+     *
+     * @param TransactionRepository $transaction
+     * @param LabelService $labelService
+     * @return string
+     */
+    public function handle(TransactionRepository $transaction, LabelService $labelService): string
     {
         $header = NULL;
         $fileName = 'bankTransactionWithoutOrder.csv';
         $file = fopen($fileName, 'w');
 
+        $reportName = 'bankTransactionReport' . date('Y-m-d H:i:s') . '.csv';
+        $reportPath = 'public/reports/' . $reportName;
+        Storage::put($reportPath, '');
+        $report = fopen(storage_path('app/' . $reportPath), 'w');
+
         $this->labelService = $labelService;
         $this->transactionRepository = $transaction;
         $data = array();
-        $i = 0;
         if (($handle = fopen($this->file, 'r')) !== FALSE) {
             while (($row = fgetcsv($handle, 5000, ';')) !== FALSE) {
                 if (count(array_filter($row)) < 5) {
@@ -97,16 +111,23 @@ class ImportBankPayIn implements ShouldQueue
                         $text = iconv('ISO-8859-2', 'UTF-8', $text);
                     }
                     $data[] = array_combine($header, $row);
-                    $i++;
                 }
             }
             fclose($handle);
         }
 
         foreach ($data as $payIn) {
-            $orderId = $this->checkOrderNumberFromTitle($payIn['tytul']);
-            if ($orderId == null) {
+            $orderId = $this->checkOrderNumberFromTitle($payIn['tytul'], $payIn);
+
+            if ($orderId === null) {
                 fputcsv($file, $payIn);
+                continue;
+            }
+
+            if ($orderId === "Brak dopasowania") {
+                continue;
+            } else if ($orderId === "Brak numeru zamówienia") {
+                fputcsv($report, $payIn);
                 continue;
             }
 
@@ -118,14 +139,10 @@ class ImportBankPayIn implements ShouldQueue
             try {
                 if (!empty($order)) {
                     $payIn['kwota'] = (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $payIn['kwota']));
-                    $transaction = $this->saveTransaction($order, $payIn);
-                    if ($transaction === null) {
-                        continue;
-                    }
                     $this->settlePromisePayments($order, $payIn);
                     $orders = $this->getRelatedOrders($order);
 
-                    $this->settleOrders($orders, $transaction);
+                    $this->settleOrders($orders, $payIn);
                 } else {
                     fputcsv($file, $payIn);
                 }
@@ -133,69 +150,78 @@ class ImportBankPayIn implements ShouldQueue
                 Log::notice('Błąd podczas importu: ' . $exception->getMessage(), ['line' => __LINE__, 'file' => __FILE__]);
             }
         }
+
         fclose($file);
-        Storage::disk('local')->put('public/transaction/bankTransactionWithoutOrder' . date('Y-m-d') . '.csv', file_get_contents($fileName));
+        fclose($report);
+
+        Storage::disk('local')
+            ->put('public/transaction/bankTransactionWithoutOrder' . date('Y-m-d') . '.csv', file_get_contents($fileName));
+
+        return Storage::url($reportPath);
     }
 
     /**
      * Search order number.
      *
      * @param string $fileLine Line in csv file.
-     * @return integer|null
+     * @param $payIn
+     * @return int|string|null
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    private function checkOrderNumberFromTitle(string $fileLine): ?int
+    private function checkOrderNumberFromTitle(string $fileLine, $payIn): int|string|null
     {
-        $matches = [];
-        $transactions = str_replace(' ', '', $fileLine);
-        preg_match('/[qQ][qQ](\d{3,5})[qQ][qQ]/', $transactions, $matches);
+        $fileLine = str_replace(' ', '', $fileLine);
+
+        $possibleOperationDescriptions = [
+            'PP/PRZELEW EXPRESS ELIXIR PRZYCH.',
+            'PP/PRZELEW WEWNĘTRZNY PRZYCHODZĄCY',
+            'PP/PRZELEW ZEWNĘTRZNY PRZYCHODZĄCY',
+            'PRZELEW EXPRESS ELIXIR PRZYCH.',
+            'PRZELEW EXPRESSOWY PRZELEW PRZYCH.',
+            'PRZELEW SEPA PRZYCHODZĄCY',
+            'PRZELEW WEWNĘTRZNY PRZYCHODZĄCY',
+            'PRZELEW ZEWNĘTRZNY PRZYCHODZĄCY',
+            'PRZELEW ZEWNĘTRZNY WYCHODZĄCY',
+        ];
+
+         $match = false;
+         foreach ($possibleOperationDescriptions as $possibleOperationDescription) {
+             if (str_contains(implode(" ", (array)$payIn), $possibleOperationDescription)) {
+                $match = true;
+                break;
+             }
+         }
+
+         if ($match === false) {
+            return "Brak dopasowania";
+         }
+
+        // Find order id by searching for "qq" pattern
+        preg_match('/[qQ][qQ](\d{3,5})[qQ][qQ]/', $fileLine, $matches);
         if (count($matches)) {
-            $orderId = $matches[1];
-        } else {
-            $orderId = null;
+            return (int)$matches[1];
         }
 
-        return $orderId;
-    }
+        // Find order id by searching for numeric pattern
+        preg_match_all('/(\d{3,5})/', $fileLine, $matches);
+        if (count($matches[1])) {
+            foreach ($matches[1] as $orderId) {
+                $order = Order::query()->find($orderId);
 
-    /**
-     * Save new transaction
-     *
-     * @param Order $order Order object
-     * @param array $data Additional data
-     * @return ?Transaction
-     *
-     * @throws Exception
-     * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
-     */
-    private function saveTransaction(Order $order, array $data): ?Transaction
-    {
-        $identifier = 'w-' . strtotime($data['data_ksiegowania']) . '-' . $order->id;
-        $existingTransaction = $this->transactionRepository->select()->where('payment_id', '=', $identifier)->first();
-        if ($existingTransaction !== null) {
-            return null;
+                if ($order !== null && $order->getValue() == (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $fileLine))) {
+                    return $order->id;
+                }
+
+                // if order value does not match, throw exception
+                if (!empty($order)) {
+                    return 'Order value does not match';
+                }
+            }
         }
 
-        try {
-            return $this->transactionRepository->create([
-                'customer_id' => $order->customer_id,
-                'posted_in_system_date' => new DateTime(),
-                'posted_in_bank_date' => new DateTime($data['data_ksiegowania']),
-                'payment_id' => $identifier,
-                'kind_of_operation' => 'przelew przychodzący',
-                'order_id' => $order->id,
-                'operator' => 'BANK',
-                'operation_value' => $data['kwota'],
-                'balance' => (float)$this->getCustomerBalance($order->customer_id) + (float)$data['kwota'],
-                'accounting_notes' => '',
-                'transaction_notes' => '',
-                'company_name' => Transaction::NEW_COMPANY_NAME_SYMBOL,
-            ]);
-        } catch (Exception $exception) {
-            Log::notice('Błąd podczas zapisu transakcji: ' . $exception->getMessage(), ['line' => __LINE__, 'file' => __FILE__]);
-            return null;
-        }
+        // No matching order id found
+        return null;
     }
 
     /**
@@ -254,43 +280,26 @@ class ImportBankPayIn implements ShouldQueue
      * Settle orders.
      *
      * @param Collection $orders Orders collection
-     * @param Transaction $transaction Transaction.
+     * @param array $payIn
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    private function settleOrders(Collection $orders, Transaction $transaction): void
+    private function settleOrders(Collection $orders, array $payIn): void
     {
-        $amount = $transaction->operation_value;
         foreach ($orders as $order) {
-            $orderBookedPaymentSum = $order->bookedPaymentsSum();
-            $amountOutstanding = $this->getTotalOrderValue($order) - $orderBookedPaymentSum;
-            if ($amount == 0 || $amountOutstanding == 0) {
-                continue;
-            }
-            if ($amountOutstanding > 0) {
-                if (bccomp($amount, $amountOutstanding, 3) >= 0) {
-                    $paymentAmount = $amountOutstanding;
-                } else {
-                    $paymentAmount = $amount;
-                }
-                $transfer = $this->saveTransfer($order, $transaction, $paymentAmount);
-                if ($order->payments->count() == 0) {
-                    $this->labelService->dispatchLabelEventByNameJob($order->id, LabelEventName::PAYMENT_RECEIVED);
-                    $this->labelService->removeLabel($order->id, [Label::ORDER_FOR_REALISATION]);
-                }
+            $orderPayment = $order->payments()->create([
+                'amount' => $payIn['kwota'],
+                'type' => 'CLIENT',
+                'promise' => '',
+                'payer' => $order->customer()->first()->login,
+                'operation_date' => $payIn['data_ksiegowania'],
+                'created_by' => OrderTransactionEnum::CREATED_BY_BANK,
+                'comments' => implode(" ",$payIn),
+                'operation_type' => 'Wpłata/wypłata bankowa'
+            ]);
 
-                $payment = $order->payments()->create([
-                    'transaction_id' => $transfer->id,
-                    'amount' => $paymentAmount,
-                    'type' => 'CLIENT',
-                    'promise' => '',
-                ]);
-
-                if ($payment instanceof OrderPayment) {
-                    OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
-                }
-
-                $amount -= $paymentAmount;
+            if ($orderPayment->operation_value < 0) {
+                $this->labelService->addLabel($order->id, 98);
             }
         }
     }
@@ -320,7 +329,7 @@ class ImportBankPayIn implements ShouldQueue
      * @param Transaction $transaction
      * @param float $amount
      * @param boolean $back
-     * @return Transaction
+     * @return Transaction|null
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
@@ -328,9 +337,11 @@ class ImportBankPayIn implements ShouldQueue
     {
         $identifier = 'p-' . strtotime($transaction->posted_in_bank_date->format('Y-m-d H:i:s')) . '-' . $order->id;
         $existingTransaction = $this->transactionRepository->select()->where('payment_id', '=', $identifier)->first();
+
         if ($existingTransaction !== null) {
             return null;
         }
+
         return $this->transactionRepository->create([
             'customer_id' => $order->customer_id,
             'posted_in_system_date' => new DateTime(),
@@ -346,3 +357,4 @@ class ImportBankPayIn implements ShouldQueue
         ]);
     }
 }
+

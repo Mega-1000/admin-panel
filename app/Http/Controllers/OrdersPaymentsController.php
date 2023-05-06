@@ -1672,7 +1672,6 @@ class OrdersPaymentsController extends Controller
             'notices' => $request->input('notices'),
             'promise' => $promise,
             'promise_date' => $request->input('promise_date'),
-            'order_id' => $order_id,
             'created_at' => $request->input('created_at'),
         ] + $updateData);
 

@@ -24,6 +24,7 @@ return new class extends Migration
             $table->string('operation_type')->nullable();
             $table->text('comments')->nullable();
             $table->unsignedInteger('order_package_id')->nullable()->comment('ID paczki do której przypisana jest wpłata - obcjonalne');
+            $table->enum('created_by', ['bank', 'manually', 'allegro', 'shipping'])->default('manually')->comment('Kto utworzył wpłatę - obligatoryjne');
         });
     }
 

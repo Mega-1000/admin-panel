@@ -11,7 +11,7 @@ return [
     'table' => [
         'order_id' => 'Numer zlecenia',
         'amount' => 'Kwota',
-        'notices' => 'Uwagi',
+        'notices' => 'Notatki własne',
         'promise' => 'Obietnica wpłaty',
         'promise_date' => 'Data obietnicy wpłaty',
         'actions' => 'Akcje',
@@ -40,7 +40,7 @@ return [
         'declared_sum' => 'Kwota deklarowana',
         'posting_date' => 'Data księgowania',
         'operation_type' => 'Typ operacji',
-        'comments' => 'Komentarze',
+        'comments' => 'Komentarz z dokumentu',
     ],
     'message' => [
         'store' => 'Płatność została dodana pomyślnie!',
@@ -53,7 +53,7 @@ return [
         'warehouse' => 'Płatność magazynu',
         'spedition' => 'Płatność transportu',
         'amount' => 'Kwota',
-        'notices' => 'Uwagi',
+        'notices' => 'Notatki własne',
         'promise' => 'Obietnica wpłaty',
         'promise_date' => 'Data obietnicy wpłaty',
         'buttons' => [
@@ -71,6 +71,6 @@ return [
         'declared_sum' => 'Kwota deklarowana',
         'posting_date' => 'Data księgowania',
         'operation_type' => 'Typ operacji',
-        'comments' => 'Komentarze',
+        'comments' => 'Komentarz z dokumentu',
     ],
 ];
