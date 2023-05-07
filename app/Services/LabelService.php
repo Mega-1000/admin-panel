@@ -5,6 +5,7 @@ namespace App\Services;
 
 use App\Entities\Order;
 use App\Jobs\DispatchLabelEventByNameJob;
+use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,5 +24,13 @@ class LabelService
         /** @var Order $order */
         $order = Order::query()->findOrFail($orderId);
         dispatch(new DispatchLabelEventByNameJob($order, $eventName));
+    }
+
+    public function addLabel(int $orderId, int $labelId): void
+    {
+        /** @var Order $order */
+        $order = Order::query()->findOrFail($orderId);
+        $preventionArray = [];
+        AddLabelService::addLabels($order, [$labelId], $preventionArray, [], Auth::user()->id);
     }
 }

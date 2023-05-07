@@ -8,6 +8,7 @@ use App\Entities\Transaction;
 use App\Http\Controllers\OrdersPaymentsController;
 use App\Repositories\TransactionRepository;
 use App\Services\Label\AddLabelService;
+use Carbon\Carbon;
 use DateTime;
 use Exception;
 use Illuminate\Bus\Queueable;
@@ -76,7 +77,7 @@ class ImportAllegroPayInJob implements ShouldQueue
 
         $this->transactionRepository = $transaction;
         $data = array();
-        $i = 0;
+
         if (($handle = fopen($this->file, 'r')) !== FALSE) {
             while (($row = fgetcsv($handle, 3000, ',')) !== FALSE) {
                 if (!$header) {
@@ -87,7 +88,6 @@ class ImportAllegroPayInJob implements ShouldQueue
                     fputcsv($file, $row);
                 } else {
                     $data[] = array_combine($header, $row);
-                    $i++;
                 }
             }
             fclose($handle);
@@ -98,17 +98,13 @@ class ImportAllegroPayInJob implements ShouldQueue
             if (!in_array($payIn['operacja'], ['wpłata', 'zwrot'])) {
                 continue;
             }
+
             $order = Order::where('allegro_payment_id', '=', $payIn['identyfikator'])->first();
+
             try {
                 if (!empty($order)) {
-                    $transaction = $this->saveTransaction($order, $payIn);
-                    if ($transaction === null) {
-                        continue;
-                    }
                     if ($payIn['operacja'] === 'wpłata') {
-                        $this->settlePromisePayments($order, $payIn);
-                        $orders = $this->getRelatedOrders($order);
-                        $this->settleOrders($orders, $transaction);
+                        $this->settleOrder($order, $payIn);
                     }
                 } else {
                     fputcsv($file, $payIn);
@@ -117,6 +113,7 @@ class ImportAllegroPayInJob implements ShouldQueue
                 Log::notice('Błąd podczas importu: ' . $exception->getMessage(), ['line' => __LINE__]);
             }
         }
+
         fclose($file);
         Storage::disk('local')->put('public/transaction/TransactionWithoutOrders' . date('Y-m-d') . '.csv', file_get_contents($fileName));
     }
@@ -126,7 +123,7 @@ class ImportAllegroPayInJob implements ShouldQueue
      *
      * @param Order $order Order object
      * @param array $data Additional data
-     * @return Transaction
+     * @return Transaction|null
      *
      * @throws Exception
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
@@ -140,7 +137,6 @@ class ImportAllegroPayInJob implements ShouldQueue
                 if (!empty($paymentsToReturn)) {
                     $paymentsToReturn->delete();
                 }
-                $this->saveRefund($order, $existingTransaction, (float)$data['kwota']);
             } else {
                 return null;
             }
@@ -166,6 +162,7 @@ class ImportAllegroPayInJob implements ShouldQueue
      *
      * @param Order $order
      * @param Transaction $transaction
+     * @param float $amount
      * @return Transaction
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
@@ -242,40 +239,29 @@ class ImportAllegroPayInJob implements ShouldQueue
     /**
      * Settle orders.
      *
-     * @param Collection $orders Orders collection
-     * @param Transaction $transaction Transaction.
-     *
+     * @param Order $order
+     * @param $payIn
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    private function settleOrders(Collection $orders, Transaction $transaction): void
+    private function settleOrder(Order $order, $payIn): void
     {
-        $amount = $transaction->operation_value;
-        foreach ($orders as $order) {
-            $orderBookedPaymentSum = $order->bookedPaymentsSum();
-            $amountOutstanding = $this->getTotalOrderValue($order) - $orderBookedPaymentSum;
-            if ($amount == 0 || $amountOutstanding == 0) {
-                continue;
-            }
-            if ($amountOutstanding > 0) {
-                if (bccomp($amount, $amountOutstanding, 3) >= 0) {
-                    $paymentAmount = $amountOutstanding;
-                } else {
-                    $paymentAmount = $amount;
-                }
-                $transfer = $this->saveTransfer($order, $transaction, (float)$paymentAmount);
-                $payment = $order->payments()->create([
-                    'transaction_id' => $transfer->id,
-                    'amount' => $paymentAmount,
-                    'type' => 'CLIENT',
-                    'promise' => '',
-                ]);
+        $declaredSum = $order->payments()->where('amount', $payIn['declared_sum'])->whereNull('deleted_at')->count() >= 1;
+        $order->payments()->where('amount', $payIn['declared_sum'])->whereNull('deleted_at')->update(['status' => 'Rozliczona deklarowana']);
 
-                if ($payment instanceof OrderPayment) {
-                    OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
-                }
+        $payment = $order->payments()->create([
+            'amount' => $payIn['kwota'],
+            'type' => 'CLIENT',
+            'promise' => '',
+            'external_payment_id' => $payIn['identyfikator'],
+            'payer' => $order->customer->login,
+            'operation_date' => Carbon::parse($payIn['data']),
+            'comments' => implode(' ', $payIn),
+            'operation_type' => 'wplata/wyplata allegro',
+            'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
+        ]);
 
-                $amount -= $paymentAmount;
-            }
+        if ($payment instanceof OrderPayment) {
+            OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
         }
     }
 
@@ -304,6 +290,7 @@ class ImportAllegroPayInJob implements ShouldQueue
      *
      * @param Order $order
      * @param Transaction $transaction
+     * @param float $amount
      * @return Transaction
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>

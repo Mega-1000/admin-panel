@@ -148,7 +148,7 @@
                        value="">
             </div>
             <div class="form-group" style="width: 15%; float: left; padding: 5px;">
-                <label for="totalPriceInfo">Suma zamówienia</label>
+                <label for="totalPriceInfo">Watrość zamówienia</label>
                 <input type="text" class="form-control" id="orderValueSum" name="orderValueSum"
                        value="" disabled>
             </div>

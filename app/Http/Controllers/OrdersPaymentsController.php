@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Entities\ColumnVisibility;
 use App\Entities\Customer;
+use App\Entities\Firm;
 use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\OrderPayment;
@@ -127,7 +128,9 @@ class OrdersPaymentsController extends Controller
         WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_EDIT_EVENT, $id);
         $orderPayment = $this->repository->find($id);
         $customerOrders = $orderPayment->order->customer->orders;
-        return view('orderPayments.edit', compact('orderPayment', 'id', 'customerOrders'));
+        $firms = Firm::all();
+
+        return view('orderPayments.edit', compact('orderPayment', 'id', 'customerOrders', 'firms'));
     }
 
     public function store(OrderPaymentCreateRequest $request)
@@ -167,7 +170,7 @@ class OrdersPaymentsController extends Controller
         $orderPaymentAmount = PriceHelper::modifyPriceToValidFormat($request->input('amount'));
         $orderPaymentsSum = $orderPayment->order->payments->sum('amount') - $orderPaymentAmount;
 
-        $this->orderPaymentLogService->create(
+        $payment = $this->orderPaymentLogService->create(
             $orderId,
             $orderPayment->id,
             $orderPayment->order->customer_id,
@@ -177,7 +180,16 @@ class OrdersPaymentsController extends Controller
             $request->input('notices') ?: '',
             $request->input('amount'),
             OrderPaymentLogTypeEnum::ORDER_PAYMENT,
-            true
+            true,
+            $request->validated('external_payment_id'),
+            $request->validated('payer'),
+            $request->validated('operation_date'),
+            $request->validated('tracking_number'),
+            $request->validated('operation_id'),
+            $request->validated('declared_sum'),
+            $request->validated('posting_date'),
+            $request->validated('operation_type'),
+            $request->validated('comments')
         );
 
         return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
@@ -193,7 +205,10 @@ class OrdersPaymentsController extends Controller
     public function create($id)
     {
         WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_CREATE_EVENT, $id);
-        return view('orderPayments.create', compact('id'));
+        return view('orderPayments.create', compact('id'), [
+            'order' => Order::query()->findorFail($id),
+            'firms' => Firm::all()
+        ]);
     }
 
     // TODO WTF -- 1400 lines of code in one method?
@@ -1649,14 +1664,18 @@ class OrdersPaymentsController extends Controller
             AddLabelService::addLabels($orderPayment, [5], $prev, [], Auth::user()->id);
         }
 
-        $payment = $this->repository->update([
+        $updateData = $request->validated();
+        unset($updateData['amount']);
+
+        OrderPayment::query()->find($id)->update([
             'amount' => PriceHelper::modifyPriceToValidFormat($request->input('amount')),
             'notices' => $request->input('notices'),
             'promise' => $promise,
             'promise_date' => $request->input('promise_date'),
-            'order_id' => $order_id,
-            'created_at' => $request->input('created_at')
-        ], $id);
+            'created_at' => $request->input('created_at'),
+        ] + $updateData);
+
+        $payment = OrderPayment::query()->find($id);
 
         OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
 

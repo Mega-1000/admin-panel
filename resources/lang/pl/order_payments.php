@@ -10,8 +10,8 @@ return [
     'show_transaction_history' => 'Wyświetl historię transakcji',
     'table' => [
         'order_id' => 'Numer zlecenia',
-        'amount' => 'Kwota',
-        'notices' => 'Uwagi',
+        'amount' => 'Kwota zaksięgowana',
+        'notices' => 'Notatki własne',
         'promise' => 'Obietnica wpłaty',
         'promise_date' => 'Data obietnicy wpłaty',
         'actions' => 'Akcje',
@@ -31,7 +31,16 @@ return [
         'invoice' => 'Faktura',
         'status' => 'Status',
         'return' => 'Zwrot nadpłaty',
-        'order-return' => 'Nadpłata pochodzi z zamówienia:'
+        'order-return' => 'Nadpłata pochodzi z zamówienia:',
+        'external_payment_id' => 'ID zewnetrznych płatności',
+        'payer' => 'Płatnik',
+        'operation_date' => 'Data operacji',
+        'tracking_number' => 'Numer listu przewozowego firmy spedycyjnej',
+        'operation_id' => 'ID platnosci',
+        'declared_sum' => 'Kwota deklarowana',
+        'posting_date' => 'Data księgowania',
+        'operation_type' => 'Typ operacji',
+        'comments' => 'Komentarz z dokumentu',
     ],
     'message' => [
         'store' => 'Płatność została dodana pomyślnie!',
@@ -43,8 +52,8 @@ return [
         'client' => 'Płatność klienta',
         'warehouse' => 'Płatność magazynu',
         'spedition' => 'Płatność transportu',
-        'amount' => 'Kwota',
-        'notices' => 'Uwagi',
+        'amount' => 'Kwota zaksięgowana',
+        'notices' => 'Notatki własne',
         'promise' => 'Obietnica wpłaty',
         'promise_date' => 'Data obietnicy wpłaty',
         'buttons' => [
@@ -53,7 +62,15 @@ return [
             'tasks' => 'Zadania',
             'messages' => 'Wiadomości',
             'packages' => 'Przesyłki'
-        ]
+        ],
+        'external_payment_id' => 'ID zewnetrznych płatności',
+        'payer' => 'Płatnik',
+        'operation_date' => 'Data operacji',
+        'tracking_number' => 'Numer listu przewozowego firmy spedycyjnej',
+        'operation_id' => 'ID platnosci',
+        'declared_sum' => 'Kwota deklarowana',
+        'posting_date' => 'Data księgowania',
+        'operation_type' => 'Typ operacji',
+        'comments' => 'Komentarz z dokumentu',
     ],
-
 ];

@@ -92,7 +92,12 @@ export default class FileUploader extends Vue {
       kind: this.kind.value
     }
 
-    await this.$store.dispatch('TransactionsService/import', params)
+    const { data } = await this.$store.dispatch('TransactionsService/import', params)
+
+    setTimeout(() => {
+      window.location.replace(data)
+    }, 1000)
+
     if (this.errors.length === 0) {
       window.location.replace('/admin/transactions?kind=' + this.kind.value)
       this.$emit('close')

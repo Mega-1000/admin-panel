@@ -4,19 +4,13 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Entities\OrderPayment;
 use App\Helpers\PriceHelper;
 use App\Repositories\OrderPaymentLogRepository;
 use Illuminate\Support\Facades\Auth;
 
 class OrderPaymentLogService
 {
-    protected $repository;
-
-    public function __construct(OrderPaymentLogRepository $repository)
-    {
-        $this->repository = $repository;
-    }
-
     public function create(
         int $orderId,
         ?int $orderPaymentId,
@@ -27,9 +21,9 @@ class OrderPaymentLogService
         ?string $notices,
         string $amount,
         string $type,
-        bool $sign
-    ) : void {
-        $this->repository->create([
+        bool $sign,
+    ) {
+        return OrderPayment::query()->create([
             'booked_date' => $createdAt,
             'payment_type' => $type,
             'order_payment_id' => $orderPaymentId,

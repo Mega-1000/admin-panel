@@ -16,8 +16,12 @@
             float: right;
         }
     </style>
-@endsection
+    <!-- Select2 CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/css/select2.min.css">
 
+    <!-- Select2 JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.1.0-beta.1/js/select2.min.js"></script>
+@endsection
 @section('table')
     @if ($errors->any())
         <div class="alert alert-danger">
@@ -42,30 +46,57 @@
                 <textarea class="form-control" id="notices" name="notices" rows="5">{{ $orderPayment->notices }}</textarea>
             </div>
             @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 2 || Auth::user()->role_id == 3)
-            <div class="form-group">
+            <div class="hidden">
                 <label for="tags">@lang('order_payments.form.promise')</label>
-                <input type="checkbox" id="promise" value="yes" name="promise" @if($orderPayment->promise == '1') checked="checked" @endif>
+                <input type="checkbox" id="promise" value="yes" name="promise" @if($orderPayment->promise == '1') checked @endif>
             </div>
             @endif
-            <div class="form-group">
-                <label for="order_id">Zmiana zamówienia</label>
-                <select name="order_id" id="order_id" class="form-control">
-                    @foreach($customerOrders as $order)
-                        @if($orderPayment->order_id == $order->id)
-                            <option value="{{ $order->id }}" selected>Zamówienie nr: {{ $order->id }}</option>
-                        @else
-                            <option value="{{ $order->id }}">Zamówienie nr: {{ $order->id }}</option>
-                        @endif
-                    @endforeach
-                </select>
-
-            </div>
             @if(Auth::user()->role_id == 1 || Auth::user()->role_id == 2 || Auth::user()->role_id == 3)
             <div class="form-group">
                 <label for="promise_date">@lang('order_payments.form.promise_date')</label><br/>
                 <input type="text" id="promise_date" name="promise_date" value="{{ $orderPayment->promise_date }}" class="form-control default-date-picker-now">
             </div>
             @endif
+            <div class="form-group">
+                Płatnik
+                <select class="select2" data-live-search="true" name="payer">
+                    <option value="{{ $orderPayment->order()->first()->customer()->first()->login }}">{{ $orderPayment->order()->first()->customer()->first()->login }}</option>
+
+                    @foreach($firms as $firm)
+                        <option value="{{ $firm->symbol }}">{{ $firm->symbol }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="tracking_number">@lang('order_payments.form.tracking_number')</label>
+                <input type="text" class="form-control" id="tracking_number" name="tracking_number"
+                       value="{{ $orderPayment->tracking_number }}">
+            </div>
+            <div class="form-group">
+                <label for="operation_id">@lang('order_payments.form.operation_id')</label>
+                <input type="text" class="form-control" id="operation_id" name="operation_id"
+                       value="{{ $orderPayment->operation_id }}">
+            </div>
+            <div class="form-group">
+                <label for="declared_sum">@lang('order_payments.form.declared_sum')</label>
+                <input type="text" class="form-control" id="declared_sum" name="declared_sum"
+                       value="{{ $orderPayment->declared_sum }}">
+            </div>
+            <div class="form-group">
+                <label for="posting_date">@lang('order_payments.form.posting_date')</label><br/>
+                <input type="datetime" id="posting_date" name="posting_date" value="{{ $orderPayment->posting_date }}" class="form-control default-date-picker-now">
+            </div>
+            <div class="form-group">
+                <label for="operation_type">@lang('order_payments.form.operation_type')</label>
+                <input type="text" class="form-control" id="operation_type" name="operation_type"
+                       value="{{ $orderPayment->operation_type }}">
+            </div>
+            <div class="form-group">
+                <label for="comments">@lang('order_payments.form.comments')</label>
+                <textarea class="form-control" id="comments" name="comments" rows="5">
+                    {{ $orderPayment->operation_type }}
+                </textarea>
+            </div>
         </div>
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
     </form>

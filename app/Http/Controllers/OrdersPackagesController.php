@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
-use App\DTO\Domains\DelivererPackageImport\PriceFormatter;
+use App\Domains\DelivererPackageImport\PriceFormatter;
 use App\Entities\ConfirmPackages;
 use App\Entities\ContainerType;
 use App\Entities\ContentType;

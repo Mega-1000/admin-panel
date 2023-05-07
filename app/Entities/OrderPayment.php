@@ -3,6 +3,7 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
@@ -33,17 +34,31 @@ class OrderPayment extends Model implements Transformable
         'status',
         'token',
         'transaction_id',
+        'external_payment_id',
+        'payer',
+        'operation_date',
+        'tracking_number',
+        'operation_id',
+        'declared_sum',
+        'posting_date',
+        'operation_type',
+        'comments',
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return BelongsTo
      */
-    public function order()
+    public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
-    public $customColumnsVisibilities = [
+    public function getPackageStatus(): string
+    {
+        return $this->order->packages->first()->status;
+    }
+
+    public array $customColumnsVisibilities = [
         'order_id',
         'amount',
         'notices',
@@ -52,5 +67,14 @@ class OrderPayment extends Model implements Transformable
         'actions',
         'created_at',
         'change_status',
+        'external_payment_id',
+        'payer',
+        'operation_date',
+        'tracking_number',
+        'operation_id',
+        'declared_sum',
+        'posting_date',
+        'operation_type',
+        'comments',
     ];
 }

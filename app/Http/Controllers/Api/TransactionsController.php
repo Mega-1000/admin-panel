@@ -300,7 +300,7 @@ class TransactionsController extends Controller
             } catch (\Exception $exception) {
                 $response = [
                     'errorCode' => 500,
-                    'errorMessage' => 'Błąd podczas wczytywania pliku'
+                    'errorMessage' => $exception->getMessage()
                 ];
             }
         }
