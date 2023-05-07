@@ -6,12 +6,10 @@ use App\Entities\Order;
 
 class PayInDTO
 {
-    public $orderId;
-    public $data;
-
-    public function __construct($orderId, $data)
+    public function __construct(
+        public string|int $orderId,
+        public array $data
+    )
     {
-        $this->orderId = $orderId;
-        $this->data = $data;
     }
 }

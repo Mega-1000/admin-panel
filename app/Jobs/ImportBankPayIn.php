@@ -133,7 +133,6 @@ class ImportBankPayIn implements ShouldQueue
             }
 
             $orderId = $payInDto->orderId;
-            $data = $payInDto->data;
 
             $order = Order::find($orderId);
             if ($order == null) {
@@ -219,7 +218,7 @@ class ImportBankPayIn implements ShouldQueue
 
                 // if order value does not match, throw exception
                 if (!empty($order)) {
-                    return 'Order value does not match';
+                    return new PayInDTO('Order value does not match', $payIn);
                 }
             }
         }
