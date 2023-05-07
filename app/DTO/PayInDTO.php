@@ -7,7 +7,7 @@ use App\Entities\Order;
 class PayInDTO
 {
     public function __construct(
-        public string|int $orderId,
+        public string|int $returnedValue,
         public array $data
     )
     {

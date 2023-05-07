@@ -125,14 +125,14 @@ class ImportBankPayIn implements ShouldQueue
                 continue;
             }
 
-            if ($payInDto->orderId === "Brak dopasowania") {
+            if ($payInDto->returnedValue === "Brak dopasowania") {
                 continue;
-            } else if ($payInDto->orderId === "Brak numeru zamówienia") {
+            } else if ($payInDto->returnedValue === "Brak numeru zamówienia") {
                 fputcsv($report, $payIn);
                 continue;
             }
 
-            $orderId = $payInDto->orderId;
+            $orderId = $payInDto->returnedValue;
 
             $order = Order::find($orderId);
             if ($order == null) {
