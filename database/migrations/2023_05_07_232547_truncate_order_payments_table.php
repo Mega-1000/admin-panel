@@ -13,8 +13,8 @@ return new class extends Migration {
     {
         DB::table('order_payments_logs')->delete();
         DB::statement('ALTER TABLE order_payments_logs AUTO_INCREMENT = 1');
-
-        DB::statement('TRUNCATE TABLE order_payments');
+        DB::statement('DELETE FROM order_payments WHERE id > 0');
+        DB::statement('ALTER TABLE order_payments AUTO_INCREMENT = 1');
     }
 
     /**
