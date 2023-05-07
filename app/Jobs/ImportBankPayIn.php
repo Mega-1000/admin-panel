@@ -120,19 +120,19 @@ class ImportBankPayIn implements ShouldQueue
         foreach ($data as $payIn) {
             $payInDto = $this->checkOrderNumberFromTitle($payIn['tytul'], $payIn);
 
-            if ($payInDto === null) {
+            if ($payInDto->orderId === null) {
                 fputcsv($file, $payIn);
                 continue;
             }
 
-            if ($payInDto->returnedValue === "Brak dopasowania") {
+            if ($payInDto->message === "Brak dopasowania") {
                 continue;
-            } else if ($payInDto->returnedValue === "Brak numeru zamówienia") {
+            } else if ($payInDto->message === "Brak numeru zamówienia") {
                 fputcsv($report, $payIn);
                 continue;
             }
 
-            $orderId = $payInDto->returnedValue;
+            $orderId = $payInDto->orderId;
 
             $order = Order::find($orderId);
             if ($order == null) {
@@ -157,8 +157,8 @@ class ImportBankPayIn implements ShouldQueue
         fclose($file);
         fclose($report);
 
-        Storage::disk('local')
-            ->put('public/transaction/bankTransactionWithoutOrder' . date('Y-m-d') . '.csv', file_get_contents($fileName));
+        Storage::disk('bankTransactionWithoutOrderDisk')
+            ->put(date('Y-m-d') . '.csv', file_get_contents($fileName));
 
         return Storage::url($reportPath);
     }
@@ -203,7 +203,11 @@ class ImportBankPayIn implements ShouldQueue
         // Find order id by searching for "qq" pattern
         preg_match('/[qQ][qQ](\d{3,5})[qQ][qQ]/', $fileLine, $matches);
         if (count($matches)) {
-            return new PayInDTO((int)$matches[1], $payIn);
+            return new PayInDTO(
+                orderId: (int)$matches[1],
+                data: $payIn,
+                message: null
+            );
         }
 
         // Find order id by searching for numeric pattern
@@ -218,7 +222,11 @@ class ImportBankPayIn implements ShouldQueue
 
                 // if order value does not match, throw exception
                 if (!empty($order)) {
-                    return new PayInDTO('Order value does not match', $payIn);
+                    return new PayInDTO(
+                        orderId: null,
+                        data: $payIn,
+                        message: 'Order value does not match'
+                    );
                 }
             }
         }
