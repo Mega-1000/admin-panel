@@ -147,7 +147,7 @@ class ImportBankPayIn implements ShouldQueue
                     fputcsv($file, $payIn);
                 }
             } catch (Exception $exception) {
-                Log::notice('Błąd podczas importu: ' . $exception->getMessage(), ['line' => __LINE__, 'file' => __FILE__]);
+                Log::notice('Błąd podczas importu: ' . $exception->getMessage(), ['line' => __LINE__, 'file' => __FILE__, 'error_line' => $exception->getLine()]);
             }
         }
 
@@ -209,7 +209,7 @@ class ImportBankPayIn implements ShouldQueue
             foreach ($matches[1] as $orderId) {
                 $order = Order::query()->find($orderId);
 
-                if ($order !== null && $order->getValue() == (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $fileLine))) {
+                if (!empty($order) && $order->getValue() == (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $fileLine))) {
                     return $order->id;
                 }
 
@@ -271,7 +271,7 @@ class ImportBankPayIn implements ShouldQueue
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    private function getRelatedOrders(Order $order): Collection
+    private function getRelatedOrders(Order $order)
     {
         return Order::where('master_order_id', '=', $order->id)->orWhere('id', '=', $order->id)->get();
     }
@@ -287,6 +287,7 @@ class ImportBankPayIn implements ShouldQueue
     private function settleOrders(Collection $orders, array $payIn): void
     {
         $amount = $payIn['kwota'];
+
         foreach ($orders as $order) {
             $orderBookedPaymentSum = $order->bookedPaymentsSum();
             $amountOutstanding = $this->getTotalOrderValue($order) - $orderBookedPaymentSum;
@@ -295,32 +296,25 @@ class ImportBankPayIn implements ShouldQueue
                 continue;
             }
 
-            if ($amountOutstanding > 0) {
-                if (bccomp($amount, $amountOutstanding, 3) >= 0) {
-                    $paymentAmount = $amountOutstanding;
-                } else {
-                    $paymentAmount = $amount;
-                }
+            $paymentAmount = min($amount, $amountOutstanding);
 
-                $orderPayment = $order->payments()->create([
-                    'amount' => $payIn['kwota'],
-                    'type' => 'CLIENT',
-                    'promise' => '',
-                    'payer' => $order->customer()->first()->login,
-                    'operation_date' => $payIn['data_ksiegowania'],
-                    'created_by' => OrderTransactionEnum::CREATED_BY_BANK,
-                    'comments' => implode(" ",$payIn),
-                    'operation_type' => 'Wpłata/wypłata bankowa'
-                ]);
+            $orderPayment = $order->payments()->create([
+                'amount' => $paymentAmount,
+                'type' => 'CLIENT',
+                'promise' => '',
+                'payer' => $order->customer()->first()->login,
+                'operation_date' => $payIn['data_ksiegowania'],
+                'created_by' => OrderTransactionEnum::CREATED_BY_BANK,
+                'comments' => implode(" ", $payIn),
+                'operation_type' => 'Wpłata/wypłata bankowa'
+            ]);
 
-                if ($orderPayment instanceof OrderPayment) {
-                    OrdersPaymentsController::dispatchLabelsForPaymentAmount($orderPayment);
-                }
-
-                $amount -= $paymentAmount;
+            if ($orderPayment instanceof OrderPayment) {
+                OrdersPaymentsController::dispatchLabelsForPaymentAmount($orderPayment);
             }
         }
     }
+
 
     /**
      * @param Order $order

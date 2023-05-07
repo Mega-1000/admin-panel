@@ -19,7 +19,7 @@ class OrderPaymentObserver
         foreach ($orderPayment->order->addresses as $orderAddress) {
             if (!(new OrderAddressService())->addressIsValid($orderAddress)) {
                 $loopPresentationArray = [];
-                AddLabelService::addLabels($orderPayment->order, [184], $loopPresentationArray, [], Auth::user()->id);
+                AddLabelService::addLabels($orderPayment->order, [184], $loopPresentationArray, [], Auth::user()?->id);
             }
         }
     }
