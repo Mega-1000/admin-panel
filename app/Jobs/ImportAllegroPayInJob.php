@@ -239,21 +239,25 @@ class ImportAllegroPayInJob implements ShouldQueue
     /**
      * Settle orders.
      *
-     * @param Collection $orders Orders collection
+     * @param Order $order
      * @param $payIn
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
     private function settleOrder(Order $order, $payIn): void
     {
+        $declaredSum = $order->payments()->where('amount', $payIn['declared_sum'])->whereNull('deleted_at')->count() >= 1;
+        $order->payments()->where('amount', $payIn['declared_sum'])->whereNull('deleted_at')->update(['status' => 'Rozliczona deklarowana']);
+
         $payment = $order->payments()->create([
             'amount' => $payIn['kwota'],
             'type' => 'CLIENT',
             'promise' => '',
-            'external_id' => $payIn['identyfikator'],
+            'external_payment_id' => $payIn['identyfikator'],
             'payer' => $order->customer->login,
             'operation_date' => Carbon::parse($payIn['data']),
             'comments' => implode(' ', $payIn),
-            'operation_type' => 'wplata/wyplata allegro'
+            'operation_type' => 'wplata/wyplata allegro',
+            'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
         ]);
 
         if ($payment instanceof OrderPayment) {
