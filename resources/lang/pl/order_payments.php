@@ -10,7 +10,7 @@ return [
     'show_transaction_history' => 'Wyświetl historię transakcji',
     'table' => [
         'order_id' => 'Numer zlecenia',
-        'amount' => 'Kwota',
+        'amount' => 'Kwota zaksięgowana',
         'notices' => 'Notatki własne',
         'promise' => 'Obietnica wpłaty',
         'promise_date' => 'Data obietnicy wpłaty',
@@ -52,7 +52,7 @@ return [
         'client' => 'Płatność klienta',
         'warehouse' => 'Płatność magazynu',
         'spedition' => 'Płatność transportu',
-        'amount' => 'Kwota',
+        'amount' => 'Kwota zaksięgowana',
         'notices' => 'Notatki własne',
         'promise' => 'Obietnica wpłaty',
         'promise_date' => 'Data obietnicy wpłaty',

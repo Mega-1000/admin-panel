@@ -286,20 +286,38 @@ class ImportBankPayIn implements ShouldQueue
      */
     private function settleOrders(Collection $orders, array $payIn): void
     {
+        $amount = $payIn['kwota'];
         foreach ($orders as $order) {
-            $orderPayment = $order->payments()->create([
-                'amount' => $payIn['kwota'],
-                'type' => 'CLIENT',
-                'promise' => '',
-                'payer' => $order->customer()->first()->login,
-                'operation_date' => $payIn['data_ksiegowania'],
-                'created_by' => OrderTransactionEnum::CREATED_BY_BANK,
-                'comments' => implode(" ",$payIn),
-                'operation_type' => 'Wpłata/wypłata bankowa'
-            ]);
+            $orderBookedPaymentSum = $order->bookedPaymentsSum();
+            $amountOutstanding = $this->getTotalOrderValue($order) - $orderBookedPaymentSum;
 
-            if ($orderPayment->operation_value < 0) {
-                $this->labelService->addLabel($order->id, 98);
+            if ($amount == 0 || $amountOutstanding == 0) {
+                continue;
+            }
+
+            if ($amountOutstanding > 0) {
+                if (bccomp($amount, $amountOutstanding, 3) >= 0) {
+                    $paymentAmount = $amountOutstanding;
+                } else {
+                    $paymentAmount = $amount;
+                }
+
+                $orderPayment = $order->payments()->create([
+                    'amount' => $payIn['kwota'],
+                    'type' => 'CLIENT',
+                    'promise' => '',
+                    'payer' => $order->customer()->first()->login,
+                    'operation_date' => $payIn['data_ksiegowania'],
+                    'created_by' => OrderTransactionEnum::CREATED_BY_BANK,
+                    'comments' => implode(" ",$payIn),
+                    'operation_type' => 'Wpłata/wypłata bankowa'
+                ]);
+
+                if ($orderPayment instanceof OrderPayment) {
+                    OrdersPaymentsController::dispatchLabelsForPaymentAmount($orderPayment);
+                }
+
+                $amount -= $paymentAmount;
             }
         }
     }
