@@ -157,7 +157,7 @@ class ImportBankPayIn implements ShouldQueue
         fclose($file);
         fclose($report);
 
-        Storage::disk('bankTransactionWithoutOrderDisk')
+        Storage::disk('transactionsDisk')
             ->put(date('Y-m-d') . '.csv', file_get_contents($fileName));
 
         return Storage::url($reportPath);

@@ -67,7 +67,7 @@ return [
             'visibility' => 'public',
         ],
 
-        'bankTransactionWithoutOrderDisk' => [
+        'transactionsDisk' => [
             'driver' => 'local',
             'root' => storage_path('app/public' . env('BANK_TRANSACTION_WITHOUT_ORDER_PATH', '/transaction/bankTransactionWithoutOrder')),
             'visibility' => 'public',
