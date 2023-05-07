@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\DTO\PayInDTO;
 use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\OrderPayment;
@@ -117,19 +118,22 @@ class ImportBankPayIn implements ShouldQueue
         }
 
         foreach ($data as $payIn) {
-            $orderId = $this->checkOrderNumberFromTitle($payIn['tytul'], $payIn);
+            $payInDto = $this->checkOrderNumberFromTitle($payIn['tytul'], $payIn);
 
-            if ($orderId === null) {
+            if ($payInDto === null) {
                 fputcsv($file, $payIn);
                 continue;
             }
 
-            if ($orderId === "Brak dopasowania") {
+            if ($payInDto->orderId === "Brak dopasowania") {
                 continue;
-            } else if ($orderId === "Brak numeru zamówienia") {
+            } else if ($payInDto->orderId === "Brak numeru zamówienia") {
                 fputcsv($report, $payIn);
                 continue;
             }
+
+            $orderId = $payInDto->orderId;
+            $data = $payInDto->data;
 
             $order = Order::find($orderId);
             if ($order == null) {
@@ -165,11 +169,11 @@ class ImportBankPayIn implements ShouldQueue
      *
      * @param string $fileLine Line in csv file.
      * @param $payIn
-     * @return int|string|null
+     * @return PayInDTO|null
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    private function checkOrderNumberFromTitle(string $fileLine, $payIn): int|string|null
+    private function checkOrderNumberFromTitle(string $fileLine, $payIn): ?PayInDTO
     {
         $fileLine = str_replace(' ', '', $fileLine);
 
@@ -193,14 +197,14 @@ class ImportBankPayIn implements ShouldQueue
              }
          }
 
-         if ($match === false) {
-            return "Brak dopasowania";
-         }
+        if ($match === false) {
+            return null;
+        }
 
         // Find order id by searching for "qq" pattern
         preg_match('/[qQ][qQ](\d{3,5})[qQ][qQ]/', $fileLine, $matches);
         if (count($matches)) {
-            return (int)$matches[1];
+            return new PayInDTO((int)$matches[1], $payIn);
         }
 
         // Find order id by searching for numeric pattern
