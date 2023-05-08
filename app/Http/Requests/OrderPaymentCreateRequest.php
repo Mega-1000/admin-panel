@@ -24,7 +24,7 @@ class OrderPaymentCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'amount' => 'required|regex:/^\d*([\.,]{1}\d{1,2})?$/',
+            'amount' => 'nullable|regex:/^\d*([\.,]{1}\d{1,2})?$/',
             'external_payment_id' => 'nullable|string',
             'payer' => 'nullable|string',
             'operation_date' => 'nullable|date',
