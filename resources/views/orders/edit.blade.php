@@ -4919,6 +4919,9 @@
                 selectedArea == area ? $(this).show() : $(this).hide();
             });
             scrollBottom();
+            $('html, body').scrollTop(
+                $('.chat-preview').offset().top - 50
+            );
         }
 
         filterMessages();

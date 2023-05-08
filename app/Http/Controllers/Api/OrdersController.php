@@ -243,7 +243,7 @@ class OrdersController extends Controller
 
             if (empty($data['cart_token'])) {
                 foreach ($orderAddresses as $orderAddress) {
-                    OrderAddressesService::updateOrderAddressFromCustomer($orderAddress, $customer) ;
+                    OrderAddressesService::updateOrderAddressFromCustomer($orderAddress, $customer);
                 }
             }
 

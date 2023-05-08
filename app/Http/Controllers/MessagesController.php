@@ -154,6 +154,7 @@ class MessagesController extends Controller
         $chatEmployees = $chatUsers->pluck('employee')->filter();
         $chatCustomers = $chatUsers->pluck('customer')->filter();
         $chatConsultants = $chatUsers->pluck('user')->filter();
+        $chatBlankUser = $chatUsers->whereNull('user_id')->whereNull('customer_id')->whereNull('employee_id')->first();
 
         $currentCustomersIdsOnChat = $chatCustomers->pluck('id');
         $currentEmployeesIdsOnChat = $chatEmployees->pluck('id');
@@ -215,6 +216,7 @@ class MessagesController extends Controller
             'userType' => $helper->currentUserType,
             'chatCustomers' => $chatCustomers,
             'chatEmployees' => $chatEmployees,
+            'chatBlankUser' => $chatBlankUser,
             'firmWithComplaintEmails' => $firmWithComplaintEmails,
             'chatConsultants' => $chatConsultants,
             'chat' => $chat,

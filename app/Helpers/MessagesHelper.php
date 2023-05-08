@@ -383,9 +383,9 @@ class MessagesHelper
                 $chat->order->save();
             }
             if ($chatUser->user) {
-                $this->setChatLabel($chat, true);
+                $this->setChatLabel($chat, true, $area);
             } else {
-                $this->setChatLabel($chat, false);
+                $this->setChatLabel($chat, false, $area);
             }
             if ($this->currentUserType == self::TYPE_CUSTOMER) {
                 $loopPrevention = [];
@@ -396,7 +396,7 @@ class MessagesHelper
                     ['added_type' => Label::CHAT_TYPE],
                     Auth::user()?->id
                 );
-            } else if (isset(Auth::user()->id)) {
+            } else if (isset(Auth::user()->id) && $area == 0) {
                 $loopPrevention = [];
                 RemoveLabelService::removeLabels(
                     $chat->order, [self::MESSAGE_YELLOW_LABEL_ID],
@@ -562,15 +562,18 @@ class MessagesHelper
             );
     }
 
-    private function setChatLabel(Chat $chat, bool $clearDanger = false): void
+    private function setChatLabel(Chat $chat, bool $clearDanger = false, int $area = 0): void
     {
+        
         if ($clearDanger) {
             $total = Chat::where('order_id', $chat->order->id)->where('need_intervention', true)->count();
             if ($total <= 1 && $chat->need_intervention) {
                 $chat->order->labels()->detach(MessagesHelper::MESSAGE_RED_LABEL_ID);
             }
         }
-        OrderLabelHelper::setBlueLabel($chat);
+        if($area == 0) {
+            OrderLabelHelper::setBlueLabel($chat);
+        }
     }
 
     /**
@@ -586,7 +589,7 @@ class MessagesHelper
         if ($order) {
             return 'Czat dotyczy zamówienia nr <b>' . $order->id . '</b>';
         }
-        return 'Czat ogólny z administracją mega1000';
+        return 'EPH Polska';
     }
 
     private function clearIntervention($chat)

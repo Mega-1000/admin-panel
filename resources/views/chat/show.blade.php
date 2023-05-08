@@ -107,7 +107,7 @@
                         </div>
                     </div>
                 </div>
-                @if (is_a(Auth::user(), \App\User::class))
+                @if ($userType == MessagesHelper::TYPE_USER)
                     <button id="call-worker" class="btn bg-primary call-button">Wyślij maila pracownikom</button>
                 @else
                     <button id="call-mod" class="btn bg-primary call-button">Wezwij moderatora</button>
@@ -282,8 +282,11 @@
                 $('.message-row').each(function() {
                     const chatUserId = String($(this).data('user-id'));
                     const area = String($(this).data('area'));
+                    const selectedArea = $('#area').val();
 
-                    usersHistoryFilter.has(chatUserId) && selectedArea == area ? $(this).show() : $(this).hide();
+                    if(chatUserId != '{{ $chatBlankUser?->id }}' || selectedArea != 0) {
+                        usersHistoryFilter.has(chatUserId) && selectedArea == area ? $(this).show() : $(this).hide();
+                    }
                 });
                 scrollBottom();
             }
@@ -319,10 +322,15 @@
                 filterMessages();
             });
 
+            var nextRefresh = $.now() + 3000;
+            var refreshRate = 1;
+            var running = false;
+
             $('#message').focus();
 
             $('.send-btn').click(async e => {
                 e.preventDefault();
+                running = true;
                 $('#new-message').addClass('loader-2');
                 var message = $('#message').val();
                 $('#message').val('');
@@ -353,13 +361,11 @@
                 $('#attachment').val('');
                 refreshRate = 1;
                 nextRefresh = 0;
+                running = false;
             });
-
-            var nextRefresh = $.now() + 3000;
-            var refreshRate = 1;
-            var running = false;
-
+            
             setInterval(getMessages, 500);
+            scrollBottom();
 
             function getMessages() {
                 if (running || $.now() < nextRefresh) {

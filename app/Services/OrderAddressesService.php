@@ -27,10 +27,10 @@ class OrderAddressesService
      * @param string $type
      * @param Customer $customer
      *
-     * @return Model|HasMany
+     * @return null|CustomerAddress
      * @throws Exception
      */
-    private static function getUserAddress(string $type, Customer $customer): CustomerAddress
+    private static function getUserAddress(string $type, Customer $customer): ?CustomerAddress
     {
         self::checkAddressType($type);
 
@@ -41,12 +41,15 @@ class OrderAddressesService
      * @param Customer $customer
      * @param OrderAddress $orderAddress
      *
-     * @return OrderAddress
+     * @return null|OrderAddress
      * @throws Exception
      */
-    public static function updateOrderAddressFromCustomer(OrderAddress $orderAddress, Customer $customer): OrderAddress
+    public static function updateOrderAddressFromCustomer(OrderAddress $orderAddress, Customer $customer): ?OrderAddress
     {
         $customerAddress = self::getUserAddress($orderAddress->type, $customer);
+
+        if($customerAddress === null) return null;
+
         unset($customerAddress->customer_id);
 
         $orderAddress->fill($customerAddress->toArray());
