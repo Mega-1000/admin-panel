@@ -172,7 +172,7 @@ class ImportBankPayIn implements ShouldQueue
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    private function checkOrderNumberFromTitle(string $fileLine, $payIn): ?PayInDTO
+    private function checkOrderNumberFromTitle(string $fileLine, $payIn): PayInDTO
     {
         $fileLine = str_replace(' ', '', $fileLine);
 
@@ -197,7 +197,11 @@ class ImportBankPayIn implements ShouldQueue
          }
 
         if ($match === false) {
-            return null;
+            return new PayInDTO(
+                orderId: null,
+                data: $payIn,
+                message: null
+            );
         }
 
         // Find order id by searching for "qq" pattern
@@ -217,7 +221,11 @@ class ImportBankPayIn implements ShouldQueue
                 $order = Order::query()->find($orderId);
 
                 if (!empty($order) && $order->getValue() == (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $fileLine))) {
-                    return $order->id;
+                    return new PayInDTO(
+                        orderId: (int)$order->id,
+                        data: $payIn,
+                        message: null
+                    );
                 }
 
                 // if order value does not match, throw exception
