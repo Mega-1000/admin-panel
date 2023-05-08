@@ -120,15 +120,15 @@ class ImportBankPayIn implements ShouldQueue
         foreach ($data as $payIn) {
             $payInDto = $this->checkOrderNumberFromTitle($payIn['tytul'], $payIn);
 
-            if ($payInDto->orderId === null) {
-                fputcsv($file, $payIn);
-                continue;
-            }
-
             if ($payInDto->message === "Brak dopasowania") {
                 continue;
             } else if ($payInDto->message === "Brak numeru zamówienia") {
                 fputcsv($report, $payIn);
+                continue;
+            }
+
+            if ($payInDto->orderId === null) {
+                fputcsv($file, $payIn);
                 continue;
             }
 
@@ -139,6 +139,7 @@ class ImportBankPayIn implements ShouldQueue
                 fputcsv($file, $payIn);
                 continue;
             }
+
             try {
                 if (!empty($order)) {
                     $payIn['kwota'] = (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $payIn['kwota']));
@@ -168,7 +169,7 @@ class ImportBankPayIn implements ShouldQueue
      *
      * @param string $fileLine Line in csv file.
      * @param $payIn
-     * @return PayInDTO|null
+     * @return PayInDTO
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
@@ -200,7 +201,7 @@ class ImportBankPayIn implements ShouldQueue
             return new PayInDTO(
                 orderId: null,
                 data: $payIn,
-                message: null
+                message: 'Brak dopasowania',
             );
         }
 
@@ -210,7 +211,7 @@ class ImportBankPayIn implements ShouldQueue
             return new PayInDTO(
                 orderId: (int)$matches[1],
                 data: $payIn,
-                message: null
+                message: null,
             );
         }
 
@@ -240,7 +241,11 @@ class ImportBankPayIn implements ShouldQueue
         }
 
         // No matching order id found
-        return null;
+        return new PayInDTO(
+            orderId: null,
+            data: $payIn,
+            message: null,
+        );
     }
 
     /**
