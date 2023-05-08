@@ -245,8 +245,8 @@ class ImportAllegroPayInJob implements ShouldQueue
      */
     private function settleOrder(Order $order, $payIn): void
     {
-        $declaredSum = $order->payments()->where('amount', $payIn['declared_sum'])->whereNull('deleted_at')->count() >= 1;
-        $order->payments()->where('amount', $payIn['declared_sum'])->whereNull('deleted_at')->update(['status' => 'Rozliczona deklarowana']);
+        $declaredSum = $order->payments()->where('declared_sum', $payIn['kwota'])->whereNull('deleted_at')->count() >= 1;
+        $order->payments()->where('declared_sum', $payIn['kwota'])->whereNull('deleted_at')->update(['status' => 'Rozliczona deklarowana']);
 
         $payment = $order->payments()->create([
             'amount' => $payIn['kwota'],
