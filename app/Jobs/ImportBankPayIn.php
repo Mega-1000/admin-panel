@@ -179,9 +179,9 @@ class ImportBankPayIn implements ShouldQueue
 
         $possibleOperationDescriptions = [
             'PP/PRZELEW EXPRESS ELIXIR PRZYCH.',
-            'PP/PRZELEW WEWNĘTRZNY PSYCHODRAMA',
-            'PP/PRZELEW ZEWNĘTRZNY PSYCHODRAMA',
-            'PRZELEW EXPRESS ELIXIR PREACHY.',
+            'PP/PRZELEW WEWNĘTRZNY PRZYCHODZĄCY',
+            'PP/PRZELEW ZEWNĘTRZNY PRZYCHODZĄCY',
+            'PRZELEW EXPRESS ELIXIR PRZYCH.',
             'PRZELEW EXPRESSOWY PRZELEW PRZYCH.',
             'PRZELEW SEPA PRZYCHODZĄCY',
             'PRZELEW WEWNĘTRZNY PRZYCHODZĄCY',
