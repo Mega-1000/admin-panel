@@ -171,7 +171,7 @@ class OrdersPaymentsController extends Controller
         $orderPaymentAmount = PriceHelper::modifyPriceToValidFormat($request->input('declared_sum'));
         $orderPaymentsSum = $orderPayment->order->payments->sum('declared_sum') - $orderPaymentAmount;
 
-        $payment = $this->orderPaymentLogService->create(
+        $this->orderPaymentLogService->create(
             $orderId,
             $orderPayment->id,
             $orderPayment->order->customer_id,
@@ -179,18 +179,9 @@ class OrdersPaymentsController extends Controller
             $orderPaymentAmount,
             $request->input('created_at') ?: Carbon::now(),
             $request->input('notices') ?: '',
-            $request->input('declared_sum'),
+            $request->input('declared_sum') ?? 0,
             OrderPaymentLogTypeEnum::ORDER_PAYMENT,
             true,
-            $request->validated('external_payment_id'),
-            $request->validated('payer'),
-            $request->validated('operation_date'),
-            $request->validated('tracking_number'),
-            $request->validated('operation_id'),
-            $request->validated('declared_sum'),
-            $request->validated('posting_date'),
-            $request->validated('operation_type'),
-            $request->validated('comments')
         );
 
         return redirect()->route('orders.edit', ['order_id' => $orderId])->with([

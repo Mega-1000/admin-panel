@@ -83,10 +83,9 @@ class OrderPaymentService
             }
         }
 
-        $payment = $this->orderPaymentRepository->create([
+        $payment = $order->payments()->create([
             'amount' => PriceHelper::modifyPriceToValidFormat($amount),
             'master_payment_id' => $masterPaymentId ?: null,
-            'order_id' => $orderId,
             'promise' => $promise,
             'promise_date' => $promiseDate ?: null,
             'type' => $type,
