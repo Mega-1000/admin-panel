@@ -193,7 +193,7 @@ class ImportBankPayIn implements ShouldQueue
         foreach ($possibleOperationDescriptions as &$description) {
             $description = iconv('UTF-8', 'ASCII//TRANSLIT', $description);
         }
-        unset($description); // Remove reference to the last element
+        unset($description);
 
 
         $match = false;
