@@ -190,7 +190,7 @@ class ImportBankPayIn implements ShouldQueue
             'PRZELEW ZEWNĘTRZNY WYCHODZĄCY',
         ];
 
-         $match = false;
+        $match = false;
          foreach ($possibleOperationDescriptions as $possibleOperationDescription) {
              if (str_contains(implode(" ", (array)$payIn), $possibleOperationDescription)) {
                 $match = true;

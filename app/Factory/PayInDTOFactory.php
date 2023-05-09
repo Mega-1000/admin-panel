@@ -7,13 +7,10 @@ use App\DTO\PayInDTO;
 class PayInDTOFactory
 {
     /**
-     * @param int|null $orderId
-     * @param array $data
-     * @param string|null $message
-     *
+     * @param array $options
      * @return PayInDTO
      */
-    public static function createPayInDTO(array $options = []): PayInDTO
+    public static function createPayInDTO(array $options): PayInDTO
     {
         $orderId = $options['orderId'] ?? null;
         $data = $options['data'];
