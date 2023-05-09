@@ -212,13 +212,15 @@ class ImportBankPayIn implements ShouldQueue
             );
         }
 
-        // Find order id by searching for "qq" pattern
-        preg_match('/[qQ][qQ](\d{3,5})[qQ][qQ]/', $fileLine, $matches);
-        if (count($matches)) {
+        // Find order id by searching for "qq" and "zz" pattern
+        $pattern1 = '/[qQ][qQ](\d{3,5})[qQ][qQ]/';
+        $pattern2 = '/[zZ][zZ](\d{3,5})[zZ][zZ]/';
+
+        if (preg_match($pattern1, $fileLine, $matches) || preg_match($pattern2, $fileLine, $matches)) {
             return new PayInDTO(
                 orderId: (int)$matches[1],
                 data: $payIn,
-                message: null,
+                message: null
             );
         }
 
@@ -329,6 +331,9 @@ class ImportBankPayIn implements ShouldQueue
 
             $paymentAmount = min($amount, $amountOutstanding);
 
+            $declaredSum = $order->payments()->where('declared_sum', $payIn['kwota'])->whereNull('deleted_at')->count() >= 1;
+            $order->payments()->where('declared_sum', $payIn['kwota'])->whereNull('deleted_at')->update(['status' => 'Rozliczona deklarowana']);
+
             $orderPayment = $order->payments()->create([
                 'amount' => $paymentAmount,
                 'type' => 'CLIENT',
@@ -337,7 +342,8 @@ class ImportBankPayIn implements ShouldQueue
                 'operation_date' => $payIn['data_ksiegowania'],
                 'created_by' => OrderTransactionEnum::CREATED_BY_BANK,
                 'comments' => implode(" ", $payIn),
-                'operation_type' => 'Wpłata/wypłata bankowa'
+                'operation_type' => 'Wpłata/wypłata bankowa',
+                'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
             ]);
 
             if ($orderPayment instanceof OrderPayment) {
