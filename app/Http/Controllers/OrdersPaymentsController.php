@@ -1830,7 +1830,7 @@ class OrdersPaymentsController extends Controller
             $orderPayment->master_payment_id,
             $orderPayment->order->customer_id,
             $orderPayment->order->payments->sum('amount') ?? 0,
-            $orderPayment->amount,
+            $orderPayment->amount ?? 0,
             Carbon::now(),
             '',
             $orderPayment->amount,
