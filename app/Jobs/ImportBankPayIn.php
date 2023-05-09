@@ -177,33 +177,33 @@ class ImportBankPayIn implements ShouldQueue
     {
         $fileLine = str_replace(' ', '', $fileLine);
 
-//        $possibleOperationDescriptions = [
-//            'PP/PRZELEW EXPRESS ELIXIR PRZYCH.',
-//            'PP/PRZELEW WEWNĘTRZNY PRZYCHODZĄCY',
-//            'PP/PRZELEW ZEWNĘTRZNY PRZYCHODZĄCY',
-//            'PRZELEW EXPRESS ELIXIR PRZYCH.',
-//            'PRZELEW EXPRESSOWY PRZELEW PRZYCH.',
-//            'PRZELEW SEPA PRZYCHODZĄCY',
-//            'PRZELEW WEWNĘTRZNY PRZYCHODZĄCY',
-//            'PRZELEW ZEWNĘTRZNY PRZYCHODZĄCY',
-//            'PRZELEW ZEWNĘTRZNY WYCHODZĄCY',
-//        ];
+        $possibleOperationDescriptions = [
+            'PP/PRZELEW EXPRESS ELIXIR PRZYCH.',
+            'PP/PRZELEW WEWNĘTRZNY PSYCHODRAMA',
+            'PP/PRZELEW ZEWNĘTRZNY PSYCHODRAMA',
+            'PRZELEW EXPRESS ELIXIR PREACHY.',
+            'PRZELEW EXPRESSOWY PRZELEW PRZYCH.',
+            'PRZELEW SEPA PRZYCHODZĽCY',
+            'PRZELEW WEWNĘTRZNY PRZYCHODZĽCY',
+            'PRZELEW ZEWNĘTRZNY PRZYCHODZĽCY',
+            'PRZELEW ZEWNĘTRZNY WYCHODZĽCY',
+        ];
 
-//         $match = true;
-//         foreach ($possibleOperationDescriptions as $possibleOperationDescription) {
-//             if (str_contains(implode(" ", (array)$payIn), $possibleOperationDescription)) {
-//                $match = true;
-//                break;
-//             }
-//         }
+         $match = false;
+         foreach ($possibleOperationDescriptions as $possibleOperationDescription) {
+             if ($payIn['opis_operacji']) {
+                $match = true;
+                break;
+             }
+         }
 
-//        if ($match === false) {
-//            return new PayInDTO(
-//                orderId: null,
-//                data: $payIn,
-//                message: 'Brak dopasowania',
-//            );
-//        }
+        if ($match === false) {
+            return new PayInDTO(
+                orderId: null,
+                data: $payIn,
+                message: 'Brak dopasowania',
+            );
+        }
 
         // Find order id by searching for "qq" pattern
         preg_match('/[qQ][qQ](\d{3,5})[qQ][qQ]/', $fileLine, $matches);
