@@ -191,14 +191,14 @@ class ImportBankPayIn implements ShouldQueue
 
 
         foreach ($possibleOperationDescriptions as &$description) {
-            $description = iconv('UTF-8', 'ASCII//TRANSLIT', $description);
+            $description = str_replace('Ą', 'Ľ', $description);
         }
         unset($description);
 
 
         $match = false;
          foreach ($possibleOperationDescriptions as $possibleOperationDescription) {
-             if ($payIn['opis_operacji']) {
+             if ($payIn['opis_operacji'] === $possibleOperationDescription) {
                 $match = true;
                 break;
              }
