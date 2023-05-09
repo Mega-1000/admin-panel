@@ -1815,11 +1815,11 @@ class OrdersPaymentsController extends Controller
         $orderPayment = $this->repository->find($id);
 
         if ($orderPayment->master_payment_id != NULL) {
-            $payment = $this->paymentRepository->find($orderPayment->master_payment_id);
+            $payment = OrderPayment::query()->where('id', $orderPayment->master_payment_id)->first();
             $payment->update([
                 'amount_left' => $payment->amount_left + $orderPayment->amount,
             ]);
-            $clientPaymentAmount = $this->customerRepository->find($orderPayment->order->customer_id)->payments->sum('amount_left');
+            $clientPaymentAmount = Customer::query()->where('id', $orderPayment->order->customer_id)->first()?->payments?->sum('amount_left') ?? 0;
             $this->orderPaymentLogService->create(
                 $orderPayment->order_id,
                 $orderPayment->master_payment_id,
@@ -1838,7 +1838,7 @@ class OrdersPaymentsController extends Controller
             $orderPayment->order_id,
             $orderPayment->master_payment_id,
             $orderPayment->order->customer_id,
-            $orderPayment->order->payments->sum('amount'),
+            $orderPayment->order->payments->sum('amount') ?? 0,
             $orderPayment->amount,
             Carbon::now(),
             '',
