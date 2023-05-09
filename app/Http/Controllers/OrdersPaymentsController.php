@@ -1833,7 +1833,7 @@ class OrdersPaymentsController extends Controller
             $orderPayment->amount ?? 0,
             Carbon::now(),
             '',
-            $orderPayment->amount,
+            $orderPayment->amount ?? '0',
             OrderPaymentLogTypeEnum::REMOVE_PAYMENT,
             false
         );
