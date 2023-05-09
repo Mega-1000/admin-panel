@@ -179,7 +179,7 @@ class OrdersPaymentsController extends Controller
             $orderPaymentAmount,
             $request->input('created_at') ?: Carbon::now(),
             $request->input('notices') ?: '',
-            $request->input('declared_sum', '0'),
+            $request->input('declared_sum', '0') ?? '0',
             OrderPaymentLogTypeEnum::ORDER_PAYMENT,
             true,
         );
