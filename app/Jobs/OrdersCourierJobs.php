@@ -175,7 +175,7 @@ class OrdersCourierJobs extends Job implements ShouldQueue
                 die;
         }
 
-        if (!empty($result['is_error'])) {
+        if (!empty($result['is_error']) || $result === null) {
             return;
         }
 

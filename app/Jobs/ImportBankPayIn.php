@@ -120,15 +120,15 @@ class ImportBankPayIn implements ShouldQueue
         foreach ($data as $payIn) {
             $payInDto = $this->checkOrderNumberFromTitle($payIn['tytul'], $payIn);
 
-            if ($payInDto->orderId === null) {
-                fputcsv($file, $payIn);
-                continue;
-            }
-
             if ($payInDto->message === "Brak dopasowania") {
                 continue;
             } else if ($payInDto->message === "Brak numeru zamówienia") {
                 fputcsv($report, $payIn);
+                continue;
+            }
+
+            if ($payInDto->orderId === null) {
+                fputcsv($file, $payIn);
                 continue;
             }
 
@@ -139,6 +139,7 @@ class ImportBankPayIn implements ShouldQueue
                 fputcsv($file, $payIn);
                 continue;
             }
+
             try {
                 if (!empty($order)) {
                     $payIn['kwota'] = (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $payIn['kwota']));
@@ -168,11 +169,11 @@ class ImportBankPayIn implements ShouldQueue
      *
      * @param string $fileLine Line in csv file.
      * @param $payIn
-     * @return PayInDTO|null
+     * @return PayInDTO
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    private function checkOrderNumberFromTitle(string $fileLine, $payIn): ?PayInDTO
+    private function checkOrderNumberFromTitle(string $fileLine, $payIn): PayInDTO
     {
         $fileLine = str_replace(' ', '', $fileLine);
 
@@ -197,7 +198,11 @@ class ImportBankPayIn implements ShouldQueue
          }
 
         if ($match === false) {
-            return null;
+            return new PayInDTO(
+                orderId: null,
+                data: $payIn,
+                message: 'Brak dopasowania',
+            );
         }
 
         // Find order id by searching for "qq" pattern
@@ -206,7 +211,7 @@ class ImportBankPayIn implements ShouldQueue
             return new PayInDTO(
                 orderId: (int)$matches[1],
                 data: $payIn,
-                message: null
+                message: null,
             );
         }
 
@@ -217,7 +222,11 @@ class ImportBankPayIn implements ShouldQueue
                 $order = Order::query()->find($orderId);
 
                 if (!empty($order) && $order->getValue() == (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $fileLine))) {
-                    return $order->id;
+                    return new PayInDTO(
+                        orderId: (int)$order->id,
+                        data: $payIn,
+                        message: null
+                    );
                 }
 
                 // if order value does not match, throw exception
@@ -232,7 +241,11 @@ class ImportBankPayIn implements ShouldQueue
         }
 
         // No matching order id found
-        return null;
+        return new PayInDTO(
+            orderId: null,
+            data: $payIn,
+            message: null,
+        );
     }
 
     /**

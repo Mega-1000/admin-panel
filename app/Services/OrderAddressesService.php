@@ -41,20 +41,18 @@ class OrderAddressesService
      * @param Customer $customer
      * @param OrderAddress $orderAddress
      *
-     * @return null|OrderAddress
      * @throws Exception
      */
-    public static function updateOrderAddressFromCustomer(OrderAddress $orderAddress, Customer $customer): ?OrderAddress
+    public static function updateOrderAddressFromCustomer(OrderAddress $orderAddress, Customer $customer): void
     {
         $customerAddress = self::getUserAddress($orderAddress->type, $customer);
-
-        if($customerAddress === null) return null;
+        if ($customerAddress === null) {
+            return;
+        }
 
         unset($customerAddress->customer_id);
 
         $orderAddress->fill($customerAddress->toArray());
         $orderAddress->save();
-
-        return $orderAddress;
     }
 }
