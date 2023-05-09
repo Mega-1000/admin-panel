@@ -189,9 +189,16 @@ class ImportBankPayIn implements ShouldQueue
             'PRZELEW ZEWNĘTRZNY WYCHODZĄCY',
         ];
 
-         $match = false;
+
+        foreach ($possibleOperationDescriptions as &$description) {
+            $description = str_replace('Ą', 'Ľ', $description);
+        }
+        unset($description);
+
+
+        $match = false;
          foreach ($possibleOperationDescriptions as $possibleOperationDescription) {
-             if (str_contains(implode(" ", (array)$payIn), $possibleOperationDescription)) {
+             if ($payIn['opis_operacji'] === $possibleOperationDescription) {
                 $match = true;
                 break;
              }

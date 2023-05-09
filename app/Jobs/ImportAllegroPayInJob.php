@@ -248,6 +248,12 @@ class ImportAllegroPayInJob implements ShouldQueue
         $declaredSum = $order->payments()->where('declared_sum', $payIn['kwota'])->whereNull('deleted_at')->count() >= 1;
         $order->payments()->where('declared_sum', $payIn['kwota'])->whereNull('deleted_at')->update(['status' => 'Rozliczona deklarowana']);
 
+        $existingPayment = OrderPayment::where('external_payment_id', $payIn['identyfikator'])->first();
+
+        if (!empty($existingPayment)) {
+            $existingPayment->delete();
+        }
+
         $payment = $order->payments()->create([
             'amount' => $payIn['kwota'],
             'type' => 'CLIENT',
