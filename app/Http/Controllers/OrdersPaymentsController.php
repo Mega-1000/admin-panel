@@ -161,7 +161,7 @@ class OrdersPaymentsController extends Controller
 
         $promiseDate = $request->input('promise_date') ?: '';
 
-        $orderPayment = $this->orderPaymentService->payOrder($orderId, $request->input('declared_sum') ?? 0,
+        $orderPayment = $this->orderPaymentService->payOrder($orderId, $request->input('declared_sum', '0'),
             $masterPaymentId, $promise,
             $chooseOrder, $promiseDate,
             $type, $isWarehousePayment
@@ -179,7 +179,7 @@ class OrdersPaymentsController extends Controller
             $orderPaymentAmount,
             $request->input('created_at') ?: Carbon::now(),
             $request->input('notices') ?: '',
-            $request->input('declared_sum') ?? 0,
+            $request->input('declared_sum', '0'),
             OrderPaymentLogTypeEnum::ORDER_PAYMENT,
             true,
         );
