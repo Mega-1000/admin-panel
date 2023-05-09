@@ -183,13 +183,20 @@ class ImportBankPayIn implements ShouldQueue
             'PP/PRZELEW ZEWNĘTRZNY PSYCHODRAMA',
             'PRZELEW EXPRESS ELIXIR PREACHY.',
             'PRZELEW EXPRESSOWY PRZELEW PRZYCH.',
-            'PRZELEW SEPA PRZYCHODZĽCY',
-            'PRZELEW WEWNĘTRZNY PRZYCHODZĽCY',
-            'PRZELEW ZEWNĘTRZNY PRZYCHODZĽCY',
-            'PRZELEW ZEWNĘTRZNY WYCHODZĽCY',
+            'PRZELEW SEPA PRZYCHODZĄCY',
+            'PRZELEW WEWNĘTRZNY PRZYCHODZĄCY',
+            'PRZELEW ZEWNĘTRZNY PRZYCHODZĄCY',
+            'PRZELEW ZEWNĘTRZNY WYCHODZĄCY',
         ];
 
-         $match = false;
+
+        foreach ($possibleOperationDescriptions as &$description) {
+            $description = iconv('UTF-8', 'ASCII//TRANSLIT', $description);
+        }
+        unset($description); // Remove reference to the last element
+
+
+        $match = false;
          foreach ($possibleOperationDescriptions as $possibleOperationDescription) {
              if ($payIn['opis_operacji']) {
                 $match = true;
