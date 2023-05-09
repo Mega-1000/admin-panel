@@ -41,15 +41,16 @@ class OrderPaymentService
         $this->orderPaymentMailService = $orderPaymentMailService;
     }
 
+    // TODO TYPOWANIA POPRAWIć!!!
     public function payOrder(
-        int    $orderId,
-        string $amount,
-               $masterPaymentId,
-        string $promise,
-               $chooseOrder,
-        string $promiseDate,
-        string $type = null,
-        bool   $isWarehousePayment = null
+        int     $orderId,
+        string  $amount,
+        ?string $masterPaymentId,
+        string  $promise,
+                $chooseOrder,
+        string  $promiseDate,
+        string  $type = null,
+        bool    $isWarehousePayment = null
     ): OrderPayment
     {
         $order = $this->orderRepository->find($orderId);

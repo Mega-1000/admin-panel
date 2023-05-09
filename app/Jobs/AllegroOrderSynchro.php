@@ -333,7 +333,7 @@ class AllegroOrderSynchro implements ShouldQueue
         } elseif ($deliveryAddress['phoneNumber'] !== null && Helper::phoneIsCorrect($deliveryAddress['phoneNumber'])) {
             $customerPhone = $deliveryAddress['phoneNumber'];
         } else {
-            throw new Exception('wrong_phone');
+            throw new Exception('No or incorrect phone number ' . PHP_EOL . ' Buyer phone number: ' . ($buyer['phoneNumber'] ?? '') . PHP_EOL . 'Delivery address phone number: ' . ($deliveryAddress['phoneNumber'] ?? ''));
         }
 
         $customerPhone = str_replace('+48', '', $customerPhone);

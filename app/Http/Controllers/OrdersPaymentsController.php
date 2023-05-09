@@ -133,6 +133,7 @@ class OrdersPaymentsController extends Controller
         return view('orderPayments.edit', compact('orderPayment', 'id', 'customerOrders', 'firms'));
     }
 
+    // TODO CAŁA TE METODA DO POPRAWIENIA, VALIDATED + poprawienie zasad, względem logiki, pozwalamy na nullable ale już ich nie obsługujemy
     public function store(OrderPaymentCreateRequest $request)
     {
         $order_id = $request->input('order_id');
@@ -160,15 +161,15 @@ class OrdersPaymentsController extends Controller
 
         $promiseDate = $request->input('promise_date') ?: '';
 
-        $orderPayment = $this->orderPaymentService->payOrder($orderId, $request->input('amount'),
+        $orderPayment = $this->orderPaymentService->payOrder($orderId, $request->input('declared_sum') ?? 0,
             $masterPaymentId, $promise,
             $chooseOrder, $promiseDate,
             $type, $isWarehousePayment
         );
 
 
-        $orderPaymentAmount = PriceHelper::modifyPriceToValidFormat($request->input('amount'));
-        $orderPaymentsSum = $orderPayment->order->payments->sum('amount') - $orderPaymentAmount;
+        $orderPaymentAmount = PriceHelper::modifyPriceToValidFormat($request->input('declared_sum'));
+        $orderPaymentsSum = $orderPayment->order->payments->sum('declared_sum') - $orderPaymentAmount;
 
         $payment = $this->orderPaymentLogService->create(
             $orderId,
@@ -178,7 +179,7 @@ class OrdersPaymentsController extends Controller
             $orderPaymentAmount,
             $request->input('created_at') ?: Carbon::now(),
             $request->input('notices') ?: '',
-            $request->input('amount'),
+            $request->input('declared_sum'),
             OrderPaymentLogTypeEnum::ORDER_PAYMENT,
             true,
             $request->validated('external_payment_id'),
@@ -1668,12 +1669,12 @@ class OrdersPaymentsController extends Controller
         unset($updateData['amount']);
 
         OrderPayment::query()->find($id)->update([
-            'amount' => PriceHelper::modifyPriceToValidFormat($request->input('amount')),
-            'notices' => $request->input('notices'),
-            'promise' => $promise,
-            'promise_date' => $request->input('promise_date'),
-            'created_at' => $request->input('created_at'),
-        ] + $updateData);
+                'amount' => PriceHelper::modifyPriceToValidFormat($request->input('amount')),
+                'notices' => $request->input('notices'),
+                'promise' => $promise,
+                'promise_date' => $request->input('promise_date'),
+                'created_at' => $request->input('created_at'),
+            ] + $updateData);
 
         $payment = OrderPayment::query()->find($id);
 
