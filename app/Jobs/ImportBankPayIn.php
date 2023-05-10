@@ -196,7 +196,7 @@ class ImportBankPayIn implements ShouldQueue
         unset($description);
 
 
-        $match = false;
+         $match = false;
          foreach ($possibleOperationDescriptions as $possibleOperationDescription) {
              if ($payIn['opis_operacji'] === $possibleOperationDescription) {
                 $match = true;
@@ -213,15 +213,19 @@ class ImportBankPayIn implements ShouldQueue
         }
 
         // Find order id by searching for "qq" and "zz" pattern
-        $pattern1 = '/[qQ][qQ](\d{3,5})[qQ][qQ]/';
-        $pattern2 = '/[zZ][zZ](\d{3,5})[zZ][zZ]/';
+        $patterns = [
+            '/[qQ][qQ](\d{3,5})[qQ][qQ]/',
+            '/[zZ][zZ](\d{3,5})[zZ][zZ]/'
+        ];
 
-        if (preg_match($pattern1, $fileLine, $matches) || preg_match($pattern2, $fileLine, $matches)) {
-            return new PayInDTO(
-                orderId: (int)$matches[1],
-                data: $payIn,
-                message: null
-            );
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $fileLine, $matches)) {
+                return new PayInDTO(
+                    orderId: (int)$matches[1],
+                    data: $payIn,
+                    message: null
+                );
+            }
         }
 
         // Find order id by searching for numeric pattern
