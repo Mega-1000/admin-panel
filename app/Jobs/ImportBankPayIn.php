@@ -12,6 +12,7 @@ use App\Enums\OrderTransactionEnum;
 use App\Factory\PayInDTOFactory;
 use App\Helpers\PdfCharactersHelper;
 use App\Http\Controllers\OrdersPaymentsController;
+use App\Integrations\Pocztex\paczkaPocztowaPLUSType;
 use App\Repositories\OrderPayments;
 use App\Repositories\TransactionRepository;
 use App\Services\Label\AddLabelService;
@@ -124,6 +125,8 @@ class ImportBankPayIn implements ShouldQueue
             } else if ($payInDto->message === "Brak numeru zamówienia") {
                 fputcsv($report, $payIn);
                 continue;
+            } else if ($payIn->mesage === "/[zZ][zZ](\d{3,5})[zZ][zZ]/") {
+                $payIn['kwota'] *= -1;
             }
 
             if ($payInDto->orderId === null) {
@@ -219,7 +222,7 @@ class ImportBankPayIn implements ShouldQueue
                 return new PayInDTO(
                     orderId: (int)$matches[1],
                     data: $payIn,
-                    message: null
+                    message: $pattern
                 );
             }
         }
