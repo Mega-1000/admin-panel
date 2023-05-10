@@ -1995,7 +1995,7 @@
                             let totalOfDeclaredPayments = 0;
                             let totalofWarehousePayments = 0;
                             let settledDeclared = 0;
-                            var payments = row['payments'];
+                            const payments = row['payments'];
 
                             for (let index = 0; index < payments.length; index++) {
                                 if (payments[index].promise === '1' && payments[index].deleted_at !== null) {
