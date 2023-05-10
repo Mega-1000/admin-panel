@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use App\Repositories\Chats;
 
 class MessagesController extends Controller
 {
@@ -154,7 +155,7 @@ class MessagesController extends Controller
         $chatEmployees = $chatUsers->pluck('employee')->filter();
         $chatCustomers = $chatUsers->pluck('customer')->filter();
         $chatConsultants = $chatUsers->pluck('user')->filter();
-        $chatBlankUser = $chatUsers->whereNull('user_id')->whereNull('customer_id')->whereNull('employee_id')->first();
+        $chatBlankUser = Chats::getBlankChatUser($chatUsers);
 
         $currentCustomersIdsOnChat = $chatCustomers->pluck('id');
         $currentEmployeesIdsOnChat = $chatEmployees->pluck('id');

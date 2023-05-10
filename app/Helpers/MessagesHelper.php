@@ -589,7 +589,7 @@ class MessagesHelper
         if ($order) {
             return 'Czat dotyczy zamówienia nr <b>' . $order->id . '</b>';
         }
-        return 'EPH Polska';
+        return config('app.name');
     }
 
     private function clearIntervention($chat)

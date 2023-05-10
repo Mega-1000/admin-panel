@@ -284,7 +284,7 @@
                     const area = String($(this).data('area'));
                     const selectedArea = $('#area').val();
 
-                    if(chatUserId != '{{ $chatBlankUser?->id }}' || selectedArea != 0) {
+                    if((chatUserId && chatUserId != '{{ $chatBlankUser?->id }}') || selectedArea != 0) {
                         usersHistoryFilter.has(chatUserId) && selectedArea == area ? $(this).show() : $(this).hide();
                     }
                 });
