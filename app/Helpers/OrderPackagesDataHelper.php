@@ -54,7 +54,7 @@ class OrderPackagesDataHelper extends DateHelper
      */
     public function findFreeShipmentDate(OrderPackage $orderPackage): OrderPackage
     {
-        $customerShipmentDateFrom = $orderPackage->order->dates->customer_shipment_date_from;
+        $customerShipmentDateFrom = $orderPackage->order->dates?->customer_shipment_date_from;
         $shipmentDate = Carbon::make($orderPackage->shipment_date);
 
         if (file_exists(storage_path('app/public/protocols/day-close-protocol-' . $orderPackage->delivery_courier_name . '-' . Carbon::today()->toDateString() . '.pdf'))) {
