@@ -9,6 +9,7 @@ use App\Entities\OrderPayment;
 use App\Entities\Transaction;
 use App\Enums\LabelEventName;
 use App\Enums\OrderTransactionEnum;
+use App\Factory\PayInDTOFactory;
 use App\Helpers\PdfCharactersHelper;
 use App\Http\Controllers\OrdersPaymentsController;
 use App\Repositories\TransactionRepository;
@@ -189,12 +190,10 @@ class ImportBankPayIn implements ShouldQueue
             'PRZELEW ZEWNĘTRZNY WYCHODZĄCY',
         ];
 
-
         foreach ($possibleOperationDescriptions as &$description) {
             $description = str_replace('Ą', 'Ľ', $description);
         }
         unset($description);
-
 
         $match = false;
          foreach ($possibleOperationDescriptions as $possibleOperationDescription) {
@@ -205,21 +204,19 @@ class ImportBankPayIn implements ShouldQueue
          }
 
         if ($match === false) {
-            return new PayInDTO(
-                orderId: null,
-                data: $payIn,
-                message: 'Brak dopasowania',
-            );
+            return PayInDTOFactory::createPayInDTO([
+                'data' => $payIn,
+                'message' => 'Brak dopasowania',
+            ]);
         }
 
         // Find order id by searching for "qq" pattern
         preg_match('/[qQ][qQ](\d{3,5})[qQ][qQ]/', $fileLine, $matches);
         if (count($matches)) {
-            return new PayInDTO(
-                orderId: (int)$matches[1],
-                data: $payIn,
-                message: null,
-            );
+            return PayInDTOFactory::createPayInDTO([
+                'orderId' => (int)$matches[1],
+                'data' => $payIn,
+            ]);
         }
 
         // Find order id by searching for numeric pattern
@@ -229,30 +226,26 @@ class ImportBankPayIn implements ShouldQueue
                 $order = Order::query()->find($orderId);
 
                 if (!empty($order) && $order->getValue() == (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $fileLine))) {
-                    return new PayInDTO(
-                        orderId: (int)$order->id,
-                        data: $payIn,
-                        message: null
-                    );
+                    return PayInDTOFactory::createPayInDTO([
+                        'orderId' => (int)$order->id,
+                        'data' => $payIn,
+                    ]);
                 }
 
                 // if order value does not match, throw exception
                 if (!empty($order)) {
-                    return new PayInDTO(
-                        orderId: null,
-                        data: $payIn,
-                        message: 'Order value does not match'
-                    );
+                    return PayInDTOFactory::createPayInDTO([
+                        'data' => $payIn,
+                        'message' => 'Brak dopasowania',
+                    ]);
                 }
             }
         }
 
         // No matching order id found
-        return new PayInDTO(
-            orderId: null,
-            data: $payIn,
-            message: null,
-        );
+        return PayInDTOFactory::createPayInDTO([
+            'data' => $payIn,
+        ]);
     }
 
     /**
