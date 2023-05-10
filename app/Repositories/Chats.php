@@ -46,4 +46,16 @@ class Chats
 
         return $chatsNeedIntervention;
     }
+    /**
+     * Get blank user, can only be one blank user per chat
+     *
+     * @param  Collection    $chatUsers
+     *
+     * @return ChatUser|null $blankChatUser
+     */
+    public static function getBlankChatUser(Collection $chatUsers): ?ChatUser {
+        $blankChatUser = $chatUsers->whereNull('user_id')->whereNull('customer_id')->whereNull('employee_id')->first();
+
+        return $blankChatUser;
+    }
 }
