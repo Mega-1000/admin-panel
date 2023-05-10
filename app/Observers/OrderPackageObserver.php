@@ -16,7 +16,7 @@ class OrderPackageObserver
     public function created(OrderPackage $orderPackage): void
     {
         // is cash on delivery
-        if ($orderPackage->cash_on_delivery) {
+        if ($orderPackage->cash_on_delivery > 0) {
             $orderPackage->orderPayments()->create([
                 'declared_sum' => $orderPackage->cash_on_delivery,
                 'type' => 'cash_on_delivery',
