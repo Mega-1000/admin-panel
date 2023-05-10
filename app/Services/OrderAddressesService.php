@@ -27,7 +27,7 @@ class OrderAddressesService
      * @param string $type
      * @param Customer $customer
      *
-     * @return Model|HasMany
+     * @return null|CustomerAddress
      * @throws Exception
      */
     private static function getUserAddress(string $type, Customer $customer): ?CustomerAddress
