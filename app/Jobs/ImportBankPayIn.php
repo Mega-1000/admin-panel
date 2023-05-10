@@ -11,6 +11,7 @@ use App\Enums\LabelEventName;
 use App\Enums\OrderTransactionEnum;
 use App\Helpers\PdfCharactersHelper;
 use App\Http\Controllers\OrdersPaymentsController;
+use App\Repositories\OrderPayments;
 use App\Repositories\TransactionRepository;
 use App\Services\Label\AddLabelService;
 use App\Services\LabelService;
@@ -335,8 +336,8 @@ class ImportBankPayIn implements ShouldQueue
 
             $paymentAmount = min($amount, $amountOutstanding);
 
-            $declaredSum = $order->payments()->where('declared_sum', $payIn['kwota'])->whereNull('deleted_at')->count() >= 1;
-            $order->payments()->where('declared_sum', $payIn['kwota'])->whereNull('deleted_at')->update(['status' => 'Rozliczona deklarowana']);
+            $declaredSum = OrderPayments::getCountOfPaymentsWithDeclaredSumFromOrder($order, $payIn) >= 1;
+            OrderPayments::updatePaymentsStatusWithDeclaredSumFromOrder($order, $payIn);
 
             $orderPayment = $order->payments()->create([
                 'amount' => $paymentAmount,
