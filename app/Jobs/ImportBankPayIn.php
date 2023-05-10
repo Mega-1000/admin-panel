@@ -12,7 +12,6 @@ use App\Enums\OrderTransactionEnum;
 use App\Factory\PayInDTOFactory;
 use App\Helpers\PdfCharactersHelper;
 use App\Http\Controllers\OrdersPaymentsController;
-use App\Integrations\Pocztex\paczkaPocztowaPLUSType;
 use App\Repositories\OrderPayments;
 use App\Repositories\TransactionRepository;
 use App\Services\Label\AddLabelService;
