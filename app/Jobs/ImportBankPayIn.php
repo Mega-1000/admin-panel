@@ -107,9 +107,6 @@ class ImportBankPayIn implements ShouldQueue
                     $header = $row;
                     fputcsv($file, $row);
                 } else {
-                    if (!str_contains($row[2], 'PRZYCH')) {
-                        continue;
-                    }
                     foreach ($row as &$text) {
                         $text = iconv('ISO-8859-2', 'UTF-8', $text);
                     }
@@ -285,7 +282,7 @@ class ImportBankPayIn implements ShouldQueue
      */
     private function settlePromisePayments(Order $order, array $payIn): void
     {
-        foreach ($order->payments()->where('promise', '=', '1')->whereNull('deleted_at')->get() as $payment) {
+        foreach ($order->payments()->where('promise', '1')->whereNull('deleted_at')->get() as $payment) {
             if ($payIn['kwota'] === (float)$payment->amount) {
                 $payment->delete();
             } else {
@@ -303,7 +300,7 @@ class ImportBankPayIn implements ShouldQueue
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    private function getRelatedOrders(Order $order)
+    private function getRelatedOrders(Order $order): Collection
     {
         return Order::where('master_order_id', '=', $order->id)->orWhere('id', '=', $order->id)->get();
     }
@@ -321,6 +318,11 @@ class ImportBankPayIn implements ShouldQueue
         $amount = $payIn['kwota'];
 
         foreach ($orders as $order) {
+            if ($amount < 0) {
+                $this->saveOrderPayment($order, $amount, $payIn, false);
+                continue;
+            }
+
             $orderBookedPaymentSum = $order->bookedPaymentsSum();
             $amountOutstanding = $this->getTotalOrderValue($order) - $orderBookedPaymentSum;
 
@@ -333,22 +335,35 @@ class ImportBankPayIn implements ShouldQueue
             $declaredSum = OrderPayments::getCountOfPaymentsWithDeclaredSumFromOrder($order, $payIn) >= 1;
             OrderPayments::updatePaymentsStatusWithDeclaredSumFromOrder($order, $payIn);
 
-            $orderPayment = $order->payments()->create([
-                'amount' => $paymentAmount,
-                'type' => 'CLIENT',
-                'promise' => '',
-                'payer' => $order->customer()->first()->login,
-                'operation_date' => $payIn['data_ksiegowania'],
-                'created_by' => OrderTransactionEnum::CREATED_BY_BANK,
-                'comments' => implode(" ", $payIn),
-                'operation_type' => 'Wpłata/wypłata bankowa',
-                'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
-            ]);
+            $orderPayment = $this->saveOrderPayment($order, $paymentAmount, $payIn, $declaredSum);
 
             if ($orderPayment instanceof OrderPayment) {
                 OrdersPaymentsController::dispatchLabelsForPaymentAmount($orderPayment);
             }
         }
+    }
+
+    /**
+     * @param Order $order
+     * @param $paymentAmount
+     * @param $payIn
+     * @param false $declaredSum
+     *
+     * @return Model
+     */
+    private function saveOrderPayment(Order $order, $paymentAmount, $payIn, $declaredSum = false): Model
+    {
+        return $order->payments()->create([
+            'amount' => $paymentAmount,
+            'type' => 'CLIENT',
+            'promise' => '',
+            'payer' => $order->customer()->first()->login,
+            'operation_date' => $payIn['data_ksiegowania'],
+            'created_by' => OrderTransactionEnum::CREATED_BY_BANK,
+            'comments' => implode(" ", $payIn),
+            'operation_type' => 'Wpłata/wypłata bankowa',
+            'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
+        ]);
     }
 
 
