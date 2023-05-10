@@ -1993,77 +1993,83 @@
                         render: function (data, type, row) {
                             let totalOfPayments = 0;
                             let totalOfDeclaredPayments = 0;
-                            let totalofWarehousePayments = 0;
-                            let settledDeclared = 0;
+                            let bilans = 0;
+                            let totalOfReturns = 0;
+                            let text = '';
+                            const settledDeclared = [];
                             var payments = row['payments'];
 
-                            for (let index = 0; index < payments.length; index++) {
-                                if (payments[index].promise === '1' && payments[index].deleted_at !== null) {
-                                    settledDeclared = payments[index].amount;
-                                    continue
+                            payments.forEach(payment => {
+                                if (payment.deleted_at !== null) {
+                                    return;
                                 }
-                                if (payments[index].type === 'WAREHOUSE') {
-                                    totalofWarehousePayments += parseFloat(payments[index].amount);
-                                } else if (payments[index].promise !== "1") {
-                                    totalOfPayments += parseFloat(payments[index].amount);
-                                } else {
-                                    totalOfDeclaredPayments += parseFloat(payments[index].amount);
-                                }
-                            }
-                            if (totalofWarehousePayments > 0) {
-                                return '<p>DM: ' + totalofWarehousePayments + '</p>';
-                            }
-                            if (totalOfDeclaredPayments > 0) {
-                                return '<p>Z: ' + totalOfPayments + '</p><p>D: ' + totalOfDeclaredPayments + '</p>';
-                            } else {
-                                return '<p>Z: ' + totalOfPayments + '</p>' + ((settledDeclared > 0) ? '<p>RD: ' + totalOfPayments + '</p>' : '');
-                            }
 
+                                const { amount, declared_sum, status } = payment;
+                                const parsedAmount = parseFloat(amount);
+                                const parsedDeclaredAmount = parseFloat(declared_sum);
+
+                                if (parsedAmount) {
+                                    bilans += parsedAmount;
+                                }
+
+                                if (parsedAmount < 0) {
+                                    totalOfReturns -= parsedAmount;
+                                } else if (parsedAmount) {
+                                    totalOfPayments += parsedAmount;
+                                } else if (!parsedAmount && parsedDeclaredAmount > 0) {
+                                    totalOfDeclaredPayments += parsedDeclaredAmount;
+
+                                    if (status === 'Rozliczona deklarowana') {
+                                        settledDeclared.push(parsedDeclaredAmount);
+                                    }
+                                }
+                            });
+
+                            text += `<p> Z: ${totalOfPayments} </p>`;
+                            text += `<p> ZW: ${totalOfReturns} </p>`;
+                            text += `<p> D: ${totalOfDeclaredPayments} </p>`
+                            text += `<p> BI: ${bilans} </p>`;
+
+                            settledDeclared.forEach((amount) => {
+                                text += `<p> ZD: ${amount} </p>`;
+                            });
+
+                            return text;
                         }
                     },
                     {
                         data: 'id',
                         name: 'left_to_pay',
                         searchable: false,
-                        render: function (date, type, row) {
+                        render(date, type, row) {
                             let totalOfProductsPrices = 0;
-                            let additionalServiceCost = row['additional_service_cost'];
-                            let additionalPackageCost = row['additional_cash_on_delivery_cost'];
-                            let shipmentPriceForClient = row['shipment_price_for_client'];
-                            if (additionalServiceCost == null) {
-                                additionalServiceCost = 0;
-                            }
-                            if (shipmentPriceForClient == null) {
-                                shipmentPriceForClient = 0;
-                            }
-                            if (additionalPackageCost == null) {
-                                additionalPackageCost = 0;
-                            }
-                            var items = row['items'];
+                            let additionalServiceCost = row.additional_service_cost ?? 0;
+                            let additionalPackageCost = row.additional_cash_on_delivery_cost ?? 0;
+                            let shipmentPriceForClient = row.shipment_price_for_client ?? 0;
 
-                            for (let index = 0; index < items.length; index++) {
-                                let price = items[index].gross_selling_price_commercial_unit;
-                                let quantity = items[index].quantity;
-                                if (price == null) {
-                                    price = 0;
-                                }
-                                if (quantity == null) {
-                                    quantity = 0;
-                                }
+                            const items = row.items;
+                            for (const item of items) {
+                                const price = item.gross_selling_price_commercial_unit ?? 0;
+                                const quantity = item.quantity ?? 0;
                                 totalOfProductsPrices += parseFloat(price) * parseInt(quantity);
                             }
-                            let orderSum = (totalOfProductsPrices + parseFloat(shipmentPriceForClient) + parseFloat(additionalServiceCost) + parseFloat(additionalPackageCost)).toFixed(2);
-                            let totalOfPayments = 0;
-                            var payments = row['payments'];
 
-                            for (let index = 0; index < payments.length; index++) {
-                                if (payments[index].promise != "1") {
-                                    totalOfPayments += parseFloat(payments[index].amount);
+                            const orderSum = (
+                                totalOfProductsPrices +
+                                parseFloat(shipmentPriceForClient) +
+                                parseFloat(additionalServiceCost) +
+                                parseFloat(additionalPackageCost)
+                            ).toFixed(2);
+
+                            let totalOfPayments = 0;
+                            const payments = row.payments;
+                            for (const payment of payments) {
+                                if (payment.promise !== "1") {
+                                    totalOfPayments += parseFloat(payment.amount);
                                 }
                             }
 
                             return (orderSum - totalOfPayments).toFixed(2);
-
                         }
                     },
                     {
@@ -2071,37 +2077,58 @@
                         name: 'transport_exchange_offers',
                         searchable: false,
                         orderable: false,
-                        render: function (data, option, row) {
+                        render(data, option, row) {
                             let html = "";
+
                             if (!data.length) {
                                 return html;
                             }
 
-                            let generateTitleTooltip = function (offer) {
-                                return `Nr: ${offer.firm_name} | NIP: ${offer.nip} | Osoba kontaktowa: ${offer.contact_person} | Telefon: ${offer.phone_number} | Email: ${offer.email} | Adres: ${offer.street} ${offer.number}, ${offer.postal_code} ${offer.city} | Uwagi: ${offer.comments} ||| Kierowca: ${offer.driver_first_name} ${offer.driver_last_name} | ${offer.driver_phone_number} | Nr dokumentu: ${offer.driver_document_number} | Nr rej.: ${offer.driver_car_registration_number} | Przybycie: ${offer.driver_arrical_date} ${offer.driver_approx_arrival_time}`;
+                            const generateTitleTooltip = (offer) => {
+                                const {
+                                    firm_name,
+                                    nip,
+                                    contact_person,
+                                    phone_number,
+                                    email,
+                                    street,
+                                    number,
+                                    postal_code,
+                                    city,
+                                    comments,
+                                    driver_first_name,
+                                    driver_last_name,
+                                    driver_phone_number,
+                                    driver_document_number,
+                                    driver_car_registration_number,
+                                    driver_arrival_date,
+                                    driver_approx_arrival_time,
+                                } = offer;
+
+                                return `Nr: ${firm_name} | NIP: ${nip} | Osoba kontaktowa: ${contact_person} | Telefon: ${phone_number} | Email: ${email} | Adres: ${street} ${number}, ${postal_code} ${city} | Uwagi: ${comments} ||| Kierowca: ${driver_first_name} ${driver_last_name} | ${driver_phone_number} | Nr dokumentu: ${driver_document_number} | Nr rej.: ${driver_car_registration_number} | Przybycie: ${driver_arrival_date} ${driver_approx_arrival_time}`;
                             };
 
-                            data.forEach(function (spedition) {
+                            data.forEach((spedition) => {
                                 let chosenSpeditionClass = "";
                                 if (spedition.chosen_spedition) {
-                                    chosenSpeditionClass = "transport-exchange__spedition-chosen"
+                                    chosenSpeditionClass = "transport-exchange__spedition-chosen";
                                 }
-                                html += `<div class='transport-exchange ${chosenSpeditionClass}'>`;
 
+                                html += `<div class='transport-exchange ${chosenSpeditionClass}'>`;
                                 html += `<div>Nr: ${spedition.id}</div>`;
 
                                 if (spedition.chosen_spedition) {
-                                    let title = generateTitleTooltip(spedition.chosen_spedition);
+                                    const title = generateTitleTooltip(spedition.chosen_spedition);
                                     html += `<div class="transport-exchange-offer" data-toggle="transport-exchange-tooltip" data-html="true" title="${title}">${spedition.chosen_spedition.firm_name.substr(0, 10)}</div>`;
                                 } else if (spedition.spedition_offers.length) {
-                                    spedition.spedition_offers.forEach(function (offer) {
-                                        let title = generateTitleTooltip(offer);
+                                    spedition.spedition_offers.forEach((offer) => {
+                                        const title = generateTitleTooltip(offer);
                                         html += `<div class="transport-exchange-offer" onclick="chooseExchangeOffer(${offer.id})" data-toggle="transport-exchange-tooltip" data-html="true" title="${title}">${offer.firm_name.substr(0, 10)}</div>`;
                                     });
                                 }
+
                                 html += "</div>";
                             });
-
 
                             return html;
                         }
@@ -2110,15 +2137,16 @@
                         data: null,
                         name: 'invoices',
                         render: function (data) {
-                            let invoices = data.invoices
-                            let html = ''
+                            let invoices = data.invoices;
+                            let html = '';
+
                             if (invoices !== undefined) {
-                                invoices.forEach(function (invoice) {
+                                invoices.forEach((invoice) => {
                                     if (invoice.invoice_type !== 'buy') {
                                         return;
                                     }
 
-                                    html += '<a target="_blank" href="/storage/invoices/' + invoice.invoice_name + '" style="margin-top: 5px;">Faktura</a>';
+                                    html += `<a target="_blank" href="/storage/invoices/${invoice.invoice_name}" style="margin-top: 5px;">Faktura</a>`;
 
                                     if (invoice.is_visible_for_client) {
                                         html += '<p class="invoice__visible">Widoczna</p>';
@@ -2126,13 +2154,14 @@
                                         html += '<p class="invoice__invisible">Niewidoczna</p>';
                                     }
 
-                                    html += '<a href="#" class="change__invoice--visibility"' + 'onclick="changeInvoiceVisibility(' + invoice.id + ')">Zmień widoczność</a>';
+                                    html += `<a href="#" class="change__invoice--visibility" onclick="changeInvoiceVisibility(${invoice.id})">Zmień widoczność</a>`;
                                 });
-                                let jsonInvoices = JSON.stringify(invoices);
-                                html += '<br />'
-                                html += '<a href="#" class="remove__invoices"' + 'onclick="getInvoicesList(' + data.orderId + ')">Usuń</a>'
+
+                                html += '<br />';
+                                html += `<a href="#" class="remove__invoices" onclick="getInvoicesList(${data.orderId})">Usuń</a>`;
                             }
-                            html += '<a href="{{rtrim(env('FRONT_NUXT_URL'),"/")}}' + '/magazyn/awizacja/0/0/' + data.orderId + '/wyslij-fakture">Dodaj</a>'
+
+                            html += `<a href="{{rtrim(config('app.front_nuxt_url') ,'/')}}/magazyn/awizacja/0/0/${data.orderId}/wyslij-fakture">Dodaj</a>`;
 
                             return html;
                         }
