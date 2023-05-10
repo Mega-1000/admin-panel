@@ -519,7 +519,7 @@ class AllegroOrderSynchro implements ShouldQueue
     private function savePayments(Order $order, array $allegroPayment)
     {
         OrderPayment::create([
-            'amount' => $allegroPayment['paidAmount']['amount'] ?? 0,
+            'declared_sum' => $allegroPayment['paidAmount']['amount'] ?? 0,
             'master_payment_id' => null,
             'order_id' => $order->id,
             'promise' => true,
