@@ -12,6 +12,7 @@ use App\Enums\OrderTransactionEnum;
 use App\Factory\PayInDTOFactory;
 use App\Helpers\PdfCharactersHelper;
 use App\Http\Controllers\OrdersPaymentsController;
+use App\Repositories\OrderPayments;
 use App\Repositories\TransactionRepository;
 use App\Services\Label\AddLabelService;
 use App\Services\LabelService;
@@ -195,7 +196,7 @@ class ImportBankPayIn implements ShouldQueue
         }
         unset($description);
 
-        $match = false;
+         $match = false;
          foreach ($possibleOperationDescriptions as $possibleOperationDescription) {
              if ($payIn['opis_operacji'] === $possibleOperationDescription) {
                 $match = true;
@@ -210,13 +211,20 @@ class ImportBankPayIn implements ShouldQueue
             ]);
         }
 
-        // Find order id by searching for "qq" pattern
-        preg_match('/[qQ][qQ](\d{3,5})[qQ][qQ]/', $fileLine, $matches);
-        if (count($matches)) {
-            return PayInDTOFactory::createPayInDTO([
-                'orderId' => (int)$matches[1],
-                'data' => $payIn,
-            ]);
+        // Find order id by searching for "qq" and "zz" pattern
+        $patterns = [
+            '/[qQ][qQ](\d{3,5})[qQ][qQ]/',
+            '/[zZ][zZ](\d{3,5})[zZ][zZ]/'
+        ];
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $fileLine, $matches)) {
+                return new PayInDTO(
+                    orderId: (int)$matches[1],
+                    data: $payIn,
+                    message: null
+                );
+            }
         }
 
         // Find order id by searching for numeric pattern
@@ -322,6 +330,9 @@ class ImportBankPayIn implements ShouldQueue
 
             $paymentAmount = min($amount, $amountOutstanding);
 
+            $declaredSum = OrderPayments::getCountOfPaymentsWithDeclaredSumFromOrder($order, $payIn) >= 1;
+            OrderPayments::updatePaymentsStatusWithDeclaredSumFromOrder($order, $payIn);
+
             $orderPayment = $order->payments()->create([
                 'amount' => $paymentAmount,
                 'type' => 'CLIENT',
@@ -330,7 +341,8 @@ class ImportBankPayIn implements ShouldQueue
                 'operation_date' => $payIn['data_ksiegowania'],
                 'created_by' => OrderTransactionEnum::CREATED_BY_BANK,
                 'comments' => implode(" ", $payIn),
-                'operation_type' => 'Wpłata/wypłata bankowa'
+                'operation_type' => 'Wpłata/wypłata bankowa',
+                'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
             ]);
 
             if ($orderPayment instanceof OrderPayment) {

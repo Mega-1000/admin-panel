@@ -3259,18 +3259,23 @@
                 {
                     data: 'id',
                     name: 'id',
-                    render: function (id) {
-                        let html = '<a href="/admin/orderPayments/' + id + '/edit" class="btn btn-sm btn-primary edit">';
-                        html += '<i class="voyager-edit"></i>';
-                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
-                        html += '</a>';
+                    render: function (id, type, row) {
+                        let html = '';
+                        if (!row.order_package_id) {
+                            html += '<a href="/admin/orderPayments/' + id + '/edit" class="btn btn-sm btn-primary edit">';
+                            html += '<i class="voyager-edit"></i>';
+                            html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
+                            html += '</a>';
+
+                            html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecordOrderPayments(' + id + ')">';
+                            html += '<i class="voyager-trash"></i>';
+                            html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
+                            html += '</button>';
+                        }
+
 
                         html += '<a href="{{ route('transactions.index') }}?email=' + '{{ $order->customer->login }}' + '" class="btn edit btn-sm btn-success">Transakcje</a>';
 
-                        html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecordOrderPayments(' + id + ')">';
-                        html += '<i class="voyager-trash"></i>';
-                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
-                        html += '</button>';
                         return html;
                     }
                 }

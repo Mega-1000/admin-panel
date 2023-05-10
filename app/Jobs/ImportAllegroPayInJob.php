@@ -6,6 +6,7 @@ use App\Entities\Order;
 use App\Entities\OrderPayment;
 use App\Entities\Transaction;
 use App\Http\Controllers\OrdersPaymentsController;
+use App\Repositories\OrderPayments;
 use App\Repositories\TransactionRepository;
 use App\Services\Label\AddLabelService;
 use Carbon\Carbon;
@@ -245,10 +246,10 @@ class ImportAllegroPayInJob implements ShouldQueue
      */
     private function settleOrder(Order $order, $payIn): void
     {
-        $declaredSum = $order->payments()->where('declared_sum', $payIn['kwota'])->whereNull('deleted_at')->count() >= 1;
-        $order->payments()->where('declared_sum', $payIn['kwota'])->whereNull('deleted_at')->update(['status' => 'Rozliczona deklarowana']);
+        $declaredSum = OrderPayments::getCountOfPaymentsWithDeclaredSumFromOrder($order, $payIn) >= 1;
+        OrderPayments::updatePaymentsStatusWithDeclaredSumFromOrder($order, $payIn);
 
-        $existingPayment = OrderPayment::where('external_payment_id', $payIn['identyfikator'])->first();
+        $existingPayment = OrderPayments::getByExternalPaymentId($payIn['identyfikator']);
 
         if (!empty($existingPayment)) {
             $existingPayment->delete();
