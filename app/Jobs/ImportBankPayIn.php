@@ -119,13 +119,14 @@ class ImportBankPayIn implements ShouldQueue
 
         foreach ($data as $payIn) {
             $payInDto = $this->checkOrderNumberFromTitle($payIn['tytul'], $payIn);
+            $payIn['kwota'] = (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $payIn['kwota']));
 
             if ($payInDto->message === "Brak dopasowania") {
                 continue;
             } else if ($payInDto->message === "Brak numeru zamówienia") {
                 fputcsv($report, $payIn);
                 continue;
-            } else if ($payIn->mesage === "/[zZ][zZ](\d{3,5})[zZ][zZ]/") {
+            } else if ($payInDto->message === "/[zZ][zZ](\d{3,5})[zZ][zZ]/") {
                 $payIn['kwota'] *= -1;
             }
 
@@ -144,7 +145,6 @@ class ImportBankPayIn implements ShouldQueue
 
             try {
                 if (!empty($order)) {
-                    $payIn['kwota'] = (float)str_replace(',', '.', preg_replace('/[^.,\d]/', '', $payIn['kwota']));
                     $this->settlePromisePayments($order, $payIn);
                     $orders = $this->getRelatedOrders($order);
 
