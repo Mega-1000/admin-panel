@@ -6,12 +6,15 @@ use App\Entities\Order;
 use App\Entities\OrderInvoice;
 use App\Entities\SubiektInvoices;
 use App\Http\Requests\AddInvoiceToOrder;
+use App\Http\Requests\UploadInvoiceRequest;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\RedirectResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class InvoicesController extends Controller
 {
 
-    public function getSubiektInvoice($id)
+    public function getSubiektInvoice($id): BinaryFileResponse|RedirectResponse
     {
         try {
             $invoice = SubiektInvoices::findOrFail($id);
@@ -24,7 +27,7 @@ class InvoicesController extends Controller
         }
     }
 
-    public function getInvoice($id)
+    public function getInvoice($id): BinaryFileResponse|RedirectResponse
     {
         try {
             $invoice = OrderInvoice::findOrFail($id);
@@ -37,7 +40,7 @@ class InvoicesController extends Controller
         }
     }
 
-    public function addInvoice(AddInvoiceToOrder $request)
+    public function addInvoice(AddInvoiceToOrder $request): RedirectResponse
     {
         try {
             $data = $request->validated();
@@ -56,6 +59,17 @@ class InvoicesController extends Controller
                 'alert-type' => 'error'
             ]);
         }
+    }
+
+    public function uploadInvoice(UploadInvoiceRequest $request): RedirectResponse
+    {
+        $files = $request->file('files');
+
+        foreach ($files as $file) {
+            $file->store('public/order-invoices');
+        }
+
+        return redirect()->back()->with(['message' => __('invoice.successfully_added'), 'alert-type' => 'success']);
     }
 
 }

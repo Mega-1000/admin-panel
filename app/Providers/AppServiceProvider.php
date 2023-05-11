@@ -4,6 +4,8 @@ namespace App\Providers;
 
 use App\Entities\OrderPackage;
 use App\Observers\OrderPackageObserver;
+use App\Repositories\FileInvoiceRepository;
+use App\Repositories\InvoiceRepositoryInterface;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
@@ -46,5 +48,7 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         Schema::defaultStringLength(191);
+
+        $this->app->bind(InvoiceRepositoryInterface::class, FileInvoiceRepository::class);
     }
 }

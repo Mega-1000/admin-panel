@@ -119,7 +119,7 @@ class OrderPackage extends Model implements Transformable
         return $this->belongsTo(ShipmentGroup::class);
     }
 
-    public function getPathToSticker()
+    public function getPathToSticker(): string
     {
         if ($this->service_courier_name === 'INPOST' || $this->service_courier_name === 'ALLEGRO-INPOST') {
             $path = "/storage/inpost/stickers/sticker$this->letter_number.pdf";
