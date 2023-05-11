@@ -50,12 +50,12 @@ class ImportAllegroPayInJob implements ShouldQueue
     /**
      * @var TransactionRepository
      */
-    protected $transactionRepository;
+    protected TransactionRepository $transactionRepository;
 
     /**
      * @var UploadedFile
      */
-    protected $file;
+    protected UploadedFile $file;
 
     /**
      * ImportAllegroPayInJob constructor.
@@ -104,9 +104,7 @@ class ImportAllegroPayInJob implements ShouldQueue
 
             try {
                 if (!empty($order)) {
-                    if ($payIn['operacja'] === 'wpłata') {
-                        $this->settleOrder($order, $payIn);
-                    }
+                    $this->settleOrder($order, $payIn);
                 } else {
                     fputcsv($file, $payIn);
                 }
