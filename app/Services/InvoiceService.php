@@ -4,17 +4,17 @@ namespace App\Services;
 
 use App\DTO\Invoices\InvoiceDTO;
 use App\Entities\Order;
-use App\Repositories\InvoiceRepositoryInterface;
+use App\Repositories\FileInvoiceRepository;
 use Illuminate\Support\Collection;
 
 readonly class InvoiceService
 {
 
     /**
-     * @param InvoiceRepositoryInterface $invoiceRepository
+     * @param FileInvoiceRepository $invoiceRepository
      */
     public function __construct(
-        private InvoiceRepositoryInterface $invoiceRepository,
+        private FileInvoiceRepository $invoiceRepository,
     ) {
     }
 
@@ -23,7 +23,7 @@ readonly class InvoiceService
      *
      * @return Collection
      */
-    public function getInvoicesForOrder(Order $order): \Illuminate\Support\Collection
+    public function getInvoicesForOrder(Order $order): Collection
     {
         $invoices = $this->invoiceRepository->getInvoicesForOrder($order);
         $formattedInvoices = [];
@@ -31,7 +31,7 @@ readonly class InvoiceService
         foreach ($invoices as $invoice) {
             $formattedInvoices[] = [
                 'name' => $invoice->getFileName(),
-                'url' => $invoice->getUrl(),
+                'url' => asset($invoice->getUrl()),
             ];
         }
 

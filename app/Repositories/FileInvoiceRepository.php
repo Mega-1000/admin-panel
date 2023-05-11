@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use App\Entities\Order;
 
 
-class FileInvoiceRepository implements InvoiceRepositoryInterface
+class FileInvoiceRepository
 {
     /**
      * @param Order $order

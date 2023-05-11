@@ -48,7 +48,5 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         Schema::defaultStringLength(191);
-
-        $this->app->bind(InvoiceRepositoryInterface::class, FileInvoiceRepository::class);
     }
 }
