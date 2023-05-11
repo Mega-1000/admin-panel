@@ -42,4 +42,15 @@ class OrderPackageObserver
             ]);
         }
     }
+
+    /**
+     * Handle the OrderPackage "deleted" event.
+     *
+     * @param OrderPackage $orderPackage
+     * @return void
+     */
+    public function deleted(OrderPackage $orderPackage): void
+    {
+        $orderPackage->orderPayments()->delete();
+    }
 }
