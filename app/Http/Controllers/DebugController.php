@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\ChatUser;
 use App\Entities\EmailSending;
 use App\Services\EmailSendingService;
 use Illuminate\Support\Carbon;
@@ -13,8 +14,7 @@ class DebugController extends Controller
         if (config('app.env') == 'production') {
             return null;
         }
-        $ess = new EmailSendingService();
-        $es = EmailSending::find(2);
-        $ess->sendEmail($es, Carbon::now());
+        $cu = ChatUser::find(15950);
+        dd($cu->is_online == true);
     }
 }

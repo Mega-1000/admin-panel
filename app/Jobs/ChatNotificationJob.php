@@ -40,7 +40,7 @@ class ChatNotificationJob implements ShouldQueue
 
         foreach ($chat->chatUsers as $chatUser) {
 
-            if($chatUser->id == $this->currentChatUserId) continue;
+            if($chatUser->id == $this->currentChatUserId || $chatUser->is_online == true) continue;
 
             $userObject = $chatUser->user ?: $chatUser->employee ?: $chatUser->customer ?: false;
 
