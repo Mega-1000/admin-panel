@@ -14,7 +14,6 @@ class DebugController extends Controller
         if (config('app.env') == 'production') {
             return null;
         }
-        $cu = ChatUser::find(15950);
-        dd($cu->is_online == true);
+        
     }
 }
