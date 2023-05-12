@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Entities\Label;
 use App\Entities\LabelGroup;
 use App\Entities\Order;
+use App\Entities\OrderItem;
 use App\Entities\Task;
 use App\Entities\TaskSalaryDetails;
 use App\Entities\TaskTime;
@@ -1372,7 +1373,7 @@ class TasksController extends Controller
             $order->getDeliveryAddress(),
             $data['delivery_warehouse']
         );
-        if(!$task){
+        if($task==0){
             $id = $this->taskService->addTaskToPlanner($order,$data['delivery_warehouse']);
         }else{
             if($task==-1){
@@ -1415,5 +1416,58 @@ class TasksController extends Controller
             'message' => __('tasks.messages.store'),
             'alert-type' => 'success'
         ]);
+    }
+
+    /**
+     * @param int $taskId
+     */
+    public function checkQuantityInStock($taskId): JsonResponse
+    {
+        try {
+            if($taskId != null){
+                $tasks = Task::with(['parent'])->where('id',$taskId)->orWhere('parent_id', $taskId)->get();
+
+                $lists = $this->getQuantityInStockList($tasks);
+                $response = [
+                    'status' => 200,
+                    'data' => $lists
+                ];
+            }
+        } catch (\Exception $exception) {
+            $response = [
+                'status' => 500,
+                'error' => $exception->getMessage()
+            ];
+        }
+        return response()->json($response);
+    }
+
+    /**
+     * @param Task $tasks
+     */
+    public function getQuantityInStockList($tasks): array
+    {
+        $stockLists = []; 
+        foreach($tasks as $task){
+            if($task->order_id!==null){
+                $orderItems = OrderItem::with(['product'])->where('order_id',$task->order_id)->get();
+                foreach($orderItems as $orderItem){
+                    if(
+                        $orderItem->quantity > $orderItem->product->getPositions()->first()->position_quantity ||
+                        $orderItem->quantity > $orderItem->product->stock->quantity
+                    ){
+                        $stockLists[$orderItem->order_id][] = [
+                            'product_stock_id' => $orderItem->product->id,
+                            'product_name' => $orderItem->product->name,
+                            'product_symbol' => $orderItem->product->symbol,
+                            'quantity' => $orderItem->quantity,
+                            'stock_quantity' => $orderItem->product->stock->quantity,
+                            'first_position_quantity' => $orderItem->product->getPositions()->first()->position_quantity
+                        ];
+                    }
+                }
+            }
+        }
+        return $stockLists;
     }
 }

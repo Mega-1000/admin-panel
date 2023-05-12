@@ -315,22 +315,22 @@ class TaskService
      * @param object $address
      * @param int $user_id
      */
-    public function checkTaskLogin($login,$address,$user_id) :bool|int
+    public function checkTaskLogin($login,$address,$user_id) :int
     {
         $tasks = $this->tasksRepository->checkTaskLogin($login, $user_id);
 
         if(empty($tasks)){
-            return false;
+            return 0;
         }
 
-        $taskID = false;
+        $taskID = 0;
         foreach($tasks as $task){
             if(
-                $task->order->getDeliveryAddress()->address = $address->address &&
-                $task->order->getDeliveryAddress()->flat_number = $address->flat_number &&
-                $task->order->getDeliveryAddress()->postal_code = $address->postal_code &&
-                $task->order->getDeliveryAddress()->city = $address->city &&
-                $task->order->getDeliveryAddress()->phone = $address->phone
+                $task->order->getDeliveryAddress()->address == $address->address &&
+                $task->order->getDeliveryAddress()->flat_number == $address->flat_number &&
+                $task->order->getDeliveryAddress()->postal_code == $address->postal_code &&
+                $task->order->getDeliveryAddress()->city == $address->city &&
+                $task->order->getDeliveryAddress()->phone == $address->phone
             ){
                 if($task->order->labels->contains('id', Label::BLUE_HAMMER_ID)){
                     if(!$task->order->labels->contains('id', Label::RED_HAMMER_ID)){
@@ -340,16 +340,10 @@ class TaskService
                             }else{
                                 $taskID = $task->id;
                             }
-                        }else{
-                            return false;
                         }
-                    }else{
-                        return false;
                     }
                 }else{
-                    if($task->order->labels->contains('id', Label::ORDER_ITEMS_REDEEMED_LABEL)){
-                        return false;
-                    }else{
+                    if(!$task->order->labels->contains('id', Label::ORDER_ITEMS_REDEEMED_LABEL)){
                         $taskID = -1; 
                     }
                 }

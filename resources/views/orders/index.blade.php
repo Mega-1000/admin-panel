@@ -173,11 +173,12 @@
                                    type="text">
                         </div>
                     </form>
+                    <div id="error-finish-task-form"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
-                    <button type="submit" form="finish-task-form" class="btn btn-success pull-right">Zakończ
-                    </button>
+                    <button type="submit" form="finish-task-form" id="check-finish-task" class="btn btn-success pull-right">Zakończ</button>
+                    <button id="check-finish-task-refresh" class="btn btn-primary pull-right">Odświez</button>  
                 </div>
             </div>
         </div>
@@ -3849,6 +3850,79 @@
             calendar.render();
         }
 
+        $("#check-finish-task-refresh").hide();
+        $("#check-finish-task").click(function(){
+            task = $('#select-task-for-finish').val();
+            if(task){
+                var checkQuantity = checkQuantityInStock(task);
+                if(checkQuantity==1){
+                    $('#finish-task-form').hide();
+                    $("#check-finish-task").hide();
+                    $("#check-finish-task-refresh").show();
+                    return false;
+                }else{
+                    $("#error-finish-task-form").html('');
+                    return true;
+                }
+            }
+        });
+        $("#check-finish-task-refresh").click(function(){
+            task = $('#select-task-for-finish').val();
+            var checkQuantity = checkQuantityInStock(task);
+            if(checkQuantity==1){
+                $('#finish-task-form').hide();
+            }else{
+                $("#error-finish-task-form").html('');
+                $("#check-finish-task").show();
+                $("#check-finish-task-refresh").hide();
+            }
+            return false;
+        });
+
+        function checkQuantityInStock(task) {
+            html = '';
+            status = 0;
+            $.ajax({
+                type: "GET",
+                url: '/admin/planning/tasks/' + task + '/checkQuantityInStock',
+                async: false
+            }).done(function (data) {
+                if(data.status == 200){
+                    if(Object.keys(data.data).length>0){
+                        status = 1;
+                    }
+                    $.each(data.data, function (index, value) {
+
+                        html += '<h3>oferta '+ index +'</h3>';
+                        html += '<table class="table">';
+                            html += '<tr class="appendRow">';
+                            html += '<td style="width: 200px;">Nazwa</td>';
+                            html += '<td style="width: 100px;">Symbol</td>';
+                            html += '<td style="width: 50px;">Ilość potrzebna</td>';
+                            html += '<td style="width: 50px;">Na magazynie/Ilość na pozycji</td>';
+                            html += '<td>#</td>';
+                            html += '</tr>';
+                        $.each(value, function (index, value) {
+                            html += '<tr class="appendRow">';
+                            html += '<td>' + value.product_name + '</td>';
+                            html += '<td>' + value.product_symbol + '</td>';
+                            html += '<td>' + value.quantity + '</td>';
+                            html += '<td>' + value.stock_quantity + '/' + value.first_position_quantity + '</td>';
+                            html += '<td><a href="/admin/products/stocks/' + value.product_stock_id + '/edit" target="_blank">Przenieś</a></td>';
+                            html += '</tr>';
+                        });
+                        html += '</table>';
+                    });
+                    $('#error-finish-task-form').html(html);
+                }else{
+                    status = 1;
+                }
+            }).fail(function () {
+                status = 1;
+            });
+
+            return status;
+        }
     </script>
     <script type="text/javascript" src="{{ URL::asset('js/helpers/render-calendar.js') }}"></script>
     <script>
