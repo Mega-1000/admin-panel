@@ -228,7 +228,7 @@ class ImportBankPayIn implements ShouldQueue
         }
 
         // Find order id by searching for numeric pattern
-        preg_match_all('/(\d \d \d \d \d)/', $fileLine, $matches);
+        preg_match_all('/^\s*\d(\s*\d)*\s*$/', $fileLine, $matches);
         if (count($matches[1])) {
             foreach ($matches[1] as $orderId) {
                 $order = Order::query()->find($orderId);
