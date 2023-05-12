@@ -124,7 +124,7 @@ class ImportBankPayIn implements ShouldQueue
             if ($payInDto->message === "Brak dopasowania") {
                 continue;
             } else if ($payInDto->message === "Brak numeru zamówienia") {
-                fputcsv($report, $payIn);
+                fputcsv($file, $payIn);
                 continue;
             } else if ($payInDto->message === "/[zZ][zZ](\d{3,5})[zZ][zZ]/") {
                 $payIn['kwota'] *= -1;
@@ -228,7 +228,7 @@ class ImportBankPayIn implements ShouldQueue
         }
 
         // Find order id by searching for numeric pattern
-        preg_match_all('/(\d{3,5})/', $fileLine, $matches);
+        preg_match_all('/(\d \d \d \d \d)/', $fileLine, $matches);
         if (count($matches[1])) {
             foreach ($matches[1] as $orderId) {
                 $order = Order::query()->find($orderId);
@@ -247,6 +247,18 @@ class ImportBankPayIn implements ShouldQueue
                         'message' => 'Brak dopasowania',
                     ]);
                 }
+            }
+        }
+
+        $allegoIdPattern = '/^Platnosc za zamowienie\s+([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$/';
+        if (str_contains($fileLine, 'PRAGMAGO') || preg_match($allegoIdPattern, $payIn['Tytuł'], $matches)) {
+            $order = Order::query()->where('allegro_transaction_id', $matches[0])->first();
+
+            if (!empty($order)) {
+                return PayInDTOFactory::createPayInDTO([
+                    'orderId' => (int)$order->id,
+                    'data' => $payIn,
+                ]);
             }
         }
 
