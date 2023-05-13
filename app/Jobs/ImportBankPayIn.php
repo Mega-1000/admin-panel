@@ -241,7 +241,7 @@ class ImportBankPayIn implements ShouldQueue
             }
         }
 
-        $invoicePattern = '/\d\/STA\/\d{2}\/\d{4}/';
+        $invoicePattern = '/^\d\/STA\/\d{2}\/\d{4}/i';
         if (preg_match($invoicePattern, $payIn['Tytuł'], $matches)) {
             $invoiceNumber = str_replace('/', '_', $matches[0]);
 
