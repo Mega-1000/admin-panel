@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Entities\Order;
+use App\Entities\OrderPayment;
 use App\Entities\OrderReturn;
 use App\Entities\ProductStock;
 use App\Helpers\EmailTagHandlerHelper;
@@ -47,9 +48,21 @@ class OrderReturnController extends Controller
      * @param Request $request
      * @return RedirectResponse
      */
-    public function store(Request $request){
+    public function store(Request $request): RedirectResponse
+    {
         $files = $request->file('photo');
         foreach($request->return as $v=>$return){
+            if($return['sum_of_return']) {
+                $order = Order::find($request->get('order_id'));
+
+                OrderPayment::create([
+                    'value' => $return['sum_of_return'] * -1,
+                    'order_id' => $order->id,
+                    'operation_type' => 'zwrot towaru',
+                    'payer' => $order->customer->login,
+                ]);
+            }
+
             if($return['check'] > 0){
                 $return['photoPath'] = null;
                 $orderReturn = null;
@@ -82,12 +95,14 @@ class OrderReturnController extends Controller
                 }
             }
         }
+
         if ($request->submit == 'updateAndStay') {
             return redirect()->route('order_return.index', ['order_id' => $request->id])->with([
                 'message' => 'Zwrot zostało dodany pomyślnie!',
                 'alert-type' => 'success',
             ]);
         }
+
         return redirect()->route('orders.index', ['order_id' => $request->id])->with([
             'message' => 'Zwrot zostało dodany pomyślnie!',
             'alert-type' => 'success',
