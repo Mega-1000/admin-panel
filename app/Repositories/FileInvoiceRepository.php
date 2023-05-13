@@ -10,6 +10,26 @@ use App\Entities\Order;
 class FileInvoiceRepository
 {
     /**
+     * @param array|string $invoiceNumber
+     *
+     * @return int|null
+     */
+    public static function getInvoiceIdFromNumber(array|string $invoiceNumber): ?int
+    {
+        $invoiceFolder = 'public/invoices/';
+        $files = Storage::files($invoiceFolder);
+
+        foreach ($files as $file) {
+            $filename = pathinfo($file, PATHINFO_FILENAME);
+            if (str_contains($filename, $invoiceNumber)) {
+                return (int)explode(' ', $filename)[1];
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @param Order $order
      *
      * @return InvoiceDTO[]
