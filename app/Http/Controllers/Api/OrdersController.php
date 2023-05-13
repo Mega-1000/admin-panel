@@ -144,7 +144,6 @@ class OrdersController extends Controller
      * @param OrderPackageRepository $orderPackageRepository
      * @param ProductService $productService
      * @param ProductPackingRepository $productPackingRepository
-     * @param OrderPackageRepository $orderPackageRepository
      */
     public function __construct(
         OrderRepository                  $orderRepository,
@@ -191,7 +190,7 @@ class OrdersController extends Controller
      * @return JsonResponse
      * @throws Throwable
      */
-    public function newOrder(StoreOrderRequest $request, ProductService $productService)
+    public function newOrder(StoreOrderRequest $request, ProductService $productService): JsonResponse
     {
         $data = $request->all();
         $customer = Customer::query()->where('login', $data['customer_login'])->first();

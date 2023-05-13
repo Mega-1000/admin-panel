@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Entities\Customer;
+use App\Entities\Order;
 use App\Entities\Transaction;
 use App\Http\Controllers\Controller;
 use App\Jobs\ImportAllegroPayInJob;
@@ -353,6 +354,7 @@ class TransactionsController extends Controller
     /**
      * Zwraca klientów z transakcjami
      *
+     * @param int $id
      * @return JsonResponse
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>

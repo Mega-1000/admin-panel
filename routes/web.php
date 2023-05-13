@@ -1,5 +1,6 @@
 <?php
 
+use App\Entities\OrderPayment;
 use App\Http\Controllers\EmailSettingsController;
 use Illuminate\Support\Facades\Route;
 use TCG\Voyager\Facades\Voyager;
@@ -562,8 +563,8 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('/newAttachmentDeclaration', 'AllegroChatController@newAttachmentDeclaration')->name('newAttachmentDeclaration');
             Route::post('/uploadAttachment/{attachmentId}', 'AllegroChatController@uploadAttachment')->name('uploadAttachment');
         });
-
     });
+
     Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/web/TrackerLogsRoutes.php');
     Route::group(['as' => 'transactions.'], __DIR__ . '/web/TransactionsRoutes.php');
     Route::group(['as' => 'workingEvents.'], __DIR__ . '/web/WorkingEventsRoutes.php');
@@ -576,6 +577,8 @@ Route::group(['prefix' => 'admin'], function () {
     Route::put('/email/settings/{emailSetting}/update', [EmailSettingsController::class, 'update'])->name('emailSettings.update');
     Route::delete('/email/settings/{emailSetting}/destroy', [EmailSettingsController::class, 'destroy'])->name('emailSettings.destroy');
 
+    Route::get('/transactions/rebook/{orderPayment}', 'OrdersPaymentsController@rebook')->name('orderPayments.rebook');
+    Route::post('/transactions/rebook/{order}/{payment}', 'OrdersPaymentsController@rebookStore')->name('orderPayments.rebookStore');
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
