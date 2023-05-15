@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('order_payments', function (Blueprint $table) {
-            $table->text('status')->nullable()->comment('Payment status - depending on warehouse action.')->change();
+            $table->string('status')->nullable()->comment('Payment status - depending on warehouse action.')->change();
         });
     }
 
