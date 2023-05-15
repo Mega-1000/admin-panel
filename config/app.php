@@ -1,6 +1,7 @@
 <?php
 
 use App\Facades\Mailer;
+use App\Providers\AppServiceProvider;
 use App\Providers\Entities\OrderAddressModelProvider;
 use App\Providers\Entities\OrderMessageModelServiceProvider;
 use App\Providers\Entities\OrderModelServiceProvider;
@@ -203,6 +204,7 @@ return [
         Barryvdh\DomPDF\ServiceProvider::class,
 
         SchenkerServiceProvider::class,
+        AppServiceProvider::class,
     ],
 
     /*

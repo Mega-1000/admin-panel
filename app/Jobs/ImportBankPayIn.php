@@ -13,6 +13,7 @@ use App\Factory\PayInDTOFactory;
 use App\Helpers\PdfCharactersHelper;
 use App\Http\Controllers\OrdersPaymentsController;
 use App\Integrations\Pocztex\paczkaPocztowaPLUSType;
+use App\Repositories\FileInvoiceRepository;
 use App\Repositories\OrderPayments;
 use App\Repositories\TransactionRepository;
 use App\Services\Label\AddLabelService;
@@ -124,7 +125,7 @@ class ImportBankPayIn implements ShouldQueue
             if ($payInDto->message === "Brak dopasowania") {
                 continue;
             } else if ($payInDto->message === "Brak numeru zamówienia") {
-                fputcsv($report, $payIn);
+                fputcsv($file, $payIn);
                 continue;
             } else if ($payInDto->message === "/[zZ][zZ](\d{3,5})[zZ][zZ]/") {
                 $payIn['kwota'] *= -1;
@@ -191,27 +192,17 @@ class ImportBankPayIn implements ShouldQueue
             'PRZELEW ZEWNĘTRZNY WYCHODZĄCY',
         ];
 
-        foreach ($possibleOperationDescriptions as &$description) {
-            $description = str_replace('Ą', 'Ľ', $description);
-        }
-        unset($description);
+        $possibleOperationDescriptions = array_map(function($description) {
+            return str_replace('Ą', 'Ľ', $description);
+        }, $possibleOperationDescriptions);
 
-         $match = false;
-         foreach ($possibleOperationDescriptions as $possibleOperationDescription) {
-             if ($payIn['opis_operacji'] === $possibleOperationDescription) {
-                $match = true;
-                break;
-             }
-         }
-
-        if ($match === false) {
+        if (!in_array($payIn['opis_operacji'], $possibleOperationDescriptions)) {
             return PayInDTOFactory::createPayInDTO([
                 'data' => $payIn,
                 'message' => 'Brak dopasowania',
             ]);
         }
 
-        // Find order id by searching for "qq" and "zz" pattern
         $patterns = [
             '/[qQ][qQ](\d{3,5})[qQ][qQ]/',
             '/[zZ][zZ](\d{3,5})[zZ][zZ]/'
@@ -227,8 +218,8 @@ class ImportBankPayIn implements ShouldQueue
             }
         }
 
-        // Find order id by searching for numeric pattern
-        preg_match_all('/(\d{3,5})/', $fileLine, $matches);
+        preg_match_all('/^\s*(\d(?:\s*\d)*)\s*$/', $fileLine, $matches);
+
         if (count($matches[1])) {
             foreach ($matches[1] as $orderId) {
                 $order = Order::query()->find($orderId);
@@ -247,6 +238,19 @@ class ImportBankPayIn implements ShouldQueue
                         'message' => 'Brak dopasowania',
                     ]);
                 }
+            }
+        }
+
+        $invoicePattern = '/^\d\/STA\/\d{2}\/\d{4}/i';
+        if (preg_match($invoicePattern, $payIn['Tytuł'], $matches)) {
+            $invoiceNumber = str_replace('/', '_', $matches[0]);
+
+            $invoiceId = FileInvoiceRepository::getInvoiceIdFromNumber($invoiceNumber);
+            if (!empty($invoice)) {
+                return PayInDTOFactory::createPayInDTO([
+                    'orderId' => $invoiceId,
+                    'data' => $payIn,
+                ]);
             }
         }
 
