@@ -15,7 +15,7 @@ return new class extends Migration
     {
         //add update_orders_table_add_proposed_cash_on_delivery
         Schema::table('orders', function (Blueprint $table) {
-            $table->decimal('proposed_cash_on_delivery')->default(20)->nullable();
+            $table->decimal('proposed_cash_on_delivery')->default(20);
         });
     }
 
