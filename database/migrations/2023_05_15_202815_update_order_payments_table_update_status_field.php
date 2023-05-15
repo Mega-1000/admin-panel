@@ -11,9 +11,11 @@ return new class extends Migration
      *
      * @return void
      */
-    public function up()
+    public function up(): void
     {
-        DB::statement("ALTER TABLE order_payments MODIFY COLUMN `status` TEXT NULL COMMENT 'Payment status - depending on warehouse action.'");
+        Schema::table('order_payments', function (Blueprint $table) {
+            $table->text('status')->nullable()->comment('Payment status - depending on warehouse action.')->change();
+        });
     }
 
     /**
@@ -23,8 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('order_payments', function (Blueprint $table) {
-            $table->dropColumn('status');
+        Schema::table('order_payments', function (Blueprint $table) {``
+            $table->enum('status', ['ACCEPTED', 'PENDING', 'DECLINED'])->nullable()->comment('Payment status - depending on warehouse action.')->change();
         });
     }
 };
