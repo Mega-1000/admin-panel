@@ -235,7 +235,7 @@ class ImportBankPayIn implements ShouldQueue
         }
 
         $allegoIdPattern = '/^Platnosc za zamowienie\s+([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$/';
-        if (str_contains($fileLine, 'PRAGMAGO') || preg_match($allegoIdPattern, $payIn['Tytuł'], $matches)) {
+        if (str_contains($fileLine, 'PRAGMAGO') || preg_match($allegoIdPattern, $payIn['tytul'], $matches)) {
             $order = Order::query()->where('allegro_transaction_id', $matches[0])->first();
 
             if (!empty($order)) {
