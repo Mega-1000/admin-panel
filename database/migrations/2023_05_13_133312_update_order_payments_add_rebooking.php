@@ -25,6 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        //
+        Schema::table('order_payments', function (Blueprint $table) {
+            $table->dropColumn('rebooked_order_payment_id');
+        });
     }
 };
