@@ -70,13 +70,6 @@ class ImportBankPayIn implements ShouldQueue
      *
      * @param TransactionRepository $transaction
      * @param LabelService $labelService
-     * @return void
-     */
-    /**
-     * Execute the job.
-     *
-     * @param TransactionRepository $transaction
-     * @param LabelService $labelService
      * @return string
      */
     public function handle(TransactionRepository $transaction, LabelService $labelService): string
