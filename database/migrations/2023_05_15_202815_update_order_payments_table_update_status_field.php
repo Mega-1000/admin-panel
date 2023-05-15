@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('order_payments', function (Blueprint $table) {``
+        Schema::table('order_payments', function (Blueprint $table) {
             $table->enum('status', ['ACCEPTED', 'PENDING', 'DECLINED'])->nullable()->comment('Payment status - depending on warehouse action.')->change();
         });
     }
