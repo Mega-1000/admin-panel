@@ -1297,6 +1297,7 @@
                 <th>@lang('order_payments.table.declared_sum')</th>
                 <th>@lang('order_payments.table.posting_date')</th>
                 <th>@lang('order_payments.table.operation_type')</th>
+                <th>@lang('order_payments.table.status')</th>
                 <th>@lang('order_payments.table.comments')</th>
                 <th>@lang('order_payments.table.actions')</th>
             </tr>
@@ -3251,6 +3252,10 @@
                 {
                     data: 'operation_type',
                     name: 'operation_type',
+                },
+                {
+                    data: 'status',
+                    name: 'status',
                 },
                 {
                     data: 'comments',

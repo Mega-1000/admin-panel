@@ -17,7 +17,6 @@ class OrderPayments
        return $order->payments()->where('declared_sum', $payIn['kwota'])->whereNull('deleted_at')->count();
    }
 
-
     /**
      * @param $order
      * @param $payIn
