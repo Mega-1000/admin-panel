@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 declare(strict_types=1);
 
@@ -6,8 +6,8 @@ namespace App\Helpers;
 
 class PriceHelper
 {
-    public static function modifyPriceToValidFormat(string $price): string
+    public static function modifyPriceToValidFormat(?string $price): ?string
     {
-        return str_replace(",", ".", $price);
+        return $price ? str_replace(",", ".", $price) : null;
     }
 }
