@@ -14,7 +14,6 @@ use App\Entities\UserSurplusPayment;
 use App\Entities\UserSurplusPaymentHistory;
 use App\Entities\WorkingEvents;
 use App\Enums\OrderPaymentLogTypeEnum;
-use App\Enums\OrderPaymentsEnum;
 use App\Helpers\AllegroPaymentImporter;
 use App\Helpers\PriceHelper;
 use App\Http\Requests\MasterPaymentCreateRequest;
@@ -41,6 +40,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Log;
 use TCG\Voyager\Models\Role;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -1977,5 +1977,16 @@ class OrdersPaymentsController extends Controller
         $this->orderService->rebookStore($order, $payment, OrderPaymentDTO::fromPayment($payment, $request->get('value')));
 
         return redirect()->route('orders.edit', $order->id);
+    }
+
+    public function cleanTable()
+    {
+        Log::notice('Użytkownik o ID: ' . Auth::user()->id . ' dokonał usunięcia płatności');
+
+        DB::table('order_payments_logs')->where('id', '>', 0)->delete();
+        DB::statement('ALTER TABLE order_payments_logs AUTO_INCREMENT = 1');
+        DB::statement('DELETE FROM order_payments WHERE id > 0');
+        DB::statement('ALTER TABLE order_payments AUTO_INCREMENT = 1');
+        return redirect()->route('payments.index')->with(['message' => 'Płatności poprawnie wyczyszczone', 'alert-type' => 'success']);
     }
 }

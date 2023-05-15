@@ -1,6 +1,5 @@
 <?php
 
-use App\Entities\OrderPayment;
 use App\Http\Controllers\EmailSettingsController;
 use Illuminate\Support\Facades\Route;
 use TCG\Voyager\Facades\Voyager;
@@ -326,6 +325,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orderPayments/create/{id}/master/without',
             'OrdersPaymentsController@createMasterWithoutOrder')->name('order_payments.createMasterWithoutOrder');
         Route::get('payments', 'OrdersPaymentsController@payments')->name('payments.index');
+        Route::get('payments/clean', 'OrdersPaymentsController@cleanTable')->name('payments.clean');
         Route::get('payments/{id}/list', 'OrdersPaymentsController@paymentsEdit')->name('payment.index');
         Route::get('payments/{id}/delete', 'OrdersPaymentsController@paymentsDestroy')->name('payments.destroy');
         Route::get('payments/{id}/edit', 'OrdersPaymentsController@paymentsEdit')->name('payments.edit');
