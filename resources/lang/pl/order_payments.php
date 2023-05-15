@@ -2,7 +2,7 @@
 
 return [
     'title' => 'Płatności',
-    'create' => 'Dodaj nową płatność do zlecenia',
+    'create' => 'Przeksięguj wpłatę na inną ofertę klienta',
     'createMaster' => 'Dodaj nową wpłatę',
     'edit' => 'Edytuj płatność',
     'list' => 'Wróć do listy płatności',

@@ -43,6 +43,7 @@ class OrderPayment extends Model implements Transformable
         'posting_date',
         'operation_type',
         'comments',
+        'rebooked_order_payment_id',
     ];
 
     /**

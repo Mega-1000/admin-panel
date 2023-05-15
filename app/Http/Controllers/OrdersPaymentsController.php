@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\orderPayments\OrderPaymentDTO;
 use App\Entities\ColumnVisibility;
 use App\Entities\Customer;
 use App\Entities\Firm;
@@ -13,6 +14,7 @@ use App\Entities\UserSurplusPayment;
 use App\Entities\UserSurplusPaymentHistory;
 use App\Entities\WorkingEvents;
 use App\Enums\OrderPaymentLogTypeEnum;
+use App\Enums\OrderPaymentsEnum;
 use App\Helpers\AllegroPaymentImporter;
 use App\Helpers\PriceHelper;
 use App\Http\Requests\MasterPaymentCreateRequest;
@@ -28,12 +30,14 @@ use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
 use App\Services\OrderPaymentLogService;
 use App\Services\OrderPaymentService;
+use App\Services\OrderService;
 use Carbon\Carbon;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -48,31 +52,17 @@ use Yajra\DataTables\Facades\DataTables;
  */
 class OrdersPaymentsController extends Controller
 {
-    protected OrderPaymentRepository $repository;
-    protected OrderRepository $orderRepository;
-    protected PaymentRepository $paymentRepository;
-    protected CustomerRepository $customerRepository;
-    protected OrderPackageRepository $orderPackageRepository;
-    protected OrderPaymentLogService $orderPaymentLogService;
-    protected OrderPaymentService $orderPaymentService;
-
     public function __construct(
-        OrderPaymentRepository $repository,
-        OrderRepository        $orderRepository,
-        PaymentRepository      $paymentRepository,
-        CustomerRepository     $customerRepository,
-        OrderPackageRepository $orderPackageRepository,
-        OrderPaymentLogService $orderPaymentLogService,
-        OrderPaymentService    $orderPaymentService
+        protected OrderPaymentRepository $repository,
+        protected OrderRepository        $orderRepository,
+        protected PaymentRepository      $paymentRepository,
+        protected CustomerRepository     $customerRepository,
+        protected OrderPackageRepository $orderPackageRepository,
+        protected OrderPaymentLogService $orderPaymentLogService,
+        protected OrderPaymentService    $orderPaymentService,
+        protected OrderService           $orderService
     )
     {
-        $this->repository = $repository;
-        $this->orderRepository = $orderRepository;
-        $this->paymentRepository = $paymentRepository;
-        $this->customerRepository = $customerRepository;
-        $this->orderPackageRepository = $orderPackageRepository;
-        $this->orderPaymentLogService = $orderPaymentLogService;
-        $this->orderPaymentService = $orderPaymentService;
     }
 
     /**
@@ -1959,5 +1949,33 @@ class OrdersPaymentsController extends Controller
         }
 
         return redirect()->back();
+    }
+
+    /**
+     * @param OrderPayment $orderPayment
+     *
+     * @return View
+     */
+    public function rebook(OrderPayment $orderPayment): View
+    {
+        return view('orderPayments.rebook', [
+            'allOrdersForUser' => $orderPayment->order->customer->orders,
+        ], compact('orderPayment'));
+    }
+
+    /**
+     * @param Order $order
+     * @param $payment
+     * @param Request $request
+     *
+     * @return RedirectResponse
+     */
+    public function rebookStore(Order $order, $payment, Request $request): RedirectResponse
+    {
+        $payment = OrderPayment::findOrFail($payment);
+
+        $this->orderService->rebookStore($order, $payment, OrderPaymentDTO::fromPayment($payment, $request->get('value')));
+
+        return redirect()->route('orders.edit', $order->id);
     }
 }
