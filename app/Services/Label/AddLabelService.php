@@ -104,7 +104,6 @@ class AddLabelService
                 }
 
                 if ($label->id == Label::ORDER_ITEMS_CONSTRUCTED) {
-                    LabelNotificationService::sendItemsConstructedMailJob($order);
                     self::savePackageGroup($order);
 
                     $tasks = Task::query()->where('order_id', '=', $order->id)->get();
@@ -121,9 +120,10 @@ class AddLabelService
                 if ($label->id == Label::ORDER_ITEMS_REDEEMED_LABEL) {
 
                     $emailSendingService = new EmailSendingService();
+                    $emailSendingService->addNewScheduledEmail($order, EmailSetting::PICKED_UP);
                     $emailSendingService->addNewScheduledEmail($order, EmailSetting::PICKED_UP_2);
 
-                    LabelNotificationService::sendItemsRedeemedMail($order);
+
                     $order->preferred_invoice_date = $now;
                     $tasks = Task::query()->where('order_id', '=', $order->id)->get();
 

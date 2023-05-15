@@ -24,10 +24,11 @@ class CalculateMultipleAdminOrder extends FormRequest
     public function rules()
     {
         return [
-            'firmSymbol' => 'required|string',
+            'firmSymbol' => 'nullable|string',
             'daysBack' => 'required|integer',
             'daysToFuture' => 'required|integer',
-            'clientEmail' => 'required|email'
+            'clientEmail' => 'required|email',
+            'daysInterval' => 'required|integer',
         ];
     }
 }

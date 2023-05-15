@@ -118,10 +118,39 @@ class OrderService
         return $order;
     }
 
+    /**
+     * Get all products quantity
+     *
+     * @param int $id
+     * @return int
+     */
     public function getAllProductsQuantity(int $id)
     {
         return ProductStockPosition::query()
             ->where('product_stock_id', $id)
             ->sum('position_quantity');
+    }
+
+    /**
+     * Get product intervals
+     *
+     * @param ProductStock $productStock
+     * @param int $interval
+     * @param int $daysBack
+     * @return array
+     */
+    public function getProductIntervals(ProductStock $productStock, int $interval, int $daysBack)
+    {
+        $intervals = [];
+        $days = 0;
+        for ($i = 0; $i < $daysBack / $interval; $i++) {
+            $intervals[$i] = [
+                'interval' => $days,
+                'quantity' => ProductStockLogs::getTotalQuantityForProductStockPeriod($productStock, ($days - $interval) * -1, $days * -1)
+            ];
+            $days -= $interval;
+        }
+
+        return $intervals;
     }
 }

@@ -82,6 +82,7 @@ use App\Services\Label\RemoveLabelService;
 use App\Services\OrderAddressService;
 use App\Services\OrderExcelService;
 use App\Services\OrderInvoiceService;
+use App\Services\OrderPaymentService;
 use App\Services\TaskService;
 use App\User;
 use Carbon\Carbon;

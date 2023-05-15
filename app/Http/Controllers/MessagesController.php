@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use App\Repositories\Chats;
 
 class MessagesController extends Controller
 {
@@ -154,6 +155,7 @@ class MessagesController extends Controller
         $chatEmployees = $chatUsers->pluck('employee')->filter();
         $chatCustomers = $chatUsers->pluck('customer')->filter();
         $chatConsultants = $chatUsers->pluck('user')->filter();
+        $chatBlankUser = Chats::getBlankChatUser($chatUsers);
 
         $currentCustomersIdsOnChat = $chatCustomers->pluck('id');
         $currentEmployeesIdsOnChat = $chatEmployees->pluck('id');
@@ -187,17 +189,28 @@ class MessagesController extends Controller
         $token = $helper->encrypt();
 
         $currentChatUser = $helper->getCurrentChatUser();
+        $currentChatUser->is_online = true;
 
         $assignedMessagesIds = [];
         if ($currentChatUser !== null) {
             $assignedMessagesIds = json_decode($helper->getCurrentChatUser()->assigned_messages_ids ?: '[]', true);
         }
+        $currentChatUser->save();
 
         $firmWithComplaintEmails = Firm::where('complaint_email', '<>', '')->get();
 
         $chatMessages = $chat->messages;
 
-        $view = view('chat.show')->with([
+        $isStyrofoarm = false;
+        foreach ($products as $product) {
+            if ($product?->variation_group === 'styropiany') {
+                $isStyrofoarm = true;
+                break;
+            }
+        }
+
+        return view('chat.show')->with([
+            'isStyropian' => $isStyrofoarm,
             'product_list' => $productList,
             'faq' => $this->prepareFaq($chatUsers),
             'notices' => $notices,
@@ -206,6 +219,7 @@ class MessagesController extends Controller
             'userType' => $helper->currentUserType,
             'chatCustomers' => $chatCustomers,
             'chatEmployees' => $chatEmployees,
+            'chatBlankUser' => $chatBlankUser,
             'firmWithComplaintEmails' => $firmWithComplaintEmails,
             'chatConsultants' => $chatConsultants,
             'chat' => $chat,
@@ -224,7 +238,6 @@ class MessagesController extends Controller
             'routeAskForIntervention' => route('api.messages.ask-for-intervention', ['token' => $token]),
             'routeForEditPrices' => route('api.messages.edit-prices', ['token' => $token])
         ]);
-        return $view;
     }
 
     private function prepareFaq(Collection $users): array

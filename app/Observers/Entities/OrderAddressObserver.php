@@ -62,10 +62,10 @@ class OrderAddressObserver
         $loopPresentationArray = [];
         if (app(OrderPaymentService::class)->hasAnyPayment($orderAddress->order) &&
             !(new OrderAddressService())->addressIsValid($orderAddress)) {
-            AddLabelService::addLabels($orderAddress->order, [LabelsHelper::INVALID_ORDER_ADDRESS], $loopPresentationArray, [], Auth::user()->id);
+            AddLabelService::addLabels($orderAddress->order, [LabelsHelper::INVALID_ORDER_ADDRESS], $loopPresentationArray, [], Auth::user()?->id);
             return;
         }
-        RemoveLabelService::removeLabels($orderAddress->order, [LabelsHelper::INVALID_ORDER_ADDRESS], $loopPresentationArray, [], Auth::user()->id);
+        RemoveLabelService::removeLabels($orderAddress->order, [LabelsHelper::INVALID_ORDER_ADDRESS], $loopPresentationArray, [], Auth::user()?->id);
     }
 
     protected function addHistoryLog(OrderAddress $orderAddress): void

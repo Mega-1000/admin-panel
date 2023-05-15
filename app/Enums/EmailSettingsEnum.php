@@ -11,6 +11,7 @@ final class EmailSettingsEnum extends Enum
     const PROVIDED = 'Zmiana statusu LP na dostarczono';
     const ADDRESS_CHANGED = 'Zmiana adresu dostawy, faktury';
     const PICKED_UP_2 = 'Towar wydano + 1 dzień roboczy';
+    const NEW_ALLEGRO_MSG = 'Nowa wiadomość Allegro';
 
     const LABEL_PRODUCED = 50;
     const LABEL_PICKED_UP = 107;

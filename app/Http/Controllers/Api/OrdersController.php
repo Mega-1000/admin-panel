@@ -6,6 +6,7 @@ namespace App\Http\Controllers\Api;
 use App\Domains\DelivererPackageImport\Exceptions\OrderNotFoundException;
 use App\Entities\Country;
 use App\Entities\Customer;
+use App\Entities\EmailSetting;
 use App\Entities\FirmSource;
 use App\Entities\Label;
 use App\Entities\Order;
@@ -43,7 +44,9 @@ use App\Repositories\OrderRepository;
 use App\Repositories\ProductPackingRepository;
 use App\Repositories\ProductPriceRepository;
 use App\Repositories\ProductRepository;
+use App\Services\EmailSendingService;
 use App\Services\Label\AddLabelService;
+use App\Services\OrderAddressesService;
 use App\Services\OrderPackageService;
 use App\Services\ProductService;
 use Carbon\Carbon;
@@ -61,8 +64,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Throwable;
-use App\Services\EmailSendingService;
-use App\Entities\EmailSetting;
 
 /**
  * Class OrdersController
@@ -190,25 +191,28 @@ class OrdersController extends Controller
      * @return JsonResponse
      * @throws Throwable
      */
-    public function newOrder(StoreOrderRequest $request, ProductService $productService): JsonResponse
+    public function newOrder(StoreOrderRequest $request, ProductService $productService)
     {
         $data = $request->all();
         $customer = Customer::query()->where('login', $data['customer_login'])->first();
         $customer = $customer ?? auth()->guard('api')->user();
 
         if ($customer === null && array_key_exists('customer_login', $data)) {
-            if (array_key_exists('phone', $data)) {
-                // ensure to get last 9 number from data['phone']
-                if (strlen($data['phone']) > 9) {
-                    $data['phone'] = substr($data['phone'], -9);
-                }
-                $customer = Customer::query()->create([
-                    'login' => $data['customer_login'],
-                    'status' => 'ACTIVE',
-                    'password' => Hash::make($data['phone']),
-                ]);
+            if (!array_key_exists('phone', $data)) {
+                throw new NotFoundException('Phone number is not existing, need this information to create new (not existing) customer', 500);
             }
-            throw new NotFoundException('Phone number is not existing, need this information to create new (not existing) customer', 500);
+            // ensure to get last 9 number from data['phone']
+            if (strlen($data['phone']) > 9) {
+                $data['phone'] = substr($data['phone'], -9);
+            }
+            if (!array_key_exists('customer_login', $data) || ($data['customer_login'] ?? '') === '') {
+                throw new NotFoundException('No customer login in request data', 500);
+            }
+            $customer = Customer::query()->create([
+                'login' => $data['customer_login'],
+                'status' => 'ACTIVE',
+                'password' => Hash::make($data['phone']),
+            ]);
         }
 
         try {
@@ -234,6 +238,14 @@ class OrdersController extends Controller
             $order = Order::query()->find($builderData['id']);
             $order->firm_source_id = FirmSource::byFirmAndSource(config('orders.firm_id'), 2)->value('id');
             $order->save();
+
+            $orderAddresses = $order->addresses()->get();
+
+            if (empty($data['cart_token'])) {
+                foreach ($orderAddresses as $orderAddress) {
+                    OrderAddressesService::updateOrderAddressFromCustomer($orderAddress, $customer);
+                }
+            }
 
             $builderData['token'] = $order->getToken();
             return response()->json($builderData);

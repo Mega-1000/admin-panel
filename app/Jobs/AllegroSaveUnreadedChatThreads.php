@@ -2,10 +2,13 @@
 
 namespace App\Jobs;
 
+use App\Services\AllegroChatUserManagmentService;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use TCG\Voyager\Models\Setting;
 use Illuminate\Support\Facades\Log;
 use App\Services\AllegroChatService;
+use App\Services\EmailSendingService;
+use Illuminate\Support\Carbon;
 
 class AllegroSaveUnreadedChatThreads extends Job implements ShouldQueue
 {
@@ -53,10 +56,21 @@ class AllegroSaveUnreadedChatThreads extends Job implements ShouldQueue
         $unreadedThreads = 0;
         $totalThreads = count($allegroThreads['threads']);
 
+        $currentTime = Carbon::now();
+        $minutesAgo = $currentTime->subMinutes(3)->toISOString();
+
         foreach ($allegroThreads['threads'] as $thread) {
             if (!$thread['read']) {
                 $unreadedThreads++;
                 $this->unreadedThreads[] = $thread;
+
+                if($thread['lastMessageDateTime'] > $minutesAgo) {
+                    $emailSendingService = new EmailSendingService();
+
+                    $customer = AllegroChatUserManagmentService::createOrFindUserFromAllegro($thread['interlocutor']['login']);
+
+                    $emailSendingService->addAllegroMsg($thread['id'], $customer->login);
+                }
             }
         }
 

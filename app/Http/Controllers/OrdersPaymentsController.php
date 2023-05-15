@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Entities\ColumnVisibility;
 use App\Entities\Customer;
+use App\Entities\Firm;
 use App\Entities\Label;
 use App\Entities\Order;
 use App\Entities\OrderPayment;
@@ -127,9 +128,12 @@ class OrdersPaymentsController extends Controller
         WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_EDIT_EVENT, $id);
         $orderPayment = $this->repository->find($id);
         $customerOrders = $orderPayment->order->customer->orders;
-        return view('orderPayments.edit', compact('orderPayment', 'id', 'customerOrders'));
+        $firms = Firm::all();
+
+        return view('orderPayments.edit', compact('orderPayment', 'id', 'customerOrders', 'firms'));
     }
 
+    // TODO CAŁA TE METODA DO POPRAWIENIA, VALIDATED + poprawienie zasad, względem logiki, pozwalamy na nullable ale już ich nie obsługujemy
     public function store(OrderPaymentCreateRequest $request)
     {
         $order_id = $request->input('order_id');
@@ -157,15 +161,15 @@ class OrdersPaymentsController extends Controller
 
         $promiseDate = $request->input('promise_date') ?: '';
 
-        $orderPayment = $this->orderPaymentService->payOrder($orderId, $request->input('amount'),
+        $orderPayment = $this->orderPaymentService->payOrder($orderId, $request->input('declared_sum', '0'),
             $masterPaymentId, $promise,
             $chooseOrder, $promiseDate,
             $type, $isWarehousePayment
         );
 
 
-        $orderPaymentAmount = PriceHelper::modifyPriceToValidFormat($request->input('amount'));
-        $orderPaymentsSum = $orderPayment->order->payments->sum('amount') - $orderPaymentAmount;
+        $orderPaymentAmount = PriceHelper::modifyPriceToValidFormat($request->input('declared_sum'));
+        $orderPaymentsSum = $orderPayment->order->payments->sum('declared_sum') - $orderPaymentAmount;
 
         $this->orderPaymentLogService->create(
             $orderId,
@@ -175,9 +179,9 @@ class OrdersPaymentsController extends Controller
             $orderPaymentAmount,
             $request->input('created_at') ?: Carbon::now(),
             $request->input('notices') ?: '',
-            $request->input('amount'),
+            $request->input('declared_sum', '0') ?? '0',
             OrderPaymentLogTypeEnum::ORDER_PAYMENT,
-            true
+            true,
         );
 
         return redirect()->route('orders.edit', ['order_id' => $orderId])->with([
@@ -193,7 +197,10 @@ class OrdersPaymentsController extends Controller
     public function create($id)
     {
         WorkingEvents::createEvent(WorkingEvents::ORDER_PAYMENT_CREATE_EVENT, $id);
-        return view('orderPayments.create', compact('id'));
+        return view('orderPayments.create', compact('id'), [
+            'order' => Order::query()->findorFail($id),
+            'firms' => Firm::all()
+        ]);
     }
 
     // TODO WTF -- 1400 lines of code in one method?
@@ -1649,14 +1656,18 @@ class OrdersPaymentsController extends Controller
             AddLabelService::addLabels($orderPayment, [5], $prev, [], Auth::user()->id);
         }
 
-        $payment = $this->repository->update([
-            'amount' => PriceHelper::modifyPriceToValidFormat($request->input('amount')),
-            'notices' => $request->input('notices'),
-            'promise' => $promise,
-            'promise_date' => $request->input('promise_date'),
-            'order_id' => $order_id,
-            'created_at' => $request->input('created_at')
-        ], $id);
+        $updateData = $request->validated();
+        unset($updateData['amount']);
+
+        OrderPayment::query()->find($id)->update([
+                'amount' => PriceHelper::modifyPriceToValidFormat($request->input('amount')),
+                'notices' => $request->input('notices'),
+                'promise' => $promise,
+                'promise_date' => $request->input('promise_date'),
+                'created_at' => $request->input('created_at'),
+            ] + $updateData);
+
+        $payment = OrderPayment::query()->find($id);
 
         OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
 
@@ -1795,11 +1806,11 @@ class OrdersPaymentsController extends Controller
         $orderPayment = $this->repository->find($id);
 
         if ($orderPayment->master_payment_id != NULL) {
-            $payment = $this->paymentRepository->find($orderPayment->master_payment_id);
+            $payment = OrderPayment::query()->where('id', $orderPayment->master_payment_id)->first();
             $payment->update([
                 'amount_left' => $payment->amount_left + $orderPayment->amount,
             ]);
-            $clientPaymentAmount = $this->customerRepository->find($orderPayment->order->customer_id)->payments->sum('amount_left');
+            $clientPaymentAmount = Customer::query()->where('id', $orderPayment->order->customer_id)->first()?->payments?->sum('amount_left') ?? 0;
             $this->orderPaymentLogService->create(
                 $orderPayment->order_id,
                 $orderPayment->master_payment_id,
@@ -1818,11 +1829,11 @@ class OrdersPaymentsController extends Controller
             $orderPayment->order_id,
             $orderPayment->master_payment_id,
             $orderPayment->order->customer_id,
-            $orderPayment->order->payments->sum('amount'),
-            $orderPayment->amount,
+            $orderPayment->order->payments->sum('amount') ?? 0,
+            $orderPayment->amount ?? 0,
             Carbon::now(),
             '',
-            $orderPayment->amount,
+            $orderPayment->amount ?? '0',
             OrderPaymentLogTypeEnum::REMOVE_PAYMENT,
             false
         );

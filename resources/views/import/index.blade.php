@@ -82,5 +82,24 @@
             </div>
         </div>
     </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-bordered">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        Wczytywanie faktur
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <form action="{{ route('uploadInvoice') }}" method="post" enctype="multipart/form-data">
+                        @csrf
+
+                        <input type="file" name="files[]" multiple>
+                        <button type="submit" class="btn btn-success">Wczytaj</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection

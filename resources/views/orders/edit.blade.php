@@ -193,7 +193,7 @@
                            value="">
                 </div>
                 <div class="form-group" style="width: 15%; float: left; padding: 5px;">
-                    <label for="totalPriceInfo">Suma zamówienia</label>
+                    <label for="totalPriceInfo">Wartość zamówienia</label>
                     <input type="text" class="form-control" id="orderValueSum" name="orderValueSum"
                            value="" disabled>
                 </div>
@@ -1289,6 +1289,15 @@
                 <th>@lang('order_payments.table.promise')</th>
                 <th>@lang('order_payments.table.promise_date')</th>
                 <th>@lang('order_payments.table.created_at')</th>
+                <th>@lang('order_payments.table.external_payment_id')</th>
+                <th>@lang('order_payments.table.payer')</th>
+                <th>@lang('order_payments.table.operation_date')</th>
+                <th>@lang('order_payments.table.tracking_number')</th>
+                <th>@lang('order_payments.table.operation_id')</th>
+                <th>@lang('order_payments.table.declared_sum')</th>
+                <th>@lang('order_payments.table.posting_date')</th>
+                <th>@lang('order_payments.table.operation_type')</th>
+                <th>@lang('order_payments.table.comments')</th>
                 <th>@lang('order_payments.table.actions')</th>
             </tr>
             </thead>
@@ -3212,20 +3221,61 @@
                     name: 'created_at'
                 },
                 {
+                    data: 'external_payment_id',
+                    name: 'external_payment_id',
+                },
+                {
+                    data: 'payer',
+                    name: 'payer',
+                },
+                {
+                    data: 'operation_date',
+                    name: 'operation_date',
+                },
+                {
+                    data: 'tracking_number',
+                    name: 'tracking_number',
+                },
+                {
+                    data: 'operation_id',
+                    name: 'operation_id',
+                },
+                {
+                    data: 'declared_sum',
+                    name: 'declared_sum',
+                },
+                {
+                    data: 'posting_date',
+                    name: 'posting_date',
+                },
+                {
+                    data: 'operation_type',
+                    name: 'operation_type',
+                },
+                {
+                    data: 'comments',
+                    name: 'comments',
+                },
+                {
                     data: 'id',
                     name: 'id',
-                    render: function (id) {
-                        let html = '<a href="/admin/orderPayments/' + id + '/edit" class="btn btn-sm btn-primary edit">';
-                        html += '<i class="voyager-edit"></i>';
-                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
-                        html += '</a>';
+                    render: function (id, type, row) {
+                        let html = '';
+                        if (!row.order_package_id) {
+                            html += '<a href="/admin/orderPayments/' + id + '/edit" class="btn btn-sm btn-primary edit">';
+                            html += '<i class="voyager-edit"></i>';
+                            html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
+                            html += '</a>';
+
+                            html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecordOrderPayments(' + id + ')">';
+                            html += '<i class="voyager-trash"></i>';
+                            html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
+                            html += '</button>';
+                        }
+
 
                         html += '<a href="{{ route('transactions.index') }}?email=' + '{{ $order->customer->login }}' + '" class="btn edit btn-sm btn-success">Transakcje</a>';
 
-                        html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecordOrderPayments(' + id + ')">';
-                        html += '<i class="voyager-trash"></i>';
-                        html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.delete')</span>';
-                        html += '</button>';
                         return html;
                     }
                 }
@@ -4874,6 +4924,9 @@
                 selectedArea == area ? $(this).show() : $(this).hide();
             });
             scrollBottom();
+            $('html, body').scrollTop(
+                $('.chat-preview').offset().top - 50
+            );
         }
 
         filterMessages();

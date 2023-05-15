@@ -9,7 +9,7 @@ use App\Enums\EmailSettingsEnum;
 
 /**
  * @property int    $id
- * @property string $status - NEW | PRODUCED | PICKED_UP | PROVIDED | ADDRESS_CHANGED | PICKED_UP_2
+ * @property string $status - NEW | PRODUCED | PICKED_UP | PROVIDED | ADDRESS_CHANGED | PICKED_UP_2 | NEW_ALLEGRO_MSG
  * @property int    $time
  * @property string $title
  * @property string $content
@@ -26,6 +26,7 @@ class EmailSetting extends Model
     const PROVIDED = 'PROVIDED';
     const ADDRESS_CHANGED = 'ADDRESS_CHANGED';
     const PICKED_UP_2 = 'PICKED_UP_2';
+    const NEW_ALLEGRO_MSG = 'NEW_ALLEGRO_MSG';
 
     protected $fillable = [
         'status',

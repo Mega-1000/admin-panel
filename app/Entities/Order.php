@@ -235,6 +235,14 @@ class Order extends Model implements Transformable
     }
 
     /**
+     * @return float
+     */
+    public function getValue(): float
+    {
+        return $this->getItemsGrossValue() + $this->packing_warehouse_cost + $this->shipment_price_for_client + $this->additional_service_cost;
+    }
+
+    /**
      * @return HasMany
      */
     public function payments()
@@ -705,7 +713,7 @@ class Order extends Model implements Transformable
         return $this->detailedCommissions()->sum('amount');
     }
 
-    public function detailedCommissions()
+    public function detailedCommissions(): HasMany
     {
         return $this->hasMany(OrderAllegroCommission::class);
     }
@@ -755,12 +763,12 @@ class Order extends Model implements Transformable
         return round($orderProfit, 2);
     }
 
-    public function chat()
+    public function chat(): HasOne
     {
         return $this->hasOne(Chat::class);
     }
 
-    public function transactions()
+    public function transactions(): HasMany
     {
         return $this->hasMany(Transaction::class);
     }
@@ -768,7 +776,7 @@ class Order extends Model implements Transformable
     /**
      * @return BelongsTo
      */
-    public function firmSource()
+    public function firmSource(): BelongsTo
     {
         return $this->belongsTo(FirmSource::class);
     }

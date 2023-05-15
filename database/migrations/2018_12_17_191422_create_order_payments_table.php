@@ -16,7 +16,7 @@ class CreateOrderPaymentsTable extends Migration
 	 */
 	public function up()
 	{
-		Schema::create('order_payments', function(Blueprint $table) {
+		Schema::create('update_order_payments_table_add_missing_params', function(Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('order_id');
             $table->decimal('amount', 9, 2)->comment('Kwota wpłacona')->nullable();

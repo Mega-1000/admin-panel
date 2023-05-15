@@ -67,6 +67,12 @@ return [
             'visibility' => 'public',
         ],
 
+        'transactionsDisk' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public' . env('BANK_TRANSACTION_WITHOUT_ORDER_PATH', '/transaction/')),
+            'visibility' => 'public',
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),

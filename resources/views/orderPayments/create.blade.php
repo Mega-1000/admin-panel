@@ -32,11 +32,6 @@
         {{ csrf_field() }}
         <div class="firms-general" id="orderPayment">
             <div class="form-group">
-                <label for="amount">@lang('order_payments.form.amount')</label>
-                <input type="text" class="form-control" id="amount" name="amount"
-                       value="{{ old('amount') }}">
-            </div>
-            <div class="form-group">
                 <label for="payment-type">Typ płatności</label>
                 <select class="form-control" id="payment-type" name="payment-type">
                     <option value="CLIENT">@lang('order_payments.form.client')</option>
@@ -44,15 +39,10 @@
                     <option value="SPEDITION">@lang('order_payments.form.spedition')</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label for="notices">@lang('order_payments.form.notices')</label>
-                <textarea class="form-control" id="notices" name="notices"
-                          value="{{old('notices')}}" rows="5"></textarea>
-            </div>
             @if(Auth::user()->role_id == 3 || Auth::user()->role_id == 2 || Auth::user()->role_id == 1)
-            <div class="form-group">
+            <div class="hidden">
                 <label for="tags">@lang('order_payments.form.promise')</label>
-                <input type="checkbox" id="promise" name="promise">
+                <input type="checkbox" id="promise" name="promise" checked>
             </div>
             @else
                 <div class="form-group">
@@ -63,6 +53,26 @@
             <div class="form-group">
                 <label for="promise_date">@lang('order_payments.form.promise_date')</label><br/>
                 <input type="datetime" id="promise_date" name="promise_date" value="{{ Carbon\Carbon::now() }}" class="form-control default-date-picker-now">
+            </div>
+            <div class="form-group">
+                Płatnik
+                <select class="select2" data-live-search="true" name="payer">
+                    <option value="{{ $order->customer()->first()->login }}">{{ $order->customer()->first()->login }}</option>
+
+                    @foreach($firms as $firm)
+                        <option value="{{ $firm->symbol }}">{{ $firm->symbol }}</option>
+                    @endforeach
+                </select>
+            </div>`
+            <div class="form-group">
+                <label for="declared_sum">@lang('order_payments.form.declared_sum')</label>
+                <input type="text" class="form-control" id="declared_sum" name="declared_sum"
+                       value="{{ old('declared_sum') }}">
+            </div>
+            <div class="form-group">
+                <label for="comments">@lang('order_payments.form.comments')</label>
+                <textarea class="form-control" id="comments" name="comments"
+                          value="{{old('comments')}}" rows="5"></textarea>
             </div>
             <input type="hidden" value="{{ $id }}" name="order_id">
         </div>

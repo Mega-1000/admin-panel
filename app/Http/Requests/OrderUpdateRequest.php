@@ -29,6 +29,7 @@ class OrderUpdateRequest extends FormRequest
             'additional_service_cost' => 'nullable|regex:/^-?\d*(\.\d{2})?$/',
             'correction_amount' => 'nullable|regex:/^\d*(\.\d{2})?$/',
             'id' => 'required|array|min:1',
+            'return_value_.*' => 'nullable|int',
         ];
     }
 

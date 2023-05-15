@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Entities\OrderPackage;
+use App\Observers\OrderPackageObserver;
+use App\Repositories\FileInvoiceRepository;
+use App\Repositories\InvoiceRepositoryInterface;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
@@ -32,6 +36,8 @@ class AppServiceProvider extends ServiceProvider
         // TODO Check solutions for deprecated functions
         Carbon::setWeekendDays([CarbonInterface::SUNDAY, CarbonInterface::SATURDAY]);
 //        TaskTime::observe(TaskTimeObserver::class);
+
+        OrderPackage::observe(OrderPackageObserver::class);
     }
 
     /**

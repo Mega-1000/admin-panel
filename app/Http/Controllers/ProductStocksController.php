@@ -19,6 +19,7 @@ use App\Http\Requests\CreateMultipleAdminOrdersRequest;
 use App\Http\Requests\ProductStockUpdateRequest;
 use App\Repositories\Firms;
 use App\Repositories\ProductRepository;
+use App\Repositories\Products;
 use App\Repositories\ProductStockLogRepository;
 use App\Repositories\ProductStockLogs;
 use App\Repositories\ProductStockPositionRepository;
@@ -27,14 +28,15 @@ use App\Services\OrderService;
 use App\Services\ProductService;
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\View;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Contracts\View\View;
 
 class ProductStocksController extends Controller
 {
@@ -153,7 +155,7 @@ class ProductStocksController extends Controller
     }
 
     /**
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
     public function print()
     {
@@ -287,9 +289,9 @@ class ProductStocksController extends Controller
 
     /**
      * @param ProductStock $productStock
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
-    public function placeAdminSideOrder(ProductStock $productStock): \Illuminate\Contracts\View\View
+    public function placeAdminSideOrder(ProductStock $productStock): View
     {
         return view('product_stocks.place_admin_side_order', compact('productStock'));
     }
@@ -329,9 +331,9 @@ class ProductStocksController extends Controller
 
     /**
      * @param Request $request
-     * @return \Illuminate\Contracts\View\View
+     * @return View
      */
-    public function placeMultipleAdminSideOrders(Request $request): \Illuminate\Contracts\View\View
+    public function placeMultipleAdminSideOrders(Request $request): View
     {
         return view('product_stocks.place_multiple_admin_orders', [
             'productStocks' => ProductStock::all(),
@@ -348,16 +350,25 @@ class ProductStocksController extends Controller
      */
     public function calculateMultipleAdminOrders(CalculateMultipleAdminOrder $request, ProductStock $productStock): JsonResponse
     {
-        $products = Firms::getAllProductsForFirm($request->validated('firmSymbol'));
+        $products = empty($request->validated('firmSymbol'))
+            ? Products::getAllProductsWithStock()
+            : Firms::getAllProductsForFirm($request->validated('firmSymbol'));
 
         $response = [];
         foreach ($products as $product) {
             $productStock = $product->stock;
+            $orderQuantity = $this->orderService->calculateOrderData(CalculateMultipleAdminOrderDTO::fromRequest($productStock, $request->validated()));
+
+            if ($orderQuantity['calculatedQuantity'] === 0) {
+                continue;
+            }
+
             $response[] = [
                 'productStock' => $productStock,
                 'product' => $product,
-                'orderQuantity' => $this->orderService->calculateOrderData(CalculateMultipleAdminOrderDTO::fromRequest($productStock, $request->validated())),
+                'orderQuantity' => $orderQuantity,
                 'currentQuantity' => $this->orderService->getAllProductsQuantity($productStock->id),
+                'intervals' => $this->orderService->getProductIntervals($productStock, $request->validated('daysInterval'), $request->validated('daysBack')),
             ];
         }
 
@@ -372,6 +383,17 @@ class ProductStocksController extends Controller
 
         return response()->json([
             'orders' => $order,
+        ]);
+    }
+
+    /**
+     * @param string $data
+     * @return View
+     */
+    public function getProductStockIntervals(string $data): View
+    {
+        return view('product_stocks.interval_chart', [
+            'intervals' => $data,
         ]);
     }
 }

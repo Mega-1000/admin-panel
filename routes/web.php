@@ -590,6 +590,8 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('/{courier}/edit', 'CourierController@edit')->name('courier.edit');
         Route::put('/{courier}/update', 'CourierController@update')->name('courier.update');     
     });
+  
+    Route::post('/upload-invoice', 'InvoicesController@uploadInvoice')->name('uploadInvoice');
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
@@ -598,6 +600,7 @@ Route::get('/order-offer-pdf/{id}', 'OrderOfferController@getPdf');
 Route::get('/order-proform-pdf/{id}', 'OrderOfferController@getProform');
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
 
+Route::group([], __DIR__ . '/web/AuctionsRoutes.php');
 
 Route::get('/debug', 'DebugController@index');
 Route::get('/communication/{warehouseId}/{orderId}', 'OrdersMessagesController@communication');

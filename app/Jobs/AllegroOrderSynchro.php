@@ -138,18 +138,29 @@ class AllegroOrderSynchro implements ShouldQueue
 
         foreach (array_reverse($allegroOrders) as $allegroOrder) {
             try {
-                if (Order::where('allegro_form_id', $allegroOrder['id'])->count() > 0) {
+                $orderModel = Order::query()->where('allegro_form_id', $allegroOrder['id'])->first();
+                if ($orderModel !== null) {
                     continue;
                 }
-                if(
-                    $allegroOrder['status'] === $this->allegroOrderService::STATUS_CANCELLED &&
-                    $allegroOrder['payment']['paidAmount']['amount'] !== $allegroOrder['summary']['totalToPay']['amount']
-                ) {
+                $orderStatus = $allegroOrder['status'] ?? AllegroOrderService::STATUS_CANCELLED;
+                $paidAmount = $allegroOrder['payment']['paidAmount']['amount'] ?? 0;
+
+                if ($orderStatus === AllegroOrderService::STATUS_CANCELLED) {
+                    if ($paidAmount <= 0) {
+                        continue;
+                    }
+                }
+
+                if ($this->checkAllegroDeliveryAddressExisting($allegroOrder) === false) {
+                    Log::error(
+                        'Not existing address data in Allegro Order',
+                        $allegroOrder
+                    );
                     continue;
                 }
 
                 DB::beginTransaction();
-                $orderModel = AllegroOrder::firstOrNew(['order_id' => $allegroOrder['id']]);
+                $orderModel = AllegroOrder::query()->firstOrNew(['order_id' => $allegroOrder['id']]);
                 $orderModel->order_id = $allegroOrder['id'];
                 $orderModel->buyer_email = $allegroOrder['buyer']['email'];
                 $orderModel->save();
@@ -168,7 +179,7 @@ class AllegroOrderSynchro implements ShouldQueue
 
                 $this->emailSendingService->addNewScheduledEmail($order);
 
-                if($allegroOrder['status'] === $this->allegroOrderService::STATUS_CANCELLED) {
+                if ($allegroOrder['status'] === $this->allegroOrderService::STATUS_CANCELLED) {
                     $prev = [];
                     AddLabelService::addLabels($order, [176], $prev, []);
                 }
@@ -210,7 +221,7 @@ class AllegroOrderSynchro implements ShouldQueue
                         $allegroOrder['delivery']['address'] = array_merge($allegroOrder['delivery']['address'], $allegroOrder['delivery']['pickupPoint']['address']);
                     }
                 }
-                $this->createOrUpdateOrderAddress($order, $allegroOrder['buyer'], $allegroOrder['delivery']['address']);
+                $this->createOrUpdateOrderAddress($order, $allegroOrder['buyer'], $allegroOrder['delivery']['address'] ?? []);
 
                 $this->createOrUpdateOrderAddress($order, $allegroOrder['buyer'], $invoiceAddress, OrderAddress::TYPE_INVOICE);
 
@@ -228,7 +239,7 @@ class AllegroOrderSynchro implements ShouldQueue
 
                 }
 
-                if (!Helper::phoneIsCorrect($orderDeliveryAddress->phone)) {
+                if (!Helper::phoneIsCorrect($orderDeliveryAddress?->phone ?? '')) {
                     $order->labels_log .= Order::formatMessage(null, 'ebudownictwo@wp.pl 691801594 55-200');
                     $order->labels()->attach(176);
                     $order->saveQuietly();
@@ -236,10 +247,9 @@ class AllegroOrderSynchro implements ShouldQueue
 
                 // order package
                 $this->addOrderPackage($order, $allegroOrder['delivery']);
-                $order->shipment_price_for_client = $allegroOrder['delivery']['cost']['amount'];
+                $order->shipment_price_for_client = $allegroOrder['delivery']['cost']['amount'] ?? 0;
 
-                $order->total_price = $allegroOrder['summary']['totalToPay']['amount'];
-                // TODO Change to configuration
+                $order->total_price = $allegroOrder['summary']['totalToPay']['amount'] ?? 0;
                 $firmSource = FirmSource::byFirmAndSource(config('orders.firm_id'), 1)->first();
                 $order->firm_source_id = $firmSource ? $firmSource->id : null;
 
@@ -276,41 +286,54 @@ class AllegroOrderSynchro implements ShouldQueue
                 DB::commit();
             } catch (Throwable $ex) {
                 DB::rollBack();
-                Log::error($ex->getMessage(), [
+                Log::error($ex->getMessage() . PHP_EOL . $ex->getTraceAsString(), [
                     'file' => $ex->getFile(),
                     'line' => $ex->getLine(),
-                    'orderId' => (isset($order)) ? $order->id : $allegroOrder['id']
+                    'orderId' => (isset($order)) ? $order->id : $allegroOrder['id'],
+                    'allegroOrder' => $allegroOrder,
                 ]);
             }
         }
     }
 
+    private function checkAllegroDeliveryAddressExisting(array $allegroOrder): bool
+    {
+        if (array_key_exists('delivery', $allegroOrder) && array_key_exists('address', $allegroOrder['delivery'] ?? []) && count($allegroOrder['delivery']['address'] ?? []) > 0) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Find customer by buyer
      *
-     * @param array $buyer
-     * @param array $deliveryAddress
-     *
+     * @param array $allegroOrder
      * @return Customer
      * @throws Exception
      */
     private function findOrCreateCustomer(array $allegroOrder): Customer
     {
         $buyer = $allegroOrder['buyer'];
-        $deliveryAddress = $allegroOrder['delivery']['address'];
+        $deliveryAddress = $allegroOrder['delivery']['address'] ?? [];
         $buyerEmail = $buyer['email'];
 
         if (preg_match('/\+([a-zA-Z0-9]+)@/', $buyer['email'], $matches)) {
             $buyerEmail = str_replace('+' . $matches[1], '', $buyer['email']);
         }
 
-        $customer = $this->customerRepository->findWhere(['login' => $buyerEmail])->first();
+        $customer = Customer::where('login', $buyerEmail)->orWhere('nick_allegro', $buyer['login'])->first();
+
+        if ($customer && array_key_exists('phoneNumber', $deliveryAddress) && !empty($deliveryAddress['phoneNumber'])) {
+            $customer->password = Hash::make($deliveryAddress['phoneNumber']);
+            $customer->saveQuietly();
+        }
+
         if ($buyer['phoneNumber'] !== null && $buyer['phoneNumber'] !== 'brak' && Helper::phoneIsCorrect($buyer['phoneNumber'])) {
             $customerPhone = $buyer['phoneNumber'];
         } elseif ($deliveryAddress['phoneNumber'] !== null && Helper::phoneIsCorrect($deliveryAddress['phoneNumber'])) {
             $customerPhone = $deliveryAddress['phoneNumber'];
         } else {
-            throw new Exception('wrong_phone');
+            throw new Exception('No or incorrect phone number ' . PHP_EOL . ' Buyer phone number: ' . ($buyer['phoneNumber'] ?? '') . PHP_EOL . 'Delivery address phone number: ' . ($deliveryAddress['phoneNumber'] ?? ''));
         }
 
         $customerPhone = str_replace('+48', '', $customerPhone);
@@ -496,7 +519,7 @@ class AllegroOrderSynchro implements ShouldQueue
     private function savePayments(Order $order, array $allegroPayment)
     {
         OrderPayment::create([
-            'amount' => $allegroPayment['paidAmount']['amount'],
+            'declared_sum' => $allegroPayment['paidAmount']['amount'] ?? 0,
             'master_payment_id' => null,
             'order_id' => $order->id,
             'promise' => true,
@@ -575,6 +598,9 @@ class AllegroOrderSynchro implements ShouldQueue
     {
         if (isset($address['address'])) {
             $address = array_merge($address, $address['address']);
+        }
+        if (count($address) === 0) {
+            return;
         }
         list($street, $flatNo) = $this->getAddress($address['street']);
         $country = Country::firstOrCreate(['iso2' => $address['countryCode']], ['name' => $address['countryCode']]);
