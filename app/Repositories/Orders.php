@@ -87,7 +87,9 @@ class Orders
         $orderPayments = [];
         foreach ($orders as $order) {
             foreach ($order->payments as $payment) {
-                $orderPayments[] = $payment;
+                if ($payment->status !== 'Rozliczona deklarowana') {
+                    $orderPayments[] = $payment;
+                }
             }
         }
 
