@@ -6,14 +6,6 @@ use App\Entities\OrderPayment;
 
 class OrderPaymentDTO
 {
-    /**
-     * @param string $amount
-     * @param string|null $payment_date
-     * @param string|null $payment_type
-     * @param string|null $status
-     * @param string|null $token
-     * @param string|null $operation_type
-     */
     public function __construct(
         public string $amount,
         public readonly ?string $payment_date,
