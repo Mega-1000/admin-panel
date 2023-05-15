@@ -52,7 +52,7 @@ class Orders
 
         $ordersValue = 0;
         foreach ($orders as $order) {
-            $ordersValue += $order->amount ?? $order->declared_sum ?? 0;
+            $ordersValue += $order->getValue() ?? $order->declared_sum ?? 0;
         }
 
         return $ordersValue;

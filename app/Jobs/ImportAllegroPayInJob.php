@@ -264,10 +264,6 @@ class ImportAllegroPayInJob implements ShouldQueue
             'operation_type' => 'wplata/wyplata allegro',
             'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
         ]);
-
-        if ($payment instanceof OrderPayment) {
-            OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
-        }
     }
 
     /**
