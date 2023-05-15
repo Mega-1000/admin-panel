@@ -350,6 +350,9 @@ class MessagesController extends Controller
             throw new ChatException('Nieprawidłowy token chatu');
         }
         $user = $helper->getCurrentUser();
+        $currentChatUser = $helper->getCurrentChatUser();
+        $currentChatUser->is_online = false;
+        $currentChatUser->save();
 
         if ($helper->currentUserType === MessagesHelper::TYPE_CUSTOMER && $order !== null) {
             // close by client

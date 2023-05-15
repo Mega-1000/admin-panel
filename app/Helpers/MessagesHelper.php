@@ -415,13 +415,13 @@ class MessagesHelper
 
         $email = null;
 
-        if ($this->getCurrentChatUser()->customer_id) {
-            $email = $this->getCurrentChatUser()->customer->login;
-        } else if ($this->getCurrentChatUser()->user_id) {
-            $email = $this->getCurrentChatUser()->user->email;
+        if ($chatUser->customer_id) {
+            $email = $chatUser->customer->login;
+        } else if ($chatUser->user_id) {
+            $email = $chatUser->user->email;
         }
 
-        (new ChatNotificationJob($chat->id, $email, $this->getCurrentChatUser()->id))->handle();
+        (new ChatNotificationJob($chat->id, $email, $chatUser->id))->handle();
 
         return $msg;
     }
@@ -589,7 +589,7 @@ class MessagesHelper
         if ($order) {
             return 'Czat dotyczy zamówienia nr <b>' . $order->id . '</b>';
         }
-        return config('app.name');
+        return 'Chat ogólny z administracją EPH POLSKA';
     }
 
     private function clearIntervention($chat)
