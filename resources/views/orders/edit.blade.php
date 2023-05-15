@@ -241,7 +241,7 @@
                            value="{{ $ourTotalCost ?? '' }}">
                 </div>
                 <div class="form-group" style="width: 15%; float: left; padding: 5px;">
-                    <label for="proposed_payment">Proponowana zaliczka brutto</label>
+                    <label for="proposed_payment">Proponowana zaliczka brutto (W przypadku zmiany pola Proponowany dodatkowy koszt pobrania przeliczenie dokonuje się przy zapisie)</label>
                     <input type="text" class="form-control priceChange" id="proposed_payment"
                            value="{{ $order->proposed_payment ?? 500 }}" name="proposed_payment">
                 </div>
@@ -292,6 +292,12 @@
                     <label for="consultant_value">@lang('orders.form.consultant_value')</label>
                     <input type="number" class="form-control" id="consultant_value" name="consultant_value"
                            value="{{ $order->consultant_value ?? ''}}">
+                </div>
+                <div class="form-group" style="width: 15%; float: left; padding: 5px;">
+                    <label for="shipment_price_for_client">@lang('orders.form.proposed_cash_on_delivery')</label>
+                    <input type="text" class="form-control sumChange" id="proposed_cash_on_delivery"
+                           name="proposed_cash_on_delivery"
+                           value="{{ $order->proposed_cash_on_delivery ?? 20 }}">
                 </div>
             </div>
             <div class="row">

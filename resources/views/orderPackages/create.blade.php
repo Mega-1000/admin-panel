@@ -316,7 +316,6 @@
 
                                 @else
                                     <p>{{$package->letter_number}}</p>
-
                                 @endif
                             @endforeach
                         </td>

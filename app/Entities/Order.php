@@ -164,6 +164,7 @@ class Order extends Model implements Transformable
         'allegro_payment_id',
         'labels_log',
         'preferred_invoice_date',
+        'proposed_cash_on_delivery',
     ];
 
     /**
@@ -383,10 +384,10 @@ class Order extends Model implements Transformable
     public function promisePaymentsSum()
     {
         $sum = 0;
-        $promisePayments = $this->payments()->where('promise', 'like', '1')->get();
+        $promisePayments = $this->payments()->where('promise', '!=', null)->get();
 
         foreach ($promisePayments as $promisePayment) {
-            $sum += $promisePayment->amount;
+            $sum += $promisePayment->declared_sum;
         }
 
         return $sum;
@@ -525,7 +526,7 @@ class Order extends Model implements Transformable
     /**
      * @return HasOne
      */
-    public function deliveryAddress()
+    public function deliveryAddress(): HasOne
     {
         return $this->hasOne(OrderAddress::class)->where('type', 'DELIVERY_ADDRESS');
     }
@@ -533,7 +534,7 @@ class Order extends Model implements Transformable
     /**
      * @return BelongsToMany
      */
-    public function invoices()
+    public function invoices(): BelongsToMany
     {
         return $this->belongsToMany(OrderInvoice::class, 'order_order_invoices', 'order_id', 'invoice_id');
     }
@@ -541,7 +542,7 @@ class Order extends Model implements Transformable
     /**
      * @return BelongsToMany
      */
-    public function buyInvoices()
+    public function buyInvoices(): BelongsToMany
     {
         return $this->belongsToMany(OrderInvoice::class, 'order_order_invoices', 'order_id', 'invoice_id')->where('invoice_type', 'buy');
     }
@@ -549,7 +550,7 @@ class Order extends Model implements Transformable
     /**
      * @return BelongsToMany
      */
-    public function sellInvoices()
+    public function sellInvoices(): BelongsToMany
     {
         return $this->belongsToMany(OrderInvoice::class, 'order_order_invoices', 'order_id', 'invoice_id')->where('invoice_type', 'sell');
     }
@@ -559,12 +560,12 @@ class Order extends Model implements Transformable
         return $this->hasMany(OrderFiles::class);
     }
 
-    public function taskSchedule()
+    public function taskSchedule(): HasMany
     {
         return $this->hasMany(Task::class);
     }
 
-    public function getToken()
+    public function getToken(): string
     {
         if (empty($this->token)) {
             $this->token = Str::random(32);
@@ -573,12 +574,12 @@ class Order extends Model implements Transformable
         return $this->token;
     }
 
-    public function factoryDelivery()
+    public function factoryDelivery(): HasMany
     {
         return $this->hasMany('App\Entities\OrderOtherPackage')->where('type', 'from_factory');
     }
 
-    public function notCalculable()
+    public function notCalculable(): HasMany
     {
         return $this->hasMany('App\Entities\OrderOtherPackage')->where('type', 'not_calculable');
     }
@@ -591,10 +592,11 @@ class Order extends Model implements Transformable
         $packagesPrice = $this->packages->reduce(function ($curr, $next) {
             return $curr + $next->cost_for_client;
         }, 0);
+
         return $factoryPrice + $packagesPrice;
     }
 
-    public function otherPackages()
+    public function otherPackages(): HasMany
     {
         return $this->hasMany('App\Entities\OrderOtherPackage');
     }
@@ -624,42 +626,42 @@ class Order extends Model implements Transformable
         });
     }
 
-    public function warehousePayments()
+    public function warehousePayments(): HasMany
     {
         return $this->hasMany(OrderPayment::class)->where('type', 'WAREHOUSE');
     }
 
-    public function speditionPayments()
+    public function speditionPayments(): HasMany
     {
         return $this->hasMany(OrderPayment::class)->where('type', 'SPEDITION');
     }
 
-    public function speditionPaymentsSum()
+    public function speditionPaymentsSum(): HasMany
     {
         return $this->hasMany(OrderPayment::class)->where('type', 'SPEDITION');
     }
 
-    public function isOrderHasLabel($labelId)
+    public function isOrderHasLabel($labelId): bool
     {
         return $this->labels()->where('labels.id', $labelId)->count() > 0;
     }
 
-    public function invoiceRequests()
+    public function invoiceRequests(): HasOne
     {
         return $this->hasOne(InvoiceRequest::class);
     }
 
-    public function subiektInvoices()
+    public function subiektInvoices(): HasMany
     {
         return $this->hasMany(SubiektInvoices::class);
     }
 
-    public function selloTransaction()
+    public function selloTransaction(): HasOne
     {
         return $this->hasOne(SelTransaction::class, 'id', 'sello_id');
     }
 
-    public function groupWarehousePayments()
+    public function groupWarehousePayments(): array
     {
         $acceptedPaymentsValue = 0;
         $pendingPaymentsValue = 0;

@@ -14,7 +14,7 @@ class EmailTagHandlerHelper
 {
     /** @var Order */
     protected $order;
-    
+
     protected $email;
 
     public function setOrder($order)
@@ -146,7 +146,7 @@ class EmailTagHandlerHelper
     }
 
     //[ADRES-DOSTAWY]
-    public function shipmentAddress()
+    public function shipmentAddress(): string
     {
         $address = $this->order->addresses->where('type', 'DELIVERY_ADDRESS')->first();
 
@@ -374,7 +374,7 @@ class EmailTagHandlerHelper
      * @return string $message
      */
 	public function parseTags(?Order $order, string $message, ?string $email = null): string {
-        
+
         $this->order = $order;
         $this->email = $email;
         $matchedTagsCount = preg_match_all('/\[.*\]/', $message, $matchedTags);

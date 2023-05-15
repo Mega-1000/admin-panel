@@ -83,6 +83,7 @@ use App\Services\OrderAddressService;
 use App\Services\OrderExcelService;
 use App\Services\OrderInvoiceService;
 use App\Services\OrderPaymentService;
+use App\Services\OrderService;
 use App\Services\TaskService;
 use App\User;
 use Carbon\Carbon;
@@ -1184,8 +1185,10 @@ class OrdersController extends Controller
      * @param $id
      * @return RedirectResponse
      */
-    public function update(OrderUpdateRequest $request, $id)
+    public function update(OrderUpdateRequest $request, $id): RedirectResponse
     {
+        $order = Order::findOrfail($id);
+
         switch ($request->submit) {
             case 'update':
                 break;
@@ -1193,12 +1196,8 @@ class OrdersController extends Controller
                 $this->store($request->all());
                 break;
         }
-        WorkingEvents::createEvent(WorkingEvents::ORDER_UPDATE_EVENT, $id);
 
-        $order = $this->orderRepository->find($id);
-        if (empty($order)) {
-            abort(404);
-        }
+        WorkingEvents::createEvent(WorkingEvents::ORDER_UPDATE_EVENT, $id);
 
         if ($request->input('status') != $order->status_id && empty(Auth::user()->userEmailData) && $request->input('shouldBeSent') == 'on') {
             return redirect()->route('orders.edit', ['order_id' => $order->id])->with([
@@ -1206,8 +1205,10 @@ class OrdersController extends Controller
                 'alert-type' => 'error',
             ]);
         }
+
         $totalPrice = 0;
         $profit = 0;
+
         foreach ($request->input('id') as $productId) {
             $totalPrice += (float)$request->input('net_selling_price_commercial_unit')[$productId] * (int)$request->input('quantity_commercial')[$productId] * 1.23;
             $profit += (((float)$request->input('net_selling_price_commercial_unit')[$productId] * (int)$request->input('quantity_commercial')[$productId]) - ((float)$request->input('net_purchase_price_commercial_unit')[$productId] * (int)$request->input('quantity_commercial')[$productId])) * 1.23;
@@ -1244,7 +1245,6 @@ class OrdersController extends Controller
             'employee_id' => $employee,
             'warehouse_id' => $warehouse ? $warehouse->id : null,
             'status_id' => $request->input('status'),
-            'proposed_payment' => $request->input('proposed_payment'),
             'last_status_update_date' => $statusUpdateDate,
             'remainder_date' => $request->input('remainder_date'),
             'shipment_date' => $request->input('shipment_date'),
@@ -1258,6 +1258,7 @@ class OrdersController extends Controller
             'allegro_form_id' => $request->input('allegro_form_id'),
             'allegro_payment_id' => $request->input('allegro_payment_id'),
             'preferred_invoice_date' => $request->input('preferred_invoice_date'),
+            'proposed_cash_on_delivery' => $request->input('proposed_cash_on_delivery'),
         ], $id);
 
         $orderObj = Order::find($id);
@@ -1275,6 +1276,8 @@ class OrdersController extends Controller
         $orderObj->confirmed_delivery_date = $request->input('confirmed_delivery_date');
         $orderObj->save();
         $task = $this->taskRepository->findByField(['order_id' => $order->id]);
+
+        OrderService::updateProposedPayment($orderObj);
 
         if ($task->first->id != null) {
             $task->first->id->taskSalaryDetail->update([

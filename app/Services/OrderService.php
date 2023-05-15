@@ -16,6 +16,7 @@ use App\Helpers\OrderPriceCalculator;
 use App\Repositories\Customers;
 use App\Repositories\ProductStockLogs;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class OrderService
@@ -32,7 +33,7 @@ class OrderService
 
         $currentStock = $this->getAllProductsQuantity($dto->productStock->id);
 
-        $orderQuantity =  $traffic - $currentStock;
+        $orderQuantity = $traffic - $currentStock;
 
         return [
             'calculatedQuantity' => max($orderQuantity, 0),
@@ -65,11 +66,11 @@ class OrderService
 
             $products = [];
             $products[0] = [
-                'amount' => $this->calculateOrderData(CalculateMultipleAdminOrderDTO::fromRequest($dto->productStock, [
-                    'daysBack' => $dto->daysBack,
-                    'daysToFuture' => $dto->daysToFuture
-                ])),
-            ] + $product->toArray();
+                    'amount' => $this->calculateOrderData(CalculateMultipleAdminOrderDTO::fromRequest($dto->productStock, [
+                        'daysBack' => $dto->daysBack,
+                        'daysToFuture' => $dto->daysToFuture
+                    ])),
+                ] + $product->toArray();
 
             $orderBuilder = (new OrderBuilder())
                 ->setPackageGenerator(new BackPackPackageDivider())
@@ -104,8 +105,8 @@ class OrderService
             foreach ($products as &$product) {
                 $quantity = $product['quantity'];
                 $product = [
-                    'amount' => $quantity
-                ] + Product::query()->findOrFail($product['id'])->toArray();
+                        'amount' => $quantity
+                    ] + Product::query()->findOrFail($product['id'])->toArray();
             }
 
             $orderBuilder = (new OrderBuilder())
@@ -124,7 +125,7 @@ class OrderService
      * @param int $id
      * @return int
      */
-    public function getAllProductsQuantity(int $id)
+    public function getAllProductsQuantity(int $id): int
     {
         return ProductStockPosition::query()
             ->where('product_stock_id', $id)
@@ -139,7 +140,7 @@ class OrderService
      * @param int $daysBack
      * @return array
      */
-    public function getProductIntervals(ProductStock $productStock, int $interval, int $daysBack)
+    public function getProductIntervals(ProductStock $productStock, int $interval, int $daysBack): array
     {
         $intervals = [];
         $days = 0;
@@ -152,5 +153,38 @@ class OrderService
         }
 
         return $intervals;
+    }
+
+    /**
+     * Calculate proposed payment
+     *
+     * @param Order|Model $order
+     * @return void
+     */
+    public static function updateProposedPayment(Order|Model $order): void
+    {
+        $orderSum = $order->getValue() + $order->proposed_cash_on_delivery;
+        $deliverySum = $order->shipment_price_for_client * 2;
+
+        $value = self::getProposedPaymentSum($orderSum, $deliverySum);
+
+        $order->update([
+            'proposed_payment' => $value
+        ]);
+    }
+
+    /**
+     * Get proposed payment sum
+     *
+     * @param int $orderSum
+     * @param int $deliverySum
+     * @return int
+     */
+    private static function getProposedPaymentSum(int $orderSum, int $deliverySum): int
+    {
+        $proposedSum = substr($orderSum, -strlen($deliverySum));
+        $proposedSum = substr_replace($proposedSum, substr($deliverySum, 0, 1), 0, 1);
+
+        return (float)$proposedSum;
     }
 }

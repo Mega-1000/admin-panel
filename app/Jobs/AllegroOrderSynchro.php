@@ -321,7 +321,7 @@ class AllegroOrderSynchro implements ShouldQueue
             $buyerEmail = str_replace('+' . $matches[1], '', $buyer['email']);
         }
 
-        $customer = Customer::where('login', $buyerEmail)->orWhere('nick_allegro', $buyer['login'])->first();
+        $customer = Customer::where('login', $buyerEmail            )->orWhere('nick_allegro', $buyer['login'])->first();
 
         if ($customer && array_key_exists('phoneNumber', $deliveryAddress) && !empty($deliveryAddress['phoneNumber'])) {
             $customer->password = Hash::make($deliveryAddress['phoneNumber']);

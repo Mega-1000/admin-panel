@@ -97,6 +97,7 @@ return [
         'last_status_update_date' => 'Ostatnia data zmiany statusu',
         'total_price' => 'Suma zamówienia',
         'weight' => 'Waga',
+        'proposed_cash_on_delivery' => 'Proponowany dodatkowy koszt pobrania',
         'shipment_price_for_client_automatic' => 'Transport klient brutto (liczony automatycznie)',
         'shipment_price_for_client' => 'Transport klient brutto (ustawiany recznie)',
         'shipment_price_for_us' => 'Koszt transportu dla nas brutto (ustawiany recznie)',

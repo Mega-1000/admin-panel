@@ -258,7 +258,7 @@ class ImportAllegroPayInJob implements ShouldQueue
             'type' => 'CLIENT',
             'promise' => '',
             'external_payment_id' => $payIn['identyfikator'],
-            'payer' => $order->customer->login,
+            'payer' => "Allegro",
             'operation_date' => Carbon::parse($payIn['data']),
             'comments' => implode(' ', $payIn),
             'operation_type' => 'wplata/wyplata allegro',

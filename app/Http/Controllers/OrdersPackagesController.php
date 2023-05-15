@@ -109,6 +109,7 @@ class OrdersPackagesController extends Controller
      * @param                           $id
      *
      * @return RedirectResponse
+     * @throws Exception
      */
     public function update(OrderPackageUpdateRequest $request, $id)
     {
@@ -135,6 +136,8 @@ class OrdersPackagesController extends Controller
 
     private function saveOrderPackage($data, $id = null)
     {
+        $order = Order::query()->find($data['order_id']);
+
         if (is_null($id)) {
             $orderPackage = new OrderPackage;
         } else {
@@ -154,7 +157,7 @@ class OrdersPackagesController extends Controller
         $orderPackage->shape = $data['shape'];
         $orderPackage->sending_number = $data['sending_number'];
         $orderPackage->letter_number = $data['letter_number'];
-        $orderPackage->cash_on_delivery = $data['cash_on_delivery'];
+        $orderPackage->cash_on_delivery = $data['cash_on_delivery'] + $order->proposed_cash_on_delivery;
         $orderPackage->status = $data['status'];
         $orderPackage->cost_for_client = $data['cost_for_client'];
         $orderPackage->cost_for_company = $data['cost_for_company'];
@@ -170,6 +173,11 @@ class OrdersPackagesController extends Controller
         $orderPackage->services = $data['services'] ?? '';
         $this->orderPackagesDataHelper->findFreeShipmentDate($orderPackage);
         $orderPackage->save();
+
+        if($orderPackage->cash_on_delivery > 0) {
+            $order->additional_cash_on_delivery_cost =  $order->proposed_cash_on_delivery;
+            $order->save();
+        }
 
         if (!empty($data['real_cost_for_company'])) {
             $orderPackage->realCostsForCompany()->create([
