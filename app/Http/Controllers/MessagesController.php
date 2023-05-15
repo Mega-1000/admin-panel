@@ -189,11 +189,13 @@ class MessagesController extends Controller
         $token = $helper->encrypt();
 
         $currentChatUser = $helper->getCurrentChatUser();
+        $currentChatUser->is_online = true;
 
         $assignedMessagesIds = [];
         if ($currentChatUser !== null) {
             $assignedMessagesIds = json_decode($helper->getCurrentChatUser()->assigned_messages_ids ?: '[]', true);
         }
+        $currentChatUser->save();
 
         $firmWithComplaintEmails = Firm::where('complaint_email', '<>', '')->get();
 

@@ -576,6 +576,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::put('/email/settings/{emailSetting}/update', [EmailSettingsController::class, 'update'])->name('emailSettings.update');
     Route::delete('/email/settings/{emailSetting}/destroy', [EmailSettingsController::class, 'destroy'])->name('emailSettings.destroy');
 
+    Route::post('/upload-invoice', 'InvoicesController@uploadInvoice')->name('uploadInvoice');
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');
