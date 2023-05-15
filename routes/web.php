@@ -579,6 +579,8 @@ Route::group(['prefix' => 'admin'], function () {
 
     Route::get('/transactions/rebook/{orderPayment}', 'OrdersPaymentsController@rebook')->name('orderPayments.rebook');
     Route::post('/transactions/rebook/{order}/{payment}', 'OrdersPaymentsController@rebookStore')->name('orderPayments.rebookStore');
+
+    Route::post('/upload-invoice', 'InvoicesController@uploadInvoice')->name('uploadInvoice');
 });
 
 Route::get('/dispatch-job/order-status-change', 'DispatchJobController@orderStatusChange');

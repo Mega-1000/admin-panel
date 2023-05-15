@@ -53,6 +53,8 @@ Route::middleware('auth:api')->group(function () {
     });
 });
 
+Route::get('order/invoice/{order}', 'Api\InvoiceController@getInvoicesForOrder')->name('api.orders.invoice');
+
 Route::post('oauth/token/from-email/{email}', 'Api\CustomersController@getTokenFromEmail')->name('api.customers.get-token-from-email');
 
 Route::post('/register', 'Api\CustomersController@register')->name('api.customers.register');

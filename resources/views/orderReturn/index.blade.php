@@ -163,8 +163,12 @@
                             </div>
                             <div class="row">
                                 <div class="form-group">
+                                    Wartość sumy zwrotu
+                                    <input class="form-control" placeholder="Wartość sumy zwrotu" name="return[{{$loop->iteration}}][sum_of_return]">
+
                                     <label for="value_of_items_gross" class="col-sm-2 control-label">Zdjęcie
                                         uszkodzenia</label>
+
                                     <div class="col-sm-4">
                                         <input type="file"
                                                name="photo[{{$loop->iteration}}]" @if(count($item->realProductPositions()) && $order->returnPosition($item->realProductPositions()[0]['id'])!==null) @endif/>
