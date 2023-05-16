@@ -67,7 +67,7 @@ class Firm extends Model implements Transformable
     /**
      * @return HasOne
      */
-    public function address()
+    public function address(): HasOne
     {
         return $this->hasOne(FirmAddress::class);
     }
@@ -75,7 +75,7 @@ class Firm extends Model implements Transformable
     /**
      * @return HasMany
      */
-    public function warehouses()
+    public function warehouses(): HasMany
     {
         return $this->hasMany(Warehouse::class);
     }
@@ -83,9 +83,17 @@ class Firm extends Model implements Transformable
     /**
      * @return HasMany
      */
-    public function employees()
+    public function employees(): HasMany
     {
         return $this->hasMany(Employee::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class, 'product_name_supplier', 'symbol');
     }
 
     /**
