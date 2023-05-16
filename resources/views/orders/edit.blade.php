@@ -1302,6 +1302,7 @@
                 <th>@lang('order_payments.table.declared_sum')</th>
                 <th>@lang('order_payments.table.posting_date')</th>
                 <th>@lang('order_payments.table.operation_type')</th>
+                <th>@lang('order_payments.table.status')</th>
                 <th>@lang('order_payments.table.comments')</th>
                 <th>@lang('order_payments.table.actions')</th>
             </tr>
@@ -3258,6 +3259,10 @@
                     name: 'operation_type',
                 },
                 {
+                    data: 'status',
+                    name: 'status',
+                },
+                {
                     data: 'comments',
                     name: 'comments',
                 },
@@ -3267,10 +3272,12 @@
                     render: function (id, type, row) {
                         let html = '';
                         if (!row.order_package_id) {
-                            html += '<a href="/admin/orderPayments/' + id + '/edit" class="btn btn-sm btn-primary edit">';
-                            html += '<i class="voyager-edit"></i>';
-                            html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
-                            html += '</a>';
+                            if (!row.rebooked_order_payment_id) {
+                                html += '<a href="/admin/orderPayments/' + id + '/edit" class="btn btn-sm btn-primary edit">';
+                                html += '<i class="voyager-edit"></i>';
+                                html += '<span class="hidden-xs hidden-sm"> @lang('voyager.generic.edit')</span>';
+                                html += '</a>';
+                            }
 
                             html += '<button class="btn btn-sm btn-danger delete delete-record" onclick="deleteRecordOrderPayments(' + id + ')">';
                             html += '<i class="voyager-trash"></i>';
@@ -3279,7 +3286,10 @@
                         }
 
 
-                        html += '<a href="{{ route('transactions.index') }}?email=' + '{{ $order->customer->login }}' + '" class="btn edit btn-sm btn-success">Transakcje</a>';
+                        if (!row.rebooked_order_payment_id) {
+                            html += `<a href="/admin/transactions/rebook/${id}" target="__blank" class="btn edit btn-sm btn-primary">Przeksięguj wpłatę na inną ofertę</a>`;
+                            html += '<a href="{{ route('transactions.index') }}?email=' + '{{ $order->customer->login }}' + '" class="btn edit btn-sm btn-success">Transakcje</a>';
+                        }
 
                         return html;
                     }

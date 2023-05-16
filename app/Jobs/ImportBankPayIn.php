@@ -70,13 +70,6 @@ class ImportBankPayIn implements ShouldQueue
      *
      * @param TransactionRepository $transaction
      * @param LabelService $labelService
-     * @return void
-     */
-    /**
-     * Execute the job.
-     *
-     * @param TransactionRepository $transaction
-     * @param LabelService $labelService
      * @return string
      */
     public function handle(TransactionRepository $transaction, LabelService $labelService): string
@@ -241,14 +234,13 @@ class ImportBankPayIn implements ShouldQueue
             }
         }
 
-        $invoicePattern = '/^\d\/STA\/\d{2}\/\d{4}/i';
-        if (preg_match($invoicePattern, $payIn['tytul'], $matches)) {
-            $invoiceNumber = str_replace('/', '_', $matches[0]);
+        $allegoIdPattern = '/^Platnosc za zamowienie\s+([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})$/';
+        if (str_contains($fileLine, 'PRAGMAGO') || preg_match($allegoIdPattern, $payIn['tytul'], $matches)) {
+            $order = Order::query()->where('allegro_transaction_id', $matches[0])->first();
 
-            $invoiceId = FileInvoiceRepository::getInvoiceIdFromNumber($invoiceNumber);
-            if (!empty($invoice)) {
+            if (!empty($order)) {
                 return PayInDTOFactory::createPayInDTO([
-                    'orderId' => $invoiceId,
+                    'orderId' => (int)$order->id,
                     'data' => $payIn,
                 ]);
             }

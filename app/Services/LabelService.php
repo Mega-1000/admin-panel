@@ -16,7 +16,7 @@ class LabelService
         /** @var Order $order */
         $order = Order::query()->findOrFail($orderId);
         $preventionArray = [];
-        RemoveLabelService::removeLabels($order, $labelsToRemove, $preventionArray, [], Auth::user()->id);
+        RemoveLabelService::removeLabels($order, $labelsToRemove, $preventionArray, [], Auth::user()?->id);
     }
 
     public function dispatchLabelEventByNameJob(int $orderId, string $eventName): void

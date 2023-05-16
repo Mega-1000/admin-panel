@@ -244,16 +244,13 @@ class ImportAllegroPayInJob implements ShouldQueue
      */
     private function settleOrder(Order $order, $payIn): void
     {
+        $payIn['kwota'] = explode(" ", $payIn['kwota'])[0];
+        Log::notice($payIn['kwota']);
+
         $declaredSum = OrderPayments::getCountOfPaymentsWithDeclaredSumFromOrder($order, $payIn) >= 1;
         OrderPayments::updatePaymentsStatusWithDeclaredSumFromOrder($order, $payIn);
 
-        $existingPayment = OrderPayments::getByExternalPaymentId($payIn['identyfikator']);
-
-        if (!empty($existingPayment)) {
-            $existingPayment->delete();
-        }
-
-        $payment = $order->payments()->create([
+         $order->payments()->create([
             'amount' => $payIn['kwota'],
             'type' => 'CLIENT',
             'promise' => '',
@@ -264,10 +261,6 @@ class ImportAllegroPayInJob implements ShouldQueue
             'operation_type' => 'wplata/wyplata allegro',
             'status' => $declaredSum ? 'Rozliczająca deklarowaną' : null,
         ]);
-
-        if ($payment instanceof OrderPayment) {
-            OrdersPaymentsController::dispatchLabelsForPaymentAmount($payment);
-        }
     }
 
     /**

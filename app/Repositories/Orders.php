@@ -52,7 +52,7 @@ class Orders
 
         $ordersValue = 0;
         foreach ($orders as $order) {
-            $ordersValue += $order->amount ?? $order->declared_sum ?? 0;
+            $ordersValue += $order->getValue() ?? $order->declared_sum ?? 0;
         }
 
         return $ordersValue;
@@ -87,7 +87,9 @@ class Orders
         $orderPayments = [];
         foreach ($orders as $order) {
             foreach ($order->payments as $payment) {
-                $orderPayments[] = $payment;
+                if ($payment->status !== 'Rozliczona deklarowana') {
+                    $orderPayments[] = $payment;
+                }
             }
         }
 
