@@ -2,17 +2,7 @@
 @section('app-header')
     <h1 class="page-title">
         <i class="voyager-tag"></i> @lang('order_payments.create')
-
     </h1>
-    <style>
-        .tags {
-            width: 100%;
-        }
-        .tag {
-            width: 50%;
-            float: right;
-        }
-    </style>
 @endsection
 
 @section('table')
@@ -59,14 +49,4 @@
         </div>
         <button type="submit" class="btn btn-primary">@lang('voyager.generic.save')</button>
     </form>
-@endsection
-@section('scripts')
-    <script>
-        var breadcrumb = $('.breadcrumb:nth-child(2)');
-
-        breadcrumb.children().remove();
-        breadcrumb.append("<li class='active'><a href='/admin/'><i class='voyager-boat'></i>Panel</a></li>");
-        breadcrumb.append("<li class='active'><a href='/admin/orders/{{$id}}/edit'>Płatności</a></li>");
-        breadcrumb.append("<li class='disable'><a href='javascript:void()'>Dodaj</a></li>");
-    </script>
 @endsection
