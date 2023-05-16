@@ -66,7 +66,8 @@ class InvoicesController extends Controller
         $files = $request->file('files');
 
         foreach ($files as $file) {
-            $file->store('public/order-invoices');
+            $fileName = $file->getClientOriginalName();
+            Storage::disk('invoicesDisk')->put($fileName, file_get_contents($file));
         }
 
         return redirect()->back()->with(['message' => __('invoice.successfully_added'), 'alert-type' => 'success']);

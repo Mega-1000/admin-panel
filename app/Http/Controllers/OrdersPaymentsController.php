@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\DTO\orderPayments\OrderPaymentDTO;
 use App\Entities\ColumnVisibility;
 use App\Entities\Customer;
 use App\Entities\Firm;
@@ -29,6 +30,7 @@ use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
 use App\Services\OrderPaymentLogService;
 use App\Services\OrderPaymentService;
+use App\Services\OrderService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\View\Factory;
@@ -36,9 +38,11 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Log;
 use TCG\Voyager\Models\Role;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -50,31 +54,17 @@ use Yajra\DataTables\Facades\DataTables;
  */
 class OrdersPaymentsController extends Controller
 {
-    protected OrderPaymentRepository $repository;
-    protected OrderRepository $orderRepository;
-    protected PaymentRepository $paymentRepository;
-    protected CustomerRepository $customerRepository;
-    protected OrderPackageRepository $orderPackageRepository;
-    protected OrderPaymentLogService $orderPaymentLogService;
-    protected OrderPaymentService $orderPaymentService;
-
     public function __construct(
-        OrderPaymentRepository $repository,
-        OrderRepository        $orderRepository,
-        PaymentRepository      $paymentRepository,
-        CustomerRepository     $customerRepository,
-        OrderPackageRepository $orderPackageRepository,
-        OrderPaymentLogService $orderPaymentLogService,
-        OrderPaymentService    $orderPaymentService
+        protected OrderPaymentRepository $repository,
+        protected OrderRepository        $orderRepository,
+        protected PaymentRepository      $paymentRepository,
+        protected CustomerRepository     $customerRepository,
+        protected OrderPackageRepository $orderPackageRepository,
+        protected OrderPaymentLogService $orderPaymentLogService,
+        protected OrderPaymentService    $orderPaymentService,
+        protected OrderService           $orderService
     )
     {
-        $this->repository = $repository;
-        $this->orderRepository = $orderRepository;
-        $this->paymentRepository = $paymentRepository;
-        $this->customerRepository = $customerRepository;
-        $this->orderPackageRepository = $orderPackageRepository;
-        $this->orderPaymentLogService = $orderPaymentLogService;
-        $this->orderPaymentService = $orderPaymentService;
     }
 
     /**
@@ -136,7 +126,7 @@ class OrdersPaymentsController extends Controller
     }
 
     // TODO CAŁA TE METODA DO POPRAWIENIA, VALIDATED + poprawienie zasad, względem logiki, pozwalamy na nullable ale już ich nie obsługujemy
-    public function store(OrderPaymentCreateRequest $request)
+    public function store(OrderPaymentCreateRequest $request): RedirectResponse
     {
         $order_id = $request->input('order_id');
         $chooseOrder = $request->input('chooseOrder');
@@ -1981,5 +1971,44 @@ class OrdersPaymentsController extends Controller
         $this->orderPaymentService->createReturn($order, $request->validated());
 
         return redirect()->route('orders.edit', ['order_id' => $order->id]);
+    }
+      
+    /**
+     * @param OrderPayment $orderPayment
+     *
+     * @return View
+     */
+    public function rebook(OrderPayment $orderPayment): View
+    {
+        return view('orderPayments.rebook', [
+            'allOrdersForUser' => $orderPayment->order->customer->orders,
+        ], compact('orderPayment'));
+    }
+
+    /**
+     * @param Order $order
+     * @param $payment
+     * @param Request $request
+     *
+     * @return RedirectResponse
+     */
+    public function rebookStore(Order $order, $payment, Request $request): RedirectResponse
+    {
+        $payment = OrderPayment::findOrFail($payment);
+
+        $this->orderService->rebookStore($order, $payment, OrderPaymentDTO::fromPayment($payment, $request->get('value')));
+
+        return redirect()->route('orders.edit', $order->id);
+    }
+
+    public function cleanTable()
+    {
+        Log::notice('Użytkownik o ID: ' . Auth::user()->id . ' dokonał usunięcia płatności');
+
+        DB::table('order_payments_logs')->where('id', '>', 0)->delete();
+        DB::statement('ALTER TABLE order_payments_logs AUTO_INCREMENT = 1');
+        DB::statement('DELETE FROM order_payments WHERE id > 0');
+        DB::statement('ALTER TABLE order_payments AUTO_INCREMENT = 1');
+        return redirect()->route('payments.index')->with(['message' => 'Płatności poprawnie wyczyszczone', 'alert-type' => 'success']);
     }
 }
