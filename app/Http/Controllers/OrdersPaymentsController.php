@@ -15,6 +15,7 @@ use App\Entities\WorkingEvents;
 use App\Enums\OrderPaymentLogTypeEnum;
 use App\Helpers\AllegroPaymentImporter;
 use App\Helpers\PriceHelper;
+use App\Http\Requests\CreateOrderReturnRequest;
 use App\Http\Requests\MasterPaymentCreateRequest;
 use App\Http\Requests\OrderPaymentCreateRequest;
 use App\Http\Requests\OrderPaymentUpdateRequest;
@@ -29,6 +30,7 @@ use App\Services\Label\RemoveLabelService;
 use App\Services\OrderPaymentLogService;
 use App\Services\OrderPaymentService;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -1889,9 +1891,11 @@ class OrdersPaymentsController extends Controller
     }
 
     /**
+     * @param $id
      * @return JsonResponse
+     * @throws Exception
      */
-    public function datatable($id)
+    public function datatable($id): JsonResponse
     {
         $collection = $this->prepareCollection($id);
 
@@ -1959,5 +1963,23 @@ class OrdersPaymentsController extends Controller
         }
 
         return redirect()->back();
+    }
+
+    public function createReturn(Order $order): View
+    {
+        $orderPayments = $order->payments;
+        $surplusPayments = $order->customer->surplusPayments;
+
+        return view('orderPayments.createReturn', compact('order', 'orderPayments', 'surplusPayments'), [
+            'firms' => Firm::all(),
+            'id' => $order->id
+        ]);
+    }
+
+    public function storeReturn(Order $order, CreateOrderReturnRequest $request): RedirectResponse
+    {
+        $this->orderPaymentService->createReturn($order, $request->validated());
+
+        return redirect()->route('orders.edit', ['order_id' => $order->id]);
     }
 }
