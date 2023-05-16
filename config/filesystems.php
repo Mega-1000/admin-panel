@@ -73,6 +73,12 @@ return [
             'visibility' => 'public',
         ],
 
+        'invoicesDisk' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public' . env('INVOICES_PATH', '/order-invoices/')),
+            'visibility' => 'public',
+        ],
+
         's3' => [
             'driver' => 's3',
             'key' => env('AWS_ACCESS_KEY_ID'),
