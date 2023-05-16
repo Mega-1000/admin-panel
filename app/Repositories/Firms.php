@@ -36,7 +36,7 @@ class Firms
      * @param String $firmSymbol
      * @return Firm
      */
-    public static function getFirmBySymbol(String $firmSymbol): Firm
+    public static function getFirmBySymbol(string $firmSymbol): Firm
     {
         return Firm::where('symbol', $firmSymbol)->first();
     }
