@@ -124,7 +124,7 @@ class OrdersPaymentsController extends Controller
     }
 
     // TODO CAŁA TE METODA DO POPRAWIENIA, VALIDATED + poprawienie zasad, względem logiki, pozwalamy na nullable ale już ich nie obsługujemy
-    public function store(OrderPaymentCreateRequest $request)
+    public function store(OrderPaymentCreateRequest $request): RedirectResponse
     {
         $order_id = $request->input('order_id');
         $chooseOrder = $request->input('chooseOrder');
