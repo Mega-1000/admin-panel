@@ -191,9 +191,9 @@ class Order extends Model implements Transformable
     }
 
     /**
-     * @return float|bool|int
+     * @return float|null
      */
-    public function toPayPackages(): float|bool|int
+    public function toPayPackages(): ?float
     {
         $sum = 0;
         $packages = $this->packages()->whereIn('status', ['SENDING', 'DELIVERED', 'NEW', 'WAITING_FOR_SENDING'])->get();
