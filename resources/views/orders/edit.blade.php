@@ -70,6 +70,11 @@
            class="btn btn-success install pull-right">
             <i class="voyager-plus"></i> <span>@lang('order_payments.create')</span>
         </a>
+        <a id="delete-button-orderPayments" style="float:right;margin-right: 15px;"
+           href="{{route('order_payments.create_return', ['order' => $order->id]) }}" target="_blank"
+           class="btn btn-danger install pull-right">
+            <i class="voyager-plus"></i> <span>@lang('order_payments.create_return')</span>
+        </a>
         <a id="create-button-orderTasks" style="float:right;margin-right: 15px;"
            href="{{route('order_tasks.create', ['id' => $order->id]) }}" target="_blank"
            class="btn btn-success install pull-right">

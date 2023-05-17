@@ -2,12 +2,14 @@
 
 return [
     'title' => 'Płatności',
-    'create' => 'Przeksięguj wpłatę na inną ofertę klienta',
+    'create' => 'Dodaj nową płatność do zlecenia',
+    'create_return' => 'Stwórz nowy zwrot',
     'createMaster' => 'Dodaj nową wpłatę',
     'edit' => 'Edytuj płatność',
     'list' => 'Wróć do listy płatności',
     'import' => 'Pomyślnie zaimportowano płatności',
     'show_transaction_history' => 'Wyświetl historię transakcji',
+
     'table' => [
         'order_id' => 'Numer zlecenia',
         'amount' => 'Kwota zaksięgowana',
@@ -63,6 +65,7 @@ return [
             'messages' => 'Wiadomości',
             'packages' => 'Przesyłki'
         ],
+        'return_value' => 'Wartość zwrotu',
         'external_payment_id' => 'ID zewnetrznych płatności',
         'payer' => 'Płatnik',
         'operation_date' => 'Data operacji',

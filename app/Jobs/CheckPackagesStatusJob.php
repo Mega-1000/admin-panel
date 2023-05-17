@@ -22,6 +22,7 @@ use App\Integrations\Pocztex\statusType;
 use App\Services\Label\RemoveLabelService;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Bus\Queueable;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -157,6 +158,9 @@ class CheckPackagesStatusJob
         }
     }
 
+    /**
+     * @throws GuzzleException
+     */
     private function prepareConnectionForTrackingStatus(string $url, string $method, array $params): ResponseInterface
     {
         $curlSettings = ['curl' => [
@@ -217,7 +221,7 @@ class CheckPackagesStatusJob
     /**
      * @param $package
      */
-    protected function checkStatusInPocztexPackages($package)
+    protected function checkStatusInPocztexPackages($package): void
     {
         $integration = new ElektronicznyNadawca();
         $request = new getEnvelopeContentShort();
@@ -293,11 +297,9 @@ class CheckPackagesStatusJob
                     break;
                 case GlsPackageStatus::INTRANSIT:
                 case GlsPackageStatus::INWAREHOUSE:
+                case GlsPackageStatus::PREADVICE:
                 case GlsPackageStatus::INDELIVERY:
                     $package->status = PackageStatus::SENDING;
-                    break;
-                case GlsPackageStatus::PREADVICE:
-                    $package->status = PackageStatus::WAITING_FOR_SENDING;
                     break;
             }
 
@@ -308,8 +310,6 @@ class CheckPackagesStatusJob
     }
 
     /**
-     * @throws SoapParamsException
-     * @throws SoapException
      */
     private function checkStatusInSchenkerPackages(OrderPackage $orderPackage)
     {
