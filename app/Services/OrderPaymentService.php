@@ -17,6 +17,7 @@ use App\Http\Controllers\OrdersPaymentsController;
 use App\Repositories\OrderPaymentRepository;
 use App\Repositories\OrderRepository;
 use App\Repositories\PaymentRepository;
+use Illuminate\Database\Eloquent\Model;
 
 class OrderPaymentService
 {
@@ -126,5 +127,16 @@ class OrderPaymentService
         if (!empty($deleted)) {
             $deleted->delete();
         }
+    }
+
+    public static function createReturn(Order $order, array $request): Model
+    {
+        return $order->payments()->create([
+            'amount' => $request['return_value'] * -1,
+            'notices' => $request['notices'],
+            'type' => OrderPaymentPayer::CLIENT,
+            'operation_type' => 'Zwrot towaru',
+            'payer' => $request['payer'],
+        ]);
     }
 }
