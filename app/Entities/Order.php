@@ -286,7 +286,17 @@ class Order extends Model implements Transformable
     /**
      * @return float|int
      */
-    public function toPay(): float|int
+    $orderTotalPrice = $this->getSumOfGrossValues();
+        $amountSum = $this->payments()->where('promise', '=', '')->sum("amount");
+        if ($amountSum <= 2) {
+            $amountSum = $this->payments()->where('promise', '=', '1')->sum("amount");
+        }
+        
+        $finalPrice = $orderTotalPrice - $amountSum;
+        if ($finalPrice > -2 && $finalPrice < 2) {
+            return 0;
+        }
+        return $finalPrice;
     {
         $orderTotalPrice = $this->getSumOfGrossValues();
         if (floatval($this->payments()->where('promise', '=', '')->sum("amount")) > 2) {
