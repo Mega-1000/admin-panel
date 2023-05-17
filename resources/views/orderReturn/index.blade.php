@@ -219,5 +219,9 @@
                 return '<img src="' + $(this).data('img') + '" />';
             }
         });
+
+        const items = @json($items);
+
+
     </script>
 @endsection
