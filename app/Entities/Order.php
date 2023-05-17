@@ -281,10 +281,8 @@ class Order extends Model implements Transformable
     public function toPay()
     {
         $orderTotalPrice = $this->getSumOfGrossValues();
-        $amountSum = $this->payments()->where('promise', '=', '')->sum("amount");
-        if ($amountSum <= 2) {
-            $amountSum = $this->payments()->where('promise', '=', '1')->sum("amount");
-        }
+        $payments = $this->payments()->where('promise', '=', '')->orWhere('promise', '=', '1')->get();
+        $amountSum = $payments->sum("amount");
 
         $finalPrice = $orderTotalPrice - $amountSum;
         if ($finalPrice > -2 && $finalPrice < 2) {
