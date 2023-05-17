@@ -203,22 +203,15 @@ class Order extends Model implements Transformable
         }
 
         $orderTotalPrice = $this->getSumOfGrossValues();
-        $totalPaymentAmount = floatval($this->payments()->where('promise', '=', '')->sum("amount"));
-        if ($orderTotalPrice - $totalPaymentAmount > -2 && $orderTotalPrice - $totalPaymentAmount < 2) {
-            return 0.00;
-        }
-        if ($totalPaymentAmount < 2 && $totalPromisePaymentAmount > 2) {
-            return round($orderTotalPrice - $totalPromisePaymentAmount - $sum, 2);
-        }
-        return round($orderTotalPrice - $totalPaymentAmount - $sum, 2);
+        $payments = $this->payments()->where('promise', '=', '')->orWhere('promise', '=', '1')->get();
+        $amountSum = $payments->sum("amount");
 
-        if ($orderTotalPrice - $totalPaymentAmount > -2 && $orderTotalPrice - $totalPaymentAmount < 2) {
+        $finalPrice = $orderTotalPrice - $amountSum;
+        if ($finalPrice > -2 && $finalPrice < 2) {
             return 0;
-        } else if ($totalPaymentAmount < 2 && $totalPromisePaymentAmount > 2) {
-            return $orderTotalPrice - $totalPromisePaymentAmount - $sum;
-        } else {
-            return $orderTotalPrice - $totalPaymentAmount - $sum;
         }
+
+        return $finalPrice;
     }
 
     public function packages(): HasMany
