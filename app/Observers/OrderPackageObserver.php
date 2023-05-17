@@ -38,7 +38,7 @@ class OrderPackageObserver
     {
         if ($orderPackage->cash_on_delivery) {
             $orderPackage->orderPayments()->update([
-                'amount' => $orderPackage->cash_on_delivery,
+                'declared_sum' => $orderPackage->cash_on_delivery,
             ]);
         }
     }
