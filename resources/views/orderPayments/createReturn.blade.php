@@ -15,7 +15,7 @@
             </ul>
         </div>
     @endif
-    <form action="{{ route('order_payments.create_return', ['order' => $id]) }}" method="POST">
+    <form action="{{ route('order_payments.create_return_post', ['order' => $id]) }}" method="POST">
         @csrf
         <div class="firms-general" id="orderPayment">
             <div class="form-group">
@@ -29,7 +29,8 @@
             <div class="form-group">
                 Płatnik
                 <select class="select2" data-live-search="true" name="payer">
-                    <option value="{{ $order->customer()->first()->login }}">{{ $order->customer()->first()->login }}</option>
+                    <option
+                        value="{{ $order->customer()->first()->login }}">{{ $order->customer()->first()->login }}</option>
 
                     @foreach($firms as $firm)
                         <option value="{{ $firm->symbol }}">{{ $firm->symbol }}</option>

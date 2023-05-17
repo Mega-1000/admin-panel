@@ -322,7 +322,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orderPayments/create/{id}', 'OrdersPaymentsController@create')->name('order_payments.create');
         //order_payments.create_return
         Route::get('orderPaymenyts/create-return/{order}', 'OrdersPaymentsController@createReturn')->name('order_payments.create_return');
-        Route::post('orderPaymenyts/create-return/{order}', 'OrdersPaymentsController@storeReturn')->name('order_payments.create_return');
+        Route::post('orderPaymenyts/create-return/{order}', 'OrdersPaymentsController@storeReturn')->name('order_payments.create_return_post');
         Route::get('orderPayments/create/{id}/master',
             'OrdersPaymentsController@createMaster')->name('order_payments.createMaster');
         Route::get('orderPayments/create/{id}/master/without',
