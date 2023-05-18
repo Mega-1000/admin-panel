@@ -69,6 +69,7 @@ class TaskHelper
      * @param $id
      * @param $start
      * @param $end
+     * @return Collection<TaskTime>
      */
     public static function getSeparator(int $user_id,int $id, string $start, string $end): Collection
     {
@@ -90,6 +91,7 @@ class TaskHelper
     /**
      * Transfers Task
      * @param int $user_id
+     * @return Collection<Task>
      */
     public static function getOpenUserTask(int $user_id): Collection
     {
