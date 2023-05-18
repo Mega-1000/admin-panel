@@ -2798,7 +2798,7 @@
                         $('#selectWarehouse').val(16);
                         $('#warehouseSelect').attr('selected', true);
                         $('#selectWarehouse').click();
-
+                        alert(delivery_warehouse);
                         addingTaskToPlanner(orderId,delivery_warehouse);
                         refreshDtOrReload();
                     }
@@ -2839,11 +2839,11 @@
                     }
                 });
             };
-
+            
             function addingTaskToPlanner(orderId,delivery_warehouse) {
                 $.ajax({
                     method: 'post',
-                    url: '/admin/planning/tasks/adding-task-to-planner',
+                    url: '{{route('planning.tasks.addingTaskToPlanner')}}',
                     dataType: 'json',
                     data: {
                         order_id: orderId,

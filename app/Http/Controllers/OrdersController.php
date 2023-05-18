@@ -114,7 +114,10 @@ use function response;
  */
 class OrdersController extends Controller
 {
-    const ALLSMALLPRINTS_PDF = 'allsmallprints.pdf';
+    const ALL_SMALL_PRINTS_PDF = 'allsmallprints.pdf';
+
+    const DURATION = 2;
+    const LOCK_NAME = 'file.lock.small';
     /**
      * @var FirmRepository
      */
@@ -759,7 +762,7 @@ class OrdersController extends Controller
 
     public function acceptDeny(OrdersFindPackageRequest $request)
     {
-        $finalPdfFileName = self::ALLSMALLPRINTS_PDF;
+        $finalPdfFileName = self::ALL_SMALL_PRINTS_PDF;
         $data = $request->validated();
         $skip = $data['skip'] ?? 1;
         if ($data['action'] == 'accept') {
@@ -793,22 +796,12 @@ class OrdersController extends Controller
     {
         $newGroup = Task::whereIn('order_id', $similar)->get();
         $newGroup = $newGroup->concat([$task]);
-        /*
-        //not working
-        $duration = $newGroup->reduce(function ($prev, $next) {
-            $time = $next->taskTime;
-            $finishTime = new Carbon($time->date_start);
-            $startTime = new Carbon($time->date_end);
-            $totalDuration = $finishTime->diffInMinutes($startTime);
-            // TODO WTF here?
-            // return $prev + $totalDuration;
-        }, 0);
-        */
+        
         $dt = Carbon::now();
         $dt->second = 0;
         $data = [
             'start' => $dt->toDateTimeString(),
-            'end' => $dt->addMinutes(2)->toDateTimeString(),
+            'end' => $dt->addMinutes(self::DURATION)->toDateTimeString(),
             'id' => $user_id,
             'user_id' => $user_id
         ];
@@ -823,9 +816,9 @@ class OrdersController extends Controller
         RemoveLabelService::removeLabels($task->order, [Label::BLUE_HAMMER_ID], $prev, [], Auth::user()->id);
 
         if ($newGroup->count() > 1) {
-            TaskHelper::createNewGroup($newGroup, $task, 2, $data);
+            TaskHelper::createNewGroup($newGroup, $task, self::DURATION, $data);
         } else {
-            TaskHelper::updateAbandonedTaskTime($newGroup->first(), 2, $data);
+            TaskHelper::updateAbandonedTaskTime($newGroup->first(), self::DURATION, $data);
         }
 
         $tsk = Task::find($task->id);
@@ -838,15 +831,16 @@ class OrdersController extends Controller
 
     public function findPackage(OrdersFindPackageRequest $request)
     {
-        $finalPdfFileName = self::ALLSMALLPRINTS_PDF;
-        $lockName = 'file.lock.small';
+        $finalPdfFileName = self::ALL_SMALL_PRINTS_PDF;
+
         $data = $request->validated();
         $skip = $data['skip'] ?? 0;
-        dispatch((new RemoveFileLockJob($lockName))->delay(360));
-        if (File::exists(public_path($lockName)) === true) {
+
+        dispatch((new RemoveFileLockJob(self::LOCK_NAME))->delay(360));
+        if($this->putLockFile() === false){
             return response(['error' => 'file_exist']);
         }
-        file_put_contents($lockName, '');
+        
         try {
             if (empty($data['task_id'])) {
                 $task = $this->taskService->prepareTask($data['package_type'], $skip);
@@ -854,9 +848,7 @@ class OrdersController extends Controller
                 $task = $this->taskRepository->find($data['task_id']);
             }
         } catch (Exception $e) {
-            if (File::exists(public_path($lockName)) === true) {
-                unlink(public_path($lockName));
-            }
+            $this->unlinkLockFile();
             return redirect()->back()->with([
                 'message' => $e->getMessage(),
                 'alert-type' => 'error',
@@ -868,11 +860,9 @@ class OrdersController extends Controller
                 throw new Exception('Brak nieprzydzielonych paczek dla: ' . $data['package_type'] . ' spróbuj wygenerować paczki dla innego kuriera');
             }
         }catch (\Exception $e) {
-            if (File::exists(public_path($lockName)) === true) {
-                unlink(public_path($lockName));
-            }
+            $this->unlinkLockFile();
             return redirect()->back()->with([
-                'message' => 'Brak nieprzydzielonych paczek dla: ' . $data['package_type'] . ' spróbuj wygenerować paczki dla innego kuriera',
+                'message' => $e->getMessage(),
                 'alert-type' => 'error',
             ]);
         }
@@ -882,67 +872,49 @@ class OrdersController extends Controller
         if (!$user->can_decline) {
             $this->attachTaskForUser($task, $data['user_id'], $ordersSimilar);
         }
-        $views = $this->createListOfWz($ordersSimilar, $task, $finalPdfFileName, $lockName);
+        $views = $this->createListOfWz($ordersSimilar, $task, $finalPdfFileName, self::LOCK_NAME);
         $pdf = Storage::disk('public')->get($finalPdfFileName);
         if (!$user->can_decline) {
-            if (File::exists(public_path($lockName)) === true) {
-                unlink(public_path($lockName));
-            }
+            $this->unlinkLockFile();
             return response($pdf, 200, [
                 'Content-Type' => 'application/pdf',
                 'Content-Disposition' => 'inline'
             ]);
         }
-        $view = View::make('orders.confirm', ['user_id' => $user->id, 'skip' => $skip + 1, 'package_type' => $data['package_type']]);
+        $view = view('orders.confirm', ['user_id' => $user->id, 'skip' => $skip + 1, 'package_type' => $data['package_type']]);
         return response($views . $view, 200);
     }
 
     public function findPackageAuto(Request $request)
     {
-        $finalPdfFileName = self::ALLSMALLPRINTS_PDF;
+        $finalPdfFileName = self::ALL_SMALL_PRINTS_PDF;
         $data = $request->all();
-        $lockName = 'file.lock.small';
 
-        dispatch((new RemoveFileLockJob($lockName))->delay(360));
-        if (File::exists(public_path($lockName)) === true) {
+        dispatch((new RemoveFileLockJob(self::LOCK_NAME))->delay(360));
+        if($this->putLockFile()===false){
             return response(['error' => 'file_exist']);
         }
-        file_put_contents($lockName, '');
 
         $user =  Auth::user();
         
         $open = $this->taskService->getOpenUserTask($user->id);
 
-        if ($open->count()) {
-            if (File::exists(public_path($lockName)) === true) {
-                unlink(public_path($lockName));
-            }
+        if ($open->count()) {   
+            $this->unlinkLockFile();
             return redirect()->back()->with([
                 'message' => 'Ostatnie pobrane zadanie to numer: ' . $open->first()->order_id . ' i nie zostało zamkniete. Zamknij zadanie aby pobrać kolejne',
                 'alert-type' => 'error',
             ]);
         }
-
         try {
             $task = $this->taskService->prepareTask($data['package_type'], 0);
-            throw new Exception('błąd pobierania task');
-        } catch (Exception $e) {
-            return redirect()->back()->with([
-                'message' => $e->getMessage(),
-                'alert-type' => 'error',
-            ]);
-        }
-
-        try {
             if (empty($task)) {
                 throw new Exception('Brak nieprzydzielonych paczek dla: ' . $data['package_type'] . ' spróbuj wygenerować paczki dla innego kuriera');
             }
-        }catch (\Exception $e) {
-            if (File::exists(public_path($lockName)) === true) {
-                unlink(public_path($lockName));
-            }
+        }catch (\Exception $e) {   
+            $this->unlinkLockFile();
             return redirect()->back()->with([
-                'message' => 'Brak nieprzydzielonych paczek dla: ' . $data['package_type'] . ' spróbuj wygenerować paczki dla innego kuriera',
+                'message' => $e->getMessage(),
                 'alert-type' => 'error',
             ]);
         }
@@ -950,9 +922,9 @@ class OrdersController extends Controller
 
         if (!$user->can_decline) {
             $this->attachTaskForUser($task, $user->id, $ordersSimilar);
-            $t = $this->taskService->movingTasksBackward($task);
+            $this->taskService->movingTasksBackward($task);
         }
-        $views = $this->createListOfWz($ordersSimilar, $task, $finalPdfFileName, $lockName);
+        $views = $this->createListOfWz($ordersSimilar, $task, $finalPdfFileName, self::LOCK_NAME);
         $pdf = Storage::disk('public')->get($finalPdfFileName);
         if (!$user->can_decline) {
             return response($pdf, 200, [
@@ -961,7 +933,7 @@ class OrdersController extends Controller
             ]);
         }
 
-        $view = View::make('orders.confirm', ['user_id' => $user->id, 'skip' => $skip + 1, 'package_type' => $data['package_type']]);
+        $view = view('orders.confirm', ['user_id' => $user->id, 'skip' => $skip + 1, 'package_type' => $data['package_type']]);
         return response($views . $view, 200);
 
     }
@@ -2668,7 +2640,7 @@ class OrdersController extends Controller
     {
         $finalPdfFileName = 'allPrints.pdf';
         $lockName = 'file.lock';
-        dispatch((new RemoveFileLockJob($lockName))->delay(360));
+        dispatch((new RemoveFileLockJob(self::LOCK_NAME))->delay(360));
         if (File::exists(public_path($lockName))) {
             return response(['error' => 'file_exist']);
         }
@@ -3546,5 +3518,28 @@ class OrdersController extends Controller
         ];
 
         return response()->json($response);
+    }
+
+    /**
+     * unlink file if exist
+     */
+    public function unlinkLockFile(): bool
+    {
+        if (File::exists(public_path(self::LOCK_NAME)) === true) {
+            unlink(public_path(self::LOCK_NAME));
+        }
+        return true;
+    }
+
+    /**
+     * create lock file
+     */
+    public function putLockFile(): bool
+    {
+        if (File::exists(public_path(self::LOCK_NAME)) === true) {
+            return false;
+        }
+        file_put_contents(self::LOCK_NAME, '');
+        return true;
     }
 }

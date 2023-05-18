@@ -1,5 +1,6 @@
 <?php
 
+use App\Entities\Task;
 use App\Http\Controllers\EmailSettingsController;
 use Illuminate\Support\Facades\Route;
 use TCG\Voyager\Facades\Voyager;
@@ -14,6 +15,9 @@ use TCG\Voyager\Facades\Voyager;
 | contains the "web" middleware group. Now create something great!
 |
  */
+Route::bind('taskId', function ($value) {
+    return Task::where('id', $value)->firstOrFail();
+});
 
 Route::redirect('/', '/admin');
 
@@ -502,7 +506,7 @@ Route::group(['prefix' => 'admin'], function () {
                     Route::post('/adding-task-to-planner', 'TasksController@addingTaskToPlanner')->name('addingTaskToPlanner'); 
                     Route::post('/store/planner', 'TasksController@saveTaskToPlanner')->name('storePlanner');
 
-                    Route::get('/{taskId}/checkQuantityInStock', 'TasksController@checkQuantityInStock')->name('checkQuantityInStock'); 
+                    Route::get('/{taskId}/checkQuantityInStock', 'TasksController@checkQuantityInStock')->name('checkQuantityInStock');   
                 });
             Route::prefix('reports')->as('reports.')
                 ->group(function () {

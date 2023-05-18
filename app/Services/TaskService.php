@@ -2,8 +2,9 @@
 
 namespace App\Services;
 
-use App\Repositories\Couriers;
 use Illuminate\Database\Eloquent\Collection;
+use App\Helpers\CourierHelper;
+use App\Helpers\TaskHelper;
 use App\Helpers\TaskTimeHelper;
 use App\Entities\Label;
 use App\Entities\Task;
@@ -14,6 +15,7 @@ use App\Repositories\TaskRepository;
 use App\Repositories\TaskTimeRepository;
 use App\Repositories\Tasks;
 use App\Repositories\TaskTimes;
+use App\Services\TaskTimeService;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Exception;
@@ -21,12 +23,16 @@ use Auth;
 
 class TaskService
 {
+    const USERS_SEPARATOR = [36, 37, 38];
+
+    const COLOR_SEPARATOR = ['FF0000', 'E6C74D', '194775'];
+
     public function __construct(
-        protected readonly TaskRepository $taskRepository, 
-        protected readonly TaskTimeRepository $taskTimeRepository, 
-        protected readonly Tasks $tasksRepository,
-        protected readonly Couriers $courierRepository,
-        protected readonly TaskTimes $taskTimesRepository
+        protected readonly TaskRepository       $taskRepository, 
+        protected readonly TaskTimeRepository   $taskTimeRepository, 
+        protected readonly Tasks                $tasksRepository,
+        protected readonly TaskTimeService      $taskTimeService,
+        protected readonly TaskTimes            $taskTimesRepository
     )
     {}
 
@@ -38,7 +44,7 @@ class TaskService
      */
     public function getTaskQuery(array $courierArray)
     {
-        return $this->tasksRepository->getTaskQuery($courierArray);
+        return $this->taskTimeService->getTaskQuery($courierArray);
     }
 
     /**
@@ -58,7 +64,7 @@ class TaskService
             $dates[$date->toDateString()] = [];
         }
         
-        $couriers = $this->courierRepository->getActiveOrderByNumber();
+        $couriers = CourierHelper::getActiveOrderByNumber();
         foreach ($couriers as $courier) {
             $tasksByDay = $dates;
             foreach ($this->getTaskQuery([$courier->courier_name])->get() as $task) {
@@ -103,14 +109,11 @@ class TaskService
      * @param string $start
      * @param string $end
      */
-    public function getSeparator($id,$start,$end) :array
+    public function getSeparator(int $id, string $start, string $end): array
     {
-        $users = [36, 37, 38];
-
         $separators = [];
-
-        foreach($users as $user_id){
-            $taskTime = $this->taskTimesRepository->getSeparator($user_id,$id,$start,$end);
+        foreach(self::USERS_SEPARATOR as $user_id){
+            $taskTime = TaskHelper::getSeparator($user_id, $id, $start, $end);
                
             if($taskTime->count()>0){
                 $taskTimeFirst = $taskTime->first();
@@ -139,38 +142,33 @@ class TaskService
      * Prepare task for handling
      *
      * @param int $user_id
-     * @param string $date
+     * @param object $date
      */
-    public function getUserSeparator($user_id,$date) :string
+    public function getUserSeparator(int $user_id, object $date): string
     {
-        $sep = '';
-        $separator = $this->getSeparator(16,$date->format('Y-m-d').' 00:00:00',$date->format('Y-m-d').' 23:59:59');
-        foreach($separator as $s){
-            if($s['resourceId'] == $user_id){
-                $sep = Carbon::parse($s['end'])->format('Y-m-d H:i:s');
+        $separatorDate = '';
+        $separators = $this->getSeparator(16, $date->format('Y-m-d').' 00:00:00', $date->format('Y-m-d').' 23:59:59');
+        foreach($separators as $separator){
+            if($separator['resourceId'] == $user_id){
+                $separatorDate = Carbon::parse($separator['end'])->format('Y-m-d H:i:s');
             }
         }
-        return $sep;
+        return $separatorDate;
     }
 
     /**
      * Transfers Task
      */
-    public function transfersTask() :string
+    public function transfersTask(): void
     {
-        $users = [36, 37, 38];
-        $colors = ['FF0000', 'E6C74D', '194775'];
-
         $today = Carbon::today();
-        foreach($users as $user_id){
+        foreach(self::USERS_SEPARATOR as $user_id){
             $time_start = Carbon::parse($today->format('Y-m-d').' '.$this->getTimeLastTask($user_id));
             
-            foreach($colors as $color){
-                $time_start = $this->prepareTransfersTask($user_id,$color,$time_start);
+            foreach(self::COLOR_SEPARATOR as $color){
+                $time_start = $this->prepareTransfersTask($user_id, $color, $time_start);
             }
         }
- 
-        return 'completed';
     }
 
     /**
@@ -180,15 +178,15 @@ class TaskService
      * @param string $color
      * @param string $time_start
      */
-    public function prepareTransfersTask($user_id,$color,$time_start) :string
+    public function prepareTransfersTask(int $user_id, string $color, string $time_start): string
     {
         $date = Carbon::yesterday();
 
-        $tasks = $this->tasksRepository->transfersTask($user_id,$color,$date);
+        $tasks = $this->taskTimeService->transfersTask($user_id, $color, $date);
 
         foreach($tasks as $task){
-            $time_start = $this->storeTransfersTask($task->taskTime->id,$time_start);
-            $this->moveTask($user_id,$time_start);
+            $time_start = $this->storeTransfersTask($task->taskTime->id, $time_start);
+            $this->moveTask($user_id, $time_start);
         }
         return $time_start;
     }
@@ -199,7 +197,7 @@ class TaskService
      * @param int $taskTime_id
      * @param string $time_start
      */
-    public function storeTransfersTask($taskTime_id,$time_start) :string
+    public function storeTransfersTask(int $taskTime_id, string $time_start): string
     {
         $date_start = $time_start;
         $date_end = Carbon::parse($time_start)->addMinutes(2);
@@ -220,7 +218,7 @@ class TaskService
      *
      * @param int $user_id
      */
-    public function getTimeLastTask($user_id) :string
+    public function getTimeLastTask(int $user_id): string
     {
         $date = Carbon::today();
         $taskTime = $this->taskTimesRepository->getTimeLastTask($user_id, $date);
@@ -230,32 +228,17 @@ class TaskService
     }
 
     /**
-     * get now task for handling
-     *
-     * @param int $user_id
-     */
-    public function getTimeLastNowTask($user_id) :string
-    {
-        $date = Carbon::today();
-        $taskTime = $this->taskTimesRepository->getTimeLastNowTask($user_id, $date);
-        $firstTaskTime = $taskTime->first(); 
-
-        return (isset($firstTaskTime->date_end) ? Carbon::parse($firstTaskTime->date_end)->format('H:i:s') : Carbon::now()->format('H:i:s'));
-    }
-
-
-    /**
      * Prepare task for handling
      *
      * @param int $user_id
      * @param string $time
      */
-    public function moveTask($user_id,$time) :bool
+    public function moveTask(int $user_id, string $time): void
     {
         $date = Carbon::today();
-        $sep = $this->getUserSeparator($user_id,$date);
+        $separatorDate = $this->getUserSeparator($user_id, $date);
 
-        if($time>=$sep){
+        if($time>=$separatorDate){
 
             $taskTimes = $this->taskTimesRepository->getMoveTask($user_id, $date);
 
@@ -266,34 +249,34 @@ class TaskService
                 ]);
             }
         }
-
-        return true;
     }
 
     /**
      * Get user task query
      *
      * @param int $user_id
+     * @return Collection<Task>
      */
-    public function getOpenUserTask($user_id): Collection
+    public function getOpenUserTask(int $user_id): Collection
     {
-        return $this->tasksRepository->getOpenUserTask($user_id);
+        return TaskHelper::getOpenUserTask($user_id);
     }
 
     /**
      * moving tasks backward
      *
-     * @param object $task
+     * @param Collection<Task> $task
+     * @return Collection<TaskTime>
      */
-    public function movingTasksBackward($task): Collection
+    public function movingTasksBackward(object $task): Collection
     {
-        $actualTaskTime = TaskTime::where('task_id',$task->id)->first();
+        $actualTaskTime = TaskTime::where('task_id', $task->id)->first();
         $date_start = Carbon::parse($actualTaskTime->date_start);
         $date_end = Carbon::parse($actualTaskTime->date_end);
 
         $totalDuration = $date_end->diffInMinutes($date_start);
 
-        $moveTasksTime = $this->taskTimesRepository->movingTasksBackward($task,$actualTaskTime,$date_start);
+        $moveTasksTime = $this->taskTimesRepository->movingTasksBackward($task, $actualTaskTime, $date_start);
         
         foreach($moveTasksTime as $taskTime){
             $startNextTaskAt = Carbon::parse($t->date_start)->subMinutes($totalDuration);
@@ -306,161 +289,5 @@ class TaskService
         }
 
         return $moveTasksTime;
-    }
-
-    /**
-     * check task login
-     *
-     * @param string $login
-     * @param object $address
-     * @param int $user_id
-     */
-    public function checkTaskLogin($login,$address,$user_id) :int
-    {
-        $tasks = $this->tasksRepository->checkTaskLogin($login, $user_id);
-
-        if(empty($tasks)){
-            return 0;
-        }
-
-        $taskID = 0;
-        foreach($tasks as $task){
-            if(
-                $task->order->getDeliveryAddress()->address == $address->address &&
-                $task->order->getDeliveryAddress()->flat_number == $address->flat_number &&
-                $task->order->getDeliveryAddress()->postal_code == $address->postal_code &&
-                $task->order->getDeliveryAddress()->city == $address->city &&
-                $task->order->getDeliveryAddress()->phone == $address->phone
-            ){
-                if($task->order->labels->contains('id', Label::BLUE_HAMMER_ID)){
-                    if(!$task->order->labels->contains('id', Label::RED_HAMMER_ID)){
-                        if(!$task->order->labels->contains('id', Label::ORDER_ITEMS_CONSTRUCTED)){
-                            if($task->parent_id){
-                                $taskID = $task->parent_id;
-                            }else{
-                                $taskID = $task->id;
-                            }
-                        }
-                    }
-                }else{
-                    if(!$task->order->labels->contains('id', Label::ORDER_ITEMS_REDEEMED_LABEL)){
-                        $taskID = -1; 
-                    }
-                }
-            }
-            
-        }
-        return $taskID;
-    }
-
-    /**
-     * add task to planer
-     *
-     * @param object $order
-     * @param int $user_id
-     */
-    public function addTaskToPlanner($order,$user_id) :int
-    {
-        $date = Carbon::today();
-        $start_date = $this->getTimeLastNowTask($user_id);
-        $start = Carbon::parse($date->format('Y-m-d').' '.$start_date);
-        $end = Carbon::parse($date->format('Y-m-d').' '.$start_date)->addMinutes(2);
-
-        $dataToStore = [
-            'start' => $start,
-            'end' => $end,
-            'id' => $user_id,
-            'user_id' => $user_id
-        ];
-        $task = $this->taskRepository->create([
-            'user_id' => $user_id,
-            'name' => $order->id !== null ? $order->id : null,
-            'created_by' => Auth::user()->id,
-            'color' => '194775',
-            'warehouse_id' => 16,
-            'status' => 'WAITING_FOR_ACCEPT',
-            'order_id' => $order->id !== null ? $order->id : null
-        ]);
-        $this->taskTimeRepository->create([
-            'task_id' => $task->id,
-            'date_start' => $start,
-            'date_end' => $end,
-        ]);
-
-        return $task->id;
-    }
-
-    /**
-     * add task to group planer
-     *
-     * @param object $order
-     * @param int $task_id
-     * @param int $user_id
-     */
-    public function addTaskToGroupPlanner($order,$task_id,$user_id) :int
-    {
-        $task = Task::find($task_id);
-        $date = Carbon::today();
-        $start_date = $this->getTimeLastNowTask($user_id);
-        $start = Carbon::parse($date->format('Y-m-d').' '.$start_date);
-        $end = Carbon::parse($date->format('Y-m-d').' '.$start_date)->addMinutes(2);
-
-        $dataToStore = [
-            'start' => $start,
-            'end' => $end,
-            'id' => $user_id,
-            'user_id' => $user_id
-        ];
-
-        if($task->childs->count() == 0){
-            $newGroup = $this->taskRepository->create([
-                'user_id' => $user_id,
-                'name' => $task->order_id.', '.$order->id,
-                'created_by' => Auth::user()->id,
-                'color' => '194775',
-                'warehouse_id' => 16,
-                'status' => 'WAITING_FOR_ACCEPT',
-            ]);
-            $this->taskTimeRepository->create([
-                'task_id' => $newGroup->id,
-                'date_start' => $start,
-                'date_end' => $end,
-            ]);
-
-            $task->update([
-                'parent_id' => $newGroup->id,
-            ]);
-            $group_id = $newGroup->id;
-        }else{
-            $name = explode(',',$task->name);
-            $name[] = $order->id;
-            $task->update([
-                'name' => join(', ',$name)
-            ]);
-
-            $task->taskTime->update([
-                'date_start' => $dataToStore['start'],
-                'date_end' => $dataToStore['end']
-            ]);
-            $group_id = $task->id;
-        }
-
-        $newTask = $this->taskRepository->create([
-            'user_id' => $user_id,
-            'name' => $order->id !== null ? $order->id : null,
-            'created_by' => Auth::user()->id,
-            'color' => '194775',
-            'warehouse_id' => 16,
-            'status' => 'WAITING_FOR_ACCEPT',
-            'order_id' => $order->id !== null ? $order->id : null,
-            'parent_id' => $group_id
-        ]);
-        $this->taskTimeRepository->create([
-            'task_id' => $newTask->id,
-            'date_start' => $start,
-            'date_end' => $end,
-        ]);
-
-        return $newTask->id;
     }
 }

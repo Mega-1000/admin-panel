@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\CourierHelper;
 use App\Repositories\Couriers;
 use Illuminate\Http\Request;
 use App\Http\Requests\CourierUpdateRequest;
@@ -15,10 +16,10 @@ class CourierController extends Controller
     /**
      * @var CourierRepository
      */
-    protected $repository;
+    protected $couriersRepository;
 
-    public function __construct(Couriers $repository) {
-        $this->repository = $repository;
+    public function __construct(Couriers $couriersRepository) {
+        $this->couriersRepository = $couriersRepository;
     }
 
     /**
@@ -26,14 +27,15 @@ class CourierController extends Controller
      */
     public function index(): View
     {
-        $couriers = $this->repository->getOrderByNumber();
+        $couriers = CourierHelper::getOrderByNumber();
         return view('courier.index', compact('couriers'));
     }
 
     /**
      * @param Courier $courier
      */
-    public function edit(Courier $courier): View {
+    public function edit(Courier $courier): View
+    {
         return view('courier.edit', compact('courier'));
     }
 
@@ -41,8 +43,8 @@ class CourierController extends Controller
      * @param  CourierUpdateRequest $request
      * @param  Courier             $courier
      */
-    public function update(CourierUpdateRequest $request, Courier $courier): RedirectResponse {
-
+    public function update(CourierUpdateRequest $request, Courier $courier): RedirectResponse
+    {
         $courier->fill($request->all());
         $courier->save();
 

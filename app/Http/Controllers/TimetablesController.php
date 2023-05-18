@@ -12,18 +12,13 @@ use Illuminate\Http\Request;
 
 class TimetablesController extends Controller
 {
-    protected $warehouseRepository;
-
-    protected $taskRepository;
-
     public function __construct(
-        WarehouseRepository $warehouseRepository, 
-        TaskRepository $taskRepository,
+        protected readonly WarehouseRepository $warehouseRepository, 
+        protected readonly TaskRepository $taskRepository,
         protected readonly TaskService  $taskService
     )
     {
-        $this->warehouseRepository = $warehouseRepository;
-        $this->taskRepository = $taskRepository;
+
     }
 
     public function index(Request $request)

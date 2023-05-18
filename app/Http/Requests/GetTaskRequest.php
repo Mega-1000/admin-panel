@@ -24,6 +24,8 @@ class GetTaskRequest extends FormRequest
     public function rules()
     {
         return [
+            'start' => 'required',
+            'end' => 'required'
         ];
     }
 }

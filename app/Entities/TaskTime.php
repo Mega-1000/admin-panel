@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * Class TaskTime.
  *
@@ -28,10 +29,7 @@ class TaskTime extends Model implements Transformable
         'transfer_date'
     ];
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function task()
+    public function task() :BelongsTo
     {
         return $this->belongsTo(Task::class);
     }
