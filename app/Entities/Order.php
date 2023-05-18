@@ -190,11 +190,17 @@ class Order extends Model implements Transformable
         return $this->toPayPackages() - $sum;
     }
 
-    /**
-     * @return float
-     */
     public function toPayPackages(): float
     {
+
+        $orderTotalPrice = $this->getSumOfGrossValues();
+        $totalPaymentAmount = $this->payments()->where('promise', '=', '')->sum('amount');
+
+        $finalPrice = $orderTotalPrice - $totalPaymentAmount;
+        if ($finalPrice > -2 && $finalPrice < 2) {
+            return 0.00;
+        }
+
         $sum = 0;
         $packages = $this->packages()->whereIn('status', ['SENDING', 'DELIVERED', 'NEW', 'WAITING_FOR_SENDING'])->get();
 
@@ -202,16 +208,12 @@ class Order extends Model implements Transformable
             $sum += $package->cash_on_delivery;
         }
 
-        $orderTotalPrice = $this->getSumOfGrossValues();
-        $payments = $this->payments()->where('promise', '=', '')->orWhere('promise', '=', '1')->get();
-        $amountSum = $payments->sum("amount");
-
-        $finalPrice = $orderTotalPrice - $amountSum;
-        if ($finalPrice > -2 && $finalPrice < 2) {
-            return 0;
+        $totalPromisePaymentAmount = $this->payments()->where('promise', '=', '')->sum('amount');
+        if ($totalPaymentAmount < 2 && $totalPromisePaymentAmount > 2) {
+            return round($orderTotalPrice - $totalPromisePaymentAmount - $sum, 2);
         }
 
-        return $finalPrice;
+        return round($orderTotalPrice - $totalPaymentAmount - $sum, 2);
     }
 
     public function packages(): HasMany
