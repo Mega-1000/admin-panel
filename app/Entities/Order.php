@@ -276,32 +276,20 @@ class Order extends Model implements Transformable
         return ($totalPaymentAmount > ($orderTotalPrice - $valueRange) && $totalPaymentAmount < ($orderTotalPrice + $valueRange));
     }
 
-    /**
-     * @return float|int
-     */
-    $orderTotalPrice = $this->getSumOfGrossValues();
+    public function toPay(): float
+    {
+
+        $orderTotalPrice = $this->getSumOfGrossValues();
         $amountSum = $this->payments()->where('promise', '=', '')->sum("amount");
         if ($amountSum <= 2) {
             $amountSum = $this->payments()->where('promise', '=', '1')->sum("amount");
         }
-        
+
         $finalPrice = $orderTotalPrice - $amountSum;
         if ($finalPrice > -2 && $finalPrice < 2) {
-            return 0;
+            return 0.00;
         }
-        return $finalPrice;
-    {
-        $orderTotalPrice = $this->getSumOfGrossValues();
-        if (floatval($this->payments()->where('promise', '=', '')->sum("amount")) > 2) {
-            $totalPaymentAmount = floatval($this->payments()->where('promise', '=', '')->sum("amount"));
-        } else {
-            $totalPaymentAmount = floatval($this->payments()->where('promise', '=', '1')->sum("amount"));
-        }
-        if ($orderTotalPrice - $totalPaymentAmount > -2 && $orderTotalPrice - $totalPaymentAmount < 2) {
-            return 0;
-        } else {
-            return $orderTotalPrice - $totalPaymentAmount;
-        }
+        return round($finalPrice, 2);
     }
 
     public function isDeliveryDataComplete(): bool
