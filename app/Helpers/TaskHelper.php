@@ -7,6 +7,7 @@ use App\Entities\Task;
 use App\Entities\TaskSalaryDetails;
 use App\Entities\TaskTime;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Collection;
 
 class TaskHelper
 {
@@ -69,7 +70,7 @@ class TaskHelper
      * @param $start
      * @param $end
      */
-    public static function getSeparator(int $user_id,int $id, string $start, string $end)
+    public static function getSeparator(int $user_id,int $id, string $start, string $end): Collection
     {
         return TaskTime::with('task')
         ->whereHas('task',
@@ -90,7 +91,7 @@ class TaskHelper
      * Transfers Task
      * @param int $user_id
      */
-    public static function getOpenUserTask(int $user_id)
+    public static function getOpenUserTask(int $user_id): Collection
     {
         return Task::where('user_id', $user_id)
         ->whereHas('order', function ($query) {
