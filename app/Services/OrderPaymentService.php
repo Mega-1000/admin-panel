@@ -85,7 +85,7 @@ class OrderPaymentService
         }
 
         $payment = $order->payments()->create([
-            'declared_amount' => PriceHelper::modifyPriceToValidFormat($amount),
+            'declared_sum' => PriceHelper::modifyPriceToValidFormat($amount),
             'master_payment_id' => $masterPaymentId ?: null,
             'promise' => $promise,
             'promise_date' => $promiseDate ?: null,
