@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+
+use App\DTO\Task\SeparatorDTO;
 use Illuminate\Database\Eloquent\Collection;
 use App\Helpers\CourierHelper;
 use App\Helpers\TaskHelper;
@@ -113,7 +115,7 @@ class TaskService
     {
         $separators = [];
         foreach(self::USERS_SEPARATOR as $user_id){
-            $taskTime = TaskHelper::getSeparator($user_id, $id, $start, $end);
+            $taskTime = $this->tasksRepository->getSeparator($user_id, $id, $start, $end);
                
             if($taskTime->count()>0){
                 $taskTimeFirst = $taskTime->first();
@@ -121,17 +123,17 @@ class TaskService
                 $start = Carbon::parse($taskTimeFirst->date_start)->subMinute();
                 $end = Carbon::parse($taskTimeFirst->date_start);
                 
-                $separators[] = [
-                    'id' => null,
-                    'resourceId' => $taskTimeFirst->task->user_id,
-                    'title' => '',
-                    'start' => $start->format('Y-m-d\TH:i'),
-                    'end' => $end->format('Y-m-d\TH:i'),
-                    'color' => '#000000',
-                    'text' => 'SEPARATOR',
-                    'customOrderId' => null,
-                    'customTaskId' => null
-                ];
+                $separators[] = new SeparatorDTO(
+                    null,
+                    $taskTimeFirst->task->user_id,
+                    '',
+                    $start->format('Y-m-d\TH:i'),
+                    $end->format('Y-m-d\TH:i'),
+                    '#000000',
+                    'SEPARATOR',
+                    null,
+                    null
+                );
             }
         }
         
@@ -259,7 +261,7 @@ class TaskService
      */
     public function getOpenUserTask(int $user_id): Collection
     {
-        return TaskHelper::getOpenUserTask($user_id);
+        return $this->tasksRepository->getOpenUserTask($user_id);
     }
 
     /**

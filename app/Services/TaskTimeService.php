@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\DTO\Task\AddingTaskResponseDTO;
+use App\DTO\Task\StockListDTO;
 use App\Entities\Order;
 use App\Entities\OrderItem;
 use App\Entities\Task;
@@ -22,7 +24,7 @@ use Auth;
 class TaskTimeService
 {
     public function __construct(
-        protected readonly TaskRepository       $taskRepository, 
+        protected readonly TaskRepository       $taskRepository,
         protected readonly TaskTimeRepository   $taskTimeRepository, 
         protected readonly Tasks                $tasksRepository,
         protected readonly TaskTimes            $taskTimesRepository
@@ -179,6 +181,22 @@ class TaskTimeService
             'user_id' => $user_id
         ];
 
+        $newTask = Task::create([
+            'user_id' => $user_id,
+            'name' => $order->id !== null ? $order->id : null,
+            'created_by' => Auth::user()->id,
+            'color' => '194775',
+            'warehouse_id' => 16,
+            'status' => 'WAITING_FOR_ACCEPT',
+            'order_id' => $order->id !== null ? $order->id : null,
+            'parent_id' => null
+        ]);
+        TaskTime::create([
+            'task_id' => $newTask->id,
+            'date_start' => $start,
+            'date_end' => $end,
+        ]);
+
         if($task->childs->count() == 0){
             $newGroup = Task::create([
                 'user_id' => $user_id,
@@ -197,35 +215,26 @@ class TaskTimeService
             $task->update([
                 'parent_id' => $newGroup->id,
             ]);
-            $group_id = $newGroup->id;
-        }else{
-            $name = explode(',',$task->name);
-            $name[] = $order->id;
-            $task->update([
-                'name' => join(', ',$name)
-            ]);
 
-            $task->taskTime->update([
-                'date_start' => $dataToStore['start'],
-                'date_end' => $dataToStore['end']
+            $newTask->update([
+                'parent_id' => $newGroup->id,
             ]);
-            $group_id = $task->id;
+            return $newTask->id;
         }
-
-        $newTask = Task::create([
-            'user_id' => $user_id,
-            'name' => $order->id !== null ? $order->id : null,
-            'created_by' => Auth::user()->id,
-            'color' => '194775',
-            'warehouse_id' => 16,
-            'status' => 'WAITING_FOR_ACCEPT',
-            'order_id' => $order->id !== null ? $order->id : null,
-            'parent_id' => $group_id
+        
+        $name = explode(',',$task->name);
+        $name[] = $order->id;
+        $task->update([
+            'name' => join(', ',$name)
         ]);
-        TaskTime::create([
-            'task_id' => $newTask->id,
-            'date_start' => $start,
-            'date_end' => $end,
+
+        $task->taskTime->update([
+            'date_start' => $dataToStore['start'],
+            'date_end' => $dataToStore['end']
+        ]);
+        
+        $newTask->update([
+            'parent_id' => $newGroup->id,
         ]);
 
         return $newTask->id;
@@ -250,37 +259,33 @@ class TaskTimeService
      * @param Order $order
      * @param int $delivery_warehouse
      */
-    public function addingTaskToPlanner(object $order, int $delivery_warehouse): array
+    public function addingTaskToPlanner(object $order, int $delivery_warehouse): AddingTaskResponseDTO
     {
-        $task = $this->tasksRepository->checkTaskLogin(
+        $task = $this->checkTaskLogin(
             $order->customer->login,
             $order->getDeliveryAddress(),
             $delivery_warehouse
         );
-      
-        if($task==0){
-            $id = $this->saveTaskToPlanner($order,$delivery_warehouse);
-        }else{
-            if($task==-1){
-                $array = [
-                    'status' => 'ERROR',
-                    'id' => $order->id,
-                    'delivery_warehouse' => $delivery_warehouse,
-                    'message' => 'Wstrzymać dodanianie zadania?'
-                ];
-                return $array;
-            }else {
-                $id = $this->addTaskToGroupPlanner($order,$task,$delivery_warehouse);
-            }
+        
+        if($task === -1) {
+            return new AddingTaskResponseDTO(
+                'ERROR', 
+                $order->id, 
+                $delivery_warehouse, 
+                'Wstrzymać dodawanie zadania?'
+            );
         }
 
-        $array = [
-            'status' => 'ADDED_TASK',
-            'id' => $id,
-            'message' => 'Dodano zadanie id: '.$id
-        ];
-
-        return $array;
+        return match($task) {
+            0 => $this->saveTaskToPlanner($order,$delivery_warehouse),
+            default => new AddingTaskResponseDTO(
+                'ADDED_TASK', 
+                $id, 
+                $delivery_warehouse, 
+                'Dodano zadanie id: '.$id
+            )
+        };
+        
     }
 
     /**
@@ -297,18 +302,66 @@ class TaskTimeService
                         $orderItem->quantity > $orderItem->product->getPositions()->first()->position_quantity ||
                         $orderItem->quantity > $orderItem->product->stock->quantity
                     ){
-                        $stockLists[$orderItem->order_id][] = [
-                            'product_stock_id' => $orderItem->product->id,
-                            'product_name' => $orderItem->product->name,
-                            'product_symbol' => $orderItem->product->symbol,
-                            'quantity' => $orderItem->quantity,
-                            'stock_quantity' => $orderItem->product->stock->quantity,
-                            'first_position_quantity' => $orderItem->product->getPositions()->first()->position_quantity
-                        ];
+                        $stockLists[$orderItem->order_id][] = new StockListDTO(
+                            $orderItem->product->id,
+                            $orderItem->product->name,
+                            $orderItem->product->symbol,
+                            $orderItem->quantity,
+                            $orderItem->product->stock->quantity,
+                            $orderItem->product->getPositions()->first()->position_quantity
+                        );
                     }
                 }
             }
         }
+
         return $stockLists;
+    }
+
+    /**
+     * check task login
+     *
+     * @param $login
+     * @param $address
+     * @param $user_id
+     */
+    public function checkTaskLogin(string $login, object $address, int $user_id): int
+    {
+        $tasks = $this->tasksRepository->getTaskLogin($login, $user_id);
+
+        if(empty($tasks)){
+            return 0;
+        }
+
+        $taskID = 0;
+        foreach($tasks as $task){
+            $delivery_address = $task->order->getDeliveryAddress();
+            $labels = $task->order->labels;
+            if(
+                $delivery_address->address == $address->address &&
+                $delivery_address->flat_number == $address->flat_number &&
+                $delivery_address->postal_code == $address->postal_code &&
+                $delivery_address->city == $address->city &&
+                $delivery_address->phone == $address->phone
+            ){
+                if($labels->contains('id', Label::BLUE_HAMMER_ID)){
+                    if(!$labels->contains('id', Label::RED_HAMMER_ID)){
+                        if(!$labels->contains('id', Label::ORDER_ITEMS_CONSTRUCTED)){
+                            if($task->parent_id){
+                                return $task->parent_id;
+                            }
+                            
+                            return $task->id;
+                        }
+                    }
+                }
+
+                if(!$labels->contains('id', Label::ORDER_ITEMS_REDEEMED_LABEL)){
+                    $taskID = -1; 
+                }
+            }
+            
+        }
+        return $taskID;
     }
 }

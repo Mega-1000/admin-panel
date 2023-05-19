@@ -3518,11 +3518,19 @@ class OrdersController extends Controller
     }
 
     /**
+     * Check if lock file is existing
+     */
+    private function isLockFileExisting(): bool
+    {
+        return File::exists(public_path(self::LOCK_NAME));
+    }
+
+    /**
      * unlink file if exist
      */
     public function unlinkLockFile(): bool
     {
-        if (File::exists(public_path(self::LOCK_NAME)) === true) {
+        if ($this->isLockFileExisting() === true) {
             unlink(public_path(self::LOCK_NAME));
         }
         return true;
@@ -3533,7 +3541,7 @@ class OrdersController extends Controller
      */
     public function putLockFile(): bool
     {
-        if (File::exists(public_path(self::LOCK_NAME)) === true) {
+        if ($this->isLockFileExisting() === true) {
             return false;
         }
         file_put_contents(self::LOCK_NAME, '');

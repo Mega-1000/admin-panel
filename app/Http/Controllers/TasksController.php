@@ -1388,4 +1388,8 @@ class TasksController extends Controller
         }
         return response()->json($response);
     }
+
+    public function test(){
+        return $this->taskService->transfersTask();
+    }
 }

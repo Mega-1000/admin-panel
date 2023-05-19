@@ -1027,6 +1027,7 @@
 
 @section('datatable-scripts')
     <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
+    <script src="{{ URL::asset('js/views/orders/taksWithChildren.js') }}"></script>
     <script>
         let getUrlParameter = function getUrlParameter(sParam) {
             var sPageURL = window.location.search.substring(1),
