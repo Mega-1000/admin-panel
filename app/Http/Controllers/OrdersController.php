@@ -892,11 +892,14 @@ class OrdersController extends Controller
         if($this->putLockFile()===false){
             return response(['error' => 'file_exist']);
         }
+        $skip = $data['skip'] ?? 0;
 
         $user =  Auth::user();
         
         $open = $this->taskService->getOpenUserTask($user->id);
 
+        $task = $this->taskService->prepareTask($data['package_type'], $skip);
+        
         if ($open->count()) {   
             $this->unlinkLockFile();
             return redirect()->back()->with([
