@@ -2799,7 +2799,6 @@
                         $('#selectWarehouse').val(16);
                         $('#warehouseSelect').attr('selected', true);
                         $('#selectWarehouse').click();
-                        alert(delivery_warehouse);
                         addingTaskToPlanner(orderId,delivery_warehouse);
                         refreshDtOrReload();
                     }
