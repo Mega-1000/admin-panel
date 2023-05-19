@@ -1998,8 +1998,13 @@
                             let text = '';
                             const settledDeclared = [];
                             var payments = row['payments'];
+                            let returnedValue = 0;
 
                             payments.forEach(payment => {
+                                if (payment.operation_type) {
+                                    returnedValue += parseFloat(payment.amount);
+                                }
+
                                 if (payment.deleted_at !== null) {
                                     return;
                                 }
@@ -2029,6 +2034,7 @@
                             text += `<p> ZW: ${totalOfReturns} </p>`;
                             text += `<p> D: ${totalOfDeclaredPayments} </p>`
                             text += `<p> BI: ${bilans} </p>`;
+                            text += `<p> WZT: ${returnedValue} </p>`
 
                             settledDeclared.forEach((amount) => {
                                 text += `<p> ZD: ${amount} </p>`;

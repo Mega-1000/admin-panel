@@ -72,7 +72,7 @@
         </a>
         <a id="delete-button-orderPayments" style="float:right;margin-right: 15px;"
            href="{{route('order_payments.create_return', ['order' => $order->id]) }}" target="_blank"
-           class="btn btn-danger install pull-right">
+           class="btn btn-primary install pull-right">
             <i class="voyager-plus"></i> <span>@lang('order_payments.create_return')</span>
         </a>
         <a id="create-button-orderTasks" style="float:right;margin-right: 15px;"
@@ -2778,6 +2778,7 @@
             var createButtonOrderPayments = $('#create-button-orderPayments').hide();
             var createButtonOrderTasks = $('#create-button-orderTasks').hide();
             var createButtonOrderPackages = $('#create-button-orderPackages').hide();
+            const createReturnOrderPayments = $('#delete-button-orderPayments').hide();
             var uri = $('#uri').val()
             var value;
             var referrer = document.referrer;
@@ -2807,6 +2808,7 @@
                 warehousePayments.hide();
                 speditionPayments.hide();
                 createButtonOrderPayments.show();
+                createReturnOrderPayments.show();
                 createButtonOrderPackages.hide();
                 createButtonOrderTasks.hide();
                 pageTitle.removeClass();
@@ -2833,6 +2835,7 @@
                 speditionPayments.hide();
                 status.hide();
                 createButtonOrderPayments.hide();
+                createReturnOrderPayments.hide();
                 createButtonOrderPackages.hide();
                 createButtonOrderTasks.show();
                 pageTitle.removeClass();
@@ -2859,6 +2862,7 @@
                 warehousePayments.hide();
                 speditionPayments.hide();
                 createButtonOrderPayments.hide();
+                createReturnOrderPayments.hide();
                 createButtonOrderPackages.show();
                 createButtonOrderTasks.hide();
                 pageTitle.removeClass();
@@ -2884,6 +2888,7 @@
                 warehousePayments.hide();
                 speditionPayments.hide();
                 createButtonOrderPayments.hide();
+                createReturnOrderPayments.hide();
                 createButtonOrderPackages.hide();
                 createButtonOrderTasks.hide();
                 pageTitle.removeClass();
@@ -2918,6 +2923,7 @@
                     pageTitle.removeClass();
                     pageTitle.addClass('voyager-file-text');
                     createButtonOrderPayments.hide();
+                    createReturnOrderPayments.hide();
                     createButtonOrderPackages.hide();
                     createButtonOrderTasks.hide();
                     breadcrumb.children().remove();
@@ -2947,6 +2953,7 @@
                     pageTitle.removeClass();
                     pageTitle.addClass('voyager-calendar');
                     createButtonOrderPayments.hide();
+                    createReturnOrderPayments.hide();
                     createButtonOrderPackages.hide();
                     createButtonOrderTasks.show();
                     breadcrumb.children().last().remove();
@@ -2974,6 +2981,7 @@
                     pageTitle.removeClass();
                     pageTitle.addClass('voyager-wallet');
                     createButtonOrderPayments.show();
+                    createReturnOrderPayments.show();
                     createButtonOrderPackages.hide();
                     createButtonOrderTasks.hide();
 
@@ -3003,6 +3011,7 @@
                     pageTitle.removeClass();
                     pageTitle.addClass('voyager-chat');
                     createButtonOrderPayments.hide();
+                    createReturnOrderPayments.hide();
                     createButtonOrderPackages.hide();
                     createButtonOrderTasks.hide();
 
@@ -3030,6 +3039,7 @@
                     pageTitle.removeClass();
                     pageTitle.addClass('voyager-archive');
                     createButtonOrderPayments.hide();
+                    createReturnOrderPayments.hide();
                     createButtonOrderPackages.show();
                     createButtonOrderTasks.hide();
                     breadcrumb.children().last().remove();
@@ -3084,6 +3094,7 @@
                     pageTitle.removeClass();
                     pageTitle.addClass('voyager-tag');
                     createButtonOrderPayments.hide();
+                    createReturnOrderPayments.hide();
                     createButtonOrderPackages.hide();
                     createButtonOrderTasks.hide();
                     breadcrumb.children().last().remove();
@@ -3111,6 +3122,7 @@
                     pageTitle.removeClass();
                     pageTitle.addClass('voyager-tag');
                     createButtonOrderPayments.hide();
+                    createReturnOrderPayments.hide();
                     createButtonOrderPackages.hide();
                     createButtonOrderTasks.hide();
                     breadcrumb.children().last().remove();
@@ -3138,6 +3150,7 @@
                     pageTitle.removeClass();
                     pageTitle.addClass('voyager-tag');
                     createButtonOrderPayments.show();
+                    createReturnOrderPayments.showz();
                     createButtonOrderPackages.hide();
                     createButtonOrderTasks.hide();
                     breadcrumb.children().last().remove();

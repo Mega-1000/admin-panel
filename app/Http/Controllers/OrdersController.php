@@ -1473,31 +1473,6 @@ class OrdersController extends Controller
         $removeLabel = 0;
         $addLabel = 0;
         $ordersToUpdate = [];
-        if ($order->status_id == 5 || $order->status_id == 6) {
-            if ($sumToCheck > 5 || $sumToCheck < -5) {
-                /** @var Order $ord */
-                foreach ($sumOfOrdersReturn[1] as $orderInstance) {
-                    $ordersToUpdate[] = [
-                        'order' => $orderInstance,
-                        'removeLabel' => 133,
-                        'addLabel' => 134,
-                    ];
-                }
-            } else {
-                foreach ($sumOfOrdersReturn[1] as $orderInstance) {
-                    $ordersToUpdate[] = [
-                        'order' => $orderInstance,
-                        'removeLabel' => 134,
-                        'addLabel' => 133,
-                    ];
-                }
-            }
-        } else {
-            $ordersToUpdate[] = [
-                'order' => $order,
-                'removeLabel' => [133, 134],
-            ];
-        }
 
         foreach ($ordersToUpdate as $element) {
             $loopPreventionArray = [];
