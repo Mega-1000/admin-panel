@@ -63,7 +63,7 @@
                         <option value="{{ $firm->symbol }}">{{ $firm->symbol }}</option>
                     @endforeach
                 </select>
-            </div>`
+            </div>
             <div class="form-group">
                 <label for="declared_sum">@lang('order_payments.form.declared_sum')</label>
                 <input type="text" class="form-control" id="declared_sum" name="declared_sum"

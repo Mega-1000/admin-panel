@@ -21,8 +21,14 @@
             <input id="days-interval" class="form-control" value="7" placeholder="interwal liczenia dla okresów sprzedaży">
         </div>
         <div class="mt-5">
-            <label for="firm-id">Symbol firmy</label>
-            <input class="form-control" id="firm-id" type="text">
+            <div class="form-group">
+                <label for="firm-id">Symbol firmy</label>
+                <select class="select2" data-live-search="true" name="firm-id" id="firm-id">
+                    @foreach($firms as $firm)
+                        <option value="{{ $firm }}">{{ $firm }}</option>
+                    @endforeach
+                </select>
+            </div>
         </div>
         <div class="mt-5">
             <label for="client-email">Email kliena</label>
