@@ -8,16 +8,16 @@ use App\Entities\Task;
 use App\Entities\TaskTime;
 use App\Entities\Label;
 use Illuminate\Database\Eloquent\Collection;
+use Carbon\Carbon;
 
 class TaskTimes
 {
     /**
      * Get Separator
-     * @param $user_id
-     * @param $date
+     * 
      * @return Collection<TaskTime>
      */
-    public static function getTimeLastTask(int $user_id, object $date): Collection
+    public static function getTimeLastTask(int $user_id, Carbon $date): Collection
     {
         return TaskTime::with(['task'])
         ->whereHas('task',
@@ -34,11 +34,10 @@ class TaskTimes
 
     /**
      * Get Separator
-     * @param $user_id
-     * @param $date
+     * 
      * @return Collection<TaskTime>
      */
-    public static function getTimeLastNowTask(int $user_id, object $date): Collection
+    public static function getTimeLastNowTask(int $user_id, Carbon $date): Collection
     {
         return TaskTime::with(['task'])
         ->whereHas('task',
@@ -55,11 +54,10 @@ class TaskTimes
     
     /**
      * Get Move Task
-     * @param $user_id
-     * @param $date
+     * 
      * @return Collection<TaskTime>
      */
-    public static function getMoveTask(int $user_id, object $date): Collection
+    public static function getMoveTask(int $user_id, Carbon $date): Collection
     {
         return TaskTime::with(['task'])
                 ->whereHas('task',
@@ -76,12 +74,10 @@ class TaskTimes
 
     /**
      * Move Task
-     * @param $task
-     * @param $taskTime
-     * @param $date_start
+     * 
      * @return Collection<TaskTime>
      */
-     public static function movingTasksBackward(object $task, object $taskTime, object $date_start): Collection
+     public static function movingTasksBackward(Task $task, TaskTime $taskTime, Carbon $date_start): Collection
      {
         return TaskTime::with(['task'])
             ->whereHas('task',

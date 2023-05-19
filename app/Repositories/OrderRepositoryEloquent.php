@@ -35,12 +35,4 @@ class OrderRepositoryEloquent extends BaseRepository implements OrderRepository
             ['id', '<=', $to]
         ]);
     }
-
-    /**
-     * @param Order $order
-     */
-    public function getOrderWithCustomer(int $order_id): Order
-    {
-        return $this->with(['customer','labels'])->where('id',$order_id)->first();
-    }
 }

@@ -16,6 +16,7 @@ use App\Enums\CourierName;
 use App\Repositories\TaskRepository;
 use App\Repositories\TaskTimeRepository;
 use App\Repositories\Tasks;
+use App\Repositories\Couriers;
 use App\Repositories\TaskTimes;
 use App\Services\TaskTimeService;
 use Carbon\Carbon;
@@ -34,7 +35,8 @@ class TaskService
         protected readonly TaskTimeRepository   $taskTimeRepository, 
         protected readonly Tasks                $tasksRepository,
         protected readonly TaskTimeService      $taskTimeService,
-        protected readonly TaskTimes            $taskTimesRepository
+        protected readonly TaskTimes            $taskTimesRepository,
+        protected readonly Couriers             $couriersRepository
     )
     {}
 
@@ -46,7 +48,7 @@ class TaskService
      */
     public function getTaskQuery(array $courierArray)
     {
-        return $this->taskTimeService->getTaskQuery($courierArray);
+        return $this->taskTimeService->getWarehouseUserWithBlueHammerLabelQuery($courierArray);
     }
 
     /**
@@ -66,7 +68,7 @@ class TaskService
             $dates[$date->toDateString()] = [];
         }
         
-        $couriers = CourierHelper::getActiveOrderByNumber();
+        $couriers = Couriers::getActiveOrderByNumber();
         foreach ($couriers as $courier) {
             $tasksByDay = $dates;
             foreach ($this->getTaskQuery([$courier->courier_name])->get() as $task) {
@@ -107,15 +109,13 @@ class TaskService
     /**
      * Prepare task for handling
      *
-     * @param int $id
-     * @param string $start
-     * @param string $end
+     * @return SeparatorDTO[]
      */
     public function getSeparator(int $id, string $start, string $end): array
     {
         $separators = [];
         foreach(self::USERS_SEPARATOR as $user_id){
-            $taskTime = $this->tasksRepository->getSeparator($user_id, $id, $start, $end);
+            $taskTime = Tasks::getSeparator($user_id, $id, $start, $end);
                
             if($taskTime->count()>0){
                 $taskTimeFirst = $taskTime->first();
@@ -143,10 +143,8 @@ class TaskService
     /**
      * Prepare task for handling
      *
-     * @param int $user_id
-     * @param object $date
      */
-    public function getUserSeparator(int $user_id, object $date): string
+    public function getUserSeparator(int $user_id, Carbon $date): string
     {
         $separatorDate = '';
         $separators = $this->getSeparator(16, $date->format('Y-m-d').' 00:00:00', $date->format('Y-m-d').' 23:59:59');
@@ -176,9 +174,6 @@ class TaskService
     /**
      * Prepare Transfer Task
      *
-     * @param int $user_id
-     * @param string $color
-     * @param string $time_start
      */
     public function prepareTransfersTask(int $user_id, string $color, string $time_start): string
     {
@@ -187,19 +182,17 @@ class TaskService
         $tasks = $this->taskTimeService->transfersTask($user_id, $color, $date);
 
         foreach($tasks as $task){
-            $time_start = $this->storeTransfersTask($task->taskTime->id, $time_start);
+            $time_start = $this->updateTransfersTask($task->taskTime->id, $time_start);
             $this->moveTask($user_id, $time_start);
         }
         return $time_start;
     }
 
     /**
-     * Prepare task for handling
+     * Update task time
      *
-     * @param int $taskTime_id
-     * @param string $time_start
      */
-    public function storeTransfersTask(int $taskTime_id, string $time_start): string
+    public function updateTransfersTask(int $taskTime_id, string $time_start): string
     {
         $date_start = $time_start;
         $date_end = Carbon::parse($time_start)->addMinutes(2);
@@ -216,24 +209,21 @@ class TaskService
     }
 
     /**
-     * Prepare task for handling
+     * Get last task time
      *
-     * @param int $user_id
      */
     public function getTimeLastTask(int $user_id): string
     {
         $date = Carbon::today();
-        $taskTime = $this->taskTimesRepository->getTimeLastTask($user_id, $date);
+        $taskTime = TaskTimes::getTimeLastTask($user_id, $date);
         $firstTaskTime = $taskTime->first(); 
-
-        return (isset($firstTaskTime->date_end) ? Carbon::parse($firstTaskTime->date_end)->format('H:i:s') : TaskTime::TIME_START);
+        
+        return $firstTaskTime?->date_end?->format('H:i:s') ?? TaskTime::TIME_START;
     }
 
     /**
-     * Prepare task for handling
+     * Updating transfer task time
      *
-     * @param int $user_id
-     * @param string $time
      */
     public function moveTask(int $user_id, string $time): void
     {
@@ -242,7 +232,7 @@ class TaskService
 
         if($time>=$separatorDate){
 
-            $taskTimes = $this->taskTimesRepository->getMoveTask($user_id, $date);
+            $taskTimes = TaskTimes::getMoveTask($user_id, $date);
 
             foreach($taskTimes as $taskTime){
                 $taskTime->update([
@@ -256,21 +246,19 @@ class TaskService
     /**
      * Get user task query
      *
-     * @param int $user_id
      * @return Collection<Task>
      */
     public function getOpenUserTask(int $user_id): Collection
     {
-        return $this->tasksRepository->getOpenUserTask($user_id);
+        return Tasks::getOpenUserTask($user_id);
     }
 
     /**
      * moving tasks backward
      *
-     * @param Collection<Task> $task
      * @return Collection<TaskTime>
      */
-    public function movingTasksBackward(object $task): Collection
+    public function movingTasksBackward(Collection $task): Collection
     {
         $actualTaskTime = TaskTime::where('task_id', $task->id)->first();
         $date_start = Carbon::parse($actualTaskTime->date_start);
@@ -278,11 +266,11 @@ class TaskService
 
         $totalDuration = $date_end->diffInMinutes($date_start);
 
-        $moveTasksTime = $this->taskTimesRepository->movingTasksBackward($task, $actualTaskTime, $date_start);
+        $moveTasksTime = TaskTimes::movingTasksBackward($task, $actualTaskTime, $date_start);
         
         foreach($moveTasksTime as $taskTime){
-            $startNextTaskAt = Carbon::parse($t->date_start)->subMinutes($totalDuration);
-	        $endNextTaskAt = Carbon::parse($t->date_end)->subMinutes($totalDuration);
+            $startNextTaskAt = $taskTime->date_start->subMinutes($totalDuration);
+	        $endNextTaskAt = $taskTime->date_end->subMinutes($totalDuration);
             $taskTime->update([
                 'date_start' => $startNextTaskAt,
                 'date_end' => $endNextTaskAt

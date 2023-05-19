@@ -7,16 +7,16 @@ use JsonSerializable;
 
 class AddingTaskResponseDTO extends BaseDTO implements JsonSerializable
 {
-    private $status;
-    private $id;
-    private $delivery_warehouse;
-    private $message;
-
-    public function __construct(string $status, int $id, int $delivery_warehouse, string $message)
+    public function __construct(
+        private string $status, 
+        private int $id, 
+        private int $deliveryWarehouse, 
+        private string $message
+    )
     {
         $this->status = $status;
         $this->id = $id;
-        $this->delivery_warehouse = $delivery_warehouse;
+        $this->deliveryWarehouse = $deliveryWarehouse;
         $this->message = $message;
     }
 
@@ -25,7 +25,7 @@ class AddingTaskResponseDTO extends BaseDTO implements JsonSerializable
         return [
             'status' => $this->status,
             'id' => $this->id,
-            'delivery_warehouse' => $this->delivery_warehouse,
+            'delivery_warehouse' => $this->deliveryWarehouse,
             'message' => $this->message
         ];
     }

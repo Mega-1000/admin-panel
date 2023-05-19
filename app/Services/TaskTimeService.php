@@ -10,6 +10,7 @@ use App\Entities\Task;
 use App\Entities\TaskTime;
 use App\Entities\Label;
 use App\Entities\LabelGroup;
+use App\Entities\OrderAddress;
 use App\Services\TaskService;
 use App\Repositories\TaskRepository;
 use App\Repositories\TaskTimeRepository;
@@ -33,102 +34,56 @@ class TaskTimeService
 
     /**
      * Get courier orderBy
-     * @param int $id
+     * 
      */
     public static function getTask(int $id): Task|null
     {
-        return Task::with(['user', 'taskTime', 'taskSalaryDetail', 'order', 'childs' => function ($q) {
-            $q->with(['order' => function ($q) {
-                $q->with(['labels' => function ($q) {
-                    $q->where('label_group_id', LabelGroup::PRODUCTION_LABEL_GROUP_ID)->orWhereIn('labels.id',
-                        [Label::BLUE_BATTERY_LABEL_ID, Label::ORANGE_BATTERY_LABEL_ID, Label::ORDER_ITEMS_REDEEMED_LABEL]);
-                }]);
-            }]);
-        }])->where('id',$id)->first();
+        return Tasks::getTaskLabel($id);
     }
 
     /**
-     * Get Task children
+     * Get Tasks Waiting For Accept With Children
      * @return Collection<Task>
      */
-    public static function getTasksWithChildren(): Collection
+    public static function getTasksWaitingForAcceptWithChildren(): Collection
     {
-        return Task::with('taskTime','childs')
-            ->has('childs')
-            ->where('status',Task::WAITING_FOR_ACCEPT)
-            ->get();
+        return Tasks::getTasksWaitingForAccept();
     }
 
     /**
-     * Get courier orderBy
-     * @param int $id
+     * Get All Tasks With Childrens
+     * 
      */
-    public static function getChildren(int $id): Task
+    public static function getAllTasksWithChildrens(int $id): Task
     {
-        return Task::with('taskTime','childs')
-            ->has('childs')
-            ->find($id);
+        return Tasks::getAllTasksWithChildrens($id);
     }
 
     /**
      * Get task query
-     * @param array $courierArray
+     * 
      */
-    public static function getTaskQuery(array $courierArray): Builder
+    public static function getWarehouseUserWithBlueHammerLabelQuery(array $couriersNames): Builder
     {
-        return Task::where('user_id', Task::WAREHOUSE_USER_ID)
-        ->whereHas('order', function ($query) use ($courierArray) {
-            $query->whereHas('packages', function ($query) use ($courierArray) {
-                $query->whereIn('service_courier_name', $courierArray);
-            })->whereHas('labels', function ($query) {
-                $query
-                    ->where('labels.id', Label::BLUE_HAMMER_ID);
-            })->whereHas('dates', function ($query) {
-                $query->orderBy('consultant_shipment_date_to');
-            })
-                ->whereDoesntHave('labels', function ($query) {
-                    $query->where('labels.id', Label::RED_HAMMER_ID)
-                        ->orWhere('labels.id', Label::GRAY_HAMMER_ID)
-                        ->orWhere('labels.id', Label::PRODUCTION_STOP_ID);
-                });
-        })
-        ->orderByRaw("FIELD(color, 'FF0000', 'E6C74D', '194775')");
+        return Tasks::getWarehouseUserWithBlueHammerLabelQuery($couriersNames);
     }
 
     /**
      * Transfers Task
-     * @param int $user_id
-     * @param string $color
-     * @param Carbon $date
+     * 
      * @return Collection<Task>
      */
-    public static function transfersTask(int $user_id, string $color, object $date): Collection
+    public static function transfersTask(int $user_id, string $color, Carbon $date): Collection
     {
-        return Task::with(['taskTime'])
-        ->where('status',Task::WAITING_FOR_ACCEPT)
-        ->where('user_id',$user_id)
-        ->where('color',$color)
-        ->whereNull('parent_id')
-        ->whereNull('rendering')
-        ->whereHas('taskTime', function ($query) use ($date) {
-            $query->where('date_start', 'like' , $date->format('Y-m-d')."%");
-        })->where(function($query) {
-            $query->whereHas('order', function ($query) {
-                $query->whereHas('labels', function ($query) {
-                    $query->where('labels.id', Label::RED_HAMMER_ID)
-                        ->orWhere('labels.id', Label::BLUE_HAMMER_ID);
-                });
-            })->orWhereDoesntHave('order');
-        })->get();
+        return Tasks::getTransfersTask($user_id, $color, $date);
     }
 
     /**
      * add task to planer
      *
      * @param Collection<Order> $order
-     * @param int $user_id
      */
-    public function saveTaskToPlanner(object $order, int $user_id): int
+    public function saveTaskToPlanner(Collection $order, int $user_id): int
     {
         $date = Carbon::today();
         $start_date = $this->getTimeLastNowTask($user_id);
@@ -160,13 +115,11 @@ class TaskTimeService
     }
 
     /**
-     * add task to group planer
-     *
+     * Add task to group planer
+     * 
      * @param Collection<Order> $order
-     * @param int $task_id
-     * @param int $user_id
      */
-    public function addTaskToGroupPlanner(object $order, int $task_id, int $user_id): int
+    public function addTaskToGroupPlanner(Collection $order, int $task_id, int $user_id): int
     {
         $task = Task::find($task_id);
         $date = Carbon::today();
@@ -241,57 +194,55 @@ class TaskTimeService
     }
 
     /**
-     * get now task for handling
+     * Get now task for handling
      *
-     * @param int $user_id
      */
     public function getTimeLastNowTask(int $user_id): string
     {
         $date = Carbon::today();
-        $taskTime = $this->taskTimesRepository->getTimeLastNowTask($user_id, $date);
+        $taskTime = TaskTimes::getTimeLastNowTask($user_id, $date);
         $firstTaskTime = $taskTime->first(); 
 
-        return (isset($firstTaskTime->date_end) ? Carbon::parse($firstTaskTime->date_end)->format('H:i:s') : Carbon::now()->format('H:i:s'));
+        return $firstTaskTime?->date_end?->format('H:i:s') ?? Carbon::now()->format('H:i:s');
     }
 
     /**
      * Adding Task To Planner
-     * @param Order $order
-     * @param int $delivery_warehouse
+     * 
      */
-    public function addingTaskToPlanner(object $order, int $delivery_warehouse): AddingTaskResponseDTO
+    public function addingTaskToPlanner(Order $order, int $deliveryWarehouse): AddingTaskResponseDTO
     {
         $task = $this->checkTaskLogin(
             $order->customer->login,
             $order->getDeliveryAddress(),
-            $delivery_warehouse
+            $deliveryWarehouse
         );
-        
+
         if($task === -1) {
             return new AddingTaskResponseDTO(
                 'ERROR', 
                 $order->id, 
-                $delivery_warehouse, 
+                $deliveryWarehouse, 
                 'Wstrzymać dodawanie zadania?'
             );
         }
 
         return match($task) {
-            0 => $this->saveTaskToPlanner($order,$delivery_warehouse),
+            0 => $this->saveTaskToPlanner($order, $deliveryWarehouse),
             default => new AddingTaskResponseDTO(
                 'ADDED_TASK', 
                 $id, 
                 $delivery_warehouse, 
-                'Dodano zadanie id: '.$id
+                'Dodano zadanie id: ' . $id
             )
         };
         
     }
 
     /**
-     * @param $tasks
+     * @return StockListDTO[]
      */
-    public function getQuantityInStockList(object $tasks): array
+    public function getQuantityInStockList(Collection $tasks): array
     {
         $stockLists = []; 
         foreach($tasks as $task){
@@ -307,7 +258,7 @@ class TaskTimeService
                             $orderItem->product->name,
                             $orderItem->product->symbol,
                             $orderItem->quantity,
-                            $orderItem->product->stock->quantity,
+                            ($orderItem->product->stock->count() ? $orderItem->product->stock->quantity : 0),
                             $orderItem->product->getPositions()->first()->position_quantity
                         );
                     }
@@ -321,13 +272,10 @@ class TaskTimeService
     /**
      * check task login
      *
-     * @param $login
-     * @param $address
-     * @param $user_id
      */
-    public function checkTaskLogin(string $login, object $address, int $user_id): int
+    public function checkTaskLogin(string $login, OrderAddress $address, int $user_id): int
     {
-        $tasks = $this->tasksRepository->getTaskLogin($login, $user_id);
+        $tasks = Tasks::getTaskLogin($login, $user_id);
 
         if(empty($tasks)){
             return 0;

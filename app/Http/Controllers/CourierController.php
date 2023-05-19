@@ -27,7 +27,7 @@ class CourierController extends Controller
      */
     public function index(): View
     {
-        $couriers = CourierHelper::getOrderByNumber();
+        $couriers = $this->couriersRepository->getOrderByNumber();
         return view('courier.index', compact('couriers'));
     }
 

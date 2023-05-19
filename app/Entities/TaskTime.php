@@ -29,6 +29,19 @@ class TaskTime extends Model implements Transformable
         'transfer_date'
     ];
 
+    protected $dates = [
+        'date_start',
+        'date_end',
+        'transfer_date'
+    ];
+
+    protected $casts = [
+        'task_id' => 'integer',
+        'date_start' => 'datetime',
+        'date_end' => 'datetime',
+        'transfer_date' => 'datetime'
+    ];
+    
     public function task(): BelongsTo
     {
         return $this->belongsTo(Task::class);

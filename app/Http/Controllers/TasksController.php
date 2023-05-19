@@ -23,10 +23,12 @@ use App\Http\Requests\BreakDownRequest;
 use App\Http\Requests\AddingTaskToPlanerRequest;
 use App\Http\Requests\GetTaskRequest;
 use App\Repositories\OrderRepository;
+use App\Repositories\Orders;
 use App\Repositories\TaskRepository;
 use App\Repositories\Tasks;
 use App\Repositories\TaskTimes;
 use App\Repositories\TaskTimeRepository;
+use App\Repositories\TrackerLog;
 use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
 use App\Services\Label\AddLabelService;
@@ -55,12 +57,14 @@ class TasksController extends Controller
         protected readonly TaskRepository       $repository,
         protected readonly UserRepository       $userRepository,
         protected readonly OrderRepository      $orderRepository,
+        protected readonly Orders            $ordersRepository,
         protected readonly WarehouseRepository  $warehouseRepository,
         protected readonly Tasks                $tasksRepository,
         protected readonly TaskTimeRepository   $taskTimeRepository,
         protected readonly TaskService          $taskService,
         protected readonly TaskTimeService      $taskTimeService,
-        protected readonly TaskTimes            $taskTimesRepository
+        protected readonly TaskTimes            $taskTimesRepository,
+        protected readonly TrackerLog           $trackerLogRepository
     )
     {}
 
@@ -388,20 +392,10 @@ class TasksController extends Controller
     public function getTasks(GetTaskRequest $request, $id)
     {
         $data = $request->validated();
+        
+        $tasks = $this->tasksRepository->getTaskSalaryDetail($id, $data);
 
-        $tasks = Task::with(['taskTime', 'taskSalaryDetail'])
-            ->whereHas('taskTime',
-                function ($query) use ($data) {
-                    $query->whereDate('date_start', '>=', $data['start']);
-                    $query->whereDate('date_end', '<=', $data['end']);
-                })
-            ->where('warehouse_id', $id)
-            ->whereNull('parent_id')
-            ->whereNull('rendering')
-            ->get();
-
-        $laziness = TrackerLogs::whereDate('created_at', '>=', $data['start'])
-            ->whereDate('updated_at', '<=', $data['end'])->get();
+        $laziness = $this->trackerLogRepository->getTrakerLogs($data);
 
 
         $array = [];
@@ -1249,7 +1243,7 @@ class TasksController extends Controller
      * Get Task
      * @param $id
      */
-    public function getTask($id): JsonResponse
+    public function getTask(int $id): JsonResponse
     {
         $task = $this->taskTimeService->getTask($id);
 
@@ -1271,18 +1265,17 @@ class TasksController extends Controller
      */
     public function getTasksWithChildren(): JsonResponse
     {
-        $tasks = $this->taskTimeService->getTasksWithChildren();
+        $tasks = $this->taskTimeService->getTasksWaitingForAcceptWithChildren();
         
         return response()->json($tasks);
     }
 
     /**
      * Get Children
-     * @param $task
      */
-    public function getChildren($task): JsonResponse
+    public function getChildren(int $taskId): JsonResponse
     {
-        $task = $this->taskTimeService->getChildren($task->id);
+        $task = $this->taskTimeService->getAllTasksWithChildrens($taskId);
         
         return response()->json($task->childs);
     }
@@ -1297,7 +1290,8 @@ class TasksController extends Controller
 
             $taskId = $data['task'];
             if($taskId != null){
-                $tasks = Task::with(['parent'])->where('parent_id', $taskId)->get();
+                $tasks = $this->tasksRepository->getChildTasks($taskId);
+                
                 foreach($tasks as $task){
 
                     $parent = $task->parent->first();
@@ -1344,7 +1338,7 @@ class TasksController extends Controller
     public function addingTaskToPlanner(AddingTaskToPlanerRequest $request): JsonResponse
     {
         $data = $request->validated();
-        $order = $this->orderRepository->getOrderWithCustomer($data['order_id']);
+        $order = $this->ordersRepository->getOrderWithCustomer($data['order_id']);
         $firm = Firm::where('name',$data['delivery_warehouse'])->first();
         $array = $this->taskTimeService->addingTaskToPlanner($order,$firm->id);
         return response()->json($array);
@@ -1356,7 +1350,7 @@ class TasksController extends Controller
     public function saveTaskToPlanner(AddingTaskToPlanerRequest $request): RedirectResponse
     {
         $data = $request->validated();
-        $order = $this->orderRepository->getOrderWithCustomer($data['order_id']);
+        $order = $this->ordersRepository->getOrderWithCustomer($data['order_id']);
         $firm = Firm::where('name',$data['delivery_warehouse'])->first();
         $id = $this->taskTimeService->saveTaskToPlanner($order,$firm->id);
 
@@ -1369,10 +1363,10 @@ class TasksController extends Controller
     /**
      * @param int $taskId
      */
-    public function checkQuantityInStock($task): JsonResponse
+    public function checkQuantityInStock(int $taskId): JsonResponse
     {
         try {
-            $tasks = Task::with(['parent'])->where('id', $task->id)->orWhere('parent_id', $task->id)->get();
+            $tasks = Task::with(['parent'])->where('id', $taskId)->orWhere('parent_id', $taskId)->get();
 
             $lists = $this->taskTimeService->getQuantityInStockList($tasks);
             $response = [
@@ -1390,6 +1384,6 @@ class TasksController extends Controller
     }
 
     public function test(){
-        return $this->taskService->transfersTask();
+       $this->taskService->transfersTask();
     }
 }

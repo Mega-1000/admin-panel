@@ -855,17 +855,15 @@ class OrdersController extends Controller
             ]);
         }
         
-        try {
-            if (empty($task)) {
-                throw new Exception('Brak nieprzydzielonych paczek dla: ' . $data['package_type'] . ' spróbuj wygenerować paczki dla innego kuriera');
-            }
-        }catch (\Exception $e) {
+        if ($task === null) {
             $this->unlinkLockFile();
+            
             return redirect()->back()->with([
-                'message' => $e->getMessage(),
+                'message' => 'Brak nieprzydzielonych paczek dla: ' . $data['package_type'] . ' spróbuj wygenerować paczki dla innego kuriera',
                 'alert-type' => 'error',
             ]);
         }
+
         $user = User::find($data['user_id']);
         $ordersSimilar = OrdersHelper::findSimilarOrders($task->order);
 
@@ -885,10 +883,10 @@ class OrdersController extends Controller
         return response($views . $view, 200);
     }
 
-    public function findPackageAuto(Request $request)
+    public function findPackageAuto(OrdersFindPackageRequest $request)
     {
         $finalPdfFileName = self::ALL_SMALL_PRINTS_PDF;
-        $data = $request->all();
+        $data = $request->validated();
 
         dispatch((new RemoveFileLockJob(self::LOCK_NAME))->delay(360));
         if($this->putLockFile()===false){
