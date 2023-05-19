@@ -2,9 +2,9 @@
 
 @section('app-header')
     <h1 class="page-title">
-        <i class="voyager-people"></i> @lang('customers.title')
-        <a href="{!! route('customers.create') !!}" class="btn btn-success btn-add-new">
-            <i class="voyager-plus"></i> <span>@lang('customers.create')</span>
+        <i class="voyager-people"></i> @lang('payments.index')
+        <a href="{!! route('payments.clean') !!}" class="btn btn-danger clean-payments">
+            <i class="voyager-bomb"></i><span>@lang('payments.clean')</span>
         </a>
     </h1>
 @endsection
@@ -79,7 +79,7 @@
             order: [[1, "asc"]],
             ajax: {
                 type: 'GET',
-                url:'{!! route('customers.datatable') !!}',
+                url: '{!! route('customers.datatable') !!}',
 
                 /* tymczasowy fix bo to wogólę nie działało niech ktoś na to zobaczy
 
@@ -184,9 +184,9 @@
                     className: 'column-status dt-center',
                     render: function (status) {
                         if (status === 'ACTIVE') {
-                            return '<span style="color: green;">' + {!! json_encode(__('customers.table.active'), true) !!} +'</span>';
+                            return '<span style="color: green;">' + {!! json_encode(__('customers.table.active'), true) !!} + '</span>';
                         } else {
-                            return '<span style="color: red;">' + {!! json_encode(__('customers.table.pending'), true) !!} +'</span>';
+                            return '<span style="color: red;">' + {!! json_encode(__('customers.table.pending'), true) !!} + '</span>';
                         }
                     }
                 },
@@ -212,23 +212,23 @@
         @foreach($visibilities as $key =>$row)
 
         var {{'show'.$row->name}}  = @json($row->show);
-        {{'show'.$row->name}} = {{'show'.$row->name}}.map(function(x){
+        {{'show'.$row->name}} = {{'show'.$row->name}}.map(function (x) {
             // if (typeof table.column(x+':name').index() === "number")
-            return table.column(x+':name').index();
+            return table.column(x + ':name').index();
         });
         {{'show'.$row->name}} = {{'show'.$row->name}}.filter(function (el) {
             return el != null;
         });
 
         var {{'hidden'.$row->name}} = @json($row->hidden);
-        {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.map(function(x){
+        {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.map(function (x) {
             // if (typeof table.column(x+':name').index() === "number")
-            return table.column(x+':name').index();
+            return table.column(x + ':name').index();
         });
         {{'hidden'.$row->name}} = {{'hidden'.$row->name}}.filter(function (el) {
             return el != null;
         });
-        table.button().add({{1+$key}},{
+        table.button().add({{1+$key}}, {
             extend: 'colvisGroup',
             text: '{{$row->display_name}}',
             show: {{'show'.$row->name}},
@@ -236,11 +236,22 @@
         });
         @endforeach
 
+        $('.clean-payments').on('click', function (e) {
+            e.preventDefault();
+            if (confirm('Czy napewno chcesz usunąć bazę płatności? Proces jest nieodwracalny!!!')) {
+                if (confirm('Ale napewno? PROCESU NIE DA SIĘ ODWRÓCIĆ!!!')) {
+                    if (confirm('PAMIĘTAJ, JESTEŚ ZA TO ODPOWIEDZIALNY. Kasujemy dane?')) {
+                        window.location = $(this).attr('href');
+                    }
+                }
+            }
+        });
+
         $('#dataTable thead tr th').each(function (i) {
             var title = $(this).text();
             if (title !== '' && title !== 'Akcje') {
-                $(this).html('<div><span>'+title+'</span></div><div><input type="text" placeholder="Szukaj '+ title +'" id="columnSearch' + i + '"/></div>');
-            } else if(title == 'Akcje') {
+                $(this).html('<div><span>' + title + '</span></div><div><input type="text" placeholder="Szukaj ' + title + '" id="columnSearch' + i + '"/></div>');
+            } else if (title == 'Akcje') {
                 $(this).html('<span id="columnSearch' + i + '">Akcje</span>');
             }
             $('input', this).on('keyup change', function () {
@@ -252,15 +263,15 @@
                 }
             });
         });
-        $('#dataTable').on( 'column-visibility.dt', function ( e, settings, column, state ) {
+        $('#dataTable').on('column-visibility.dt', function (e, settings, column, state) {
             console.log([column, state]);
-            if(state === true) {
-                    let columnSearch =  $("#columnSearch" + (column));
-                    columnSearch.parent().show();
+            if (state === true) {
+                let columnSearch = $("#columnSearch" + (column));
+                columnSearch.parent().show();
 
             } else {
-                    let columnSearch =  $("#columnSearch" + (column));
-                    columnSearch.parent().hide();
+                let columnSearch = $("#columnSearch" + (column));
+                columnSearch.parent().hide();
             }
 
         });

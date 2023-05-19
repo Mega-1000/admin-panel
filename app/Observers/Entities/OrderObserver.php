@@ -9,31 +9,34 @@ use App\Jobs\DispatchLabelEventByNameJob;
 use App\Mail\ShipmentDateInOrderChangedMail;
 use App\Repositories\StatusRepository;
 use App\Services\Label\AddLabelService;
+use App\Services\OrderPaymentLabelsService;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
-class OrderObserver
+readonly class OrderObserver
 {
-    /** @var StatusRepository */
-    protected $statusRepository;
-
     /**
      * OrderObserver constructor.
      * @param StatusRepository $statusRepository
+     * @param OrderPaymentLabelsService $orderPaymentLabelsService
      */
-    public function __construct(StatusRepository $statusRepository)
+    public function __construct(
+        protected StatusRepository $statusRepository,
+        protected OrderPaymentLabelsService $orderPaymentLabelsService,
+    )
     {
-        $this->statusRepository = $statusRepository;
     }
 
-    public function created(Order $order)
+    public function created(Order $order): void
     {
         dispatch(new DispatchLabelEventByNameJob($order, "new-order-created"));
+
+        $this->orderPaymentLabelsService->calculateLabels($order);
     }
 
-    public function updating(Order $order)
+    public function updating(Order $order): void
     {
         if (!$order->isDirty()) {
             return;
@@ -75,7 +78,7 @@ class OrderObserver
         }
     }
 
-    public function updated(Order $order)
+    public function updated(Order $order): void
     {
         if (count($order->payments)) {
             if ($order->isPaymentRegulated()) {
@@ -92,5 +95,7 @@ class OrderObserver
                 dispatch(new DispatchLabelEventByNameJob($order, "added-delivery-address"));
             }
         }
+
+        $this->orderPaymentLabelsService->calculateLabels($order);
     }
 }

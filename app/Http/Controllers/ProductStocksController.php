@@ -337,7 +337,7 @@ class ProductStocksController extends Controller
     {
         return view('product_stocks.place_multiple_admin_orders', [
             'productStocks' => ProductStock::all(),
-            'firms' => Firm::all(),
+            'firms' => Product::distinct('manufacturer')->pluck('manufacturer')->toArray(),
         ]);
     }
 

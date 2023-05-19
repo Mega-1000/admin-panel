@@ -906,18 +906,15 @@ class OrdersController extends Controller
                 'alert-type' => 'error',
             ]);
         }
-        try {
-            $task = $this->taskService->prepareTask($data['package_type'], 0);
-            if (empty($task)) {
-                throw new Exception('Brak nieprzydzielonych paczek dla: ' . $data['package_type'] . ' spróbuj wygenerować paczki dla innego kuriera');
-            }
-        }catch (\Exception $e) {   
+        
+        if ($task === null) {
             $this->unlinkLockFile();
             return redirect()->back()->with([
-                'message' => $e->getMessage(),
+                'message' => 'Brak nieprzydzielonych paczek dla: ' . $data['package_type'] . ' spróbuj wygenerować paczki dla innego kuriera',
                 'alert-type' => 'error',
             ]);
         }
+        
         $ordersSimilar = OrdersHelper::findSimilarOrders($task->order);
 
         if (!$user->can_decline) {

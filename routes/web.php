@@ -325,11 +325,15 @@ Route::group(['prefix' => 'admin'], function () {
         Route::get('orderPayments/datatable/{id}',
             'OrdersPaymentsController@datatable')->name('order_payments.datatable');
         Route::get('orderPayments/create/{id}', 'OrdersPaymentsController@create')->name('order_payments.create');
+        //order_payments.create_return
+        Route::get('orderPaymenyts/create-return/{order}', 'OrdersPaymentsController@createReturn')->name('order_payments.create_return');
+        Route::post('orderPaymenyts/create-return/{order}', 'OrdersPaymentsController@storeReturn')->name('order_payments.create_return_post');
         Route::get('orderPayments/create/{id}/master',
             'OrdersPaymentsController@createMaster')->name('order_payments.createMaster');
         Route::get('orderPayments/create/{id}/master/without',
             'OrdersPaymentsController@createMasterWithoutOrder')->name('order_payments.createMasterWithoutOrder');
         Route::get('payments', 'OrdersPaymentsController@payments')->name('payments.index');
+        Route::get('payments/clean', 'OrdersPaymentsController@cleanTable')->name('payments.clean');
         Route::get('payments/{id}/list', 'OrdersPaymentsController@paymentsEdit')->name('payment.index');
         Route::get('payments/{id}/delete', 'OrdersPaymentsController@paymentsDestroy')->name('payments.destroy');
         Route::get('payments/{id}/edit', 'OrdersPaymentsController@paymentsEdit')->name('payments.edit');
@@ -575,8 +579,8 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('/newAttachmentDeclaration', 'AllegroChatController@newAttachmentDeclaration')->name('newAttachmentDeclaration');
             Route::post('/uploadAttachment/{attachmentId}', 'AllegroChatController@uploadAttachment')->name('uploadAttachment');
         });
-
     });
+
     Route::group(['prefix' => 'tracker', 'as' => 'tracker.'], __DIR__ . '/web/TrackerLogsRoutes.php');
     Route::group(['as' => 'transactions.'], __DIR__ . '/web/TransactionsRoutes.php');
     Route::group(['as' => 'workingEvents.'], __DIR__ . '/web/WorkingEventsRoutes.php');
@@ -595,6 +599,9 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('/{courier}/update', 'CourierController@update')->name('courier.update');     
     });
   
+    Route::get('/transactions/rebook/{orderPayment}', 'OrdersPaymentsController@rebook')->name('orderPayments.rebook');
+    Route::post('/transactions/rebook/{order}/{payment}', 'OrdersPaymentsController@rebookStore')->name('orderPayments.rebookStore');
+
     Route::post('/upload-invoice', 'InvoicesController@uploadInvoice')->name('uploadInvoice');
 });
 

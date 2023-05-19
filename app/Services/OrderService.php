@@ -2,21 +2,28 @@
 
 namespace App\Services;
 
+use App\DTO\orderPayments\OrderPaymentDTO;
 use App\DTO\ProductStocks\CalculateMultipleAdminOrderDTO;
 use App\DTO\ProductStocks\CreateMultipleOrdersDTO;
 use App\DTO\ProductStocks\ProductStocks\CreateAdminOrderDTO;
 use App\Entities\Customer;
 use App\Entities\Order;
+use App\Entities\OrderPayment;
 use App\Entities\Product;
 use App\Entities\ProductStock;
 use App\Entities\ProductStockPosition;
+use App\Enums\OrderPaymentsEnum;
 use App\Helpers\BackPackPackageDivider;
 use App\Helpers\OrderBuilder;
 use App\Helpers\OrderPriceCalculator;
 use App\Repositories\Customers;
+use App\Repositories\OrderPaymentRepository;
+use App\Repositories\OrderPayments;
 use App\Repositories\ProductStockLogs;
 use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class OrderService
 {
@@ -37,7 +44,7 @@ class OrderService
         return [
             'calculatedQuantity' => max($orderQuantity, 0),
             'inOneDay' => ProductStockLogs::getTotalQuantityForProductStockInLastDays($dto->productStock, $dto->daysToFuture) / $dto->daysBack,
-            'soldInLastDays' => ProductStockLogs::getTotalQuantityForProductStockInLastDays($dto->productStock, $dto->daysToFuture),
+            'soldInLastDays' => ProductStockLogs::getTotalQuantityForProductStockInLastDays($dto->productStock, $dto->daysBack),
         ];
     }
 
@@ -124,7 +131,7 @@ class OrderService
      * @param int $id
      * @return int
      */
-    public function getAllProductsQuantity(int $id)
+    public function getAllProductsQuantity(int $id): int
     {
         return ProductStockPosition::query()
             ->where('product_stock_id', $id)
@@ -139,7 +146,7 @@ class OrderService
      * @param int $daysBack
      * @return array
      */
-    public function getProductIntervals(ProductStock $productStock, int $interval, int $daysBack)
+    public function getProductIntervals(ProductStock $productStock, int $interval, int $daysBack): array
     {
         $intervals = [];
         $days = 0;
@@ -152,5 +159,30 @@ class OrderService
         }
 
         return $intervals;
+    }
+
+    /**
+     * @param Order $order
+     * @param OrderPayment $payment
+     * @param OrderPaymentDTO $paymentDTO
+     *
+     * @return void
+     */
+    public function rebookStore(Order $order, OrderPayment $payment, OrderPaymentDTO $paymentDTO): void {
+        DB::transaction(function() use ($payment, $order, $paymentDTO) {
+            OrderPayments::createRebookedOrderPayment(
+                $order,
+                $paymentDTO,
+                OrderPaymentsEnum::REBOOKED_TYPE_IN . " " . (string)$payment->order()->first()->id,
+                $payment
+            );
+
+            OrderPayments::createRebookedOrderPayment(
+                $payment->order()->first(),
+                $paymentDTO->setAmount($paymentDTO->getAmount() * -1),
+                OrderPaymentsEnum::REBOOKED_TYPE_OUT . " " . $order->id,
+                $payment
+            );
+        });
     }
 }

@@ -29,7 +29,7 @@ class TaskTime extends Model implements Transformable
         'transfer_date'
     ];
 
-    public function task() :BelongsTo
+    public function task(): BelongsTo
     {
         return $this->belongsTo(Task::class);
     }
