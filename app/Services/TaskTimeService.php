@@ -83,7 +83,7 @@ class TaskTimeService
      *
      * @param Collection<Order> $order
      */
-    public function saveTaskToPlanner(Collection $order, int $user_id): int
+    public function saveTaskToPlanner(Order $order, int $user_id): int
     {
         $date = Carbon::today();
         $start_date = $this->getTimeLastNowTask($user_id);
@@ -210,7 +210,7 @@ class TaskTimeService
      * Adding Task To Planner
      * 
      */
-    public function addingTaskToPlanner(Order $order, int $deliveryWarehouse): AddingTaskResponseDTO
+    public function addingTaskToPlanner(Order $order, int $deliveryWarehouse): AddingTaskResponseDTO|int
     {
         $task = $this->checkTaskLogin(
             $order->customer->login,
