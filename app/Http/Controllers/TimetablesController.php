@@ -6,19 +6,18 @@ use App\Entities\Task;
 use App\Entities\Warehouse;
 use App\Repositories\TaskRepository;
 use App\Repositories\WarehouseRepository;
+use App\Services\TaskService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class TimetablesController extends Controller
 {
-    protected $warehouseRepository;
-
-    protected $taskRepository;
-
-    public function __construct(WarehouseRepository $warehouseRepository, TaskRepository $taskRepository)
+    public function __construct(
+        protected readonly WarehouseRepository $warehouseRepository,
+        protected readonly TaskRepository      $taskRepository,
+        protected readonly TaskService         $taskService
+    )
     {
-        $this->warehouseRepository = $warehouseRepository;
-        $this->taskRepository = $taskRepository;
     }
 
     public function index(Request $request)
@@ -29,7 +28,7 @@ class TimetablesController extends Controller
         if (isset($request->id)) {
             $string = explode('-', $request->id);
             if (isset($string[1])) {
-                if($string[0] == 'taskOrder') {
+                if ($string[0] == 'taskOrder') {
                     $tasks = Task::where('order_id', (int)$string[1]);
                     if ($tasks->count() == 0) {
                         return redirect()->back()->with([
@@ -98,6 +97,6 @@ class TimetablesController extends Controller
             abort(404);
         }
 
-        return response()->json($warehouse->users, 200);
+        return response()->json($warehouse->users);
     }
 }

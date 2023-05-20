@@ -155,7 +155,10 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
+    align-items: center;
     margin-bottom: 5px !important;
+    border: 1px solid #ddd;
+    background-color: #f7f6f6;
 }
 
 .z-index-max {
@@ -201,3 +204,5 @@
     from {transform:rotate(0deg);}
     to {transform:rotate(359deg);}
 }
+.fc-rows tr:nth-child(even) {background: #eee;}
+.fc-rows tr:nth-child(even) td {border: 1px solid #ddd;}

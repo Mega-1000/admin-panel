@@ -5,14 +5,13 @@ namespace App\Helpers;
 use App\Entities\Task;
 use App\User;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Log;
 
 class TaskTimeHelper
 {
 
-    public static function getFirstAvailableTime($duration, $data = false)
+    public static function getFirstAvailableTime(int $duration, array $data = [])
     {
-        if (!$data) {
+        if (count($data) === 0) {
             $date = Carbon::now();
             $date->setTime(8, 0);
             $data = [
@@ -24,7 +23,7 @@ class TaskTimeHelper
         }
 
         $allow = false;
-        while (!$allow) {
+        while ($allow === false) {
             $allow = self::allowTaskMove($data);
             if ($allow) {
                 return $data;
@@ -41,16 +40,15 @@ class TaskTimeHelper
         }
     }
 
-    public static function allowTaskMove($data)
+    public static function allowTaskMove($data): bool
     {
-        $tasks = Task::with(['taskTime'])->whereNull('parent_id')->whereHas('taskTime', function ($query) use ($data) {
-            $dateStart = new Carbon($data['start']);
-            $dateEnd = new Carbon($data['end']);
-            $query->whereRaw('((`date_start` BETWEEN "' . $dateStart->addMinute()->toDateTimeString() . '" AND "' . $dateEnd->subMinute()->toDateTimeString() . '" OR `date_end` BETWEEN "' . $dateStart->addMinute()->toDateTimeString() . '" AND "' . $dateEnd->subMinute()->toDateTimeString() . '") OR ("' . $dateStart->addMinute()->toDateTimeString() . '" BETWEEN `date_start` AND `date_end` OR "' . $dateEnd->subMinute()->toDateTimeString() . '" BETWEEN `date_start` AND `date_end` ))');
-        })->where([
-            ['id', '!=', $data['id'] !== null ? $data['id'] : null],
-            ['user_id', '=', $data['user_id']]
-        ])->count();
-        return $tasks == 0;
+        return Task::with(['taskTime'])->whereNull('parent_id')->whereHas('taskTime', function ($query) use ($data) {
+                $dateStart = new Carbon($data['start']);
+                $dateEnd = new Carbon($data['end']);
+                $query->whereRaw('((`date_start` BETWEEN "' . $dateStart->addMinute()->toDateTimeString() . '" AND "' . $dateEnd->subMinute()->toDateTimeString() . '" OR `date_end` BETWEEN "' . $dateStart->addMinute()->toDateTimeString() . '" AND "' . $dateEnd->subMinute()->toDateTimeString() . '") OR ("' . $dateStart->addMinute()->toDateTimeString() . '" BETWEEN `date_start` AND `date_end` OR "' . $dateEnd->subMinute()->toDateTimeString() . '" BETWEEN `date_start` AND `date_end` ))');
+            })->where([
+                ['id', '!=', $data['id'] !== null ? $data['id'] : null],
+                ['user_id', '=', $data['user_id']]
+            ])->exists() === false;
     }
 }

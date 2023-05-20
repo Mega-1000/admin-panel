@@ -263,6 +263,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('orders/sendSelfOrderToWarehouse/{id}',
             'OrdersController@sendSelfOrderToWarehouse')->name('orders.sendSelfOrderToWarehouse');
         Route::post('orders/findPackage', 'OrdersController@findPackage')->name('orders.findPackage');
+        Route::post('orders/findPackageAuto', 'OrdersController@findPackageAuto')->name('orders.findPackageAuto');
         Route::post('orders/accept-deny', 'OrdersController@acceptDeny')->name('accept-deny');
         Route::post('orders/datatable', 'OrdersController@datatable')->name('orders.datatable');
         Route::post('orders/printAll', 'OrdersController@printAll')->name('orders.printAll');
@@ -482,6 +483,8 @@ Route::group(['prefix' => 'admin'], function () {
                     Route::get('/datatable', 'TasksController@datatable')->name('datatable');
                     Route::post('/store', 'TasksController@store')->name('store');
                     Route::get('/create', 'TasksController@create')->name('create');
+                    Route::get('/getTasksWithChildren', 'TasksController@getTasksWithChildren')->name('getTasksWithChildren');
+                    Route::get('/{taskId}/getChildren', 'TasksController@getChildren')->name('getChildren');
                     Route::get('/{id}/edit', 'TasksController@edit')->name('edit');
                     Route::get('/{id}/delete', 'TasksController@destroy')->name('destroy');
                     Route::put('/{id}/update', 'TasksController@update')->name('update');
@@ -497,7 +500,14 @@ Route::group(['prefix' => 'admin'], function () {
                     Route::post('/rejectTask', 'TasksController@rejectTask')->name('rejectTask');
                     Route::post('/produce', 'TasksController@produceOrders')->name('produceOrders');
                     Route::post('/produce-redirect', 'TasksController@produceOrdersRedirect')->name('produceOrdersRedirect');
+                    Route::post('/produce-break-down', 'TasksController@breakDownTask')->name('breakDownTask');
                     Route::post('/mark-denied/', 'TasksController@deny')->name('deny');
+
+                    Route::post('/adding-task-to-planner', 'TasksController@addingTaskToPlanner')->name('addingTaskToPlanner');
+                    Route::post('/store/planner', 'TasksController@saveTaskToPlanner')->name('storePlanner');
+
+                    Route::get('/{taskId}/checkQuantityInStock', 'TasksController@checkQuantityInStock')->name('checkQuantityInStock');  
+                    
                 });
             Route::prefix('reports')->as('reports.')
                 ->group(function () {
@@ -580,6 +590,12 @@ Route::group(['prefix' => 'admin'], function () {
     Route::put('/email/settings/{emailSetting}/update', [EmailSettingsController::class, 'update'])->name('emailSettings.update');
     Route::delete('/email/settings/{emailSetting}/destroy', [EmailSettingsController::class, 'destroy'])->name('emailSettings.destroy');
 
+    Route::prefix('courier')->as('courier.')->group(function () {
+        Route::get('/', 'CourierController@index')->name('courier.index');           
+        Route::get('/{courier}/edit', 'CourierController@edit')->name('courier.edit');
+        Route::put('/{courier}/update', 'CourierController@update')->name('courier.update');     
+    });
+  
     Route::get('/transactions/rebook/{orderPayment}', 'OrdersPaymentsController@rebook')->name('orderPayments.rebook');
     Route::post('/transactions/rebook/{order}/{payment}', 'OrdersPaymentsController@rebookStore')->name('orderPayments.rebookStore');
 

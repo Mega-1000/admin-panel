@@ -2,36 +2,48 @@
 
 namespace App\Http\Controllers;
 
+use App\Entities\Firm;
 use App\Entities\Label;
-use App\Entities\LabelGroup;
 use App\Entities\Order;
 use App\Entities\Task;
 use App\Entities\TaskSalaryDetails;
 use App\Entities\TaskTime;
-use App\Entities\TrackerLogs;
 use App\Entities\Warehouse;
 use App\Helpers\OrderCalcHelper;
 use App\Helpers\OrdersHelper;
 use App\Helpers\TaskHelper;
 use App\Helpers\TaskTimeHelper;
+use App\Http\Requests\AddingTaskToPlanerRequest;
+use App\Http\Requests\BreakDownRequest;
 use App\Http\Requests\DenyTaskRequest;
+use App\Http\Requests\GetTaskRequest;
 use App\Http\Requests\TaskCreateRequest;
 use App\Http\Requests\TaskUpdateRequest;
 use App\Repositories\OrderRepository;
+use App\Repositories\Orders;
 use App\Repositories\TaskRepository;
+use App\Repositories\Tasks;
 use App\Repositories\TaskTimeRepository;
+use App\Repositories\TaskTimes;
+use App\Repositories\TrackerLog;
 use App\Repositories\UserRepository;
 use App\Repositories\WarehouseRepository;
 use App\Services\Label\AddLabelService;
 use App\Services\Label\RemoveLabelService;
+use App\Services\TaskService;
+use App\Services\TaskTimeService;
 use App\User;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Log;
 use Yajra\DataTables\Facades\DataTables;
+
+// TODO REFAKTORYZACJA REQUESTÓW !!! BARDZO WAŻNE
 
 /**
  * Class TasksController.
@@ -40,32 +52,20 @@ use Yajra\DataTables\Facades\DataTables;
  */
 class TasksController extends Controller
 {
-    /**
-     * @var TaskRepository
-     */
-    protected $repository;
-
-    protected $userRepository;
-
-    protected $orderRepository;
-
-    protected $warehouseRepository;
-
-    protected $taskTimeRepository;
-
     public function __construct(
-        TaskRepository      $repository,
-        UserRepository      $userRepository,
-        OrderRepository     $orderRepository,
-        WarehouseRepository $warehouseRepository,
-        TaskTimeRepository  $taskTimeRepository
+        protected readonly TaskRepository      $repository,
+        protected readonly UserRepository      $userRepository,
+        protected readonly OrderRepository     $orderRepository,
+        protected readonly Orders              $ordersRepository,
+        protected readonly WarehouseRepository $warehouseRepository,
+        protected readonly Tasks               $tasksRepository,
+        protected readonly TaskTimeRepository  $taskTimeRepository,
+        protected readonly TaskService         $taskService,
+        protected readonly TaskTimeService     $taskTimeService,
+        protected readonly TaskTimes           $taskTimesRepository,
+        protected readonly TrackerLog          $trackerLogRepository
     )
     {
-        $this->repository = $repository;
-        $this->userRepository = $userRepository;
-        $this->orderRepository = $orderRepository;
-        $this->warehouseRepository = $warehouseRepository;
-        $this->taskTimeRepository = $taskTimeRepository;
     }
 
 
@@ -139,6 +139,7 @@ class TasksController extends Controller
                 'date_start' => $request->date_start,
                 'date_end' => $request->date_end,
             ]);
+
             $task->taskSalaryDetail()->create($request->all());
 
             if ($request->quickTask) {
@@ -388,34 +389,22 @@ class TasksController extends Controller
         return $collection;
     }
 
-    public function getTasks(Request $request, $id)
+    public function getTasks(GetTaskRequest $request, $id)
     {
-        $tasks = Task::with(['taskTime', 'taskSalaryDetail'])
-            ->whereHas('taskTime',
-                function ($query) use ($request) {
-                    $query->whereDate('date_start', '>=', $request->start);
-                    $query->whereDate('date_end', '<=', $request->end);
-                })
-            ->where('warehouse_id', $id)
-            ->whereNull('parent_id')
-            ->whereNull('rendering')
-            ->get();
+        $data = $request->validated();
 
-        $laziness = TrackerLogs::whereDate('created_at', '>=', $request->start)
-            ->whereDate('updated_at', '<=', $request->end)->get();
-
+        $tasks = $this->tasksRepository->getTaskSalaryDetail($id, $data);
 
         $array = [];
         foreach ($tasks as $task) {
             $start = new Carbon($task->taskTime->date_start);
             $end = new Carbon($task->taskTime->date_end);
             if ($task->taskSalaryDetail != null) {
-                $consultantNotice = $task->order ? $task->order->consultant_notices : $task->taskSalaryDetail->consultant_notice;
-                $warehouseNotice = $task->order ? $task->order->warehouse_notice : $task->taskSalaryDetail->warehouse_notice;
+                $consultantNotice = $task->order?->consultant_notices ?? $task->taskSalaryDetail->consultant_notice;
+                $warehouseNotice = $task->order?->warehouse_notice ?? $task->taskSalaryDetail->warehouse_notice;
                 $text = 'ID Zadania: ' . $task->id . ', Nazwa zadania: ' . $task->name . ', Wykonuje: ' . $task->user->name . ', Rozpoczęcie: ' . $start->toDateTimeString() . ', Zakończenie: ' . $end->toDateTimeString() . ', Koszt obsługi konsultanta: ' . $task->taskSalaryDetail->consultant_value . ', Uwagi konsultanta: ' . $consultantNotice . ', Koszt obsługi magazynu: ' . $task->taskSalaryDetail->warehouse_value . ', Uwagi magazynu: ' . $warehouseNotice;
-                if ($task->order != null) {
-                    $drnp = new Carbon($task->order->shipment_date);
-                    $text .= ', Data rozpoczęcia nadawania przesyłki: ' . $drnp->toDateString();
+                if ($task->order !== null) {
+                    $text .= ', Data rozpoczęcia nadawania przesyłki: ' . $task->order?->shipment_date->toDateString();
                 }
             } else {
                 $text = 'ID Zadania: ' . $task->id . ', Nazwa zadania: ' . $task->name . ', Wykonuje: ' . $task->user->name . ', Rozpoczęcie: ' . $start->toDateTimeString() . ', Zakończenie: ' . $end->toDateTimeString();
@@ -432,25 +421,8 @@ class TasksController extends Controller
                 'customTaskId' => 'task-' . $task->id
             ];
         }
-        //Zaśmieca timetable - narazie zakomentujemy
-//        foreach ($laziness as $task) {
-//            $start = new Carbon($task->created_at);
-//            $end = new Carbon($task->updated_at);
-//            $consultantNotice = $warehouseNotice = '';
-//            $text = $task->description;
-//
-//            $array[] = [
-//                'id' => 'tracker_id_'.$task->id,
-//                'resourceId' => $task->user_id,
-//                'title' => 'Brak aktywności',
-//                'start' => $start->format('Y-m-d\TH:i'),
-//                'end' => $end->format('Y-m-d\TH:i'),
-//                'color' => '#FF0000',
-//                'text' => $text ?? 'Brak uzasadnienia',
-//                'customOrderId' => '',
-//                'customTaskId' => ''
-//            ];
-//        }
+
+        $array = array_merge($array, $this->taskService->getSeparator($id, $data['start'], $data['end']));
 
         return response()->json($array);
     }
@@ -726,9 +698,9 @@ class TasksController extends Controller
             $task = Task::findOrFail($request->id);
             $end = Carbon::now();
             $end->second = 0;
-            $task->TaskTime->date_end = $end;
+            $task->taskTime->date_end = $end;
             $task->status = Task::FINISHED;
-            $task->TaskTime->save();
+            $task->taskTime->save();
 
             $response = $this->markTaskAsProduced($task);
             if ($response === false) {
@@ -741,6 +713,11 @@ class TasksController extends Controller
             $task->save();
             if ($request->warehouse_notice) {
                 $task->taskSalaryDetail->warehouse_notice .= Order::formatMessage($task->user, $request->warehouse_notice);
+                $task->taskSalaryDetail->save();
+            }
+
+            if ($request->description !== '') {
+                $task->taskSalaryDetail->warehouse_notice .= Order::formatMessage($task->user, $request->description);
                 $task->taskSalaryDetail->save();
             }
         } catch (Exception $e) {
@@ -790,6 +767,7 @@ class TasksController extends Controller
     public function deny(DenyTaskRequest $request)
     {
         $data = $request->validated();
+
         $task = Task::find($data['task_id']);
         $time = $task->taskTime()->first();
         $newTask = Task::create([
@@ -1048,6 +1026,7 @@ class TasksController extends Controller
      */
     private function onlyUpdateTask($id, Request $request): RedirectResponse
     {
+        //TODO DODAĆ WALIDACJĘ !!! Ktokolwiek będzie coś tu zmieniał, ma być dodana walidacja do kodu
         $task = $this->repository->find($id);
         if ($task->order_id != null) {
             $customId = 'taskOrder-' . $task->order_id;
@@ -1165,11 +1144,8 @@ class TasksController extends Controller
         $taskTime->date_end = $endTime->toDateTimeString();
         $taskTime->save();
         $request->end = $taskTime->date_end;
-        if ($newGroup->count() > 1) {
-            TaskHelper::createNewGroup($newGroup, $task, $duration);
-        } else {
-            TaskHelper::updateAbandonedTaskTime($newGroup->first(), $duration);
-        }
+
+        TaskHelper::createOrUpdateTask($newGroup, $task, $duration, []);
     }
 
     /**
@@ -1237,24 +1213,137 @@ class TasksController extends Controller
         ]);
     }
 
-    public function getTask($id)
+    /**
+     * Get Task
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function getTask(int $id): JsonResponse
     {
-        $task = Task::with(['user', 'taskTime', 'taskSalaryDetail', 'order', 'childs' => function ($q) {
-            $q->with(['order' => function ($q) {
-                $q->with(['labels' => function ($q) {
-                    $q->where('label_group_id', LabelGroup::PRODUCTION_LABEL_GROUP_ID)->orWhereIn('labels.id',
-                        [Label::BLUE_BATTERY_LABEL_ID, Label::ORANGE_BATTERY_LABEL_ID, Label::ORDER_ITEMS_REDEEMED_LABEL]);
-                }]);
-            }]);
-        }])->find($id);
+        $task = Tasks::getTaskLabel($id);
+
+        if ($task === null) {
+            abort(404);
+        }
 
         foreach ($task->childs as $child) {
             $child->order->similar = OrdersHelper::findSimilarOrders($child->order);
         }
-        if (empty($task)) {
-            abort(404);
-        }
 
         return response()->json($task);
+    }
+
+    /**
+     * Get Tasks with children
+     */
+    public function getTasksWithChildren(): JsonResponse
+    {
+        $tasks = Tasks::getTasksWaitingForAccept();
+
+        return response()->json($tasks);
+    }
+
+    /**
+     * Get Children
+     */
+    public function getChildren(int $taskId): JsonResponse
+    {
+        $task = Tasks::getAllTaskWithChilds($taskId);
+
+        return response()->json($task->childs);
+    }
+
+    /**
+     * @param BreakDownRequest $request
+     */
+    public function breakDownTask(BreakDownRequest $request): RedirectResponse
+    {
+        try {
+            $data = $request->validated();
+
+            $taskId = $data['task'];
+            if ($taskId != null) {
+                $tasks = $this->tasksRepository->getChildTasks($taskId);
+
+                foreach ($tasks as $task) {
+
+                    $fixedParentName = TaskHelper::removeOrderIdFromParentName($task);
+
+                    $task->parent->update([
+                        'name' => $fixedParentName
+                    ]);
+
+                    $task->update([
+                        'user_id' => 36,
+                        'parent_id' => null,
+                        'status' => Task::WAITING_FOR_ACCEPT
+                    ]);
+
+                    if ($task->order_id > 0) {
+                        $preventionArray = [];
+                        RemoveLabelService::removeLabels(Order::find($task->order_id), [Label::GREEN_HAMMER_ID], $preventionArray, [], Auth::user()->id);
+                        $prev = [];
+                        AddLabelService::addLabels(Order::find($task->order_id), [Label::RED_HAMMER_ID, Label::CONSULTANT_MARK], $prev, [], Auth::user()->id);
+                    }
+                }
+            }
+        } catch (Exception $e) {
+
+            Log::error('Nie udało się rozbic zadań', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+
+            return redirect()->back()->with([
+                'message' => __('tasks.messages.update_error'),
+                'alert-type' => 'error'
+            ]);
+        }
+        return redirect()->back()->with([
+            'message' => __('tasks.messages.update'),
+            'alert-type' => 'success'
+        ]);
+    }
+
+    /**
+     * @param AddingTaskToPlanerRequest $request
+     * @return JsonResponse
+     */
+    public function addingTaskToPlanner(AddingTaskToPlanerRequest $request): JsonResponse
+    {
+        $data = $request->validated();
+        $order = $this->ordersRepository->getOrderWithCustomer($data['order_id']);
+        $firm = Firm::where('name', $data['delivery_warehouse'])->first();
+        $array = $this->taskTimeService->addingTaskToPlanner($order, $firm->id);
+        return response()->json($array);
+    }
+
+    /**
+     * @param AddingTaskToPlanerRequest $request
+     */
+    public function saveTaskToPlanner(AddingTaskToPlanerRequest $request): RedirectResponse
+    {
+        $data = $request->validated();
+        $order = $this->ordersRepository->getOrderWithCustomer($data['order_id']);
+        $firm = Firm::where('name', $data['delivery_warehouse'])->first();
+        $this->taskTimeService->saveTaskToPlanner($order, $firm->id);
+
+        return redirect()->route('planning.tasks.index')->with([
+            'message' => __('tasks.messages.store'),
+            'alert-type' => 'success'
+        ]);
+    }
+
+    /**
+     * @param int $taskId
+     * @return JsonResponse
+     */
+    public function checkQuantityInStock(int $taskId): JsonResponse
+    {
+        $tasks = Task::with(['parent'])->where('id', $taskId)->orWhere('parent_id', $taskId)->get();
+
+        $lists = $this->taskTimeService->getQuantityInStockList($tasks);
+
+        return response()->json([
+            'status' => 200,
+            'data' => $lists
+        ]);
     }
 }

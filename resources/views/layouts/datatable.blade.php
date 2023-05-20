@@ -303,13 +303,13 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="labels_to_add_after_removal_modal">@lang('labels.form.labels_to_add_after_removal')</label>
-                        <select multiple class="form-control text-uppercase" id="labels_to_add_after_removal_modal" name="labels_to_add_after_removal_modal[]" size="6">
+                        <select class="form-control text-uppercase" id="labels_to_add_after_removal_modal" name="labels_to_add_after_removal_modal[]" size="6">
                         </select>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-info" data-dismiss="modal">Anuluj</button>
-                    <button type="button" class="btn btn-danger" id="labels_to_add_after_removal_modal_ok" data-dismiss="modal">Ok</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="button" class="btn btn-success" id="labels_to_add_after_removal_modal_ok" data-dismiss="modal">Zatwierdź</button>
                 </div>
             </div>
         </div>

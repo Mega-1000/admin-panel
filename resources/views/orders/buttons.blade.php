@@ -78,7 +78,7 @@
             Edytuj regulamin allegro
         </a>
     </div>
-    <div class="col-md-10">
+    <div class="col-md-8">
         <form method="POST" action="{{ route('order_packages.getProtocols') }}">
             @if ($errors->any())
                 <div class="alert alert-danger">
@@ -480,26 +480,32 @@
             </div>
         </div>
     </div>
-    <div class="col-md-2">
+    <div class="col-md-3">
         <h4>Drukuj paczki z grupy:</h4>
         @foreach($couriersTasks as $courierCode => $tasksInDay)
             <div class="row">
-                <button class="btn btn-info print-group col-lg-12"
-                        name="{{ $courierCode }}"
-                        data-courierTasks="{{ json_encode($tasksInDay) }}">
-                    {{ \App\Enums\CourierName::DELIVERY_TYPE_LABELS[$courierCode] }}
+                <div class="col-lg-12 print-group">
+                        {{ \App\Enums\CourierName::DELIVERY_TYPE_LABELS[$courierCode] }}
                     <div>
+                        <form target="_blank" method="POST" id="print-auto-package-form" action="{{ route('orders.findPackageAuto') }}">
+                            @csrf()
+                            <input name="package_type" id="print-package-type" value="{{ $courierCode }}" type="hidden">
+                            <button type="submit" class="print-auto btn btn-success">Automat</button>
+                        </form>
+                        <span class="print-list btn btn-primary"
+                        name="{{ $courierCode }}"
+                        data-courierTasks="{{ json_encode($tasksInDay) }}">Z listy</span>
                         <span class="badge"
-                              style=" color:#fff !important; background-color:#f96868 !important;">{{ count($tasksInDay['past']) }}</span>
+                              style="color:#fff !important; background-color:#f96868 !important;">{{ count($tasksInDay['past']) }}</span>
                         @foreach($tasksInDay as $date => $tasks)
                             @if(preg_match('/^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$/', $date))
                                 <span class="badge badge-light">{{ count($tasks) }}</span>
                             @endif
                         @endforeach
                         <span class="badge"
-                              style=" color:#fff !important; background-color:#526069 !important;">{{ count($tasksInDay['future']) }}</span>
+                              style="color:#fff !important; background-color:#526069 !important;">{{ count($tasksInDay['future']) }}</span>
                     </div>
-                </button>
+</div>
             </div>
         @endforeach
         <div class="row">
@@ -507,6 +513,8 @@
         </div>
         <div class="row">
             <button id="accept-pack" class="btn btn-success">Wykonano</button>
+            <button id="accept-pack-desc" class="btn btn-success">Wykonano z opisem</button>
+            <button id="break-down-pack" class="btn btn-primary">Rozbij zadania</button>
             <button id="deny-pack" class="btn btn-danger">Odrzucono</button>
         </div>
     </div>
