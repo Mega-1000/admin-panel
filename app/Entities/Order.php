@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Entities;
 
+use App\Enums\OrderPaymentsEnum;
 use App\Enums\PackageStatus;
 use App\Helpers\TaskTimeHelper;
 use App\Traits\SaveQuietlyTrait;
@@ -413,6 +414,12 @@ class Order extends Model implements Transformable
         }
 
         return $sum;
+    }
+
+    public function getOfferFinanceBilans()
+    {
+        $bilans = $this->payments()->where('operation_type', '!=', 'Zwrot towaru')->sum('amount');
+        return $this->getValue() - $bilans + $this->payments()->where('operation_type', 'Zwrot towaru')->sum('amount');
     }
 
     public function bookedPaymentsSum()

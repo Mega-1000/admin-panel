@@ -185,6 +185,21 @@ class ImportBankPayIn implements ShouldQueue
             'PRZELEW ZEWNĘTRZNY WYCHODZĄCY',
         ];
 
+        $notPossibleOperationDescriptions = [
+            'WYPŁATA PAYPRO',
+            'Wypłata PayU',
+            'INFODEMOS',
+        ];
+
+        foreach ($notPossibleOperationDescriptions as $notPossibleOperationDescription) {
+            if (str_contains($fileLine, $notPossibleOperationDescription)) {
+                return PayInDTOFactory::createPayInDTO([
+                    'data' => $payIn,
+                    'message' => 'Brak dopasowania',
+                ]);
+            }
+        }
+
         $possibleOperationDescriptions = array_map(function($description) {
             return str_replace('Ą', 'Ľ', $description);
         }, $possibleOperationDescriptions);
@@ -322,8 +337,7 @@ class ImportBankPayIn implements ShouldQueue
                 continue;
             }
 
-            $orderBookedPaymentSum = $order->bookedPaymentsSum();
-            $amountOutstanding = $this->getTotalOrderValue($order) - $orderBookedPaymentSum;
+            $amountOutstanding = $order->getOfferFinanceBilans($order);
 
             if ($amount == 0 || $amountOutstanding == 0) {
                 continue;
