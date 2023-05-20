@@ -9,13 +9,13 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package namespace App\Entities;
  */
-class TrackerLogs extends Model
+class TrackerLog extends Model
 {
     protected $table = 'tracker_logs';
 
     public function getTitle(): string
     {
-        return 'Brak aktywności w ciągu ' . $this->time. ' minut ';
+        return 'Brak aktywności w ciągu ' . $this->time . ' minut ';
     }
 
     public function getContent(): string
@@ -23,11 +23,9 @@ class TrackerLogs extends Model
         $content = 'Brak aktywności na stronie ' . $this->page . '<br/> ';
         $content .= 'Data ' . $this->created_at . '<br/>';
         if ($this->description !== '') {
-            $content .= 'Powód bezczynności: ' . $this->description . ' ';
-        }else{
-            $content .= 'Brak powodu bezczynności';
+            return $content . 'Powód bezczynności: ' . $this->description . ' ';
         }
 
-        return $content;
+        return $content . 'Brak powodu bezczynności';
     }
 }

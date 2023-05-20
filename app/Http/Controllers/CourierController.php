@@ -2,23 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\CourierHelper;
-use App\Repositories\Couriers;
-use Illuminate\Http\Request;
-use App\Http\Requests\CourierUpdateRequest;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Contracts\View\View;
 use App\Entities\Courier;
+use App\Http\Requests\CourierUpdateRequest;
+use App\Repositories\Couriers;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class CourierController extends Controller
 {
 
-    /**
-     * @var CourierRepository
-     */
-    protected $couriersRepository;
+    protected Couriers $couriersRepository;
 
-    public function __construct(Couriers $couriersRepository) {
+    public function __construct(Couriers $couriersRepository)
+    {
         $this->couriersRepository = $couriersRepository;
     }
 
@@ -33,6 +29,7 @@ class CourierController extends Controller
 
     /**
      * @param Courier $courier
+     * @return View
      */
     public function edit(Courier $courier): View
     {
@@ -40,8 +37,9 @@ class CourierController extends Controller
     }
 
     /**
-     * @param  CourierUpdateRequest $request
-     * @param  Courier             $courier
+     * @param CourierUpdateRequest $request
+     * @param Courier $courier
+     * @return RedirectResponse
      */
     public function update(CourierUpdateRequest $request, Courier $courier): RedirectResponse
     {

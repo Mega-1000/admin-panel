@@ -4,20 +4,20 @@ declare(strict_types=1);
 
 namespace App\Repositories;
 
-use App\Entities\TrackerLogs;
+use App\Entities\TrackerLog as TrackLogModel;
 use Illuminate\Database\Eloquent\Collection;
 
 class TrackerLog
 {
     /**
      * Get Trake rLogs
-     * @param $data
-     * @return Collection<TrackerLogs>
+     * @param array $data
+     * @return Collection<TrackLogModel>
      */
-    public static function getTrakerLogs(array $data): Collection
+    public static function getTrackerLogs(array $data): Collection
     {
-        return TrackerLogs::whereDate('created_at', '>=', $data['start'])
-                ->whereDate('updated_at', '<=', $data['end'])
-                ->get();
+        return TrackerLog::whereDate('created_at', '>=', $data['start'])
+            ->whereDate('updated_at', '<=', $data['end'])
+            ->get();
     }
 }

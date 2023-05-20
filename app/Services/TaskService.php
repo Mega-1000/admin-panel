@@ -4,25 +4,18 @@ namespace App\Services;
 
 
 use App\DTO\Task\SeparatorDTO;
-use Illuminate\Database\Eloquent\Collection;
-use App\Helpers\CourierHelper;
-use App\Helpers\TaskHelper;
-use App\Helpers\TaskTimeHelper;
-use App\Entities\Label;
 use App\Entities\Task;
 use App\Entities\TaskTime;
-use App\Entities\Courier;
 use App\Enums\CourierName;
-use App\Repositories\TaskRepository;
-use App\Repositories\TaskTimeRepository;
-use App\Repositories\Tasks;
 use App\Repositories\Couriers;
+use App\Repositories\TaskRepository;
+use App\Repositories\Tasks;
+use App\Repositories\TaskTimeRepository;
 use App\Repositories\TaskTimes;
-use App\Services\TaskTimeService;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 use Exception;
-use Auth;
+use Illuminate\Database\Eloquent\Collection;
 
 class TaskService
 {
@@ -31,24 +24,14 @@ class TaskService
     const COLOR_SEPARATOR = ['FF0000', 'E6C74D', '194775'];
 
     public function __construct(
-        protected readonly TaskRepository       $taskRepository, 
-        protected readonly TaskTimeRepository   $taskTimeRepository, 
-        protected readonly Tasks                $tasksRepository,
-        protected readonly TaskTimeService      $taskTimeService,
-        protected readonly TaskTimes            $taskTimesRepository,
-        protected readonly Couriers             $couriersRepository
+        protected readonly TaskRepository     $taskRepository,
+        protected readonly TaskTimeRepository $taskTimeRepository,
+        protected readonly Tasks              $tasksRepository,
+        protected readonly TaskTimeService    $taskTimeService,
+        protected readonly TaskTimes          $taskTimesRepository,
+        protected readonly Couriers           $couriersRepository
     )
-    {}
-
-    /**
-     * Get task query
-     *
-     * @param array $courierArray
-     * @return mixed
-     */
-    public function getTaskQuery(array $courierArray)
     {
-        return $this->taskTimeService->getWarehouseUserWithBlueHammerLabelQuery($courierArray);
     }
 
     /**
@@ -67,11 +50,12 @@ class TaskService
         foreach ($period as $date) {
             $dates[$date->toDateString()] = [];
         }
-        
+
         $couriers = Couriers::getActiveOrderByNumber();
         foreach ($couriers as $courier) {
             $tasksByDay = $dates;
-            foreach ($this->getTaskQuery([$courier->courier_name])->get() as $task) {
+            $tasks = Tasks::getWarehouseUserWithBlueHammerLabelQuery([$courier->courier_name])->get();
+            foreach ($tasks as $task) {
                 $orderDate = Carbon::parse($task->order->dates->customer_shipment_date_to);
                 $key = $orderDate->toDateString();
                 if ($orderDate->isBefore($today)) {
@@ -93,17 +77,16 @@ class TaskService
      *
      * @param $package_type
      * @param $skip
-     * @return mixed
+     * @return Task|null
      * @throws Exception
      */
-    public function prepareTask($package_type, $skip)
+    public function prepareTask($package_type, $skip): ?Task
     {
         $courierArray = CourierName::DELIVERY_TYPE_FOR_TASKS[$package_type] ?? [];
         if (empty($courierArray)) {
             throw new Exception(__('order_packages.message.package_error'));
         }
-        $task = $this->getTaskQuery($courierArray)->offset($skip)->first();
-        return $task;
+        return Tasks::getWarehouseUserWithBlueHammerLabelQuery($courierArray)->offset($skip)->first();
     }
 
     /**
@@ -114,15 +97,15 @@ class TaskService
     public function getSeparator(int $id, string $start, string $end): array
     {
         $separators = [];
-        foreach(self::USERS_SEPARATOR as $user_id){
+        foreach (self::USERS_SEPARATOR as $user_id) {
             $taskTime = Tasks::getSeparator($user_id, $id, $start, $end);
-               
-            if($taskTime->count()>0){
+
+            if ($taskTime->count() > 0) {
                 $taskTimeFirst = $taskTime->first();
 
                 $start = Carbon::parse($taskTimeFirst->date_start)->subMinute();
                 $end = Carbon::parse($taskTimeFirst->date_start);
-                
+
                 $separators[] = new SeparatorDTO(
                     null,
                     $taskTimeFirst->task->user_id,
@@ -136,7 +119,7 @@ class TaskService
                 );
             }
         }
-        
+
         return $separators;
     }
 
@@ -147,9 +130,9 @@ class TaskService
     public function getUserSeparator(int $user_id, Carbon $date): string
     {
         $separatorDate = '';
-        $separators = $this->getSeparator(16, $date->format('Y-m-d').' 00:00:00', $date->format('Y-m-d').' 23:59:59');
-        foreach($separators as $separator){
-            if($separator['resourceId'] == $user_id){
+        $separators = $this->getSeparator(16, $date->format('Y-m-d') . ' 00:00:00', $date->format('Y-m-d') . ' 23:59:59');
+        foreach ($separators as $separator) {
+            if ($separator['resourceId'] == $user_id) {
                 $separatorDate = Carbon::parse($separator['end'])->format('Y-m-d H:i:s');
             }
         }
@@ -162,10 +145,10 @@ class TaskService
     public function transfersTask(): void
     {
         $today = Carbon::today();
-        foreach(self::USERS_SEPARATOR as $user_id){
-            $time_start = Carbon::parse($today->format('Y-m-d').' '.$this->getTimeLastTask($user_id));
-            
-            foreach(self::COLOR_SEPARATOR as $color){
+        foreach (self::USERS_SEPARATOR as $user_id) {
+            $time_start = Carbon::parse($today->format('Y-m-d') . ' ' . $this->getTimeLastTask($user_id));
+
+            foreach (self::COLOR_SEPARATOR as $color) {
                 $time_start = $this->prepareTransfersTask($user_id, $color, $time_start);
             }
         }
@@ -175,17 +158,18 @@ class TaskService
      * Prepare Transfer Task
      *
      */
-    public function prepareTransfersTask(int $user_id, string $color, string $time_start): string
+    public function prepareTransfersTask(int $userId, string $color, string $timeStart): string
     {
         $date = Carbon::yesterday();
 
-        $tasks = $this->taskTimeService->transfersTask($user_id, $color, $date);
+        $tasks = Tasks::getTransfersTask($userId, $color, $date);
 
-        foreach($tasks as $task){
-            $time_start = $this->updateTransfersTask($task->taskTime->id, $time_start);
-            $this->moveTask($user_id, $time_start);
+        foreach ($tasks as $task) {
+            $timeStart = $this->updateTransfersTask($task->taskTime->id, $timeStart);
+            $this->moveTask($userId, $timeStart);
         }
-        return $time_start;
+
+        return $timeStart;
     }
 
     /**
@@ -204,7 +188,7 @@ class TaskService
             'date_end' => $date_end->format('Y-m-d H:i:s'),
             'transfer_date' => $transfer_date
         ]);
-        
+
         return $date_end;
     }
 
@@ -216,8 +200,8 @@ class TaskService
     {
         $date = Carbon::today();
         $taskTime = TaskTimes::getTimeLastTask($user_id, $date);
-        $firstTaskTime = $taskTime->first(); 
-        
+        $firstTaskTime = $taskTime->first();
+
         return $firstTaskTime?->date_end?->format('H:i:s') ?? TaskTime::TIME_START;
     }
 
@@ -230,11 +214,11 @@ class TaskService
         $date = Carbon::today();
         $separatorDate = $this->getUserSeparator($user_id, $date);
 
-        if($time>=$separatorDate){
+        if ($time >= $separatorDate) {
 
             $taskTimes = TaskTimes::getMoveTask($user_id, $date);
 
-            foreach($taskTimes as $taskTime){
+            foreach ($taskTimes as $taskTime) {
                 $taskTime->update([
                     'date_start' => Carbon::parse($taskTime->date_start)->addMinutes(30),
                     'date_end' => Carbon::parse($taskTime->date_end)->addMinutes(30)
@@ -256,9 +240,10 @@ class TaskService
     /**
      * moving tasks backward
      *
-     * @return Collection<TaskTime>
+     * @param Task $task
+     * @return Collection
      */
-    public function movingTasksBackward(Collection $task): Collection
+    public function movingTasksBackward(Task $task): Collection
     {
         $actualTaskTime = TaskTime::where('task_id', $task->id)->first();
         $date_start = Carbon::parse($actualTaskTime->date_start);
@@ -267,10 +252,10 @@ class TaskService
         $totalDuration = $date_end->diffInMinutes($date_start);
 
         $moveTasksTime = TaskTimes::movingTasksBackward($task, $actualTaskTime, $date_start);
-        
-        foreach($moveTasksTime as $taskTime){
+
+        foreach ($moveTasksTime as $taskTime) {
             $startNextTaskAt = $taskTime->date_start->subMinutes($totalDuration);
-	        $endNextTaskAt = $taskTime->date_end->subMinutes($totalDuration);
+            $endNextTaskAt = $taskTime->date_end->subMinutes($totalDuration);
             $taskTime->update([
                 'date_start' => $startNextTaskAt,
                 'date_end' => $endNextTaskAt

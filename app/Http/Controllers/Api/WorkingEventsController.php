@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Entities\TrackerLogs;
-use App\Entities\WorkingEvents;
+use App\Entities\TrackerLog;
 use App\Http\Controllers\Controller;
 use App\Repositories\UserRepository;
 use App\Repositories\WorkingEventRepository;
-use App\User;
-use Faker\Provider\DateTime;
+use DateTime;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -16,15 +15,14 @@ class WorkingEventsController extends Controller
 {
     use ApiResponsesTrait;
 
-    /** @var WorkingEventRepository */
-    protected $workingEventRepository;
+    protected WorkingEventRepository $workingEventRepository;
 
-    /** @var UserRepository */
-    protected $userRepository;
+    protected UserRepository $userRepository;
 
     /**
      * WorkingEvent constructor.
      * @param WorkingEventRepository $workingEventRepository
+     * @param UserRepository $userRepository
      */
     public function __construct(
         WorkingEventRepository $workingEventRepository,
@@ -53,10 +51,10 @@ class WorkingEventsController extends Controller
                 $criteria['user_id'] = $request->get('userId');
             }
             if ($request->has('date') && $request->get('date') !== 'null') {
-                $date = new \DateTime($request->get('date'));
+                $date = new DateTime($request->get('date'));
                 $criteria[] = ['created_at', 'like', $date->format('Y-m-d') . '%'];
             } else {
-                $criteria[] = ['created_at', 'like', (new \DateTime())->format('Y-m-d') . '%'];
+                $criteria[] = ['created_at', 'like', (new DateTime())->format('Y-m-d') . '%'];
             }
             $result = $this->workingEventRepository->findWhere($criteria);
 
@@ -84,7 +82,7 @@ class WorkingEventsController extends Controller
                     'workInfo' => []
                 ];
             }
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $response = [
                 'errorCode' => $exception->getCode(),
                 'errorMessage' => $exception->getMessage()
@@ -108,13 +106,13 @@ class WorkingEventsController extends Controller
         $response = [];
 
         try {
-            $query = TrackerLogs::query();
+            $query = TrackerLog::query();
 
             if ($request->has('userId')) {
                 $query->where('user_id', '=', $request->get('userId'));
             }
             if ($request->has('date')) {
-                $date = new \DateTime($request->get('date'));
+                $date = new DateTime($request->get('date'));
                 $query->where('created_at', 'like', $date->format('Y-m-d') . '%');
             }
             $result = $query->get();
@@ -138,7 +136,7 @@ class WorkingEventsController extends Controller
             } else {
                 $response['inactivity'] = [];
             }
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $response = [
                 'errorCode' => $exception->getCode(),
                 'errorMessage' => $exception->getMessage()
@@ -168,7 +166,7 @@ class WorkingEventsController extends Controller
                     'errorMessage' => 'Brak użytkowników'
                 ];
             }
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $response = [
                 'errorCode' => $exception->getCode(),
                 'errorMessage' => $exception->getMessage()
@@ -180,21 +178,21 @@ class WorkingEventsController extends Controller
     /**
      * Usunięcie bezczynności
      *
-     * @param TrackerLogs $trackerLogs Transakcja
+     * @param TrackerLog $trackerLogs Transakcja
      *
      * @return JsonResponse
      *
      * @author Norbert Grzechnik <grzechniknorbert@gmail.com>
      */
-    public function destroy(TrackerLogs $trackerLogs): JsonResponse
+    public function destroy(TrackerLog $trackerLogs): JsonResponse
     {
         $response = [];
         try {
-            $result = TrackerLogs::find($trackerLogs->id)->delete();
+            $result = TrackerLog::find($trackerLogs->id)->delete();
             if ($result) {
                 $response['status'] = 200;
             }
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $response = [
                 'status' => 424,
                 'errorCode' => $exception->getCode(),

@@ -13,12 +13,11 @@ use Illuminate\Http\Request;
 class TimetablesController extends Controller
 {
     public function __construct(
-        protected readonly WarehouseRepository $warehouseRepository, 
-        protected readonly TaskRepository $taskRepository,
-        protected readonly TaskService  $taskService
+        protected readonly WarehouseRepository $warehouseRepository,
+        protected readonly TaskRepository      $taskRepository,
+        protected readonly TaskService         $taskService
     )
     {
-
     }
 
     public function index(Request $request)
@@ -29,7 +28,7 @@ class TimetablesController extends Controller
         if (isset($request->id)) {
             $string = explode('-', $request->id);
             if (isset($string[1])) {
-                if($string[0] == 'taskOrder') {
+                if ($string[0] == 'taskOrder') {
                     $tasks = Task::where('order_id', (int)$string[1]);
                     if ($tasks->count() == 0) {
                         return redirect()->back()->with([
@@ -98,6 +97,6 @@ class TimetablesController extends Controller
             abort(404);
         }
 
-        return response()->json($warehouse->users, 200);
+        return response()->json($warehouse->users);
     }
 }

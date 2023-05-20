@@ -3,10 +3,10 @@
 namespace App\Entities;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * Class TaskTime.
  *
@@ -37,11 +37,8 @@ class TaskTime extends Model implements Transformable
 
     protected $casts = [
         'task_id' => 'integer',
-        'date_start' => 'datetime',
-        'date_end' => 'datetime',
-        'transfer_date' => 'datetime'
     ];
-    
+
     public function task(): BelongsTo
     {
         return $this->belongsTo(Task::class);

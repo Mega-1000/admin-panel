@@ -82,7 +82,6 @@ use App\Services\Label\RemoveLabelService;
 use App\Services\OrderAddressService;
 use App\Services\OrderExcelService;
 use App\Services\OrderInvoiceService;
-use App\Services\OrderPaymentService;
 use App\Services\TaskService;
 use App\User;
 use Carbon\Carbon;
@@ -796,7 +795,7 @@ class OrdersController extends Controller
     {
         $newGroup = Task::whereIn('order_id', $similar)->get();
         $newGroup = $newGroup->concat([$task]);
-        
+
         $dt = Carbon::now();
         $dt->second = 0;
         $data = [
@@ -815,11 +814,7 @@ class OrdersController extends Controller
         $prev = [];
         RemoveLabelService::removeLabels($task->order, [Label::BLUE_HAMMER_ID], $prev, [], Auth::user()->id);
 
-        if ($newGroup->count() > 1) {
-            TaskHelper::createNewGroup($newGroup, $task, self::DURATION, $data);
-        } else {
-            TaskHelper::updateAbandonedTaskTime($newGroup->first(), self::DURATION, $data);
-        }
+        TaskHelper::createOrUpdateTask($newGroup, $task, self::DURATION, $data ?? []);
 
         $tsk = Task::find($task->id);
         if ($tsk->parent->count()) {
@@ -837,10 +832,10 @@ class OrdersController extends Controller
         $skip = $data['skip'] ?? 0;
 
         dispatch((new RemoveFileLockJob(self::LOCK_NAME))->delay(360));
-        if($this->putLockFile() === false){
+        if ($this->putLockFile() === false) {
             return response(['error' => 'file_exist']);
         }
-        
+
         try {
             if (empty($data['task_id'])) {
                 $task = $this->taskService->prepareTask($data['package_type'], $skip);
@@ -854,10 +849,10 @@ class OrdersController extends Controller
                 'alert-type' => 'error',
             ]);
         }
-        
+
         if ($task === null) {
             $this->unlinkLockFile();
-            
+
             return redirect()->back()->with([
                 'message' => 'Brak nieprzydzielonych paczek dla: ' . $data['package_type'] . ' spróbuj wygenerować paczki dla innego kuriera',
                 'alert-type' => 'error',
@@ -870,7 +865,7 @@ class OrdersController extends Controller
         if (!$user->can_decline) {
             $this->attachTaskForUser($task, $data['user_id'], $ordersSimilar);
         }
-        $views = $this->createListOfWz($ordersSimilar, $task, $finalPdfFileName, self::LOCK_NAME);
+        $views = $this->createListOfWz($ordersSimilar, $task, $finalPdfFileName);
         $pdf = Storage::disk('public')->get($finalPdfFileName);
         if (!$user->can_decline) {
             $this->unlinkLockFile();
@@ -889,25 +884,25 @@ class OrdersController extends Controller
         $data = $request->validated();
 
         dispatch((new RemoveFileLockJob(self::LOCK_NAME))->delay(360));
-        if($this->putLockFile()===false){
+        if ($this->putLockFile() === false) {
             return response(['error' => 'file_exist']);
         }
         $skip = $data['skip'] ?? 0;
 
-        $user =  Auth::user();
-        
+        $user = Auth::user();
+
         $open = $this->taskService->getOpenUserTask($user->id);
 
         $task = $this->taskService->prepareTask($data['package_type'], $skip);
-        
-        if ($open->count()) {   
+
+        if ($open->count()) {
             $this->unlinkLockFile();
             return redirect()->back()->with([
                 'message' => 'Ostatnie pobrane zadanie to numer: ' . $open->first()->order_id . ' i nie zostało zamkniete. Zamknij zadanie aby pobrać kolejne',
                 'alert-type' => 'error',
             ]);
         }
-        
+
         if ($task === null) {
             $this->unlinkLockFile();
             return redirect()->back()->with([
@@ -915,14 +910,14 @@ class OrdersController extends Controller
                 'alert-type' => 'error',
             ]);
         }
-        
+
         $ordersSimilar = OrdersHelper::findSimilarOrders($task->order);
 
         if (!$user->can_decline) {
             $this->attachTaskForUser($task, $user->id, $ordersSimilar);
             $this->taskService->movingTasksBackward($task);
         }
-        $views = $this->createListOfWz($ordersSimilar, $task, $finalPdfFileName, self::LOCK_NAME);
+        $views = $this->createListOfWz($ordersSimilar, $task, $finalPdfFileName);
         $pdf = Storage::disk('public')->get($finalPdfFileName);
         if (!$user->can_decline) {
             return response($pdf, 200, [
@@ -935,13 +930,14 @@ class OrdersController extends Controller
         return response($views . $view, 200);
 
     }
+
     /**
      * @param array $similar
-     * @param $task
+     * @param Task $task
      * @param string $finalPdfFileName
-     * @param string $lockName
+     * @return string
      */
-    private function createListOfWz(array $similar, $task, string $finalPdfFileName, string $lockName)
+    private function createListOfWz(array $similar, Task $task, string $finalPdfFileName)
     {
         $allOrders = array_merge($similar, [$task->order->id]);
         $tagHelper = new EmailTagHandlerHelper();
@@ -978,7 +974,7 @@ class OrdersController extends Controller
             File::delete(public_path("spec_usr_$i.pdf"));
             $i--;
         }
-        unlink(public_path($lockName));
+        unlink(public_path(self::LOCK_NAME));
         return $views;
     }
 

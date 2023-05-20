@@ -8,29 +8,20 @@ use JsonSerializable;
 class SeparatorDTO extends BaseDTO implements JsonSerializable
 {
     public function __construct(
-        private ?int $id,
-        private int $resourceId,
-        private string $title,
-        private string $start,
-        private string $end,
-        private string $color,
-        private string $text,
-        private ?int $customOrderId,
-        private ?int $customTaskId
+        private readonly ?int   $id,
+        private readonly int    $resourceId,
+        private readonly string $title,
+        private readonly string $start,
+        private readonly string $end,
+        private readonly string $color,
+        private readonly string $text,
+        private readonly ?int   $customOrderId,
+        private readonly ?int   $customTaskId
     )
     {
-        $this->id = $id;
-        $this->resourceId = $resourceId;
-        $this->title = $title;
-        $this->start = $start;
-        $this->end = $end;
-        $this->color = $color;
-        $this->text = $text;
-        $this->customOrderId = $customOrderId;
-        $this->customTaskId = $customTaskId;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'id' => $this->id,

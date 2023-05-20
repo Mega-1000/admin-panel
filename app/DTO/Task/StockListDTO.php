@@ -8,23 +8,17 @@ use JsonSerializable;
 class StockListDTO extends BaseDTO implements JsonSerializable
 {
     public function __construct(
-        private int $product_stock_id,
-        private string $product_name,
-        private string $product_symbol,
-        private int $quantity,
-        private int $stock_quantity,
-        private int $first_position_quantity
+        private readonly int    $product_stock_id,
+        private readonly string $product_name,
+        private readonly string $product_symbol,
+        private readonly int    $quantity,
+        private readonly int    $stock_quantity,
+        private readonly int    $first_position_quantity
     )
     {
-        $this->product_stock_id = $product_stock_id;
-        $this->product_name = $product_name;
-        $this->product_symbol = $product_symbol;
-        $this->quantity = $quantity;
-        $this->stock_quantity = $stock_quantity;
-        $this->first_position_quantity = $first_position_quantity;
     }
 
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
             'product_stock_id' => $this->product_stock_id,

@@ -2,22 +2,39 @@
 
 namespace App\Helpers;
 
-use App\Entities\Label;
 use App\Entities\Task;
 use App\Entities\TaskSalaryDetails;
 use App\Entities\TaskTime;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Collection;
 
 class TaskHelper
 {
+    public static function createOrUpdateTask(Collection $newGroup, Task $task, int $duration, array $data): Task
+    {
+        if ($newGroup->count() > 1) {
+            return TaskHelper::createNewGroup($newGroup, $task, $duration, $data);
+        }
+        return TaskHelper::updateAbandonedTaskTime($newGroup->first(), $duration, $data);
+    }
+
+    public static function removeOrderIdFromParentName(Task $task): string
+    {
+        $parent = $task->parent->first();
+        $explodedParentName = explode(',', $parent->name);
+        if (($key = array_search($task->order_id, $explodedParentName)) !== false) {
+            unset($explodedParentName[$key]);
+        }
+        return join(', ', $explodedParentName);
+    }
+
     /**
-     * @param \Illuminate\Support\Collection $newGroup
-     * @param $task
-     * @param $duration
-     * @param $data
+     * @param Collection $newGroup
+     * @param Task $task
+     * @param int $duration
+     * @param array $data
+     * @return Task
      */
-    public static function createNewGroup(\Illuminate\Support\Collection $newGroup, $task, $duration, $data = false): void
+    private static function createNewGroup(Collection $newGroup, Task $task, int $duration, array $data = []): Task
     {
         $name = $newGroup->map(function ($item) {
             return $item->order_id;
@@ -45,14 +62,17 @@ class TaskHelper
             $item->parent_id = $taskNew->id;
             $item->save();
         });
+
+        return $taskNew;
     }
 
     /**
-     * @param $task
-     * @param $duration
-     * @param $data
+     * @param Task $task
+     * @param int $duration
+     * @param array $data
+     * @return Task
      */
-    public static function updateAbandonedTaskTime($task, $duration, $data = false): void
+    private static function updateAbandonedTaskTime(Task $task, int $duration, array $data = []): Task
     {
         $taskTime = $task->taskTime;
         $time = TaskTimeHelper::getFirstAvailableTime($duration, $data);
@@ -61,5 +81,7 @@ class TaskHelper
         $taskTime->save();
         $task->parent_id = null;
         $task->save();
+
+        return $task;
     }
 }
