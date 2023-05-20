@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 /**
  * Class Task.
  *
@@ -50,42 +53,42 @@ class Task extends Model implements Transformable
         });
     }
 
-    public function warehouse()
+    public function warehouse() :BelongsTo
     {
         return $this->belongsTo(Warehouse::class);
     }
 
-    public function user()
+    public function user() :BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function order()
+    public function order() :BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
-    public function taskSalaryDetail()
+    public function taskSalaryDetail() :HasOne
     {
         return $this->hasOne(TaskSalaryDetails::class);
     }
 
-    public function taskTime()
+    public function taskTime() :HasOne
     {
         return $this->hasOne(TaskTime::class);
     }
 
-    public function reportProperty()
+    public function reportProperty() :HasMany
     {
         return $this->hasMany(ReportProperty::class);
     }
 
-    public function childs()
+    public function childs() :HasMany
     {
         return $this->hasMany(Task::class, 'parent_id', 'id');
     }
 
-    public function parent()
+    public function parent() :HasMany
     {
         return $this->hasMany(Task::class, 'id', 'parent_id');
     }

@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
         $this->call(BanksDataSeeder::class);
         $this->call(DumpedTablesSeeder::class);
         $this->call(PackageTemplateSeeder::class);
+        $this->call(CourierSeeder::class);
         DB::unprepared(file_get_contents(database_path('seeds/SelTables.sql')));
     }
 }

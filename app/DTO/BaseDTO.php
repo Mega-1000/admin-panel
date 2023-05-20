@@ -6,7 +6,7 @@ use Carbon\Carbon;
 
 class BaseDTO
 {
-    protected $optionalFields = [];
+    protected array $optionalFields = [];
 
     protected function getOptionalFilledFields(): array
     {
@@ -33,12 +33,9 @@ class BaseDTO
 
     protected function convertDate(?Carbon $date, ?string $format = null): ?string
     {
-        if ($date !== null) {
-            return $date->format(
-                $format ?? config('integrations.schenker.default_date_time_format', 'Y-m-d\TH:i:s')
-            );
-        }
-        return null;
+        return $date?->format(
+            $format ?? config('integrations.schenker.default_date_time_format', 'Y-m-d\TH:i:s')
+        );
     }
 
     protected function substrText(string $text, $limit = 60, $startFrom = 0): string

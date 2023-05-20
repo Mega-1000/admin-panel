@@ -123,3 +123,9 @@
 .dropdown-menu {
     width: 100%;
 }
+
+.fc-rows tr:nth-child(even) {background: #CCC}
+
+#print-auto-package-form{
+    display: inline;
+}

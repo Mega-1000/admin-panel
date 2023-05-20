@@ -95,4 +95,12 @@ class Orders
 
         return $orderPayments;
     }
+
+    /**
+     * @param Order $order
+     */
+    public function getOrderWithCustomer(int $order_id): Order
+    {
+        return Order::with(['customer','labels'])->where('id',$order_id)->first();
+    }
 }

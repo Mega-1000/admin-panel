@@ -173,10 +173,63 @@
                                    type="text">
                         </div>
                     </form>
+                    <div id="error-finish-task-form"></div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
-                    <button type="submit" form="finish-task-form" class="btn btn-success pull-right">Zakończ
+                    <button type="submit" form="finish-task-form" id="check-finish-task" class="btn btn-success pull-right">Zakończ</button>
+                    <button id="check-finish-task-refresh" class="btn btn-primary pull-right">Odświez</button>  
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" tabindex="-1" id="mark-as-created-desc" role="dialog">
+        <div class="modal-dialog" id="modalDialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="titleModal">@lang('orders.task_realized')</h4>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" id="finish-task-form2"
+                          action="{{ route('planning.tasks.produceOrdersRedirect') }}">
+                        @csrf()
+                        <div class="form-group">
+                            <label for="select-user-for-finish-task2">Wybierz użytkownika</label>
+                            <select onchange="fetchUsersTasks(this, '#select-task-for-finish2')"
+                                    id="select-user-for-finish-task2" name="user_id" required
+                                    class="form-control">
+                                <option value="" selected="selected">brak</option>
+                                @foreach($users as $user)
+                                    <option
+                                        value="{{$user->id}}">{{$user->name}} {{$user->firstname}} {{$user->lastname}}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="select-task-for-finish2">Wybierz zadanie</label>
+                            <select
+                                onchange="taskSelected(this, '#warehouse-done-notice2', '#warehouse-done-notice-input2')"
+                                name="id" id="select-task-for-finish2" required class="form-control">
+                                <option value="" selected="selected">brak</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="warehouse-done-notice2">
+                            <label for="warehouse_notice">Podaj nazwę zadania</label>
+                            <input id="warehouse-done-notice-input2" class="form-control" name="warehouse_notice"
+                                   type="text">
+                        </div>
+                        <div class="form-group" id="task-description">
+                            <label for="description">Opis</label>
+                            <textarea id="task-description-input" class="form-control" name="description"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" form="finish-task-form2" class="btn btn-success pull-right">Zakończ
                     </button>
                 </div>
             </div>
@@ -680,6 +733,73 @@
             </div>
         </div>
     </div>
+
+
+    <div class="modal fade" tabindex="-1" id="break-down-pack-modal" role="dialog">
+        <div class="modal-dialog" id="modalDialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="titleModal">Rozbij zadanie</h4>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" id="finish-breakDownTask"
+                          action="{{ route('planning.tasks.breakDownTask') }}">
+                        @csrf()
+                        <div class="form-group">
+                            <label for="select-task-with-child-for-finish">Wybierz zadanie</label>
+                            <select
+                                onchange="fetchChildren(this,'.form-group-checkobox')"
+                                name="task" id="select-task-with-child-for-finish" required class="form-control">
+                                <option value="" selected="selected">brak</option>
+                            </select>
+                        </div>
+                        <div class="form-group-checkobox">
+                        </div>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Anuluj</button>
+                    <button type="submit" form="finish-breakDownTask" class="btn btn-success pull-right">Rozbij
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" tabindex="-1" id="add-withdraw-task" role="dialog">
+        <div class="modal-dialog" id="modalDialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"
+                            aria-label="{{ __('voyager::generic.close') }}"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="titleModal">Potwierdź</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Dany klient ma juz wyprodukowaną ofertę/grupę ofert, która lezy na tym magazynie</p>
+                    <p>Zalecane sprawdznie czy jest mozliwośc dołączenia do paczek juz istnijących.</p>
+                    <form method="POST" id="addToPlanner"
+                          action="{{ url('admin/planning/tasks/store/planner') }}">
+                        @csrf()
+                        <input type="hidden" id="add-withdraw-task-delivery_warehouse" name="delivery_warehouse" value="">
+                        <input type="hidden" id="add-withdraw-task-order_id" name="order_id" value="">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" form="withdrawTask" id="withdrawTaskButton" class="btn btn-danger">Wycofaj, chcę sprawdzic</button>
+                    <button type="submit" form="addToPlanner" class="btn btn-success pull-right">Dodaj
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+
     @include('orders.buttons')
     <button name="selectAllDates" id="selectAllDates">Wybierz wszystkie daty</button>
     <table id="dataTable" class="table table-hover spacious-container ordersTable">
@@ -907,6 +1027,7 @@
 
 @section('datatable-scripts')
     <script src="//cdn.jsdelivr.net/npm/jquery.scrollto@2.1.2/jquery.scrollTo.min.js"></script>
+    <script src="{{ URL::asset('js/views/orders/taksWithChildren.js') }}"></script>
     <script>
         let getUrlParameter = function getUrlParameter(sParam) {
             var sPageURL = window.location.search.substring(1),
@@ -1006,6 +1127,35 @@
                 })
         }
 
+        function fetchTasksWithChildren(select) {
+            $(select).empty();
+            $(select).append('<option value="" selected="selected">brak</option>');
+            let url = "{{route('planning.tasks.getTasksWithChildren')}}"
+            $.ajax(url)
+                .done(response => {
+                    if (response.errors) {
+                        alert('Wystąpił błąd pobierania danych')
+                        return;
+                    }
+                    response.forEach(task => $(select).append(`<option data-order="${task.order_id ?? ''}" class="temporary-option" value="${task.id}">${task.name}</option>`))
+                })
+        }
+        fetchTasksWithChildren('#select-task-with-child-for-finish');
+
+        function fetchChildren(task,div) {
+            $(div).empty();
+            let id = task.value
+            let url = "{{route('planning.tasks.getChildren', ['taskId' => '%%'])}}"
+            $.ajax(url.replace('%%', id))
+                .done(response => {
+                    if (response.errors) {
+                        alert('Wystąpił błąd pobierania danych')
+                        return;
+                    }
+                    response.forEach(task => $(div).append(`<div><label><input type="hidden" name="task[${task.id}]" value="${task.id}"><input type="checkbox" name="task[${task.id}]" data-order="${task.order_id ?? ''}" value="0"> ${task.order_id}</label></div>`))
+                })
+        }
+
         function showPackageCostModal(packageId, dataTemplate, costForClient, costForCompany) {
             $('#changePackageCost').val(packageId);
             $('#packageTemplatesList option').prop('selected', '');
@@ -1022,6 +1172,12 @@
         $('#accept-pack').click(event => {
             $("#mark-as-created").modal('show');
         });
+        $('#accept-pack-desc').click(event => {
+            $("#mark-as-created-desc").modal('show');
+        });
+        $('#break-down-pack').click(event => {
+            $("#break-down-pack-modal").modal('show');
+        });
         $('#deny-pack').click(event => $('#mark-as-denied').modal('show'));
         $('#create-new-task-button').click(event => {
             $('#add-custom-task').modal('show');
@@ -1037,7 +1193,7 @@
                 $('#print-package-group').modal('hide');
             }, 5000);
         });
-        $('.print-group').click(event => {
+        $('.print-group .print-list').click(event => {
             $('#print-package-type').val(event.currentTarget.name);
             let opt = $(event.currentTarget).data('couriertasks');
             let select = $('#print-package-group').find('[name="task_id"]');
@@ -2635,7 +2791,7 @@
                 });
             };
 
-            function removeMultiLabel(orderId, labelId, ids) {
+            function removeMultiLabel(orderId, labelId, ids, delivery_warehouse=null) {
                 $.ajax({
                     url: "/admin/orders/label-removal/" + orderId + "/" + labelId,
                     method: "POST",
@@ -2645,15 +2801,14 @@
                     }
                 }).done(function () {
                     if ($.inArray('47', ids) != -1) {
-                        $('#magazine').modal();
                         $('input[name="order_id"]').val(orderId);
                         $('#selectWarehouse').val(16);
                         $('#warehouseSelect').attr('selected', true);
                         $('#selectWarehouse').click();
+                        addingTaskToPlanner(orderId,delivery_warehouse);
+                        refreshDtOrReload();
                     }
                     refreshDtOrReload();
-
-                    renderCalendar();
                 })
                     .fail((error) => {
                         if (error.responseText === 'warehouse not found') {
@@ -2690,6 +2845,50 @@
                     }
                 });
             };
+            
+            function addingTaskToPlanner(orderId,delivery_warehouse) {
+                $.ajax({
+                    method: 'post',
+                    url: '{{route('planning.tasks.addingTaskToPlanner')}}',
+                    dataType: 'json',
+                    data: {
+                        order_id: orderId,
+                        delivery_warehouse: delivery_warehouse
+                    },
+                }).done(function (data) {
+                    if(data.status=='ERROR'){
+                        let modal = $('#add-withdraw-task');
+                        let input_delivery_warehouse = modal.find("#add-withdraw-task-delivery_warehouse");
+                        let input_order_id = modal.find("#add-withdraw-task-order_id");
+                        input_delivery_warehouse.val(data.delivery_warehouse);
+                        input_order_id.val(data.id);
+                        let order_ids = [data.id];
+                        let clickCount = 0;
+                        modal.modal();
+                        $('#withdrawTaskButton').on('click', () => {
+                            if(clickCount > 0) {
+                                return false;
+                            }else{
+                                $.ajax({
+                                    url: "/admin/orders/label-addition/45",
+                                    method: "POST",
+                                    data: {
+                                        orderIds: order_ids
+                                    }
+                                }).done(function () {
+                                    modal.modal('hide');
+                                    table.ajax.reload(null, false);
+                                    return false;
+                                });
+                                
+                                clickCount++;
+                            }
+                        })
+                    }else{
+                        window.open('/admin/planning/timetable', '_blank');
+                    }
+                });
+            } 
 
             const showSelectWarehouseTemplate = (modal, orderId) => {
                 const row = $('#id-' + orderId);
@@ -2699,11 +2898,15 @@
                 $('.warehouse-template').remove();
 
                 let warehouseTemplate = `
+                <div class="error" style="display: none">
+                    <div class="alert alert-danger" role="alert">
+                    </div>
+                </div>
                 <div class="warehouse-template">
                 <p>Magazyn nie został przypisany, przypisz magazyn przed wysłaniem</p>
                 <div class="form-group" style="width: 15%; padding: 5px;">
-                    <label for="delivery_warehouse2">Magazyn</label>
-                    <input type="text" class="form-control" id="delivery_warehouse2" name="delivery_warehouse2" value="${warehouse}">
+                    <label for="delivery_warehouse2">Magazyn obsługujący</label>
+                    <input type="text" class="form-control" id="delivery_warehouse2" name="delivery_warehouse2" value="${warehouse}" readonly>
                 </div><br>
                 </div>`;
 
@@ -2747,8 +2950,7 @@
                     data.forEach(function (item) {
                         input.append($('<option>', {
                             value: item.id,
-                            text: item.name,
-                            selected: true
+                            text: item.name
                         }));
                     });
                     $('#manual_label_selection_to_add_modal').modal('show');
@@ -2756,8 +2958,21 @@
                     if (labelId == 45) showSelectWarehouseTemplate(modal, orderId);
 
                     modal.find("#labels_to_add_after_removal_modal_ok").off().on('click', function () {
-                        let ids = input.val();
-                        removeMultiLabel(orderId, labelId, ids);
+                        let ids = [];
+                        ids.push(input.val());
+                        if(modal.find("#delivery_warehouse2").val() == ''){
+                            modal.find(".error").show();
+                            modal.find(".error .alert").text('Wybierz magazyn');
+                            return false;
+                        }
+                        if(!ids){
+                            modal.find(".error").show();
+                            modal.find(".error .alert").text('Wybierz przynajmniej jeden etykietę');
+                            return false;
+                        }
+                        delivery_warehouse = modal.find("#delivery_warehouse2").val();
+                        removeMultiLabel(orderId, labelId, ids, delivery_warehouse);
+                        modal.modal('hide');
                     });
                 });
             } else {
@@ -3670,6 +3885,79 @@
             calendar.render();
         }
 
+        $("#check-finish-task-refresh").hide();
+        $("#check-finish-task").click(function(){
+            task = $('#select-task-for-finish').val();
+            if(task){
+                var checkQuantity = checkQuantityInStock(task);
+                if(checkQuantity==1){
+                    $('#finish-task-form').hide();
+                    $("#check-finish-task").hide();
+                    $("#check-finish-task-refresh").show();
+                    return false;
+                }else{
+                    $("#error-finish-task-form").html('');
+                    return true;
+                }
+            }
+        });
+        $("#check-finish-task-refresh").click(function(){
+            task = $('#select-task-for-finish').val();
+            var checkQuantity = checkQuantityInStock(task);
+            if(checkQuantity==1){
+                $('#finish-task-form').hide();
+            }else{
+                $("#error-finish-task-form").html('');
+                $("#check-finish-task").show();
+                $("#check-finish-task-refresh").hide();
+            }
+            return false;
+        });
+
+        function checkQuantityInStock(task) {
+            html = '';
+            status = 0;
+            $.ajax({
+                type: "GET",
+                url: '/admin/planning/tasks/' + task + '/checkQuantityInStock',
+                async: false
+            }).done(function (data) {
+                if(data.status == 200){
+                    if(Object.keys(data.data).length>0){
+                        status = 1;
+                    }
+                    $.each(data.data, function (index, value) {
+
+                        html += '<h3>oferta '+ index +'</h3>';
+                        html += '<table class="table">';
+                            html += '<tr class="appendRow">';
+                            html += '<td style="width: 200px;">Nazwa</td>';
+                            html += '<td style="width: 100px;">Symbol</td>';
+                            html += '<td style="width: 50px;">Ilość potrzebna</td>';
+                            html += '<td style="width: 50px;">Na magazynie/Ilość na pozycji</td>';
+                            html += '<td>#</td>';
+                            html += '</tr>';
+                        $.each(value, function (index, value) {
+                            html += '<tr class="appendRow">';
+                            html += '<td>' + value.product_name + '</td>';
+                            html += '<td>' + value.product_symbol + '</td>';
+                            html += '<td>' + value.quantity + '</td>';
+                            html += '<td>' + value.stock_quantity + '/' + value.first_position_quantity + '</td>';
+                            html += '<td><a href="/admin/products/stocks/' + value.product_stock_id + '/edit" target="_blank">Przenieś</a></td>';
+                            html += '</tr>';
+                        });
+                        html += '</table>';
+                    });
+                    $('#error-finish-task-form').html(html);
+                }else{
+                    status = 1;
+                }
+            }).fail(function () {
+                status = 1;
+            });
+
+            return status;
+        }
     </script>
     <script type="text/javascript" src="{{ URL::asset('js/helpers/render-calendar.js') }}"></script>
     <script>
