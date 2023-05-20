@@ -2169,16 +2169,12 @@
                                     return;
                                 }
 
-                                if (parsedAmount) {
-                                    bilans += parsedAmount;
-                                }
-
                                 if (parsedAmount < 0 && payment.operation_type !== "zwrot towaru") {
                                     totalOfReturns -= parsedAmount ?? parsedDeclaredAmount;
                                 } else if (parsedAmount) {
                                     totalOfPayments += parsedAmount;
                                 } else if (!parsedAmount && parsedDeclaredAmount > 0) {
-                                    totalOfDeclaredPayments += parsedDeclaredAmount;
+                                    totalOfDeclaredPayments += status === 'Rozliczona deklarowana' ? parsedDeclaredAmount : 0;
 
                                     if (status === 'Rozliczona deklarowana') {
                                         settledDeclared.push(parsedDeclaredAmount);
@@ -2186,11 +2182,16 @@
                                 }
                             });
 
+                            bilans = row['values_data']['sum_of_gross_values'] + totalOfReturns + totalOfDeclaredPayments;
+                            let offerFinanceBilans = row['values_data']['sum_of_gross_values'] - bilans + returnedValue;
+
+                            text += `<p> WZ: ${row['values_data']['sum_of_gross_values']} </p>`
                             text += `<p> Z: ${totalOfPayments} </p>`;
                             text += `<p> ZW: ${totalOfReturns} </p>`;
                             text += `<p> D: ${totalOfDeclaredPayments} </p>`
-                            text += `<p> BI: ${bilans} </p>`;
                             text += `<p> ZT: ${returnedValue} </p>`
+                            text += `<p> BIF: ${bilans} </p>`;
+                            text += `<p> CBO: ${offerFinanceBilans} </p>`
 
                             settledDeclared.forEach((amount) => {
                                 text += `<p> ZD: ${amount} </p>`;
