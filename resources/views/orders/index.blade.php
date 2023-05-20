@@ -2169,7 +2169,7 @@
                                     return;
                                 }
 
-                                if (parsedAmount < 0 && payment.operation_type !== "zwrot towaru") {
+                                if (parsedAmount < 0 && payment.operation_type !== "Zwrot towaru") {
                                     totalOfReturns -= parsedAmount ?? parsedDeclaredAmount;
                                 } else if (parsedAmount) {
                                     totalOfPayments += parsedAmount;
