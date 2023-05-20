@@ -2174,7 +2174,7 @@
                                 } else if (parsedAmount) {
                                     totalOfPayments += parsedAmount;
                                 } else if (!parsedAmount && parsedDeclaredAmount > 0) {
-                                    totalOfDeclaredPayments += status === 'Rozliczona deklarowana' ? parsedDeclaredAmount : 0;
+                                    totalOfDeclaredPayments += status === 'Rozliczona deklarowana' ? 0 : parsedDeclaredAmount;
 
                                     if (status === 'Rozliczona deklarowana') {
                                         settledDeclared.push(parsedDeclaredAmount);
