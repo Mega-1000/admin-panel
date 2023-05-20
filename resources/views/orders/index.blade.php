@@ -2017,7 +2017,7 @@
                                     bilans += parsedAmount;
                                 }
 
-                                if (parsedAmount < 0) {
+                                if (parsedAmount < 0 || payment.operation_type !== "zwrot towaru") {
                                     totalOfReturns -= parsedAmount;
                                 } else if (parsedAmount) {
                                     totalOfPayments += parsedAmount;

@@ -52,7 +52,7 @@
             @endif
             <div class="form-group">
                 <label for="promise_date">@lang('order_payments.form.promise_date')</label><br/>
-                <input type="datetime" id="promise_date" name="promise_date" value="{{ Carbon\Carbon::now() }}" class="form-control default-date-picker-now">
+                <input type="datetime-local" id="promise_date" name="promise_date"  class="form-control">
             </div>
             <div class="form-group">
                 Płatnik
