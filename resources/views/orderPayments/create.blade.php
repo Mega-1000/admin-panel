@@ -52,7 +52,7 @@
             @endif
             <div class="form-group">
                 <label for="promise_date">@lang('order_payments.form.promise_date')</label><br/>
-                <input type="datetime-local" id="promise_date" name="promise_date"  class="form-control">
+                <input type="datetime-local" id="promise_date" name="promise_date" class="form-control">
             </div>
             <div class="form-group">
                 Płatnik
