@@ -1288,21 +1288,21 @@
             <tr>
                 <th></th>
                 <th>ID</th>
+                <th>@lang('order_payments.table.status')</th>
                 <th>@lang('order_payments.table.order_id')</th>
+                <th>@lang('order_payments.table.payer')</th>
+                <th>@lang('order_payments.table.operation_type')</th>
                 <th>@lang('order_payments.table.amount')</th>
-                <th>@lang('order_payments.table.notices')</th>
+                <th>@lang('order_payments.table.declared_sum')</th>
                 <th>@lang('order_payments.table.promise')</th>
                 <th>@lang('order_payments.table.promise_date')</th>
-                <th>@lang('order_payments.table.created_at')</th>
-                <th>@lang('order_payments.table.external_payment_id')</th>
-                <th>@lang('order_payments.table.payer')</th>
                 <th>@lang('order_payments.table.operation_date')</th>
+                <th>@lang('order_payments.table.external_payment_id')</th>
+                <th>@lang('order_payments.table.notices')</th>
                 <th>@lang('order_payments.table.tracking_number')</th>
-                <th>@lang('order_payments.table.declared_sum')</th>
-                <th>@lang('order_payments.table.operation_type')</th>
-                <th>@lang('order_payments.table.status')</th>
                 <th>@lang('order_payments.table.comments')</th>
                 <th>@lang('order_payments.table.freight_bill_status_local')</th>
+                <th>@lang('order_payments.table.created_at')</th>
                 <th>@lang('order_payments.table.actions')</th>
             </tr>
             </thead>
@@ -3207,16 +3207,28 @@
                     name: 'id'
                 },
                 {
+                    data: 'status',
+                    name: 'status',
+                },
+                {
                     data: 'order_id',
                     name: 'order_id'
+                },
+                {
+                    data: 'payer',
+                    name: 'payer',
+                },
+                {
+                    data: 'operation_type',
+                    name: 'operation_type',
                 },
                 {
                     data: 'amount',
                     name: 'amount'
                 },
                 {
-                    data: 'notices',
-                    name: 'notices'
+                    data: 'declared_sum',
+                    name: 'declared_sum',
                 },
                 {
                     data: 'promise',
@@ -3235,36 +3247,20 @@
                     name: 'promise_date'
                 },
                 {
-                    data: 'created_at',
-                    name: 'created_at'
+                    data: 'operation_date',
+                    name: 'operation_date',
                 },
                 {
                     data: 'external_payment_id',
                     name: 'external_payment_id',
                 },
                 {
-                    data: 'payer',
-                    name: 'payer',
-                },
-                {
-                    data: 'operation_date',
-                    name: 'operation_date',
+                    data: 'notices',
+                    name: 'notices'
                 },
                 {
                     data: 'tracking_number',
                     name: 'tracking_number',
-                },
-                {
-                    data: 'declared_sum',
-                    name: 'declared_sum',
-                },
-                {
-                    data: 'operation_type',
-                    name: 'operation_type',
-                },
-                {
-                    data: 'status',
-                    name: 'status',
                 },
                 {
                     data: 'comments',
@@ -3276,6 +3272,10 @@
                     render: function (id, type, row) {
                         return row?.order_package?.status ?? '';
                     }
+                },
+                {
+                    data: 'created_at',
+                    name: 'created_at'
                 },
                 {
                     data: 'id',
