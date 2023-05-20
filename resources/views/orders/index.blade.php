@@ -2157,23 +2157,23 @@
                             let returnedValue = 0;
 
                             payments.forEach(payment => {
-                                if (payment.operation_type === "zwrot towaru") {
-                                    returnedValue += parseFloat(payment.amount);
+                                const { amount, declared_sum, status } = payment;
+                                const parsedAmount = parseFloat(amount);
+                                const parsedDeclaredAmount = parseFloat(declared_sum);
+
+                                if (payment.operation_type === "Zwrot towaru") {
+                                    returnedValue += parsedAmount;
                                 }
 
                                 if (payment.deleted_at !== null) {
                                     return;
                                 }
 
-                                const { amount, declared_sum, status } = payment;
-                                const parsedAmount = parseFloat(amount);
-                                const parsedDeclaredAmount = parseFloat(declared_sum);
-
                                 if (parsedAmount) {
                                     bilans += parsedAmount;
                                 }
 
-                                if (parsedAmount < 0 || payment.operation_type !== "zwrot towaru") {
+                                if (parsedAmount < 0 && payment.operation_type !== "zwrot towaru") {
                                     totalOfReturns -= parsedAmount ?? parsedDeclaredAmount;
                                 } else if (parsedAmount) {
                                     totalOfPayments += parsedAmount;
